@@ -1,4 +1,4 @@
-description: 'March VI strairs-down gait with HAA, ADPF, HFE and KFE movements.'
+description: March VI strairs-down gait with HAA, ADPF, HFE and KFE movements.
 duration: 4000000000
 gait_type: stairs_like
 joints:

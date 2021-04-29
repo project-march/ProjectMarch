@@ -279,11 +279,11 @@ positions:
   stand:
     gait_type: walk_like
     joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: -0.0873
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: 0.0
       left_knee: 0.0
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: -0.0873
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: 0.0
       right_knee: 0.0

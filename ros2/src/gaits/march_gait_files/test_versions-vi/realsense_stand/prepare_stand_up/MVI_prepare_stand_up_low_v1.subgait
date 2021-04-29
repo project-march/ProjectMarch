@@ -1,4 +1,5 @@
-description: Move to a position from where once can comfortably stand up from a chair of 35 cm.
+description: Move to a position from where once can comfortably stand up from a chair
+  of 35 cm.
 duration: 1000000000
 gait_type: sit_like
 joints:

@@ -6,16 +6,16 @@ joints:
   - position: 0.04363323
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_fe:
   - position: 1.22173048
     time_from_start: 0
@@ -29,9 +29,9 @@ joints:
   - position: 0.08726646
     time_from_start: 2000000000
     velocity: 0.0
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   left_knee:
   - position: 1.0472
     time_from_start: 0
@@ -44,7 +44,7 @@ joints:
     velocity: -0.0
   - position: 0.0
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   right_ankle:
   - position: -0.15707963
     time_from_start: 0
@@ -55,9 +55,9 @@ joints:
   - position: 0.04363323
     time_from_start: 2000000000
     velocity: -0.0
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   right_hip_aa:
   - position: 0.0
     time_from_start: 0
@@ -68,9 +68,9 @@ joints:
   - position: -0.03490659
     time_from_start: 2000000000
     velocity: 0.17453293
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   right_hip_fe:
   - position: 0.08726646
     time_from_start: 0
@@ -81,9 +81,9 @@ joints:
   - position: 0.08726646
     time_from_start: 2000000000
     velocity: 0.0
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
   right_knee:
   - position: 0.2443
     time_from_start: 0
@@ -93,6 +93,6 @@ joints:
     velocity: -0.08726646
   - position: 0.0
     time_from_start: 2750000000
-    velocity: -0.0
+    velocity: 0.0
 name: left_close
 version: MVI_stairsdown_leftclose_haa_adpf_v3
