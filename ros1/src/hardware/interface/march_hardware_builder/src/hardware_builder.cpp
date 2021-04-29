@@ -80,11 +80,10 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     // Read if name from parameter server or from yaml config if it is an empty
     // string
     std::string if_name;
-    ros::param::get("/march/hardware_interface/if_name", if_name);
+    ros::param::get("if_name", if_name);
     if (if_name == "") {
         if_name = config["if_name"].as<std::string>();
     }
-    ROS_INFO_STREAM("IFNAME: " << if_name);
 
     const auto cycle_time = config["ecatCycleTime"].as<int>();
     const auto slave_timeout = config["ecatSlaveTimeout"].as<int>();
