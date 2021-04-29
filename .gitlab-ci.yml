@@ -125,10 +125,11 @@ container:build:
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
     - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
-  rules:
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - Dockerfile
+  only:
+    refs:
+      - branches
+    changes:
+      - "Dockerfile"
 
 #################
 # flake8 linter #
