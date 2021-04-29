@@ -23,26 +23,13 @@ setup(
             os.path.join("share", package_name, "launch"),
             glob(os.path.join("launch", "*.launch.py")),
         ),
-        # (os.path.join("share", package_name), ["plugin.xml"]),
-        # (
-        #     os.path.join("share", package_name),
-        #     [os.path.join("resource", "gait_selection.ui")],
-        # ),
-        # (
-        #     os.path.join("share", package_name),
-        #     [os.path.join("resource", "parametric_pop_up.ui")],
-        # ),
-        # (
-        #     os.path.join("share", package_name, "resource", "img"),
-        #     glob(os.path.join("resource", "img", "*.png")),
-        # ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
     maintainer="Project March",
     maintainer_email="software@projectmarch.nl",
-    description="An RQT plugin for changing the gait version during runtime.",
-    license="TODO: License declaration",
+    description="A ROS2 node that listens to the model predictive controller, and publishes it to a local network.",
+    license="GPLv3",
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
