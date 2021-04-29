@@ -49,6 +49,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     should_publish = false;
 }
 
+// Sets the new publish mode and, if relevant, the requested pointcloud file name
 bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
@@ -62,7 +63,8 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     return true;
 }
 
-void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
+// Sets the right cloud as the pointcloud to publish based on the file name
+void RealsenseTestPublisher::loadPointcloudToFromFilename()
 {
     mirrorZCoordinate();
     pointcloud_to_publish = boost::make_shared<PointCloud>();
@@ -76,6 +78,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     }
 }
 
+// Publishes the pointcloud with the requested file name
 bool RealsenseTestPublisher::publishCustomPointcloud(
     std::string pointcloud_file_name)
 {
@@ -92,6 +95,7 @@ bool RealsenseTestPublisher::publishCustomPointcloud(
     return true;
 }
 
+// Publish the current pointcloud to publish
 void RealsenseTestPublisher::publishTestCloud(
     const ros::TimerEvent& timer_event)
 {
@@ -114,12 +118,14 @@ std::string RealsenseTestPublisher::getFileNamesString()
     return file_names_string;
 }
 
+// Publishes the first pointcloud in the dataset directory
 void RealsenseTestPublisher::startPublishingPointclouds()
 {
     pointcloud_file_name = file_names[0];
     loadPointcloudToPublishFromFilename();
 }
 
+// Publishes the next pointcloud in the dataset directory
 void RealsenseTestPublisher::publishNextPointcloud()
 {
     // If already publishing, find the next pointcloud and publish that
@@ -147,6 +153,7 @@ void RealsenseTestPublisher::publishNextPointcloud()
     }
 }
 
+// Publish the right pointcloud based on the latest service call
 void RealsenseTestPublisher::updatePublishLoop(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
@@ -191,6 +198,9 @@ void RealsenseTestPublisher::updatePublishLoop(
     }
 }
 
+// flips the sign of the z coordinates of the cloud, necessary because of a
+// weird inconsistency between the coordinate systems in the realsense
+// viewer and the .ply files
 void RealsenseTestPublisher::mirrorZCoordinate()
 {
     for (size_t i = 0; i < pointcloud_to_publish->size(); ++i) {

@@ -19,22 +19,25 @@ public:
     // Setup realsense reader with given node handle.
     RealsenseTestPublisher(ros::NodeHandle* n);
 
-    // Publish a pointcloud on a timer
+    // Publish the current pointcloud to publish
     void publishTestCloud(const ros::TimerEvent& timer_event);
 
 private:
     // Creates a string of all the valid file names separated by an end line
     std::string getFileNamesString();
 
-    // Publishes the right pointcloud on the right topic
+    // Sets the new publish mode and, if relevant, the requested pointcloud file name
     bool publishTestDatasetCallback(
         march_shared_msgs::PublishTestDataset::Request& req,
         march_shared_msgs::PublishTestDataset::Response& res);
 
+    // Sets the right cloud as the pointcloud to publish based on the file name
+    void loadPointcloudToPublishFromFilename();
+
     // Publishes the first pointcloud in the dataset directory
     void startPublishingPointclouds();
 
-    // Publishes the next pointcloud in the statset directory
+    // Publishes the next pointcloud in the dataset directory
     void publishNextPointcloud();
 
     // Publishes the pointcloud with the requested file name
