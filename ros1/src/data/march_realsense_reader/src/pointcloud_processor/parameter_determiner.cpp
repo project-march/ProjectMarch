@@ -496,7 +496,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
             ground_point, potential_foot_locations_of_point);
 
         if (potential_foot_locations_of_point->points.size() != 0) {
-            PointNormalCloud::iterator result
+            auto result
                 = std::max_element(potential_foot_locations_of_point->begin(),
                     potential_foot_locations_of_point->end(),
                     linear_algebra_utilities::pointIsLower);
