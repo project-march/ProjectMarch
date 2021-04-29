@@ -189,6 +189,6 @@ void RealsenseTestPublisher::updatePublishLoop(
 void RealsenseTestPublisher::mirrorXCoordinate(PointCloud::Ptr pointcloud)
 {
     for (pcl::PointXYZ point : *pointcloud) {
-        point.x = -point.x;
+        point.z = -point.z;
     }
 }
