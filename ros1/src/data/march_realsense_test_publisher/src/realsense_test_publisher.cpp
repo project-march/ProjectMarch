@@ -1,8 +1,8 @@
 #include <filesystem>
 #include <iostream>
-#include <march_shared_msgs/PublishTestDataset.h>
-#include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/io/ply_io.h>
+#include <march_shared_msgs/GetGaitParameters.h>
+#include <march_shared_msgs/PublishTestDataset.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <realsense_test_publisher.h>
@@ -49,8 +49,8 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     test_cloud_publisher
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
-    process_pointcloud_publisher
-        = n_->advertise<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_TOPIC, /*queue_size=*/1);
+    process_pointcloud_service_client
+        = n_->serviceClient<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_TOPIC);
 
     should_publish = false;
 }
@@ -71,7 +71,7 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 }
 
 // Sets the right cloud as the pointcloud to publish based on the file name
-void RealsenseTestPublisher::loadPointcloudToFromFilename()
+void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 {
     mirrorZCoordinate();
     pointcloud_to_publish = boost::make_shared<PointCloud>();
@@ -230,5 +230,5 @@ void RealsenseTestPublisher::makeProcessPointcloudCall() {
     service.request.selected_gait = 0;
     service.request.frame_id_to_transform_to = "foot_left";
     service.request.camera_to_use = 2;
-    process_pointcloud_publisher.publish(service);
+    process_pointcloud_service_client.call(service);
 }
