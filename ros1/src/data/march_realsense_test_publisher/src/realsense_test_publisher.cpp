@@ -67,8 +67,10 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     mirrorZCoordinate();
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     if (pcl::io::loadPLYFile<pcl::PointXYZ>(
-            data_path.string() + pointcloud_file_name, *pointcloud_to_publish) == -1) {
-        ROS_WARN_STREAM("Couldn't find file from path " << data_path.string() + pointcloud_file_name);
+            data_path.string() + pointcloud_file_name, *pointcloud_to_publish)
+        == -1) {
+        ROS_WARN_STREAM("Couldn't find file from path "
+            << data_path.string() + pointcloud_file_name);
     } else {
         ROS_DEBUG_STREAM("File loaded.");
     }
@@ -131,8 +133,9 @@ void RealsenseTestPublisher::publishNextPointcloud()
         // the old name is the last in the list, set the new name to the first
         // in the list
         if (filename_iterator == file_names.end()) {
-            ROS_WARN_STREAM("The old pointcloud file name could not be found in "
-                            "the file name vector. Unable to find next pointcloud.");
+            ROS_WARN_STREAM(
+                "The old pointcloud file name could not be found in "
+                "the file name vector. Unable to find next pointcloud.");
         } else if (filename_iterator == file_names.end() - 1) {
             pointcloud_file_name = file_names[0];
         } else {

@@ -44,7 +44,9 @@ private:
     void updatePublishLoop(
         march_shared_msgs::PublishTestDataset::Response& res);
 
-    // flips the sign of the z coordinates of the cloud, necessary because of a weird inconsistency between the coordinate systems in the realsense viewer and the .ply files 
+    // flips the sign of the z coordinates of the cloud, necessary because of a
+    // weird inconsistency between the coordinate systems in the realsense
+    // viewer and the .ply files
     void mirrorZCoordinate();
 
     ros::NodeHandle* n_;
