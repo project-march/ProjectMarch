@@ -58,6 +58,7 @@ private:
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
+    rps::Publisher process_pointcloud_publisher;
 
     std::vector<std::string> file_names;
     path data_path;
@@ -67,6 +68,7 @@ private:
     SelectedMode selected_mode;
     bool should_publish;
     bool no_files_present;
+    bool use_front_camera;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H

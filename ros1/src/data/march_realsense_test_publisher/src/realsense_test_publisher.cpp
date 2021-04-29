@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <march_shared_msgs/PublishTestDataset.h>
+#include <march_shared_msgs/GetGaitParameters.srv>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -14,6 +15,7 @@ using namespace std::filesystem;
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID_FRONT = "camera_front_depth_optical_frame";
 std::string CAMERA_FRAME_ID_BACK = "camera_back_depth_optimal_frame";
+std::string PROCESS_POINTCLOUD_TOPIC = "/camera/process_pointcloud";
 std::string POINTCLOUD_EXTENSION = ".ply";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
@@ -46,6 +48,9 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 
     test_cloud_publisher
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
+
+    process_pointcloud_publisher
+        = n_->advertise<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_TOPIC, 1);
 
     should_publish = false;
 }
@@ -102,7 +107,11 @@ void RealsenseTestPublisher::publishTestCloud(
     const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
-        pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
+        if (use_front_camera) {
+            pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
+        } else {
+            pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_BACK;
+        }
         pcl_conversions::toPCL(
             ros::Time::now(), pointcloud_to_publish->header.stamp);
         test_cloud_publisher.publish(pointcloud_to_publish);
@@ -217,5 +226,8 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 
 // Calls on the realsense reader to process a pointcloud from the test topic
 void makeProcessPointcloudCall() {
-
+    march_shared_msgs::GetGaitParameters service;
+    service.selected_gait = 0;
+    service.frame_id_to_transform_to = "foot_left";
+    process_pointcloud_publisher.publish(service);
 }
