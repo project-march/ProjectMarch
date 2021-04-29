@@ -7,10 +7,10 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -20.0
+  - position: -10.0
     time_from_start: 2000000000
     velocity: 0.0
-  - position: 20.0
+  - position: 10.0
     time_from_start: 6000000000
     velocity: 0.0
   - position: 0.0

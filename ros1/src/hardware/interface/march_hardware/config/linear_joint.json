@@ -5,12 +5,12 @@
     "value":10.0
   },
   {
-    "name":"encoder_manager.encoder2.config.cpr",
+    "name":"axis1.encoder.config.cpr",
     "type":"int32",
     "value":8192
   },
   {
-    "name":"encoder_manager.encoder2.config.use_index",
+    "name":"axis1.encoder.config.use_index",
     "type":"bool",
     "value":1
   },
@@ -43,10 +43,5 @@
     "name": "axis1.controller.config.vel_limit",
     "type": "float",
     "value": 50.0
-  },
-  {
-    "name": "encoder_manager.encoder_processor2.use_axis",
-    "type": "bool",
-    "value": 1
   }
 ]

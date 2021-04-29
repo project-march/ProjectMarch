@@ -49,9 +49,15 @@ if(NOT acado-solver_POPULATED)
     fetchcontent_populate(acado-solver)
 endif()
 
-# Define a variable that points to the location of the ACADO. This
+# Choose which model to use
+# Models:   test_joint_rotational,
+#           test_joint_linear
+set(MODEL_NAME test_joint_rotational)
+
+# Define a variable that points to the location of the chosen ACADO model_export directory. This
 # location is chosen by FetchContent_Declare.
-set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src/mpc_export")
+set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src/models/${MODEL_NAME}/model_export")
+
 
 # Create a list of all source files in the ACADO directory and store it
 # in ACADO_SRCS.
