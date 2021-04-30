@@ -101,7 +101,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 bool RealsenseTestPublisher::publishCustomPointcloud(
     std::string pointcloud_file_name)
 {
-    std::vector<std::string>::iterator filename_iterator
+    auto filename_iterator
         = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
     if (filename_iterator == file_names.end()) {
         ROS_WARN_STREAM("the given file name " << pointcloud_file_name
@@ -150,7 +150,7 @@ void RealsenseTestPublisher::publishNextPointcloud()
     // Otherwise, start publishing
     if (should_publish) {
         // find the current pointcloud filename
-        std::vector<std::string>::iterator filename_iterator = std::find(
+        auto filename_iterator = std::find(
             file_names.begin(), file_names.end(), pointcloud_file_name);
 
         // Set the current pointcloud file name to the next name in the list, if
