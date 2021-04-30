@@ -61,7 +61,7 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
     selected_mode = (SelectedMode)req.selected_mode;
-    use_front_camera = req.use_front_camera;
+    use_back_camera = req.use_back_camera;
     // Only update the pointcloud file name from the service if it is relevant
     if (selected_mode == SelectedMode::custom) {
         pointcloud_file_name = req.pointcloud_file_name;
@@ -107,10 +107,10 @@ void RealsenseTestPublisher::publishTestCloud(
     const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
-        if (use_front_camera) {
-            pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
-        } else {
+        if (use_back_camera) {
             pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_BACK;
+        } else {
+            pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
         }
         pcl_conversions::toPCL(
             ros::Time::now(), pointcloud_to_publish->header.stamp);

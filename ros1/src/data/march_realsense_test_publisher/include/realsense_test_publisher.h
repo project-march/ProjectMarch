@@ -68,7 +68,7 @@ private:
     SelectedMode selected_mode;
     bool should_publish;
     bool no_files_present;
-    bool use_front_camera;
+    bool use_back_camera;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H
