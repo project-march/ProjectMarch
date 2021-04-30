@@ -1,15 +1,15 @@
 #include <filesystem>
 #include <iostream>
-#include <pcl/io/ply_io.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <march_shared_msgs/PublishTestDataset.h>
-#include <utilities/realsense_gait_utilities.h>
+#include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <realsense_test_publisher.h>
 #include <ros/package.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
+#include <utilities/realsense_gait_utilities.h>
 
 using namespace std::filesystem;
 
@@ -51,12 +51,15 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
     process_pointcloud_service_client
-        = n_->serviceClient<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_TOPIC);
+        = n_->serviceClient<march_shared_msgs::GetGaitParameters>(
+            PROCESS_POINTCLOUD_TOPIC);
 
     should_publish = false;
 }
 
-// Sets the new publish mode, the camera position in which the pointcloud has been created, the arguments for the process call and, if relevant, the requested pointcloud file name
+// Sets the new publish mode, the camera position in which the pointcloud has
+// been created, the arguments for the process call and, if relevant, the
+// requested pointcloud file name
 bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
@@ -229,7 +232,8 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 }
 
 // Calls on the realsense reader to process a pointcloud from the test topic
-void RealsenseTestPublisher::makeProcessPointcloudCall() {
+void RealsenseTestPublisher::makeProcessPointcloudCall()
+{
     march_shared_msgs::GetGaitParameters service;
     service.request.selected_gait = 0;
     service.request.frame_id_to_transform_to = "foot_left";

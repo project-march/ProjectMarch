@@ -27,7 +27,9 @@ private:
     // Creates a string of all the valid file names separated by an end line
     std::string getFileNamesString();
 
-    // Sets the new publish mode and, if relevant, the requested pointcloud file name
+    // Sets the new publish mode, the camera position in which the pointcloud has
+    // been created, the arguments for the process call and, if relevant, the
+    // requested pointcloud file name
     bool publishTestDatasetCallback(
         march_shared_msgs::PublishTestDataset::Request& req,
         march_shared_msgs::PublishTestDataset::Response& res);
