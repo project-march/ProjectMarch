@@ -138,6 +138,15 @@ protected:
     // of the end points it is
     bool getGaitParametersFromFootLocation();
 
+    // Verify if there is support for the entire foot around the possible foot
+    // location
+    bool entireFootCanBePlaced(pcl::PointNormal possible_foot_location);
+
+    // Fill a point cloud with vertices of the foot on the ground around a
+    // possible foot location
+    void fillFootPointCloud(PointCloud2D::Ptr foot_pointcloud,
+        pcl::PointNormal possible_foot_location);
+
     // Verify that a possible foot location is valid for the requested gait
     bool isValidLocation(pcl::PointNormal possible_foot_location);
 
@@ -158,7 +167,7 @@ protected:
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
 
-    // Read all relevant parameters
+    // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
     float min_x_stairs {};
@@ -166,13 +175,17 @@ protected:
     float min_z_stairs {};
     float max_z_stairs {};
     float y_location {};
-    double x_flat {};
-    double z_flat {};
-    double x_steep {};
-    double z_steep {};
+    float foot_length_back {};
+    float foot_length_front {};
+    float foot_width {};
+    float max_allowed_z_deviation_foot {};
+    float x_flat {};
+    float z_flat {};
+    float x_steep {};
+    float z_steep {};
     float min_search_area {};
     float max_search_area {};
-    double max_distance_to_line {};
+    float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
 
