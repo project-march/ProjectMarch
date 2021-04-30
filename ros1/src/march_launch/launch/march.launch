@@ -27,6 +27,8 @@
     <arg name="input_device" default="false" doc="Launches ros serial node to connect with input device."/>
     <arg name="wireless" default="false" doc="Enables wireless connection to the input device."/>
     <arg name="hardware_interface" default="true" doc="Launches the hardware interface when config is 'exoskeleton."/>
+    <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
+                                        If not provided, then the value is read from the robot .yaml file."/>
 
 <!-- Data                       -->
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
@@ -67,6 +69,7 @@
             <arg name="robot" value="$(arg robot)"/>
             <arg name="robot_description" value="$(arg robot_description)"/>
             <arg name="controller_name" value="$(arg controller_name)"/>
+            <arg name="if_name" value="$(arg if_name)"/>
         </include>
     </group>
 

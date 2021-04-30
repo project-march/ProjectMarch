@@ -1,4 +1,5 @@
-description: Move to the position in which Sjaan was comfortable sitting for a chair of 35cm.
+description: Move to the position in which Sjaan was comfortable sitting for a chair
+  of 35cm.
 duration: 1000000000
 gait_type: sit_like
 joints:
