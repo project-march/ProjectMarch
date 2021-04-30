@@ -87,9 +87,14 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
         == -1) {
         ROS_WARN_STREAM("Couldn't find file from path "
             << data_path.string() + pointcloud_file_name);
-    } else {
-        ROS_DEBUG_STREAM("File loaded.");
+        return;
     }
+    if (from_back_camera) {
+        pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_BACK;
+    } else {
+        pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
+    }
+    ROS_DEBUG_STREAM("File loaded.");
 }
 
 // Publishes the pointcloud with the requested file name
@@ -114,12 +119,7 @@ void RealsenseTestPublisher::publishTestCloud(
     const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
-        if (from_back_camera) {
-            pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_BACK;
-        } else {
-            pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
-        }
-        pcl_conversions::toPCL(
+        fpcl_conversions::toPCL(
             ros::Time::now(), pointcloud_to_publish->header.stamp);
         test_cloud_publisher.publish(pointcloud_to_publish);
     }
@@ -235,8 +235,14 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 void RealsenseTestPublisher::makeProcessPointcloudCall()
 {
     march_shared_msgs::GetGaitParameters service;
-    service.request.selected_gait = 0;
-    service.request.frame_id_to_transform_to = "foot_left";
+    service.request.selected_gait = selected_gait;
+    // Use foot_right as the default value as most gaits start with right open
+    if (frame_id_to_transform_to != "") {
+        service.request.frame_id_to_transform_to = frame_id_to_transform_to;
+    } else {
+        service.request.frame_id_to_transform_to = "foot_right";
+    }
+    // The image always comes from simulated camera topic (enum value 2)
     service.request.camera_to_use = 2;
     process_pointcloud_service_client.call(service);
 }
