@@ -95,7 +95,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     }
     mirrorZCoordinate();
 
-    ROS_DEBUG_STREAM("File loaded.");
+    ROS_DEBUG_STREAM("File loaded with name " << pointcloud_file_name << ".");
 }
 
 // Publishes the pointcloud with the requested file name
