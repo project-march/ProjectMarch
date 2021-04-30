@@ -237,7 +237,8 @@ void RealsenseTestPublisher::makeProcessPointcloudCall()
     if (should_process) {
         march_shared_msgs::GetGaitParameters service;
         service.request.selected_gait = selected_gait;
-        // Use foot_right as the default value as most gaits start with right open
+        // Use foot_right as the default value as most gaits start with right
+        // open
         if (frame_id_to_transform_to != "") {
             service.request.frame_id_to_transform_to = frame_id_to_transform_to;
         } else {
