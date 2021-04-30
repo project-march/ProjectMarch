@@ -232,7 +232,8 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 }
 
 // Calls on the realsense reader to process a pointcloud from the test topic
-void RealsenseTestPublisher::makeProcessPointcloudCall()
+void RealsenseTestPublisher::makeProcessPointcloudCall(
+    const ros::TimerEvent& timer_event)
 {
     if (should_process) {
         march_shared_msgs::GetGaitParameters service;

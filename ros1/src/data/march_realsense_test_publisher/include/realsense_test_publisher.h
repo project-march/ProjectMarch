@@ -26,7 +26,7 @@ public:
 
     // Calls on the realsense reader to process a pointcloud from the test topic
     // is public to allow a timer call from the node
-    void makeProcessPointcloudCall();
+    void makeProcessPointcloudCall(const ros::TimerEvent& timer_event);
 
 private:
     // Creates a string of all the valid file names separated by an end line
