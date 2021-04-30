@@ -3,6 +3,7 @@
 #include <pcl/io/ply_io.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <march_shared_msgs/PublishTestDataset.h>
+#include <utilities/realsense_gait_utilities.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <realsense_test_publisher.h>

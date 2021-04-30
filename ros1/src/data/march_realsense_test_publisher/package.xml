@@ -16,6 +16,7 @@
   <build_export_depend>pcl_ros</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>march_shared_msgs</build_export_depend>
+  <depend>march_realsense_reader</depend>
   <exec_depend>pcl_conversions</exec_depend>
   <exec_depend>pcl_ros</exec_depend>
   <exec_depend>roscpp</exec_depend>
