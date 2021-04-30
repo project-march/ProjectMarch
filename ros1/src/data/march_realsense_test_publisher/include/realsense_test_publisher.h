@@ -21,7 +21,12 @@ public:
     RealsenseTestPublisher(ros::NodeHandle* n);
 
     // Publish the current pointcloud to publish
+    // is public to allow a timer call from the node
     void publishTestCloud(const ros::TimerEvent& timer_event);
+
+    // Calls on the realsense reader to process a pointcloud from the test topic
+    // is public to allow a timer call from the node
+    void makeProcessPointcloudCall();
 
 private:
     // Creates a string of all the valid file names separated by an end line
@@ -54,9 +59,6 @@ private:
     // weird inconsistency between the coordinate systems in the realsense
     // viewer and the .ply files
     void mirrorZCoordinate();
-
-    // Calls on the realsense reader to process a pointcloud from the test topic
-    void makeProcessPointcloudCall();
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
