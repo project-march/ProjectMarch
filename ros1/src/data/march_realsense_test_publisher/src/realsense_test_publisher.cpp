@@ -56,13 +56,16 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     should_publish = false;
 }
 
-// Sets the new publish mode and, if relevant, the requested pointcloud file name
+// Sets the new publish mode, the camera position in which the pointcloud has been created, the arguments for the process call and, if relevant, the requested pointcloud file name
 bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
 {
     selected_mode = (SelectedMode)req.selected_mode;
-    use_back_camera = req.use_back_camera;
+    selected_gait = (SelectedGait)req.selected_gait;
+    frame_id_to_transform_to = req.frame_id_to_transform_to;
+
+    from_back_camera = req.from_back_camera;
     // Only update the pointcloud file name from the service if it is relevant
     if (selected_mode == SelectedMode::custom) {
         pointcloud_file_name = req.pointcloud_file_name;
@@ -108,7 +111,7 @@ void RealsenseTestPublisher::publishTestCloud(
     const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
-        if (use_back_camera) {
+        if (from_back_camera) {
             pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_BACK;
         } else {
             pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;

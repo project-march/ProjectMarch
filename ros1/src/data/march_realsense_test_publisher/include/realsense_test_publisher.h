@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
+#include <utilities/realsense_gait_utilities.h>
 #include <vector>
 
 using namespace std::filesystem;
@@ -68,7 +69,9 @@ private:
     SelectedMode selected_mode;
     bool should_publish;
     bool no_files_present;
-    bool use_back_camera;
+    bool from_back_camera;
+    SelectedGait selected_gait;
+    std::string frame_id_to_transform_to;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H

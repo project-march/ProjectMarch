@@ -10,7 +10,7 @@ uint8 selected_mode
 string pointcloud_file_name
 
 # A bool indicating whether the imagine originated from the front or back camera
-bool use_back_camera
+bool from_back_camera
 
 # This enum is used for specifying the obstacle that should be dynamically
 # made with the RealSense camera. All supported obstacles should be
