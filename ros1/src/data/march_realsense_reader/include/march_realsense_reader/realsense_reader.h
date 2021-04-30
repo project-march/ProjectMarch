@@ -28,7 +28,7 @@ public:
      * gait parameters, these parameters are put into the response,
      * returns whether the processing was successful.
      */
-    bool processPointcloud(PointCloud::Ptr input_cloud,
+    bool processPointcloud(const PointCloud::Ptr& input_cloud,
         march_shared_msgs::GetGaitParameters::Response& res);
 
     /** A callback that starts the entire pointcloud processing when the
@@ -41,7 +41,7 @@ public:
     /** Pointcloud callback, empty since we are not processing all pointclouds,
      * this gives a speedup when you need a single pointcloud.
      */
-    void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
+    void pointcloudCallback(const sensor_msgs::PointCloud2& pointCloud2) {};
 
     void readConfigCb(
         march_realsense_reader::pointcloud_parametersConfig& config,
@@ -50,11 +50,13 @@ public:
     // Publishes the pointcloud on a topic for visualisation in rviz or furter
     // use
     template <typename T>
-    void publishCloud(ros::Publisher publisher, pcl::PointCloud<T> cloud);
+    void publishCloud(
+        const ros::Publisher& publisher, pcl::PointCloud<T> cloud);
 
     // Turn a HullVector into a marker with a list of points and publish for
     // visualization
-    void publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector);
+    void publishHullMarkerArray(
+        const boost::shared_ptr<HullVector>& hull_vector);
 
     // Create markers from the parameter determiner and publish them for
     // visualization
@@ -69,13 +71,13 @@ public:
     // Create a marker list from the 'foot locations to try' and publish it and
     // publish for visualization
     void fillFootLocationsToTryMarker(
-        PointCloud2D::Ptr const foot_locations_to_try,
+        PointCloud2D::Ptr const& foot_locations_to_try,
         visualization_msgs::Marker& marker_list);
 
     // Create a marker list from the 'foot locations to try' and publish it and
     // publish for visualization
     void fillPossibleFootLocationsMarker(
-        PointNormalCloud::Ptr const possible_foot_locations,
+        PointNormalCloud::Ptr const& possible_foot_locations,
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
 

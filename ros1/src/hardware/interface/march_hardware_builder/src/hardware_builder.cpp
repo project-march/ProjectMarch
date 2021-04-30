@@ -104,7 +104,8 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     const std::string& joint_name, const urdf::JointConstSharedPtr& urdf_joint,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
     if (!urdf_joint) {
@@ -143,7 +144,8 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
 
 std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
     const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     HardwareBuilder::validateRequiredKeysExist(config,
         HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
@@ -191,7 +193,8 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
             .append("/config/sw_files/" + urdf_joint->name + ".sw"));
     std::string setup = convertSWFileToString(imc_setup_data);
     return std::make_unique<march::IMotionCube>(
-        march::Slave(slave_index, pdo_interface, sdo_interface),
+        march::Slave(
+            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
         HardwareBuilder::createAbsoluteEncoder(
             absolute_encoder_config, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(incremental_encoder_config),
@@ -215,7 +218,9 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
     return std::make_unique<march::ODrive>(
-        march::Slave(slave_index, pdo_interface, sdo_interface), axis,
+        march::Slave(
+            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
+        axis,
         HardwareBuilder::createAbsoluteEncoder(
             absolute_encoder_config, urdf_joint),
         mode);
@@ -290,7 +295,9 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
     const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
     const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
     return std::make_unique<march::TemperatureGES>(
-        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
+        march::Slave(
+            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
+        byte_offset);
 }
 
 std::unique_ptr<march::PowerDistributionBoard>
@@ -331,7 +338,8 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
             boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
     return std::make_unique<march::PowerDistributionBoard>(
-        march::Slave(slave_index, pdo_interface, sdo_interface),
+        march::Slave(
+            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
         net_monitor_offsets, net_driver_offsets, boot_shutdown_offsets);
 }
 
@@ -357,8 +365,9 @@ void HardwareBuilder::initUrdf()
 }
 
 std::vector<march::Joint> HardwareBuilder::createJoints(
-    const YAML::Node& joints_config, march::PdoInterfacePtr pdo_interface,
-    march::SdoInterfacePtr sdo_interface) const
+    const YAML::Node& joints_config,
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface) const
 {
     std::vector<march::Joint> joints;
     for (const YAML::Node& joint_config : joints_config) {
@@ -393,7 +402,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
 
 std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(
     const YAML::Node& pressure_soles_config,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     std::vector<march::PressureSole> pressure_soles;
     if (!pressure_soles_config) {
@@ -419,8 +429,9 @@ march::PressureSole HardwareBuilder::createPressureSole(
     const auto byte_offset = pressure_sole_config["byteOffset"].as<int>();
     const auto side = pressure_sole_config["side"].as<std::string>();
     return march::PressureSole(
-        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset,
-        side);
+        march::Slave(
+            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
+        byte_offset, side);
 }
 
 std::string convertSWFileToString(std::ifstream& sw_file)

@@ -80,11 +80,12 @@ namespace error {
 
     class NotImplemented : public std::logic_error {
     public:
-        explicit NotImplemented(std::string function_name)
+        explicit NotImplemented(const std::string& function_name)
             : std::logic_error(
                 "Function " + function_name + " is not implemented") {};
 
-        NotImplemented(std::string function_name, std::string context)
+        NotImplemented(
+            const std::string& function_name, const std::string& context)
             : std::logic_error("Function " + function_name
                 + " is not implemented for " + context) {};
     };

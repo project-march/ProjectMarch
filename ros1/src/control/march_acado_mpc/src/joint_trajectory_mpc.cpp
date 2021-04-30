@@ -40,7 +40,7 @@ bool ModelPredictiveControllerInterface::init(
 
 // Retrieve the weights from the parameter server for a joint.
 std::vector<float> ModelPredictiveControllerInterface::getWeights(
-    std::string joint_name)
+    const std::string& joint_name)
 {
     // get path to controller parameters
     std::string parameter_path = "/march/controller/trajectory";

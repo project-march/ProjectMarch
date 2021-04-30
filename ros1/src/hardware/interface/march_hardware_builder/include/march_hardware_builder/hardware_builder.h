@@ -73,8 +73,8 @@ public:
     static march::Joint createJoint(const YAML::Node& joint_config,
         const std::string& joint_name,
         const urdf::JointConstSharedPtr& urdf_joint,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
         const YAML::Node& absolute_encoder_config,
         const urdf::JointConstSharedPtr& urdf_joint);
@@ -82,8 +82,8 @@ public:
         const YAML::Node& incremental_encoder_config);
     static std::unique_ptr<march::MotorController> createMotorController(
         const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::IMotionCube> createIMotionCube(
         const YAML::Node& imc_config, march::ActuationMode mode,
         const urdf::JointConstSharedPtr& urdf_joint,
@@ -106,8 +106,8 @@ public:
 
     static std::vector<march::PressureSole> createPressureSoles(
         const YAML::Node& pressure_soles_config,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static march::PressureSole createPressureSole(
         const YAML::Node& pressure_sole_config,
         march::PdoInterfacePtr pdo_interface,
@@ -138,8 +138,8 @@ private:
      * @return list of created joints
      */
     std::vector<march::Joint> createJoints(const YAML::Node& joints_config,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface) const;
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface) const;
 
     YAML::Node robot_config_;
     urdf::Model urdf_;

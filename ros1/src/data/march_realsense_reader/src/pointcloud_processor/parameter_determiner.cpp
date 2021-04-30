@@ -12,6 +12,7 @@
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
+#include <utility>
 
 #define EPSILON 0.0001
 
@@ -447,7 +448,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 // Create a point cloud with points on the ground where the points represent
 // where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(
-    PointCloud2D::Ptr foot_locations_to_try)
+    const PointCloud2D::Ptr& foot_locations_to_try)
 {
     bool success = true;
     foot_locations_to_try->points.resize(number_of_optional_foot_locations);
@@ -501,7 +502,8 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
  * the input_cloud has been moved to the output cloud,
  * result is set to true, it is set to false otherwise **/
 bool HullParameterDeterminer::cropCloudToHullVector(
-    PointCloud2D::Ptr const input_cloud, PointNormalCloud::Ptr output_cloud)
+    PointCloud2D::Ptr const& input_cloud,
+    const PointNormalCloud::Ptr& output_cloud)
 {
     if (input_cloud->points.size() == 0) {
         ROS_WARN_STREAM("cropCloudToHullVector method called with an input "
@@ -542,14 +544,15 @@ bool HullParameterDeterminer::cropPointToHullVector(
     PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
     input_cloud->push_back(input_point);
 
-    bool success = cropCloudToHullVector(input_cloud, output_cloud);
+    bool success = cropCloudToHullVector(input_cloud, std::move(output_cloud));
     return success;
 }
 
 // Crops a cloud to a hull vector, but only puts each input point in
 // the highest hull it falls into
 bool HullParameterDeterminer::cropCloudToHullVectorUnique(
-    PointCloud2D::Ptr const input_cloud, PointNormalCloud::Ptr output_cloud)
+    PointCloud2D::Ptr const& input_cloud,
+    const PointNormalCloud::Ptr& output_cloud)
 {
     bool success = true;
 
@@ -573,9 +576,9 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
 // of the hull
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
-    PointCloud2D::Ptr const input_cloud,
-    PlaneCoefficients::Ptr const plane_coefficients,
-    PointCloud::Ptr elevated_cloud)
+    PointCloud2D::Ptr const& input_cloud,
+    PlaneCoefficients::Ptr const& plane_coefficients,
+    const PointCloud::Ptr& elevated_cloud)
 {
     elevated_cloud->points.resize(input_cloud->points.size());
 
@@ -600,7 +603,8 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
 
 // Remove all points from a cloud which do not fall in the hull
 bool HullParameterDeterminer::cropCloudToHull(
-    PointCloud::Ptr elevated_cloud, const Hull::Ptr hull, const Polygon polygon)
+    const PointCloud::Ptr& elevated_cloud, const Hull::Ptr& hull,
+    const Polygon& polygon)
 {
     if (elevated_cloud->points.size() == 0) {
         ROS_WARN_STREAM("The cloud to be cropped in the "
@@ -619,9 +623,9 @@ bool HullParameterDeterminer::cropCloudToHull(
 // Add normals to the elevated cloud which correspond to the normal vector of
 // the plane
 bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
-    PointCloud::Ptr const elevated_cloud,
-    PlaneCoefficients::Ptr const plane_coefficients,
-    PointNormalCloud::Ptr elevated_cloud_with_normals)
+    PointCloud::Ptr const& elevated_cloud,
+    PlaneCoefficients::Ptr const& plane_coefficients,
+    const PointNormalCloud::Ptr& elevated_cloud_with_normals)
 {
     elevated_cloud_with_normals->width = elevated_cloud->width;
     elevated_cloud_with_normals->height = elevated_cloud->height;
