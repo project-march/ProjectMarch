@@ -1,4 +1,39 @@
-* @BasVolkers @ThijsRay @kschmahl
+# The software department will always be marked as a CODEOWNER.
+[Software department]
+* @BasVolkers @kschmahl @ThijsRay
 
-[Movement]
-/ros1/src/gaits/march_gait_files/ @floorheijs @wnederpel
+[Software license]
+LICENSE @ThijsRay @wnederpel
+LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel
+
+[CI/CD and Pipeline]
+.catkin_lint @ThijsRay
+.clang-format @ThijsRay
+.clang-format-ignore @ThijsRay
+.clang-tidy @ThijsRay
+.gitlab-ci.yml @ThijsRay
+Dockerfile @ThijsRay
+/.scripts/ @ThijsRay
+
+[C/C++]
+*.cpp @ThijsRay
+*.hpp @ThijsRay
+*.c @ThijsRay
+*.h @ThijsRay
+
+^[Movement]
+/ros1/src/gaits/ @floorheijs @wnederpel
+/ros2/src/gaits/ @floorheijs @wnederpel
+
+[Balance]
+/ros1/src/balance/ @kschmahl
+
+[Control]
+/ros1/src/control/ @MZZRD @Hvaneven @ttveen
+
+[Depth camera]
+/ros1/src/data/march_realsense_reader/ @kschmahl @ttveen @wnederpel
+
+[Data visualizations]
+/ros1/src/visualization/ @ttveen
+/ros2/src/visualization/ @ttveen
