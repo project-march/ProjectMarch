@@ -41,7 +41,8 @@ public:
     /** Pointcloud callback, empty since we are not processing all pointclouds,
      * this gives a speedup when you need a single pointcloud.
      */
-    void pointcloudCallback(const sensor_msgs::PointCloud2& pointCloud2) {};
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
+    void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
 
     void readConfigCb(
         march_realsense_reader::pointcloud_parametersConfig& config,
