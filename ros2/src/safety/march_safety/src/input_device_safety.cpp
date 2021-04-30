@@ -33,6 +33,7 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node,
     connection_timeout_
         = rclcpp::Duration(std::chrono::milliseconds(milliseconds));
 
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
     auto callback = [this](const AliveMsg::SharedPtr msg) {
         inputDeviceAliveCallback(msg);
     };

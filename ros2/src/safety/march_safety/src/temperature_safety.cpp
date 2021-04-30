@@ -162,6 +162,7 @@ void TemperatureSafety::createSubscribers()
         // Construct callback instead of using std::bind
         // https://github.com/ros2/rclcpp/issues/583#issuecomment-442146657
         auto callback
+            // NOLINTNEXTLINE(performance-unnecessary-value-param)
             = [this, joint_name](const TemperatureMsg::SharedPtr msg) {
                   temperatureCallback(msg, joint_name);
               };
