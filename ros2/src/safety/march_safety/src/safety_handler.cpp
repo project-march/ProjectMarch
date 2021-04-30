@@ -7,9 +7,10 @@
 #include <march_shared_msgs/msg/gait_instruction.hpp>
 
 #include <string>
+#include <utility>
 
 SafetyHandler::SafetyHandler(std::shared_ptr<SafetyNode> node)
-    : node_(node)
+    : node_(std::move(node))
 {
 }
 
