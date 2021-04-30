@@ -4,6 +4,7 @@
 #include <vector>
 
 float PUBLISH_FREQUENCY = 1.0 / 10.0; // seconds per frame
+float PROCESS_FREQUENCY = 1.0; // seconds between process calls
 
 int main(int argc, char** argv)
 {
@@ -15,6 +16,10 @@ int main(int argc, char** argv)
     ros::Timer timer_publish_pointcloud
         = n.createTimer(ros::Duration(PUBLISH_FREQUENCY),
             &RealsenseTestPublisher::publishTestCloud, &test_publisher);
+
+    ros::Timer timer_process_pointcloud
+            = n.createTimer(ros::Duration(PUBLISH_FREQUENCY),
+                            &RealsenseTestPublisher::makeProcessPointcloudCall, &test_publisher);
 
     ros::spin();
     ros::shutdown();

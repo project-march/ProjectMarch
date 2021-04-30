@@ -72,6 +72,7 @@ private:
     bool should_publish;
     bool no_files_present;
     bool from_back_camera;
+    bool should_process;
     SelectedGait selected_gait;
     std::string frame_id_to_transform_to;
 };

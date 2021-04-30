@@ -210,7 +210,7 @@ void RealsenseTestPublisher::updatePublishLoop(
             }
         }
         if (selected_mode != SelectedMode::end) {
-            makeProcessPointcloudCall();
+            should_process = true;
         }
         res.success = success;
     } else {
@@ -234,15 +234,20 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 // Calls on the realsense reader to process a pointcloud from the test topic
 void RealsenseTestPublisher::makeProcessPointcloudCall()
 {
-    march_shared_msgs::GetGaitParameters service;
-    service.request.selected_gait = selected_gait;
-    // Use foot_right as the default value as most gaits start with right open
-    if (frame_id_to_transform_to != "") {
-        service.request.frame_id_to_transform_to = frame_id_to_transform_to;
-    } else {
-        service.request.frame_id_to_transform_to = "foot_right";
+    if (should_process) {
+        march_shared_msgs::GetGaitParameters service;
+        service.request.selected_gait = selected_gait;
+        // Use foot_right as the default value as most gaits start with right open
+        if (frame_id_to_transform_to != "") {
+            service.request.frame_id_to_transform_to = frame_id_to_transform_to;
+        } else {
+            service.request.frame_id_to_transform_to = "foot_right";
+        }
+        // The image always comes from simulated camera topic (enum value 2)
+        service.request.camera_to_use = 2;
+        process_pointcloud_service_client.call(service);
+        // Only process the current point cloud once, should_process
+        // should be set to true when a new pointcloud can be processed
+        should_process = false;
     }
-    // The image always comes from simulated camera topic (enum value 2)
-    service.request.camera_to_use = 2;
-    process_pointcloud_service_client.call(service);
 }
