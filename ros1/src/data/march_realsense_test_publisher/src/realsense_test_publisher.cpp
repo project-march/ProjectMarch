@@ -80,7 +80,6 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 // Sets the right cloud as the pointcloud to publish based on the file name
 void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 {
-    mirrorZCoordinate();
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     if (pcl::io::loadPLYFile<pcl::PointXYZ>(
             data_path.string() + pointcloud_file_name, *pointcloud_to_publish)
@@ -94,6 +93,8 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     } else {
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
     }
+    mirrorZCoordinate();
+
     ROS_DEBUG_STREAM("File loaded.");
 }
 
@@ -109,7 +110,6 @@ bool RealsenseTestPublisher::publishCustomPointcloud(
                                                << getFileNamesString());
         return false;
     }
-
     loadPointcloudToPublishFromFilename();
     return true;
 }
