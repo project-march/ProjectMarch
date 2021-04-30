@@ -119,7 +119,7 @@ void RealsenseTestPublisher::publishTestCloud(
     const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
-        fpcl_conversions::toPCL(
+        pcl_conversions::toPCL(
             ros::Time::now(), pointcloud_to_publish->header.stamp);
         test_cloud_publisher.publish(pointcloud_to_publish);
     }
