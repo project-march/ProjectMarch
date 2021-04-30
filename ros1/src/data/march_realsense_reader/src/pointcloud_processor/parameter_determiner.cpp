@@ -409,18 +409,18 @@ void HullParameterDeterminer::fillFootPointCloud(
     // Deviation back is added as the forward direction of the exoskeleton
     // is the negative x direction in the simulation
     foot_pointcloud->points[0].x = possible_foot_location.x + foot_length_back;
-    foot_pointcloud->points[0].y = possible_foot_location.y - foot_width / 2.0f;
+    foot_pointcloud->points[0].y = possible_foot_location.y - foot_width / 2.0F;
 
     foot_pointcloud->points[1].x = possible_foot_location.x + foot_length_back;
-    foot_pointcloud->points[1].y = possible_foot_location.y + foot_width / 2.0f;
+    foot_pointcloud->points[1].y = possible_foot_location.y + foot_width / 2.0F;
 
     // Deviation front is subtracted as the forward direction of the exoskeleton
     // is the negative x direction in the simulation
     foot_pointcloud->points[2].x = possible_foot_location.x - foot_length_front;
-    foot_pointcloud->points[2].y = possible_foot_location.y - foot_width / 2.0f;
+    foot_pointcloud->points[2].y = possible_foot_location.y - foot_width / 2.0F;
 
     foot_pointcloud->points[3].x = possible_foot_location.x - foot_length_front;
-    foot_pointcloud->points[3].y = possible_foot_location.y + foot_width / 2.0f;
+    foot_pointcloud->points[3].y = possible_foot_location.y + foot_width / 2.0F;
 }
 
 // Compute the optimal foot location as if one were not limited by anything.
