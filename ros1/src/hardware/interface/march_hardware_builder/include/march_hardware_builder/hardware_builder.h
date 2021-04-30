@@ -87,22 +87,22 @@ public:
     static std::unique_ptr<march::IMotionCube> createIMotionCube(
         const YAML::Node& imc_config, march::ActuationMode mode,
         const urdf::JointConstSharedPtr& urdf_joint,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::ODrive> createODrive(
         const YAML::Node& odrive_config, march::ActuationMode mode,
         const urdf::JointConstSharedPtr& urdf_joint,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::TemperatureGES> createTemperatureGES(
         const YAML::Node& temperature_ges_config,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::PowerDistributionBoard>
     createPowerDistributionBoard(
         const YAML::Node& power_distribution_board_config,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
 
     static std::vector<march::PressureSole> createPressureSoles(
         const YAML::Node& pressure_soles_config,
@@ -110,8 +110,8 @@ public:
         const march::SdoInterfacePtr& sdo_interface);
     static march::PressureSole createPressureSole(
         const YAML::Node& pressure_sole_config,
-        march::PdoInterfacePtr pdo_interface,
-        march::SdoInterfacePtr sdo_interface);
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;

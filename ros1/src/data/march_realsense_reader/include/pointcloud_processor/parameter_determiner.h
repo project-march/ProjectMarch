@@ -110,8 +110,8 @@ protected:
         const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a single point to a hull vector.
-    bool cropPointToHullVector(
-        pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud);
+    bool cropPointToHullVector(pcl::PointXY const input_point,
+        const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a cloud to a hull vector, but only puts each input point in
     // the highest hull it falls into

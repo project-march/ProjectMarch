@@ -86,8 +86,10 @@ namespace error {
 
         NotImplemented(
             const std::string& function_name, const std::string& context)
-            : std::logic_error("Function " + function_name
-                + " is not implemented for " + context) {};
+            : std::logic_error(std::string("Function ")
+                                   .append(function_name)
+                                   .append(" is not implemented for ")
+                                   .append(context)) {};
     };
 
 } // namespace error

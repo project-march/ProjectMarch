@@ -539,7 +539,7 @@ bool HullParameterDeterminer::cropCloudToHullVector(
 
 // Crops a single point to a hull vector.
 bool HullParameterDeterminer::cropPointToHullVector(
-    pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud)
+    pcl::PointXY const input_point, const PointNormalCloud::Ptr& output_cloud)
 {
     PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
     input_cloud->push_back(input_point);

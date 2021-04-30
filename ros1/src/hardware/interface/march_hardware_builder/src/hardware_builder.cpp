@@ -174,7 +174,8 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
 std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
     const YAML::Node& imc_config, march::ActuationMode mode,
     const urdf::JointConstSharedPtr& urdf_joint,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     if (!imc_config || !urdf_joint) {
         return nullptr;
@@ -204,7 +205,8 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
 std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     const YAML::Node& odrive_config, march::ActuationMode mode,
     const urdf::JointConstSharedPtr& urdf_joint,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     if (!odrive_config || !urdf_joint) {
         return nullptr;
@@ -283,7 +285,8 @@ HardwareBuilder::createIncrementalEncoder(
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
     const YAML::Node& temperature_ges_config,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     if (!temperature_ges_config) {
         return nullptr;
@@ -302,7 +305,8 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
 
 std::unique_ptr<march::PowerDistributionBoard>
 HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     if (!pdb) {
         return nullptr;
@@ -420,7 +424,8 @@ std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(
 
 march::PressureSole HardwareBuilder::createPressureSole(
     const YAML::Node& pressure_sole_config,
-    march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     HardwareBuilder::validateRequiredKeysExist(pressure_sole_config,
         HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");

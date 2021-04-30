@@ -49,8 +49,16 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(
     std::vector<float> Q;
     std::vector<float> R;
 
-    ros::param::get(parameter_path + "/weights/" + joint_name + "/Q", Q);
-    ros::param::get(parameter_path + "/weights/" + joint_name + "/R", R);
+    ros::param::get(std::string(parameter_path)
+                        .append("/weights/")
+                        .append(joint_name)
+                        .append("/Q"),
+        Q);
+    ros::param::get(std::string(parameter_path)
+                        .append("/weights/")
+                        .append(joint_name)
+                        .append("/R"),
+        R);
 
     // Add Q and R to W
     std::vector<float> W;
