@@ -137,6 +137,15 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     // Create regions
     bool region_creating_was_successful
         = region_creator_->createRegions(pointcloud, normals, region_vector);
+
+    if (not region_creating_was_successful) {
+        res.error_message
+            = "Region creating was unsuccessful, see debug output "
+              "for more information";
+        res.success = false;
+        return false;
+    }
+
     if (debugging_) {
         ROS_DEBUG("Done creating regions, now publishing point cloud regions "
                   "to /camera/region_cloud");
@@ -144,13 +153,6 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
             = region_creator_->debug_visualisation();
         publishCloud<pcl::PointXYZRGB>(
             region_pointcloud_publisher_, *coloured_cloud);
-    }
-    if (not region_creating_was_successful) {
-        res.error_message
-            = "Region creating was unsuccessful, see debug output "
-              "for more information";
-        res.success = false;
-        return false;
     }
 
     // Setup data structures for finding
