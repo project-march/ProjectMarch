@@ -178,7 +178,9 @@ std::string RealsenseTestPublisher::getFileNamesString()
 void RealsenseTestPublisher::startPublishingPointclouds()
 {
     ROS_DEBUG_STREAM("Start publishing pointcloud");
-    pointcloud_file_name = file_names[0];
+    // start at a random index to reduce over fitting on one data set
+    int random_index = rand() & file_names.size();
+    pointcloud_file_name = file_names[random_index];
     loadPointcloudToPublishFromFilename();
 }
 
@@ -252,9 +254,9 @@ void RealsenseTestPublisher::updatePublishLoop(
     }
 }
 
-// flips the sign of the z and y coordinates of the cloud, necessary because of a
-// weird inconsistency between the coordinate systems in the realsense
-// viewer and the .ply files
+// flips the sign of the z and y coordinates of the cloud, necessary because of
+// a weird inconsistency between the coordinate systems in the realsense viewer
+// and the .ply files
 void RealsenseTestPublisher::transformToCameraCoordinates()
 {
     for (size_t i = 0; i < pointcloud_to_publish->size(); ++i) {
