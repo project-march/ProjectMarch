@@ -5,11 +5,11 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <random>
 #include <realsense_test_publisher.h>
 #include <ros/package.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
-#include <random>
 
 using namespace std::filesystem;
 
