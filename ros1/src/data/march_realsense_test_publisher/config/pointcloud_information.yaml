@@ -17,5 +17,5 @@
 # bool from_back_camera
 test.ply:
   selected_gait: 0
-  frame_id_to_transform_to: foot_right
+  frame_id_to_transform_to: "foot_right"
   from_back_camera: false

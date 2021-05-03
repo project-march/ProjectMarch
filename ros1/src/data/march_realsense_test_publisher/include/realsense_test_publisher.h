@@ -11,6 +11,7 @@
 #include <utilities/publish_mode_utilities.h>
 #include <utilities/realsense_gait_utilities.h>
 #include <vector>
+#include <yaml-cpp/yaml.h>
 
 using namespace std::filesystem;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -65,6 +66,8 @@ private:
     ros::Publisher test_cloud_publisher;
     ros::ServiceClient process_pointcloud_service_client;
 
+    YAML::Node config_tree;
+
     std::vector<std::string> file_names;
     path data_path;
     std::string pointcloud_topic;
@@ -74,7 +77,7 @@ private:
     bool should_publish;
     bool no_files_present;
     bool from_back_camera;
-    SelectedGait selected_gait;
+    int selected_gait;
     std::string frame_id_to_transform_to;
 };
 

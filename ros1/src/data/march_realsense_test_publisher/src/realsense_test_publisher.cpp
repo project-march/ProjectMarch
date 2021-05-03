@@ -54,6 +54,22 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
             PROCESS_POINTCLOUD_TOPIC);
 
     should_publish = false;
+
+    config_tree = loadConfig("pointcloud_information.yaml");
+}
+
+YAML::Node RealSenseReader::loadConfig(std::string config_file) {
+    YAML::Node config_tree;
+    std::string path = ros::package::getPath("march_realsense_test_publisher")
+                       + "/config/" + config_file;
+    try {
+        config_tree = YAML::LoadFile(path);
+    } catch (YAML::Exception &e) {
+        ROS_WARN_STREAM("YAML file with path " << path
+                                               << " could not be loaded, using "
+                                                  "empty config instead");
+    }
+    return config_tree;
 }
 
 // Sets the new publish mode, the camera position in which the pointcloud has
@@ -74,11 +90,16 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 
 void RealsenseTestPublisher::getProcessPointcloudInputs()
 {
-
-    selected_gait = (SelectedGait)req.selected_gait;
-    frame_id_to_transform_to = req.frame_id_to_transform_to;
-
-    from_back_camera = req.from_back_camera;
+    if (YAML::Node pointcloud_config = config_tree[pointcloud_file_name]) {
+        selected_gait = yaml_utilities::grabParameters<int>(pointcloud_config, "selected_gait").value();
+        from_back_camera = yaml_utilities::grabParameters<bool>(pointcloud_config, "from_back_camera").value();
+        frame_id_to_transform_to = yaml_utilities::grabParameters<std::string>(pointcloud_config, "frame_id_to_transform_to").value();
+    } else {
+        ROS_WARN_STREAM("No configuration specified for pointcloud file with name " << pointcloud_file_name << ". Continuing with default parameters");
+        selected_gait = 0;
+        from_back_camera = false;
+        frame_id_to_transform_to = "foot_right";
+    }
 }
 
 // Sets the right cloud as the pointcloud to publish based on the file name
@@ -237,13 +258,8 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 void RealsenseTestPublisher::makeProcessPointcloudCall() {
     march_shared_msgs::GetGaitParameters service;
     service.request.selected_gait = selected_gait;
-    // Use foot_right as the default value as most gaits start with right
-    // open
-    if (frame_id_to_transform_to != "") {
-        service.request.frame_id_to_transform_to = frame_id_to_transform_to;
-    } else {
-        service.request.frame_id_to_transform_to = "foot_right";
-    }
+    service.request.frame_id_to_transform_to = frame_id_to_transform_to;
+
     // The image always comes from simulated camera topic (enum value 2)
     service.request.camera_to_use = 2;
     process_pointcloud_service_client.call(service);
