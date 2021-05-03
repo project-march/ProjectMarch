@@ -9,6 +9,7 @@
 #include <ros/package.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
+#include <random>
 
 using namespace std::filesystem;
 
@@ -179,8 +180,9 @@ void RealsenseTestPublisher::startPublishingPointclouds()
 {
     ROS_DEBUG_STREAM("Start publishing pointcloud");
     // start at a random index to reduce over fitting on one data set
-    int random_index = (int)rand() % file_names.size();
-    pointcloud_file_name = file_names[random_index];
+    std::minstd_rand rng; // random number engine
+    std::uniform_int_distribution<int> uniform(0, file_names.size());
+    pointcloud_file_name = file_names[uniform(rng)];
     loadPointcloudToPublishFromFilename();
 }
 
