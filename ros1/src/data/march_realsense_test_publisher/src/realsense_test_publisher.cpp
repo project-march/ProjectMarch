@@ -28,7 +28,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 
     path directory_path
         = ros::package::getPath("march_realsense_test_publisher");
-    path relative_path("config/datasets/");
+    path relative_path(/*__source*/ "config/datasets/");
     data_path = directory_path / relative_path;
 
     for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
@@ -179,7 +179,7 @@ void RealsenseTestPublisher::startPublishingPointclouds()
 {
     ROS_DEBUG_STREAM("Start publishing pointcloud");
     // start at a random index to reduce over fitting on one data set
-    int random_index = rand() & file_names.size();
+    int random_index = rand() % file_names.size();
     pointcloud_file_name = file_names[random_index];
     loadPointcloudToPublishFromFilename();
 }

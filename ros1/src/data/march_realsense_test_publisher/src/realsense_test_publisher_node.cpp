@@ -10,7 +10,8 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "march_realsense_datasets_publisher");
     ros::NodeHandle n;
-    ros::MultiThreadedSpinner spinner(2);
+    // We need two threads to publish and process at the same time
+    ros::MultiThreadedSpinner spinner(/*thread_count*/ 2);
 
     RealsenseTestPublisher test_publisher = RealsenseTestPublisher(&n);
 
