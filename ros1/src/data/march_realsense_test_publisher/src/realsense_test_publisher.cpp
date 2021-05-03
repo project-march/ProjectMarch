@@ -9,7 +9,6 @@
 #include <ros/package.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
-#include <utilities/realsense_gait_utilities.h>
 
 using namespace std::filesystem;
 
@@ -65,10 +64,6 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
     selected_mode = (SelectedMode)req.selected_mode;
-    selected_gait = (SelectedGait)req.selected_gait;
-    frame_id_to_transform_to = req.frame_id_to_transform_to;
-
-    from_back_camera = req.from_back_camera;
     // Only update the pointcloud file name from the service if it is relevant
     if (selected_mode == SelectedMode::custom) {
         pointcloud_file_name = req.pointcloud_file_name;
@@ -77,9 +72,20 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     return true;
 }
 
+void RealsenseTestPublisher::getProcessPointcloudInputs()
+{
+
+    selected_gait = (SelectedGait)req.selected_gait;
+    frame_id_to_transform_to = req.frame_id_to_transform_to;
+
+    from_back_camera = req.from_back_camera;
+}
+
 // Sets the right cloud as the pointcloud to publish based on the file name
 void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 {
+    getProcessPointcloudInputs();
+
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     if (pcl::io::loadPLYFile<pcl::PointXYZ>(
             data_path.string() + pointcloud_file_name, *pointcloud_to_publish)
@@ -88,6 +94,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
             << data_path.string() + pointcloud_file_name);
         return;
     }
+
     if (from_back_camera) {
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_BACK;
     } else {
@@ -102,6 +109,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 bool RealsenseTestPublisher::publishCustomPointcloud(
     std::string pointcloud_file_name)
 {
+    ROS_DEBUG_STREAM("Publish a custom pointcloud");
     auto filename_iterator
         = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
     if (filename_iterator == file_names.end()) {
@@ -139,6 +147,7 @@ std::string RealsenseTestPublisher::getFileNamesString()
 // Publishes the first pointcloud in the dataset directory
 void RealsenseTestPublisher::startPublishingPointclouds()
 {
+    ROS_DEBUG_STREAM("Start publishing pointcloud");
     pointcloud_file_name = file_names[0];
     loadPointcloudToPublishFromFilename();
 }
@@ -149,6 +158,7 @@ void RealsenseTestPublisher::publishNextPointcloud()
     // If already publishing, find the next pointcloud and publish that
     // Otherwise, start publishing
     if (should_publish) {
+        ROS_DEBUG_STREAM("Publish next pointcloud");
         // find the current pointcloud filename
         auto filename_iterator = std::find(
             file_names.begin(), file_names.end(), pointcloud_file_name);
@@ -181,20 +191,12 @@ void RealsenseTestPublisher::updatePublishLoop(
         bool success = true;
 
         switch (selected_mode) {
-            case SelectedMode::start: {
-                ROS_DEBUG_STREAM("Start publishing pointclouds");
-                startPublishingPointclouds();
-                should_publish = true;
-                break;
-            }
             case SelectedMode::next: {
-                ROS_DEBUG_STREAM("Publish next pointcloud");
                 publishNextPointcloud();
                 should_publish = true;
                 break;
             }
             case SelectedMode::custom: {
-                ROS_DEBUG_STREAM("Publish a custom pointcloud");
                 success &= publishCustomPointcloud(pointcloud_file_name);
                 should_publish = success;
                 break;
@@ -232,8 +234,7 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 }
 
 // Calls on the realsense reader to process a pointcloud from the test topic
-void RealsenseTestPublisher::makeProcessPointcloudCall()
-{
+void RealsenseTestPublisher::makeProcessPointcloudCall() {
     march_shared_msgs::GetGaitParameters service;
     service.request.selected_gait = selected_gait;
     // Use foot_right as the default value as most gaits start with right
@@ -246,8 +247,4 @@ void RealsenseTestPublisher::makeProcessPointcloudCall()
     // The image always comes from simulated camera topic (enum value 2)
     service.request.camera_to_use = 2;
     process_pointcloud_service_client.call(service);
-    // Only process the current point cloud once, should_process
-    // should be set to true when a new pointcloud can be processed
-//    should_process = false;
-
 }

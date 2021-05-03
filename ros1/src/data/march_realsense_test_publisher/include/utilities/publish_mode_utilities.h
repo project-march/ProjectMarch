@@ -5,6 +5,6 @@
  * made with the RealSense camera, made to match the
  *  PublishTestDataset.srv
  */
-enum SelectedMode { start = 0, next = 1, end = 2, custom = 3 };
+enum SelectedMode {next = 0, end = 1, custom = 2};
 
 #endif // MARCH_PUBLISH_MODE_UTILITIES_H

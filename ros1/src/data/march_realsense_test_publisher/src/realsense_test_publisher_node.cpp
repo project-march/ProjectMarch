@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     ros::Timer timer_publish_pointcloud
         = n.createTimer(ros::Duration(PUBLISH_FREQUENCY),
             &RealsenseTestPublisher::publishTestCloud, &test_publisher);
-    
+
     spinner.spin();
     ros::shutdown();
     return 0;

@@ -1,27 +1,11 @@
 # This enum is used for specifying to which mode of publishing the test publisher should switch.
 # All supported modes should be specified here
-uint8 START=0
-uint8 NEXT=1
-uint8 STOP=2
-uint8 CUSTOM=3
+uint8 NEXT=0
+uint8 STOP=1
+uint8 CUSTOM=2
 uint8 selected_mode
 
 # A string specifying the name of the pointcloud when CUSTUM is the selected mode.
 string pointcloud_file_name
-
-# A bool indicating whether the imagine originated from the front or back camera
-bool from_back_camera
-
-# This enum is used for specifying the obstacle that should be dynamically
-# made with the RealSense camera. All supported obstacles should be
-# specified here
-uint8 STAIRS_UP=0
-uint8 STAIRS_DOWN=1
-uint8 RAMP_UP=2
-uint8 RAMP_DOWN=3
-uint8 selected_gait
-
-# The link to transform to, is generally set to either "foot_left" or "foot_right"
-string frame_id_to_transform_to
 ---
 bool success
