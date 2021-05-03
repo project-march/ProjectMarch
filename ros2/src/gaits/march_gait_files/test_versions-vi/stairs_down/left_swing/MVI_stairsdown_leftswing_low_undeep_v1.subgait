@@ -29,14 +29,14 @@ joints:
   - position: 0.85756578
     time_from_start: 0
     velocity: 0.0
-  - position: 0.78539816
+  - position: 0.6981317
     time_from_start: 2981100000
     velocity: -0.52359878
-  - position: 0.43633231
+  - position: 0.38397244
     time_from_start: 4000000000
     velocity: 0.0
   left_knee:
-  - position: 1.55038645
+  - position: 1.3962634
     time_from_start: 0
     velocity: 0.0
   - position: 1.57079633
@@ -63,7 +63,7 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.43633231
+  - position: 0.38397244
     time_from_start: 0
     velocity: 0.0
   - position: 0.34910076
@@ -82,7 +82,7 @@ joints:
   - position: 0.52360052
     time_from_start: 2000000000
     velocity: 0.08729962
-  - position: 1.55038675
+  - position: 1.3962634
     time_from_start: 4000000000
     velocity: 0.0
 name: left_swing
