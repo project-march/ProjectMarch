@@ -4,6 +4,9 @@
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_gait_utilities.h"
+#include "utilities/yaml_utilities.h"
+#include "yaml-cpp/yaml.h"
+#include <cmath>
 #include <ctime>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
@@ -55,15 +58,20 @@ void HullParameterDeterminer::readParameters(
     general_most_desirable_location_is_small
         = config.parameter_determiner_most_desirable_loc_is_small;
 
+    foot_length_back = (float)config.parameter_determiner_foot_length_back;
+    foot_length_front = (float)config.parameter_determiner_foot_length_front;
+    foot_width = (float)config.parameter_determiner_foot_length_front;
+    hull_dimension = config.hull_dimension;
+
     max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
     min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
-    max_distance_to_line
-        = config.parameter_determiner_ramp_max_distance_to_line;
-    x_flat = config.parameter_determiner_ramp_x_flat;
-    z_flat = config.parameter_determiner_ramp_z_flat;
-    x_steep = config.parameter_determiner_ramp_x_steep;
-    z_steep = config.parameter_determiner_ramp_z_steep;
+    x_flat = (float)config.parameter_determiner_ramp_x_flat;
+    z_flat = (float)config.parameter_determiner_ramp_z_flat;
+    x_steep = (float)config.parameter_determiner_ramp_x_steep;
+    z_steep = (float)config.parameter_determiner_ramp_z_steep;
     y_location = (float)config.parameter_determiner_ramp_y_location;
+    max_allowed_z_deviation_foot
+        = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
         = (float)config.parameter_determiner_ramp_max_distance_to_line;
 
@@ -268,7 +276,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
     }
 
     double min_distance_to_object = std::numeric_limits<double>::max();
-    double distance_to_object = std::numeric_limits<double>::max();
+    double distance_to_object;
 
     for (pcl::PointNormal& possible_foot_location : *possible_foot_locations) {
         if (not isValidLocation(possible_foot_location)) {
@@ -325,15 +333,18 @@ bool HullParameterDeterminer::getDistanceToObject(
 bool HullParameterDeterminer::isValidLocation(
     pcl::PointNormal possible_foot_location)
 {
+    // Less and larger than signs are swapped for the x coordinate as the
+    // positive x axis points in the backwards direction of the exoskeleton
     switch (selected_gait_.value()) {
         case SelectedGait::stairs_up: {
-            // Less and larger than signs are swapped for the x coordinate
-            // as the positive x axis points in the backwards direction of the
-            // exoskeleton
+            // A possible foot location for the stairs gait is valid if it is
+            // reachable by the stairs gait and the location offers support
+            // for the entire foot
             return (possible_foot_location.x < min_x_stairs
                 && possible_foot_location.x > max_x_stairs
                 && possible_foot_location.z > min_z_stairs
-                && possible_foot_location.z < max_z_stairs);
+                && possible_foot_location.z < max_z_stairs
+                && entireFootCanBePlaced(possible_foot_location));
         }
         case SelectedGait::ramp_down: {
             pcl::PointXYZ projected_point
@@ -344,9 +355,7 @@ bool HullParameterDeterminer::isValidLocation(
                 projected_point, possible_foot_location);
             // only points which are close enough to the line are valid
             // Only points on the line which are between the two given values
-            // are valid Less and larger than signs are swapped for the x
-            // coordinate as the positive x axis points in the backwards
-            // direction of the exoskeleton
+            // are valid
             return (projected_point.x < x_steep && projected_point.x > x_flat
                 && distance < max_distance_to_line);
         }
@@ -357,6 +366,61 @@ bool HullParameterDeterminer::isValidLocation(
             return false;
         }
     }
+}
+
+// Verify if there is support for the entire foot around the possible foot
+// location
+bool HullParameterDeterminer::entireFootCanBePlaced(
+    pcl::PointNormal possible_foot_location)
+{
+    bool success = true;
+    // First create a pointcloud containing the edge points (vertices) of the
+    // foot on the ground
+    PointCloud2D::Ptr foot_pointcloud = boost::make_shared<PointCloud2D>();
+    fillFootPointCloud(foot_pointcloud, possible_foot_location);
+
+    // Then find possible foot locations associated with the foot vertices
+    PointNormalCloud::Ptr potential_foot_support_cloud
+        = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVectorUnique(
+        foot_pointcloud, potential_foot_support_cloud);
+
+    // The location is only valid if all foot vertices can be placed
+    success
+        &= (potential_foot_support_cloud->size() == foot_pointcloud->size());
+
+    // The location is only valid if the foot vertices have a z value close
+    // enough to the locations z value
+    for (pcl::PointNormal potential_foot_support :
+        *potential_foot_support_cloud) {
+        success &= (abs(potential_foot_support.z - possible_foot_location.z)
+            < max_allowed_z_deviation_foot);
+    }
+    return success;
+}
+
+// Fill a point cloud with vertices of the foot on the ground around a possible
+// foot location
+void HullParameterDeterminer::fillFootPointCloud(
+    PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
+{
+    foot_pointcloud->points.resize(/*__new_size=*/4);
+
+    // Deviation back is added as the forward direction of the exoskeleton
+    // is the negative x direction in the simulation
+    foot_pointcloud->points[0].x = possible_foot_location.x + foot_length_back;
+    foot_pointcloud->points[0].y = possible_foot_location.y - foot_width / 2.0F;
+
+    foot_pointcloud->points[1].x = possible_foot_location.x + foot_length_back;
+    foot_pointcloud->points[1].y = possible_foot_location.y + foot_width / 2.0F;
+
+    // Deviation front is subtracted as the forward direction of the exoskeleton
+    // is the negative x direction in the simulation
+    foot_pointcloud->points[2].x = possible_foot_location.x - foot_length_front;
+    foot_pointcloud->points[2].y = possible_foot_location.y - foot_width / 2.0F;
+
+    foot_pointcloud->points[3].x = possible_foot_location.x - foot_length_front;
+    foot_pointcloud->points[3].y = possible_foot_location.y + foot_width / 2.0F;
 }
 
 // Compute the optimal foot location as if one were not limited by anything.
