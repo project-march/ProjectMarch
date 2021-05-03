@@ -95,4 +95,4 @@ joints:
     time_from_start: 3750000000
     velocity: -0.69810028
 name: right_open
-version: MVI_stairsdown_rightopen_high_undeep_v2
+version: MVI_stairsdown_rightopen_high_undeep_v3
