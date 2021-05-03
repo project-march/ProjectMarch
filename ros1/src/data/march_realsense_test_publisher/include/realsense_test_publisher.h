@@ -24,7 +24,7 @@ public:
     // Publish the current pointcloud to publish
     // is public to allow a timer call from the node
     void publishTestCloud(const ros::TimerEvent& timer_event);
-    
+
 private:
     // Creates a string of all the valid file names separated by an end line
     std::string getFileNamesString();
@@ -67,7 +67,6 @@ private:
     // Calls on the realsense reader to process a pointcloud from the test topic
     // is public to allow a timer call from the node
     void makeProcessPointcloudCall();
-
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
