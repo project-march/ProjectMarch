@@ -16,9 +16,9 @@ joints:
   - position: -0.08726646
     time_from_start: 1000000000
     velocity: 0.0
-  - position: -0.08198335
-    time_from_start: 3000000000
-    velocity: 0.0
+  - position: -0.08603494
+    time_from_start: 2029142860
+    velocity: 0
   - position: 0.08726646
     time_from_start: 4000000000
     velocity: 0.0
@@ -50,9 +50,6 @@ joints:
   - position: 0.08726646
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 2000000000
-    velocity: 0.0
   - position: 0.17453293
     time_from_start: 2900000000
     velocity: 0.0
@@ -60,13 +57,13 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
   right_hip_fe:
-  - position: -0.0873
+  - position: -0.08729962
     time_from_start: 0
     velocity: 0.0
   - position: -0.08729962
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.52359878
+  - position: 0.43633231
     time_from_start: 2160000000
     velocity: 0.52359878
   - position: -0.08726646
@@ -82,10 +79,10 @@ joints:
   - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 1.04719755
+  - position: 0.78539816
     time_from_start: 2160000000
     velocity: 0.87266463
-  - position: 1.04719755
+  - position: 0.78539816
     time_from_start: 2831800000
     velocity: -1.30899694
   - position: 0.0
