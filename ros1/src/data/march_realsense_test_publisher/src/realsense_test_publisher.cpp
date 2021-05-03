@@ -130,7 +130,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     } else {
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
     }
-    mirrorZCoordinate();
+    transformToCameraCoordinates();
 
     ROS_DEBUG_STREAM("File loaded with name " << pointcloud_file_name << ".");
 }
@@ -252,14 +252,16 @@ void RealsenseTestPublisher::updatePublishLoop(
     }
 }
 
-// flips the sign of the z coordinates of the cloud, necessary because of a
+// flips the sign of the z and y coordinates of the cloud, necessary because of a
 // weird inconsistency between the coordinate systems in the realsense
 // viewer and the .ply files
-void RealsenseTestPublisher::mirrorZCoordinate()
+void RealsenseTestPublisher::transformToCameraCoordinates()
 {
     for (size_t i = 0; i < pointcloud_to_publish->size(); ++i) {
         float z_value = pointcloud_to_publish->points[i].z;
+        float y_value = pointcloud_to_publish->points[i].y;
         pointcloud_to_publish->points[i].z = -z_value;
+        pointcloud_to_publish->points[i].y = -y_value;
     }
 }
 

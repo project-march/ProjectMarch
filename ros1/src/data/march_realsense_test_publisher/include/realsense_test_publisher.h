@@ -59,7 +59,7 @@ private:
     // flips the sign of the z coordinates of the cloud, necessary because of a
     // weird inconsistency between the coordinate systems in the realsense
     // viewer and the .ply files
-    void mirrorZCoordinate();
+    void transformToCameraCoordinates();
 
     // Grabs the inputs needed for the process pointcloud service call from the
     // configuration file
