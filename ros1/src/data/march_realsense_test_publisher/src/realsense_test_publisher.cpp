@@ -179,7 +179,7 @@ void RealsenseTestPublisher::startPublishingPointclouds()
 {
     ROS_DEBUG_STREAM("Start publishing pointcloud");
     // start at a random index to reduce over fitting on one data set
-    int random_index = rand() % file_names.size();
+    int random_index = (int)rand() % file_names.size();
     pointcloud_file_name = file_names[random_index];
     loadPointcloudToPublishFromFilename();
 }

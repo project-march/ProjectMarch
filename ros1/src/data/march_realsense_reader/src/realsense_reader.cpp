@@ -110,7 +110,7 @@ void RealSenseReader::readConfigCb(
 }
 
 // This method executes the logic to process a pointcloud
-bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
+void RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     clock_t start_of_processing_time = clock();
@@ -129,7 +129,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         res.error_message = "Preprocessing was unsuccessful, see debug output "
                             "for more information";
         res.success = false;
-        return false;
+        return;
     }
 
     // Setup data structures for region creating
@@ -151,7 +151,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
             = "Region creating was unsuccessful, see debug output "
               "for more information";
         res.success = false;
-        return false;
+        return;
     }
 
     // Setup data structures for finding
@@ -174,7 +174,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         res.error_message = "Hull finding was unsuccessful, see debug output "
                             "for more information";
         res.success = false;
-        return false;
+        return;
     }
 
     // Setup data structures for parameter determining
@@ -195,7 +195,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
             = "Parameter determining was unsuccessful, see debug output "
               "for more information";
         res.success = false;
-        return false;
+        return;
     }
 
     res.gait_parameters = *gait_parameters;
@@ -212,7 +212,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     res.success = true;
     // Returning false means that the service was not able to respond at all,
     // this causes problems with the bridge, therefore always return true!
-    return true;
+    return;
 }
 
 // Publish a pointcloud of any point type on a publisher
@@ -413,7 +413,6 @@ bool RealSenseReader::processPointcloudCallback(
             = "Unknown camera given in the request, not available in the "
               "POINTCLOUD_TOPICS in the realsense_reader";
         res.success = false;
-        return true;
     }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
@@ -424,14 +423,13 @@ bool RealSenseReader::processPointcloudCallback(
                             "no processing could be done.";
         ROS_WARN_STREAM(res.error_message);
         res.success = false;
-        return true;
     }
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
-    bool success = processPointcloud(point_cloud, res);
+    processPointcloud(point_cloud, res);
 
     time_t end_callback = clock();
     double time_taken
