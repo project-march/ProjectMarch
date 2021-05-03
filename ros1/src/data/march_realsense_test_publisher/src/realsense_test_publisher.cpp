@@ -58,13 +58,14 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     config_tree = loadConfig("pointcloud_information.yaml");
 }
 
-YAML::Node RealSenseReader::loadConfig(std::string config_file) {
+YAML::Node RealsenseTestPublisher::loadConfig(std::string config_file)
+{
     YAML::Node config_tree;
     std::string path = ros::package::getPath("march_realsense_test_publisher")
-                       + "/config/" + config_file;
+        + "/config/" + config_file;
     try {
         config_tree = YAML::LoadFile(path);
-    } catch (YAML::Exception &e) {
+    } catch (YAML::Exception& e) {
         ROS_WARN_STREAM("YAML file with path " << path
                                                << " could not be loaded, using "
                                                   "empty config instead");
@@ -91,11 +92,19 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 void RealsenseTestPublisher::getProcessPointcloudInputs()
 {
     if (YAML::Node pointcloud_config = config_tree[pointcloud_file_name]) {
-        selected_gait = yaml_utilities::grabParameters<int>(pointcloud_config, "selected_gait").value();
-        from_back_camera = yaml_utilities::grabParameters<bool>(pointcloud_config, "from_back_camera").value();
-        frame_id_to_transform_to = yaml_utilities::grabParameters<std::string>(pointcloud_config, "frame_id_to_transform_to").value();
+        selected_gait = yaml_utilities::grabParameter<int>(
+            pointcloud_config, "selected_gait")
+                            .value();
+        from_back_camera = yaml_utilities::grabParameter<bool>(
+            pointcloud_config, "from_back_camera")
+                               .value();
+        frame_id_to_transform_to = yaml_utilities::grabParameter<std::string>(
+            pointcloud_config, "frame_id_to_transform_to")
+                                       .value();
     } else {
-        ROS_WARN_STREAM("No configuration specified for pointcloud file with name " << pointcloud_file_name << ". Continuing with default parameters");
+        ROS_WARN_STREAM(
+            "No configuration specified for pointcloud file with name "
+            << pointcloud_file_name << ". Continuing with default parameters");
         selected_gait = 0;
         from_back_camera = false;
         frame_id_to_transform_to = "foot_right";
@@ -255,7 +264,8 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 }
 
 // Calls on the realsense reader to process a pointcloud from the test topic
-void RealsenseTestPublisher::makeProcessPointcloudCall() {
+void RealsenseTestPublisher::makeProcessPointcloudCall()
+{
     march_shared_msgs::GetGaitParameters service;
     service.request.selected_gait = selected_gait;
     service.request.frame_id_to_transform_to = frame_id_to_transform_to;

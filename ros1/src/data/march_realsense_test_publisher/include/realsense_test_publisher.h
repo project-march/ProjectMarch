@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
-#include <utilities/realsense_gait_utilities.h>
+#include <utilities/yaml_utilities.h>
 #include <vector>
 #include <yaml-cpp/yaml.h>
 
@@ -60,6 +60,13 @@ private:
     // weird inconsistency between the coordinate systems in the realsense
     // viewer and the .ply files
     void mirrorZCoordinate();
+
+    // Grabs the inputs needed for the process pointcloud service call from the
+    // configuration file
+    void getProcessPointcloudInputs();
+
+    // Load the configuration yaml file
+    YAML::Node loadConfig(std::string config_file);
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;

@@ -34,7 +34,7 @@ include_directories(
 add_library(${PROJECT_NAME}
     src/realsense_test_publisher.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
 
 add_executable(${PROJECT_NAME}_node src/realsense_test_publisher_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME})
