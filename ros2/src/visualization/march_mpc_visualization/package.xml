@@ -7,7 +7,7 @@
   <maintainer email="ttveen@gmail.com">ttveen</maintainer>
   <license>TODO: License declaration</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
+
   <depend>rclpy</depend>
   <depend>python-flask</depend>
   <depend>march_shared_msgs</depend>
