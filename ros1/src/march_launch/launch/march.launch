@@ -140,7 +140,7 @@
 
     <param name="robot_description"
            command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
-                    ground_gait:=$(arg ground_gait) configuration:=$(arg configuration)"/>
+                    ground_gait:=$(arg ground_gait) configuration:=$(arg configuration) realsense_simulation:=$(arg realsense_simulation)"/>
 
     <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
     <group if="$(eval configuration == 'simulation')">
