@@ -194,8 +194,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
             .append("/config/sw_files/" + urdf_joint->name + ".sw"));
     std::string setup = convertSWFileToString(imc_setup_data);
     return std::make_unique<march::IMotionCube>(
-        march::Slave(
-            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
+        march::Slave(slave_index, pdo_interface, sdo_interface),
         HardwareBuilder::createAbsoluteEncoder(
             absolute_encoder_config, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(incremental_encoder_config),
@@ -220,9 +219,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
     return std::make_unique<march::ODrive>(
-        march::Slave(
-            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
-        axis,
+        march::Slave(slave_index, pdo_interface, sdo_interface), axis,
         HardwareBuilder::createAbsoluteEncoder(
             absolute_encoder_config, urdf_joint),
         mode);
@@ -298,9 +295,7 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
     const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
     const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
     return std::make_unique<march::TemperatureGES>(
-        march::Slave(
-            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
-        byte_offset);
+        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
 std::unique_ptr<march::PowerDistributionBoard>
@@ -342,8 +337,7 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
             boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
     return std::make_unique<march::PowerDistributionBoard>(
-        march::Slave(
-            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
+        march::Slave(slave_index, pdo_interface, sdo_interface),
         net_monitor_offsets, net_driver_offsets, boot_shutdown_offsets);
 }
 
@@ -434,9 +428,8 @@ march::PressureSole HardwareBuilder::createPressureSole(
     const auto byte_offset = pressure_sole_config["byteOffset"].as<int>();
     const auto side = pressure_sole_config["side"].as<std::string>();
     return march::PressureSole(
-        march::Slave(
-            slave_index, std::move(pdo_interface), std::move(sdo_interface)),
-        byte_offset, side);
+        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset,
+        side);
 }
 
 std::string convertSWFileToString(std::ifstream& sw_file)
