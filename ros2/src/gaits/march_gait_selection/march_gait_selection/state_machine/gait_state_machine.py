@@ -369,7 +369,7 @@ class GaitStateMachine(object):
                 self._current_gait = None
                 self._gait_selection.get_logger().info(
                     f"Starting the gait returned "
-                    f"no trajectory, going back to ide state {self._current_state}"
+                    f"no trajectory, going back to idle state {self._current_state}"
                 )
                 return
 
