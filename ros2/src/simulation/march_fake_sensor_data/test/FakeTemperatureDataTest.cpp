@@ -20,7 +20,7 @@ protected:
         rclcpp::shutdown();
     }
 
-    FakeTemperatureDataNode* node;
+    FakeTemperatureDataNode* node {};
 };
 
 TEST_F(FakeTemperatureDataNodeTest, test_default_range)

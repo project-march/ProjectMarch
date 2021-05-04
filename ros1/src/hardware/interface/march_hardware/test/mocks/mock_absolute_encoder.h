@@ -12,7 +12,4 @@ public:
             0.1, /*upper_soft_limit_rad=*/0.9)
     {
     }
-
-    MOCK_METHOD0(getAngleIU, int32_t());
-    MOCK_METHOD0(getAngleRad, double());
 };

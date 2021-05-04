@@ -1,15 +1,16 @@
 # For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
 march4:
-  ifName: enp2s0
+  if_name: enp0s31f6
   ecatCycleTime: 4
   ecatSlaveTimeout: 50
   joints:
     - left_ankle:
-        actuationMode: torque
         allowActuation: true
         netNumber: 8
         temperatureges: {slaveIndex: 1, byteOffset: 0}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 2
           absoluteEncoder:
             resolution: 12
@@ -20,11 +21,12 @@ march4:
             transmission: 200
 
     - left_hip_aa:
-        actuationMode: torque
         allowActuation: true
         netNumber: 5
         temperatureges: {slaveIndex: 7, byteOffset: 0}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 6
           absoluteEncoder:
             resolution: 12
@@ -35,11 +37,12 @@ march4:
             transmission: 200
 
     - left_hip_fe:
-        actuationMode: torque
         allowActuation: true
         netNumber: 6
         temperatureges: {slaveIndex: 5, byteOffset: 0}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 4
           absoluteEncoder:
             resolution: 17
@@ -50,11 +53,12 @@ march4:
             transmission: 101
 
     - left_knee:
-        actuationMode: torque
         allowActuation: true
         netNumber: 7
         temperatureges: {slaveIndex: 5, byteOffset: 4}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 3
           absoluteEncoder:
             resolution: 17
@@ -65,11 +69,12 @@ march4:
             transmission: 101
 
     - right_ankle:
-        actuationMode: torque
         allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 13, byteOffset: 0}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 12
           absoluteEncoder:
             resolution: 12
@@ -80,11 +85,12 @@ march4:
             transmission: 200
 
     - right_hip_aa:
-        actuationMode: torque
         allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 7, byteOffset: 4}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 8
           absoluteEncoder:
             resolution: 12
@@ -95,11 +101,12 @@ march4:
             transmission: 200
 
     - right_hip_fe:
-        actuationMode: torque
         allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 9, byteOffset: 0}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 10
           absoluteEncoder:
             resolution: 17
@@ -110,11 +117,12 @@ march4:
             transmission: 101
 
     - right_knee:
-        actuationMode: torque
         allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 9, byteOffset: 4}
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 11
           absoluteEncoder:
             resolution: 17

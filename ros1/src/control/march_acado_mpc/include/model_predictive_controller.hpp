@@ -10,34 +10,21 @@ using namespace std;
 class ModelPredictiveController {
 
 public:
-    ModelPredictiveController(std::vector<float> W);
+    explicit ModelPredictiveController(std::vector<float> W);
 
     // Public variables
     vector<double> x0 { 0, 0 }; // Current state
-    double u; // Calculated control input
+    double u {}; // Calculated control input
     std::string joint_name;
-    double cost; // Objective value
-
-    // Error enums
-    enum Error {
-
-        // acado_preparationStep() errors
-        PREP_INTERNAL_ERROR = 1,
-
-        // acado_feedbackStep() errors
-        QP_ITERATION_LIMIT_REACHED = 1,
-        QP_INTERNAL_ERROR = -1,
-        QP_INFEASIBLE = -2,
-        QP_UNBOUNDED = -3
-    };
+    double cost {}; // Objective value
 
     // Timing variables
-    acado_timer t;
-    double t_preparation, t_feedback;
+    acado_timer t {};
+    double t_preparation {}, t_feedback {};
 
     // status variables
-    int preparationStepStatus;
-    int feedbackStepStatus;
+    int preparationStepStatus {};
+    int feedbackStepStatus {};
 
     /**
      * \brief Initialise the model predictive controller

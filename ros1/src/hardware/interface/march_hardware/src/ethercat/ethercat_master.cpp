@@ -1,6 +1,7 @@
 // Copyright 2019 Project March.
 #include "march_hardware/ethercat/ethercat_master.h"
 #include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/motor_controller/motor_controller.h"
 
 #include <chrono>
 #include <exception>
@@ -14,9 +15,9 @@
 
 namespace march {
 EthercatMaster::EthercatMaster(
-    std::string ifname, int max_slave_index, int cycle_time, int slave_timeout)
+    std::string if_name, int max_slave_index, int cycle_time, int slave_timeout)
     : is_operational_(/*__i=*/false)
-    , ifname_(std::move(ifname))
+    , if_name_(std::move(if_name))
     , max_slave_index_(max_slave_index)
     , cycle_time_ms_(cycle_time)
     , slave_watchdog_timeout_(slave_timeout)
@@ -62,11 +63,11 @@ bool EthercatMaster::start(std::vector<Joint>& joints)
 void EthercatMaster::ethercatMasterInitiation()
 {
     ROS_INFO("Trying to start EtherCAT");
-    if (!ec_init(this->ifname_.c_str())) {
+    if (!ec_init(this->if_name_.c_str())) {
         throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION,
-            "No socket connection on %s", this->ifname_.c_str());
+            "No socket connection on %s", this->if_name_.c_str());
     }
-    ROS_INFO("ec_init on %s succeeded", this->ifname_.c_str());
+    ROS_INFO("ec_init on %s succeeded", this->if_name_.c_str());
 
     const int slave_count = ec_config_init(FALSE);
     if (slave_count < this->max_slave_index_) {
@@ -81,12 +82,15 @@ void EthercatMaster::ethercatMasterInitiation()
 int setSlaveWatchdogTimer(uint16 slave)
 {
     uint16 configadr = ec_slave[slave].configadr;
-    ec_FPWRw(configadr, /*ADO=*/0x0400, IMotionCube::WATCHDOG_DIVIDER,
-        EC_TIMEOUTRET); // Set the divider register of the WD
-    ec_FPWRw(configadr, /*ADO=*/0x0410, IMotionCube::WATCHDOG_TIME,
-        EC_TIMEOUTRET); // Set the PDI watchdog = WD
-    ec_FPWRw(configadr, /*ADO=*/0x0420, IMotionCube::WATCHDOG_TIME,
-        EC_TIMEOUTRET); // Set the SM watchdog = WD
+    // Set the divider register of the WD
+    ec_FPWRw(configadr, /*ADO=*/0x0400, MotorController::WATCHDOG_DIVIDER,
+        EC_TIMEOUTRET);
+    // Set the PDI watchdog = WD
+    ec_FPWRw(configadr, /*ADO=*/0x0410, MotorController::WATCHDOG_TIME,
+        EC_TIMEOUTRET);
+    // Set the SM watchdog = WD
+    ec_FPWRw(configadr, /*ADO=*/0x0420, MotorController::WATCHDOG_TIME,
+        EC_TIMEOUTRET);
     return 1;
 }
 
@@ -97,11 +101,9 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ec_statecheck(/*slave=*/0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
     for (Joint& joint : joints) {
-        if (joint.hasIMotionCube()) {
-            ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig
-                = setSlaveWatchdogTimer;
-        }
-        reset |= joint.initialize(this->cycle_time_ms_);
+        ec_slave[joint.getMotorController()->getSlaveIndex()].PO2SOconfig
+            = setSlaveWatchdogTimer;
+        reset |= joint.initSdo(this->cycle_time_ms_);
     }
 
     ec_config_map(&this->io_map_);

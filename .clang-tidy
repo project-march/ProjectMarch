@@ -3,7 +3,14 @@ Checks:     -*,
             portability-*,
             bugprone-*,
             cert-*,
-            -cert-err58-cpp
+            -cert-err58-cpp,
+            clang-analyzer-*,
+            concurrency-*,
+            hicpp-*,
+            -hicpp-special-member-functions,
+            -hicpp-no-array-decay,
+            -hicpp-vararg,
+            -hicpp-avoid-goto
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
@@ -29,5 +36,7 @@ CheckOptions:
     - key:      bugprone-misplaced-widening-cast.CheckImplicitCasts
       value:    '1'
     - key:      bugprone-suspicious-enum-usage.StrictMode
+      value:    '1'
+    - key:      hicpp-signed-bitwise.IgnorePositiveIntegerLiterals 
       value:    '1'
 ...

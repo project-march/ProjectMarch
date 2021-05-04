@@ -14,7 +14,7 @@
 namespace march {
 /**
  * Base class of the ethercat master supported with the SOEM library
- * @param ifname Network interface name, check ifconfig.
+ * @param if_name Network interface name, check ifconfig.
  * @param io_map Holds the mapping of the SOEM message.
  * @param expected_working_counter The expected working counter of the ethercat
  * train.
@@ -23,7 +23,7 @@ namespace march {
  */
 class EthercatMaster {
 public:
-    EthercatMaster(std::string ifname, int max_slave_index, int cycle_time,
+    EthercatMaster(std::string if_name, int max_slave_index, int cycle_time,
         int slave_timeout);
     ~EthercatMaster();
 
@@ -62,7 +62,7 @@ public:
 
 private:
     /**
-     * Opens the ethernet port with the given ifname and checks the amount of
+     * Opens the ethernet port with the given if_name and checks the amount of
      * slaves.
      */
     void ethercatMasterInitiation();
@@ -116,7 +116,7 @@ private:
 
     std::atomic<bool> is_operational_;
 
-    const std::string ifname_;
+    const std::string if_name_;
     const int max_slave_index_;
     const int cycle_time_ms_;
 
@@ -124,7 +124,7 @@ private:
     std::condition_variable wait_on_pdo_condition_var_;
     bool pdo_received_ = false;
 
-    char io_map_[4096] = { 0 };
+    std::array<char, 4096> io_map_ = { 0 };
     int expected_working_counter_ = 0;
 
     int latest_lost_slave_ = -1;

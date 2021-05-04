@@ -56,10 +56,10 @@ private:
     // Safety handlers to use when logging errors
     std::shared_ptr<SafetyHandler> safety_handler_;
 
-    double default_temperature_threshold_;
-
-    rclcpp::Duration send_errors_interval_;
     rclcpp::Time time_last_send_error_;
+    rclcpp::Duration send_errors_interval_;
+
+    double default_temperature_threshold_ {};
 
     // Map of ThresholdHoldsMaps to store threshold values for each joint
     std::map<ThresholdType, ThresholdHoldsMap> thresholds_maps_;

@@ -1,7 +1,7 @@
 #ifndef MARCH_REGION_CREATOR_H
 #define MARCH_REGION_CREATOR_H
 
-#include "yaml-cpp/yaml.h"
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl/segmentation/region_growing.h>
 #include <pcl_ros/point_cloud.h>
@@ -14,30 +14,36 @@ using RegionVector = std::vector<pcl::PointIndices>;
 
 class RegionCreator {
 public:
-    RegionCreator(YAML::Node config_tree, bool debugging);
+    explicit RegionCreator(bool debugging);
     // This function is required to be implemented by any region creator
     virtual bool createRegions(PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals,
         boost::shared_ptr<RegionVector> region_vector)
         = 0;
-    virtual ~RegionCreator() {};
+    virtual ~RegionCreator() = default;
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
+
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
+    virtual void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config)
+        = 0;
 
 protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
     boost::shared_ptr<RegionVector> region_vector_;
-    YAML::Node config_tree_;
     bool debugging_;
 };
 
 class RegionGrower : RegionCreator {
 public:
     // Use the constructors defined in the super class
-    RegionGrower(YAML::Node config_tree, bool debugging);
+    explicit RegionGrower(bool debugging);
     /** Create cluster using the region growing algorithm, takes algorithm
-     * configuration from the YAML, and fills parameter region_vector with
-     * clusters. **/
+     * configuration from the dynamic parameter server, and fills parameter
+     * region_vector with clusters. **/
     bool createRegions(PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals,
         boost::shared_ptr<RegionVector> region_vector) override;
@@ -48,13 +54,13 @@ public:
      */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
 
-private:
-    /**
-     * Read out YAML
-     * @return true if succesful
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
      */
-    void readYaml();
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config) override;
 
+private:
     /**
      * Configure region growing algorithm
      */

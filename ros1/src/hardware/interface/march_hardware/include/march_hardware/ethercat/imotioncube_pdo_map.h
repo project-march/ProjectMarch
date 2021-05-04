@@ -1,8 +1,10 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_PDOMAP_H
-#define MARCH_HARDWARE_PDOMAP_H
+#ifndef MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
+#define MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
 #include "march_hardware/ethercat/sdo_interface.h"
+#include "march_hardware/motor_controller/odrive/odrive_state.h"
 
+#include <array>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -13,25 +15,26 @@
 namespace march {
 /** Store IMC data as a struct to prevent data overlap.*/
 struct IMCObject {
-    uint16_t address; // in IMC memory (see IMC manual)
-    uint8_t
-        sub_index; // sub index corresponding to PDO register (see IMC manual)
-    uint8_t length; // bits (see IMC manual)
-    uint32_t combined_address; // combine the address(hex), sub-index(hex) and
-                               // length(hex)
+    uint16_t address {}; // in IMC memory (see IMC manual)
+    uint8_t sub_index {}; // sub index corresponding to PDO register (see IMC
+                          // manual)
+    uint8_t length {}; // bits (see IMC manual)
+    uint32_t combined_address {}; // combine the address(hex), sub-index(hex)
+                                  // and length(hex)
 
     IMCObject(uint16_t _address, uint8_t _sub_index, uint8_t _length)
         : address(_address)
         , sub_index(_sub_index)
         , length(_length)
     {
-        uint32_t MSword = (address << 16);
-        uint32_t LSword = (sub_index << 8) | length;
+        uint32_t MSword = (address << 16U);
+        uint32_t LSword = ((uint32_t)(sub_index << 8U)) | length;
 
         combined_address = (MSword | LSword);
     }
 
-    IMCObject() {};
+    IMCObject() = default;
+    ;
 };
 
 /** The data direction to which the PDO is specified is restricted to master in
@@ -42,7 +45,7 @@ enum class DataDirection {
 };
 
 /** All the available IMC object names divided over the PDO maps. make sure to
- * also add it to PDOmap constructor.*/
+ * also add it to IMCPDOmap constructor.*/
 enum class IMCObjectName {
     StatusWord,
     ActualPosition,
@@ -64,7 +67,7 @@ enum class IMCObjectName {
     MotorVoltage
 };
 
-class PDOmap {
+class IMCPDOmap {
 public:
     /**
      * Initiate all the entered IMC objects to prepare the PDO.
@@ -99,8 +102,8 @@ private:
     const int bits_per_register = 64; // Maximum amount of bits that can be
                                       // constructed in one PDO message.
     const int nr_of_regs = 4; // Amount of registers available.
-    const int object_sizes[3] = { 32, 16, 8 }; // Available sizes.
+    const std::array<int, 3> object_sizes { 32, 16, 8 }; // Available sizes.
 };
 } // namespace march
 
-#endif // MARCH_HARDWARE_PDOMAP_H
+#endif // MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
