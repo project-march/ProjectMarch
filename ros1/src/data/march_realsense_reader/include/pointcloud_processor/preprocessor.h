@@ -23,8 +23,8 @@ public:
 
     // Removes a point from a pointcloud (and optionally the corresponding
     // pointcloud_normals as well) at a given index
-    void removePointByIndex(int const index, PointCloud::Ptr pointcloud,
-        Normals::Ptr pointcloud_normals = nullptr);
+    void removePointByIndex(int const index, const PointCloud::Ptr& pointcloud,
+        const Normals::Ptr& pointcloud_normals = nullptr);
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -92,7 +92,8 @@ protected:
 
     // Estimates the normals of the pointcloud and fills the pointcloud_normals_
     // cloud with those
-    bool fillNormalCloud(geometry_msgs::TransformStamped transform_stamped);
+    bool fillNormalCloud(
+        const geometry_msgs::TransformStamped& transform_stamped);
 
     // Removes all points which do not roughly have a normal in a certain
     // direction (specified in the parameter file)

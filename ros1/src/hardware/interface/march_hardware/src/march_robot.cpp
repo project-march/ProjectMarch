@@ -17,8 +17,8 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
-    , ethercatMaster(
-          if_name, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
+          ecatCycleTime, ecatSlaveTimeout)
     , pdb_(nullptr)
 {
 }
@@ -28,8 +28,8 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
-    , ethercatMaster(
-          if_name, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
+          ecatCycleTime, ecatSlaveTimeout)
     , pdb_(std::move(powerDistributionBoard))
 {
 }
@@ -40,8 +40,8 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
-    , ethercatMaster(
-          if_name, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
+          ecatCycleTime, ecatSlaveTimeout)
     , pdb_(std::move(powerDistributionBoard))
     , pressureSoles(std::move(pressureSoles))
 {
@@ -176,7 +176,7 @@ int MarchRobot::getEthercatCycleTime() const
     return this->ethercatMaster.getCycleTime();
 }
 
-Joint& MarchRobot::getJoint(::std::string jointName)
+Joint& MarchRobot::getJoint(const ::std::string& jointName)
 {
     if (!ethercatMaster.isOperational()) {
         ROS_WARN(

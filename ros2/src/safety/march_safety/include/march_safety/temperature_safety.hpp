@@ -32,7 +32,7 @@ public:
 private:
     // Callback for when a temperature is published.
     void temperatureCallback(
-        const TemperatureMsg::SharedPtr msg, const std::string& sensor_name);
+        const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name);
 
     // Create a subscriber for each joint on the /march/temperature/<joint>
     // topic

@@ -40,7 +40,7 @@ class PdoSlaveInterface {
 public:
     PdoSlaveInterface(uint16_t slave_index, PdoInterfacePtr pdo)
         : slave_index_(slave_index)
-        , pdo_(pdo)
+        , pdo_(std::move(pdo))
     {
     }
 

@@ -22,7 +22,7 @@ public:
         double time_since_start, double stable_foot_pose_x);
     void getWalkGoalPositionX(
         double time_since_start, double stable_foot_pose_x);
-    bool changeComLevel(std::string);
+    bool changeComLevel(const std::string&);
 
     std::vector<std::string> com_levels;
 

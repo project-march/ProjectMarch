@@ -33,7 +33,7 @@ double distanceBetweenPoints(T point1, Q point2)
 // Project a point to a line
 template <typename T>
 pcl::PointXYZ projectPointToLine(
-    T point, pcl::ModelCoefficients::Ptr line_coefficients)
+    T point, const pcl::ModelCoefficients::Ptr& line_coefficients)
 {
     // The calculations only with pointXYZ types as pcl does the calculations
     pcl::PointXYZ point_to_project;

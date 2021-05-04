@@ -11,7 +11,7 @@ namespace yaml_utilities {
 // requested parameter does not exist
 template <typename T>
 std::optional<T> grabParameter(
-    YAML::Node const yaml_node, std::string const parameter_name)
+    YAML::Node const& yaml_node, std::string const& parameter_name)
 {
     T parameter;
     if (YAML::Node raw_parameter = yaml_node[parameter_name]) {

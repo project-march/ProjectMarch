@@ -13,8 +13,8 @@
 namespace march {
 class Slave : public PdoSlaveInterface {
 public:
-    Slave(uint16_t slave_index, PdoInterfacePtr pdo_interface,
-        SdoInterfacePtr sdo_interface)
+    Slave(uint16_t slave_index, const PdoInterfacePtr& pdo_interface,
+        const SdoInterfacePtr& sdo_interface)
         : PdoSlaveInterface(slave_index, pdo_interface)
         , slave_index_(slave_index)
         , sdo_interface_(sdo_interface)

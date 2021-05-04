@@ -88,7 +88,7 @@ private:
      * @return Returns a vector: The weight values belonging to the diagonal of
      * the MPC weight matrix.
      */
-    std::vector<float> getWeights(std::string joint_name);
+    std::vector<float> getWeights(const std::string& joint_name);
 
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 

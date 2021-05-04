@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -21,7 +22,7 @@ ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
 ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
-    : W_(W)
+    : W_(std::move(W))
 {
 }
 

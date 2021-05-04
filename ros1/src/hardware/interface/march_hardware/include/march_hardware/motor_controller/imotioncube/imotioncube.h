@@ -100,7 +100,7 @@ private:
     void actuateIU(int32_t target_iu);
 
     // Set the IMotionCube in a certain state
-    void goToTargetState(IMotionCubeTargetState target_state);
+    void goToTargetState(const IMotionCubeTargetState& target_state);
     void setControlWord(uint16_t control_word);
 
     // Getters for information about the state of the IMotionCube

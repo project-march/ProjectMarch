@@ -67,7 +67,7 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(
 void FakeTemperatureDataNode::initialize()
 {
     // Create a temperature publisher for all the different joints.
-    for (auto sensor : node_utils::get_joint_names(*this)) {
+    for (const auto& sensor : node_utils::get_joint_names(*this)) {
         add_temperature_publisher(sensor);
     }
 
@@ -168,7 +168,7 @@ void FakeTemperatureDataNode::add_temperature_publisher(
  */
 void FakeTemperatureDataNode::publish_temperatures()
 {
-    for (auto publisher : temperature_publishers) {
+    for (const auto& publisher : temperature_publishers) {
         generate_new_temperature();
 
         MessageType message;
