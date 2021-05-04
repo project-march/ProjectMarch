@@ -12,8 +12,12 @@ from march_utility.utilities.utility_functions import (
 )
 from march_utility.utilities.vector_3d import Vector3d
 
-from march_utility.gait.edge_position import DynamicEdgePosition, EdgePosition, \
-    StaticEdgePosition, UnknownEdgePosition
+from march_utility.gait.edge_position import (
+    DynamicEdgePosition,
+    EdgePosition,
+    StaticEdgePosition,
+    UnknownEdgePosition,
+)
 
 
 class EdgePointTest(unittest.TestCase):
@@ -24,8 +28,7 @@ class EdgePointTest(unittest.TestCase):
 
     def test_get_item(self):
         position = EdgePosition(self.values)
-        joint_name = "joint1"
-        self.assertEqual(self.values[joint_name], position[joint_name])
+        self.assertEqual(self.values["joint1"], position[0])
 
     def test_eq(self):
         position1 = EdgePosition(self.values)
@@ -69,7 +72,7 @@ class EdgePointTest(unittest.TestCase):
 
     def test_unknown(self):
         position = UnknownEdgePosition()
-        self.assertIsNone(position.values)
+        self.assertEqual(position.values, ())
 
     def test_is_compatible_unknown(self):
         position1 = UnknownEdgePosition()

@@ -1,0 +1,6 @@
+name: simple_gait
+subgaits:
+  start:
+    to: first
+  first:
+    to: end

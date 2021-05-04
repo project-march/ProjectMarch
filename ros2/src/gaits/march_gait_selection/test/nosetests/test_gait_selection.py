@@ -38,7 +38,7 @@ class TestGaitSelection(unittest.TestCase):
 
     # load gaits tests
     def test_types_in_loaded_gaits(self):
-        for gait in self.gait_selection._loaded_gaits.values():
+        for gait in self.gait_selection._gaits.values():
             self.assertIsInstance(gait, GaitInterface)
 
     def test_gait_selection_positions(self):

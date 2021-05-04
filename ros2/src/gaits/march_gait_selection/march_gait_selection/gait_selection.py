@@ -23,6 +23,7 @@ from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
 )
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from march_utility.utilities.node_utils import joint_names_from_urdf, get_robot_urdf
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -81,7 +82,7 @@ class GaitSelection(Node):
             )
 
         self._robot = get_robot_urdf_from_service(self) if robot is None else robot
-        self._joint_names = get_joint_names_from_robot(self._robot)
+        self._joint_names = sorted(get_joint_names_from_robot(self._robot))
 
         self._realsense_yaml = os.path.join(
             self._gait_directory, "realsense_gaits.yaml"
@@ -101,7 +102,7 @@ class GaitSelection(Node):
         )
 
         self._create_services()
-        self._loaded_gaits = self._load_gaits()
+        self._gaits = self._load_gaits()
 
         self._early_schedule_duration = self._parse_duration_parameter(
             "early_schedule_duration"
@@ -188,7 +189,7 @@ class GaitSelection(Node):
     def shortest_subgait(self) -> Subgait:
         """Get the subgait with the smallest duration of all subgaits in the loaded gaits."""
         shortest_subgait = None
-        for gait in self._loaded_gaits.values():
+        for gait in self._gaits.values():
             for subgait in gait.subgaits.values():
                 if (
                     shortest_subgait is None
@@ -226,7 +227,7 @@ class GaitSelection(Node):
         :param dict version_map: Mapping subgait names to versions
         """
         self.get_logger().info(f"Setting gait versions, should be {version_map}")
-        if gait_name not in self._loaded_gaits:
+        if gait_name not in self._gaits:
             raise GaitNameNotFound(gait_name)
 
         # Only update versions that are different
@@ -235,7 +236,7 @@ class GaitSelection(Node):
             for name, version in version_map.items()
             if version != self._gait_version_map[gait_name][name]
         }
-        self._loaded_gaits[gait_name].set_subgait_versions(
+        self._gaits[gait_name].set_subgait_versions(
             self._robot, self._gait_directory, version_map
         )
         self._gait_version_map[gait_name].update(version_map)
@@ -274,7 +275,7 @@ class GaitSelection(Node):
         :param request: service request
         :return: True when the gait and subgait are loaded
         """
-        gait = self._loaded_gaits.get(request.gait)
+        gait = self._gaits.get(request.gait)
         if gait is None:
             response.contains = False
             return response
@@ -324,12 +325,12 @@ class GaitSelection(Node):
 
         The to be added gait should implement `GaitInterface`.
         """
-        if gait.name in self._loaded_gaits:
+        if gait.name in self._gaits:
             self.get_logger().warn(
                 "Gait `{gait}` already exists in gait selection".format(gait=gait.name)
             )
         else:
-            self._loaded_gaits[gait.name] = gait
+            self._gaits[gait.name] = gait
 
     def _load_gaits(self):
         """Loads the gaits in the specified gait directory.
@@ -469,8 +470,8 @@ class GaitSelection(Node):
 
     def __getitem__(self, name):
         """Returns a gait from the loaded gaits."""
-        return self._loaded_gaits.get(name)
+        return self._gaits.get(name)
 
     def __iter__(self):
         """Returns an iterator over all loaded gaits."""
-        return iter(self._loaded_gaits.values())
+        return iter(self._gaits.values())

@@ -1,0 +1,14 @@
+gaits:
+  simple_gait: {first: test_version}
+positions:
+  stand:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.1
+      left_hip_aa: 0.2
+      left_hip_fe: 0.3
+      left_knee: 0.4
+      right_ankle: 0.5
+      right_hip_aa: 0.6
+      right_hip_fe: 0.7
+      right_knee: 0.8

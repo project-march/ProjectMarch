@@ -6,6 +6,8 @@ realsense_stairs_up_single_step:
   # The gait realsense category must match an available category in GetGaitParameters.srv
   realsense_category: stairs_up
   camera_to_use: front
+  starting_position: static
+  final_position: static
   dimensions: 2
   default_parameters:
   - 0.5
@@ -24,6 +26,8 @@ realsense_stairs_up_single_step:
 realsense_stairs_up:
   realsense_category: stairs_up
   camera_to_use: front
+  starting_position: static
+  final_position: static
   dimensions: 2
   default_parameters:
   - 1.0
@@ -57,30 +61,34 @@ realsense_stairs_up:
 
 # EXAMPLE for future 1 dimension gaits that are coupled (implementation for coupled
 #  will be added to realsense gait later)
-#    realsense_sit:
-#      gait: sit
-#      camera_to_use: back
-#      default_parameters:
-#       - 0.5
-#      subgaits:
-#        sit_down:
-#        - MVI_sit_down_low_v1
-#        - MVI_sit_down_high_v1
-#        sit_home:
-#        - MVI_sit_home_low_v1
-#        - MVI_sit_home_high_v1
-#      responsible_for:
-#      - realsense_stand
-#    realsense_stand:
-#      gait: sit
-#      camera_to_use: back
-#      default_parameters:
-#      - 0.5
-#      subgaits:
-#        prepare_stand_up:
-#        - MVI_prepare_stand_up_low
-#        - MVI_prepare_stand_up_high
-#        stand_up:
-#        - MVI_stand_up_low
-#        - MVI_stand_up_high
+realsense_sit:
+  realsense_category: sit
+  camera_to_use: back
+  starting_position: static
+  final_position: dynamic
+  default_parameters:
+   - 0.5
+  subgaits:
+    sit_down:
+    - MVI_sit_down_low_v1
+    - MVI_sit_down_high_v1
+    sit_home:
+    - MVI_sit_home_low_v1
+    - MVI_sit_home_high_v1
+#  responsible_for:
+#  - realsense_stand
+realsense_stand:
+  realsense_category: sit
+  camera_to_use: back
+  starting_position: dynamic
+  final_position: static
+  default_parameters:
+  - 0.5
+  subgaits:
+    prepare_stand_up:
+    - MVI_prepare_stand_up_low
+    - MVI_prepare_stand_up_high
+    stand_up:
+    - MVI_stand_up_low
+    - MVI_stand_up_high
 #      dependent: True

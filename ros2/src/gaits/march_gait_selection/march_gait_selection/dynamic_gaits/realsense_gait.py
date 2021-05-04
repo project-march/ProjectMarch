@@ -4,6 +4,8 @@ from typing import Optional, List
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
+from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition, \
+    DynamicEdgePosition
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
@@ -57,6 +59,8 @@ class RealSenseGait(SetpointsGait):
         dimensions: InterpolationDimensions,
         parameters: List[float],
         process_service: Client,
+        starting_position: EdgePosition,
+        final_position: EdgePosition,
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
         self._node = node
@@ -71,10 +75,20 @@ class RealSenseGait(SetpointsGait):
         self._get_gait_parameters_service = process_service
         self.realsense_service_event = Event()
         self.realsense_service_result = None
+        self._starting_position = starting_position
+        self._final_position = final_position
 
     @property
     def can_be_scheduled_early(self) -> bool:
         return False
+
+    @property
+    def starting_position(self) -> EdgePosition:
+        return self._starting_position
+
+    @property
+    def final_position(self)-> EdgePosition:
+        return self._final_position
 
     @classmethod
     def from_yaml(
@@ -140,6 +154,15 @@ class RealSenseGait(SetpointsGait):
                         use_foot_position=True,
                     )
 
+            starting_position = cls.parse_edge_position(
+                gait_config["starting_position"],
+                subgaits[graph.end_subgaits()[0]].starting_position
+            )
+            final_position = cls.parse_edge_position(
+                gait_config["starting_position"],
+                subgaits[graph.end_subgaits()[0]].final_position
+            )
+
         except KeyError as e:
             raise WrongRealSenseConfigurationError(
                 f"There was a missing key to create realsense gait in gait {gait_name}:"
@@ -161,7 +184,20 @@ class RealSenseGait(SetpointsGait):
             dimensions,
             parameters,
             process_service,
+            starting_position,
+            final_position
         )
+
+    @classmethod
+    def parse_edge_position(cls, config_value, position_values):
+        if config_value == "static":
+            return StaticEdgePosition(position_values)
+        elif config_value == "dynamic":
+            return DynamicEdgePosition(position_values)
+        else:
+            raise WrongRealSenseConfigurationError("The edge position did not have a "
+                                                   "valid value, should be static or "
+                                                   f"dynamic, but was `{config_value}`")
 
     @classmethod
     def realsense_category_from_string(cls, gait_name: str) -> int:

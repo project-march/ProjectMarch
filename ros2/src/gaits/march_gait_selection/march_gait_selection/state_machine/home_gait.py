@@ -1,8 +1,10 @@
+from march_utility.gait.edge_position import StaticEdgePosition, UnknownEdgePosition
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from .gait_update import GaitUpdate
+
 from .gait_interface import GaitInterface
+from .gait_update import GaitUpdate
 from .trajectory_scheduler import TrajectoryCommand
 
 
@@ -48,11 +50,11 @@ class HomeGait(GaitInterface):
 
     @property
     def starting_position(self):
-        return None
+        return UnknownEdgePosition()
 
     @property
     def final_position(self):
-        return self._position
+        return StaticEdgePosition(self._position)
 
     @property
     def version(self):
