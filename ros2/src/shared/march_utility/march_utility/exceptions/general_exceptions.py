@@ -84,3 +84,16 @@ class WeightedAverageError(Exception):
             msg = "The calculation of the weighted average cannot be executed safely."
 
         super(WeightedAverageError, self).__init__(msg)
+
+
+class InconsistentDigitsError(Exception):
+    def __init__(self, msg: str = None, number1: float = None, number2: float = None):
+        """
+        Class to raise an error when precision or digits are not consistent where they should be.
+        """
+        if msg is None:
+            msg = "Two numbers which which should have the same number of digits but do not were supplied."
+            if number1 is not None and number2 is not None:
+                msg += f"The numbers are: {number1} and {number2}"
+
+        super(InconsistentDigitsError, self).__init__(msg)

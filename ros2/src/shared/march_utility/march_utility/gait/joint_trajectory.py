@@ -170,14 +170,18 @@ class JointTrajectory(object):
 
         LOGGER = rclpy.logging.get_logger("march_utility_logger")
 
-        if (not abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR):
+        if not abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR:
             LOGGER.warning("")
-            LOGGER.warning(f"joint {self.name} has an invalid VELOCITY transition as {from_setpoint.velocity} != {to_setpoint.velocity}")
+            LOGGER.warning(
+                f"joint {self.name} has an invalid VELOCITY transition as {from_setpoint.velocity} != {to_setpoint.velocity}"
+            )
             LOGGER.warning("")
 
-        if (not abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR):
+        if not abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
             LOGGER.warning("")
-            LOGGER.warning(f"joint {self.name} has an invalid POSITION transition as {from_setpoint.position} != {to_setpoint.position}")
+            LOGGER.warning(
+                f"joint {self.name} has an invalid POSITION transition as {from_setpoint.position} != {to_setpoint.position}"
+            )
             LOGGER.warning("")
 
         return (

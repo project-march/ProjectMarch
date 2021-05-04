@@ -155,4 +155,14 @@ class FeetState(object):
             feet_state.right_foot, feet_state.time
         )
 
-        return merge_dictionaries(left_joint_states, right_joint_states)
+        working_setpoint_dictionary = merge_dictionaries(
+            left_joint_states, right_joint_states
+        )
+
+        final_setpoint_dictionary = (
+            Setpoint.set_setpoint_dictionary_to_default_precision(
+                working_setpoint_dictionary
+            )
+        )
+
+        return final_setpoint_dictionary

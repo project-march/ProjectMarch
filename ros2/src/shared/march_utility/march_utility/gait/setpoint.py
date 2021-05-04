@@ -11,6 +11,8 @@ from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
 )
+from ..exeptions.general_exceptions import InconsistentDigitsError
+
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
@@ -19,10 +21,14 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
-    digits = 8
+    DEFAULT_DIGITS = 4
 
     def __init__(
-        self, time: Duration, position: float, velocity: Optional[float] = None
+        self,
+        time: Duration,
+        position: float,
+        velocity: Optional[float] = None,
+        digits: Optional[int] = DEFAULT_DIGITS,
     ) -> None:
         """
         Initialize a setpoint.
@@ -30,11 +36,16 @@ class Setpoint:
         :param time: The time within the subgait, in nanoseconds.
         :param position: The position (angle) of the joint.
         :param velocity: The velocity of the joint.
+        :param digits: The digits to which the position and velocity are specified
         """
+        self.digits = digits
+
         self._time = round(
             time, self.digits
         )  # https://github.com/python/mypy/issues/8213
+
         self._position = round(position, self.digits)
+
         if velocity is not None:
             self._velocity: Optional[float] = round(velocity, self.digits)
         else:
@@ -124,9 +135,17 @@ class Setpoint:
 
         :return: The joint velocities of the joints on the specified side
         """
-        self.velocity = (next_state.position - self.position) / (
-            next_state.time - self.time
-        ).seconds
+        if self.digits != next_state.digits:
+            raise InconsistentDigitsError(
+                msg=f"Cannot add joint velocity from next angle state as digits the setpoints "
+                f"are {self.digits} while those from the next state are {next_state.digits}"
+            )
+
+        self.velocity = round(
+            (next_state.position - self.position)
+            / (next_state.time - self.time).seconds,
+            self.digits,
+        )
 
     @staticmethod
     def interpolate_setpoints(
@@ -151,3 +170,8 @@ class Setpoint:
             base_setpoint.velocity, other_setpoint.velocity, parameter
         )
         return Setpoint(time, position, velocity)
+
+    @staticmethod
+    def set_setpoint_dictionary_to_default_precision(setpoint_dictionary: dict):
+        for key in setpoint_dictionary.keys():
+            setpoint_dictionary[key].digits = setpoint_dictionary.DEFAULT_DIGITS

@@ -170,9 +170,12 @@ class Foot(object):
         )
 
         return {
-            foot_side.value + "_hip_aa": Setpoint(time, haa),
-            foot_side.value + "_hip_fe": Setpoint(time, hfe),
-            foot_side.value + "_knee": Setpoint(time, kfe),
+            foot_side.value
+            + "_hip_aa": Setpoint(time, haa, digits=MID_CALCULATION_PRECISION_DIGITS),
+            foot_side.value
+            + "_hip_fe": Setpoint(time, hfe, digits=MID_CALCULATION_PRECISION_DIGITS),
+            foot_side.value
+            + "_knee": Setpoint(time, kfe, digits=MID_CALCULATION_PRECISION_DIGITS),
         }
 
     @staticmethod
