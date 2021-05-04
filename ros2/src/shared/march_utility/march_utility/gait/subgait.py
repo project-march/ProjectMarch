@@ -743,7 +743,7 @@ class Subgait(object):
                 )
                 setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
 
-                LOGGER.info(f"setpoints_to_add_IK = {setpoints_to_add}")
+            LOGGER.info(f"setpoints_to_add_IK = {setpoints_to_add}")
 
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
