@@ -10,7 +10,9 @@ Checks:     -*,
             -hicpp-special-member-functions,
             -hicpp-no-array-decay,
             -hicpp-vararg,
-            -hicpp-avoid-goto
+            -hicpp-avoid-goto,
+            concurrency-*,
+            performance-*
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
@@ -38,5 +40,7 @@ CheckOptions:
     - key:      bugprone-suspicious-enum-usage.StrictMode
       value:    '1'
     - key:      hicpp-signed-bitwise.IgnorePositiveIntegerLiterals 
+      value:    '1'
+    - key:      performance-inefficient-string-concatenation.StrictMode
       value:    '1'
 ...
