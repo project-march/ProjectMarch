@@ -1,6 +1,10 @@
 variables:
+  # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
 
+# The different stages of the pipeline. They will occur in this order.
+# See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
+# on how this should be interpreted.
 stages:
   - Tag container
   - Build container
@@ -9,7 +13,66 @@ stages:
   - Test code
   - Static analysis on code
 
-image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
+# GitLab defines different job types, depending on how the job is scheduled.
+# Right now, we use two types: 1) branches and 2) merge_requests.
+#
+# 1) Branches
+# Pipelines labeled "branches" are executed on the latest commit of a branch. All
+# jobs that are scheduled conditionally based on the file changes in the
+# latest commit (the "changes" keyword,
+# see https://docs.gitlab.com/ee/ci/yaml/README.html#onlychangesexceptchanges)
+#
+# 2) Merge requests
+# Pipelines labeled "merge_requests" are executed when commits are pushed to a
+# merge request. This pipeline runs on the difference between the target branch
+# and the source branch. The "changes" keywords covers ALL changes that differ
+# between the two branches.
+#
+# In short: branches        = only latest commit
+#           merge_requests  = all commits in in merge request
+#
+# An overview of all the different types can be
+# found on https://docs.gitlab.com/ee/ci/yaml/README.html#onlyexcept-basic
+
+# These following jobs are so called "hidden jobs"
+#   (see https://docs.gitlab.com/ee/ci/yaml/README.html#hide-jobs). 
+# These jobs are not actually used here, but used in other jobs with the help of
+# the "extends" keyword (sort of like #include or import, 
+#   see https://docs.gitlab.com/ee/ci/yaml/README.html#extends)
+# They are used to extract statements that are included in almost every job, to
+# prevent duplication.
+
+# Only run when the pipeline is for a branch that does not start with some digits
+# followed by a `-`, i.e. all branches that are not created via issues.
+.branches_to_run_pipeline_on:
+  only:
+    refs:
+      - branches
+  except:
+    refs:
+      # Regular expression that matches branches that start with some digits, followed by a '-'
+      # i.e. all branches that are created from an issue. 
+      - /^[\d]+-.*$/
+
+# Only run when the pipeline is for a merge_request
+.merge_request_ref:
+  only:
+    refs:
+      - merge_requests
+
+# Use a specific Docker image when it is a branch. These two are different
+# because "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" does not exist for branches.
+.branches:
+    image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
+    extends:
+      - .branches_to_run_pipeline_on
+
+# Use a specific Docker image when it is a merge request. These two are different
+# because "$CI_COMMIT_BRANCH" does not exist for merge requests.
+.merge_requests:
+    image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    extends:
+      - .merge_request_ref
 
 # Allow each branch to run their own container. This allows a branch to add
 # dependencies to their package.xml and use them as expected. This process works as
@@ -18,7 +81,7 @@ image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 #   is pulled and tagged as the image for this branch.
 # 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
 #   container. This will use remote caches from GitLab to speed up the process.
-container:tag:
+.container:tag-base:
   stage: Tag container
   image: quay.io/podman/stable
   variables:
@@ -26,8 +89,30 @@ container:tag:
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && podman push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
+    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
 
+# If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
+# then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
+container:tag:
+  variables:
+    BRANCH_NAME: $CI_COMMIT_BRANCH
+  extends:
+    - .container:tag-base
+    - .branches_to_run_pipeline_on
+
+# If the pipeline is for merge_requests defined in `.merge_request_ref`,
+# then use $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME as the $BRANCH_NAME in the "tag" job.
+container:tag for MRs:
+  variables:
+    BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+  extends:
+    - .container:tag-base
+    - .merge_request_ref
+
+# Build the container iff the Dockerfile has been changed. This only runs for
+# branches because this is a very long job. Running it for merge requests would
+# mean that this job is scheduled every time that a commit is pushed in a merge requests,
+# which is unnessecary if the Dockerfile is only changed once in the merge request.
 container:build:
   stage: Build container
   image:
@@ -40,14 +125,18 @@ container:build:
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
     - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
-  rules:
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - Dockerfile
+  only:
+    refs:
+      - branches
+    changes:
+      - "Dockerfile"
 
-# Runs a linter on the code to see if the code style is consistent and to avoid common
-# mistakes
-flake8:
+#################
+# flake8 linter #
+#################
+# Runs a Python linter on the code to see if the code style is consistent and
+# to avoid common mistakes
+.flake8-base:
   stage: Lint code
   script:
     - python3 -m flakehell lint --suppress-none-returning --format=gitlab --output-file flakehell.json
@@ -60,7 +149,24 @@ flake8:
       - "pyproject.toml"
       - "**/*.py"
 
-clang_format:
+# The job for branches
+flake8:
+  extends:
+    - .flake8-base
+    - .branches
+
+# The job for merge_requests
+flake8 for MRs:
+  extends:
+    - .flake8-base
+    - .merge_requests
+
+#######################
+# clang-format linter #
+#######################
+# Check if the C++ code is consistent in code formatting (correct amount of tabs/spaces,
+# correct indentation etc.)
+.clang_format-base:
   stage: Lint code
   script:
     - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
@@ -69,7 +175,30 @@ clang_format:
       - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
       - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
 
-noetic:build:
+# The job for branches
+clang_format:
+  extends:
+    - .clang_format-base
+    - .branches
+
+# The job for merge_requests
+clang_format for MRs:
+  extends:
+    - .clang_format-base
+    - .merge_requests
+
+####################
+# Build code stage #
+####################
+# Run the build command to see if everything compiles without errors. This is a
+# separate stage for the noetic and for the foxy code, because they are not dependent
+# on each other and can therefore be run in parallel.
+# Besides compiling, this also produces a "compile_commands.json" file that is used
+# by subsequent C++ static analysis stages.
+
+# Build ROS 1 noetic iff a file in the ros1 folder has changed, or if .clang-tidy has
+# changed
+.noetic:build-base:
   stage: Build code
   artifacts:
     paths:
@@ -79,8 +208,24 @@ noetic:build:
   script:
     - cd ros1/
     - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+  only:
+    changes:
+      - "ros1/**/*"
+      - ".clang-tidy"
 
-foxy:build:
+noetic:build:
+  extends:
+    - .noetic:build-base
+    - .branches
+
+noetic:build for MRs:
+  extends:
+    - .noetic:build-base
+    - .merge_requests
+
+# Build ROS 2 foxy iff a file in the ros2 folder has changed, or if .clang-tidy has
+# changed
+.foxy:build-base:
   stage: Build code
   artifacts:
     paths:
@@ -90,8 +235,29 @@ foxy:build:
   script:
     - cd ros2/
     - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+  only:
+    changes:
+      - "ros2/**/*"
+      - ".clang-tidy"
 
-noetic:test:
+foxy:build:
+  extends:
+    - .foxy:build-base
+    - .branches
+
+foxy:build for MRs:
+  extends:
+    - .foxy:build-base
+    - .merge_requests
+
+###################
+# Test code stage #
+###################
+# Run the tests, both for noetic and foxy. These stages are separated because they
+# are not dependent on eachother. This enables extra parallelization.
+
+# Run noetic tests, if something in the ros1 folder has changed
+.noetic:test-base:
   stage: Test code
   dependencies:
     - noetic:build
@@ -100,8 +266,24 @@ noetic:test:
     - cd ros1/
     - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
+  only:
+    changes:
+      - "ros1/**/*"
 
-foxy:test:
+noetic:test:
+  extends:
+    - .noetic:test-base
+    - .branches
+
+noetic:test for MRs:
+  dependencies: ["noetic:build for MRs"]
+  needs: ["noetic:build for MRs"]
+  extends:
+    - .noetic:test-base
+    - .merge_requests
+
+# Run foxy tests, if something in the ros2 folder has changed
+.foxy:test-base:
   stage: Test code
   dependencies:
     - foxy:build
@@ -110,8 +292,30 @@ foxy:test:
     - cd ros2/
     - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
+  only:
+    changes:
+      - "ros2/**/*"
 
-noetic:clang_tidy:
+foxy:test:
+  extends:
+    - .foxy:test-base
+    - .branches
+
+foxy:test for MRs:
+  dependencies: ["foxy:build for MRs"]
+  needs: ["foxy:build for MRs"]
+  extends:
+    - .foxy:test-base
+    - .merge_requests
+
+#######################
+# C++ static analysis #
+#######################
+# Run C++ static analysis. This is dependent on the `compile_commands.json` file that is
+# produced by the build stage. This runs when a C++ file has been changed or if the
+# static analysis configuration has changed. Currently, only clang-tidy is executed in
+# this stage. More information on clang-tidy can be found on https://clang.llvm.org/extra/clang-tidy/
+.noetic:clang_tidy-base:
   stage: Static analysis on code
   dependencies:
     - noetic:build
@@ -125,7 +329,19 @@ noetic:clang_tidy:
       - "ros1/**/CMakeLists.txt"
       - ".clang-tidy"
 
-foxy:clang_tidy:
+noetic:clang_tidy:
+  extends:
+    - .noetic:clang_tidy-base
+    - .branches
+
+noetic:clang_tidy for MRs:
+  dependencies: ["noetic:build for MRs"]
+  needs: ["noetic:build for MRs"]
+  extends:
+    - .noetic:clang_tidy-base
+    - .merge_requests
+
+.foxy:clang_tidy-base:
   stage: Static analysis on code
   dependencies:
     - foxy:build
@@ -138,3 +354,15 @@ foxy:clang_tidy:
       - "ros2/**/*.{hpp,h,cpp}"
       - "ros2/**/CMakeLists.txt"
       - ".clang-tidy"
+
+foxy:clang_tidy:
+  extends:
+    - .foxy:clang_tidy-base
+    - .branches
+
+foxy:clang_tidy for MRs:
+  dependencies: ["foxy:build for MRs"]
+  needs: ["foxy:build for MRs"]
+  extends:
+    - .foxy:clang_tidy-base
+    - .merge_requests
