@@ -160,6 +160,7 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(
