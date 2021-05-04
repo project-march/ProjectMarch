@@ -99,12 +99,12 @@ bool RegionGrower::extractRegions()
                 region.indices.size());
             i++;
         }
+    }
 
-        if (region_vector_->size() == 0) {
-            ROS_WARN("Region growing algorithm found no clusters");
-            return false;
-        }
-        return true;
+    if (region_vector_->size() == 0) {
+        ROS_WARN("Region growing algorithm found no clusters, stopping "
+                 "region grower");
+        return false;
     }
 
     return true;
