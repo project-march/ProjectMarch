@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Optional
 
+import rclpy
+
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 from march_utility.utilities.duration import Duration
@@ -11,24 +13,24 @@ from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
 )
-from ..exeptions.general_exceptions import InconsistentDigitsError
+from ..exceptions.general_exceptions import InconsistentDigitsError
 
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
-
+DEFAULT_DIGITS = 4
 
 class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
-    DEFAULT_DIGITS = 4
+    digits = DEFAULT_DIGITS
 
     def __init__(
         self,
         time: Duration,
         position: float,
         velocity: Optional[float] = None,
-        digits: Optional[int] = DEFAULT_DIGITS,
+        digits: Optional[int] = digits,
     ) -> None:
         """
         Initialize a setpoint.
@@ -141,11 +143,11 @@ class Setpoint:
                 f"are {self.digits} while those from the next state are {next_state.digits}"
             )
 
-        self.velocity = round(
-            (next_state.position - self.position)
-            / (next_state.time - self.time).seconds,
-            self.digits,
-        )
+        self.velocity = (next_state.position - self.position)\
+                        / (next_state.time - self.time).seconds
+
+        LOGGER = rclpy.logging.get_logger("march_utility_logger")
+        LOGGER.warning(f"the velocity = {self.velocity}")
 
     @staticmethod
     def interpolate_setpoints(
@@ -174,4 +176,4 @@ class Setpoint:
     @staticmethod
     def set_setpoint_dictionary_to_default_precision(setpoint_dictionary: dict):
         for key in setpoint_dictionary.keys():
-            setpoint_dictionary[key].digits = setpoint_dictionary.DEFAULT_DIGITS
+            setpoint_dictionary[key].digits = DEFAULT_DIGITS
