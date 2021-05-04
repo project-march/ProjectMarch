@@ -32,9 +32,12 @@ enum class ODriveObjectName {
     EncoderManagerError,
     EncoderError,
     ControllerError,
+    AxisState,
+    Temperature,
 
     // Write objects
     TargetTorque,
+    RequestedState
 };
 
 class ODrivePDOmap {

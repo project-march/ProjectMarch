@@ -21,21 +21,62 @@
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode)
-    : MotorController(slave, std::move(absolute_encoder), actuation_mode)
+               std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+               std::unique_ptr<IncrementalEncoder> incremental_encoder,
+               ActuationMode actuation_mode, bool pre_calibrated)
+    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
+    , pre_calibrated_(pre_calibrated)
 {
     if (!absolute_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "An ODrive needs an absolute encoder");
+                                       "An ODrive needs an absolute encoder");
     }
+}
+
+ODrive::ODrive(const Slave& slave, ODriveAxis axis,
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    ActuationMode actuation_mode, bool pre_calibrated)
+    : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode, pre_calibrated)
+{
+}
+
+ODrive::ODrive(const Slave& slave, ODriveAxis axis,
+               std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+               ActuationMode actuation_mode)
+    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false)
+{
 }
 
 void ODrive::prepareActuation()
 {
-    // No action is needed as the DieBoSlave makes sure actuation is ready when
-    // etherCAT connection is made
+    if (!pre_calibrated_)
+    {
+        // Calibrate the ODrive first
+        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+        waitForState(ODriveAxisState::IDLE);
+    }
+    // Set the ODrive to closed loop control
+    setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+    waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+
+    auto odrive_state = getState();
+    if (odrive_state->hasError()) {
+        ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
+        throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
+    }
+}
+
+void ODrive::waitForState(ODriveAxisState target_state)
+{
+    auto current_state = getAxisState();
+    while (current_state != target_state) {
+        ROS_INFO("\tWaiting for '%s', currently in '%s'",
+            target_state.toString().c_str(), current_state.toString().c_str());
+
+        ros::Duration(1).sleep();
+        current_state = getAxisState();
+    }
 }
 
 void ODrive::actuateTorque(float target_torque)
@@ -108,8 +149,15 @@ void ODrive::reset(SdoSlaveInterface& /*sdo*/)
 
 ODriveAxisState ODrive::getAxisState()
 {
-    // TODO: implement
-    return ODriveAxisState::CLOSED_LOOP_CONTROL;
+    return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(
+            ODriveObjectName::AxisState, axis_))
+        .ui);
+}
+
+void ODrive::setAxisState(ODriveAxisState state)
+{
+    bit32 write_struct = { .ui = state.value_ };
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 
 float ODrive::getAbsolutePositionIU()

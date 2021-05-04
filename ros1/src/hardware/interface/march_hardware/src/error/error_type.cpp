@@ -60,6 +60,8 @@ namespace error {
                        "been lost";
             case ErrorType::ODRIVE_WRONG_AXIS_NUMBER:
                 return "ODrive axis number must be either 0 or 1";
+            case ErrorType::PREPARE_ACTUATION_ERROR:
+                return "Something went wrong with preparing for actuation";
             default:
                 return "Unknown error occurred. Please create/use a documented "
                        "error";

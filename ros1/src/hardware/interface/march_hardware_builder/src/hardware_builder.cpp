@@ -218,11 +218,16 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     int slave_index = odrive_config["slaveIndex"].as<int>();
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
+    bool pre_calibrated = false;
+    if (odrive_config["preCalibrated"]) {
+        pre_calibrated = odrive_config["preCalibrated"].as<bool>();
+    }
+
     return std::make_unique<march::ODrive>(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
         HardwareBuilder::createAbsoluteEncoder(
             absolute_encoder_config, urdf_joint),
-        mode);
+        mode, pre_calibrated);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(

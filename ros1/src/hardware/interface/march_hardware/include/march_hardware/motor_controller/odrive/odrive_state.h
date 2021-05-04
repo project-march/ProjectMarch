@@ -13,7 +13,7 @@ enum class ODriveAxis { Zero = 0, One = 1 };
 
 class ODriveAxisState {
 public:
-    enum Value : int8_t {
+    enum Value : uint32_t {
         UNDEFINED = 0,
         IDLE = 1,
         STARTUP_SEQUENCE = 2,
@@ -36,7 +36,7 @@ public:
     }
 
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
-    ODriveAxisState(int8_t state)
+    ODriveAxisState(int32_t state)
         : value_(Value(state))
     {
     }
@@ -164,4 +164,4 @@ public:
 
 } // namespace march
 
-#endif // MARCH_HARDWARE_ODRIVE_STATE_OF_OPERATION_H
+#endif // MARCH_HARDWARE_ODRIVE_STATE_H
