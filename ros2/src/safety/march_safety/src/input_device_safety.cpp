@@ -7,6 +7,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include <chrono>
+#include <utility>
 
 using namespace std::chrono_literals;
 
@@ -22,8 +23,8 @@ const float THROTTLE_DURATION_MS { 5000.0 };
  */
 InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node,
     std::shared_ptr<SafetyHandler> safety_handler)
-    : node_(node)
-    , safety_handler_(safety_handler)
+    : node_(std::move(node))
+    , safety_handler_(std::move(safety_handler))
     , connection_timeout_(/*nanoseconds=*/0)
 {
     int milliseconds;
@@ -32,6 +33,7 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node,
     connection_timeout_
         = rclcpp::Duration(std::chrono::milliseconds(milliseconds));
 
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
     auto callback = [this](const AliveMsg::SharedPtr msg) {
         inputDeviceAliveCallback(msg);
     };
@@ -44,7 +46,7 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node,
  * /march/input_device/alive topic
  * @param msg Alive msg
  */
-void InputDeviceSafety::inputDeviceAliveCallback(const AliveMsg::SharedPtr msg)
+void InputDeviceSafety::inputDeviceAliveCallback(const AliveMsg::SharedPtr& msg)
 {
     last_alive_stamps_[msg->id] = msg->stamp;
 }

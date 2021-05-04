@@ -94,7 +94,7 @@ bool RegionGrower::extractRegions()
         ROS_DEBUG(
             "Total number of clusters found: %lu", region_vector_->size());
         int i = 0;
-        for (auto region : *region_vector_) {
+        for (const auto& region : *region_vector_) {
             ROS_DEBUG("Total number of points in cluster %i: %lu", i,
                 region.indices.size());
             i++;
