@@ -403,7 +403,8 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
 // Fill a point cloud with vertices of the foot on the ground around a possible
 // foot location
 void HullParameterDeterminer::fillFootPointCloud(
-    PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
+    const PointCloud2D::Ptr& foot_pointcloud,
+    pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(/*__new_size=*/4);
 
@@ -544,7 +545,7 @@ bool HullParameterDeterminer::cropPointToHullVector(
     PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
     input_cloud->push_back(input_point);
 
-    bool success = cropCloudToHullVector(input_cloud, std::move(output_cloud));
+    bool success = cropCloudToHullVector(input_cloud, output_cloud);
     return success;
 }
 
