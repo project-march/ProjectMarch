@@ -109,6 +109,7 @@ class SetpointTest(unittest.TestCase):
                 round_setpoint(self.setpoint_dict[key].velocity),
                 places=3,
             )
+        self.assertTrue(False)
 
     def test_inverse_kinematics_reversed_position(self):
         right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))

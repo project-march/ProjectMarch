@@ -13,24 +13,18 @@ from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
 )
-from ..exceptions.general_exceptions import InconsistentDigitsError
-
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
-DEFAULT_DIGITS = 4
+
 
 class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
-    digits = DEFAULT_DIGITS
+    digits = 8
 
     def __init__(
-        self,
-        time: Duration,
-        position: float,
-        velocity: Optional[float] = None,
-        digits: Optional[int] = digits,
+            self, time: Duration, position: float, velocity: Optional[float] = None, internal_digits: Optional[int] = digits
     ) -> None:
         """
         Initialize a setpoint.
@@ -38,18 +32,14 @@ class Setpoint:
         :param time: The time within the subgait, in nanoseconds.
         :param position: The position (angle) of the joint.
         :param velocity: The velocity of the joint.
-        :param digits: The digits to which the position and velocity are specified
         """
-        self.digits = digits
-
+        self.internal_digits = internal_digits
         self._time = round(
-            time, self.digits
+            time, self.internal_digits
         )  # https://github.com/python/mypy/issues/8213
-
-        self._position = round(position, self.digits)
-
+        self._position = round(position, self.internal_digits)
         if velocity is not None:
-            self._velocity: Optional[float] = round(velocity, self.digits)
+            self._velocity: Optional[float] = round(velocity, self.internal_digits)
         else:
             self._velocity = None
 
@@ -59,7 +49,7 @@ class Setpoint:
 
     @time.setter
     def time(self, time: float):
-        self._time = round(time, self.digits)
+        self._time = round(time, self.internal_digits)
 
     @property
     def position(self):
@@ -67,7 +57,7 @@ class Setpoint:
 
     @position.setter
     def position(self, position: float):
-        self._position = round(position, self.digits)
+        self._position = round(position, self.internal_digits)
 
     @property
     def velocity(self):
@@ -75,7 +65,7 @@ class Setpoint:
 
     @velocity.setter
     def velocity(self, velocity: float):
-        self._velocity = round(velocity, self.digits)
+        self._velocity = round(velocity, self.internal_digits)
 
     def __repr__(self):
         if self.velocity is not None:
@@ -176,4 +166,4 @@ class Setpoint:
     @staticmethod
     def set_setpoint_dictionary_to_default_precision(setpoint_dictionary: dict):
         for key in setpoint_dictionary.keys():
-            setpoint_dictionary[key].digits = DEFAULT_DIGITS
+            setpoint_dictionary[key].digits = setpoint_dictionary[key].internal_digits

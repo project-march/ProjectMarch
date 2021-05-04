@@ -175,16 +175,16 @@ class Foot(object):
         LOGGER.warning(f"calculated kfe = {kfe}")
         LOGGER.warning(f"calculated hfe = {hfe}")
 
-        LOGGER.warning(f"actual setpoint of haa {Setpoint(time, haa, digits=MID_CALCULATION_PRECISION_DIGITS)}")
+        LOGGER.warning(f"actual setpoint of haa {Setpoint(time, haa, internal_digits=MID_CALCULATION_PRECISION_DIGITS)}")
 
 
         return {
             foot_side.value
-            + "_hip_aa": Setpoint(time, haa, digits=MID_CALCULATION_PRECISION_DIGITS),
+            + "_hip_aa": Setpoint(time, haa, internal_digits=MID_CALCULATION_PRECISION_DIGITS),
             foot_side.value
-            + "_hip_fe": Setpoint(time, hfe, digits=MID_CALCULATION_PRECISION_DIGITS),
+            + "_hip_fe": Setpoint(time, hfe, internal_digits=MID_CALCULATION_PRECISION_DIGITS),
             foot_side.value
-            + "_knee": Setpoint(time, kfe, digits=MID_CALCULATION_PRECISION_DIGITS),
+            + "_knee": Setpoint(time, kfe, internal_digits=MID_CALCULATION_PRECISION_DIGITS),
         }
 
     @staticmethod
