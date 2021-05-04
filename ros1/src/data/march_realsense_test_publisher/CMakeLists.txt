@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
     pcl_ros
     roscpp
     march_shared_msgs
-    march_realsense_reader
 )
 
 find_package(yaml-cpp)
