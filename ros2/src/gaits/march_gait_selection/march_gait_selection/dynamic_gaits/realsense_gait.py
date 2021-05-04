@@ -30,7 +30,7 @@ class RealSenseGait(SetpointsGait):
     """
     The RealSenseGait class is used for creating gaits based on the parameters given
     by the realsense reader. It is based on the setpoints gait, and it uses the
-    interpolation over 1/2 dimensions with 2/4 subgaits.
+    interpolation over 1 or 2 dimensions with 2 or 4 subgaits respectively.
     """
 
     SERVICE_TIMEOUT = Duration(seconds=2.0)
@@ -64,6 +64,10 @@ class RealSenseGait(SetpointsGait):
         self._get_gait_parameters_service = process_service
         self.realsense_service_event = Event()
         self.realsense_service_result = None
+
+    @property
+    def can_be_scheduled_early(self) -> bool:
+        return False
 
     @classmethod
     def from_yaml(
@@ -133,6 +137,11 @@ class RealSenseGait(SetpointsGait):
             raise WrongRealSenseConfigurationError(
                 f"There was a missing key to create realsense gait in gait {gait_name}:"
                 f" {e}"
+            )
+        except ValueError as e:
+            raise WrongRealSenseConfigurationError(
+                f"There was a wrong value in the config for the realsense gait"
+                f" {gait_name}: {e}"
             )
         return cls(
             gait_name,
