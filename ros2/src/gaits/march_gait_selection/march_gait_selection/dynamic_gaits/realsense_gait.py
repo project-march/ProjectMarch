@@ -134,6 +134,11 @@ class RealSenseGait(SetpointsGait):
                 f"There was a missing key to create realsense gait in gait {gait_name}:"
                 f" {e}"
             )
+        except ValueError as e:
+            raise WrongRealSenseConfigurationError(
+                f"There was a wrong value in the config for the realsense gait"
+                f" {gait_name}: {e}"
+            )
         return cls(
             gait_name,
             subgaits,
