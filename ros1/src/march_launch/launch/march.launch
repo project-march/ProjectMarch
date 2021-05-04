@@ -35,7 +35,7 @@
     <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
     <arg name="realsense_simulation" default="$(arg realsense)"
          doc="Whether the simulation camera or the physical camera should be used"/>
-    <arg name="realsense_test_data" default="$(eval realsense and (rviz or gazebo_ui))" doc="Whether the node which can publish pointclouds
+    <arg name="realsense_test_data" default="$(eval realsense and (configuration == 'simulation'))" doc="Whether the node which can publish pointclouds
     from datasets should be started."/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
              if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
