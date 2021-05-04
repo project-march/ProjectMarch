@@ -24,7 +24,7 @@ class MpcListener(Node):
     # Set all data
     def mpc_topic_listener_callback(self, msg):
         """
-        Updates all arrays that are streamed to the host. Array indices are chose such that the can be plotted
+        Updates all arrays that are streamed to the host. Array indices are chosen such that the can be plotted
         immediately. states[0] contains position, states[1] the velocity, as defined in march_acado_mpc package.
         The current state is at array[], and the estimation are all the following values.
         :param msg: march_shared_msgs.MpcMsg
