@@ -179,10 +179,9 @@ std::string RealsenseTestPublisher::getFileNamesString()
 void RealsenseTestPublisher::startPublishingPointclouds()
 {
     ROS_DEBUG_STREAM("Start publishing pointcloud");
-    // start at a random index to reduce over fitting on one data set
-    std::minstd_rand rng; // random number engine
-    std::uniform_int_distribution<int> uniform(0, file_names.size());
-    pointcloud_file_name = file_names[uniform(rng)];
+    // Start at a random index to reduce over fitting on one data set
+    int random_index = rand() % file_names.size(); // NOLINT
+    pointcloud_file_name = file_names[random_index];
     loadPointcloudToPublishFromFilename();
 }
 
