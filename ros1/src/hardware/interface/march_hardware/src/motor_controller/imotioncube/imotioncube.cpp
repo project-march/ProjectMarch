@@ -349,7 +349,7 @@ void IMotionCube::setControlWord(uint16_t control_word)
         control_word_ui);
 }
 
-void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
+void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
 {
     ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
     while (!target_state.isReached(this->getStatusWord())) {

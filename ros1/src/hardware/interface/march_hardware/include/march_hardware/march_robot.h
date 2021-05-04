@@ -67,7 +67,7 @@ public:
 
     int getEthercatCycleTime() const;
 
-    Joint& getJoint(::std::string jointName);
+    Joint& getJoint(const ::std::string& jointName);
 
     Joint& getJoint(size_t index);
 
