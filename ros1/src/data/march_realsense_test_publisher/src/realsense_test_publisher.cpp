@@ -248,6 +248,7 @@ void RealsenseTestPublisher::updatePublishLoop(
             makeProcessPointcloudCall();
         }
         res.success = success;
+        res.message = "Now publishing pointcloud with name " + pointcloud_file_name;
     } else {
         ROS_ERROR_STREAM(
             "No .ply files can be found by the test publisher under path "

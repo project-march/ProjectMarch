@@ -9,3 +9,4 @@ uint8 selected_mode
 string pointcloud_file_name
 ---
 bool success
+string message
