@@ -124,7 +124,7 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
 }
 
 // Sets the right cloud as the pointcloud to publish based on the file name
-void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
+bool RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 {
     getProcessPointcloudInputs();
 
@@ -132,9 +132,10 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     if (pcl::io::loadPLYFile<pcl::PointXYZ>(
             data_path.string() + pointcloud_file_name, *pointcloud_to_publish)
         == -1) {
-        ROS_WARN_STREAM("Couldn't find file from path "
-            << data_path.string() + pointcloud_file_name);
-        return;
+        ROS_WARN_STREAM("Couldn't find file at "
+            << data_path.string() + pointcloud_file_name
+            << ". file name must be one of " << getFileNamesString());
+        return false;
     }
 
     if (from_back_camera) {
@@ -143,6 +144,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
     }
     transformToCameraCoordinates();
+<<<<<<< HEAD
 
     ROS_DEBUG_STREAM("File loaded with name " << pointcloud_file_name << ".");
 }
@@ -161,6 +163,8 @@ bool RealsenseTestPublisher::publishCustomPointcloud(
         return false;
     }
     loadPointcloudToPublishFromFilename();
+=======
+>>>>>>> aa8d6c199... Finalize messages
     return true;
 }
 
@@ -187,22 +191,20 @@ std::string RealsenseTestPublisher::getFileNamesString()
 }
 
 // Publishes the first pointcloud in the dataset directory
-void RealsenseTestPublisher::startPublishingPointclouds()
+bool RealsenseTestPublisher::startPublishingPointclouds()
 {
-    ROS_DEBUG_STREAM("Start publishing pointcloud");
     // Start at a random index to reduce over fitting on one data set
     int random_index = rand() % file_names.size(); // NOLINT
     pointcloud_file_name = file_names[random_index];
-    loadPointcloudToPublishFromFilename();
+    return loadPointcloudToPublishFromFilename();
 }
 
 // Publishes the next pointcloud in the dataset directory
-void RealsenseTestPublisher::publishNextPointcloud()
+bool RealsenseTestPublisher::publishNextPointcloud()
 {
     // If already publishing, find the next pointcloud and publish that
     // Otherwise, start publishing
     if (should_publish) {
-        ROS_DEBUG_STREAM("Publish next pointcloud");
         // find the current pointcloud filename
         auto filename_iterator = std::find(
             file_names.begin(), file_names.end(), pointcloud_file_name);
@@ -214,14 +216,15 @@ void RealsenseTestPublisher::publishNextPointcloud()
             ROS_WARN_STREAM(
                 "The old pointcloud file name could not be found in "
                 "the file name vector. Unable to find next pointcloud.");
+            return false;
         } else if (filename_iterator == file_names.end() - 1) {
             pointcloud_file_name = file_names[0];
         } else {
             pointcloud_file_name = *(filename_iterator + 1);
         }
-        loadPointcloudToPublishFromFilename();
+        return loadPointcloudToPublishFromFilename();
     } else {
-        startPublishingPointclouds();
+        return startPublishingPointclouds();
     }
 }
 
@@ -262,43 +265,62 @@ void RealsenseTestPublisher::updatePublishLoop(
 {
     // The update is successful by default until something goes wrong
     bool success = true;
-        switch (selected_mode) {
-            case SelectedMode::next: {
-                publishNextPointcloud();
-                should_publish = true;
+    switch (selected_mode) {
+        case SelectedMode::next: {
+            if (success = publishNextPointcloud()) {
+                info_message = "Now publishing a pointcloud with file name "
+                    + pointcloud_file_name + " and processing the cloud";
                 makeProcessPointcloudCall();
-                break;
+            } else {
+                std::string warn_message
+                    = "failed to publish a pointcloud with file name "
+                    + pointcloud_file_name;
             }
-            case SelectedMode::custom: {
-                success &= publishCustomPointcloud(pointcloud_file_name);
-                should_publish = success;
-                break;
-            }
-            case SelectedMode::end: {
-                ROS_DEBUG_STREAM("Stop publishing pointclouds");
-                should_publish = false;
-                break;
-            }
-            case SelectedMode::save: {
-                ROS_DEBUG_STREAM("Save the current pointcloud");
-                if (success &= saveCurrentPointcloud()) {
-                    res.message("Succesfully saved pointcloud as " << save_pointcloud_name)
-                }
-                break;
-            }
-            default: {
-                ROS_WARN_STREAM("Invalid mode selected");
-                return;
-            }
+            should_publish = success;
+            break;
         }
-        if (success && (selected_mode == SelectedMode::next || selected_mode == SelectedMode::custom)) {
-            makeProcessPointcloudCall();
-            res.message
-                = "Now publishing pointcloud with name " + pointcloud_file_name;
+        case SelectedMode::custom: {
+            if (success = loadPointcloudToPublishFromFilename()) {
+                info_message = "Now publishing a pointcloud with file name "
+                    + pointcloud_file_name + " and processing the cloud";
+                makeProcessPointcloudCall();
+            } else {
+                std::string warn_message
+                    = "failed to publish a pointcloud with file name "
+                    + pointcloud_file_name;
+            }
+            should_publish = success;
+            break;
         }
-        else if (success && selected_mode == save)
-        res.success = success;
-
+        case SelectedMode::end: {
+            should_publish = false;
+            info_message = "Stopped publishing pointclouds";
+            success = true;
+            break;
+        }
+        case SelectedMode::save: {
+            if (success = saveCurrentPointcloud()) {
+                info_message = "Succesfully saved pointcloud as"
+                    + save_pointcloud_name;
+            } else {
+                warn_message = "Failed to save pointcloud";
+            }
+            break;
+        }
+        default: {
+            warn_message = "Invalid mode selected";
+            success = false;
+            return;
+        }
+    }
+    if (success) {
+        res.message = info_message;
+        ROS_DEBUG_STREAM(info_message);
+    } else {
+        res.message = warn_message;
+        ROS_WARN_STREAM(
+            warn_message + ". See the ros1 terminal for more information.")
+    }
     res.success = success;
 }
 
