@@ -12,7 +12,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace std;
@@ -22,7 +21,7 @@ ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
 ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
-    : W_(std::move(W))
+    : W_(W)
 {
 }
 
@@ -45,8 +44,8 @@ void ModelPredictiveController::init()
     std::fill(std::begin(acadoVariables.W), std::end(acadoVariables.W), 0.0);
     std::fill(std::begin(acadoVariables.WN), std::end(acadoVariables.WN), 0.0);
 
-    // Current state feedback
-    setInitialState(x0);
+    // Reserve space for the inputs
+    command.reserve(ACADO_NU);
 
     // Assign the weighting matrix
     assignWeightingMatrix(W_);
@@ -55,35 +54,37 @@ void ModelPredictiveController::init()
     acado_preparationStep();
 }
 
-void ModelPredictiveController::setInitialState(vector<double> x0)
+void ModelPredictiveController::setInitialState(std::vector<double>& x0)
 {
-    for (int i = 0; i < ACADO_NX; ++i) {
-        acadoVariables.x0[i] = x0[i];
-    }
+    std::copy(x0.begin(), x0.end(), std::begin(acadoVariables.x0));
 }
-void ModelPredictiveController::setReference(
-    int n, const std::vector<double>& reference)
+
+void ModelPredictiveController::setRunningReference(
+    const std::vector<double>& reference)
 {
-
-    // check if size of reference at time step n is equal to size of ACADO_NY
-    if (ACADO_NY != reference.size()) {
-        ROS_DEBUG_STREAM_ONCE(joint_name
-            << ", The supplied reference vector has an incorrect size");
+    // check if size of reference is equal to the size of acadoVariables.y
+    if (reference.size()
+        != sizeof(acadoVariables.y) / sizeof(acadoVariables.y[0])) {
+        ROS_WARN_STREAM_ONCE(
+            "The \"running\" reference vector has an incorrect size");
     }
 
-    // Set the reference of node n
-    if (n != ACADO_N) {
-        // set "running" reference
-        // reference of node 0 to node ACADO_N-1, includes states and control
-        // references
-        std::copy_n(reference.begin(), ACADO_NY,
-            std::begin(acadoVariables.y) + n * ACADO_NY);
-    } else {
-        // set "end" reference
-        // reference of the last node N, includes only the states references
-        std::copy_n(
-            reference.begin(), ACADO_NYN, std::begin(acadoVariables.yN));
+    // copy the reference vector to the acadoVariables.y array
+    std::copy(reference.begin(), reference.end(), std::begin(acadoVariables.y));
+}
+
+void ModelPredictiveController::setEndReference(
+    const std::vector<double>& end_reference)
+{
+    // check if size of end_reference is equal to the size of acadoVariables.yN
+    if (end_reference.size() != ACADO_NYN) {
+        ROS_WARN_STREAM_ONCE(
+            "The \"end\" reference vector has an incorrect size");
     }
+
+    // copy the end_reference vector to the acadoVariables.yN array
+    std::copy(end_reference.begin(), end_reference.end(),
+        std::begin(acadoVariables.yN));
 }
 
 void ModelPredictiveController::shiftStatesAndControl()
@@ -109,18 +110,15 @@ void ModelPredictiveController::controllerDiagnosis()
 {
     // Check acado_preparationStep() status code
     ROS_WARN_STREAM_COND(preparationStepStatus != 0,
-        acado_getErrorString(preparationStepStatus));
+        "MPC_PREP, " << acado_getErrorString(preparationStepStatus));
 
     // Check acado_feedbackStep() status code
-    ROS_WARN_STREAM_COND(
-        feedbackStepStatus != 0, acado_getErrorString(feedbackStepStatus));
+    ROS_WARN_STREAM_COND(feedbackStepStatus != 0,
+        "MPC_FEEDBACK, " << acado_getErrorString(feedbackStepStatus));
 }
 
-void ModelPredictiveController::calculateControlInput()
+std::vector<double> ModelPredictiveController::calculateControlInput()
 {
-    // Set initial state
-    setInitialState(x0);
-
     // Preparation step (timed)
     acado_tic(&t);
     preparationStepStatus = acado_preparationStep();
@@ -134,13 +132,13 @@ void ModelPredictiveController::calculateControlInput()
     // Objective cost for diagnosis
     cost = acado_getObjective();
 
-    // Set mpc command
-    u = acadoVariables.u[0];
-
-    // Shift states and control and prepare for the next iteration
-    acado_shiftStates(/*strategy=*/2, /*xEnd=*/nullptr, /*uEnd=*/nullptr);
-    acado_shiftControls(/*uEnd=*/nullptr);
-
     // Perform a diagnosis on the controller
     controllerDiagnosis();
+
+    // get command
+    command.assign(
+        std::begin(acadoVariables.u), std::begin(acadoVariables.u) + ACADO_NU);
+
+    // return command
+    return command;
 }
