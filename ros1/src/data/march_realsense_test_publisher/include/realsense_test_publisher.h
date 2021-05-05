@@ -19,7 +19,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class RealsenseTestPublisher {
 public:
     // Setup realsense reader with given node handle.
-    RealsenseTestPublisher(ros::NodeHandle* n);
+    explicit RealsenseTestPublisher(ros::NodeHandle* n);
 
     // Publish the current pointcloud to publish
     // is public to allow a timer call from the node

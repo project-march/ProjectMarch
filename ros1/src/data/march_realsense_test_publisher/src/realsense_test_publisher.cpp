@@ -21,6 +21,10 @@ std::string POINTCLOUD_EXTENSION = ".ply";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
+    , should_publish(false)
+    , from_back_camera(false)
+    , slected_mode(-1)
+    , selected_gait(-1)
 {
     if (ros::console::set_logger_level(
             ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
@@ -54,12 +58,10 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         = n_->serviceClient<march_shared_msgs::GetGaitParameters>(
             PROCESS_POINTCLOUD_TOPIC);
 
-    should_publish = false;
-
     config_tree = loadConfig("pointcloud_information.yaml");
 }
 
-YAML::Node RealsenseTestPublisher::loadConfig(std::string config_file)
+YAML::Node RealsenseTestPublisher::loadConfig(const std::string& config_file)
 {
     YAML::Node config_tree;
     std::string path = ros::package::getPath("march_realsense_test_publisher")
@@ -138,7 +140,7 @@ void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 
 // Publishes the pointcloud with the requested file name
 bool RealsenseTestPublisher::publishCustomPointcloud(
-    std::string pointcloud_file_name)
+    const std::string& pointcloud_file_name)
 {
     ROS_DEBUG_STREAM("Publish a custom pointcloud");
     auto filename_iterator
@@ -169,7 +171,7 @@ std::string RealsenseTestPublisher::getFileNamesString()
 {
     // Start with an end line for ease of printing
     std::string file_names_string = "\n";
-    for (std::string name : file_names) {
+    for (const std::string& name : file_names) {
         file_names_string += name + "\n";
     }
     return file_names_string;
