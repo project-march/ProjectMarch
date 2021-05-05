@@ -24,7 +24,7 @@ class Setpoint:
     digits = 8
 
     def __init__(
-            self, time: Duration, position: float, velocity: Optional[float] = None, internal_digits: Optional[int] = digits
+            self, time: Duration, position: float, velocity: Optional[float] = None
     ) -> None:
         """
         Initialize a setpoint.
@@ -33,13 +33,12 @@ class Setpoint:
         :param position: The position (angle) of the joint.
         :param velocity: The velocity of the joint.
         """
-        self.internal_digits = internal_digits
         self._time = round(
-            time, self.internal_digits
+            time, self.digits
         )  # https://github.com/python/mypy/issues/8213
-        self._position = round(position, self.internal_digits)
+        self._position = round(position, self.digits)
         if velocity is not None:
-            self._velocity: Optional[float] = round(velocity, self.internal_digits)
+            self._velocity: Optional[float] = round(velocity, self.digits)
         else:
             self._velocity = None
 
