@@ -144,27 +144,6 @@ bool RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
     }
     transformToCameraCoordinates();
-<<<<<<< HEAD
-
-    ROS_DEBUG_STREAM("File loaded with name " << pointcloud_file_name << ".");
-}
-
-// Publishes the pointcloud with the requested file name
-bool RealsenseTestPublisher::publishCustomPointcloud(
-    const std::string& pointcloud_file_name)
-{
-    ROS_DEBUG_STREAM("Publish a custom pointcloud");
-    auto filename_iterator
-        = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
-    if (filename_iterator == file_names.end()) {
-        ROS_WARN_STREAM("the given file name " << pointcloud_file_name
-                                               << " is invalid. Must be one of "
-                                               << getFileNamesString());
-        return false;
-    }
-    loadPointcloudToPublishFromFilename();
-=======
->>>>>>> aa8d6c199... Finalize messages
     return true;
 }
 
