@@ -16,7 +16,7 @@ public:
      * Controller variables
      */
 
-    std::vector<double> command {}; // calculated input
+    std::vector<double> command; // calculated input
 
     /**
      * Diagnostic variables
