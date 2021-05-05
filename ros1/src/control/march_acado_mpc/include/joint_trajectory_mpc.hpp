@@ -94,7 +94,7 @@ private:
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
     // The amount of joints to control
-    unsigned int num_joints_;
+    unsigned int num_joints_ {};
 
     // Vectors to store the amount of states (NX) and inputs (NU) of each
     // individual joint
