@@ -62,7 +62,7 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 #############
 ## Mark libraries for installation
 install(TARGETS ${PROJECT_NAME}
-        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 
