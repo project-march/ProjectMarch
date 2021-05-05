@@ -89,7 +89,7 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     if (selected_mode == SelectedMode::custom) {
         pointcloud_file_name = req.pointcloud_file_name;
     }
-    if (selected_mode == SelectedMode::Save) {
+    if (selected_mode == SelectedMode::save) {
         save_pointcloud_name = req.pointcloud_file_name;
         save_camera_back = req.save_camera_back;
     }
@@ -225,23 +225,22 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
 {
     // Set the correct pointcloud topic
     std::string pointcloud_topic;
-    if (use_camera_back) {
+    if (save_camera_back) {
         pointcloud_topic = TOPIC_CAMERA_BACK;
     } else {
-        poitncloud_topic = TOPIC_CAMERA_FRONT;
+        pointcloud_topic = TOPIC_CAMERA_FRONT;
     }
     // get the next pointcloud from the topic
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
+            pointcloud_topic, *n_, POINTCLOUD_TIMEOUT);
 
     if (input_cloud == nullptr) {
-        res.error_message = ;
         ROS_WARN_STREAM("No pointcloud published within timeout on topic "
             << pointcloud_topic
             << ", so "
                "no saving could be done.");
-        res.success = false;
+        return false;
     }
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
@@ -250,6 +249,7 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
 
     std::string writePath = data_path.string() + pointcloud_file_name;
     pcl::io::savePLYFileBinary(writePath, *point_cloud);
+    return false;
 }
 
 // Publish the right pointcloud based on the latest service call
@@ -265,6 +265,7 @@ void RealsenseTestPublisher::updatePublishLoop(
             case SelectedMode::next: {
                 publishNextPointcloud();
                 should_publish = true;
+                makeProcessPointcloudCall();
                 break;
             }
             case SelectedMode::custom: {
@@ -277,9 +278,11 @@ void RealsenseTestPublisher::updatePublishLoop(
                 should_publish = false;
                 break;
             }
-            case SelectedMode::Save: {
-                ROS_DEBUG_STREAM("Save the current pointcloud")
-                saveCurrentpointcloud();
+            case SelectedMode::save: {
+                ROS_DEBUG_STREAM("Save the current pointcloud");
+                if (success &= saveCurrentPointcloud()) {
+                    res.message("Succesfully saved pointcloud as " << save_pointcloud_name)
+                }
                 break;
             }
             default: {
@@ -287,12 +290,14 @@ void RealsenseTestPublisher::updatePublishLoop(
                 return;
             }
         }
-        if (selected_mode != SelectedMode::end) {
+        if (success && (selected_mode == SelectedMode::next || selected_mode == SelectedMode::custom)) {
             makeProcessPointcloudCall();
+            res.message
+                = "Now publishing pointcloud with name " + pointcloud_file_name;
         }
+        else if (success && selected_mode == save)
         res.success = success;
-        res.message
-            = "Now publishing pointcloud with name " + pointcloud_file_name;
+
     } else {
         ROS_ERROR_STREAM(
             "No .ply files can be found by the test publisher under path "

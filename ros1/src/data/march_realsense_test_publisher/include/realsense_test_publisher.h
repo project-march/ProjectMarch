@@ -68,6 +68,10 @@ private:
     // is public to allow a timer call from the node
     void makeProcessPointcloudCall();
 
+    // Save the current pointcloud being published on either the front or back
+    // camera topic as a .ply file to test with later
+    bool saveCurrentPointcloud();
+
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
