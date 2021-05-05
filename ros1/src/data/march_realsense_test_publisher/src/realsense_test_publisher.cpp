@@ -243,7 +243,7 @@ void RealsenseTestPublisher::updatePublishLoop(
         // The update is successful by default until something goes wrong
         bool success = true;
         std::string info_message;
-        st::string warn_message;
+        std::string warn_message;
 
         switch (selected_mode) {
             case SelectedMode::next: {
@@ -299,7 +299,7 @@ void RealsenseTestPublisher::updatePublishLoop(
         } else {
             res.message = warn_message;
             ROS_WARN_STREAM(
-                warn_message + ". See the ros1 terminal for more information.")
+                warn_message + ". See the ros1 terminal for more information.");
         }
         res.success = success;
     } else {
