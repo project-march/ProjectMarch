@@ -247,10 +247,9 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
                "no saving could be done.");
         res.success = false;
     }
-    PointCloud converted_cloud;
-    pcl::fromROSMsg(*input_cloud, converted_cloud);
-    PointCloud::Ptr point_cloud
-        = boost::make_shared<PointCloud>(converted_cloud);
+//    pcl_conversions::toPCL(*input_cloud, pcl_pc2);
+
+    pcl::PLYWriter::write(save_pointcloud_name, input_cloud, binary = true)
 }
 
 // Publish the right pointcloud based on the latest service call
