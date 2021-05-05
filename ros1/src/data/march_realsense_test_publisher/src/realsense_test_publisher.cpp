@@ -23,7 +23,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
     , should_publish(false)
     , from_back_camera(false)
-    , slected_mode(-1)
+    , selected_mode((SelectedMode)-1)
     , selected_gait(-1)
 {
     if (ros::console::set_logger_level(

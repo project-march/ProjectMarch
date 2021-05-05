@@ -46,7 +46,7 @@ private:
     void publishNextPointcloud();
 
     // Publishes the pointcloud with the requested file name
-    bool publishCustomPointcloud(std::string pointcloud_file_name);
+    bool publishCustomPointcloud(const std::string& pointcloud_file_name);
 
     // Publish the right pointcloud based on the latest service call
     void updatePublishLoop(
@@ -62,7 +62,7 @@ private:
     void getProcessPointcloudInputs();
 
     // Load the configuration yaml file
-    YAML::Node loadConfig(std::string config_file);
+    YAML::Node loadConfig(const std::string& config_file);
 
     // Calls on the realsense reader to process a pointcloud from the test topic
     // is public to allow a timer call from the node
