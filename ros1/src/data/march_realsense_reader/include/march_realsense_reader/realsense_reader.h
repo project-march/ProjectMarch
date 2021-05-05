@@ -28,7 +28,7 @@ public:
      * gait parameters, these parameters are put into the response,
      * returns whether the processing was successful.
      */
-    bool processPointcloud(const PointCloud::Ptr& input_cloud,
+    void processPointcloud(const PointCloud::Ptr& input_cloud,
         march_shared_msgs::GetGaitParameters::Response& res);
 
     /** A callback that starts the entire pointcloud processing when the
