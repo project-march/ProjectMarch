@@ -46,50 +46,39 @@ add_library(${PROJECT_NAME}
     src/pointcloud_processor/hull_finder.cpp
     src/pointcloud_processor/parameter_determiner.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_node src/realsense_reader_node.cpp)
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME})
-
-target_link_libraries(${PROJECT_NAME}_node
-    ${PROJECT_NAME}
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node
+        ${PROJECT_NAME}
+        ${PROJECT_NAME}_gencfg
 )
+
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 #############
 ## Install ##
 #############
+## Mark libraries for installation
+install(TARGETS ${PROJECT_NAME}
+    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
 
 # Mark executables for installation
 install(TARGETS ${PROJECT_NAME}_node
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-## Mark libraries for installation
-install(TARGETS ${PROJECT_NAME}
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-)
-
-# Mark cpp header files for installation
-install(DIRECTORY config
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-        )
 
 install(DIRECTORY include/${PROJECT_NAME}/ include/pointcloud_processor/
         include/utilities/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-    FILES_MATCHING PATTERN "*.h"
-)
-
-install(TARGETS ${PROJECT_NAME}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        )
 
 install(DIRECTORY launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-# The node has to be build, before this line is reached
-add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
 
