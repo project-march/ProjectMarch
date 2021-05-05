@@ -225,7 +225,8 @@ void RealsenseTestPublisher::publishNextPointcloud()
     }
 }
 
-bool RealsenseTestPublisher::saveCurrentPointcloud() {
+bool RealsenseTestPublisher::saveCurrentPointcloud()
+{
     // Set the correct pointcloud topic
     std::string pointcloud_topic;
     if (use_camera_back) {
@@ -240,8 +241,10 @@ bool RealsenseTestPublisher::saveCurrentPointcloud() {
 
     if (input_cloud == nullptr) {
         res.error_message = ;
-        ROS_WARN_STREAM("No pointcloud published within timeout on topic " << pointcloud_topic << ", so "
-                        "no saving could be done.");
+        ROS_WARN_STREAM("No pointcloud published within timeout on topic "
+            << pointcloud_topic
+            << ", so "
+               "no saving could be done.");
         res.success = false;
     }
     PointCloud converted_cloud;
