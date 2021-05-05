@@ -6,7 +6,7 @@ import rclpy
 from march_utility.utilities.utility_functions import get_joint_names_for_inverse_kinematics
 from march_utility.utilities.duration import Duration
 
-from setpoint import Setpoint
+from .setpoint import Setpoint
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()

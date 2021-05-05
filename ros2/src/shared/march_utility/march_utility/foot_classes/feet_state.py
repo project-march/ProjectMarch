@@ -5,7 +5,7 @@ This class is  used to create gaits based on the state of both feet.
 """
 from __future__ import annotations
 
-from march_utility.gait.setpoint import Setpoint
+from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
@@ -70,7 +70,7 @@ class FeetState(object):
             Side.right,
         )
 
-        next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
+        next_joint_positions = CalculationSetpoint.calculate_next_positions_joint(setpoint_dic)
 
         next_foot_state_left = Foot.calculate_foot_position(
             next_joint_positions["left_hip_aa"].position,
