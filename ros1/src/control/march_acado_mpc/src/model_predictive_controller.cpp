@@ -21,7 +21,7 @@ ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
 ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
-    : W_(std::move(W))
+    : W_(W)
 {
 }
 

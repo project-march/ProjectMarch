@@ -23,8 +23,8 @@ public:
      */
 
     // Timing variables
-    acado_timer t {};
-    double t_preparation {}, t_feedback {};
+    acado_timer t;
+    double t_preparation, t_feedback;
 
     // Status variables
     int preparationStepStatus {};
