@@ -37,16 +37,13 @@ private:
         march_shared_msgs::PublishTestDataset::Response& res);
 
     // Sets the right cloud as the pointcloud to publish based on the file name
-    void loadPointcloudToPublishFromFilename();
+    bool loadPointcloudToPublishFromFilename();
 
     // Publishes the first pointcloud in the dataset directory
-    void startPublishingPointclouds();
+    bool startPublishingPointclouds();
 
     // Publishes the next pointcloud in the dataset directory
-    void publishNextPointcloud();
-
-    // Publishes the pointcloud with the requested file name
-    bool publishCustomPointcloud(const std::string& pointcloud_file_name);
+    bool publishNextPointcloud();
 
     // Publish the right pointcloud based on the latest service call
     void updatePublishLoop(
