@@ -3,7 +3,7 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
-#include "utilities/realsense_gait_utilities.h"
+#include "utilities/realsense_category_utilities.h"
 #include "utilities/yaml_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <cmath>
@@ -86,7 +86,7 @@ bool HullParameterDeterminer::determineParameters(
     boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
     boost::shared_ptr<HullVector> const hull_vector,
     boost::shared_ptr<PolygonVector> const polygon_vector,
-    SelectedGait const selected_gait,
+    RealSenseCategory const realsense_category,
     boost::shared_ptr<GaitParameters> gait_parameters)
 {
     time_t start_determine_parameters = clock();
@@ -97,7 +97,7 @@ bool HullParameterDeterminer::determineParameters(
     gait_parameters_ = gait_parameters;
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
-    selected_gait_.emplace(selected_gait);
+    realsense_category_.emplace(realsense_category);
     // Initialize the optimal foot location at the origin and the gait
     // parmaeters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
@@ -138,12 +138,12 @@ bool HullParameterDeterminer::determineParameters(
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
     bool success = true;
-    switch (selected_gait_.value()) {
-        case SelectedGait::stairs_up: {
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
             success &= getGaitParametersFromFootLocationStairsUp();
             break;
         }
-        case SelectedGait::ramp_down: {
+        case RealSenseCategory::ramp_down: {
             success &= getGaitParametersFromFootLocationRampDown();
             break;
         }
@@ -151,7 +151,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
             ROS_ERROR_STREAM(
                 "No way to transform a foot location to parameters "
                 "is implemented yet for obstacle "
-                << selected_gait_.value());
+                << realsense_category_.value());
             return false;
         }
     }
@@ -227,8 +227,8 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 {
     bool success = true;
-    switch (selected_gait_.value()) {
-        case SelectedGait::stairs_up: {
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
             // Get the location where we would ideally place the foot
             success &= getGeneralMostDesirableLocation();
 
@@ -236,7 +236,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             success &= getPossibleMostDesirableLocation();
             break;
         }
-        case SelectedGait::ramp_down: {
+        case RealSenseCategory::ramp_down: {
             // Get the line on which it is possible to stand for a ramp gait.
             success &= getExecutableLocationsLine();
 
@@ -247,7 +247,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
         default: {
             ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
                              "for selected obstacle "
-                << selected_gait_.value());
+                << realsense_category_.value());
             return false;
         }
     }
@@ -307,7 +307,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
     } else {
         ROS_ERROR_STREAM("No valid foot location could be found for the "
                          "current selected gait "
-            << selected_gait_.value());
+            << realsense_category_.value());
         return false;
     }
 }
@@ -316,14 +316,14 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 bool HullParameterDeterminer::getDistanceToObject(
     pcl::PointNormal possible_foot_location, double& distance)
 {
-    if (selected_gait_.value() == SelectedGait::stairs_up
-        or selected_gait_.value() == SelectedGait::stairs_down) {
+    if (realsense_category_.value() == RealSenseCategory::stairs_up
+        or realsense_category_.value() == RealSenseCategory::stairs_down) {
         // For stairs gait find which point is closest to the most desirable
         // location
         distance = linear_algebra_utilities::distanceBetweenPoints(
             possible_foot_location, most_desirable_foot_location_);
-    } else if (selected_gait_.value() == SelectedGait::ramp_up
-        or selected_gait_.value() == SelectedGait::ramp_down) {
+    } else if (realsense_category_.value() == RealSenseCategory::ramp_up
+        or realsense_category_.value() == RealSenseCategory::ramp_down) {
         // For the ramp find which point is closest to the possible locations
         // line
         distance = linear_algebra_utilities::distancePointToLine(
@@ -331,7 +331,7 @@ bool HullParameterDeterminer::getDistanceToObject(
     } else {
         ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
                          "for selected obstacle "
-            << selected_gait_.value());
+            << realsense_category_.value());
         return false;
     }
 
@@ -344,8 +344,8 @@ bool HullParameterDeterminer::isValidLocation(
 {
     // Less and larger than signs are swapped for the x coordinate as the
     // positive x axis points in the backwards direction of the exoskeleton
-    switch (selected_gait_.value()) {
-        case SelectedGait::stairs_up: {
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
             // A possible foot location for the stairs gait is valid if it is
             // reachable by the stairs gait and the location offers support
             // for the entire foot
@@ -355,7 +355,7 @@ bool HullParameterDeterminer::isValidLocation(
                 && possible_foot_location.z < max_z_stairs
                 && entireFootCanBePlaced(possible_foot_location));
         }
-        case SelectedGait::ramp_down: {
+        case RealSenseCategory::ramp_down: {
             pcl::PointXYZ projected_point
                 = linear_algebra_utilities::projectPointToLine(
                     possible_foot_location,
@@ -371,7 +371,7 @@ bool HullParameterDeterminer::isValidLocation(
         default: {
             ROS_ERROR_STREAM(
                 "isValidLocation method has not been implemented for obstacle "
-                << selected_gait_.value() << ". Returning false.");
+                << realsense_category_.value() << ". Returning false.");
             return false;
         }
     }
@@ -461,20 +461,20 @@ bool HullParameterDeterminer::getOptionalFootLocations(
 {
     bool success = true;
     foot_locations_to_try->points.resize(number_of_optional_foot_locations);
-    switch (selected_gait_.value()) {
-        case SelectedGait::stairs_up: {
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
             success
                 &= fillOptionalFootLocationCloud(min_x_stairs, max_x_stairs);
             break;
         }
-        case SelectedGait::ramp_down: {
+        case RealSenseCategory::ramp_down: {
             success &= fillOptionalFootLocationCloud(
                 min_search_area, max_search_area);
             break;
         }
         default: {
             ROS_ERROR_STREAM("The selected obstacle "
-                << selected_gait_.value()
+                << realsense_category_.value()
                 << " does not have a way to create the optional foot locations "
                    "to try cloud");
             return false;
@@ -676,12 +676,12 @@ bool SimpleParameterDeterminer::determineParameters(
     boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
     boost::shared_ptr<HullVector> const hull_vector,
     boost::shared_ptr<PolygonVector> const polygon_vector,
-    SelectedGait const selected_gait,
+    RealSenseCategory const realsense_category,
     boost::shared_ptr<GaitParameters> gait_parameters)
 {
     ROS_DEBUG("Determining parameters with simple parameter determiner");
     hull_vector_ = hull_vector;
-    selected_gait_.emplace(selected_gait);
+    realsense_category_.emplace(realsense_category);
     gait_parameters_ = gait_parameters;
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;

@@ -31,7 +31,7 @@ ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
-    , selected_gait_(-1)
+    , realsense_category_(-1)
     , use_left_foot_(nullptr)
     , debugging_launch(false)
 {
@@ -181,13 +181,13 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     // Setup data structures for parameter determining
-    auto selected_gait = (SelectedGait)selected_gait_;
+    auto realsense_category = (RealSenseCategory) realsense_category_;
     boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
         = boost::make_shared<march_shared_msgs::GaitParameters>();
     // Determine parameters
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
-            hull_vector, polygon_vector, selected_gait, gait_parameters);
+            hull_vector, polygon_vector, realsense_category, gait_parameters);
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
@@ -406,7 +406,7 @@ bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Request& req,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
-    selected_gait_ = req.selected_gait;
+    realsense_category_ = req.realsense_category;
     frame_id_to_transform_to_ = req.frame_id_to_transform_to;
 
     time_t start_callback = clock();

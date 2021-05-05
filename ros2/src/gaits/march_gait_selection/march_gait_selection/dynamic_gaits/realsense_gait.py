@@ -38,7 +38,13 @@ class RealSenseGait(SetpointsGait):
         "front": GetGaitParameters.Request.CAMERA_FRONT,
         "back": GetGaitParameters.Request.CAMERA_BACK,
     }
-    SELECTED_REALSENSE_GAIT_MAP = {"stairs_up": GetGaitParameters.Request.STAIRS_UP}
+    REALSENSE_CATEGORY_MAP = {
+        "stairs_up": GetGaitParameters.Request.STAIRS_UP,
+        "stairs_down": GetGaitParameters.Request.STAIRS_DOWN,
+        "ramp_up": GetGaitParameters.Request.RAMP_UP,
+        "ramp_down": GetGaitParameters.Request.RAMP_DOWN,
+        "sit": GetGaitParameters.Request.SIT
+    }
 
     def __init__(
         self,
@@ -46,7 +52,7 @@ class RealSenseGait(SetpointsGait):
         subgaits: dict,
         graph: SubgaitGraph,
         node: Node,
-        selected_gait: str,
+        realsense_category: str,
         camera_to_use: str,
         subgaits_to_interpolate: dict,
         dimensions: InterpolationDimensions,
@@ -57,7 +63,8 @@ class RealSenseGait(SetpointsGait):
         self._node = node
         self.parameters = parameters
         self.dimensions = dimensions
-        self.selected_gait = self.selected_realsense_gait_msg_from_string(selected_gait)
+        self.realsense_category = self.realsense_category_from_string(
+            realsense_category)
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
         self.subgaits_to_interpolate = subgaits_to_interpolate
         # Set up service and event for asynchronous
@@ -103,7 +110,7 @@ class RealSenseGait(SetpointsGait):
                     f"The amount of parameters in the config file ({len(parameters)}), "
                     f"doesn't match the dimensions"
                 )
-            selected_gait = gait_config["gait_type"]
+            realsense_category = gait_config["realsense_category"]
             camera_to_use = gait_config["camera_to_use"]
             subgait_version_map = gait_config["subgaits"]
             # Create subgaits to interpolate with
@@ -148,7 +155,7 @@ class RealSenseGait(SetpointsGait):
             subgaits,
             graph,
             node,
-            selected_gait,
+            realsense_category,
             camera_to_use,
             subgaits_to_interpolate,
             dimensions,
@@ -157,20 +164,19 @@ class RealSenseGait(SetpointsGait):
         )
 
     @classmethod
-    def selected_realsense_gait_msg_from_string(cls, gait_name: str) -> int:
+    def realsense_category_from_string(cls, gait_name: str) -> int:
         """
         Construct the realsense gait from the string in the realsense_gaits.yaml.
 
         :param gait_name: The string from the config.
-        :return: The integer to send to the realsense reader to define the selected
-        gait.
+        :return: The integer to send to the realsense reader to define the category.
         """
-        if gait_name not in cls.SELECTED_REALSENSE_GAIT_MAP:
+        if gait_name not in cls.REALSENSE_CATEGORY_MAP:
             raise WrongRealSenseConfigurationError(
                 f"Gait name {gait_name} from the config is not known as a possible "
                 f"realsense reader gait configuration"
             )
-        return cls.SELECTED_REALSENSE_GAIT_MAP[gait_name]
+        return cls.REALSENSE_CATEGORY_MAP[gait_name]
 
     @classmethod
     def camera_msg_from_string(cls, camera_name: str) -> int:
@@ -246,7 +252,7 @@ class RealSenseGait(SetpointsGait):
         :return: Whether the call was succesful
         """
         request = GetGaitParameters.Request(
-            selected_gait=self.selected_gait,
+            realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
             frame_id_to_transform_to=frame_id_to_transform_to,
         )
