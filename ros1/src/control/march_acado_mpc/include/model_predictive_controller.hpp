@@ -16,34 +16,22 @@ public:
      * Controller variables
      */
 
-    std::vector<double> command; // calculated input
+    std::vector<double> command {}; // calculated input
 
     /**
      * Diagnostic variables
      */
 
     // Timing variables
-    acado_timer t;
-    double t_preparation, t_feedback;
+    acado_timer t {};
+    double t_preparation {}, t_feedback {};
 
     // Status variables
-    int preparationStepStatus;
-    int feedbackStepStatus;
+    int preparationStepStatus {};
+    int feedbackStepStatus {};
 
     // Performance variables
-    double cost; // Objective value
-
-    // qpOASES error enums
-    enum Error {
-        // acado_preparationStep() errors
-        PREP_INTERNAL_ERROR = 1,
-
-        // acado_feedbackStep() errors
-        QP_ITERATION_LIMIT_REACHED = 1,
-        QP_INTERNAL_ERROR = -1,
-        QP_INFEASIBLE = -2,
-        QP_UNBOUNDED = -3
-    };
+    double cost {}; // Objective value
 
     /**
      * \brief Initialise the model predictive controller
