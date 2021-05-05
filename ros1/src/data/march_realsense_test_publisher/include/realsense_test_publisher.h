@@ -78,6 +78,7 @@ private:
 
     std::vector<std::string> file_names;
     path data_path;
+    path write_path;
     std::string pointcloud_topic;
     PointCloud::Ptr pointcloud_to_publish;
     std::string pointcloud_file_name;
