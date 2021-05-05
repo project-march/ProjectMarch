@@ -106,6 +106,7 @@ private:
     // it could be used later if desired.
     std::vector<double> desired_inputs;
 
+    // Vectors for collecting the initial states and references of all joints
     std::vector<double> initial_state;
     std::vector<double> reference;
     std::vector<double> end_reference;
