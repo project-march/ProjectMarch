@@ -252,11 +252,11 @@ void RealsenseTestPublisher::updatePublishLoop(
                         + pointcloud_file_name + " and processing the cloud";
                     makeProcessPointcloudCall();
                 } else {
-                    std::string warn_message
+                    warn_message
                         = "failed to publish a pointcloud with file name "
                         + pointcloud_file_name;
                 }
-                succes = should_publish;
+                success = should_publish;
                 break;
             }
             case SelectedMode::custom: {
@@ -265,11 +265,11 @@ void RealsenseTestPublisher::updatePublishLoop(
                         + pointcloud_file_name + " and processing the cloud";
                     makeProcessPointcloudCall();
                 } else {
-                    std::string warn_message
+                    warn_message
                         = "failed to publish a pointcloud with file name "
                         + pointcloud_file_name;
                 }
-                succes = should_publish;
+                success = should_publish;
                 break;
             }
             case SelectedMode::end: {
