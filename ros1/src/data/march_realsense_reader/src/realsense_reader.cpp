@@ -113,7 +113,7 @@ void RealSenseReader::readConfigCb(
 }
 
 // This method executes the logic to process a pointcloud
-bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
+void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     clock_t start_of_processing_time = clock();
@@ -147,7 +147,7 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             = "Region creating was unsuccessful, see debug output "
               "for more information";
         res.success = false;
-        return false;
+        return;
     }
     if (debugging_) {
         ROS_DEBUG("Done creating regions, now publishing point cloud regions "
