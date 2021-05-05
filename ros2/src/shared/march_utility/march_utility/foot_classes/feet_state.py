@@ -11,7 +11,6 @@ from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     merge_dictionaries,
-    weighted_average_floats,
 )
 
 from march_utility.exceptions.gait_exceptions import (

@@ -32,27 +32,30 @@ class CalculationSetpoint(Setpoint):
             self._velocity = None
 
     @property
-    def time(self):
+    def time(self) -> float:
+        """Return the time of the setpoint"""
         return self._time
 
     @time.setter
-    def time(self, time: float):
+    def time(self, time: float) -> None:
         self._time = time
 
     @property
-    def position(self):
+    def position(self) -> float:
+        """Return the position of the setpoint"""
         return self._position
 
     @position.setter
-    def position(self, position: float):
+    def position(self, position: float) -> None:
         self._position = position
 
     @property
-    def velocity(self):
+    def velocity(self) -> float:
+        """Return the velocity of the setpoint"""
         return self._velocity
 
     @velocity.setter
-    def velocity(self, velocity: float):
+    def velocity(self, velocity: float) -> None:
         self._velocity = velocity
 
     @classmethod
@@ -79,19 +82,18 @@ class CalculationSetpoint(Setpoint):
 
         return next_positions
 
-    def to_normal_setpoint(self):
+    def to_normal_setpoint(self) -> Setpoint:
+        """Creates a normal setpoint from the calculation setpoint."""
         return Setpoint(self.time, self.position, self.velocity)
 
     def add_joint_velocity_from_next_angle(self, next_state: Setpoint) -> None:
-        """Calculate the joint velocities given a current position and a next position.
+        """Calculate the setpoint velocitiy given a setpoint a moment later.
 
         Calculates using the approximation:
         next_position = position + current_velocity * time_difference
 
-        :param self: A Setpoint object with no velocity
-        :param next_state: A Setpoint with the positions a moment later
-
-        :return: The joint velocities of the joints on the specified side
+        :param self: A Setpoint object to which the velocity has to be added
+        :param next_state: A Setpoint with the position a moment later
         """
         self.velocity = (next_state.position - self.position) / (
             next_state.time - self.time

@@ -12,7 +12,6 @@ from typing import Tuple
 
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_utility.exceptions.general_exceptions import SideSpecificationError
-from march_utility.gait.setpoint import Setpoint
 from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
