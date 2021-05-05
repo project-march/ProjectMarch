@@ -202,7 +202,7 @@ class RealSenseGait(SetpointsGait):
         2) Update all subgaits to interpolated subgaits with the given parameters
         (this will later become only some of the subgaits when the update function is
          also used).
-        3) Update the gait parameters to prepare for stari
+        3) Update the gait parameters to prepare for start
         4) Return the first subgait, if correct parameters were found.
 
         :return: A gait update that tells the state machine what to do. Empty means

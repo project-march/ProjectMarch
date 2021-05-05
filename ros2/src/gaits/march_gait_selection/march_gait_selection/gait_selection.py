@@ -353,11 +353,10 @@ class GaitSelection(Node):
 
         :param gaits: The dictionary where the loaded gaits will be added to.
         """
-        realsense_callback_group = MutuallyExclusiveCallbackGroup()
         get_gait_parameters_service = self.create_client(
             srv_type=GetGaitParameters,
             srv_name="/camera/process_pointcloud",
-            callback_group=realsense_callback_group,
+            callback_group=MutuallyExclusiveCallbackGroup(),
         )
         for gait_name in self._realsense_gait_version_map:
             gait_folder = gait_name
