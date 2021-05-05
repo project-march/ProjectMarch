@@ -13,11 +13,14 @@
 
 using namespace std::filesystem;
 
+std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID_FRONT = "camera_front_depth_optical_frame";
 std::string CAMERA_FRAME_ID_BACK = "camera_back_depth_optimal_frame";
 std::string PROCESS_POINTCLOUD_TOPIC = "/camera/process_pointcloud";
 std::string POINTCLOUD_EXTENSION = ".ply";
+ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
@@ -85,6 +88,10 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     // Only update the pointcloud file name from the service if it is relevant
     if (selected_mode == SelectedMode::custom) {
         pointcloud_file_name = req.pointcloud_file_name;
+    }
+    if (selected_mode == SelectedMode::Save) {
+        save_pointcloud_name = req.pointcloud_file_name;
+        save_camera_back = req.save_camera_back;
     }
     updatePublishLoop(res);
     return true;
@@ -214,6 +221,31 @@ void RealsenseTestPublisher::publishNextPointcloud()
     }
 }
 
+bool RealsenseTestPublisher::saveCurrentPointcloud() {
+    // Set the correct pointcloud topic
+    std::string pointcloud_topic;
+    if (use_camera_back) {
+        pointcloud_topic = TOPIC_CAMERA_BACK;
+    } else {
+        poitncloud_topic = TOPIC_CAMERA_FRONT;
+    }
+    // get the next pointcloud from the topic
+    boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
+        = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
+            POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
+
+    if (input_cloud == nullptr) {
+        res.error_message = ;
+        ROS_WARN_STREAM("No pointcloud published within timeout on topic " << pointcloud_topic << ", so "
+                        "no saving could be done.");
+        res.success = false;
+    }
+    PointCloud converted_cloud;
+    pcl::fromROSMsg(*input_cloud, converted_cloud);
+    PointCloud::Ptr point_cloud
+        = boost::make_shared<PointCloud>(converted_cloud);
+}
+
 // Publish the right pointcloud based on the latest service call
 void RealsenseTestPublisher::updatePublishLoop(
     march_shared_msgs::PublishTestDataset::Response& res)
@@ -237,6 +269,11 @@ void RealsenseTestPublisher::updatePublishLoop(
             case SelectedMode::end: {
                 ROS_DEBUG_STREAM("Stop publishing pointclouds");
                 should_publish = false;
+                break;
+            }
+            case SelectedMode::Save: {
+                ROS_DEBUG_STREAM("Save the current pointcloud")
+                saveCurrentpointcloud();
                 break;
             }
             default: {

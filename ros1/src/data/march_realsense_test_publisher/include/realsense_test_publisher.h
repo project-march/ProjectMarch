@@ -86,6 +86,8 @@ private:
     bool from_back_camera;
     int selected_gait;
     std::string frame_id_to_transform_to;
+    bool save_camera_back;
+    std::string save_pointcloud_name;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H
