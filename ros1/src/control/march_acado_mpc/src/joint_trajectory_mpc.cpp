@@ -17,6 +17,7 @@ bool ModelPredictiveControllerInterface::init(
     std::vector<hardware_interface::JointHandle>& joint_handles,
     ros::NodeHandle& nh)
 {
+    // Get joint handles and the amount of joints to control
     joint_handles_ptr_ = &joint_handles;
     num_joints_ = joint_handles.size();
 
