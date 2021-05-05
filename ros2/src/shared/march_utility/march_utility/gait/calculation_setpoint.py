@@ -1,7 +1,8 @@
-
 from typing import Optional
 
-from march_utility.utilities.utility_functions import get_joint_names_for_inverse_kinematics
+from march_utility.utilities.utility_functions import (
+    get_joint_names_for_inverse_kinematics,
+)
 from march_utility.utilities.duration import Duration
 
 from .setpoint import Setpoint
@@ -14,7 +15,7 @@ class CalculationSetpoint(Setpoint):
     """Base class to define setpoints used in calculations which do not round."""
 
     def __init__(
-            self, time: Duration, position: float, velocity: Optional[float] = None
+        self, time: Duration, position: float, velocity: Optional[float] = None
     ) -> None:
         """
         Initialize a setpoint.
@@ -74,14 +75,12 @@ class CalculationSetpoint(Setpoint):
                     setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
                     setpoint_dic[joint].position
                     + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
-                    )
+                )
 
         return next_positions
 
-
     def to_normal_setpoint(self):
         return Setpoint(self.time, self.position, self.velocity)
-
 
     def add_joint_velocity_from_next_angle(self, next_state: Setpoint) -> None:
         """Calculate the joint velocities given a current position and a next position.
@@ -94,5 +93,6 @@ class CalculationSetpoint(Setpoint):
 
         :return: The joint velocities of the joints on the specified side
         """
-        self.velocity = (next_state.position - self.position) \
-                        / (next_state.time - self.time).seconds
+        self.velocity = (next_state.position - self.position) / (
+            next_state.time - self.time
+        ).seconds

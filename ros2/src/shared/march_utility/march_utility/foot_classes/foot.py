@@ -171,12 +171,9 @@ class Foot(object):
         )
 
         return {
-            foot_side.value
-            + "_hip_aa": CalculationSetpoint(time, haa),
-            foot_side.value
-            + "_hip_fe": CalculationSetpoint(time, hfe),
-            foot_side.value
-            + "_knee": CalculationSetpoint(time, kfe),
+            foot_side.value + "_hip_aa": CalculationSetpoint(time, haa),
+            foot_side.value + "_hip_fe": CalculationSetpoint(time, hfe),
+            foot_side.value + "_knee": CalculationSetpoint(time, kfe),
         }
 
     @staticmethod

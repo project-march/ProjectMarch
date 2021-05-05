@@ -70,7 +70,9 @@ class FeetState(object):
             Side.right,
         )
 
-        next_joint_positions = CalculationSetpoint.calculate_next_positions_joint(setpoint_dic)
+        next_joint_positions = CalculationSetpoint.calculate_next_positions_joint(
+            setpoint_dic
+        )
 
         next_foot_state_left = Foot.calculate_foot_position(
             next_joint_positions["left_hip_aa"].position,
@@ -155,11 +157,11 @@ class FeetState(object):
             feet_state.right_foot, feet_state.time
         )
 
-        setpoint_dictionary = merge_dictionaries(
-            left_joint_states, right_joint_states
-        )
+        setpoint_dictionary = merge_dictionaries(left_joint_states, right_joint_states)
 
         for joint_name in setpoint_dictionary.keys():
-            setpoint_dictionary[joint_name] = setpoint_dictionary[joint_name].to_normal_setpoint()
+            setpoint_dictionary[joint_name] = setpoint_dictionary[
+                joint_name
+            ].to_normal_setpoint()
 
         return setpoint_dictionary

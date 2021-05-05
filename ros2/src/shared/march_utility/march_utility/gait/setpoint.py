@@ -24,7 +24,7 @@ class Setpoint:
     digits = 8
 
     def __init__(
-            self, time: Duration, position: float, velocity: Optional[float] = None
+        self, time: Duration, position: float, velocity: Optional[float] = None
     ) -> None:
         """
         Initialize a setpoint.
