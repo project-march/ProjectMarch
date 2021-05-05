@@ -247,7 +247,7 @@ void RealsenseTestPublisher::updatePublishLoop(
 
         switch (selected_mode) {
             case SelectedMode::next: {
-                if (success = publishNextPointcloud()) {
+                if (should_publish = publishNextPointcloud()) {
                     info_message = "Now publishing a pointcloud with file name "
                         + pointcloud_file_name + " and processing the cloud";
                     makeProcessPointcloudCall();
@@ -256,11 +256,11 @@ void RealsenseTestPublisher::updatePublishLoop(
                         = "failed to publish a pointcloud with file name "
                         + pointcloud_file_name;
                 }
-                should_publish = success;
+                succes = should_publish;
                 break;
             }
             case SelectedMode::custom: {
-                if (success = loadPointcloudToPublishFromFilename()) {
+                if (should_publish = loadPointcloudToPublishFromFilename()) {
                     info_message = "Now publishing a pointcloud with file name "
                         + pointcloud_file_name + " and processing the cloud";
                     makeProcessPointcloudCall();
@@ -269,7 +269,7 @@ void RealsenseTestPublisher::updatePublishLoop(
                         = "failed to publish a pointcloud with file name "
                         + pointcloud_file_name;
                 }
-                should_publish = success;
+                succes = should_publish;
                 break;
             }
             case SelectedMode::end: {
