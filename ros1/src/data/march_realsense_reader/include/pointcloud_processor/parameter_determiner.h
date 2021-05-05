@@ -1,7 +1,7 @@
 #ifndef MARCH_PARAMETER_DETERMINER_H
 #define MARCH_PARAMETER_DETERMINER_H
 #include "march_shared_msgs/GetGaitParameters.h"
-#include "utilities/realsense_gait_utilities.h"
+#include "utilities/realsense_category_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -32,7 +32,7 @@ public:
             plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_gait,
+        RealSenseCategory const realsense_category,
         boost::shared_ptr<GaitParameters> gait_parameters)
         = 0;
 
@@ -49,7 +49,7 @@ protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
-    std::optional<SelectedGait> selected_gait_ = std::nullopt;
+    std::optional<RealSenseCategory> realsense_category_ = std::nullopt;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     bool debugging_;
 };
@@ -69,7 +69,7 @@ public:
                                  plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_gait,
+        RealSenseCategory const realsense_category,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
     /** This function is called upon whenever a parameter from config is
@@ -208,7 +208,7 @@ public:
                                  plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_gait,
+        RealSenseCategory const realsense_category,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 

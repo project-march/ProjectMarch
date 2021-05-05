@@ -3,8 +3,8 @@
 # depth parameter and then the two created subgaits with the height pararmeter
 
 realsense_stairs_up_single_step:
-  # The gait type must match an available gait type in GetGaitParameters.srv
-  gait_type: stairs_up
+  # The gait realsense category must match an available category in GetGaitParameters.srv
+  realsense_category: stairs_up
   camera_to_use: front
   dimensions: 2
   default_parameters:
@@ -22,7 +22,7 @@ realsense_stairs_up_single_step:
       - MVI_stairsup_leftclose_high_undeep
       - MVI_stairsup_leftclose_high_deep
 realsense_stairs_up:
-  gait_type: stairs_up
+  realsense_category: stairs_up
   camera_to_use: front
   dimensions: 2
   default_parameters:
