@@ -147,7 +147,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             = "Region creating was unsuccessful, see debug output "
               "for more information";
         res.success = false;
-        return false;
+        return;
     }
     if (debugging_) {
         ROS_DEBUG("Done creating regions, now publishing point cloud regions "
