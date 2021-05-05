@@ -56,6 +56,15 @@ gaits:
   side_step_right:
     right_open: MVI_sidestepright_rightopen_v1
     left_close: MVI_sidestepright_leftclose_v1
+  side_step_right_small:
+    right_open: MVI_sidesteprightsmall_rightopen_v1
+    left_close: MVI_sidesteprightsmall_leftclose_v1
+  side_step_left:
+    right_close: MVI_sidestepleft_rightclose_v1
+    left_open: MVI_sidestepleft_leftopen_v1
+  side_step_left_small:
+    right_close: MVI_sidestepleftsmall_rightclose_v1
+    left_open: MVI_sidestepleftsmall_leftopen_v1
   single_step_normal:
     left_close: MIV_final
     right_open: MIV_final
