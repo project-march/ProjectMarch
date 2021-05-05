@@ -66,4 +66,9 @@ def main():
     node = DiagnosticUpdater()
     node.start()
 
-    rclpy.spin(node)
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+
+    rclpy.shutdown()
