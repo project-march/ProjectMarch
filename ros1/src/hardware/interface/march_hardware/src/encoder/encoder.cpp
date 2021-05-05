@@ -26,4 +26,24 @@ size_t Encoder::calculateTotalPositions(size_t number_of_bits)
     return (size_t)1 << number_of_bits;
 }
 
+double Encoder::positionIUToRadians(double position) const
+{
+    return position * getRadiansPerIU();
+}
+
+double Encoder::velocityIUToRadians(double velocity) const
+{
+    return velocity * getRadiansPerIU();
+}
+
+double Encoder::positionRadiansToIU(double position) const
+{
+    return position / getRadiansPerIU();
+}
+
+double Encoder::velocityRadiansToIU(double velocity) const
+{
+    return velocity / getRadiansPerIU();
+}
+
 } // namespace march

@@ -26,7 +26,8 @@ public:
      * @param slave slave of the ODrive
      * @param absolute_encoder pointer to absolute encoder, required so cannot
      * be nullptr
-     * @param incremental_encoder pointer to incremental encoder, not required so can be nullptr
+     * @param incremental_encoder pointer to incremental encoder, not required
+     * so can be nullptr
      * @param actuation_mode actuation mode in which the ODrive must
      * operate
      * @throws error::HardwareException When an absolute encoder is nullptr.
@@ -34,16 +35,13 @@ public:
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode,
-        bool pre_calibrated);
+        ActuationMode actuation_mode, bool pre_calibrated);
     ODrive(const Slave& slave, ODriveAxis axis,
-           std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-           ActuationMode actuation_mode,
-           bool pre_calibrated);
+        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        ActuationMode actuation_mode, bool pre_calibrated);
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         ActuationMode actuation_mode);
-
 
     ~ODrive() noexcept override = default;
 

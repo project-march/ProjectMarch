@@ -175,8 +175,8 @@ void IMotionCube::actuateRadians(float target_position)
             target_position, MAX_TARGET_DIFFERENCE,
             this->getAbsolutePositionUnchecked(), this->getSlaveIndex());
     }
-    this->actuateIU(this->absolute_encoder_->toIU(
-        target_position, /*use_zero_position=*/true));
+    this->actuateIU(
+        this->absolute_encoder_->positionRadiansToIU(target_position));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
@@ -584,26 +584,26 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 
 float IMotionCube::getAbsolutePositionUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->toRadians(
-        getAbsolutePositionIU(), /*use_zero_position=*/true);
+    return (float)this->getAbsoluteEncoder()->positionIUToRadians(
+        getAbsolutePositionIU());
 }
 
 float IMotionCube::getIncrementalPositionUnchecked()
 {
-    return (float)this->getIncrementalEncoder()->toRadians(
-        getIncrementalPositionIU(), true);
+    return (float)this->getIncrementalEncoder()->positionIUToRadians(
+        getIncrementalPositionIU());
 }
 
 float IMotionCube::getAbsoluteVelocityUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->toRadians(
-        getAbsoluteVelocityIU(), /*use_zero_position=*/false);
+    return (float)this->getAbsoluteEncoder()->velocityIUToRadians(
+        getAbsoluteVelocityIU());
 }
 
 float IMotionCube::getIncrementalVelocityUnchecked()
 {
-    return (float)this->getIncrementalEncoder()->toRadians(
-        getIncrementalVelocityIU(), false);
+    return (float)this->getIncrementalEncoder()->velocityIUToRadians(
+        getIncrementalVelocityIU());
 }
 
 } // namespace march

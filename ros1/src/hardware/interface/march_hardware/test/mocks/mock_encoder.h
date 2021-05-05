@@ -10,7 +10,10 @@ public:
     {
     }
 
-    MOCK_CONST_METHOD0(getRadiansPerBit, double());
-    MOCK_CONST_METHOD2(toRadians, double(double, bool));
-    MOCK_CONST_METHOD2(toIU, double(double, bool));
+    MOCK_CONST_METHOD0(getRadiansPerIU, double());
+
+    MOCK_CONST_METHOD1(positionIUToRadians, double(double));
+    MOCK_CONST_METHOD1(velocityIUToRadians, double(double));
+    MOCK_CONST_METHOD1(positionRadiansToIU, double(double));
+    MOCK_CONST_METHOD1(velocityRadiansToIU, double(double));
 };

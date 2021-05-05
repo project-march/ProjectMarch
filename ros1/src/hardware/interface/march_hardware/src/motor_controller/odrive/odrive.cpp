@@ -21,37 +21,38 @@
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-               std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-               std::unique_ptr<IncrementalEncoder> incremental_encoder,
-               ActuationMode actuation_mode, bool pre_calibrated)
-    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+    ActuationMode actuation_mode, bool pre_calibrated)
+    : MotorController(slave, std::move(absolute_encoder),
+        std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
     , pre_calibrated_(pre_calibrated)
 {
     if (!absolute_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "An ODrive needs an absolute encoder");
+            "An ODrive needs an absolute encoder");
     }
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     ActuationMode actuation_mode, bool pre_calibrated)
-    : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode, pre_calibrated)
+    : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode,
+        pre_calibrated)
 {
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-               std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-               ActuationMode actuation_mode)
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    ActuationMode actuation_mode)
     : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false)
 {
 }
 
 void ODrive::prepareActuation()
 {
-    if (!pre_calibrated_)
-    {
+    if (!pre_calibrated_) {
         // Calibrate the ODrive first
         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
         waitForState(ODriveAxisState::IDLE);
@@ -63,7 +64,8 @@ void ODrive::prepareActuation()
     auto odrive_state = getState();
     if (odrive_state->hasError()) {
         ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
-        throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
+        throw error::HardwareException(
+            error::ErrorType::PREPARE_ACTUATION_ERROR);
     }
 }
 
@@ -150,14 +152,16 @@ void ODrive::reset(SdoSlaveInterface& /*sdo*/)
 ODriveAxisState ODrive::getAxisState()
 {
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::AxisState, axis_))
-        .ui);
+                                            ODriveObjectName::AxisState, axis_))
+                               .ui);
 }
 
 void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct = { .ui = state.value_ };
-    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
+    this->write32(ODrivePDOmap::getMOSIByteOffset(
+                      ODriveObjectName::RequestedState, axis_),
+        write_struct);
 }
 
 float ODrive::getAbsolutePositionIU()
@@ -178,14 +182,14 @@ float ODrive::getAbsoluteVelocityIU()
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->toRadians(
-        getAbsolutePositionIU(), /*use_zero_position=*/true);
+    return (float)this->getAbsoluteEncoder()->positionIUToRadians(
+        getAbsolutePositionIU());
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->toRadians(
-        getAbsoluteVelocityIU(), /*use_zero_position=*/false);
+    return (float)this->getAbsoluteEncoder()->velocityIUToRadians(
+        getAbsoluteVelocityIU());
 }
 
 uint32_t ODrive::getAxisError()

@@ -9,21 +9,9 @@ IncrementalEncoder::IncrementalEncoder(
 {
 }
 
-double IncrementalEncoder::getRadiansPerBit() const
+double IncrementalEncoder::getRadiansPerIU() const
 {
     return PI_2 / (getTotalPositions() * this->transmission_);
-}
-
-double IncrementalEncoder::toIU(
-    double radians, bool /*use_zero_position*/) const
-{
-    return radians / getRadiansPerBit();
-}
-
-double IncrementalEncoder::toRadians(
-    double iu, bool /*use_zero_position*/) const
-{
-    return iu * getRadiansPerBit();
 }
 
 double IncrementalEncoder::getTransmission() const

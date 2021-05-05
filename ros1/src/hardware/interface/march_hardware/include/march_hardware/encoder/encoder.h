@@ -16,40 +16,36 @@ public:
     virtual ~Encoder() noexcept = default;
 
     /**
-     * Converts encoder Internal Units (IU) to radians.
-     * This is a pure virtual function and must be implemented by subclasses,
-     * since each type of encoder has a different way of calculating radians.
-     * Conversion may be different if it is position or velocity
-     * @param use_zero_position: Whether to use the zero position in the
-     * calculation
+     * Convert encoder Internal Units (IU) to radians.
+     * Conversion may be different if it is position or velocity.
+     * These methods may be overridden by child classes.
      */
-    virtual double toRadians(double iu, bool use_zero_position) const = 0;
+    virtual double positionIUToRadians(double position) const;
+    virtual double velocityIUToRadians(double velocity) const;
 
     /**
-     * Converts radians to encoder Internal Units (IU).
-     * This is a pure virtual function and must be implemented by subclasses,
-     * since each type of encoder has a different way of calculating radians.
-     * Conversion may be different if it is position or velocity
-     * @param use_zero_position: Whether to use the zero position in the
-     * calculation
+     * Convert radians to encoder Internal Units (IU).
+     * Conversion may be different if it is position or velocity.
+     * These methods may be overridden by child classes.
      */
-    virtual double toIU(double radians, bool use_zero_position) const = 0;
+    virtual double positionRadiansToIU(double position) const;
+    virtual double velocityRadiansToIU(double velocity) const;
 
     /**
-     * Returns the amount of radians corresponding to a single LSB flip.
+     * Returns the amount of radians corresponding to a single Internal Unit
      *
      * Say for example an absolute encoder has a resolution of 12 bits.
      * Then there are 2^12 = 4096 different positions that can be encoded.
      * A complete circle is 2 PI radians.
      * Hence to encode a complete circle each position must account for 2 PI /
-     * 4096 radians. In this case flipping the LSB results in a position
+     * 4096 radians. In this case adding a single IU results in a position
      * difference of 0.00153. This value can be used to convert from IU to
      * radians and back.
      *
      * This is a pure virtual function and must be implemented by subclasses,
      * since each type of encoder has a different way of calculating radians.
      */
-    virtual double getRadiansPerBit() const = 0;
+    virtual double getRadiansPerIU() const = 0;
 
     size_t getTotalPositions() const;
 

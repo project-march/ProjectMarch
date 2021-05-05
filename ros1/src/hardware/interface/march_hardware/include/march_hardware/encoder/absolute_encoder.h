@@ -16,9 +16,9 @@ public:
     ~AbsoluteEncoder() noexcept override = default;
 
     // Inherited methods
-    double getRadiansPerBit() const final;
-    double toRadians(double iu, bool use_zero_position) const final;
-    double toIU(double radians, bool use_zero_position) const final;
+    double getRadiansPerIU() const final;
+    double positionIUToRadians(double position) const final;
+    double positionRadiansToIU(double position) const final;
 
     bool isWithinHardLimitsIU(int32_t iu) const;
     bool isWithinSoftLimitsIU(int32_t iu) const;
@@ -56,8 +56,12 @@ public:
 
 private:
     int32_t zero_position_iu_ = 0;
+
+    // Hard limits
     int32_t lower_limit_iu_ = 0;
     int32_t upper_limit_iu_ = 0;
+
+    // Soft limits
     int32_t lower_soft_limit_iu_ = 0;
     int32_t upper_soft_limit_iu_ = 0;
 };
