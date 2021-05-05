@@ -17,7 +17,15 @@
 
     <xacro:property name="hover_height" value="0.5"/>
 
-    <xacro:include filename="march.gazebo"/>
+    <!-- Set the gazebo_ros_control plugin the same way "march.gazebo" does
+    but overwrite the default control update period -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/march</robotNamespace>
+            <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+            <controlPeriod>0.02</controlPeriod>
+        </plugin>
+    </gazebo>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
     <link name="world"/>
