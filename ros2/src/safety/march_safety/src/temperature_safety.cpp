@@ -7,6 +7,7 @@
 #include <chrono>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 const double DEFAULT_TEMPERATURE_THRESHOLD { 40.0 };
@@ -26,9 +27,10 @@ const std::map<ThresholdType, std::string> THRESHOLD_NAMES
  */
 TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node,
     std::shared_ptr<SafetyHandler> safety_handler)
-    : node_(node)
-    , safety_handler_(safety_handler)
+    : node_(std::move(node))
+    , safety_handler_(std::move(safety_handler))
     , send_errors_interval_(/*nanoseconds=*/0)
+    , default_temperature_threshold_(DEFAULT_TEMPERATURE_THRESHOLD)
 {
     node_->get_parameter_or("default_temperature_threshold",
         default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);
@@ -50,9 +52,9 @@ TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node,
  */
 void TemperatureSafety::setTemperatureThresholds()
 {
-    for (auto type : THRESHOLD_NAMES) {
+    for (const auto& type : THRESHOLD_NAMES) {
         ThresholdHoldsMap thresholds_map;
-        for (std::string joint : node_->joint_names) {
+        for (const std::string& joint : node_->joint_names) {
             double threshold_value;
             std::string parameter_name
                 = "temperature_thresholds_" + type.second + "." + joint;
@@ -78,7 +80,7 @@ void TemperatureSafety::setTemperatureThresholds()
  * defined threshold.
  */
 void TemperatureSafety::temperatureCallback(
-    const TemperatureMsg::SharedPtr msg, const std::string& sensor_name)
+    const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name)
 {
     // Send at most an error every 'send_errors_interval_'
     if (node_->get_clock()->now()
@@ -160,6 +162,7 @@ void TemperatureSafety::createSubscribers()
         // Construct callback instead of using std::bind
         // https://github.com/ros2/rclcpp/issues/583#issuecomment-442146657
         auto callback
+            // NOLINTNEXTLINE(performance-unnecessary-value-param)
             = [this, joint_name](const TemperatureMsg::SharedPtr msg) {
                   temperatureCallback(msg, joint_name);
               };

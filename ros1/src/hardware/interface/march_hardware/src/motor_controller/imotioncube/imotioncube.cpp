@@ -201,7 +201,7 @@ void IMotionCube::actuateIU(int32_t target_iu)
 
 void IMotionCube::actuateTorque(float target_torque)
 {
-    int16_t target_torque_iu = (int16_t)std::round(target_torque);
+    auto target_torque_iu = (int16_t)std::round(target_torque);
     if (this->actuation_mode_ != ActuationMode::torque) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
             "trying to actuate torque, while actuation mode is %s",
@@ -312,10 +312,10 @@ float IMotionCube::getMotorCurrent()
     int16_t motor_current_iu
         = this->read16(this->miso_byte_offsets_.at(IMCObjectName::ActualTorque))
               .i;
-    return (2.0f * PEAK_CURRENT / IU_CONVERSION_CONST)
+    return (2.0F * PEAK_CURRENT / IU_CONVERSION_CONST)
         * static_cast<float>(
             motor_current_iu); // Conversion to Amp, see Technosoft CoE
-                               // programming manual
+    // programming manual
 }
 
 float IMotionCube::getMotorControllerVoltage()
@@ -349,7 +349,7 @@ void IMotionCube::setControlWord(uint16_t control_word)
         control_word_ui);
 }
 
-void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
+void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
 {
     ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
     while (!target_state.isReached(this->getStatusWord())) {
@@ -468,7 +468,8 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
         = this->computeSWCheckSum(start_address, end_address);
     // set parameters to compute checksum on the imc
     const int checksum_setup = sdo.write<uint32_t>(
-        /*index=*/0x2069, /*sub=*/0, (end_address << 16) | start_address);
+        /*index=*/0x2069, /*sub=*/0,
+        (uint32_t)(end_address << 16U) | start_address);
 
     uint16_t imc_value;
     int value_size = sizeof(imc_value);
@@ -488,8 +489,8 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
 
 void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 {
-    int result = 0;
-    int final_result = 0;
+    uint32_t result = 0;
+    uint32_t final_result = 0;
 
     size_t pos = 0;
     size_t old_pos = 0;
@@ -500,8 +501,8 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
             const uint16_t mem_location
                 = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
             const uint16_t mem_setup = 9; // send 16-bits and auto increment
-            result = sdo.write<uint32_t>(/*index=*/0x2064, /*sub=*/0,
-                (mem_location << 16)
+            result = (uint32_t)sdo.write<uint32_t>(/*index=*/0x2064, /*sub=*/0,
+                (uint32_t)(mem_location << 16U)
                     | mem_setup); // write the write-configuration
             final_result |= result;
         } else {
@@ -515,14 +516,16 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 
                 uint32_t data = 0;
                 if (pos != old_pos) {
-                    data = (std::stoi(
+                    data = ((uint32_t)std::stoi(
                                 next_token, /*__idx=*/nullptr, /*__base=*/16)
-                               << 16)
-                        | std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
+                               << 16U)
+                        | (uint32_t)std::stoi(
+                            token, /*__idx=*/nullptr, /*__base=*/16);
                 } else {
-                    data = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
+                    data = (uint32_t)std::stoi(
+                        token, /*__idx=*/nullptr, /*__base=*/16);
                 }
-                result = sdo.write<uint32_t>(
+                result = (uint32_t)sdo.write<uint32_t>(
                     /*index=*/0x2065, /*sub=*/0,
                     data); // write the write-configuration
             }

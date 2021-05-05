@@ -145,9 +145,9 @@ public:
     }
 
     IMCStateOfOperation state_of_operation_;
-    uint16_t motion_error_;
-    uint16_t detailed_error_;
-    uint16_t second_detailed_error_;
+    uint16_t motion_error_ {};
+    uint16_t detailed_error_ {};
+    uint16_t second_detailed_error_ {};
 };
 } // namespace march
 

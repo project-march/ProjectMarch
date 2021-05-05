@@ -32,7 +32,7 @@ public:
 private:
     // Callback for when a temperature is published.
     void temperatureCallback(
-        const TemperatureMsg::SharedPtr msg, const std::string& sensor_name);
+        const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name);
 
     // Create a subscriber for each joint on the /march/temperature/<joint>
     // topic
@@ -56,10 +56,10 @@ private:
     // Safety handlers to use when logging errors
     std::shared_ptr<SafetyHandler> safety_handler_;
 
-    double default_temperature_threshold_;
-
-    rclcpp::Duration send_errors_interval_;
     rclcpp::Time time_last_send_error_;
+    rclcpp::Duration send_errors_interval_;
+
+    double default_temperature_threshold_ {};
 
     // Map of ThresholdHoldsMaps to store threshold values for each joint
     std::map<ThresholdType, ThresholdHoldsMap> thresholds_maps_;

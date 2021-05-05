@@ -36,7 +36,7 @@ namespace error {
         {
         }
 
-        virtual ~HardwareException() noexcept = default;
+        ~HardwareException() noexcept override = default;
 
         const char* what() const noexcept override
         {
@@ -80,13 +80,16 @@ namespace error {
 
     class NotImplemented : public std::logic_error {
     public:
-        NotImplemented(std::string function_name)
+        explicit NotImplemented(const std::string& function_name)
             : std::logic_error(
                 "Function " + function_name + " is not implemented") {};
 
-        NotImplemented(std::string function_name, std::string context)
-            : std::logic_error("Function " + function_name
-                + " is not implemented for " + context) {};
+        NotImplemented(
+            const std::string& function_name, const std::string& context)
+            : std::logic_error(std::string(/*s=*/"Function ")
+                                   .append(function_name)
+                                   .append(/*s=*/" is not implemented for ")
+                                   .append(context)) {};
     };
 
 } // namespace error

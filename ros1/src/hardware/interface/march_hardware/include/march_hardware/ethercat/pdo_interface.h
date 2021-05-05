@@ -24,7 +24,8 @@ public:
     virtual bit8 read8(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual bit16 read16(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual bit32 read32(uint16_t slave_index, uint8_t module_index) const = 0;
-    virtual ~PdoInterface() {};
+    virtual ~PdoInterface() = default;
+    ;
 };
 
 /**
@@ -39,7 +40,7 @@ class PdoSlaveInterface {
 public:
     PdoSlaveInterface(uint16_t slave_index, PdoInterfacePtr pdo)
         : slave_index_(slave_index)
-        , pdo_(pdo)
+        , pdo_(std::move(pdo))
     {
     }
 

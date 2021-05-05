@@ -35,11 +35,13 @@ public:
     {
     }
 
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     ODriveAxisState(int8_t state)
         : value_(Value(state))
     {
     }
 
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     ODriveAxisState(Value value)
         : value_(value)
     {
@@ -153,11 +155,11 @@ public:
     }
 
     ODriveAxisState axis_state_;
-    uint32_t axis_error_;
-    uint32_t motor_error_;
-    uint32_t encoder_error_;
-    uint32_t encoder_manager_error_;
-    uint32_t controller_error_;
+    uint32_t axis_error_ {};
+    uint32_t motor_error_ {};
+    uint32_t encoder_error_ {};
+    uint32_t encoder_manager_error_ {};
+    uint32_t controller_error_ {};
 };
 
 } // namespace march

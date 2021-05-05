@@ -1,7 +1,7 @@
 #ifndef MARCH_LINEAR_ALGEBRA_UTILITIES_H
 #define MARCH_LINEAR_ALGEBRA_UTILITIES_H
 
-#include <math.h>
+#include <cmath>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
 #include <vector>
@@ -33,7 +33,7 @@ double distanceBetweenPoints(T point1, Q point2)
 // Project a point to a line
 template <typename T>
 pcl::PointXYZ projectPointToLine(
-    T point, pcl::ModelCoefficients::Ptr line_coefficients)
+    T point, const pcl::ModelCoefficients::Ptr& line_coefficients)
 {
     // The calculations only with pointXYZ types as pcl does the calculations
     pcl::PointXYZ point_to_project;
@@ -75,6 +75,13 @@ double distancePointToLine(
         = projectPointToLine<T>(point, line_coefficients);
     return distanceBetweenPoints<T, pcl::PointXYZ>(point, projected_point);
 }
+
+// Return true if the z coordinate of point1 is lower then that of point2
+inline bool pointIsLower(pcl::PointNormal point1, pcl::PointNormal point2)
+{
+    return point1.z < point2.z;
+}
+
 } // namespace linear_algebra_utilities
 
 #endif // MARCH_LINEAR_ALGEBRA_UTILITIES_H

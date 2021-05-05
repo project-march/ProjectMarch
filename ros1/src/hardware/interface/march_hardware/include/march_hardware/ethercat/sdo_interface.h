@@ -47,7 +47,8 @@ public:
         return this->read(slave, index, sub, val_size, &value);
     }
 
-    virtual ~SdoInterface() {};
+    virtual ~SdoInterface() = default;
+    ;
 
 protected:
     virtual int write(uint16_t slave, uint16_t index, uint8_t sub,
@@ -70,7 +71,7 @@ class SdoSlaveInterface {
 public:
     SdoSlaveInterface(uint16_t slave_index, SdoInterfacePtr sdo)
         : slave_index_(slave_index)
-        , sdo_(sdo)
+        , sdo_(std::move(sdo))
     {
     }
 

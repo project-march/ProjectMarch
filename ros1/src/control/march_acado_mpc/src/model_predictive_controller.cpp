@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -21,7 +22,7 @@ ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
 ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
-    : W_(W)
+    : W_(std::move(W))
 {
 }
 
@@ -87,8 +88,8 @@ void ModelPredictiveController::setReference(
 
 void ModelPredictiveController::shiftStatesAndControl()
 {
-    acado_shiftStates(/*strategy=*/2, /*xEnd=*/0, /*uEnd=*/0);
-    acado_shiftControls(/*uEnd=*/0);
+    acado_shiftStates(/*strategy=*/2, /*xEnd=*/nullptr, /*uEnd=*/nullptr);
+    acado_shiftControls(/*uEnd=*/nullptr);
 }
 
 void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
@@ -137,8 +138,8 @@ void ModelPredictiveController::calculateControlInput()
     u = acadoVariables.u[0];
 
     // Shift states and control and prepare for the next iteration
-    acado_shiftStates(/*strategy=*/2, /*xEnd=*/0, /*uEnd=*/0);
-    acado_shiftControls(/*uEnd=*/0);
+    acado_shiftStates(/*strategy=*/2, /*xEnd=*/nullptr, /*uEnd=*/nullptr);
+    acado_shiftControls(/*uEnd=*/nullptr);
 
     // Perform a diagnosis on the controller
     controllerDiagnosis();

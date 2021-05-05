@@ -30,8 +30,7 @@ bool ModelPredictiveControllerInterface::init(
 
     // Initialize the model predictive controllers
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        model_predictive_controllers_.push_back(
-            ModelPredictiveController(getWeights(joint_names[i])));
+        model_predictive_controllers_.emplace_back(getWeights(joint_names[i]));
         model_predictive_controllers_[i].joint_name = std::move(joint_names[i]);
         model_predictive_controllers_[i].init();
     }
@@ -41,7 +40,7 @@ bool ModelPredictiveControllerInterface::init(
 
 // Retrieve the weights from the parameter server for a joint.
 std::vector<float> ModelPredictiveControllerInterface::getWeights(
-    std::string joint_name)
+    const std::string& joint_name)
 {
     // get path to controller parameters
     std::string parameter_path = "/march/controller/trajectory";
@@ -50,8 +49,16 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(
     std::vector<float> Q;
     std::vector<float> R;
 
-    ros::param::get(parameter_path + "/weights/" + joint_name + "/Q", Q);
-    ros::param::get(parameter_path + "/weights/" + joint_name + "/R", R);
+    ros::param::get(std::string(parameter_path)
+                        .append(/*s=*/"/weights/")
+                        .append(joint_name)
+                        .append(/*s=*/"/Q"),
+        Q);
+    ros::param::get(std::string(parameter_path)
+                        .append(/*s=*/"/weights/")
+                        .append(joint_name)
+                        .append(/*s=*/"/R"),
+        R);
 
     // Add Q and R to W
     std::vector<float> W;

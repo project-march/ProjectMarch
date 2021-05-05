@@ -27,15 +27,15 @@ public:
     using iterator = std::vector<Joint>::iterator;
 
     MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-        ::std::string ifName, int ecatCycleTime, int ecatSlaveTimeout);
+        ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
 
     MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
         std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-        ::std::string ifName, int ecatCycleTime, int ecatSlaveTimeout);
+        ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
 
     MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
         std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-        std::vector<PressureSole> pressureSoles, ::std::string ifName,
+        std::vector<PressureSole> pressureSoles, ::std::string if_name,
         int ecatCycleTime, int ecatSlaveTimeout);
 
     ~MarchRobot();
@@ -67,7 +67,7 @@ public:
 
     int getEthercatCycleTime() const;
 
-    Joint& getJoint(::std::string jointName);
+    Joint& getJoint(const ::std::string& jointName);
 
     Joint& getJoint(size_t index);
 

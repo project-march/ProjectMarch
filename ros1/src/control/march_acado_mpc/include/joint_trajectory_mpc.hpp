@@ -21,8 +21,8 @@
 #include <ros/time.h>
 
 #include <cassert>
+#include <ctime>
 #include <memory>
-#include <time.h>
 
 // Create a State alias
 namespace joint_trajectory_controller {
@@ -88,12 +88,12 @@ private:
      * @return Returns a vector: The weight values belonging to the diagonal of
      * the MPC weight matrix.
      */
-    std::vector<float> getWeights(std::string joint_name);
+    std::vector<float> getWeights(const std::string& joint_name);
 
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
-    unsigned int num_joints_;
-    double command;
+    unsigned int num_joints_ {};
+    double command {};
 
     std::vector<ModelPredictiveController> model_predictive_controllers_;
     vector<double> state;

@@ -17,7 +17,11 @@ RegionCreator::RegionCreator(bool debugging)
 // Construct a basic CHullFinder class
 RegionGrower::RegionGrower(bool debugging)
     : RegionCreator(debugging)
-
+    , number_of_neighbours(-1)
+    , min_cluster_size(-1)
+    , max_cluster_size(-1)
+    , smoothness_threshold(std::numeric_limits<float>::lowest())
+    , curvature_threshold(std::numeric_limits<float>::lowest())
 {
 }
 
@@ -90,17 +94,17 @@ bool RegionGrower::extractRegions()
         ROS_DEBUG(
             "Total number of clusters found: %lu", region_vector_->size());
         int i = 0;
-        for (auto region : *region_vector_) {
+        for (const auto& region : *region_vector_) {
             ROS_DEBUG("Total number of points in cluster %i: %lu", i,
                 region.indices.size());
             i++;
         }
+    }
 
-        if (region_vector_->size() == 0) {
-            ROS_WARN("Region growing algorithm found no clusters");
-            return false;
-        }
-        return true;
+    if (region_vector_->size() == 0) {
+        ROS_WARN("Region growing algorithm found no clusters, stopping "
+                 "region grower");
+        return false;
     }
 
     return true;
