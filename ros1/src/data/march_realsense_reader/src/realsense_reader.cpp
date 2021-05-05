@@ -181,7 +181,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     }
 
     // Setup data structures for parameter determining
-    auto realsense_category = (RealSenseCategory) realsense_category_;
+    auto realsense_category = (RealSenseCategory)realsense_category_;
     boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
         = boost::make_shared<march_shared_msgs::GaitParameters>();
     // Determine parameters
