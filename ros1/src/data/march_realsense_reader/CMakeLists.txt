@@ -62,23 +62,21 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 #############
 ## Mark libraries for installation
 install(TARGETS ${PROJECT_NAME}
-    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 
 # Mark executables for installation
 install(TARGETS ${PROJECT_NAME}_node
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/ include/pointcloud_processor/
         include/utilities/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         FILES_MATCHING PATTERN "*.h"
-        )
-
-install(DIRECTORY launch
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-
+install(DIRECTORY launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
