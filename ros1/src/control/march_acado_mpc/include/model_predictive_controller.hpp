@@ -16,15 +16,15 @@ public:
      * Controller variables
      */
 
-    std::vector<double> command; // calculated input
+    std::vector<double> command {}; // calculated input
 
     /**
      * Diagnostic variables
      */
 
     // Timing variables
-    acado_timer t;
-    double t_preparation, t_feedback;
+    acado_timer t {};
+    double t_preparation {}, t_feedback {};
 
     // Status variables
     int preparationStepStatus {};
