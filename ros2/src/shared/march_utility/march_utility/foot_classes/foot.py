@@ -10,8 +10,6 @@ from __future__ import annotations
 from math import acos, asin, atan, atan2, cos, pi, sin, sqrt
 from typing import Tuple
 
-import rclpy
-
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.gait.setpoint import Setpoint
@@ -171,13 +169,6 @@ class Foot(object):
         hfe, kfe = Foot.calculate_hfe_kfe_angles(
             transformed_x, transformed_z, ul, ll, transformed_distance_to_origin
         )
-        LOGGER = rclpy.logging.get_logger("march_utility_logger")
-        LOGGER.warning(f"calculated haa = {haa}")
-        LOGGER.warning(f"calculated kfe = {kfe}")
-        LOGGER.warning(f"calculated hfe = {hfe}")
-
-        LOGGER.warning(f"actual setpoint of haa {CalculationSetpoint(time, haa)}")
-
 
         return {
             foot_side.value

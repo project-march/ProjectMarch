@@ -1,8 +1,6 @@
 
 from typing import Optional
 
-import rclpy
-
 from march_utility.utilities.utility_functions import get_joint_names_for_inverse_kinematics
 from march_utility.utilities.duration import Duration
 
@@ -98,6 +96,3 @@ class CalculationSetpoint(Setpoint):
         """
         self.velocity = (next_state.position - self.position) \
                         / (next_state.time - self.time).seconds
-
-        LOGGER = rclpy.logging.get_logger("march_utility_logger")
-        LOGGER.warning(f"the velocity = {self.velocity}")

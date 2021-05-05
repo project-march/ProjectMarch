@@ -5,8 +5,6 @@ import os
 import re
 from typing import List, Tuple, Collection
 
-import rclpy
-
 import yaml
 from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContent,
@@ -32,8 +30,6 @@ PARAMETRIC_GAITS_PREFIX = "_pg_"
 FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
-
-LOGGER = rclpy.logging.get_logger("march_utility_logger")
 
 
 class Subgait(object):
@@ -743,8 +739,6 @@ class Subgait(object):
                 )
                 setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
 
-            LOGGER.info(f"setpoints_to_add_IK = {setpoints_to_add}")
-
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
             # fill the ankle joint using the angle based linear interpolation
@@ -758,7 +752,6 @@ class Subgait(object):
                 new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(
                     base_setpoint, other_setpoint, parameter
                 )
-                LOGGER.info(f"setpoints_to_add ankle = {new_ankle_setpoint_to_add}")
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
         duration = base_subgait.duration.weighted_average(
@@ -781,10 +774,6 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
         """Create two lists of setpoints with equal time stamps."""
-
-        LOGGER.info(
-            f"start preparing subgaits with names {base_subgait.subgait_name} and {other_subgait.subgait_name}"
-        )
         base_to_other_duration_ratio = other_subgait.duration / base_subgait.duration
 
         original_base_time_stamps = set(
@@ -804,9 +793,6 @@ class Subgait(object):
             for other_time in other_time_stamps
         ]
 
-        LOGGER.info(f"base_time_stamps = {base_time_stamps}")
-        LOGGER.info(f"other_time_stamps = {other_time_stamps}")
-
         base_time_stamps = sorted(base_time_stamps)
         other_time_stamps = sorted(other_time_stamps)
 
@@ -816,9 +802,6 @@ class Subgait(object):
         other_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
             other_subgait, other_time_stamps
         )
-
-        LOGGER.info(f"base_setpoints = {base_setpoints_to_interpolate}")
-        LOGGER.info(f"other_setpoints = {other_setpoints_to_interpolate}")
 
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate
 
