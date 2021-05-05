@@ -48,7 +48,7 @@ class Setpoint:
 
     @time.setter
     def time(self, time: float):
-        self._time = round(time, self.internal_digits)
+        self._time = round(time, self.digits)
 
     @property
     def position(self):
@@ -56,7 +56,7 @@ class Setpoint:
 
     @position.setter
     def position(self, position: float):
-        self._position = round(position, self.internal_digits)
+        self._position = round(position, self.digits)
 
     @property
     def velocity(self):
@@ -64,7 +64,7 @@ class Setpoint:
 
     @velocity.setter
     def velocity(self, velocity: float):
-        self._velocity = round(velocity, self.internal_digits)
+        self._velocity = round(velocity, self.digits)
 
     def __repr__(self):
         if self.velocity is not None:
@@ -91,53 +91,6 @@ class Setpoint:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @classmethod
-    def calculate_next_positions_joint(cls, setpoint_dic: dict) -> dict:
-        """
-        Calculate the position of the joints a moment later.
-
-        Calculates using the approximation:
-        next_position = position + current_velocity * time_difference
-        :param setpoint_dic: A dictionary of setpoints with positions and velocities
-        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR
-        seconds later
-        """
-        next_positions = {}
-        for joint in JOINT_NAMES_IK:
-            if joint not in setpoint_dic:
-                raise KeyError(f"Setpoint_dic is missing joint {joint}")
-            else:
-                next_positions[joint] = cls(
-                    setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
-                    setpoint_dic[joint].position
-                    + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
-                )
-
-        return next_positions
-
-    def add_joint_velocity_from_next_angle(self, next_state: Setpoint) -> None:
-        """Calculate the joint velocities given a current position and a next position.
-
-        Calculates using the approximation:
-        next_position = position + current_velocity * time_difference
-
-        :param self: A Setpoint object with no velocity
-        :param next_state: A Setpoint with the positions a moment later
-
-        :return: The joint velocities of the joints on the specified side
-        """
-        if self.digits != next_state.digits:
-            raise InconsistentDigitsError(
-                msg=f"Cannot add joint velocity from next angle state as digits the setpoints "
-                f"are {self.digits} while those from the next state are {next_state.digits}"
-            )
-
-        self.velocity = (next_state.position - self.position)\
-                        / (next_state.time - self.time).seconds
-
-        LOGGER = rclpy.logging.get_logger("march_utility_logger")
-        LOGGER.warning(f"the velocity = {self.velocity}")
-
     @staticmethod
     def interpolate_setpoints(
         base_setpoint: Setpoint, other_setpoint: Setpoint, parameter: float
@@ -161,8 +114,3 @@ class Setpoint:
             base_setpoint.velocity, other_setpoint.velocity, parameter
         )
         return Setpoint(time, position, velocity)
-
-    @staticmethod
-    def set_setpoint_dictionary_to_default_precision(setpoint_dictionary: dict):
-        for key in setpoint_dictionary.keys():
-            setpoint_dictionary[key].digits = setpoint_dictionary[key].internal_digits

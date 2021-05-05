@@ -159,8 +159,7 @@ class FeetState(object):
             left_joint_states, right_joint_states
         )
 
-        # Setpoint.set_setpoint_dictionary_to_default_precision(
-        #     setpoint_dictionary
-        # )
+        for joint_name in setpoint_dictionary.keys():
+            setpoint_dictionary[joint_name] = setpoint_dictionary[joint_name].to_normal_setpoint()
 
         return setpoint_dictionary

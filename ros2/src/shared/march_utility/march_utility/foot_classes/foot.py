@@ -15,6 +15,7 @@ import rclpy
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.gait.setpoint import Setpoint
+from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
@@ -175,16 +176,16 @@ class Foot(object):
         LOGGER.warning(f"calculated kfe = {kfe}")
         LOGGER.warning(f"calculated hfe = {hfe}")
 
-        LOGGER.warning(f"actual setpoint of haa {Setpoint(time, haa, internal_digits=MID_CALCULATION_PRECISION_DIGITS)}")
+        LOGGER.warning(f"actual setpoint of haa {CalculationSetpoint(time, haa)}")
 
 
         return {
             foot_side.value
-            + "_hip_aa": Setpoint(time, haa, internal_digits=MID_CALCULATION_PRECISION_DIGITS),
+            + "_hip_aa": CalculationSetpoint(time, haa),
             foot_side.value
-            + "_hip_fe": Setpoint(time, hfe, internal_digits=MID_CALCULATION_PRECISION_DIGITS),
+            + "_hip_fe": CalculationSetpoint(time, hfe),
             foot_side.value
-            + "_knee": Setpoint(time, kfe, internal_digits=MID_CALCULATION_PRECISION_DIGITS),
+            + "_knee": CalculationSetpoint(time, kfe),
         }
 
     @staticmethod
