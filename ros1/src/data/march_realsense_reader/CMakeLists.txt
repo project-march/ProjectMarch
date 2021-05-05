@@ -48,7 +48,7 @@ add_library(${PROJECT_NAME}
 )
 
 add_executable(${PROJECT_NAME}_node src/realsense_reader_node.cpp)
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_node
         ${PROJECT_NAME}
         ${PROJECT_NAME}_gencfg
