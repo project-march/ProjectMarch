@@ -32,8 +32,17 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 
     path directory_path
         = ros::package::getPath("march_realsense_test_publisher");
-    path relative_path(/*__source*/ "config/datasets/");
-    data_path = directory_path / relative_path;
+    path relative_data_path(/*__source*/ "config/datasets/");
+    data_path = directory_path / relative_data_path;
+
+    // This is necessary as we cannot write to the install folder
+    path source_data_from_ros1_path(
+        "src/data/march_realsense_test_publisher/config/datasets/");
+    path ros1_path = directory_path.parent_path()
+                         .parent_path()
+                         .parent_path()
+                         .parent_path();
+    write_path = ros1_path / source_data_from_ros1_path;
 
     for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
         if (std::filesystem::is_regular_file(entry)
@@ -229,9 +238,14 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
-    std::string writePath = data_path.string() + pointcloud_file_name;
-    pcl::io::savePLYFileBinary(writePath, *point_cloud);
-    return false;
+    ROS_DEBUG_STREAM(
+        "saving under " << write_path.string() + save_pointcloud_name);
+    if (pcl::io::savePLYFileBinary(
+            write_path.string() + save_pointcloud_name, *point_cloud)
+        == -1) {
+        return false;
+    }
+    return true;
 }
 
 // Publish the right pointcloud based on the latest service call
@@ -297,9 +311,9 @@ void RealsenseTestPublisher::updatePublishLoop(
             res.message = info_message;
             ROS_DEBUG_STREAM(info_message);
         } else {
-            res.message = warn_message;
-            ROS_WARN_STREAM(
-                warn_message + ". See the ros1 terminal for more information.");
+            res.message = warn_message
+                + ". See the ros1 terminal for more information.";
+            ROS_WARN_STREAM(warn_message);
         }
         res.success = success;
     } else {
