@@ -73,23 +73,23 @@ private:
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
     ros::ServiceClient process_pointcloud_service_client;
-
     YAML::Node config_tree;
 
     std::vector<std::string> file_names;
     path data_path;
     path write_path;
-    std::string pointcloud_topic;
     PointCloud::Ptr pointcloud_to_publish;
     std::string pointcloud_file_name;
-    SelectedMode selected_mode;
+    std::string frame_id_to_transform_to;
+    std::string save_pointcloud_name;
+    std::string pointcloud_topic;
     bool should_publish;
     bool no_files_present;
     bool from_back_camera;
-    int selected_gait;
-    std::string frame_id_to_transform_to;
+    bool from_realsense_viewer;
     bool save_camera_back;
-    std::string save_pointcloud_name;
+    SelectedMode selected_mode;
+    int selected_gait;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H

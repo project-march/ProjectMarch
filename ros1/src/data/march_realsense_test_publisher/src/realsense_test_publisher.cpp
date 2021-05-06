@@ -118,6 +118,9 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
         frame_id_to_transform_to = yaml_utilities::grabParameter<std::string>(
             pointcloud_config, "frame_id_to_transform_to")
                                        .value();
+        from_realsense_viewer = yaml_utilities::grabParameter<bool>(
+            pointcloud_config, "from_realsense_viewer")
+                                    .value();
     } else {
         ROS_WARN_STREAM(
             "No configuration specified for pointcloud file with name "
@@ -148,7 +151,11 @@ bool RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     } else {
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID_FRONT;
     }
-    transformToCameraCoordinates();
+    // There is a weird inconsistency between the coordinate systems of the the
+    // realsense viewer and that of rviz, this makes them consistent
+    if (from_realsense_viewer) {
+        transformToCameraCoordinates();
+    }
     return true;
 }
 
