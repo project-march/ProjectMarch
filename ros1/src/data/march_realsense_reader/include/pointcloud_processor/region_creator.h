@@ -81,6 +81,7 @@ private:
     int max_cluster_size;
     float smoothness_threshold;
     float curvature_threshold;
+    bool use_recursive_growing
 };
 
 #endif // MARCH_PREPROCESSOR_H

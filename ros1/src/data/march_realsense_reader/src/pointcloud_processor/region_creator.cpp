@@ -37,8 +37,12 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     clock_t start_region_grow = clock();
 
     bool success = true;
-    success &= setupRegionGrower();
-    success &= extractRegions();
+    if (use_recursive_growing) {
+        succes &= recursiveRegionGrower();
+    } else {
+        success &= setupRegionGrower();
+        success &= extractRegions();
+    }
 
     clock_t end_region_grow = clock();
     double time_taken
@@ -61,6 +65,7 @@ void RegionGrower::readParameters(
         = (float)config.region_creator_region_growing_smoothness_threshold;
     curvature_threshold
         = (float)config.region_creator_region_growing_curvature_threshold;
+    use_recursive_growing = config.region_creator_region_growing_use_recursive_growing;
 
     debugging_ = config.debug;
 }
@@ -113,4 +118,38 @@ bool RegionGrower::extractRegions()
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
 {
     return region_grower.getColoredCloud();
+}
+
+bool RegionGr
+
+bool RegionGrower::recursiveRegionGrower(PointCloud::Ptr too_small, PointCloud::Ptr too_large, float last_tolerance)
+{
+    // verify that the indices are different
+
+    small_tolerance = last_tolerance / 1.1f;
+    large_tolerance = last_tolerance * 1.1f;
+
+    RegionVector potential_region_vector = tryRegionGrowing(too_small, small_tolerance);
+
+    // get the too small and large part of the region_vec
+    // Add the valid ones to the region vector
+
+    if (too_small.size > 10 || too_large.size > 10) {
+        recursiveEuclideanClustering(too_small, too_large, small_tolerance)
+    }
+    else {
+        // add the small and large too
+    }
+
+    RegionVector potential_region_vector = tryEuclideanClustering(too_large, large_tolerance);
+
+    // get the too small and large part of the region_vec
+    // Add the valid ones to the region vector
+
+    if (too_small.size > 10 || too_large.size > 10) {
+        recursiveEuclideanClustering(too_small, too_large, large_tolerance)
+    }
+    else {
+        // add the small and large too
+    }
 }
