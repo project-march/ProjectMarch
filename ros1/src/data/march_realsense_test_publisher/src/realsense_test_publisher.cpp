@@ -30,6 +30,8 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     , from_back_camera(false)
     , selected_mode((SelectedMode)-1)
     , realsense_category(-1)
+    , from_realsense_viewer(nullptr)
+    , save_camera_back(false)
 {
     if (ros::console::set_logger_level(
             ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
@@ -43,7 +45,8 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 
     // This is necessary as we cannot write to the install folder
     path source_data_from_ros1_path(
-        "src/data/march_realsense_test_publisher/config/datasets/");
+        /*__source*/ "src/data/march_realsense_test_publisher/config/"
+                     "datasets/");
     path ros1_path = directory_path.parent_path()
                          .parent_path()
                          .parent_path()
