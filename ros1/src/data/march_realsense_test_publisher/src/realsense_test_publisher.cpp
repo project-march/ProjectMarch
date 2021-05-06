@@ -225,6 +225,15 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
     } else {
         pointcloud_topic = TOPIC_CAMERA_FRONT;
     }
+    if (save_pointcloud_name.compare(
+            save_pointcloud_name.length() - POINTCLOUD_EXTENSION.length(),
+            POINTCLOUD_EXTENSION.length(), POINTCLOUD_EXTENSION)
+        != 0) {
+        ROS_WARN_STREAM("The name under which to save the pointcloud should "
+                        "end with .ply but does not. Supplied name is "
+            << save_pointcloud_name);
+        return false;
+    }
     // get the next pointcloud from the topic
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(

@@ -67,3 +67,8 @@ from-ramp.ply:
   realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
+jkifjkj.ply:
+  selectd_gait: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+
