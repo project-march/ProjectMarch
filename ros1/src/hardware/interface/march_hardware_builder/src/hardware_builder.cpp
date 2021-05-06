@@ -15,6 +15,7 @@
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
+#include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 
@@ -195,9 +196,10 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
     std::string setup = convertSWFileToString(imc_setup_data);
     return std::make_unique<march::IMotionCube>(
         march::Slave(slave_index, pdo_interface, sdo_interface),
-        HardwareBuilder::createAbsoluteEncoder(
-            absolute_encoder_config, urdf_joint),
-        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config),
+        HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
+            march::MotorControllerType::IMotionCube, urdf_joint),
+        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
+            march::MotorControllerType::IMotionCube),
         setup, mode);
 }
 
@@ -225,13 +227,14 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
 
     return std::make_unique<march::ODrive>(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
-        HardwareBuilder::createAbsoluteEncoder(
-            absolute_encoder_config, urdf_joint),
+        HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
+            march::MotorControllerType::ODrive, urdf_joint),
         mode, pre_calibrated);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const YAML::Node& absolute_encoder_config,
+    const march::MotorControllerType motor_controller_type,
     const urdf::JointConstSharedPtr& urdf_joint)
 {
     if (!absolute_encoder_config || !urdf_joint) {
@@ -260,14 +263,16 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
         soft_upper_limit = urdf_joint->limits->upper;
     }
 
-    return std::make_unique<march::AbsoluteEncoder>(resolution, min_position,
-        max_position, urdf_joint->limits->lower, urdf_joint->limits->upper,
-        soft_lower_limit, soft_upper_limit);
+    return std::make_unique<march::AbsoluteEncoder>(resolution,
+        motor_controller_type, min_position, max_position,
+        urdf_joint->limits->lower, urdf_joint->limits->upper, soft_lower_limit,
+        soft_upper_limit);
 }
 
 std::unique_ptr<march::IncrementalEncoder>
 HardwareBuilder::createIncrementalEncoder(
-    const YAML::Node& incremental_encoder_config)
+    const YAML::Node& incremental_encoder_config,
+    const march::MotorControllerType motor_controller_type)
 {
     if (!incremental_encoder_config) {
         return nullptr;
@@ -282,7 +287,7 @@ HardwareBuilder::createIncrementalEncoder(
     const auto transmission
         = incremental_encoder_config["transmission"].as<double>();
     return std::make_unique<march::IncrementalEncoder>(
-        resolution, transmission);
+        resolution, motor_controller_type, transmission);
 }
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(

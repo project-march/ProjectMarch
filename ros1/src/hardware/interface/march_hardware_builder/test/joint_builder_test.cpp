@@ -12,6 +12,7 @@
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/motor_controller_type.h>
 
 class JointBuilderTest : public ::testing::Test {
 protected:
@@ -19,6 +20,8 @@ protected:
     urdf::JointSharedPtr joint;
     march::PdoInterfacePtr pdo_interface;
     march::SdoInterfacePtr sdo_interface;
+    const march::MotorControllerType motor_controller_type
+        = march::MotorControllerType::IMotionCube;
 
     void SetUp() override
     {
@@ -49,12 +52,12 @@ TEST_F(JointBuilderTest, ValidJointHip)
     march::Joint created = HardwareBuilder::createJoint(
         config, name, this->joint, this->pdo_interface, this->sdo_interface);
 
-    auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(16, 22134,
-        43436, this->joint->limits->lower, this->joint->limits->upper,
-        this->joint->safety->soft_lower_limit,
+    auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(16,
+        motor_controller_type, 22134, 43436, this->joint->limits->lower,
+        this->joint->limits->upper, this->joint->safety->soft_lower_limit,
         this->joint->safety->soft_upper_limit);
-    auto incremental_encoder
-        = std::make_unique<march::IncrementalEncoder>(12, 50.0);
+    auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(
+        12, motor_controller_type, 50.0);
     auto imc = std::make_unique<march::IMotionCube>(
         march::Slave(
             /*slave_index=*/2, this->pdo_interface, this->sdo_interface),
@@ -82,12 +85,12 @@ TEST_F(JointBuilderTest, ValidNotActuated)
         = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint,
             this->pdo_interface, this->sdo_interface);
 
-    auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(16, 22134,
-        43436, this->joint->limits->lower, this->joint->limits->upper,
-        this->joint->safety->soft_lower_limit,
+    auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(16,
+        motor_controller_type, 22134, 43436, this->joint->limits->lower,
+        this->joint->limits->upper, this->joint->safety->soft_lower_limit,
         this->joint->safety->soft_upper_limit);
-    auto incremental_encoder
-        = std::make_unique<march::IncrementalEncoder>(12, 50.0);
+    auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(
+        12, motor_controller_type, 50.0);
     auto imc = std::make_unique<march::IMotionCube>(
         march::Slave(
             /*slave_index=*/2, this->pdo_interface, this->sdo_interface),
@@ -142,11 +145,13 @@ TEST_F(JointBuilderTest, ValidActuationMode)
         std::make_unique<march::IMotionCube>(
             march::Slave(
                 /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
-            std::make_unique<march::AbsoluteEncoder>(16, 22134, 43436,
-                this->joint->limits->lower, this->joint->limits->upper,
+            std::make_unique<march::AbsoluteEncoder>(16, motor_controller_type,
+                22134, 43436, this->joint->limits->lower,
+                this->joint->limits->upper,
                 this->joint->safety->soft_lower_limit,
                 this->joint->safety->soft_upper_limit),
-            std::make_unique<march::IncrementalEncoder>(12, 50.0),
+            std::make_unique<march::IncrementalEncoder>(
+                12, motor_controller_type, 50.0),
             march::ActuationMode::position));
 
     ASSERT_EQ(expected, created);

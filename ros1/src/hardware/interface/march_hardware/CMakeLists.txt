@@ -59,6 +59,7 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube_state.h
     include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube_target_state.h
     include/${PROJECT_NAME}/motor_controller/motor_controller.h
+    include/${PROJECT_NAME}/motor_controller/motor_controller_type.h
     include/${PROJECT_NAME}/motor_controller/motor_controller_state.h
     include/${PROJECT_NAME}/motor_controller/odrive/odrive.h
     include/${PROJECT_NAME}/motor_controller/odrive/odrive_state.h

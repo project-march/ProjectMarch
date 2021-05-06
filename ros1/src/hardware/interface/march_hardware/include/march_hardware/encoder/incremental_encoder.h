@@ -3,13 +3,15 @@
 #ifndef MARCH_HARDWARE_INCREMENTAL_ENCODER_H
 #define MARCH_HARDWARE_INCREMENTAL_ENCODER_H
 #include "march_hardware/encoder/encoder.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <ostream>
 
 namespace march {
 class IncrementalEncoder : public Encoder {
 public:
-    IncrementalEncoder(size_t number_of_bits, double transmission);
+    IncrementalEncoder(size_t resolution,
+        MotorControllerType motor_controller_type, double transmission);
 
     ~IncrementalEncoder() noexcept override = default;
 

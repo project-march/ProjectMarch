@@ -3,13 +3,15 @@
 #ifndef MARCH_HARDWARE_ABSOLUTE_ENCODER_H
 #define MARCH_HARDWARE_ABSOLUTE_ENCODER_H
 #include "march_hardware/encoder/encoder.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <ostream>
 
 namespace march {
 class AbsoluteEncoder : public Encoder {
 public:
-    AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu,
+    AbsoluteEncoder(size_t resolution,
+        MotorControllerType motor_controller_type, int32_t lower_limit_iu,
         int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
         double lower_soft_limit_rad, double upper_soft_limit_rad);
 

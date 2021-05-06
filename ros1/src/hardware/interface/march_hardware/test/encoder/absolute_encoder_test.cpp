@@ -1,6 +1,7 @@
 // Copyright 2020 Project March.
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <cmath>
 #include <tuple>
@@ -10,6 +11,8 @@
 class AbsoluteEncoderTest : public testing::Test {
 protected:
     const size_t resolution = 17;
+    const march::MotorControllerType motor_controller_type
+        = march::MotorControllerType::IMotionCube;
     const size_t total_positions = std::pow(/*__x=*/2, resolution);
     const int32_t lower_limit = 2053;
     const int32_t upper_limit = 45617;
@@ -26,8 +29,8 @@ protected:
         = upper_soft_limit_rad * total_positions / (2 * M_PI) + zero_position;
 
     march::AbsoluteEncoder encoder = march::AbsoluteEncoder(resolution,
-        lower_limit, upper_limit, lower_limit_rad, upper_limit_rad,
-        lower_soft_limit_rad, upper_soft_limit_rad);
+        motor_controller_type, lower_limit, upper_limit, lower_limit_rad,
+        upper_limit_rad, lower_soft_limit_rad, upper_soft_limit_rad);
 };
 
 class TestEncoderParameterizedLimits
@@ -67,26 +70,28 @@ TEST_F(AbsoluteEncoderTest, CorrectUpperSoftLimits)
 
 TEST_F(AbsoluteEncoderTest, LowerSoftLimitAboveUpperSoftLimit)
 {
-    ASSERT_THROW(
-        march::AbsoluteEncoder(this->resolution, this->lower_limit,
-            this->upper_limit, this->lower_limit_rad, this->upper_limit_rad,
-            this->upper_soft_limit_rad, this->lower_soft_limit_rad),
+    ASSERT_THROW(march::AbsoluteEncoder(this->resolution, motor_controller_type,
+                     this->lower_limit, this->upper_limit,
+                     this->lower_limit_rad, this->upper_limit_rad,
+                     this->upper_soft_limit_rad, this->lower_soft_limit_rad),
         march::error::HardwareException);
 }
 
 TEST_F(AbsoluteEncoderTest, LowerSoftLimitLowerThanLowerHardLimit)
 {
-    ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit,
-                     this->upper_limit, this->lower_limit_rad,
-                     this->upper_limit_rad, -0.4, this->upper_soft_limit_rad),
+    ASSERT_THROW(
+        march::AbsoluteEncoder(this->resolution, motor_controller_type,
+            this->lower_limit, this->upper_limit, this->lower_limit_rad,
+            this->upper_limit_rad, -0.4, this->upper_soft_limit_rad),
         march::error::HardwareException);
 }
 
 TEST_F(AbsoluteEncoderTest, UpperSoftLimitHigherThanUpperHardLimit)
 {
-    ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit,
-                     this->upper_limit, this->lower_limit_rad,
-                     this->upper_limit_rad, this->lower_soft_limit_rad, 2.0),
+    ASSERT_THROW(
+        march::AbsoluteEncoder(this->resolution, motor_controller_type,
+            this->lower_limit, this->upper_limit, this->lower_limit_rad,
+            this->upper_limit_rad, this->lower_soft_limit_rad, 2.0),
         march::error::HardwareException);
 }
 

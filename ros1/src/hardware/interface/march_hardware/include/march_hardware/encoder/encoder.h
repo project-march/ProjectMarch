@@ -3,6 +3,7 @@
 #ifndef MARCH_HARDWARE_ENCODER_H
 #define MARCH_HARDWARE_ENCODER_H
 #include "march_hardware/ethercat/pdo_interface.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <cmath>
 #include <cstddef>
@@ -11,7 +12,7 @@
 namespace march {
 class Encoder {
 public:
-    explicit Encoder(size_t number_of_bits);
+    Encoder(size_t resolution, MotorControllerType motor_controller_type);
 
     virtual ~Encoder() noexcept = default;
 
@@ -48,6 +49,7 @@ public:
     virtual double getRadiansPerIU() const = 0;
 
     size_t getTotalPositions() const;
+    MotorControllerType getMotorControllerType() const;
 
     static const size_t MIN_RESOLUTION = 1;
     static const size_t MAX_RESOLUTION = 32;
@@ -58,15 +60,16 @@ private:
     /**
      * Returns the total number of positions possible on an encoder
      * with the given amount of bits.
-     * @param number_of_bits The resolution of the encoder
+     * @param resolution The resolution of the encoder
      * @returns The total amount of different positions
      * @throws HardwareException When the given resolution is outside the
      * allowed range Which is determined by Encoder::MIN_RESOLUTION and
      * Encoder::MAX_RESOLUTION.
      */
-    static size_t calculateTotalPositions(size_t number_of_bits);
+    static size_t calculateTotalPositions(size_t resolution);
 
     size_t total_positions_ = 0;
+    MotorControllerType motor_controller_type_;
 };
 } // namespace march
 

@@ -1,14 +1,16 @@
 // Copyright 2019 Project March.
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <ros/ros.h>
 
 namespace march {
-AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu,
+AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+    MotorControllerType motor_controller_type, int32_t lower_limit_iu,
     int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
     double lower_soft_limit_rad, double upper_soft_limit_rad)
-    : Encoder(number_of_bits)
+    : Encoder(resolution, motor_controller_type)
     , lower_limit_iu_(lower_limit_iu)
     , upper_limit_iu_(upper_limit_iu)
 {
@@ -45,7 +47,15 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu,
 
 double AbsoluteEncoder::getRadiansPerIU() const
 {
-    return PI_2 / getTotalPositions();
+    switch (getMotorControllerType()) {
+        case MotorControllerType::IMotionCube:
+            return PI_2 / getTotalPositions();
+        case MotorControllerType::ODrive:
+            return PI_2;
+        default:
+            throw error::HardwareException(
+                error::ErrorType::INVALID_MOTOR_CONTROLLER);
+    }
 }
 
 double AbsoluteEncoder::positionIUToRadians(double position) const
