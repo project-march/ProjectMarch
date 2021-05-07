@@ -1,4 +1,4 @@
-description: Stairs up with height of 22 cm and depth of 20 cm
+description: Stairs up height of 22 cm and depth of 20
 duration: 3750000000
 gait_type: stairs_like
 joints:
@@ -13,12 +13,6 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.06108652
-    time_from_start: 750000000
-    velocity: -0.12217305
-  - position: -0.06108652
-    time_from_start: 1750000000
-    velocity: 0.12217305
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
@@ -56,7 +50,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
