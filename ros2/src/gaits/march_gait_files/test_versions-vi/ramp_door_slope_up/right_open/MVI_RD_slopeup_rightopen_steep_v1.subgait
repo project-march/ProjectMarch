@@ -30,9 +30,9 @@ joints:
   - position: 0.17453293
     time_from_start: 1150000000
     velocity: 0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2500000000
-    velocity: 0.34906585
+    velocity: 0.0
   right_ankle:
   - position: 0.0436
     time_from_start: 0
@@ -57,7 +57,7 @@ joints:
   - position: -0.0873
     time_from_start: 0
     velocity: 0.0
-  - position: 0.87266463
+  - position: 0.99483767
     time_from_start: 1166700000
     velocity: -0.12217305
   - position: 0.87266463
@@ -67,10 +67,10 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.22173048
+  - position: 1.37881011
     time_from_start: 910000000
     velocity: -0.34910076
-  - position: 1.04719755
+  - position: 1.13446401
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open

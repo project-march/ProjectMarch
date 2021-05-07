@@ -26,7 +26,7 @@ joints:
   - position: -0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 0.99483767
+  - position: 1.02974426
     time_from_start: 1550000000
     velocity: 0.0
   - position: 0.87266463
@@ -35,11 +35,11 @@ joints:
   left_knee:
   - position: 0.08726646
     time_from_start: 0
-    velocity: 0.34906585
-  - position: 1.50098316
+    velocity: 0.0
+  - position: 1.65806279
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 1.04719755
+  - position: 1.13446401
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -64,11 +64,11 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 1.04719755
+  - position: 1.13446401
     time_from_start: 0
     velocity: 0.0
   - position: 0.08726646
     time_from_start: 2500000000
-    velocity: 0.34906585
+    velocity: 0.0
 name: left_swing
 version: MVI_RD_slopeup_leftswing_steep_v1
