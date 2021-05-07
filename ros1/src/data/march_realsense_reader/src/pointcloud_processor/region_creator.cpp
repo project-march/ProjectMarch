@@ -129,36 +129,27 @@ bool RegionGrower::recursiveRegionGrower(
     boost::shared_ptr<RegionVector> right_size_regions;
     segmentRegionVector(last_region_vector);
 
-    boost::shared_ptr<RegionVector> continuing_regions;
+    region_vector_.insert(region_vector_.end(),
+                              right_size_regions.begin(), right_size_regions.end());
 
-    if (too_small->size() > 50) {
-        float small_tolerance = last_tolerance / 1.1f;
-        boost::shared_ptr<RegionVector> potential_region_vector
-            = tryRegionGrowing(too_small, small_tolerance);
-        continuing_regions.insert(continuing_regions.end(),
-            potential_region_vector.begin(), potential_region_vector.end());
-    }
-    if (too_large->size > 50) {
+    if (points_in_region_vector(too_small_regions) > 50) {
         float large_tolerance = last_tolerance * 1.1f;
+        // Try region growing on the small regions with a larger tolerance
+        boost::shared_ptr<RegionVector> potential_region_vector
+            = tryRegionGrowing(too_small_regions, large_tolerance);
+        recursiveRegionGrower(potential_region_vector, large_tolerance);
+    } else {
+        region_vector_.insert(region_vector_.end(),
+                              too_small_regions.begin(), too_small_regions.end());
+    }
+    if (points_in_region_vector(too_large_regions) > 50) {
+        float small_tolerance = last_tolerance / 1.1f;
+        // Try region growing on the large regions with a smaller tolerance
         RegionVector potential_region_vector
-            = tryEuclideanClustering(too_large, large_tolerance);
-    }
-
-    // get the too small and large part of the region_vec
-    // Add the valid ones to the region vector
-
-    if (too_small.size > 10 || too_large.size > 10) {
-        recursiveEuclideanClustering(too_small, too_large, small_tolerance)
+            = tryEuclideanClustering(too_large_regions, small_tolerance);
+        recursiveRegionGrower(potential_region_vector, large_tolerance);
     } else {
-        // add the small and large too
-    }
-
-    // get the too small and large part of the region_vec
-    // Add the valid ones to the region vector
-
-    if (too_small.size > 10 || too_large.size > 10) {
-        recursiveEuclideanClustering(too_small, too_large, large_tolerance)
-    } else {
-        // add the small and large too
+        region_vector_.insert(region_vector_.end(),
+                              too_large_regions.begin(), too_large_regions.end());
     }
 }
