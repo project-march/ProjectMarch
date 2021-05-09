@@ -66,6 +66,7 @@ void HullParameterDeterminer::readParameters(
 
     max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
     min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
+
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
     z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
     x_steep_down = (float)config.parameter_determiner_ramp_x_steep_down;
@@ -141,7 +142,7 @@ void HullParameterDeterminer::initializeGaitDimensions()
 {
     switch (selected_gait_.value()) {
         case SelectedGait::ramp_down: {
-            float x_flat = x_flat_down;
+            x_flat = x_flat_down;
             x_steep = x_steep_down;
             z_flat = z_flat_down;
             z_steep = z_steep_down;
