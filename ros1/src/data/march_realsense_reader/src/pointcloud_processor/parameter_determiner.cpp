@@ -165,10 +165,12 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     switch (selected_gait_.value()) {
         case SelectedGait::stairs_up: {
             success &= getGaitParametersFromFootLocationStairsUp();
+            break;
         }
         case SelectedGait::ramp_down:
         case SelectedGait::ramp_up: {
             success &= getGaitParametersFromFootLocationRamp();
+            break;
         }
         default: {
             ROS_ERROR_STREAM(
@@ -348,6 +350,7 @@ bool HullParameterDeterminer::getDistanceToObject(
             // location
             distance = linear_algebra_utilities::distanceBetweenPoints(
                 possible_foot_location, most_desirable_foot_location_);
+            break;
         }
         case SelectedGait::ramp_up:
         case SelectedGait::ramp_down: {
@@ -356,6 +359,7 @@ bool HullParameterDeterminer::getDistanceToObject(
             distance = linear_algebra_utilities::distancePointToLine(
                 possible_foot_location,
                 executable_locations_line_coefficients_);
+            break;
         }
         default: {
             ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
