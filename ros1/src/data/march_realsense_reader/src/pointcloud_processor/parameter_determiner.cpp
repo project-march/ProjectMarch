@@ -106,6 +106,7 @@ bool HullParameterDeterminer::determineParameters(
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
     selected_gait_.emplace(selected_gait);
+    optimal_foot_location = pcl::PointNormal();
 
     // Since the parameter determining for e.g. ramp down is very similar to
     // ramp up set variables like the size a step on a flat ramp equal to the
@@ -115,17 +116,16 @@ bool HullParameterDeterminer::determineParameters(
 
     bool success = true;
 
-    success &= getOptimalFootLocation();
+    if (success &= getOptimalFootLocation()) {
+        ROS_DEBUG_STREAM("The optimal foot location is "
+            << output_utilities::pointToString(optimal_foot_location));
+        success &= getGaitParametersFromFootLocation();
 
-    ROS_DEBUG_STREAM("The optimal foot location is "
-        << output_utilities::pointToString(optimal_foot_location));
-
-    success &= getGaitParametersFromFootLocation();
-
-    ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
-        << gait_parameters_->step_size_parameter << ", "
-        << gait_parameters_->step_height_parameter << ", "
-        << gait_parameters_->side_step_parameter << ") ");
+        ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
+            << gait_parameters_->step_size_parameter << ", "
+            << gait_parameters_->step_height_parameter << ", "
+            << gait_parameters_->side_step_parameter << ") ");
+    }
 
     time_t end_determine_parameters = clock();
     double time_taken
