@@ -140,7 +140,7 @@ bool HullParameterDeterminer::determineParameters(
 void HullParameterDeterminer::initializeGaitDimensions()
 {
     switch (selected_gait_.value()) {
-        case SelectedGait::ramp_up: {
+        case SelectedGait::ramp_down: {
             float x_flat = x_flat_down;
             x_steep = x_steep_down;
             z_flat = z_flat_down;
@@ -341,7 +341,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 bool HullParameterDeterminer::getDistanceToObject(
     pcl::PointNormal possible_foot_location, double& distance)
 {
-    switch (selected_gait.value()) {
+    switch (selected_gait_.value()) {
         case SelectedGait::stairs_up:
         case SelectedGait::stairs_down: {
             // For stairs gait find which point is closest to the most desirable
