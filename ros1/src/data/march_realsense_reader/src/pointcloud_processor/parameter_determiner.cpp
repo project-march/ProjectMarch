@@ -298,7 +298,7 @@ bool HullParameterDeterminer::getExecutableLocationsLine()
     executable_locations_line_coefficients_->values.resize(/*__new_size=*/6);
 
     executable_locations_line_coefficients_->values[0] = x_flat - x_steep;
-    executable_locations_line_coefficients_->values[1] = y_location;
+    executable_locations_line_coefficients_->values[1] = 0;
     executable_locations_line_coefficients_->values[2] = z_flat - z_steep;
 
     executable_locations_line_coefficients_->values[3] = x_steep;
