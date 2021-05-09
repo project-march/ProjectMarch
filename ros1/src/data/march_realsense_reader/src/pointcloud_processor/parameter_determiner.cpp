@@ -98,13 +98,20 @@ bool HullParameterDeterminer::determineParameters(
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
     selected_gait_.emplace(selected_gait);
+    // Initialize the optimal foot location at the origin and the gait
+    // parmaeters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
+    gait_parameters_->step_size_parameter = -1;
+    gait_parameters_->step_height_parameter = -1;
+    gait_parameters_->side_step_parameter = -1;
 
     bool success = true;
 
-    success &= getOptimalFootLocation());
-
-    success &= getGaitParametersFromFootLocation();
+    // Only calculate the gait parameters if an optimal foot location has been
+    // found
+    if (success &= getOptimalFootLocation()) {
+        success &= getGaitParametersFromFootLocation();
+    }
 
     if (success) {
         ROS_DEBUG_STREAM("The optimal foot location is "
