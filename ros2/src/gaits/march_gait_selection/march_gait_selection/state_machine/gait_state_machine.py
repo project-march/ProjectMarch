@@ -263,7 +263,14 @@ class GaitStateMachine(object):
         machine is started, this function is called every timer period.
         """
         if not self._shutdown_requested:
-            if self._is_idle:
+            if self._input.unknown_requested():
+                self._input.gait_accepted()
+                self._transition_to_unknown()
+                self._input.gait_finished()
+                self._call_transition_callbacks()
+                self._current_gait = None
+                self._trajectory_scheduler.reset()
+            elif self._is_idle:
                 self._process_idle_state()
             else:
                 self._process_gait_state()
@@ -326,12 +333,6 @@ class GaitStateMachine(object):
                     f"Cannot execute gait `{gait_name}` from idle state `"
                     f"{self._current_state}`"
                 )
-
-        elif self._input.unknown_requested():
-            self._input.gait_accepted()
-            self._transition_to_unknown()
-            self._input.gait_finished()
-            self._call_transition_callbacks()
 
     def _process_gait_state(self):
         """Processes the current state when there is a gait happening.
@@ -399,6 +400,7 @@ class GaitStateMachine(object):
             )
             self._current_gait = None
             self._is_stopping = False
+            self._trajectory_scheduler.reset()
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
@@ -458,6 +460,9 @@ class GaitStateMachine(object):
     def _transition_to_unknown(self):
         """When the unknown button is pressed, this function resets the
         state machine to unknown state."""
+        if self._current_gait is not None:
+            self._trajectory_scheduler.send_position_hold()
+            self._trajectory_scheduler.cancel_active_goals()
         self._current_state = self.UNKNOWN
         self._is_idle = True
         self._gait_selection.get_logger().info(
