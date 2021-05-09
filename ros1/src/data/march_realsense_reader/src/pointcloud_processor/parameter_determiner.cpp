@@ -116,7 +116,7 @@ bool HullParameterDeterminer::determineParameters(
     if (success) {
         ROS_DEBUG_STREAM("The optimal foot location is "
             << output_utilities::pointToString(optimal_foot_location)
-            << "With corresponding parameters (size, height, side) ("
+            << "\n With corresponding parameters (size, height, side) ("
             << gait_parameters_->step_size_parameter << ", "
             << gait_parameters_->step_height_parameter << ", "
             << gait_parameters_->side_step_parameter << ") ");
