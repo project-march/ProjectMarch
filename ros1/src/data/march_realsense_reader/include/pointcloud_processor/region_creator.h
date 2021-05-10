@@ -72,6 +72,12 @@ private:
      */
     bool extractRegions();
 
+    // Implements the region growing algorithm and recursively improves on too
+    // small or too large regions
+    bool recursiveRegionGrower(
+        boost::shared_ptr<RegionVector> last_region_vector,
+        float last_tolerance);
+
     // Region Growing Object
     pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> region_grower;
 

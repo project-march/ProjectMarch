@@ -38,7 +38,8 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
 
     bool success = true;
     if (use_recursive_growing) {
-        succes &= recursiveRegionGrower();
+        succes &= setupRecursiveRegionGrower()
+            : succes &= recursiveRegionGrower();
     } else {
         success &= setupRegionGrower();
         success &= extractRegions();
@@ -121,35 +122,87 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
     return region_grower.getColoredCloud();
 }
 
+// Similar to the regular setup, but the cloud, normals, and smoothness
+// threshold are not yet set.
+bool RegionGrower::setupRecursiveRegionGrower() {
+    pcl::search::Search<pcl::PointXYZ>::Ptr tree(
+            new pcl::search::KdTree <pcl::PointXYZ>);
+    region_grower.setMinClusterSize(min_cluster_size);
+    region_grower.setMaxClusterSize(max_cluster_size);
+    region_grower.setSearchMethod(tree);
+    region_grower.setNumberOfNeighbours(number_of_neighbours);
+    region_grower.setCurvatureThreshold(curvature_threshold);
+    return true;
+}
+
+// Implements the region growing algorithm and recursively improves on too small
+// or too large regions
 bool RegionGrower::recursiveRegionGrower(
     boost::shared_ptr<RegionVector> last_region_vector, float last_tolerance)
 {
     boost::shared_ptr<RegionVector> too_small_regions;
     boost::shared_ptr<RegionVector> too_large_regions;
     boost::shared_ptr<RegionVector> right_size_regions;
-    segmentRegionVector(last_region_vector);
+    segmentRegionVector(last_region_vector, too_small_regions, too_large_regions, right_size_regions);
 
-    region_vector_.insert(region_vector_.end(),
-                              right_size_regions.begin(), right_size_regions.end());
+    region_vector_.insert(region_vector_.end(), right_size_regions.begin(),
+        right_size_regions.end());
 
-    if (points_in_region_vector(too_small_regions) > 50) {
-        float large_tolerance = last_tolerance * 1.1f;
-        // Try region growing on the small regions with a larger tolerance
-        boost::shared_ptr<RegionVector> potential_region_vector
-            = tryRegionGrowing(too_small_regions, large_tolerance);
-        recursiveRegionGrower(potential_region_vector, large_tolerance);
-    } else {
-        region_vector_.insert(region_vector_.end(),
-                              too_small_regions.begin(), too_small_regions.end());
+    for (pcl::PointIndices small_region : *too_small_regions) {
+        if (small_region.indices.size() > 50) {
+            float large_tolerance = last_tolerance * 1.1f;
+            // Try region growing on the small regions with a larger tolerance
+            boost::shared_ptr<RegionVector> potential_region_vector
+                    = doRecursiveRegionGrowingStep(small_region, large_tolerance);
+            recursiveRegionGrower(potential_region_vector, large_tolerance);
+        } else {
+//            region_vector_.insert(region_vector_.end(), too_small_regions.begin(),
+//                                  too_small_regions.end());
+// fix
+        }
     }
-    if (points_in_region_vector(too_large_regions) > 50) {
-        float small_tolerance = last_tolerance / 1.1f;
-        // Try region growing on the large regions with a smaller tolerance
-        RegionVector potential_region_vector
-            = tryEuclideanClustering(too_large_regions, small_tolerance);
-        recursiveRegionGrower(potential_region_vector, large_tolerance);
-    } else {
-        region_vector_.insert(region_vector_.end(),
-                              too_large_regions.begin(), too_large_regions.end());
+    for (pcl::PointIndices large_region : *too_large_regions) {
+        if (large_region.indices.size() > 50) {
+            float small_tolerance = last_tolerance / 1.1f;
+            // Try region growing on the large regions with a smaller tolerance
+            RegionVector potential_region_vector
+                    = doRecursiveRegionGrowingStep(large_region, small_tolerance);
+            recursiveRegionGrower(potential_region_vector, small_tolerance);
+        } else {
+//            region_vector_.insert(region_vector_.end(), too_large_regions.begin(),
+//                                  too_large_regions.end());
+// fix
+        }
     }
+}
+
+void RegionGrower::segmentRegionVector(boost::shared_ptr<RegionVector> region_vector) {
+
+}
+
+boost::shared_ptr<RegionVector> RegionGrower::doRecursiveRegionGrowingStep(
+    pcl::PointIndices region, float tolerance)
+{
+    boost::shared_ptr<RegionVector> region_vector = boost::make_shared<RegionVector>();
+    PointCloud::Ptr pointcloud_to_grow_on = boost::make_shared<PointCloud>();
+    PointCloud::Ptr pointcloud_normals_to_grow_on = boost::make_shared<Normals>();
+
+    pcl::copyPointCloud(*region_to_grow_on, region, *region_points_);
+    pcl::copyPointCloud(*region_normals_to_grow_on, region, *region_normals_);
+
+
+    if (pointcloud_to_grow_on->size()
+        == pointcloud_normals_to_grow_on->size()) {
+        region_grower.setInputCloud(pointcloud_to_grow_on);
+        region_grower.setInputNormals(pointcloud_normals_to_grow_on);
+        region_grower.setSmoothnessThreshold(tolerance);
+        region_grower.extract(*region_vector);
+    } else {
+        ROS_ERROR("pointcloud_to_grow_on is of size: %lu, while "
+                  "pointcloud_normals_to_grow_on is "
+                  "of size: %lu. Returning empty region vector.",
+                  pointcloud_to_grow_on->size(),
+                  pointcloud_normals_to_grow_on->size());
+    }
+    return region_vector;
 }
