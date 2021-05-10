@@ -277,6 +277,9 @@ void RealsenseTestPublisher::updatePublishLoop(
 {
     // The update is successful by default until something goes wrong
     bool success = true;
+    std::string info_message;
+    std::string warn_message;
+    
     switch (selected_mode) {
         case SelectedMode::next: {
             if (success = publishNextPointcloud()) {
@@ -284,8 +287,7 @@ void RealsenseTestPublisher::updatePublishLoop(
                     + pointcloud_file_name + " and processing the cloud";
                 makeProcessPointcloudCall();
             } else {
-                std::string warn_message
-                    = "failed to publish a pointcloud with file name "
+                warn_message = "failed to publish a pointcloud with file name "
                     + pointcloud_file_name;
             }
             should_publish = success;
@@ -297,8 +299,7 @@ void RealsenseTestPublisher::updatePublishLoop(
                     + pointcloud_file_name + " and processing the cloud";
                 makeProcessPointcloudCall();
             } else {
-                std::string warn_message
-                    = "failed to publish a pointcloud with file name "
+                warn_message = "failed to publish a pointcloud with file name "
                     + pointcloud_file_name;
             }
             should_publish = success;
@@ -312,8 +313,8 @@ void RealsenseTestPublisher::updatePublishLoop(
         }
         case SelectedMode::save: {
             if (success = saveCurrentPointcloud()) {
-                info_message = "Succesfully saved pointcloud as"
-                    + save_pointcloud_name;
+                info_message
+                    = "Succesfully saved pointcloud as" + save_pointcloud_name;
             } else {
                 warn_message = "Failed to save pointcloud";
             }
@@ -329,9 +330,9 @@ void RealsenseTestPublisher::updatePublishLoop(
         res.message = info_message;
         ROS_DEBUG_STREAM(info_message);
     } else {
-        res.message = warn_message;
-        ROS_WARN_STREAM(
-            warn_message + ". See the ros1 terminal for more information.")
+        res.message
+            = warn_message + ". See the ros1 terminal for more information.";
+        ROS_WARN_STREAM(warn_message);
     }
     res.success = success;
 }
