@@ -4,7 +4,8 @@ gaits:
     left_open: MVI_ramp_up_leftopen_steep_v1
     left_swing: MVI_ramp_up_leftswing_steep_v1
     right_close: MVI_ramp_up_rightclose_steep_v1
-    right_open: MVI_ramp_up_rightswing_steep_v1
+    right_open: MVI_ramp_up_rightopen_steep_v1
+    right_swing: MVI_ramp_up_rightswing_steep_v1
 
 positions:
   stand:
