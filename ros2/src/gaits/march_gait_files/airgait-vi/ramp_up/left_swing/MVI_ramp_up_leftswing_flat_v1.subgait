@@ -71,4 +71,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.34906585
 name: left_swing
-version: MVI_RD_slopeup_leftswing_flat_v1
+version: MVI_ramp_up_leftswing_flat_v1

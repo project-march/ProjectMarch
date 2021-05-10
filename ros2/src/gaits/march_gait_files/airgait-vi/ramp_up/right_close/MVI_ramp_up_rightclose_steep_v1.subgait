@@ -71,4 +71,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_close
-version: MVI_RD_slopeup_rightclose_steep_v1
+version: MVI_ramp_up_rightclose_steep_v1
