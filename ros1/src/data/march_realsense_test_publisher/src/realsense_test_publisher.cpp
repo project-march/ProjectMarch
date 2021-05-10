@@ -16,7 +16,7 @@ using namespace std::filesystem;
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID_FRONT = "camera_front_depth_optical_frame";
 std::string CAMERA_FRAME_ID_BACK = "camera_back_depth_optimal_frame";
-std::string PROCESS_POINTCLOUD_TOPIC = "/camera/process_pointcloud";
+std::string PROCESS_POINTCLOUD_SERVICE_NAME = "/camera/process_pointcloud";
 std::string POINTCLOUD_EXTENSION = ".ply";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
@@ -42,10 +42,10 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
             file_names.push_back(entry.path().filename().string());
         }
     }
-    no_files_present = (file_names.size() == 0);
-    if (no_files_present) {
+    if (file_names.size() == 0) {
         ROS_ERROR_STREAM("There are no .ply files present under path "
-            << data_path << ". Test publisher will not work.");
+            << data_path << ". Shutting down the test publisher.");
+        ros::shutdown();
     }
     publish_test_cloud_service
         = n_->advertiseService(/*service=*/"/camera/publish_test_cloud",
@@ -56,7 +56,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 
     process_pointcloud_service_client
         = n_->serviceClient<march_shared_msgs::GetGaitParameters>(
-            PROCESS_POINTCLOUD_TOPIC);
+            PROCESS_POINTCLOUD_SERVICE_NAME);
 
     config_tree = loadConfig("pointcloud_information.yaml");
 }
@@ -218,45 +218,37 @@ void RealsenseTestPublisher::publishNextPointcloud()
 
 // Publish the right pointcloud based on the latest service call
 void RealsenseTestPublisher::updatePublishLoop(
-    march_shared_msgs::PublishTestDataset::Response& res)
-{
-    // Only update the publish loop if there are files available
-    if (!no_files_present) {
-        // The update is successful by default until something goes wrong
-        bool success = true;
+    march_shared_msgs::PublishTestDataset::Response& res) {
+    // The update is successful by default until something goes wrong
+    bool success = true;
 
-        switch (selected_mode) {
-            case SelectedMode::next: {
-                publishNextPointcloud();
-                should_publish = true;
-                break;
-            }
-            case SelectedMode::custom: {
-                success &= publishCustomPointcloud(pointcloud_file_name);
-                should_publish = success;
-                break;
-            }
-            case SelectedMode::end: {
-                ROS_DEBUG_STREAM("Stop publishing pointclouds");
-                should_publish = false;
-                break;
-            }
-            default: {
-                ROS_WARN_STREAM("Invalid mode selected");
-                return;
-            }
+    switch (selected_mode) {
+        case SelectedMode::next: {
+            publishNextPointcloud();
+            should_publish = true;
+            break;
         }
-        if (selected_mode != SelectedMode::end) {
-            makeProcessPointcloudCall();
-            res.message
-                = "Now publishing pointcloud with name " + pointcloud_file_name;
+        case SelectedMode::custom: {
+            success &= publishCustomPointcloud(pointcloud_file_name);
+            should_publish = success;
+            break;
         }
-        res.success = success;
-    } else {
-        ROS_ERROR_STREAM(
-            "No .ply files can be found by the test publisher under path "
-            << data_path << ". Unable to publish a test cloud.");
+        case SelectedMode::end: {
+            ROS_DEBUG_STREAM("Stop publishing pointclouds");
+            should_publish = false;
+            break;
+        }
+        default: {
+            ROS_WARN_STREAM("Invalid mode selected");
+            return;
+        }
     }
+    if (selected_mode != SelectedMode::end) {
+        makeProcessPointcloudCall();
+        res.message
+                = "Now publishing pointcloud with name " + pointcloud_file_name;
+    }
+    res.success = success;
 }
 
 // flips the sign of the z and y coordinates of the cloud, necessary because of

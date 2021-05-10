@@ -82,7 +82,6 @@ private:
     std::string pointcloud_file_name;
     SelectedMode selected_mode;
     bool should_publish;
-    bool no_files_present;
     bool from_back_camera;
     int selected_gait;
     std::string frame_id_to_transform_to;
