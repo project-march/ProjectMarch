@@ -1,4 +1,4 @@
-description: Stairs down backwards with height of 13 cm and depth of 35 cm
+description: Stairs down backwards with height of 12 cm and depth of 45 cm
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -6,16 +6,16 @@ joints:
   - position: -0.08726646
     time_from_start: 0
     velocity: -0.0
-  - position: 0.04363323
+  - position: 0.0
     time_from_start: 536400000
     velocity: -0.0
-  - position: 0.04785433
+  - position: 0.0
     time_from_start: 1335000000
-    velocity: 0
+    velocity: 0.0
   - position: -0.26179939
     time_from_start: 2045500000
     velocity: -0.0
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 2500000000
     velocity: -0.0
   left_hip_aa:
@@ -49,7 +49,7 @@ joints:
     time_from_start: 2500000000
     velocity: -0.76790996
   right_ankle:
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 0
     velocity: -0.0
   - position: -0.08726646
