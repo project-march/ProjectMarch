@@ -258,7 +258,7 @@ void ObstacleController::getWalkGoalPositionX(
     }
 }
 
-bool ObstacleController::changeComLevel(std::string level_name)
+bool ObstacleController::changeComLevel(const std::string& level_name)
 {
     if (not std::count(com_levels.begin(), com_levels.end(), level_name)) {
         ROS_WARN_STREAM("The requested CoM level was not found");
