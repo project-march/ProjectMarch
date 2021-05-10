@@ -26,7 +26,6 @@ def shutdown_system():
         matches = re.findall(pattern, processes)
         if len(matches) > 0:
             pid = int(matches[0])
-            print(f'Killing {process_name}')
             try:
                 os.kill(pid, signal.SIGTERM)
             except PermissionError:
