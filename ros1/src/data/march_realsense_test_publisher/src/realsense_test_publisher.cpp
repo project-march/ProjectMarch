@@ -17,6 +17,8 @@ std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID_FRONT = "camera_front_depth_optical_frame";
 std::string CAMERA_FRAME_ID_BACK = "camera_back_depth_optimal_frame";
 std::string PROCESS_POINTCLOUD_SERVICE_NAME = "/camera/process_pointcloud";
+std::string PUBLISH_POINTCLOUD_SERVICE_NAME = "/camera/publish_pointcloud";
+std::string DATASET_CONFIGURATION_NAME = "pointcloud_information.yaml";
 std::string POINTCLOUD_EXTENSION = ".ply";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
@@ -58,7 +60,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         = n_->serviceClient<march_shared_msgs::GetGaitParameters>(
             PROCESS_POINTCLOUD_SERVICE_NAME);
 
-    config_tree = loadConfig("pointcloud_information.yaml");
+    config_tree = loadConfig(DATASET_CONFIGURATION_NAME);
 }
 
 YAML::Node RealsenseTestPublisher::loadConfig(const std::string& config_file)

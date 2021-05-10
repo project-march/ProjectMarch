@@ -4,7 +4,6 @@
 #include <vector>
 
 float PUBLISH_FREQUENCY = 1.0 / 5.0; // seconds per frame
-float PROCESS_FREQUENCY = 1.0; // seconds between process calls
 
 int main(int argc, char** argv)
 {
