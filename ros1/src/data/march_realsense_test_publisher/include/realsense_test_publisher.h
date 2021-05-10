@@ -84,7 +84,6 @@ private:
     std::string save_pointcloud_name;
     std::string pointcloud_topic;
     bool should_publish;
-    bool no_files_present;
     bool from_back_camera;
     bool from_realsense_viewer;
     bool save_camera_back;
