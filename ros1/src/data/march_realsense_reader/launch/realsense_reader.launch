@@ -1,5 +1,8 @@
 <launch>
-    <node name="march_realsense_reader_node" pkg="march_realsense_reader"
+    <node name="realsense_reader_node"
+          pkg="march_realsense_reader"
           type="march_realsense_reader_node"
-          output="screen"/>
+          output="screen"
+          respawn="true"
+    />
 </launch>
