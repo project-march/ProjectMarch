@@ -7,6 +7,14 @@ gaits:
     right_open: MVI_ramp_up_rightopen_steep_v1
     right_swing: MVI_ramp_up_rightswing_steep_v1
 
+  stairs_up:
+    left_close: MVI_stairsup_leftclose_cybathlon_v2
+    left_open: MVI_stairsup_leftopen_cybathlon_v2
+    left_swing: MVI_stairsup_leftswing_cybathlon_v2
+    right_close: MVI_stairsup_rightclose_cybathlon_v2
+    right_open: MVI_stairsup_rightswing_cybathlon_v2
+    right_swing: MVI_stairsup_rightswing_cybathlon_v2
+
 positions:
   stand:
     gait_type: walk_like
