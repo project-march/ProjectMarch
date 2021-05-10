@@ -1,4 +1,4 @@
-description: The right open gait for the 20 degrees slope up
+description: 'First version of a flat ramp_up gait '
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -8,7 +8,7 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -20,7 +20,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.1396
+  - position: -0.29670597
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
@@ -30,9 +30,9 @@ joints:
   - position: 0.17453293
     time_from_start: 1150000000
     velocity: 0.0
-  - position: 0.0
+  - position: 0.08726646
     time_from_start: 2500000000
-    velocity: 0.0
+    velocity: 0.34906585
   right_ankle:
   - position: 0.0
     time_from_start: 0
@@ -57,21 +57,21 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.99483767
-    time_from_start: 1166700000
-    velocity: -0.12217305
-  - position: 0.87266463
+  - position: 0.6981317
+    time_from_start: 1550000000
+    velocity: 0.0
+  - position: 0.59341195
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.37881011
+  - position: 1.04719755
     time_from_start: 910000000
-    velocity: -0.34910076
-  - position: 1.13446401
+    velocity: -0.34906585
+  - position: 0.72710417
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MVI_ramp_up_rightopen_steep_v1
+version: MVI_rampup_rightopen_flat_v1

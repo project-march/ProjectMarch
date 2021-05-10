@@ -1,16 +1,16 @@
-description: The right swing gait for the 20 degrees slope up.
+description: First version of a flat ramp_up gait
 duration: 2500000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0
     time_from_start: 0
-    velocity: -0.0
-  - position: -0.17453293
-    time_from_start: 387800000
+    velocity: 0.0
+  - position: -0.10471976
+    time_from_start: 300000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 771400000
+    time_from_start: 600000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
@@ -19,27 +19,27 @@ joints:
   - position: -0.08726646
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: -0.1396
+  - position: -0.29670597
     time_from_start: 0
     velocity: 0.0
-  - position: 1.02974426
-    time_from_start: 1550000000
+  - position: 0.61086524
+    time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.87266463
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.08726646
     time_from_start: 0
-    velocity: 0.0
-  - position: 1.65806279
+    velocity: 0.34906585
+  - position: 1.32645023
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 1.13446401
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -53,22 +53,22 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.08726646
+  - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.87266463
+  - position: 0.59341195
     time_from_start: 0
     velocity: 0.0
-  - position: -0.1396
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 1.13446401
+  - position: 0.72710417
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
-name: left_swing
-version: MVI_ramp_up_leftswing_steep_v1
+name: left_close
+version: MVI_rampup_leftclose_flat_v1

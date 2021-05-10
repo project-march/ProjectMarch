@@ -1,74 +1,74 @@
-description: 'First version of a flat ramp_up gait '
+description: The right open gait for the 20 degrees slope up
 duration: 2500000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0
     time_from_start: 0
+    velocity: -0.0
+  - position: -0.08726646
+    time_from_start: 327100000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 812900000
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 0
     velocity: 0.0
-  - position: -0.08726646
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.59341195
+  - position: -0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: -0.29670597
+  - position: 1.02974426
+    time_from_start: 1550000000
+    velocity: 0.0
+  - position: 0.87266463
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
-  - position: 0.72710417
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
+  - position: 1.65806279
+    time_from_start: 1250000000
+    velocity: 0.0
+  - position: 1.13446401
     time_from_start: 2500000000
-    velocity: 0.34906585
+    velocity: 0.0
   right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.13089969
-    time_from_start: 378800000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 711500000
-    velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
-    velocity: 0.0
+    velocity: -0.0
   right_hip_aa:
-  - position: -0.08726646
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: -0.29670597
+  - position: 0.87266463
     time_from_start: 0
     velocity: 0.0
-  - position: 0.75049158
-    time_from_start: 1550000000
-    velocity: 0.0
-  - position: 0.59341195
+  - position: -0.1396
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 0.08726646
+  - position: 1.13446401
     time_from_start: 0
-    velocity: 0.34906585
-  - position: 1.32645023
-    time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.72710417
+  - position: 0.08726646
     time_from_start: 2500000000
     velocity: 0.0
-name: right_swing
-version: MVI_ramp_up_rightswing_flat_v1
+name: left_open
+version: MVI_rampup_leftopen_steep_v1
