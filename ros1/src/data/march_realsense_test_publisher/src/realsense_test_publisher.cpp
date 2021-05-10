@@ -220,7 +220,8 @@ void RealsenseTestPublisher::publishNextPointcloud()
 
 // Publish the right pointcloud based on the latest service call
 void RealsenseTestPublisher::updatePublishLoop(
-    march_shared_msgs::PublishTestDataset::Response& res) {
+    march_shared_msgs::PublishTestDataset::Response& res)
+{
     // The update is successful by default until something goes wrong
     bool success = true;
 
@@ -248,7 +249,7 @@ void RealsenseTestPublisher::updatePublishLoop(
     if (selected_mode != SelectedMode::end) {
         makeProcessPointcloudCall();
         res.message
-                = "Now publishing pointcloud with name " + pointcloud_file_name;
+            = "Now publishing pointcloud with name " + pointcloud_file_name;
     }
     res.success = success;
 }
