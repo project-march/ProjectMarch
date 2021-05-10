@@ -13,6 +13,10 @@ from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
 from .image_button import ImageButton
 
+DEFAULT_LAYOUT_FILE = os.path.join(
+    get_package_share_directory("march_rqt_input_device"), "config", "default.json"
+)
+
 
 class InputDeviceView(QWidget):
     """
@@ -46,7 +50,7 @@ class InputDeviceView(QWidget):
         self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
 
         self.logger = logger
-        self._layout_file = layout_file
+        self._layout_file = layout_file if layout_file != "" else DEFAULT_LAYOUT_FILE
         self._image_names = [
             file.name
             for file in Path(
