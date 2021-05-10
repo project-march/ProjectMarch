@@ -1,24 +1,23 @@
 import os
-import rclpy
+from typing import Tuple
+
+import yaml
+from ament_index_python.packages import get_package_share_directory
 from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
 from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
-from rclpy.parameter import Parameter
-from rcl_interfaces.srv import GetParameters
-from rclpy.callback_groups import ReentrantCallbackGroup
-from rclpy.exceptions import ParameterNotDeclaredException
-from rclpy.node import Node
-from ament_index_python.packages import get_package_share_directory
-import yaml
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
+from march_utility.utilities.node_utils import get_robot_urdf
+from march_utility.utilities.duration import Duration
+from rclpy.exceptions import ParameterNotDeclaredException
+from rclpy.node import Node
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_utility.utilities.node_utils import get_robot_urdf
 from .state_machine.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
@@ -84,6 +83,14 @@ class GaitSelection(Node):
 
         self._create_services()
         self._loaded_gaits = self._load_gaits()
+
+        self._early_schedule_duration = self._parse_duration_parameter(
+            "early_schedule_duration"
+        )
+        self._first_subgait_delay = self._parse_duration_parameter(
+            "first_subgait_delay"
+        )
+
         self.get_logger().info("Successfully initialized gait selection node.")
 
     def _create_services(self) -> None:
@@ -128,6 +135,33 @@ class GaitSelection(Node):
             srv_name="/march/gait_selection/contains_gait",
             callback=self.contains_gait_cb,
         )
+
+    def _parse_duration_parameter(self, name: str) -> Duration:
+        """Get a duration parameter from the parameter server.
+
+        Returns 0 if the parameter does not exist.
+        Clamps the duration to 0 if it is negative.
+        """
+        if self.has_parameter(name):
+            value = self.get_parameter(name).value
+            if value < 0:
+                value = 0
+            duration = Duration(seconds=value)
+        else:
+            duration = Duration(0)
+        return duration
+
+    def shortest_subgait(self) -> Subgait:
+        """Get the subgait with the smallest duration of all subgaits in the loaded gaits."""
+        shortest_subgait = None
+        for gait in self._loaded_gaits.values():
+            for subgait in gait.subgaits.values():
+                if (
+                    shortest_subgait is None
+                    or subgait.duration < shortest_subgait.duration
+                ):
+                    shortest_subgait = subgait
+        return shortest_subgait
 
     @property
     def robot(self):

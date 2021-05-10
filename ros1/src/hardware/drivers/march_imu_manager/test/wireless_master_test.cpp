@@ -5,23 +5,25 @@
 
 TEST(WirelessMasterTest, emptyRates)
 {
-    XsIntArray rates(0, nullptr);
-    const int rate = WirelessMaster::findClosestUpdateRate(rates, 0);
+    XsIntArray rates(/*sz=*/0, /*src=*/nullptr);
+    const int rate = WirelessMaster::findClosestUpdateRate(
+        rates, /*desired_update_rate=*/0);
     ASSERT_EQ(rate, 0);
 }
 
 TEST(WirelessMasterTest, oneRate)
 {
     const int supportedRate = 60;
-    XsIntArray rates(1, &supportedRate);
-    const int rate = WirelessMaster::findClosestUpdateRate(rates, 0);
+    XsIntArray rates(/*sz=*/1, &supportedRate);
+    const int rate = WirelessMaster::findClosestUpdateRate(
+        rates, /*desired_update_rate=*/0);
     ASSERT_EQ(rate, supportedRate);
 }
 
 TEST(WirelessMasterTest, matchingRate)
 {
-    const int supportedRates[3] = { 60, 80, 100 };
-    XsIntArray rates(3, supportedRates);
+    const std::array<int, 3> supportedRates { 60, 80, 100 };
+    XsIntArray rates(/*sz=*/supportedRates.size(), supportedRates.data());
     const int rate
         = WirelessMaster::findClosestUpdateRate(rates, supportedRates[1]);
     ASSERT_EQ(rate, supportedRates[1]);
@@ -29,9 +31,10 @@ TEST(WirelessMasterTest, matchingRate)
 
 TEST(WirelessMasterTest, twoClosestRates)
 {
-    const int supportedRates[2] = { 10, 20 };
-    XsIntArray rates(2, supportedRates);
-    const int rate = WirelessMaster::findClosestUpdateRate(rates, 15);
+    const std::array<int, 2> supportedRates { 10, 20 };
+    XsIntArray rates(/*sz=*/supportedRates.size(), supportedRates.data());
+    const int rate = WirelessMaster::findClosestUpdateRate(
+        rates, /*desired_update_rate=*/15);
     ASSERT_EQ(rate, supportedRates[0]);
 }
 

@@ -8,7 +8,7 @@ class FakeTemperatureDataNodeTest : public testing::Test {
 protected:
     void SetUp() override
     {
-        rclcpp::init(0, nullptr);
+        rclcpp::init(/*argc=*/0, /*argv=*/nullptr);
         std::vector<float> weights = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
         node = new FakeTemperatureDataNode { "march_fake_temperature_node",
             std::move(weights) };
@@ -20,7 +20,7 @@ protected:
         rclcpp::shutdown();
     }
 
-    FakeTemperatureDataNode* node;
+    FakeTemperatureDataNode* node {};
 };
 
 TEST_F(FakeTemperatureDataNodeTest, test_default_range)
@@ -33,14 +33,14 @@ TEST_F(FakeTemperatureDataNodeTest, test_default_range)
 
 TEST_F(FakeTemperatureDataNodeTest, test_change_range)
 {
-    (*node).set_range(-10, 10);
+    (*node).set_range(/*minimum_temperature=*/-10, /*maximum_temperature=*/10);
     for (int i { 0 }; i < 10; ++i) {
         (*node).generate_new_temperature();
         ASSERT_LE((*node).calculate_autoregression_temperature(), 10);
         ASSERT_GE((*node).calculate_autoregression_temperature(), -10);
     }
 
-    (*node).set_range(-2, 2);
+    (*node).set_range(/*minimum_temperature=*/-2, /*maximum_temperature=*/2);
     // "flush" the previous values
     for (int i { 0 }; i < 10; ++i) {
         (*node).generate_new_temperature();

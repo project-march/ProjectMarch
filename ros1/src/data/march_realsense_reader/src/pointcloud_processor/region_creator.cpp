@@ -1,28 +1,28 @@
 #include "pointcloud_processor/region_creator.h"
-#include "yaml-cpp/yaml.h"
 #include <ctime>
 #include <pcl/search/kdtree.h>
 #include <pcl/search/search.h>
 #include <ros/ros.h>
-#include <utilities/yaml_utilities.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
 // Construct a basic RegionCreator class
-RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging)
-    : config_tree_ { config_tree }
-    , debugging_ { debugging }
+RegionCreator::RegionCreator(bool debugging)
+    : debugging_ { debugging }
 {
 }
 
 // Construct a basic CHullFinder class
-RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging)
-    : RegionCreator(config_tree, debugging)
-
+RegionGrower::RegionGrower(bool debugging)
+    : RegionCreator(debugging)
+    , number_of_neighbours(-1)
+    , min_cluster_size(-1)
+    , max_cluster_size(-1)
+    , smoothness_threshold(std::numeric_limits<float>::lowest())
+    , curvature_threshold(std::numeric_limits<float>::lowest())
 {
-    readYaml();
 }
 
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
@@ -49,22 +49,20 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
 
     return success;
 }
-void RegionGrower::readYaml()
+
+void RegionGrower::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
 {
-    if (YAML::Node region_growing_parameters = config_tree_["region_growing"]) {
-        number_of_neighbours = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "number_of_neighbours");
-        min_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "min_cluster_size");
-        max_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "max_cluster_size");
-        smoothness_threshold = yaml_utilities::grabParameter<double>(
-            region_growing_parameters, "smoothness_threshold");
-        curvature_threshold = yaml_utilities::grabParameter<double>(
-            region_growing_parameters, "curvature_threshold");
-    } else {
-        ROS_ERROR("'region_growing' parameters not found in parameter file");
-    }
+    number_of_neighbours
+        = config.region_creator_region_growing_number_of_neighbours;
+    min_cluster_size = config.region_creator_region_growing_min_cluster_size;
+    max_cluster_size = config.region_creator_region_growing_max_cluster_size;
+    smoothness_threshold
+        = (float)config.region_creator_region_growing_smoothness_threshold;
+    curvature_threshold
+        = (float)config.region_creator_region_growing_curvature_threshold;
+
+    debugging_ = config.debug;
 }
 
 bool RegionGrower::setupRegionGrower()
@@ -96,22 +94,20 @@ bool RegionGrower::extractRegions()
         ROS_DEBUG(
             "Total number of clusters found: %lu", region_vector_->size());
         int i = 0;
-        for (auto region : *region_vector_) {
+        for (const auto& region : *region_vector_) {
             ROS_DEBUG("Total number of points in cluster %i: %lu", i,
                 region.indices.size());
             i++;
         }
-
-        if (region_vector_->size() == 0) {
-            ROS_WARN("Region growing algorithm found no clusters");
-            return false;
-        }
-        return true;
     }
 
-    ROS_ERROR("Something went wrong during extracting the regions from the "
-              "region grower.");
-    return false;
+    if (region_vector_->size() == 0) {
+        ROS_WARN("Region growing algorithm found no clusters, stopping "
+                 "region grower");
+        return false;
+    }
+
+    return true;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()

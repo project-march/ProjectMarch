@@ -1,12 +1,13 @@
 testjoint_linear:
- ifName: enp2s0
+ if_name: enp2s0
  ecatCycleTime: 4
  ecatSlaveTimeout: 50
  joints:
    - linear_joint:
-       actuationMode: torque
        allowActuation: true
-       imotioncube:
+       motor_controller:
+         type: imotioncube
+         actuationMode: torque
          slaveIndex: 1
          absoluteEncoder:
            resolution: 12

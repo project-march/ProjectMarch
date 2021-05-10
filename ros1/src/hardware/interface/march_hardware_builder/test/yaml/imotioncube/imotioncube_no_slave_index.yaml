@@ -1,7 +1,0 @@
-absoluteEncoder:
-  resolution: 16
-  minPositionIU: 22134
-  maxPositionIU: 43436
-incrementalEncoder:
-  resolution: 12
-  transmission: 75.1

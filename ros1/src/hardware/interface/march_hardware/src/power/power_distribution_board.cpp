@@ -25,7 +25,7 @@ float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 
 void PowerDistributionBoard::setMasterOnline()
 {
-    bit8 isOkBit;
+    bit8 isOkBit {};
     // By continuously flipping the master online toggle we let the pdb know we
     // are still connected.
     this->masterOnlineToggle = !this->masterOnlineToggle;
@@ -35,7 +35,7 @@ void PowerDistributionBoard::setMasterOnline()
 
 void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
 {
-    bit8 isAllowedBit;
+    bit8 isAllowedBit {};
     isAllowedBit.ui = isAllowed;
     this->write8(
         this->bootShutdownOffsets.getShutdownAllowedByteOffset(), isAllowedBit);

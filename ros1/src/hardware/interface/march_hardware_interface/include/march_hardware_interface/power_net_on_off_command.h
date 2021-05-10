@@ -3,11 +3,12 @@
 #define MARCH_HARDWARE_INTERFACE_POWERNETONOFFCOMMAND_H
 
 #include <march_hardware_interface/power_net_type.h>
+#include <ostream>
 
 class PowerNetOnOffCommand {
     PowerNetType type_;
-    bool on_or_off_;
-    int net_number_;
+    bool on_or_off_ {};
+    int net_number_ {};
 
 public:
     PowerNetOnOffCommand()

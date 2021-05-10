@@ -10,7 +10,7 @@ public:
     {
     }
 
-    MOCK_CONST_METHOD1(toRad, double(int32_t));
-
-    MOCK_CONST_METHOD0(getRadPerBit, double());
+    MOCK_CONST_METHOD0(getRadiansPerBit, double());
+    MOCK_CONST_METHOD2(toRadians, double(double, bool));
+    MOCK_CONST_METHOD2(toIU, double(double, bool));
 };

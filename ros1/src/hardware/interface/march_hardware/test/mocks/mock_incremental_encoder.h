@@ -6,10 +6,7 @@
 class MockIncrementalEncoder : public march::IncrementalEncoder {
 public:
     MockIncrementalEncoder()
-        : IncrementalEncoder(10, 100.0)
+        : IncrementalEncoder(/*number_of_bits=*/10, /*transmission=*/100.0)
     {
     }
-
-    MOCK_METHOD0(getAngleIU, int32_t());
-    MOCK_METHOD0(getAngleRad, double());
 };

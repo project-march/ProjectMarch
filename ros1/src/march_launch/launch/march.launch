@@ -27,6 +27,8 @@
     <arg name="input_device" default="false" doc="Launches ros serial node to connect with input device."/>
     <arg name="wireless" default="false" doc="Enables wireless connection to the input device."/>
     <arg name="hardware_interface" default="true" doc="Launches the hardware interface when config is 'exoskeleton."/>
+    <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
+                                        If not provided, then the value is read from the robot .yaml file."/>
 
 <!-- Data                       -->
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
@@ -37,6 +39,8 @@
          doc="Whether the simulation camera or the physical camera should be used"/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
              if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
+    <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
+    <param name="realsense_debug" value="$(arg realsense_debug)"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
     <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
     <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
@@ -65,6 +69,7 @@
             <arg name="robot" value="$(arg robot)"/>
             <arg name="robot_description" value="$(arg robot_description)"/>
             <arg name="controller_name" value="$(arg controller_name)"/>
+            <arg name="if_name" value="$(arg if_name)"/>
         </include>
     </group>
 

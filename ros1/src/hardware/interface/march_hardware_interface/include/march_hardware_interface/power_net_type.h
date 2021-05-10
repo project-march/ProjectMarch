@@ -1,6 +1,8 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H
 #define MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H
+#include <ostream>
+#include <ros/assert.h>
 #include <ros/package.h>
 #include <string>
 
@@ -20,6 +22,7 @@ public:
         } else if (name == "low_voltage") {
             this->value = low_voltage;
         } else {
+            // NOLINTNEXTLINE(hicpp-no-assembler): violation in macro of ROS
             ROS_ASSERT_MSG(false, "Unknown power net type %s", name.c_str());
             this->value = undefined;
         }

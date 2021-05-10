@@ -30,8 +30,7 @@ bool ModelPredictiveControllerInterface::init(
 
     // Initialize the model predictive controllers
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        model_predictive_controllers_.push_back(
-            ModelPredictiveController(getWeights(joint_names[i])));
+        model_predictive_controllers_.emplace_back(getWeights(joint_names[i]));
         model_predictive_controllers_[i].joint_name = std::move(joint_names[i]);
         model_predictive_controllers_[i].init();
     }
@@ -41,7 +40,7 @@ bool ModelPredictiveControllerInterface::init(
 
 // Retrieve the weights from the parameter server for a joint.
 std::vector<float> ModelPredictiveControllerInterface::getWeights(
-    std::string joint_name)
+    const std::string& joint_name)
 {
     // get path to controller parameters
     std::string parameter_path = "/march/controller/trajectory";
@@ -50,8 +49,16 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(
     std::vector<float> Q;
     std::vector<float> R;
 
-    ros::param::get(parameter_path + "/weights/" + joint_name + "/Q", Q);
-    ros::param::get(parameter_path + "/weights/" + joint_name + "/R", R);
+    ros::param::get(std::string(parameter_path)
+                        .append(/*s=*/"/weights/")
+                        .append(joint_name)
+                        .append(/*s=*/"/Q"),
+        Q);
+    ros::param::get(std::string(parameter_path)
+                        .append(/*s=*/"/weights/")
+                        .append(joint_name)
+                        .append(/*s=*/"/R"),
+        R);
 
     // Add Q and R to W
     std::vector<float> W;
@@ -84,7 +91,7 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 
     // zero commands
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        (*joint_handles_ptr_)[i].setCommand(0.0);
+        (*joint_handles_ptr_)[i].setCommand(/*command=*/0.0);
     }
 }
 
@@ -106,12 +113,12 @@ void ModelPredictiveControllerInterface::initMpcMsg()
         // Loop trough the states
         for (unsigned int j = 0; j < ACADO_NX; j++) {
             mpc_pub_->msg_.joint[i].estimation.states[j].array.resize(
-                prediction_horizon + 1);
+                (size_t)prediction_horizon + 1);
         }
         // Loop trough all the outputs
         for (unsigned int j = 0; j < ACADO_NYN; j++) {
             mpc_pub_->msg_.joint[i].reference.states[j].array.resize(
-                prediction_horizon + 1);
+                (size_t)prediction_horizon + 1);
         }
 
         // Loop trough all the inputs
@@ -119,9 +126,9 @@ void ModelPredictiveControllerInterface::initMpcMsg()
             // The optimal control is one value shorter than the output,
             // since there is no control on the terminal state
             mpc_pub_->msg_.joint[i].estimation.inputs[j].array.resize(
-                prediction_horizon);
+                (size_t)prediction_horizon);
             mpc_pub_->msg_.joint[i].reference.inputs[j].array.resize(
-                prediction_horizon);
+                (size_t)prediction_horizon);
         }
     }
 }
@@ -216,7 +223,7 @@ void ModelPredictiveControllerInterface::updateCommand(
         (*joint_handles_ptr_)[i].setCommand(command);
     }
 
-    for (unsigned int i = 0; i < num_joints_; ++i) {
+    for (int i = 0; i < num_joints_; ++i) {
         // Fill MPC message with information
         setMpcMsg(i);
 
@@ -234,7 +241,7 @@ void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {
     // zero commands
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        (*joint_handles_ptr_)[i].setCommand(0.0);
+        (*joint_handles_ptr_)[i].setCommand(/*command=*/0.0);
     }
 }
 

@@ -1,10 +1,8 @@
 #include "pointcloud_processor/hull_finder.h"
-#include "yaml-cpp/yaml.h"
 #include <cmath>
 #include <ros/ros.h>
 #include <utilities/linear_algebra_utilities.h>
 #include <utilities/output_utilities.h>
-#include <utilities/yaml_utilities.h>
 
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/project_inliers.h>
@@ -23,17 +21,15 @@ using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 
 // Construct a basic HullFinder class
-HullFinder::HullFinder(YAML::Node config_tree, bool debugging)
-    : config_tree_ { config_tree }
-    , debugging_ { debugging }
+HullFinder::HullFinder(bool debugging)
+    : debugging_ { debugging }
 {
 }
 
 // Construct a basic CHullFinder class
-CHullFinder::CHullFinder(YAML::Node config_tree, bool debugging)
-    : HullFinder(config_tree, debugging)
+CHullFinder::CHullFinder(bool debugging)
+    : HullFinder(debugging)
 {
-    readYaml();
 }
 
 bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
@@ -84,20 +80,14 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     return success;
 }
-
-// Read all relevant parameters from the parameter yaml file
-void CHullFinder::readYaml()
+void CHullFinder::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
 {
-    if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"]) {
-        convex = yaml_utilities::grabParameter<bool>(
-            c_hull_finder_parameters, "convex");
-        alpha = yaml_utilities::grabParameter<double>(
-            c_hull_finder_parameters, "alpha");
-        hull_dimension = yaml_utilities::grabParameter<int>(
-            c_hull_finder_parameters, "hull_dimension");
-    } else {
-        ROS_ERROR("'c_hull_finder' parameters not found in parameter file");
-    }
+    convex = config.hull_finder_convex;
+    alpha = config.hull_finder_alpha;
+    hull_dimension = config.hull_dimension;
+
+    debugging_ = config.debug;
 }
 
 // Converts a region into a convex or concave hull
@@ -151,13 +141,13 @@ bool CHullFinder::getPlaneCoefficientsRegion()
 {
     // calculate average normal and average point to calculate plane
     // coefficients from
-    std::vector<double> average_normal(3);
-    std::vector<double> average_point(3);
+    std::vector<double> average_normal(/*__n=*/3);
+    std::vector<double> average_point(/*__n=*/3);
 
     bool success = getAveragePointAndNormal(average_point, average_normal);
 
     // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
-    plane_coefficients_->values.resize(4);
+    plane_coefficients_->values.resize(/*__new_size=*/4);
     // The first three coefficients are the normal vector of the plane as
     // all the vectors in the plane are perpendicular to the normal
     plane_coefficients_->values.assign(

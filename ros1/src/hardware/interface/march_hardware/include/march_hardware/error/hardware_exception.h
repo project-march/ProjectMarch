@@ -13,6 +13,9 @@
 namespace march {
 namespace error {
     class HardwareException : public std::exception {
+        const ErrorType type_ = ErrorType::UNKNOWN;
+        std::runtime_error m;
+
     public:
         explicit HardwareException(ErrorType type)
             : HardwareException(type, "")
@@ -21,7 +24,7 @@ namespace error {
 
         HardwareException(ErrorType type, const std::string& message)
             : type_(type)
-            , description_(this->createDescription(message))
+            , m(this->createDescription(message))
         {
         }
 
@@ -29,21 +32,15 @@ namespace error {
         HardwareException(
             ErrorType type, const std::string& format, Args... args)
             : type_(type)
+            , m(this->createDescription(format, args...))
         {
-            const size_t size
-                = std::snprintf(nullptr, 0, format.c_str(), args...);
-            std::vector<char> buffer(size + 1); // note +1 for null terminator
-            std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
-
-            this->description_
-                = this->createDescription(std::string(buffer.data(), size));
         }
 
-        virtual ~HardwareException() noexcept = default;
+        ~HardwareException() noexcept override = default;
 
         const char* what() const noexcept override
         {
-            return this->description_.c_str();
+            return m.what();
         }
 
         ErrorType type() const noexcept
@@ -54,7 +51,7 @@ namespace error {
         friend std::ostream& operator<<(
             std::ostream& s, const HardwareException& e)
         {
-            s << e.description_;
+            s << e.what();
             return s;
         }
 
@@ -69,9 +66,30 @@ namespace error {
             }
             return ss.str();
         }
+        template <typename... Args>
+        std::string createDescription(const std::string& format, Args... args)
+        {
+            const size_t size = std::snprintf(
+                /*__s=*/nullptr, /*__maxlen=*/0, format.c_str(), args...);
+            std::vector<char> buffer(size + 1); // note +1 for null terminator
+            std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
 
-        const ErrorType type_ = ErrorType::UNKNOWN;
-        std::string description_;
+            return this->createDescription(std::string(buffer.data(), size));
+        }
+    };
+
+    class NotImplemented : public std::logic_error {
+    public:
+        explicit NotImplemented(const std::string& function_name)
+            : std::logic_error(
+                "Function " + function_name + " is not implemented") {};
+
+        NotImplemented(
+            const std::string& function_name, const std::string& context)
+            : std::logic_error(std::string(/*s=*/"Function ")
+                                   .append(function_name)
+                                   .append(/*s=*/" is not implemented for ")
+                                   .append(context)) {};
     };
 
 } // namespace error

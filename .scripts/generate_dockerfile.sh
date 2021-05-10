@@ -1,6 +1,6 @@
 BASE_IMAGE="ros:foxy-ros1-bridge-focal"
 BASE_PACKAGES="ros-noetic-ros-base ros-foxy-ros-base"
-BUILD_TOOLS="python3-rosdep python3-rosinstall python3-rosinstall-generator build-essential python3-colcon-common-extensions python3-pip python3-pip python3-catkin-pkg python3-catkin-lint clang-tidy clang libssl-dev wget cmake git git-lfs libbullet-dev python3-flake8 python3-pytest-cov python3-setuptools python3-vcstool ssh clang-format"
+BUILD_TOOLS="python3-rosdep python3-rosinstall python3-rosinstall-generator build-essential python3-colcon-common-extensions python3-pip python3-pip python3-catkin-pkg python3-catkin-lint clang-tidy clang libssl-dev wget cmake git git-lfs libbullet-dev python3-flake8 python3-pytest-cov python3-setuptools python3-vcstool ssh clang-format parallel tmux"
 BUILD_TOOLS_NO_REC="libasio-dev libtinyxml2-dev libcunit1-dev"
 PYTHON_TOOLS="mock argcomplete pytest-repeat pytest-rerunfailures pytest flakehell"
 

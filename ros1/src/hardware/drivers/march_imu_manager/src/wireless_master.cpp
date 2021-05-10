@@ -70,7 +70,13 @@ int WirelessMaster::init()
 
 int WirelessMaster::configure(const int update_rate, const int channel)
 {
-    if (this->master_ && !this->master_->gotoConfig()) {
+    if (!this->master_) {
+        ROS_FATAL(
+            "Wireless master cannot be configured before it is initialized!");
+        return -1;
+    }
+
+    if (!this->master_->gotoConfig()) {
         ROS_FATAL("Failed to go to config mode");
         return -1;
     }
@@ -145,20 +151,20 @@ void WirelessMaster::update()
 
                 // [m/s²]
                 imu_msg.linear_acceleration.x
-                    = packet->calibratedAcceleration().value(0);
+                    = packet->calibratedAcceleration().value(/*index=*/0);
                 imu_msg.linear_acceleration.y
-                    = packet->calibratedAcceleration().value(1);
+                    = packet->calibratedAcceleration().value(/*index=*/1);
                 imu_msg.linear_acceleration.z
-                    = packet->calibratedAcceleration().value(2);
+                    = packet->calibratedAcceleration().value(/*index=*/2);
                 imu_msg.linear_acceleration_covariance[0] = -1;
 
                 // [rad/s]
                 imu_msg.angular_velocity.x
-                    = packet->calibratedGyroscopeData().value(0);
+                    = packet->calibratedGyroscopeData().value(/*index=*/0);
                 imu_msg.angular_velocity.y
-                    = packet->calibratedGyroscopeData().value(1);
+                    = packet->calibratedGyroscopeData().value(/*index=*/1);
                 imu_msg.angular_velocity.z
-                    = packet->calibratedGyroscopeData().value(2);
+                    = packet->calibratedGyroscopeData().value(/*index=*/2);
                 imu_msg.angular_velocity_covariance[0] = -1;
 
                 // unit quaternion
@@ -204,8 +210,8 @@ void WirelessMaster::onConnectivityChanged(
             this->connected_mtws_.insert(
                 std::make_pair(device_id, std::unique_ptr<Mtw>(new Mtw(dev))));
 
-            ros::Publisher publisher
-                = this->node_->advertise<sensor_msgs::Imu>("/march/imu", 10);
+            ros::Publisher publisher = this->node_->advertise<sensor_msgs::Imu>(
+                "/march/imu", /*queue_size=*/10);
             this->publishers_.insert(std::make_pair(device_id, publisher));
             break;
         }

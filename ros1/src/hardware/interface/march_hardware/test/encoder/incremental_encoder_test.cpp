@@ -15,13 +15,13 @@ protected:
 
 TEST_F(IncrementalEncoderTest, ZeroIUToRad)
 {
-    ASSERT_EQ(0.0, this->encoder.toRad(0));
+    ASSERT_EQ(0.0, this->encoder.toRadians(0, true));
 }
 
 TEST_F(IncrementalEncoderTest, CorrectToRad)
 {
     const int32_t iu = 1000;
     const double expected = iu * 2.0 * M_PI
-        / (std::pow(2, this->resolution) * this->transmission);
-    ASSERT_DOUBLE_EQ(expected, this->encoder.toRad(iu));
+        / (std::pow(/*__x=*/2, this->resolution) * this->transmission);
+    ASSERT_DOUBLE_EQ(expected, this->encoder.toRadians(iu, true));
 }

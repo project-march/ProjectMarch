@@ -4,10 +4,11 @@
 #include <gazebo/physics/physics.hh>
 #include <march_gazebo_plugins/walk_controller.h>
 #include <ros/package.h>
+#include <utility>
 
 namespace gazebo {
 WalkController::WalkController(physics::ModelPtr model)
-    : ObstacleController(model)
+    : ObstacleController(std::move(model))
 {
     swing_step_size_ = 0.7; // This estimate will be adjusted every step
 
@@ -18,7 +19,7 @@ WalkController::WalkController(physics::ModelPtr model)
 
     for (YAML::const_iterator it = com_levels_tree.begin();
          it != com_levels_tree.end(); ++it) {
-        std::string key = it->first.as<std::string>();
+        auto key = it->first.as<std::string>();
         com_levels.push_back(key);
     }
 

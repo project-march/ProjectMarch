@@ -32,6 +32,8 @@ def generate_launch_description():
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
+    first_subgait_delay = LaunchConfiguration("first_subgait_delay")
+    early_schedule_duration = LaunchConfiguration("early_schedule_duration")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -131,6 +133,19 @@ def generate_launch_description():
                 default_value="False",
                 description="Whether balance is being used.",
             ),
+            DeclareLaunchArgument(
+                name="first_subgait_delay",
+                default_value="0.2",
+                description="Duration to wait before starting first subgait."
+                            "If 0 then the first subgait is started immediately,"
+                            "dropping the first setpoint in the process.",
+            ),
+            DeclareLaunchArgument(
+                name="early_schedule_duration",
+                default_value="0.2",
+                description="Duration to schedule next subgait early. If 0 then the"
+                            "next subgait is never scheduled early.",
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -172,6 +187,8 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("gait_directory", gait_directory),
                     ("balance", balance),
+                    ("first_subgait_delay", first_subgait_delay),
+                    ("early_schedule_duration", early_schedule_duration),
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),

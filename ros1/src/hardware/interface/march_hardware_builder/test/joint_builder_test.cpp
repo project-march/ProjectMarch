@@ -11,7 +11,7 @@
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/error/hardware_exception.h>
-#include <march_hardware/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 
 class JointBuilderTest : public ::testing::Test {
 protected:
@@ -23,7 +23,7 @@ protected:
     void SetUp() override
     {
         this->base_path = ros::package::getPath("march_hardware_builder")
-                              .append("/test/yaml/joint");
+                              .append(/*__s=*/"/test/yaml/joint");
         this->joint = std::make_shared<urdf::Joint>();
         this->joint->limits = std::make_shared<urdf::JointLimits>();
         this->joint->safety = std::make_shared<urdf::JointSafety>();
@@ -56,12 +56,16 @@ TEST_F(JointBuilderTest, ValidJointHip)
     auto incremental_encoder
         = std::make_unique<march::IncrementalEncoder>(12, 50.0);
     auto imc = std::make_unique<march::IMotionCube>(
-        march::Slave(2, this->pdo_interface, this->sdo_interface),
+        march::Slave(
+            /*slave_index=*/2, this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),
         march::ActuationMode::unknown);
     auto ges = std::make_unique<march::TemperatureGES>(
-        march::Slave(1, this->pdo_interface, this->sdo_interface), 2);
-    march::Joint expected(name, -1, true, std::move(imc), std::move(ges));
+        march::Slave(
+            /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
+        2);
+    march::Joint expected(name, /*net_number=*/-1, /*allow_actuation=*/true,
+        std::move(imc), std::move(ges));
 
     ASSERT_EQ(expected, created);
 }
@@ -85,13 +89,16 @@ TEST_F(JointBuilderTest, ValidNotActuated)
     auto incremental_encoder
         = std::make_unique<march::IncrementalEncoder>(12, 50.0);
     auto imc = std::make_unique<march::IMotionCube>(
-        march::Slave(2, this->pdo_interface, this->sdo_interface),
+        march::Slave(
+            /*slave_index=*/2, this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),
         march::ActuationMode::unknown);
     auto ges = std::make_unique<march::TemperatureGES>(
-        march::Slave(1, this->pdo_interface, this->sdo_interface), 2);
-    march::Joint expected(
-        "test_joint_hip", -1, false, std::move(imc), std::move(ges));
+        march::Slave(
+            /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
+        2);
+    march::Joint expected("test_joint_hip", /*net_number=*/-1,
+        /*allow_actuation=*/false, std::move(imc), std::move(ges));
 
     ASSERT_EQ(expected, created);
 }
@@ -103,16 +110,6 @@ TEST_F(JointBuilderTest, NoActuate)
     ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_actuate",
                      this->joint, this->pdo_interface, this->sdo_interface),
         MissingKeyException);
-}
-
-TEST_F(JointBuilderTest, NoIMotionCube)
-{
-    YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
-    march::Joint joint
-        = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube",
-            this->joint, this->pdo_interface, this->sdo_interface);
-
-    ASSERT_FALSE(joint.hasIMotionCube());
 }
 
 TEST_F(JointBuilderTest, NoTemperatureGES)
@@ -140,9 +137,11 @@ TEST_F(JointBuilderTest, ValidActuationMode)
         = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint,
             this->pdo_interface, this->sdo_interface);
 
-    march::Joint expected("test_joint_hip", -1, false,
+    march::Joint expected("test_joint_hip", /*net_number=*/-1,
+        /*allow_actuation=*/false,
         std::make_unique<march::IMotionCube>(
-            march::Slave(1, this->pdo_interface, this->sdo_interface),
+            march::Slave(
+                /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
             std::make_unique<march::AbsoluteEncoder>(16, 22134, 43436,
                 this->joint->limits->lower, this->joint->limits->upper,
                 this->joint->safety->soft_lower_limit,

@@ -14,11 +14,13 @@ std::string PressureSole::getSide()
 
 PressureSoleData PressureSole::read()
 {
-    float data[PRESSURE_SOLE_DATA_LENGTH];
-    for (unsigned int i = 0; i < PRESSURE_SOLE_DATA_LENGTH; i++) {
+    std::array<float, PRESSURE_SOLE_DATA_LENGTH> data {};
+    for (unsigned int i = 0; i < data.size(); i++) {
         // Increment the offset by 4 bytes each iteration
         data[i] = this->read32(byte_offset_ + i * sizeof(float)).f;
     }
+
+    static_assert(PRESSURE_SOLE_DATA_LENGTH == 8);
     return { data[0], data[1], data[2], data[3], data[4], data[5], data[6],
         data[7] };
 }

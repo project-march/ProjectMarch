@@ -22,7 +22,7 @@ public:
         double time_since_start, double stable_foot_pose_x);
     void getWalkGoalPositionX(
         double time_since_start, double stable_foot_pose_x);
-    bool changeComLevel(std::string);
+    bool changeComLevel(const std::string&);
 
     std::vector<std::string> com_levels;
 
@@ -40,7 +40,7 @@ protected:
     std::string default_subgait_name_;
     std::string subgait_name_;
     double subgait_start_time_;
-    double swing_step_size_;
+    double swing_step_size_ {};
     double subgait_duration_;
 
     bool subgait_changed_;
