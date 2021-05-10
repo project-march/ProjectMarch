@@ -100,43 +100,54 @@ protected:
 
     // Create a point cloud with points on the ground where the points represent
     // where it should be checked if there is a valid foot location
-    bool getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try);
+    bool getOptionalFootLocations(
+        const PointCloud2D::Ptr& foot_locations_to_try);
 
     /** Takes a 2D point cloud of potential foot locations and returns
      * the valid foot locations with associated height and normal vector.
      * Result indicates whether every original point ends up being valid.**/
-    bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
-        PointNormalCloud::Ptr output_cloud);
+    bool cropCloudToHullVector(PointCloud2D::Ptr const& input_cloud,
+        const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a single point to a hull vector.
-    bool cropPointToHullVector(
-        pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud);
+    bool cropPointToHullVector(pcl::PointXY const input_point,
+        const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a cloud to a hull vector, but only puts each input point in
     // the highest hull it falls into
-    bool cropCloudToHullVectorUnique(PointCloud2D::Ptr const input_cloud,
-        PointNormalCloud::Ptr output_cloud);
+    bool cropCloudToHullVectorUnique(PointCloud2D::Ptr const& input_cloud,
+        const PointNormalCloud::Ptr& output_cloud);
 
     // Elevate the 2D points so they have z coordinate as if they lie on the
     // plane of the hull
     bool addZCoordinateToCloudFromPlaneCoefficients(
-        PointCloud2D::Ptr input_cloud,
-        PlaneCoefficients::Ptr plane_coefficients,
-        PointCloud::Ptr elevated_cloud);
+        const PointCloud2D::Ptr& input_cloud,
+        const PlaneCoefficients::Ptr& plane_coefficients,
+        const PointCloud::Ptr& elevated_cloud);
 
     // Remove all points from a cloud which do not fall in the hull
-    bool cropCloudToHull(
-        PointCloud::Ptr elevated_cloud, Hull::Ptr hull, Polygon polygon);
+    bool cropCloudToHull(const PointCloud::Ptr& elevated_cloud,
+        const Hull::Ptr& hull, const Polygon& polygon);
 
     // Add normals to the elevated cloud which correspond to the normal vector
     // of the plane
-    bool addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr elevated_cloud,
-        PlaneCoefficients::Ptr plane_coefficients,
-        PointNormalCloud::Ptr elevated_cloud_with_normals);
+    bool addNormalToCloudFromPlaneCoefficients(
+        const PointCloud::Ptr& elevated_cloud,
+        const PlaneCoefficients::Ptr& plane_coefficients,
+        const PointNormalCloud::Ptr& elevated_cloud_with_normals);
 
     // Find the parameters from the foot location by finding at what percentage
     // of the end points it is
     bool getGaitParametersFromFootLocation();
+
+    // Verify if there is support for the entire foot around the possible foot
+    // location
+    bool entireFootCanBePlaced(pcl::PointNormal possible_foot_location);
+
+    // Fill a point cloud with vertices of the foot on the ground around a
+    // possible foot location
+    void fillFootPointCloud(const PointCloud2D::Ptr& foot_pointcloud,
+        pcl::PointNormal possible_foot_location);
 
     // Verify that a possible foot location is valid for the requested gait
     bool isValidLocation(pcl::PointNormal possible_foot_location);
@@ -158,7 +169,7 @@ protected:
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
 
-    // Read all relevant parameters
+    // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
     float min_x_stairs {};
@@ -166,13 +177,17 @@ protected:
     float min_z_stairs {};
     float max_z_stairs {};
     float y_location {};
-    double x_flat {};
-    double z_flat {};
-    double x_steep {};
-    double z_steep {};
+    float foot_length_back {};
+    float foot_length_front {};
+    float foot_width {};
+    float max_allowed_z_deviation_foot {};
+    float x_flat {};
+    float z_flat {};
+    float x_steep {};
+    float z_steep {};
     float min_search_area {};
     float max_search_area {};
-    double max_distance_to_line {};
+    float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
 

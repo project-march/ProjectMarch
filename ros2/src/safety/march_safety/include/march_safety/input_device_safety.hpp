@@ -30,7 +30,7 @@ public:
 private:
     // Callback for when the input device publishes on the
     // /march/input_device/alive topic
-    void inputDeviceAliveCallback(const AliveMsg::SharedPtr msg);
+    void inputDeviceAliveCallback(const AliveMsg::SharedPtr& msg);
 
     // Check the last alive stamp of an input device.
     void check_last_alive_stamp(
