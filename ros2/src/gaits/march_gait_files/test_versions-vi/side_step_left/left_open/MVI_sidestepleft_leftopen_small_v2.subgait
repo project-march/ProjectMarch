@@ -71,4 +71,4 @@ joints:
     time_from_start: 2000000000
     velocity: 0.0
 name: left_open
-version: MVI_sidesteplefts_leftopen_small_v2
+version: MVI_sidestepleft_leftopen_small_v2
