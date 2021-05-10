@@ -40,7 +40,7 @@ NormalsPreprocessor::NormalsPreprocessor(bool debugging)
 // Removes a point from a pointcloud (and optionally the corresponding
 // pointcloud_normals as well) at a given index
 void Preprocessor::removePointByIndex(int const index,
-    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+    const PointCloud::Ptr& pointcloud, const Normals::Ptr& pointcloud_normals)
 {
     if (index < pointcloud->points.size() && index >= 0) {
         if (pointcloud_normals != nullptr) {
@@ -205,7 +205,7 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 // pointcloud_ object The normals are oriented to the origin from before the
 // transformation
 bool NormalsPreprocessor::fillNormalCloud(
-    geometry_msgs::TransformStamped transform_stamped)
+    const geometry_msgs::TransformStamped& transform_stamped)
 {
     geometry_msgs::Vector3 translation
         = transform_stamped.transform.translation;

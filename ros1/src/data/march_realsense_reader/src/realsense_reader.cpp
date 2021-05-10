@@ -109,7 +109,7 @@ void RealSenseReader::readConfigCb(
 }
 
 // This method executes the logic to process a pointcloud
-bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
+bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     clock_t start_of_processing_time = clock();
@@ -137,6 +137,15 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     // Create regions
     bool region_creating_was_successful
         = region_creator_->createRegions(pointcloud, normals, region_vector);
+
+    if (not region_creating_was_successful) {
+        res.error_message
+            = "Region creating was unsuccessful, see debug output "
+              "for more information";
+        res.success = false;
+        return false;
+    }
+
     if (debugging_) {
         ROS_DEBUG("Done creating regions, now publishing point cloud regions "
                   "to /camera/region_cloud");
@@ -144,13 +153,6 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
             = region_creator_->debug_visualisation();
         publishCloud<pcl::PointXYZRGB>(
             region_pointcloud_publisher_, *coloured_cloud);
-    }
-    if (not region_creating_was_successful) {
-        res.error_message
-            = "Region creating was unsuccessful, see debug output "
-              "for more information";
-        res.success = false;
-        return false;
     }
 
     // Setup data structures for finding
@@ -217,7 +219,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
 // Publish a pointcloud of any point type on a publisher
 template <typename T>
 void RealSenseReader::publishCloud(
-    ros::Publisher publisher, pcl::PointCloud<T> cloud)
+    const ros::Publisher& publisher, pcl::PointCloud<T> cloud)
 {
     cloud.width = 1;
     cloud.height = cloud.points.size();
@@ -234,7 +236,7 @@ void RealSenseReader::publishCloud(
 // Turn a HullVector into a marker with a list of points and publish for
 // visualization
 void RealSenseReader::publishHullMarkerArray(
-    boost::shared_ptr<HullVector> hull_vector)
+    const boost::shared_ptr<HullVector>& hull_vector)
 {
     visualization_msgs::Marker marker_list;
     marker_list.header.frame_id = frame_id_to_transform_to_;
@@ -249,7 +251,7 @@ void RealSenseReader::publishHullMarkerArray(
     marker_list.scale.y = cube_side_length;
     marker_list.scale.z = cube_side_length;
 
-    for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull : *hull_vector) {
+    for (const pcl::PointCloud<pcl::PointXYZ>::Ptr& hull : *hull_vector) {
         // Color the hull with a random color (r, g and b in [1, 0])
         int number_of_colors = 500;
 
@@ -317,7 +319,7 @@ void RealSenseReader::publishParameterDeterminerMarkerArray()
 }
 
 void RealSenseReader::fillPossibleFootLocationsMarker(
-    PointNormalCloud::Ptr const possible_foot_locations,
+    PointNormalCloud::Ptr const& possible_foot_locations,
     pcl::PointNormal const optimal_foot_location,
     visualization_msgs::Marker& marker_list)
 {
@@ -348,7 +350,7 @@ void RealSenseReader::fillPossibleFootLocationsMarker(
 // Create a marker list from the 'foot locations to try' and publish it and
 // publish for visualization
 void RealSenseReader::fillFootLocationsToTryMarker(
-    PointCloud2D::Ptr const foot_locations_to_try,
+    PointCloud2D::Ptr const& foot_locations_to_try,
     visualization_msgs::Marker& marker_list)
 {
     marker_list.pose.orientation.w = 1.0;
