@@ -44,6 +44,9 @@ class GaitStateMachine(object):
         self._gait_transitions = {}
         self._generate_graph()
 
+        self._gait_selection.get_logger().info(str(self._idle_transitions))
+        self._gait_selection.get_logger().info(str(self._gait_transitions))
+
         self._transition_callbacks = []
         self._gait_callbacks = []
         self._stop_accepted_callbacks = []

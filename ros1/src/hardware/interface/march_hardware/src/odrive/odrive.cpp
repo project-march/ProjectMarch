@@ -483,7 +483,7 @@ float Odrive::readMotorCurrent()
     ROS_ERROR("Could not retrieve motor current");
     return ODRIVE_ERROR;
   }
-
+  ROS_INFO("Motor_current: %f", motor_current);
   return motor_current;
 }
 
