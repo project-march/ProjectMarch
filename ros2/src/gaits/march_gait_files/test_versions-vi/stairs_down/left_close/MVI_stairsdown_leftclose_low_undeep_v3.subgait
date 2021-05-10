@@ -1,0 +1,110 @@
+description: Stairs down backwards height 12 cm and depth 20
+duration: 3500000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.08726646
+    time_from_start: 1550000000
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 3500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.91097286
+    time_from_start: 0
+    velocity: -0.0
+  - position: 1.20427718
+    time_from_start: 750000000
+    velocity: -0.0
+  - position: 0.08726646
+    time_from_start: 2750000000
+    velocity: -0.0
+  - position: 0.08726646
+    time_from_start: 3000000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3500000000
+    velocity: 0.0
+  left_knee:
+  - position: 1.17154353
+    time_from_start: 0
+    velocity: -0.0
+  - position: 1.74532925
+    time_from_start: 1150000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: -0.52359878
+  - position: 0.0
+    time_from_start: 3500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.06108652
+    time_from_start: 550000000
+    velocity: -0.12217305
+  - position: -0.06108652
+    time_from_start: 1950000000
+    velocity: 0.12217305
+  - position: 0.0349
+    time_from_start: 3500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.17449976
+  - position: 0.08726646
+    time_from_start: 1315100000
+    velocity: -0.02153387
+  - position: 0.08726646
+    time_from_start: 2750000000
+    velocity: -0.0
+  - position: 0.08726646
+    time_from_start: 3000000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.24430072
+    time_from_start: 0
+    velocity: -0.69810028
+  - position: 0.13960016
+    time_from_start: 450000000
+    velocity: -0.03490659
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3500000000
+    velocity: 0.0
+name: left_close
+version: MVI_stairsdown_leftclose_low_undeep_v3
