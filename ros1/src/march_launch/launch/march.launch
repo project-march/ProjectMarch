@@ -86,7 +86,7 @@
             name="record"
             type="record"
             output="log"
-            args="-a -q -o $(arg bag_prefix)"
+            args="-a -q -o $(arg bag_prefix) -x '(.*)camera_(front|back)(.*)'"
     />
 
     <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
