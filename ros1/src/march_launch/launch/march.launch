@@ -126,23 +126,18 @@
             <arg name="configuration" value="$(arg gain_tuning)"/>
         </include>
 
-<!-- Simulation            -->
-        <param name="robot_description"
-               command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
-                    ground_gait:=$(arg ground_gait) realsense_simulation:=$(arg realsense_simulation)
-                    configuration:=$(arg configuration)"/>
-
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
         <include if="$(arg balance)"
                  file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
+        <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
     </group>
-    <param name="balance" value="$(arg balance)"/>
 
     <param name="robot_description"
            command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
                     ground_gait:=$(arg ground_gait) configuration:=$(arg configuration) realsense_simulation:=$(arg realsense_simulation)"/>
 
-    <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
+    <param name="balance" value="$(arg balance)"/>
+
     <group if="$(eval configuration == 'simulation')">
         <include file="$(find march_simulation)/launch/march_world.launch">
             <arg name="gazebo_ui" value="$(eval not headless and gazebo_ui)"/>
