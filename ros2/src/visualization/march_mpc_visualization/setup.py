@@ -14,6 +14,7 @@ setup(
             os.path.join("share", "ament_index", "resource_index", "packages"),
             [os.path.join("resource", package_name)],
         ),
+        (os.path.join("share", package_name), ["package.xml"]),
         (
             os.path.join("share", package_name, "launch"),
             glob(os.path.join("launch", "*.launch.py")),
@@ -25,6 +26,7 @@ setup(
     maintainer_email="software@projectmarch.nl",
     description="This package contains a Flask application that streams the estimations from march_acado_mpc to a host",
     license="GPLv3",
+    tests_require=["pytest"],
     entry_points={
         "console_scripts": [
             "march_mpc_visualization= march_mpc_visualization.mpc_visualization_node:main"
