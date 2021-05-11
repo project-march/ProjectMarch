@@ -31,4 +31,11 @@
         - 'image_transport/compressed'
     </rosparam>
 </group>
+<group ns="/$(arg camera_name)/depth/image_rect_raw">
+    <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+    </rosparam>
+</group>
 </launch>
