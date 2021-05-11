@@ -6,7 +6,7 @@ joints:
   - position: -0.17453293
     time_from_start: 0
     velocity: -0.0
-  - position: 0.04363323
+  - position: 0.0
     time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
@@ -34,16 +34,16 @@ joints:
     time_from_start: 3000000000
     velocity: -0.0
   right_ankle:
-  - position: 0.04363323
+  - position: 0.0
     time_from_start: 0
     velocity: -0.0
   - position: -0.08726646
     time_from_start: 319700000
     velocity: 0.0
-  - position: 0.04326846
+  - position: 0.0
     time_from_start: 640300000
     velocity: 0.0
-  - position: 0.04326846
+  - position: 0.0
     time_from_start: 902600000
     velocity: 0.0
   - position: -0.17453293
