@@ -135,7 +135,7 @@
     <xacro:include filename="march.gazebo"/>
 
     <material name="blue">
-        <color rgba="0.163 0.476 0.718 0.8"/>
+        <color rgba="0.163 0.476 0.718 0.9"/>
     </material>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
