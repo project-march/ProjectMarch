@@ -118,7 +118,7 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
     if (YAML::Node pointcloud_config = config_tree[pointcloud_file_name]) {
         realsense_category = yaml_utilities::grabParameter<int>(
             pointcloud_config, "realsense_category")
-                            .value();
+                                 .value();
         from_back_camera = yaml_utilities::grabParameter<bool>(
             pointcloud_config, "from_back_camera")
                                .value();
