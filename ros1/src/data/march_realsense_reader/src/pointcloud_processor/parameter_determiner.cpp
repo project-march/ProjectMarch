@@ -4,7 +4,6 @@
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_category_utilities.h"
-#include "utilities/yaml_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <cmath>
 #include <ctime>

@@ -22,11 +22,15 @@ using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
 std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
+std::string TOPIC_TEST_CLOUDS = "/test_clouds";
+
 std::map<int, std::string> POINTCLOUD_TOPICS
     = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
             TOPIC_CAMERA_FRONT },
           { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
-              TOPIC_CAMERA_BACK } };
+              TOPIC_CAMERA_BACK },
+          { march_shared_msgs::GetGaitParametersRequest::TEST_CLOUD,
+              TOPIC_TEST_CLOUDS } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
@@ -109,7 +113,7 @@ void RealSenseReader::readConfigCb(
 }
 
 // This method executes the logic to process a pointcloud
-bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
+void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     clock_t start_of_processing_time = clock();
@@ -122,7 +126,8 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     if (not preprocessing_was_successful) {
         res.error_message = "Preprocessing was unsuccessful, see debug output "
                             "for more information";
-        return false;
+        res.success = false;
+        return;
     }
 
     if (debugging_) {
@@ -144,9 +149,8 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             = "Region creating was unsuccessful, see debug output "
               "for more information";
         res.success = false;
-        return false;
+        return;
     }
-
     if (debugging_) {
         ROS_DEBUG("Done creating regions, now publishing point cloud regions "
                   "to /camera/region_cloud");
@@ -171,7 +175,8 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     if (not hull_finding_was_successful) {
         res.error_message = "Hull finding was unsuccessful, see debug output "
                             "for more information";
-        return false;
+        res.success = false;
+        return;
     }
 
     if (debugging_) {
@@ -192,7 +197,8 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
               "for more information";
-        return false;
+        res.success = false;
+        return;
     }
     if (debugging_) {
         ROS_DEBUG("Done determining parameters, now publishing a marker to "
@@ -211,8 +217,10 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
 
-    // The processing was successful, so return true
-    return true;
+    res.success = true;
+    // Returning false means that the service was not able to respond at all,
+    // this causes problems with the bridge, therefore always return true!
+    return;
 }
 
 // Publish a pointcloud of any point type on a publisher
@@ -415,7 +423,6 @@ bool RealSenseReader::processPointcloudCallback(
             = "Unknown camera given in the request, not available in the "
               "POINTCLOUD_TOPICS in the realsense_reader";
         res.success = false;
-        return true;
     }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
@@ -424,16 +431,15 @@ bool RealSenseReader::processPointcloudCallback(
     if (input_cloud == nullptr) {
         res.error_message = "No pointcloud published within timeout, so "
                             "no processing could be done.";
+        ROS_WARN_STREAM(res.error_message);
         res.success = false;
-        return true;
     }
-
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
-    res.success = processPointcloud(point_cloud, res);
+    processPointcloud(point_cloud, res);
 
     time_t end_callback = clock();
     double time_taken
@@ -441,7 +447,6 @@ bool RealSenseReader::processPointcloudCallback(
     ROS_DEBUG_STREAM("Time taken by process point cloud callback method: "
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
-
     // Always return true, to show that the service was able to handle the
     // request. Otherwise, the bridge will fail.
     return true;
