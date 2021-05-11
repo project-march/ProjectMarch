@@ -83,7 +83,7 @@ private:
     SelectedMode selected_mode;
     bool should_publish;
     bool from_back_camera;
-    int selected_gait;
+    int realsense_category;
     std::string frame_id_to_transform_to;
 };
 
