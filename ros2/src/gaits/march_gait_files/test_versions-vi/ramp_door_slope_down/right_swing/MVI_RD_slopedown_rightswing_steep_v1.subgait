@@ -1,4 +1,4 @@
-description: The left swing step for the 20 degrees ramp down.
+description: The right swing step for the 20 degrees ramp down.
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -10,10 +10,10 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
-  - position: -0.05235988
+  - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.05235988
+  - position: -0.08726646
     time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
@@ -53,10 +53,10 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.05235988
+  - position: -0.08726646
     time_from_start: 0
     velocity: -0.0
-  - position: -0.05235988
+  - position: 0.0
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
