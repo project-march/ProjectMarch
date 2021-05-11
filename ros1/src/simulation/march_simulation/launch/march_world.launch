@@ -23,7 +23,7 @@
              if="$(eval realsense_simulation)">
         <arg name="camera_name" value="camera_back"/>
     </include>
-    
+
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
