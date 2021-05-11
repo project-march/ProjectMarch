@@ -47,7 +47,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="imu_topic",
                 default_value="/camera_front/imu/data",
-                description="The topic that should be used to determine the orientation"
+                description="The topic that should be used to determine the orientation",
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
@@ -100,7 +100,7 @@ def generate_launch_description():
                         ),
                         "use_imu_data": use_imu_data,
                         "to_world_transform": to_world_transform,
-                        "imu_topic": imu_topic
+                        "imu_topic": imu_topic,
                     }
                 ],
             ),

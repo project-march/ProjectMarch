@@ -158,9 +158,11 @@ bool CHullFinder::getPlaneCoefficientsRegion()
         -linear_algebra_utilities::dotProductVector<double>(
             average_point, average_normal));
 
-    ROS_DEBUG_STREAM("Region "
-        << region_index_ << " has plane coefficients: "
-        << output_utilities::vectorToString(plane_coefficients_->values));
+    if (success) {
+        ROS_DEBUG_STREAM("Region "
+            << region_index_ << " has plane coefficients: "
+            << output_utilities::vectorToString(plane_coefficients_->values));
+    }
 
     return success;
 }

@@ -50,9 +50,7 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
-                name="robot",
-                default_value="march4",
-                description="Robot to use."
+                name="robot", default_value="march4", description="Robot to use."
             ),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
@@ -109,12 +107,12 @@ def generate_launch_description():
                 name="use_imu_data",
                 default_value="False",
                 description="Whether to use the camera imu to know the real "
-                            "orientation of the exoskeleton"
+                "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
                 name="imu_topic",
                 default_value="/camera_front/imu/data",
-                description="The topic that should be used to determine the orientation"
+                description="The topic that should be used to determine the orientation",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -137,14 +135,14 @@ def generate_launch_description():
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
-                            "If 0 then the first subgait is started immediately,"
-                            "dropping the first setpoint in the process.",
+                "If 0 then the first subgait is started immediately,"
+                "dropping the first setpoint in the process.",
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
                 default_value="0.2",
                 description="Duration to schedule next subgait early. If 0 then the"
-                            "next subgait is never scheduled early.",
+                "next subgait is never scheduled early.",
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
