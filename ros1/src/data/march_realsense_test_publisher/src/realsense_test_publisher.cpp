@@ -29,9 +29,9 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     , should_publish(false)
     , from_back_camera(false)
     , selected_mode((SelectedMode)-1)
-    , selected_gait(-1)
     , from_realsense_viewer(nullptr)
     , save_camera_back(false)
+    , realsense_category(-1)
 {
     if (ros::console::set_logger_level(
             ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
@@ -116,8 +116,8 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 void RealsenseTestPublisher::getProcessPointcloudInputs()
 {
     if (YAML::Node pointcloud_config = config_tree[pointcloud_file_name]) {
-        selected_gait = yaml_utilities::grabParameter<int>(
-            pointcloud_config, "selected_gait")
+        realsense_category = yaml_utilities::grabParameter<int>(
+            pointcloud_config, "realsense_category")
                             .value();
         from_back_camera = yaml_utilities::grabParameter<bool>(
             pointcloud_config, "from_back_camera")
@@ -132,7 +132,7 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
         ROS_WARN_STREAM(
             "No configuration specified for pointcloud file with name "
             << pointcloud_file_name << ". Continuing with default parameters");
-        selected_gait = 0;
+        realsense_category = 0;
         from_back_camera = false;
         frame_id_to_transform_to = "foot_right";
     }
@@ -353,7 +353,7 @@ void RealsenseTestPublisher::transformToCameraCoordinates()
 void RealsenseTestPublisher::makeProcessPointcloudCall()
 {
     march_shared_msgs::GetGaitParameters service;
-    service.request.selected_gait = selected_gait;
+    service.request.realsense_category = realsense_category;
     service.request.frame_id_to_transform_to = frame_id_to_transform_to;
 
     // The image always comes from simulated camera topic (enum value 2)

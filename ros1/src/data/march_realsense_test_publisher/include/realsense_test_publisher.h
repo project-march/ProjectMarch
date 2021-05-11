@@ -88,7 +88,7 @@ private:
     bool from_realsense_viewer;
     bool save_camera_back;
     SelectedMode selected_mode;
-    int selected_gait;
+    int realsense_category;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H

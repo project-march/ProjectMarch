@@ -16,66 +16,66 @@
 # Whether the pointcloud has been taken from the front camera position or the back camera position
 # bool from_back_camera
 door.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 ramp2.ply:
-  selected_gait: 2
+  realsense_category: 2
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 ramp-leaning.ply:
-  selected_gait: 2
+  realsense_category: 2
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 ramp-from-stand-with-crutch.ply:
-  selected_gait: 2
+  realsense_category: 2
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 ramp-from-stand-with-thijs.ply:
-  selected_gait: 2
+  realsense_category: 2
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 ramp-from-stand-without-thijs.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 stairs1.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 stairs2.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 stairs3.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 stairs4.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 stairs_down1.ply:
-  selected_gait: 1
+  realsense_category: 1
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 stairs_down2.ply:
-  selected_gait: 1
+  realsense_category: 1
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
 from-ramp.ply:
-  selected_gait: 0
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
