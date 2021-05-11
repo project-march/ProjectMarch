@@ -36,9 +36,9 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_knee:
-  - position: 0.24430072
+  - position: 0.2443
     time_from_start: 0
-    velocity: 0.76790996
+    velocity: 0.76791
   - position: 1.57079633
     time_from_start: 1400000000
     velocity: 0.0

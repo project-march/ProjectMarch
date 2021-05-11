@@ -1,3 +1,5 @@
+from typing import List
+
 from attr import dataclass
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
@@ -37,6 +39,9 @@ class TrajectoryCommand:
             start_time,
         )
 
+    def __str__(self):
+        return f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
+
 
 class TrajectoryScheduler(object):
     """Scheduler that sends sends the wanted trajectories to the topic listened
@@ -45,6 +50,7 @@ class TrajectoryScheduler(object):
     def __init__(self, node):
         self._failed = False
         self._node = node
+        self._goals: List[TrajectoryCommand] = []
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -68,6 +74,13 @@ class TrajectoryScheduler(object):
             qos_profile=5,
         )
 
+        # Publisher for sending hold position mode
+        self._trajectory_command_pub = self._node.create_publisher(
+            msg_type=JointTrajectory,
+            topic="/march/controller/trajectory/command",
+            qos_profile=5,
+        )
+
     def schedule(self, command: TrajectoryCommand):
         """Schedules a new trajectory.
         :param TrajectoryCommand command: The trajectory command to schedule
@@ -78,10 +91,11 @@ class TrajectoryScheduler(object):
         goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
-                header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
+                header=Header(stamp=stamp),
+                goal_id=GoalID(stamp=stamp, id=str(command)),
+                goal=goal,
             )
         )
-
         info_log_message = f"Scheduling {command.name}"
         debug_log_message = f"Subgait {command.name} starts "
         if self._node.get_clock().now() < command.start_time:
@@ -92,14 +106,27 @@ class TrajectoryScheduler(object):
         else:
             debug_log_message += "now"
 
+        self._goals.append(command)
         self._node.get_logger().info(info_log_message)
         self._node.get_logger().debug(debug_log_message)
+
+    def cancel_active_goals(self):
+        now = self._node.get_clock().now()
+        for goal in self._goals:
+            if goal.start_time + goal.duration > now:
+                self._cancel_pub.publish(
+                    GoalID(stamp=goal.start_time.to_msg(), id=str(goal))
+                )
+
+    def send_position_hold(self):
+        self._trajectory_command_pub.publish(JointTrajectory())
 
     def failed(self) -> bool:
         return self._failed
 
     def reset(self):
         self._failed = False
+        self._goals = []
 
     def _done_cb(self, result):
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:

@@ -1,22 +1,32 @@
 description: Stairs up with height of 22 cm and depth of 30 cm
+<<<<<<< HEAD
 duration: 2750000000
+=======
+duration: 2500000000
+>>>>>>> main
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
+<<<<<<< HEAD
   - position: 0.04363323
     time_from_start: 2000000000
     velocity: 0.0
   - position: 0.04360007
     time_from_start: 2750000000
+=======
+  - position: 0.04360007
+    time_from_start: 2500000000
+>>>>>>> main
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: -0.06108652
+<<<<<<< HEAD
     time_from_start: 800000000
     velocity: -0.12217305
   - position: -0.08726646
@@ -27,6 +37,18 @@ joints:
     velocity: 0.12217305
   - position: 0.0
     time_from_start: 2750000000
+=======
+    time_from_start: 733909090
+    velocity: -0.13439036
+  - position: -0.08726646
+    time_from_start: 1432181820
+    velocity: 0.01210282
+  - position: -0.06108652
+    time_from_start: 2015000000
+    velocity: 0.13439036
+  - position: 0.0
+    time_from_start: 2500000000
+>>>>>>> main
     velocity: 0.0
   left_hip_fe:
   - position: 1.18448864
