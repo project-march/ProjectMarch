@@ -1,0 +1,12 @@
+# This enum is used for specifying to which mode of publishing the test publisher should switch.
+# All supported modes should be specified here
+uint8 NEXT=0
+uint8 STOP=1
+uint8 CUSTOM=2
+uint8 selected_mode
+
+# A string specifying the name of the pointcloud when CUSTUM is the selected mode.
+string pointcloud_file_name
+---
+bool success
+string message

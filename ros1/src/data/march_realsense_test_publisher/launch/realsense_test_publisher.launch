@@ -1,0 +1,5 @@
+<launch>
+    <node name="march_realsense_test_publisher_node" pkg="march_realsense_test_publisher"
+          type="march_realsense_test_publisher_node"
+          output="screen"/>
+</launch>
