@@ -13,7 +13,14 @@ Checks:     -*,
             -hicpp-avoid-goto,
             concurrency-*,
             performance-*,
-            cppcoreguidelines-*
+            cppcoreguidelines-*,
+            -cppcoreguidelines-avoid-magic-numbers,
+            -cppcoreguidelines-pro-type-vararg,
+            -cppcoreguidelines-owning-memory,
+            -cppcoreguidelines-avoid-goto,
+            -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+            -cppcoreguidelines-special-member-functions,
+            -cppcoreguidelines-non-private-member-variables-in-classes
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
