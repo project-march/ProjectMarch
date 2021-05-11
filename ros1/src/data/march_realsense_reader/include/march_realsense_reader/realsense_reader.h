@@ -109,7 +109,7 @@ private:
 
     std::string frame_id_to_transform_to_;
 
-    int selected_gait_;
+    int realsense_category_;
     bool use_left_foot_;
 };
 
