@@ -126,7 +126,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     if (not preprocessing_was_successful) {
         res.error_message = "Preprocessing was unsuccessful, see debug output "
                             "for more information";
-        return false;
+        res.success = false;
+        return;
     }
 
     if (debugging_) {
