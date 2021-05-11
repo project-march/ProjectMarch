@@ -1,9 +1,16 @@
+import signal
+import sys
+
 import rclpy
 from rclpy.executors import MultiThreadedExecutor
 
 from .gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_state_machine import GaitStateMachine
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
+
+
+def sys_exit(*_):
+    sys.exit(0)
 
 
 def main():
@@ -15,6 +22,8 @@ def main():
     gait_state_machine = GaitStateMachine(gait_selection, scheduler)
     gait_state_machine.run()
     executor = MultiThreadedExecutor()
+
+    signal.signal(signal.SIGTERM, sys_exit)
 
     try:
         rclpy.spin(gait_selection, executor)
