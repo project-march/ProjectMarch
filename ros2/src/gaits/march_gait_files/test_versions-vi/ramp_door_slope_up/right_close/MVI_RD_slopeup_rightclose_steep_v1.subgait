@@ -1,75 +1,72 @@
-description: The right close gait for the 20 degrees slope up.
+description: The left close gait for the 20 degrees slope up.
 duration: 2500000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.04363323
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
-  - position: -0.08726646
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 1250000000
-    velocity: 0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.7278
+  - position: 0.87266463
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
-  - position: 0.9031
+  - position: 1.13446401
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.10214683
+  - position: -0.10214714
     time_from_start: 278600000
     velocity: 0.0
-  - position: 0.04363323
+  - position: 0.0
     time_from_start: 618600000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.05235988
+  - position: -0.08726646
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 0.9599
+  - position: 0.61086524
     time_from_start: 1250000000
     velocity: -0.3491
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 0.1396
+  - position: 0.08726646
     time_from_start: 0
     velocity: 0.0
-  - position: 1.3963
-    time_from_start: 1000000000
-    velocity: -0.3491
+  - position: 1.32645023
+    time_from_start: 1250000000
+    velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0

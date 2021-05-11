@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -54,8 +54,13 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
-                    {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
+                    {
+                        "early_schedule_duration": LaunchConfiguration(
+                            "early_schedule_duration"
+                        )
+                    },
                 ],
+                on_exit=Shutdown()
             ),
         ]
     )

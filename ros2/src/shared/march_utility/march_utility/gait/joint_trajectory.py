@@ -7,6 +7,7 @@ and to check the safety limits.
 
 from __future__ import annotations
 
+from math import isclose
 from typing import List, Tuple, Any
 
 from march_utility.exceptions.gait_exceptions import (
@@ -159,7 +160,7 @@ class JointTrajectory(object):
             raise NonValidGaitContent(
                 self.name,
                 msg=f"Invalid boundary points for begin setpoint {self.setpoints[0]} "
-                f"and end setpoint {self.setpoints[-1]}",
+                f"and end setpoint {self.setpoints[-1]} with duration {self.duration}",
             )
 
         from_setpoint = self.setpoints[-1]
@@ -180,7 +181,11 @@ class JointTrajectory(object):
         return (
             self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
         ) and (
-            self.setpoints[-1].time == round(self.duration, Setpoint.digits)
+            isclose(
+                self.setpoints[-1].time.seconds,
+                self.duration.seconds,
+                abs_tol=ALLOWED_ERROR,
+            )
             or self.setpoints[-1].velocity == 0
         )
 

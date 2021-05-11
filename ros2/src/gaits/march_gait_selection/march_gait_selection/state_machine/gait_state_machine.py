@@ -1,8 +1,11 @@
+from typing import Optional
+
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
@@ -202,7 +205,7 @@ class GaitStateMachine(object):
         if msg.type == Error.NON_FATAL:
             self.stop_gait()
         elif msg.type == Error.FATAL:
-            self.request_shutdown()
+            self.request_shutdown("A fatal error was posted to /march/error")
 
     def get_possible_gaits(self):
         """Returns possible names of gaits that can be executed.
@@ -263,18 +266,29 @@ class GaitStateMachine(object):
         machine is started, this function is called every timer period.
         """
         if not self._shutdown_requested:
-            if self._is_idle:
+            if self._input.unknown_requested():
+                self._input.gait_accepted()
+                self._transition_to_unknown()
+                self._input.gait_finished()
+                self._call_transition_callbacks()
+                self._current_gait = None
+                self._trajectory_scheduler.reset()
+            elif self._is_idle:
                 self._process_idle_state()
             else:
                 self._process_gait_state()
         else:
             self.update_timer.cancel()
 
-    def request_shutdown(self):
+    def request_shutdown(self, msg: Optional[str] = None):
         """Requests shutdown, which will terminate the state machine as soon as
         possible."""
+        base_msg = "Shutdown requested"
+        if msg is not None:
+            base_msg += ": " + msg
+        self._gait_selection.get_logger().fatal(base_msg)
         self._shutdown_requested = True
-        self._gait_selection.destroy_node()
+        shutdown_system()
 
     def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
@@ -327,12 +341,6 @@ class GaitStateMachine(object):
                     f"{self._current_state}`"
                 )
 
-        elif self._input.unknown_requested():
-            self._input.gait_accepted()
-            self._transition_to_unknown()
-            self._input.gait_finished()
-            self._call_transition_callbacks()
-
     def _process_gait_state(self):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
@@ -353,6 +361,26 @@ class GaitStateMachine(object):
                 )
             else:
                 gait_update = self._current_gait.start(now)
+
+            if gait_update == GaitUpdate.empty():
+                self._input.gait_finished()
+                self._is_idle = True
+                # Find the start position of the current gait, to go back to idle.
+                self._current_state = next(
+                    (
+                        name
+                        for name, position in self._gait_selection.positions.items()
+                        if position["joints"] == self._current_gait.starting_position
+                    ),
+                    None,
+                )
+                self._current_gait = None
+                self._gait_selection.get_logger().info(
+                    f"Starting the gait returned "
+                    f"no trajectory, going back to idle state {self._current_state}"
+                )
+                return
+
             if not self.check_correct_foot_pressure():
                 self._gait_selection.get_logger().debug(
                     f"Foot forces when incorrect pressure warning was issued: "
@@ -399,6 +427,7 @@ class GaitStateMachine(object):
             )
             self._current_gait = None
             self._is_stopping = False
+            self._trajectory_scheduler.reset()
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
@@ -458,6 +487,9 @@ class GaitStateMachine(object):
     def _transition_to_unknown(self):
         """When the unknown button is pressed, this function resets the
         state machine to unknown state."""
+        if self._current_gait is not None:
+            self._trajectory_scheduler.send_position_hold()
+            self._trajectory_scheduler.cancel_active_goals()
         self._current_state = self.UNKNOWN
         self._is_idle = True
         self._gait_selection.get_logger().info(
@@ -551,7 +583,6 @@ class GaitStateMachine(object):
                 raise GaitStateMachineError(
                     f"Gaits cannot have the same name as home gait `{home_gait_name}`"
                 )
-
             self._gait_transitions[home_gait_name] = idle_name
             self._idle_transitions[self.UNKNOWN].add(home_gait_name)
 
