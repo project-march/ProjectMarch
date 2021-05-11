@@ -37,6 +37,8 @@
     <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
     <arg name="realsense_simulation" default="$(arg realsense)"
          doc="Whether the simulation camera or the physical camera should be used"/>
+    <arg name="realsense_test_data" default="$(eval realsense and (configuration == 'simulation'))" doc="Whether the node which can publish pointclouds
+    from datasets should be started."/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
              if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
     <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
@@ -86,7 +88,7 @@
             name="record"
             type="record"
             output="log"
-            args="-a -q -o $(arg bag_prefix)"
+            args="-a -q -o $(arg bag_prefix) -x '(.*)camera_(front|back)(.*)'"
     />
 
     <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
@@ -95,6 +97,9 @@
     <group ns="march">
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
                  if="$(arg realsense)"/>
+
+        <include file="$(find march_realsense_test_publisher)/launch/realsense_test_publisher.launch"
+                 if="$(arg realsense_test_data)"/>
 
         <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
             <arg name="pressure_soles" value="$(arg pressure_soles)"/>
@@ -107,11 +112,15 @@
         <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
 
 
-<!-- ROS1 Gait selection    -->
-        <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(eval sounds and gait_selection)" output="screen"/>
-        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch" if="$(arg gait_selection)">
-            <arg name="gait_directory" value="$(arg gait_directory)"/>
-            <arg name="sounds" value="$(arg sounds)"/>
+        <!-- To prevent unnecessary topics and messages, we disable the plugins that
+         send a lot of compressed versions of the camera topics. -->
+        <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
+                 if="$(arg realsense)">
+            <arg name="camera_name" value="camera_front"/>
+        </include>
+        <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
+                 if="$(arg realsense)">
+            <arg name="camera_name" value="camera_back"/>
         </include>
 
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
