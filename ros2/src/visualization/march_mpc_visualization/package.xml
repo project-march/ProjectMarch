@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_mpc_visualization</name>
+  <version>1.0.0</version>
+  <description>This package contains a Flask application that streams the estimations from march_acado_mpc to a host</description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>GPLv3</license>
+
+  <depend>rclpy</depend>
+  <depend>march_shared_msgs</depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

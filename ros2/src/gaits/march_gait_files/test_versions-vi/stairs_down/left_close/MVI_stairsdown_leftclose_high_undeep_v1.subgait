@@ -1,30 +1,30 @@
-description: Stairs up with height of 22 cm and depth of 45 cm
+description: Stairs down of MVI for the stair with a heigth of 22 and depth op 20
 duration: 3750000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.04360007
+  - position: -0.26179939
     time_from_start: 0
-    velocity: 0.0
-  - position: 0.04363323
+    velocity: 0.13960016
+  - position: 0.0
     time_from_start: 2080000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_aa:
-  - position: -0.08726646
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_fe:
-  - position: -0.08726646
+  - position: 1.06954998
     time_from_start: 0
-    velocity: 0.17449976
-  - position: 1.04719755
-    time_from_start: 1700000000
+    velocity: 0.0
+  - position: 1.24437407
+    time_from_start: 1690892860
     velocity: 0.0
   - position: 0.08726646
     time_from_start: 2750000000
@@ -36,15 +36,12 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_knee:
-  - position: 0.2443
+  - position: 1.9097933
     time_from_start: 0
-    velocity: 0.76791
-  - position: 1.57079633
-    time_from_start: 1400000000
     velocity: 0.0
-  - position: 1.20080049
-    time_from_start: 1888000000
-    velocity: -1.33309994
+  - position: 1.9097933
+    time_from_start: 1509285710
+    velocity: 0.0
   - position: 0.0
     time_from_start: 2750000000
     velocity: 0.0
@@ -52,7 +49,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_ankle:
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -72,7 +69,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.18448864
+  - position: 0.43633231
     time_from_start: 0
     velocity: 0.0
   - position: 0.08726646
@@ -85,7 +82,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_knee:
-  - position: 1.20170457
+  - position: 0.33160034
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -95,4 +92,4 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsup_leftclose_high_deep
+version: MVI_stairsdown_leftclose_high_undeep_v1
