@@ -47,6 +47,7 @@ topics:
   - { topic: 'tf_static', type: 'tf2_msgs/msg/TFMessage' }
   - { topic: 'march/motor_controller_states', type: 'march_shared_msgs/msg/MotorControllerState'}
   - { topic: 'camera_front/imu/data', type: 'sensor_msgs/msg/Imu'}
+  - { topic: 'march/mpc', type: 'march_shared_msgs/msg/MpcMsg'}
 
 services_1_to_2:
   - { service: '/freeze',
@@ -67,7 +68,7 @@ services_2_to_1:
   - { service: '/gazebo/get_world_properties',
       type: 'gazebo_msgs/GetWorldProperties' }
   - { service: '/camera/process_pointcloud',
-      type: 'std_srvs/Trigger' }
+      type: 'march_shared_msgs/GetGaitParameters' }
   - { service: '/gazebo/get_model_state',
       type: 'gazebo_msgs/GetModelState' }
   - { service: '/march/set_obstacle_size/block_like',

@@ -57,17 +57,17 @@ gaits:
     left_close: MIV_final
     right_open: MIV_final
   stairs_down:
-    left_close: MV_stairsdown_leftclose_v2
-    left_swing: MV_stairsdown_leftswing_v2
-    right_close: MV_stairsdown_rightclose_v2
-    right_open: MV_stairsdown_rightopen_v2
-    right_swing: MV_stairsdown_rightswing_v2
+    left_close: MVI_stairsdown_leftclose_low_undeep_v1
+    left_swing: MVI_stairsdown_leftswing_low_undeep_v1
+    right_close: MVI_stairsdown_rightclose_low_undeep_v1
+    right_open: MVI_stairsdown_rightopen_low_undeep_v1
+    right_swing: MVI_stairsdown_rightswing_low_undeep_v1
   stairs_up:
-    left_close: MVI_stairsup_leftclose_IK_v1
-    left_swing: MVI_stairsup_leftswing_IK_v1
-    right_close: MVI_stairsup_rightclose_IK_v1
-    right_open: MVI_stairsup_rightopen_IK_v1
-    right_swing: MVI_stairsup_rightswing_IK_v1
+    left_close: MVI_stairsup_leftclose_low_undeep
+    left_swing: MVI_stairsup_leftswing_low_undeep
+    right_close: MVI_stairsup_rightclose_low_undeep
+    right_open: MVI_stairsup_rightopen_low_undeep
+    right_swing: MVI_stairsup_rightswing_low_undeep
   tilted_path_first_end:
     left_open: MV_TPend1_leftopen_v1
     right_close: MV_TPend1_rightclose_v1

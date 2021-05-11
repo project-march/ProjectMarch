@@ -41,7 +41,7 @@ class SetpointsGait(GaitInterface, Gait):
         if self._current_subgait is not None:
             return self._current_subgait.subgait_name
         else:
-            return None
+            return ""
 
     @property
     def version(self):
