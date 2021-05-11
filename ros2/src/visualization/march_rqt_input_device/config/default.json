@@ -224,6 +224,9 @@
       },
       {
          "name": "test_joint_gait"
+      },
+      {
+         "name":"home_shutdown"
       }
    ]
 ]
