@@ -7,18 +7,24 @@ from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
 from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
-from march_shared_msgs.srv import SetGaitVersion, ContainsGait
+from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
+
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.node_utils import get_robot_urdf
 from march_utility.utilities.duration import Duration
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
+from march_utility.utilities.dimensions import InterpolationDimensions
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from .state_machine.setpoints_gait import SetpointsGait
+from march_utility.utilities.node_utils import get_robot_urdf
+from march_gait_selection.dynamic_gaits.realsense_gait import RealSenseGait
+from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
+
 
 NODE_NAME = "gait_selection"
 
@@ -59,6 +65,9 @@ class GaitSelection(Node):
         self._directory_name = directory
         self._gait_directory = os.path.join(package_path, directory)
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
+        self._realsense_yaml = os.path.join(
+            self._gait_directory, "realsense_gaits.yaml"
+        )
 
         if not os.path.isdir(self._gait_directory):
             self.get_logger().error(f"Gait directory does not exist: {directory}")
@@ -67,6 +76,7 @@ class GaitSelection(Node):
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
 
+        self._realsense_gait_version_map = self._load_realsense_configuration()
         (
             self._gait_version_map,
             self._positions,
@@ -312,7 +322,7 @@ class GaitSelection(Node):
             )
 
         self._load_semi_dynamic_gaits(gaits)
-
+        self._load_realsense_gaits(gaits)
         if self._balance_used and "balance_walk" in gaits.keys():
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
             if balance_gait is not None:
@@ -333,6 +343,48 @@ class GaitSelection(Node):
                 self._robot,
                 self._semi_dynamic_gait_version_map,
             )
+
+    def _load_realsense_gaits(self, gaits):
+        """
+        Load all gaits from the realsense gait version map.
+        Also create a service with a separate callback group that can be used by the
+        realsense gaits to get parameters from the realsense_reader. A new callback
+        group is necessary to prevent a deadlock.
+
+        :param gaits: The dictionary where the loaded gaits will be added to.
+        """
+        get_gait_parameters_service = self.create_client(
+            srv_type=GetGaitParameters,
+            srv_name="/camera/process_pointcloud",
+            callback_group=MutuallyExclusiveCallbackGroup(),
+        )
+        for gait_name in self._realsense_gait_version_map:
+            gait_folder = gait_name
+            gait_path = os.path.join(
+                self._gait_directory, gait_folder, gait_name + ".gait"
+            )
+            with open(gait_path, "r") as gait_file:
+                gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
+            gait = RealSenseGait.from_yaml(
+                node=self,
+                robot=self._robot,
+                gait_name=gait_name,
+                gait_config=self._realsense_gait_version_map[gait_name],
+                gait_graph=gait_graph,
+                gait_directory=self._gait_directory,
+                process_service=get_gait_parameters_service,
+            )
+            gaits[gait_name] = gait
+
+    def _load_realsense_configuration(self):
+        if not os.path.isfile(self._realsense_yaml):
+            self.get_logger().warn(
+                "No realsense_yaml present, no realsense gaits will be created."
+            )
+            return {}
+        with open(self._realsense_yaml, "r") as realsense_config_file:
+            realsense_config = yaml.load(realsense_config_file, Loader=yaml.SafeLoader)
+        return realsense_config
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""

@@ -46,7 +46,8 @@ class TestSetpointsGait(unittest.TestCase):
         self.assertFalse(self.gait._start_is_delayed)
 
         self.assertEqual(
-            gait_update, GaitUpdate.should_schedule(self.gait._command_from_current_subgait())
+            gait_update,
+            GaitUpdate.should_schedule(self.gait._command_from_current_subgait()),
         )
 
     def test_start_delayed(self):
@@ -133,7 +134,8 @@ class TestSetpointsGait(unittest.TestCase):
         self.assertFalse(self.gait._scheduled_early)
 
         self.assertEqual(
-            gait_update, GaitUpdate.should_schedule(self.gait._command_from_current_subgait())
+            gait_update,
+            GaitUpdate.should_schedule(self.gait._command_from_current_subgait()),
         )
 
     def test_update_subgait_not_done(self):
