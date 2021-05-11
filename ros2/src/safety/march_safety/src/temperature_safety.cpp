@@ -35,7 +35,7 @@ TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node,
     node_->get_parameter_or("default_temperature_threshold",
         default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);
 
-    int send_errors_interval_ms;
+    int send_errors_interval_ms {};
     node_->get_parameter_or("send_errors_interval", send_errors_interval_ms,
         DEFAULT_SEND_ERRORS_INTERVAL);
     send_errors_interval_
@@ -55,7 +55,7 @@ void TemperatureSafety::setTemperatureThresholds()
     for (const auto& type : THRESHOLD_NAMES) {
         ThresholdHoldsMap thresholds_map;
         for (const std::string& joint : node_->joint_names) {
-            double threshold_value;
+            double threshold_value {};
             std::string parameter_name
                 = "temperature_thresholds_" + type.second + "." + joint;
 

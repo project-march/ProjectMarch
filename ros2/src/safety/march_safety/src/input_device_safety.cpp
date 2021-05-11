@@ -27,7 +27,7 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node,
     , safety_handler_(std::move(safety_handler))
     , connection_timeout_(/*nanoseconds=*/0)
 {
-    int milliseconds;
+    int milliseconds {};
     node_->get_parameter("input_device_connection_timeout", milliseconds);
 
     connection_timeout_
