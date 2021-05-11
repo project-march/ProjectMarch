@@ -1,5 +1,5 @@
 description: MVI ankle gait version 1 with HAA version 2 movement included
-duration: 1199999999
+duration: 1200000000
 gait_type: walk_like
 joints:
   left_ankle:
@@ -26,10 +26,10 @@ joints:
     time_from_start: 1200000000
     velocity: -0.0
   left_hip_fe:
-  - position: -0.0785
+  - position: -0.07849967
     time_from_start: 0
     velocity: 0.0
-  - position: 0.66322512
+  - position: 0.57595865
     time_from_start: 720000000
     velocity: 0.1280007
   - position: 0.31415927
