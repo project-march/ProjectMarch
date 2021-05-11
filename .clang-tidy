@@ -12,7 +12,8 @@ Checks:     -*,
             -hicpp-vararg,
             -hicpp-avoid-goto,
             concurrency-*,
-            performance-*
+            performance-*,
+            cppcoreguidelines-*
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
