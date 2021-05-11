@@ -354,6 +354,26 @@ class GaitStateMachine(object):
                 )
             else:
                 gait_update = self._current_gait.start(now)
+
+            if gait_update == GaitUpdate.empty():
+                self._input.gait_finished()
+                self._is_idle = True
+                # Find the start position of the current gait, to go back to idle.
+                self._current_state = next(
+                    (
+                        name
+                        for name, position in self._gait_selection.positions.items()
+                        if position["joints"] == self._current_gait.starting_position
+                    ),
+                    None,
+                )
+                self._current_gait = None
+                self._gait_selection.get_logger().info(
+                    f"Starting the gait returned "
+                    f"no trajectory, going back to idle state {self._current_state}"
+                )
+                return
+
             if not self.check_correct_foot_pressure():
                 self._gait_selection.get_logger().debug(
                     f"Foot forces when incorrect pressure warning was issued: "
@@ -556,7 +576,6 @@ class GaitStateMachine(object):
                 raise GaitStateMachineError(
                     f"Gaits cannot have the same name as home gait `{home_gait_name}`"
                 )
-
             self._gait_transitions[home_gait_name] = idle_name
             self._idle_transitions[self.UNKNOWN].add(home_gait_name)
 

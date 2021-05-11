@@ -54,7 +54,11 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
-                    {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
+                    {
+                        "early_schedule_duration": LaunchConfiguration(
+                            "early_schedule_duration"
+                        )
+                    },
                 ],
             ),
         ]
