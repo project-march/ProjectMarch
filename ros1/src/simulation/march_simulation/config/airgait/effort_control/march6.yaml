@@ -7,7 +7,7 @@ march:
 
   controller:
     trajectory:
-      type: inertia_trajectory_controller/JointTrajectoryController
+      type: effort_controllers/JointTrajectoryController
       joints:
         - left_ankle
         - left_hip_aa
@@ -35,6 +35,7 @@ march:
       stop_trajectory_duration: 0        # Override default
 
       constraints:
+        goal_time: 0.2
         left_ankle:
           trajectory: 0.5
         left_hip_aa:
@@ -51,39 +52,3 @@ march:
           trajectory: 0.5
         right_knee:
           trajectory: 0.5
-
-      inertia_estimator:
-        rotary:
-          std_samples: 100 # number of samples used to calculate the standard deviation
-          lambda: 0.96
-          alpha_filter_size: 12
-          vibration_boundaries:
-            - 1.4
-            - 1.9
-          control_points:
-            inertia:
-              - 0.0
-              - 1.0
-            p:
-              - 150
-              - 300
-            d:
-              - 0
-              - 5
-        linear:
-          std_samples: 100 # number of samples used to calculate the standard deviation
-          lambda: 0.96
-          alpha_filter_size: 12
-          vibration_boundaries:
-            - 1.4
-            - 1.9
-          control_points:
-            inertia:
-              - 0.0
-              - 1.0
-            p:
-              - 150
-              - 300
-            d:
-              - 0
-              - 5
