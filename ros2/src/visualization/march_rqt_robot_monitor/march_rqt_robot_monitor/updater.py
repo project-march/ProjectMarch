@@ -11,7 +11,7 @@ from march_shared_msgs.msg import Alive
 from .diagnostic_analyzers.check_input_device import CheckInputDevice
 from .diagnostic_analyzers.control import CheckJointValues
 from .diagnostic_analyzers.gait_state import CheckGaitStatus
-from .diagnostic_analyzers.imc_state import CheckImcStatus
+from .diagnostic_analyzers.motor_controller_state import CheckMotorControllerStatus
 
 NODE_NAME = "rqt_robot_monitor"
 HARDWARE_ID = "MARCH VI"
@@ -43,8 +43,8 @@ class DiagnosticUpdater(Node):
         )
         self.updater.add("Control effort values", check_joint_states.effort_diagnostics)
 
-        # IMC state check
-        CheckImcStatus(self, self.updater, joint_names)
+        # MotorController state check
+        CheckMotorControllerStatus(self, self.updater, joint_names)
 
         # Gait information
         CheckGaitStatus(self, self.updater)
@@ -66,4 +66,9 @@ def main():
     node = DiagnosticUpdater()
     node.start()
 
-    rclpy.spin(node)
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+
+    rclpy.shutdown()
