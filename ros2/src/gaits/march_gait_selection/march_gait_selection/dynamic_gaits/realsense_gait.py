@@ -43,7 +43,7 @@ class RealSenseGait(SetpointsGait):
         "stairs_down": GetGaitParameters.Request.STAIRS_DOWN,
         "ramp_up": GetGaitParameters.Request.RAMP_UP,
         "ramp_down": GetGaitParameters.Request.RAMP_DOWN,
-        "sit": GetGaitParameters.Request.SIT
+        "sit": GetGaitParameters.Request.SIT,
     }
 
     def __init__(
@@ -64,7 +64,8 @@ class RealSenseGait(SetpointsGait):
         self.parameters = parameters
         self.dimensions = dimensions
         self.realsense_category = self.realsense_category_from_string(
-            realsense_category)
+            realsense_category
+        )
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
         self.subgaits_to_interpolate = subgaits_to_interpolate
         # Set up service and event for asynchronous
@@ -214,6 +215,7 @@ class RealSenseGait(SetpointsGait):
             frame_id_to_transform_to="foot_right"
         )
         if not service_call_succesful:
+            self._node.get_logger().warn("No service response received within timeout")
             return GaitUpdate.empty()
 
         gait_parameters_response = self.realsense_service_result
