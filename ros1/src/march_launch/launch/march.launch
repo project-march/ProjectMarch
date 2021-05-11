@@ -88,7 +88,7 @@
             name="record"
             type="record"
             output="log"
-            args="-a -q -o $(arg bag_prefix)"
+            args="-a -q -o $(arg bag_prefix) -x '(.*)camera_(front|back)(.*)'"
     />
 
     <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
@@ -112,11 +112,15 @@
         <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
 
 
-<!-- ROS1 Gait selection    -->
-        <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(eval sounds and gait_selection)" output="screen"/>
-        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch" if="$(arg gait_selection)">
-            <arg name="gait_directory" value="$(arg gait_directory)"/>
-            <arg name="sounds" value="$(arg sounds)"/>
+        <!-- To prevent unnecessary topics and messages, we disable the plugins that
+         send a lot of compressed versions of the camera topics. -->
+        <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
+                 if="$(arg realsense)">
+            <arg name="camera_name" value="camera_front"/>
+        </include>
+        <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
+                 if="$(arg realsense)">
+            <arg name="camera_name" value="camera_back"/>
         </include>
 
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
