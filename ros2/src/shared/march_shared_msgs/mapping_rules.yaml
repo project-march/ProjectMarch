@@ -31,4 +31,3 @@
   ros2_package_name: 'march_shared_msgs'
   ros1_message_name: 'FollowJointTrajectoryActionFeedback'
   ros2_message_name: 'FollowJointTrajectoryActionFeedback'
--
