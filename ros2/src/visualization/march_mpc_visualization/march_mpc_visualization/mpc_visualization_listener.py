@@ -21,6 +21,7 @@ class MpcListener(Node):
         self.new_measurement_position = []
         self.new_measurement_velocity = []
         self.last_input = []
+
         self.new_time = 0
 
         self.new_estimation_position = np.empty([0, 0], dtype=float)
@@ -129,6 +130,7 @@ class MpcListener(Node):
             self.response_body_estimation[
                 f"joint_{joint_number}_estimation_input"
             ] = self.new_estimation_input[joint_number, :].tolist()
+
             self.response_body_estimation["time"] = np.linspace(
                 start=self.new_time,
                 stop=self.new_time + self.future_time_steps * self.sampling_time,
@@ -139,4 +141,5 @@ class MpcListener(Node):
             response = make_response(jsonify(self.response_body_estimation))
             response = self.set_headers(response)
 
-            return response
+        return response
+

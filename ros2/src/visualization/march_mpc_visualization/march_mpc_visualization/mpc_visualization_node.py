@@ -22,11 +22,7 @@ def main():
     )
 
     # ROS Node and Flask app need to run in seperatie thread
-
-    # We want to bind to all interfaces
-    flask_thread = threading.Thread(
-        target=lambda: app.run(host="0.0.0.0")  # noqa: S104
-    )
+    flask_thread = threading.Thread(target=lambda: app.run(host="0.0.0.0"))
 
     # Daemon, so that it shuts down when main() finishes
     flask_thread.daemon = True
