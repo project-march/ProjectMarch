@@ -21,8 +21,8 @@ def main():
         methods=["GET", "OPTIONS", "POST"],
     )
 
-    # ROS Node and Flask app need to run in seperatie thread
 
+    # ROS Node and Flask app need to run in seperatie thread
     flask_thread = threading.Thread(target=lambda: app.run(host="0.0.0.0"))
 
     # Daemon, so that it shuts down when main() finishes
