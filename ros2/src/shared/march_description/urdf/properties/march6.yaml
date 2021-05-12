@@ -1,0 +1,146 @@
+dimensions:
+  hip_base:
+    length: 0.145
+    mass: 8.686 # TODO
+  hip_aa_side:
+    length: 0.1605
+    mass: 2.982 # TODO
+  hip_aa_base:
+    length: 0.151
+    mass: 0
+  upper_leg:
+    length: 0.410
+    mass: 4.995 # TODO
+    offset: 0.04 # TODO
+  lower_leg:
+    length: 0.410
+    mass: 4.458 # TODO
+  ankle_plate:
+    length: 0.14567
+    offset: 0.07
+  foot:
+    height_forward: 0.184
+    height_backward: 0.059
+    mass: 1.821 # TODO
+inertia:  # TODO
+  hip_base:
+    xx: 0.141
+    xy: 0.0000336
+    xz: -0.007
+    yy: 0.087
+    yz: 0.0005089
+    zz: 0.091
+  hip_aa:
+    xx: 0.013
+    xy: 0.008
+    xz: 0.005
+    yy: 0.023
+    yz: -0.001
+    zz: 0.028
+  upper_leg:
+    xx: 0.127
+    xy: 0.0001291
+    xz: -0.0002056
+    yy: 0.122
+    yz: 0.016
+    zz: 0.015
+  lower_leg:
+    xx: 0.075
+    xy: -0.027
+    xz: -0.008
+    yy: 0.11
+    yz: -0.002
+    zz: 0.071
+  foot:
+    xx: 0.021
+    xy: -0.002
+    xz: 0.02
+    yy: 0.027
+    yz: 0.004
+    zz: 0.01
+joint_limits:  # TODO
+  # The upper and lower limits of the joints, given in degrees
+  # For limit calculations, see https://confluence.projectmarch.nl:8443/pages/viewpage.action?pageId=268697604
+  left_knee:
+    lower_limit: -5.012512207
+    upper_limit: 112.4230957
+  right_knee:
+    lower_limit: -4.89440918
+    upper_limit: 115.3097534
+  left_hfe:
+    lower_limit: -21.04431152
+    upper_limit: 98.97033691
+  right_hfe:
+    lower_limit: -20.23406982
+    upper_limit: 99.48120117
+  left_ankle:
+    lower_limit: -26.30401611
+    upper_limit: 15.88348389
+  right_ankle:
+    lower_limit: -23.203125
+    upper_limit: 14.23828125
+  left_haa:
+    lower_limit: -18.54492188
+    upper_limit: 16.34765625
+  right_haa:
+    lower_limit: -18.10546875
+    upper_limit: 15.99609375
+safety:  # TODO
+  exoskeleton:
+    knee:
+      lower_soft_buffer: 3.5    # degrees
+      upper_soft_buffer: 3.0      # degrees
+      k_position: 14.88
+      k_velocity: 20000.0
+      max_effort: 18000.0
+      max_velocity: 2.5
+    hfe:
+      lower_soft_buffer: 3.0
+      upper_soft_buffer: 3.0
+      k_position: 14.88
+      k_velocity: 20000.0
+      max_effort: 18000.0
+      max_velocity: 2.0
+    ankle:
+      lower_soft_buffer: 3.0
+      upper_soft_buffer: 5.0
+      k_position: 5.0
+      k_velocity: 20000.0
+      max_effort: 22932.0
+      max_velocity: 1.0
+    haa:
+      lower_soft_buffer: 3.5
+      upper_soft_buffer: 3.5
+      k_position: 4.0
+      k_velocity: 20000.0
+      max_effort: 22932.0
+      max_velocity: 1.0
+  simulation:
+    knee:
+      lower_soft_buffer: 3.5    # degrees
+      upper_soft_buffer: 3.0      # degrees
+      k_position: 5000.0
+      k_velocity: 60.0
+      max_effort: 200.0
+      max_velocity: 2.5
+    hfe:
+      lower_soft_buffer: 3.0
+      upper_soft_buffer: 3.0
+      k_position: 5000.0
+      k_velocity: 60.0
+      max_effort: 200.0
+      max_velocity: 2.0
+    ankle:
+      lower_soft_buffer: 3.0
+      upper_soft_buffer: 5.0
+      k_position: 5000.0
+      k_velocity: 15.0
+      max_effort: 200.0
+      max_velocity: 1.0
+    haa:
+      lower_soft_buffer: 3.5
+      upper_soft_buffer: 3.5
+      k_position: 5000.0
+      k_velocity: 60.0
+      max_effort: 200.0
+      max_velocity: 1.0

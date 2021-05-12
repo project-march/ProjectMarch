@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="march_joint"
+                 params="name parent child safety origin axis reduction limits">
+        <joint name="${name}" type="revolute">
+            <parent link="${parent}"/>
+            <child link="${child}"/>
+            <origin xyz="${origin}" rpy="0 0 0"/>
+            <axis xyz="${axis}"/>
+
+            <xacro:safety_limits safety="${safety}" limits="${limits}"/>
+
+        </joint>
+
+        <transmission name="${name}">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="${name}">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="${name}_motor">
+                <mechanicalReduction>
+                    ${reduction}
+                </mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+</robot>
