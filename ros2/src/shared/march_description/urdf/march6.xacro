@@ -190,6 +190,7 @@
                       visual_rpy="0 0 0"
     />
 
+<!-- Left Leg -->
     <xacro:frame_part name="upper_leg_left"
                       reflect="-1"
                       length="${upper_leg_height}"
@@ -216,6 +217,7 @@
                       scale="0.001 0.001 0.001"
     />
 
+<!-- Left Foot -->
     <xacro:frame_part name="ankle_plate_left"
                       reflect="-1"
                       length="${ankle_plate_height}"
@@ -247,6 +249,7 @@
 
     <xacro:pressure_sole side="left" foot_name="foot_left"/>
 
+<!-- Right Hip -->
     <xacro:frame_part name="hip_aa_frame_right_side"
                       reflect="1"
                       direction="y"
@@ -268,6 +271,7 @@
                       inertia="${inertia['hip_aa']}"
     />
 
+<!-- Right Leg -->
     <xacro:frame_part name="upper_leg_right"
                       reflect="1"
                       direction="z"
@@ -297,6 +301,7 @@
     />
 
 
+<!-- Right Foot -->
     <xacro:frame_part name="ankle_plate_right"
                       reflect="1"
                       length="${ankle_plate_height}"
@@ -308,7 +313,6 @@
                       visual_rpy="0 0 ${-pi/2}"
     />
 
-    <!-- Foot Right -->
     <xacro:pressure_sole side="right" foot_name="foot_right"/>
 
     <xacro:frame_part name="foot_right"
