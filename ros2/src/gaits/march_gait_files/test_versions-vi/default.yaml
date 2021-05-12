@@ -142,11 +142,11 @@ positions:
   high_sit:
     gait_type: sit_like
     joints:
-      left_ankle: 0.0436
+      left_ankle: 0.0
       left_hip_aa: 0.0
       left_hip_fe: 1.3962634
       left_knee: 1.48352986
-      right_ankle: 0.0436
+      right_ankle: 0.0
       right_hip_aa: 0.0
       right_hip_fe: 1.3962634
       right_knee: 1.48352986
@@ -263,22 +263,22 @@ positions:
   low_sit:
     gait_type: sit_like
     joints:
-      left_ankle: 0.1571
+      left_ankle: -0.1
       left_hip_aa: 0.0
       left_hip_fe: 1.5708
       left_knee: 1.8326
-      right_ankle: 0.1571
+      right_ankle: -0.1
       right_hip_aa: 0.0
       right_hip_fe: 1.5708
       right_knee: 1.8326
   sit:
     gait_type: walk_like
     joints:
-      left_ankle: 0.0436
+      left_ankle: 0.0
       left_hip_aa: 0.0
       left_hip_fe: 1.2217
       left_knee: 1.5708
-      right_ankle: 0.0436
+      right_ankle: 0.0
       right_hip_aa: 0.0
       right_hip_fe: 1.2217
       right_knee: 1.5708
@@ -292,37 +292,4 @@ positions:
       right_ankle: 0.0
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
-      right_knee: 0.0
-  unknown_idle_14:
-    gait_type: ''
-    joints:
-      left_ankle: -0.2618
-      left_hip_aa: 0.03490659
-      left_hip_fe: -0.0873
-      left_knee: 0.0
-      right_ankle: -0.17449976
-      right_hip_aa: 0.03490659
-      right_hip_fe: -0.0873
-      right_knee: 0.0
-  unknown_idle_15:
-    gait_type: ''
-    joints:
-      left_ankle: 0.0
-      left_hip_aa: 0.0348996
-      left_hip_fe: 0.0
-      left_knee: 0.0
-      right_ankle: 0.0
-      right_hip_aa: 0.0349
-      right_hip_fe: 0.0
-      right_knee: 0.0
-  unknown_idle_16:
-    gait_type: ''
-    joints:
-      left_ankle: -0.2618
-      left_hip_aa: 0.03490659
-      left_hip_fe: -0.0873
-      left_knee: 0.0
-      right_ankle: -0.2618
-      right_hip_aa: 0.03490659
-      right_hip_fe: -0.0873
       right_knee: 0.0
