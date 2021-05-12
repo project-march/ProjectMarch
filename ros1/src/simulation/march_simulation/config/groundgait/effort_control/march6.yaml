@@ -39,10 +39,10 @@ march:
         stopped_velocity_tolerance: 0.2
         left_ankle:
           trajectory: 0.5
-            goal: 0.5
+          goal: 0.5
         left_hip_aa:
           trajectory: 0.5
-            goal: 0.5
+          goal: 0.5
         left_hip_fe:
           trajectory: 0.5
           goal: 0.5
