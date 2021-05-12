@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 description: Stairs up with height of 22 cm and depth of 45 cm
-=======
-description: Stairs up with height of 22 cm and depth of 30 cm
->>>>>>> main
-=======
-description: Stairs up with height of 22 cm and depth of 45 cm
->>>>>>> main
 duration: 2500000000
 gait_type: stairs_like
 joints:
