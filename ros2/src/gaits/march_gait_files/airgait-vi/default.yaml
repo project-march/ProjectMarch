@@ -1,14 +1,28 @@
 gaits:
+  ramp_up:
+    left_close: MVI_rampup_leftclose_steep_v1
+    left_open: MVI_rampup_leftopen_steep_v1
+    left_swing: MVI_rampup_leftswing_steep_v1
+    right_close: MVI_rampup_rightclose_steep_v1
+    right_open: MVI_rampup_rightopen_steep_v1
+    right_swing: MVI_rampup_rightswing_steep_v1
+
+  stairs_up:
+    left_close: MVI_stairsup_leftclose_cybathlon_v2
+    left_swing: MVI_stairsup_leftswing_cybathlon_v2
+    right_close: MVI_stairsup_rightclose_cybathlon_v2
+    right_open: MVI_stairsup_rightopen_cybathlon_v2
+    right_swing: MVI_stairsup_rightswing_cybathlon_v2
 
 positions:
   stand:
     gait_type: walk_like
     joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: -0.0873
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: 0.0
       left_knee: 0.0
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: -0.0873
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: 0.0
       right_knee: 0.0

@@ -53,6 +53,12 @@ gaits:
   rough_terrain_third_middle_step:
     left_close: MV_RT_third_middlestep_leftclose_v1
     right_open: MV_RT_third_middlestep_rightopen_v1
+  side_step_right:
+    right_open: MVI_sidestepright_rightopen_v1
+    left_close: MVI_sidestepright_leftclose_v1
+  side_step_left:
+    right_close: MVI_sidestepleft_rightclose_v1
+    left_open: MVI_sidestepleft_leftopen_v1
   single_step_normal:
     left_close: MIV_final
     right_open: MIV_final
