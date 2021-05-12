@@ -28,14 +28,14 @@ gaits:
     right_open: MVI_RD_slopeup_rightopen_steep_v1
     right_swing: MVI_RD_slopeup_rightswing_steep_v1
   realsense_sit:
-    sit_down: MVI_sit_down_high_v1
-    sit_home: MVI_sit_home_high_v1
+    sit_down: MVI_sit_down_low_v1
+    sit_home: MVI_sit_home_low_v1
   realsense_stairs_up_single_step:
     left_close: MVI_stairsup_leftclose_low_undeep
     right_open: MVI_stairsup_rightopen_low_undeep
   realsense_stand:
-    prepare_stand_up: MVI_prepare_stand_up_high_v1
-    stand_up: MVI_stand_up_high_v1
+    prepare_stand_up: MVI_prepare_stand_up_low_v1
+    stand_up: MVI_stand_up_low_v1
   rough_terrain_first_middle_step:
     left_close: MV_RT_first_middlestep_leftclose_v2
     right_open: MV_RT_first_middlestep_rightopen_v2
