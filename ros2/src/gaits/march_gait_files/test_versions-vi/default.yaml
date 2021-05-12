@@ -205,7 +205,7 @@ positions:
       right_hip_aa: 0.0
       right_hip_fe: 0.1745
       right_knee: 0.4363
-  idle_4:
+  MV_ramp_stand:
     gait_type: walk_like
     joints:
       left_ankle: -0.2618
@@ -214,6 +214,28 @@ positions:
       left_knee: 0.0
       right_ankle: -0.2618
       right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
+  flat_ramp_stand:
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.08726646
+      left_hip_aa: 0.03490659
+      left_hip_fe: -0.08729962
+      left_knee: 0.0
+      right_ankle: -0.08726646
+      right_hip_aa: 0.03490659
+      right_hip_fe: -0.08729962
+      right_knee: 0.0
+  steep_ramp_stand:
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.2618
+      left_hip_aa: 0.03490659
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: -0.2618
+      right_hip_aa: 0.03490659
       right_hip_fe: -0.0873
       right_knee: 0.0
   idle_6:
