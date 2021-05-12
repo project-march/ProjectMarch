@@ -47,8 +47,13 @@
     <xacro:property name="inertia" value="${properties['inertia']}"/>
     <xacro:property name="dimensions" value="${properties['dimensions']}"/>
 
-    <xacro:property name="rotary_reduction" value="101"/>
-    <xacro:property name="linear_reduction" value="200"/>
+    <!-- Harmonic Drive: 101, Belt: 1,2-->
+    <xacro:property name="rotary_reduction" value="${101 * 1.2}"/>
+
+    <!-- Linearised around 0 -->
+    <xacro:property name="linear_reduction_hip" value="240"/>
+    <xacro:property name="linear_reduction_ankle" value="236"/>
+
 
 
     <!-- Constants for robot dimensions -->
@@ -343,7 +348,7 @@
             axis="-1 0 0"
             safety="${safety_values['haa']}"
             limits="${joint_limits['left_haa']}"
-            reduction="${linear_reduction}"
+            reduction="${linear_reduction_hip}"
     />
 
     <joint name="left_hip_angle" type="fixed">
@@ -382,7 +387,7 @@
             safety="${safety_values['ankle']}"
             origin="0 ${ankle_plate_offset} ${-lower_leg_height}"
             axis="0 1 0"
-            reduction="${linear_reduction}"
+            reduction="${linear_reduction_ankle}"
             limits="${joint_limits['left_ankle']}"
     />
 
@@ -399,7 +404,7 @@
             origin="0 ${hip_base_height/2} 0"
             axis="1 0 0"
             safety="${safety_values['haa']}"
-            reduction="${linear_reduction}"
+            reduction="${linear_reduction_ankle}"
             limits="${joint_limits['right_haa']}"
     />
 
@@ -438,7 +443,7 @@
             safety="${safety_values['ankle']}"
             origin="0 ${-ankle_plate_offset} ${-lower_leg_height}"
             axis="0 1 0"
-            reduction="${linear_reduction}"
+            reduction="${linear_reduction_ankle}"
             limits="${joint_limits['right_ankle']}"
     />
 
