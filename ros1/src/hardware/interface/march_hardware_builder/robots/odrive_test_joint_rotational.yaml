@@ -7,7 +7,7 @@ testsetup:
         allowActuation: true
         odrive:
           serial_number: "0x2084387E304E"
-          axis: "axis0"
+          axis: "axis1"
           absoluteEncoder:
             resolution: 17
             minPositionIU: 97242
