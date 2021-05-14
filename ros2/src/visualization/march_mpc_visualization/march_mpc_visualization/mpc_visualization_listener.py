@@ -20,6 +20,7 @@ class MpcListener(Node):
 
         self.new_measurement_position = []
         self.new_measurement_velocity = []
+        self.last_input = []
         self.new_time = 0
 
         self.new_estimation_position = np.empty([0, 0], dtype=float)
@@ -45,8 +46,11 @@ class MpcListener(Node):
         if not self.new_estimation_position.any():
             self.set_lengths()
 
-        # Current position and velocity
         for joint_number in range(self.number_of_joints):
+            # Set old estimated input as last applied input
+            self.last_input.insert(joint_number, self.new_estimation_input[joint_number, 0])
+
+            # Current position and velocity
             self.new_measurement_position.insert(joint_number, msg.joint[joint_number].estimation.states[0].array[0])
             self.new_measurement_velocity.insert(joint_number, msg.joint[joint_number].estimation.states[1].array[0])
 
@@ -88,11 +92,15 @@ class MpcListener(Node):
         for joint_number in range(self.number_of_joints):
             self.response_body_measurement[
                 f"joint_{joint_number}_position"
-            ] = self.new_measurement_position[joint_number]
+            ] = [self.new_measurement_position[joint_number]]
+
             self.response_body_measurement[
                 f"joint_{joint_number}_velocity"
-            ] = self.new_measurement_velocity[joint_number]
-            self.response_body_measurement["time_stamp"] = self.new_time
+            ] = [self.new_measurement_velocity[joint_number]]
+
+            self.response_body_measurement[f"joint_{joint_number}_input"] = [self.last_input[joint_number]]
+
+            self.response_body_measurement["time"] = [self.new_time]
 
         response = make_response(jsonify(self.response_body_measurement))
         response = self.set_headers(response)
