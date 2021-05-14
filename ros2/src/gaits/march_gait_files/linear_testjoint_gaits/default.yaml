@@ -1,7 +1,6 @@
 gaits:
   linear_sine_gait:
     sine_subgait: MVI_linear_sine_subgait_v1
-    step_response:
 positions:
   setup:
     gait_type: ''

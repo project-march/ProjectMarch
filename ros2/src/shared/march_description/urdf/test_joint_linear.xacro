@@ -15,11 +15,11 @@
     <xacro:property name="bar_mass" value="1.080"/>
     <xacro:property name="bar_width" value="0.05"/>
 
-    <xacro:property name="joint_buffer" value="${3*pi/180}"/> <!-- rad -->
-    <xacro:property name="joint_lower_limit" value="${-223*pi/360}"/> <!-- rad -->
-    <xacro:property name="joint_upper_limit" value="${223*pi/360}"/> <!-- rad -->
+    <xacro:property name="joint_buffer" value="1"/> <!-- rad -->
+    <xacro:property name="joint_lower_limit" value="-10"/> <!-- rad -->
+    <xacro:property name="joint_upper_limit" value="10"/> <!-- rad -->
     <xacro:property name="joint_effort_limit" value="10927.0"/>
-    <xacro:property name="joint_velocity_limit" value="10.0"/> <!-- rad/s -->
+    <xacro:property name="joint_velocity_limit" value="5.0"/> <!-- rad/s -->
 
     <xacro:property name="hover_height" value="0.5"/>
 
@@ -38,7 +38,7 @@
         <origin xyz="0 0 ${hover_height}" rpy="0 0 0"/>
     </joint>
 
-    <joint name="linear_joint" type="revolute">
+    <joint name="linear_joint" type="prismatic">
         <parent link="joint_base"/>
         <child link="bar"/>
         <origin xyz="0 ${-joint_base_width} 0" rpy="0 0 0"/>
@@ -80,7 +80,7 @@
             <geometry>
                 <box size="${bar_width} ${bar_width} ${bar_length}"/>
             </geometry>
-        </visual>
+        </visual>pi
 
         <inertial>
             <origin xyz="0 0 ${-bar_length/2}" rpy="0 0 0"/>
