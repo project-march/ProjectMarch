@@ -261,8 +261,6 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
-    ROS_DEBUG_STREAM(
-        "saving under " << write_path.string() + save_pointcloud_name);
     if (pcl::io::savePLYFileBinary(
             write_path.string() + save_pointcloud_name, *point_cloud)
         == -1) {
@@ -314,7 +312,7 @@ void RealsenseTestPublisher::updatePublishLoop(
         case SelectedMode::save: {
             if (success = saveCurrentPointcloud()) {
                 info_message
-                    = "Succesfully saved pointcloud as" + save_pointcloud_name;
+                    = "Succesfully saved pointcloud as " + write_path.string() + save_pointcloud_name;
             } else {
                 warn_message = "Failed to save pointcloud";
             }
