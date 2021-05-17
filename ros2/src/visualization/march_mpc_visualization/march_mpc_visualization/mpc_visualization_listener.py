@@ -142,4 +142,3 @@ class MpcListener(Node):
             response = self.set_headers(response)
 
         return response
-
