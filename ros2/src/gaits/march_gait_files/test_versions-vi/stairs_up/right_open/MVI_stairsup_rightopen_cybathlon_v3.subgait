@@ -95,4 +95,4 @@ joints:
     time_from_start: 2750000000
     velocity: 0.0
 name: right_open
-version: MVI_stairsup_rightopen_haa_adpf_v3
+version: MVI_stairsup_rightopen_cybathlon_v3

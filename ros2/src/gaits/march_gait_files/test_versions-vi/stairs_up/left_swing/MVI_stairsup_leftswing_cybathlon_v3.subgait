@@ -77,4 +77,4 @@ joints:
     time_from_start: 2750000000
     velocity: 0.69810028
 name: left_swing
-version: MVI_stairsup_leftswing_haa_adpf_v3
+version: MVI_stairsup_leftswing_cybathlon_v3
