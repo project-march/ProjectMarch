@@ -168,26 +168,21 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        LOGGER = rclpy.logging.get_logger("march_utility_logger")
+        logger = rclpy.logging.get_logger("march_utility_logger")
 
         if not abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR:
-            LOGGER.warning("")
-            LOGGER.warning(
-                f"joint {self.name} has an invalid VELOCITY transition as {from_setpoint.velocity} != {to_setpoint.velocity}"
+            logger.warning(
+                f"joint {self.name} has an invalid velocity transition as {from_setpoint.velocity} != {to_setpoint.velocity}"
             )
-            LOGGER.warning("")
+            return False
 
         if not abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
-            LOGGER.warning("")
-            LOGGER.warning(
-                f"joint {self.name} has an invalid POSITION transition as {from_setpoint.position} != {to_setpoint.position}"
+            logger.warning(
+                f"joint {self.name} has an invalid position transition as {from_setpoint.position} != {to_setpoint.position}"
             )
-            LOGGER.warning("")
+            return False
 
-        return (
-            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
-            and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
-        )
+        return True
 
     def _validate_boundary_points(self) -> bool:
         """Validate the starting and ending of this joint.
