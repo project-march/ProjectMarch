@@ -1,4 +1,4 @@
-description: MVI walk movements
+description: MVI walk movements with HAA version 1 movements
 duration: 1500000000
 gait_type: walk_like
 joints:
@@ -6,7 +6,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_aa:
@@ -40,13 +40,16 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.06659129
-    time_from_start: 250000000
-    velocity: 0.34906585
-  - position: 0.04363323
+  - position: 0.0
+    time_from_start: 200000000
+    velocity: 0.0
+  - position: -0.10471976
+    time_from_start: 382000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 622500000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_aa:
@@ -63,12 +66,12 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.6191
+  - position: 0.57595865
     time_from_start: 900000000
-    velocity: 0.1396
-  - position: 0.3752
+    velocity: 0.13960016
+  - position: 0.31415927
     time_from_start: 1500000000
-    velocity: -0.32
+    velocity: -0.27733282
   right_knee:
   - position: 0.0
     time_from_start: 0

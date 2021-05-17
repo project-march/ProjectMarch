@@ -1,89 +1,89 @@
 description: 'The MVI high close step with the v2 HAA movements. '
-duration: 1300000000
+duration: 1500000000
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: -0.10470056
-    time_from_start: 250000000
-    velocity: 0.0
-  - position: 0.04360007
-    time_from_start: 600000000
-    velocity: 0.0
-  - position: 0.04360007
-    time_from_start: 900000000
+    time_from_start: 288461540
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1300000000
+    time_from_start: 692307690
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1038461539
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0611
-    time_from_start: 614000000
+    time_from_start: 708461540
     velocity: 0.0
   - position: 0.0349
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0785
     time_from_start: 0
     velocity: 0.0
   - position: 0.61086524
-    time_from_start: 520000000
-    velocity: 0.13960016
+    time_from_start: 600000000
+    velocity: 0.12098681
   - position: 0.26179939
-    time_from_start: 949400000
-    velocity: -1.10399929
+    time_from_start: 1095461540
+    velocity: -0.95679938
   - position: 0.0
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
   left_knee:
   - position: 0.1396
     time_from_start: 0
     velocity: 0.0
   - position: 1.22173048
-    time_from_start: 416000000
+    time_from_start: 480000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
-  - position: 0.04360007
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.04360007
-    time_from_start: 300000000
+  - position: 0.0
+    time_from_start: 346153850
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: -0.0611
-    time_from_start: 300000000
+    time_from_start: 346153850
     velocity: 0.0
   - position: 0.0349
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.37520041
     time_from_start: 0
-    velocity: -0.29538382
+    velocity: -0.25599931
   - position: 0.0
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
   right_knee:
   - position: 0.13960016
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1300000000
+    time_from_start: 1500000000
     velocity: 0.0
 name: left_close
-version: MVI_walk_leftclose_haa_adpf_high_v1
+version: MVI_walk_leftclose_haa_adpf_high_v2

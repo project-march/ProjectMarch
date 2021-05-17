@@ -6,7 +6,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 1500000000
     velocity: -0.0
   left_hip_aa:
@@ -43,7 +43,16 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0436
+  - position: 0.0
+    time_from_start: 196200000
+    velocity: 0.0
+  - position: -0.06981317
+    time_from_start: 382000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 1500000000
     velocity: -0.0
   right_hip_aa:
@@ -83,4 +92,4 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MV_walksmall_rightopen_v2
+version: MVI_walksmall_rightopen_v2

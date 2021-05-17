@@ -1,4 +1,4 @@
-description: Right close for the 5 degrees ramp down
+description: Left close for the 5 degrees  ramp down
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -6,27 +6,27 @@ joints:
   - position: -0.17453293
     time_from_start: 0
     velocity: 0.0
-  - position: -0.2618
+  - position: -0.08726646
     time_from_start: 1500000000
     velocity: -0.0
-  - position: -0.2618
+  - position: -0.08726646
     time_from_start: 3000000000
     velocity: -0.0
   left_hip_aa:
-  - position: -0.05235988
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.03490659
     time_from_start: 2627500000
     velocity: -0.0
-  - position: 0.0
+  - position: 0.03490659
     time_from_start: 3000000000
     velocity: -0.0
   left_hip_fe:
   - position: 0.52359878
     time_from_start: 0
     velocity: -0.0
-  - position: -0.0873
+  - position: -0.08729962
     time_from_start: 3000000000
     velocity: -0.0
   left_knee:
@@ -43,26 +43,23 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   right_ankle:
-  - position: 0.04363323
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.04363323
-    time_from_start: 1250000000
+  - position: -0.08726646
+    time_from_start: 1500000000
     velocity: 0.0
-  - position: -0.26179939
-    time_from_start: 1871600000
-    velocity: 0.0
-  - position: -0.26179939
+  - position: -0.08726646
     time_from_start: 3000000000
     velocity: -0.0
   right_hip_aa:
-  - position: 0.05235988
+  - position: -0.05235988
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.03490659
     time_from_start: 2464900000
     velocity: -0.0
-  - position: 0.0
+  - position: 0.03490659
     time_from_start: 3000000000
     velocity: -0.0
   right_hip_fe:
