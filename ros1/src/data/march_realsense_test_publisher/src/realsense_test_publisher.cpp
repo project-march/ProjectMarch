@@ -310,8 +310,8 @@ void RealsenseTestPublisher::updatePublishLoop(
         }
         case SelectedMode::save: {
             if (success = saveCurrentPointcloud()) {
-                info_message
-                    = "Succesfully saved pointcloud as " + write_path.string() + save_pointcloud_name;
+                info_message = "Succesfully saved pointcloud as "
+                    + write_path.string() + save_pointcloud_name;
             } else {
                 warn_message = "Failed to save pointcloud";
             }
