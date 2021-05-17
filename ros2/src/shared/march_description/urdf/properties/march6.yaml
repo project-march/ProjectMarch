@@ -4,24 +4,24 @@ dimensions:
     mass: 8.686 # TODO
   hip_aa_side:
     length: 0.1605
-    mass: 2.982 # TODO
+    mass: 3.019
   hip_aa_base:
     length: 0.151
     mass: 0
   upper_leg:
     length: 0.410
-    mass: 4.995 # TODO
+    mass: 8.161
     offset: 0.04 # TODO
   lower_leg:
     length: 0.410
-    mass: 4.458 # TODO
+    mass: 4.997
   ankle_plate:
     length: 0.14567
     offset: 0.07
   foot:
     height_forward: 0.184
     height_backward: 0.059
-    mass: 1.821 # TODO
+    mass: 0.789
 inertia:  # TODO
   hip_base:
     xx: 0.141
