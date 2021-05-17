@@ -1,7 +1,6 @@
 from rclpy.node import Node
 from march_shared_msgs.msg import MpcMsg
 from flask import jsonify, make_response, request, Response
-from itertools import chain
 import numpy as np
 
 MAX_AGE = str(21600)
