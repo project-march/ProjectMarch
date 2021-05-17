@@ -1,8 +1,11 @@
+from typing import Optional
+
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
@@ -202,7 +205,7 @@ class GaitStateMachine(object):
         if msg.type == Error.NON_FATAL:
             self.stop_gait()
         elif msg.type == Error.FATAL:
-            self.request_shutdown()
+            self.request_shutdown("A fatal error was posted to /march/error")
 
     def get_possible_gaits(self):
         """Returns possible names of gaits that can be executed.
@@ -277,11 +280,15 @@ class GaitStateMachine(object):
         else:
             self.update_timer.cancel()
 
-    def request_shutdown(self):
+    def request_shutdown(self, msg: Optional[str] = None):
         """Requests shutdown, which will terminate the state machine as soon as
         possible."""
+        base_msg = "Shutdown requested"
+        if msg is not None:
+            base_msg += ": " + msg
+        self._gait_selection.get_logger().fatal(base_msg)
         self._shutdown_requested = True
-        self._gait_selection.destroy_node()
+        shutdown_system()
 
     def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
