@@ -6,7 +6,7 @@ uint8 CUSTOM=2
 uint8 SAVE=3
 uint8 selected_mode
 
-# A string specifying the name of the pointcloud when CUSTUM is the selected mode.
+# A string specifying the name of the pointcloud when CUSTOM is the selected mode.
 string pointcloud_file_name
 
 # From which camera the pointcloud to save comes from, default is front
