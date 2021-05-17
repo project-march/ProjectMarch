@@ -52,7 +52,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_ankle:
-  - position: -0.08726646
+  - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
