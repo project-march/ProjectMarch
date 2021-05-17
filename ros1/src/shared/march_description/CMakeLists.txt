@@ -10,6 +10,7 @@ include(cmake/${PROJECT_NAME}-extras.cmake)
 set(XACRO_FILES
     "../../../../ros2/src/shared/march_description/urdf/march3.xacro"
     "../../../../ros2/src/shared/march_description/urdf/march4.xacro"
+    "../../../../ros2/src/shared/march_description/urdf/march6.xacro"
     "../../../../ros2/src/shared/march_description/urdf/march4_with_koen_lengths.xacro"
     "../../../../ros2/src/shared/march_description/urdf/test_joint_rotational.xacro"
     "../../../../ros2/src/shared/march_description/urdf/test_joint_linear.xacro"

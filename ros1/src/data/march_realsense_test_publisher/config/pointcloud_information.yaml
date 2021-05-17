@@ -1,0 +1,69 @@
+# This yaml specifies the origins and how to process each point cloud in the datasets directory
+# The following fields should be specified:
+
+# This enum is used for specifying the obstacle that should be dynamically
+# made with the RealSense camera. All supported obstacles should be
+# specified here
+# uint8 STAIRS_UP=0
+# uint8 STAIRS_DOWN=1
+# uint8 RAMP_UP=2
+# uint8 RAMP_DOWN=3
+# uint8 selected_gait
+#
+# The link to transform to, is generally set to either "foot_left" or "foot_right"
+# string frame_id_to_transform_to
+#
+# Whether the pointcloud has been taken from the front camera position or the back camera position
+# bool from_back_camera
+door.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+ramp2.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+ramp-leaning.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+ramp-from-stand-with-crutch.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+ramp-from-stand-with-thijs.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+ramp-from-stand-without-thijs.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+stairs1.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+stairs2.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+stairs3.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+stairs4.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+stairs_down1.ply:
+  realsense_category: 1
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+stairs_down2.ply:
+  realsense_category: 1
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+from-ramp.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false

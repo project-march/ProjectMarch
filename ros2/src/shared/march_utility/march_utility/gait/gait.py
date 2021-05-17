@@ -1,4 +1,5 @@
 import os
+from typing import List, Dict
 
 import yaml
 from urdf_parser_py import urdf
@@ -148,6 +149,10 @@ class Gait(object):
                         ns=to_subgait.subgait_name,
                     )
                 )
+
+    def set_subgaits(self, new_subgaits: Dict[str, Subgait]):
+        self.subgaits.update(new_subgaits)
+        self._validate_trajectory_transition()
 
     def set_subgait_versions(
         self, robot: urdf.Robot, gait_directory: str, version_map: dict
