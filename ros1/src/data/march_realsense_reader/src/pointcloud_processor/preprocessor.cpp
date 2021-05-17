@@ -98,6 +98,7 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
             << "Points in pointcloud: " << pointcloud_->points.size()
             << "Points in pointcloud_normals: "
             << pointcloud_normals_->points.size());
+        return false;
     }
 
     double time_taken
