@@ -404,13 +404,6 @@ bool HullParameterDeterminer::isValidLocation(
                     executable_locations_line_coefficients_);
             double distance = linear_algebra_utilities::distanceBetweenPoints(
                 projected_point, possible_foot_location);
-            ROS_WARN_STREAM("");
-            ROS_WARN_STREAM("The distance from point to line is " << distance);
-            ROS_WARN_STREAM("The x coord of projected point is " << projected_point.x);
-            ROS_WARN_STREAM("The x coord of original point is " << possible_foot_location.x);
-            ROS_WARN_STREAM("The z coord of projected point is " << projected_point.z   );
-            ROS_WARN_STREAM("The z coord of original point is " << possible_foot_location.z);
-            ROS_WARN_STREAM("");
             // only points which are close enough to the line are valid
             // Only points on the line which are between the two given values
             // are valid
