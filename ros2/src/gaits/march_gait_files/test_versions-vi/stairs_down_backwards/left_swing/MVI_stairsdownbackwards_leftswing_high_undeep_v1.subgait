@@ -1,4 +1,4 @@
-description: Stairs down backwards height 22 cm and depth 20
+description: Stairs down backwards height 22 cm and depth of 20 cm.
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -9,8 +9,8 @@ joints:
   - position: 0.0
     time_from_start: 536400000
     velocity: -0.0
-  - position: -0.24469691
-    time_from_start: 2045500000
+  - position: 0.0
+    time_from_start: 1335000000
     velocity: -0.0
   - position: 0.0
     time_from_start: 2500000000
@@ -19,10 +19,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.08726646
-    time_from_start: 1225727270
-    velocity: -0.0
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 2500000000
     velocity: -0.0
   left_hip_fe:
@@ -50,21 +47,12 @@ joints:
     time_from_start: 0
     velocity: -0.0
   - position: 0.0
-    time_from_start: 681800000
-    velocity: -0.0
-  - position: 0.0
     time_from_start: 2500000000
     velocity: -0.0
   right_hip_aa:
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 0
     velocity: -0.0
-  - position: -0.06108652
-    time_from_start: 700000000
-    velocity: -0.12217305
-  - position: -0.06108652
-    time_from_start: 1900000000
-    velocity: 0.12217305
   - position: 0.0
     time_from_start: 2500000000
     velocity: -0.0
@@ -86,4 +74,4 @@ joints:
     time_from_start: 2500000000
     velocity: -0.0
 name: left_swing
-version: MVI_stairsdown_leftswing_high_undeep_v3
+version: MVI_stairsdownbackwards_leftswing_high_undeep_v1

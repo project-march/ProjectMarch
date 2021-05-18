@@ -1,4 +1,4 @@
-description: 'Stairs down backwards height 22 cm and depth 20 cm '
+description: Stairs down backwards with height 22 cm and depth 20 cm.
 duration: 3500000000
 gait_type: stairs_like
 joints:
@@ -13,15 +13,9 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 0
     velocity: -0.0
-  - position: -0.06108652
-    time_from_start: 550000000
-    velocity: -0.12217305
-  - position: -0.06108652
-    time_from_start: 1950000000
-    velocity: 0.12217305
   - position: 0.0349
     time_from_start: 3500000000
     velocity: 0.0
@@ -29,13 +23,13 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: -0.17449976
-  - position: 0.08726646
-    time_from_start: 1315100000
+  - position: 0.0
+    time_from_start: 1000000000
     velocity: -0.02153387
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 3000000000
     velocity: -0.0
   - position: 0.0
@@ -48,9 +42,6 @@ joints:
   - position: 0.13960016
     time_from_start: 450000000
     velocity: -0.03490659
-  - position: 0.0
-    time_from_start: 2750000000
-    velocity: -0.0
   - position: 0.0
     time_from_start: 3500000000
     velocity: 0.0
@@ -71,9 +62,6 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.08726646
-    time_from_start: 1550000000
-    velocity: -0.0
   - position: 0.0349
     time_from_start: 3500000000
     velocity: 0.0
@@ -84,10 +72,10 @@ joints:
   - position: 1.48352986
     time_from_start: 750000000
     velocity: -0.0
-  - position: 0.08726646
-    time_from_start: 2750000000
+  - position: 0.0
+    time_from_start: 2600000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 3000000000
     velocity: -0.0
   - position: 0.0
@@ -97,10 +85,7 @@ joints:
   - position: 1.6794134
     time_from_start: 0
     velocity: -0.0
-  - position: 1.9097933
-    time_from_start: 1200000000
-    velocity: -0.0
-  - position: 1.9097933
+  - position: 1.96017498
     time_from_start: 1384500000
     velocity: -0.0
   - position: 0.0
@@ -110,4 +95,4 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
 name: right_close
-version: MVI_stairsdown_rightclose_high_undeep_v3
+version: MVI_stairsdownbackwards_rightclose_high_undeep_v1
