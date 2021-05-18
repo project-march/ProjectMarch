@@ -209,7 +209,7 @@
                       length="${lower_leg_height}"
                       direction="z"
                       collision_origin="0 0 ${-lower_leg_height/2}"
-                      visual_origin="0 0 ${-lower_leg_height-width}"
+                      visual_origin="0 ${-width/2} ${-lower_leg_height-width}"
                       mesh="march6/LowerLeftLeg.stl"
                       com="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z}"
                       mass="${lower_leg_mass}"
@@ -224,7 +224,7 @@
                       direction="z"
                       mesh="march6/LeftFoot.stl"
                       visual_origin="${foot_height_forward}
-                     ${-ankle_plate_offset/2}
+                     ${-width/2}
                      ${-ankle_plate_height - width/2}"
                       collision_origin="0 0 ${-ankle_plate_height/2}"
                       scale="0.001 0.001 0.001"
@@ -290,7 +290,7 @@
                       reflect="1"
                       length="${lower_leg_height}"
                       direction="z"
-                      visual_origin="0 0 ${-lower_leg_height-width}"
+                      visual_origin="0 ${width/2} ${-lower_leg_height-width}"
                       mesh="march6/LowerRightLeg.stl"
                       com="${lower_leg_com_x} ${lower_leg_com_y} ${lower_leg_com_z}"
                       mass="${lower_leg_mass}"
@@ -307,7 +307,7 @@
                       length="${ankle_plate_height}"
                       direction="z"
                       mesh="march6/RightFoot.stl"
-                      visual_origin="${foot_height_forward} ${ankle_plate_offset/2} ${-ankle_plate_height-width/2}"
+                      visual_origin="${foot_height_forward} ${width/2} ${-ankle_plate_height-width/2}"
                       collision_origin="0 0 ${-ankle_plate_height/2}"
                       scale="0.001 0.001 0.001"
                       visual_rpy="0 0 ${-pi/2}"
