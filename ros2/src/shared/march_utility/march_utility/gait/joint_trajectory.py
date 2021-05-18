@@ -10,6 +10,8 @@ from __future__ import annotations
 from math import isclose
 from typing import List, Tuple, Any
 
+import rclpy
+
 from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
     NonValidGaitContent,
@@ -166,10 +168,21 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        return (
-            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
-            and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
-        )
+        logger = rclpy.logging.get_logger("march_utility_logger")
+
+        if not abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR:
+            logger.warning(
+                f"joint {self.name} has an invalid velocity transition as {from_setpoint.velocity} != {to_setpoint.velocity}"
+            )
+            return False
+
+        if not abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
+            logger.warning(
+                f"joint {self.name} has an invalid position transition as {from_setpoint.position} != {to_setpoint.position}"
+            )
+            return False
+
+        return True
 
     def _validate_boundary_points(self) -> bool:
         """Validate the starting and ending of this joint.

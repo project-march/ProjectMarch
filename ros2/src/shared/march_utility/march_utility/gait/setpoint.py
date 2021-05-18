@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Optional
 
+import rclpy
+
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 from march_utility.utilities.duration import Duration
@@ -88,45 +90,6 @@ class Setpoint:
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-    @classmethod
-    def calculate_next_positions_joint(cls, setpoint_dic: dict) -> dict:
-        """
-        Calculate the position of the joints a moment later.
-
-        Calculates using the approximation:
-        next_position = position + current_velocity * time_difference
-        :param setpoint_dic: A dictionary of setpoints with positions and velocities
-        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR
-        seconds later
-        """
-        next_positions = {}
-        for joint in JOINT_NAMES_IK:
-            if joint not in setpoint_dic:
-                raise KeyError(f"Setpoint_dic is missing joint {joint}")
-            else:
-                next_positions[joint] = cls(
-                    setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
-                    setpoint_dic[joint].position
-                    + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
-                )
-
-        return next_positions
-
-    def add_joint_velocity_from_next_angle(self, next_state: Setpoint) -> None:
-        """Calculate the joint velocities given a current position and a next position.
-
-        Calculates using the approximation:
-        next_position = position + current_velocity * time_difference
-
-        :param self: A Setpoint object with no velocity
-        :param next_state: A Setpoint with the positions a moment later
-
-        :return: The joint velocities of the joints on the specified side
-        """
-        self.velocity = (next_state.position - self.position) / (
-            next_state.time - self.time
-        ).seconds
 
     @staticmethod
     def interpolate_setpoints(
