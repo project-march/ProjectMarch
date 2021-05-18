@@ -5,13 +5,12 @@ This class is  used to create gaits based on the state of both feet.
 """
 from __future__ import annotations
 
-from march_utility.gait.setpoint import Setpoint
+from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     merge_dictionaries,
-    weighted_average_floats,
 )
 
 from march_utility.exceptions.gait_exceptions import (
@@ -70,7 +69,9 @@ class FeetState(object):
             Side.right,
         )
 
-        next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
+        next_joint_positions = CalculationSetpoint.calculate_next_positions_joint(
+            setpoint_dic
+        )
 
         next_foot_state_left = Foot.calculate_foot_position(
             next_joint_positions["left_hip_aa"].position,
@@ -155,4 +156,11 @@ class FeetState(object):
             feet_state.right_foot, feet_state.time
         )
 
-        return merge_dictionaries(left_joint_states, right_joint_states)
+        setpoint_dictionary = merge_dictionaries(left_joint_states, right_joint_states)
+
+        for joint_name in setpoint_dictionary.keys():
+            setpoint_dictionary[joint_name] = setpoint_dictionary[
+                joint_name
+            ].to_normal_setpoint()
+
+        return setpoint_dictionary
