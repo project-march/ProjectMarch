@@ -224,7 +224,7 @@
                       direction="z"
                       mesh="march6/LeftFoot.stl"
                       visual_origin="${foot_height_forward}
-                     0
+                     ${-ankle_plate_offset/2}
                      ${-ankle_plate_height - width/2}"
                       collision_origin="0 0 ${-ankle_plate_height/2}"
                       scale="0.001 0.001 0.001"
@@ -236,7 +236,7 @@
                       length="${foot_height_forward+foot_height_backward}"
                       direction="x"
                       inertia="${inertia['foot']}"
-                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      collision_origin="${(foot_height_backward-foot_height_forward)/2} 0 0"
                       com="${foot_com_x} ${-foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
 
@@ -307,7 +307,7 @@
                       length="${ankle_plate_height}"
                       direction="z"
                       mesh="march6/RightFoot.stl"
-                      visual_origin="${foot_height_forward} 0 ${-ankle_plate_height-width/2}"
+                      visual_origin="${foot_height_forward} ${ankle_plate_offset/2} ${-ankle_plate_height-width/2}"
                       collision_origin="0 0 ${-ankle_plate_height/2}"
                       scale="0.001 0.001 0.001"
                       visual_rpy="0 0 ${-pi/2}"
@@ -320,7 +320,7 @@
                       length="${foot_height_forward+foot_height_backward}"
                       direction="x"
                       inertia="${inertia['foot']}"
-                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      collision_origin="${(foot_height_backward-foot_height_forward)/2} 0 0"
                       com="${foot_com_x} ${foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
 
