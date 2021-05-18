@@ -1,4 +1,4 @@
-description: Stairs down backwards with height of 12 cm and depth of 45 cm
+description: Stairs down backwards with height of 13 cm and depth of 35 cm
 duration: 3500000000
 gait_type: stairs_like
 joints:
@@ -10,15 +10,9 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 0
     velocity: -0.0
-  - position: -0.06108652
-    time_from_start: 1050000000
-    velocity: -0.12217305
-  - position: -0.06108652
-    time_from_start: 1950000000
-    velocity: 0.12217305
   - position: 0.0349
     time_from_start: 3500000000
     velocity: 0.0
@@ -26,13 +20,13 @@ joints:
   - position: -0.08726646
     time_from_start: 0
     velocity: -0.17449976
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 1000000000
     velocity: -0.02349213
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 3000000000
     velocity: -0.0
   - position: 0.0
@@ -65,9 +59,6 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.08726646
-    time_from_start: 1350000000
-    velocity: -0.0
   - position: 0.0349
     time_from_start: 3500000000
     velocity: 0.0
@@ -78,10 +69,10 @@ joints:
   - position: 1.09955743
     time_from_start: 750000000
     velocity: 0.17453293
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 3000000000
     velocity: -0.0
   - position: 0.0
@@ -101,4 +92,4 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
 name: right_close
-version: MVI_stairsdown_rightclose_low_deep_v3
+version: MVI_stairsdownbackwards_rightclose_low_deep_v1

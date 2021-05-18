@@ -19,9 +19,6 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0
-    time_from_start: 2750000000
-    velocity: -0.0
   - position: 0.0349
     time_from_start: 3500000000
     velocity: 0.0
@@ -32,11 +29,11 @@ joints:
   - position: 1.39801397
     time_from_start: 750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2600000000
     velocity: -0.17453293
-  - position: 0.08726646
-    time_from_start: 3008000000
+  - position: 0.0
+    time_from_start: 3000000000
     velocity: -0.0
   - position: 0.0
     time_from_start: 3500000000
@@ -45,7 +42,7 @@ joints:
   - position: 1.20170457
     time_from_start: 0
     velocity: -0.0
-  - position: 1.9097933
+  - position: 1.91986218
     time_from_start: 1150000000
     velocity: -0.0
   - position: 0.0
@@ -62,15 +59,9 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0
+  - position: -0.08726646
     time_from_start: 0
     velocity: -0.0
-  - position: -0.06108652
-    time_from_start: 1050000000
-    velocity: -0.12217305
-  - position: -0.06108652
-    time_from_start: 1950000000
-    velocity: 0.12217305
   - position: 0.0349
     time_from_start: 3500000000
     velocity: 0.0
@@ -78,22 +69,22 @@ joints:
   - position: -0.08726646
     time_from_start: 0
     velocity: -0.17449976
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 1000000000
     velocity: -0.02349213
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 2750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0
     time_from_start: 3000000000
     velocity: -0.0
   - position: 0.0
     time_from_start: 3500000000
     velocity: 0.0
   right_knee:
-  - position: 0.2443
+  - position: 0.24430072
     time_from_start: 0
-    velocity: -0.76791
+    velocity: -0.76790996
   - position: 0.13960016
     time_from_start: 450000000
     velocity: -0.08726646
@@ -101,4 +92,4 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsdown_leftclose_high_deep_v3
+version: MVI_stairsdownbackwards_leftclose_high_deep_v1
