@@ -4,6 +4,7 @@ from flask import jsonify, make_response, request, Response
 import numpy as np
 
 MAX_AGE = str(21600)
+NANO = 10 ** -9
 
 
 class MpcListener(Node):
@@ -71,7 +72,7 @@ class MpcListener(Node):
             )
 
         # Get time
-        self.new_time = msg.header.stamp.sec + msg.header.stamp.nanosec * (10 ** -9)
+        self.new_time = msg.header.stamp.sec + msg.header.stamp.nanosec * NANO
 
     def set_lengths(self):
         self.new_estimation_position = np.empty(
