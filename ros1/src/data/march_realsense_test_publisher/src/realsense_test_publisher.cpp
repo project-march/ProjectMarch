@@ -45,7 +45,8 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 
     // The source directory should be two steps behind this source file
     path source_file_path(__FILE__);
-    write_path = source_file_path.parent_path().parent_path() / relative_data_path;
+    write_path
+        = source_file_path.parent_path().parent_path() / relative_data_path;
 
     for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
         if (std::filesystem::is_regular_file(entry)
