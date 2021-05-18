@@ -1,0 +1,78 @@
+description: The right swing step for the 20 degrees ramp down and more knee flexion
+  and less hip flexion than version 1.
+duration: 3000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 902600000
+    velocity: 0.0
+  - position: -0.26179939
+    time_from_start: 1500000000
+    velocity: 0.0
+  - position: -0.26179939
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: -0.08726646
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.17449976
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.81507923
+    time_from_start: 1271900000
+    velocity: 0.0
+  - position: 0.19198622
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_knee:
+  - position: 1.22173048
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.41522291
+    time_from_start: 976100000
+    velocity: -0.0
+  - position: 0.26179939
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_ankle:
+  - position: -0.26179939
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.08726646
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.19198622
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.17449976
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.26179939
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.50889961
+    time_from_start: 1498800000
+    velocity: 0.34910076
+  - position: 1.22173048
+    time_from_start: 3000000000
+    velocity: -0.0
+name: left_swing
+version: MVI_RD_slopedown_leftswing_steep_v2
