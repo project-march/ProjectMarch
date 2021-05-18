@@ -373,7 +373,7 @@ bool HullParameterDeterminer::getDistanceToObject(
             ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
                              "for selected obstacle "
                 << realsense_category_.value());
-            double = std::numeric_limits<double>::max();
+            distance = std::numeric_limits<double>::max();
             return false;
         }
     }
