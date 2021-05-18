@@ -12,7 +12,7 @@ from typing import Tuple
 
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_utility.exceptions.general_exceptions import SideSpecificationError
-from march_utility.gait.setpoint import Setpoint
+from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
@@ -170,9 +170,9 @@ class Foot(object):
         )
 
         return {
-            foot_side.value + "_hip_aa": Setpoint(time, haa),
-            foot_side.value + "_hip_fe": Setpoint(time, hfe),
-            foot_side.value + "_knee": Setpoint(time, kfe),
+            foot_side.value + "_hip_aa": CalculationSetpoint(time, haa),
+            foot_side.value + "_hip_fe": CalculationSetpoint(time, hfe),
+            foot_side.value + "_knee": CalculationSetpoint(time, kfe),
         }
 
     @staticmethod
