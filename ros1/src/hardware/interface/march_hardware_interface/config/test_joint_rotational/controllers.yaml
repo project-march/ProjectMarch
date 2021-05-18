@@ -19,4 +19,4 @@ march:
           trajectory: 0.305
           goal: 0.305
       gains: # Required because we're controlling an effort interface
-        rotational_joint: {p: 150, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        rotational_joint: {p: 50, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
