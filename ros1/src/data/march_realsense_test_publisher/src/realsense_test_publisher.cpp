@@ -43,15 +43,9 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     path relative_data_path(/*__source*/ "config/datasets/");
     data_path = directory_path / relative_data_path;
 
-    // This is necessary as we cannot write to the install folder
-    path source_data_from_ros1_path(
-        /*__source*/ "src/data/march_realsense_test_publisher/config/"
-                     "datasets/");
-    path ros1_path = directory_path.parent_path()
-                         .parent_path()
-                         .parent_path()
-                         .parent_path();
-    write_path = ros1_path / source_data_from_ros1_path;
+    // The source directory should be two steps behind this source file
+    path source_file_path(__FILE__);
+    write_path = source_file_path.parent_path().parent_path() / relative_data_path;
 
     for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
         if (std::filesystem::is_regular_file(entry)
