@@ -48,9 +48,9 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         }
 
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();
-        success &= setupRecursiveRegionGrower();
-        success &= recursiveRegionGrower(region_vector_, pointcloud_,
-            pointcloud_normals_, smoothness_threshold);
+        setupRecursiveRegionGrower();
+        recursiveRegionGrower(region_vector_, pointcloud_, pointcloud_normals_,
+            smoothness_threshold);
     } else {
         success &= setupRegionGrower();
         success &= extractRegions();
@@ -149,18 +149,21 @@ bool RegionGrower::setupRecursiveRegionGrower()
 
 // Implements the region growing algorithm and recursively improves on too small
 // or too large regions
-bool RegionGrower::recursiveRegionGrower(
-    boost::shared_ptr<RegionVector> last_region_vector,
-    PointCloud::Ptr last_pointcloud, Normals::Ptr last_pointcloud_normals,
-    float last_tolerance)
+void RegionGrower::recursiveRegionGrower(
+    const boost::shared_ptr<RegionVector> last_region_vector,
+    const PointCloud::Ptr last_pointcloud,
+    const Normals::Ptr last_pointcloud_normals, const float& last_tolerance)
 {
-    boost::shared_ptr<RegionVector> too_small_regions;
-    boost::shared_ptr<RegionVector> too_large_regions;
-    boost::shared_ptr<RegionVector> right_size_regions;
-    boost::make_shared<PointCloud> too_small_pointcloud;
-    boost::make_shared<Normals> too_small_pointcloud_normals;
-    boost::make_shared<PointCloud> too_large_pointcloud;
-    boost::make_shared<Normals> too_large_pointcloud_normals;
+    boost::shared_ptr<RegionVector> too_small_regions
+        = boost::make_shared<RegionVector>;
+    boost::shared_ptr<RegionVector> too_large_regions
+        = boost::make_shared<RegionVector>;
+    boost::shared_ptr<RegionVector> right_size_regions
+        = boost::make_shared<RegionVector>;
+    PointCloud::Ptr too_small_pointcloud = boost::make_shared<PointCloud>;
+    Normals::Ptr too_small_pointcloud_normals = boost::make_shared<Normals>;
+    PointCloud::Ptr too_large_pointcloud = boost::make_shared<Pointcloud>;
+    Normals::Ptr too_large_pointcloud_normals = boost::make_shared<Normals>;
 
     // Segment the region grower into small, good, and large regions
     segmentRegionVector(last_region_vector, too_small_regions,
@@ -239,8 +242,8 @@ void RegionGrower::fillInvalidClouds(
     const Normals::Ptr last_pointcloud_normals,
     PointCloud::Ptr invalid_pointcloud, Normals::Ptr invalid_pointcloud_normals)
 {
-    boost::make_shared<PointCloud> invalid_region_pointcloud;
-    boost::make_shared<Normals> invalid_region_normals;
+    PointCloud::Ptr invalid_region_pointcloud = boost::make_shared<PointCloud>;
+    Normals::Ptr invalid_region_normals = boost::make_shared<Normals>;
 
     for (pcl::PointIndices invalid_region : *invalid_region_vector) {
         pcl::copyPointCloud(
@@ -249,7 +252,7 @@ void RegionGrower::fillInvalidClouds(
             *last_pointcloud_normals, invalid_region, *invalid_region_normals);
 
         *invalid_pointcloud += *invalid_region_pointcloud;
-        *invalid_pointcloud_normals += *invalid_region_pointcloud_normals;
+        *invalid_pointcloud_normals += *invalid_region_normals;
 
         invalid_region_pointcloud->clear();
         invalid_region_normals->clear();
@@ -266,11 +269,11 @@ void RegionGrower::segmentRegionVector(
 {
     for (pcl::PointIndices region : *region_vector) {
         if (region.indices.size() > 50) {
-            too_large_regions.push_back(region);
+            too_large_regions->push_back(region);
         } else if (region.indices.size() < 20) {
-            too_small_regions.push_back(region);
+            too_small_regions->push_back(region);
         } else {
-            right_size_regions.push_back(region);
+            right_size_regions->push_back(region);
         }
     }
 }
@@ -283,8 +286,7 @@ boost::shared_ptr<RegionVector> RegionGrower::getRegionVectorFromTolerance(
     boost::shared_ptr<RegionVector> region_vector
         = boost::make_shared<RegionVector>();
 
-    if (pointcloud_to_grow_on->size()
-        == pointcloud_normals_to_grow_on->size()) {
+    if (pointcloud->size() == pointcloud_normals->size()) {
         region_grower.setInputCloud(pointcloud);
         region_grower.setInputNormals(pointcloud_normals);
         region_grower.setSmoothnessThreshold(tolerance);

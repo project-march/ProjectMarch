@@ -74,9 +74,11 @@ private:
 
     // Implements the region growing algorithm and recursively improves on too
     // small or too large regions
-    bool recursiveRegionGrower(
-        boost::shared_ptr<RegionVector> last_region_vector,
-        float last_tolerance);
+    void recursiveRegionGrower(
+        const boost::shared_ptr<RegionVector> last_region_vector,
+        const PointCloud::Ptr last_pointcloud,
+        const Normals::Ptr last_pointcloud_normals,
+        const float& last_tolerance);
 
     // Splits a region Vector into the regions considered too large, just right,
     // and too small
