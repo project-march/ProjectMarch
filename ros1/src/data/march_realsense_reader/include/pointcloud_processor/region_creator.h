@@ -68,7 +68,7 @@ private:
 
     /**
      * Extract clusters from region_grower object
-     * @return true if succesful
+     * @return true if successful
      */
     bool extractRegions();
 
@@ -129,8 +129,8 @@ private:
     float smoothness_threshold;
     float curvature_threshold;
     bool use_recursive_growing;
-    boost::shared_ptr<std::vector<PointCloud>> pointcloud_vector_;
-    boost::shared_ptr<std::vector<Normals>> normals_vector_;
+    boost::shared_ptr<std::vector<PointCloud::Ptr>> pointcloud_vector_;
+    boost::shared_ptr<std::vector<Normals::Ptr>> normals_vector_;
 };
 
 #endif // MARCH_REGION_CREATOR_H

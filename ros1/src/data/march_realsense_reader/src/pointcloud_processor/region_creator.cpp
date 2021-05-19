@@ -7,8 +7,6 @@
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
-using PointCloudVector = std::vector<PointCloud::ptr>;
-using NormalsVector = std::vector<Normals>;
 
 // Construct a basic RegionCreator class
 RegionCreator::RegionCreator(bool debugging)
@@ -42,7 +40,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     if (use_recursive_growing) {
         // First extract regions as normal to start the recursive call from the
         // first result
-        succes &= setupRegionGrower();
+        success &= setupRegionGrower();
         if (!extractRegions()) {
             ROS_WARN_STREAM(
                 "Extracting regions in initialization of the recursive failed. "
@@ -50,8 +48,8 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         }
 
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();
-        succes &= setupRecursiveRegionGrower();
-        succes &= recursiveRegionGrower(region_vector_, pointcloud_,
+        success &= setupRecursiveRegionGrower();
+        success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
     } else {
         success &= setupRegionGrower();
