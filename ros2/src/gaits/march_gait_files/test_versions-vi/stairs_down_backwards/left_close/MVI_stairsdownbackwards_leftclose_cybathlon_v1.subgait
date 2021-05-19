@@ -50,7 +50,7 @@ joints:
     time_from_start: 0
     velocity: -0.0
   - position: -0.15707963
-    time_from_start: 1381699999
+    time_from_start: 1381700000
     velocity: -0.0
   - position: 0.04363323
     time_from_start: 2000000000
@@ -95,4 +95,4 @@ joints:
     time_from_start: 2750000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsdown_leftclose_haa_adpf_v3
+version: MVI_stairsdownbackwards_leftclose_cybathlon_v1

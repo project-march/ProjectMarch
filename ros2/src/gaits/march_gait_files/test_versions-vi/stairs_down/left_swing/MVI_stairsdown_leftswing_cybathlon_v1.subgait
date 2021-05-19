@@ -7,7 +7,7 @@ joints:
     time_from_start: 0
     velocity: 0.13960016
   - position: 0.04363323
-    time_from_start: 1659999999
+    time_from_start: 1660000000
     velocity: 0.0
   - position: 0.04363323
     time_from_start: 3000000000
@@ -27,7 +27,7 @@ joints:
     time_from_start: 0
     velocity: 0.26179939
   - position: 0.6981317
-    time_from_start: 1429999999
+    time_from_start: 1430000000
     velocity: 0.0
   - position: 0.5061001
     time_from_start: 4000000000
@@ -80,4 +80,4 @@ joints:
     time_from_start: 4000000000
     velocity: 0.4363
 name: left_swing
-version: MVI_stairsdown_leftswing_haa_adpf_v1
+version: MVI_stairsdown_leftswing_cybathlon_v1
