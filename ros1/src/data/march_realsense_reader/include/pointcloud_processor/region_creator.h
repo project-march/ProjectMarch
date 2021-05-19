@@ -90,6 +90,10 @@ private:
     boost::shared_ptr<RegionVector> doRecursiveRegionGrowingStep(
         boost::shared_ptr<RegionVector> region_vector, float tolerance);
 
+    //
+    void copyRegionVectorToPointsAndNormals(
+        region_vector, pointcloud_to_grow_on, pointcloud_normals_to_grow_on);
+
     // Region Growing Object
     pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> region_grower;
 
@@ -99,7 +103,9 @@ private:
     int max_cluster_size;
     float smoothness_threshold;
     float curvature_threshold;
-    bool use_recursive_growing
+    bool use_recursive_growing;
+    boost::shared_ptr<std::vector<PointCloud> pointcloud_vector_;
+    boost::shared_ptr<std::vector<Normals> normals_vector_;
 };
 
 #endif // MARCH_REGION_CREATOR_H
