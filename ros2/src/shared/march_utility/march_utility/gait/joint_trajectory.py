@@ -7,7 +7,10 @@ and to check the safety limits.
 
 from __future__ import annotations
 
+from math import isclose
 from typing import List, Tuple, Any
+
+import rclpy
 
 from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
@@ -159,16 +162,27 @@ class JointTrajectory(object):
             raise NonValidGaitContent(
                 self.name,
                 msg=f"Invalid boundary points for begin setpoint {self.setpoints[0]} "
-                f"and end setpoint {self.setpoints[-1]}",
+                f"and end setpoint {self.setpoints[-1]} with duration {self.duration}",
             )
 
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        return (
-            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
-            and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
-        )
+        logger = rclpy.logging.get_logger("march_utility_logger")
+
+        if not abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR:
+            logger.warning(
+                f"joint {self.name} has an invalid velocity transition as {from_setpoint.velocity} != {to_setpoint.velocity}"
+            )
+            return False
+
+        if not abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
+            logger.warning(
+                f"joint {self.name} has an invalid position transition as {from_setpoint.position} != {to_setpoint.position}"
+            )
+            return False
+
+        return True
 
     def _validate_boundary_points(self) -> bool:
         """Validate the starting and ending of this joint.
@@ -180,7 +194,11 @@ class JointTrajectory(object):
         return (
             self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
         ) and (
-            self.setpoints[-1].time == round(self.duration, Setpoint.digits)
+            isclose(
+                self.setpoints[-1].time.seconds,
+                self.duration.seconds,
+                abs_tol=ALLOWED_ERROR,
+            )
             or self.setpoints[-1].velocity == 0
         )
 

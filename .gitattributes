@@ -4,3 +4,5 @@
 *.png filter=lfs diff=lfs merge=lfs -text
 .flake-baseline filter=lfs diff=lfs merge=lfs -text
 ros2/src/shared/march_description/urdf/camera/_d435.dae filter=lfs diff=lfs merge=lfs -text
+*.ply filter=lfs diff=lfs merge=lfs -text
+*.stl filter=lfs diff=lfs merge=lfs -text

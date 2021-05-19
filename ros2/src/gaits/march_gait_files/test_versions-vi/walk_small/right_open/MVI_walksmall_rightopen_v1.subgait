@@ -1,26 +1,26 @@
-description: The MVI small walk, with the version 2 HAA movements of normal walking
+description: The MVI small walk, with the version 1 HAA movements of normal walking
 duration: 1500000000
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: 0.0436
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.04360007
-    time_from_start: 1500000000
-    velocity: 0.0
-  left_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.05235988
-    time_from_start: 400300000
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0348996
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.08726646
+    time_from_start: 600000000
     velocity: 0.0
   - position: -0.08729962
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: -0.1667
@@ -37,30 +37,33 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
-  - position: 0.04360007
-    time_from_start: 0
-    velocity: 0.0
-  - position: -0.06632251
-    time_from_start: 250000000
-    velocity: 0.0
-  - position: 0.04363323
-    time_from_start: 622000000
-    velocity: 0.0
-  - position: 0.0436
-    time_from_start: 1500000000
-    velocity: 0.0
-  right_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 728100000
+  - position: 0.0
+    time_from_start: 200000000
+    velocity: 0.0
+  - position: -0.06981317
+    time_from_start: 382000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 622000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0348996
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.06108652
+    time_from_start: 400000000
     velocity: 0.0
   - position: -0.08729962
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_fe:
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.4189
