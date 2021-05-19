@@ -78,6 +78,18 @@ private:
         boost::shared_ptr<RegionVector> last_region_vector,
         float last_tolerance);
 
+    // Find the total number of points in a region vector
+    int getTotalRegionVectorSize(boost::shared_ptr<RegionVector> region_vector);
+
+    // Splits a region Vector into the regions considered too large, just right,
+    // and too small
+    void segmentRegionVector(boost::shared_ptr<RegionVector> region_vector);
+
+    // Creates a potential region vector from a region vector with a certain
+    // tolerance
+    boost::shared_ptr<RegionVector> doRecursiveRegionGrowingStep(
+        boost::shared_ptr<RegionVector> region_vector, float tolerance);
+
     // Region Growing Object
     pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> region_grower;
 
@@ -90,4 +102,4 @@ private:
     bool use_recursive_growing
 };
 
-#endif // MARCH_PREPROCESSOR_H
+#endif // MARCH_REGION_CREATOR_H
