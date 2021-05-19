@@ -70,7 +70,6 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        RealSenseCategory const realsense_category,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
     /** This function is called upon whenever a parameter from config is
