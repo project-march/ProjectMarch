@@ -7,8 +7,10 @@
   <maintainer email="software@projectmarch.nl">Project MARCH</maintainer>
   <license>TODO: License declaration</license>
 
-  <test_depend>march_shared_msgs</test_depend>
-  <test_depend>std_msgs</test_depend>
+  <depend>march_shared_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>rclpy</depend>
+
   <test_depend>python3-pytest</test_depend>
 
   <export>

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from setuptools import setup
 
 package_name = 'march_smartglasses_bridge'
@@ -20,6 +21,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'march_smartglasses_bridge = march_smartglasses_bridge.bridge:main'
         ],
-    },
+ 
+        },
 )
