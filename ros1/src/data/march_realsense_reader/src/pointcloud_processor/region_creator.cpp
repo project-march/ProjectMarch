@@ -214,6 +214,7 @@ void RegionGrower::processInvalidRegions(const float& next_tolerance,
     }
 }
 
+// Add the right regions to the region points and region normals vectors
 void RegionGrower::addRegionsToPointAndNormalVectors(
     const boost::shared_ptr<RegionVector> right_size_regions,
     const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals)
@@ -233,6 +234,7 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
     }
 }
 
+// Fill a pointcloud with the points in invalid regions
 void RegionGrower::fillInvalidClouds(
     const boost::shared_ptr<RegionVector> invalid_region_vector,
     const PointCloud::Ptr last_pointcloud,
@@ -256,6 +258,8 @@ void RegionGrower::fillInvalidClouds(
     }
 }
 
+// Splits a region Vector into the regions considered too large, just right,
+// and too small
 void RegionGrower::segmentRegionVector(
     const boost::shared_ptr<RegionVector> region_vector,
     boost::shared_ptr<RegionVector> too_small_regions,
@@ -273,6 +277,7 @@ void RegionGrower::segmentRegionVector(
     }
 }
 
+// Creates a potential region vector from a pointcloud with a certain tolerance
 boost::shared_ptr<RegionVector> RegionGrower::getRegionVectorFromTolerance(
     const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals,
     const float& tolerance)
