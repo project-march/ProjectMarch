@@ -1,4 +1,4 @@
-description: Stairs down backwards with height of 13 cm and depth of 35 cm
+description: Stairs down backwards with height of 13 cm and depth of 45 cm
 duration: 2500000000
 gait_type: stairs_like
 joints:
