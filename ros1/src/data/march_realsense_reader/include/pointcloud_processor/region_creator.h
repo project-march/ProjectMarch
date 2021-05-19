@@ -78,9 +78,6 @@ private:
         boost::shared_ptr<RegionVector> last_region_vector,
         float last_tolerance);
 
-    // Find the total number of points in a region vector
-    int getTotalRegionVectorSize(boost::shared_ptr<RegionVector> region_vector);
-
     // Splits a region Vector into the regions considered too large, just right,
     // and too small
     void segmentRegionVector(boost::shared_ptr<RegionVector> region_vector);
@@ -104,8 +101,8 @@ private:
     float smoothness_threshold;
     float curvature_threshold;
     bool use_recursive_growing;
-    boost::shared_ptr<std::vector<PointCloud> pointcloud_vector_;
-    boost::shared_ptr<std::vector<Normals> normals_vector_;
+    boost::shared_ptr < std::vector<PointCloud> pointcloud_vector_;
+    boost::shared_ptr < std::vector<Normals> normals_vector_;
 };
 
 #endif // MARCH_REGION_CREATOR_H
