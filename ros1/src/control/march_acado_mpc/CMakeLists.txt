@@ -53,7 +53,7 @@ endif()
 # Models:   full_exo_simulation_disconnected
 #           test_joint_rotational,
 #           test_joint_linear
-set(MODEL_NAME test_joint_rotational)
+set(MODEL_NAME full_exo_simulation_disconnected)
 
 # Define a variable that points to the location of the chosen ACADO model_export directory. This
 # location is chosen by FetchContent_Declare.
