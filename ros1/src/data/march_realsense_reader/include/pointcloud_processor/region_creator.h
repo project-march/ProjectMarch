@@ -92,7 +92,7 @@ private:
     // tolerance
     boost::shared_ptr<RegionVector> getRegionVectorFromTolerance(
         const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals,
-        const float& tolerance);
+        const float& tolerance, boost::shared_ptr<RegionVector> region_vector);
 
     // Add the right regions to the region points and region normals vectors
     void addRegionsToPointAndNormalVectors(
