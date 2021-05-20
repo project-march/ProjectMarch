@@ -150,7 +150,7 @@ bool RegionGrower::extractRegions()
     Normals::Ptr region_normals = boost::make_shared<Normals>();
     for (const auto& region : *region_vector_) {
         pcl::copyPointCloud(*pointcloud_, region, *region_points);
-        pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
+        pcl::copyPointCloud(*pointcloud_normals_, region, *region_normals);
 
         points_vector_->push_back(region_points);
         normals_vector_->push_back(region_normals);
@@ -327,9 +327,6 @@ bool RegionGrower::getRegionVectorFromTolerance(
     const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals,
     const float& tolerance, boost::shared_ptr<RegionVector> region_vector)
 {
-    boost::shared_ptr<RegionVector> region_vector
-        = boost::make_shared<RegionVector>();
-
     if (pointcloud->size() == pointcloud_normals->size()) {
         region_grower.setInputCloud(pointcloud);
         region_grower.setInputNormals(pointcloud_normals);
@@ -340,11 +337,7 @@ bool RegionGrower::getRegionVectorFromTolerance(
                   "pointcloud_normals_to_grow_on is "
                   "of size: %lu. Returning empty region vector.",
             pointcloud->size(), pointcloud_normals->size());
-        return false
+        return false;
     }
     return true;
-}
-
-bool RegionGrower::getRegionVectorFromPointAndNormalVectors()
-{
 }

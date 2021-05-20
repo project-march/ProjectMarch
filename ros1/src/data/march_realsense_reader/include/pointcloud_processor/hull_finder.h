@@ -101,6 +101,7 @@ protected:
     int hull_dimension {};
 
     int region_index_ {};
+    boost::shared_ptr<RegionVector> region_vector_;
     PointCloud::Ptr region_points_;
     Normals::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;

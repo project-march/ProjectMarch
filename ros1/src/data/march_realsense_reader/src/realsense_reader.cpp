@@ -140,7 +140,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     // Setup data structures for region creating
     boost::shared_ptr<PointsVector> points_vector
-        = boost::make_shared<PointVector>();
+        = boost::make_shared<PointsVector>();
     boost::shared_ptr<NormalsVector> normals_vector
         = boost::make_shared<NormalsVector>();
     // Create regions
