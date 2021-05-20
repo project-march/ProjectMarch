@@ -18,8 +18,10 @@ RegionCreator::RegionCreator(bool debugging)
 RegionGrower::RegionGrower(bool debugging)
     : RegionCreator(debugging)
     , number_of_neighbours(-1)
-    , min_cluster_size(-1)
-    , max_cluster_size(-1)
+    , min_valid_cluster_size(-1)
+    , max_valid_cluster_size(-1)
+    , min_desired_cluster_size(-1)
+    , max_desired_cluster_size(-1)
     , smoothness_threshold(std::numeric_limits<float>::lowest())
     , curvature_threshold(std::numeric_limits<float>::lowest())
 {
@@ -72,8 +74,14 @@ void RegionGrower::readParameters(
 {
     number_of_neighbours
         = config.region_creator_region_growing_number_of_neighbours;
-    min_cluster_size = config.region_creator_region_growing_min_cluster_size;
-    max_cluster_size = config.region_creator_region_growing_max_cluster_size;
+    min_valid_cluster_size
+        = config.region_creator_region_growing_min_valid_cluster_size;
+    max_valid_cluster_size
+        = config.region_creator_region_growing_max_valid_cluster_size;
+    min_desired_cluster_size
+        = config.region_creator_region_growing_min_desired_cluster_size;
+    max_desired_cluster_size
+        = config.region_creator_region_growing_max_desired_cluster_size;
     smoothness_threshold
         = (float)config.region_creator_region_growing_smoothness_threshold;
     curvature_threshold
@@ -95,8 +103,8 @@ bool RegionGrower::setupRegionGrower()
     if (pointcloud_->size() == pointcloud_normals_->size()) {
         pcl::search::Search<pcl::PointXYZ>::Ptr tree(
             new pcl::search::KdTree<pcl::PointXYZ>);
-        region_grower.setMinClusterSize(min_cluster_size);
-        region_grower.setMaxClusterSize(max_cluster_size);
+        region_grower.setMinClusterSize(min_desired_cluster_size);
+        region_grower.setMaxClusterSize(max_desired_cluster_size);
         region_grower.setSearchMethod(tree);
         region_grower.setNumberOfNeighbours(number_of_neighbours);
         region_grower.setInputCloud(pointcloud_);
@@ -146,8 +154,8 @@ void RegionGrower::setupRecursiveRegionGrower()
 {
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(
         new pcl::search::KdTree<pcl::PointXYZ>);
-    region_grower.setMinClusterSize(min_cluster_size);
-    region_grower.setMaxClusterSize(max_cluster_size);
+    region_grower.setMinClusterSize(min_valid_cluster_size);
+    region_grower.setMaxClusterSize(max_valid_cluster_size);
     region_grower.setSearchMethod(tree);
     region_grower.setNumberOfNeighbours(number_of_neighbours);
     region_grower.setCurvatureThreshold(curvature_threshold);
@@ -212,7 +220,7 @@ bool RegionGrower::processInvalidRegions(const float& next_tolerance,
     const boost::shared_ptr<RegionVector> invalid_regions,
     PointCloud::Ptr last_pointcloud, Normals::Ptr last_pointcloud_normals)
 {
-    if (invalid_pointcloud->size() > 20) {
+    if (invalid_pointcloud->size() > min_desired_cluster_size) {
         // Try region growing on the invalid regions with a new tolerance
         boost::shared_ptr<RegionVector> potential_region_vector
             = boost::make_shared<RegionVector>();
@@ -285,9 +293,9 @@ void RegionGrower::segmentRegionVector(
     boost::shared_ptr<RegionVector> right_size_regions)
 {
     for (pcl::PointIndices region : *region_vector) {
-        if (region.indices.size() > 50) {
+        if (region.indices.size() > max_desired_cluster_size) {
             too_large_regions->push_back(region);
-        } else if (region.indices.size() < 20) {
+        } else if (region.indices.size() < min_desired_cluster_size) {
             too_small_regions->push_back(region);
         } else {
             right_size_regions->push_back(region);
