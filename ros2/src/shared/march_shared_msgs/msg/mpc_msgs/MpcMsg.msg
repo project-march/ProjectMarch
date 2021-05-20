@@ -1,3 +1,4 @@
-std_msgs/Header header
+Header header
+MpcDiagnostics diagnostics
 MpcJoint[] joint
 
