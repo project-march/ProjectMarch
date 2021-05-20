@@ -30,7 +30,7 @@ RegionGrower::RegionGrower(bool debugging)
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     Normals::Ptr pointcloud_normals,
     boost::shared_ptr<PointsVector> points_vector,
-    boost::shared_ptr<NormalsVector> normals_vector,)
+    boost::shared_ptr<NormalsVector> normals_vector)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;

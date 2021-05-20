@@ -18,7 +18,7 @@ using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
 using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 using PointsVector = std::vector<PointCloud::Ptr>;
-using NormalsVector = std::vector<Normals::ptr>;
+using NormalsVector = std::vector<Normals::Ptr>;
 
 class HullFinder {
 public:

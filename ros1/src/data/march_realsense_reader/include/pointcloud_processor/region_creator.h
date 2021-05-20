@@ -12,7 +12,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 using PointsVector = std::vector<PointCloud::Ptr>;
-using NormalsVector = std::vector<Normals::ptr>;
+using NormalsVector = std::vector<Normals::Ptr>;
 
 class RegionCreator {
 public:
@@ -20,7 +20,8 @@ public:
     // This function is required to be implemented by any region creator
     virtual bool createRegions(PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals,
-        boost::shared_ptr<RegionVector> region_vector)
+        boost::shared_ptr<PointsVector> points_vector,
+        boost::shared_ptr<NormalsVector> normals_vector)
         = 0;
     virtual ~RegionCreator() = default;
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
@@ -49,7 +50,8 @@ public:
      * region_vector with clusters. **/
     bool createRegions(PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals,
-        boost::shared_ptr<RegionVector> region_vector) override;
+        boost::shared_ptr<PointsVector> points_vector,
+        boost::shared_ptr<NormalsVector> normals_vector) override;
 
     /**
      * @return A pointer to a single pointcloud, with unique colours for every
@@ -129,8 +131,10 @@ private:
 
     // Region Growing configuration parameters
     int number_of_neighbours;
-    int min_cluster_size;
-    int max_cluster_size;
+    int min_valid_cluster_size;
+    int max_valid_cluster_size;
+    int min_desired_cluster_size;
+    int max_desired_cluster_size;
     float smoothness_threshold;
     float curvature_threshold;
     bool use_recursive_growing;

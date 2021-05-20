@@ -15,7 +15,8 @@
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
-using RegionVector = std::vector<pcl::PointIndices>;
+using PointsVector = std::vector<PointCloud::Ptr>;
+using NormalsVector = std::vector<Normals::Ptr>;
 using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
@@ -138,11 +139,13 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     // Setup data structures for region creating
-    boost::shared_ptr<RegionVector> region_vector
-        = boost::make_shared<RegionVector>();
+    boost::shared_ptr<PointsVector> points_vector
+        = boost::make_shared<PointVector>();
+    boost::shared_ptr<NormalsVector> normals_vector
+        = boost::make_shared<NormalsVector>();
     // Create regions
-    bool region_creating_was_successful
-        = region_creator_->createRegions(pointcloud, normals, region_vector);
+    bool region_creating_was_successful = region_creator_->createRegions(
+        pointcloud, normals, points_vector, normals_vector);
 
     if (not region_creating_was_successful) {
         res.error_message
@@ -168,9 +171,9 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     boost::shared_ptr<PolygonVector> polygon_vector
         = boost::make_shared<PolygonVector>();
     // Find hulls
-    bool hull_finding_was_successful
-        = hull_finder_->findHulls(pointcloud, normals, region_vector,
-            plane_coefficients_vector, hull_vector, polygon_vector);
+    bool hull_finding_was_successful = hull_finder_->findHulls(pointcloud,
+        normals, points_vector, normals_vector, plane_coefficients_vector,
+        hull_vector, polygon_vector);
 
     if (not hull_finding_was_successful) {
         res.error_message = "Hull finding was unsuccessful, see debug output "

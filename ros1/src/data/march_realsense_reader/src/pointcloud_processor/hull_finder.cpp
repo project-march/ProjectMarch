@@ -125,7 +125,7 @@ bool CHullFinder::getCHullFromRegion()
 bool CHullFinder::initializeRegionVariables()
 {
     region_points_ = points_vector_->at(region_index_);
-    region_normals_ = normals_vector_->at(region_index);
+    region_normals_ = normals_vector_->at(region_index_);
     region_points_projected_ = boost::make_shared<PointCloud>();
     plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
     hull_ = boost::make_shared<Hull>();
