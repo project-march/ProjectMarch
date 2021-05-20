@@ -55,11 +55,8 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
     } else {
-        ROS_DEBUG_STREAM("Using the normal grower");
         success &= setupRegionGrower();
-        ROS_DEBUG_STREAM("Setup worked");
         success &= extractRegions();
-        ROS_DEBUG_STREAM("Extraction worked");
     }
 
     clock_t end_region_grow = clock();
@@ -126,9 +123,7 @@ bool RegionGrower::setupRegionGrower()
 bool RegionGrower::extractRegions()
 {
     region_vector_ = boost::make_shared<RegionVector>();
-    ROS_DEBUG_STREAM("fine after initializing region vector");
     region_grower.extract(*region_vector_);
-    ROS_DEBUG_STREAM("fine after setting region vector");
 
     if (region_vector_->size() == 0) {
         ROS_WARN("Region growing algorithm found no clusters, stopping "
@@ -150,8 +145,6 @@ bool RegionGrower::extractRegions()
         }
     }
 
-    ROS_DEBUG_STREAM(__LINE__ << "fine before making the point vector");
-
     PointCloud::Ptr region_points = boost::make_shared<PointCloud>();
     Normals::Ptr region_normals = boost::make_shared<Normals>();
     for (const auto& region : *region_vector_) {
@@ -165,14 +158,43 @@ bool RegionGrower::extractRegions()
         region_normals->clear();
     }
 
-    ROS_DEBUG_STREAM(__LINE__ << "fine after setting the point vector");
-
     return true;
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
+ColoredCloud::Ptr RegionGrower::debug_visualisation()
 {
-    return region_grower.getColoredCloud();
+    if (!use_recursive_growing) {
+        return region_grower.getColoredCloud();
+    } else {
+        ColoredCloud::Ptr colored_cloud = boost::make_shared<ColoredCloud>();
+        ColoredCloud::Ptr colored_region = boost::make_shared<ColoredCloud>();
+        for (int region_index = 0; region_index < points_vector_->size(); ++i) {
+            // Color the hull with a random color (r, g and b in [1, 0])
+            int number_of_colors = 500;
+            // clang-tidy linter cert-msc30-c and cert-msc50-cpp say that rand()
+            // is not a uniform distribution. This is not something that is
+            // important here, therefore these lines can ignore this linter
+            // rule. NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
+            double r = (rand() % number_of_colors) / (double)number_of_colors;
+            // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
+            double g = (rand() % number_of_colors) / (double)number_of_colors;
+            // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
+            double b = (rand() % number_of_colors) / (double)number_of_colors;
+            colored_region.reserve(point_vector_->size());
+            for (pcl::PointXYZ point : *points_vector_->at(region_index)) {
+                pcl::PointRBGXYZ colored_point;
+                colored_point.x = point.x;
+                colored_point.y = point.y;
+                colored_point.z = point.z;
+                colored_point.r = r;
+                colored_point.g = g;
+                colored_point.b = b;
+                colored_region->points.push_back(colored_point);
+            }
+            *colored_cloud += *colored_region;
+        }
+        return colored_cloud;
+    }
 }
 
 // Similar to the regular setup, but the cloud, normals, and smoothness

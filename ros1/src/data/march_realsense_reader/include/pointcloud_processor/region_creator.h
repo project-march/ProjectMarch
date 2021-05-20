@@ -10,6 +10,7 @@
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
+using ColoredCloud = pcl::PointCloud<pcl::PointXYZRGB>;
 using RegionVector = std::vector<pcl::PointIndices>;
 using PointsVector = std::vector<PointCloud::Ptr>;
 using NormalsVector = std::vector<Normals::Ptr>;
@@ -24,7 +25,7 @@ public:
         boost::shared_ptr<NormalsVector> normals_vector)
         = 0;
     virtual ~RegionCreator() = default;
-    virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
+    virtual ColoredCloud::Ptr debug_visualisation() = 0;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -57,7 +58,7 @@ public:
      * @return A pointer to a single pointcloud, with unique colours for every
      * cluster
      */
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
+    ColoredCloud::Ptr debug_visualisation() override;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
