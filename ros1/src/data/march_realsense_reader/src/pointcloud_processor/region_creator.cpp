@@ -80,8 +80,12 @@ void RegionGrower::readParameters(
         = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
-    tolerance_change_factor
-        = config.region_creator_region_growing_talerance_change_factor;
+    tolerance_change_factor_decrease
+        = (float)config
+              .region_creator_region_growing_tolerance_change_factor_increase;
+    tolerance_change_factor_decrease
+        = (float)config
+              .region_creator_region_growing_tolerance_change_factor_decrease;
 
     debugging_ = config.debug;
 }
@@ -185,8 +189,8 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    float large_tolerance = last_tolerance * 1.1f;
-    float small_tolerance = last_tolerance / 1.1f;
+    float large_tolerance = last_tolerance * tolerance_change_factor_increase;
+    float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
     // Process the invalid regions with the new tolerance
     // This method makes a call to this method if the invalid region is large

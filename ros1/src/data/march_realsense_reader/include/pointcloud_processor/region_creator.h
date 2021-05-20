@@ -131,6 +131,8 @@ private:
     float smoothness_threshold;
     float curvature_threshold;
     bool use_recursive_growing;
+    float tolerance_change_factor_decrease
+    float tolerance_change_factor_increase
     boost::shared_ptr<std::vector<PointCloud::Ptr>> pointcloud_vector_;
     boost::shared_ptr<std::vector<Normals::Ptr>> normals_vector_;
 };
