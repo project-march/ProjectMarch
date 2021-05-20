@@ -60,9 +60,9 @@ public:
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
     bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
-                   boost::shared_ptr<PointsVector> points_vector,
-                   boost::shared_ptr<NormalsVector> normals_vector,
-                   boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
+        boost::shared_ptr<PointsVector> points_vector,
+        boost::shared_ptr<NormalsVector> normals_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
         boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector) override;
 

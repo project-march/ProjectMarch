@@ -35,7 +35,8 @@ public:
 protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
-    boost::shared_ptr<RegionVector> region_vector_;
+    boost::shared_ptr<PointsVector> pointcloud_vector_;
+    boost::shared_ptr<NormalsVector> normals_vector_;
     bool debugging_;
 };
 
@@ -135,8 +136,7 @@ private:
     bool use_recursive_growing;
     float tolerance_change_factor_decrease;
     float tolerance_change_factor_increase;
-    boost::shared_ptr<PointsVector> pointcloud_vector_;
-    boost::shared_ptr<NormalsVector> normals_vector_;
+    boost::shared_ptr<RegionVector> region_vector_;
 };
 
 #endif // MARCH_REGION_CREATOR_H

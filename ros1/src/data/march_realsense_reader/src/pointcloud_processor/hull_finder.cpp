@@ -34,7 +34,8 @@ CHullFinder::CHullFinder(bool debugging)
 
 bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
     Normals::Ptr pointcloud_normals,
-    boost::shared_ptr<RegionVector> region_vector,
+    boost::shared_ptr<PointsVector> points_vector,
+    boost::shared_ptr<NormalsVector> normals_vector,
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
     boost::shared_ptr<HullVector> hull_vector,
     boost::shared_ptr<PolygonVector> polygon_vector)
@@ -43,7 +44,8 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
-    region_vector_ = region_vector;
+    points_vector_ = points_vector;
+    normals_vector_ = normals_vector;
     plane_coefficients_vector_ = plane_coefficients_vector;
     hull_vector_ = hull_vector;
     polygon_vector_ = polygon_vector;
@@ -54,8 +56,6 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     for (region_index_ = 0; region_index_ < region_vector_->size();
          region_index_++) {
-        region_ = region_vector_->at(region_index_);
-
         success &= getCHullFromRegion();
     }
 
@@ -124,15 +124,11 @@ bool CHullFinder::getCHullFromRegion()
 // Get the points and normals of the region and initialize region variables
 bool CHullFinder::initializeRegionVariables()
 {
-    region_points_ = boost::make_shared<PointCloud>();
-    region_normals_ = boost::make_shared<Normals>();
+    region_points_ = points_vector_->at(region_index_);
+    region_normals_ = normals_vector_->at(region_index);
     region_points_projected_ = boost::make_shared<PointCloud>();
     plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
     hull_ = boost::make_shared<Hull>();
-
-    pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
-    pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
-
     return true;
 }
 

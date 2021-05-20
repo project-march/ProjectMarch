@@ -29,11 +29,13 @@ RegionGrower::RegionGrower(bool debugging)
 
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     Normals::Ptr pointcloud_normals,
-    boost::shared_ptr<RegionVector> region_vector)
+    boost::shared_ptr<PointsVector> points_vector,
+    boost::shared_ptr<NormalsVector> normals_vector,)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
-    region_vector_ = region_vector;
+    points_vector_ = points_vector;
+    normals_vector_ = normals_vector;
     ROS_DEBUG_STREAM("Creating regions with region growing");
 
     clock_t start_region_grow = clock();
@@ -54,7 +56,6 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         setupRecursiveRegionGrower();
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
-        success &= getRegionVectorFromPointAndNormalVectors();
     } else {
         success &= setupRegionGrower();
         success &= extractRegions();
@@ -124,6 +125,16 @@ bool RegionGrower::setupRegionGrower()
 bool RegionGrower::extractRegions()
 {
     region_grower.extract(*region_vector_);
+
+    if (region_vector_->size() == 0) {
+        ROS_WARN("Region growing algorithm found no clusters, stopping "
+                 "region grower");
+        return false;
+    } else {
+        points_vector_->reserve(region_vector_->size());
+        normals_vector_->reserve(region_vector_->size());
+    }
+
     if (debugging_) {
         ROS_DEBUG(
             "Total number of clusters found: %lu", region_vector_->size());
@@ -135,10 +146,17 @@ bool RegionGrower::extractRegions()
         }
     }
 
-    if (region_vector_->size() == 0) {
-        ROS_WARN("Region growing algorithm found no clusters, stopping "
-                 "region grower");
-        return false;
+    PointCloud::Ptr region_points = boost::make_shared<PointCloud>();
+    Normals::Ptr region_normals = boost::make_shared<Normals>();
+    for (const auto& region : *region_vector_) {
+        pcl::copyPointCloud(*pointcloud_, region, *region_points);
+        pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
+
+        points_vector_->push_back(region_points);
+        normals_vector_->push_back(region_normals);
+
+        region_points->clear();
+        region_normals->clear();
     }
 
     return true;
@@ -252,7 +270,7 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
         pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
         pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
 
-        pointcloud_vector_->push_back(region_pointcloud);
+        points_vector_->push_back(region_pointcloud);
         normals_vector_->push_back(region_normals);
 
         region_pointcloud->clear();
@@ -329,5 +347,4 @@ bool RegionGrower::getRegionVectorFromTolerance(
 
 bool RegionGrower::getRegionVectorFromPointAndNormalVectors()
 {
-
 }
