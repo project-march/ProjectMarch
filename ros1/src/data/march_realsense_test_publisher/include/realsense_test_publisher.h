@@ -85,10 +85,10 @@ private:
     std::string pointcloud_topic;
     bool should_publish;
     bool from_back_camera;
-    int realsense_category;
     bool from_realsense_viewer;
     bool save_camera_back;
     SelectedMode selected_mode;
+    int realsense_category;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H
