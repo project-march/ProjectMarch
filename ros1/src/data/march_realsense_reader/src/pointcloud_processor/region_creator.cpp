@@ -4,6 +4,8 @@
 #include <pcl/search/search.h>
 #include <ros/ros.h>
 
+#define EPSILON 0.0001
+
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
@@ -92,11 +94,9 @@ void RegionGrower::readParameters(
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
     tolerance_change_factor_decrease
-        = config
-              .region_creator_region_growing_tolerance_change_factor_increase;
+        = config.region_creator_region_growing_tolerance_change_factor_increase;
     tolerance_change_factor_decrease
-        = config
-              .region_creator_region_growing_tolerance_change_factor_decrease;
+        = config.region_creator_region_growing_tolerance_change_factor_decrease;
 
     debugging_ = config.debug;
 }
@@ -251,14 +251,23 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
+    if (last_tolerance < EPSILON) {
+        ROS_ERROR_STREAM("The last tolerance given is smaller then "
+            << EPSILON << ". Termination recursive region growing.");
+        return false;
+    }
     double large_tolerance = last_tolerance * tolerance_change_factor_increase;
     double small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
-    ROS_DEBUG_STREAM("The too small cloud is of size " << too_small_pointcloud->size());
-    ROS_DEBUG_STREAM("As a result of the too small regions of which there are " << too_small_regions->size());
+    ROS_DEBUG_STREAM(
+        "The too small cloud is of size " << too_small_pointcloud->size());
+    ROS_DEBUG_STREAM("As a result of the too small regions of which there are "
+        << too_small_regions->size());
     ROS_DEBUG_STREAM("The tolerance for that cloud is " << large_tolerance);
-    ROS_DEBUG_STREAM("The too large cloud is of size " << too_large_pointcloud->size());
-    ROS_DEBUG_STREAM("As a result of the too large regions of which there are " << too_large_regions->size());
+    ROS_DEBUG_STREAM(
+        "The too large cloud is of size " << too_large_pointcloud->size());
+    ROS_DEBUG_STREAM("As a result of the too large regions of which there are "
+        << too_large_regions->size());
     ROS_DEBUG_STREAM("The tolerance for that cloud is " << small_tolerance);
 
     // Process the invalid regions with the new tolerance
