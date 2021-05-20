@@ -32,8 +32,6 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     , from_realsense_viewer(nullptr)
     , save_camera_back(false)
     , realsense_category(-1)
-    , from_realsense_viewer(nullptr)
-    , save_camera_back(false)
 {
     if (ros::console::set_logger_level(
             ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
@@ -266,48 +264,6 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
     return true;
 }
 
-bool RealsenseTestPublisher::saveCurrentPointcloud()
-{
-    // Set the correct pointcloud topic
-    std::string pointcloud_topic;
-    if (save_camera_back) {
-        pointcloud_topic = TOPIC_CAMERA_BACK;
-    } else {
-        pointcloud_topic = TOPIC_CAMERA_FRONT;
-    }
-    if (save_pointcloud_name.compare(
-            save_pointcloud_name.length() - POINTCLOUD_EXTENSION.length(),
-            POINTCLOUD_EXTENSION.length(), POINTCLOUD_EXTENSION)
-        != 0) {
-        ROS_WARN_STREAM("The name under which to save the pointcloud should "
-                        "end with .ply but does not. Supplied name is "
-            << save_pointcloud_name);
-        return false;
-    }
-    // get the next pointcloud from the topic
-    boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
-        = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            pointcloud_topic, *n_, POINTCLOUD_TIMEOUT);
-
-    if (input_cloud == nullptr) {
-        ROS_WARN_STREAM("No pointcloud published within timeout on topic "
-            << pointcloud_topic
-            << ", so "
-               "no saving could be done.");
-        return false;
-    }
-    PointCloud converted_cloud;
-    pcl::fromROSMsg(*input_cloud, converted_cloud);
-    PointCloud::Ptr point_cloud
-        = boost::make_shared<PointCloud>(converted_cloud);
-
-    if (pcl::io::savePLYFileBinary(
-            write_path.string() + save_pointcloud_name, *point_cloud)
-        == -1) {
-        return false;
-    }
-    return true;
-}
 // Publish the right pointcloud based on the latest service call
 void RealsenseTestPublisher::updatePublishLoop(
     march_shared_msgs::PublishTestDataset::Response& res)
