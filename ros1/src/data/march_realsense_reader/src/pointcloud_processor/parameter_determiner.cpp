@@ -65,11 +65,19 @@ void HullParameterDeterminer::readParameters(
 
     max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
     min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
-    x_flat = (float)config.parameter_determiner_ramp_x_flat;
-    z_flat = (float)config.parameter_determiner_ramp_z_flat;
-    x_steep = (float)config.parameter_determiner_ramp_x_steep;
-    z_steep = (float)config.parameter_determiner_ramp_z_steep;
-    y_location = (float)config.parameter_determiner_ramp_y_location;
+
+    x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
+    z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
+    x_steep_down = (float)config.parameter_determiner_ramp_x_steep_down;
+    z_steep_down = (float)config.parameter_determiner_ramp_z_steep_down;
+
+    x_flat_up = (float)config.parameter_determiner_ramp_x_flat_up;
+    z_flat_up = (float)config.parameter_determiner_ramp_z_flat_up;
+    x_steep_up = (float)config.parameter_determiner_ramp_x_steep_up;
+    z_steep_up = (float)config.parameter_determiner_ramp_z_steep_up;
+
+    y_location = (float)config.parameter_determiner_y_location;
+
     max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
@@ -104,6 +112,12 @@ bool HullParameterDeterminer::determineParameters(
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
 
+    // Since the parameter determining for e.g. ramp down is very similar to
+    // ramp up set variables like the size a step on a flat ramp equal to the
+    // relevant (up or down) value and continue threating ramp up and ramp down
+    // the same
+    initializeGaitDimensions();
+
     bool success = true;
 
     // Only calculate the gait parameters if an optimal foot location has been
@@ -132,6 +146,26 @@ bool HullParameterDeterminer::determineParameters(
     return success;
 };
 
+void HullParameterDeterminer::initializeGaitDimensions()
+{
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::ramp_down: {
+            x_flat = x_flat_down;
+            x_steep = x_steep_down;
+            z_flat = z_flat_down;
+            z_steep = z_steep_down;
+            break;
+        }
+        case RealSenseCategory::ramp_up: {
+            x_flat = x_flat_up;
+            x_steep = x_steep_up;
+            z_flat = z_flat_up;
+            z_steep = z_steep_up;
+            break;
+        }
+    }
+}
+
 // Find the parameters from the foot location by finding at what percentage of
 // the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
@@ -142,8 +176,9 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
             success &= getGaitParametersFromFootLocationStairsUp();
             break;
         }
-        case RealSenseCategory::ramp_down: {
-            success &= getGaitParametersFromFootLocationRampDown();
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+            success &= getGaitParametersFromFootLocationRamp();
             break;
         }
         default: {
@@ -168,7 +203,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
     return true;
 }
 
-bool HullParameterDeterminer::getGaitParametersFromFootLocationRampDown()
+bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
 {
     // As we can only execute gaits in a certain line,
     // project to the line and find where on the line the point falls.
@@ -235,7 +270,8 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             success &= getPossibleMostDesirableLocation();
             break;
         }
-        case RealSenseCategory::ramp_down: {
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
             // Get the line on which it is possible to stand for a ramp gait.
             success &= getExecutableLocationsLine();
 
@@ -260,7 +296,7 @@ bool HullParameterDeterminer::getExecutableLocationsLine()
     executable_locations_line_coefficients_->values.resize(/*__new_size=*/6);
 
     executable_locations_line_coefficients_->values[0] = x_flat - x_steep;
-    executable_locations_line_coefficients_->values[1] = y_location;
+    executable_locations_line_coefficients_->values[1] = 0;
     executable_locations_line_coefficients_->values[2] = z_flat - z_steep;
 
     executable_locations_line_coefficients_->values[3] = x_steep;
@@ -315,25 +351,32 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 bool HullParameterDeterminer::getDistanceToObject(
     pcl::PointNormal possible_foot_location, double& distance)
 {
-    if (realsense_category_.value() == RealSenseCategory::stairs_up
-        or realsense_category_.value() == RealSenseCategory::stairs_down) {
-        // For stairs gait find which point is closest to the most desirable
-        // location
-        distance = linear_algebra_utilities::distanceBetweenPoints(
-            possible_foot_location, most_desirable_foot_location_);
-    } else if (realsense_category_.value() == RealSenseCategory::ramp_up
-        or realsense_category_.value() == RealSenseCategory::ramp_down) {
-        // For the ramp find which point is closest to the possible locations
-        // line
-        distance = linear_algebra_utilities::distancePointToLine(
-            possible_foot_location, executable_locations_line_coefficients_);
-    } else {
-        ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
-                         "for selected obstacle "
-            << realsense_category_.value());
-        return false;
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up:
+        case RealSenseCategory::stairs_down: {
+            // For stairs gait find which point is closest to the most desirable
+            // location
+            distance = linear_algebra_utilities::distanceBetweenPoints(
+                possible_foot_location, most_desirable_foot_location_);
+            break;
+        }
+        case RealSenseCategory::ramp_up:
+        case RealSenseCategory::ramp_down: {
+            // For the ramp find which point is closest to the possible
+            // locations line
+            distance = linear_algebra_utilities::distancePointToLine(
+                possible_foot_location,
+                executable_locations_line_coefficients_);
+            break;
+        }
+        default: {
+            ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
+                             "for selected obstacle "
+                << realsense_category_.value());
+            distance = std::numeric_limits<double>::max();
+            return false;
+        }
     }
-
     return true;
 }
 
@@ -354,7 +397,8 @@ bool HullParameterDeterminer::isValidLocation(
                 && possible_foot_location.z < max_z_stairs
                 && entireFootCanBePlaced(possible_foot_location));
         }
-        case RealSenseCategory::ramp_down: {
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
             pcl::PointXYZ projected_point
                 = linear_algebra_utilities::projectPointToLine(
                     possible_foot_location,
@@ -466,7 +510,8 @@ bool HullParameterDeterminer::getOptionalFootLocations(
                 &= fillOptionalFootLocationCloud(min_x_stairs, max_x_stairs);
             break;
         }
-        case RealSenseCategory::ramp_down: {
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
             success &= fillOptionalFootLocationCloud(
                 min_search_area, max_search_area);
             break;
