@@ -23,7 +23,7 @@ namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated)
+    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
     : MotorController(slave, std::move(absolute_encoder),
         std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
@@ -33,20 +33,21 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
             "An ODrive needs an absolute encoder");
     }
+    torque_constant_ = motor_kv * KV_TO_TORQUE_CONSTANT;
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated)
+    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
     : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode,
-        pre_calibrated)
+        pre_calibrated, motor_kv)
 {
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode)
-    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false)
+    ActuationMode actuation_mode, unsigned int motor_kv)
+    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false, motor_kv)
 {
 }
 
@@ -81,8 +82,10 @@ void ODrive::waitForState(ODriveAxisState target_state)
     }
 }
 
-void ODrive::actuateTorque(float target_torque)
+void ODrive::actuateTorque(float target_effort)
 {
+    float target_torque = target_effort * torque_constant_;
+    ROS_INFO_STREAM("Writing torque: " << target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
         ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
@@ -113,11 +116,15 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     auto state = std::make_unique<ODriveState>();
 
     // Set general attributes
+    state->motor_current_ = getMotorCurrent();
     state->absolute_position_iu_ = getAbsolutePositionIU();
-    state->absolute_velocity_iu_ = getAbsoluteVelocityIU();
+    state->incremental_position_iu_ = getIncrementalPositionIU();
+    state->incremental_velocity_iu_ = getIncrementalVelocityIU();
 
     state->absolute_position_ = getAbsolutePositionUnchecked();
     state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
+    state->incremental_position_ = getIncrementalPositionUnchecked();
+    state->incremental_position_ = getIncrementalPositionUnchecked();
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
@@ -126,15 +133,13 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     state->encoder_manager_error_ = getEncoderManagerError();
     state->encoder_error_ = getEncoderError();
     state->controller_error_ = getControllerError();
+
     return state;
 }
 
 float ODrive::getTorque()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::ActualTorque, axis_))
-        .f;
+    return getMotorCurrent() * torque_constant_;
 }
 
 bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
@@ -152,27 +157,36 @@ void ODrive::reset(SdoSlaveInterface& /*sdo*/)
 ODriveAxisState ODrive::getAxisState()
 {
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(
-                                            ODriveObjectName::AxisState, axis_))
-                               .ui);
+        ODriveObjectName::AxisState, axis_))
+        .ui);
 }
 
-void ODrive::setAxisState(ODriveAxisState state)
+void ODrive::setAxisState(ODriveAxisState /* state */)
 {
-    bit32 write_struct = { .ui = state.value_ };
-    this->write32(ODrivePDOmap::getMOSIByteOffset(
-                      ODriveObjectName::RequestedState, axis_),
-        write_struct);
+    return;
+//    bit32 write_struct = { .ui = state.value_ };
+//    this->write32(ODrivePDOmap::getMOSIByteOffset(
+//                      ODriveObjectName::RequestedState, axis_),
+//        write_struct);
 }
 
-float ODrive::getAbsolutePositionIU()
+int32_t ODrive::getAbsolutePositionIU()
 {
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ActualPosition, axis_))
+        .i;
+}
+
+float ODrive::getIncrementalPositionIU()
+{
+    return this
+        ->read32(ODrivePDOmap::getMISOByteOffset(
+            ODriveObjectName::MotorPosition, axis_))
         .f;
 }
 
-float ODrive::getAbsoluteVelocityIU()
+float ODrive::getIncrementalVelocityIU()
 {
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
@@ -182,14 +196,34 @@ float ODrive::getAbsoluteVelocityIU()
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->positionIUToRadians(
+    return this->getAbsoluteEncoder()->positionIUToRadians(
         getAbsolutePositionIU());
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->velocityIUToRadians(
-        getAbsoluteVelocityIU());
+    // The current ODrive firmware doesn't support absolute encoder velocity
+    return getIncrementalVelocityUnchecked();
+}
+
+float ODrive::getIncrementalPositionUnchecked()
+{
+    return this->getIncrementalEncoder()->positionIUToRadians(
+        getIncrementalPositionIU());
+}
+
+float ODrive::getIncrementalVelocityUnchecked()
+{
+    return this->getIncrementalEncoder()->velocityIUToRadians(
+        getIncrementalVelocityIU());
+}
+
+float ODrive::getMotorCurrent()
+{
+    return this
+        ->read32(ODrivePDOmap::getMISOByteOffset(
+            ODriveObjectName::ActualCurrent, axis_))
+        .f;
 }
 
 uint32_t ODrive::getAxisError()
@@ -239,11 +273,6 @@ void ODrive::actuateRadians(float /*target_position*/)
     throw error::NotImplemented("actuateRadians", "ODrive");
 }
 
-float ODrive::getMotorCurrent()
-{
-    throw error::NotImplemented("getMotorCurrent", "ODrive");
-}
-
 float ODrive::getMotorControllerVoltage()
 {
     throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
@@ -252,16 +281,6 @@ float ODrive::getMotorControllerVoltage()
 float ODrive::getMotorVoltage()
 {
     throw error::NotImplemented("getMotorVoltage", "ODrive");
-}
-
-float ODrive::getIncrementalPositionUnchecked()
-{
-    throw error::NotImplemented("getIncrementalPosition", "ODrive");
-}
-
-float ODrive::getIncrementalVelocityUnchecked()
-{
-    throw error::NotImplemented("getIncrementalVelocity", "ODrive");
 }
 
 } // namespace march

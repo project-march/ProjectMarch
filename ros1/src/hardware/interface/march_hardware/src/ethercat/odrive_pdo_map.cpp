@@ -14,7 +14,7 @@ namespace march {
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_0 = {
     { ODriveObjectName::ActualPosition,
         ODriveObject(/*offset=*/0, /*length=*/32) },
-    { ODriveObjectName::ActualTorque,
+    { ODriveObjectName::ActualCurrent,
         ODriveObject(/*offset=*/4, /*length=*/32) },
     { ODriveObjectName::ActualVelocity,
         ODriveObject(/*offset=*/8, /*length=*/32) },
@@ -30,27 +30,31 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_0 = {
     { ODriveObjectName::AxisState, ODriveObject(/*offset=*/32, /*length=*/32) },
     { ODriveObjectName::Temperature,
         ODriveObject(/*offset=*/36, /*length=*/32) },
+    { ODriveObjectName::MotorPosition,
+            ODriveObject(/*offset=*/40, /*length=*/32) }
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = {
     { ODriveObjectName::ActualPosition,
-        ODriveObject(/*offset=*/40, /*length=*/32) },
-    { ODriveObjectName::ActualTorque,
         ODriveObject(/*offset=*/44, /*length=*/32) },
-    { ODriveObjectName::ActualVelocity,
+    { ODriveObjectName::ActualCurrent,
         ODriveObject(/*offset=*/48, /*length=*/32) },
-    { ODriveObjectName::AxisError, ODriveObject(/*offset=*/52, /*length=*/32) },
+    { ODriveObjectName::ActualVelocity,
+        ODriveObject(/*offset=*/52, /*length=*/32) },
+    { ODriveObjectName::AxisError, ODriveObject(/*offset=*/56, /*length=*/32) },
     { ODriveObjectName::MotorError,
-        ODriveObject(/*offset=*/56, /*length=*/32) },
-    { ODriveObjectName::EncoderManagerError,
         ODriveObject(/*offset=*/60, /*length=*/32) },
-    { ODriveObjectName::EncoderError,
+    { ODriveObjectName::EncoderManagerError,
         ODriveObject(/*offset=*/64, /*length=*/32) },
-    { ODriveObjectName::ControllerError,
+    { ODriveObjectName::EncoderError,
         ODriveObject(/*offset=*/68, /*length=*/32) },
+    { ODriveObjectName::ControllerError,
+        ODriveObject(/*offset=*/72, /*length=*/32) },
     { ODriveObjectName::AxisState, ODriveObject(/*offset=*/72, /*length=*/32) },
     { ODriveObjectName::Temperature,
         ODriveObject(/*offset=*/76, /*length=*/32) },
+    { ODriveObjectName::MotorPosition,
+        ODriveObject(/*offset=*/80, /*length=*/32) }
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {

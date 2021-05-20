@@ -27,7 +27,7 @@ const std::vector<std::string>
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
     = { "incrementalEncoder", "absoluteEncoder" };
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS
-    = { "axis", "absoluteEncoder" };
+    = { "axis", "absoluteEncoder", "motorKV" };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset" };
 const std::vector<std::string>
@@ -224,12 +224,13 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     if (odrive_config["preCalibrated"]) {
         pre_calibrated = odrive_config["preCalibrated"].as<bool>();
     }
+    unsigned int motor_kv = odrive_config["motorKV"].as<unsigned int>();
 
     return std::make_unique<march::ODrive>(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
             march::MotorControllerType::ODrive, urdf_joint),
-        mode, pre_calibrated);
+        mode, pre_calibrated, motor_kv);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(

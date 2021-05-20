@@ -150,6 +150,9 @@ private:
         motor_controller_state_pub_;
     RtPublisherPtr<march_shared_msgs::PressureSolesData>
         pressure_sole_data_pub_;
+
+    float determineTorque(const ros::Time& time);
+    std::unique_ptr<ros::Time> start_time = nullptr;
 };
 
 #endif // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

@@ -1,7 +1,7 @@
 testsetup:
-  if_name: enp2s0
+  if_name: enp0s31f6
   ecatCycleTime: 4
-  ecatSlaveTimeout: 50
+  ecatSlaveTimeout: 250
   joints:
     - rotational_joint:
         allowActuation: true
@@ -10,8 +10,12 @@ testsetup:
           actuationMode: torque
           slaveIndex: 1
           axis: 0
-          preCalibrated: false
+          preCalibrated: true
+          motorKV: 95
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 29266
-            maxPositionIU: 52948
+            resolution: 20
+            minPositionIU: 308602
+            maxPositionIU: 552125
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101

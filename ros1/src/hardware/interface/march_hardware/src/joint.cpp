@@ -56,7 +56,7 @@ void Joint::prepareActuation()
             "Failed to prepare joint %s for actuation", this->name_.c_str());
     }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
-    motor_controller_->prepareActuation();
+//    motor_controller_->prepareActuation();
     ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 
     if (motor_controller_->hasIncrementalEncoder()) {
