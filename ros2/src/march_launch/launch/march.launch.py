@@ -23,6 +23,9 @@ def generate_launch_description():
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
 
+    # HUD arguments
+    use_hud = LaunchConfiguration("use_hud")
+
     # Simulation arguments
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -102,6 +105,11 @@ def generate_launch_description():
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting.",
+            ),
+            DeclareLaunchArgument(
+                name="use_hud",
+                default_value="False",
+                description="Whether to use a physical HUD for the pilot",
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
@@ -249,6 +257,16 @@ def generate_launch_description():
                     ("maximum_fake_temperature", maximum_fake_temperature),
                 ],
                 condition=IfCondition(fake_sensor_data),
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_smartglasses_bridge"),
+                        "launch",
+                        "smartglasses_bridge.launch.py",
+                    )
+                ),
+                condition=IfCondition(use_hud),
             ),
         ]
     )
