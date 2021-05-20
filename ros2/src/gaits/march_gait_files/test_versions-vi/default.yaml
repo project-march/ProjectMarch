@@ -28,14 +28,14 @@ gaits:
     right_open: MVI_RD_slopeup_rightopen_steep_v1
     right_swing: MVI_RD_slopeup_rightswing_steep_v1
   realsense_sit:
-    sit_down: MVI_sit_down_high_v1
-    sit_home: MVI_sit_home_high_v1
+    sit_down: MVI_sit_down_low_v1
+    sit_home: MVI_sit_home_low_v1
   realsense_stairs_up_single_step:
     left_close: MVI_stairsup_leftclose_low_undeep
     right_open: MVI_stairsup_rightopen_low_undeep
   realsense_stand:
-    prepare_stand_up: MVI_prepare_stand_up_high_v1
-    stand_up: MVI_stand_up_high_v1
+    prepare_stand_up: MVI_prepare_stand_up_low_v1
+    stand_up: MVI_stand_up_low_v1
   rough_terrain_first_middle_step:
     left_close: MV_RT_first_middlestep_leftclose_v2
     right_open: MV_RT_first_middlestep_rightopen_v2
@@ -139,15 +139,26 @@ gaits:
     right_open: MVI_walksmall_rightopen_v2
     right_swing: MVI_walksmall_rightswing_v2
 positions:
+  low_sit:
+    gait_type: sit_like
+    joints:
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: 1.5708
+      left_knee: 1.8326
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: 1.5708
+      right_knee: 1.8326
   high_sit:
     gait_type: sit_like
     joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
       left_hip_fe: 1.3962634
       left_knee: 1.48352986
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
       right_hip_fe: 1.3962634
       right_knee: 1.48352986
   idle_1:
@@ -282,28 +293,17 @@ positions:
       right_hip_aa: 0.1222
       right_hip_fe: -0.0873
       right_knee: 0.0
-  low_sit:
-    gait_type: sit_like
-    joints:
-      left_ankle: 0.1571
-      left_hip_aa: 0.0
-      left_hip_fe: 1.5708
-      left_knee: 1.8326
-      right_ankle: 0.1571
-      right_hip_aa: 0.0
-      right_hip_fe: 1.5708
-      right_knee: 1.8326
   sit:
     gait_type: walk_like
     joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: 1.2217
-      left_knee: 1.5708
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: 1.2217
-      right_knee: 1.5708
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: 1.5708
+      left_knee: 1.7453
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: 1.5708
+      right_knee: 1.7453
   stand:
     gait_type: walk_like
     joints:
