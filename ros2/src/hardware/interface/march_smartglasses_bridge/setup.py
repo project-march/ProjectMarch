@@ -23,6 +23,5 @@ setup(
         'console_scripts': [
             'march_smartglasses_bridge = march_smartglasses_bridge.bridge:main'
         ],
- 
-        },
+    },
 )
