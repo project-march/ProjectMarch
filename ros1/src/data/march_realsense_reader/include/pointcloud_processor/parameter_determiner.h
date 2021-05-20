@@ -162,12 +162,15 @@ protected:
     // Find the stairs up parameters from the foot locations
     bool getGaitParametersFromFootLocationStairsUp();
 
-    // Find the ramp down parameter from the foot locations
-    bool getGaitParametersFromFootLocationRampDown();
+    // Find the ramp parameter from the foot locations
+    bool getGaitParametersFromFootLocationRamp();
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
+
+    // set the gait dimension variables to the relevant value
+    void initializeGaitDimensions();
 
     // All relevant parameters
     int hull_dimension {};
@@ -185,6 +188,14 @@ protected:
     float z_flat {};
     float x_steep {};
     float z_steep {};
+    float x_flat_down {};
+    float z_flat_down {};
+    float x_steep_down {};
+    float z_steep_down {};
+    float x_flat_up {};
+    float z_flat_up {};
+    float x_steep_up {};
+    float z_steep_up {};
     float min_search_area {};
     float max_search_area {};
     float max_distance_to_line {};
