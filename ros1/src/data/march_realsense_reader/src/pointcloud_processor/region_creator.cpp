@@ -45,10 +45,8 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         // First extract regions as normal to start the recursive call from the
         // first result
         success &= setupRegionGrower();
-        if (!extractRegions()) {
-            ROS_WARN_STREAM(
-                "Extracting regions in initialization of the recursive failed. "
-                "Recursive method could still work.");
+        if (success &= !extractRegions()) {
+            return false;
         }
         // reinitialize the region grower to start with an empty object at the
         // start of the recursive call
@@ -57,8 +55,11 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
     } else {
+        ROS_DEBUG_STREAM("Using the normal grower");
         success &= setupRegionGrower();
+        ROS_DEBUG_STREAM("Setup worked");
         success &= extractRegions();
+        ROS_DEBUG_STREAM("Extraction worked");
     }
 
     clock_t end_region_grow = clock();
@@ -105,8 +106,8 @@ bool RegionGrower::setupRegionGrower()
     if (pointcloud_->size() == pointcloud_normals_->size()) {
         pcl::search::Search<pcl::PointXYZ>::Ptr tree(
             new pcl::search::KdTree<pcl::PointXYZ>);
-        region_grower.setMinClusterSize(min_desired_cluster_size);
-        region_grower.setMaxClusterSize(max_desired_cluster_size);
+        region_grower.setMinClusterSize(min_valid_cluster_size);
+        region_grower.setMaxClusterSize(max_valid_cluster_size);
         region_grower.setSearchMethod(tree);
         region_grower.setNumberOfNeighbours(number_of_neighbours);
         region_grower.setInputCloud(pointcloud_);
@@ -124,7 +125,10 @@ bool RegionGrower::setupRegionGrower()
 
 bool RegionGrower::extractRegions()
 {
+    region_vector_ = boost::make_shared<RegionVector>();
+    ROS_DEBUG_STREAM("fine after initializing region vector");
     region_grower.extract(*region_vector_);
+    ROS_DEBUG_STREAM("fine after setting region vector");
 
     if (region_vector_->size() == 0) {
         ROS_WARN("Region growing algorithm found no clusters, stopping "
@@ -146,6 +150,8 @@ bool RegionGrower::extractRegions()
         }
     }
 
+    ROS_DEBUG_STREAM(__LINE__ << "fine before making the point vector");
+
     PointCloud::Ptr region_points = boost::make_shared<PointCloud>();
     Normals::Ptr region_normals = boost::make_shared<Normals>();
     for (const auto& region : *region_vector_) {
@@ -158,6 +164,8 @@ bool RegionGrower::extractRegions()
         region_points->clear();
         region_normals->clear();
     }
+
+    ROS_DEBUG_STREAM(__LINE__ << "fine after setting the point vector");
 
     return true;
 }
