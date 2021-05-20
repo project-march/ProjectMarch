@@ -22,7 +22,7 @@ RegionGrower::RegionGrower(bool debugging)
     , max_valid_cluster_size(-1)
     , min_desired_cluster_size(-1)
     , max_desired_cluster_size(-1)
-    , smoothness_threshold(std::numeric_limits<float>::lowest())
+    , smoothness_threshold(std::numeric_limits<double>::lowest())
     , curvature_threshold(std::numeric_limits<float>::lowest())
 {
 }
@@ -86,7 +86,7 @@ void RegionGrower::readParameters(
     max_desired_cluster_size
         = config.region_creator_region_growing_max_desired_cluster_size;
     smoothness_threshold
-        = (float)config.region_creator_region_growing_smoothness_threshold;
+        = config.region_creator_region_growing_smoothness_threshold;
     curvature_threshold
         = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
