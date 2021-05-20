@@ -84,7 +84,7 @@ private:
         const boost::shared_ptr<RegionVector> last_region_vector,
         const PointCloud::Ptr last_pointcloud,
         const Normals::Ptr last_pointcloud_normals,
-        const float& last_tolerance);
+        const double& last_tolerance);
 
     // Splits a region Vector into the regions considered too large, just right,
     // and too small
@@ -97,7 +97,7 @@ private:
     // Creates a potential region vector from a pointcloud with a certain
     // tolerance
     bool getRegionVectorFromTolerance(const PointCloud::Ptr pointcloud,
-        const Normals::Ptr pointcloud_normals, const float& tolerance,
+        const Normals::Ptr pointcloud_normals, const double& tolerance,
         boost::shared_ptr<RegionVector> region_vector);
 
     // Add the right regions to the region points and region normals vectors
@@ -117,7 +117,7 @@ private:
     // Process the invalid regions with the new tolerance
     // This method makes a call to this method if the invalid region is large
     // enough
-    bool processInvalidRegions(const float& next_tolerance,
+    bool processInvalidRegions(const double& next_tolerance,
         const PointCloud::Ptr invalid_pointcloud,
         Normals::Ptr invalid_pointcloud_normals,
         const boost::shared_ptr<RegionVector> invalid_regions,
@@ -139,8 +139,8 @@ private:
     float smoothness_threshold;
     float curvature_threshold;
     bool use_recursive_growing;
-    float tolerance_change_factor_decrease;
-    float tolerance_change_factor_increase;
+    double tolerance_change_factor_decrease;
+    double tolerance_change_factor_increase;
     boost::shared_ptr<RegionVector> region_vector_;
 };
 

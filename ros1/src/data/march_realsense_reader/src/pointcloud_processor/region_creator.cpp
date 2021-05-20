@@ -52,12 +52,15 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         // start of the recursive call
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();
         setupRecursiveRegionGrower();
+        ROS_DEBUG_STREAM("The recursive grower has been setup");
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
     } else {
         success &= setupRegionGrower();
         success &= extractRegions();
     }
+
+    ROS_DEBUG_STREAM("The regions have been grown");
 
     clock_t end_region_grow = clock();
     double time_taken
@@ -89,10 +92,10 @@ void RegionGrower::readParameters(
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
     tolerance_change_factor_decrease
-        = (float)config
+        = config
               .region_creator_region_growing_tolerance_change_factor_increase;
     tolerance_change_factor_decrease
-        = (float)config
+        = config
               .region_creator_region_growing_tolerance_change_factor_decrease;
 
     debugging_ = config.debug;
@@ -216,8 +219,9 @@ void RegionGrower::setupRecursiveRegionGrower()
 bool RegionGrower::recursiveRegionGrower(
     const boost::shared_ptr<RegionVector> last_region_vector,
     const PointCloud::Ptr last_pointcloud,
-    const Normals::Ptr last_pointcloud_normals, const float& last_tolerance)
+    const Normals::Ptr last_pointcloud_normals, const double& last_tolerance)
 {
+    ROS_DEBUG_STREAM("A call to the recursive region grower has been made!");
     bool success = true;
     boost::shared_ptr<RegionVector> too_small_regions
         = boost::make_shared<RegionVector>();
@@ -247,8 +251,15 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    float large_tolerance = last_tolerance * tolerance_change_factor_increase;
-    float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
+    double large_tolerance = last_tolerance * tolerance_change_factor_increase;
+    double small_tolerance = last_tolerance * tolerance_change_factor_decrease;
+
+    ROS_DEBUG_STREAM("The too small cloud is of size " << too_small_pointcloud->size());
+    ROS_DEBUG_STREAM("As a result of the too small regions of which there are " << too_small_regions->size());
+    ROS_DEBUG_STREAM("The tolerance for that cloud is " << large_tolerance);
+    ROS_DEBUG_STREAM("The too large cloud is of size " << too_large_pointcloud->size());
+    ROS_DEBUG_STREAM("As a result of the too large regions of which there are " << too_large_regions->size());
+    ROS_DEBUG_STREAM("The tolerance for that cloud is " << small_tolerance);
 
     // Process the invalid regions with the new tolerance
     // This method makes a call to this method if the invalid region is large
@@ -261,10 +272,12 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals, too_large_regions, last_pointcloud,
         last_pointcloud_normals);
 
+    ROS_DEBUG_STREAM("A recursive call is returning with success: " << success);
+
     return success;
 }
 
-bool RegionGrower::processInvalidRegions(const float& next_tolerance,
+bool RegionGrower::processInvalidRegions(const double& next_tolerance,
     const PointCloud::Ptr invalid_pointcloud,
     Normals::Ptr invalid_pointcloud_normals,
     const boost::shared_ptr<RegionVector> invalid_regions,
@@ -356,7 +369,7 @@ void RegionGrower::segmentRegionVector(
 // Creates a potential region vector from a pointcloud with a certain tolerance
 bool RegionGrower::getRegionVectorFromTolerance(
     const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals,
-    const float& tolerance, boost::shared_ptr<RegionVector> region_vector)
+    const double& tolerance, boost::shared_ptr<RegionVector> region_vector)
 {
     if (pointcloud->size() == pointcloud_normals->size()) {
         region_grower.setInputCloud(pointcloud);
