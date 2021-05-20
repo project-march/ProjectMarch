@@ -168,7 +168,8 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
     } else {
         ColoredCloud::Ptr colored_cloud = boost::make_shared<ColoredCloud>();
         ColoredCloud::Ptr colored_region = boost::make_shared<ColoredCloud>();
-        for (int region_index = 0; region_index < points_vector_->size(); ++i) {
+        for (int region_index = 0; region_index < points_vector_->size();
+             ++region_index) {
             // Color the hull with a random color (r, g and b in [1, 0])
             int number_of_colors = 500;
             // clang-tidy linter cert-msc30-c and cert-msc50-cpp say that rand()
@@ -180,9 +181,9 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
             double g = (rand() % number_of_colors) / (double)number_of_colors;
             // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
             double b = (rand() % number_of_colors) / (double)number_of_colors;
-            colored_region.reserve(point_vector_->size());
+            colored_region->resize(points_vector_->size());
             for (pcl::PointXYZ point : *points_vector_->at(region_index)) {
-                pcl::PointRBGXYZ colored_point;
+                pcl::PointXYZRGB colored_point;
                 colored_point.x = point.x;
                 colored_point.y = point.y;
                 colored_point.z = point.z;
