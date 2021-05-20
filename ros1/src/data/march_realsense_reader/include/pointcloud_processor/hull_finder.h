@@ -17,6 +17,8 @@ using RegionVector = std::vector<Region>;
 using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
 using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
+using PointsVector = std::vector<PointCloud::Ptr>;
+using NormalsVector = std::vector<Normals::ptr>;
 
 class HullFinder {
 public:
@@ -24,7 +26,8 @@ public:
     // This function is required to be implemented by any plane finder
     virtual bool findHulls(PointCloud::Ptr pointcloud,
         Normals::Ptr normal_pointcloud,
-        boost::shared_ptr<RegionVector> region_vector,
+        boost::shared_ptr<PointsVector> points_vector,
+        boost::shared_ptr<NormalsVector> normals_vector,
         boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
         boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector)
@@ -42,7 +45,8 @@ public:
 protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
-    boost::shared_ptr<RegionVector> region_vector_;
+    boost::shared_ptr<PointsVector> points_vector_;
+    boost::shared_ptr<NormalsVector> normals_vector_;
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
@@ -56,8 +60,9 @@ public:
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
     bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
-        boost::shared_ptr<RegionVector> region_vector,
-        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
+                   boost::shared_ptr<PointsVector> points_vector,
+                   boost::shared_ptr<NormalsVector> normals_vector,
+                   boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
         boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector) override;
 

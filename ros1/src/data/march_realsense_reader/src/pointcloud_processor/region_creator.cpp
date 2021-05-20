@@ -54,6 +54,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         setupRecursiveRegionGrower();
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
+        success &= getRegionVectorFromPointAndNormalVectors();
     } else {
         success &= setupRegionGrower();
         success &= extractRegions();
@@ -324,4 +325,9 @@ bool RegionGrower::getRegionVectorFromTolerance(
         return false
     }
     return true;
+}
+
+bool RegionGrower::getRegionVectorFromPointAndNormalVectors()
+{
+
 }

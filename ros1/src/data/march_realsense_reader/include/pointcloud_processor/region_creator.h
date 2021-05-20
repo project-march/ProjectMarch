@@ -11,6 +11,8 @@
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
+using PointsVector = std::vector<PointCloud::Ptr>;
+using NormalsVector = std::vector<Normals::ptr>;
 
 class RegionCreator {
 public:
@@ -131,11 +133,10 @@ private:
     float smoothness_threshold;
     float curvature_threshold;
     bool use_recursive_growing;
-    float tolerance_change_factor_decrease float
-        tolerance_change_factor_increase
-            boost::shared_ptr<std::vector<PointCloud::Ptr>>
-                pointcloud_vector_;
-    boost::shared_ptr<std::vector<Normals::Ptr>> normals_vector_;
+    float tolerance_change_factor_decrease;
+    float tolerance_change_factor_increase;
+    boost::shared_ptr<PointsVector> pointcloud_vector_;
+    boost::shared_ptr<NormalsVector> normals_vector_;
 };
 
 #endif // MARCH_REGION_CREATOR_H
