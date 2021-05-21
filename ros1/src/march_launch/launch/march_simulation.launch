@@ -33,6 +33,10 @@
     <arg name="gait_selection" default="false" doc="Whether to start the ros1 gait selection"/>
     <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
 
+    <group ns="march"
+           if="$(eval realsense and not realsense_simulation and ground_gait)"/>
+    <node name="republish_pointclouds" pkg="march_simulation" type="republish_pointclouds.py"/>
+
 <!-- Pass everything to march.launch -->
     <include file="$(dirname)/march.launch" pass_all_args="true">
         <arg name="configuration" value="simulation"/>
