@@ -166,12 +166,9 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
     if (!use_recursive_growing) {
         return region_grower.getColoredCloud();
     } else {
-        ROS_WARN_STREAM("Attempt to make debug cloud");
         ColoredCloud::Ptr colored_cloud = boost::make_shared<ColoredCloud>();
         ColoredCloud::Ptr colored_region = boost::make_shared<ColoredCloud>();
         for (PointCloud::Ptr region_point : *points_vector_) {
-            ROS_WARN_STREAM("Making debug cloud for one region");
-            ROS_WARN_STREAM("This region is of size " << region_point->size());
             // Color the hull with a random color (r, g and b in [0, 255]))
             int number_of_colors = 500;
             // clang-tidy linter cert-msc30-c and cert-msc50-cpp say that rand()
@@ -195,14 +192,9 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
                 colored_point.r = r;
                 colored_point.g = g;
                 colored_point.b = b;
-                ROS_WARN_STREAM("the colored point has (x, y, z, r, g, b) "
-                    << colored_point.x << colored_point.y << colored_point.z
-                    << colored_point.r << colored_point.g << colored_point.b);
                 colored_region->push_back(colored_point);
             }
             *colored_cloud += *colored_region;
-            ROS_WARN_STREAM(
-                "The colored cloud is now of size " << colored_cloud->size());
         }
         return colored_cloud;
     }
@@ -322,27 +314,8 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
         pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
         pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
 
-        ROS_WARN_STREAM("Adding a region to the points and normals vectors. "
-                        "The region has size "
-            << region_pointcloud->size());
-
         points_vector_->push_back(region_pointcloud);
         normals_vector_->push_back(region_normals);
-
-        ROS_WARN_STREAM("Added a region of size "
-            << (points_vector_->at(points_vector_->size() - 1))->size());
-        ROS_WARN_STREAM("The size of the first region by index is "
-            << (points_vector_->at(0))->size());
-
-        ROS_WARN_STREAM(
-            "The points vector is now of size " << points_vector_->size());
-    }
-    ROS_WARN_STREAM("The size of the first region by index is "
-        << (points_vector_->at(0))->size());
-    for (PointCloud::Ptr region : *points_vector_) {
-        ROS_WARN_STREAM(
-            "The size of the first region by loop is " << region->size());
-        break;
     }
 }
 
