@@ -24,6 +24,12 @@ RegionGrower::RegionGrower(bool debugging)
     , max_desired_cluster_size(-1)
     , smoothness_threshold(std::numeric_limits<float>::lowest())
     , curvature_threshold(std::numeric_limits<float>::lowest())
+    , smoothness_threshold_lower_bound(-1)
+    , smoothness_threshold_upper_bound(-1)
+    , use_recursive_growing(nullptr)
+    , tolerance_change_factor_decrease(0)
+    , tolerance_change_factor_increase(0)
+    , number_of_recursive_calls(0)
 {
 }
 

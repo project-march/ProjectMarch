@@ -301,7 +301,7 @@ void RealSenseReader::publishParameterDeterminerMarkerArray()
         = frame_id_to_transform_to_;
     fillFootLocationsToTryMarker(parameter_determiner_->foot_locations_to_try,
         foot_locations_to_try_marker_list);
-
+/builds/project-march/march/ros1/src/data/march_realsense_reader/src/pointcloud_processor/region_creator.cpp:18:1: error: constructor does not initialize these fields: smoothness_threshold_lower_bound, smoothness_threshold_upper_bound, use_recursive_growing, tolerance_change_factor_decrease, tolerance_change_factor_increase, number_of_recursive_calls [hicpp-member-init,-warnings-as-errors]
     visualization_msgs::Marker possible_foot_locations_marker_list;
     possible_foot_locations_marker_list.id = 2;
     possible_foot_locations_marker_list.header.frame_id
