@@ -106,17 +106,21 @@ void RegionGrower::readParameters(
     smoothness_threshold
         = (float)config.region_creator_region_growing_smoothness_threshold;
     smoothness_threshold_lower_bound
-        = (float)config.region_creator_region_growing_smoothness_threshold_lower_bound;
+        = (float)config
+              .region_creator_region_growing_smoothness_threshold_lower_bound;
     smoothness_threshold_upper_bound
-        = (float)config.region_creator_region_growing_smoothness_threshold_upper_bound;
+        = (float)config
+              .region_creator_region_growing_smoothness_threshold_upper_bound;
     curvature_threshold
         = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
     tolerance_change_factor_increase
-        = (float)config.region_creator_region_growing_tolerance_change_factor_increase;
+        = (float)config
+              .region_creator_region_growing_tolerance_change_factor_increase;
     tolerance_change_factor_decrease
-        = (float)config.region_creator_region_growing_tolerance_change_factor_decrease;
+        = (float)config
+              .region_creator_region_growing_tolerance_change_factor_decrease;
 
     debugging_ = config.debug;
 }
