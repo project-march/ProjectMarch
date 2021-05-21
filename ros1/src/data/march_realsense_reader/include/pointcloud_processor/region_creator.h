@@ -142,6 +142,7 @@ private:
     double tolerance_change_factor_decrease;
     double tolerance_change_factor_increase;
     boost::shared_ptr<RegionVector> region_vector_;
+    int number_of_recursive_calls;
 };
 
 #endif // MARCH_REGION_CREATOR_H

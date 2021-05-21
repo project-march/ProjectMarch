@@ -78,6 +78,11 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
                 "Total number of points in cluster %i: %lu", i, region->size());
             i++;
         }
+        if (use_recursive_growing) {
+            ROS_DEBUG_STREAM("The number of recursive calls made is: "
+                << number_of_recursive_calls);
+        }
+
         double time_taken = double(end_region_grow - start_region_grow)
             / double(CLOCKS_PER_SEC);
         ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
@@ -209,6 +214,8 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
 // threshold are not yet set.
 void RegionGrower::setupRecursiveRegionGrower()
 {
+    number_of_recursive_calls = 0;
+
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(
         new pcl::search::KdTree<pcl::PointXYZ>);
     region_grower.setMinClusterSize(min_valid_cluster_size);
@@ -225,6 +232,8 @@ bool RegionGrower::recursiveRegionGrower(
     const PointCloud::Ptr last_pointcloud,
     const Normals::Ptr last_pointcloud_normals, const double& last_tolerance)
 {
+    number_of_recursive_calls++;
+
     bool success = true;
     boost::shared_ptr<RegionVector> too_small_regions
         = boost::make_shared<RegionVector>();
