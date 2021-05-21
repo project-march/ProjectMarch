@@ -4,9 +4,6 @@
 #include <pcl/search/search.h>
 #include <ros/ros.h>
 
-#define SMALL_THRESHOLD 0.001
-#define LARGE_THRESHOLD 4
-
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
@@ -263,7 +260,8 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    if (last_tolerance < SMALL_THRESHOLD || last_tolerance > LARGE_THRESHOLD) {
+    if (last_tolerance < smoothness_threshold / 10.0
+        || last_tolerance > smoothness_threshold * 10.0) {
         // When the last tolerance given is too small or too large add the
         // regions and end the recursive loop as the remaining regions are
         // likely disjoint
