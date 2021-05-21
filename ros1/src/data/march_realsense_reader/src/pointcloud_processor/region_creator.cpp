@@ -130,9 +130,6 @@ bool RegionGrower::extractRegions()
         ROS_WARN("Region growing algorithm found no clusters, stopping "
                  "region grower");
         return false;
-    } else {
-        points_vector_->reserve(region_vector_->size());
-        normals_vector_->reserve(region_vector_->size());
     }
 
     if (debugging_) {
@@ -146,17 +143,19 @@ bool RegionGrower::extractRegions()
         }
     }
 
-    PointCloud::Ptr region_points = boost::make_shared<PointCloud>();
-    Normals::Ptr region_normals = boost::make_shared<Normals>();
-    for (const auto& region : *region_vector_) {
-        pcl::copyPointCloud(*pointcloud_, region, *region_points);
-        pcl::copyPointCloud(*pointcloud_normals_, region, *region_normals);
+    if (!use_recursive_growing) {
+        points_vector_->reserve(region_vector_->size());
+        normals_vector_->reserve(region_vector_->size());
 
-        points_vector_->push_back(region_points);
-        normals_vector_->push_back(region_normals);
+        for (const auto& region : *region_vector_) {
+            PointCloud::Ptr region_points = boost::make_shared<PointCloud>();
+            Normals::Ptr region_normals = boost::make_shared<Normals>();
+            pcl::copyPointCloud(*pointcloud_, region, *region_points);
+            pcl::copyPointCloud(*pointcloud_normals_, region, *region_normals);
 
-        region_points->clear();
-        region_normals->clear();
+            points_vector_->push_back(region_points);
+            normals_vector_->push_back(region_normals);
+        }
     }
 
     return true;
@@ -167,23 +166,28 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
     if (!use_recursive_growing) {
         return region_grower.getColoredCloud();
     } else {
+        ROS_WARN_STREAM("Attempt to make debug cloud");
         ColoredCloud::Ptr colored_cloud = boost::make_shared<ColoredCloud>();
         ColoredCloud::Ptr colored_region = boost::make_shared<ColoredCloud>();
-        for (int region_index = 0; region_index < points_vector_->size();
-             ++region_index) {
-            // Color the hull with a random color (r, g and b in [1, 0])
+        for (PointCloud::Ptr region_point : *points_vector_) {
+            ROS_WARN_STREAM("Making debug cloud for one region");
+            ROS_WARN_STREAM("This region is of size " << region_point->size());
+            // Color the hull with a random color (r, g and b in [0, 255]))
             int number_of_colors = 500;
             // clang-tidy linter cert-msc30-c and cert-msc50-cpp say that rand()
             // is not a uniform distribution. This is not something that is
             // important here, therefore these lines can ignore this linter
             // rule. NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-            double r = (rand() % number_of_colors) / (double)number_of_colors;
+            double r
+                = (rand() % number_of_colors) * 255 / (double)number_of_colors;
             // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-            double g = (rand() % number_of_colors) / (double)number_of_colors;
+            double g
+                = (rand() % number_of_colors) * 255 / (double)number_of_colors;
             // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-            double b = (rand() % number_of_colors) / (double)number_of_colors;
-            colored_region->resize(points_vector_->size());
-            for (pcl::PointXYZ point : *points_vector_->at(region_index)) {
+            double b
+                = (rand() % number_of_colors) * 255 / (double)number_of_colors;
+            colored_region->resize(region_point->size());
+            for (pcl::PointXYZ point : *region_point) {
                 pcl::PointXYZRGB colored_point;
                 colored_point.x = point.x;
                 colored_point.y = point.y;
@@ -191,9 +195,14 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
                 colored_point.r = r;
                 colored_point.g = g;
                 colored_point.b = b;
-                colored_region->points.push_back(colored_point);
+                ROS_WARN_STREAM("the colored point has (x, y, z, r, g, b) "
+                    << colored_point.x << colored_point.y << colored_point.z
+                    << colored_point.r << colored_point.g << colored_point.b);
+                colored_region->push_back(colored_point);
             }
             *colored_cloud += *colored_region;
+            ROS_WARN_STREAM(
+                "The colored cloud is now of size " << colored_cloud->size());
         }
         return colored_cloud;
     }
@@ -248,13 +257,14 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    if (last_tolerance < EPSILON) {
-        // When the last tolerance given is smaller then then EPSILON
-        // end the recursive loop as the remaining regions are likely disjoint
-        return true;
-    } else if (last_tolerance > 1.0 / EPSILON) {
-        // When the last tolerance given is larger then 1.0 / EPSILON
-        // end the recursive loop as the remaining regions are likely disjoint
+    if (last_tolerance < EPSILON || last_tolerance > 1.0 / EPSILON) {
+        // When the last tolerance given is too small or too large add the
+        // regions and end the recursive loop as the remaining regions are
+        // likely disjoint
+        addRegionsToPointAndNormalVectors(
+            too_small_regions, last_pointcloud, last_pointcloud_normals);
+        addRegionsToPointAndNormalVectors(
+            too_large_regions, last_pointcloud, last_pointcloud_normals);
         return true;
     }
 
@@ -305,18 +315,34 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
     const boost::shared_ptr<RegionVector> right_size_regions,
     const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals)
 {
-    PointCloud::Ptr region_pointcloud = boost::make_shared<PointCloud>();
-    Normals::Ptr region_normals = boost::make_shared<Normals>();
 
     for (pcl::PointIndices region : *right_size_regions) {
+        PointCloud::Ptr region_pointcloud = boost::make_shared<PointCloud>();
+        Normals::Ptr region_normals = boost::make_shared<Normals>();
         pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
         pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
+
+        ROS_WARN_STREAM("Adding a region to the points and normals vectors. "
+                        "The region has size "
+            << region_pointcloud->size());
 
         points_vector_->push_back(region_pointcloud);
         normals_vector_->push_back(region_normals);
 
-        region_pointcloud->clear();
-        region_normals->clear();
+        ROS_WARN_STREAM("Added a region of size "
+            << (points_vector_->at(points_vector_->size() - 1))->size());
+        ROS_WARN_STREAM("The size of the first region by index is "
+            << (points_vector_->at(0))->size());
+
+        ROS_WARN_STREAM(
+            "The points vector is now of size " << points_vector_->size());
+    }
+    ROS_WARN_STREAM("The size of the first region by index is "
+        << (points_vector_->at(0))->size());
+    for (PointCloud::Ptr region : *points_vector_) {
+        ROS_WARN_STREAM(
+            "The size of the first region by loop is " << region->size());
+        break;
     }
 }
 
