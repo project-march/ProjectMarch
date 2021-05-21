@@ -34,6 +34,7 @@ namespace error {
         MISSING_TEMPERATURE_GES = 125,
         ODRIVE_WRONG_AXIS_NUMBER = 126,
         INVALID_MOTOR_CONTROLLER = 127,
+        PREPARE_ACTUATION_ERROR = 128,
         UNKNOWN = 999,
     };
 

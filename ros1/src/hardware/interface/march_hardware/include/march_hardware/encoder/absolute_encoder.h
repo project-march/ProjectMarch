@@ -3,22 +3,41 @@
 #ifndef MARCH_HARDWARE_ABSOLUTE_ENCODER_H
 #define MARCH_HARDWARE_ABSOLUTE_ENCODER_H
 #include "march_hardware/encoder/encoder.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <ostream>
 
 namespace march {
 class AbsoluteEncoder : public Encoder {
 public:
-    AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu,
+    /**
+     * Construct AbsoluteEncoder with both hard and soft limits.
+     */
+    AbsoluteEncoder(size_t resolution,
+        MotorControllerType motor_controller_type, int32_t lower_limit_iu,
         int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
         double lower_soft_limit_rad, double upper_soft_limit_rad);
 
+    /**
+     *  Construct AbsoluteEncoder with no soft limits.
+     *  Soft limits will be set equal to hard limits.
+     */
+    AbsoluteEncoder(size_t resolution,
+                    MotorControllerType motor_controller_type, int32_t lower_limit_iu,
+                    int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad);
+
     ~AbsoluteEncoder() noexcept override = default;
 
+    /**
+     * Check that the range of motion is valid.
+     * @throws A HardwareException if the range of motion is not valid.
+     */
+    void checkRangeOfMotion(double lower_limit_rad, double upper_limit_rad) ;
+
     // Inherited methods
-    double getRadiansPerBit() const final;
-    double toRadians(double iu, bool use_zero_position) const final;
-    double toIU(double radians, bool use_zero_position) const final;
+    double getRadiansPerIU() const final;
+    double positionIUToRadians(double position) const final;
+    double positionRadiansToIU(double position) const final;
 
     bool isWithinHardLimitsIU(int32_t iu) const;
     bool isWithinSoftLimitsIU(int32_t iu) const;
@@ -56,8 +75,12 @@ public:
 
 private:
     int32_t zero_position_iu_ = 0;
+
+    // Hard limits
     int32_t lower_limit_iu_ = 0;
     int32_t upper_limit_iu_ = 0;
+
+    // Soft limits
     int32_t lower_soft_limit_iu_ = 0;
     int32_t upper_soft_limit_iu_ = 0;
 };

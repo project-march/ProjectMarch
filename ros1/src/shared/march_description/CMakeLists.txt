@@ -14,6 +14,7 @@ set(XACRO_FILES
     "../../../../ros2/src/shared/march_description/urdf/march4_with_koen_lengths.xacro"
     "../../../../ros2/src/shared/march_description/urdf/test_joint_rotational.xacro"
     "../../../../ros2/src/shared/march_description/urdf/test_joint_linear.xacro"
+    "../../../../ros2/src/shared/march_description/urdf/test_joint_rotational_odrive.xacro"
 )
 build_and_install_xacro_files(${XACRO_FILES})
 
