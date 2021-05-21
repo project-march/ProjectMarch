@@ -217,6 +217,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
         odrive_config, HardwareBuilder::ODRIVE_REQUIRED_KEYS, "odrive");
 
     YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
+    YAML::Node incremental_encoder_config = odrive_config["incrementalEncoder"];
     int slave_index = odrive_config["slaveIndex"].as<int>();
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
@@ -230,6 +231,8 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
             march::MotorControllerType::ODrive, urdf_joint),
+        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
+            march::MotorControllerType::ODrive),
         mode, pre_calibrated, motor_kv);
 }
 
