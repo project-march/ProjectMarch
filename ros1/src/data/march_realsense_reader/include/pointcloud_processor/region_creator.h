@@ -118,10 +118,11 @@ private:
     // This method makes a call to this method if the invalid region is
     // large enough
     bool processInvalidRegions(const float& next_tolerance,
-        const PointCloud::Ptr invalid_pointcloud,
+        const PointCloud::Ptr& invalid_pointcloud,
         const Normals::Ptr& invalid_pointcloud_normals,
         const boost::shared_ptr<RegionVector>& invalid_regions,
-        PointCloud::Ptr last_pointcloud, Normals::Ptr last_pointcloud_normals);
+        const PointCloud::Ptr& last_pointcloud,
+        const Normals::Ptr& last_pointcloud_normals);
 
     // Similar to the regular setup, but the cloud, normals, and smoothness
     // threshold are not yet set.

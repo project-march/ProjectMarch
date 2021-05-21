@@ -185,20 +185,14 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
         ColoredCloud::Ptr colored_region = boost::make_shared<ColoredCloud>();
         for (PointCloud::Ptr& region_point : *points_vector_) {
             // Color the hull with a random color (r, g and b in [0, 255]))
-            int number_of_colors = 500;
+            int number_of_colors = 255;
             // clang-tidy linter cert-msc30-c and cert-msc50-cpp say that rand()
             // is not a uniform distribution. This is not something that is
             // important here, therefore these lines can ignore this linter
             // rule.
-            float r = (rand() % number_of_colors) * 255
-                / (float)
-                    number_of_colors; // NOLINT(cert-msc30-c, cert-msc50-cpp)
-            float g = (rand() % number_of_colors) * 255
-                / (float)
-                    number_of_colors; // NOLINT(cert-msc30-c, cert-msc50-cpp)
-            float b = (rand() % number_of_colors) * 255
-                / (float)
-                    number_of_colors; // NOLINT(cert-msc30-c, cert-msc50-cpp)
+            int r = (rand() % number_of_colors); // NOLINT
+            int g = (rand() % number_of_colors); // NOLINT
+            int b = (rand() % number_of_colors); // NOLINT
             colored_region->resize(region_point->size());
             for (pcl::PointXYZ point : *region_point) {
                 pcl::PointXYZRGB colored_point;
@@ -299,10 +293,11 @@ bool RegionGrower::recursiveRegionGrower(
 }
 
 bool RegionGrower::processInvalidRegions(const float& next_tolerance,
-    const PointCloud::Ptr invalid_pointcloud,
+    const PointCloud::Ptr& invalid_pointcloud,
     const Normals::Ptr& invalid_pointcloud_normals,
     const boost::shared_ptr<RegionVector>& invalid_regions,
-    PointCloud::Ptr last_pointcloud, Normals::Ptr last_pointcloud_normals)
+    const PointCloud::Ptr& last_pointcloud,
+    const Normals::Ptr& last_pointcloud_normals)
 {
     if (invalid_pointcloud->size() > min_desired_cluster_size) {
         // Try region growing on the invalid regions with a new tolerance
@@ -317,8 +312,8 @@ bool RegionGrower::processInvalidRegions(const float& next_tolerance,
         }
         return success;
     } else {
-        addRegionsToPointAndNormalVectors(invalid_regions,
-            std::move(last_pointcloud), std::move(last_pointcloud_normals));
+        addRegionsToPointAndNormalVectors(
+            invalid_regions, last_pointcloud, last_pointcloud_normals);
         return true;
     }
 }
