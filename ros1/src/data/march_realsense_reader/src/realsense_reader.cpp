@@ -117,7 +117,6 @@ void RealSenseReader::readConfigCb(
 void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
-    clock_t start_of_processing_time = clock();
     Normals::Ptr normals = boost::make_shared<Normals>();
 
     // Preprocess
@@ -210,15 +209,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     res.gait_parameters = *gait_parameters;
-
-    clock_t end_of_processing_time = clock();
-
-    double time_taken
-        = double(end_of_processing_time - start_of_processing_time)
-        / double(CLOCKS_PER_SEC);
-    ROS_DEBUG_STREAM("Time taken by point cloud processor is : "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
-        << std::endl);
 
     res.success = true;
     // Returning false means that the service was not able to respond at all,
@@ -442,7 +432,18 @@ bool RealSenseReader::processPointcloudCallback(
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
+    clock_t start_of_processing_time = clock();
+
     processPointcloud(point_cloud, res);
+
+    clock_t end_of_processing_time = clock();
+
+    double time_taken
+        = double(end_of_processing_time - start_of_processing_time)
+        / double(CLOCKS_PER_SEC);
+    ROS_DEBUG_STREAM("Time taken by point cloud processor is : "
+        << std::fixed << time_taken << std::setprecision(5) << " sec "
+        << std::endl);
 
     time_t end_callback = clock();
     double time_taken
