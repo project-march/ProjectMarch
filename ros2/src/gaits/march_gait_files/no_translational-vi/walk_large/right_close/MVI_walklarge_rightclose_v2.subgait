@@ -1,0 +1,84 @@
+description: 'Large walking gait of MVI with the version 2 HAA movements of normal
+  walking gait. '
+duration: 1500000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.06108652
+    time_from_start: 276387090
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.43633231
+    time_from_start: 0
+    velocity: -0.34910076
+  - position: 0.0524
+    time_from_start: 900000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.13960016
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.10471976
+    time_from_start: 288461540
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 692307690
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.06108652
+    time_from_start: 708461540
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.1667
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.5585
+    time_from_start: 600000000
+    velocity: 0.14425333
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.13960016
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: 480000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+name: right_close
+version: MVI_walklarge_rightclose_v2

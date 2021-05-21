@@ -26,7 +26,6 @@
 
         <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
         <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
-
     </group>
 
     <group>
@@ -54,5 +53,7 @@
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
         <node name="model_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
           args="-urdf -model $(arg obstacle) -param model_description"/>
+        <node name="robot_state_publisher" pkg="robot_state_publisher"
+              type="robot_state_publisher"/>
     </group>
 </launch>

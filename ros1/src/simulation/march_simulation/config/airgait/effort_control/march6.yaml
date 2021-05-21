@@ -44,8 +44,6 @@ march:
           trajectory: 0.5
         left_knee:
           trajectory: 0.5
-        right_ankle:
-          trajectory: 0.5
         right_hip_aa:
           trajectory: 0.5
         right_hip_fe:
