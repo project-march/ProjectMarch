@@ -109,7 +109,7 @@ void RegionGrower::readParameters(
         = config.region_creator_region_growing_smoothness_threshold_lower_bound;
     smoothness_threshold_upper_bound
         = config.region_creator_region_growing_smoothness_threshold_upper_bound;
-    curvature_threshold curvature_threshold
+    curvature_threshold
         = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;

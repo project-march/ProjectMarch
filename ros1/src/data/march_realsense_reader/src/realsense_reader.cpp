@@ -438,18 +438,18 @@ bool RealSenseReader::processPointcloudCallback(
 
     clock_t end_of_processing_time = clock();
 
-    double time_taken
+    double time_taken_by_processing
         = double(end_of_processing_time - start_of_processing_time)
         / double(CLOCKS_PER_SEC);
     ROS_DEBUG_STREAM("Time taken by point cloud processor is : "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
+        << std::fixed << time_taken_by_processing << std::setprecision(5) << " sec "
         << std::endl);
 
     time_t end_callback = clock();
-    double time_taken
+    double time_taken_by_callback
         = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
     ROS_DEBUG_STREAM("Time taken by process point cloud callback method: "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
+        << std::fixed << time_taken_by_callback << std::setprecision(5) << " sec "
         << std::endl);
     // Always return true, to show that the service was able to handle the
     // request. Otherwise, the bridge will fail.
