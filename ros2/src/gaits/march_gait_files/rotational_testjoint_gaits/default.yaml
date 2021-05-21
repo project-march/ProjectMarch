@@ -11,6 +11,7 @@ gaits:
     rotational_testjoint_hip_walk_subgait: MVI_rotational_hip_walk_subgait_v1
   rotational_testjoint_knee_walk_gait:
     rotational_testjoint_knee_walk_subgait: MVI_rotational_knee_walk_subgait_v1
+  rotational_trapezoidal: {trapezoidal_slope1_amp0349_period05: MVI_trapezoidal_slope1_amp0349_period05}
 positions:
   setup:
     gait_type: ''

@@ -1,0 +1,6 @@
+name: rotational_trapezoidal
+subgaits:
+  trapezoidal_slope1_amp0349_period05:
+    to: end
+  start:
+    to: trapezoidal_slope1_amp0349_period05
