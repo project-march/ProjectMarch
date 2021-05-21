@@ -22,7 +22,7 @@ RegionGrower::RegionGrower(bool debugging)
     , max_valid_cluster_size(-1)
     , min_desired_cluster_size(-1)
     , max_desired_cluster_size(-1)
-    , smoothness_threshold(std::numeric_limits<double>::lowest())
+    , smoothness_threshold(std::numeric_limits<float>::lowest())
     , curvature_threshold(std::numeric_limits<float>::lowest())
 {
 }
@@ -66,7 +66,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         ROS_DEBUG(
             "Total number of clusters found: %lu", points_vector_->size());
         int i = 0;
-        for (const PointCloud::Ptr region : *points_vector_) {
+        for (const PointCloud::Ptr& region : *points_vector_) {
             if (i >= 10) {
                 ROS_DEBUG("Stop outputting to debug to reduce clutter.");
                 break;
@@ -104,19 +104,19 @@ void RegionGrower::readParameters(
     max_desired_cluster_size
         = config.region_creator_region_growing_max_desired_cluster_size;
     smoothness_threshold
-        = config.region_creator_region_growing_smoothness_threshold;
+        = (float)config.region_creator_region_growing_smoothness_threshold;
     smoothness_threshold_lower_bound
-        = config.region_creator_region_growing_smoothness_threshold_lower_bound;
+        = (float)config.region_creator_region_growing_smoothness_threshold_lower_bound;
     smoothness_threshold_upper_bound
-        = config.region_creator_region_growing_smoothness_threshold_upper_bound;
+        = (float)config.region_creator_region_growing_smoothness_threshold_upper_bound;
     curvature_threshold
         = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
     tolerance_change_factor_increase
-        = config.region_creator_region_growing_tolerance_change_factor_increase;
+        = (float)config.region_creator_region_growing_tolerance_change_factor_increase;
     tolerance_change_factor_decrease
-        = config.region_creator_region_growing_tolerance_change_factor_decrease;
+        = (float)config.region_creator_region_growing_tolerance_change_factor_decrease;
 
     debugging_ = config.debug;
 }
@@ -186,14 +186,14 @@ ColoredCloud::Ptr RegionGrower::debug_visualisation()
             // is not a uniform distribution. This is not something that is
             // important here, therefore these lines can ignore this linter
             // rule. NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-            double r
-                = (rand() % number_of_colors) * 255 / (double)number_of_colors;
+            float r
+                = (rand() % number_of_colors) * 255 / (float)number_of_colors;
             // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-            double g
-                = (rand() % number_of_colors) * 255 / (double)number_of_colors;
+            float g
+                = (rand() % number_of_colors) * 255 / (float)number_of_colors;
             // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-            double b
-                = (rand() % number_of_colors) * 255 / (double)number_of_colors;
+            float b
+                = (rand() % number_of_colors) * 255 / (float)number_of_colors;
             colored_region->resize(region_point->size());
             for (pcl::PointXYZ point : *region_point) {
                 pcl::PointXYZRGB colored_point;
@@ -231,7 +231,7 @@ void RegionGrower::setupRecursiveRegionGrower()
 bool RegionGrower::recursiveRegionGrower(
     const boost::shared_ptr<RegionVector> last_region_vector,
     const PointCloud::Ptr last_pointcloud,
-    const Normals::Ptr last_pointcloud_normals, const double& last_tolerance)
+    const Normals::Ptr last_pointcloud_normals, const float& last_tolerance)
 {
     number_of_recursive_calls++;
 
@@ -276,8 +276,8 @@ bool RegionGrower::recursiveRegionGrower(
         return true;
     }
 
-    double large_tolerance = last_tolerance * tolerance_change_factor_increase;
-    double small_tolerance = last_tolerance * tolerance_change_factor_decrease;
+    float large_tolerance = last_tolerance * tolerance_change_factor_increase;
+    float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
     // Process the invalid regions with the new tolerance
     // This method makes a call to this method if the invalid region is large
@@ -293,7 +293,7 @@ bool RegionGrower::recursiveRegionGrower(
     return success;
 }
 
-bool RegionGrower::processInvalidRegions(const double& next_tolerance,
+bool RegionGrower::processInvalidRegions(const float& next_tolerance,
     const PointCloud::Ptr invalid_pointcloud,
     Normals::Ptr invalid_pointcloud_normals,
     const boost::shared_ptr<RegionVector> invalid_regions,
@@ -382,7 +382,7 @@ void RegionGrower::segmentRegionVector(
 // Creates a potential region vector from a pointcloud with a certain tolerance
 bool RegionGrower::getRegionVectorFromTolerance(
     const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals,
-    const double& tolerance, boost::shared_ptr<RegionVector> region_vector)
+    const float& tolerance, boost::shared_ptr<RegionVector> region_vector)
 {
     if (pointcloud->size() == pointcloud_normals->size()) {
         region_grower.setInputCloud(pointcloud);
