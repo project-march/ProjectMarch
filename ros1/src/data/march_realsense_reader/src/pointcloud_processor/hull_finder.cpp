@@ -54,7 +54,7 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     bool success = true;
 
-    for (region_index_ = 0; region_index_ < region_vector_->size();
+    for (region_index_ = 0; region_index_ < points_vector_->size();
          region_index_++) {
         success &= getCHullFromRegion();
     }
