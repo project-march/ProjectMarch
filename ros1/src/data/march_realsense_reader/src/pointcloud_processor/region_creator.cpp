@@ -105,7 +105,11 @@ void RegionGrower::readParameters(
         = config.region_creator_region_growing_max_desired_cluster_size;
     smoothness_threshold
         = config.region_creator_region_growing_smoothness_threshold;
-    curvature_threshold
+    smoothness_threshold_lower_bound
+        = config.region_creator_region_growing_smoothness_threshold_lower_bound;
+    smoothness_threshold_upper_bound
+        = config.region_creator_region_growing_smoothness_threshold_upper_bound;
+    curvature_threshold curvature_threshold
         = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
@@ -260,8 +264,8 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    if (last_tolerance < smoothness_threshold / 10.0
-        || last_tolerance > smoothness_threshold * 10.0) {
+    if (last_tolerance < smoothness_threshold_lower_bound
+        || last_tolerance > smoothness_threshold_upper_bound) {
         // When the last tolerance given is too small or too large add the
         // regions and end the recursive loop as the remaining regions are
         // likely disjoint
