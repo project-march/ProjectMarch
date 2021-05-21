@@ -137,6 +137,8 @@ private:
     int min_desired_cluster_size;
     int max_desired_cluster_size;
     double smoothness_threshold;
+    double smoothness_threshold_lower_bound;
+    double smoothness_threshold_upper_bound;
     float curvature_threshold;
     bool use_recursive_growing;
     double tolerance_change_factor_decrease;
