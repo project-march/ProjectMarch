@@ -10,19 +10,19 @@ joints:
         time_from_start: 2000000000
         velocity: 0.0
       - position: 0.5239
-        time_from_start: 448400000
+        time_from_start: 4484000000
         velocity: 2.337
       - position: 0.925
-        time_from_start: 704000000
+        time_from_start: 7040000000
         velocity: 0.0
       - position: 0.0969
-        time_from_start: 1280000000
+        time_from_start: 12800000000
         velocity: 0.0
       - position: 0.1396
-        time_from_start: 1399999999
+        time_from_start: 13999999999
         velocity: 0.0
       - position: 0
-        time_from_start: 1700000000
+        time_from_start: 17000000000
         velocity: 0
 
 name: rotational_testjoint_knee_walk_subgait

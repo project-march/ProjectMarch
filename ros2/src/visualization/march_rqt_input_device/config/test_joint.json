@@ -36,6 +36,9 @@
          "name": "rotational_sine_gait_4"
       },
       {
+         "name": "rotational_trapezoidal"
+      },
+      {
          "name": "rotational_testjoint_hip_walk_gait"
       },
       {
