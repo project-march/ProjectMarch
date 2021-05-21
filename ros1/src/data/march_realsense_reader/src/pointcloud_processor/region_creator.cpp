@@ -4,7 +4,7 @@
 #include <pcl/search/search.h>
 #include <ros/ros.h>
 
-#define EPSILON 0.000001
+#define EPSILON 0.001
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -47,22 +47,19 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         // First extract regions as normal to start the recursive call from the
         // first result
         success &= setupRegionGrower();
-        if (success &= !extractRegions()) {
+        success &= extractRegions()
+        if (!success) {
             return false;
         }
         // reinitialize the region grower to start with an empty object at the
         // start of the recursive call
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();
         setupRecursiveRegionGrower();
-        ROS_DEBUG_STREAM("The recursive grower has been setup");
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
     } else {
         success &= setupRegionGrower();
         success &= extractRegions();
-    }
-    if (success) {
-        ROS_DEBUG_STREAM("The regions have successfully been grown");
     }
 
     clock_t end_region_grow = clock();
@@ -222,7 +219,6 @@ bool RegionGrower::recursiveRegionGrower(
     const PointCloud::Ptr last_pointcloud,
     const Normals::Ptr last_pointcloud_normals, const double& last_tolerance)
 {
-    ROS_DEBUG_STREAM("A call to the recursive region grower has been made!");
     bool success = true;
     boost::shared_ptr<RegionVector> too_small_regions
         = boost::make_shared<RegionVector>();
@@ -253,36 +249,17 @@ bool RegionGrower::recursiveRegionGrower(
 
     // Compute the new tolerances with which to do the next region growing step
     if (last_tolerance < EPSILON) {
-        ROS_WARN_STREAM("The last tolerance given is smaller then "
-            << EPSILON << ". Ending this recursive call with success is true.");
+        // When the last tolerance given is smaller then then EPSILON
+        // end the recursive loop as the remaining regions are likely disjoint
         return true;
     } else if (last_tolerance > 1.0 / EPSILON) {
-        ROS_WARN_STREAM("The last tolerance given is largen then "
-            << 1.0 / EPSILON
-            << ". Ending this recursive call with success is true.");
+        // When the last tolerance given is larger then 1.0 / EPSILON
+        // end the recursive loop as the remaining regions are likely disjoint
         return true;
     }
 
     double large_tolerance = last_tolerance * tolerance_change_factor_increase;
     double small_tolerance = last_tolerance * tolerance_change_factor_decrease;
-
-    ROS_DEBUG_STREAM("");
-    ROS_DEBUG_STREAM(
-        "The too small cloud is of size " << too_small_pointcloud->size());
-    ROS_DEBUG_STREAM("As a result of the too small regions of which there are "
-        << too_small_regions->size());
-    ROS_DEBUG_STREAM("The tolerance for that cloud is " << large_tolerance);
-    ROS_DEBUG_STREAM(
-        "The large increase factor is " << tolerance_change_factor_increase);
-    ROS_DEBUG_STREAM("");
-    ROS_DEBUG_STREAM(
-        "The too large cloud is of size " << too_large_pointcloud->size());
-    ROS_DEBUG_STREAM("As a result of the too large regions of which there are "
-        << too_large_regions->size());
-    ROS_DEBUG_STREAM("The tolerance for that cloud is " << small_tolerance);
-    ROS_DEBUG_STREAM(
-        "The large decrease factor is " << tolerance_change_factor_decrease);
-    ROS_DEBUG_STREAM("");
 
     // Process the invalid regions with the new tolerance
     // This method makes a call to this method if the invalid region is large
@@ -294,8 +271,6 @@ bool RegionGrower::recursiveRegionGrower(
     success &= processInvalidRegions(small_tolerance, too_large_pointcloud,
         too_large_pointcloud_normals, too_large_regions, last_pointcloud,
         last_pointcloud_normals);
-
-    ROS_DEBUG_STREAM("A recursive call is returning with success: " << success);
 
     return success;
 }
