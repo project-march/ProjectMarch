@@ -47,7 +47,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         // First extract regions as normal to start the recursive call from the
         // first result
         success &= setupRegionGrower();
-        success &= extractRegions()
+        success &= extractRegions();
         if (!success) {
             return false;
         }
