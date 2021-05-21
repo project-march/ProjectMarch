@@ -4,7 +4,8 @@
 #include <pcl/search/search.h>
 #include <ros/ros.h>
 
-#define EPSILON 0.001
+#define SMALL_THRESHOLD 0.001
+#define LARGE_THRESHOLD 4
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -63,11 +64,26 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     }
 
     clock_t end_region_grow = clock();
-    double time_taken
-        = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
-    ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
-        << std::endl);
+
+    if (debugging_) {
+        ROS_DEBUG(
+            "Total number of clusters found: %lu", points_vector_->size());
+        int i = 0;
+        for (const PointCloud::Ptr region : *points_vector_) {
+            if (i >= 10) {
+                ROS_DEBUG("Stop outputting to debug to reduce clutter.");
+                break;
+            }
+            ROS_DEBUG(
+                "Total number of points in cluster %i: %lu", i, region->size());
+            i++;
+        }
+        double time_taken = double(end_region_grow - start_region_grow)
+            / double(CLOCKS_PER_SEC);
+        ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
+            << std::fixed << time_taken << std::setprecision(5) << " sec "
+            << std::endl);
+    }
 
     return success;
 }
@@ -130,17 +146,6 @@ bool RegionGrower::extractRegions()
         ROS_WARN("Region growing algorithm found no clusters, stopping "
                  "region grower");
         return false;
-    }
-
-    if (debugging_) {
-        ROS_DEBUG(
-            "Total number of clusters found: %lu", region_vector_->size());
-        int i = 0;
-        for (const auto& region : *region_vector_) {
-            ROS_DEBUG("Total number of points in cluster %i: %lu", i,
-                region.indices.size());
-            i++;
-        }
     }
 
     if (!use_recursive_growing) {
@@ -249,7 +254,7 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    if (last_tolerance < EPSILON || last_tolerance > 1.0 / EPSILON) {
+    if (last_tolerance < SMALL_THRESHOLD || last_tolerance > LARGE_THRESHOLD) {
         // When the last tolerance given is too small or too large add the
         // regions and end the recursive loop as the remaining regions are
         // likely disjoint

@@ -155,9 +155,14 @@ bool CHullFinder::getPlaneCoefficientsRegion()
             average_point, average_normal));
 
     if (success) {
-        ROS_DEBUG_STREAM("Region "
-            << region_index_ << " has plane coefficients: "
-            << output_utilities::vectorToString(plane_coefficients_->values));
+        if (region_index_ >= 10) {
+            ROS_DEBUG_ONCE("Stop outputting to debug to reduce clutter.");
+        } else {
+            ROS_DEBUG_STREAM("Region " << region_index_
+                                       << " has plane coefficients: "
+                                       << output_utilities::vectorToString(
+                                              plane_coefficients_->values));
+        }
     }
 
     return success;
