@@ -81,46 +81,46 @@ private:
     // Implements the region growing algorithm and recursively improves on too
     // small or too large regions
     bool recursiveRegionGrower(
-        const boost::shared_ptr<RegionVector> last_region_vector,
-        const PointCloud::Ptr last_pointcloud,
-        const Normals::Ptr last_pointcloud_normals,
+        const boost::shared_ptr<RegionVector>& last_region_vector,
+        const PointCloud::Ptr& last_pointcloud,
+        const Normals::Ptr& last_pointcloud_normals,
         const float& last_tolerance);
 
     // Splits a region Vector into the regions considered too large, just right,
     // and too small
     void segmentRegionVector(
-        const boost::shared_ptr<RegionVector> region_vector,
-        boost::shared_ptr<RegionVector> too_small_regions,
-        boost::shared_ptr<RegionVector> too_large_regions,
-        boost::shared_ptr<RegionVector> right_size_regions);
+        const boost::shared_ptr<RegionVector>& region_vector,
+        boost::shared_ptr<RegionVector>& too_small_regions,
+        boost::shared_ptr<RegionVector>& too_large_regions,
+        boost::shared_ptr<RegionVector>& right_size_regions);
 
     // Creates a potential region vector from a pointcloud with a certain
     // tolerance
-    bool getRegionVectorFromTolerance(const PointCloud::Ptr pointcloud,
-        const Normals::Ptr pointcloud_normals, const float& tolerance,
-        boost::shared_ptr<RegionVector> region_vector);
+    bool getRegionVectorFromTolerance(const PointCloud::Ptr& pointcloud,
+        const Normals::Ptr& pointcloud_normals, const float& tolerance,
+        boost::shared_ptr<RegionVector>& region_vector);
 
     // Add the right regions to the region points and region normals vectors
     void addRegionsToPointAndNormalVectors(
-        const boost::shared_ptr<RegionVector> right_size_regions,
-        const PointCloud::Ptr pointcloud,
-        const Normals::Ptr pointcloud_normals);
+        const boost::shared_ptr<RegionVector>& right_size_regions,
+        const PointCloud::Ptr& pointcloud,
+        const Normals::Ptr& pointcloud_normals);
 
     // Fill a pointcloud with the points in invalid regions
     void fillInvalidClouds(
-        const boost::shared_ptr<RegionVector> invalid_region_vector,
-        const PointCloud::Ptr last_pointcloud,
-        const Normals::Ptr last_pointcloud_normals,
-        PointCloud::Ptr invalid_pointcloud,
-        Normals::Ptr invalid_pointcloud_normals);
+        const boost::shared_ptr<RegionVector>& invalid_region_vector,
+        const PointCloud::Ptr& last_pointcloud,
+        const Normals::Ptr& last_pointcloud_normals,
+        PointCloud::Ptr& invalid_pointcloud,
+        Normals::Ptr& invalid_pointcloud_normals);
 
     // Process the invalid regions with the new tolerance
-    // This method makes a call to this method if the invalid region is large
-    // enough
+    // This method makes a call to this method if the invalid region is
+    // large enough
     bool processInvalidRegions(const float& next_tolerance,
         const PointCloud::Ptr invalid_pointcloud,
-        Normals::Ptr invalid_pointcloud_normals,
-        const boost::shared_ptr<RegionVector> invalid_regions,
+        const Normals::Ptr& invalid_pointcloud_normals,
+        const boost::shared_ptr<RegionVector>& invalid_regions,
         PointCloud::Ptr last_pointcloud, Normals::Ptr last_pointcloud_normals);
 
     // Similar to the regular setup, but the cloud, normals, and smoothness
