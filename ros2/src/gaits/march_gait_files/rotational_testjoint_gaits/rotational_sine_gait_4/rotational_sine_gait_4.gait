@@ -1,0 +1,6 @@
+name: rotational_sine_gait_4
+subgaits:
+  sine_subgait_4:
+    to: end
+  start:
+    to: sine_subgait_4

@@ -1,6 +1,6 @@
 description: Subgait generated using TestJointGaitGenerator, with a duration of 6.0s
   and 2 setpoints.
-duration: 2000001000
+duration: 8000000000
 gait_type: ''
 joints:
   rotational_joint:
@@ -8,10 +8,13 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.2
-    time_from_start: 1000
+    time_from_start: 2000000000
     velocity: 0.0
-  - position: 0.2
-    time_from_start: 2000001000
+  - position: -0.2
+    time_from_start: 6000000000
     velocity: 0.0
-name: sine_subgait
-version: MVI_rotational_sine_subgait_v1
+  - position: 0
+    time_from_start: 8000000000
+    velocity: 0.0
+name: sine_subgait_2
+version: MVI_rotational_sine_subgait_v2

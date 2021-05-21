@@ -1,0 +1,26 @@
+description: MVI with no ADPF movements version 2
+duration: 1700000000
+gait_type: ''
+joints:
+  rotational_joint:
+      - position: 0.0
+        time_from_start: 0
+        velocity: 0.0
+      - position: -0.1667
+        time_from_start: 2000000000
+        velocity: 0.0
+      - position: 0.0
+        time_from_start: 529400000
+        velocity: 1.3155
+      - position: 0.4887
+        time_from_start: 920000000
+        velocity: 0.1396
+      - position: 0.288
+        time_from_start: 1399999999
+        velocity: -0.3491
+      - position: 0
+        time_from_start: 1700000000
+        velocity: 0
+
+name: rotational_testjoint_hip_walk_subgait
+version: MVI_rotational_hip_walk_subgait_v1

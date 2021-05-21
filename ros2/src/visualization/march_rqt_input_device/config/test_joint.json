@@ -24,7 +24,22 @@
    ],
    [
       {
-         "name": "rotational_sine_gait"
+         "name": "rotational_sine_gait_1"
+      },
+      {
+         "name": "rotational_sine_gait_2"
+      },
+      {
+         "name": "rotational_sine_gait_3"
+      },
+      {
+         "name": "rotational_sine_gait_4"
+      },
+      {
+         "name": "rotational_testjoint_hip_walk_gait"
+      },
+      {
+         "name": "rotational_testjoint_knee_walk_gait"
       },
       {
          "name": "linear_sine_gait"

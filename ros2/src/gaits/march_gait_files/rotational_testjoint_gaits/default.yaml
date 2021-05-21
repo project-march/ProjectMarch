@@ -1,6 +1,16 @@
 gaits:
-  rotational_sine_gait:
-    sine_subgait: MVI_rotational_sine_subgait_v1
+  rotational_sine_gait_1:
+    sine_subgait_1: MVI_rotational_sine_subgait_v1
+  rotational_sine_gait_2:
+    sine_subgait_2: MVI_rotational_sine_subgait_v2
+  rotational_sine_gait_3:
+    sine_subgait_3: MVI_rotational_sine_subgait_v3
+  rotational_sine_gait_4:
+    sine_subgait_4: MVI_rotational_sine_subgait_v4
+  rotational_testjoint_hip_walk_gait:
+    rotational_testjoint_hip_walk_subgait: MVI_rotational_hip_walk_subgait_v1
+  rotational_testjoint_knee_walk_gait:
+    rotational_testjoint_knee_walk_subgait: MVI_rotational_knee_walk_subgait_v1
 positions:
   setup:
     gait_type: ''

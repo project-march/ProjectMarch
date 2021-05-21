@@ -1,0 +1,6 @@
+name: rotational_testjoint_knee_walk_gait
+subgaits:
+  rotational_testjoint_knee_walk_subgait:
+    to: end
+  start:
+    to: rotational_testjoint_knee_walk_subgait

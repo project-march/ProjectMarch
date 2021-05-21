@@ -1,16 +1,16 @@
 [
   {
-    "name":"axis1.motor.config.current_lim",
+    "name":"axis0.motor.config.current_lim",
     "type":"float",
     "value":30.0
   },
   {
-    "name":"axis1.encoder.config.cpr",
+    "name":"axis0.encoder.config.cpr",
     "type":"int32",
     "value":4096
   },
   {
-    "name":"axis1.encoder.config.use_index",
+    "name":"axis0.encoder.config.use_index",
     "type":"bool",
     "value":1
   },
@@ -20,27 +20,27 @@
     "value":2.0
   },
   {
-    "name":"axis1.motor.config.pole_pairs",
+    "name":"axis0.motor.config.pole_pairs",
     "type":"int32",
     "value":21
   },
   {
-    "name":"axis1.controller.config.control_mode",
+    "name":"axis0.controller.config.control_mode",
     "type":"int32",
     "value":1
   },
   {
-    "name":"axis1.controller.config.input_mode",
+    "name":"axis0.controller.config.input_mode",
     "type":"int32",
     "value":1
   },
   {
-    "name": "axis1.motor.config.torque_constant",
+    "name": "axis0.motor.config.torque_constant",
     "type": "float",
-    "value": 0.05513333333
+    "value": 0.08705263157
   },
   {
-    "name": "axis1.controller.config.vel_limit",
+    "name": "axis0.controller.config.vel_limit",
     "type": "float",
     "value": 38.0
   }
