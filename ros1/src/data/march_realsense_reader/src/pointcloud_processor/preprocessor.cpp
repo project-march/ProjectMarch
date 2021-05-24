@@ -137,6 +137,9 @@ void NormalsPreprocessor::readParameters(
     allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
+    // Transformation parameters
+    foot_height = config.proprocessor_foot_height;
+
     debugging_ = config.debug;
 }
 
@@ -180,6 +183,16 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
             << ex.what());
         return false;
     }
+
+    Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
+    // Define a translation down of the width of the foot.
+    double trans_z = foot_height;
+
+    transform_matrix.translation() << trans_x, trans_y, trans_z;
+
+    // Executing the transformation
+    pcl::transformPointCloud (*cloud, *cloud, transform_2);
+
     return true;
 }
 
