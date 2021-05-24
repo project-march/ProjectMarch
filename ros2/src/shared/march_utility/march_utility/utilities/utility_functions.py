@@ -206,7 +206,7 @@ def get_joint_names_for_inverse_kinematics() -> List[str]:
     """
     robot = urdf.Robot.from_xml_file(
         os.path.join(
-            get_package_share_directory("march_description"), "urdf", "march4.urdf"
+            get_package_share_directory("march_description"), "urdf", "march6.urdf"
         )
     )
     robot_joint_names = robot.joint_map.keys()
