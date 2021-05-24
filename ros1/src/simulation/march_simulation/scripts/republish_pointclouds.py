@@ -24,7 +24,7 @@ def republish_cloud(publisher, msg):
     :param publisher: The publisher to republish on.
     :param msg: The message that should be republished
     """
-    msg.header.stamp = rospy.Time(0)
+    msg.header.stamp = rospy.Time.now()
     publisher.publish(msg)
 
 
