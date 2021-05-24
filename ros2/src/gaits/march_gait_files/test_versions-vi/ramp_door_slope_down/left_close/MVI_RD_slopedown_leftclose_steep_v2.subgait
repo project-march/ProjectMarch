@@ -10,7 +10,7 @@ joints:
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
-  - position: -0.26179939
+  - position: -0.2618
     time_from_start: 3000000000
     velocity: -0.0
   left_hip_aa:
@@ -29,8 +29,8 @@ joints:
     velocity: 0.0
   - position: 0.7047447
     time_from_start: 1589126210
-    velocity: 0
-  - position: -0.08729962
+    velocity: 0.0
+  - position: -0.0873
     time_from_start: 3000000000
     velocity: -0.0
   left_knee:
@@ -39,10 +39,10 @@ joints:
     velocity: -0.0
   - position: 1.3962634
     time_from_start: 1200000000
-    velocity: -0.34910076
+    velocity: -0.3491
   - position: 0.0
     time_from_start: 3000000000
-    velocity: -0.0
+    velocity: 0.0
   right_ankle:
   - position: -0.26179939
     time_from_start: 0
@@ -67,7 +67,7 @@ joints:
   - position: 0.19198622
     time_from_start: 0
     velocity: -0.0
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 3000000000
     velocity: -0.0
   right_knee:
@@ -79,6 +79,6 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 3000000000
-    velocity: 0.0
+    velocity: -0.0
 name: left_close
 version: MVI_RD_slopedown_leftclose_steep_v2
