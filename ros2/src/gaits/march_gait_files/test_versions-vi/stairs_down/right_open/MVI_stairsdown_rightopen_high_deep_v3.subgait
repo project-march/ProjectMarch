@@ -13,12 +13,12 @@ joints:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: -0.06108652
+  - position: -0.0611
     time_from_start: 2000000000
-    velocity: -0.12217305
-  - position: -0.06108652
+    velocity: -0.1222
+  - position: -0.0611
     time_from_start: 3000000000
-    velocity: 0.12217305
+    velocity: 0.1222
   - position: 0.0
     time_from_start: 3750000000
     velocity: -0.0
@@ -26,13 +26,13 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
+  - position: 0.0873
     time_from_start: 750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0873
     time_from_start: 1000000000
     velocity: -0.0
-  - position: 1.18448864
+  - position: 1.1845
     time_from_start: 3750000000
     velocity: -0.0
   left_knee:
@@ -42,7 +42,7 @@ joints:
   - position: 0.0
     time_from_start: 1000000000
     velocity: -0.0
-  - position: 1.20170457
+  - position: 1.2017
     time_from_start: 3750000000
     velocity: -0.0
   right_ankle:
@@ -66,18 +66,18 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
+  - position: 0.0873
     time_from_start: 750000000
     velocity: -0.0
-  - position: 0.08726646
+  - position: 0.0873
     time_from_start: 1000000000
     velocity: -0.0
-  - position: 1.04719755
+  - position: 1.0472
     time_from_start: 2049999999
     velocity: -0.0
-  - position: -0.08726646
+  - position: -0.0873
     time_from_start: 3750000000
-    velocity: -0.17449976
+    velocity: -0.1745
   right_knee:
   - position: 0.0
     time_from_start: 0
@@ -85,14 +85,14 @@ joints:
   - position: 0.0
     time_from_start: 1000000000
     velocity: -0.0
-  - position: 1.20080049
+  - position: 1.2008
     time_from_start: 1862000000
-    velocity: 1.33309994
-  - position: 1.57079633
+    velocity: 1.3331
+  - position: 1.5708
     time_from_start: 2350000000
     velocity: -0.0
   - position: 0.2443
     time_from_start: 3750000000
-    velocity: -0.76791
+    velocity: -0.7679
 name: right_open
 version: MVI_stairsdown_rightopen_high_deep_v3
