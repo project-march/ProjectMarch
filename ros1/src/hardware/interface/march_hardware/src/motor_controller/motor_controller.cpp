@@ -41,16 +41,17 @@ MotorController::MotorController(const Slave& slave,
 
 bool MotorController::isIncrementalEncoderMorePrecise() const
 {
-    if (!hasIncrementalEncoder()) {
-        return false;
-    }
-    if (!hasAbsoluteEncoder()) {
-        return true;
-    }
-    /* The most precise encoder can encode more positions.
-       This means that every Internal Unit represents less radians. */
-    return incremental_encoder_->getRadiansPerIU()
-        < absolute_encoder_->getRadiansPerIU();
+    return true;
+//    if (!hasIncrementalEncoder()) {
+//        return false;
+//    }
+//    if (!hasAbsoluteEncoder()) {
+//        return true;
+//    }
+//    /* The most precise encoder can encode more positions.
+//       This means that every Internal Unit represents less radians. */
+//    return incremental_encoder_->getRadiansPerIU()
+//        < absolute_encoder_->getRadiansPerIU();
 }
 
 float MotorController::getPosition()

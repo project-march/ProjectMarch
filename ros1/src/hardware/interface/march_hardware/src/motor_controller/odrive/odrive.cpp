@@ -33,7 +33,8 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
             "An ODrive needs an absolute encoder");
     }
-    torque_constant_ = motor_kv * KV_TO_TORQUE_CONSTANT;
+    torque_constant_ = KV_TO_TORQUE_CONSTANT / (float) motor_kv;
+    ROS_INFO_STREAM("torque constant: " << torque_constant_);
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
@@ -84,8 +85,9 @@ void ODrive::waitForState(ODriveAxisState target_state)
 
 void ODrive::actuateTorque(float target_effort)
 {
+    ROS_INFO_STREAM("Effort: " << target_effort);
     float target_torque = target_effort * torque_constant_;
-    ROS_INFO_STREAM("Writing torque: " << target_torque);
+    ROS_INFO_STREAM("Torque: " << target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
         ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
@@ -124,7 +126,12 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     state->absolute_position_ = getAbsolutePositionUnchecked();
     state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
     state->incremental_position_ = getIncrementalPositionUnchecked();
-    state->incremental_position_ = getIncrementalPositionUnchecked();
+    state->incremental_velocity_ = getIncrementalVelocityUnchecked();
+
+//    ROS_INFO_STREAM("incremental_position_iu_: " << state->incremental_position_iu_);
+//    ROS_INFO_STREAM("incremental_position_: " << state->incremental_position_);
+//    ROS_INFO_STREAM("absolute_position_iu_: " << state->absolute_position_iu_);
+//    ROS_INFO_STREAM("absolute_position_: " << state->absolute_position_);
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
@@ -196,8 +203,9 @@ float ODrive::getIncrementalVelocityIU()
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return this->getAbsoluteEncoder()->positionIUToRadians(
-        getAbsolutePositionIU());
+    return 0;
+//    return this->getAbsoluteEncoder()->positionIUToRadians(
+//        getAbsolutePositionIU());
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()

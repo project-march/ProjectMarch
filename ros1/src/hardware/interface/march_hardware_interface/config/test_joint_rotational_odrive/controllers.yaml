@@ -5,7 +5,7 @@ march:
       publish_rate: 50
     joint_state:
       type: joint_state_controller/JointStateController
-      publish_rate: 250
+      publish_rate: 50
     temperature_sensor:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
       publish_rate: 1
@@ -14,9 +14,10 @@ march:
       joints:
         - rotational_joint
       gains:
-        rotational_joint: {p: 1, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        rotational_joint: {p: 50, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
       constraints:
         rotational_joint:
+          stopped_velocity_tolerance: 0.1
           margin_soft_limit_error: 0.5
           goal: 0.5
           trajectory: 0.5

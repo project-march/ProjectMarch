@@ -120,10 +120,6 @@ bool MarchHardwareInterface::init(
         ROS_WARN("Running without Power Distribution Board");
     }
 
-    // PRrnt all values once
-    march::Joint& joint = march_robot_->getJoint(0);
-    joint.getMotorController()->getState();
-
     // Initialize interfaces for each joint
     for (size_t i = 0; i < num_joints_; ++i) {
         march::Joint& joint = march_robot_->getJoint(i);
@@ -245,7 +241,9 @@ void MarchHardwareInterface::read(
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
         }
-        joint_effort_[i] = joint.getMotorController()->getTorque();
+//        joint_effort_[i] = joint.getMotorController()->getTorque();
+        joint_effort_[i] = joint.getMotorController()->getMotorCurrent();
+        ROS_INFO("Motor current: %f", joint_effort_[i]);
     }
 
     this->updateMotorControllerState();
@@ -270,7 +268,7 @@ float MarchHardwareInterface::determineTorque(const ros::Time& time)
 }
 
 void MarchHardwareInterface::write(
-    const ros::Time& /*time*/, const ros::Duration& elapsed_time)
+    const ros::Time& /*time*/, const ros::Duration& /*elapsed_time*/)
 {
     for (size_t i = 0; i < num_joints_; i++) {
         // Enlarge joint_effort_command because ROS control limits the pid
@@ -289,7 +287,7 @@ void MarchHardwareInterface::write(
     }
 
     // Enforce limits on all joints in effort mode
-    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+//    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
     if (not has_actuated_) {
         bool found_non_zero = false;
@@ -306,7 +304,7 @@ void MarchHardwareInterface::write(
         }
     }
     // Enforce limits on all joints in position mode
-    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+//    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
     for (size_t i = 0; i < num_joints_; i++) {
         march::Joint& joint = march_robot_->getJoint(i);
