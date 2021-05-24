@@ -119,7 +119,7 @@ protected:
     double allowed_length_z {};
 
     // Transformation parameters
-    double proprocessor_foot_height {};
+    double foot_height {};
 
     // Objects needed for transformation based on URDF
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
