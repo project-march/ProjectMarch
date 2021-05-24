@@ -122,7 +122,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
     try:
         robot = urdf.Robot.from_xml_file(
             os.path.join(
-                get_package_share_directory("march_description"), "urdf", "march4.urdf"
+                get_package_share_directory("march_description"), "urdf", "march6.urdf"
             )
         )
         # size[0], size[1] and size[2] are used to grab relevant length of the link,
