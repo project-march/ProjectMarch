@@ -34,7 +34,7 @@
     <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
 
     <group ns="march"
-           if="$(eval realsense and not realsense_simulation and ground_gait)"/>
+           if="$(eval realsense and not realsense_simulation)"/>
     <node name="republish_pointclouds" pkg="march_simulation" type="republish_pointclouds.py"/>
 
 <!-- Pass everything to march.launch -->
