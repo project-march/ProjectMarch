@@ -6,23 +6,20 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.1396
+  - position: 0.13960016
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.95993109
+    time_from_start: 1004000000
+    velocity: 0.0
+  - position: 0.09690068
+    time_from_start: 1580000000
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 1700000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 2000000000
     velocity: 0.0
-  - position: 0.5239
-    time_from_start: 4484000000
-    velocity: 2.337
-  - position: 0.925
-    time_from_start: 7040000000
-    velocity: 0.0
-  - position: 0.0969
-    time_from_start: 12800000000
-    velocity: 0.0
-  - position: 0.1396
-    time_from_start: 13999999999
-    velocity: 0.0
-  - position: 0
-    time_from_start: 17000000000
-    velocity: 0
 name: rotational_testjoint_knee_walk_subgait
 version: MVI_rotational_knee_walk_subgait_v1
