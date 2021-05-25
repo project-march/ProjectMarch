@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <filesystem>
-#include <yaml.h>
+#include "yaml-cpp/yaml.h"
 
 #include <pcl_ros/transforms.h>
 #include <tf2_ros/transform_listener.h>
@@ -142,8 +142,8 @@ void NormalsPreprocessor::readParameters(
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
     // Transformation parameters
-    YAML::Node robot_properties = YAML::LoadFile(ros::package::getPath("march_description") / "urdf" / "properties" / "march6.yaml");
-    foot_height = robot_properties['general']['width'];
+    YAML::Node robot_properties = YAML::LoadFile(ros::package::getPath("march_description") + "/urdf/properties/march6.yaml");
+    foot_height = robot_properties["general"]["width"].as<double>();
 
     debugging_ = config.debug;
 }
