@@ -3,6 +3,7 @@
 #include <pcl/search/kdtree.h>
 #include <pcl/search/search.h>
 #include <ros/ros.h>
+#include <utilities/output_utilities.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -14,7 +15,7 @@ RegionCreator::RegionCreator(bool debugging)
 {
 }
 
-// Construct a basic CHullFinder class
+// Construct a basic RegionGrower class
 RegionGrower::RegionGrower(bool debugging)
     : RegionCreator(debugging)
     , number_of_neighbours(-1)
@@ -47,11 +48,11 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     clock_t start_region_grow = clock();
 
     bool success = true;
+    // First extract regions as normal to potentially start the recursive call
+    // from the first result to improve it
+    success &= setupRegionGrower();
+    success &= extractRegions();
     if (use_recursive_growing) {
-        // First extract regions as normal to start the recursive call from the
-        // first result
-        success &= setupRegionGrower();
-        success &= extractRegions();
         if (!success) {
             return false;
         }
@@ -61,9 +62,6 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         setupRecursiveRegionGrower();
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
-    } else {
-        success &= setupRegionGrower();
-        success &= extractRegions();
     }
 
     clock_t end_region_grow = clock();
@@ -71,19 +69,33 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     if (debugging_) {
         ROS_DEBUG(
             "Total number of clusters found: %lu", points_vector_->size());
-        int i = 0;
+        std::vector<int> length_vector(points_vector_->size());
+        int right_size_regions_count = 0;
+        int too_small_regions_count = 0;
+        int too_large_regions_count = 0;
         for (const PointCloud::Ptr& region : *points_vector_) {
-            if (i >= 10) {
-                ROS_DEBUG("Stop outputting to debug to reduce clutter.");
-                break;
+            if (region->size() != 0) {
+                length_vector.push_back(region->size());
+                if (region->size() > max_desired_cluster_size) {
+                    ++too_large_regions_count;
+                } else if (region->size() < min_desired_cluster_size) {
+                    ++too_small_regions_count;
+                } else {
+                    ++right_size_regions_count;
+                }
             }
-            ROS_DEBUG(
-                "Total number of points in cluster %i: %lu", i, region->size());
-            i++;
         }
+        ROS_DEBUG_STREAM(
+            "All the lengths of the regions are in the following vector: "
+            << output_utilities::vectorToString(length_vector));
+
         if (use_recursive_growing) {
             ROS_DEBUG_STREAM("The number of recursive calls made is: "
                 << number_of_recursive_calls);
+            ROS_DEBUG_STREAM("There were "
+                << right_size_regions_count << " regions with the right size, "
+                << too_small_regions_count << " to small regions and "
+                << too_large_regions_count << " too large regions");
         }
 
         double time_taken = double(end_region_grow - start_region_grow)
