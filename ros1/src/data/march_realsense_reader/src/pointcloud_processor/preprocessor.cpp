@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <filesystem>
+#include <yaml.h>
 
 #include <pcl_ros/transforms.h>
 #include <tf2_ros/transform_listener.h>
