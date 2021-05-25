@@ -174,9 +174,13 @@ bool MarchHardwareInterface::init(
             joint.prepareActuation();
 
             // Set the first target as the current position
-            joint_position_[i] = joint.getPosition();
-            joint_velocity_[i] = joint.getVelocity();
-            joint_effort_[i] = 0;
+//            joint_position_[i] = joint.getPosition();
+//            joint_velocity_[i] = joint.getVelocity();
+//            joint_effort_[i] = 0;
+
+//            joint_position_[i] = 0;
+//            joint_velocity_[i] = 0;
+//            joint_effort_[i] = 0;
 
             if (actuation_mode == march::ActuationMode::position) {
                 joint_position_command_[i] = joint_position_[i];
@@ -424,7 +428,7 @@ void MarchHardwareInterface::updatePowerNet()
                     .getNetOperational(power_net_on_off_command_.getNetNumber())
                 != power_net_on_off_command_.isOnOrOff()) {
                 march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
+                    ->getHighVoltage()getAbsolutePosition
                     .setNetOnOff(power_net_on_off_command_.isOnOrOff(),
                         power_net_on_off_command_.getNetNumber());
             }

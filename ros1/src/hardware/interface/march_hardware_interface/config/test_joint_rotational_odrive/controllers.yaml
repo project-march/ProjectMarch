@@ -16,6 +16,7 @@ march:
       gains:
         rotational_joint: {p: 50, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
       constraints:
+        goal_time: 0.5
         rotational_joint:
           stopped_velocity_tolerance: 0.1
           margin_soft_limit_error: 0.5
