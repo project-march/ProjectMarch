@@ -154,10 +154,10 @@ bool CHullFinder::getPlaneCoefficientsRegion()
         -linear_algebra_utilities::dotProductVector<double>(
             average_point, average_normal));
 
-    if (success) {
-        if (region_index_ >= 10) {
-            ROS_DEBUG_ONCE("Stop outputting to debug to reduce clutter.");
-        } else {
+    if (success && debugging_) {
+        if (region_index_ == 10) {
+            ROS_DEBUG("Stop outputting to debug to reduce clutter.");
+        } else if (region_index_ < 10) {
             ROS_DEBUG_STREAM("Region " << region_index_
                                        << " has plane coefficients: "
                                        << output_utilities::vectorToString(
