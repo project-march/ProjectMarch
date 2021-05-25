@@ -38,3 +38,13 @@ default:
   yaw:
     p: 1500
     d: 70000
+side_controller:
+  pitch:
+    p: 100
+    d: 0
+  roll:
+    p: 250
+    d: 70000
+  yaw:
+    p: 1500
+    d: 70000
