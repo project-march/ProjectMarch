@@ -190,7 +190,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     transform_matrix.translation() << 0, 0, foot_height;
 
     // Executing the transformation
-    pcl::transformPointCloud (*pointcloud_, *pointcloud_, transform_matrix);
+    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform_matrix);
 
     return true;
 }
