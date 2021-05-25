@@ -178,9 +178,9 @@ bool MarchHardwareInterface::init(
 //            joint_velocity_[i] = joint.getVelocity();
 //            joint_effort_[i] = 0;
 
-//            joint_position_[i] = 0;
-//            joint_velocity_[i] = 0;
-//            joint_effort_[i] = 0;
+            joint_position_[i] = 0.2;
+            joint_velocity_[i] = 0;
+            joint_effort_[i] = 0;
 
             if (actuation_mode == march::ActuationMode::position) {
                 joint_position_command_[i] = joint_position_[i];
@@ -264,23 +264,23 @@ float MarchHardwareInterface::determineTorque(const ros::Time& time)
     }
     auto time_diff = time - *start_time;
     float time_from_start = ((float) time_diff.sec) + ((float) (time_diff.nsec)) / 1e9;
-    ROS_INFO_STREAM("time from start: " << time_from_start);
+//    ROS_INFO_STREAM("time from start: " << time_from_start);
     float amplitude = 0.15;
     float period = 4;
     float target = std::cos(((M_PI * 2.0) / period) * time_from_start) * amplitude;
-    return target;
+    return target / (8.27/95);
 }
 
 void MarchHardwareInterface::write(
-    const ros::Time& /*time*/, const ros::Duration& /*elapsed_time*/)
+    const ros::Time& time, const ros::Duration& /*elapsed_time*/)
 {
     for (size_t i = 0; i < num_joints_; i++) {
         // Enlarge joint_effort_command because ROS control limits the pid
         // values to a certain maximum
 //        joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
 //        joint_effort_command_[i] = -0.25;//joint_effort_command_[i]; //* (8.27/95);
-//        float torque = determineTorque(time);
-//        joint_effort_command_[i] = torque;
+        float torque = determineTorque(time);
+        joint_effort_command_[i] = torque;
 //        if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
 //            > MAX_EFFORT_CHANGE) {
 //            joint_effort_command_[i] = joint_last_effort_command_[i]
@@ -428,7 +428,7 @@ void MarchHardwareInterface::updatePowerNet()
                     .getNetOperational(power_net_on_off_command_.getNetNumber())
                 != power_net_on_off_command_.isOnOrOff()) {
                 march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()getAbsolutePosition
+                    ->getHighVoltage()
                     .setNetOnOff(power_net_on_off_command_.isOnOrOff(),
                         power_net_on_off_command_.getNetNumber());
             }
