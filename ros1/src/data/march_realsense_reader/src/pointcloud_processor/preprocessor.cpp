@@ -183,14 +183,20 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
             << ex.what());
         return false;
     }
+    // When transforming to the foot, raise the pointcloud up a bit so that the
+    // origin is on the ground If not, assume that the frame id to transform
+    // chosen differently on purpose (for example to be the pressure sole which
+    // is already on the ground) and do as expected.
+    if (frame_id_to_transform_to_ != "foot_left"
+        && frame_id_to_transform_to_ != "foot_right") {
+        Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
 
-    Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
+        // Define a translation up of the height of the foot.
+        transform_matrix.translation() << 0, 0, foot_height;
 
-    // Define a translation up of the height of the foot.
-    transform_matrix.translation() << 0, 0, foot_height;
-
-    // Executing the transformation
-    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform_matrix);
+        // Executing the transformation
+        pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform_matrix);
+    }
 
     return true;
 }
