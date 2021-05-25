@@ -7,12 +7,15 @@
 #include <pcl/search/kdtree.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <ros/ros.h>
+#include <ros/package.h>
+#include <filesystem>
 
 #include <pcl_ros/transforms.h>
 #include <tf2_ros/transform_listener.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
+using namespace std::filesystem;
 
 // Base constructor for preprocessors
 Preprocessor::Preprocessor(bool debugging)
@@ -138,7 +141,8 @@ void NormalsPreprocessor::readParameters(
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
     // Transformation parameters
-    foot_height = config.preprocessor_foot_height;
+    YAML::Node robot_properties = YAML::LoadFile(ros::package::getPath("march_description") / "urdf" / "properties" / "march6.yaml");
+    foot_height = robot_properties['general']['width'];
 
     debugging_ = config.debug;
 }
