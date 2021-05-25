@@ -1,4 +1,5 @@
-description: 'The MVI high rightswing with the v2 HAA movements. '
+description: MVI ankle gait version 1 with HAA version 2 movement included and changed
+  for the march6 robot
 duration: 1200000000
 gait_type: walk_like
 joints:
@@ -12,28 +13,25 @@ joints:
   left_hip_aa:
   - position: 0.0
     time_from_start: 0
-    velocity: -0.0
+    velocity: 0.0
   - position: -0.0611
     time_from_start: 300000000
     velocity: -0.211
   - position: -0.0611
     time_from_start: 900000000
-    velocity: 0.211
+    velocity: 0.2129
   - position: 0.0
     time_from_start: 1200000000
-    velocity: 0.0
+    velocity: -0.0
   left_hip_fe:
-  - position: 0.3752
+  - position: 0.31415927
     time_from_start: 0
-    velocity: -0.32000001
-  - position: 0.3386
-    time_from_start: 471300000
-    velocity: -0.5076
+    velocity: -0.27733282
   - position: -0.0785
     time_from_start: 1200000000
     velocity: 0.0
   left_knee:
-  - position: 0.1396
+  - position: 0.13960016
     time_from_start: 0
     velocity: 0.0
   - position: 0.2094
@@ -51,7 +49,7 @@ joints:
     velocity: 0.0
   - position: -0.13962634
     time_from_start: 180000000
-    velocity: -0.34906585
+    velocity: 0.0
   - position: 0.0
     time_from_start: 550000000
     velocity: 0.0
@@ -61,36 +59,33 @@ joints:
   right_hip_aa:
   - position: 0.0
     time_from_start: 0
-    velocity: -0.0
+    velocity: 0.0
   - position: 0.0873
-    time_from_start: 600000000
+    time_from_start: 601400000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1200000000
-    velocity: 0.0
+    velocity: -0.0
   right_hip_fe:
   - position: -0.07849967
     time_from_start: 0
     velocity: 0.0
-  - position: 0.79160979
-    time_from_start: 464800000
-    velocity: 1.23309955
-  - position: 0.95899036
+  - position: 0.57595865
     time_from_start: 720000000
     velocity: 0.1280007
-  - position: 0.37520041
+  - position: 0.31415927
     time_from_start: 1200000000
-    velocity: -0.32000088
+    velocity: -0.27733282
   right_knee:
   - position: 0.13960016
     time_from_start: 0
     velocity: 0.0
-  - position: 1.3962634
-    time_from_start: 492100000
-    velocity: 0.0
-  - position: 0.87269953
-    time_from_start: 769300000
-    velocity: -2.45929982
+  - position: 1.1693706
+    time_from_start: 504000000
+    velocity: 0.52359878
+  - position: 1.09955743
+    time_from_start: 668300000
+    velocity: -2.22397184
   - position: 0.09690068
     time_from_start: 1080000000
     velocity: 0.0
@@ -98,4 +93,4 @@ joints:
     time_from_start: 1200000000
     velocity: 0.0
 name: right_swing
-version: MVI_walk_rightswing_haa_adpf_high_v2
+version: MVI_walk_rightswing_v3

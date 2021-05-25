@@ -74,7 +74,7 @@ joints:
   right_hip_fe:
   - position: 0.37520041
     time_from_start: 0
-    velocity: -0.25599931
+    velocity: -0.32000088
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0

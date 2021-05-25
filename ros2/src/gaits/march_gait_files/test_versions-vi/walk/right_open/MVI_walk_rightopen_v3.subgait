@@ -1,4 +1,5 @@
-description: 'The MVI high rights open with the v2 HAA movements. '
+description: MVI ankle gait version 1 with HAA version 2 movement included and changed
+  for the march6 robot
 duration: 1500000000
 gait_type: walk_like
 joints:
@@ -21,12 +22,12 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 1500000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_fe:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.07849967
+  - position: -0.0785
     time_from_start: 1500000000
     velocity: 0.0
   left_knee:
@@ -36,18 +37,21 @@ joints:
   - position: 0.1396
     time_from_start: 1020000000
     velocity: 0.0
-  - position: 0.13960016
+  - position: 0.1396
     time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.06632251
-    time_from_start: 288500000
-    velocity: 0.30252316
   - position: 0.0
-    time_from_start: 717700000
+    time_from_start: 196153850
+    velocity: 0.0
+  - position: -0.10471976
+    time_from_start: 382038460
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1500000000
@@ -61,29 +65,29 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 1500000000
-    velocity: -0.0
+    velocity: 0.0
   right_hip_fe:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.84093941
-    time_from_start: 885145630
-    velocity: 0.12098681
-  - position: 0.3752
+  - position: 0.57595865
+    time_from_start: 900000000
+    velocity: 0.12098622
+  - position: 0.31415927
     time_from_start: 1500000000
-    velocity: -0.32000001
+    velocity: -0.27733282
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.3962634
+  - position: 1.08210414
     time_from_start: 630000000
-    velocity: 0.0
+    velocity: 0.52359878
   - position: 0.09690068
     time_from_start: 1350000000
     velocity: 0.0
-  - position: 0.1396
+  - position: 0.13960016
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MVI_walk_rightopen_haa_adpf_high_v2
+version: MVI_walk_rightopen_v3
