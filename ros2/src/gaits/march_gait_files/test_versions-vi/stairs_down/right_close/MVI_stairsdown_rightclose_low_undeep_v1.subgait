@@ -1,5 +1,5 @@
 description: Stairs down of MVI for the stair with a heigth of 12 and depth op 20
-duration: 3750000000
+duration: 4000000000
 gait_type: stairs_like
 joints:
   left_ankle:
@@ -7,89 +7,71 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.06108652
-    time_from_start: 750000000
-    velocity: -0.12217305
-  - position: -0.06108652
-    time_from_start: 1750000000
-    velocity: 0.12217305
   - position: 0.0349
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.38397244
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 3000000000
+  - position: 0.26179939
+    time_from_start: 1430000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   left_knee:
   - position: 0.33160034
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 2750000000
+    time_from_start: 2933333330
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 2080000000
+    time_from_start: 2218666670
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.85756578
     time_from_start: 0
     velocity: 0.0
   - position: 1.04719755
-    time_from_start: 1690900000
-    velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 3000000000
+    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
   right_knee:
   - position: 1.3962634
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079633
-    time_from_start: 1509300000
-    velocity: 0.0
+  - position: 1.22173048
+    time_from_start: 2000000000
+    velocity: -0.6981317
   - position: 0.0
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 3750000000
+    time_from_start: 4000000000
     velocity: 0.0
 name: right_close
 version: MVI_stairsdown_rightclose_low_undeep_v1

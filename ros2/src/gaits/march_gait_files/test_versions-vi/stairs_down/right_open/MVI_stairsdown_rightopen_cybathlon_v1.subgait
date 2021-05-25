@@ -1,5 +1,4 @@
-description: Forward stairs down MVI version for the stair with 12 cm height and 45
-  cm depth.
+description: March VI strairs-down gait with HAA, ADPF, HFE and KFE movements.
 duration: 4000000000
 gait_type: stairs_like
 joints:
@@ -7,21 +6,18 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.04363323
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.0
+  - position: 0.04363323
     time_from_start: 2340000000
     velocity: 0.0
-  - position: 0.0
+  - position: -0.26179939
     time_from_start: 4000000000
-    velocity: 0.0
+    velocity: 0.13960016
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
-    velocity: 0.0
-  - position: -0.10224313
-    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 4000000000
@@ -40,20 +36,20 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.54109919
+  - position: 0.5411
     time_from_start: 1500000000
-    velocity: -0.17449976
-  - position: 0.52360052
-    time_from_start: 2500000000
-    velocity: 0.08729962
-  - position: 1.57079633
+    velocity: -0.1745
+  - position: 0.5236
+    time_from_start: 2000000000
+    velocity: 0.0873
+  - position: 1.4486
     time_from_start: 4000000000
-    velocity: 0.43629915
+    velocity: 0.4363
   right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.16590138
+  - position: 0.0436
     time_from_start: 4000000000
     velocity: 0.0
   right_hip_aa:
@@ -67,21 +63,21 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.78028784
-    time_from_start: 1588400000
-    velocity: 0.26179939
-  - position: 0.59341195
+  - position: 0.6981317
+    time_from_start: 1430000000
+    velocity: 0.0
+  - position: 0.5061001
     time_from_start: 4000000000
     velocity: 0.0
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.41888777
-    time_from_start: 1529708740
+  - position: 1.22173048
+    time_from_start: 1500000000
     velocity: -0.26179939
   - position: 0.33160034
     time_from_start: 4000000000
     velocity: 0.0
 name: right_open
-version: MVI_stairsdown_rightopen_low_deep_v1
+version: MVI_stairsdown_rightopen_cybathlon_v1
