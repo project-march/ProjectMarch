@@ -186,7 +186,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
 
     Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
 
-    // Define a translation down of the width of the foot.
+    // Define a translation up of the height of the foot.
     transform_matrix.translation() << 0, 0, foot_height;
 
     // Executing the transformation
