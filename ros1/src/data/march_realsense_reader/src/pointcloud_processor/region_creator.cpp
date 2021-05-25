@@ -14,7 +14,7 @@ RegionCreator::RegionCreator(bool debugging)
 {
 }
 
-// Construct a basic CHullFinder class
+// Construct a basic RegionGrower class
 RegionGrower::RegionGrower(bool debugging)
     : RegionCreator(debugging)
     , number_of_neighbours(-1)
@@ -47,11 +47,11 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     clock_t start_region_grow = clock();
 
     bool success = true;
+    // First extract regions as normal to potentially start the recursive call
+    // from the first result to improve it
+    success &= setupRegionGrower();
+    success &= extractRegions();
     if (use_recursive_growing) {
-        // First extract regions as normal to start the recursive call from the
-        // first result
-        success &= setupRegionGrower();
-        success &= extractRegions();
         if (!success) {
             return false;
         }
@@ -61,9 +61,6 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         setupRecursiveRegionGrower();
         success &= recursiveRegionGrower(region_vector_, pointcloud_,
             pointcloud_normals_, smoothness_threshold);
-    } else {
-        success &= setupRegionGrower();
-        success &= extractRegions();
     }
 
     clock_t end_region_grow = clock();
