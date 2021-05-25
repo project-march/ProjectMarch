@@ -109,7 +109,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="use_hud",
                 default_value="False",
-                description="Whether to use a physical HUD for the pilot",
+                description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
