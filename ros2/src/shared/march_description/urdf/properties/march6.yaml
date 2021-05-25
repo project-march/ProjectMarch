@@ -4,63 +4,62 @@ dimensions:
     mass: 8.686 # TODO
   hip_aa_side:
     length: 0.1605
-    mass: 2.982 # TODO
-  hip_aa_front:
+    mass: 3.019
+  hip_aa_base:
     length: 0.151
     mass: 0
   upper_leg:
     length: 0.410
-    mass: 4.995 # TODO
-    offset: 0.04 # TODO
+    mass: 8.161
+    offset: 0.00
   lower_leg:
     length: 0.410
-    mass: 4.458 # TODO
+    mass: 4.997
   ankle_plate:
-    length: 0.14567
-    offset: 0.07
+    length: 0.115
+    offset: 0.08
   foot:
     height_forward: 0.184
     height_backward: 0.059
-    mass: 1.821 # TODO
-inertia:  # TODO
+    mass: 0.789
+inertia:
   hip_base:
-    xx: 0.141
-    xy: 0.0000336
-    xz: -0.007
-    yy: 0.087
-    yz: 0.0005089
-    zz: 0.091
+    xx: 0.303498
+    xy: -0.000197304
+    xz: 0.0189663
+    yy: 0.239254
+    yz: 0.00122058
+    zz: 0.11822
   hip_aa:
-    xx: 0.013
-    xy: 0.008
-    xz: 0.005
-    yy: 0.023
-    yz: -0.001
-    zz: 0.028
+    xx: 0.068391
+    xy: -0.0426776
+    xz: 0.000171569
+    yy: 0.0388633
+    yz: 0.00117041
+    zz: 0.104156
   upper_leg:
-    xx: 0.127
-    xy: 0.0001291
-    xz: -0.0002056
-    yy: 0.122
-    yz: 0.016
-    zz: 0.015
+    xx: 1.68779
+    xy: -0.0439623
+    xz: 0.249519
+    yy: 1.68452
+    yz: 0.0814673
+    zz: 0.20142
   lower_leg:
-    xx: 0.075
-    xy: -0.027
-    xz: -0.008
-    yy: 0.11
-    yz: -0.002
-    zz: 0.071
+    xx: 0.567226
+    xy: 0.00351928
+    xz: 0.0146315
+    yy: 0.561191
+    yz: -0.019722
+    zz: 0.0624652
   foot:
-    xx: 0.021
-    xy: -0.002
-    xz: 0.02
-    yy: 0.027
-    yz: 0.004
-    zz: 0.01
+    xx: 0.00388523
+    xy: -0.00209516
+    xz: -0.00189858
+    yy: 0.00659119
+    yz: -0.00168033
+    zz: 0.00630322
 joint_limits:  # TODO
   # The upper and lower limits of the joints, given in degrees
-  # For limit calculations, see https://confluence.projectmarch.nl:8443/pages/viewpage.action?pageId=268697604
   left_knee:
     lower_limit: -5.012512207
     upper_limit: 112.4230957
@@ -85,7 +84,7 @@ joint_limits:  # TODO
   right_haa:
     lower_limit: -18.10546875
     upper_limit: 15.99609375
-safety:  # TODO
+safety:  # This is still copied from MV
   exoskeleton:
     knee:
       lower_soft_buffer: 3.5    # degrees
