@@ -1,4 +1,6 @@
+#include "yaml-cpp/yaml.h"
 #include <ctime>
+#include <filesystem>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/random_sample.h>
@@ -6,10 +8,8 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/search/kdtree.h>
 #include <pointcloud_processor/preprocessor.h>
-#include <ros/ros.h>
 #include <ros/package.h>
-#include <filesystem>
-#include "yaml-cpp/yaml.h"
+#include <ros/ros.h>
 
 #include <pcl_ros/transforms.h>
 #include <tf2_ros/transform_listener.h>
@@ -142,7 +142,9 @@ void NormalsPreprocessor::readParameters(
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
     // Transformation parameters
-    YAML::Node robot_properties = YAML::LoadFile(ros::package::getPath("march_description") + "/urdf/properties/march6.yaml");
+    YAML::Node robot_properties
+        = YAML::LoadFile(ros::package::getPath("march_description")
+            + "/urdf/properties/march6.yaml");
     foot_height = robot_properties["general"]["width"].as<double>();
 
     debugging_ = config.debug;
