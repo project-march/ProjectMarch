@@ -196,16 +196,10 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             frame_id_to_transform_to_);
 
     if (debugging_) {
-        if (parameter_determiner_->debug_marker_array != nullopt) {
-            ROS_DEBUG("Done determining parameters, now publishing a marker to "
-                      "/camera/foot_locations_marker_array");
-            hull_parameter_determiner_publisher_.publish(
-                parameter_determiner_->debug_maker_array);
-        } else {
-            ROS_DEBUG("Done determining parameters, but the parameter "
-                      "determiner does not contain a debug marker array."
-                      "Unable to visualize results.");
-        }
+        ROS_DEBUG("Done determining parameters, now publishing a marker to "
+                  "/camera/foot_locations_marker_array");
+        hull_parameter_determiner_publisher_.publish(
+                parameter_determiner_->debug_marker_array);
     }
     if (not parameter_determining_was_successful) {
         res.error_message

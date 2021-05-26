@@ -47,8 +47,7 @@ public:
         march_realsense_reader::pointcloud_parametersConfig& config)
         = 0;
 
-    std::optional<visualization_msgs::MarkerArray> debug_marker_array
-        = std::nullopt;
+    visualization_msgs::MarkerArray debug_marker_array;
 
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
