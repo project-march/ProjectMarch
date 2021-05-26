@@ -194,8 +194,8 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     // origin is on the ground If not, assume that the frame id to transform
     // chosen differently on purpose (for example to be the pressure sole which
     // is already on the ground) and do as expected.
-    if (frame_id_to_transform_to_ != "foot_left"
-        && frame_id_to_transform_to_ != "foot_right") {
+    if (frame_id_to_transform_to_ == "foot_left"
+        || frame_id_to_transform_to_ == "foot_right") {
         Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
 
         // Define a translation up of the height of the foot.
