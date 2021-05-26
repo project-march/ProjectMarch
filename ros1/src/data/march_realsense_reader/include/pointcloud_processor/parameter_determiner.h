@@ -84,10 +84,6 @@ public:
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
 
-    pcl::PointNormal optimal_foot_location;
-    PointNormalCloud::Ptr possible_foot_locations;
-    PointCloud2D::Ptr foot_locations_to_try;
-
 protected:
     // Get the optimal foot location by finding which possible foot location is
     // closest to the most desirable foot location
@@ -229,6 +225,10 @@ protected:
     // [5])^T
     LineCoefficients::Ptr executable_locations_line_coefficients_
         = boost::make_shared<LineCoefficients>();
+
+    pcl::PointNormal optimal_foot_location;
+    PointNormalCloud::Ptr possible_foot_locations;
+    PointCloud2D::Ptr foot_locations_to_try;
 };
 
 /** The simple parameter determiner

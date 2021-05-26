@@ -176,15 +176,15 @@ void HullParameterDeterminer::initializeDebugOutput()
 void HullParameterDeterminer::initializeMarkerList(
     visualization_msgs::Marker& marker_list, int id)
 {
-    foot_locations_to_try_marker_list.id = id;
-    foot_locations_to_try_marker_list.header.frame_id
+    marker_list.id = id;
+    marker_list.header.frame_id
         = frame_id_to_transform_to_;
-    foot_locations_to_try_marker_list.pose.orientation.w = 1.0;
-    foot_locations_to_try_marker_list.type
+    marker_list.pose.orientation.w = 1.0;
+    marker_list.type
         = visualization_msgs::Marker::SPHERE_LIST;
-    foot_locations_to_try_marker_list.scale.x = DEBUG_MARKER_SIZE;
-    foot_locations_to_try_marker_list.scale.y = DEBUG_MARKER_SIZE;
-    foot_locations_to_try_marker_list.scale.z = DEBUG_MARKER_SIZE;
+    marker_list.scale.x = DEBUG_MARKER_SIZE;
+    marker_list.scale.y = DEBUG_MARKER_SIZE;
+    marker_list.scale.z = DEBUG_MARKER_SIZE;
 }
 
 void HullParameterDeterminer::addDebugGaitInformation()
@@ -238,7 +238,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
             break;
         }
         default: {
-            ROS_ERROR_STREAM("gait debug information is not implemented yet "
+            ROS_WARN_STREAM("gait debug information is not implemented yet "
                              "for realsense category "
                 << realsense_category_.value());
         }
@@ -250,6 +250,7 @@ void HullParameterDeterminer::addDebugMarkersToArray()
     debug_marker_array.markers.push_back(foot_locations_to_try_marker_list);
     debug_marker_array.markers.push_back(possible_foot_locations_marker_list);
     debug_marker_array.markers.push_back(optimal_foot_location_marker);
+    debug_marker_array.markers.push_back(gait_information_marker_list);
 }
 
 void HullParameterDeterminer::initializeGaitDimensions()
@@ -361,6 +362,23 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         foot_locations_to_try, possible_foot_locations);
 
     success &= getOptimalFootLocationFromPossibleLocations();
+
+    if (debugging_ && success) {
+        geometry_msgs::Point marker_point;
+        marker_point.x = optimal_foot_location.x;
+        marker_point.y = optimal_foot_location.y;
+        marker_point.z = optimal_foot_location.z;
+
+        std_msgs::ColorRGBA marker_color;
+        marker_color.r = 0.0;
+        marker_color.g = 0.0;
+        marker_color.b = 0.0;
+        marker_color.a = 1.0;
+
+        optimal_foot_location_marker.points.push_back(marker_point);
+        optimal_foot_location_marker.colors.push_back(marker_color);
+    }
+    
     return success;
 }
 
@@ -497,12 +515,12 @@ bool HullParameterDeterminer::isValidLocation(
         case RealSenseCategory::stairs_up: {
             if (debugging_) {
                 geometry_msgs::Point marker_point;
-                std_msgs::ColorRGBA marker_color;
 
                 marker_point.x = possible_foot_location.x;
                 marker_point.y = possible_foot_location.y;
                 marker_point.z = possible_foot_location.z;
 
+                std_msgs::ColorRGBA marker_color;
                 if (!(possible_foot_location.x < min_x_stairs
                         && possible_foot_location.x > max_x_stairs
                         && possible_foot_location.z > min_z_stairs
