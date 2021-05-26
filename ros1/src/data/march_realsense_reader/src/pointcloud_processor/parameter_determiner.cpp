@@ -94,7 +94,8 @@ bool HullParameterDeterminer::determineParameters(
     boost::shared_ptr<HullVector> const hull_vector,
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters)
+    boost::shared_ptr<GaitParameters> gait_parameters,
+    std::string frame_id_to_transform_to)
 {
     time_t start_determine_parameters = clock();
 
@@ -105,6 +106,7 @@ bool HullParameterDeterminer::determineParameters(
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
     realsense_category_.emplace(realsense_category);
+    frame_id_to_transform_to_ = frame_id_to_transform_to;
     // Initialize the optimal foot location at the origin and the gait
     // parmaeters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
@@ -539,6 +541,12 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         return false;
     }
     for (int i = 0; i < number_of_optional_foot_locations; i++) {
+        if (debugging_) {
+            visualization_msgs::Marker foot_locations_to_try_marker_list;
+            foot_locations_to_try_marker_list.id = 0;
+            foot_locations_to_try_marker_list.header.frame_id
+                    = frame_id_to_transform_to_;
+        }
         float x_location = start
             + (end - start) * (float)i
                 / ((float)number_of_optional_foot_locations - 1.0F);

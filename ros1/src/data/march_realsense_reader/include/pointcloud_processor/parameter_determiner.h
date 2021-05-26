@@ -7,6 +7,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
+#include <visualization_msgs/MarkerArray.h>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -33,7 +34,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters)
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to)
         = 0;
 
     virtual ~ParameterDeterminer() = default;
@@ -52,6 +54,7 @@ protected:
     std::optional<RealSenseCategory> realsense_category_ = std::nullopt;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     bool debugging_;
+    visualization_msgs::MarkerArray debug_marker_array;
 };
 
 /** The hull parameter determiner
@@ -70,7 +73,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to) override;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -201,7 +205,7 @@ protected:
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
-
+    std::string frame_id_to_transform_to_
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
     // [5])^T
@@ -222,7 +226,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to) override;
 };
 
 #endif // MARCH_PARAMETER_DETERMINER_H
