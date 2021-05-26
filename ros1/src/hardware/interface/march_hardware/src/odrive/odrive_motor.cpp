@@ -243,7 +243,7 @@ double OdriveMotor::getAngleRadIncremental()
 
 double OdriveMotor::getVelocityRadIncremental()
 {
-  double velocity_rad_incremental_double = this->velocity_rad_incremental * -1;
+  double velocity_rad_incremental_double = this->velocity_rad_incremental;
 //  double velocity_rad_incremental_double = this->velocity_rad_incremental * 1;
   return velocity_rad_incremental_double;
 }
