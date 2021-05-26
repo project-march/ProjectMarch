@@ -168,6 +168,10 @@ void HullParameterDeterminer::initializeDebugOutput()
 
     id = 2;
     initializeMarkerList(optimal_foot_location_marker, id);
+    // Make the optimal foot location stand out more
+    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.1
+    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.1
+    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.1
 
     id = 3;
     initializeMarkerList(gait_information_marker_list, id);
@@ -190,8 +194,8 @@ void HullParameterDeterminer::initializeMarkerList(
 void HullParameterDeterminer::addDebugGaitInformation()
 {
     std_msgs::ColorRGBA marker_color;
-    marker_color.r = 0.0;
-    marker_color.g = 1.0;
+    marker_color.r = 1.0;
+    marker_color.g = 0.0;
     marker_color.b = 0.0;
     marker_color.a = 0.7;
 
@@ -378,7 +382,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         optimal_foot_location_marker.points.push_back(marker_point);
         optimal_foot_location_marker.colors.push_back(marker_color);
     }
-    
+
     return success;
 }
 
@@ -525,9 +529,9 @@ bool HullParameterDeterminer::isValidLocation(
                         && possible_foot_location.x > max_x_stairs
                         && possible_foot_location.z > min_z_stairs
                         && possible_foot_location.z < max_z_stairs)) {
-                    marker_color.r = 0.0;
+                    marker_color.r = 1.0;
                     marker_color.g = 1.0;
-                    marker_color.b = 1.0;
+                    marker_color.b = 0.0;
                     marker_color.a = 0.7;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
                     marker_color.r = 1.0;
