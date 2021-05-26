@@ -134,7 +134,7 @@
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
     <xacro:include filename="march.gazebo"/>
 
-    <material name="blue">
+    <material name="visuals_material">
         <color rgba="0 0 0.6 1"/>
     </material>
 
