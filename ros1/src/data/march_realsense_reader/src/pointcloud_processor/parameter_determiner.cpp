@@ -169,9 +169,9 @@ void HullParameterDeterminer::initializeDebugOutput()
     id = 2;
     initializeMarkerList(optimal_foot_location_marker, id);
     // Make the optimal foot location stand out more
-    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.1
-    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.1
-    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.1
+    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.1;
+    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.1;
+    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.1;
 
     id = 3;
     initializeMarkerList(gait_information_marker_list, id);
