@@ -19,6 +19,6 @@ march:
           trajectory: 0.305
           goal: 0.305
       gains: # Required because we're controlling an effort interface
-        rotational_joint: {p: 1ros2 launch march_launch march_simulation.launch.py robot:=test_joint_rotational gait_directory:=rotational_testjoint_gaits layout:=test_joint
+        rotational_joint: {p: 50, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
 
           ### 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
