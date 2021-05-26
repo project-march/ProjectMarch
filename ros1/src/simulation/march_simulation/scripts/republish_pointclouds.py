@@ -3,19 +3,7 @@
 import rospy
 from sensor_msgs.msg import PointCloud2
 
-rospy.init_node('republish_pointclouds', anonymous=True)
-
-CAMERA_FRONT_TOPIC = '/camera_front/depth/color/points'
-CAMERA_BACK_TOPIC = '/camera_back/depth/color/points'
 REPUBLISH_POSTFIX = "/sim_time"
-
-for topic in (CAMERA_BACK_TOPIC, CAMERA_FRONT_TOPIC):
-    publisher = rospy.Publisher(topic + REPUBLISH_POSTFIX, PointCloud2)
-    subscription = rospy.Subscriber(
-        topic,
-        PointCloud2,
-        lambda data: republish_cloud(publisher, data)
-    )
 
 
 def republish_cloud(publisher, msg):
@@ -28,4 +16,17 @@ def republish_cloud(publisher, msg):
     publisher.publish(msg)
 
 
+rospy.init_node("republish_pointclouds", anonymous=True)
+name = rospy.get_param("~name", "...")
+
+CAMERA_TOPIC = f"/{name}/depth/color/points"
+publisher = rospy.Publisher(
+    CAMERA_TOPIC + REPUBLISH_POSTFIX, PointCloud2, queue_size=100
+)
+subscription = rospy.Subscriber(
+    CAMERA_TOPIC,
+    PointCloud2,
+    lambda data: republish_cloud(publisher, data),
+    queue_size=100,
+)
 rospy.spin()

@@ -35,9 +35,19 @@
     <arg name="gait_selection" default="false" doc="Whether to start the ros1 gait selection"/>
     <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
 
-    <group ns="march"
+    <group ns="camera_back"
+           if="$(eval realsense and not realsense_simulation and ground_gait and use_camera_back)">
+        <node name="republish_pointclouds" pkg="march_simulation"
+              type="republish_pointclouds.py">
+            <param name="name" value="camera_back"/>
+        </node>
+    </group>
+    <group ns="camera_front"
            if="$(eval realsense and not realsense_simulation and ground_gait)">
-        <node name="republish_pointclouds" pkg="march_simulation" type="republish_pointclouds.py"/>
+        <node name="republish_pointclouds" pkg="march_simulation"
+              type="republish_pointclouds.py">
+            <param name="name" value="camera_front"/>
+        </node>
     </group>
 
 <!-- Pass everything to march.launch -->
