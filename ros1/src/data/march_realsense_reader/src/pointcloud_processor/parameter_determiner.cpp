@@ -14,7 +14,7 @@
 #include <utility>
 
 #define EPSILON 0.0001
-#define DEBUG_MARKER_SIZE
+#define DEBUG_MARKER_SIZE 0.1
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -238,19 +238,18 @@ void HullParameterDeterminer::addDebugGaitInformation()
             break;
         }
         default: {
-            ROS_ERROR_STREAM(
-                "gait debug information is not implemented yet for obstacle "
+            ROS_ERROR_STREAM("gait debug information is not implemented yet "
+                             "for realsense category "
                 << realsense_category_.value());
-            return false;
         }
     }
 }
 
 void HullParameterDeterminer::addDebugMarkersToArray()
 {
-    marker_array.markers.push_back(foot_locations_to_try_marker_list);
-    marker_array.markers.push_back(possible_foot_locations_marker_list);
-    marker_array.markers.push_back(optimal_foot_location_marker);
+    debug_marker_array.markers.push_back(foot_locations_to_try_marker_list);
+    debug_marker_array.markers.push_back(possible_foot_locations_marker_list);
+    debug_marker_array.markers.push_back(optimal_foot_location_marker);
 }
 
 void HullParameterDeterminer::initializeGaitDimensions()
@@ -500,9 +499,9 @@ bool HullParameterDeterminer::isValidLocation(
                 geometry_msgs::Point marker_point;
                 std_msgs::ColorRGBA marker_color;
 
-                marker_point.x = x_location;
-                marker_point.y = y_location;
-                marker_point.z = 0;
+                marker_point.x = possible_foot_location.x;
+                marker_point.y = possible_foot_location.y;
+                marker_point.z = possible_foot_location.z;
 
                 if (!(possible_foot_location.x < min_x_stairs
                         && possible_foot_location.x > max_x_stairs
@@ -634,7 +633,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
             "Unable to compute general most desirable foot location.");
         return false;
     }
-    if (debuggin_) {
+    if (debugging_) {
         std_msgs::ColorRGBA marker_color;
         marker_color.r = 0.0;
         marker_color.g = 1.0;
@@ -892,7 +891,8 @@ bool SimpleParameterDeterminer::determineParameters(
     boost::shared_ptr<HullVector> const hull_vector,
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters)
+    boost::shared_ptr<GaitParameters> gait_parameters,
+    std::string frame_id_to_transform_to)
 {
     ROS_DEBUG("Determining parameters with simple parameter determiner");
     hull_vector_ = hull_vector;
@@ -900,6 +900,7 @@ bool SimpleParameterDeterminer::determineParameters(
     gait_parameters_ = gait_parameters;
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
+    frame_id_to_transform_to_ = frame_id_to_transform_to;
 
     // Return a standard step parameter, which works for medium stairs and
     // medium ramp

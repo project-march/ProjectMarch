@@ -194,6 +194,19 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
             hull_vector, polygon_vector, realsense_category, gait_parameters,
             frame_id_to_transform_to_);
+
+    if (debugging_) {
+        if (parameter_determiner_->debug_marker_array != nullopt) {
+            ROS_DEBUG("Done determining parameters, now publishing a marker to "
+                      "/camera/foot_locations_marker_array");
+            hull_parameter_determiner_publisher_.publish(
+                parameter_determiner_->debug_maker_array);
+        } else {
+            ROS_DEBUG("Done determining parameters, but the parameter "
+                      "determiner does not contain a debug marker array."
+                      "Unable to visualize results.");
+        }
+    }
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
@@ -201,11 +214,12 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         res.success = false;
         return;
     }
-    if (debugging_) {
-        ROS_DEBUG("Done determining parameters, now publishing a marker to "
-                  "/camera/foot_locations_marker_array");
-        publishParameterDeterminerMarkerArray();
-    }
+    //    if (debugging_) {
+    //        ROS_DEBUG("Done determining parameters, now publishing a marker to
+    //        "
+    //                  "/camera/foot_locations_marker_array");
+    //        publishParameterDeterminerMarkerArray();
+    //    }
 
     res.gait_parameters = *gait_parameters;
 
@@ -254,7 +268,7 @@ void RealSenseReader::publishHullMarkerArray(
     marker_list.pose.orientation.w = 1.0;
     marker_list.id = 0;
     marker_list.type = visualization_msgs::Marker::CUBE_LIST;
-    float cube_side_length = 0.07;
+    float cube_side_length = 0.02;
     marker_list.scale.x = cube_side_length;
     marker_list.scale.y = cube_side_length;
     marker_list.scale.z = cube_side_length;
@@ -290,122 +304,122 @@ void RealSenseReader::publishHullMarkerArray(
     }
     hull_marker_array_publisher_.publish(marker_list);
 }
-
-// Create markers from the parameter determiner and publish them for
-// visualization
-void RealSenseReader::publishParameterDeterminerMarkerArray()
-{
-    visualization_msgs::MarkerArray marker_array;
-
-    visualization_msgs::Marker optimal_foot_location_marker;
-    optimal_foot_location_marker.id = 0;
-    optimal_foot_location_marker.header.frame_id = frame_id_to_transform_to_;
-    fillOptimalFootLocationMarker(parameter_determiner_->optimal_foot_location,
-        optimal_foot_location_marker);
-
-    visualization_msgs::Marker foot_locations_to_try_marker_list;
-    foot_locations_to_try_marker_list.id = 1;
-    foot_locations_to_try_marker_list.header.frame_id
-        = frame_id_to_transform_to_;
-    fillFootLocationsToTryMarker(parameter_determiner_->foot_locations_to_try,
-        foot_locations_to_try_marker_list);
-
-    visualization_msgs::Marker possible_foot_locations_marker_list;
-    possible_foot_locations_marker_list.id = 2;
-    possible_foot_locations_marker_list.header.frame_id
-        = frame_id_to_transform_to_;
-    fillPossibleFootLocationsMarker(
-        parameter_determiner_->possible_foot_locations,
-        parameter_determiner_->optimal_foot_location,
-        possible_foot_locations_marker_list);
-
-    marker_array.markers.push_back(optimal_foot_location_marker);
-    marker_array.markers.push_back(foot_locations_to_try_marker_list);
-    marker_array.markers.push_back(possible_foot_locations_marker_list);
-
-    hull_parameter_determiner_publisher_.publish(marker_array);
-}
-
-void RealSenseReader::fillPossibleFootLocationsMarker(
-    PointNormalCloud::Ptr const& possible_foot_locations,
-    pcl::PointNormal const optimal_foot_location,
-    visualization_msgs::Marker& marker_list)
-{
-    marker_list.pose.orientation.w = 1.0;
-    marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
-    float sphere_radius = 0.05;
-    marker_list.scale.x = sphere_radius;
-    marker_list.scale.y = sphere_radius;
-    marker_list.scale.z = sphere_radius;
-
-    for (pcl::PointNormal ground_point : *possible_foot_locations) {
-        geometry_msgs::Point marker_point;
-        marker_point.x = ground_point.x;
-        marker_point.y = ground_point.y;
-        marker_point.z = ground_point.z;
-
-        std_msgs::ColorRGBA marker_color;
-        marker_color.r = 0.0;
-        marker_color.g = 1.0;
-        marker_color.b = 0.0;
-        marker_color.a = 0.7;
-
-        marker_list.points.push_back(marker_point);
-        marker_list.colors.push_back(marker_color);
-    }
-}
-
-// Create a marker list from the 'foot locations to try' and publish it and
-// publish for visualization
-void RealSenseReader::fillFootLocationsToTryMarker(
-    PointCloud2D::Ptr const& foot_locations_to_try,
-    visualization_msgs::Marker& marker_list)
-{
-    marker_list.pose.orientation.w = 1.0;
-    marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
-    float sphere_radius = 0.05;
-    marker_list.scale.x = sphere_radius;
-    marker_list.scale.y = sphere_radius;
-    marker_list.scale.z = sphere_radius;
-
-    for (pcl::PointXY ground_point : *foot_locations_to_try) {
-
-        geometry_msgs::Point marker_point;
-        marker_point.x = ground_point.x;
-        marker_point.y = ground_point.y;
-        marker_point.z = 0;
-
-        std_msgs::ColorRGBA marker_color;
-        marker_color.r = 0.0;
-        marker_color.g = 0.0;
-        marker_color.b = 1.0;
-        marker_color.a = 0.7;
-
-        marker_list.points.push_back(marker_point);
-        marker_list.colors.push_back(marker_color);
-    }
-}
-
-// Create a marker from the optimal foot location and publish it and publish for
-// visualization
-void RealSenseReader::fillOptimalFootLocationMarker(
-    pcl::PointNormal const optimal_foot_location,
-    visualization_msgs::Marker& marker)
-{
-    marker.type = visualization_msgs::Marker::SPHERE;
-    float sphere_radius = 0.07;
-    marker.scale.x = sphere_radius;
-    marker.scale.y = sphere_radius;
-    marker.scale.z = sphere_radius;
-    marker.pose.position.x = optimal_foot_location.x;
-    marker.pose.position.y = optimal_foot_location.y;
-    marker.pose.position.z = optimal_foot_location.z;
-    marker.pose.orientation.w = 1.0;
-    marker.color.r = 1.0;
-    marker.color.g = 1.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
-}
+//
+//// Create markers from the parameter determiner and publish them for
+//// visualization
+// void RealSenseReader::publishParameterDeterminerMarkerArray()
+//{
+//    visualization_msgs::MarkerArray marker_array;
+//
+//    visualization_msgs::Marker optimal_foot_location_marker;
+//    optimal_foot_location_marker.id = 0;
+//    optimal_foot_location_marker.header.frame_id = frame_id_to_transform_to_;
+//    fillOptimalFootLocationMarker(parameter_determiner_->optimal_foot_location,
+//        optimal_foot_location_marker);
+//
+//    visualization_msgs::Marker foot_locations_to_try_marker_list;
+//    foot_locations_to_try_marker_list.id = 1;
+//    foot_locations_to_try_marker_list.header.frame_id
+//        = frame_id_to_transform_to_;
+//    fillFootLocationsToTryMarker(parameter_determiner_->foot_locations_to_try,
+//        foot_locations_to_try_marker_list);
+//
+//    visualization_msgs::Marker possible_foot_locations_marker_list;
+//    possible_foot_locations_marker_list.id = 2;
+//    possible_foot_locations_marker_list.header.frame_id
+//        = frame_id_to_transform_to_;
+//    fillPossibleFootLocationsMarker(
+//        parameter_determiner_->possible_foot_locations,
+//        parameter_determiner_->optimal_foot_location,
+//        possible_foot_locations_marker_list);
+//
+//    marker_array.markers.push_back(optimal_foot_location_marker);
+//    marker_array.markers.push_back(foot_locations_to_try_marker_list);
+//    marker_array.markers.push_back(possible_foot_locations_marker_list);
+//
+//    hull_parameter_determiner_publisher_.publish(marker_array);
+//}
+//
+// void RealSenseReader::fillPossibleFootLocationsMarker(
+//    PointNormalCloud::Ptr const& possible_foot_locations,
+//    pcl::PointNormal const optimal_foot_location,
+//    visualization_msgs::Marker& marker_list)
+//{
+//    marker_list.pose.orientation.w = 1.0;
+//    marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
+//    float sphere_radius = 0.05;
+//    marker_list.scale.x = sphere_radius;
+//    marker_list.scale.y = sphere_radius;
+//    marker_list.scale.z = sphere_radius;
+//
+//    for (pcl::PointNormal ground_point : *possible_foot_locations) {
+//        geometry_msgs::Point marker_point;
+//        marker_point.x = ground_point.x;
+//        marker_point.y = ground_point.y;
+//        marker_point.z = ground_point.z;
+//
+//        std_msgs::ColorRGBA marker_color;
+//        marker_color.r = 0.0;
+//        marker_color.g = 1.0;
+//        marker_color.b = 0.0;
+//        marker_color.a = 0.7;
+//
+//        marker_list.points.push_back(marker_point);
+//        marker_list.colors.push_back(marker_color);
+//    }
+//}
+//
+//// Create a marker list from the 'foot locations to try' and publish it and
+//// publish for visualization
+// void RealSenseReader::fillFootLocationsToTryMarker(
+//    PointCloud2D::Ptr const& foot_locations_to_try,
+//    visualization_msgs::Marker& marker_list)
+//{
+//    marker_list.pose.orientation.w = 1.0;
+//    marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
+//    float sphere_radius = 0.05;
+//    marker_list.scale.x = sphere_radius;
+//    marker_list.scale.y = sphere_radius;
+//    marker_list.scale.z = sphere_radius;
+//
+//    for (pcl::PointXY ground_point : *foot_locations_to_try) {
+//
+//        geometry_msgs::Point marker_point;
+//        marker_point.x = ground_point.x;
+//        marker_point.y = ground_point.y;
+//        marker_point.z = 0;
+//
+//        std_msgs::ColorRGBA marker_color;
+//        marker_color.r = 0.0;
+//        marker_color.g = 0.0;
+//        marker_color.b = 1.0;
+//        marker_color.a = 0.7;
+//
+//        marker_list.points.push_back(marker_point);
+//        marker_list.colors.push_back(marker_color);
+//    }
+//}
+//
+//// Create a marker from the optimal foot location and publish it and publish
+///for / visualization
+// void RealSenseReader::fillOptimalFootLocationMarker(
+//    pcl::PointNormal const optimal_foot_location,
+//    visualization_msgs::Marker& marker)
+//{
+//    marker.type = visualization_msgs::Marker::SPHERE;
+//    float sphere_radius = 0.07;
+//    marker.scale.x = sphere_radius;
+//    marker.scale.y = sphere_radius;
+//    marker.scale.z = sphere_radius;
+//    marker.pose.position.x = optimal_foot_location.x;
+//    marker.pose.position.y = optimal_foot_location.y;
+//    marker.pose.position.z = optimal_foot_location.z;
+//    marker.pose.orientation.w = 1.0;
+//    marker.color.r = 1.0;
+//    marker.color.g = 1.0;
+//    marker.color.b = 1.0;
+//    marker.color.a = 1.0;
+//}
 
 // The callback for the service that was starts processing the point cloud and
 // gives back parameters for a gait. This function should always return true,

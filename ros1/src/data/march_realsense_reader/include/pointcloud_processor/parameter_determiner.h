@@ -47,6 +47,9 @@ public:
         march_realsense_reader::pointcloud_parametersConfig& config)
         = 0;
 
+    std::optional<visualization_msgs::MarkerArray> debug_marker_array
+        = std::nullopt;
+
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
@@ -54,7 +57,7 @@ protected:
     std::optional<RealSenseCategory> realsense_category_ = std::nullopt;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     bool debugging_;
-    visualization_msgs::MarkerArray debug_marker_array;
+    std::string frame_id_to_transform_to_;
 };
 
 /** The hull parameter determiner
@@ -85,7 +88,6 @@ public:
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
-    visualization_msgs::MarkerArray marker_array;
 
 protected:
     // Get the optimal foot location by finding which possible foot location is
@@ -219,7 +221,6 @@ protected:
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
-    std::string frame_id_to_transform_to_;
     visualization_msgs::Marker foot_locations_to_try_marker_list;
     visualization_msgs::Marker possible_foot_locations_marker_list;
     visualization_msgs::Marker gait_information_marker_list;
