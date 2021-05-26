@@ -108,7 +108,7 @@ bool HullParameterDeterminer::determineParameters(
     realsense_category_.emplace(realsense_category);
     frame_id_to_transform_to_ = frame_id_to_transform_to;
     // Initialize the optimal foot location at the origin and the gait
-    // parmaeters at -1 in case the calculation fails
+    // parameters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
     gait_parameters_->first_parameter = -1;
     gait_parameters_->second_parameter = -1;
@@ -116,9 +116,13 @@ bool HullParameterDeterminer::determineParameters(
 
     // Since the parameter determining for e.g. ramp down is very similar to
     // ramp up set variables like the size a step on a flat ramp equal to the
-    // relevant (up or down) value and continue threating ramp up and ramp down
+    // relevant (up or down) value and continue treating ramp up and ramp down
     // the same
     initializeGaitDimensions();
+
+    if (debugging_) {
+        initializeDebugOutput();
+    }
 
     bool success = true;
 
@@ -126,6 +130,10 @@ bool HullParameterDeterminer::determineParameters(
     // found
     if (success &= getOptimalFootLocation()) {
         success &= getGaitParametersFromFootLocation();
+    }
+
+    if (debugging_) {
+        addDebugMarkersToArray();
     }
 
     if (success) {
@@ -147,6 +155,46 @@ bool HullParameterDeterminer::determineParameters(
 
     return success;
 };
+
+void HullParameterDeterminer::initializeDebugOutput()
+{
+    float sphere_radius = 0.01;
+
+    foot_locations_to_try_marker_list.id = 0;
+    foot_locations_to_try_marker_list.header.frame_id
+        = frame_id_to_transform_to_;
+    foot_locations_to_try_marker_list.pose.orientation.w = 1.0;
+    foot_locations_to_try_marker_list.type
+        = visualization_msgs::Marker::SPHERE_LIST;
+    foot_locations_to_try_marker_list.scale.x = sphere_radius;
+    foot_locations_to_try_marker_list.scale.y = sphere_radius;
+    foot_locations_to_try_marker_list.scale.z = sphere_radius;
+
+    possible_foot_locations_marker_list.id = 1;
+    possible_foot_locations_marker_list.header.frame_id
+        = frame_id_to_transform_to_;
+    possible_foot_locations_marker_list.pose.orientation.w = 1.0;
+    possible_foot_locations_marker_list.type
+        = visualization_msgs::Marker::SPHERE_LIST;
+    possible_foot_locations_marker_list.scale.x = sphere_radius;
+    possible_foot_locations_marker_list.scale.y = sphere_radius;
+    possible_foot_locations_marker_list.scale.z = sphere_radius;
+
+    optimal_foot_location_marker.id = 2;
+    optimal_foot_location_marker.header.frame_id = frame_id_to_transform_to_;
+    optimal_foot_location_marker.pose.orientation.w = 1.0;
+    optimal_foot_location_marker.type = visualization_msgs::Marker::SPHERE_LIST;
+    optimal_foot_location_marker.scale.x = sphere_radius;
+    optimal_foot_location_marker.scale.y = sphere_radius;
+    optimal_foot_location_marker.scale.z = sphere_radius;
+}
+
+void HullParameterDeterminer::addDebugMarkersToArray()
+{
+    marker_array.markers.push_back(foot_locations_to_try_marker_list);
+    marker_array.markers.push_back(possible_foot_locations_marker_list);
+    marker_array.markers.push_back(optimal_foot_location_marker);
+}
 
 void HullParameterDeterminer::initializeGaitDimensions()
 {
@@ -248,13 +296,14 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     bool success = true;
     // Get some locations on the ground we might want to place our foot
     foot_locations_to_try = boost::make_shared<PointCloud2D>();
-
     success &= getOptionalFootLocations(foot_locations_to_try);
+
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(
         foot_locations_to_try, possible_foot_locations);
+
     success &= getOptimalFootLocationFromPossibleLocations();
     return success;
 }
@@ -541,17 +590,27 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         return false;
     }
     for (int i = 0; i < number_of_optional_foot_locations; i++) {
-        if (debugging_) {
-            visualization_msgs::Marker foot_locations_to_try_marker_list;
-            foot_locations_to_try_marker_list.id = 0;
-            foot_locations_to_try_marker_list.header.frame_id
-                    = frame_id_to_transform_to_;
-        }
         float x_location = start
             + (end - start) * (float)i
                 / ((float)number_of_optional_foot_locations - 1.0F);
         foot_locations_to_try->points[i].x = x_location;
         foot_locations_to_try->points[i].y = y_location;
+
+        if (debugging_) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = x_location;
+            marker_point.y = y_location;
+            marker_point.z = 0;
+
+            std_msgs::ColorRGBA marker_color;
+            marker_color.r = 0.0;
+            marker_color.g = 0.0;
+            marker_color.b = 1.0;
+            marker_color.a = 0.7;
+
+            marker_list.points.push_back(marker_point);
+            marker_list.colors.push_back(marker_color);
+        }
     }
     return true;
 }
