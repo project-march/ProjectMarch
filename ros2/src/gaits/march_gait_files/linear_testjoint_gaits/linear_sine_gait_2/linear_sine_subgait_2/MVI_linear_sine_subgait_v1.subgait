@@ -16,5 +16,5 @@ joints:
   - position: 0.0
     time_from_start: 8000000000
     velocity: 0.0
-name: sine_subgait
-version: MVI_linear_sine_subgait_v1
+name: linear_sine_subgait_2
+version: MVI_linear_sine_subgait_v2

@@ -1,0 +1,25 @@
+description: MVI with no ADPF movements version 2
+duration: 17000000000
+gait_type: ''
+joints:
+  rotational_joint:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.95993109
+    time_from_start: 1004000000
+    velocity: 0.0
+  - position: 0.09690068
+    time_from_start: 1580000000
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 1700000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2000000000
+    velocity: 0.0
+name: linear_testjoint_knee_walk_subgait
+version: MVI_linear_knee_walk_subgait_v1

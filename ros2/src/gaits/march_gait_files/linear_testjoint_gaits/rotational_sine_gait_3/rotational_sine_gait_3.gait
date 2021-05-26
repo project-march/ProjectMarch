@@ -1,0 +1,6 @@
+name: linear_sine_gait_3
+subgaits:
+  linear_sine_subgait_3:
+    to: end
+  start:
+    to: linear_sine_subgait_3

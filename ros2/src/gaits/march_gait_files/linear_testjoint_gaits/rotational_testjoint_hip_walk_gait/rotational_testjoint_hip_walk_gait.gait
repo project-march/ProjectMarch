@@ -1,0 +1,6 @@
+name: linear_testjoint_hip_walk_gait
+subgaits:
+  linear_testjoint_hip_walk_subgait:
+    to: end
+  start:
+    to: linear_testjoint_hip_walk_subgait
