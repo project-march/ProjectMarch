@@ -62,7 +62,7 @@ protected:
 /** The hull parameter determiner
  *
  */
-class HullParameterDeterminer : ParameterDeterminer {
+class HullParameterDeterminer : public ParameterDeterminer {
 public:
     /** Basic constructor for ParameterDeterminer preprocessor **/
     explicit HullParameterDeterminer(bool debugging);
