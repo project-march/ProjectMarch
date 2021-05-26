@@ -225,13 +225,6 @@
                       com="${foot_com_x} ${-foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
 
-    <gazebo reference="foot_left">
-        <mu1>${foot_mu1}</mu1>
-        <mu2>${foot_mu2}</mu2>
-        <minDepth>${foot_min_depth}</minDepth>
-        <fdir1>1 0 0</fdir1>
-    </gazebo>
-
     <xacro:pressure_sole side="left"/>
 
     <xacro:frame_part name="hip_aa_frame_right_side"
@@ -301,14 +294,6 @@
                       collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
                       com="${foot_com_x} ${foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
-
-    <gazebo reference="foot_right">
-        <mu1>${foot_mu1}</mu1>
-        <mu2>${foot_mu2}</mu2>
-        <minDepth>${foot_min_depth}</minDepth>
-        <fdir1>1 0 0</fdir1>
-    </gazebo>
-
 
     <!-- Joints -->
     <joint name="imu_joint" type="fixed">
