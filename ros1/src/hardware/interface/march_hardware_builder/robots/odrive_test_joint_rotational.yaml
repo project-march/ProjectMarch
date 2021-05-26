@@ -6,7 +6,7 @@ testsetup:
         actuationMode: torque
         allowActuation: true
         odrive:
-          serial_number: "0x2084387E304E"
+          serial_number: "0x204D3695424D"
           axis: "axis0"
           absoluteEncoder:
             resolution: 17

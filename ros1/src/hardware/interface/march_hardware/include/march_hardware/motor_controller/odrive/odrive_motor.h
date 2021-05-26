@@ -10,7 +10,7 @@
 #include <march_hardware/motor_controller/actuation_mode.h>
 
 
-static constexpr double MOTOR_KV = 100;
+static constexpr double MOTOR_KV = 95;
 static constexpr double CURRENT_TO_TORQUE_CONVERSION = 8.27;
 
 namespace march
@@ -64,7 +64,7 @@ private:
   int32_t getState();
 
   int getAngleCountsAbsolute();
-  int getAngleCountsIncremental();
+  double getAngleCountsIncremental();
 
   ActuationMode mode_;
   std::string json_config_file_path_;

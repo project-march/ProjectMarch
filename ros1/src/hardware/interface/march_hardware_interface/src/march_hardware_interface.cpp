@@ -252,6 +252,8 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     joint_position_[i] = joint.getPosition();
     joint_velocity_[i] = joint.getVelocity();
 
+    ROS_INFO("pos: %f vel: %f", joint_position_[i], joint_velocity_[i]);
+
     if (joint.hasTemperatureGES())
     {
       joint_temperature_[i] = joint.getTemperature();
@@ -283,7 +285,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   }
 
   // Enforce limits on all joints in effort mode
-  effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+//  effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
   if (not has_actuated_)
   {
@@ -302,7 +304,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     }
   }
   // Enforce limits on all joints in position mode
-  position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+//  position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
   for (size_t i = 0; i < num_joints_; i++)
   {

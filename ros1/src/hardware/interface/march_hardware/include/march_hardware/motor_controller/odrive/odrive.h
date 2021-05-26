@@ -92,7 +92,7 @@ protected:
   int readAngleCountsAbsolute();
   double readVelocityRadAbsolute();
 
-  int readAngleCountsIncremental();
+  double readAngleCountsIncremental();
   double readVelocityRadIncremental();
   std::string create_command(std::string command_name);
 

@@ -31,21 +31,21 @@ void OdriveMotor::prepareActuation()
 {
   this->importOdriveJson();
 
-  if (this->setConfigurations(this->json_config_file_path_) == 1)
-  {
-    ROS_FATAL("Setting configurations was not finished successfully");
-  }
-
-  this->reset();
-
-  if (this->setState(States::AXIS_STATE_FULL_CALIBRATION_SEQUENCE) == 1)
-  {
-    ROS_FATAL("Calibration sequence was not finished successfully");
-    return;
-  }
-
-  this->waitForIdleState();
-
+//  if (this->setConfigurations(this->json_config_file_path_) == 1)
+//  {
+//    ROS_FATAL("Setting configurations was not finished successfully");
+//  }
+//
+//  this->reset();
+//
+//  if (this->setState(States::AXIS_STATE_FULL_CALIBRATION_SEQUENCE) == 1)
+//  {
+//    ROS_FATAL("Calibration sequence was not finished successfully");
+//    return;
+//  }
+//
+//  this->waitForIdleState();
+//
   if (this->setState(States::AXIS_STATE_CLOSED_LOOP_CONTROL) == 1)
   {
     ROS_FATAL("Setting closed loop control was not finished successfully");
@@ -81,21 +81,21 @@ void OdriveMotor::reset()
     ROS_ERROR("Could not reset axis");
   }
 
-  int32_t axis_motor_error = 0;
+  uint64_t axis_motor_error = 0;
   command_name_ = this->create_command(O_PM_AXIS_MOTOR_ERROR);
   if (this->write(command_name_, axis_motor_error) == 1)
   {
     ROS_ERROR("Could not reset motor axis");
   }
 
-  int32_t axis_encoder_error = 0;
+  uint16_t axis_encoder_error = 0;
   command_name_ = this->create_command(O_PM_AXIS_ENCODER_ERROR);
   if (this->write(command_name_, axis_encoder_error) == 1)
   {
     ROS_ERROR("Could not reset encoder axis");
   }
 
-  int32_t axis_controller_error = 0;
+  uint8_t axis_controller_error = 0;
   command_name_ = this->create_command(O_PM_AXIS_CONTROLLER_ERROR);
   if (this->write(command_name_, axis_controller_error) == 1)
   {
@@ -113,7 +113,7 @@ void OdriveMotor::actuateTorque(double target_torque_ampere)
 {
   float target_torque_ampere_float = (float)target_torque_ampere * (TORQUE_CONSTANT);
 
-//  ROS_INFO("Torque sent: %f", target_torque_ampere_float);
+  ROS_INFO("Effort: %f", target_torque_ampere);
 
   std::string command_name_ = this->create_command(O_PM_INPUT_TORQUE);
   if (this->write(command_name_, target_torque_ampere_float) == 1)
@@ -122,6 +122,7 @@ void OdriveMotor::actuateTorque(double target_torque_ampere)
   }
 
   this->readValues();
+  ROS_INFO("Current: %f", this->motor_current);
 }
 
 MotorControllerStates& OdriveMotor::getStates()
@@ -226,7 +227,7 @@ bool OdriveMotor::getIncrementalMorePrecise() const
   return true;
 }
 
-int OdriveMotor::getAngleCountsIncremental()
+double OdriveMotor::getAngleCountsIncremental()
 {
   // ROS_INFO("Angle counts: %f ", this->angle_counts_incremental);
   return this->angle_counts_incremental;
@@ -235,6 +236,7 @@ int OdriveMotor::getAngleCountsIncremental()
 double OdriveMotor::getAngleRadIncremental()
 {
   double angle_rad = ((double)(this->getAngleCountsIncremental()) / 4096) * PI_2 /  (double)GEAR_RATIO;
+//  double angle_rad = ((double)(this->getAngleCountsIncremental())) * PI_2 /  (double)GEAR_RATIO;
 //  ROS_INFO("Angle rad: %f ", angle_rad);
   return angle_rad;
 }
@@ -242,13 +244,15 @@ double OdriveMotor::getAngleRadIncremental()
 double OdriveMotor::getVelocityRadIncremental()
 {
   double velocity_rad_incremental_double = this->velocity_rad_incremental * -1;
+//  double velocity_rad_incremental_double = this->velocity_rad_incremental * 1;
   return velocity_rad_incremental_double;
 }
 
 int OdriveMotor::setState(int32_t state)
 {
+  uint8_t write_state = state;
   std::string command_name_ = this->create_command(O_PM_REQUEST_STATE);
-  if (this->write(command_name_, state) == 1)
+  if (this->write(command_name_, write_state) == 1)
   {
     ROS_ERROR("Could net set state; %i to the axis", state);
     return ODRIVE_ERROR;
@@ -258,7 +262,7 @@ int OdriveMotor::setState(int32_t state)
 
 int32_t OdriveMotor::getState()
 {
-  int32_t axis_state;
+  uint8_t axis_state;
   std::string command_name_ = this->create_command(O_PM_CURRENT_STATE);
   if (this->read(command_name_, axis_state) == 1)
   {

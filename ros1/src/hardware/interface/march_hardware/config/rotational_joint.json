@@ -12,12 +12,12 @@
   {
     "name":"axis0.encoder.config.use_index",
     "type":"bool",
-    "value":1
+    "value":0
   },
   {
     "name":"config.brake_resistance",
     "type":"float",
-    "value":2.0
+    "value":3.2
   },
   {
     "name":"axis0.motor.config.pole_pairs",
@@ -26,12 +26,12 @@
   },
   {
     "name":"axis0.controller.config.control_mode",
-    "type":"int32",
+    "type":"uint8",
     "value":1
   },
   {
     "name":"axis0.controller.config.input_mode",
-    "type":"int32",
+    "type":"uint8",
     "value":1
   },
   {

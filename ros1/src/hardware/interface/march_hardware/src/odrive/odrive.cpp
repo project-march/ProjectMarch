@@ -395,7 +395,7 @@ int Odrive::setConfigurations(const std::string& configuration_json_path)
     }
   }
 
-  int32_t control_mode;
+  uint8_t control_mode;
   std::string command_name_ = this->create_command(".controller.config.control_mode");
   if (this->read(command_name_, control_mode) == 1)
   {
@@ -412,7 +412,7 @@ int Odrive::setConfigurations(const std::string& configuration_json_path)
 
 int32_t Odrive::readAxisError()
 {
-  int32_t axis_error;
+  uint32_t axis_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_ERROR);
   if (this->read(command_name_, axis_error) == 1)
   {
@@ -425,7 +425,7 @@ int32_t Odrive::readAxisError()
 
 int32_t Odrive::readAxisMotorError()
 {
-  int32_t axis_motor_error;
+  uint64_t axis_motor_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_MOTOR_ERROR);
   if (this->read(command_name_, axis_motor_error) == 1)
   {
@@ -438,7 +438,7 @@ int32_t Odrive::readAxisMotorError()
 
 int32_t Odrive::readAxisEncoderError()
 {
-  int32_t axis_encoder_error;
+  uint16_t axis_encoder_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_ENCODER_ERROR);
   if (this->read(command_name_, axis_encoder_error) == 1)
   {
@@ -451,7 +451,7 @@ int32_t Odrive::readAxisEncoderError()
 
 int32_t Odrive::readAxisControllerError()
 {
-  int32_t axis_controller_error;
+  uint8_t axis_controller_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_CONTROLLER_ERROR);
   if (this->read(command_name_, axis_controller_error) == 1)
   {
@@ -483,7 +483,7 @@ float Odrive::readMotorCurrent()
     ROS_ERROR("Could not retrieve motor current");
     return ODRIVE_ERROR;
   }
-  ROS_INFO("Motor_current: %f", motor_current);
+//  ROS_INFO("Motor_current: %f", motor_current);
   return motor_current;
 }
 
@@ -512,9 +512,10 @@ double Odrive::readVelocityRadAbsolute()
   return 0;
 }
 
-int Odrive::readAngleCountsIncremental()
+double Odrive::readAngleCountsIncremental()
 {
   int iu_position;
+//  float iu_position;
   std::string command_name_ = this->create_command(O_PM_ENCODER_POSITION_UI);
   if (this->read(command_name_, iu_position) == 1)
   {
