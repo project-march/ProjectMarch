@@ -161,6 +161,7 @@ bool HullParameterDeterminer::determineParameters(
 void HullParameterDeterminer::initializeDebugOutput()
 {
     int id = 0;
+    // re initialize these baby's!
     initializeMarkerList(foot_locations_to_try_marker_list, id);
 
     id = 1;
@@ -367,7 +368,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 
     success &= getOptimalFootLocationFromPossibleLocations();
 
-    if (debugging_ && success) {
+    if (debugging_) {
         geometry_msgs::Point marker_point;
         marker_point.x = optimal_foot_location.x;
         marker_point.y = optimal_foot_location.y;
