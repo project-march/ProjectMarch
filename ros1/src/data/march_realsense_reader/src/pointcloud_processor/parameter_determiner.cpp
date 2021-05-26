@@ -173,14 +173,15 @@ void HullParameterDeterminer::initializeDebugOutput()
     initializeMarkerList(gait_information_marker_list, id);
 }
 
-void HullParameterDeterminer::initializeMarkerList(visualization_msgs::Marker& marker_list, int id)
+void HullParameterDeterminer::initializeMarkerList(
+    visualization_msgs::Marker& marker_list, int id)
 {
     foot_locations_to_try_marker_list.id = id;
     foot_locations_to_try_marker_list.header.frame_id
-            = frame_id_to_transform_to_;
+        = frame_id_to_transform_to_;
     foot_locations_to_try_marker_list.pose.orientation.w = 1.0;
     foot_locations_to_try_marker_list.type
-            = visualization_msgs::Marker::SPHERE_LIST;
+        = visualization_msgs::Marker::SPHERE_LIST;
     foot_locations_to_try_marker_list.scale.x = DEBUG_MARKER_SIZE;
     foot_locations_to_try_marker_list.scale.y = DEBUG_MARKER_SIZE;
     foot_locations_to_try_marker_list.scale.z = DEBUG_MARKER_SIZE;
@@ -238,8 +239,8 @@ void HullParameterDeterminer::addDebugGaitInformation()
         }
         default: {
             ROS_ERROR_STREAM(
-                    "gait debug information is not implemented yet for obstacle "
-                            << realsense_category_.value());
+                "gait debug information is not implemented yet for obstacle "
+                << realsense_category_.value());
             return false;
         }
     }
@@ -504,9 +505,9 @@ bool HullParameterDeterminer::isValidLocation(
                 marker_point.z = 0;
 
                 if (!(possible_foot_location.x < min_x_stairs
-                   && possible_foot_location.x > max_x_stairs
-                   && possible_foot_location.z > min_z_stairs
-                   && possible_foot_location.z < max_z_stairs)) {
+                        && possible_foot_location.x > max_x_stairs
+                        && possible_foot_location.z > min_z_stairs
+                        && possible_foot_location.z < max_z_stairs)) {
                     marker_color.r = 0.0;
                     marker_color.g = 1.0;
                     marker_color.b = 1.0;
@@ -522,8 +523,10 @@ bool HullParameterDeterminer::isValidLocation(
                     marker_color.b = 0.0;
                     marker_color.a = 0.7;
                 }
-                possible_foot_locations_marker_list.points.push_back(marker_point);
-                possible_foot_locations_marker_list.colors.push_back(marker_color);
+                possible_foot_locations_marker_list.points.push_back(
+                    marker_point);
+                possible_foot_locations_marker_list.colors.push_back(
+                    marker_color);
             }
             // A possible foot location for the stairs gait is valid if it is
             // reachable by the stairs gait and the location offers support
