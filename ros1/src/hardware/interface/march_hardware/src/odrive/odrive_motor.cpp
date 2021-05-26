@@ -45,12 +45,12 @@ void OdriveMotor::prepareActuation()
 //  }
 //
 //  this->waitForIdleState();
-//
-  if (this->setState(States::AXIS_STATE_CLOSED_LOOP_CONTROL) == 1)
-  {
-    ROS_FATAL("Setting closed loop control was not finished successfully");
-    return;
-  }
+////
+//  if (this->setState(States::AXIS_STATE_CLOSED_LOOP_CONTROL) == 1)
+//  {
+//    ROS_FATAL("Setting closed loop control was not finished successfully");
+//    return;
+//  }
   this->readValues();
 }
 

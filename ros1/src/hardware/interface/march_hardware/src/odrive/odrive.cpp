@@ -70,6 +70,7 @@ odrive_json_object Odrive::getJsonObject(const std::string& parameter_name)
 
 int Odrive::importOdriveJson()
 {
+  ROS_INFO("Reading in ODrive json");
   commBuffer rx;
   commBuffer tx;
 

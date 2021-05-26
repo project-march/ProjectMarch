@@ -285,7 +285,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   }
 
   // Enforce limits on all joints in effort mode
-//  effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+  effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
   if (not has_actuated_)
   {
@@ -304,7 +304,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     }
   }
   // Enforce limits on all joints in position mode
-//  position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+  position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
   for (size_t i = 0; i < num_joints_; i++)
   {
