@@ -1,0 +1,81 @@
+description: 'The left open step for the 5 degrees ramp down, so the second step.
+  Same peaks as steep version 2. '
+duration: 3000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 750000000
+    velocity: 0.0
+  - position: -0.17453293
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: -0.17453293
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: -0.05235988
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: 0.1745
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.80359148
+    time_from_start: 1260000000
+    velocity: 0.0
+  - position: 0.36651914
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_knee:
+  - position: 0.6981
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.09955743
+    time_from_start: 950000000
+    velocity: 0.0
+  - position: 0.20650038
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_ankle:
+  - position: -0.17453293
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.05235988
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.36651914
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1745
+    time_from_start: 999900000
+    velocity: -0.1449
+  - position: 0.1745
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_knee:
+  - position: 0.2065
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2065
+    time_from_start: 1050000000
+    velocity: 0.0
+  - position: 0.6981
+    time_from_start: 3000000000
+    velocity: 0.0
+name: left_open
+version: MVI_RD_slopedown_leftopen_flat_v2
