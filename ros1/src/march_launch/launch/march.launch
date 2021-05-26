@@ -33,7 +33,7 @@
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
     <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
-    <arg name="realsense_simulation" default="$(arg realsense)"
+    <arg name="realsense_simulation" default="false"
          doc="Whether the simulation camera or the physical camera should be used"/>
     <arg name="realsense_test_data" default="$(eval realsense and (configuration == 'simulation'))" doc="Whether the node which can publish pointclouds
     from datasets should be started."/>
