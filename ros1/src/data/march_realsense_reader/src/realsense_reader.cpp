@@ -20,8 +20,8 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
-std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points/sim_time";
-std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points/sim_time";
+std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 
 std::map<int, std::string> POINTCLOUD_TOPICS
