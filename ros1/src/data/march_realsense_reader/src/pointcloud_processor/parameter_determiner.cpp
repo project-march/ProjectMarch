@@ -14,6 +14,7 @@
 #include <utility>
 
 #define EPSILON 0.0001
+#define DEBUG_MARKER_SIZE
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -122,6 +123,7 @@ bool HullParameterDeterminer::determineParameters(
 
     if (debugging_) {
         initializeDebugOutput();
+        addDebugGaitInformation();
     }
 
     bool success = true;
@@ -158,35 +160,89 @@ bool HullParameterDeterminer::determineParameters(
 
 void HullParameterDeterminer::initializeDebugOutput()
 {
-    float sphere_radius = 0.01;
+    int id = 0;
+    initializeMarkerList(foot_locations_to_try_marker_list, id);
 
-    foot_locations_to_try_marker_list.id = 0;
+    id = 1;
+    initializeMarkerList(possible_foot_locations_marker_list, id);
+
+    id = 2;
+    initializeMarkerList(optimal_foot_location_marker, id);
+
+    id = 3;
+    initializeMarkerList(gait_information_marker_list, id);
+}
+
+void HullParameterDeterminer::initializeMarkerList(visualization_msgs::Marker& marker_list, int id)
+{
+    foot_locations_to_try_marker_list.id = id;
     foot_locations_to_try_marker_list.header.frame_id
-        = frame_id_to_transform_to_;
+            = frame_id_to_transform_to_;
     foot_locations_to_try_marker_list.pose.orientation.w = 1.0;
     foot_locations_to_try_marker_list.type
-        = visualization_msgs::Marker::SPHERE_LIST;
-    foot_locations_to_try_marker_list.scale.x = sphere_radius;
-    foot_locations_to_try_marker_list.scale.y = sphere_radius;
-    foot_locations_to_try_marker_list.scale.z = sphere_radius;
+            = visualization_msgs::Marker::SPHERE_LIST;
+    foot_locations_to_try_marker_list.scale.x = DEBUG_MARKER_SIZE;
+    foot_locations_to_try_marker_list.scale.y = DEBUG_MARKER_SIZE;
+    foot_locations_to_try_marker_list.scale.z = DEBUG_MARKER_SIZE;
+}
 
-    possible_foot_locations_marker_list.id = 1;
-    possible_foot_locations_marker_list.header.frame_id
-        = frame_id_to_transform_to_;
-    possible_foot_locations_marker_list.pose.orientation.w = 1.0;
-    possible_foot_locations_marker_list.type
-        = visualization_msgs::Marker::SPHERE_LIST;
-    possible_foot_locations_marker_list.scale.x = sphere_radius;
-    possible_foot_locations_marker_list.scale.y = sphere_radius;
-    possible_foot_locations_marker_list.scale.z = sphere_radius;
+void HullParameterDeterminer::addDebugGaitInformation()
+{
+    std_msgs::ColorRGBA marker_color;
+    marker_color.r = 0.0;
+    marker_color.g = 1.0;
+    marker_color.b = 0.0;
+    marker_color.a = 0.7;
 
-    optimal_foot_location_marker.id = 2;
-    optimal_foot_location_marker.header.frame_id = frame_id_to_transform_to_;
-    optimal_foot_location_marker.pose.orientation.w = 1.0;
-    optimal_foot_location_marker.type = visualization_msgs::Marker::SPHERE_LIST;
-    optimal_foot_location_marker.scale.x = sphere_radius;
-    optimal_foot_location_marker.scale.y = sphere_radius;
-    optimal_foot_location_marker.scale.z = sphere_radius;
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
+            geometry_msgs::Point marker_point;
+            marker_point.y = y_location;
+
+            marker_point.x = min_x_stairs;
+            marker_point.z = min_z_stairs;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+
+            marker_point.x = max_x_stairs;
+            marker_point.z = min_z_stairs;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+
+            marker_point.x = min_x_stairs;
+            marker_point.z = max_z_stairs;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+
+            marker_point.x = max_x_stairs;
+            marker_point.z = max_z_stairs;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+            break;
+        }
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+            geometry_msgs::Point marker_point;
+            marker_point.y = y_location;
+
+            marker_point.x = x_flat;
+            marker_point.z = z_flat;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+
+            marker_point.x = x_steep;
+            marker_point.z = z_steep;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+            break;
+        }
+        default: {
+            ROS_ERROR_STREAM(
+                    "gait debug information is not implemented yet for obstacle "
+                            << realsense_category_.value());
+            return false;
+        }
+    }
 }
 
 void HullParameterDeterminer::addDebugMarkersToArray()
@@ -439,6 +495,36 @@ bool HullParameterDeterminer::isValidLocation(
     // positive x axis points in the backwards direction of the exoskeleton
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up: {
+            if (debugging_) {
+                geometry_msgs::Point marker_point;
+                std_msgs::ColorRGBA marker_color;
+
+                marker_point.x = x_location;
+                marker_point.y = y_location;
+                marker_point.z = 0;
+
+                if (!(possible_foot_location.x < min_x_stairs
+                   && possible_foot_location.x > max_x_stairs
+                   && possible_foot_location.z > min_z_stairs
+                   && possible_foot_location.z < max_z_stairs)) {
+                    marker_color.r = 0.0;
+                    marker_color.g = 1.0;
+                    marker_color.b = 1.0;
+                    marker_color.a = 0.7;
+                } else if (!entireFootCanBePlaced(possible_foot_location)) {
+                    marker_color.r = 1.0;
+                    marker_color.g = 0.0;
+                    marker_color.b = 1.0;
+                    marker_color.a = 0.7;
+                } else {
+                    marker_color.r = 0.0;
+                    marker_color.g = 1.0;
+                    marker_color.b = 0.0;
+                    marker_color.a = 0.7;
+                }
+                possible_foot_locations_marker_list.points.push_back(marker_point);
+                possible_foot_locations_marker_list.colors.push_back(marker_color);
+            }
             // A possible foot location for the stairs gait is valid if it is
             // reachable by the stairs gait and the location offers support
             // for the entire foot
@@ -545,6 +631,21 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
             "Unable to compute general most desirable foot location.");
         return false;
     }
+    if (debuggin_) {
+        std_msgs::ColorRGBA marker_color;
+        marker_color.r = 0.0;
+        marker_color.g = 1.0;
+        marker_color.b = 0.0;
+        marker_color.a = 0.7;
+
+        geometry_msgs::Point marker_point;
+        marker_point.x = most_desirable_foot_location_.x;
+        marker_point.y = most_desirable_foot_location_.y;
+        marker_point.z = most_desirable_foot_location_.z;
+
+        gait_information_marker_list.points.push_back(marker_point);
+        gait_information_marker_list.colors.push_back(marker_color);
+    }
     return true;
 }
 
@@ -608,8 +709,8 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
             marker_color.b = 1.0;
             marker_color.a = 0.7;
 
-            marker_list.points.push_back(marker_point);
-            marker_list.colors.push_back(marker_color);
+            foot_locations_to_try_marker_list.points.push_back(marker_point);
+            foot_locations_to_try_marker_list.colors.push_back(marker_color);
         }
     }
     return true;
