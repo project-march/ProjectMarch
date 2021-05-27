@@ -7,14 +7,14 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 20.0
+  - position: 10.0
     time_from_start: 200000000
     velocity: 0.0
-  - position: -20.0
+  - position: -10.0
     time_from_start: 600000000
     velocity: 0.0
   - position: 0
     time_from_start: 800000000
     velocity: 0.0
 name: linear_sine_subgait_4
-version: MVI_linear_sine_subgait_v3
+version: MVI_linear_sine_subgait_v4
