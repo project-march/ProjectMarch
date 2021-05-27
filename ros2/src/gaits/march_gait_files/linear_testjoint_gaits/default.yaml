@@ -9,8 +9,8 @@ gaits:
     linear_sine_subgait_4: MVI_linear_sine_subgait_v4
   linear_testjoint_hip_walk_gait:
     linear_testjoint_hip_walk_subgait: MVI_linear_hip_walk_subgait_v1
-  linear_testjoint_knee_walk_gait:
-    linear_testjoint_knee_walk_subgait: MVI_linear_knee_walk_subgait_v1
+  linear_testjoint_ankle_walk_gait:
+    linear_testjoint_ankle_walk_subgait: MVI_linear_knee_walk_subgait_v1
 positions:
   setup:
     gait_type: ''

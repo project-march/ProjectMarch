@@ -1,0 +1,20 @@
+description: MVI with no ADPF movements version 2
+duration: 1199999999
+gait_type: ''
+joints:
+  rotational_joint:
+      - position: 0.0
+        time_from_start: 0
+        velocity: 0.0
+      - position: -0.0611
+        time_from_start: 300000000
+        velocity: -0.211
+      - position: -0.0611
+        time_from_start: 900000000
+        velocity: 0.2129
+      - position: 0.0
+        time_from_start: 1199999999
+        velocity: 0.0
+
+name: linear_testjoint_hip_walk_subgait
+version: MVI_linear_hip_walk_subgait_v1
