@@ -14,7 +14,7 @@
 #include <utility>
 
 #define EPSILON 0.0001
-#define DEBUG_MARKER_SIZE 0.1
+#define DEBUG_MARKER_SIZE 0.03
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -171,9 +171,9 @@ void HullParameterDeterminer::initializeDebugOutput()
     id = 2;
     optimal_foot_location_marker = initializeMarkerListWithId(id);
     // Make the optimal foot location stand out more
-    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.1;
-    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.1;
-    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.1;
+    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.2;
+    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.2;
+    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.2;
 
     id = 3;
     gait_information_marker_list = initializeMarkerListWithId(id);
@@ -378,9 +378,9 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         marker_point.z = optimal_foot_location.z;
 
         std_msgs::ColorRGBA marker_color;
-        marker_color.r = 0.0;
-        marker_color.g = 0.0;
-        marker_color.b = 0.0;
+        marker_color.r = 1.0;
+        marker_color.g = 1.0;
+        marker_color.b = 1.0;
         marker_color.a = 1.0;
 
         optimal_foot_location_marker.points.push_back(marker_point);
