@@ -184,11 +184,9 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 {
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
-    marker_list.header.frame_id
-        = frame_id_to_transform_to_;
+    marker_list.header.frame_id = frame_id_to_transform_to_;
     marker_list.pose.orientation.w = 1.0;
-    marker_list.type
-        = visualization_msgs::Marker::SPHERE_LIST;
+    marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
     marker_list.scale.x = DEBUG_MARKER_SIZE;
     marker_list.scale.y = DEBUG_MARKER_SIZE;
     marker_list.scale.z = DEBUG_MARKER_SIZE;
@@ -247,7 +245,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
         }
         default: {
             ROS_WARN_STREAM("gait debug information is not implemented yet "
-                             "for realsense category "
+                            "for realsense category "
                 << realsense_category_.value());
         }
     }
@@ -581,7 +579,8 @@ bool HullParameterDeterminer::isValidLocation(
                 marker_point.z = possible_foot_location.z;
 
                 std_msgs::ColorRGBA marker_color;
-                if (!(projected_point.x < x_steep && projected_point.x > x_flat)) {
+                if (!(projected_point.x < x_steep
+                        && projected_point.x > x_flat)) {
                     marker_color.r = 1.0;
                     marker_color.g = 1.0;
                     marker_color.b = 0.0;
@@ -598,9 +597,9 @@ bool HullParameterDeterminer::isValidLocation(
                     marker_color.a = 0.7;
                 }
                 possible_foot_locations_marker_list.points.push_back(
-                        marker_point);
+                    marker_point);
                 possible_foot_locations_marker_list.colors.push_back(
-                        marker_color);
+                    marker_color);
             }
 
             // only points which are close enough to the line are valid

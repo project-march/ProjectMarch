@@ -196,14 +196,18 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             frame_id_to_transform_to_);
 
     if (debugging_) {
-        ROS_DEBUG("Done determining parameters, now publishing a marker array to "
-                  "/camera/foot_locations_marker_array. The color coding of the marker array is \n"
-                  "blue: a foot location to try \n"
-                  "yellow: a potential foot location which is outside the reachable area"
-                  "purple: a potential foot locations which is invalid for a gait specific reason "
-                  "(i.e. foot support or too far removed from the ");
+        ROS_DEBUG(
+            "Done determining parameters, now publishing a marker array to "
+            "/camera/foot_locations_marker_array. The color coding of the "
+            "marker array is \n"
+            "blue: a foot location to try \n"
+            "yellow: a potential foot location which is outside the reachable "
+            "area"
+            "purple: a potential foot locations which is invalid for a gait "
+            "specific reason "
+            "(i.e. foot support or too far removed from the ");
         hull_parameter_determiner_publisher_.publish(
-                parameter_determiner_->debug_marker_array);
+            parameter_determiner_->debug_marker_array);
     }
     if (not parameter_determining_was_successful) {
         res.error_message
