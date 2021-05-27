@@ -1,0 +1,83 @@
+description: 'The MVI_walk_v3 high right open with the v2 HAA movements. '
+duration: 1500000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0348996
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.05235988
+    time_from_start: 527499999
+    velocity: -0.12217305
+  - position: -0.05235988
+    time_from_start: 1153800000
+    velocity: 0.12217305
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.13962634
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1020000000
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 717700000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0348996
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.06108652
+    time_from_start: 750000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.84093978
+    time_from_start: 900000000
+    velocity: 0.12098622
+  - position: 0.37520041
+    time_from_start: 1500000000
+    velocity: -0.32000088
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.04719755
+    time_from_start: 800000000
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 1500000000
+    velocity: 0.0
+name: right_open
+version: MVI_walk_rightopen_high_v3
