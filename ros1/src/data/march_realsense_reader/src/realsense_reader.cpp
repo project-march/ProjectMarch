@@ -113,7 +113,8 @@ void RealSenseReader::readConfigCb(
 }
 
 // This method executes the logic to process a pointcloud
-void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
+void RealSenseReader::processPointcloud(const PointCloud::Ptr& output_cloud,
+    const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     clock_t start_of_processing_time = clock();
@@ -121,7 +122,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     // Preprocess
     bool preprocessing_was_successful = preprocessor_->preprocess(
-        pointcloud, normals, frame_id_to_transform_to_);
+        output_cloud, pointcloud, normals, frame_id_to_transform_to_);
 
     if (not preprocessing_was_successful) {
         res.error_message = "Preprocessing was unsuccessful, see debug output "
@@ -134,7 +135,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for "
                   "resulting point cloud");
         publishCloud<pcl::PointXYZ>(
-            preprocessed_pointcloud_publisher_, *pointcloud);
+            preprocessed_pointcloud_publisher_, *output_cloud);
+        ROS_DEBUG_STREAM("output_cloud size:" << output_cloud->size());
     }
 
     // Setup data structures for region creating
@@ -142,7 +144,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         = boost::make_shared<RegionVector>();
     // Create regions
     bool region_creating_was_successful
-        = region_creator_->createRegions(pointcloud, normals, region_vector);
+        = region_creator_->createRegions(output_cloud, normals, region_vector);
 
     if (not region_creating_was_successful) {
         res.error_message
@@ -169,7 +171,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         = boost::make_shared<PolygonVector>();
     // Find hulls
     bool hull_finding_was_successful
-        = hull_finder_->findHulls(pointcloud, normals, region_vector,
+        = hull_finder_->findHulls(output_cloud, normals, region_vector,
             plane_coefficients_vector, hull_vector, polygon_vector);
 
     if (not hull_finding_was_successful) {
@@ -230,11 +232,13 @@ void RealSenseReader::publishCloud(
 {
     cloud.width = 1;
     cloud.height = cloud.points.size();
-
+    ROS_DEBUG_STREAM("msg data:" << cloud.height);
     sensor_msgs::PointCloud2 msg;
 
     pcl::toROSMsg(cloud, msg);
-
+    ROS_DEBU("msg data_size: %lu\n", msg.data.size);
+    ROS_DEBUG_STREAM("msg height:" << msg.height);
+    ROS_DEBUG_STREAM("msg width:" << msg.width);
     msg.header.frame_id = frame_id_to_transform_to_;
 
     publisher.publish(msg);
@@ -438,8 +442,9 @@ bool RealSenseReader::processPointcloudCallback(
     pcl::fromROSMsg(*input_cloud, converted_cloud);
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
+    PointCloud::Ptr output_cloud = boost::make_shared<PointCloud>();
 
-    processPointcloud(point_cloud, res);
+        processPointcloud(output_cloud, point_cloud, res);
 
     time_t end_callback = clock();
     double time_taken

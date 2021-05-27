@@ -16,7 +16,8 @@ public:
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
-        Normals::Ptr normal_pointcloud, std::string frame_id_to_transform_to_)
+        PointCloud::Ptr input_pointcloud, Normals::Ptr normal_pointcloud,
+        std::string frame_id_to_transform_to_)
         = 0;
 
     virtual ~Preprocessor() = default;
@@ -34,6 +35,7 @@ public:
         = 0;
 
     PointCloud::Ptr pointcloud_;
+    PointCloud::Ptr input_pointcloud_;
     Normals::Ptr pointcloud_normals_;
     bool debugging_;
 };
@@ -48,7 +50,8 @@ public:
     explicit SimplePreprocessor(bool debugging);
 
     // Preprocess the given pointcloud, based on parameters in the config tree
-    bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+    bool preprocess(PointCloud::Ptr pointcloud,
+        PointCloud::Ptr input_pointcloud, Normals::Ptr pointcloud_normals,
         std::string frame_id_to_transform_to = "foot_left") override;
 
 protected:
@@ -71,7 +74,8 @@ public:
 
     // Calls all subsequent methods to preprocess a pointlcoud using normal
     // vectors
-    bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+    bool preprocess(PointCloud::Ptr pointcloud,
+        PointCloud::Ptr input_pointcloud, Normals::Ptr pointcloud_normals,
         std::string frame_id_to_transform_to = "foot_left") override;
 
     void readParameters(

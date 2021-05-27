@@ -66,9 +66,11 @@ void Preprocessor::removePointByIndex(int const index,
 }
 
 bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
+    PointCloud::Ptr input_pointcloud, Normals::Ptr pointcloud_normals,
+    std::string frame_id_to_transform_to)
 {
     pointcloud_ = pointcloud;
+    copyPointCloud(*input_pointcloud, *pointcloud);
     pointcloud_normals_ = pointcloud_normals;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
 
@@ -265,7 +267,7 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 
 // Preprocess the pointcloud, this means only transforming for the simple
 // preprocessor
-bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
+bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud, PointCloud::Ptr input_pointcloud,
     Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
 {
     pointcloud_ = pointcloud;
