@@ -161,13 +161,15 @@ bool HullParameterDeterminer::determineParameters(
 void HullParameterDeterminer::initializeDebugOutput()
 {
     int id = 0;
-    // re initialize these baby's!
+    visualization_msgs::Marker foot_location_to_try_marker_list;
     initializeMarkerList(foot_locations_to_try_marker_list, id);
 
     id = 1;
+    visualization_msgs::Marker possible_foot_locations_marker_list;
     initializeMarkerList(possible_foot_locations_marker_list, id);
 
     id = 2;
+    visualization_msgs::Marker optimal_foot_location_marker;
     initializeMarkerList(optimal_foot_location_marker, id);
     // Make the optimal foot location stand out more
     optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.1;
@@ -175,6 +177,7 @@ void HullParameterDeterminer::initializeDebugOutput()
     optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.1;
 
     id = 3;
+    visualization_msgs::Marker gait_information_marker_list;
     initializeMarkerList(gait_information_marker_list, id);
 }
 
@@ -658,8 +661,8 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
     }
     if (debugging_) {
         std_msgs::ColorRGBA marker_color;
-        marker_color.r = 0.0;
-        marker_color.g = 1.0;
+        marker_color.r = 1.0;
+        marker_color.g = 0.0;
         marker_color.b = 0.0;
         marker_color.a = 0.7;
 
