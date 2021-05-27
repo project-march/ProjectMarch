@@ -16,7 +16,7 @@ class GaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = "walk"
         self.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
+            get_package_share_directory("march_description") + "/urdf/march6.urdf"
         )
         self.resources_folder = os.path.join(
             get_package_share_directory("march_utility"), "test", "resources"

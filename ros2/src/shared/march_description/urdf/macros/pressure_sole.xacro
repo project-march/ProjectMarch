@@ -5,7 +5,8 @@
 
         <link name="pressure_sole_${side}">
             <collision>
-                <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+                <origin xyz="${(foot_height_backward-foot_height_forward)/2} 0 0"
+                        rpy="0 0 0"/>
                 <geometry>
                     <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
                 </geometry>
@@ -28,5 +29,13 @@
             <child link="pressure_sole_${side}"/>
             <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
         </joint>
+
+
+        <gazebo reference="pressure_sole_${side}">
+            <mu1>${foot_mu1}</mu1>
+            <mu2>${foot_mu2}</mu2>
+            <minDepth>${foot_min_depth}</minDepth>
+            <fdir1>1 0 0</fdir1>
+        </gazebo>
     </xacro:macro>
 </robot>
