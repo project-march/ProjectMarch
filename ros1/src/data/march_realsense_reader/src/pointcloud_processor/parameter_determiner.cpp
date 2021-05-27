@@ -521,6 +521,7 @@ bool HullParameterDeterminer::isValidLocation(
     // positive x axis points in the backwards direction of the exoskeleton
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up: {
+
             if (debugging_) {
                 geometry_msgs::Point marker_point;
 
@@ -553,6 +554,7 @@ bool HullParameterDeterminer::isValidLocation(
                 possible_foot_locations_marker_list.colors.push_back(
                     marker_color);
             }
+
             // A possible foot location for the stairs gait is valid if it is
             // reachable by the stairs gait and the location offers support
             // for the entire foot
@@ -570,6 +572,37 @@ bool HullParameterDeterminer::isValidLocation(
                     executable_locations_line_coefficients_);
             double distance = linear_algebra_utilities::distanceBetweenPoints(
                 projected_point, possible_foot_location);
+            
+            if (debugging_) {
+                geometry_msgs::Point marker_point;
+
+                marker_point.x = possible_foot_location.x;
+                marker_point.y = possible_foot_location.y;
+                marker_point.z = possible_foot_location.z;
+
+                std_msgs::ColorRGBA marker_color;
+                if (!(projected_point.x < x_steep && projected_point.x > x_flat)) {
+                    marker_color.r = 1.0;
+                    marker_color.g = 1.0;
+                    marker_color.b = 0.0;
+                    marker_color.a = 0.7;
+                } else if (!distance < max_distance_to_line)) {
+                    marker_color.r = 1.0;
+                    marker_color.g = 0.0;
+                    marker_color.b = 1.0;
+                    marker_color.a = 0.7;
+                } else {
+                    marker_color.r = 0.0;
+                    marker_color.g = 1.0;
+                    marker_color.b = 0.0;
+                    marker_color.a = 0.7;
+                }
+                possible_foot_locations_marker_list.points.push_back(
+                        marker_point);
+                possible_foot_locations_marker_list.colors.push_back(
+                        marker_color);
+            }
+
             // only points which are close enough to the line are valid
             // Only points on the line which are between the two given values
             // are valid
