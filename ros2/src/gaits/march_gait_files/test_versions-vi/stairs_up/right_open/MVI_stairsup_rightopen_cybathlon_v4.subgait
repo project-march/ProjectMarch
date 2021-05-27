@@ -1,0 +1,98 @@
+description: 'Made the steps what smaller for the dimensions of march6 robot. '
+duration: 3750000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1670000000
+    velocity: 0.0
+  - position: -0.15707963
+    time_from_start: 2380000000
+    velocity: 0.0
+  - position: -0.15707963
+    time_from_start: 3750000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.03490659
+    time_from_start: 750000000
+    velocity: -0.17453293
+  - position: -0.08726646
+    time_from_start: 1750000000
+    velocity: 0.0
+  - position: -0.08726646
+    time_from_start: 3750000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 3000000000
+    velocity: 0.02349213
+  - position: 0.08726646
+    time_from_start: 3750000000
+    velocity: 0.17449976
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.12370196
+    time_from_start: 3031700000
+    velocity: 0.08726646
+  - position: 0.24430072
+    time_from_start: 3750000000
+    velocity: 0.34906585
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3750000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3750000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 1.36135682
+    time_from_start: 3000000000
+    velocity: -0.17453293
+  - position: 1.27409035
+    time_from_start: 3300000000
+    velocity: -0.34906585
+  - position: 1.22173048
+    time_from_start: 3750000000
+    velocity: -0.08726646
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 1.70072404
+    time_from_start: 2386677630
+    velocity: 0.25709512
+  - position: 1.35680674
+    time_from_start: 3750000000
+    velocity: 0.0
+name: right_open
+version: MVI_stairsup_rightopen_cybathlon_v4
