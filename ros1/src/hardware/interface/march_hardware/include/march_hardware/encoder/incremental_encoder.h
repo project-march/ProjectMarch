@@ -15,8 +15,10 @@ public:
 
     ~IncrementalEncoder() noexcept override = default;
 
-    // Inherited method
+    // Inherited methods
     double getRadiansPerIU() const final;
+    double velocityRadiansToIU(double velocity) const;
+    double velocityIUToRadians(double velocity) const;
 
     double getTransmission() const;
 

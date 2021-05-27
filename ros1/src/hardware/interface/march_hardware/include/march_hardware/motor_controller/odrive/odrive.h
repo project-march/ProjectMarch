@@ -87,7 +87,7 @@ private:
     ODriveAxisState getAxisState();
 
     int32_t getAbsolutePositionIU();
-    float getIncrementalPositionIU();
+    int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
 
     uint32_t getAxisError();

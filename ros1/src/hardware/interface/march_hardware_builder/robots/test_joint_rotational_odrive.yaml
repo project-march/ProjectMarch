@@ -1,6 +1,6 @@
 testsetup:
   if_name: enp0s31f6
-  ecatCycleTime: 10
+  ecatCycleTime: 4
   ecatSlaveTimeout: 250
   joints:
     - rotational_joint:

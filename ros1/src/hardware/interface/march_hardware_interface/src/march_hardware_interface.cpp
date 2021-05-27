@@ -174,11 +174,7 @@ bool MarchHardwareInterface::init(
             joint.prepareActuation();
 
             // Set the first target as the current position
-//            joint_position_[i] = joint.getPosition();
-//            joint_velocity_[i] = joint.getVelocity();
-//            joint_effort_[i] = 0;
-
-            joint_position_[i] = 0.2;
+            joint_position_[i] = joint.getPosition();
             joint_velocity_[i] = 0;
             joint_effort_[i] = 0;
 
@@ -272,7 +268,7 @@ float MarchHardwareInterface::determineTorque(const ros::Time& time)
 }
 
 void MarchHardwareInterface::write(
-    const ros::Time& /*time*/, const ros::Duration& /*elapsed_time*/)
+    const ros::Time& /*time*/, const ros::Duration& elapsed_time)
 {
     for (size_t i = 0; i < num_joints_; i++) {
         // Enlarge joint_effort_command because ROS control limits the pid
@@ -291,7 +287,7 @@ void MarchHardwareInterface::write(
     }
 
     // Enforce limits on all joints in effort mode
-//    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
     if (not has_actuated_) {
         bool found_non_zero = false;
@@ -308,7 +304,7 @@ void MarchHardwareInterface::write(
         }
     }
     // Enforce limits on all joints in position mode
-//    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
     for (size_t i = 0; i < num_joints_; i++) {
         march::Joint& joint = march_robot_->getJoint(i);

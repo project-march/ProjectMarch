@@ -13,19 +13,37 @@ IncrementalEncoder::IncrementalEncoder(size_t resolution,
 
 double IncrementalEncoder::getRadiansPerIU() const
 {
+    return PI_2 / (getTotalPositions() * transmission_);
+}
+
+double IncrementalEncoder::getTransmission() const
+{
+    return transmission_;
+}
+
+double IncrementalEncoder::velocityIUToRadians(double velocity) const
+{
     switch (getMotorControllerType()) {
-        case MotorControllerType::IMotionCube:
-            return PI_2 / (getTotalPositions() * transmission_);
         case MotorControllerType::ODrive:
-            return PI_2 / transmission_;
+            return velocity *  (PI_2 / transmission_);
+        case MotorControllerType::IMotionCube:
+            return this->velocityIUToRadians(velocity);
         default:
             throw error::HardwareException(
                 error::ErrorType::INVALID_MOTOR_CONTROLLER);
     }
 }
 
-double IncrementalEncoder::getTransmission() const
+double IncrementalEncoder::velocityRadiansToIU(double velocity) const
 {
-    return transmission_;
+    switch (getMotorControllerType()) {
+        case MotorControllerType::ODrive:
+            return velocity /  (PI_2 / transmission_);
+        case MotorControllerType::IMotionCube:
+            return Encoder::velocityIUToRadians(velocity);
+        default:
+            throw error::HardwareException(
+                error::ErrorType::INVALID_MOTOR_CONTROLLER);
+    }
 }
 } //  namespace march

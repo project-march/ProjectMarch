@@ -87,6 +87,7 @@ void ODrive::actuateTorque(float target_effort)
 {
     ROS_INFO_STREAM("Effort: " << target_effort);
     float target_torque = target_effort * torque_constant_;
+    ROS_INFO_STREAM("Torque: " << target_torque);
 //    ROS_INFO_STREAM("Torque: " << target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
@@ -185,12 +186,12 @@ int32_t ODrive::getAbsolutePositionIU()
         .i;
 }
 
-float ODrive::getIncrementalPositionIU()
+int32_t ODrive::getIncrementalPositionIU()
 {
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::MotorPosition, axis_))
-        .f;
+        .i;
 }
 
 float ODrive::getIncrementalVelocityIU()
