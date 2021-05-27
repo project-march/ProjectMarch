@@ -4,6 +4,7 @@
 
 #include <march_hardware/joint.h>
 #include <march_hardware/motor_controller/actuation_mode.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
 #include <march_shared_msgs/PressureSoleData.h>
 #include <march_shared_msgs/PressureSolesData.h>
@@ -253,36 +254,24 @@ void MarchHardwareInterface::read(
     }
 }
 
-float MarchHardwareInterface::determineTorque(const ros::Time& time)
-{
-    if (!start_time) {
-        start_time = std::make_unique<ros::Time>(time);
-    }
-    auto time_diff = time - *start_time;
-    float time_from_start = ((float) time_diff.sec) + ((float) (time_diff.nsec)) / 1e9;
-//    ROS_INFO_STREAM("time from start: " << time_from_start);
-    float amplitude = 0.15;
-    float period = 4;
-    float target = std::cos(((M_PI * 2.0) / period) * time_from_start) * amplitude;
-    return target / (8.27/95);
+template<typename Base, typename T>
+inline bool instanceof(const T*) {
+    return std::is_base_of<Base, T>::value;
 }
 
 void MarchHardwareInterface::write(
     const ros::Time& /*time*/, const ros::Duration& elapsed_time)
 {
     for (size_t i = 0; i < num_joints_; i++) {
-        // Enlarge joint_effort_command because ROS control limits the pid
-        // values to a certain maximum
-//        joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
-//        joint_effort_command_[i] = -0.25;//joint_effort_command_[i]; //* (8.27/95);
-//        float torque = determineTorque(time);
-//        joint_effort_command_[i] = torque;
-//        if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
-//            > MAX_EFFORT_CHANGE) {
-//            joint_effort_command_[i] = joint_last_effort_command_[i]
-//                + std::copysign(MAX_EFFORT_CHANGE,
-//                    joint_effort_command_[i] - joint_last_effort_command_[i]);
-//        }
+        // Enlarge joint_effort_command for IMotionCube because ROS control
+        // limits the pid values to a certain maximum
+        joint_effort_command_[i] = joint_effort_command_[i] * march_robot_->getJoint(i).getMotorController()->effortMultiplicationConstant();
+        if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
+            > MAX_EFFORT_CHANGE) {
+            joint_effort_command_[i] = joint_last_effort_command_[i]
+                + std::copysign(MAX_EFFORT_CHANGE,
+                    joint_effort_command_[i] - joint_last_effort_command_[i]);
+        }
         has_actuated_ |= (joint_effort_command_[i] != 0);
     }
 

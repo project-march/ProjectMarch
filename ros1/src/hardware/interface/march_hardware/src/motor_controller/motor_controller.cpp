@@ -160,4 +160,9 @@ void MotorController::actuate(float target)
             actuation_mode_.toString().c_str());
     }
 }
+
+float MotorController::effortMultiplicationConstant()
+{
+    return 1.0;
+}
 } // namespace march

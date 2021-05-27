@@ -72,6 +72,8 @@ public:
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
 
+    float effortMultiplicationConstant() override;
+
     constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
     // This value is slightly larger than the current limit of the
     // linear joints defined in the URDF.

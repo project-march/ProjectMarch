@@ -34,7 +34,6 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
             "An ODrive needs an absolute encoder");
     }
     torque_constant_ = KV_TO_TORQUE_CONSTANT / (float) motor_kv;
-    ROS_INFO_STREAM("torque constant: " << torque_constant_);
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,

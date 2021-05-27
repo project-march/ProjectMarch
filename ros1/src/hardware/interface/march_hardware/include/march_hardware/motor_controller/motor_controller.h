@@ -76,6 +76,10 @@ public:
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;
 
+    // Effort may have to be multiplied by a constant
+    // because ROS control limits the pid values to a certain maximum
+    virtual float effortMultiplicationConstant();
+
     ~MotorController() override = default;
 
     // Override comparison operator

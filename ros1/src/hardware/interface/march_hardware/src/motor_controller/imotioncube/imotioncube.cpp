@@ -606,4 +606,8 @@ float IMotionCube::getIncrementalVelocityUnchecked()
         getIncrementalVelocityIU());
 }
 
+float IMotionCube::effortMultiplicationConstant()
+{
+    return 1000.0;
+}
 } // namespace march
