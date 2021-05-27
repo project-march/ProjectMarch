@@ -179,7 +179,7 @@ protected:
     void initializeDebugOutput();
 
     // Initialize a single marker list with a certain id
-    void initializeMarkerList(visualization_msgs::Marker& marker_list, int id);
+    visualization_msgs::Marker initializeMarkerListWithId(int id);
 
     // Add the gait information to the marker array
     void addDebugGaitInformation();

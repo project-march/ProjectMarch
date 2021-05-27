@@ -160,30 +160,29 @@ bool HullParameterDeterminer::determineParameters(
 
 void HullParameterDeterminer::initializeDebugOutput()
 {
+    visualization_msgs::MarkerArray debug_marker_array;
+
     int id = 0;
-    visualization_msgs::Marker foot_location_to_try_marker_list;
-    initializeMarkerList(foot_locations_to_try_marker_list, id);
+    foot_locations_to_try_marker_list = initializeMarkerListWithId(id);
 
     id = 1;
-    visualization_msgs::Marker possible_foot_locations_marker_list;
-    initializeMarkerList(possible_foot_locations_marker_list, id);
+    possible_foot_locations_marker_list = initializeMarkerListWithId(id);
 
     id = 2;
-    visualization_msgs::Marker optimal_foot_location_marker;
-    initializeMarkerList(optimal_foot_location_marker, id);
+    optimal_foot_location_marker = initializeMarkerListWithId(id);
     // Make the optimal foot location stand out more
     optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.1;
     optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.1;
     optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.1;
 
     id = 3;
-    visualization_msgs::Marker gait_information_marker_list;
-    initializeMarkerList(gait_information_marker_list, id);
+    gait_information_marker_list = initializeMarkerListWithId(id);
 }
 
-void HullParameterDeterminer::initializeMarkerList(
-    visualization_msgs::Marker& marker_list, int id)
+visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
+    int id)
 {
+    visualization_msgs::Marker marker_list;
     marker_list.id = id;
     marker_list.header.frame_id
         = frame_id_to_transform_to_;
@@ -193,6 +192,7 @@ void HullParameterDeterminer::initializeMarkerList(
     marker_list.scale.x = DEBUG_MARKER_SIZE;
     marker_list.scale.y = DEBUG_MARKER_SIZE;
     marker_list.scale.z = DEBUG_MARKER_SIZE;
+    return marker_list;
 }
 
 void HullParameterDeterminer::addDebugGaitInformation()
