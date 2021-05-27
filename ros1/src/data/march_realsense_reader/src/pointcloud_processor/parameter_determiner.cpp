@@ -572,7 +572,7 @@ bool HullParameterDeterminer::isValidLocation(
                     executable_locations_line_coefficients_);
             double distance = linear_algebra_utilities::distanceBetweenPoints(
                 projected_point, possible_foot_location);
-            
+
             if (debugging_) {
                 geometry_msgs::Point marker_point;
 
@@ -586,7 +586,7 @@ bool HullParameterDeterminer::isValidLocation(
                     marker_color.g = 1.0;
                     marker_color.b = 0.0;
                     marker_color.a = 0.7;
-                } else if (!distance < max_distance_to_line)) {
+                } else if (!(distance < max_distance_to_line)) {
                     marker_color.r = 1.0;
                     marker_color.g = 0.0;
                     marker_color.b = 1.0;
