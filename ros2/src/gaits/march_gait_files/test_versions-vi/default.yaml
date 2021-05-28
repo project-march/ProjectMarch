@@ -75,11 +75,11 @@ gaits:
     right_open: MVI_stairsdownbackwards_rightopen_low_undeep_v1
     right_swing: MVI_stairsdownbackwards_rightswing_low_undeep_v1
   stairs_up:
-    left_close: MVI_stairsup_leftclose_cybathlon_v3
-    left_swing: MVI_stairsup_leftswing_cybathlon_v3
-    right_close: MVI_stairsup_rightclose_cybathlon_v3
-    right_open: MVI_stairsup_rightopen_cybathlon_v3
-    right_swing: MVI_stairsup_rightswing_cybathlon_v3
+    left_close: MVI_stairsup_leftclose_cybathlon_v4
+    left_swing: MVI_stairsup_leftswing_cybathlon_v4
+    right_close: MVI_stairsup_rightclose_cybathlon_v4
+    right_open: MVI_stairsup_rightopen_cybathlon_v4
+    right_swing: MVI_stairsup_rightswing_cybathlon_v4
   tilted_path_first_end:
     left_open: MV_TPend1_leftopen_v1
     right_close: MV_TPend1_rightclose_v1
