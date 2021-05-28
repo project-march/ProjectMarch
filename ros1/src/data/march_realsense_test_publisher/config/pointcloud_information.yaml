@@ -15,17 +15,52 @@
 #
 # Whether the pointcloud has been taken from the front camera position or the back camera position
 # bool from_back_camera
+chair1.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
+chair_high.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
+chair_low.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
+chair_medium.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
+chair_wooden_low.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
+chair_wooden_medium.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
+chair_wooden_high.ply:
+  realsense_category: 4
+  frame_id_to_transform_to: "pressure_sole_left"
+  from_back_camera: true
+  from_realsense_viewer: false
 door.ply:
   realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
-ramp2.ply:
-  realsense_category: 2
+from-ramp.ply:
+  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
-ramp-leaning.ply:
+ramp2.ply:
   realsense_category: 2
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
@@ -45,6 +80,36 @@ ramp-from-stand-without-thijs.ply:
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
+ramp-leaning.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+  from_realsense_viewer: true
+ramp_mini.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "pressure_sole_right"
+  from_back_camera: false
+  from_realsense_viewer: false
+ramp_mini2.ply:
+  realsense_category: 2
+  frame_id_to_transform_to: "pressure_sole_right"
+  from_back_camera: false
+  from_realsense_viewer: false
+single_step1.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "pressure_sole_right"
+  from_back_camera: false
+  from_realsense_viewer: false
+single_step_chair_background.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "pressure_sole_right"
+  from_back_camera: false
+  from_realsense_viewer: false
+single_step_high_undeep.ply:
+  realsense_category: 0
+  frame_id_to_transform_to: "pressure_sole_right"
+  from_back_camera: false
+  from_realsense_viewer: false
 stairs1.ply:
   realsense_category: 0
   frame_id_to_transform_to: "foot_right"
@@ -72,11 +137,6 @@ stairs_down1.ply:
   from_realsense_viewer: true
 stairs_down2.ply:
   realsense_category: 1
-  frame_id_to_transform_to: "foot_right"
-  from_back_camera: false
-  from_realsense_viewer: true
-from-ramp.ply:
-  realsense_category: 0
   frame_id_to_transform_to: "foot_right"
   from_back_camera: false
   from_realsense_viewer: true
