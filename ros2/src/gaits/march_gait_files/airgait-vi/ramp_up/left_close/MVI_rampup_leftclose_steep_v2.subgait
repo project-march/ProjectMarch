@@ -1,4 +1,5 @@
-description: First version of a flat ramp_up gait with more hip flexion in both legs
+description: The left close gait for the 20 degrees slope up, but with more hip flexion
+  in both legs
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -6,11 +7,11 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0873
-    time_from_start: 327100000
+  - position: -0.1021
+    time_from_start: 278600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 812900000
+    time_from_start: 618600000
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
@@ -19,27 +20,27 @@ joints:
   - position: -0.0873
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: -0.2094
+  - position: -0.05235988
     time_from_start: 0
     velocity: 0.0
-  - position: 0.8378
-    time_from_start: 1550000000
-    velocity: 0.0
-  - position: 0.6807
+  - position: 0.55850536
+    time_from_start: 1250000000
+    velocity: -0.34910076
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.0873
     time_from_start: 0
-    velocity: 0.3491
+    velocity: 0.0
   - position: 1.3265
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.7271
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -53,22 +54,22 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0873
+  - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.6807
+  - position: 0.95993109
     time_from_start: 0
     velocity: 0.0
-  - position: -0.2094
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 0.7271
+  - position: 1.1345
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0873
+  - position: 0.0
     time_from_start: 2500000000
-    velocity: 0.3491
-name: left_open
-version: MVI_rampup_leftopen_flat_v2
+    velocity: 0.0
+name: left_close
+version: MVI_rampup_leftclose_steep_v2
