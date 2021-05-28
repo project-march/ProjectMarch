@@ -53,40 +53,40 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: -0.16667894356545848
+  - position: -0.1667
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0698131700798
+  - position: 0.0698
     time_from_start: 400000000
-    velocity: 1.49923782746
-  - position: 0.558505360638
+    velocity: 1.4992
+  - position: 0.5585
     time_from_start: 887500000
-    velocity: 0.200712863979
-  - position: 0.349065850399
+    velocity: 0.2007
+  - position: 0.3491
     time_from_start: 1250000000
-    velocity: -1.00007366139
-  - position: 0.209439510239
+    velocity: -1.0001
+  - position: 0.2094
     time_from_start: 1448412698
-    velocity: -1.00007366139
-  - position: -0.16667894356545848
+    velocity: -1.0001
+  - position: -0.1667
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.349065850399
+  - position: 0.3491
     time_from_start: 287500000
-    velocity: 2.50000962056
-  - position: 0.872664625997
+    velocity: 2.5
+  - position: 0.8727
     time_from_start: 775000000
     velocity: 0.0
-  - position: 0.349065850399
+  - position: 0.3491
     time_from_start: 1250000000
-    velocity: -0.872664625997
-  - position: 0.0968657734857
+    velocity: -0.8727
+  - position: 0.0969
     time_from_start: 1448412698
-    velocity: -0.399680398707
+    velocity: -0.3997
   - position: 0.0
     time_from_start: 2100000000
     velocity: 0.0
@@ -144,45 +144,45 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.3490658503988659
+  - position: 0.3491
     time_from_start: 0
-    velocity: -1.0000736613927508
-  - position: 0.209439510239
+    velocity: -1.0001
+  - position: 0.2094
     time_from_start: 198412698
-    velocity: -1.00007366139
-  - position: -0.166678943565
+    velocity: -1.0001
+  - position: -0.1667
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.0698131700798
+  - position: 0.0698
     time_from_start: 1650000000
-    velocity: 1.49923782746
-  - position: 0.558505360638
+    velocity: 1.4992
+  - position: 0.5585
     time_from_start: 2137500000
-    velocity: 0.200712863979
-  - position: 0.3490658503988659
+    velocity: 0.2007
+  - position: 0.3491
     time_from_start: 2500000000
-    velocity: -1.0000736613927508
+    velocity: -1.0001
   right_knee:
-  - position: 0.3490658503988659
+  - position: 0.3491
     time_from_start: 0
-    velocity: -0.8726646259971648
-  - position: 0.0968657734857
+    velocity: -0.8727
+  - position: 0.0969
     time_from_start: 198412698
-    velocity: -0.399680398707
+    velocity: -0.3997
   - position: 0.0
     time_from_start: 850000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.349065850399
+  - position: 0.3491
     time_from_start: 1537500000
-    velocity: 2.50000962056
-  - position: 0.872664625997
+    velocity: 2.5
+  - position: 0.8727
     time_from_start: 2025000000
     velocity: 0.0
-  - position: 0.3490658503988659
+  - position: 0.3491
     time_from_start: 2500000000
-    velocity: -0.8726646259971648
+    velocity: -0.8727
 name: left_swing
 version: MIII_total

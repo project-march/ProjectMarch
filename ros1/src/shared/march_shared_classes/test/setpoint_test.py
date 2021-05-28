@@ -26,19 +26,19 @@ class SetpointTest(unittest.TestCase):
         }
 
     def test_time_rounding(self):
-        self.assertEqual(self.setpoint.time, 1.12341254)
+        self.assertEqual(self.setpoint.time, 1.1234)
 
     def test_position_rounding(self):
-        self.assertEqual(self.setpoint.position, 0.03434126)
+        self.assertEqual(self.setpoint.position, 0.0343)
 
     def test_velocity_rounding(self):
-        self.assertEqual(self.setpoint.velocity, 123.16208455)
+        self.assertEqual(self.setpoint.velocity, 123.1621)
 
     def test_string_output(self):
         self.assertEqual(
             str(self.setpoint),
             "Time: {t}, Position: {p}, Velocity: {v}".format(
-                t=1.12341254, p=0.03434126, v=123.16208455
+                t=1.1234, p=0.0343, v=123.1621
             ),
         )
 
@@ -83,14 +83,6 @@ class SetpointTest(unittest.TestCase):
                 new_setpoints[key].position, self.setpoint_dict[key].position, places=4
             )
 
-    def test_inverse_kinematics_velocity(self):
-        feet_state = FeetState.from_setpoints(self.setpoint_dict)
-        new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
-        for key in new_setpoints.keys():
-            self.assertAlmostEqual(
-                new_setpoints[key].velocity, self.setpoint_dict[key].velocity, places=4
-            )
-
     def test_inverse_kinematics_reversed_position(self):
         right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
         left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
@@ -104,8 +96,8 @@ class SetpointTest(unittest.TestCase):
         dif_right = (
             desired_state.right_foot.position - resulting_position.right_foot.position
         )
-        self.assertLess(dif_left.norm(), 0.00001)
-        self.assertLess(dif_right.norm(), 1 / 0.00001)
+        self.assertLess(dif_left.norm(), 0.0001)
+        self.assertLess(dif_right.norm(), 1 / 0.0001)
 
     def test_weighted_average_states(self):
         parameter = 0.8
