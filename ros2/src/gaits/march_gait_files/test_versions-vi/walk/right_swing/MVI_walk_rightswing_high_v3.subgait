@@ -15,22 +15,22 @@ joints:
     velocity: -0.0
   - position: -0.0611
     time_from_start: 325000000
-    velocity: -0.19476923
+    velocity: -0.1948
   - position: -0.0611
     time_from_start: 975000000
-    velocity: 0.19476923
+    velocity: 0.1948
   - position: 0.0
     time_from_start: 1300000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.37520041
+  - position: 0.3752
     time_from_start: 0
-    velocity: -0.32000088
-  - position: -0.13962634
+    velocity: -0.32
+  - position: -0.1396
     time_from_start: 1300000000
     velocity: 0.0
   left_knee:
-  - position: 0.13960016
+  - position: 0.1396
     time_from_start: 0
     velocity: 0.0
   - position: 0.2094
@@ -46,7 +46,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.13962634
+  - position: -0.1396
     time_from_start: 195000000
     velocity: 0.0
   - position: 0.0
@@ -66,26 +66,26 @@ joints:
     time_from_start: 1300000000
     velocity: 0.0
   right_hip_fe:
-  - position: -0.13962634
+  - position: -0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 0.79160979
+  - position: 0.7916
     time_from_start: 750000000
     velocity: 0.0
-  - position: 0.37520041
+  - position: 0.3752
     time_from_start: 1300000000
-    velocity: -0.32000088
+    velocity: -0.32
   right_knee:
-  - position: 0.13960016
+  - position: 0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 1.30899694
+  - position: 1.309
     time_from_start: 546000000
     velocity: 0.0
-  - position: 1.27409035
+  - position: 1.2741
     time_from_start: 724000000
     velocity: 0.0
-  - position: 0.13960016
+  - position: 0.1396
     time_from_start: 1300000000
     velocity: 0.0
 name: right_swing

@@ -75,12 +75,12 @@ joints:
   - position: 0.7916
     time_from_start: 464800000
     velocity: 1.2331
-  - position: 0.9590
+  - position: 0.959
     time_from_start: 720000000
     velocity: 0.128
   - position: 0.3752
     time_from_start: 1200000000
-    velocity: -0.3200
+    velocity: -0.32
   right_knee:
   - position: 0.1396
     time_from_start: 0

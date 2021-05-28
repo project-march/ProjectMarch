@@ -71,7 +71,7 @@ joints:
     velocity: 0.121
   - position: 0.3752
     time_from_start: 1500000000
-    velocity: -0.32000001
+    velocity: -0.32
   right_knee:
   - position: 0.0
     time_from_start: 0
