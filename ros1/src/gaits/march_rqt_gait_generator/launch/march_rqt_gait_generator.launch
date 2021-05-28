@@ -1,5 +1,7 @@
 <launch>
-    <param name="robot_description" textfile="$(find march_description)/urdf/march4.urdf"/>
+    <arg name="robot" default="march6" doc="Robot to use."/>
+
+    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).urdf"/>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
