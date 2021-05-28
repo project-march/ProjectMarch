@@ -1,0 +1,92 @@
+description: Large walk version of MVI_walk_v3
+duration: 1300000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.1396
+    time_from_start: 200000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1300000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0873
+    time_from_start: 650000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1300000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.1667
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.6981
+    time_from_start: 783100000
+    velocity: 0.1181
+  - position: 0.4363
+    time_from_start: 1300000000
+    velocity: -0.3491
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.1345
+    time_from_start: 546000000
+    velocity: 0.0
+  - position: 1.1345
+    time_from_start: 685400000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1300000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1300000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0611
+    time_from_start: 325000000
+    velocity: -0.1933
+  - position: -0.0611
+    time_from_start: 975000000
+    velocity: 0.1933
+  - position: 0.0
+    time_from_start: 1300000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.4363
+    time_from_start: 0
+    velocity: -0.3491
+  - position: -0.1667
+    time_from_start: 1300000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 260000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 884000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1300000000
+    velocity: 0.0
+name: left_swing
+version: MVI_walklarge_leftswing_v3
