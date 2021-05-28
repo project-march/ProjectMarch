@@ -27,15 +27,15 @@ joints:
     time_from_start: 2750000000
     velocity: 0.17449976
   left_knee:
-  - position: 1.35680674
+  - position: 1.3962634
     time_from_start: 0
     velocity: 0.0
-  - position: 0.1396
+  - position: 0.13960016
     time_from_start: 2282500000
     velocity: 0.0
   - position: 0.24430072
     time_from_start: 2750000000
-    velocity: 0.69810028
+    velocity: 0.34906585
   right_ankle:
   - position: -0.15707963
     time_from_start: 0
@@ -73,7 +73,7 @@ joints:
   - position: 1.67550037
     time_from_start: 1750000000
     velocity: 0.0
-  - position: 1.35680674
+  - position: 1.3962634
     time_from_start: 2750000000
     velocity: 0.0
 name: right_swing
