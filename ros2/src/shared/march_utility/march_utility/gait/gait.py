@@ -159,12 +159,11 @@ class Gait:
     def _validate_new_edge_position(self, gait_edge_position, new_subgait_position,
                                         subgait_name):
         if isinstance(gait_edge_position, StaticEdgePosition):
-            old_edge_position = gait_position.values
             for joint in self.subgaits[subgait_name].joints:
                 if (
                         abs(
-                            old_edge_position.values[joint.name]
-                            - new_edge_position.values[joint.name]
+                            gait_edge_position.values[joint.name]
+                            - new_subgait_position[joint.name]
                         )
                         >= ALLOWED_ERROR_ENDPOINTS
                 ):
@@ -179,7 +178,6 @@ class Gait:
             )
         elif isinstance(gait_edge_position, DynamicEdgePosition):
             return True
-
 
     def _validate_new_edge_positions(self, new_subgaits):
         for from_subgait_name, to_subgait_name in self.graph:
@@ -203,6 +201,7 @@ class Gait:
 
 
     def set_subgaits(self, new_subgaits: Dict[str, Subgait]):
+        self._validate_new_edge_positions(new_subgaits)
         self.subgaits.update(new_subgaits)
         self._validate_trajectory_transition()
 
@@ -222,9 +221,7 @@ class Gait:
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
-
-        self._validate_new_edge_positions(new_subgaits)
-        self.subgaits.update(new_subgaits)
+        self.set_subgaits(new_subgaits)
 
     def __getitem__(self, name: str):
         """Returns a subgait from the loaded subgaits."""

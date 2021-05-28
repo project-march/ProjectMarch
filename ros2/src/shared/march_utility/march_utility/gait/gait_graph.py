@@ -44,6 +44,12 @@ class GaitGraph:
         }
         self._named_positions[UnknownEdgePosition()] = GaitGraph.UNKNOWN
 
+    def get_name_of_position(self, position: EdgePosition) -> str:
+        if position in self._named_positions.keys():
+            return self._named_positions[position]
+        else:
+            return "unnamed"
+
     def _make_transitions(self):
         """Make all gait transitions.
 
@@ -54,21 +60,23 @@ class GaitGraph:
         """
         for gait in self._gait_selection._gaits.values():
             if gait.starting_position not in self._named_positions:
-                position_name = self._new_unnamed()
-                self._gait_selection.get_logger().warn(
-                    f"No named position given for starting position of gait `"
-                    f"{gait.name}, creating {position_name}"
-                )
-                self._named_positions[gait.starting_position] = position_name
+                if isinstance(gait.starting_position, StaticEdgePosition):
+                    position_name = self._new_unnamed()
+                    self._gait_selection.get_logger().warn(
+                        f"No named position given for starting position of gait `"
+                        f"{gait.name}, creating {position_name}."
+                    )
+                    self._named_positions[gait.starting_position] = position_name
             self._add_idle_transition(gait.starting_position, gait.gait_name)
 
             if gait.final_position not in self._named_positions:
-                position_name = self._new_unnamed()
-                self._gait_selection.get_logger().warn(
-                    f"No named position given for final position of gait `"
-                    f"{gait.name}, creating {position_name}"
-                )
-                self._named_positions[gait.final_position] = position_name
+                if isinstance(gait.final_position, StaticEdgePosition):
+                    position_name = self._new_unnamed()
+                    self._gait_selection.get_logger().warn(
+                        f"No named position given for final position of gait `"
+                        f"{gait.name}, creating {position_name}"
+                    )
+                    self._named_positions[gait.final_position] = position_name
             self._gait_transitions[gait.gait_name] = gait.final_position
 
     def _make_home_gaits(self):

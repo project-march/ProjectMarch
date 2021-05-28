@@ -156,10 +156,10 @@ class RealSenseGait(SetpointsGait):
 
             starting_position = cls.parse_edge_position(
                 gait_config["starting_position"],
-                subgaits[graph.end_subgaits()[0]].starting_position
+                subgaits[graph.start_subgaits()[0]].starting_position
             )
             final_position = cls.parse_edge_position(
-                gait_config["starting_position"],
+                gait_config["final_position"],
                 subgaits[graph.end_subgaits()[0]].final_position
             )
 
@@ -250,6 +250,13 @@ class RealSenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
+
+        self._current_time = current_time
+        self._start_time = current_time
+        self._node.get_logger().info(
+            f"Times: current: {self._current_time}, start: {self._start_time}, "
+            f"end: {self._end_time}"
+        )
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
         service_call_succesful = self.make_realsense_service_call(
@@ -266,25 +273,33 @@ class RealSenseGait(SetpointsGait):
             )
             return GaitUpdate.empty()
 
+        self._node.get_logger().info(
+            f"Gait parameters responded"
+        )
+        # self._update_time_stamps(self._current_subgait)
+        self._node.get_logger().info(
+            f"Times: current: {self._current_time}, start: {self._start_time}, "
+            f"end: {self._end_time}"
+        )
         self.update_parameters(gait_parameters_response.gait_parameters)
+        self._node.get_logger().info(
+            f"Done updating parameters"
+        )
         self.interpolate_subgaits_from_parameters()
 
         self._reset()
-        self._current_time = current_time
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
+        self._end_time = self._start_time + self._current_subgait.duration
 
-        # Delay first subgait if duration is greater than zero
-        if first_subgait_delay is not None and first_subgait_delay > Duration(0):
-            self._start_is_delayed = True
-            self._update_time_stamps(self._current_subgait, first_subgait_delay)
-            return GaitUpdate.should_schedule_early(
-                self._command_from_current_subgait()
-            )
-        else:
-            self._start_is_delayed = False
-            self._update_time_stamps(self._current_subgait)
-            return GaitUpdate.should_schedule(self._command_from_current_subgait())
+        self._node.get_logger().info(
+            f"Times: current: {self._current_time}, start: {self._start_time}, "
+            f"end: {self._end_time}"
+        )
+
+        self._start_is_delayed = False
+        # self._update_time_stamps(self._current_subgait)
+        return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
@@ -327,7 +342,7 @@ class RealSenseGait(SetpointsGait):
         """Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
-            self._node.get_logger().debug(
+            self._node.get_logger().info(
                 f"Interpolating with parameters={self.parameters}"
             )
             new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(

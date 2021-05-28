@@ -66,6 +66,7 @@ realsense_sit:
   camera_to_use: back
   starting_position: static
   final_position: dynamic
+  dimensions: 1
   default_parameters:
    - 0.5
   subgaits:
@@ -82,13 +83,14 @@ realsense_stand:
   camera_to_use: back
   starting_position: dynamic
   final_position: static
+  dimensions: 1
   default_parameters:
   - 0.5
   subgaits:
     prepare_stand_up:
-    - MVI_prepare_stand_up_low
-    - MVI_prepare_stand_up_high
+    - MVI_prepare_stand_up_low_v1
+    - MVI_prepare_stand_up_high_v1
     stand_up:
-    - MVI_stand_up_low
-    - MVI_stand_up_high
+    - MVI_stand_up_low_v1
+    - MVI_stand_up_high_v1
 #      dependent: True
