@@ -15,6 +15,8 @@ from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.utilities.vector_3d import Vector3d
 from .side import Side
 
+import yaml
+
 
 def weighted_average_floats(
     base_value: float, other_value: float, parameter: float
@@ -120,65 +122,28 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
             side, f"Side should be either 'left', 'right' or 'both', but was {side}"
         )
     try:
-        robot = urdf.Robot.from_xml_file(
+        yaml_file = open(
             os.path.join(
-                get_package_share_directory("march_description"), "urdf", "march4.urdf"
-            )
-        )
-        # size[0], size[1] and size[2] are used to grab relevant length of the link,
-        # e.g. the relevant length of the hip base is in the y direction, that of the
-        # upper leg in the z direction.
-        # length of the hip base structure
-        base = robot.link_map["hip_base"].collisions[0].geometry.size[1]  # noqa: ECE001
-
-        # left upper leg length
-        l_ul = (  # noqa: ECE001
-            robot.link_map["upper_leg_left"].collisions[0].geometry.size[2]
+                get_package_share_directory("march_description"),
+                "urdf",
+                "properties",
+                "march6.yaml",
+            ),
+            "r",
         )
 
-        # left lower leg length
-        l_ll = (  # noqa: ECE001
-            robot.link_map["lower_leg_left"].collisions[0].geometry.size[2]
-        )
+        robot_dimensions = yaml.safe_load(yaml_file)["dimensions"]
 
-        # left haa arm to leg
-        l_hl = (  # noqa: ECE001
-            robot.link_map["hip_aa_frame_left_front"].collisions[0].geometry.size[0]
+        base_length = robot_dimensions["hip_base"]["length"]
+        hip_side_length = robot_dimensions["hip_aa_side"]["length"]
+        hip_front_length = robot_dimensions["hip_aa_front"]["length"]
+        upper_leg_length = robot_dimensions["upper_leg"]["length"]
+        lower_leg_length = robot_dimensions["lower_leg"]["length"]
+        ankle_offset = (
+            robot_dimensions["upper_leg"]["offset"]
+            + robot_dimensions["ankle_plate"]["offset"]
         )
-
-        # left pelvis to hip length
-        l_ph = (  # noqa ECE001
-            robot.link_map["hip_aa_frame_left_side"].collisions[0].geometry.size[1]
-        )
-
-        # right upper leg length
-        r_ul = (  # noqa: ECE001
-            robot.link_map["upper_leg_right"].collisions[0].geometry.size[2]
-        )
-
-        # right lower leg length
-        r_ll = (  # noqa: ECE001
-            robot.link_map["lower_leg_right"].collisions[0].geometry.size[2]
-        )
-
-        # right haa arm to leg
-        r_hl = (  # noqa: ECE001
-            robot.link_map["hip_aa_frame_right_front"].collisions[0].geometry.size[0]
-        )
-
-        # right pelvis hip length
-        r_ph = (  # noqa: ECE001
-            robot.link_map["hip_aa_frame_right_side"]
-            .collisions[0]
-            .geometry.size[1]  # noqa ECE001
-        )
-        # The foot is a certain amount more to the inside of the exo then the
-        # leg structures. The haa arms (pelic to hip lengths) need to account for this.
-        off_set = (  # noqa: ECE001
-            robot.link_map["ankle_plate_right"].visual.origin.xyz[1] + base / 2 + r_hl
-        )
-        r_ph = r_ph - off_set
-        l_ph = l_ph - off_set
+        hip_aa_arm_length = hip_side_length - ankle_offset
 
     except KeyError as e:
         raise KeyError(
@@ -186,7 +151,18 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
         )
 
     return select_lengths_for_inverse_kinematics(
-        [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base], side
+        [
+            upper_leg_length,
+            lower_leg_length,
+            hip_front_length,
+            hip_aa_arm_length,
+            upper_leg_length,
+            lower_leg_length,
+            hip_front_length,
+            hip_aa_arm_length,
+            base_length,
+        ],
+        side,
     )
 
 
@@ -206,7 +182,7 @@ def get_joint_names_for_inverse_kinematics() -> List[str]:
     """
     robot = urdf.Robot.from_xml_file(
         os.path.join(
-            get_package_share_directory("march_description"), "urdf", "march4.urdf"
+            get_package_share_directory("march_description"), "urdf", "march6.urdf"
         )
     )
     robot_joint_names = robot.joint_map.keys()
