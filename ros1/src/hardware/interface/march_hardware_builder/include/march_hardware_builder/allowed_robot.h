@@ -18,7 +18,10 @@ public:
         test_joint_rotational_odrive,
         test_joint_linear_odrive,
         pdb,
-        pressure_soles
+        pressure_soles,
+        test_right_leg_rotational,
+        test_left_leg_rotational,
+        march6_no_translational_joints,
     };
 
     AllowedRobot() = default;
@@ -45,7 +48,13 @@ public:
             this->value = pdb;
         } else if (robot_name == "pressure_soles") {
             this->value = pressure_soles;
-        } else {
+        } else if (robot_name == "test_right_leg_rotational") {
+            this->value = test_right_leg_rotational;
+        } else if (robot_name == "test_left_leg_rotational") {
+            this->value = test_left_leg_rotational;
+        }  else if (robot_name == "march6_no_translational_joints") {
+            this->value = march6_no_translational_joints;
+        }else {
             ROS_WARN_STREAM("Unknown robot " << robot_name);
             this->value = AllowedRobot::test_joint_rotational;
         }
@@ -75,6 +84,16 @@ public:
             return base_path.append(/*__s=*/"/robots/pdb.yaml");
         } else if (this->value == AllowedRobot::pressure_soles) {
             return base_path.append(/*__s=*/"/robots/pressure_soles.yaml");
+        } else if (this->value == AllowedRobot::test_right_leg_rotational) {
+            return base_path.append(
+                /*__s=*/"/robots/test_right_leg_rotational.yaml");
+        } else if (this->value == AllowedRobot::test_left_leg_rotational) {
+            return base_path.append(
+                /*__s=*/"/robots/test_left_leg_rotational.yaml");
+        }
+        else if (this->value == AllowedRobot::march6_no_translational_joints) {
+            return base_path.append(
+                /*__s=*/"/robots/march6_no_translational_joints.yaml");
         }
         ROS_ERROR(
             "Robotname not implemented. Using test_joint_rotational.yaml...");
@@ -127,6 +146,15 @@ public:
                 break;
             case pressure_soles:
                 out << "pressure_soles";
+                break;
+            case test_right_leg_rotational:
+                out << "test_right_leg_rotational";
+                break;
+            case test_left_leg_rotational:
+                out << "test_left_leg_rotational";
+                break;
+            case march6_no_translational_joints:
+                out << "march6_no_translational_joints";
                 break;
             default:
                 out << "(Unknown)";

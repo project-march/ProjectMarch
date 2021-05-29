@@ -14,7 +14,7 @@ march:
       joints:
         - rotational_joint
       gains:
-        rotational_joint: {p: 200, i: 0, d: 15, i_clamp: 100, publish_state: true, antiwindup: true}
+        rotational_joint: {p: 40, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
       constraints:
         goal_time: 0.5
         rotational_joint:

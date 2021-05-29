@@ -64,6 +64,8 @@ namespace error {
                 return "MotorController must be IMotionCube or ODrive";
             case ErrorType::PREPARE_ACTUATION_ERROR:
                 return "Something went wrong with preparing for actuation";
+            case ErrorType::INVALID_DIRECTION:
+                return "Direction must be either -1 or 1";
             default:
                 return "Unknown error occurred. Please create/use a documented "
                        "error";

@@ -41,13 +41,15 @@ public:
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv);
+        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv,
+        int direction);
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv);
+        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv,
+       int direction);
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode, unsigned int motor_kv);
+        ActuationMode actuation_mode, unsigned int motor_kv, int direction);
 
     ~ODrive() noexcept override = default;
 
@@ -99,6 +101,9 @@ private:
     ODriveAxis axis_;
     bool pre_calibrated_;
     float torque_constant_;
+
+    // Direction of the ODrive, either -1 or 1
+    int direction_;
 };
 
 } // namespace march

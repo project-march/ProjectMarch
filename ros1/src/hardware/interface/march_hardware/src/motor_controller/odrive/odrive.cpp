@@ -23,31 +23,36 @@ namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
+    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv,
+    int direction)
     : MotorController(slave, std::move(absolute_encoder),
         std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
     , pre_calibrated_(pre_calibrated)
+    , direction_(direction)
 {
     if (!absolute_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
             "An ODrive needs an absolute encoder");
+    }
+    if (!(direction_ == 1 || direction_ == -1)) {
+        throw error::HardwareException(error::ErrorType::INVALID_DIRECTION);
     }
     torque_constant_ = KV_TO_TORQUE_CONSTANT / (float) motor_kv;
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
+    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv, int direction)
     : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode,
-        pre_calibrated, motor_kv)
+        pre_calibrated, motor_kv, direction)
 {
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, unsigned int motor_kv)
-    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false, motor_kv)
+    ActuationMode actuation_mode, unsigned int motor_kv, int direction)
+    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false, motor_kv, direction)
 {
 }
 
@@ -84,9 +89,9 @@ void ODrive::waitForState(ODriveAxisState target_state)
 
 void ODrive::actuateTorque(float target_effort)
 {
-    ROS_INFO_STREAM("Effort: " << target_effort);
-    float target_torque = target_effort * torque_constant_;
-    ROS_INFO_STREAM("Torque: " << target_torque);
+    ROS_INFO("Effort: %f", target_effort);
+    float target_torque = target_effort * torque_constant_ * direction_;
+    ROS_INFO("Torque: %f", target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
         ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
@@ -173,10 +178,17 @@ void ODrive::setAxisState(ODriveAxisState /* state */)
 
 int32_t ODrive::getAbsolutePositionIU()
 {
-    return this
+    int32_t iu_value = this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ActualPosition, axis_))
         .i;
+
+    if (direction_ == 1) {
+        return iu_value;
+    }
+    else {
+        return this->absolute_encoder_->getTotalPositions() - iu_value;
+    }
 }
 
 int32_t ODrive::getIncrementalPositionIU()
@@ -184,7 +196,7 @@ int32_t ODrive::getIncrementalPositionIU()
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::MotorPosition, axis_))
-        .i;
+        .i * direction_;
 }
 
 float ODrive::getIncrementalVelocityIU()
@@ -192,7 +204,7 @@ float ODrive::getIncrementalVelocityIU()
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ActualVelocity, axis_))
-        .f;
+        .f * direction_;
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -224,7 +236,7 @@ float ODrive::getMotorCurrent()
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ActualCurrent, axis_))
-        .f;
+        .f * direction_;
 }
 
 uint32_t ODrive::getAxisError()

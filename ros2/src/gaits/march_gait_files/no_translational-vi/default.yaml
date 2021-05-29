@@ -25,14 +25,14 @@ gaits:
     right_open: MVI_RD_slopeup_rightopen_steep_v1
     right_swing: MVI_RD_slopeup_rightswing_steep_v1
   realsense_sit:
-    sit_down: MVI_sit_down_low_v1
-    sit_home: MVI_sit_home_low_v1
+    sit_down: MIV_final
+    sit_home: MIV_final
   realsense_stairs_up_single_step:
     left_close: MVI_stairsup_leftclose_low_undeep
     right_open: MVI_stairsup_rightopen_low_undeep
   realsense_stand:
-    prepare_stand_up: MVI_prepare_stand_up_low_v1
-    stand_up: MVI_stand_up_low_v1
+    prepare_stand_up: MIV_final
+    stand_up: MIV_final
   rough_terrain_first_middle_step:
     left_close: MV_RT_first_middlestep_leftclose_v2
     right_open: MV_RT_first_middlestep_rightopen_v2
@@ -118,11 +118,11 @@ gaits:
     left_close: MV_TPstraight_leftclose_v1
     right_open: MV_TPstraight_rightopen_v1
   walk:
-    left_close: MVI_walk_leftclose_haa_adpf_v2
-    left_swing: MVI_walk_leftswing_haa_adpf_v2
-    right_close: MVI_walk_rightclose_haa_adpf_v2
-    right_open: MVI_walk_rightopen_haa_adpf_v2
-    right_swing: MVI_walk_rightswing_haa_adpf_v2
+    left_close: MIV_final
+    left_swing: MIV_final
+    right_close: MIV_final
+    right_open: MIV_final
+    right_swing: MIV_final
   walk_large:
     left_close: MVI_walklarge_leftclose_v2
     left_swing: MVI_walklarge_leftswing_v2

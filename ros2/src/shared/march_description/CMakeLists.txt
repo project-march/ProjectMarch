@@ -26,6 +26,9 @@ set(XACRO_FILES
     urdf/march4_with_koen_lengths.xacro
     urdf/test_joint_linear.xacro
     urdf/test_joint_rotational.xacro
+    urdf/test_right_leg_rotational.xacro
+    urdf/test_left_leg_rotational.xacro
+    urdf/march6_no_translational_joints.xacro
 )
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)

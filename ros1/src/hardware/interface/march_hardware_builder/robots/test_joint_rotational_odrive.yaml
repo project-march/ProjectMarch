@@ -12,10 +12,11 @@ testsetup:
           axis: 0
           preCalibrated: true
           motorKV: 95
+          direction: -1
           absoluteEncoder:
             resolution: 20
-            minPositionIU: 308602
-            maxPositionIU: 552125
+            minPositionIU: 559641
+            maxPositionIU: 925326
           incrementalEncoder:
             resolution: 12
             transmission: 121
