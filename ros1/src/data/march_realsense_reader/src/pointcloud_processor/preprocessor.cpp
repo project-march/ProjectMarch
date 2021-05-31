@@ -145,7 +145,8 @@ void NormalsPreprocessor::readParameters(
     YAML::Node robot_properties
         = YAML::LoadFile(ros::package::getPath("march_description")
             + "/urdf/properties/march6.yaml");
-    foot_height = robot_properties["dimensions"]["general"]["width"].as<double>();
+    foot_height
+        = robot_properties["dimensions"]["general"]["width"].as<double>();
     debugging_ = config.debug;
 }
 
