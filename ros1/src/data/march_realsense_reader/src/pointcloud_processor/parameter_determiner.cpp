@@ -185,6 +185,7 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
     marker_list.header.frame_id = frame_id_to_transform_to_;
+    // Places the marker up right (axis aligned with that of its frame id)
     marker_list.pose.orientation.w = 1.0;
     marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
     marker_list.scale.x = DEBUG_MARKER_SIZE;
