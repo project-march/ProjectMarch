@@ -35,7 +35,7 @@ namespace error {
         ODRIVE_WRONG_AXIS_NUMBER = 126,
         INVALID_MOTOR_CONTROLLER = 127,
         PREPARE_ACTUATION_ERROR = 128,
-        INVALID_DIRECTION = 129,
+        INVALID_ENCODER_DIRECTION = 129,
         UNKNOWN = 999,
     };
 

@@ -41,15 +41,13 @@ public:
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv,
-        int direction);
+        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv);
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv,
-       int direction);
+        ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv);
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode, unsigned int motor_kv, int direction);
+        ActuationMode actuation_mode, unsigned int motor_kv);
 
     ~ODrive() noexcept override = default;
 
@@ -57,6 +55,7 @@ public:
     void prepareActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
+    bool isIncrementalEncoderMorePrecise() const;
 
     // Transform the ActuationMode to a number that is understood by the ODrive
     int getActuationModeNumber() const override;
@@ -98,12 +97,12 @@ private:
     uint32_t getEncoderError();
     uint32_t getControllerError();
 
+    // Get the direction of the most significant encoder
+    Encoder::Direction getMotorDirection() const;
+
     ODriveAxis axis_;
     bool pre_calibrated_;
     float torque_constant_;
-
-    // Direction of the ODrive, either -1 or 1
-    int direction_;
 };
 
 } // namespace march

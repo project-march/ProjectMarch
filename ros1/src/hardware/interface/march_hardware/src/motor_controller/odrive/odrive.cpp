@@ -23,36 +23,31 @@ namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv,
-    int direction)
+    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
     : MotorController(slave, std::move(absolute_encoder),
         std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
     , pre_calibrated_(pre_calibrated)
-    , direction_(direction)
 {
     if (!absolute_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
             "An ODrive needs an absolute encoder");
-    }
-    if (!(direction_ == 1 || direction_ == -1)) {
-        throw error::HardwareException(error::ErrorType::INVALID_DIRECTION);
     }
     torque_constant_ = KV_TO_TORQUE_CONSTANT / (float) motor_kv;
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv, int direction)
+    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
     : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode,
-        pre_calibrated, motor_kv, direction)
+        pre_calibrated, motor_kv)
 {
 }
 
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, unsigned int motor_kv, int direction)
-    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false, motor_kv, direction)
+    ActuationMode actuation_mode, unsigned int motor_kv)
+    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false, motor_kv)
 {
 }
 
@@ -90,7 +85,7 @@ void ODrive::waitForState(ODriveAxisState target_state)
 void ODrive::actuateTorque(float target_effort)
 {
     ROS_INFO("Effort: %f", target_effort);
-    float target_torque = target_effort * torque_constant_ * direction_;
+    float target_torque = target_effort * torque_constant_ * getMotorDirection();
     ROS_INFO("Torque: %f", target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
@@ -183,11 +178,10 @@ int32_t ODrive::getAbsolutePositionIU()
             ODriveObjectName::ActualPosition, axis_))
         .i;
 
-    if (direction_ == 1) {
-        return iu_value;
-    }
-    else {
-        return this->absolute_encoder_->getTotalPositions() - iu_value;
+    switch (absolute_encoder_->getDirection()) {
+        case Encoder::Direction::Positive: return iu_value;
+        case Encoder::Direction::Negative: return this->absolute_encoder_->getTotalPositions() - iu_value;
+        default: throw error::HardwareException(error::ErrorType::INVALID_ENCODER_DIRECTION);
     }
 }
 
@@ -196,7 +190,7 @@ int32_t ODrive::getIncrementalPositionIU()
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::MotorPosition, axis_))
-        .i * direction_;
+        .i * incremental_encoder_->getDirection();
 }
 
 float ODrive::getIncrementalVelocityIU()
@@ -204,7 +198,7 @@ float ODrive::getIncrementalVelocityIU()
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ActualVelocity, axis_))
-        .f * direction_;
+        .f * incremental_encoder_->getDirection();
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -236,7 +230,7 @@ float ODrive::getMotorCurrent()
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ActualCurrent, axis_))
-        .f * direction_;
+        .f * getMotorDirection();
 }
 
 uint32_t ODrive::getAxisError()
@@ -277,6 +271,17 @@ uint32_t ODrive::getControllerError()
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::ControllerError, axis_))
         .ui;
+}
+
+bool ODrive::isIncrementalEncoderMorePrecise() const
+{
+    return true;
+}
+
+Encoder::Direction ODrive::getMotorDirection() const
+{
+    // Use the incremental encoder to determine motor direction
+    return this->incremental_encoder_->getDirection();
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum

@@ -220,10 +220,6 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     YAML::Node incremental_encoder_config = odrive_config["incrementalEncoder"];
     int slave_index = odrive_config["slaveIndex"].as<int>();
 
-    int direction = 1;
-    if (odrive_config["direction"]) {
-        direction = odrive_config["direction"].as<int>();
-    }
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
     bool pre_calibrated = false;
@@ -238,7 +234,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             march::MotorControllerType::ODrive, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
             march::MotorControllerType::ODrive),
-        mode, pre_calibrated, motor_kv, direction);
+        mode, pre_calibrated, motor_kv);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
@@ -273,7 +269,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     }
 
     return std::make_unique<march::AbsoluteEncoder>(resolution,
-        motor_controller_type, min_position, max_position,
+        motor_controller_type, getEncoderDirection(absolute_encoder_config), min_position, max_position,
         urdf_joint->limits->lower, urdf_joint->limits->upper, soft_lower_limit,
         soft_upper_limit);
 }
@@ -296,7 +292,21 @@ HardwareBuilder::createIncrementalEncoder(
     const auto transmission
         = incremental_encoder_config["transmission"].as<double>();
     return std::make_unique<march::IncrementalEncoder>(
-        resolution, motor_controller_type, transmission);
+        resolution, motor_controller_type, getEncoderDirection(incremental_encoder_config), transmission);
+}
+
+march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node& encoder_config)
+{
+    if (encoder_config["direction"]) {
+        switch (encoder_config["direction"].as<int>()) {
+            case 1: return march::Encoder::Direction::Positive;
+            case -1: return march::Encoder::Direction::Negative;
+            default: throw march::error::HardwareException(march::error::ErrorType::INVALID_ENCODER_DIRECTION);
+        }
+    }
+    else {
+        return march::Encoder::Direction::Positive;
+    }
 }
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(

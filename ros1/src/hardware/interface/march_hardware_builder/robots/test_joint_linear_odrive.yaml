@@ -1,7 +1,7 @@
 testsetup:
-  if_name: enp2s0
+  if_name: enp0s31f6
   ecatCycleTime: 4
-  ecatSlaveTimeout: 50
+  ecatSlaveTimeout: 250
   joints:
     - rotational_joint:
         allowActuation: true
@@ -11,5 +11,10 @@ testsetup:
           axis: 0
           absoluteEncoder:
             resolution: 17
-            minPositionIU: 29266
-            maxPositionIU: 52948
+            direction: 1
+            minPositionIU: 0
+            maxPositionIU: 0
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1

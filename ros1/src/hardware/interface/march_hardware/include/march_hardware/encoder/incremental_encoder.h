@@ -11,7 +11,9 @@ namespace march {
 class IncrementalEncoder : public Encoder {
 public:
     IncrementalEncoder(size_t resolution,
-        MotorControllerType motor_controller_type, double transmission);
+        MotorControllerType motor_controller_type,
+        Direction direction,
+        double transmission);
 
     ~IncrementalEncoder() noexcept override = default;
 

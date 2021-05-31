@@ -12,7 +12,12 @@
 namespace march {
 class Encoder {
 public:
-    Encoder(size_t resolution, MotorControllerType motor_controller_type);
+    enum Direction {
+        Positive = 1,
+        Negative = -1
+    };
+    Encoder(size_t resolution, MotorControllerType motor_controller_type,
+        Direction direction);
 
     virtual ~Encoder() noexcept = default;
 
@@ -49,6 +54,7 @@ public:
     virtual double getRadiansPerIU() const = 0;
 
     size_t getTotalPositions() const;
+    Direction getDirection() const;
     MotorControllerType getMotorControllerType() const;
 
     static const size_t MIN_RESOLUTION = 1;
@@ -70,6 +76,9 @@ private:
 
     size_t total_positions_ = 0;
     MotorControllerType motor_controller_type_;
+
+    // Not used in calculations, only when reading values
+    Direction direction_;
 };
 } // namespace march
 

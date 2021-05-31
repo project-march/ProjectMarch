@@ -7,10 +7,10 @@
 
 namespace march {
 AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
-    MotorControllerType motor_controller_type, int32_t lower_limit_iu,
+    MotorControllerType motor_controller_type, Direction direction, int32_t lower_limit_iu,
     int32_t upper_limit_iu, double lower_limit_rad, double /*upper_limit_rad*/,
     double lower_soft_limit_rad, double upper_soft_limit_rad)
-    : Encoder(resolution, motor_controller_type)
+    : Encoder(resolution, motor_controller_type, direction)
     , lower_limit_iu_(lower_limit_iu)
     , upper_limit_iu_(upper_limit_iu)
 {
