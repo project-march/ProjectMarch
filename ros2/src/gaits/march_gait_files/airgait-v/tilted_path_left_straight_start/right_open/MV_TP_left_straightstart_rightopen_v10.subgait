@@ -82,5 +82,5 @@ joints:
   - position: 0.4189
     time_from_start: 2700000000
     velocity: 0.0
-name: 'right_open'
+name: right_open
 version: MV_TP_left_straightstart_rightopen_v10
