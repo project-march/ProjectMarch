@@ -229,6 +229,7 @@ void RealSenseReader::publishCloud(
     pcl::toROSMsg(cloud, msg);
 
     msg.header.frame_id = frame_id_to_transform_to_;
+    msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
 }

@@ -26,15 +26,15 @@ joints:
   - position: -0.1667
     time_from_start: 0
     velocity: 0.0
-  - position: 0.111501
+  - position: 0.1115
     time_from_start: 266821430
-    velocity: 1.67788671
-  - position: 0.55149754
+    velocity: 1.6779
+  - position: 0.5515
     time_from_start: 711007140
-    velocity: -0.27885201
-  - position: 0.12167911
+    velocity: -0.2789
+  - position: 0.1217
     time_from_start: 1207892860
-    velocity: -1.0148936
+    velocity: -1.0149
   - position: 0.0
     time_from_start: 1550000000
     velocity: 0.0
@@ -45,9 +45,9 @@ joints:
   - position: 0.8727
     time_from_start: 496000000
     velocity: 0.0
-  - position: 0.57393373
+  - position: 0.5739
     time_from_start: 910514290
-    velocity: -1.18539951
+    velocity: -1.1854
   - position: 0.0
     time_from_start: 1550000000
     velocity: 0.0
@@ -75,9 +75,9 @@ joints:
   - position: 0.288
     time_from_start: 0
     velocity: -0.3491
-  - position: 0.14629675
+  - position: 0.1463
     time_from_start: 409864290
-    velocity: -0.3117602
+    velocity: -0.3118
   - position: 0.0524
     time_from_start: 930000000
     velocity: 0.0
