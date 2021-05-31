@@ -297,8 +297,8 @@ bool RegionGrower::recursiveRegionGrower(
     float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
     // Process the invalid regions with the new tolerance
-    // This method makes a call to this method if the invalid region is large
-    // enough
+    // The processInvalidRegions method makes a call to the
+    // recursiveRegionGrower method if the invalid region is large enough
     success &= processInvalidRegions(large_tolerance, too_small_pointcloud,
         too_small_pointcloud_normals, too_small_regions, last_pointcloud,
         last_pointcloud_normals);
