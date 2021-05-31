@@ -239,7 +239,9 @@ void RegionGrower::setupRecursiveRegionGrower()
     region_grower.setMinClusterSize(min_valid_cluster_size);
     region_grower.setMaxClusterSize(max_valid_cluster_size);
     region_grower.setSearchMethod(tree);
-    region_grower.setNumberOfNeighbours(number_of_neighbours);
+    // Set the number of neighbours smaller then teh min valid cluster size to
+    // avoid combining small regions which are far apart
+    region_grower.setNumberOfNeighbours(min_valid_cluster_size - 1);
     region_grower.setCurvatureThreshold(curvature_threshold);
 }
 
