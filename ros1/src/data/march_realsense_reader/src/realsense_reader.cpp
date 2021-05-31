@@ -137,6 +137,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         gait_parameters->first_parameter =  ((double) rand() / (RAND_MAX));
         res.gait_parameters = *gait_parameters;
         res.success = true;
+        ROS_INFO_STREAM("Returning random result: \n" <<
+            "First parameter: " << gait_parameters->first_parameter );
         return;
     }
 

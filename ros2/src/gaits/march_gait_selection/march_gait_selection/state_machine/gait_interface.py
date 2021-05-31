@@ -56,6 +56,12 @@ class GaitInterface:
         """Return whether this gait can be scheduled early, default is False."""
         return False
 
+    @property
+    def can_be_started_early(self) -> bool:
+        """Return whether this gait can be started early, this means that the first
+        subgait will be delayed, with the first_subgait_delay, default is False."""
+        return False
+
     def start(self, current_time: Time) -> GaitUpdate:
         """Start the gait.
 

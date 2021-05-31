@@ -83,6 +83,9 @@ class RealSenseGait(SetpointsGait):
         return False
 
     @property
+    def can_be_started_early(self) -> bool:
+        return True
+    @property
     def starting_position(self) -> EdgePosition:
         return self._starting_position
 
@@ -250,13 +253,12 @@ class RealSenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
+        # Delay start until parameterisation is done
+        self._start_is_delayed = True
+        self._start_time = current_time + Duration(seconds=10)
 
         self._current_time = current_time
-        self._start_time = current_time
-        self._node.get_logger().info(
-            f"Times: current: {self._current_time}, start: {self._start_time}, "
-            f"end: {self._end_time}"
-        )
+
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
         service_call_succesful = self.make_realsense_service_call(
@@ -269,37 +271,24 @@ class RealSenseGait(SetpointsGait):
         gait_parameters_response = self.realsense_service_result
         if gait_parameters_response is None or not gait_parameters_response.success:
             self._node.get_logger().warn(
-                "No gait parameters were found, gait will not be started"
+                "No gait parameters were found, gait will not be started, "
+                f"{gait_parameters_response}"
             )
             return GaitUpdate.empty()
 
-        self._node.get_logger().info(
-            f"Gait parameters responded"
-        )
-        # self._update_time_stamps(self._current_subgait)
-        self._node.get_logger().info(
-            f"Times: current: {self._current_time}, start: {self._start_time}, "
-            f"end: {self._end_time}"
-        )
+
         self.update_parameters(gait_parameters_response.gait_parameters)
-        self._node.get_logger().info(
-            f"Done updating parameters"
-        )
+
         self.interpolate_subgaits_from_parameters()
 
-        self._reset()
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
+        if first_subgait_delay is None:
+            first_subgait_delay = Duration(0)
+        self._start_time = self._node.get_clock().now() + first_subgait_delay
         self._end_time = self._start_time + self._current_subgait.duration
 
-        self._node.get_logger().info(
-            f"Times: current: {self._current_time}, start: {self._start_time}, "
-            f"end: {self._end_time}"
-        )
-
-        self._start_is_delayed = False
-        # self._update_time_stamps(self._current_subgait)
-        return GaitUpdate.should_schedule(self._command_from_current_subgait())
+        return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
@@ -351,7 +340,8 @@ class RealSenseGait(SetpointsGait):
                 parameters=self.parameters,
                 use_foot_position=True,
             )
-        self.set_subgaits(new_subgaits)
+
+        self.set_subgaits(new_subgaits, self._node)
 
     def update_parameters(self, gait_parameters: GaitParameters) -> None:
         """

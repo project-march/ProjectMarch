@@ -371,7 +371,7 @@ class GaitStateMachine:
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            if self._current_gait.can_be_scheduled_early:
+            if self._current_gait.can_be_started_early:
                 gait_update = self._current_gait.start(
                     now, self._gait_selection._first_subgait_delay
                 )

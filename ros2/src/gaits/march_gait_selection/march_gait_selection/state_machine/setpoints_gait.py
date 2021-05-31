@@ -81,6 +81,10 @@ class SetpointsGait(GaitInterface, Gait):
     def can_be_scheduled_early(self) -> bool:
         return True
 
+    @property
+    def can_be_started_early(self) -> bool:
+        return True
+
     def _reset(self):
         """Reset all attributes of the gait"""
         self._current_subgait = None
@@ -151,10 +155,13 @@ class SetpointsGait(GaitInterface, Gait):
         """
         self._current_time = current_time
 
-        if self._start_is_delayed and self._current_time >= self._start_time:
-            # Reset start delayed flag and update first subgait
-            self._start_is_delayed = False
-            return GaitUpdate.subgait_updated()
+        if self._start_is_delayed:
+            if self._current_time >= self._start_time:
+                # Reset start delayed flag and update first subgait
+                self._start_is_delayed = False
+                return GaitUpdate.subgait_updated()
+            else:
+                return GaitUpdate.empty()
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
