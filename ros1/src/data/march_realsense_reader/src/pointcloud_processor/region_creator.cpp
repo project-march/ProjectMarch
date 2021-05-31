@@ -52,10 +52,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     // from the first result to improve it
     success &= setupRegionGrower();
     success &= extractRegions();
-    if (use_recursive_growing) {
-        if (!success) {
-            return false;
-        }
+    if (use_recursive_growing && success) {
         // reinitialize the region grower to start with an empty object at the
         // start of the recursive call
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();

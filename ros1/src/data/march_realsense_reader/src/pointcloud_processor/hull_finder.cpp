@@ -59,6 +59,7 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
         success &= getCHullFromRegion();
     }
 
+    ROS_DEBUG_STREAM("The number of hulls found is: " << hull_vector_->size());
     if (hull_vector_->size() != plane_coefficients_vector_->size()
         || hull_vector_->size() != polygon_vector_->size()) {
         ROS_WARN_STREAM("The hull vector does not have the same size as either "
