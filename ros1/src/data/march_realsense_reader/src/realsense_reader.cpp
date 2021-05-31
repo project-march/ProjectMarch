@@ -200,13 +200,16 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             "Done determining parameters, now publishing a marker array to "
             "/camera/foot_locations_marker_array. The color coding of the "
             "marker array is \n"
-            "blue: a foot location to try \n"
-            "yellow: a potential foot location which is outside the reachable "
+            "Blue: a foot location to try \n"
+            "Yellow: a potential foot location which is outside the reachable "
             "area \n"
-            "purple: a potential foot locations which is invalid for a gait "
+            "Purple: a potential foot locations which is invalid for a gait "
             "specific reason "
             "(i.e. lacking foot support or too far removed from the reachable "
-            "positions");
+            "positions \n"
+            "Red: Gait information such as end points of gaits \n"
+            "Green: A valid foot location \n"
+            "White: The optimal foot location");
         hull_parameter_determiner_publisher_.publish(
             parameter_determiner_->debug_marker_array);
     }

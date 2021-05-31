@@ -693,11 +693,8 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
         return false;
     }
     if (debugging_) {
-        std_msgs::ColorRGBA marker_color;
-        marker_color.r = 1.0;
-        marker_color.g = 0.0;
-        marker_color.b = 0.0;
-        marker_color.a = 0.7;
+        float a = 0.7;
+        std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
         geometry_msgs::Point marker_point;
         marker_point.x = most_desirable_foot_location_.x;
