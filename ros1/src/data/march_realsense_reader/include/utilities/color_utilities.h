@@ -38,18 +38,10 @@ std::map<std::string, std_msgs::ColorRGBA> COLOR_MAP
 
 // Initialize a std_msgs color from a name and an a value
 std_msgs::ColorRGBA colorRGBAInitNameA(
-    std::string color_name, const double a = 1.0)
+    const std::string& color_name, const double a = 1.0)
 {
     std_msgs::ColorRGBA color = COLOR_MAP[color_name];
     return colorRGBAInitRGBA(color.r, color.g, color.b, a);
-}
-
-// Initialize a geometry_msgs point from x y z coordinates
-void fillPointXYZ(geometry_msgs::Point& point, double x, double y, double z)
-{
-    point.z = x;
-    point.y = y;
-    point.z = z;
 }
 } // namespace color_utilities
 
