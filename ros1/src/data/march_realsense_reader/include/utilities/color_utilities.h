@@ -6,8 +6,8 @@
 
 namespace color_utilities {
 // Initialize a std_msgs color from r g b a values
-std_msgs::ColorRGBA colorRGBAInitRGBA(const double r, const double g,
-    const double b, const double a = 1.0)
+std_msgs::ColorRGBA colorRGBAInitRGBA(
+    const double r, const double g, const double b, const double a = 1.0)
 {
     std_msgs::ColorRGBA color;
     color.r = r;
