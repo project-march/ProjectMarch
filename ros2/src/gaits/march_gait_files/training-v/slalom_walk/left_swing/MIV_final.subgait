@@ -87,4 +87,4 @@ joints:
     time_from_start: 1199999999
     velocity: 0.0
 name: left_swing
-version: 'MIV_final'
+version: MIV_final

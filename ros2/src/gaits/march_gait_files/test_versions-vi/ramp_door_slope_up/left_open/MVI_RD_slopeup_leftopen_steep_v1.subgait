@@ -6,7 +6,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: -0.08726646
+  - position: -0.0873
     time_from_start: 327100000
     velocity: 0.0
   - position: 0.0
@@ -16,7 +16,7 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
-  - position: -0.08726646
+  - position: -0.0873
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -26,20 +26,20 @@ joints:
   - position: -0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 1.02974426
+  - position: 1.0297
     time_from_start: 1550000000
     velocity: 0.0
-  - position: 0.87266463
+  - position: 0.8727
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.65806279
+  - position: 1.6581
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 1.13446401
+  - position: 1.1345
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -53,21 +53,21 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.08726646
+  - position: -0.0873
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.87266463
+  - position: 0.8727
     time_from_start: 0
     velocity: 0.0
   - position: -0.1396
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 1.13446401
+  - position: 1.1345
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
+  - position: 0.0873
     time_from_start: 2500000000
     velocity: 0.0
 name: left_open
