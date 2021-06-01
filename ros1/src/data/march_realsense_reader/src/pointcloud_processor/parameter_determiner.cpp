@@ -693,13 +693,8 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
         return false;
     }
     if (debugging_) {
-        float a = 0.7;
-        std_msgs::ColorRGBA marker_color = color_utilities::RED;
-
-        geometry_msgs::Point marker_point;
-        marker_point.x = most_desirable_foot_location_.x;
-        marker_point.y = most_desirable_foot_location_.y;
-        marker_point.z = most_desirable_foot_location_.z;
+        std_msgs::ColorRGBA marker_color = output_utilities::RED;
+        geometry_msgs::Point marker_point = pointInitPCLPoint(most_desirable_foot_location_);
 
         gait_information_marker_list.points.push_back(marker_point);
         gait_information_marker_list.colors.push_back(marker_color);
@@ -756,12 +751,12 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         foot_locations_to_try->points[i].y = y_location;
 
         if (debugging_) {
-            geometry_msgs::Point marker_point;
+            geometry_msgs::Point marker_point = PointInitXYZ(x_location, y_location, 0);
             marker_point.x = x_location;
             marker_point.y = y_location;
             marker_point.z = 0;
 
-            std_msgs::ColorRGBA marker_color;
+            std_msgs::ColorRGBA marker_color = BLUE;
             marker_color.r = 0.0;
             marker_color.g = 0.0;
             marker_color.b = 1.0;
