@@ -224,8 +224,17 @@ class GaitStateMachine:
 
         :returns List of names, or empty list when a gait is executing.
         """
+        self._gait_selection.get_logger().info(f"Current state: {self._current_state}")
         if self._is_idle():
-            return self._gait_graph._idle_transitions[self._current_state]
+            res = []
+            for gait in self._gait_selection:
+                self._gait_selection.get_logger().info(f"{gait.name}\n"
+                                                       f"{gait.starting_position}\n"
+                                                       f"{gait.final_position}")
+                if gait.starting_position == self._current_state:
+                    res.append(gait.name)
+            self._gait_selection.get_logger().info(f"res: {res}")
+            return res
         else:
             return []
 
@@ -350,8 +359,6 @@ class GaitStateMachine:
             if (
                 gait is not None
                 and gait.starting_position == self._current_state
-                and gait_name
-                in self._gait_graph._idle_transitions[gait.starting_position]
             ):
                 self._current_state = gait_name
                 self._should_stop = False
@@ -506,101 +513,6 @@ class GaitStateMachine:
         self._gait_selection.get_logger().info(
             f"Transitioned to unknown"
         )
-    #
-    # def _generate_graph(self):
-    #     """During the initializing of the state machine, a graph of the
-    #     available gaits and idle positions that gives the valid transitions for
-    #     the exoskeleton. This is done based on the gaits starting point and end
-    #     point. These points are matched with the available idle positions.
-    #     The constructed transititions are validated and a home gait is generated
-    #     for every idle position."""
-    #     self._idle_transitions = {}
-    #     self._gait_transitions = {}
-    #     idle_positions = self._gait_selection.positions
-    #     for gait in self._gait_selection:
-    #         gait_name = gait.name
-    #         starting_position = gait.starting_position
-    #         from_idle_name = next(
-    #             (
-    #                 name
-    #                 for name, position in idle_positions.items()
-    #                 if position["joints"] == starting_position.values
-    #             ),
-    #             None,
-    #         )
-    #
-    #         if from_idle_name is None:
-    #             from_idle_name = "unknown_idle_{0}".format(len(idle_positions))
-    #             self._gait_selection.get_logger().warn(
-    #                 f"No named position given for starting position of gait `"
-    #                 f"{gait_name} creating {from_idle_name}. Starting position is"
-    #                 f" {starting_position}` of type {type(starting_position)}"
-    #                 f"with values {starting_position.values}"
-    #             )
-    #             idle_positions[from_idle_name] = {
-    #                 "gait_type": "",
-    #                 "joints": starting_position,
-    #             }
-    #         if from_idle_name in self._idle_transitions:
-    #             self._idle_transitions[from_idle_name].add(gait_name)
-    #         else:
-    #             self._idle_transitions[from_idle_name] = {gait_name}
-    #
-    #         final_position = gait.final_position
-    #         to_idle_name = next(
-    #             (
-    #                 name
-    #                 for name, position in idle_positions.items()
-    #                 if position["joints"] == final_position.values
-    #             ),
-    #             None,
-    #         )
-    #         if to_idle_name is None:
-    #             to_idle_name = "unknown_idle_{0}".format(len(idle_positions))
-    #             self._gait_selection.get_logger().warn(
-    #                 f"No named position given for final position of gait "
-    #                 f"{gait_name}`, creating {to_idle_name}. Final position is"
-    #                 f" {final_position}` of type {type(final_position)}"
-    #                 f"with values {final_position.values}"
-    #             )
-    #             idle_positions[to_idle_name] = {
-    #                 "gait_type": "",
-    #                 "joints": final_position,
-    #             }
-    #         self._gait_transitions[gait_name] = to_idle_name
-    #
-    #     self._validate_transitions()
-    #     self._generate_home_gaits(idle_positions)
-    #
-    # def _validate_transitions(self):
-    #     """Validates that every idle position has a transition after the
-    #     generating of the state machine graph in the initialization of the
-    #     state machine."""
-    #     for idle in self._gait_transitions.values():
-    #         if idle not in self._idle_transitions:
-    #             self._gait_selection.get_logger().warn(
-    #                 f"{idle} does not have transitions"
-    #             )
-    #
-    # def _generate_home_gaits(self, idle_positions):
-    #     """
-    #     Generates a home gait for all given idle positions. This allows to
-    #     transition from unknown to this idle position.
-    #     :param idle_positions:
-    #     """
-    #     self._idle_transitions[self.UNKNOWN] = set()
-    #     self._home_gaits = {}
-    #     for idle_name, position in idle_positions.items():
-    #         home_gait = HomeGait(idle_name, position["joints"], position["gait_type"])
-    #         home_gait_name = home_gait.name
-    #         self._home_gaits[home_gait_name] = home_gait
-    #         if home_gait_name in self._gait_transitions:
-    #             raise GaitStateMachineError(
-    #                 f"Gaits cannot have the same name as home gait `{home_gait_name}`"
-    #             )
-    #         self._gait_transitions[home_gait_name] = idle_name
-    #         self._idle_transitions[self.UNKNOWN].add(home_gait_name)
-    #
 
     @staticmethod
     def _add_callback(callbacks, cb):

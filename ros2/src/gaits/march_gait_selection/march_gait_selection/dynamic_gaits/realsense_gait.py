@@ -353,10 +353,7 @@ class RealSenseGait(SetpointsGait):
                 parameters=self.parameters,
                 use_foot_position=True,
             )
-        self._node.get_logger().info(f"End position was {self.final_position}")
         self.set_subgaits(new_subgaits)
-        self._node.get_logger().info(f"End position agter int"
-                                     f"erpolation is {self.final_position}")
 
     def update_parameters(self, gait_parameters: GaitParameters) -> None:
         """

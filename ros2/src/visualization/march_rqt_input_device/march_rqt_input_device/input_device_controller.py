@@ -136,6 +136,8 @@ class InputDeviceController:
             self.gait_future = self._possible_gait_client.call_async(
                 PossibleGaits.Request()
             )
+            # self.gait_future.add_done_callback(lambda future: self._node.get_logger(
+            # ).info(f"{future.result()}"))
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")

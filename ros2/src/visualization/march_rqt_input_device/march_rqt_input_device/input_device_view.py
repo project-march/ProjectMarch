@@ -125,8 +125,8 @@ class InputDeviceView(QWidget):
         Update the buttons if the possible gaits have changed.
         """
         new_possible_gaits = future.result().gaits
-        if set(self.possible_gaits) != set(new_possible_gaits):
-            self._update_gait_buttons(new_possible_gaits)
+        # if set(self.possible_gaits) != set(new_possible_gaits):
+        self._update_gait_buttons(new_possible_gaits)
 
     def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
         """

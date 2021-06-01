@@ -96,7 +96,6 @@ class Gait:
         }
         return cls(gait_name, subgaits, graph)
 
-
     @property
     def starting_position(self) -> EdgePosition:
         """Returns the starting position of all joints."""
@@ -106,7 +105,6 @@ class Gait:
     def final_position(self) -> EdgePosition:
         """Returns the position of all the joints after the gait has ended."""
         return self._final_position
-
 
     @staticmethod
     def load_subgait(
@@ -170,13 +168,13 @@ class Gait:
         :raises: NonValidGaitContent if the transition is not valid.
         """
         if isinstance(old_edge_position, StaticEdgePosition):
-            if old_edge_position != StaticEdgePosition(new_edge_position_values):
-                raise NonValidGaitContent(
-                    msg="The edge position of new version does not match to the "
-                        "static old version"
-                )
-            else:
-                return StaticEdgePosition(new_edge_position_values)
+            # if old_edge_position != StaticEdgePosition(new_edge_position_values):
+            #     raise NonValidGaitContent(
+            #         msg="The edge position of new version does not match to the "
+            #             "static old version"
+            #     )
+            # else:
+            return StaticEdgePosition(new_edge_position_values)
         elif isinstance(old_edge_position, UnknownEdgePosition):
             raise NonValidGaitContent(
                 msg="Gaits with unknown edge positions should not be updated"

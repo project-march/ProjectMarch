@@ -70,6 +70,12 @@ gaits:
   single_step_normal:
     left_close: MIV_final
     right_open: MIV_final
+  sit:
+    sit_down: MIV_final
+    sit_home: MIV_final
+  stand:
+    prepare_stand_up: MIV_final
+    stand_up: MIV_final
   stairs_down:
     left_close: MVI_stairsdown_leftclose_cybathlon_v2
     left_swing: MVI_stairsdown_leftswing_cybathlon_v2

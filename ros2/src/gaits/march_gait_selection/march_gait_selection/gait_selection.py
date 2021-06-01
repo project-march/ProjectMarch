@@ -226,7 +226,6 @@ class GaitSelection(Node):
         :param str gait_name: Name of the gait to change versions
         :param dict version_map: Mapping subgait names to versions
         """
-        self.get_logger().info(f"Setting gait versions, should be {version_map}")
         if gait_name not in self._gaits:
             raise GaitNameNotFound(gait_name)
 
@@ -241,7 +240,7 @@ class GaitSelection(Node):
         )
         self._gait_version_map[gait_name].update(version_map)
         self.get_logger().info(
-            f"Setting gait versions, is {self._gait_version_map[gait_name]}"
+            f"Setting gait versions successful: {self._gaits[gait_name]}"
         )
 
     def set_gait_versions_cb(self, request, response):

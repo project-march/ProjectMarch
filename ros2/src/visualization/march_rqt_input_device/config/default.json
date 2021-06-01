@@ -223,12 +223,6 @@
       },
       {
          "name":"ik_test_multiple_subgaits"
-      },
-      {
-         "name":"realsense_sit"
-      },
-      {
-         "name":"realsense_stand"
       }
    ],
    [
