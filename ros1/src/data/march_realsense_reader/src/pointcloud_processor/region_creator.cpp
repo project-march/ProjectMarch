@@ -71,7 +71,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         int too_small_regions_count = 0;
         int too_large_regions_count = 0;
         for (const PointCloud::Ptr& region : *points_vector_) {
-            if (region->size() != 0) {
+            if (region->size() > 0) {
                 length_vector.push_back(region->size());
                 if (region->size() > max_desired_cluster_size) {
                     ++too_large_regions_count;

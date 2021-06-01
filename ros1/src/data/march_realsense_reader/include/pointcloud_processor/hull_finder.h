@@ -109,6 +109,7 @@ protected:
     Hull::Ptr hull_;
     Polygon polygon_;
     Region region_;
+    bool output_plane_information;
 };
 
 #endif // MARCH_HULL_FINDER_H
