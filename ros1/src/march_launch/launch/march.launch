@@ -61,7 +61,7 @@
                   args="pub /march/error march_shared_msgs/Error '{header: {seq: 0, stamp: {secs: 0, nsecs: 0},  frame_id: &quot; &quot;},
                 error_message: &quot;Gait directory should never be used for non-simulation purposes.&quot;,
                 type: 0}'"
-                  output="screen"/>
+                  output="screen" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.directory_check.%p'"/>
         </group>
     </group>
 
@@ -90,6 +90,7 @@
             type="record"
             output="log"
             args="-a -q -o $(arg bag_prefix) -x '(.*)camera_(front|back)(.*)'"
+            launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.rosbag.%p'"
     />
 
     <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
@@ -131,7 +132,7 @@
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
         <include if="$(arg balance)"
                  file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
-        <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
+        <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.rviz.%p'"/>
     </group>
 
     <param name="robot_description"

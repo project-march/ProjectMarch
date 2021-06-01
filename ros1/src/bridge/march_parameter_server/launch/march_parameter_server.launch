@@ -1,3 +1,4 @@
 <launch>
-    <node name="parameter_server_node" pkg="march_parameter_server" type="march_parameter_server_node" output="screen"></node>
+    <env name="GMON_OUT_PREFIX" value="parameter_server_node" />
+    <node name="parameter_server_node" pkg="march_parameter_server" type="march_parameter_server_node" output="screen" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.march_parameter_server.%p'"></node>
 </launch>

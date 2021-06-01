@@ -1,3 +1,4 @@
+import cProfile
 from typing import List, Optional
 
 import rclpy
@@ -13,16 +14,18 @@ NODE_NAME = "robot_information_node"
 
 def main():
     """Starts the robot information node."""
-    rclpy.init()
+    with cProfile.Profile() as pr:
+        rclpy.init()
 
-    node = RobotInformation()
+        node = RobotInformation()
 
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
+        try:
+            rclpy.spin(node)
+        except KeyboardInterrupt:
+            pass
 
-    rclpy.shutdown()
+        rclpy.shutdown()
+    pr.dump_stats("march_robot_information.prof")
 
 
 class RobotInformation(Node):

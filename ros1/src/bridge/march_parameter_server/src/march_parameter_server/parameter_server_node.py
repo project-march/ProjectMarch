@@ -1,4 +1,5 @@
 import rospy
+import cProfile
 
 from march_shared_msgs.srv import (
     GetParamBool,
@@ -121,6 +122,9 @@ class ParameterServer:
 
 
 def main():
-    rospy.init_node("march_parameter_server_node")
-    ParameterServer()
-    rospy.spin()
+    with cProfile.Profile() as pr:
+        rospy.init_node("march_parameter_server_node")
+        ParameterServer()
+        rospy.spin()
+    pr.dump_stats("march_parameter_server")
+

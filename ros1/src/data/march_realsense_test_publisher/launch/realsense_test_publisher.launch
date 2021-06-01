@@ -1,5 +1,5 @@
 <launch>
     <node name="march_realsense_test_publisher_node" pkg="march_realsense_test_publisher"
           type="march_realsense_test_publisher_node"
-          output="screen"/>
+          output="screen" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.march_realsense_test_publisher.%p'"/>
 </launch>

@@ -24,6 +24,9 @@ catkin_package(
     CATKIN_DEPENDS march_shared_msgs roscpp
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 add_library(${PROJECT_NAME}
     src/com_controller_plugin.cpp
     src/obstacle_controller.cpp

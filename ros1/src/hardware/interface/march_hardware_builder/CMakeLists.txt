@@ -20,6 +20,9 @@ catkin_package(
     LIBRARIES ${PROJECT_NAME}
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
     # Add compiler flags for coverage instrumentation before defining any targets

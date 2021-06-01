@@ -1,5 +1,6 @@
 """The module updater.py contains the DiagnosticUpdater Node."""
 
+import cProfile
 import diagnostic_updater
 import rclpy
 from march_utility.utilities.node_utils import get_joint_names
@@ -61,14 +62,16 @@ class DiagnosticUpdater(Node):
 
 def main():
     """Start the DiagnosticUpdater Node and the update timer."""
-    rclpy.init()
+    with cProfile.Profile() as pr:
+        rclpy.init()
 
-    node = DiagnosticUpdater()
-    node.start()
+        node = DiagnosticUpdater()
+        node.start()
 
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
+        try:
+            rclpy.spin(node)
+        except KeyboardInterrupt:
+            pass
+    pr.dump_stats("march_rqt_robot_monitor")
 
     rclpy.shutdown()

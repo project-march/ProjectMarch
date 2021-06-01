@@ -20,6 +20,9 @@ catkin_package(
     ${PROJECT_NAME}-extras.cmake
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
 include_directories(

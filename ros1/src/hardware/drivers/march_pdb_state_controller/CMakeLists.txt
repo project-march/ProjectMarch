@@ -30,6 +30,9 @@ catkin_package(
     sensor_msgs
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 include_directories(include SYSTEM ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}

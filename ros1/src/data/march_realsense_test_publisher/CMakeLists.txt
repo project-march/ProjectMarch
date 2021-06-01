@@ -23,6 +23,9 @@ catkin_package(
     march_shared_msgs
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}

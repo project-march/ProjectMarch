@@ -3,7 +3,7 @@
     <arg name="linear" default="true" doc="Whether to linearize the change in PID values"/>
     <arg name="slope" default="100.0" doc="The slope of the linear change in PID values. Only used when 'linear' is true"/>
 
-    <node name="gain_scheduling_node" pkg="march_gain_scheduling" type="march_gain_scheduling_node" output="screen">
+    <node name="gain_scheduling_node" pkg="march_gain_scheduling" type="march_gain_scheduling_node" output="screen" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.march_gain_scheduling.%p'">
         <rosparam command="load" file="$(find march_gain_scheduling)/config/$(arg configuration).yaml"/>
         <param name="linearize_gain_scheduling" type="bool" value="$(arg linear)"/>
         <param name="linear_slope" type="double" value="$(arg slope)"/>

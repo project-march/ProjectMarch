@@ -5,6 +5,7 @@
   <rosparam file="$(find march_moveit)/config/ros_controllers.yaml" command="load"/>
 
   <!-- Load the controllers -->
+  <env name="GMON_OUT_PREFIX" value="controller_spawner" />
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
     output="screen" args=""/>
 

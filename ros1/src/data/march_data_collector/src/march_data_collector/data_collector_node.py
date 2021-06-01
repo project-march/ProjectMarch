@@ -1,3 +1,4 @@
+import cProfile
 import errno
 from math import pi
 import socket
@@ -222,23 +223,25 @@ class DataCollectorNode(object):
 
 
 def main():
-    rospy.init_node("data_collector", anonymous=True)
-    try:
-        robot = URDF.from_parameter_server("/robot_description")
-    except KeyError:
-        rospy.logerr("Cannot retrieve URDF from parameter server.")
-        sys.exit()
-    tf_buffer = tf2_ros.Buffer()
-    tf2_ros.TransformListener(tf_buffer)
-    center_of_mass_calculator = CoMCalculator(robot, tf_buffer)
-    # key is the swing foot and item is the static foot
-    feet = {"foot_left": "foot_right", "foot_right": "foot_left"}
-    cp_calculators = [
-        CPCalculator(tf_buffer, swing_foot, static_foot)
-        for swing_foot, static_foot in feet.items()
-    ]
+    with cProfile.Profile() as pr:
+        rospy.init_node("data_collector", anonymous=True)
+        try:
+            robot = URDF.from_parameter_server("/robot_description")
+        except KeyError:
+            rospy.logerr("Cannot retrieve URDF from parameter server.")
+            sys.exit()
+        tf_buffer = tf2_ros.Buffer()
+        tf2_ros.TransformListener(tf_buffer)
+        center_of_mass_calculator = CoMCalculator(robot, tf_buffer)
+        # key is the swing foot and item is the static foot
+        feet = {"foot_left": "foot_right", "foot_right": "foot_left"}
+        cp_calculators = [
+            CPCalculator(tf_buffer, swing_foot, static_foot)
+            for swing_foot, static_foot in feet.items()
+        ]
 
-    data_collector_node = DataCollectorNode(
-        center_of_mass_calculator, cp_calculators, tf_buffer, feet.keys()
-    )
-    data_collector_node.run()
+        data_collector_node = DataCollectorNode(
+            center_of_mass_calculator, cp_calculators, tf_buffer, feet.keys()
+        )
+        data_collector_node.run()
+    pr.dump_stats("march_data_collector")

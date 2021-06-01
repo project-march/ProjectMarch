@@ -116,7 +116,7 @@
             <arg name="allow_no_texture_points"  value="$(arg allow_no_texture_points)"/>
         </include>
 
-        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.imu_filter_node.%p'">
             <param name="use_mag" type="bool" value="false" />
             <param name="publish_tf" type="bool" value="false" />
             <param name="_world_frame" type="string" value="nwu" />

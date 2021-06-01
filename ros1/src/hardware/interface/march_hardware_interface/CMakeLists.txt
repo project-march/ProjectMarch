@@ -33,6 +33,9 @@ catkin_package(
     urdf
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 # needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
 # in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
 set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")

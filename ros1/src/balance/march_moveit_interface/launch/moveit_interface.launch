@@ -1,4 +1,5 @@
 <launch>
+    <env name="GMON_OUT_PREFIX" value="march_moveit_interface" />
     <node name="march_moveit_interface" pkg="march_moveit_interface"
            type="march_moveit_interface" output="screen"/>
 </launch>

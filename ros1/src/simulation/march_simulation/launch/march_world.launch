@@ -22,10 +22,11 @@
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
               respawn="false" output="screen"
-              args="spawn controller/trajectory joint_state_controller"/>
+              args="spawn controller/trajectory joint_state_controller"
+              launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.controller_manager.%p'"/>
 
-        <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
-        <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
+        <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.upload_joint_names.%p'"/>
+        <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.set_obstacle_node.%p'"/>
 
     </group>
 
@@ -42,7 +43,8 @@
 
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
-          args="-urdf -model march -param robot_description"/>
+          args="-urdf -model march -param robot_description"
+          launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.urdf_spawner.%p'"/>
     </group>
 
 
@@ -53,6 +55,6 @@
 
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
         <node name="model_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
-          args="-urdf -model $(arg obstacle) -param model_description"/>
+          args="-urdf -model $(arg obstacle) -param model_description" launch-prefix="valgrind --tool=callgrind --callgrind-out-file='callgrind.model_spawner.%p'"/>
     </group>
 </launch>

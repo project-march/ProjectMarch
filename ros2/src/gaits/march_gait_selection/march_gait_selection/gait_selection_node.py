@@ -1,3 +1,4 @@
+import cProfile
 import signal
 import sys
 
@@ -15,19 +16,21 @@ def sys_exit(*_):
 
 def main():
     """ Starts up the gait selection node with the state machine and scheduler. """
-    rclpy.init()
+    with cProfile.Profile() as pr:
+        rclpy.init()
 
-    gait_selection = GaitSelection()
-    scheduler = TrajectoryScheduler(gait_selection)
-    gait_state_machine = GaitStateMachine(gait_selection, scheduler)
-    gait_state_machine.run()
-    executor = MultiThreadedExecutor()
+        gait_selection = GaitSelection()
+        scheduler = TrajectoryScheduler(gait_selection)
+        gait_state_machine = GaitStateMachine(gait_selection, scheduler)
+        gait_state_machine.run()
+        executor = MultiThreadedExecutor()
 
-    signal.signal(signal.SIGTERM, sys_exit)
+        signal.signal(signal.SIGTERM, sys_exit)
 
-    try:
-        rclpy.spin(gait_selection, executor)
-    except KeyboardInterrupt:
-        pass
+        try:
+            rclpy.spin(gait_selection, executor)
+        except KeyboardInterrupt:
+            pass
 
-    rclpy.shutdown()
+        rclpy.shutdown()
+    pr.dump_stats("march_gait_selection.prof")

@@ -35,6 +35,9 @@ catkin_package(
     std_msgs
 )
 
+add_compile_options(-pg)
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
 ################
 # ACADO SOLVER #
 ################
