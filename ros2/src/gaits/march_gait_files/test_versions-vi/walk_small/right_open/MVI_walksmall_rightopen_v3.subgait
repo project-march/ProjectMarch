@@ -1,4 +1,4 @@
-description: 'The MVI high rights open with the v2 HAA movements. '
+description: The right open subgait for the small version of MVI_walk_v3
 duration: 1500000000
 gait_type: walk_like
 joints:
@@ -8,17 +8,17 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 1500000000
-    velocity: 0.0
+    velocity: -0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0875
-    time_from_start: 527538460
-    velocity: 0.0
-  - position: -0.0873
-    time_from_start: 1153846150
-    velocity: 0.0
+  - position: -0.0524
+    time_from_start: 527499999
+    velocity: -0.1222
+  - position: -0.0524
+    time_from_start: 1150000000
+    velocity: 0.1222
   - position: 0.0
     time_from_start: 1500000000
     velocity: -0.0
@@ -26,7 +26,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0785
+  - position: -0.1667
     time_from_start: 1500000000
     velocity: 0.0
   left_knee:
@@ -43,20 +43,14 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0663
-    time_from_start: 288500000
-    velocity: 0.3025
-  - position: 0.0
-    time_from_start: 717700000
-    velocity: 0.0
   - position: 0.0
     time_from_start: 1500000000
-    velocity: 0.0
+    velocity: -0.0
   right_hip_aa:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: 0.1047
+  - position: 0.0524
     time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
@@ -66,24 +60,24 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.8409
-    time_from_start: 885145630
-    velocity: 0.121
-  - position: 0.3752
+  - position: 0.6109
+    time_from_start: 900000000
+    velocity: 0.1396
+  - position: 0.192
     time_from_start: 1500000000
-    velocity: -0.32
+    velocity: -0.3491
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.3963
-    time_from_start: 630000000
+  - position: 1.0472
+    time_from_start: 800000000
     velocity: 0.0
-  - position: 0.0969
-    time_from_start: 1350000000
+  - position: 1.0472
+    time_from_start: 900000000
     velocity: 0.0
   - position: 0.1396
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MVI_walk_rightopen_haa_adpf_high_v2
+version: MVI_walksmall_rightopen_v3
