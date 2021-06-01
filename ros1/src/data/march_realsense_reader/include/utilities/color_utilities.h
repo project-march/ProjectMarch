@@ -19,21 +19,21 @@ std_msgs::ColorRGBA colorRGBAInitRGBA(
 
 // Some commonly used colors which can be used as
 // std_msgs::ColorRGBA mycolor = YELLOW;
-std_msgs::ColorRGBA YELLOW = colorRGBAInitRGBA(1.0, 1.0, 0.0);
+std_msgs::ColorRGBA YELLOW = colorRGBAInitRGBA(/*r=*/1.0, /*g=*/1.0, /*b=*/0.0);
 
-std_msgs::ColorRGBA WHITE = colorRGBAInitRGBA(1.0, 1.0, 1.0);
+std_msgs::ColorRGBA WHITE = colorRGBAInitRGBA(/*r=*/1.0, /*g=*/1.0, /*b=*/1.0);
 
-std_msgs::ColorRGBA PURPLE = colorRGBAInitRGBA(1.0, 0.0, 1.0);
+std_msgs::ColorRGBA PURPLE = colorRGBAInitRGBA(/*r=*/1.0, /*g=*/0.0, /*b=*/1.0);
 
-std_msgs::ColorRGBA GREEN = colorRGBAInitRGBA(0.0, 1.0, 0.0);
+std_msgs::ColorRGBA GREEN = colorRGBAInitRGBA(/*r=*/0.0, /*g=*/1.0, /*b=*/0.0);
 
-std_msgs::ColorRGBA RED = colorRGBAInitRGBA(1.0, 0.0, 0.0);
+std_msgs::ColorRGBA RED = colorRGBAInitRGBA(/*r=*/1.0, /*g=*/0.0, /*b=*/0.0);
 
-std_msgs::ColorRGBA BLUE = colorRGBAInitRGBA(0.0, 0.0, 1.0);
+std_msgs::ColorRGBA BLUE = colorRGBAInitRGBA(/*r=*/0.0, /*g=*/0.0, /*b=*/1.0);
 
 std::map<std::string, std_msgs::ColorRGBA> COLOR_MAP
-    = { { "yellow", YELLOW }, { "white", WHITE }, { "purple", PURPLE },
-          { "green", GREEN }, { "red", RED }, { "blue", BLUE } };
+    = { { /*x=*/"yellow", YELLOW }, { /*x=*/"white", WHITE }, { /*x=*/"purple", PURPLE },
+          { /*x=*/"green", GREEN }, { /*x=*/"red", RED }, { /*x=*/"blue", BLUE } };
 
 // Initialize a std_msgs color from a name and an a value
 std_msgs::ColorRGBA colorRGBAInitNameA(
