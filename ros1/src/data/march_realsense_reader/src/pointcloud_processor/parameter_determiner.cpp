@@ -1,7 +1,7 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
 #include "pointcloud_processor/parameter_determiner.h"
-#include "utilities/debug_utilities.h"
+#include "utilities/color_utilities.h"
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_category_utilities.h"
@@ -197,7 +197,7 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 
 void HullParameterDeterminer::addDebugGaitInformation()
 {
-    std_msgs::ColorRGBA marker_color = debug_utilities::RED;
+    std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up: {
@@ -372,7 +372,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         marker_point.x = optimal_foot_location.x;
         marker_point.y = optimal_foot_location.x;
         marker_point.z = optimal_foot_location.z;
-        std_msgs::ColorRGBA marker_color = debug_utilities::WHITE;
+        std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
 
         optimal_foot_location_marker.points.push_back(marker_point);
         optimal_foot_location_marker.colors.push_back(marker_color);
@@ -524,11 +524,11 @@ bool HullParameterDeterminer::isValidLocation(
                         && possible_foot_location.x > max_x_stairs
                         && possible_foot_location.z > min_z_stairs
                         && possible_foot_location.z < max_z_stairs)) {
-                    marker_color = debug_utilities::YELLOW;
+                    marker_color = color_utilities::YELLOW;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
-                    marker_color = debug_utilities::PURPLE;
+                    marker_color = color_utilities::PURPLE;
                 } else {
-                    marker_color = debug_utilities::RED;
+                    marker_color = color_utilities::RED;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
@@ -563,11 +563,11 @@ bool HullParameterDeterminer::isValidLocation(
                 std_msgs::ColorRGBA marker_color;
                 if (!(projected_point.x < x_steep
                         && projected_point.x > x_flat)) {
-                    marker_color = debug_utilities::YELLOW;
+                    marker_color = color_utilities::YELLOW;
                 } else if (!(distance < max_distance_to_line)) {
-                    marker_color = debug_utilities::PURPLE;
+                    marker_color = color_utilities::PURPLE;
                 } else {
-                    marker_color = debug_utilities::RED;
+                    marker_color = color_utilities::RED;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
@@ -665,7 +665,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
         return false;
     }
     if (debugging_) {
-        std_msgs::ColorRGBA marker_color = debug_utilities::RED;
+        std_msgs::ColorRGBA marker_color = color_utilities::RED;
         geometry_msgs::Point marker_point;
         marker_point.x = most_desirable_foot_location_.x;
         marker_point.y = most_desirable_foot_location_.y;
@@ -731,7 +731,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
             marker_point.y = y_location;
             marker_point.z = 0;
 
-            std_msgs::ColorRGBA marker_color = debug_utilities::BLUE;
+            std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
 
             foot_locations_to_try_marker_list.points.push_back(marker_point);
             foot_locations_to_try_marker_list.colors.push_back(marker_color);

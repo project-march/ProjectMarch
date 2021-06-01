@@ -1,10 +1,10 @@
-#ifndef MARCH_REALSENSE_READER_DEBUG_UTILITIES_H
-#define MARCH_REALSENSE_READER_DEBUG_UTILITIES_H
+#ifndef MARCH_REALSENSE_READER_COLOR_UTILITIES_H
+#define MARCH_REALSENSE_READER_COLOR_UTILITIES_H
 
 #include <map>
 #include <visualization_msgs/MarkerArray.h>
 
-namespace debug_utilities {
+namespace color_utilities {
 // Initialize a std_msgs color from r g b a values
 std_msgs::ColorRGBA colorRGBAInitRGBA(const double r, const double g,
     const double b, const double a = 1.0)
@@ -50,6 +50,6 @@ void fillPointXYZ(geometry_msgs::Point& point, double x, double y, double z)
     point.y = y;
     point.z = z;
 }
-} // namespace debug_utilities
+} // namespace color_utilities
 
-#endif // MARCH_REALSENSE_READER_DEBUG_UTILITIES_H
+#endif // MARCH_REALSENSE_READER_COLOR_UTILITIES_H
