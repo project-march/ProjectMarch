@@ -237,10 +237,10 @@ positions:
   sit:
     gait_type: walk_like
     joints:
-      left_hip_fe: 1.5708
-      left_knee: 1.7453
-      right_hip_fe: 1.5708
-      right_knee: 1.7453
+      left_hip_fe: 1.4835
+      left_knee: 1.4835
+      right_hip_fe: 1.4835
+      right_knee: 1.4835
   stand:
     gait_type: walk_like
     joints:
