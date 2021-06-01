@@ -31,38 +31,38 @@ joints:
     time_from_start: 2500000000
     velocity: -0.0
   left_hip_fe:
-  - position: -0.16667894356545848
+  - position: -0.1667
     time_from_start: 0
     velocity: 0.0
-  - position: 0.488692190558
+  - position: 0.4887
     time_from_start: 750000000
-    velocity: 0.200712863979
-  - position: 0.488692190558
+    velocity: 0.2007
+  - position: 0.4887
     time_from_start: 1250000000
-    velocity: -0.349065850399
-  - position: -0.16667894356545848
+    velocity: -0.3491
+  - position: -0.1667
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
-  - position: 0.13962634015954636
+  - position: 0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 0.872664625997
+  - position: 0.8727
     time_from_start: 525000000
     velocity: 0.0
-  - position: 0.0968657734857
+  - position: 0.0969
     time_from_start: 1125000000
     velocity: 0.0
-  - position: 0.13962634016
+  - position: 0.1396
     time_from_start: 1250000000
-    velocity: 0.349065850399
-  - position: 0.209439510239
+    velocity: 0.3491
+  - position: 0.2094
     time_from_start: 1500000000
     velocity: 0.0
-  - position: 0.13962634016
+  - position: 0.1396
     time_from_start: 2100000000
     velocity: 0.0
-  - position: 0.13962634015954636
+  - position: 0.1396
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -92,39 +92,39 @@ joints:
     time_from_start: 2500000000
     velocity: -0.0
   right_hip_fe:
-  - position: 0.4886921905584123
+  - position: 0.4887
     time_from_start: 0
-    velocity: -0.3490658503988659
-  - position: -0.166678943565
+    velocity: -0.3491
+  - position: -0.1667
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.488692190558
+  - position: 0.4887
     time_from_start: 2000000000
-    velocity: 0.200712863979
-  - position: 0.4886921905584123
+    velocity: 0.2007
+  - position: 0.4887
     time_from_start: 2500000000
-    velocity: -0.3490658503988659
+    velocity: -0.3491
   right_knee:
-  - position: 0.13962634015954636
+  - position: 0.1396
     time_from_start: 0
-    velocity: 0.3490658503988659
-  - position: 0.209439510239
+    velocity: 0.3491
+  - position: 0.2094
     time_from_start: 250000000
     velocity: 0.0
-  - position: 0.13962634016
+  - position: 0.1396
     time_from_start: 850000000
     velocity: 0.0
-  - position: 0.13962634016
+  - position: 0.1396
     time_from_start: 1250000000
     velocity: 0.0
-  - position: 0.872664625997
+  - position: 0.8727
     time_from_start: 1775000000
     velocity: 0.0
-  - position: 0.0968657734857
+  - position: 0.0969
     time_from_start: 2375000000
     velocity: 0.0
-  - position: 0.13962634015954636
+  - position: 0.1396
     time_from_start: 2500000000
-    velocity: 0.3490658503988659
+    velocity: 0.3491
 name: left_swing
 version: MIII_tweaked_longer_hip_flexion_total
