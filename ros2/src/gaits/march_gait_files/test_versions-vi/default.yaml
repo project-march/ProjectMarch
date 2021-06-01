@@ -31,11 +31,11 @@ gaits:
     sit_down: MVI_sit_down_high_v1
     sit_home: MVI_sit_home_high_v1
   sit:
-    sit_down: MVI_sit_down_v2
-    sit_home: MVI_sit_home_v2
+    sit_down: MVI_sit_down_v1
+    sit_home: MVI_sit_home_v1
   stand:
-    prepare_stand_up: MVI_prepare_stand_up_v2
-    stand_up: MVI_stand_up_v2
+    prepare_stand_up: MVI_prepare_stand_up_v1
+    stand_up: MVI_stand_up_v1
   realsense_stairs_up_single_step:
     left_close: MVI_stairsup_leftclose_low_undeep
     right_open: MVI_stairsup_rightopen_low_undeep
@@ -324,7 +324,7 @@ positions:
       left_hip_fe: 1.4835
       left_knee: 1.4835
       right_ankle: 0.0
-      right_hip_aa: 0.0349
+      right_hip_aa: 0.0
       right_hip_fe: 1.4835
       right_knee: 1.4835
   stand:
