@@ -29,6 +29,7 @@ HullFinder::HullFinder(bool debugging)
 // Construct a basic CHullFinder class
 CHullFinder::CHullFinder(bool debugging)
     : HullFinder(debugging)
+    , output_plane_information(false)
 {
 }
 
