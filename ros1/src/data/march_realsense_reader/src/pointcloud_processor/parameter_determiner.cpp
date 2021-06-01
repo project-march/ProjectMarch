@@ -196,50 +196,34 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 
 void HullParameterDeterminer::addDebugGaitInformation()
 {
-    std_msgs::ColorRGBA marker_color;
-    marker_color.r = 1.0;
-    marker_color.g = 0.0;
-    marker_color.b = 0.0;
-    marker_color.a = 0.7;
+    std_msgs::ColorRGBA marker_color = RED;
 
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up: {
-            geometry_msgs::Point marker_point;
-            marker_point.y = y_location;
-
-            marker_point.x = min_x_stairs;
-            marker_point.z = min_z_stairs;
+            geometry_msgs::Point marker_point = PointInitXYZ(min_x_stairs, y_location, min_z_stairs);
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
-            marker_point.x = max_x_stairs;
-            marker_point.z = min_z_stairs;
+            geometry_msgs::Point marker_point = PointInitXYZ(max_x_stairs, y_location, min_z_stairs);
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
-            marker_point.x = min_x_stairs;
-            marker_point.z = max_z_stairs;
+            geometry_msgs::Point marker_point = PointInitXYZ(min_x_stairs, y_location, max_z_stairs);
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
-            marker_point.x = max_x_stairs;
-            marker_point.z = max_z_stairs;
+            geometry_msgs::Point marker_point = PointInitXYZ(max_x_stairs, y_location, max_z_stairs);
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            geometry_msgs::Point marker_point;
-            marker_point.y = y_location;
-
-            marker_point.x = x_flat;
-            marker_point.z = z_flat;
+            geometry_msgs::Point marker_point = PointInitXYZ(x_flat, y_location, z_flat);
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
-
-            marker_point.x = x_steep;
-            marker_point.z = z_steep;
+            
+            geometry_msgs::Point marker_point = PointInitXYZ(x_steep, y_location, z_steep);
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
@@ -371,16 +355,8 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     success &= getOptimalFootLocationFromPossibleLocations();
 
     if (debugging_) {
-        geometry_msgs::Point marker_point;
-        marker_point.x = optimal_foot_location.x;
-        marker_point.y = optimal_foot_location.y;
-        marker_point.z = optimal_foot_location.z;
-
-        std_msgs::ColorRGBA marker_color;
-        marker_color.r = 1.0;
-        marker_color.g = 1.0;
-        marker_color.b = 1.0;
-        marker_color.a = 1.0;
+        geometry_msgs::Point marker_point = PointInitPCLPoint(optimal_foot_location);
+        std_msgs::ColorRGBA marker_color = WHITE
 
         optimal_foot_location_marker.points.push_back(marker_point);
         optimal_foot_location_marker.colors.push_back(marker_color);
@@ -522,31 +498,18 @@ bool HullParameterDeterminer::isValidLocation(
         case RealSenseCategory::stairs_up: {
 
             if (debugging_) {
-                geometry_msgs::Point marker_point;
-
-                marker_point.x = possible_foot_location.x;
-                marker_point.y = possible_foot_location.y;
-                marker_point.z = possible_foot_location.z;
+                geometry_msgs::Point marker_point = PointInitPCLPoint(possible_foot_location);
 
                 std_msgs::ColorRGBA marker_color;
                 if (!(possible_foot_location.x < min_x_stairs
                         && possible_foot_location.x > max_x_stairs
                         && possible_foot_location.z > min_z_stairs
                         && possible_foot_location.z < max_z_stairs)) {
-                    marker_color.r = 1.0;
-                    marker_color.g = 1.0;
-                    marker_color.b = 0.0;
-                    marker_color.a = 0.7;
+                    marker_color = YELLOW;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
-                    marker_color.r = 1.0;
-                    marker_color.g = 0.0;
-                    marker_color.b = 1.0;
-                    marker_color.a = 0.7;
+                    marker_color = PURPLE;
                 } else {
-                    marker_color.r = 0.0;
-                    marker_color.g = 1.0;
-                    marker_color.b = 0.0;
-                    marker_color.a = 0.7;
+                    marker_color = RED;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
@@ -573,29 +536,16 @@ bool HullParameterDeterminer::isValidLocation(
                 projected_point, possible_foot_location);
 
             if (debugging_) {
-                geometry_msgs::Point marker_point;
-
-                marker_point.x = possible_foot_location.x;
-                marker_point.y = possible_foot_location.y;
-                marker_point.z = possible_foot_location.z;
+                geometry_msgs::Point marker_point = PointInitPCLPoint(possible_foot_location);
 
                 std_msgs::ColorRGBA marker_color;
                 if (!(projected_point.x < x_steep
                         && projected_point.x > x_flat)) {
-                    marker_color.r = 1.0;
-                    marker_color.g = 1.0;
-                    marker_color.b = 0.0;
-                    marker_color.a = 0.7;
+                    marker_color = YELLOW;
                 } else if (!(distance < max_distance_to_line)) {
-                    marker_color.r = 1.0;
-                    marker_color.g = 0.0;
-                    marker_color.b = 1.0;
-                    marker_color.a = 0.7;
+                    marker_color = PURPLE;
                 } else {
-                    marker_color.r = 0.0;
-                    marker_color.g = 1.0;
-                    marker_color.b = 0.0;
-                    marker_color.a = 0.7;
+                    marker_color = RED;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
@@ -752,15 +702,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
 
         if (debugging_) {
             geometry_msgs::Point marker_point = PointInitXYZ(x_location, y_location, 0);
-            marker_point.x = x_location;
-            marker_point.y = y_location;
-            marker_point.z = 0;
-
             std_msgs::ColorRGBA marker_color = BLUE;
-            marker_color.r = 0.0;
-            marker_color.g = 0.0;
-            marker_color.b = 1.0;
-            marker_color.a = 0.7;
 
             foot_locations_to_try_marker_list.points.push_back(marker_point);
             foot_locations_to_try_marker_list.colors.push_back(marker_color);
