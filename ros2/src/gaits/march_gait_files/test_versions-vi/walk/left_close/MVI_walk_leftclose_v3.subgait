@@ -1,42 +1,9 @@
-description: 'The MVI high close step with the v2 HAA movements. '
+description: MVI ankle gait version 1 with HAA version 2 movement included and changed
+  for the march6 robot
 duration: 1500000000
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: 0.0
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 346153850
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 1500000000
-    velocity: 0.0
-  left_hip_aa:
-  - position: 0.0
-    time_from_start: 0
-    velocity: 0.0
-  - position: -0.0611
-    time_from_start: 346153850
-    velocity: 0.0
-  - position: 0.0349
-    time_from_start: 1500000000
-    velocity: 0.0
-  left_hip_fe:
-  - position: 0.3752
-    time_from_start: 0
-    velocity: -0.32
-  - position: 0.0
-    time_from_start: 1500000000
-    velocity: 0.0
-  left_knee:
-  - position: 0.1396
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 1500000000
-    velocity: 0.0
-  right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
@@ -52,26 +19,63 @@ joints:
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
-  right_hip_aa:
+  left_hip_aa:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.0611
     time_from_start: 708461540
     velocity: 0.0
   - position: 0.0349
     time_from_start: 1500000000
     velocity: 0.0
-  right_hip_fe:
-  - position: -0.0785
+  left_hip_fe:
+  - position: -0.1658
     time_from_start: 0
     velocity: 0.0
-  - position: 0.6109
+  - position: 0.4712
     time_from_start: 600000000
     velocity: 0.121
-  - position: 0.2618
-    time_from_start: 1095461540
-    velocity: -0.9568
+  - position: 0.4538
+    time_from_start: 857700000
+    velocity: -0.6297
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 480000000
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 646000000
+    velocity: -0.8394
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0611
+    time_from_start: 346153850
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.3142
+    time_from_start: 0
+    velocity: -0.2773
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
@@ -79,11 +83,8 @@ joints:
   - position: 0.1396
     time_from_start: 0
     velocity: 0.0
-  - position: 1.2217
-    time_from_start: 480000000
-    velocity: 0.0
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
-name: right_close
-version: MVI_walk_rightclose_haa_adpf_high_v2
+name: left_close
+version: MVI_walk_leftclose_v3
