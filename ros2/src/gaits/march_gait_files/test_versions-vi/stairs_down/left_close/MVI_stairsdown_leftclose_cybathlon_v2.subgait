@@ -1,5 +1,4 @@
-description: Improved v1 by removing ankle flexion and better HAA movements. Made
-  the steps smaller by less hip flexion.
+description: Changed the HAA and ADPF movement with the sedygas stairsdown movements.
 duration: 3750000000
 gait_type: stairs_like
 joints:
@@ -24,9 +23,9 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.80285146
+  - position: 0.6283
     time_from_start: 0
-    velocity: 0.0
+    velocity: 0.2618
   - position: 1.06465084
     time_from_start: 2000000000
     velocity: 0.0
@@ -34,10 +33,10 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_knee:
-  - position: 1.69296937
+  - position: 1.44860059
     time_from_start: 0
     velocity: 0.0
-  - position: 1.74532925
+  - position: 1.57079633
     time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0
@@ -58,7 +57,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.42760567
+  - position: 0.28972466
     time_from_start: 0
     velocity: 0.0
   - position: 0.23413766
