@@ -15,6 +15,7 @@ add_message_files(
     AfterLimitJointCommand.msg
     Alive.msg
     CurrentGait.msg
+    CurrentIPDState.msg
     CurrentState.msg
     Error.msg
     GaitInstruction.msg
