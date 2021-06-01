@@ -341,6 +341,7 @@ class SetpointsGait(GaitInterface, Gait):
                 "Cannot change subgait version while gait is being executed"
             )
 
+
     def _make_transition_subgait(self) -> TransitionSubgait:
         """
         Creates the transition subgait from the next subgait to the

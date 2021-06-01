@@ -341,6 +341,12 @@ class GaitStateMachine:
             gait_name = self._input.gait_name()
             self._gait_selection.get_logger().info(f"Requested gait `{gait_name}`")
             gait = self._gait_selection._gaits.get(gait_name)
+            self._gait_selection.get_logger().info(f"Current state: "
+                                                   f"{type(self._current_state)} - "
+                                                   f" {self._current_state}")
+            self._gait_selection.get_logger().info(f"Gait starting position: "
+                                                   f"{type(gait.starting_position)} - "
+                                                   f"{gait.starting_position}")
             if (
                 gait is not None
                 and gait.starting_position == self._current_state

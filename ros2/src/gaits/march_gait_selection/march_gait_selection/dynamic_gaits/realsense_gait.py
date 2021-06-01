@@ -1,5 +1,5 @@
 from threading import Event
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
@@ -80,17 +80,26 @@ class RealSenseGait(SetpointsGait):
 
     @property
     def can_be_scheduled_early(self) -> bool:
+        """
+        Whether a subgait can be scheduled early, this is not possible for the realsense
+        gait, since this will later have a service call to determine the next subgait.
+        """
         return False
 
     @property
     def can_be_started_early(self) -> bool:
+        """
+        Whether the first subgait can be started with a delay, this is possible for
+        the realsense gait.
+        """
         return True
+
     @property
     def starting_position(self) -> EdgePosition:
         return self._starting_position
 
     @property
-    def final_position(self)-> EdgePosition:
+    def final_position(self) -> EdgePosition:
         return self._final_position
 
     @classmethod
@@ -192,7 +201,13 @@ class RealSenseGait(SetpointsGait):
         )
 
     @classmethod
-    def parse_edge_position(cls, config_value, position_values):
+    def parse_edge_position(cls, config_value: str, position_values: Dict[str, float]):
+        """
+        Parse the edge position based on the string in the realsense_gaits.yaml.
+        :param config_value: The value in the yaml file.
+        :param position_values: The actual joint positions at the edge of the gait.
+        :return: The edge position to use.
+        """
         if config_value == "static":
             return StaticEdgePosition(position_values)
         elif config_value == "dynamic":
@@ -276,9 +291,7 @@ class RealSenseGait(SetpointsGait):
             )
             return GaitUpdate.empty()
 
-
         self.update_parameters(gait_parameters_response.gait_parameters)
-
         self.interpolate_subgaits_from_parameters()
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
@@ -330,18 +343,20 @@ class RealSenseGait(SetpointsGait):
     def interpolate_subgaits_from_parameters(self) -> None:
         """Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
+        self._node.get_logger().info(
+            f"Interpolating with parameters: {self.parameters}"
+        )
         for subgait_name in self.subgaits.keys():
-            self._node.get_logger().info(
-                f"Interpolating with parameters={self.parameters}"
-            )
             new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
                 dimensions=self.dimensions,
                 subgaits=self.subgaits_to_interpolate[subgait_name],
                 parameters=self.parameters,
                 use_foot_position=True,
             )
-
-        self.set_subgaits(new_subgaits, self._node)
+        self._node.get_logger().info(f"End position was {self.final_position}")
+        self.set_subgaits(new_subgaits)
+        self._node.get_logger().info(f"End position agter int"
+                                     f"erpolation is {self.final_position}")
 
     def update_parameters(self, gait_parameters: GaitParameters) -> None:
         """
@@ -358,3 +373,7 @@ class RealSenseGait(SetpointsGait):
             ]
         else:
             raise UnknownDimensionsError(self.dimensions)
+
+    def set_edge_positions(self, starting_position, final_position):
+        self._starting_position = starting_position
+        self._final_position = final_position

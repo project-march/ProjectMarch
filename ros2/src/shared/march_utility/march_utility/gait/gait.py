@@ -31,7 +31,8 @@ class Gait:
         self.gait_name = gait_name
         self.subgaits = subgaits
         self.graph = graph
-
+        self._starting_position = None
+        self._final_position = None
         self._validate_trajectory_transition()
 
     @classmethod
@@ -99,12 +100,12 @@ class Gait:
     @property
     def starting_position(self) -> EdgePosition:
         """Returns the starting position of all joints."""
-        return None
+        return self._starting_position
 
     @property
     def final_position(self) -> EdgePosition:
         """Returns the position of all the joints after the gait has ended."""
-        return None
+        return self._final_position
 
 
     @staticmethod
@@ -156,80 +157,79 @@ class Gait:
                         f"{to_subgait.subgait_name} does not match"
                 )
 
-    def _validate_new_edge_position(self, gait_edge_position: EdgePosition,
-                                    new_subgait_position: Dict[str, float],
-                                        subgait_name, node=None):
-        if node is not None:
-            node.get_logger().info(f"Validate type {type(gait_edge_position)}, "
-                                   f"subgait name is {subgait_name}")
-        if isinstance(gait_edge_position, StaticEdgePosition):
-            # if node is not None:
-            #     node.get_logger().info(f"Is static: {new_subgait_position}")
-            #     node.get_logger().info(f"{gait_edge_position.values}")
-            #     node.get_logger().info(f"Validate static, looking at difference "
-            #                            f"between "
-            #                            f"{gait_edge_position.values} "
-            #                            f"and "
-            #                            f"{StaticEdgePosition(new_subgait_position).values}")
-            if gait_edge_position != StaticEdgePosition(new_subgait_position):
-                node.get_logger().warn(f"The static edge position of new version does "
-                                       f"not match the old edge position.")
+    def _validate_new_edge_position(self, old_edge_position: EdgePosition,
+                                    new_edge_position_values: Dict[str, float]) -> \
+            EdgePosition:
+        """
+        Validate that the edge position has made an acceptable change, this means:
+        StaticEdgePosition -> Should remain the same, values and type.
+        UnknownEdgePosition -> Should never be updated.
+        DynamicEdgePosition -> Values can change.
+        :param old_edge_position: The position the gait has now
+        :param new_edge_position: The new edge position that should be validated
+        :raises: NonValidGaitContent if the transition is not valid.
+        """
+        if isinstance(old_edge_position, StaticEdgePosition):
+            if old_edge_position != StaticEdgePosition(new_edge_position_values):
                 raise NonValidGaitContent(
-                    msg=f"The edge position of new version does not match"
+                    msg="The edge position of new version does not match to the "
+                        "static old version"
                 )
-            return
-        elif isinstance(gait_edge_position, UnknownEdgePosition):
+            else:
+                return StaticEdgePosition(new_edge_position_values)
+        elif isinstance(old_edge_position, UnknownEdgePosition):
             raise NonValidGaitContent(
-                msg=f"Gaits with unknown edge positions should not be updated"
+                msg="Gaits with unknown edge positions should not be updated"
             )
-        elif isinstance(gait_edge_position, DynamicEdgePosition):
-            return
+        elif isinstance(old_edge_position, DynamicEdgePosition):
+             return DynamicEdgePosition(new_edge_position_values)
 
-    def _validate_new_edge_positions(self, new_subgaits, node=None):
-        if node is not None:
-            node.get_logger().info("Validate new edge Positions")
+    def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait]):
+        """
+        Validate that both the starting position and the final position changed in a
+        valid way.
+        :param new_subgaits: The new subgaits that will be used.
+        """
+        new_starting_position = None
+        new_final_position = None
         for from_subgait_name, to_subgait_name in self.graph:
             if from_subgait_name == self.graph.START:
                 new_subgait = new_subgaits[to_subgait_name]
-                new_starting_position = new_subgait.starting_position
-                if node is not None:
-                    node.get_logger().info(f"Validating starting pos changed to "
-                                           f"{new_subgait.starting_position}")
-                self._validate_new_edge_position(
-                    self.starting_position,
-                    new_starting_position,
-                    to_subgait_name,
-                    node
-                )
+                new_starting_position_values = new_subgait.starting_position
+                try:
+                    new_starting_position = self._validate_new_edge_position(
+                        self.starting_position,
+                        new_starting_position_values,
+                    )
+                except NonValidGaitContent:
+                    return False
 
             elif to_subgait_name == self.graph.END:
                 new_subgait = new_subgaits[from_subgait_name]
-                new_final_position = new_subgait.final_position
-                if node is not None:
-                    node.get_logger().info(f"Validating final pos changed to "
-                                           f"{new_subgait.final_position}")
-                self._validate_new_edge_position(
-                    self.final_position,
-                    new_final_position,
-                    from_subgait_name,
-                    node
-                )
+                new_final_position_values = new_subgait.final_position
+                try:
+                    new_final_position = self._validate_new_edge_position(
+                        self.final_position,
+                        new_final_position_values,
+                    )
+                except NonValidGaitContent:
+                    return False
+        self.set_edge_positions(new_starting_position, new_final_position)
+        return True
 
-        if node is not None:
-            node.get_logger().info('Validated all edge positions')
+    def set_edge_positions(self, starting_position, final_position):
+        self._starting_position = starting_position
+        self._final_position = final_position
 
-    def set_subgaits(self, new_subgaits: Dict[str, Subgait], node=None):
-        if node is not None:
-            node.get_logger().info('Updating subgaits')
-        self._validate_new_edge_positions(new_subgaits, node)
-        if node is not None:
-            node.get_logger().info('Validated aledge positions')
+    def set_subgaits(self, new_subgaits: Dict[str, Subgait]):
+        """
+        Update the subgaits of the gaits, and validate that the edges changes
+        acceptably. Also make sure that all transitions between the subgaits match.
+        :param new_subgaits: The dictionary with the new subgaits to use
+        """
+        self._validate_and_set_new_edge_positions(new_subgaits)
         self.subgaits.update(new_subgaits)
-        if node is not None:
-            node.get_logger().info('Updated')
         self._validate_trajectory_transition()
-        if node is not None:
-            node.get_logger().info('Validated transitions')
 
     def set_subgait_versions(
         self, robot: urdf.Robot, gait_directory: str, version_map: dict
