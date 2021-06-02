@@ -7,9 +7,9 @@
 # TODO: Make sure axis numbers of ODrives are correct
 # TODO: Update netNumbers if necessary
 march6:
-  if_name: enp0s31f6
+  if_name: enp7s0
   ecatCycleTime: 4
-  ecatSlaveTimeout: 50
+  ecatSlaveTimeout: 250
   joints:
     - left_ankle:
         allowActuation: true

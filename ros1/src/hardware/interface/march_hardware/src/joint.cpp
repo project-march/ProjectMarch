@@ -56,7 +56,7 @@ void Joint::prepareActuation()
             "Failed to prepare joint %s for actuation", this->name_.c_str());
     }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
-    ros::Duration(0.4).sleep();
+    ros::Duration(1).sleep();
 //    motor_controller_->prepareActuation();
     ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 
@@ -85,12 +85,14 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
     if (this->receivedDataUpdate()) {
         if (motor_controller_->isIncrementalEncoderMorePrecise()) {
+            //ROS_INFO("Reading inc encoder");
             double new_incremental_position
                 = motor_controller_->getIncrementalPosition();
             position_
                 += (new_incremental_position - previous_incremental_position_);
             previous_incremental_position_ = new_incremental_position;
         } else {
+            //ROS_INFO("Reading abs encoder");
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();

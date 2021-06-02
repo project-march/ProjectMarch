@@ -31,6 +31,7 @@ set(XACRO_FILES
     urdf/test_right_leg_rotational.xacro
     urdf/test_left_leg_rotational.xacro
     urdf/test_left_odrive_upper.xacro
+    urdf/test_left_odrive_lower.xacro
     urdf/march6_no_translational_joints.xacro
 )
 

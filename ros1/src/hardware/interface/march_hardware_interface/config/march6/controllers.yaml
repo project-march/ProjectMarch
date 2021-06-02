@@ -11,7 +11,7 @@ march:
       publish_rate: 1
     trajectory:
       type: effort_controllers/JointTrajectoryController
-      allow_partial_joints_goal: true
+      #allow_partial_joints_goal: true
       joints:
         - left_ankle
         - left_hip_aa
@@ -32,36 +32,36 @@ march:
         right_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
-        goal_time: 0.2
+        goal_time: 0.5
         left_ankle:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         left_hip_aa:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         left_hip_fe:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         left_knee:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         right_ankle:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         right_hip_aa:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         right_hip_fe:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0
         right_knee:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 1.0
+          goal: 1.0

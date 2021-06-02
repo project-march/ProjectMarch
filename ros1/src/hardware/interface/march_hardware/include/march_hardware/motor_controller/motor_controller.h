@@ -57,7 +57,7 @@ public:
 
     // Get whether the incremental encoder is more precise than the absolute
     // encoder
-    bool isIncrementalEncoderMorePrecise() const;
+    virtual bool isIncrementalEncoderMorePrecise() const;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two

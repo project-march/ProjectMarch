@@ -88,29 +88,29 @@ joint_limits:
 safety:  # TODO
   exoskeleton:
     knee:
-      lower_soft_buffer: 3.5    # degrees
-      upper_soft_buffer: 3.0      # degrees
+      lower_soft_buffer: 0.5    # degrees
+      upper_soft_buffer: 0.5      # degrees
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0
       max_velocity: 3.0
     hfe:
-      lower_soft_buffer: 3.0
-      upper_soft_buffer: 3.0
+      lower_soft_buffer: 0.5
+      upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0
       max_velocity: 3.0
     ankle:
-      lower_soft_buffer: 3.0
-      upper_soft_buffer: 5.0
+      lower_soft_buffer: 0.5
+      upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0
       max_velocity: 3.0
     haa:
-      lower_soft_buffer: 3.5
-      upper_soft_buffer: 3.5
+      lower_soft_buffer: 0.5
+      upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0

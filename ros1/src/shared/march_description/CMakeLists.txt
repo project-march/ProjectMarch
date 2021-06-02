@@ -20,6 +20,7 @@ set(XACRO_FILES
     "../../../../ros2/src/shared/march_description/urdf/test_left_leg_rotational.xacro"
     "../../../../ros2/src/shared/march_description/urdf/march6_no_translational_joints.xacro"
     "../../../../ros2/src/shared/march_description/urdf/test_left_odrive_upper.xacro"
+    "../../../../ros2/src/shared/march_description/urdf/test_left_odrive_lower.xacro"
 )
 build_and_install_xacro_files(${XACRO_FILES})
 

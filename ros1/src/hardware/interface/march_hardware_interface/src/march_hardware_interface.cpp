@@ -237,14 +237,14 @@ void MarchHardwareInterface::read(
         joint_position_[i] = position;
         joint_velocity_[i] = velocity;
 
-        ROS_INFO_STREAM("Joint " << i << ", position= " << position << ", velocity= " << velocity);
+        ROS_INFO_STREAM("Joint " << joint.getName() << ", position= " << position << ", velocity= " << velocity);
 
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
         }
 //        joint_effort_[i] = joint.getMotorController()->getTorque();
         joint_effort_[i] = joint.getMotorController()->getMotorCurrent();
-        ROS_INFO("Motor current: %f", joint_effort_[i]);
+        //ROS_INFO("Motor current: %f", joint_effort_[i]);
     }
 
     this->updateMotorControllerState();

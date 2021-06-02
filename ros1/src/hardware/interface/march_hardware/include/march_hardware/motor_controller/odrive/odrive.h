@@ -55,7 +55,7 @@ public:
     void prepareActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
-    bool isIncrementalEncoderMorePrecise() const;
+    bool isIncrementalEncoderMorePrecise() const override;
 
     // Transform the ActuationMode to a number that is understood by the ODrive
     int getActuationModeNumber() const override;

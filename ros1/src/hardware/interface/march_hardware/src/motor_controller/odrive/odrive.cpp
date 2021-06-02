@@ -84,9 +84,9 @@ void ODrive::waitForState(ODriveAxisState target_state)
 
 void ODrive::actuateTorque(float target_effort)
 {
-    ROS_INFO("Effort: %f", target_effort);
+    //ROS_INFO("Effort: %f", target_effort);
     float target_torque = target_effort * torque_constant_ * getMotorDirection();
-    ROS_INFO("Torque: %f", target_torque);
+    //ROS_INFO("Torque: %f", target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
         ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
@@ -288,17 +288,19 @@ Encoder::Direction ODrive::getMotorDirection() const
 // Viable Product
 void ODrive::actuateRadians(float /*target_position*/)
 {
-    throw error::NotImplemented("actuateRadians", "ODrive");
+    //throw error::NotImplemented("actuateRadians", "ODrive");
 }
 
 float ODrive::getMotorControllerVoltage()
 {
-    throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
+    //throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
+    return -1;
 }
 
 float ODrive::getMotorVoltage()
 {
-    throw error::NotImplemented("getMotorVoltage", "ODrive");
+    //throw error::NotImplemented("getMotorVoltage", "ODrive");
+    return -1;
 }
 
 } // namespace march

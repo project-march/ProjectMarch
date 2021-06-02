@@ -115,8 +115,9 @@ public:
 
     bool hasError() override
     {
-        return axis_error_ || motor_error_ || encoder_error_
-            || encoder_manager_error_ || controller_error_;
+        return !isOperational();
+        //axis_error_ || motor_error_ || encoder_error_
+        //    || encoder_manager_error_ || controller_error_;
     }
 
     std::optional<std::string> getErrorStatus() override
