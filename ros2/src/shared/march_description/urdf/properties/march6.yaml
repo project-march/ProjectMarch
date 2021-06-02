@@ -73,19 +73,18 @@ joint_limits:
   right_hfe:
     lower_limit: -25.18
     upper_limit: 102.32
-  #TODO: Linear joints
   left_ankle:
-    lower_limit: -26.30401611
-    upper_limit: 15.88348389
+    lower_limit: -25.18
+    upper_limit: 14.82
   right_ankle:
-    lower_limit: -23.203125
-    upper_limit: 14.23828125
+    lower_limit: -26.43
+    upper_limit: 13.57
   left_haa:
-    lower_limit: -18.54492188
-    upper_limit: 16.34765625
+    lower_limit: -11.54
+    upper_limit: 8.46
   right_haa:
-    lower_limit: -18.10546875
-    upper_limit: 15.99609375
+    lower_limit: -8.96
+    upper_limit: 11.04
 safety:  # TODO
   exoskeleton:
     knee:
@@ -133,14 +132,14 @@ safety:  # TODO
       max_velocity: 3.0
     ankle:
       lower_soft_buffer: 3.0
-      upper_soft_buffer: 5.0
+      upper_soft_buffer: 3.0
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0
       max_velocity: 3.0
     haa:
-      lower_soft_buffer: 3.5
-      upper_soft_buffer: 3.5
+      lower_soft_buffer: 0.0
+      upper_soft_buffer: 0.0
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0

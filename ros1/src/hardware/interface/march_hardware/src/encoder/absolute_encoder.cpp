@@ -16,6 +16,8 @@ AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
 {
     zero_position_iu_ = lower_limit_iu_ - lower_limit_rad / (getRadiansPerIU());
 
+    ROS_INFO("Zero position: %d", zero_position_iu_);
+
     lower_soft_limit_iu_ = positionRadiansToIU(lower_soft_limit_rad);
     upper_soft_limit_iu_ = positionRadiansToIU(upper_soft_limit_rad);
 

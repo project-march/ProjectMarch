@@ -26,8 +26,11 @@ set(XACRO_FILES
     urdf/march4_with_koen_lengths.xacro
     urdf/test_joint_linear.xacro
     urdf/test_joint_rotational.xacro
+    urdf/test_joint_linear_odrive.xacro
+    urdf/test_joint_rotational_odrive.xacro
     urdf/test_right_leg_rotational.xacro
     urdf/test_left_leg_rotational.xacro
+    urdf/test_left_odrive_upper.xacro
     urdf/march6_no_translational_joints.xacro
 )
 

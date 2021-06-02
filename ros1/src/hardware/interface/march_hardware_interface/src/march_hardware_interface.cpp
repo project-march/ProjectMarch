@@ -266,6 +266,7 @@ void MarchHardwareInterface::write(
         // Enlarge joint_effort_command for IMotionCube because ROS control
         // limits the pid values to a certain maximum
         joint_effort_command_[i] = joint_effort_command_[i] * march_robot_->getJoint(i).getMotorController()->effortMultiplicationConstant();
+//        joint_effort_command_[i] = 1;
         if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
             > MAX_EFFORT_CHANGE) {
             joint_effort_command_[i] = joint_last_effort_command_[i]

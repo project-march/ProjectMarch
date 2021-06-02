@@ -70,7 +70,6 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     this->initUrdf();
     auto pdo_interface = march::PdoInterfaceImpl::create();
     auto sdo_interface = march::SdoInterfaceImpl::create();
-
     const auto robot_name
         = this->robot_config_.begin()->first.as<std::string>();
     ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
@@ -209,6 +208,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     const march::PdoInterfacePtr& pdo_interface,
     const march::SdoInterfacePtr& sdo_interface)
 {
+    ROS_INFO("Creating ODrive");
     if (!odrive_config || !urdf_joint) {
         return nullptr;
     }

@@ -3,18 +3,20 @@ testsetup:
   ecatCycleTime: 4
   ecatSlaveTimeout: 250
   joints:
-    - rotational_joint:
+    - linear_joint:
         allowActuation: true
         motor_controller:
           type: odrive
+          actuationMode: torque
           slaveIndex: 1
-          axis: 0
+          axis: 1
+          motorKV: 355
           absoluteEncoder:
-            resolution: 17
-            direction: 1
-            minPositionIU: 0
-            maxPositionIU: 0
+            resolution: 14
+            direction: -1
+            minPositionIU: 4782
+            maxPositionIU: 5665
           incrementalEncoder:
             resolution: 13
-            transmission: 236
-            direction: -1
+            transmission: 240
+            direction: 1

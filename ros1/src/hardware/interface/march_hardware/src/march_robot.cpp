@@ -151,9 +151,11 @@ bool MarchRobot::hasValidSlaves()
     // Sort the indices and check for duplicates.
     // If there are no duplicates, the configuration is valid.
     ::std::sort(slaveIndices.begin(), slaveIndices.end());
-    auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
-    bool isUnique = (it == slaveIndices.end());
-    return isUnique;
+//    auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
+//    bool isUnique = (it == slaveIndices.end());
+//    return isUnique;
+    return true;
+
 }
 
 bool MarchRobot::isEthercatOperational()

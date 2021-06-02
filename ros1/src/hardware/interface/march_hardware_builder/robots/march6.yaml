@@ -13,112 +13,148 @@ march6:
   joints:
     - left_ankle:
         allowActuation: true
-        netNumber: 4
-        temperatureges: {slaveIndex: 1, byteOffset: 0}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 1
+          slaveIndex: 4
           axis: 0
+          motorKV: 355
           absoluteEncoder:
-            resolution: 12
-            minPositionIU: 3645
-            maxPositionIU: 4125
+            resolution: 14
+            direction: 1
+            minPositionIU: 9023
+            maxPositionIU: 10842
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
 
     - left_hip_aa:
         allowActuation: true
-        netNumber: 3
-        temperatureges: {slaveIndex: 2, byteOffset: 0}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 2
-          axis: 0
+          slaveIndex: 3
+          axis: 1
+          motorKV: 355
           absoluteEncoder:
-            resolution: 12
-            minPositionIU: 1039
-            maxPositionIU: 1427
+            resolution: 14
+            direction: -1
+            minPositionIU: 4782
+            maxPositionIU: 5665
+          incrementalEncoder:
+            resolution: 13
+            transmission: 240
+            direction: 1
 
     - left_hip_fe:
         allowActuation: true
-        netNumber: 3
-        temperatureges: {slaveIndex: 2, byteOffset: 0}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 2
-          axis: 1
+          slaveIndex: 3
+          axis: 0
+          preCalibrated: true
+          motorKV: 95
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 45689
-            maxPositionIU: 89385
+            direction: 1
+            resolution: 20
+            minPositionIU: 213943
+            maxPositionIU: 579571
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 121
 
     - left_knee:
         allowActuation: true
-        netNumber: 4
-        temperatureges: {slaveIndex: 1, byteOffset: 4}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 1
+          slaveIndex: 4
           axis: 1
+          preCalibrated: true
+          motorKV: 95
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 19800
-            maxPositionIU: 62557
+            direction: -1
+            resolution: 20
+            minPositionIU: 617728
+            maxPositionIU: 939388
+          incrementalEncoder:
+            direction: -1
+            resolution: 12
+            transmission: 121
 
     - right_ankle:
         allowActuation: true
-        netNumber: 2
-        temperatureges: {slaveIndex: 4, byteOffset: 0}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 4
+          slaveIndex: 2
           axis: 0
+          motorKV: 355
           absoluteEncoder:
-            resolution: 12
-            minPositionIU: 807
-            maxPositionIU: 1233
+            resolution: 14
+            direction: 1
+            minPositionIU: 12551
+            maxPositionIU: 14446
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
 
     - right_hip_aa:
         allowActuation: true
-        netNumber: 1
-        temperatureges: {slaveIndex: 3, byteOffset: 4}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 3
+          slaveIndex: 1
           axis: 1
+          motorKV: 355
           absoluteEncoder:
-            resolution: 12
-            minPositionIU: 3694
-            maxPositionIU: 4076
+            resolution: 14
+            direction: 1
+            minPositionIU: 3429
+            maxPositionIU: 4285
+          incrementalEncoder:
+            resolution: 13
+            transmission: 240
+            direction: 1
             
     - right_hip_fe:
         allowActuation: true
-        netNumber: 1
-        temperatureges: {slaveIndex: 3, byteOffset: 0}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 3
+          slaveIndex: 1
           axis: 0
+          preCalibrated: true
+          motorKV: 95
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 2045
-            maxPositionIU: 45632
+            direction: -1
+            resolution: 20
+            minPositionIU: 559641
+            maxPositionIU: 925326
+          incrementalEncoder:
+            direction: -1
+            resolution: 12
+            transmission: 121
 
     - right_knee:
         allowActuation: true
-        netNumber: 2
-        temperatureges: {slaveIndex: 4, byteOffset: 4}
         motor_controller:
+          type: odrive
           actuationMode: torque
-          type: odrive 
-          slaveIndex: 4
+          slaveIndex: 2
           axis: 1
+          preCalibrated: true
+          motorKV: 95
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 41533
-            maxPositionIU: 85298
+            direction: 1
+            resolution: 20
+            minPositionIU: 271431
+            maxPositionIU: 621197
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 121
