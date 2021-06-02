@@ -45,6 +45,15 @@ class RealSenseGait(SetpointsGait):
         "ramp_down": GetGaitParameters.Request.RAMP_DOWN,
         "sit": GetGaitParameters.Request.SIT,
     }
+    SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP = {
+        "right_open": "foot_right",
+        "left_open": "foot_left",
+        "right_swing": "foot_right",
+        "left_swing": "foot_left",
+        "right_close": "foot_right",
+        "left_close": "foot_left",
+        "sit_down": "foot_right",
+    }
 
     def __init__(
         self,
@@ -211,8 +220,15 @@ class RealSenseGait(SetpointsGait):
         """
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
+        frame_id_to_transform_to = self.get_frame_id_to_transfrom_to()
+        if frame_id_to_transform_to is None:
+            self._node.get_logger().warn(
+                "No frame id to transform to was found. gait will not be started"
+            )
+            return GaitUpdate.empty()
+
         service_call_succesful = self.make_realsense_service_call(
-            frame_id_to_transform_to="foot_right"
+            frame_id_to_transform_to
         )
         if not service_call_succesful:
             self._node.get_logger().warn("No service response received within timeout")
@@ -245,13 +261,29 @@ class RealSenseGait(SetpointsGait):
             self._update_time_stamps(self._current_subgait)
             return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
+    def get_frame_id_to_transfrom_to(self):
+        try:
+            self._node.get_logger().warn(
+                "frame id = ",
+                self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[self._current_subgait.name],
+            )
+            return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
+                self._current_subgait.name
+            ]
+        except KeyError as e:
+            self._node.get_logger().warn(
+                "The current subgait name ",
+                self._current_subgait.name,
+                " has no known associated frame id.",
+            )
+
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
 
         :param frame_id_to_transform_to: The frame that should be given to the reader.
-        :return: Whether the call was succesful
+        :return: Whether the call was successful
         """
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
