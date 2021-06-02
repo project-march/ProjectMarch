@@ -218,6 +218,11 @@ class RealSenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
+        self._reset()
+        self._current_time = current_time
+        self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
+        self._next_subgait = self._current_subgait
+
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
         frame_id_to_transform_to = self.get_frame_id_to_transfrom_to()
@@ -244,11 +249,6 @@ class RealSenseGait(SetpointsGait):
         self.update_parameters(gait_parameters_response.gait_parameters)
         self.interpolate_subgaits_from_parameters()
 
-        self._reset()
-        self._current_time = current_time
-        self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
-        self._next_subgait = self._current_subgait
-
         # Delay first subgait if duration is greater than zero
         if first_subgait_delay is not None and first_subgait_delay > Duration(0):
             self._start_is_delayed = True
@@ -264,18 +264,18 @@ class RealSenseGait(SetpointsGait):
     def get_frame_id_to_transfrom_to(self):
         try:
             self._node.get_logger().warn(
-                "frame id = ",
-                self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[self._current_subgait.name],
+                f"frame id = "
+                f"{self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[self._current_subgait.subgait_name]}"
             )
             return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
-                self._current_subgait.name
+                self._current_subgait.subgait_name
             ]
         except KeyError as e:
             self._node.get_logger().warn(
-                "The current subgait name ",
-                self._current_subgait.name,
-                " has no known associated frame id.",
+                f"The current subgait name {self._current_subgait.subgait_name} "
+                f"has no known associated frame id."
             )
+            return None
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """

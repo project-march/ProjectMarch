@@ -58,7 +58,7 @@ realsense_stairs_up:
 # EXAMPLE for future 1 dimension gaits that are coupled (implementation for coupled
 #  will be added to realsense gait later)
 #    realsense_sit:
-#      gait: sit
+#      realsense_category: sit
 #      camera_to_use: back
 #      default_parameters:
 #       - 0.5
@@ -72,7 +72,7 @@ realsense_stairs_up:
 #      responsible_for:
 #      - realsense_stand
 #    realsense_stand:
-#      gait: sit
+#      realsense_category: sit
 #      camera_to_use: back
 #      default_parameters:
 #      - 0.5
