@@ -307,11 +307,18 @@ class RealSenseGait(SetpointsGait):
             )
             return False
 
-        return self.realsense_service_event.wait(timeout=self.SERVICE_TIMEOUT.seconds)
+        event_wait = self.realsense_service_event.wait(timeout=self.SERVICE_TIMEOUT.seconds)
+        self._node.get_logger().warn(f"event_wait variable is {event_wait}")
+        return event_wait
 
     def _realsense_response_cb(self, future: Future):
         """Set capture point result when the capture point service returns."""
+        if future.done():
+            self._node.get_logger().warn("The future is done in the realsense responde cb")
+        else:
+            self._node.get_logger().warn("The future is NOT done in the realsense responde cb")
         self.realsense_service_result = future.result()
+        self._node.get_logger().warn(f"The result is {self.realsense_service_result}")
         self.realsense_service_event.set()
 
     def interpolate_subgaits_from_parameters(self) -> None:
