@@ -664,9 +664,7 @@ class Subgait(object):
     @staticmethod
     def unpack_four_parametric_version(version: str) -> Tuple[List[str], List[float]]:
         """Unpack a version to four versions and two parameters."""
-        parameter_search = re.findall(
-            r"(\d+\.\d+)", version
-        )
+        parameter_search = re.findall(r"(\d+\.\d+)", version)
         if parameter_search is None:
             raise SubgaitInterpolationError(
                 f"Parametric version string was stored in wrong format. "

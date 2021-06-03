@@ -11,7 +11,7 @@ SHOULD_NOT_FREEZE_FIRST_SECS = Duration(seconds=0.3)
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
-    """ A semi-dynamic version of the setpoints gait, implements a freeze functionality """
+    """A semi-dynamic version of the setpoints gait, implements a freeze functionality"""
 
     def __init__(self, gait_name, subgaits, graph):
         super(SemiDynamicSetpointsGait, self).__init__(
