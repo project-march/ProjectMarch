@@ -5,4 +5,6 @@ subgaits:
   sit_home:
     to: end
   start:
+    to: prepare_sit_down
+  prepare_sit_down:
     to: sit_down

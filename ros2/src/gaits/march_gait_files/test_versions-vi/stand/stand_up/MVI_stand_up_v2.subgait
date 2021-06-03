@@ -1,5 +1,5 @@
 description: 'Stand up gait: from the sit block of 50 cm to the standing position.
-  With haa from 0 degrees to 2 degrees'
+  With haa at 0 degrees'
 duration: 1700000000
 gait_type: sit_like
 joints:
@@ -20,7 +20,7 @@ joints:
   - position: 0.014
     time_from_start: 800000000
     velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   left_hip_fe:
@@ -69,7 +69,7 @@ joints:
   - position: 0.0140
     time_from_start: 800000000
     velocity: 0.0302
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   right_hip_fe:
