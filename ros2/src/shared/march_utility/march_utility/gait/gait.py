@@ -150,7 +150,7 @@ class Gait(object):
                     )
                 )
 
-    def set_subgaits(self, new_subgaits: Dict[str, Subgait]):
+    def set_subgaits(self, new_subgaits: dict[str, Subgait]):
         self.subgaits.update(new_subgaits)
         self._validate_trajectory_transition()
 
