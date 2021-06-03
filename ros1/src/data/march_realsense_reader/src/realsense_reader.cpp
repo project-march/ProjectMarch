@@ -127,20 +127,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 {
     Normals::Ptr normals = boost::make_shared<Normals>();
 
-    RealSenseCategory realsense_category = (RealSenseCategory)
-        realsense_category_;
-    if (realsense_category == RealSenseCategory::sit) {
-        boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
-            = boost::make_shared<march_shared_msgs::GaitParameters>();
-        // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
-        gait_parameters->first_parameter =  0.3;
-        res.gait_parameters = *gait_parameters;
-        res.success = true;
-        ROS_INFO_STREAM("Returning random result: \n" <<
-                                                      "First parameter: " << gait_parameters->first_parameter );
-        return;
-    }
-
     clock_t start_of_processing_time = clock();
     Normals::Ptr normals = boost::make_shared<Normals>();
 
@@ -213,7 +199,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     // Setup data structures for parameter determining
-//    auto realsense_category = (RealSenseCategory)realsense_category_;
+    auto realsense_category = (RealSenseCategory)realsense_category_;
     boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
         = boost::make_shared<march_shared_msgs::GaitParameters>();
     // Determine parameters
