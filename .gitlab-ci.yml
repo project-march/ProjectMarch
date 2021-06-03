@@ -143,7 +143,6 @@ container:build:
   artifacts:
     reports:
       codequality: codeclimate.json
-  allow_failure: true
   only:
     changes:
       - ".flake8"
