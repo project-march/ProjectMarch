@@ -8,7 +8,7 @@ from march_utility.gait.edge_position import (
     UnknownEdgePosition,
     EdgePosition,
 )
-from rclpy import Node
+from rclpy.node import Node
 from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (
