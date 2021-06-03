@@ -5,7 +5,7 @@ BUILD_TOOLS_NO_REC="libasio-dev libtinyxml2-dev libcunit1-dev"
 PYTHON_TOOLS="mock argcomplete pytest-repeat pytest-rerunfailures pytest"
 
 PYTHON_REQUIREMENTS=$(cat requirements.pip | sort | tr '\n' ' ')
-FLAKE8_REQUIREMENTS="flake8 flake8-codeclimate"
+FLAKE8_REQUIREMENTS="flake8 flake8-codeclimate flake8-black"
 ROS_PACKAGES=$(./.scripts/package_list.sh | sort | tr '\n' ' ')
 
 echo "################################################################"
