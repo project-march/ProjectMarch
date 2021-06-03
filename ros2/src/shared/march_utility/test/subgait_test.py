@@ -30,7 +30,7 @@ class SubgaitTest(unittest.TestCase):
             get_package_share_directory("march_utility") + "/test/resources"
         )
         self.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
+            get_package_share_directory("march_description") + "/urdf/march6.urdf"
         )
         self.subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
             rsc=self.resources_folder,

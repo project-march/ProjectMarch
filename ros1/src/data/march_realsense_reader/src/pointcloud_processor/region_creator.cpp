@@ -52,10 +52,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     // from the first result to improve it
     success &= setupRegionGrower();
     success &= extractRegions();
-    if (use_recursive_growing) {
-        if (!success) {
-            return false;
-        }
+    if (use_recursive_growing && success) {
         // reinitialize the region grower to start with an empty object at the
         // start of the recursive call
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();
@@ -74,7 +71,7 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         int too_small_regions_count = 0;
         int too_large_regions_count = 0;
         for (const PointCloud::Ptr& region : *points_vector_) {
-            if (region->size() != 0) {
+            if (region->size() > 0) {
                 length_vector.push_back(region->size());
                 if (region->size() > max_desired_cluster_size) {
                     ++too_large_regions_count;
@@ -239,7 +236,9 @@ void RegionGrower::setupRecursiveRegionGrower()
     region_grower.setMinClusterSize(min_valid_cluster_size);
     region_grower.setMaxClusterSize(max_valid_cluster_size);
     region_grower.setSearchMethod(tree);
-    region_grower.setNumberOfNeighbours(number_of_neighbours);
+    // Set the number of neighbours smaller then teh min valid cluster size to
+    // avoid combining small regions which are far apart
+    region_grower.setNumberOfNeighbours(min_valid_cluster_size - 1);
     region_grower.setCurvatureThreshold(curvature_threshold);
 }
 
@@ -297,8 +296,8 @@ bool RegionGrower::recursiveRegionGrower(
     float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
     // Process the invalid regions with the new tolerance
-    // This method makes a call to this method if the invalid region is large
-    // enough
+    // The processInvalidRegions method makes a call to the
+    // recursiveRegionGrower method if the invalid region is large enough
     success &= processInvalidRegions(large_tolerance, too_small_pointcloud,
         too_small_pointcloud_normals, too_small_regions, last_pointcloud,
         last_pointcloud_normals);

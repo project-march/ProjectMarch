@@ -21,31 +21,31 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.65806279
+  - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.30899694
+  - position: 1.309
     time_from_start: 400000000
-    velocity: -1.13446401
-  - position: 0.69446651
+    velocity: -1.1345
+  - position: 0.6945
     time_from_start: 900000000
-    velocity: -1.74532925
+    velocity: -1.7453
   - position: 0.0
     time_from_start: 1600000000
-    velocity: -1.01229969
+    velocity: -1.0123
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   left_knee:
-  - position: 1.48352986
+  - position: 1.4835
     time_from_start: 0
     velocity: 0.0
-  - position: 0.46813919
+  - position: 0.4681
     time_from_start: 730300000
-    velocity: -0.90519233
-  - position: 0.08729962
+    velocity: -0.9052
+  - position: 0.0873
     time_from_start: 1600000000
-    velocity: -1.01229969
+    velocity: -1.0123
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
@@ -67,28 +67,28 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.65806279
+  - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.30899694
+  - position: 1.309
     time_from_start: 400000000
-    velocity: -1.13446401
-  - position: 0.6945084
+    velocity: -1.1345
+  - position: 0.6945
     time_from_start: 900000000
-    velocity: -1.74532925
+    velocity: -1.7453
   - position: 0.0
     time_from_start: 1600000000
-    velocity: -1.01229969
+    velocity: -1.0123
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   right_knee:
-  - position: 1.48352986
+  - position: 1.4835
     time_from_start: 0
     velocity: 0.0
-  - position: 0.46813869
+  - position: 0.4681
     time_from_start: 730271430
-    velocity: -0.90519147
+    velocity: -0.9052
   - position: 0.0873
     time_from_start: 1600000000
     velocity: -1.0123

@@ -13,7 +13,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration("use_sim_time", default="true")
+    use_sim_time = LaunchConfiguration("use_sim_time")
     robot_description = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -29,7 +29,7 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "use_sim_time",
-                default_value="true",
+                default_value="false",
                 description="Use simulation (Gazebo) clock if true",
             ),
             DeclareLaunchArgument(

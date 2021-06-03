@@ -10,7 +10,13 @@ PID_REGEX = "([0-9]{4,}).{10}[0-9]{2}:[0-9]{2}:[0-9]{2} "
 # roslaunch and roscore refer to ROS1 processes
 # parameter_bridge and dynamic_bridge refer to bridge processes
 # march_gait_selection is a required node in ROS2, ending this process shuts all ROS2 processes down.
-ROS_PROCESSES = ["roslaunch", "roscore", "parameter_bridge", "dynamic_bridge", "march_gait_selection"]
+ROS_PROCESSES = [
+    "roslaunch",
+    "roscore",
+    "parameter_bridge",
+    "dynamic_bridge",
+    "march_gait_selection",
+]
 
 # ROS processes have a maximum name length of 15 characters
 ROS_PROCESS_NAME_LENGTH = 15

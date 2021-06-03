@@ -60,7 +60,7 @@ def generate_launch_description():
                         )
                     },
                 ],
-                on_exit=Shutdown()
+                on_exit=Shutdown(),
             ),
         ]
     )

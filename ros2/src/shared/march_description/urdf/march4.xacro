@@ -63,7 +63,7 @@
     <xacro:property name="hip_aa_frame_height"
                     value="${dimensions['hip_aa_side']['length']}"/>
     <xacro:property name="hip_aa_frame_width"
-                    value="${dimensions['hip_aa_base']['length']}"/>
+                    value="${dimensions['hip_aa_front']['length']}"/>
     <xacro:property name="hip_aa_mass" value="${dimensions['hip_aa_side']['mass']}"/>
     <!-- mass = Moving hip -->
 
@@ -134,7 +134,7 @@
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
     <xacro:include filename="march.gazebo"/>
 
-    <material name="blue">
+    <material name="visuals_material">
         <color rgba="0 0 0.6 1"/>
     </material>
 
@@ -221,7 +221,7 @@
                       length="${foot_height_forward+foot_height_backward}"
                       direction="x"
                       inertia="${inertia['foot']}"
-                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      collision_origin="${(foot_height_backward-foot_height_forward)/2} 0 0"
                       com="${foot_com_x} ${-foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
 
@@ -298,7 +298,7 @@
                       length="${foot_height_forward+foot_height_backward}"
                       direction="x"
                       inertia="${inertia['foot']}"
-                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      collision_origin="${(foot_height_backward-foot_height_forward)/2} 0 0"
                       com="${foot_com_x} ${foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
 

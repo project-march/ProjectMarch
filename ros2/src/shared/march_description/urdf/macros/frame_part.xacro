@@ -25,7 +25,7 @@
                     <geometry>
                         <mesh filename="package://march_description/urdf/stl-files/${mesh}" scale="${scale}"/>
                     </geometry>
-                    <material name="blue"/>
+                    <material name="visuals_material"/>
                 </visual>
             </xacro:unless>
 

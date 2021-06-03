@@ -26,21 +26,21 @@ joints:
   left_hip_fe:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.799360797413
-  - position: 1.57079632679
+    velocity: 0.7994
+  - position: 1.5708
     time_from_start: 2299999999
-    velocity: 0.799360797413
-  - position: 1.60570291183
+    velocity: 0.7994
+  - position: 1.6057
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.799360797413
-  - position: 1.4835298642
+    velocity: 0.7994
+  - position: 1.4835
     time_from_start: 2299999999
-    velocity: 0.799360797413
-  - position: 1.57079632679
+    velocity: 0.7994
+  - position: 1.5708
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -66,21 +66,21 @@ joints:
   right_hip_fe:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.799360797413
-  - position: 1.57079632679
+    velocity: 0.7994
+  - position: 1.5708
     time_from_start: 2299999999
-    velocity: 0.799360797413
-  - position: 1.60570291183
+    velocity: 0.7994
+  - position: 1.6057
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.799360797413
-  - position: 1.4835298642
+    velocity: 0.7994
+  - position: 1.4835
     time_from_start: 2299999999
-    velocity: 0.799360797413
-  - position: 1.57079632679
+    velocity: 0.7994
+  - position: 1.5708
     time_from_start: 2500000000
     velocity: 0.0
 name: sit_down
