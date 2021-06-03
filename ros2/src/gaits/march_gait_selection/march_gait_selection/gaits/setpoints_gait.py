@@ -1,6 +1,6 @@
 from typing import Optional
 
-from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
+from march_gait_selection.gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
 from march_utility.gait.edge_position import StaticEdgePosition
@@ -8,10 +8,10 @@ from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
-from .gait_update import GaitUpdate
-from .gait_interface import GaitInterface
-from .state_machine_input import TransitionRequest
-from .trajectory_scheduler import TrajectoryCommand
+from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.state_machine.gait_interface import GaitInterface
+from march_gait_selection.state_machine.state_machine_input import TransitionRequest
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
 
 class SetpointsGait(GaitInterface, Gait):

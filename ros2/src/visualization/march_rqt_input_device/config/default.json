@@ -113,6 +113,12 @@
       },
       {
          "name":"realsense_stand"
+      },
+      {
+         "name":"dynamic_sit"
+      },
+      {
+         "name":"dynamic_stand"
       }
    ],
    [

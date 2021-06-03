@@ -3,9 +3,9 @@ from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-from .gait_interface import GaitInterface
-from .gait_update import GaitUpdate
-from .trajectory_scheduler import TrajectoryCommand
+from march_gait_selection.state_machine.gait_interface import GaitInterface
+from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
 
 DEFAULT_HOMEGAIT_DURATION = Duration(seconds=3)

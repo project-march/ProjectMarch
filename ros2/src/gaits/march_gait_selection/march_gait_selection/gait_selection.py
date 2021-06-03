@@ -2,10 +2,9 @@ import os
 
 import yaml
 from ament_index_python.packages import get_package_share_directory
-from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
-from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
-    SemiDynamicSetpointsGait,
-)
+from march_gait_selection.gaits.balance_gait import BalanceGait
+from march_gait_selection.gaits.dynamic_edge_setpoints_gait import \
+    DynamicEdgeSetpointsGait
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
 
 from march_utility.exceptions.gait_exceptions import (
@@ -30,9 +29,9 @@ from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_gaits.realsense_gait import RealSenseGait
-from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
-
+from march_utility.utilities.node_utils import get_robot_urdf
+from march_gait_selection.gaits.realsense_gait import RealSenseGait
+from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
 
@@ -91,7 +90,7 @@ class GaitSelection(Node):
         (
             self._gait_version_map,
             self._positions,
-            self._semi_dynamic_gait_version_map,
+            self._dynamic_edge_version_map
         ) = self._load_configuration()
 
         self._robot_description_sub = self.create_subscription(
@@ -343,7 +342,13 @@ class GaitSelection(Node):
                 gait, self._gait_directory, self._robot, self._gait_version_map
             )
 
-        self._load_semi_dynamic_gaits(gaits)
+        for gait in self._dynamic_edge_version_map:
+            gaits[gait] = DynamicEdgeSetpointsGait.from_file(
+                gait, self._gait_directory, self._robot,
+                self._dynamic_edge_version_map
+            )
+            self._gait_version_map[gait] = self._dynamic_edge_version_map[
+                gait]
         self._load_realsense_gaits(gaits)
         if self._balance_used and "balance_walk" in gaits.keys():
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
@@ -352,19 +357,6 @@ class GaitSelection(Node):
                 gaits["balanced_walk"] = balance_gait
 
         return gaits
-
-    def _load_semi_dynamic_gaits(self, gaits):
-        """
-        Loads the semi dynamic gaits, this is currently only 1 gait.
-        :param gaits: dict to add the semi dynamic gaits to
-        """
-        for gait in self._semi_dynamic_gait_version_map:
-            gaits[f"dynamic_{gait}"] = SemiDynamicSetpointsGait.from_file(
-                gait,
-                self._gait_directory,
-                self._robot,
-                self._semi_dynamic_gait_version_map,
-            )
 
     def _load_realsense_gaits(self, gaits):
         """
@@ -416,7 +408,7 @@ class GaitSelection(Node):
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         version_map = default_config["gaits"]
-        semi_dynamic_version_map = default_config.get("semi_dynamic_gaits", [])
+        dynamic_edge_version_map = default_config["dynamic_edge_gaits"]
 
         if not isinstance(version_map, dict):
             raise TypeError("Gait version map should be of type; dictionary")
@@ -444,7 +436,8 @@ class GaitSelection(Node):
                     f"has {positions[position_name]['joints'].keys()}, "
                     f"required: {self._joint_names}"
                 )
-        return version_map, positions, semi_dynamic_version_map
+        return version_map, positions, dynamic_edge_version_map
+
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.

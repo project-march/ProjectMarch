@@ -1,7 +1,7 @@
 from threading import Event
 from typing import Optional, List, Dict
 
-from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
+from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition, \

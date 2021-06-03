@@ -346,4 +346,10 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
       right_knee: 0.0
-
+dynamic_edge_gaits:
+  dynamic_sit:
+    sit_down: MIV_final
+    sit_home: MIV_final
+  dynamic_stand:
+    prepare_stand_up: MIV_final
+    stand_up: MIV_final

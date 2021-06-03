@@ -1,10 +1,11 @@
-from typing import Dict, Set
+from typing import Dict, Set, List
 
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_state_machine_error import (
     GaitStateMachineError,
 )
-from march_gait_selection.state_machine.home_gait import HomeGait
+from march_gait_selection.gaits.home_gait import HomeGait
+from march_utility.gait.edge_position import DynamicEdgePosition
 
 from .edge_position import EdgePosition, StaticEdgePosition, UnknownEdgePosition
 
@@ -22,8 +23,15 @@ class GaitGraph:
 
         self._named_positions: GaitGraph.NamedPositions = {}
         self._idle_transitions: GaitGraph.IdleTransitions = {}
+        self._dynamic_transitions: Set = set()
         self._gait_transitions: GaitGraph.GaitTransitions = {}
         self._unnamed_count = 0
+
+    def possible_gaits_from_idle(self, current_state: EdgePosition) -> Set:
+        if isinstance(current_state, DynamicEdgePosition):
+            return self._dynamic_transitions
+        else:
+            return self._idle_transitions[current_state]
 
     def generate_graph(self):
         """Generate the gait graph."""
@@ -106,7 +114,9 @@ class GaitGraph:
         :param start_position Position the gait is started from.
         :param gait_name Name of the gait that is started.
         """
-        if start_position in self._idle_transitions:
+        if isinstance(start_position, DynamicEdgePosition):
+            self._dynamic_transitions.add(gait_name)
+        elif start_position in self._idle_transitions:
             self._idle_transitions[start_position].add(gait_name)
         else:
             self._idle_transitions[start_position] = {gait_name}

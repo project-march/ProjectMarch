@@ -2,7 +2,7 @@ from typing import Optional, Union
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.gait_state_machine_error import \
     GaitStateMachineError
-from march_gait_selection.state_machine.home_gait import HomeGait
+from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
@@ -226,15 +226,7 @@ class GaitStateMachine:
         """
         self._gait_selection.get_logger().info(f"Current state: {self._current_state}")
         if self._is_idle():
-            res = []
-            for gait in self._gait_selection:
-                self._gait_selection.get_logger().info(f"{gait.name}\n"
-                                                       f"{gait.starting_position}\n"
-                                                       f"{gait.final_position}")
-                if gait.starting_position == self._current_state:
-                    res.append(gait.name)
-            self._gait_selection.get_logger().info(f"res: {res}")
-            return res
+            return self._gait_graph.possible_gaits_from_idle(self._current_state)
         else:
             return []
 
@@ -358,6 +350,7 @@ class GaitStateMachine:
                                                    f"{gait.starting_position}")
             if (
                 gait is not None
+                # and gait.name in self._gait_graph.possible_gaits_from_idle(self._current_state)
                 and gait.starting_position == self._current_state
             ):
                 self._current_state = gait_name
