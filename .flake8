@@ -1,0 +1,12 @@
+[flake8]
+# Recommend matching the black line length (default 88),
+# rather than using the flake8 default of 79:
+max-line-length = 88
+show-source = true
+exclude = .git,__init__.py,ros1/build,ros1/install,ros1/log,ros2/build,ros2/install,ros2/log,ros2/src/libraries,venv,.scripts
+extend-ignore =
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    E203,
+    # This gives errors if the lines are too long, but we use the black formatter which has different settings
+    E501
+

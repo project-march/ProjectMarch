@@ -146,7 +146,7 @@ container:build:
   allow_failure: true
   only:
     changes:
-      - "pyproject.toml"
+      - ".flake8"
       - "**/*.py"
 
 # The job for branches
