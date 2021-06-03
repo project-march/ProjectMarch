@@ -1,6 +1,7 @@
 import os
 
 import yaml
+from typing import Dict
 from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (
@@ -149,7 +150,7 @@ class Gait(object):
                     )
                 )
 
-    def set_subgaits(self, new_subgaits: dict[str, Subgait]):
+    def set_subgaits(self, new_subgaits: Dict[str, Subgait]):
         self.subgaits.update(new_subgaits)
         self._validate_trajectory_transition()
 
