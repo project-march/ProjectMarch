@@ -139,10 +139,10 @@ container:build:
 .flake8-base:
   stage: Lint code
   script:
-    - python3 -m flakehell lint --suppress-none-returning --format=gitlab --output-file flakehell.json
+    - python3 -m flake8 --format=codeclimate --append-config codeclimate.json
   artifacts:
     reports:
-      codequality: flakehell.json
+      codequality: codeclimate.json
   allow_failure: true
   only:
     changes:
