@@ -383,7 +383,9 @@ class RealSenseGait(SetpointsGait):
         else:
             raise UnknownDimensionsError(self.dimensions)
 
-    def set_edge_positions(self, starting_position: EdgePosition, final_position: EdgePosition):
+    def set_edge_positions(
+        self, starting_position: EdgePosition, final_position: EdgePosition
+    ):
         """
         Set the new edge positions. Overrides from the setpoints gait, which does not
         store the starting or final position

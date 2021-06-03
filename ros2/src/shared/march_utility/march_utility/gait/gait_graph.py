@@ -16,6 +16,7 @@ class GaitGraph:
     that are available. It is generated at startup and is used by the gait state
     machine to get the possible gaits and to verify a requested gait.
     """
+
     NamedPositions = Dict[EdgePosition, str]
     IdleTransitions = Dict[EdgePosition, Set[str]]
     GaitTransitions = Dict[str, EdgePosition]

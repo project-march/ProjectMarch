@@ -8,6 +8,7 @@ class EdgePosition:
     used both when interpolating gaits, to verify that static end positions don't
     accidentally change and to determine the possible transitions on startup.
     """
+
     ALLOWED_ERROR_ENDPOINTS = 0.001
     JointDictionary = Dict[str, float]
 
@@ -46,6 +47,7 @@ class StaticEdgePosition(EdgePosition):
     EdgePosition for when no changes can be done during runtime. These are best for
     determining transitions beforehand and will also be named in the default.yaml.
     """
+
     def __init__(self, values):
         super().__init__(values)
 
@@ -66,6 +68,7 @@ class DynamicEdgePosition(EdgePosition):
     EdgePosition for gaits that allow changing at runtime, for example based on the
     camera images. These transitions are checked extra when requesting the gaits.
     """
+
     def __init__(self, values):
         super().__init__(values)
 
@@ -85,6 +88,7 @@ class UnknownEdgePosition(EdgePosition):
     """
     EdgePosition for gaits that can start from an unknown idle position.
     """
+
     def __init__(self):
         super().__init__({})
 
