@@ -30,7 +30,7 @@ def generate_launch_description() -> LaunchDescription:
                 arguments=[],
                 parameters=[
                     {"hud_host": LaunchConfiguration("hud_host")},
-                    {"hud_port": LaunchConfiguration("hud_port")}
+                    {"hud_port": LaunchConfiguration("hud_port")},
                 ],
             ),
         ]
