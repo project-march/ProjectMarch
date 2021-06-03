@@ -5,6 +5,6 @@ subgaits:
   stand_up:
     to: end
   start:
-    to: stand_home
-  stand_home:
     to: prepare_stand_up
+  stand_up:
+    to: stand_home
