@@ -417,7 +417,7 @@ class GaitStateMachine:
                 now, self._gait_selection._early_schedule_duration
             )
         else:
-            gait_update = self._current_gait.update(now, node=self._gait_selection)
+            gait_update = self._current_gait.update(now)
         self._process_gait_update(gait_update)
 
     def _process_gait_update(self, gait_update: GaitUpdate):

@@ -95,11 +95,5 @@ class UnknownEdgePosition(EdgePosition):
     def __eq__(self, other):
         return isinstance(other, UnknownEdgePosition)
 
-    def is_compatible(self, other):
-        return self == other
-
     def __hash__(self):
         return super().__hash__()
-
-    def __str__(self):
-        return "UnknownEdgePosition"

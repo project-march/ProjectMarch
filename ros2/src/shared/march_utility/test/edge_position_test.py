@@ -45,36 +45,6 @@ class EdgePointTest(unittest.TestCase):
         position2 = EdgePosition(self.values_not_close)
         self.assertNotEqual(position1, position2)
 
-    def test_is_compatible_parent(self):
-        position1 = EdgePosition(self.values)
-        position2 = EdgePosition(self.values)
-        self.assertTrue(position1.is_compatible(position2))
-
-    def test_is_compatible_static(self):
-        position1 = StaticEdgePosition(self.values)
-        position2 = StaticEdgePosition(self.values)
-        self.assertTrue(position1.is_compatible(position2))
-
-    def test_is_compatible_dynamic(self):
-        position1 = DynamicEdgePosition(self.values)
-        position2 = DynamicEdgePosition(self.values)
-        self.assertTrue(position1.is_compatible(position2))
-
-    def test_is_compatible_static_dynamic(self):
-        position1 = StaticEdgePosition(self.values)
-        position2 = DynamicEdgePosition(self.values)
-        self.assertFalse(position1.is_compatible(position2))
-
-    def test_is_compatible_dynamic_static(self):
-        position1 = DynamicEdgePosition(self.values)
-        position2 = StaticEdgePosition(self.values)
-        self.assertFalse(position1.is_compatible(position2))
-
     def test_unknown(self):
         position = UnknownEdgePosition()
         self.assertEqual(position.values, ())
-
-    def test_is_compatible_unknown(self):
-        position1 = UnknownEdgePosition()
-        position2 = UnknownEdgePosition()
-        self.assertTrue(position1.is_compatible(position2))

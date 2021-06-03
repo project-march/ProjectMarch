@@ -125,7 +125,7 @@ class GaitGraph:
                 )
 
             self._gait_selection._gaits[home_gait_name] = home_gait
-            self._add_idle_transition(UnknownEdgePosition(), home_gait_name)
+            self._add_idle_transition(home_gait.starting_position, home_gait_name)
 
     def _add_idle_transition(self, start_position: EdgePosition, gait_name: str):
         """Add an idle transition.

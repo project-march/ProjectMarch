@@ -26,6 +26,7 @@ class TestGaitGraph(unittest.TestCase):
             gait_package="march_utility",
             directory="test/resources/gait_graph_gaits",
             robot=self.robot,
+            balance=False
         )
 
     def test_make_named_position(self):
@@ -53,7 +54,7 @@ class TestGaitGraph(unittest.TestCase):
         gait_graph._make_home_gaits()
         expected_idle_transitions = {
             self.stand_position: {"simple_gait"},
-            UnknownEdgePosition(): {"home_stand"},
+            self.gait_selection._gaits["home_stand"].starting_position: {"home_stand"},
         }
         self.assertTrue(len(self.gait_selection._gaits) == 2)
         self.assertEqual(expected_idle_transitions, gait_graph._idle_transitions)

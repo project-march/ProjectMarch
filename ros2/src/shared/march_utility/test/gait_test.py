@@ -1,5 +1,7 @@
 import os
 import unittest
+from copy import deepcopy
+
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 import yaml
@@ -140,21 +142,19 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_set_new_subgait_version_invalid_start(self):
-        self.gait.subgaits["right_open"].joints[0].setpoints[0].position = 124
-        subgait_name = "right_open"
-        new_version = "MIV_final"
+        new_subgaits = deepcopy(self.gait.subgaits)
+        new_subgaits["right_open"].joints[0].setpoints[0].position = 124
         with self.assertRaises(NonValidGaitContent):
-            self.gait.set_subgait_versions(
-                self.robot, self.resources_folder, {subgait_name: new_version}
+            self.gait.set_subgaits(
+                new_subgaits
             )
 
     def test_set_new_subgait_version_invalid_final(self):
-        self.gait.subgaits["left_close"].joints[0].setpoints[-1].position = 124
-        subgait_name = "left_close"
-        new_version = "MIV_final"
+        new_subgaits = deepcopy(self.gait.subgaits)
+        new_subgaits["left_close"].joints[0].setpoints[-1].position = 124
         with self.assertRaises(NonValidGaitContent):
-            self.gait.set_subgait_versions(
-                self.robot, self.resources_folder, {subgait_name: new_version}
+            self.gait.set_subgaits(
+                new_subgaits
             )
 
 

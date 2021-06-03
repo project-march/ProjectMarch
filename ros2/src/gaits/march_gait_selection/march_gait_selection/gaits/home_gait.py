@@ -34,6 +34,8 @@ class HomeGait(GaitInterface):
         self._scheduled_early = False
         self._start_time = None
         self._end_time = None
+        self._starting_position = UnknownEdgePosition()
+        self._final_position = StaticEdgePosition(self._position)
 
     @property
     def name(self):
@@ -53,11 +55,11 @@ class HomeGait(GaitInterface):
 
     @property
     def starting_position(self):
-        return UnknownEdgePosition()
+        return self._starting_position
 
     @property
     def final_position(self):
-        return StaticEdgePosition(self._position)
+        return self._final_position
 
     @property
     def can_be_scheduled_early(self) -> bool:

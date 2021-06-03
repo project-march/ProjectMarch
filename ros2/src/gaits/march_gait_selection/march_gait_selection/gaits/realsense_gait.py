@@ -19,7 +19,7 @@ from march_utility.utilities.dimensions import (
 )
 from march_utility.exceptions.gait_exceptions import (
     UnknownDimensionsError,
-    WrongRealSenseConfigurationError,
+    WrongRealSenseConfigurationError, NonValidGaitContent,
 )
 from rclpy import Future
 from rclpy.node import Node
@@ -359,12 +359,11 @@ class RealSenseGait(SetpointsGait):
                 parameters=self.parameters,
                 use_foot_position=True,
             )
-        if not self.set_subgaits(new_subgaits, self._node):
-            self._node.get_logger().info("Failed setting the interpolating")
+        try:
+            self.set_subgaits(new_subgaits, self._node)
+        except NonValidGaitContent:
             return False
-        self._node.get_logger().info(
-            f"{self._starting_position} and {self._final_position}"
-        )
+
         return True
 
     def update_parameters(self, gait_parameters: GaitParameters) -> None:

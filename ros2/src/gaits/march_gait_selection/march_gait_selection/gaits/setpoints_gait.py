@@ -3,7 +3,7 @@ from typing import Optional
 from march_gait_selection.gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
-from march_utility.gait.edge_position import StaticEdgePosition
+from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
@@ -66,16 +66,13 @@ class SetpointsGait(GaitInterface, Gait):
             return None
 
     @property
-    def starting_position(self):
-        return StaticEdgePosition(
-            self.subgaits[self.graph.start_subgaits()[0]].starting_position
-        )
+    def starting_position(self) -> EdgePosition:
+        return StaticEdgePosition(self.subgaits[self.graph.start_subgaits()[
+            0]].starting_position)
 
     @property
-    def final_position(self):
-        return StaticEdgePosition(
-            self.subgaits[self.graph.end_subgaits()[0]].final_position
-        )
+    def final_position(self) -> EdgePosition:
+        return StaticEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
 
     @property
     def can_be_scheduled_early(self) -> bool:

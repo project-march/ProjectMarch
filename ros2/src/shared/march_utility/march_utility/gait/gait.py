@@ -36,8 +36,8 @@ class Gait:
         self.gait_name = gait_name
         self.subgaits = subgaits
         self.graph = graph
-        self._starting_position = None
-        self._final_position = None
+        self._starting_position = StaticEdgePosition(self.subgaits[self.graph.start_subgaits()[0]].starting_position)
+        self._final_position = StaticEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
         self._validate_trajectory_transition()
 
     @classmethod
@@ -102,13 +102,11 @@ class Gait:
         return cls(gait_name, subgaits, graph)
 
     @property
-    def starting_position(self) -> EdgePosition:
-        """Returns the starting position of all joints."""
+    def starting_position(self):
         return self._starting_position
 
     @property
-    def final_position(self) -> EdgePosition:
-        """Returns the position of all the joints after the gait has ended."""
+    def final_position(self):
         return self._final_position
 
     @staticmethod
@@ -222,15 +220,15 @@ class Gait:
         self.set_edge_positions(new_starting_position, new_final_position)
         return True
 
+
     def set_edge_positions(
-        self, starting_position: EdgePosition, final_position: EdgePosition
+            self, starting_position: EdgePosition, final_position: EdgePosition
     ):
         """
-        Change the edge positions, in general this is changing the attributes,
-        but gaits (e.g. the setpoints gait) can override this if the edge position
-        is determined differently.
-        :param starting_position: The new starting position of the gait
-        :param final_position: The new final position of the gait
+        Set the new edge positions. Overrides from the setpoints gait, which does not
+        store the starting or final position
+        :param starting_position: The new starting position
+        :param final_position: The new final position
         """
         self._starting_position = starting_position
         self._final_position = final_position
@@ -249,11 +247,10 @@ class Gait:
                 self.subgaits.update(new_subgaits)
                 self._validate_trajectory_transition()
                 return True
-            return False
         except NonValidGaitContent as e:
             if node is not None:
                 node.get_logger().warn(f"New subgaits were invalid: {e}")
-            return False
+            raise e
 
     def set_subgait_versions(
         self, robot: urdf.Robot, gait_directory: str, version_map: dict
@@ -264,14 +261,17 @@ class Gait:
         :param str gait_directory: path to the gait directory
         :param dict version_map: Mapping subgait names to versions
         """
-        new_subgaits = {}
+        new_subgaits = self.subgaits
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
                 raise SubgaitNameNotFound(subgait_name, self.gait_name)
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
-        self.set_subgaits(new_subgaits)
+            try:
+                self.set_subgaits(new_subgaits)
+            except NonValidGaitContent as e:
+                raise e
 
     def __getitem__(self, name: str):
         """Returns a subgait from the loaded subgaits."""

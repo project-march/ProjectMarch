@@ -40,7 +40,7 @@ NODE_NAME = "gait_selection"
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
-    def __init__(self, gait_package=None, directory=None, robot=None):
+    def __init__(self, gait_package=None, directory=None, robot=None, balance=None):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
@@ -58,10 +58,10 @@ class GaitSelection(Node):
                     .get_parameter_value()
                     .string_value
                 )
-
-            self._balance_used = (
-                self.get_parameter("balance").get_parameter_value().bool_value
-            )
+            if balance is None:
+                self._balance_used = (
+                    self.get_parameter("balance").get_parameter_value().bool_value
+                )
 
         except ParameterNotDeclaredException:
             self.get_logger().error(
@@ -394,7 +394,7 @@ class GaitSelection(Node):
 
     def _load_realsense_configuration(self):
         if not os.path.isfile(self._realsense_yaml):
-            self.get_logger().warn(
+            self.get_logger().info(
                 "No realsense_yaml present, no realsense gaits will be created."
             )
             return {}
@@ -408,7 +408,9 @@ class GaitSelection(Node):
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         version_map = default_config["gaits"]
-        dynamic_edge_version_map = default_config["dynamic_edge_gaits"]
+        dynamic_edge_version_map = {}
+        if "dynamic_edge_gaits" in default_config.keys():
+            dynamic_edge_version_map = default_config["dynamic_edge_gaits"]
 
         if not isinstance(version_map, dict):
             raise TypeError("Gait version map should be of type; dictionary")
