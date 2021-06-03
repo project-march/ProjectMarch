@@ -1,4 +1,6 @@
+#include "yaml-cpp/yaml.h"
 #include <ctime>
+#include <filesystem>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/random_sample.h>
@@ -6,6 +8,7 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/search/kdtree.h>
 #include <pointcloud_processor/preprocessor.h>
+#include <ros/package.h>
 #include <ros/ros.h>
 
 #include <pcl_ros/transforms.h>
@@ -13,6 +16,7 @@
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
+using namespace std::filesystem;
 
 // Base constructor for preprocessors
 Preprocessor::Preprocessor(bool debugging)
@@ -137,6 +141,12 @@ void NormalsPreprocessor::readParameters(
     allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
+    // Transformation parameters
+    YAML::Node robot_properties
+        = YAML::LoadFile(ros::package::getPath("march_description")
+            + "/urdf/properties/march6.yaml");
+    foot_height
+        = robot_properties["dimensions"]["general"]["width"].as<double>();
     debugging_ = config.debug;
 }
 
@@ -180,6 +190,21 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
             << ex.what());
         return false;
     }
+    // When transforming to the foot, raise the pointcloud up a bit so that the
+    // origin is on the ground If not, assume that the frame id to transform
+    // chosen differently on purpose (for example to be the pressure sole which
+    // is already on the ground) and do as expected.
+    if (frame_id_to_transform_to_ == "foot_left"
+        || frame_id_to_transform_to_ == "foot_right") {
+        Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
+
+        // Define a translation up of half the height of the foot.
+        transform_matrix.translation() << 0, 0, foot_height / (double)2.0;
+
+        // Executing the transformation
+        pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform_matrix);
+    }
+
     return true;
 }
 

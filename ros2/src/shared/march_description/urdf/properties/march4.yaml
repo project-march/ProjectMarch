@@ -1,4 +1,6 @@
 dimensions:
+  general:
+    width: 0.05
   hip_base:
     length: 0.160
     mass: 8.686
