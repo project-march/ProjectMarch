@@ -35,6 +35,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AfterLimitJointCommand.msg"
   "msg/Alive.msg"
   "msg/CurrentGait.msg"
+  "msg/CurrentIPDState.msg"
   "msg/CurrentState.msg"
   "msg/Error.msg"
   "msg/FollowJointTrajectoryGoal.msg"

@@ -1,5 +1,5 @@
 <launch>
-    <arg name="arduino_master" default="true" doc="Launches the arduino master serial node when true."/>
+    <arg name="arduino_master" default="false" doc="Launches the arduino master serial node when true."/>
     <arg name="arduino_master_port" default="/dev/ttyACM0" doc="Device port to use for arduino master serial connection."/>
     <arg name="arduino_master_baud" default="57600" doc="Baud rate to set for the arduino master connection."/>
 
