@@ -24,7 +24,6 @@ def generate_launch_description():
     imu_topic = LaunchConfiguration("imu_topic")
 
     # Simulation arguments
-    realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 

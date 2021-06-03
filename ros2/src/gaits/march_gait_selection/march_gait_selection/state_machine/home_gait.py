@@ -1,5 +1,3 @@
-from typing import Optional, Tuple
-
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
