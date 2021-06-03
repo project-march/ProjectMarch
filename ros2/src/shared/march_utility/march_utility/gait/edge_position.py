@@ -3,8 +3,12 @@ from typing import Dict, Union
 
 
 class EdgePosition:
+    """
+    A class that is used to denote the starting and final positions of gaits. This is
+    used both when interpolating gaits, to verify that static end positions don't
+    accidentally change and to determine the possible transitions on startup.
+    """
     ALLOWED_ERROR_ENDPOINTS = 0.001
-
     JointDictionary = Dict[str, float]
 
     def __init__(self, values: Union[tuple, list, JointDictionary]):
@@ -36,11 +40,12 @@ class EdgePosition:
     def __hash__(self):
         return hash(self.values)
 
-    def is_compatible(self, other):
-        return self == other
-
 
 class StaticEdgePosition(EdgePosition):
+    """
+    EdgePosition for when no changes can be done during runtime. These are best for
+    determining transitions beforehand and will also be named in the default.yaml.
+    """
     def __init__(self, values):
         super().__init__(values)
 
@@ -49,16 +54,18 @@ class StaticEdgePosition(EdgePosition):
             return super().__eq__(other)
         return False
 
-    def is_compatible(self, other):
-        if isinstance(other, StaticEdgePosition):
-            return super().is_compatible(other)
-        return False
-
     def __hash__(self):
         return super().__hash__()
+
+    def __str__(self):
+        return f"Static: {self.values}"
 
 
 class DynamicEdgePosition(EdgePosition):
+    """
+    EdgePosition for gaits that allow changing at runtime, for example based on the
+    camera images. These transitions are checked extra when requesting the gaits.
+    """
     def __init__(self, values):
         super().__init__(values)
 
@@ -67,16 +74,17 @@ class DynamicEdgePosition(EdgePosition):
             return super().__eq__(other)
         return False
 
-    def is_compatible(self, other):
-        if isinstance(other, DynamicEdgePosition):
-            return True
-        return False
-
     def __hash__(self):
         return super().__hash__()
 
+    def __str__(self):
+        return f"Dynamic: {self.values}"
+
 
 class UnknownEdgePosition(EdgePosition):
+    """
+    EdgePosition for gaits that can start from an unknown idle position.
+    """
     def __init__(self):
         super().__init__({})
 
@@ -88,3 +96,6 @@ class UnknownEdgePosition(EdgePosition):
 
     def __hash__(self):
         return super().__hash__()
+
+    def __str__(self):
+        return "UnknownEdgePosition"

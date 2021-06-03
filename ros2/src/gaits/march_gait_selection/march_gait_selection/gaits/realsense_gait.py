@@ -4,8 +4,11 @@ from typing import Optional, List, Dict
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
-from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition, \
-    DynamicEdgePosition
+from march_utility.gait.edge_position import (
+    StaticEdgePosition,
+    EdgePosition,
+    DynamicEdgePosition,
+)
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
@@ -168,11 +171,11 @@ class RealSenseGait(SetpointsGait):
 
             starting_position = cls.parse_edge_position(
                 gait_config["starting_position"],
-                subgaits[graph.start_subgaits()[0]].starting_position
+                subgaits[graph.start_subgaits()[0]].starting_position,
             )
             final_position = cls.parse_edge_position(
                 gait_config["final_position"],
-                subgaits[graph.end_subgaits()[0]].final_position
+                subgaits[graph.end_subgaits()[0]].final_position,
             )
 
         except KeyError as e:
@@ -197,7 +200,7 @@ class RealSenseGait(SetpointsGait):
             parameters,
             process_service,
             starting_position,
-            final_position
+            final_position,
         )
 
     @classmethod
@@ -213,9 +216,11 @@ class RealSenseGait(SetpointsGait):
         elif config_value == "dynamic":
             return DynamicEdgePosition(position_values)
         else:
-            raise WrongRealSenseConfigurationError("The edge position did not have a "
-                                                   "valid value, should be static or "
-                                                   f"dynamic, but was `{config_value}`")
+            raise WrongRealSenseConfigurationError(
+                "The edge position did not have a "
+                "valid value, should be static or "
+                f"dynamic, but was `{config_value}`"
+            )
 
     @classmethod
     def realsense_category_from_string(cls, gait_name: str) -> int:
@@ -292,7 +297,8 @@ class RealSenseGait(SetpointsGait):
             return GaitUpdate.empty()
 
         self.update_parameters(gait_parameters_response.gait_parameters)
-        self.interpolate_subgaits_from_parameters()
+        if not self.interpolate_subgaits_from_parameters():
+            return GaitUpdate.empty()
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
@@ -340,8 +346,8 @@ class RealSenseGait(SetpointsGait):
         self.realsense_service_result = future.result()
         self.realsense_service_event.set()
 
-    def interpolate_subgaits_from_parameters(self) -> None:
-        """Change all subgaits to one interpolated from the current parameters."""
+    def interpolate_subgaits_from_parameters(self) -> bool:
+        """ Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
         self._node.get_logger().info(
             f"Interpolating with parameters: {self.parameters}"
@@ -353,7 +359,13 @@ class RealSenseGait(SetpointsGait):
                 parameters=self.parameters,
                 use_foot_position=True,
             )
-        self.set_subgaits(new_subgaits)
+        if not self.set_subgaits(new_subgaits, self._node):
+            self._node.get_logger().info("Failed setting the interpolating")
+            return False
+        self._node.get_logger().info(
+            f"{self._starting_position} and {self._final_position}"
+        )
+        return True
 
     def update_parameters(self, gait_parameters: GaitParameters) -> None:
         """
@@ -371,6 +383,12 @@ class RealSenseGait(SetpointsGait):
         else:
             raise UnknownDimensionsError(self.dimensions)
 
-    def set_edge_positions(self, starting_position, final_position):
+    def set_edge_positions(self, starting_position: EdgePosition, final_position: EdgePosition):
+        """
+        Set the new edge positions. Overrides from the setpoints gait, which does not
+        store the starting or final position
+        :param starting_position: The new starting position
+        :param final_position: The new final position
+        """
         self._starting_position = starting_position
         self._final_position = final_position

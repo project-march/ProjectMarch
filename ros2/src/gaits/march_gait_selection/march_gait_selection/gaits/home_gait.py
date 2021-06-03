@@ -1,3 +1,5 @@
+from typing import Optional
+
 from march_utility.gait.edge_position import StaticEdgePosition, UnknownEdgePosition
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
@@ -29,6 +31,7 @@ class HomeGait(GaitInterface):
         self._position = position
         self._gait_type = gait_type
         self._duration = duration
+        self._scheduled_early = False
         self._start_time = None
         self._end_time = None
 
@@ -57,29 +60,58 @@ class HomeGait(GaitInterface):
         return StaticEdgePosition(self._position)
 
     @property
+    def can_be_scheduled_early(self) -> bool:
+        return True
+
+    @property
     def version(self):
         return "home_gait_version"
 
-    def start(self, current_time: Time) -> GaitUpdate:
+    def start(
+        self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)
+    ) -> GaitUpdate:
         """Start the gait.
         Creates a trajectory command to go towards the idle position in the given duration.
         :returns Returns a GaitUpdate that usually contains a TrajectoryCommand.
         """
-        self._start_time = current_time
-        self._end_time = self._start_time + self._duration
-        return GaitUpdate.should_schedule(
-            TrajectoryCommand(
-                self._get_trajectory_msg(), self._duration, self._name, self._start_time
+        if first_subgait_delay is not None and first_subgait_delay > Duration(0):
+            self._start_time = current_time + self._duration
+            self._end_time = self._start_time + self._duration
+            self._scheduled_early = True
+            return GaitUpdate.should_schedule_early(
+                TrajectoryCommand(
+                    self._get_trajectory_msg(),
+                    self._duration,
+                    self._name,
+                    self._start_time,
+                )
             )
-        )
+        else:
+            self._start_time = current_time
+            self._end_time = self._start_time + self._duration
+            return GaitUpdate.should_schedule(
+                TrajectoryCommand(
+                    self._get_trajectory_msg(),
+                    self._duration,
+                    self._name,
+                    self._start_time,
+                )
+            )
 
-    def update(self, current_time: Time) -> GaitUpdate:
+    def update(
+        self,
+        current_time: Time,
+        early_schedule_duration: Optional[Duration] = Duration(0),
+        node=None,
+    ) -> GaitUpdate:
         """Give an update on the progress of the gait.
         :param current_time: Current time
         :returns Returns a GaitUpdate with only the is_finished set to either true or false.
         """
         if current_time >= self._end_time:
             return GaitUpdate.finished()
+        elif self._scheduled_early and current_time > self._start_time:
+            return GaitUpdate.subgait_updated()
         else:
             return GaitUpdate.empty()
 

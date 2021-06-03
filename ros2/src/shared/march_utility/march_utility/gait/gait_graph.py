@@ -11,6 +11,11 @@ from .edge_position import EdgePosition, StaticEdgePosition, UnknownEdgePosition
 
 
 class GaitGraph:
+    """
+    The gait graph is made to keep track of all named positions and gait transitions
+    that are available. It is generated at startup and is used by the gait state
+    machine to get the possible gaits and to verify a requested gait.
+    """
     NamedPositions = Dict[EdgePosition, str]
     IdleTransitions = Dict[EdgePosition, Set[str]]
     GaitTransitions = Dict[str, EdgePosition]
@@ -28,6 +33,12 @@ class GaitGraph:
         self._unnamed_count = 0
 
     def possible_gaits_from_idle(self, current_state: EdgePosition) -> Set:
+        """
+        Get the list of gait names that are (possibly) available from this edge
+        position.
+        :param current_state: The current position of the exo.
+        :return: A list of gait names
+        """
         if isinstance(current_state, DynamicEdgePosition):
             return self._dynamic_transitions
         else:
@@ -53,10 +64,17 @@ class GaitGraph:
         self._named_positions[UnknownEdgePosition()] = GaitGraph.UNKNOWN
 
     def get_name_of_position(self, position: EdgePosition) -> str:
+        """
+        Get the name of a given position. Static positions will have a name from the
+        default.yaml or a name generated at startup. Dynamic gaits have no name,
+        but return a string with the values.
+        :param position: The position to get the name from.
+        :return: The name.
+        """
         if position in self._named_positions.keys():
             return self._named_positions[position]
         else:
-            return "unnamed"
+            return f"unnamed: {position}"
 
     def _make_transitions(self):
         """Make all gait transitions.

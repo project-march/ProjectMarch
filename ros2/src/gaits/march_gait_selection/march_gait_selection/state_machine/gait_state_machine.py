@@ -1,12 +1,17 @@
 from typing import Optional, Union
 from gazebo_msgs.msg import ContactsState
-from march_gait_selection.state_machine.gait_state_machine_error import \
-    GaitStateMachineError
+from march_gait_selection.state_machine.gait_state_machine_error import (
+    GaitStateMachineError,
+)
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
-from march_utility.gait.edge_position import EdgePosition, UnknownEdgePosition
+from march_utility.gait.edge_position import (
+    EdgePosition,
+    UnknownEdgePosition,
+    DynamicEdgePosition,
+)
 from march_utility.gait.gait_graph import GaitGraph
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.shutdown import shutdown_system
@@ -105,9 +110,7 @@ class GaitStateMachine:
             callback_group=ReentrantCallbackGroup(),
             qos_profile=10,
         )
-        self._freeze_sub = self._gait_selection.create_service(
-            srv_type=Trigger, srv_name="/freeze", callback=self._freeze_cb
-        )
+
         self._get_possible_gaits_client = self._gait_selection.create_service(
             srv_type=PossibleGaits,
             srv_name="/march/gait_selection/get_possible_gaits",
@@ -122,21 +125,6 @@ class GaitStateMachine:
     def _is_idle(self):
         return isinstance(self._current_state, EdgePosition)
 
-    def _freeze_cb(self, request, response):
-        if self._freeze():
-            response.success = True
-        else:
-            response.success = False
-        return response
-
-    def _freeze(self):
-        if self._current_gait is not None and self._current_gait.can_freeze:
-            self._gait_selection.get_logger().debug("Freezing the gait")
-            self._current_gait.freeze()
-            return True
-        else:
-            return False
-
     def _update_foot_on_ground_cb(self, side, msg):
         """Update the status of the feet on ground based on pressure sole data,
         this is currently decided based on the force in simulation, but the numbers
@@ -147,11 +135,8 @@ class GaitStateMachine:
             if force > PRESSURE_SOLE_STANDING_FORCE:
                 if not self._right_foot_on_ground and side is Side.right:
                     self._right_foot_on_ground = True
-                    self._freeze()
                 elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
-                    self._freeze()
-
             # Assign force to specific foot
             if side is Side.right:
                 self._force_right_foot = force
@@ -178,7 +163,8 @@ class GaitStateMachine:
         add_transition_callback."""
         if self._is_idle():
             state_type = CurrentState.IDLE
-            state_name = self._gait_graph._named_positions[self._current_state]
+            state_name = self._gait_graph.get_name_of_position(self._current_state)
+
         else:
             state_type = CurrentState.GAIT
             state_name = self._current_state
@@ -224,7 +210,6 @@ class GaitStateMachine:
 
         :returns List of names, or empty list when a gait is executing.
         """
-        self._gait_selection.get_logger().info(f"Current state: {self._current_state}")
         if self._is_idle():
             return self._gait_graph.possible_gaits_from_idle(self._current_state)
         else:
@@ -316,22 +301,23 @@ class GaitStateMachine:
 
         If not, issue a warning. This will only be checked when transitioning from idle to gait state
         """
-        if (
-            "right" in self._current_gait.subgait_name
-            and self._force_right_foot > self._force_left_foot
-        ):
-            self._gait_selection.get_logger().warn(
-                "Incorrect pressure placement, place pressure on left foot"
-            )
-            return False
-        if (
-            "left" in self._current_gait.subgait_name
-            and self._force_left_foot > self._force_right_foot
-        ):
-            self._gait_selection.get_logger().warn(
-                "Incorrect pressure placement, place pressure on right foot"
-            )
-            return False
+        if self._current_gait is not None:
+            if (
+                "right" in self._current_gait.subgait_name
+                and self._force_right_foot > self._force_left_foot
+            ):
+                self._gait_selection.get_logger().warn(
+                    "Incorrect pressure placement, place pressure on left foot"
+                )
+                return False
+            if (
+                "left" in self._current_gait.subgait_name
+                and self._force_left_foot > self._force_right_foot
+            ):
+                self._gait_selection.get_logger().warn(
+                    "Incorrect pressure placement, place pressure on right foot"
+                )
+                return False
 
         return True
 
@@ -342,17 +328,22 @@ class GaitStateMachine:
             gait_name = self._input.gait_name()
             self._gait_selection.get_logger().info(f"Requested gait `{gait_name}`")
             gait = self._gait_selection._gaits.get(gait_name)
-            self._gait_selection.get_logger().info(f"Current state: "
-                                                   f"{type(self._current_state)} - "
-                                                   f" {self._current_state}")
-            self._gait_selection.get_logger().info(f"Gait starting position: "
-                                                   f"{type(gait.starting_position)} - "
-                                                   f"{gait.starting_position}")
             if (
                 gait is not None
-                # and gait.name in self._gait_graph.possible_gaits_from_idle(self._current_state)
-                and gait.starting_position == self._current_state
+                and gait_name
+                in self._gait_graph.possible_gaits_from_idle(self._current_state)
             ):
+                if (
+                    isinstance(gait.starting_position, DynamicEdgePosition)
+                    and gait.starting_position != self._current_state
+                ):
+                    self._gait_selection.get_logger().warn(
+                        f"The gait {gait_name} does not have the correct dynamic "
+                        f"starting position, should be {self._current_state}, but was "
+                        f"{gait.starting_position}"
+                    )
+                    self._input.gait_rejected()
+                    return
                 self._current_state = gait_name
                 self._should_stop = False
                 self._input.gait_accepted()
@@ -369,8 +360,15 @@ class GaitStateMachine:
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
+        # self._gait_selection.get_logger().info(
+        #     f"process gait state, current is {self._current_gait}"
+        # )
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
+            self._gait_selection.get_logger().info(
+                f"Current state `{self._current_state}, gaits: "
+                f"{self._gait_selection._gaits}`"
+            )
             self._current_gait = self._gait_selection._gaits[self._current_state]
 
 
@@ -402,6 +400,7 @@ class GaitStateMachine:
                     f"left={self._force_left_foot}, right={self._force_right_foot}"
                 )
             self._process_gait_update(gait_update)
+            return
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()
@@ -418,7 +417,7 @@ class GaitStateMachine:
                 now, self._gait_selection._early_schedule_duration
             )
         else:
-            gait_update = self._current_gait.update(now)
+            gait_update = self._current_gait.update(now, node=self._gait_selection)
         self._process_gait_update(gait_update)
 
     def _process_gait_update(self, gait_update: GaitUpdate):
@@ -436,12 +435,12 @@ class GaitStateMachine:
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
-            self._gait_selection.get_logger().info(
-                f"Finished gait `{self._current_gait.name}`"
-            )
             self._current_gait = None
             self._is_stopping = False
             self._trajectory_scheduler.reset()
+            self._gait_selection.get_logger().info(
+                f"Finished gait `{self._current_gait.name}`"
+            )
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
@@ -503,9 +502,7 @@ class GaitStateMachine:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
         self._current_state = UnknownEdgePosition()
-        self._gait_selection.get_logger().info(
-            f"Transitioned to unknown"
-        )
+        self._gait_selection.get_logger().info(f"Transitioned to unknown")
 
     @staticmethod
     def _add_callback(callbacks, cb):

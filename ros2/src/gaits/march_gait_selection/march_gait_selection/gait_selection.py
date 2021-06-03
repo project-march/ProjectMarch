@@ -3,8 +3,9 @@ import os
 import yaml
 from ament_index_python.packages import get_package_share_directory
 from march_gait_selection.gaits.balance_gait import BalanceGait
-from march_gait_selection.gaits.dynamic_edge_setpoints_gait import \
-    DynamicEdgeSetpointsGait
+from march_gait_selection.gaits.dynamic_edge_setpoints_gait import (
+    DynamicEdgeSetpointsGait,
+)
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
 
 from march_utility.exceptions.gait_exceptions import (
@@ -90,7 +91,7 @@ class GaitSelection(Node):
         (
             self._gait_version_map,
             self._positions,
-            self._dynamic_edge_version_map
+            self._dynamic_edge_version_map,
         ) = self._load_configuration()
 
         self._robot_description_sub = self.create_subscription(
@@ -343,12 +344,11 @@ class GaitSelection(Node):
             )
 
         for gait in self._dynamic_edge_version_map:
+            self.get_logger().info(f"Adding gait {gait}")
             gaits[gait] = DynamicEdgeSetpointsGait.from_file(
-                gait, self._gait_directory, self._robot,
-                self._dynamic_edge_version_map
+                gait, self._gait_directory, self._robot, self._dynamic_edge_version_map
             )
-            self._gait_version_map[gait] = self._dynamic_edge_version_map[
-                gait]
+            self._gait_version_map[gait] = self._dynamic_edge_version_map[gait]
         self._load_realsense_gaits(gaits)
         if self._balance_used and "balance_walk" in gaits.keys():
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
