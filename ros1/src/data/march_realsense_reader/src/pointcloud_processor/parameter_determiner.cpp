@@ -48,10 +48,23 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_foot_locations;
     hull_dimension = config.hull_dimension;
 
-    min_x_stairs = (float)config.parameter_determiner_stairs_locations_min_x;
-    max_x_stairs = (float)config.parameter_determiner_stairs_locations_max_x;
-    min_z_stairs = (float)config.parameter_determiner_stairs_locations_min_z;
-    max_z_stairs = (float)config.parameter_determiner_stairs_locations_max_z;
+    min_x_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_min_x;
+    max_x_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_max_x;
+    min_z_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_min_z;
+    max_z_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_max_z;
+
+    min_x_stairs_down
+        = (float)config.parameter_determiner_stairs_down_locations_min_x;
+    max_x_stairs_down
+        = (float)config.parameter_determiner_stairs_down_locations_max_x;
+    min_z_stairs_down
+        = (float)config.parameter_determiner_stairs_down_locations_min_z;
+    max_z_stairs_down
+        = (float)config.parameter_determiner_stairs_down_locations_max_z;
 
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
@@ -165,6 +178,18 @@ void HullParameterDeterminer::initializeGaitDimensions()
             z_flat = z_flat_up;
             z_steep = z_steep_up;
             break;
+        }
+        case RealSenseCategory::stairs_up: {
+            min_x_stairs = min_x_stairs_up;
+            max_x_stairs = max_x_stairs_up;
+            min_z_stairs = min_z_stairs_up;
+            max_z_stairs = max_z_stairs_up;
+        }
+        case RealSenseCategory::stairs_down: {
+            min_x_stairs = min_x_stairs_down;
+            max_x_stairs = max_x_stairs_down;
+            min_z_stairs = min_z_stairs_down;
+            max_z_stairs = max_z_stairs_down;
         }
     }
     // If the subgait is a swing subgait, double the gait parameters and search

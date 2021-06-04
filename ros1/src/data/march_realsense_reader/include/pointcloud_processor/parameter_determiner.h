@@ -177,6 +177,14 @@ protected:
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
+    float min_x_stairs_down {};
+    float max_x_stairs_down {};
+    float min_z_stairs_down {};
+    float max_z_stairs_down {};
+    float min_x_stairs_up {};
+    float max_x_stairs_up {};
+    float min_z_stairs_up {};
+    float max_z_stairs_up {};
     float min_x_stairs {};
     float max_x_stairs {};
     float min_z_stairs {};
