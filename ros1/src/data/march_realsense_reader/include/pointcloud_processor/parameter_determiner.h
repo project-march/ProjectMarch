@@ -35,11 +35,7 @@ public:
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
         boost::shared_ptr<GaitParameters> gait_parameters,
-<<<<<<< HEAD
-        std::string subgait_name)
-=======
-        std::string frame_id_to_transform_to)
->>>>>>> 923-improve-debug-visualization-of-the-parameter-determiner
+        std::string frame_id_to_transform_to, std::string subgait_name)
         = 0;
 
     virtual ~ParameterDeterminer() = default;

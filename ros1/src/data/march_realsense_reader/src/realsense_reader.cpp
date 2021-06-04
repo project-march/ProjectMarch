@@ -212,7 +212,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         hull_parameter_determiner_publisher_.publish(
             parameter_determiner_->debug_marker_array);
     }
->>>>>>> 923-improve-debug-visualization-of-the-parameter-determiner
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "

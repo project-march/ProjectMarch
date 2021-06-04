@@ -216,6 +216,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
     std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
     switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
             marker_point.y = y_location;
