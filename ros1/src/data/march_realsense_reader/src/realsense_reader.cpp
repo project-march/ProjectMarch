@@ -192,7 +192,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     // Determine parameters
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
-            hull_vector, polygon_vector, realsense_category, gait_parameters, subgait_name);
+            hull_vector, polygon_vector, realsense_category, gait_parameters,
+            subgait_name);
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
