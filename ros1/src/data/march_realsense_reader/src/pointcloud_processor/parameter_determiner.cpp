@@ -296,12 +296,14 @@ void HullParameterDeterminer::initializeGaitDimensions()
             max_x_stairs = max_x_stairs_up;
             min_z_stairs = min_z_stairs_up;
             max_z_stairs = max_z_stairs_up;
+            break;
         }
         case RealSenseCategory::stairs_down: {
             min_x_stairs = min_x_stairs_down;
             max_x_stairs = max_x_stairs_down;
             min_z_stairs = min_z_stairs_down;
             max_z_stairs = max_z_stairs_down;
+            break;
         }
     }
     // If the subgait is a swing subgait, double the gait parameters and search
