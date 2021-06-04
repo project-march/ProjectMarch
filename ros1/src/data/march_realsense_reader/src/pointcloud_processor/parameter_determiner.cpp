@@ -59,15 +59,6 @@ void HullParameterDeterminer::readParameters(
     max_z_stairs_up
         = (float)config.parameter_determiner_stairs_up_locations_max_z;
 
-    min_x_stairs_down
-        = (float)config.parameter_determiner_stairs_down_locations_min_x;
-    max_x_stairs_down
-        = (float)config.parameter_determiner_stairs_down_locations_max_x;
-    min_z_stairs_down
-        = (float)config.parameter_determiner_stairs_down_locations_min_z;
-    max_z_stairs_down
-        = (float)config.parameter_determiner_stairs_down_locations_max_z;
-
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
@@ -78,8 +69,6 @@ void HullParameterDeterminer::readParameters(
     foot_width = (float)config.parameter_determiner_foot_width;
     hull_dimension = config.hull_dimension;
 
-    ramp_max_search_area
-        = (float)config.parameter_determiner_ramp_max_search_area;
     ramp_min_search_area
         = (float)config.parameter_determiner_ramp_min_search_area;
 
@@ -299,10 +288,10 @@ void HullParameterDeterminer::initializeGaitDimensions()
             break;
         }
         case RealSenseCategory::stairs_down: {
-            min_x_stairs = min_x_stairs_down;
-            max_x_stairs = max_x_stairs_down;
-            min_z_stairs = min_z_stairs_down;
-            max_z_stairs = max_z_stairs_down;
+            min_x_stairs = -min_x_stairs_up;
+            max_x_stairs = -max_x_stairs_up;
+            min_z_stairs = -min_z_stairs_up;
+            max_z_stairs = -max_z_stairs_up;
             break;
         }
     }
@@ -313,7 +302,6 @@ void HullParameterDeterminer::initializeGaitDimensions()
         x_steep *= 2;
         z_flat *= 2;
         z_steep *= 2;
-        ramp_max_search_area *= 2;
         min_x_stairs *= 2;
         max_x_stairs *= 2;
         min_z_stairs *= 2;
@@ -736,8 +724,11 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            success &= fillOptionalFootLocationCloud(
-                ramp_min_search_area, ramp_max_search_area);
+            // A point further than x_flat can never be project on the right
+            // part of the potential foot locations line assuming that the
+            // x_flat > x_steep and z_flat < z_steep
+            success
+                &= fillOptionalFootLocationCloud(ramp_min_search_area, x_flat);
             break;
         }
         default: {
