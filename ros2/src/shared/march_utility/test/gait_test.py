@@ -145,17 +145,13 @@ class GaitTest(unittest.TestCase):
         new_subgaits = deepcopy(self.gait.subgaits)
         new_subgaits["right_open"].joints[0].setpoints[0].position = 124
         with self.assertRaises(NonValidGaitContent):
-            self.gait.set_subgaits(
-                new_subgaits
-            )
+            self.gait.set_subgaits(new_subgaits)
 
     def test_set_new_subgait_version_invalid_final(self):
         new_subgaits = deepcopy(self.gait.subgaits)
         new_subgaits["left_close"].joints[0].setpoints[-1].position = 124
         with self.assertRaises(NonValidGaitContent):
-            self.gait.set_subgaits(
-                new_subgaits
-            )
+            self.gait.set_subgaits(new_subgaits)
 
 
 if __name__ == "__main__":

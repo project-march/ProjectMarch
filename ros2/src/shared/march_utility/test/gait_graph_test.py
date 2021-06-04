@@ -26,7 +26,7 @@ class TestGaitGraph(unittest.TestCase):
             gait_package="march_utility",
             directory="test/resources/gait_graph_gaits",
             robot=self.robot,
-            balance=False
+            balance=False,
         )
 
     def test_make_named_position(self):

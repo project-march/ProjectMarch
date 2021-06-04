@@ -36,8 +36,12 @@ class Gait:
         self.gait_name = gait_name
         self.subgaits = subgaits
         self.graph = graph
-        self._starting_position = StaticEdgePosition(self.subgaits[self.graph.start_subgaits()[0]].starting_position)
-        self._final_position = StaticEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
+        self._starting_position = StaticEdgePosition(
+            self.subgaits[self.graph.start_subgaits()[0]].starting_position
+        )
+        self._final_position = StaticEdgePosition(
+            self.subgaits[self.graph.end_subgaits()[0]].final_position
+        )
         self._validate_trajectory_transition()
 
     @classmethod
@@ -220,9 +224,8 @@ class Gait:
         self.set_edge_positions(new_starting_position, new_final_position)
         return True
 
-
     def set_edge_positions(
-            self, starting_position: EdgePosition, final_position: EdgePosition
+        self, starting_position: EdgePosition, final_position: EdgePosition
     ):
         """
         Set the new edge positions. Overrides from the setpoints gait, which does not

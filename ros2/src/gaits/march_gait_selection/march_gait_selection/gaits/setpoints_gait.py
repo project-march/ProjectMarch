@@ -67,12 +67,15 @@ class SetpointsGait(GaitInterface, Gait):
 
     @property
     def starting_position(self) -> EdgePosition:
-        return StaticEdgePosition(self.subgaits[self.graph.start_subgaits()[
-            0]].starting_position)
+        return StaticEdgePosition(
+            self.subgaits[self.graph.start_subgaits()[0]].starting_position
+        )
 
     @property
     def final_position(self) -> EdgePosition:
-        return StaticEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
+        return StaticEdgePosition(
+            self.subgaits[self.graph.end_subgaits()[0]].final_position
+        )
 
     @property
     def can_be_scheduled_early(self) -> bool:
