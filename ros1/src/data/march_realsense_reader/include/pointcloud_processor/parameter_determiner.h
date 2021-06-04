@@ -33,7 +33,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters)
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string subgait_name)
         = 0;
 
     virtual ~ParameterDeterminer() = default;
@@ -70,7 +71,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string subgait_name) override;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -222,7 +224,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string subgait_name) override;
 };
 
 #endif // MARCH_PARAMETER_DETERMINER_H

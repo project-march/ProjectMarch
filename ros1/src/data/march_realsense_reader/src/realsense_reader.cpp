@@ -192,7 +192,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     // Determine parameters
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
-            hull_vector, polygon_vector, realsense_category, gait_parameters);
+            hull_vector, polygon_vector, realsense_category, gait_parameters, subgait_name);
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
@@ -417,6 +417,7 @@ bool RealSenseReader::processPointcloudCallback(
 {
     realsense_category_ = req.realsense_category;
     frame_id_to_transform_to_ = req.frame_id_to_transform_to;
+    subgait_name_ = req.subgait_name;
 
     time_t start_callback = clock();
     if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {

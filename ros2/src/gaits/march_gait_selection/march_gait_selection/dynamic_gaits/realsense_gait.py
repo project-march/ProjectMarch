@@ -1,6 +1,7 @@
 from threading import Event
 from typing import Optional, List
 
+from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
@@ -17,15 +18,11 @@ from march_utility.exceptions.gait_exceptions import (
     WrongRealSenseConfigurationError,
 )
 from rclpy import Future
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client
 from urdf_parser_py import urdf
 
-from .gait_update import GaitUpdate
-
-from march_gait_selection.state_machine.gait_update import GaitUpdate
 
 
 class RealSenseGait(SetpointsGait):
@@ -263,15 +260,6 @@ class RealSenseGait(SetpointsGait):
             self._update_time_stamps(self._current_subgait)
             return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
-    def update(
-            self,
-            current_time: Time,
-            early_schedule_duration: Optional[Duration] = Duration(0),
-    ) -> GaitUpdate:
-        self._node.get_logger().warn("updating!")
-        return GaitUpdate.empty()
-
-
     def get_frame_id_to_transfrom_to(self):
         try:
             self._node.get_logger().warn(
@@ -300,6 +288,7 @@ class RealSenseGait(SetpointsGait):
             realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
             frame_id_to_transform_to=frame_id_to_transform_to,
+            subgait_name=self._current_subgait.subgait_name
         )
         self.realsense_service_event.clear()
         if self._get_gait_parameters_service.wait_for_service(

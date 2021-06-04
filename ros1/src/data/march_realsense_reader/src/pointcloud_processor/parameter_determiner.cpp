@@ -94,7 +94,8 @@ bool HullParameterDeterminer::determineParameters(
     boost::shared_ptr<HullVector> const hull_vector,
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters)
+    boost::shared_ptr<GaitParameters> gait_parameters,
+    std::string subgait_name)
 {
     time_t start_determine_parameters = clock();
 
@@ -721,7 +722,8 @@ bool SimpleParameterDeterminer::determineParameters(
     boost::shared_ptr<HullVector> const hull_vector,
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters)
+    boost::shared_ptr<GaitParameters> gait_parameters,
+    std::string subgait_name)
 {
     ROS_DEBUG("Determining parameters with simple parameter determiner");
     hull_vector_ = hull_vector;
