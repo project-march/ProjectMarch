@@ -362,7 +362,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(
+    success &= cropCloudToHullVector(
         foot_locations_to_try, possible_foot_locations);
 
     success &= getOptimalFootLocationFromPossibleLocations();
