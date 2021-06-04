@@ -7,6 +7,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
+#include <visualization_msgs/MarkerArray.h>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -33,7 +34,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters)
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to)
         = 0;
 
     virtual ~ParameterDeterminer() = default;
@@ -45,6 +47,8 @@ public:
         march_realsense_reader::pointcloud_parametersConfig& config)
         = 0;
 
+    visualization_msgs::MarkerArray debug_marker_array;
+
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
@@ -52,12 +56,13 @@ protected:
     std::optional<RealSenseCategory> realsense_category_ = std::nullopt;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     bool debugging_;
+    std::string frame_id_to_transform_to_;
 };
 
 /** The hull parameter determiner
  *
  */
-class HullParameterDeterminer : ParameterDeterminer {
+class HullParameterDeterminer : public ParameterDeterminer {
 public:
     /** Basic constructor for ParameterDeterminer preprocessor **/
     explicit HullParameterDeterminer(bool debugging);
@@ -70,17 +75,14 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to) override;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
      */
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
-
-    pcl::PointNormal optimal_foot_location;
-    PointNormalCloud::Ptr possible_foot_locations;
-    PointCloud2D::Ptr foot_locations_to_try;
 
 protected:
     // Get the optimal foot location by finding which possible foot location is
@@ -169,8 +171,21 @@ protected:
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
 
-    // set the gait dimension variables to the relevant value
+    // Set the gait dimension variables to the relevant value
     void initializeGaitDimensions();
+
+    // Initialize the debug output marker lists to easily add them during
+    // computations
+    void initializeDebugOutput();
+
+    // Initialize a single marker list with a certain id
+    visualization_msgs::Marker initializeMarkerListWithId(int id);
+
+    // Add the gait information to the marker array
+    void addDebugGaitInformation();
+
+    // Add the marker lists to the marker array
+    void addDebugMarkersToArray();
 
     // All relevant parameters
     int hull_dimension {};
@@ -201,12 +216,19 @@ protected:
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
-
+    visualization_msgs::Marker foot_locations_to_try_marker_list;
+    visualization_msgs::Marker possible_foot_locations_marker_list;
+    visualization_msgs::Marker gait_information_marker_list;
+    visualization_msgs::Marker optimal_foot_location_marker;
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
     // [5])^T
     LineCoefficients::Ptr executable_locations_line_coefficients_
         = boost::make_shared<LineCoefficients>();
+
+    pcl::PointNormal optimal_foot_location;
+    PointNormalCloud::Ptr possible_foot_locations;
+    PointCloud2D::Ptr foot_locations_to_try;
 };
 
 /** The simple parameter determiner
@@ -222,7 +244,8 @@ public:
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to) override;
 };
 
 #endif // MARCH_PARAMETER_DETERMINER_H
