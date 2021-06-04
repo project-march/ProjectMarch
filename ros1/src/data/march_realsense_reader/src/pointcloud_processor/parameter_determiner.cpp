@@ -528,7 +528,7 @@ bool HullParameterDeterminer::isValidLocation(
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
                     marker_color = color_utilities::PURPLE;
                 } else {
-                    marker_color = color_utilities::RED;
+                    marker_color = color_utilities::GREEN;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
@@ -567,7 +567,7 @@ bool HullParameterDeterminer::isValidLocation(
                 } else if (!(distance < max_distance_to_line)) {
                     marker_color = color_utilities::PURPLE;
                 } else {
-                    marker_color = color_utilities::RED;
+                    marker_color = color_utilities::GREEN;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
