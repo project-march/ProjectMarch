@@ -63,8 +63,10 @@ void HullParameterDeterminer::readParameters(
     foot_width = (float)config.parameter_determiner_foot_width;
     hull_dimension = config.hull_dimension;
 
-    max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
-    min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
+    ramp_max_search_area
+        = (float)config.parameter_determiner_ramp_max_search_area;
+    ramp_min_search_area
+        = (float)config.parameter_determiner_ramp_min_search_area;
 
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
     z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
@@ -105,6 +107,7 @@ bool HullParameterDeterminer::determineParameters(
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
     realsense_category_.emplace(realsense_category);
+    subgait_name_ = subgait_name;
     // Initialize the optimal foot location at the origin and the gait
     // parmaeters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
@@ -163,6 +166,19 @@ void HullParameterDeterminer::initializeGaitDimensions()
             z_steep = z_steep_up;
             break;
         }
+    }
+    // If the subgait is a swing subgait, double the gait parameters and search
+    // in a wider area
+    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing") {
+        x_flat *= 2;
+        x_steep *= 2;
+        z_flat *= 2;
+        z_steep *= 2;
+        ramp_max_search_area *= 2;
+        min_x_stairs *= 2;
+        max_x_stairs *= 2;
+        min_z_stairs *= 2;
+        max_z_stairs *= 2;
     }
 }
 
@@ -513,7 +529,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
             success &= fillOptionalFootLocationCloud(
-                min_search_area, max_search_area);
+                ramp_min_search_area, ramp_max_search_area);
             break;
         }
         default: {

@@ -198,11 +198,12 @@ protected:
     float z_flat_up {};
     float x_steep_up {};
     float z_steep_up {};
-    float min_search_area {};
-    float max_search_area {};
+    float ramp_min_search_area {};
+    float ramp_max_search_area {};
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
+    std::string subgait_name_;
 
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],

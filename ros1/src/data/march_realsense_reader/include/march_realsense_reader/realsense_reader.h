@@ -108,7 +108,7 @@ private:
     bool debugging_;
 
     std::string frame_id_to_transform_to_;
-    std::string subgait_name;
+    std::string subgait_name_;
 
     int realsense_category_;
     bool use_left_foot_;
