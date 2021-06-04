@@ -417,6 +417,7 @@ bool RealSenseReader::processPointcloudCallback(
             = "Unknown camera given in the request, not available in the "
               "POINTCLOUD_TOPICS in the realsense_reader";
         res.success = false;
+        return true;
     }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
@@ -427,6 +428,7 @@ bool RealSenseReader::processPointcloudCallback(
                             "no processing could be done.";
         ROS_WARN_STREAM(res.error_message);
         res.success = false;
+        return true;
     }
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
