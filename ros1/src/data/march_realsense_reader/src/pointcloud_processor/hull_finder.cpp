@@ -1,8 +1,8 @@
 #include "pointcloud_processor/hull_finder.h"
+#include "utilities/linear_algebra_utilities.h"
+#include "utilities/output_utilities.h"
 #include <cmath>
 #include <ros/ros.h>
-#include <utilities/linear_algebra_utilities.h>
-#include <utilities/output_utilities.h>
 
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/project_inliers.h>
