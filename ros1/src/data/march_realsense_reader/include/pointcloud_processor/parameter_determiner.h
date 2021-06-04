@@ -191,10 +191,6 @@ protected:
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
-    float min_x_stairs_down {};
-    float max_x_stairs_down {};
-    float min_z_stairs_down {};
-    float max_z_stairs_down {};
     float min_x_stairs_up {};
     float max_x_stairs_up {};
     float min_z_stairs_up {};
@@ -221,7 +217,6 @@ protected:
     float x_steep_up {};
     float z_steep_up {};
     float ramp_min_search_area {};
-    float ramp_max_search_area {};
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
