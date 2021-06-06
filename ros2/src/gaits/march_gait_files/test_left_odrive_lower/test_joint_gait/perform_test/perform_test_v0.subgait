@@ -1,5 +1,5 @@
 description: Gait with left hip aa and fe
-duration: 1500000000
+duration: 4500000000
 gait_type: ''
 joints:
   left_ankle:
@@ -7,20 +7,20 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: -0.35
-    time_from_start: 500000000
+    time_from_start: 2250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1500000000
+    time_from_start: 4500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.75
-    time_from_start: 750000000
+    time_from_start: 2250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1500000000
+    time_from_start: 4500000000
     velocity: 0.0
 name: perform_test
 version: example
