@@ -28,7 +28,22 @@
    [
       {
          "name": "ramp_up"
-      }
+      },
+      {
+         "name": "ramp_down"
+      },
+      {
+         "name": "ramp_down_last_step"
+      },
+      {
+         "name": "walk_single_step"
+      },
+      {
+         "name": "walk_single_step_small"
+      },
+      {
+         "name": "walk_single_step_large"
+      },
    ],
    [
       {
@@ -99,6 +114,12 @@
       },
       {
          "name":"stairs_down_single_step"
+      },
+      {
+         "name":"stairs_down_backwards"
+      },
+      {
+         "name":"stairs_down_backwards_single_step"
       },
       {
          "name":"realsense_stairs_up"
