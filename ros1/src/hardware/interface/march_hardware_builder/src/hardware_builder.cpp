@@ -368,17 +368,53 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     const march::SdoInterfacePtr& sdo_interface) const
 {
     std::vector<march::Joint> joints;
-    for (const YAML::Node& joint_config : joints_config) {
+
+    bool remove_fixed_joints_from_ethercat_train;
+    ros::param::get("remove_fixed_joints_from_ethercat_train",
+        remove_fixed_joints_from_ethercat_train);
+    std::set<int> fixedSlaveIndices;
+    if (remove_fixed_joints_from_ethercat_train) {
+        for (const YAML::Node& joint_config : joints_config) {
+            const auto joint_name
+                = joint_config.begin()->first.as<std::string>();
+            const auto urdf_joint = this->urdf_.getJoint(joint_name);
+            if (urdf_joint->type == urdf::Joint::FIXED) {
+                fixedSlaveIndices.insert(
+                    joint_config[joint_name].begin()->second["slaveIndex"]
+                        .as<int>());
+            }
+        }
+        ROS_INFO("Removing fixed joints.");
+    }
+
+    for (YAML::Node joint_config : joints_config) {
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
-        if (urdf_joint->type == urdf::Joint::FIXED) {
-            ROS_WARN(
-                "Joint %s is fixed in the URDF, but defined in the robot yaml",
-                joint_name.c_str());
+        if (urdf_joint->type != urdf::Joint::FIXED) {
+            if (remove_fixed_joints_from_ethercat_train) {
+                int slaveIndex = joint_config[joint_name]["slaveIndex"].as<int>();
+                int amountFixedBeforeSlave = 0;
+                for (int fixedSlaveIndex : fixedSlaveIndices) {
+                    if (fixedSlaveIndex < slaveIndex) {
+                        amountFixedBeforeSlave++;
+                    }
+                }
+                joint_config[joint_name]["slaveIndex"]
+                    = slaveIndex - amountFixedBeforeSlave;
+            }
+            joints.push_back(
+                HardwareBuilder::createJoint(joint_config[joint_name],
+                                             joint_name, urdf_joint, pdo_interface, sdo_interface));
+        } else {
+            ROS_WARN("Joint %s is fixed in the URDF, but defined in the robot yaml",
+                     joint_name.c_str());
         }
-        joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name],
-            joint_name, urdf_joint, pdo_interface, sdo_interface));
     }
+
+    ROS_INFO_STREAM(
+        "There are " << joints.size() << "moving joints initialized in "
+                                         "the robot"
+    );
 
     for (const auto& urdf_joint : this->urdf_.joints_) {
         if (urdf_joint.second->type != urdf::Joint::FIXED) {

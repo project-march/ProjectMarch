@@ -5,10 +5,16 @@
     <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
     <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
                                         If not provided, then the value is read from the robot .yaml file."/>
+    <arg name="remove_fixed_joints_from_ethercat_train" default="true"
+         doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
+         are also not in the ethercat train."/>
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg controller_name)/controllers.yaml" command="load"/>
-
+    <node name="upload_controller_values" pkg="march_launch"
+          type="upload_controller_values.py"/>
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
+    <param name="remove_fixed_joints_from_ethercat_train"
+           value="$(arg remove_fixed_joints_from_ethercat_train"/>
 
     <group ns="march">
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
