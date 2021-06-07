@@ -18,14 +18,22 @@ class MpcListener(Node):
         self.future_time_steps = 0  # TODO: read from message after MPC MR
         self.sampling_time = 0.02  # TODO: read from message after MPC MR
 
+        # Data to be appended in the visualisation
         self.new_measurement_position = []
         self.new_measurement_velocity = []
+        self.new_reference_position = []
+        self.new_reference_velocity = []
+        self.new_reference_input = []
         self.last_input = []
         self.new_time = 0
 
+        # Data to be replaced in the visualisation
         self.new_estimation_position = np.empty([0, 0], dtype=float)
         self.new_estimation_velocity = np.empty([0, 0], dtype=float)
         self.new_estimation_input = np.empty([0, 0], dtype=float)
+        self.future_reference_position = []
+        self.future_reference_velocity = []
+        self.future_reference_input = []
 
         self.response_body_measurement = {}
         self.response_body_estimation = {}
@@ -52,7 +60,7 @@ class MpcListener(Node):
                 joint_number, self.new_estimation_input[joint_number, 0]
             )
 
-            # Current position and velocity
+            # Current position, velocity and input
             self.new_measurement_position.insert(
                 joint_number, msg.joint[joint_number].estimation.states[0].array[0]
             )
@@ -60,7 +68,17 @@ class MpcListener(Node):
                 joint_number, msg.joint[joint_number].estimation.states[1].array[0]
             )
 
-            # Estimation
+            self.new_reference_position.insert(
+                joint_number, msg.joint[joint_number].reference.states[0].array[0]
+            )
+            self.new_reference_velocity.insert(
+                joint_number, msg.joint[joint_number].reference.states[1].array[0]
+            )
+            self.new_reference_input.insert(
+                joint_number, msg.joint[joint_number].reference.inputs[0].array[0]
+            )
+
+            # Estimation position, velocity and input
             self.new_estimation_position[joint_number, :] = (
                 msg.joint[joint_number].estimation.states[0].array[1:]
             )
@@ -69,6 +87,15 @@ class MpcListener(Node):
             )
             self.new_estimation_input[joint_number, :] = (
                 msg.joint[joint_number].estimation.inputs[0].array
+            )
+            self.future_reference_position[joint_number, :] = (
+                msg.joint[joint_number].reference.states[0].array[1:]
+            )
+            self.future_reference_velocity[joint_number, :] = (
+                msg.joint[joint_number].reference.states[1].array[1:]
+            )
+            self.future_reference_input[joint_number, :] = (
+                msg.joint[joint_number].reference.inputs[0].array
             )
 
         # Get time
@@ -84,6 +111,17 @@ class MpcListener(Node):
         self.new_estimation_input = np.empty(
             shape=(self.number_of_joints, self.future_time_steps), dtype=float
         )
+
+        self.future_reference_position = np.empty(
+            shape=(self.number_of_joints, self.future_time_steps), dtype=float
+        )
+        self.future_reference_velocity = np.empty(
+            shape=(self.number_of_joints, self.future_time_steps), dtype=float
+        )
+        self.future_reference_input = np.empty(
+            shape=(self.number_of_joints, self.future_time_steps), dtype=float
+        )
+
 
     @staticmethod
     def set_headers(response: Response) -> Response:
@@ -111,7 +149,19 @@ class MpcListener(Node):
                 self.last_input[joint_number]
             ]
 
-            self.response_body_measurement["time"] = [self.new_time]
+            self.response_body_measurement[f"joint_{joint_number}_reference_position"] = [
+                self.new_reference_position[joint_number]
+            ]
+
+            self.response_body_measurement[f"joint_{joint_number}_reference_velocity"] = [
+                self.new_reference_velocity[joint_number]
+            ]
+
+            self.response_body_measurement[f"joint_{joint_number}_reference_input"] = [
+                self.new_reference_input[joint_number]
+            ]
+
+        self.response_body_measurement["time"] = [self.new_time]
 
         response = make_response(jsonify(self.response_body_measurement))
         response = self.set_headers(response)
@@ -129,14 +179,24 @@ class MpcListener(Node):
             self.response_body_estimation[
                 f"joint_{joint_number}_estimation_input"
             ] = self.new_estimation_input[joint_number, :].tolist()
-            self.response_body_estimation["time"] = np.linspace(
-                start=self.new_time,
-                stop=self.new_time + self.future_time_steps * self.sampling_time,
-                num=self.future_time_steps,
-                endpoint=False,
-            ).tolist()
+            self.response_body_estimation[
+                f"joint_{joint_number}_reference_position"
+            ] = self.future_reference_position[joint_number, :].tolist()
+            self.response_body_estimation[
+                f"joint_{joint_number}_reference_velocity"
+            ] = self.future_reference_velocity[joint_number, :].tolist()
+            self.response_body_estimation[
+                f"joint_{joint_number}_reference_input"
+            ] = self.future_reference_input[joint_number, :].tolist()
 
-            response = make_response(jsonify(self.response_body_estimation))
-            response = self.set_headers(response)
+        self.response_body_estimation["time"] = np.linspace(
+            start=self.new_time,
+            stop=self.new_time + self.future_time_steps * self.sampling_time,
+            num=self.future_time_steps,
+            endpoint=False,
+        ).tolist()
 
-            return response
+        response = make_response(jsonify(self.response_body_estimation))
+        response = self.set_headers(response)
+
+        return response
