@@ -379,9 +379,10 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
                 = joint_config.begin()->first.as<std::string>();
             const auto urdf_joint = this->urdf_.getJoint(joint_name);
             if (urdf_joint->type == urdf::Joint::FIXED) {
-                fixedSlaveIndices.insert(
-                    joint_config[joint_name].begin()->second["slaveIndex"]
-                        .as<int>());
+                fixedSlaveIndices.insert(joint_config[joint_name]
+                                             .begin()
+                                             ->second["slaveIndex"]
+                                             .as<int>());
             }
         }
         ROS_INFO("Removing fixed joints.");
@@ -392,7 +393,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         if (urdf_joint->type != urdf::Joint::FIXED) {
             if (remove_fixed_joints_from_ethercat_train) {
-                int slaveIndex = joint_config[joint_name]["slaveIndex"].as<int>();
+                int slaveIndex
+                    = joint_config[joint_name]["slaveIndex"].as<int>();
                 int amountFixedBeforeSlave = 0;
                 for (int fixedSlaveIndex : fixedSlaveIndices) {
                     if (fixedSlaveIndex < slaveIndex) {
@@ -404,17 +406,17 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
             }
             joints.push_back(
                 HardwareBuilder::createJoint(joint_config[joint_name],
-                                             joint_name, urdf_joint, pdo_interface, sdo_interface));
+                    joint_name, urdf_joint, pdo_interface, sdo_interface));
         } else {
-            ROS_WARN("Joint %s is fixed in the URDF, but defined in the robot yaml",
-                     joint_name.c_str());
+            ROS_WARN(
+                "Joint %s is fixed in the URDF, but defined in the robot yaml",
+                joint_name.c_str());
         }
     }
 
-    ROS_INFO_STREAM(
-        "There are " << joints.size() << "moving joints initialized in "
-                                         "the robot"
-    );
+    ROS_INFO_STREAM("There are " << joints.size()
+                                 << "moving joints initialized in "
+                                    "the robot");
 
     for (const auto& urdf_joint : this->urdf_.joints_) {
         if (urdf_joint.second->type != urdf::Joint::FIXED) {

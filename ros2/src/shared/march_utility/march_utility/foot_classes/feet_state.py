@@ -52,9 +52,11 @@ class FeetState(object):
             position and velocity corresponding to the setpoint dictionary
         """
         if JOINT_NAMES_IK is None:
-            raise SubgaitInterpolationError("Robot joints do not allow IK, "
-                                            "so FeetState object can not be created "
-                                            "from setpoints.")
+            raise SubgaitInterpolationError(
+                "Robot joints do not allow IK, "
+                "so FeetState object can not be created "
+                "from setpoints."
+            )
         for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
                 raise KeyError(
