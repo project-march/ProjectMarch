@@ -58,6 +58,8 @@ public:
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
 
+    bool hasUniqueSlaves() const override;
+
     // Transform the ActuationMode to a number that is understood by the
     // IMotionCube
     int getActuationModeNumber() const override;

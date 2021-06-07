@@ -15,8 +15,6 @@ public:
         march3,
         test_joint_rotational,
         test_joint_linear,
-        test_joint_rotational_odrive,
-        test_joint_linear_odrive,
         pdb,
         pressure_soles,
         test_right_leg_rotational,
@@ -42,10 +40,6 @@ public:
             this->value = test_joint_rotational;
         } else if (robot_name == "test_joint_linear") {
             this->value = test_joint_linear;
-        } else if (robot_name == "test_joint_rotational_odrive") {
-            this->value = test_joint_rotational_odrive;
-        } else if (robot_name == "test_joint_linear_odrive") {
-            this->value = test_joint_linear_odrive;
         } else if (robot_name == "pdb") {
             this->value = pdb;
         } else if (robot_name == "pressure_soles") {
@@ -80,12 +74,6 @@ public:
                 /*__s=*/"/robots/test_joint_rotational.yaml");
         } else if (this->value == AllowedRobot::test_joint_linear) {
             return base_path.append(/*__s=*/"/robots/test_joint_linear.yaml");
-        } else if (this->value == AllowedRobot::test_joint_rotational_odrive) {
-            return base_path.append(
-                /*__s=*/"/robots/test_joint_rotational_odrive.yaml");
-        } else if (this->value == AllowedRobot::test_joint_linear_odrive) {
-            return base_path.append(
-                /*__s=*/"/robots/test_joint_linear_odrive.yaml");
         } else if (this->value == AllowedRobot::pdb) {
             return base_path.append(/*__s=*/"/robots/pdb.yaml");
         } else if (this->value == AllowedRobot::pressure_soles) {
@@ -146,12 +134,6 @@ public:
                 break;
             case test_joint_rotational:
                 out << "test_joint_rotational";
-                break;
-            case test_joint_linear_odrive:
-                out << "test_joint_linear_odrive";
-                break;
-            case test_joint_rotational_odrive:
-                out << "test_joint_rotational_odrive";
                 break;
             case pdb:
                 out << "pdb";

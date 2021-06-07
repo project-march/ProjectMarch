@@ -555,6 +555,11 @@ int IMotionCube::getActuationModeNumber() const
     }
 }
 
+bool IMotionCube::hasUniqueSlaves() const
+{
+    return true;
+}
+
 std::unique_ptr<MotorControllerState> IMotionCube::getState()
 {
     auto state = std::make_unique<IMotionCubeState>();

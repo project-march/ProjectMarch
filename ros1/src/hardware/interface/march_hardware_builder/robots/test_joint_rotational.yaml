@@ -1,18 +1,23 @@
 testsetup:
-  if_name: enp2s0
+  if_name: enp0s31f6
   ecatCycleTime: 4
-  ecatSlaveTimeout: 50
+  ecatSlaveTimeout: 250
   joints:
     - rotational_joint:
         allowActuation: true
         motor_controller:
-          type: imotioncube
+          type: odrive
           actuationMode: torque
           slaveIndex: 1
+          axis: 0
+          preCalibrated: true
+          motorKV: 95
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 29266
-            maxPositionIU: 52948
+            resolution: 20
+            minPositionIU: 559641
+            maxPositionIU: 925326
+            direction: -1
           incrementalEncoder:
             resolution: 12
-            transmission: 101
+            transmission: 121
+            direction: -1

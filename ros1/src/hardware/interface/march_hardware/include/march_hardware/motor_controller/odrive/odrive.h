@@ -59,6 +59,8 @@ public:
     void actuateRadians(float target_position) override;
     bool isIncrementalEncoderMorePrecise() const override;
 
+    bool hasUniqueSlaves() const override;
+
     // Transform the ActuationMode to a number that is understood by the ODrive
     int getActuationModeNumber() const override;
 

@@ -117,6 +117,11 @@ int ODrive::getActuationModeNumber() const
     }
 }
 
+bool ODrive::hasUniqueSlaves() const
+{
+    return false;
+}
+
 std::unique_ptr<MotorControllerState> ODrive::getState()
 {
     auto state = std::make_unique<ODriveState>();

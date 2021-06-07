@@ -12,6 +12,13 @@ IncrementalEncoder::IncrementalEncoder(size_t resolution,
 {
 }
 
+IncrementalEncoder::IncrementalEncoder(size_t resolution,
+    MotorControllerType motor_controller_type, double transmission)
+    : IncrementalEncoder(
+        resolution, motor_controller_type, Direction::Positive, transmission)
+{
+}
+
 double IncrementalEncoder::getRadiansPerIU() const
 {
     return PI_2 / (getTotalPositions() * transmission_);

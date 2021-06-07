@@ -13,6 +13,11 @@ Encoder::Encoder(size_t resolution, MotorControllerType motor_controller_type,
 {
 }
 
+Encoder::Encoder(size_t resolution, MotorControllerType motor_controller_type)
+    : Encoder(resolution, motor_controller_type, Direction::Positive)
+{
+}
+
 size_t Encoder::getTotalPositions() const
 {
     return this->total_positions_;

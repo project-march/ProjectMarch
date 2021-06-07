@@ -59,6 +59,9 @@ public:
     // encoder
     virtual bool isIncrementalEncoderMorePrecise() const;
 
+    // Are the slaves of this MotorController unique
+    virtual bool hasUniqueSlaves() const = 0;
+
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
     bool hasAbsoluteEncoder() const;
