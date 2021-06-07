@@ -26,10 +26,6 @@ IMotionCube::IMotionCube(const Slave& slave,
         std::move(incremental_encoder), actuation_mode)
     , sw_string_(/*__s=*/"empty")
 {
-    if (!absolute_encoder_ || !incremental_encoder_) {
-        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "An IMotionCube needs both an incremental and an absolute encoder");
-    }
 }
 
 IMotionCube::IMotionCube(const Slave& slave,

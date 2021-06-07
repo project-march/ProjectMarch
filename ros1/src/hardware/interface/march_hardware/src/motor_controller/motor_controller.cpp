@@ -16,9 +16,9 @@ MotorController::MotorController(const Slave& slave,
     , incremental_encoder_(std::move(incremental_encoder))
     , actuation_mode_(actuation_mode)
 {
-    if (!absolute_encoder_ && !incremental_encoder_) {
+    if (!absolute_encoder_ || !incremental_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "A MotorController needs at least an incremental or an absolute "
+            "A MotorController needs both an incremental and an absolute "
             "encoder");
     }
 }

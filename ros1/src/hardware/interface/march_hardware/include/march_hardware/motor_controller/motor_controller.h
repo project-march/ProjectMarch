@@ -129,10 +129,8 @@ protected:
     virtual float getAbsoluteVelocityUnchecked() = 0;
     virtual float getIncrementalVelocityUnchecked() = 0;
 
-    // A MotorController doesn't necessarily have an AbsoluteEncoder and an
-    // IncrementalEncoder, but will have at least one of the two
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
-    std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
+    std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     ActuationMode actuation_mode_;
 };
 

@@ -32,8 +32,8 @@ public:
      * @param slave slave of the ODrive
      * @param absolute_encoder pointer to absolute encoder, required so cannot
      * be nullptr
-     * @param incremental_encoder pointer to incremental encoder, not required
-     * so can be nullptr
+     * @param incremental_encoder pointer to incremental encoder, required so
+     * cannot be nullptr
      * @param actuation_mode actuation mode in which the ODrive must
      * operate
      * @throws error::HardwareException When an absolute encoder is nullptr.

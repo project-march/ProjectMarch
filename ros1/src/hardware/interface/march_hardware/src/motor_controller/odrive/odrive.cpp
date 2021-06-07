@@ -29,10 +29,6 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     , axis_(axis)
     , pre_calibrated_(pre_calibrated)
 {
-    if (!absolute_encoder_) {
-        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "An ODrive needs an absolute encoder");
-    }
     torque_constant_ = KV_TO_TORQUE_CONSTANT / (float)motor_kv;
 }
 
