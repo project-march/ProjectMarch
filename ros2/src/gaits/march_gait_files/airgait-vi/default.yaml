@@ -94,3 +94,25 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: -0.0873
       right_knee: 0.0
+  sit_without_haa:
+    gait_type: sit_like
+    joints:
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: 1.4835
+      left_knee: 1.4835
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: 1.4835
+      right_knee: 1.4835
+  sit_with_haa:
+    gait_type: sit_like
+    joints:
+      left_ankle: 0.0
+      left_hip_aa: 0.0
+      left_hip_fe: 1.4835
+      left_knee: 1.4835
+      right_ankle: 0.0
+      right_hip_aa: 0.0
+      right_hip_fe: 1.4835
+      right_knee: 1.4835
