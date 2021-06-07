@@ -14,11 +14,10 @@ public:
      * Construct AbsoluteEncoder with both hard and soft limits.
      */
     AbsoluteEncoder(size_t resolution,
-        MotorControllerType motor_controller_type,
-        Direction direction,
-        int32_t lower_limit_iu,
-        int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
-        double lower_soft_limit_rad, double upper_soft_limit_rad);
+        MotorControllerType motor_controller_type, Direction direction,
+        int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
+        double upper_limit_rad, double lower_soft_limit_rad,
+        double upper_soft_limit_rad);
 
     ~AbsoluteEncoder() noexcept override = default;
 
@@ -26,7 +25,7 @@ public:
      * Check that the range of motion is valid.
      * @throws A HardwareException if the range of motion is not valid.
      */
-    void checkRangeOfMotion(double lower_limit_rad, double upper_limit_rad) ;
+    void checkRangeOfMotion(double lower_limit_rad, double upper_limit_rad);
 
     // Inherited methods
     double getRadiansPerIU() const final;

@@ -5,7 +5,8 @@
 
 namespace march {
 IncrementalEncoder::IncrementalEncoder(size_t resolution,
-    MotorControllerType motor_controller_type, Direction direction, double transmission)
+    MotorControllerType motor_controller_type, Direction direction,
+    double transmission)
     : Encoder(resolution, motor_controller_type, direction)
     , transmission_(transmission)
 {
@@ -25,7 +26,7 @@ double IncrementalEncoder::velocityIUToRadians(double velocity) const
 {
     switch (getMotorControllerType()) {
         case MotorControllerType::ODrive:
-            return velocity *  (PI_2 / transmission_);
+            return velocity * (PI_2 / transmission_);
         case MotorControllerType::IMotionCube:
             return this->velocityIUToRadians(velocity);
         default:
@@ -38,7 +39,7 @@ double IncrementalEncoder::velocityRadiansToIU(double velocity) const
 {
     switch (getMotorControllerType()) {
         case MotorControllerType::ODrive:
-            return velocity /  (PI_2 / transmission_);
+            return velocity / (PI_2 / transmission_);
         case MotorControllerType::IMotionCube:
             return Encoder::velocityIUToRadians(velocity);
         default:

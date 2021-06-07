@@ -116,7 +116,7 @@ public:
     bool hasError() override
     {
         return !isOperational();
-        //axis_error_ || motor_error_ || encoder_error_
+        // axis_error_ || motor_error_ || encoder_error_
         //    || encoder_manager_error_ || controller_error_;
     }
 
@@ -128,19 +128,15 @@ public:
                 << "Axis: "
                 << error::parseError(
                        axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
-                << ", "
                 << "\nMotor: "
                 << error::parseError(
                        motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR)
-                << ", "
                 << "\nEncoder: "
                 << error::parseError(encoder_error_,
                        error::ErrorRegister::ODRIVE_ENCODER_ERROR)
-                << ", "
                 << "\nEncoder Manager: "
                 << error::parseError(encoder_manager_error_,
                        error::ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR)
-                << ", "
                 << "\nController: "
                 << error::parseError(controller_error_,
                        error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);

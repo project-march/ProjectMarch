@@ -83,7 +83,8 @@ public:
     static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
         const YAML::Node& incremental_encoder_config,
         const march::MotorControllerType motor_controller_type);
-    static march::Encoder::Direction getEncoderDirection(const YAML::Node& encoder_config);
+    static march::Encoder::Direction getEncoderDirection(
+        const YAML::Node& encoder_config);
     static std::unique_ptr<march::MotorController> createMotorController(
         const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
         const march::PdoInterfacePtr& pdo_interface,

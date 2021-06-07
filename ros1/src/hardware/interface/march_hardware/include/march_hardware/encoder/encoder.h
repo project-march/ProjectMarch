@@ -12,10 +12,7 @@
 namespace march {
 class Encoder {
 public:
-    enum Direction {
-        Positive = 1,
-        Negative = -1
-    };
+    enum Direction { Positive = 1, Negative = -1 };
     Encoder(size_t resolution, MotorControllerType motor_controller_type,
         Direction direction);
 

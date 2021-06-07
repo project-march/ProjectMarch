@@ -232,8 +232,8 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
             march::MotorControllerType::ODrive, urdf_joint),
-        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
-            march::MotorControllerType::ODrive),
+        HardwareBuilder::createIncrementalEncoder(
+            incremental_encoder_config, march::MotorControllerType::ODrive),
         mode, pre_calibrated, motor_kv);
 }
 
@@ -269,9 +269,9 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     }
 
     return std::make_unique<march::AbsoluteEncoder>(resolution,
-        motor_controller_type, getEncoderDirection(absolute_encoder_config), min_position, max_position,
-        urdf_joint->limits->lower, urdf_joint->limits->upper, soft_lower_limit,
-        soft_upper_limit);
+        motor_controller_type, getEncoderDirection(absolute_encoder_config),
+        min_position, max_position, urdf_joint->limits->lower,
+        urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
 }
 
 std::unique_ptr<march::IncrementalEncoder>
@@ -291,20 +291,25 @@ HardwareBuilder::createIncrementalEncoder(
         = incremental_encoder_config["resolution"].as<size_t>();
     const auto transmission
         = incremental_encoder_config["transmission"].as<double>();
-    return std::make_unique<march::IncrementalEncoder>(
-        resolution, motor_controller_type, getEncoderDirection(incremental_encoder_config), transmission);
+    return std::make_unique<march::IncrementalEncoder>(resolution,
+        motor_controller_type, getEncoderDirection(incremental_encoder_config),
+        transmission);
 }
 
-march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node& encoder_config)
+march::Encoder::Direction HardwareBuilder::getEncoderDirection(
+    const YAML::Node& encoder_config)
 {
     if (encoder_config["direction"]) {
         switch (encoder_config["direction"].as<int>()) {
-            case 1: return march::Encoder::Direction::Positive;
-            case -1: return march::Encoder::Direction::Negative;
-            default: throw march::error::HardwareException(march::error::ErrorType::INVALID_ENCODER_DIRECTION);
+            case 1:
+                return march::Encoder::Direction::Positive;
+            case -1:
+                return march::Encoder::Direction::Negative;
+            default:
+                throw march::error::HardwareException(
+                    march::error::ErrorType::INVALID_ENCODER_DIRECTION);
         }
-    }
-    else {
+    } else {
         return march::Encoder::Direction::Positive;
     }
 }

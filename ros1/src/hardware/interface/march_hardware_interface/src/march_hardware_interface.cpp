@@ -237,14 +237,15 @@ void MarchHardwareInterface::read(
         joint_position_[i] = position;
         joint_velocity_[i] = velocity;
 
-        ROS_INFO_STREAM("Joint " << joint.getName() << ", position= " << position << ", velocity= " << velocity);
+        ROS_INFO_STREAM("Joint " << joint.getName() << ", position= "
+                                 << position << ", velocity= " << velocity);
 
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
         }
-//        joint_effort_[i] = joint.getMotorController()->getTorque();
+        //        joint_effort_[i] = joint.getMotorController()->getTorque();
         joint_effort_[i] = joint.getMotorController()->getMotorCurrent();
-        //ROS_INFO("Motor current: %f", joint_effort_[i]);
+        // ROS_INFO("Motor current: %f", joint_effort_[i]);
     }
 
     this->updateMotorControllerState();
@@ -254,8 +255,8 @@ void MarchHardwareInterface::read(
     }
 }
 
-template<typename Base, typename T>
-inline bool instanceof(const T*) {
+template <typename Base, typename T> inline bool instanceof (const T*)
+{
     return std::is_base_of<Base, T>::value;
 }
 
@@ -265,8 +266,11 @@ void MarchHardwareInterface::write(
     for (size_t i = 0; i < num_joints_; i++) {
         // Enlarge joint_effort_command for IMotionCube because ROS control
         // limits the pid values to a certain maximum
-        joint_effort_command_[i] = joint_effort_command_[i] * march_robot_->getJoint(i).getMotorController()->effortMultiplicationConstant();
-//        joint_effort_command_[i] = 1;
+        joint_effort_command_[i] = joint_effort_command_[i]
+            * march_robot_->getJoint(i)
+                  .getMotorController()
+                  ->effortMultiplicationConstant();
+        //        joint_effort_command_[i] = 1;
         if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
             > MAX_EFFORT_CHANGE) {
             joint_effort_command_[i] = joint_last_effort_command_[i]
