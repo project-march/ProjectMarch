@@ -71,3 +71,26 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
       right_knee: 0.0
+
+  flat_ramp_stand:
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.0873
+      left_hip_aa: 0.0349
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: -0.0873
+      right_hip_aa: 0.0349
+      right_hip_fe: -0.0873
+      right_knee: 0.0
+  steep_ramp_stand:
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.2618
+      left_hip_aa: 0.0349
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: -0.2618
+      right_hip_aa: 0.0349
+      right_hip_fe: -0.0873
+      right_knee: 0.0
