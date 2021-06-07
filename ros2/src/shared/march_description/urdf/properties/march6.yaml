@@ -1,3 +1,7 @@
+moving_joints:
+  - right_hip_fe
+  - right_knee
+  - right_hip_aa
 dimensions:
   hip_base:
     length: 0.145

@@ -174,7 +174,7 @@ def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[flo
     return select_lengths_for_inverse_kinematics(LENGTHS_BOTH_SIDES, side)
 
 
-def get_joint_names_for_inverse_kinematics() -> List[str]:
+def validate_and_get_joint_names_for_inverse_kinematics() -> List[str]:
     """Get a list of the joint names that can be used for the inverse kinematics.
 
     This also checks whether robot description contains the required joints.
@@ -195,10 +195,24 @@ def get_joint_names_for_inverse_kinematics() -> List[str]:
         "right_knee",
     ]
     for joint_name in joint_name_list:
-        if joint_name not in robot_joint_names:
+        if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == \
+                "fixed":
             raise KeyError(
-                f"Inverse kinematics calculation expected the robot to have joint "
+                f"Inverse kinematics calculation expected the robot to have "
+                f"moving joint "
                 f"{joint_name}, but {joint_name} was not found."
             )
 
     return joint_name_list
+
+def get_joint_names_from_urdf() -> List[str]:
+    joint_names = []
+    robot = urdf.Robot.from_xml_file(
+        os.path.join(
+            get_package_share_directory("march_description"), "urdf", "march6.urdf"
+        )
+    )
+    for robot_joint_name, robot_joint in robot.joint_map.items():
+        if robot_joint.type != "fixed":
+            joint_names.append(robot_joint_name)
+    return joint_names

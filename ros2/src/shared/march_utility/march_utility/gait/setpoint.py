@@ -4,18 +4,14 @@ from __future__ import annotations
 
 from typing import Optional
 
-import rclpy
-
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
-    get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
 )
 
 VELOCITY_SCALE_FACTOR = 0.001
-JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
 class Setpoint:

@@ -81,7 +81,6 @@
         <arg name="wireless" value="$(arg wireless)"/>
     </include>
 
-
 <!-- Data-->
     <node
             if="$(arg rosbag)"
@@ -139,6 +138,7 @@
                     ground_gait:=$(arg ground_gait) configuration:=$(arg configuration) realsense_simulation:=$(arg realsense_simulation)"/>
 
     <param name="balance" value="$(arg balance)"/>
+
 
     <group if="$(eval configuration == 'simulation')">
         <include file="$(find march_simulation)/launch/march_world.launch">

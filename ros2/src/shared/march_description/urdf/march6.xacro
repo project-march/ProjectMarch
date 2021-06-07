@@ -35,6 +35,7 @@
     <xacro:include filename="macros/pressure_sole.xacro"/>
     <xacro:include filename="macros/frame_part.xacro"/>
     <xacro:include filename="macros/joint.xacro"/>
+    <xacro:include filename="macros/configurable_joint.xacro"/>
 
 
     <!-- Add yaml files with properties -->
@@ -53,8 +54,7 @@
     <!-- Linearised around 0 -->
     <xacro:property name="linear_reduction_hip" value="240"/>
     <xacro:property name="linear_reduction_ankle" value="236"/>
-
-
+    <xacro:property name="moving_joints" value="${(properties['moving_joints'])}"/>
 
     <!-- Constants for robot dimensions -->
     <!-- Masses determined in Catia, see https://confluence.projectmarch.nl:8443/display/51/URDF+description -->
@@ -321,7 +321,7 @@
         <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="left_hip_aa"
             parent="hip_base"
             child="hip_aa_frame_left_side"
@@ -338,7 +338,7 @@
         <origin xyz="0 ${-hip_aa_frame_height} 0" rpy="0 0 0"/>
     </joint>
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="left_hip_fe"
             parent="hip_aa_frame_left_front"
             child="upper_leg_left"
@@ -350,7 +350,7 @@
     />
 
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="left_knee"
             parent="upper_leg_left"
             child="lower_leg_left"
@@ -361,7 +361,7 @@
             limits="${joint_limits['left_knee']}"
     />
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="left_ankle"
             parent="lower_leg_left"
             child="ankle_plate_left"
@@ -378,7 +378,7 @@
         <origin xyz="0 0 ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="right_hip_aa"
             parent="hip_base"
             child="hip_aa_frame_right_side"
@@ -395,7 +395,7 @@
         <origin xyz="0 ${hip_aa_frame_height} 0" rpy="0 0 0"/>
     </joint>
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="right_hip_fe"
             parent="hip_aa_frame_right_front"
             child="upper_leg_right"
@@ -406,7 +406,7 @@
             limits="${joint_limits['right_hfe']}"
     />
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="right_knee"
             parent="upper_leg_right"
             child="lower_leg_right"
@@ -417,7 +417,7 @@
             reduction="${rotary_reduction}"
     />
 
-    <xacro:march_joint
+    <xacro:march_configurable_joint
             name="right_ankle"
             parent="lower_leg_right"
             child="ankle_plate_right"
