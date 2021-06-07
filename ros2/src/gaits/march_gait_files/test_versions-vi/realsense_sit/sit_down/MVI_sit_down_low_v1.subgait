@@ -33,10 +33,10 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.17449976
+  - position: 0.1745
     time_from_start: 800000000
-    velocity: 0.69810028
-  - position: 1.83259571
+    velocity: 0.6981
+  - position: 1.8326
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -63,17 +63,17 @@ joints:
   - position: 1.4835
     time_from_start: 2000000000
     velocity: 0.5585
-  - position: 1.68391463
+  - position: 1.6839
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.17449976
+  - position: 0.1745
     time_from_start: 800000000
-    velocity: 0.69810028
-  - position: 1.83259571
+    velocity: 0.6981
+  - position: 1.8326
     time_from_start: 2500000000
     velocity: 0.0
 name: sit_down

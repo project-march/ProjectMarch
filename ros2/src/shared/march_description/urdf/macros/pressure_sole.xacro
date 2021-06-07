@@ -1,32 +1,79 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="pressure_sole"
-                 params="side foot_name">
-
-        <link name="pressure_sole_${side}">
+    <xacro:macro name="pressure_sensor"
+                 params="foot_place side counter foot_mu1:=^|1 foot_mu2:=^|1 foot_min_depth:=^|0.0005 *origin">
+        <link name="pressure_sole_${side}_${foot_place}">
             <collision>
-                <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+                <xacro:insert_block name="origin"/>
                 <geometry>
-                    <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
+                    <box size="${(foot_height_forward+foot_height_backward)/4} ${width/2} 0.001"/>
                 </geometry>
             </collision>
         </link>
 
-        <gazebo reference="pressure_sole_${side}">
-            <sensor name="pressure_sole_${side}" type="contact">
+        <gazebo reference="pressure_sole_${side}_${foot_place}">
+            <sensor name="pressure_sole_${foot_place}_sensor" type="contact">
                 <always_on>true</always_on>
-                <contact collision="ankle_plate_${side}_fixed_joint_lump__pressure_sole_${side}_collision_2"/>
-                <plugin name="pressure_sole_plugin_${side}" filename="libgazebo_ros_bumper.so">
-                    <bumperTopicName>/march/sensor/right_pressure_sole</bumperTopicName>
+                <contact>
+                    <collision>ankle_plate_${side}_fixed_joint_lump__pressure_sole_${side}_${foot_place}_collision_${counter}</collision>
+                </contact>
+                <plugin name="pressure_sole_plugin_${foot_place}" filename="libgazebo_ros_bumper.so">
+                    <bumperTopicName>march/sensor/${side}_pressure_sole_${foot_place}</bumperTopicName>
                     <frameName>world</frameName>
                 </plugin>
             </sensor>
-        </gazebo>`
+        </gazebo>
 
-        <joint name="pressure_sole_${side}_joint" type="fixed">
-            <parent link="${foot_name}"/>
-            <child link="pressure_sole_${side}"/>
+        <gazebo reference="pressure_sole_${side}_${foot_place}">
+            <mu1>${foot_mu1}</mu1>
+            <mu2>${foot_mu2}</mu2>
+            <minDepth>${foot_min_depth}</minDepth>
+            <fdir1>1 0 0</fdir1>
+        </gazebo>
+
+        <joint name="pressure_sole_${side}_${foot_place}_joint" type="fixed">
+            <parent link="foot_${side}"/>
+            <child link="pressure_sole_${side}_${foot_place}"/>
             <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
         </joint>
+
+        <gazebo reference="pressure_sole_${side}">
+            <mu1>${foot_mu1}</mu1>
+            <mu2>${foot_mu2}</mu2>
+            <minDepth>${foot_min_depth}</minDepth>
+            <fdir1>1 0 0</fdir1>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name="pressure_sole"
+                 params="side">
+        <xacro:pressure_sensor foot_place="heel_1" side="${side}" counter="8">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)/8 + foot_height_backward} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="heel_2" side="${side}" counter="9">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)/8 + foot_height_backward} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
+        <xacro:pressure_sensor foot_place="arch" side="${side}" counter="2">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*3/8 + foot_height_backward} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="met1" side="${side}" counter="4">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*3/8 + foot_height_backward} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
+        <xacro:pressure_sensor foot_place="met3" side="${side}" counter="5">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*5/8 + foot_height_backward} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="met5" side="${side}" counter="6">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*5/8 + foot_height_backward} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
+        <xacro:pressure_sensor foot_place="toes" side="${side}" counter="7">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*7/8 + foot_height_backward} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="hallux" side="${side}" counter="3">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*7/8 + foot_height_backward} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
     </xacro:macro>
 </robot>

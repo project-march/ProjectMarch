@@ -1,11 +1,13 @@
 dimensions:
+  general:
+    width: 0.05
   hip_base:
     length: 0.160
     mass: 8.686
   hip_aa_side:
     length: 0.170
     mass: 2.982
-  hip_aa_base:
+  hip_aa_front:
     length: 0.1395
     mass: 0
   upper_leg:

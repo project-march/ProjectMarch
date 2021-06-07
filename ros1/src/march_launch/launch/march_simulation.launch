@@ -1,6 +1,6 @@
 <launch>
 <!-- General                    -->
-    <arg name="robot" default="march4" doc="Robot to use."/>
+    <arg name="robot" default="march6" doc="Robot to use."/>
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
@@ -26,12 +26,29 @@
 
     <arg name="realsense" default="false"
          doc="Launches the realsense reader node when true."/>
+    <arg name="realsense_simulation" default="true"
+         doc="Whether the simulation camera or the physical camera should be used"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
 
 <!-- ROS1 Gait selection        -->
     <arg name="sounds" default="true" doc="Whether to use sounds."/>
     <arg name="gait_selection" default="false" doc="Whether to start the ros1 gait selection"/>
     <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
+
+    <group ns="camera_back"
+           if="$(eval realsense and not realsense_simulation and ground_gait and use_camera_back)">
+        <node name="republish_pointclouds" pkg="march_simulation"
+              type="republish_pointclouds.py">
+            <param name="name" value="camera_back"/>
+        </node>
+    </group>
+    <group ns="camera_front"
+           if="$(eval realsense and not realsense_simulation and ground_gait)">
+        <node name="republish_pointclouds" pkg="march_simulation"
+              type="republish_pointclouds.py">
+            <param name="name" value="camera_front"/>
+        </node>
+    </group>
 
 <!-- Pass everything to march.launch -->
     <include file="$(dirname)/march.launch" pass_all_args="true">

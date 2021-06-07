@@ -24,8 +24,14 @@
     <exec_depend>march_parameter_server</exec_depend>
 
     <exec_depend>realsense2_camera</exec_depend>
-    <exec_depend>rosserial_python</exec_depend>
     <exec_depend>rviz</exec_depend>
     <exec_depend>sound_play</exec_depend>
     <exec_depend>xacro</exec_depend>
+
+    <!-- Packages required for ROS serial -->
+    <exec_depend>rosserial</exec_depend>
+    <exec_depend>rosserial_arduino</exec_depend>
+    <exec_depend>rosserial_client</exec_depend>
+    <exec_depend>rosserial_msgs</exec_depend>
+    <exec_depend>rosserial_python</exec_depend>
 </package>

@@ -54,7 +54,7 @@
     <!-- Constants for robot dimensions -->
     <!-- Masses determined in Catia, see https://confluence.projectmarch.nl:8443/display/51/URDF+description -->
     <xacro:property name="width"
-                    value="0.05"/> <!-- Square dimensions (widthxwidth) of beams -->
+                    value="${dimensions['general']['width']}"/> <!-- Square dimensions (widthxwidth) of beams -->
 
     <xacro:property name="hip_base_height" value="${dimensions['hip_base']['length']}"/>
     <xacro:property name="hip_base_mass" value="${dimensions['hip_base']['mass']}"/>
@@ -63,7 +63,7 @@
     <xacro:property name="hip_aa_frame_height"
                     value="${dimensions['hip_aa_side']['length']}"/>
     <xacro:property name="hip_aa_frame_width"
-                    value="${dimensions['hip_aa_base']['length']}"/>
+                    value="${dimensions['hip_aa_front']['length']}"/>
     <xacro:property name="hip_aa_mass" value="${dimensions['hip_aa_side']['mass']}"/>
     <!-- mass = Moving hip -->
 
@@ -134,7 +134,7 @@
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
     <xacro:include filename="march.gazebo"/>
 
-    <material name="blue">
+    <material name="visuals_material">
         <color rgba="0 0 0.6 1"/>
     </material>
 
@@ -221,18 +221,11 @@
                       length="${foot_height_forward+foot_height_backward}"
                       direction="x"
                       inertia="${inertia['foot']}"
-                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      collision_origin="${(foot_height_backward-foot_height_forward)/2} 0 0"
                       com="${foot_com_x} ${-foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
 
-    <gazebo reference="foot_left">
-        <mu1>${foot_mu1}</mu1>
-        <mu2>${foot_mu2}</mu2>
-        <minDepth>${foot_min_depth}</minDepth>
-        <fdir1>1 0 0</fdir1>
-    </gazebo>
-
-    <xacro:pressure_sole side="left" foot_name="foot_left"/>
+    <xacro:pressure_sole side="left"/>
 
     <xacro:frame_part name="hip_aa_frame_right_side"
                       reflect="1"
@@ -291,24 +284,16 @@
     />
 
     <!-- Foot Right -->
-    <xacro:pressure_sole side="right" foot_name="foot_right"/>
+    <xacro:pressure_sole side="right"/>
 
     <xacro:frame_part name="foot_right"
                       reflect="1"
                       length="${foot_height_forward+foot_height_backward}"
                       direction="x"
                       inertia="${inertia['foot']}"
-                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      collision_origin="${(foot_height_backward-foot_height_forward)/2} 0 0"
                       com="${foot_com_x} ${foot_com_y} ${foot_com_z}"
                       mass="${foot_mass}"/>
-
-    <gazebo reference="foot_right">
-        <mu1>${foot_mu1}</mu1>
-        <mu2>${foot_mu2}</mu2>
-        <minDepth>${foot_min_depth}</minDepth>
-        <fdir1>1 0 0</fdir1>
-    </gazebo>
-
 
     <!-- Joints -->
     <joint name="imu_joint" type="fixed">

@@ -6,12 +6,12 @@ gaits:
     left_close: MVI_RD_laststep_leftclose_steep_v1
     right_open: MVI_RD_laststep_rightopen_steep_v1
   ramp_door_slope_down:
-    left_close: MVI_RD_slopedown_leftclose_steep_v1
-    left_open: MVI_RD_slopedown_leftopen_steep_v1
-    left_swing: MVI_RD_slopedown_leftswing_steep_v1
-    right_close: MVI_RD_slopedown_rightclose_steep_v1
-    right_open: MVI_RD_slopedown_rightopen_steep_v1
-    right_swing: MVI_RD_slopedown_rightswing_steep_v1
+    left_close: MVI_RD_slopedown_leftclose_steep_v2
+    left_open: MVI_RD_slopedown_leftopen_steep_v2
+    left_swing: MVI_RD_slopedown_leftswing_steep_v2
+    right_close: MVI_RD_slopedown_rightclose_steep_v2
+    right_open: MVI_RD_slopedown_rightopen_steep_v2
+    right_swing: MVI_RD_slopedown_rightswing_steep_v2
   ramp_door_slope_down_fixed:
     left_close: MV_RD_slopedown_fixed_leftclose_v1
     left_swing: MV_RD_slopedown_fixed_leftswing_v1
@@ -63,17 +63,23 @@ gaits:
     left_close: MIV_final
     right_open: MIV_final
   stairs_down:
-    left_close: MVI_stairsdown_leftclose_low_undeep_v1
-    left_swing: MVI_stairsdown_leftswing_low_undeep_v1
-    right_close: MVI_stairsdown_rightclose_low_undeep_v1
-    right_open: MVI_stairsdown_rightopen_low_undeep_v1
-    right_swing: MVI_stairsdown_rightswing_low_undeep_v1
+    left_close: MVI_stairsdown_leftclose_cybathlon_v2
+    left_swing: MVI_stairsdown_leftswing_cybathlon_v2
+    right_close: MVI_stairsdown_rightclose_cybathlon_v2
+    right_open: MVI_stairsdown_rightopen_cybathlon_v2
+    right_swing: MVI_stairsdown_rightswing_cybathlon_v2
+  stairs_down_backwards:
+    left_close: MVI_stairsdownbackwards_leftclose_low_undeep_v1
+    left_swing: MVI_stairsdownbackwards_leftswing_low_undeep_v1
+    right_close: MVI_stairsdownbackwards_rightclose_low_undeep_v1
+    right_open: MVI_stairsdownbackwards_rightopen_low_undeep_v1
+    right_swing: MVI_stairsdownbackwards_rightswing_low_undeep_v1
   stairs_up:
-    left_close: MVI_stairsup_leftclose_cybathlon_v3
-    left_swing: MVI_stairsup_leftswing_cybathlon_v3
-    right_close: MVI_stairsup_rightclose_cybathlon_v3
-    right_open: MVI_stairsup_rightopen_cybathlon_v3
-    right_swing: MVI_stairsup_rightswing_cybathlon_v3
+    left_close: MVI_stairsup_leftclose_cybathlon_v4
+    left_swing: MVI_stairsup_leftswing_cybathlon_v4
+    right_close: MVI_stairsup_rightclose_cybathlon_v4
+    right_open: MVI_stairsup_rightopen_cybathlon_v4
+    right_swing: MVI_stairsup_rightswing_cybathlon_v4
   tilted_path_first_end:
     left_open: MV_TPend1_leftopen_v1
     right_close: MV_TPend1_rightclose_v1
@@ -121,23 +127,23 @@ gaits:
     left_close: MV_TPstraight_leftclose_v1
     right_open: MV_TPstraight_rightopen_v1
   walk:
-    left_close: MVI_walk_leftclose_haa_adpf_v2
-    left_swing: MVI_walk_leftswing_haa_adpf_v2
-    right_close: MVI_walk_rightclose_haa_adpf_v2
-    right_open: MVI_walk_rightopen_haa_adpf_v2
-    right_swing: MVI_walk_rightswing_haa_adpf_v2
+    left_close: MVI_walk_leftclose_v3
+    left_swing: MVI_walk_leftswing_v3
+    right_close: MVI_walk_rightclose_v3
+    right_open: MVI_walk_rightopen_v3
+    right_swing: MVI_walk_rightswing_v3
   walk_large:
-    left_close: MVI_walklarge_leftclose_v2
-    left_swing: MVI_walklarge_leftswing_v2
-    right_close: MVI_walklarge_rightclose_v2
-    right_open: MVI_walklarge_rightopen_v2
-    right_swing: MVI_walklarge_rightswing_v2
+    left_close: MVI_walklarge_leftclose_v3
+    left_swing: MVI_walklarge_leftswing_v3
+    right_close: MVI_walklarge_rightclose_v3
+    right_open: MVI_walklarge_rightopen_v3
+    right_swing: MVI_walklarge_rightswing_v3
   walk_small:
-    left_close: MVI_walksmall_leftclose_v2
-    left_swing: MVI_walksmall_leftswing_v2
-    right_close: MVI_walksmall_rightclose_v2
-    right_open: MVI_walksmall_rightopen_v2
-    right_swing: MVI_walksmall_rightswing_v2
+    left_close: MVI_walksmall_leftclose_v3
+    left_swing: MVI_walksmall_leftswing_v3
+    right_close: MVI_walksmall_rightclose_v3
+    right_open: MVI_walksmall_rightopen_v3
+    right_swing: MVI_walksmall_rightswing_v3
 positions:
   low_sit:
     gait_type: sit_like
@@ -155,12 +161,12 @@ positions:
     joints:
       left_ankle: 0.0
       left_hip_aa: 0.0349
-      left_hip_fe: 1.3962634
-      left_knee: 1.48352986
+      left_hip_fe: 1.3963
+      left_knee: 1.4835
       right_ankle: 0.0
       right_hip_aa: 0.0349
-      right_hip_fe: 1.3962634
-      right_knee: 1.48352986
+      right_hip_fe: 1.3963
+      right_knee: 1.4835
   idle_1:
     gait_type: walk_like
     joints:
@@ -230,23 +236,23 @@ positions:
   flat_ramp_stand:
     gait_type: walk_like
     joints:
-      left_ankle: -0.08726646
-      left_hip_aa: 0.03490659
-      left_hip_fe: -0.08729962
+      left_ankle: -0.0873
+      left_hip_aa: 0.0349
+      left_hip_fe: -0.0873
       left_knee: 0.0
-      right_ankle: -0.08726646
-      right_hip_aa: 0.03490659
-      right_hip_fe: -0.08729962
+      right_ankle: -0.0873
+      right_hip_aa: 0.0349
+      right_hip_fe: -0.0873
       right_knee: 0.0
   steep_ramp_stand:
     gait_type: walk_like
     joints:
       left_ankle: -0.2618
-      left_hip_aa: 0.03490659
+      left_hip_aa: 0.0349
       left_hip_fe: -0.0873
       left_knee: 0.0
       right_ankle: -0.2618
-      right_hip_aa: 0.03490659
+      right_hip_aa: 0.0349
       right_hip_fe: -0.0873
       right_knee: 0.0
   idle_6:
@@ -315,3 +321,4 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
       right_knee: 0.0
+

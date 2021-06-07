@@ -105,7 +105,6 @@ void RealSenseReader::readConfigCb(
             ros::console::notifyLoggerLevelsChanged();
         }
     }
-
     preprocessor_->readParameters(config);
     region_creator_->readParameters(config);
     parameter_determiner_->readParameters(config);
@@ -236,6 +235,7 @@ void RealSenseReader::publishCloud(
     pcl::toROSMsg(cloud, msg);
 
     msg.header.frame_id = frame_id_to_transform_to_;
+    msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
 }
