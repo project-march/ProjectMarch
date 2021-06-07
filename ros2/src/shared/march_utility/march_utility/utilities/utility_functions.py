@@ -195,8 +195,10 @@ def validate_and_get_joint_names_for_inverse_kinematics() -> List[str]:
         "right_knee",
     ]
     for joint_name in joint_name_list:
-        if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == \
-                "fixed":
+        if (
+            joint_name not in robot_joint_names
+            or robot.joint_map[joint_name].type == "fixed"
+        ):
             raise KeyError(
                 f"Inverse kinematics calculation expected the robot to have "
                 f"moving joint "
@@ -204,6 +206,7 @@ def validate_and_get_joint_names_for_inverse_kinematics() -> List[str]:
             )
 
     return joint_name_list
+
 
 def get_joint_names_from_urdf() -> List[str]:
     joint_names = []
