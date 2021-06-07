@@ -10,8 +10,10 @@ from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameter
 
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
-from march_utility.utilities.node_utils import get_robot_urdf
+from march_utility.utilities.node_utils import get_robot_urdf, get_joint_names
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.utility_functions import \
+    validate_and_get_joint_names_for_inverse_kinematics
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
@@ -98,7 +100,22 @@ class GaitSelection(Node):
             "first_subgait_delay"
         )
 
+        if not self._validate_inverse_kinematics_is_possible():
+            self.get_logger().warn(f"The currently available joints are unsuitable for "
+                                   f"using inverse kinematics.\n"
+                                   f"Any interpolation on foot_location will return "
+                                   f"the base subgait instead. Realsense gaits will "
+                                   f"not be loaded.")
         self.get_logger().info("Successfully initialized gait selection node.")
+
+    def _validate_inverse_kinematics_is_possible(self):
+        try:
+            ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
+        except KeyError as e:
+            return False
+        if ik_joint_names != get_joint_names(self):
+            return False
+        return True
 
     def _create_services(self) -> None:
         self.create_service(
@@ -350,6 +367,8 @@ class GaitSelection(Node):
 
         :param gaits: The dictionary where the loaded gaits will be added to.
         """
+        if not self._validate_inverse_kinematics_is_possible():
+            return
         get_gait_parameters_service = self.create_client(
             srv_type=GetGaitParameters,
             srv_name="/camera/process_pointcloud",
@@ -399,7 +418,18 @@ class GaitSelection(Node):
                 msg="Gait version map: {gm}, is not valid".format(gm=version_map)
             )
 
-        return version_map, default_config["positions"], semi_dynamic_version_map
+        joint_names = get_joint_names(self)
+        positions = {}
+        self.get_logger().info(f"Config is {default_config['positions']}, joint_names \
+            = {joint_names}")
+        for position_name, position_values in default_config["positions"].items():
+            positions[position_name] = {'gait_type': position_values['gait_type'],
+                                        'joints': {}}
+            for joint, joint_value in position_values['joints'].items():
+                if joint in joint_names:
+                    positions[position_name]['joints'][joint] = joint_value
+
+        return version_map, positions, semi_dynamic_version_map
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.

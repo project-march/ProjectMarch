@@ -1,14 +1,11 @@
 from typing import Optional
-
-from march_utility.utilities.utility_functions import (
-    get_joint_names_for_inverse_kinematics,
-)
 from march_utility.utilities.duration import Duration
 
 from .setpoint import Setpoint
+from ..utilities.utility_functions import get_joint_names_from_urdf
 
 VELOCITY_SCALE_FACTOR = 0.001
-JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+JOINT_NAMES = get_joint_names_from_urdf()
 
 
 class CalculationSetpoint(Setpoint):
@@ -70,7 +67,7 @@ class CalculationSetpoint(Setpoint):
         seconds later
         """
         next_positions = {}
-        for joint in JOINT_NAMES_IK:
+        for joint in JOINT_NAMES:
             if joint not in setpoint_dic:
                 raise KeyError(f"Setpoint_dic is missing joint {joint}")
             else:
