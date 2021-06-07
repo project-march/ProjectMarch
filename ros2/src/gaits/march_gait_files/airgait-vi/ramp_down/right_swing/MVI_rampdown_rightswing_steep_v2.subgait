@@ -4,6 +4,37 @@ duration: 3000000000
 gait_type: stairs_like
 joints:
   left_ankle:
+  - position: -0.2618
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0873
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.192
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.1745
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.2618
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.5089
+    time_from_start: 1498800000
+    velocity: 0.3491
+  - position: 1.2217
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
@@ -16,14 +47,14 @@ joints:
   - position: -0.2618
     time_from_start: 3000000000
     velocity: 0.0
-  left_hip_aa:
+  right_hip_aa:
   - position: -0.0873
     time_from_start: 0
     velocity: -0.0
   - position: 0.0
     time_from_start: 3000000000
     velocity: 0.0
-  left_hip_fe:
+  right_hip_fe:
   - position: 0.1745
     time_from_start: 0
     velocity: -0.0
@@ -33,7 +64,7 @@ joints:
   - position: 0.192
     time_from_start: 3000000000
     velocity: -0.0
-  left_knee:
+  right_knee:
   - position: 1.2217
     time_from_start: 0
     velocity: 0.0
@@ -43,36 +74,5 @@ joints:
   - position: 0.2618
     time_from_start: 3000000000
     velocity: -0.0
-  right_ankle:
-  - position: -0.2618
-    time_from_start: 0
-    velocity: -0.0
-  - position: 0.0
-    time_from_start: 3000000000
-    velocity: 0.0
-  right_hip_aa:
-  - position: 0.0
-    time_from_start: 0
-    velocity: -0.0
-  - position: -0.0873
-    time_from_start: 3000000000
-    velocity: 0.0
-  right_hip_fe:
-  - position: 0.192
-    time_from_start: 0
-    velocity: -0.0
-  - position: 0.1745
-    time_from_start: 3000000000
-    velocity: 0.0
-  right_knee:
-  - position: 0.2618
-    time_from_start: 0
-    velocity: -0.0
-  - position: 0.5089
-    time_from_start: 1498800000
-    velocity: 0.3491
-  - position: 1.2217
-    time_from_start: 3000000000
-    velocity: -0.0
-name: left_swing
-version: MVI_slopedown_leftswing_steep_v2
+name: right_swing
+version: MVI_rampdown_rightswing_steep_v2

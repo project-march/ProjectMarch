@@ -86,4 +86,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MVI_slopedownlaststep_rightopen_flat_v1
+version: MVI_rampdownlaststep_rightopen_flat_v1
