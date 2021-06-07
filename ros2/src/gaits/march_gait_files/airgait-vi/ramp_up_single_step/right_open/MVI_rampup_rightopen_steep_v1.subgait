@@ -1,0 +1,77 @@
+description: The right open gait for the 20 degrees slope up
+duration: 2500000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.1396
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1745
+    time_from_start: 1150000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: 327100000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 812900000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.9948
+    time_from_start: 1166700000
+    velocity: -0.1222
+  - position: 0.8727
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.3788
+    time_from_start: 910000000
+    velocity: -0.3491
+  - position: 1.1345
+    time_from_start: 2500000000
+    velocity: 0.0
+name: right_open
+version: MVI_rampup_rightopen_steep_v1

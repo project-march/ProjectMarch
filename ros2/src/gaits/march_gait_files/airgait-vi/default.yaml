@@ -7,6 +7,10 @@ gaits:
     right_open: MVI_rampup_rightopen_steep_v2
     right_swing: MVI_rampup_rightswing_steep_v2
 
+  ramp_up_single_step:
+    right_open: MVI_rampup_rightopen_steep_v2
+    left_close: MVI_rampup_leftclose_steep_v2
+
   ramp_down:
     left_close: MVI_rampdown_leftclose_steep_v2
     left_open: MVI_rampdown_leftopen_steep_v2
@@ -26,12 +30,20 @@ gaits:
     right_open: MVI_stairsup_rightopen_cybathlon_v4
     right_swing: MVI_stairsup_rightswing_cybathlon_v4
 
+  stairs_up_single_step:
+    right_open: MVI_stairsup_rightopen_cybathlon_v4
+    left_close: MVI_stairsup_leftclose_cybathlon_v4
+
   stairs_down:
     left_close: MVI_stairsdown_leftclose_cybathlon_v2
     left_swing: MVI_stairsdown_leftswing_cybathlon_v2
     right_close: MVI_stairsdown_rightclose_cybathlon_v2
     right_open: MVI_stairsdown_rightopen_cybathlon_v2
     right_swing: MVI_stairsdown_rightswing_cybathlon_v2
+
+  stairs_down_single_step:
+    left_close: MVI_stairsdown_leftclose_cybathlon_v2
+    right_open: MVI_stairsdown_rightopen_cybathlon_v2
 
   stairs_down_backwards:
     left_close: MVI_stairsdownbackwards_leftclose_cybathlon_v2
@@ -40,12 +52,20 @@ gaits:
     right_open: MVI_stairsdownbackwards_rightopen_cybathlon_v2
     right_swing: MVI_stairsdownbackwards_rightswing_cybathlon_v2
 
+  stairs_down_backwards_single_step:
+    left_close: MVI_stairsdownbackwards_leftclose_cybathlon_v2
+    right_open: MVI_stairsdownbackwards_rightopen_cybathlon_v2
+
   walk:
     left_close: MVI_walk_leftclose_v3
     left_swing: MVI_walk_leftswing_v3
     right_close: MVI_walk_rightclose_v3
     right_open: MVI_walk_rightopen_v3
     right_swing: MVI_walk_rightswing_v3
+
+  walk_single_step:
+    right_open: MVI_walksinglestep_rightopen_v3
+    left_close: MVI_walksinglestep_leftclose_v3
   
   walk_large:
     left_close: MVI_walklarge_leftclose_v3
@@ -53,6 +73,10 @@ gaits:
     right_close: MVI_walklarge_rightclose_v3
     right_open: MVI_walklarge_rightopen_v3
     right_swing: MVI_walklarge_rightswing_v3
+
+  walk_large_single_step:
+    right_open: MVI_walksinglesteplarge_rightopen_v3
+    left_close: MVI_walksinglesteplarge_leftclose_v3
  
   walk_small:
     left_close: MVI_walksmall_leftclose_v3
@@ -60,6 +84,10 @@ gaits:
     right_close: MVI_walksmall_rightclose_v3
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
+
+  walk_small_single_step:
+    right_open: MVI_walksinglestepsmall_rightopen_v3
+    left_close: MVI_walksinglestepsmall_leftclose_v3
 
   sit:
     sit_down: MVI_sit_down_v2
