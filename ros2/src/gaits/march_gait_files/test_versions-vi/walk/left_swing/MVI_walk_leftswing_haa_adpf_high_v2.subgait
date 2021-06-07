@@ -30,7 +30,7 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.7916
-    time_from_start: 464758250
+    time_from_start: 464800000
     velocity: 1.2331
   - position: 0.959
     time_from_start: 720000000
@@ -98,4 +98,4 @@ joints:
     time_from_start: 1200000000
     velocity: 0.0
 name: left_swing
-version: MVI_walk_leftswing_haa_adpf_high_v1
+version: MVI_walk_leftswing_haa_adpf_high_v2

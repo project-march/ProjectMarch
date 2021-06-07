@@ -48,6 +48,7 @@ topics:
   - { topic: 'march/motor_controller_states', type: 'march_shared_msgs/msg/MotorControllerState'}
   - { topic: 'camera_front/imu/data', type: 'sensor_msgs/msg/Imu'}
   - { topic: 'march/mpc', type: 'march_shared_msgs/msg/MpcMsg'}
+  - { topic: 'march/input_device/current_state', type: 'march_shared_msgs/msg/CurrentIPDState'}
 
 services_1_to_2:
   - { service: '/freeze',

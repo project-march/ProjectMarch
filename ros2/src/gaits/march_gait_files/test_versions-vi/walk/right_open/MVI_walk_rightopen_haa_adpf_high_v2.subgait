@@ -71,7 +71,7 @@ joints:
     velocity: 0.121
   - position: 0.3752
     time_from_start: 1500000000
-    velocity: -0.256
+    velocity: -0.32
   right_knee:
   - position: 0.0
     time_from_start: 0
@@ -86,4 +86,4 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MVI_walk_rightopen_haa_adpf_high_v1
+version: MVI_walk_rightopen_haa_adpf_high_v2
