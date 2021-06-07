@@ -1,4 +1,4 @@
-description: 'Left close for the last step of the steep (5 deg) ramp down. '
+description: 'Right open for the last step of the steep (5 deg) ramp down. '
 duration: 2500000000
 gait_type: walk_like
 joints:
@@ -6,12 +6,9 @@ joints:
   - position: -0.0873
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0
-    time_from_start: 2083300000
-    velocity: 0.0
-  - position: 0.0
+  - position: -0.0873
     time_from_start: 2500000000
-    velocity: 0.0
+    velocity: -0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -24,34 +21,34 @@ joints:
     velocity: 0.0
   - position: 0.0349
     time_from_start: 2500000000
-    velocity: 0.0
+    velocity: -0.0
   left_hip_fe:
-  - position: -0.1667
+  - position: -0.0873
     time_from_start: 0
-    velocity: 0.0
-  - position: 0.5585
-    time_from_start: 1000000000
-    velocity: 0.1396
-  - position: 0.0
+    velocity: -0.0
+  - position: -0.1667
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
-  - position: 0.1396
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.8727
-    time_from_start: 800000000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 2500000000
-    velocity: 0.0
-  right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0
+  - position: 0.1396
+    time_from_start: 1700000000
+    velocity: 0.0
+  - position: 0.1396
     time_from_start: 2500000000
     velocity: 0.0
+  right_ankle:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2083300000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: -0.0
   right_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -64,23 +61,29 @@ joints:
     velocity: 0.0
   - position: 0.0349
     time_from_start: 2500000000
-    velocity: 0.0
+    velocity: -0.0
   right_hip_fe:
-  - position: 0.3142
+  - position: -0.0873
     time_from_start: 0
-    velocity: -0.3491
-  - position: 0.0524
+    velocity: -0.0
+  - position: 0.5585
     time_from_start: 1500000000
-    velocity: 0.0
-  - position: 0.0
+    velocity: 0.1396
+  - position: 0.3142
     time_from_start: 2500000000
-    velocity: 0.0
+    velocity: -0.3491
   right_knee:
-  - position: 0.1396
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.8727
+    time_from_start: 1050000000
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: 2250000000
+    velocity: 0.0
+  - position: 0.1396
     time_from_start: 2500000000
     velocity: 0.0
-name: left_close
-version: MVI_laststep_leftclose_flat_v1
+name: right_open
+version: MVI_slopedownlaststep_rightopen_flat_v1

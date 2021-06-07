@@ -1,12 +1,12 @@
-description: 'Right open for the last step of the steep (5 deg) ramp down. '
+description: 'Right open for the last step of the steep (20 deg) ramp down. '
 duration: 2500000000
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: -0.0873
+  - position: -0.2618
     time_from_start: 0
     velocity: -0.0
-  - position: -0.0873
+  - position: -0.1745
     time_from_start: 2500000000
     velocity: -0.0
   left_hip_aa:
@@ -40,7 +40,7 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
-  - position: -0.0873
+  - position: -0.2618
     time_from_start: 0
     velocity: -0.0
   - position: 0.0
@@ -86,4 +86,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MVI_laststep_rightopen_flat_v1
+version: MVI_slopedownlaststep_rightopen_steep_v1
