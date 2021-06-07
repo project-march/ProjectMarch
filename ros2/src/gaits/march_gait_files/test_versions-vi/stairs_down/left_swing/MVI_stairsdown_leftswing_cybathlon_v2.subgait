@@ -1,0 +1,92 @@
+description: Changed the HAA and ADPF movement with the sedygas stairsdown movements.
+duration: 4000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1660000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 4000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.05235988
+    time_from_start: 2000000000
+    velocity: 0.0
+  - position: -0.05235988
+    time_from_start: 4000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.62829933
+    time_from_start: 0
+    velocity: 0.26179939
+  - position: 0.9250245
+    time_from_start: 1650000000
+    velocity: 0.0
+  - position: 0.28972466
+    time_from_start: 4000000000
+    velocity: 0.0
+  left_knee:
+  - position: 1.44860059
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.65806279
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 1.48352986
+    time_from_start: 1662000000
+    velocity: -0.43633231
+  - position: 0.33160034
+    time_from_start: 4000000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 4000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: -0.05235988
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.08726646
+    time_from_start: 2000000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 4000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.28972466
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.34910076
+    time_from_start: 2000000000
+    velocity: 0.0
+  - position: 0.62829933
+    time_from_start: 4000000000
+    velocity: 0.26179939
+  right_knee:
+  - position: 0.33160034
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.54109919
+    time_from_start: 1500000000
+    velocity: -0.17449976
+  - position: 0.52360052
+    time_from_start: 2000000000
+    velocity: 0.08729962
+  - position: 1.44860059
+    time_from_start: 4000000000
+    velocity: 0.0
+name: left_swing
+version: MVI_stairsdown_leftswing_cybathlon_v2
