@@ -68,7 +68,7 @@
     <xacro:property name="hip_aa_frame_height"
                     value="${dimensions['hip_aa_side']['length']}"/>
     <xacro:property name="hip_aa_frame_width"
-                    value="${dimensions['hip_aa_base']['length']}"/>
+                    value="${dimensions['hip_aa_front']['length']}"/>
     <xacro:property name="hip_aa_mass" value="${dimensions['hip_aa_side']['mass']}"/>
     <!-- mass = Moving hip -->
 
@@ -247,7 +247,7 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <xacro:pressure_sole side="left" foot_name="foot_left"/>
+    <xacro:pressure_sole side="left"/>
 
 <!-- Right Hip -->
     <xacro:frame_part name="hip_aa_frame_right_side"
@@ -313,7 +313,7 @@
                       visual_rpy="0 0 ${-pi/2}"
     />
 
-    <xacro:pressure_sole side="right" foot_name="foot_right"/>
+    <xacro:pressure_sole side="right"/>
 
     <xacro:frame_part name="foot_right"
                       reflect="1"
