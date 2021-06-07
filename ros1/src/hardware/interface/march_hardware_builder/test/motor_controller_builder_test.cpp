@@ -7,12 +7,16 @@
 #include <ros/package.h>
 #include <urdf/model.h>
 
+#include <march_hardware/motor_controller/motor_controller_type.h>
+
 class MotorControllerBuilderTest : public ::testing::Test {
 protected:
     std::string base_path;
     urdf::JointSharedPtr joint;
     march::PdoInterfacePtr pdo_interface;
     march::SdoInterfacePtr sdo_interface;
+    const march::MotorControllerType motor_controller_type
+        = march::MotorControllerType::IMotionCube;
 
     void SetUp() override
     {
@@ -60,12 +64,12 @@ TEST_F(MotorControllerBuilderTest, ValidIMotionCube)
     auto created = HardwareBuilder::createMotorController(
         config, this->joint, this->pdo_interface, this->sdo_interface);
 
-    auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(16, 22134,
-        43436, this->joint->limits->lower, this->joint->limits->upper,
-        this->joint->safety->soft_lower_limit,
+    auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(16,
+        motor_controller_type, 22134, 43436, this->joint->limits->lower,
+        this->joint->limits->upper, this->joint->safety->soft_lower_limit,
         this->joint->safety->soft_upper_limit);
-    auto incremental_encoder
-        = std::make_unique<march::IncrementalEncoder>(12, 101.0);
+    auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(
+        12, motor_controller_type, 101.0);
     march::IMotionCube expected(march::Slave(/*slave_index=*/2,
                                     this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),

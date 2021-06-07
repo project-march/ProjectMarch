@@ -47,8 +47,10 @@ bool MotorController::isIncrementalEncoderMorePrecise() const
     if (!hasAbsoluteEncoder()) {
         return true;
     }
-    return incremental_encoder_->getRadiansPerBit()
-        < absolute_encoder_->getRadiansPerBit();
+    /* The most precise encoder can encode more positions.
+       This means that every Internal Unit represents less radians. */
+    return incremental_encoder_->getRadiansPerIU()
+        < absolute_encoder_->getRadiansPerIU();
 }
 
 float MotorController::getPosition()
@@ -156,5 +158,10 @@ void MotorController::actuate(float target)
             "Actuation mode %s is not supported",
             actuation_mode_.toString().c_str());
     }
+}
+
+float MotorController::effortMultiplicationConstant()
+{
+    return 1.0;
 }
 } // namespace march

@@ -1,0 +1,31 @@
+march:
+  controller:
+    pdb_state:
+      type: march_pdb_state_controller/MarchPdbStateController
+      publish_rate: 50
+    joint_state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 250
+    temperature_sensor:
+      type: march_temperature_sensor_controller/MarchTemperatureSensorController
+      publish_rate: 1
+    trajectory:
+      type: effort_controllers/JointTrajectoryController
+      #allow_partial_joints_goal: true
+      joints:
+        - left_ankle
+        - left_knee
+      gains: # Required because we're controlling an effort interface
+        left_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}        
+        left_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+
+      constraints:
+        goal_time: 0.5
+        left_ankle:
+          margin_soft_limit_error: 0.5
+          trajectory: 1.0
+          goal: 1.0
+        left_knee:
+          margin_soft_limit_error: 0.5
+          trajectory: 1.0
+          goal: 1.0

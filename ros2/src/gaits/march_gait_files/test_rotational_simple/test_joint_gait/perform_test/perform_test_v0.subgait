@@ -1,0 +1,46 @@
+description: left leg subgait
+duration: 5000000000
+gait_type: ''
+joints:
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+name: perform_test
+version: example

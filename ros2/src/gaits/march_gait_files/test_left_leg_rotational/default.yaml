@@ -1,0 +1,9 @@
+gaits:
+  test_joint_gait:
+    perform_test: perform_test_v0
+positions:
+  setup:
+    gait_type: ''
+    joints:
+      left_hip_fe: 0.0
+      left_knee: 0.0

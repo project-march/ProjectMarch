@@ -1,0 +1,95 @@
+description: Stairs up height 12 cm and depth 20
+duration: 2750000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 2000000000
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 2750000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.06108652
+    time_from_start: 800000000
+    velocity: -0.12217305
+  - position: -0.08726646
+    time_from_start: 1570000000
+    velocity: 0.01099557
+  - position: -0.06108652
+    time_from_start: 2200000000
+    velocity: 0.12217305
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.91097286
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: 0.17449976
+  left_knee:
+  - position: 1.17154353
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 2282500000
+    velocity: 0.0
+  - position: 0.24430072
+    time_from_start: 2750000000
+    velocity: 0.69810028
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.26179939
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 1415100000
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 2160000000
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 2750000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 1401700000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.17449976
+  - position: 1.11056173
+    time_from_start: 2009500000
+    velocity: 0.0
+  - position: 0.91097286
+    time_from_start: 2750000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.24430072
+    time_from_start: 0
+    velocity: 0.69810028
+  - position: 1.6231562
+    time_from_start: 1602100000
+    velocity: 0.0
+  - position: 1.17154353
+    time_from_start: 2750000000
+    velocity: 0.0
+name: right_swing
+version: MVI_stairsup_rightswing_low_undeep

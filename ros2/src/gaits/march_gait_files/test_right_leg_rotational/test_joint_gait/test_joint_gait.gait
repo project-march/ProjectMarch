@@ -1,0 +1,6 @@
+name: test_joint_gait
+subgaits:
+  perform_test:
+    to: end
+  start:
+    to: perform_test

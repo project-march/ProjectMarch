@@ -15,6 +15,7 @@
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
+#include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 
@@ -26,7 +27,7 @@ const std::vector<std::string>
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
     = { "incrementalEncoder", "absoluteEncoder" };
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS
-    = { "axis", "absoluteEncoder" };
+    = { "axis", "absoluteEncoder", "motorKV" };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset" };
 const std::vector<std::string>
@@ -69,7 +70,6 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     this->initUrdf();
     auto pdo_interface = march::PdoInterfaceImpl::create();
     auto sdo_interface = march::SdoInterfaceImpl::create();
-
     const auto robot_name
         = this->robot_config_.begin()->first.as<std::string>();
     ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
@@ -195,9 +195,10 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
     std::string setup = convertSWFileToString(imc_setup_data);
     return std::make_unique<march::IMotionCube>(
         march::Slave(slave_index, pdo_interface, sdo_interface),
-        HardwareBuilder::createAbsoluteEncoder(
-            absolute_encoder_config, urdf_joint),
-        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config),
+        HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
+            march::MotorControllerType::IMotionCube, urdf_joint),
+        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
+            march::MotorControllerType::IMotionCube),
         setup, mode);
 }
 
@@ -207,6 +208,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     const march::PdoInterfacePtr& pdo_interface,
     const march::SdoInterfacePtr& sdo_interface)
 {
+    ROS_INFO("Creating ODrive");
     if (!odrive_config || !urdf_joint) {
         return nullptr;
     }
@@ -215,18 +217,29 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
         odrive_config, HardwareBuilder::ODRIVE_REQUIRED_KEYS, "odrive");
 
     YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
+    YAML::Node incremental_encoder_config = odrive_config["incrementalEncoder"];
     int slave_index = odrive_config["slaveIndex"].as<int>();
+
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
+
+    bool pre_calibrated = false;
+    if (odrive_config["preCalibrated"]) {
+        pre_calibrated = odrive_config["preCalibrated"].as<bool>();
+    }
+    unsigned int motor_kv = odrive_config["motorKV"].as<unsigned int>();
 
     return std::make_unique<march::ODrive>(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
-        HardwareBuilder::createAbsoluteEncoder(
-            absolute_encoder_config, urdf_joint),
-        mode);
+        HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
+            march::MotorControllerType::ODrive, urdf_joint),
+        HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
+            march::MotorControllerType::ODrive),
+        mode, pre_calibrated, motor_kv);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const YAML::Node& absolute_encoder_config,
+    const march::MotorControllerType motor_controller_type,
     const urdf::JointConstSharedPtr& urdf_joint)
 {
     if (!absolute_encoder_config || !urdf_joint) {
@@ -255,14 +268,16 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
         soft_upper_limit = urdf_joint->limits->upper;
     }
 
-    return std::make_unique<march::AbsoluteEncoder>(resolution, min_position,
-        max_position, urdf_joint->limits->lower, urdf_joint->limits->upper,
-        soft_lower_limit, soft_upper_limit);
+    return std::make_unique<march::AbsoluteEncoder>(resolution,
+        motor_controller_type, getEncoderDirection(absolute_encoder_config), min_position, max_position,
+        urdf_joint->limits->lower, urdf_joint->limits->upper, soft_lower_limit,
+        soft_upper_limit);
 }
 
 std::unique_ptr<march::IncrementalEncoder>
 HardwareBuilder::createIncrementalEncoder(
-    const YAML::Node& incremental_encoder_config)
+    const YAML::Node& incremental_encoder_config,
+    const march::MotorControllerType motor_controller_type)
 {
     if (!incremental_encoder_config) {
         return nullptr;
@@ -277,7 +292,21 @@ HardwareBuilder::createIncrementalEncoder(
     const auto transmission
         = incremental_encoder_config["transmission"].as<double>();
     return std::make_unique<march::IncrementalEncoder>(
-        resolution, transmission);
+        resolution, motor_controller_type, getEncoderDirection(incremental_encoder_config), transmission);
+}
+
+march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node& encoder_config)
+{
+    if (encoder_config["direction"]) {
+        switch (encoder_config["direction"].as<int>()) {
+            case 1: return march::Encoder::Direction::Positive;
+            case -1: return march::Encoder::Direction::Negative;
+            default: throw march::error::HardwareException(march::error::ErrorType::INVALID_ENCODER_DIRECTION);
+        }
+    }
+    else {
+        return march::Encoder::Direction::Positive;
+    }
 }
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(

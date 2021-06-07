@@ -57,7 +57,7 @@ public:
 
     // Get whether the incremental encoder is more precise than the absolute
     // encoder
-    bool isIncrementalEncoderMorePrecise() const;
+    virtual bool isIncrementalEncoderMorePrecise() const;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
@@ -75,6 +75,10 @@ public:
 
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;
+
+    // Effort may have to be multiplied by a constant
+    // because ROS control limits the pid values to a certain maximum
+    virtual float effortMultiplicationConstant();
 
     ~MotorController() override = default;
 
