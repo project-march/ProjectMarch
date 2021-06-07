@@ -18,7 +18,7 @@
               command="load" unless="$(eval ground_gait)"/>
     <rosparam file="$(find march_simulation)/config/groundgait/$(arg controller_type)/$(arg controller_name).yaml"
               command="load" if="$(eval ground_gait)"/>
-    <node name="upload_controller_values" pkg="march_simulation"
+    <node name="upload_controller_values" pkg="march_launch"
           type="upload_controller_values.py"/>
 
     <group ns="march">
