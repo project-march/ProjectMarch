@@ -1,7 +1,12 @@
 moving_joints:
+  - right_hip_aa
   - right_hip_fe
   - right_knee
-  - right_hip_aa
+  - right_ankle
+  - left_hip_aa
+  - left_hip_fe
+  - left_knee
+  - left_ankle
 dimensions:
   general:
     width: 0.05
