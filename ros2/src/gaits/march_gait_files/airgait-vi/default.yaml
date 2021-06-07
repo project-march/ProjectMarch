@@ -7,10 +7,6 @@ gaits:
     right_open: MVI_rampup_rightopen_steep_v2
     right_swing: MVI_rampup_rightswing_steep_v2
 
-  ramp_up_single_step:
-    right_open: MVI_rampup_rightopen_steep_v2
-    left_close: MVI_rampup_leftclose_steep_v2
-
   ramp_down:
     left_close: MVI_rampdown_leftclose_steep_v2
     left_open: MVI_rampdown_leftopen_steep_v2
@@ -74,7 +70,7 @@ gaits:
     right_open: MVI_walklarge_rightopen_v3
     right_swing: MVI_walklarge_rightswing_v3
 
-  walk_large_single_step:
+  walk_single_step_large:
     right_open: MVI_walksinglesteplarge_rightopen_v3
     left_close: MVI_walksinglesteplarge_leftclose_v3
  
@@ -85,7 +81,7 @@ gaits:
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
 
-  walk_small_single_step:
+  walk_single_step_small:
     right_open: MVI_walksinglestepsmall_rightopen_v3
     left_close: MVI_walksinglestepsmall_leftclose_v3
 
