@@ -5,18 +5,16 @@ march:
       publish_rate: 50
     temperature_sensor:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
-      publish_rate: 50
+      publish_rate: 1
     pdb_state:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
     trajectory:
-        type: position_controllers/JointTrajectoryController
-        # When you switch to effort actuationmode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
-        joints:
-          - linear_joint
-#      gains: # Required because we're controlling an effort interface
-#        test_joint: {p: 50, i: 0, d: 10, i_clamp: 10, publish_state: true, antiwindup: true}
-        # Note: these gains are tuned for the KFE joints in the exoskeleton
+      type: effort_controllers/JointTrajectoryController
+      joints:
+        - linear_joint
+      gains:
+        linear_joint: {p: 150, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
         linear_joint:
