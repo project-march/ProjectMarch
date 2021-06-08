@@ -310,11 +310,13 @@ void ODrive::actuateRadians(float /*target_position*/)
 float ODrive::getMotorControllerVoltage()
 {
 //    throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
+    return -1;
 }
 
 float ODrive::getMotorVoltage()
 {
 //    throw error::NotImplemented("getMotorVoltage", "ODrive");
+    return -1;
 }
 
 } // namespace march
