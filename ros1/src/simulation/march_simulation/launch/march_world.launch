@@ -42,17 +42,17 @@
 
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
-              args="-urdf -model march -param robot_description"/>
+          args="-urdf -model march -param robot_description"/>
     </group>
 
 
 
     <group if="$(eval obstacle != 'none')">
         <param name="model_description"
-               command="$(find xacro)/xacro '$(find march_simulation)/obstacles/$(arg obstacle).xacro'" />
+           command="$(find xacro)/xacro '$(find march_simulation)/obstacles/$(arg obstacle).xacro'" />
 
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
         <node name="model_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
-              args="-urdf -model $(arg obstacle) -param model_description"/>
+          args="-urdf -model $(arg obstacle) -param model_description"/>
     </group>
 </launch>
