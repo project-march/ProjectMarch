@@ -62,8 +62,7 @@ namespace error {
     {
         if (error == 0) {
             return "None. ";
-        }
-        else {
+        } else {
             std::string description;
             const auto size = sizeof(error) * 8;
             const std::bitset<size> bitset(error);

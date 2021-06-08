@@ -43,8 +43,8 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     ActuationMode actuation_mode, unsigned int motor_kv)
-    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, /*pre_calibrated=*/false,
-        motor_kv)
+    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode,
+        /*pre_calibrated=*/false, motor_kv)
 {
 }
 
@@ -85,7 +85,7 @@ void ODrive::actuateTorque(float target_effort)
 {
     // ROS_INFO("Effort: %f", target_effort);
     float target_torque
-        = target_effort * torque_constant_ * (float) getMotorDirection();
+        = target_effort * torque_constant_ * (float)getMotorDirection();
     // ROS_INFO("Torque: %f", target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
@@ -150,9 +150,9 @@ float ODrive::getTorque()
 
 bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
 {
-    // Almost no action is needed as the DieBoSlave make sure actuation is ready when
-    // etherCAT connection is made.
-    // Only need to wait a second for the EtherCAT network to become available.
+    // Almost no action is needed as the DieBoSlave make sure actuation is ready
+    // when etherCAT connection is made. Only need to wait a second for the
+    // EtherCAT network to become available.
     ros::Duration(/*t=*/1).sleep();
     return false;
 }
@@ -167,7 +167,6 @@ ODriveAxisState ODrive::getAxisState()
                                             ODriveObjectName::AxisState, axis_))
                                .ui);
 }
-
 
 int32_t ODrive::getAbsolutePositionIU()
 {
@@ -200,30 +199,30 @@ float ODrive::getIncrementalVelocityIU()
     return this->read32(ODrivePDOmap::getMISOByteOffset(
                             ODriveObjectName::ActualVelocity, axis_))
                .f
-        * (float) incremental_encoder_->getDirection();
+        * (float)incremental_encoder_->getDirection();
 }
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return (float) this->getAbsoluteEncoder()->positionIUToRadians(
+    return (float)this->getAbsoluteEncoder()->positionIUToRadians(
         getAbsolutePositionIU());
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
 {
     // The current ODrive firmware doesn't support absolute encoder velocity
-    return (float) getIncrementalVelocityUnchecked();
+    return (float)getIncrementalVelocityUnchecked();
 }
 
 float ODrive::getIncrementalPositionUnchecked()
 {
-    return (float) this->getIncrementalEncoder()->positionIUToRadians(
+    return (float)this->getIncrementalEncoder()->positionIUToRadians(
         getIncrementalPositionIU());
 }
 
 float ODrive::getIncrementalVelocityUnchecked()
 {
-    return (float) this->getIncrementalEncoder()->velocityIUToRadians(
+    return (float)this->getIncrementalEncoder()->velocityIUToRadians(
         getIncrementalVelocityIU());
 }
 
@@ -232,7 +231,7 @@ float ODrive::getMotorCurrent()
     return this->read32(ODrivePDOmap::getMISOByteOffset(
                             ODriveObjectName::ActualCurrent, axis_))
                .f
-        * (float) getMotorDirection();
+        * (float)getMotorDirection();
 }
 
 uint32_t ODrive::getAxisError()
