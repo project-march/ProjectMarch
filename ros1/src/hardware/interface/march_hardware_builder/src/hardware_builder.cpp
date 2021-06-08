@@ -221,7 +221,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
 
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
-    bool pre_calibrated = false;
+    bool pre_calibrated = true;
     if (odrive_config["preCalibrated"]) {
         pre_calibrated = odrive_config["preCalibrated"].as<bool>();
     }

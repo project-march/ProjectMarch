@@ -44,12 +44,13 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     ActuationMode actuation_mode, unsigned int motor_kv)
     : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode,
-        /*pre_calibrated=*/false, motor_kv)
+        /*pre_calibrated=*/true, motor_kv)
 {
 }
 
 void ODrive::prepareActuation()
 {
+    ros::Duration(/*t=*/1).sleep();
     if (!pre_calibrated_) {
         // Calibrate the ODrive first
         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
@@ -153,7 +154,7 @@ bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
     // Almost no action is needed as the DieBoSlave make sure actuation is ready
     // when etherCAT connection is made. Only need to wait a second for the
     // EtherCAT network to become available.
-    ros::Duration(/*t=*/1).sleep();
+//    ros::Duration(/*t=*/1).sleep();
     return false;
 }
 
