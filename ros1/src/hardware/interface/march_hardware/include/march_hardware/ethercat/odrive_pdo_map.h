@@ -38,7 +38,9 @@ enum class ODriveObjectName {
 
     // Write objects
     TargetTorque,
-    RequestedState
+
+    // Requested State is not yet implemented on the DieBoSlave
+    // RequestedState
 };
 
 class ODrivePDOmap {

@@ -60,6 +60,7 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = {
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
     { ODriveObjectName::TargetTorque,
         ODriveObject(/*offset=*/0, /*length=*/32) },
+    // Requested State is not yet implemented on the DieBoSlave
     //    { ODriveObjectName::RequestedState,
     //        ODriveObject(/*offset=*/4, /*length=*/32) },
 };
@@ -67,6 +68,7 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
     { ODriveObjectName::TargetTorque,
         ODriveObject(/*offset=*/4, /*length=*/32) },
+    // Requested State is not yet implemented on the DieBoSlave
     //    { ODriveObjectName::RequestedState,
     //        ODriveObject(/*offset=*/12, /*length=*/32) },
 };

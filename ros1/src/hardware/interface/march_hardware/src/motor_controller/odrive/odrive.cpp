@@ -43,14 +43,13 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     ActuationMode actuation_mode, unsigned int motor_kv)
-    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, false,
+    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode, /*pre_calibrated=*/false,
         motor_kv)
 {
 }
 
 void ODrive::prepareActuation()
 {
-    ros::Duration(1).sleep();
     if (!pre_calibrated_) {
         // Calibrate the ODrive first
         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
@@ -86,7 +85,7 @@ void ODrive::actuateTorque(float target_effort)
 {
     // ROS_INFO("Effort: %f", target_effort);
     float target_torque
-        = target_effort * torque_constant_ * getMotorDirection();
+        = target_effort * torque_constant_ * (float) getMotorDirection();
     // ROS_INFO("Torque: %f", target_torque);
     bit32 write_torque = { .f = target_torque };
     this->write32(
@@ -151,14 +150,15 @@ float ODrive::getTorque()
 
 bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
 {
-    // No action is needed as the DieBoSlave make sure actuation is ready when
-    // etherCAT connection is made
+    // Almost no action is needed as the DieBoSlave make sure actuation is ready when
+    // etherCAT connection is made.
+    // Only need to wait a second for the EtherCAT network to become available.
+    ros::Duration(/*t=*/1).sleep();
     return false;
 }
 
 void ODrive::reset(SdoSlaveInterface& /*sdo*/)
 {
-    // TODO: implement
 }
 
 ODriveAxisState ODrive::getAxisState()
@@ -168,14 +168,6 @@ ODriveAxisState ODrive::getAxisState()
                                .ui);
 }
 
-void ODrive::setAxisState(ODriveAxisState /* state */)
-{
-    return;
-    //    bit32 write_struct = { .ui = state.value_ };
-    //    this->write32(ODrivePDOmap::getMOSIByteOffset(
-    //                      ODriveObjectName::RequestedState, axis_),
-    //        write_struct);
-}
 
 int32_t ODrive::getAbsolutePositionIU()
 {
@@ -208,30 +200,30 @@ float ODrive::getIncrementalVelocityIU()
     return this->read32(ODrivePDOmap::getMISOByteOffset(
                             ODriveObjectName::ActualVelocity, axis_))
                .f
-        * incremental_encoder_->getDirection();
+        * (float) incremental_encoder_->getDirection();
 }
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return this->getAbsoluteEncoder()->positionIUToRadians(
+    return (float) this->getAbsoluteEncoder()->positionIUToRadians(
         getAbsolutePositionIU());
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
 {
     // The current ODrive firmware doesn't support absolute encoder velocity
-    return getIncrementalVelocityUnchecked();
+    return (float) getIncrementalVelocityUnchecked();
 }
 
 float ODrive::getIncrementalPositionUnchecked()
 {
-    return this->getIncrementalEncoder()->positionIUToRadians(
+    return (float) this->getIncrementalEncoder()->positionIUToRadians(
         getIncrementalPositionIU());
 }
 
 float ODrive::getIncrementalVelocityUnchecked()
 {
-    return this->getIncrementalEncoder()->velocityIUToRadians(
+    return (float) this->getIncrementalEncoder()->velocityIUToRadians(
         getIncrementalVelocityIU());
 }
 
@@ -240,7 +232,7 @@ float ODrive::getMotorCurrent()
     return this->read32(ODrivePDOmap::getMISOByteOffset(
                             ODriveObjectName::ActualCurrent, axis_))
                .f
-        * getMotorDirection();
+        * (float) getMotorDirection();
 }
 
 uint32_t ODrive::getAxisError()
@@ -296,21 +288,29 @@ Encoder::Direction ODrive::getMotorDirection() const
 
 // Throw NotImplemented error by default for functions not part of the Minimum
 // Viable Product
+void ODrive::setAxisState(ODriveAxisState /* state */)
+{
+    throw error::NotImplemented("setAxisState", "ODrive");
+    // Requested State is not yet implemented on the DieBoSlave
+    //    bit32 write_struct = { .ui = state.value_ };
+    //    this->write32(ODrivePDOmap::getMOSIByteOffset(
+    //                      ODriveObjectName::RequestedState, axis_),
+    //        write_struct);
+}
+
 void ODrive::actuateRadians(float /*target_position*/)
 {
-    // throw error::NotImplemented("actuateRadians", "ODrive");
+    throw error::NotImplemented("actuateRadians", "ODrive");
 }
 
 float ODrive::getMotorControllerVoltage()
 {
-    // throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
-    return -1;
+    throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
 }
 
 float ODrive::getMotorVoltage()
 {
-    // throw error::NotImplemented("getMotorVoltage", "ODrive");
-    return -1;
+    throw error::NotImplemented("getMotorVoltage", "ODrive");
 }
 
 } // namespace march

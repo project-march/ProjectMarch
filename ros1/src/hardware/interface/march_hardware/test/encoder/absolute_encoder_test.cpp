@@ -97,7 +97,7 @@ TEST_F(AbsoluteEncoderTest, UpperSoftLimitHigherThanUpperHardLimit)
 
 TEST_F(AbsoluteEncoderTest, ZeroPositionRadToZeroPosition)
 {
-    ASSERT_EQ(this->encoder.positionRadiansToIU(/*radians=*/0.0),
+    ASSERT_EQ(this->encoder.positionRadiansToIU(/*position=*/0.0),
         this->zero_position);
 }
 

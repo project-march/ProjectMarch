@@ -20,8 +20,8 @@ public:
 
     // Inherited methods
     double getRadiansPerIU() const final;
-    double velocityRadiansToIU(double velocity) const;
-    double velocityIUToRadians(double velocity) const;
+    double velocityRadiansToIU(double velocity) const override;
+    double velocityIUToRadians(double velocity) const override;
 
     double getTransmission() const;
 
