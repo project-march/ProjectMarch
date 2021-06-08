@@ -4,6 +4,7 @@
 #define MARCH_HARDWARE_MOTOR_CONTROLLER_ERROR_H
 #include <array>
 #include <bitset>
+#include <climits>
 #include <string>
 
 namespace march {
@@ -64,7 +65,7 @@ namespace error {
             return "None. ";
         } else {
             std::string description;
-            const auto size = sizeof(error) * 8;
+            const auto size = sizeof(error) * CHAR_BIT;
             const std::bitset<size> bitset(error);
 
             for (size_t i = 0; i < size; i++) {
