@@ -57,10 +57,3 @@ def get_joint_names(node: Node) -> List[str]:
     rclpy.spin_until_future_complete(node, future)
 
     return future.result().joint_names
-
-def get_joint_names_from_robot(robot: urdf.Robot) -> List[str]:
-    names = []
-    for joint in robot.joints:
-        if joint.type != "fixed":
-            names.append(joint.name)
-    return names
