@@ -88,8 +88,7 @@ private:
 
     // Splits a region Vector into the regions considered too large, just right,
     // and too small
-    void segmentRegionVector(
-        const std::unique_ptr<RegionVector>& region_vector,
+    void segmentRegionVector(const std::unique_ptr<RegionVector>& region_vector,
         std::unique_ptr<RegionVector>& too_small_regions,
         std::unique_ptr<RegionVector>& too_large_regions,
         std::unique_ptr<RegionVector>& right_size_regions);
