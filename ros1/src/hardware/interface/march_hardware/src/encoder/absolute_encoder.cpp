@@ -70,14 +70,7 @@ void AbsoluteEncoder::checkRangeOfMotion(
 
 double AbsoluteEncoder::getRadiansPerIU() const
 {
-    switch (getMotorControllerType()) {
-        case MotorControllerType::IMotionCube:
-        case MotorControllerType::ODrive:
-            return PI_2 / getTotalPositions();
-        default:
-            throw error::HardwareException(
-                error::ErrorType::INVALID_MOTOR_CONTROLLER);
-    }
+    return PI_2 / getTotalPositions();
 }
 
 double AbsoluteEncoder::positionIUToRadians(double position) const
