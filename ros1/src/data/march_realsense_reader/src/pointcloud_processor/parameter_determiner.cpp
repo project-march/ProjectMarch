@@ -295,8 +295,9 @@ void HullParameterDeterminer::initializeGaitDimensions()
             break;
         }
     }
-    // If the subgait is a swing subgait, double the gait parameters and search
-    // in a wider area
+    // If the subgait is a swing subgait, double the gait parameters as
+    // the step size (and height) of a swing subgait are twice that of
+    // an open or close subgait
     if (subgait_name_.substr(subgait_name_.size() - 5) == "swing") {
         x_flat *= 2;
         x_steep *= 2;
