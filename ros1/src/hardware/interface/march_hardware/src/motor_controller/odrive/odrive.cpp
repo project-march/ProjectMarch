@@ -50,6 +50,7 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 
 void ODrive::prepareActuation()
 {
+    ros::Duration(/*t=*/2).sleep();
 //    if (!pre_calibrated_) {
 //        // Calibrate the ODrive first
 //        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
@@ -153,7 +154,7 @@ bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
     // Almost no action is needed as the DieBoSlave make sure actuation is ready
     // when etherCAT connection is made. Only need to wait a second for the
     // EtherCAT network to become available.
-    ros::Duration(/*t=*/1).sleep();
+    // ros::Duration(/*t=*/1).sleep();
     return false;
 }
 
