@@ -208,7 +208,6 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     const march::PdoInterfacePtr& pdo_interface,
     const march::SdoInterfacePtr& sdo_interface)
 {
-    ROS_INFO("Creating ODrive");
     if (!odrive_config || !urdf_joint) {
         return nullptr;
     }

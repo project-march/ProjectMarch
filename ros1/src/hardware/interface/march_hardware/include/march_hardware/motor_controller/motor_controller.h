@@ -75,6 +75,7 @@ public:
     virtual float getMotorCurrent() = 0;
     virtual float getMotorControllerVoltage() = 0;
     virtual float getMotorVoltage() = 0;
+    virtual float getActualEffort() = 0;
 
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;

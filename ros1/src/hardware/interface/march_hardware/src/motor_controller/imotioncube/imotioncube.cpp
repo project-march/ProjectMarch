@@ -226,6 +226,11 @@ float IMotionCube::getTorque()
     return return_byte.i;
 }
 
+float IMotionCube::getActualEffort()
+{
+    return getTorque();
+}
+
 int32_t IMotionCube::getAbsolutePositionIU()
 {
     if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord())

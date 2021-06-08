@@ -231,21 +231,17 @@ void MarchHardwareInterface::read(
 
         // Update position with he most accurate velocity
         joint.readEncoders(elapsed_time);
-        auto position = joint.getPosition();
-        auto velocity = joint.getVelocity();
+        joint_position_[i] = joint.getPosition();
+        joint_velocity_[i] = joint.getVelocity();
 
-        joint_position_[i] = position;
-        joint_velocity_[i] = velocity;
-
-        ROS_INFO_STREAM("Joint " << joint.getName() << ", position= "
-                                 << position << ", velocity= " << velocity);
+        ROS_INFO_STREAM("Joint " << joint.getName()
+                                 << ", position= " << joint_position_[i]
+                                 << ", velocity= " << joint_velocity_[i]);
 
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
         }
-        //        joint_effort_[i] = joint.getMotorController()->getTorque();
-        joint_effort_[i] = joint.getMotorController()->getMotorCurrent();
-        // ROS_INFO("Motor current: %f", joint_effort_[i]);
+        joint_effort_[i] = joint.getMotorController()->getActualEffort();
     }
 
     this->updateMotorControllerState();
@@ -253,11 +249,6 @@ void MarchHardwareInterface::read(
     if (march_robot_->hasPressureSoles()) {
         updatePressureSoleData();
     }
-}
-
-template <typename Base, typename T> inline bool instanceof (const T*)
-{
-    return std::is_base_of<Base, T>::value;
 }
 
 void MarchHardwareInterface::write(
@@ -270,7 +261,6 @@ void MarchHardwareInterface::write(
             * march_robot_->getJoint(i)
                   .getMotorController()
                   ->effortMultiplicationConstant();
-        //        joint_effort_command_[i] = 1;
         if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
             > MAX_EFFORT_CHANGE) {
             joint_effort_command_[i] = joint_last_effort_command_[i]

@@ -73,6 +73,7 @@ public:
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
+    float getActualEffort() override;
 
     float effortMultiplicationConstant() override;
 

@@ -73,6 +73,7 @@ public:
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
+    float getActualEffort() override;
 
 protected:
     // Override protected functions from Slave class

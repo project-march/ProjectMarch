@@ -234,6 +234,11 @@ float ODrive::getMotorCurrent()
         * (float)getMotorDirection();
 }
 
+float ODrive::getActualEffort()
+{
+    return getMotorCurrent();
+}
+
 uint32_t ODrive::getAxisError()
 {
     return this
