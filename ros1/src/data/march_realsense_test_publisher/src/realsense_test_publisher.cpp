@@ -41,22 +41,17 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     path directory_path
         = ros::package::getPath("march_realsense_test_publisher");
     path relative_data_path(/*__source*/ "config/datasets/");
-    data_path = directory_path / relative_data_path;
 
     // The source directory should be two steps behind this source file
     path source_file_path(__FILE__);
     write_path
         = source_file_path.parent_path().parent_path() / relative_data_path;
 
-    for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
-        if (std::filesystem::is_regular_file(entry)
-            && entry.path().extension() == POINTCLOUD_EXTENSION) {
-            file_names.push_back(entry.path().filename().string());
-        }
-    }
+    updateFileNamesVector();
+
     if (file_names.size() == 0) {
         ROS_ERROR_STREAM("There are no .ply files present under path "
-            << data_path << ". Shutting down the test publisher.");
+            << write_path << ". Shutting down the test publisher.");
         ros::shutdown();
     }
     publish_test_cloud_service
@@ -71,6 +66,16 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
             PROCESS_POINTCLOUD_SERVICE_NAME);
 
     config_tree = loadConfig(DATASET_CONFIGURATION_NAME);
+}
+
+void RealsenseTestPublisher::updateFileNamesVector()
+{
+    for (const auto& entry : std::filesystem::directory_iterator(write_path)) {
+        if (std::filesystem::is_regular_file(entry)
+            && entry.path().extension() == POINTCLOUD_EXTENSION) {
+            file_names.push_back(entry.path().filename().string());
+        }
+    }
 }
 
 YAML::Node RealsenseTestPublisher::loadConfig(const std::string& config_file)
@@ -130,6 +135,7 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
         realsense_category = 0;
         from_back_camera = false;
         frame_id_to_transform_to = "foot_right";
+        from_realsense_viewer = false;
     }
 }
 
@@ -140,10 +146,10 @@ bool RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     if (pcl::io::loadPLYFile<pcl::PointXYZ>(
-            data_path.string() + pointcloud_file_name, *pointcloud_to_publish)
+            write_path.string() + pointcloud_file_name, *pointcloud_to_publish)
         == -1) {
         ROS_WARN_STREAM("Couldn't find file at "
-            << data_path.string() + pointcloud_file_name
+            << write_path.string() + pointcloud_file_name
             << ". file name must be one of " << getFileNamesString());
         return false;
     }
@@ -261,6 +267,7 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
         == -1) {
         return false;
     }
+    updateFileNamesVector();
     return true;
 }
 // Publish the right pointcloud based on the latest service call
