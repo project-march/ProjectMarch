@@ -10,7 +10,8 @@ from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameter
 
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
-from march_utility.utilities.node_utils import get_robot_urdf, get_joint_names
+from march_utility.utilities.node_utils import get_robot_urdf, \
+    get_joint_names_from_robot
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
@@ -65,24 +66,25 @@ class GaitSelection(Node):
         self._directory_name = directory
         self._gait_directory = os.path.join(package_path, directory)
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
-        self._realsense_yaml = os.path.join(
-            self._gait_directory, "realsense_gaits.yaml"
-        )
-
         if not os.path.isdir(self._gait_directory):
             self.get_logger().error(f"Gait directory does not exist: {directory}")
+            raise FileNotFoundError(directory)
         if not os.path.isfile(self._default_yaml):
             self.get_logger().error(
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
 
+        self._robot = get_robot_urdf(self) if robot is None else robot
+
+        self._realsense_yaml = os.path.join(
+            self._gait_directory, "realsense_gaits.yaml"
+        )
         self._realsense_gait_version_map = self._load_realsense_configuration()
         (
             self._gait_version_map,
             self._positions,
             self._semi_dynamic_gait_version_map,
         ) = self._load_configuration()
-        self._robot = get_robot_urdf(self) if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(
             msg_type=String,
@@ -116,7 +118,7 @@ class GaitSelection(Node):
             ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
         except KeyError as e:
             return False
-        if ik_joint_names != get_joint_names(self):
+        if ik_joint_names != get_joint_names_from_robot(self.robot):
             return False
         return True
 
@@ -140,8 +142,7 @@ class GaitSelection(Node):
         self.create_service(
             srv_type=Trigger,
             srv_name="/march/gait_selection/get_default_dict",
-            callback=self.get_default_dict_cb,
-        )
+            callback=self.get_default_dict_cb,        )
 
         self.create_service(
             srv_type=SetGaitVersion,
@@ -421,12 +422,9 @@ class GaitSelection(Node):
                 msg="Gait version map: {gm}, is not valid".format(gm=version_map)
             )
 
-        joint_names = get_joint_names(self)
+        joint_names = get_joint_names_from_robot(self.robot)
         positions = {}
-        self.get_logger().info(
-            f"Config is {default_config['positions']}, joint_names \
-            = {joint_names}"
-        )
+
         for position_name, position_values in default_config["positions"].items():
             positions[position_name] = {
                 "gait_type": position_values["gait_type"],

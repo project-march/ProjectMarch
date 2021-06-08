@@ -5,7 +5,6 @@ from .setpoint import Setpoint
 from ..utilities.utility_functions import get_joint_names_from_urdf
 
 VELOCITY_SCALE_FACTOR = 0.001
-JOINT_NAMES = get_joint_names_from_urdf()
 
 
 class CalculationSetpoint(Setpoint):
@@ -29,7 +28,7 @@ class CalculationSetpoint(Setpoint):
             self._velocity = None
 
     @property
-    def time(self) -> float:
+    def time(self) -> Duration:
         """Return the time of the setpoint"""
         return self._time
 
@@ -67,15 +66,12 @@ class CalculationSetpoint(Setpoint):
         seconds later
         """
         next_positions = {}
-        for joint in JOINT_NAMES:
-            if joint not in setpoint_dic:
-                raise KeyError(f"Setpoint_dic is missing joint {joint}")
-            else:
-                next_positions[joint] = cls(
-                    setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
-                    setpoint_dic[joint].position
-                    + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
-                )
+        for joint in setpoint_dic.keys():
+            next_positions[joint] = cls(
+                setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
+                setpoint_dic[joint].position
+                + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
+            )
 
         return next_positions
 
