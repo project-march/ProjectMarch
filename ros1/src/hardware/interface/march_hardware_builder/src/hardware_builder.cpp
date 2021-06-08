@@ -226,7 +226,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     if (odrive_config["preCalibrated"]) {
         pre_calibrated = odrive_config["preCalibrated"].as<bool>();
     }
-    unsigned int motor_kv = odrive_config["motorKV"].as<unsigned int>();
+    auto motor_kv = odrive_config["motorKV"].as<unsigned int>();
 
     return std::make_unique<march::ODrive>(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,

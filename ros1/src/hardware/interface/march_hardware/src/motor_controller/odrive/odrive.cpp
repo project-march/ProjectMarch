@@ -76,7 +76,7 @@ void ODrive::waitForState(ODriveAxisState target_state)
         ROS_INFO("\tWaiting for '%s', currently in '%s'",
             target_state.toString().c_str(), current_state.toString().c_str());
 
-        ros::Duration(1).sleep();
+        ros::Duration(/*t=*/1).sleep();
         current_state = getAxisState();
     }
 }
