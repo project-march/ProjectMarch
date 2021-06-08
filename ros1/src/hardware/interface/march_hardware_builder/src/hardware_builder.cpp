@@ -364,8 +364,8 @@ void HardwareBuilder::initUrdf()
     }
 }
 
-int HardwareBuilder::getSlaveIndexFromJointConfig(const YAML::Node& joint)
-    const {
+int HardwareBuilder::getSlaveIndexFromJointConfig(const YAML::Node& joint) const
+{
     if (joint["motor_controller"]) {
         if (joint["motor_controller"]["slaveIndex"]) {
             return joint["motor_controller"]["slaveIndex"].as<int>();
@@ -374,16 +374,17 @@ int HardwareBuilder::getSlaveIndexFromJointConfig(const YAML::Node& joint)
     return -1;
 }
 
-std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(const YAML::Node&
-        joints_config) const {
+std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
+    const YAML::Node& joints_config) const
+{
     std::set<int> fixedSlaveIndices;
     for (const YAML::Node& joint_config : joints_config) {
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         if (urdf_joint->type == urdf::Joint::FIXED) {
-            int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]); //
-            ROS_INFO_STREAM("Joint is fixed. " <<
-                                               slaveIndex);
+            int slaveIndex
+                = getSlaveIndexFromJointConfig(joint_config[joint_name]); //
+            ROS_INFO_STREAM("Joint is fixed. " << slaveIndex);
             if (slaveIndex != -1) {
                 fixedSlaveIndices.insert(slaveIndex);
             }
@@ -392,10 +393,10 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(const YAML::Node&
     return fixedSlaveIndices;
 }
 
-int HardwareBuilder::updateSlaveIndexBasedOnFixedJoints(const YAML::Node&
-                                                            joint_config,
-    const std::string& joint_name, const std::set<int>& fixedSlaveIndices)
-    const {
+int HardwareBuilder::updateSlaveIndexBasedOnFixedJoints(
+    const YAML::Node& joint_config, const std::string& joint_name,
+    const std::set<int>& fixedSlaveIndices) const
+{
     int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
     int amountFixedBeforeSlave = 0;
     for (int fixedSlaveIndex : fixedSlaveIndices) {
@@ -405,7 +406,6 @@ int HardwareBuilder::updateSlaveIndexBasedOnFixedJoints(const YAML::Node&
     }
     return slaveIndex - amountFixedBeforeSlave;
 }
-
 
 std::vector<march::Joint> HardwareBuilder::createJoints(
     const YAML::Node& joints_config,
@@ -428,11 +428,9 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         if (urdf_joint->type != urdf::Joint::FIXED) {
             if (remove_fixed_joints_from_ethercat_train) {
-                joint_config[joint_name]["motor_controller"]["slaveIndex"] =
-                    updateSlaveIndexBasedOnFixedJoints
-                    (joint_config,
-                    joint_name,
-                    fixedSlaveIndices);
+                joint_config[joint_name]["motor_controller"]["slaveIndex"]
+                    = updateSlaveIndexBasedOnFixedJoints(
+                        joint_config, joint_name, fixedSlaveIndices);
             }
             joints.push_back(
                 HardwareBuilder::createJoint(joint_config[joint_name],
