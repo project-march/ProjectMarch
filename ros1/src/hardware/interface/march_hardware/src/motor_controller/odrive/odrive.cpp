@@ -50,23 +50,23 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 
 void ODrive::prepareActuation()
 {
-    if (!pre_calibrated_) {
-        // Calibrate the ODrive first
-        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
-        waitForState(ODriveAxisState::IDLE);
-    }
-    if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        // Set the ODrive to closed loop control
-        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-        waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-
-        auto odrive_state = getState();
-        if (odrive_state->hasError()) {
-            ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
-            throw error::HardwareException(
-                error::ErrorType::PREPARE_ACTUATION_ERROR);
-        }
-    }
+//    if (!pre_calibrated_) {
+//        // Calibrate the ODrive first
+//        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+//        waitForState(ODriveAxisState::IDLE);
+//    }
+//    if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+//        // Set the ODrive to closed loop control
+//        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+//        waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+//
+//        auto odrive_state = getState();
+//        if (odrive_state->hasError()) {
+//            ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
+//            throw error::HardwareException(
+//                error::ErrorType::PREPARE_ACTUATION_ERROR);
+//        }
+//    }
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -294,7 +294,7 @@ Encoder::Direction ODrive::getMotorDirection() const
 // Viable Product
 void ODrive::setAxisState(ODriveAxisState /* state */)
 {
-    throw error::NotImplemented("setAxisState", "ODrive");
+//    throw error::NotImplemented("setAxisState", "ODrive");
     // Requested State is not yet implemented on the DieBoSlave
     //    bit32 write_struct = { .ui = state.value_ };
     //    this->write32(ODrivePDOmap::getMOSIByteOffset(
@@ -304,17 +304,17 @@ void ODrive::setAxisState(ODriveAxisState /* state */)
 
 void ODrive::actuateRadians(float /*target_position*/)
 {
-    throw error::NotImplemented("actuateRadians", "ODrive");
+//    throw error::NotImplemented("actuateRadians", "ODrive");
 }
 
 float ODrive::getMotorControllerVoltage()
 {
-    throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
+//    throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
 }
 
 float ODrive::getMotorVoltage()
 {
-    throw error::NotImplemented("getMotorVoltage", "ODrive");
+//    throw error::NotImplemented("getMotorVoltage", "ODrive");
 }
 
 } // namespace march
