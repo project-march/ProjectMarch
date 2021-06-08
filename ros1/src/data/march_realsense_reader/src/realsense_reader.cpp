@@ -188,6 +188,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         ROS_DEBUG("Done creating hulls, now publishing markers to "
                   "/camera/hull_marker_list");
         publishHullMarkerArray(hull_vector);
+        publishHullAreaCloud(hull_vector);
     }
 
     // Setup data structures for parameter determining
