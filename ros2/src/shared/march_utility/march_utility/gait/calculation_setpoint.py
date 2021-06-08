@@ -2,7 +2,6 @@ from typing import Optional
 from march_utility.utilities.duration import Duration
 
 from .setpoint import Setpoint
-from ..utilities.utility_functions import get_joint_names_from_urdf
 
 VELOCITY_SCALE_FACTOR = 0.001
 

@@ -21,6 +21,9 @@
                 <child link="${child}"/>
                 <origin xyz="${origin}" rpy="0 0 0"/>
             </joint>
+            <gazebo reference="${name}">
+                <preserveFixedJoint>true</preserveFixedJoint>
+            </gazebo>
         </xacro:unless>
     </xacro:macro>
 </robot>

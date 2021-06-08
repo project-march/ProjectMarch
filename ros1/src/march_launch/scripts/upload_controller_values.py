@@ -4,6 +4,7 @@ from typing import List
 import rospy
 from urdf_parser_py import urdf
 
+
 def get_params_for_actuation(joint: str) -> List[str]:
     """
     Give all parameters that are set for every joint to be able to spawn a controller

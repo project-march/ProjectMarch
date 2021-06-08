@@ -14,13 +14,10 @@ from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContent,
 )
 from march_utility.gait.subgait import Subgait
-from march_utility.utilities.node_utils import (
-    get_robot_urdf,
-    get_joint_names_from_robot,
-)
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
+    get_joint_names_from_robot,
 )
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
