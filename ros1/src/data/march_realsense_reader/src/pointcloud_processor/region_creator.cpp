@@ -324,6 +324,8 @@ bool RegionGrower::processInvalidRegions(const float& next_tolerance,
             invalid_pointcloud_normals, next_tolerance,
             potential_region_vector);
         if (success) {
+            // Investigate if the newly found region vector has valid regions
+            // and process its invalid regions again
             success &= recursiveRegionGrower(potential_region_vector,
                 invalid_pointcloud, invalid_pointcloud_normals, next_tolerance);
         }
@@ -352,7 +354,7 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
     }
 }
 
-// Fill a pointcloud with the points in invalid regions
+// Fill a pointcloud with all the points in invalid regions
 void RegionGrower::fillInvalidClouds(
     const std::unique_ptr<RegionVector>& invalid_region_vector,
     const PointCloud::Ptr& last_pointcloud,
@@ -360,19 +362,25 @@ void RegionGrower::fillInvalidClouds(
     PointCloud::Ptr& invalid_pointcloud,
     Normals::Ptr& invalid_pointcloud_normals)
 {
+    // Initialize the clouds corresponding to the regions
     PointCloud::Ptr invalid_region_pointcloud
         = boost::make_shared<PointCloud>();
     Normals::Ptr invalid_region_normals = boost::make_shared<Normals>();
 
     for (pcl::PointIndices& invalid_region : *invalid_region_vector) {
+        // Extract the points and normals of the last cloud which were invalid
+        // into the region clouds
         pcl::copyPointCloud(
             *last_pointcloud, invalid_region, *invalid_region_pointcloud);
         pcl::copyPointCloud(
             *last_pointcloud_normals, invalid_region, *invalid_region_normals);
 
+        // Add the region clouds together in a cloud containing all invalid
+        // points on which region growing can be executed again
         *invalid_pointcloud += *invalid_region_pointcloud;
         *invalid_pointcloud_normals += *invalid_region_normals;
 
+        // Clear the region clouds so they can be used again
         invalid_region_pointcloud->clear();
         invalid_region_normals->clear();
     }
