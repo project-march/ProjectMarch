@@ -12,7 +12,7 @@ class HomeGait(GaitInterface):
     """ A standard gait that goes from the unknown state to an idle position. """
 
     def __init__(
-        self, name, position, gait_type, duration: Duration = Duration(seconds=8)
+            self, name, position, gait_type, duration: Duration = Duration(seconds=3)
     ):
         """Initializes an executable home gait with given positions.
 
@@ -57,18 +57,12 @@ class HomeGait(GaitInterface):
     def version(self):
         return "home_gait_version"
 
-    @property
-    def can_be_scheduled_early(self) -> bool:
-        return True
-
-    def start(self, current_time: Time, first_subgait_delay: Duration = Duration(0)) \
-            -> \
-            GaitUpdate:
+    def start(self, current_time: Time) -> GaitUpdate:
         """Start the gait.
         Creates a trajectory command to go towards the idle position in the given duration.
         :returns Returns a GaitUpdate that usually contains a TrajectoryCommand.
         """
-        self._start_time = current_time + first_subgait_delay
+        self._start_time = current_time
         self._end_time = self._start_time + self._duration
         return GaitUpdate.should_schedule(
             TrajectoryCommand(
@@ -76,9 +70,7 @@ class HomeGait(GaitInterface):
             )
         )
 
-
-    def update(self, current_time: Time, early_schedule_duration: Optional[Duration] =
-    Duration(0)) -> GaitUpdate:
+    def update(self, current_time: Time) -> GaitUpdate:
         """Give an update on the progress of the gait.
         :param current_time: Current time
         :returns Returns a GaitUpdate with only the is_finished set to either true or false.
@@ -88,7 +80,7 @@ class HomeGait(GaitInterface):
         else:
             return GaitUpdate.empty()
 
-    def _get_trajectory_msg(self, subgait_delay: Duration = Duration(0)):
+    def _get_trajectory_msg(self):
         """
         Constructs a trajectory message that has only one set point to be
         standing still in the idle position after the specified duration.
