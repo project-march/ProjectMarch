@@ -8,10 +8,16 @@ from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
 
-from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
+from march_utility.exceptions.gait_exceptions import (
+    GaitError,
+    GaitNameNotFound,
+    NonValidGaitContent,
+)
 from march_utility.gait.subgait import Subgait
-from march_utility.utilities.node_utils import get_robot_urdf, \
-    get_joint_names_from_robot
+from march_utility.utilities.node_utils import (
+    get_robot_urdf,
+    get_joint_names_from_robot,
+)
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
@@ -142,7 +148,8 @@ class GaitSelection(Node):
         self.create_service(
             srv_type=Trigger,
             srv_name="/march/gait_selection/get_default_dict",
-            callback=self.get_default_dict_cb,        )
+            callback=self.get_default_dict_cb,
+        )
 
         self.create_service(
             srv_type=SetGaitVersion,
@@ -434,6 +441,13 @@ class GaitSelection(Node):
                 if joint in joint_names:
                     positions[position_name]["joints"][joint] = joint_value
 
+            if positions[position_name]["joints"].keys() != joint_names:
+                raise NonValidGaitContent(
+                    f"The position {position_name} does not "
+                    f"have a position for all required joits: it "
+                    f"has {positions[position_name]['joints'].keys()}, "
+                    f"required: {joint_names}"
+                )
         return version_map, positions, semi_dynamic_version_map
 
     def _validate_version_map(self, version_map):

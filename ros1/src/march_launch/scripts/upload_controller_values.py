@@ -1,9 +1,15 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
+from typing import List
+
 import rospy
 from urdf_parser_py import urdf
 
-
-def get_params_for_actuation(joint):
+def get_params_for_actuation(joint: str) -> List[str]:
+    """
+    Give all parameters that are set for every joint to be able to spawn a controller
+    :param joint: The name of the joint
+    :return: The parameter names
+    """
     return [
         f"/march/controller/trajectory/gains/{joint}",
         f"/march/controller/trajectory/constraints/{joint}",
@@ -11,6 +17,13 @@ def get_params_for_actuation(joint):
 
 
 def main():
+    """
+    This script looks at the values that were uploaded for the controller and removes
+    values for joints that are fixed in the urdf. By calling this before spawning the
+    controller it is made easier to change what joints we are currently working with
+    and only controlling these. This way, there are not different config files required
+    for every combination of joints.
+    """
     rospy.init_node("upload_controller_values")
     robot = urdf.Robot.from_parameter_server("/robot_description")
     actuating_joint_names = []

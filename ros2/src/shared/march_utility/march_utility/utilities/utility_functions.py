@@ -208,14 +208,18 @@ def validate_and_get_joint_names_for_inverse_kinematics() -> List[str]:
     return joint_name_list
 
 
-def get_joint_names_from_urdf() -> List[str]:
-    joint_names = []
+def get_joint_names_from_robot_name(robot_name: str) -> List[str]:
     robot = urdf.Robot.from_xml_file(
         os.path.join(
             get_package_share_directory("march_description"), "urdf", "march6.urdf"
         )
     )
-    for robot_joint_name, robot_joint in robot.joint_map.items():
-        if robot_joint.type != "fixed":
-            joint_names.append(robot_joint_name)
+    return get_joint_names_from_robot(robot)
+
+
+def get_joint_names_from_robot(robot: urdf.Robot) -> List[str]:
+    joint_names = []
+    for joint in robot.joints:
+        if joint.type != "fixed":
+            joint_names.append(joint.name)
     return joint_names
