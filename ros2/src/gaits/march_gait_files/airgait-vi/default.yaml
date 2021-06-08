@@ -49,10 +49,6 @@ gaits:
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
 
-  sit:
-    sit_down: MIV_final
-    sit_home: MIV_final
-
 positions:
   stand:
     gait_type: walk_like
