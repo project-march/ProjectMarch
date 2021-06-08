@@ -82,6 +82,8 @@ public:
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
 
+    void publishHullAreaCloud()
+
 private:
     PointCloud last_pointcloud_;
 

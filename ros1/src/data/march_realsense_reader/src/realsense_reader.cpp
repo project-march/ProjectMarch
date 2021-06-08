@@ -203,6 +203,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         ROS_DEBUG("Done determining parameters, now publishing a marker to "
                   "/camera/foot_locations_marker_array");
         publishParameterDeterminerMarkerArray();
+        publishHullAreaCloud();
     }
 
     res.gait_parameters = *gait_parameters;
@@ -238,6 +239,31 @@ void RealSenseReader::publishCloud(
     msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
+}
+
+void RealSenseReader::publishHullAreaCloud(
+    const boost::shared_ptr<HullVector>& hull_vector)
+{
+    PointCloud2D::Ptr ground_cloud = boost::make_shared<PointCloud2D>();
+    float x_grid_size = 0.05;
+    float y_grid_size = 0.05;
+    float min_x = 0;
+    float max_x = 2;
+    float min_y = -1;
+    float max_y = 1;
+    int x_points = (max_x - min_x) / x_grid_size + 1;
+    int y_points = (max_y - min_y) / y_grid_size + 1;
+    for (int i = 0; i < x_points; ++i) {
+        for (int j = 0; j < y_points; ++j) {
+            pcl::PointXY point;
+            point.x = min_x + i * x_grid_size;
+            point.y = min_y + i * y_grid_size;
+            ground_cloud->push_back(point);
+        }
+    }
+    PointNormalCloud::Ptr cropped_cloud = boost::make_shared<PointNormalCloud>();
+    parameter_determiner_->cropCloudToHullVector(ground_cloud, cropped_cloud);
+    publishCloud(hull_area_pointcloud_publisher_, *cropped_cloud);
 }
 
 // Turn a HullVector into a marker with a list of points and publish for
