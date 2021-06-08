@@ -18,11 +18,7 @@ from march_utility.exceptions.gait_exceptions import (
 )
 from .foot import Foot
 
-try:
-    JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
-except KeyError:
-    JOINT_NAMES_IK = None
-
+JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 class FeetState(object):
     """Class for encapturing the state of both feet."""

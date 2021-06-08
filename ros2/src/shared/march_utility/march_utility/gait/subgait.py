@@ -29,10 +29,7 @@ from ..utilities.dimensions import amount_of_subgaits, amount_of_parameters
 PARAMETRIC_GAITS_PREFIX = "_pg_"
 FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 SUBGAIT_SUFFIX = ".subgait"
-try:
-    JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
-except KeyError as e:
-    JOINT_NAMES_IK = None
+JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
 class Subgait(object):

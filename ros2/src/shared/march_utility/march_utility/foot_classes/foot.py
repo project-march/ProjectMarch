@@ -25,10 +25,7 @@ from march_utility.utilities.utility_functions import (
 from march_utility.utilities.vector_3d import Vector3d
 
 VELOCITY_SCALE_FACTOR = 0.001
-try:
-    JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
-except KeyError:
-    JOINT_NAMES_IK = None
+JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 MID_CALCULATION_PRECISION_DIGITS = 10
 ALLOWABLE_OVERSHOOT_FOOT_POSITION = 0.001
 
