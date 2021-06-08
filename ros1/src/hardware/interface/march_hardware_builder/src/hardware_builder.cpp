@@ -416,7 +416,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     }
 
     ROS_INFO_STREAM("There are " << joints.size()
-                                 << "moving joints initialized in "
+                                 << "actuating joints initialized in "
                                     "the robot");
 
     for (const auto& urdf_joint : this->urdf_.joints_) {

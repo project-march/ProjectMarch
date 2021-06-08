@@ -201,7 +201,7 @@ def validate_and_get_joint_names_for_inverse_kinematics() -> List[str]:
         ):
             raise KeyError(
                 f"Inverse kinematics calculation expected the robot to have "
-                f"moving joint "
+                f"actuating joint "
                 f"{joint_name}, but {joint_name} was not found."
             )
 
