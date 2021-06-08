@@ -71,6 +71,10 @@ public:
     static constexpr double MAX_RANGE_DIFFERENCE = 0.05;
 
 private:
+    // The zero position of the joint, in internal units.
+    // If reading the absolute encoder of the joint gives this value, then
+    // the joint is at exactly 0 degrees.
+    // Start at zero and is then set by the constructor of the AbsoluteEncoder
     int32_t zero_position_iu_ = 0;
 
     // Hard limits
