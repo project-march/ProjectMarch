@@ -76,13 +76,11 @@ TEST_F(MotorControllerBuilderTest, ValidIMotionCube)
 TEST_F(MotorControllerBuilderTest, RemoveFixedJointsTest)
 {
     std::string yaml_path = this->base_path.append(
-        "/test_joint_rotational_remove_fixed_joints.yaml");
+        /*__s=*/"/test_joint_rotational_remove_fixed_joints.yaml");
     urdf::Model urdf;
     urdf.initFile(ros::package::getPath("march_description")
                       .append(/*__s=*/"/urdf/test_joint_rotational.urdf"));
-    HardwareBuilder builder
-        = HardwareBuilder(yaml_path, urdf);
-    auto robot
-        = builder.createMarchRobot();
+    HardwareBuilder builder = HardwareBuilder(yaml_path, urdf);
+    auto robot = builder.createMarchRobot();
     ASSERT_EQ(robot->size(), 1);
 }
