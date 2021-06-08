@@ -81,34 +81,33 @@ private:
     // Implements the region growing algorithm and recursively improves on too
     // small or too large regions
     bool recursiveRegionGrower(
-        const boost::shared_ptr<RegionVector>& last_region_vector,
+        const std::unique_ptr<RegionVector>& last_region_vector,
         const PointCloud::Ptr& last_pointcloud,
         const Normals::Ptr& last_pointcloud_normals,
         const float& last_tolerance);
 
     // Splits a region Vector into the regions considered too large, just right,
     // and too small
-    void segmentRegionVector(
-        const boost::shared_ptr<RegionVector>& region_vector,
-        boost::shared_ptr<RegionVector>& too_small_regions,
-        boost::shared_ptr<RegionVector>& too_large_regions,
-        boost::shared_ptr<RegionVector>& right_size_regions);
+    void segmentRegionVector(const std::unique_ptr<RegionVector>& region_vector,
+        std::unique_ptr<RegionVector>& too_small_regions,
+        std::unique_ptr<RegionVector>& too_large_regions,
+        std::unique_ptr<RegionVector>& right_size_regions);
 
     // Creates a potential region vector from a pointcloud with a certain
     // tolerance
     bool getRegionVectorFromTolerance(const PointCloud::Ptr& pointcloud,
         const Normals::Ptr& pointcloud_normals, const float& tolerance,
-        boost::shared_ptr<RegionVector>& region_vector);
+        std::unique_ptr<RegionVector>& region_vector);
 
     // Add the right regions to the region points and region normals vectors
     void addRegionsToPointAndNormalVectors(
-        const boost::shared_ptr<RegionVector>& right_size_regions,
+        const std::unique_ptr<RegionVector>& right_size_regions,
         const PointCloud::Ptr& pointcloud,
         const Normals::Ptr& pointcloud_normals);
 
     // Fill a pointcloud with the points in invalid regions
     void fillInvalidClouds(
-        const boost::shared_ptr<RegionVector>& invalid_region_vector,
+        const std::unique_ptr<RegionVector>& invalid_region_vector,
         const PointCloud::Ptr& last_pointcloud,
         const Normals::Ptr& last_pointcloud_normals,
         PointCloud::Ptr& invalid_pointcloud,
@@ -120,7 +119,7 @@ private:
     bool processInvalidRegions(const float& next_tolerance,
         const PointCloud::Ptr& invalid_pointcloud,
         const Normals::Ptr& invalid_pointcloud_normals,
-        const boost::shared_ptr<RegionVector>& invalid_regions,
+        const std::unique_ptr<RegionVector>& invalid_regions,
         const PointCloud::Ptr& last_pointcloud,
         const Normals::Ptr& last_pointcloud_normals);
 
@@ -144,7 +143,7 @@ private:
     bool use_recursive_growing;
     float tolerance_change_factor_decrease;
     float tolerance_change_factor_increase;
-    boost::shared_ptr<RegionVector> region_vector_;
+    std::unique_ptr<RegionVector> region_vector_;
     int number_of_recursive_calls;
 };
 
