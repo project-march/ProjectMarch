@@ -24,7 +24,6 @@ logs/
 log/
 build/
 bin/
-log/
 lib/
 .catkin_workspace
 
@@ -39,7 +38,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -118,7 +116,6 @@ celerybeat-schedule
 
 # Mr Developer
 .mr.developer.cfg
-.project
 .pydevproject
 
 # mkdocs documentation
@@ -133,9 +130,6 @@ dmypy.json
 .pyre/
 
 ### ROS ###
-devel/
-logs/
-bin/
 msg_gen/
 srv_gen/
 msg/*Action.msg
@@ -158,16 +152,10 @@ devel_isolated/
 *.wikidoc
 docs/build/*
 *.dox
-*.wikidoc
 
 # eclipse stuff
-.project
 .cproject
 
-# qcreator stuff
-CMakeLists.txt.user
-*.egg-info/
-.cproject
 
 # qcreator stuff
 srv/_*.py
@@ -200,11 +188,4 @@ venv/
 # End of https://www.gitignore.io/api/ros,cmake
 .idea/*
 */cmake-build-debug/**
-.vscode/settings.json
-
-.idea/*
-*/cmake-build-debug/**
-.vscode/settings.json
-
-
 .vscode/*
