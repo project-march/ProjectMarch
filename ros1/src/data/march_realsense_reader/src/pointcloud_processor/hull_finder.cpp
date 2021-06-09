@@ -132,7 +132,9 @@ bool CHullFinder::initializeRegionVariables()
     region_points_projected_ = boost::make_shared<PointCloud>();
     plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
     hull_ = boost::make_shared<Hull>();
-    return true;
+    polygon_.clear();
+
+ return true;
 }
 
 // Get the plane coefficients of the region using average point and normal
@@ -194,6 +196,10 @@ bool CHullFinder::getCHullFromProjectedRegion()
         concave_hull.setDimension(hull_dimension);
         concave_hull.reconstruct(*hull_, polygon_);
     }
+    ROS_DEBUG_STREAM("Region "
+        << region_index_ << " has a hull of size: " << hull_->size()
+        << " with indices (also names polygon): "
+        << output_utilities::vertexVectorToString(polygon_));
     return true;
 }
 

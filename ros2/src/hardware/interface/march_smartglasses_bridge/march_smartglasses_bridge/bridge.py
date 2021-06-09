@@ -3,6 +3,7 @@ import socket
 from rclpy.node import Node
 from march_shared_msgs.msg import CurrentIPDState
 
+
 class SmartglassBridge(Node):
     def __init__(self):
         super().__init__("march_smartglass_bridge")
@@ -15,8 +16,12 @@ class SmartglassBridge(Node):
             qos_profile=1,
         )
 
-        self.host = self.declare_parameter("hud_host").get_parameter_value().string_value
-        self.port = self.declare_parameter("hud_port").get_parameter_value().integer_value
+        self.host = (
+            self.declare_parameter("hud_host").get_parameter_value().string_value
+        )
+        self.port = (
+            self.declare_parameter("hud_port").get_parameter_value().integer_value
+        )
 
     def current_state_callback(self, msg: CurrentIPDState) -> None:
         self.get_logger().debug(f"Received IPD state message: {msg.menu_name}")
@@ -29,7 +34,10 @@ class SmartglassBridge(Node):
                 s.connect((host, self.port))
                 s.sendall(bytes(f"{state}\n", "utf-8"))
             except ConnectionRefusedError:
-                self.get_logger().warn(f"Smart glasses can not be found on {self.host}:{self.port}")
+                self.get_logger().warn(
+                    f"Smart glasses can not be found on {self.host}:{self.port}"
+                )
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -37,6 +45,7 @@ def main(args=None):
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()
