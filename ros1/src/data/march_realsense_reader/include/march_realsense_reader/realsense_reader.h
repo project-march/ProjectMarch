@@ -82,7 +82,7 @@ public:
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
 
-    void publishHullAreaCloud()
+    void publishHullAreaCloud();
 
 private:
     PointCloud last_pointcloud_;
@@ -100,6 +100,8 @@ private:
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher region_pointcloud_publisher_;
     ros::Publisher hull_marker_array_publisher_;
+    ros::Publisher hull_area_pointcloud_publisher_;
+    ros::Publisher hull_ground_pointcloud_publisher_;
     ros::Publisher hull_parameter_determiner_publisher_;
     ros::Publisher pointcloud_publisher_;
 
