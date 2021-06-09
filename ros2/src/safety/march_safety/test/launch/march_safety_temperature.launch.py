@@ -80,9 +80,10 @@ class TestMarchSafetyTemperature(unittest.TestCase):
             callback=self.error_counter.cb,
             qos_profile=1,
         )
-        self.thresholds = yaml.load(open(CONFIG_PATH).read(), Loader=yaml.FullLoader)[
-            "march/safety_node"
-        ]["ros__parameters"]
+        with open(CONFIG_PATH) as f:
+            self.thresholds = yaml.safe_load(f.read())["march/safety_node"][
+                "ros__parameters"
+            ]
 
     def tearDown(self):
         """Destroy the ROS node."""
