@@ -199,7 +199,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     // Determine parameters
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
-<<<<<<< HEAD
             hull_vector, polygon_vector, realsense_category, gait_parameters,
             frame_id_to_transform_to_);
 
