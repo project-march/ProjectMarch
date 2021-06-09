@@ -21,7 +21,7 @@ from march_data_collector.cp_calculator import CPCalculator
 
 
 class DataCollectorNode(object):
-    """A node """
+    """A node"""
 
     def __init__(
         self,

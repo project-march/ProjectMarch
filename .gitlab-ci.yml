@@ -141,6 +141,7 @@ container:build:
   script:
     - rm -f codeclimate.json
     - python3 -m flake8 --format=codeclimate --config .flake8 --output-file codeclimate.json
+    - cat codeclimate.json
   artifacts:
     reports:
       codequality: codeclimate.json

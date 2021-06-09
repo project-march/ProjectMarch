@@ -162,7 +162,7 @@ class GaitStateMachine(object):
                 self._force_left_foot = 0
 
     def _possible_gaits_cb(self, request, response):
-        """ Standard callback for the get possible gaits service """
+        """Standard callback for the get possible gaits service"""
         response.gaits = self.get_possible_gaits()
         return response
 
@@ -461,7 +461,7 @@ class GaitStateMachine(object):
                 )
 
     def _call_transition_callbacks(self):
-        """ Calls all transition callbacks when the current state changes. """
+        """Calls all transition callbacks when the current state changes."""
         self._call_callbacks(
             self._transition_callbacks, self._current_state, self._is_idle
         )
@@ -472,7 +472,7 @@ class GaitStateMachine(object):
         return self._input.stop_requested() or self._should_stop
 
     def _call_gait_callbacks(self):
-        """ Calls all added gait callbacks when the current gait changes. """
+        """Calls all added gait callbacks when the current gait changes."""
         if self._current_gait is not None:
             self._call_callbacks(
                 self._gait_callbacks,

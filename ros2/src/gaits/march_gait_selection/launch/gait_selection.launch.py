@@ -5,7 +5,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """ Basic launch file to launch the gait selection node """
+    """Basic launch file to launch the gait selection node"""
     return LaunchDescription(
         [
             DeclareLaunchArgument(

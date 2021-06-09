@@ -23,7 +23,7 @@ ROS_PROCESS_NAME_LENGTH = 15
 
 
 def shutdown_system():
-    """ Shutdown ROS1, the bridge and ROS2."""
+    """Shutdown ROS1, the bridge and ROS2."""
     result = subprocess.run(["ps", "-A"], capture_output=True)
     processes = result.stdout.decode("utf-8")
 
