@@ -196,10 +196,6 @@ bool CHullFinder::getCHullFromProjectedRegion()
         concave_hull.setDimension(hull_dimension);
         concave_hull.reconstruct(*hull_, polygon_);
     }
-    ROS_DEBUG_STREAM("Region "
-        << region_index_ << " has a hull of size: " << hull_->size()
-        << " with indices (also names polygon): "
-        << output_utilities::vertexVectorToString(polygon_));
     return true;
 }
 
