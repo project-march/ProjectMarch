@@ -219,7 +219,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 =======
             hull_vector, polygon_vector, realsense_category, gait_parameters);
     if (debugging_) {
-        ROS_DEBUG("Publishing some more information on the hull's to "
+        ROS_DEBUG("Publishing hull area information to "
                   "/camera/hull_area_cloud");
         publishHullAreaCloud();
 >>>>>>> d59041c78... Finish debug method
