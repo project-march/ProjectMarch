@@ -17,7 +17,6 @@ from march_utility.exceptions.gait_exceptions import (
     WrongRealSenseConfigurationError,
 )
 from rclpy import Future
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client

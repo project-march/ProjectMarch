@@ -1,7 +1,7 @@
 import os
-from typing import List, Dict
 
 import yaml
+from typing import Dict
 from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (

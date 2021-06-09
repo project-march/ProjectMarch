@@ -9,7 +9,6 @@ from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
-from rclpy.time import Time
 from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
