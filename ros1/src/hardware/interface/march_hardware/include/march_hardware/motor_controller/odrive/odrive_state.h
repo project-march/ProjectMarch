@@ -72,7 +72,7 @@ public:
             case ENCODER_OFFSET_CALIBRATION:
                 return "Encoder offset calibration";
             case CLOSED_LOOP_CONTROL:
-                return "Close loop control";
+                return "Closed loop control";
             case LOCKIN_SPIN:
                 return "Lockin spin";
             case ENCODER_DIR_FIND:

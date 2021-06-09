@@ -61,25 +61,24 @@ void ODrive::prepareActuation()
     //     // Set the ODrive to closed loop control
     //     setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     //     waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+    // } 
 
-    //     auto odrive_state = getState();
-    //     if (odrive_state->hasError()) {
-    //         ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
-    //         throw error::HardwareException(
-    //             error::ErrorType::PREPARE_ACTUATION_ERROR);
-    //     }
-    // }
-    waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL)
+    auto odrive_state = getState();
+    if (odrive_state->hasError()) {
+        ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
+        throw error::HardwareException(
+            error::ErrorType::PREPARE_ACTUATION_ERROR);
+    }
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
 {
     auto current_state = getAxisState();
     while (current_state != target_state) {
-        ROS_INFO("\tWaiting for '%s', currently in '%s'",
+        ROS_INFO("Waiting for '%s', currently in '%s'",
             target_state.toString().c_str(), current_state.toString().c_str());
 
-        ros::Duration(/*t=*/1).sleep();
+        ros::Duration(/*t=*/2).sleep();
         current_state = getAxisState();
     }
 }
