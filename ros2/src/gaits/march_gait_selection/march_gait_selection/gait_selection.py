@@ -172,7 +172,7 @@ class GaitSelection(Node):
 
     @property
     def robot(self):
-        """ Return the robot obtained from the robot state publisher."""
+        """Return the robot obtained from the robot state publisher."""
         return self._robot
 
     @property

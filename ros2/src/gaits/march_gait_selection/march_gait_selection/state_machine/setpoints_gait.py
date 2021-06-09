@@ -14,7 +14,7 @@ from .trajectory_scheduler import TrajectoryCommand
 
 
 class SetpointsGait(GaitInterface, Gait):
-    """ The standard gait built up from setpoints """
+    """The standard gait built up from setpoints"""
 
     def __init__(self, gait_name, subgaits, graph):
         super(SetpointsGait, self).__init__(gait_name, subgaits, graph)

@@ -5,7 +5,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """ Basic launch file to launch the robot information node """
+    """Basic launch file to launch the robot information node"""
     return LaunchDescription(
         [
             DeclareLaunchArgument(
