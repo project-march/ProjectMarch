@@ -44,7 +44,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
     def elapsed_time(self) -> Duration:
         return Duration.from_ros_duration(self._current_time - self._start_time)
 
-    def freeze(self, duration: Duration = Duration(seconds=3)):
+    DEFAULT_DURATION = Duration(seconds=3)
+
+    def freeze(self, duration: Duration = DEFAULT_DURATION):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
