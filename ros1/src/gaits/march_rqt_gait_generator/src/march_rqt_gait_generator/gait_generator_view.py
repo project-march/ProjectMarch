@@ -15,7 +15,6 @@ from python_qt_binding.QtWidgets import (
     QMessageBox,
     QShortcut,
     QWidget,
-    QInputDialog,
 )
 import rospkg
 import rospy

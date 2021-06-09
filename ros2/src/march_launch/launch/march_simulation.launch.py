@@ -24,7 +24,6 @@ def generate_launch_description():
     imu_topic = LaunchConfiguration("imu_topic")
 
     # Simulation arguments
-    realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 
@@ -50,7 +49,7 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
-                name="robot", default_value="march4", description="Robot to use."
+                name="robot", default_value="march6", description="Robot to use."
             ),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(

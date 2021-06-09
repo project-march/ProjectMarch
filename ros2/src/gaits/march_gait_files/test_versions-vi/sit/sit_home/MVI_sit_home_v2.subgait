@@ -1,0 +1,63 @@
+description: Move to the location Sjaan felt comfortable in, for a chair of 50 cm.
+  With haa at 0 degrees.
+duration: 1000000000
+gait_type: sit_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 1.5708
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.4835
+    time_from_start: 1000000000
+    velocity: 0.0
+  left_knee:
+  - position: 1.4835
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.4835
+    time_from_start: 1000000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 1.5708
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.4835
+    time_from_start: 1000000000
+    velocity: 0.0
+  right_knee:
+  - position: 1.4835
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.4835
+    time_from_start: 1000000000
+    velocity: 0.0
+name: sit_home
+version: MVI_sit_home_v2

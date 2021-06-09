@@ -14,7 +14,7 @@ def sys_exit(*_):
 
 
 def main():
-    """ Starts up the gait selection node with the state machine and scheduler. """
+    """Starts up the gait selection node with the state machine and scheduler."""
     rclpy.init()
 
     gait_selection = GaitSelection()
