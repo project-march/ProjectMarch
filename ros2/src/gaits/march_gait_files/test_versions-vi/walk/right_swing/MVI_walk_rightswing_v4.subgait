@@ -1,0 +1,92 @@
+description: Slower version of MVI_walk_v3.
+duration: 1500000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.0611
+    time_from_start: 375000000
+    velocity: -0.1688
+  - position: -0.0611
+    time_from_start: 1125000000
+    velocity: 0.1702
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: 0.3142
+    time_from_start: 0
+    velocity: -0.26
+  - position: -0.1658
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 300000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1020000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.1396
+    time_from_start: 225000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 687400000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0873
+    time_from_start: 751800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: -0.1658
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.6109
+    time_from_start: 875000000
+    velocity: 0.0
+  - position: 0.3142
+    time_from_start: 1500000000
+    velocity: -0.26
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.1694
+    time_from_start: 630000000
+    velocity: 0.0
+  - position: 1.1694
+    time_from_start: 835300000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1500000000
+    velocity: 0.0
+name: right_swing
+version: MVI_walk_rightswing_v4
