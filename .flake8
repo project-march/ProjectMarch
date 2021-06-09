@@ -15,4 +15,7 @@ ignore =
     # This gives errors if the lines are too long, but we use the black formatter which has different settings
     E501,
     # This warning conflicts with the black formatter
-    W503
+    W503,
+    C812,
+    C815,
+    C816
