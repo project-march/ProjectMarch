@@ -84,18 +84,13 @@ class Gait(object):
         subgaits = gait_dictionary["subgaits"]
 
         graph = SubgaitGraph(subgaits)
-        subgaits = dict(
-            [
-                (
-                    name,
-                    cls.load_subgait(
-                        robot, gait_directory, gait_name, name, gait_version_map
-                    ),
-                )
-                for name in subgaits
-                if name not in ("start", "end")
-            ]
-        )
+        subgaits = {
+            name: cls.load_subgait(
+                robot, gait_directory, gait_name, name, gait_version_map
+            )
+            for name in subgaits
+            if name not in ("start", "end")
+        }
         return cls(gait_name, subgaits, graph)
 
     @staticmethod

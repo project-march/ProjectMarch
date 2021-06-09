@@ -232,13 +232,11 @@ class GaitSelection(Node):
             raise GaitNameNotFound(gait_name)
 
         # Only update versions that are different
-        version_map = dict(
-            [
-                (name, version)
-                for name, version in version_map.items()
-                if version != self._gait_version_map[gait_name][name]
-            ]
-        )
+        version_map = {
+            name: version
+            for name, version in version_map.items()
+            if version != self._gait_version_map[gait_name][name]
+        }
         self._loaded_gaits[gait_name].set_subgait_versions(
             self._robot, self._gait_directory, version_map
         )
