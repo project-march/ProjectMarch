@@ -85,7 +85,6 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     if (if_name == "") {
         if_name = config["if_name"].as<std::string>();
     }
-    ROS_INFO("Gotten if name.");
 
     const auto cycle_time = config["ecatCycleTime"].as<int>();
     const auto slave_timeout = config["ecatSlaveTimeout"].as<int>();
@@ -124,6 +123,10 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     } else {
         ROS_WARN("Joint %s does not have a netNumber", joint_name.c_str());
     }
+
+    int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
+    ROS_INFO("Joint %s: ", joint_name.c_str());
+    ROS_INFO_STREAM("Slave index is " << slaveIndex);
 
     const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
@@ -378,17 +381,26 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
     const YAML::Node& joints_config) const
 {
     std::set<int> fixedSlaveIndices;
+    std::set<int> actuatingSlaveIndices;
     for (const YAML::Node& joint_config : joints_config) {
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
+        int slaveIndex
+            = getSlaveIndexFromJointConfig(joint_config[joint_name]);
         if (urdf_joint->type == urdf::Joint::FIXED) {
-            int slaveIndex
-                = getSlaveIndexFromJointConfig(joint_config[joint_name]); //
             ROS_INFO_STREAM("Joint is fixed. " << slaveIndex);
             if (slaveIndex != -1) {
                 fixedSlaveIndices.insert(slaveIndex);
             }
+        } else {
+            actuatingSlaveIndices.insert(slaveIndex);
         }
+    }
+    for (int actuatingSlaveIndex : actuatingSlaveIndices) {
+        fixedSlaveIndices.erase(actuatingSlaveIndex);
+    }
+    for (int fixedSlaveIndex : fixedSlaveIndices) {
+        ROS_INFO_STREAM("Fixed index: " << fixedSlaveIndex);
     }
     return fixedSlaveIndices;
 }
@@ -413,7 +425,6 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     const march::SdoInterfacePtr& sdo_interface) const
 {
     std::vector<march::Joint> joints;
-    ROS_INFO("Creating joints.");
 
     bool remove_fixed_joints_from_ethercat_train;
     ros::param::get("remove_fixed_joints_from_ethercat_train",
