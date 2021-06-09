@@ -17,29 +17,39 @@
 #include <string>
 #include <unordered_map>
 
+/* For more info see
+ * https://docs.odriverobotics.com/
+ * https://discourse.odriverobotics.com/t/where-does-the-formula-for-calculating-torque-come-from/1169
+ */
+#define KV_TO_TORQUE_CONSTANT 8.27
+
 namespace march {
 class ODrive : public MotorController {
 public:
     /**
-     * Constructs an IMotionCube with an incremental and absolute encoder.
+     * Constructs an ODrive with an incremental and absolute encoder.
      *
-     * @param slave slave of the IMotionCube
+     * @param slave slave of the ODrive
      * @param absolute_encoder pointer to absolute encoder, required so cannot
      * be nullptr
      * @param incremental_encoder pointer to incremental encoder, required so
      * cannot be nullptr
-     * @param actuation_mode actuation mode in which the IMotionCube must
+     * @param actuation_mode actuation mode in which the ODrive must
      * operate
-     * @throws std::invalid_argument When an absolute or incremental encoder is
-     * nullptr.
+     * @throws error::HardwareException When an absolute encoder is nullptr.
      */
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode);
+        ActuationMode actuation_mode, bool pre_calibrated,
+        unsigned int motor_kv);
     ODrive(const Slave& slave, ODriveAxis axis,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode);
+        ActuationMode actuation_mode, bool pre_calibrated,
+        unsigned int motor_kv);
+    ODrive(const Slave& slave, ODriveAxis axis,
+        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        ActuationMode actuation_mode, unsigned int motor_kv);
 
     ~ODrive() noexcept override = default;
 
@@ -47,6 +57,9 @@ public:
     void prepareActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
+    bool isIncrementalEncoderMorePrecise() const override;
+
+    bool hasUniqueSlaves() const override;
 
     // Transform the ActuationMode to a number that is understood by the ODrive
     int getActuationModeNumber() const override;
@@ -60,6 +73,7 @@ public:
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
+    float getActualEffort() override;
 
 protected:
     // Override protected functions from Slave class
@@ -73,13 +87,14 @@ protected:
     float getIncrementalVelocityUnchecked() override;
 
 private:
-    // Set the ODrive in a certain axis state
-    //  void goToAxisState(ODriveAxisState target_state);
-
+    // Getter and setter for the axis state
+    void setAxisState(ODriveAxisState state);
+    void waitForState(ODriveAxisState target_state);
     ODriveAxisState getAxisState();
 
-    float getAbsolutePositionIU();
-    float getAbsoluteVelocityIU();
+    int32_t getAbsolutePositionIU();
+    int32_t getIncrementalPositionIU();
+    float getIncrementalVelocityIU();
 
     uint32_t getAxisError();
     uint32_t getMotorError();
@@ -87,7 +102,12 @@ private:
     uint32_t getEncoderError();
     uint32_t getControllerError();
 
+    // Get the direction of the most significant encoder
+    Encoder::Direction getMotorDirection() const;
+
     ODriveAxis axis_;
+    bool pre_calibrated_;
+    float torque_constant_;
 };
 
 } // namespace march

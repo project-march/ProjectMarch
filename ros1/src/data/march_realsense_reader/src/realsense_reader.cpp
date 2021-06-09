@@ -105,7 +105,6 @@ void RealSenseReader::readConfigCb(
             ros::console::notifyLoggerLevelsChanged();
         }
     }
-
     preprocessor_->readParameters(config);
     region_creator_->readParameters(config);
     parameter_determiner_->readParameters(config);
