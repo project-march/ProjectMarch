@@ -84,10 +84,10 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
         hull_marker_array_publisher_
             = n_->advertise<visualization_msgs::Marker>(
                 "/camera/hull_marker_list", /*queue_size=*/1);
-        hull_area_pointcloud_publisher_
-            = n_->advertise<PointNormalCloud>("/camera/hull_area_cloud", /*queue_size=*/1);
-        hull_ground_pointcloud_publisher_
-                = n_->advertise<PointCloud2D>("/camera/hull_ground_cloud", /*queue_size=*/1);
+        hull_area_pointcloud_publisher_ = n_->advertise<PointNormalCloud>(
+            "/camera/hull_area_cloud", /*queue_size=*/1);
+        hull_ground_pointcloud_publisher_ = n_->advertise<PointCloud2D>(
+            "/camera/hull_ground_cloud", /*queue_size=*/1);
         hull_parameter_determiner_publisher_
             = n_->advertise<visualization_msgs::MarkerArray>(
                 "/camera/foot_locations_marker_array", /*queue_size=*/1);
@@ -221,7 +221,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 =======
             hull_vector, polygon_vector, realsense_category, gait_parameters);
     if (debugging_) {
-        ROS_DEBUG("Publishing some more information on the hull's to /camera/hull_area_cloud");
+        ROS_DEBUG("Publishing some more information on the hull's to "
+                  "/camera/hull_area_cloud");
         publishHullAreaCloud();
 >>>>>>> d59041c78... Finish debug method
     }
@@ -299,11 +300,12 @@ void RealSenseReader::publishHullAreaCloud()
             point_viz.z = 0;
             ground_cloud->push_back(point);
             ground_cloud_viz->push_back(point_viz);
-
         }
     }
-    ROS_DEBUG_STREAM("Ground cloud consist of " << ground_cloud_viz->size() << " points");
-    PointNormalCloud::Ptr cropped_cloud = boost::make_shared<PointNormalCloud>();
+    ROS_DEBUG_STREAM(
+        "Ground cloud consist of " << ground_cloud_viz->size() << " points");
+    PointNormalCloud::Ptr cropped_cloud
+        = boost::make_shared<PointNormalCloud>();
     PointCloud::Ptr cropped_cloud_viz = boost::make_shared<PointCloud>();
     publishCloud(hull_ground_pointcloud_publisher_, *ground_cloud_viz);
     parameter_determiner_->cropCloudToHullVector(ground_cloud, cropped_cloud);
@@ -317,10 +319,10 @@ void RealSenseReader::publishHullAreaCloud()
         ++i;
     }
 
-    ROS_DEBUG_STREAM("The cropped cloud consist of " << cropped_cloud->size() << " points");
+    ROS_DEBUG_STREAM(
+        "The cropped cloud consist of " << cropped_cloud->size() << " points");
     publishCloud(hull_area_pointcloud_publisher_, *cropped_cloud_viz);
 }
-
 
 // Turn a HullVector into a marker with a list of points and publish for
 // visualization
