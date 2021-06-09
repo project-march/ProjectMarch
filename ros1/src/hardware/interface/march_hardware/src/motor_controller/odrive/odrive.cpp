@@ -51,23 +51,25 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 void ODrive::prepareActuation()
 {
     ros::Duration(/*t=*/1).sleep();
-    if (!pre_calibrated_) {
-        // Calibrate the ODrive first
-        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
-        waitForState(ODriveAxisState::IDLE);
-    }
-    if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        // Set the ODrive to closed loop control
-        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-        waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+    // Setting Axis state is not (yet) supported
+    // if (!pre_calibrated_) {
+    //     // Calibrate the ODrive first
+    //     setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+    //     waitForState(ODriveAxisState::IDLE);
+    // }
+    // if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+    //     // Set the ODrive to closed loop control
+    //     setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+    //     waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
 
-        auto odrive_state = getState();
-        if (odrive_state->hasError()) {
-            ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
-            throw error::HardwareException(
-                error::ErrorType::PREPARE_ACTUATION_ERROR);
-        }
-    }
+    //     auto odrive_state = getState();
+    //     if (odrive_state->hasError()) {
+    //         ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
+    //         throw error::HardwareException(
+    //             error::ErrorType::PREPARE_ACTUATION_ERROR);
+    //     }
+    // }
+    waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL)
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
