@@ -1,15 +1,12 @@
 # For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
-# TODO: Update IU values of absolute encoders
-# TODO: Update if_name
 # TODO: Add pressure soles to this .yaml file
 # TODO: Add PDB to this .yaml files
 # TODO: Make sure slaveIndexes are correct
-# TODO: Make sure axis numbers of ODrives are correct
 # TODO: Update netNumbers if necessary
 march6:
   if_name: enp7s0
-  ecatCycleTime: 4
-  ecatSlaveTimeout: 250
+  ecatCycleTime: 6
+  ecatSlaveTimeout: 100
   joints:
     - left_ankle:
         allowActuation: true
