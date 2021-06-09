@@ -142,14 +142,6 @@ class TestMarchSafetyTemperature(unittest.TestCase):
                 0,
                 "test_joint1",
             ],
-            # [
-            #     "between_warning_and_non_fatal_threshold",
-            #     "temperature_thresholds_warning",
-            #     1,
-            #     1,
-            #     0,
-            #     "test_joint1",
-            # ],
             [
                 "between_non_fatal_and_fatal_threshold",
                 "temperature_thresholds_non_fatal",
@@ -158,39 +150,6 @@ class TestMarchSafetyTemperature(unittest.TestCase):
                 1,
                 "test_joint1",
             ],
-            # Commenting these tests until we think of something to reduce flakiness
-            # [
-            #     "exceed_fatal_threshold",
-            #     "temperature_thresholds_fatal",
-            #     1,
-            #     1,
-            #     1,
-            #     "test_joint1",
-            # ],
-            # [
-            #     "exceed_fatal_threshold_multiple_times",
-            #     "temperature_thresholds_fatal",
-            #     1,
-            #     3,
-            #     3,
-            #     "test_joint1",
-            # ],
-            # [
-            #     "exceed_default_threshold",
-            #     "default_temperature_threshold",
-            #     1,
-            #     1,
-            #     1,
-            #     "test_joint3",
-            # ],
-            # [
-            #     "exceed_default_threshold_multiple_times",
-            #     "default_temperature_threshold",
-            #     1,
-            #     3,
-            #     3,
-            #     "test_joint3",
-            # ],
         ]
     )
     def test_parameterized(
@@ -215,14 +174,6 @@ class TestMarchSafetyTemperature(unittest.TestCase):
             while (datetime.now() - start_time) <= timedelta(seconds=TIMEOUT_DURATION):
                 rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
                 rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-        #     # Execute publish temperature callback
-        #     rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-        #
-        #     # Spin to let this node handle the published error
-        #     rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-        #
-        # # Spin an extra time to make sure the error counter is updated
-        # rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
 
         self.assertEqual(
             self.error_counter.count,
