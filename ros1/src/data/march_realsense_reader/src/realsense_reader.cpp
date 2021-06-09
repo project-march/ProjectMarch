@@ -109,6 +109,9 @@ void RealSenseReader::readConfigCb(
             ros::console::notifyLoggerLevelsChanged();
         }
     }
+
+    publish_hull_area_debug_ = config.publish_hull_area_debug;
+
     preprocessor_->readParameters(config);
     region_creator_->readParameters(config);
     parameter_determiner_->readParameters(config);
@@ -218,7 +221,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             parameter_determiner_->debug_marker_array);
 =======
             hull_vector, polygon_vector, realsense_category, gait_parameters);
-    if (debugging_) {
+    if (debugging_ && publish_hull_area_debug_) {
         ROS_DEBUG("Publishing hull area information to "
                   "/camera/hull_area_cloud");
         publishHullAreaCloud();

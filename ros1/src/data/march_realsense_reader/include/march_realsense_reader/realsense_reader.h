@@ -111,6 +111,9 @@ private:
     // Debugging flag, dynamically reconfigurable debugging_launch is true
     bool debugging_;
 
+    // Debugging flag for the hull area information, can be slow to compute
+    bool publish_hull_area_debug_;
+
     std::string frame_id_to_transform_to_;
 
     int realsense_category_;
