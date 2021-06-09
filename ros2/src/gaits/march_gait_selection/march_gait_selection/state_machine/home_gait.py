@@ -9,8 +9,10 @@ from .trajectory_scheduler import TrajectoryCommand
 class HomeGait(GaitInterface):
     """A standard gait that goes from the unknown state to an idle position."""
 
+    DEFAULT_DURATION = Duration(seconds=3)
+
     def __init__(
-        self, name, position, gait_type, duration: Duration = Duration(seconds=3)
+        self, name, position, gait_type, duration: Duration = DEFAULT_DURATION
     ):
         """Initializes an executable home gait with given positions.
 
