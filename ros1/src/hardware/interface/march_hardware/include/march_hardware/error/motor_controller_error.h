@@ -69,7 +69,6 @@ namespace error {
             const auto size = sizeof(error) * CHAR_BIT;
             const std::bitset<size> bitset(error);
 
-            ROS_INFO("Error binary: %s", bitset.to_string().c_str());
 
             for (size_t i = 0; i < size; i++) {
                 if (bitset.test(i)) {
