@@ -201,7 +201,12 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 <<<<<<< HEAD
             hull_vector, polygon_vector, realsense_category, gait_parameters,
             frame_id_to_transform_to_);
+<<<<<<< HEAD
 
+=======
+    // The debug output of the parameter determiner is made so that it can be
+    // visualized even if the parameter determiner was not successful
+>>>>>>> c8df6bf25... Format cpp code
     if (debugging_) {
         ROS_DEBUG(
             "Done determining parameters, now publishing a marker array to "
