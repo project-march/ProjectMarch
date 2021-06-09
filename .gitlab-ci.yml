@@ -139,7 +139,8 @@ container:build:
 .flake8-base:
   stage: Lint code
   script:
-    - python3 -m flake8 --format=codeclimate --append-config codeclimate.json
+    - rm -f codeclimate.json
+    - python3 -m flake8 --format=codeclimate --append-config .flake8 --output-file codeclimate.json
   artifacts:
     reports:
       codequality: codeclimate.json
