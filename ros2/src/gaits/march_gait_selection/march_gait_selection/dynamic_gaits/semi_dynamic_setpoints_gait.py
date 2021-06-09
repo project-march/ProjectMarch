@@ -136,21 +136,16 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             "description": "A subgait that stays in the same position",
             "duration": self._freeze_duration.nanoseconds,
             "gait_type": self._current_subgait.gait_type,
-            "joints": dict(
-                [
-                    (
-                        joint.name,
-                        [
-                            {
-                                "position": self._freeze_position[joint.name],
-                                "time_from_start": self._freeze_duration.nanoseconds,
-                                "velocity": 0,
-                            }
-                        ],
-                    )
-                    for joint in self._current_subgait.joints
+            "joints": {
+                joint.name: [
+                    {
+                        "position": self._freeze_position[joint.name],
+                        "time_from_start": self._freeze_duration.nanoseconds,
+                        "velocity": 0,
+                    }
                 ]
-            ),
+                for joint in self._current_subgait.joints
+            },
         }
 
         # freeze subgait

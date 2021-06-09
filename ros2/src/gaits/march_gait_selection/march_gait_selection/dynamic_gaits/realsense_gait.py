@@ -130,7 +130,7 @@ class RealSenseGait(SetpointsGait):
                         f"the amount of dimensions for subgait {subgait_name}"
                     )
 
-            subgaits = dict()
+            subgaits = {}
             for subgait_name in subgait_version_map:
                 if subgait_name not in ("start", "end"):
                     subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
