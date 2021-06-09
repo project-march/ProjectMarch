@@ -494,7 +494,7 @@ class Subgait(object):
         gait_type = (
             base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         )
-        ## What to do with the version of the new gait
+        # What to do with the version of the new gait
         version = "{0}{1}_({2})_({3})".format(
             PARAMETRIC_GAITS_PREFIX,
             parameter,
@@ -665,7 +665,7 @@ class Subgait(object):
     def unpack_four_parametric_version(version: str) -> Tuple[List[str], List[float]]:
         """Unpack a version to four versions and two parameters."""
         parameter_search = re.findall(
-            r"(\d+\.\d+)".format(FOUR_PARAMETRIC_GAITS_PREFIX), version
+            r"(\d+\.\d+)", version
         )
         if parameter_search is None:
             raise SubgaitInterpolationError(

@@ -108,7 +108,7 @@ class TestMarchSafetyTemperature(unittest.TestCase):
                     ]
                 )
             ),
-            msg=f"Parameters were not set within timeout duration",
+            msg="Parameters were not set within timeout duration",
         )
 
         client = self.node.create_client(

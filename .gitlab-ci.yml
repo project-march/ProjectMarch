@@ -139,14 +139,14 @@ container:build:
 .flake8-base:
   stage: Lint code
   script:
-    - python3 -m flakehell lint --suppress-none-returning --format=gitlab --output-file flakehell.json
+    - rm -f codeclimate.json
+    - python3 -m flake8 --format=codeclimate --config .flake8 --output-file codeclimate.json
   artifacts:
     reports:
-      codequality: flakehell.json
-  allow_failure: true
+      codequality: codeclimate.json
   only:
     changes:
-      - "pyproject.toml"
+      - ".flake8"
       - "**/*.py"
 
 # The job for branches
