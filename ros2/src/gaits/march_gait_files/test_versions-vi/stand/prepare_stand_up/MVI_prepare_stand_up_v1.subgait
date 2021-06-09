@@ -1,7 +1,7 @@
-description: 'Prepare stand up: perform hip flexion before the actual standing up
-  from the sofa.'
+description: Move to a position from where one can comfortably stand up from a chair
+  of 50 cm. With haa at 2 degrees.
 duration: 1000000000
-gait_type: walk_like
+gait_type: sit_like
 joints:
   left_ankle:
   - position: 0.0
@@ -18,17 +18,17 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.5708
+  - position: 1.4835
     time_from_start: 0
     velocity: 0.0
   - position: 1.6581
     time_from_start: 1000000000
     velocity: 0.0
   left_knee:
-  - position: 1.7453
+  - position: 1.4835
     time_from_start: 0
     velocity: 0.0
-  - position: 1.7453
+  - position: 1.4835
     time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
@@ -46,18 +46,18 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.5708
+  - position: 1.4835
     time_from_start: 0
     velocity: 0.0
   - position: 1.6581
     time_from_start: 1000000000
     velocity: 0.0
   right_knee:
-  - position: 1.7453
+  - position: 1.4835
     time_from_start: 0
     velocity: 0.0
-  - position: 1.7453
+  - position: 1.4835
     time_from_start: 1000000000
     velocity: 0.0
 name: prepare_stand_up
-version: MIV_final
+version: MVI_prepare_stand_up_v1
