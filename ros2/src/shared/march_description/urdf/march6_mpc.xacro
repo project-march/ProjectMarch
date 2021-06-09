@@ -249,7 +249,7 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <xacro:pressure_sole side="left" foot_name="foot_left"/>
+    <xacro:pressure_sole side="left"/>
 
 <!-- Right Hip -->
     <xacro:frame_part name="hip_aa_frame_right_side"
@@ -311,7 +311,7 @@
                       visual_rpy="0 0 0"
     />
 
-    <xacro:pressure_sole side="right" foot_name="foot_right"/>
+    <xacro:pressure_sole side="right"/>
 
     <xacro:frame_part name="foot_right"
                       reflect="1"
