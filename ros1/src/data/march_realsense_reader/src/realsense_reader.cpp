@@ -285,11 +285,11 @@ void RealSenseReader::publishHullAreaCloud()
     float min_y = -1.5;
     float max_y = 1.5;
     // The number of points in each direction of the grid
-    int x_points = round((max_x - min_x) / x_grid_size) + 1;
-    int y_points = round((max_y - min_y) / y_grid_size) + 1;
+    int x_points = int(round((max_x - min_x) / x_grid_size)) + 1;
+    int y_points = int(round((max_y - min_y) / y_grid_size)) + 1;
     for (int i = 0; i < x_points; ++i) {
         for (int j = 0; j < y_points; ++j) {
-            pcl::PointXY point;
+            pcl::PointXY point {};
             point.x = min_x + (float)i * x_grid_size;
             point.y = min_y + (float)j * y_grid_size;
             ground_cloud->push_back(point);
