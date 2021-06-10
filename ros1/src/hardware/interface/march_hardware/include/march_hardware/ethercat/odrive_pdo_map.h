@@ -25,16 +25,22 @@ struct ODriveObject {
 enum class ODriveObjectName {
     // Read objects
     ActualPosition,
-    ActualTorque,
+    ActualCurrent,
     ActualVelocity,
     AxisError,
     MotorError,
     EncoderManagerError,
     EncoderError,
     ControllerError,
+    AxisState,
+    Temperature,
+    MotorPosition,
 
     // Write objects
     TargetTorque,
+
+    // Requested State is not yet implemented on the DieBoSlave
+    // RequestedState
 };
 
 class ODrivePDOmap {

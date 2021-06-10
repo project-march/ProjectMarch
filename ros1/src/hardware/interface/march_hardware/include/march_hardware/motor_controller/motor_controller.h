@@ -57,7 +57,10 @@ public:
 
     // Get whether the incremental encoder is more precise than the absolute
     // encoder
-    bool isIncrementalEncoderMorePrecise() const;
+    virtual bool isIncrementalEncoderMorePrecise() const;
+
+    // Are the slaves of this MotorController unique
+    virtual bool hasUniqueSlaves() const = 0;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
@@ -72,9 +75,14 @@ public:
     virtual float getMotorCurrent() = 0;
     virtual float getMotorControllerVoltage() = 0;
     virtual float getMotorVoltage() = 0;
+    virtual float getActualEffort() = 0;
 
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;
+
+    // Effort may have to be multiplied by a constant
+    // because ROS control limits the pid values to a certain maximum
+    virtual float effortMultiplicationConstant();
 
     ~MotorController() override = default;
 
@@ -122,10 +130,8 @@ protected:
     virtual float getAbsoluteVelocityUnchecked() = 0;
     virtual float getIncrementalVelocityUnchecked() = 0;
 
-    // A MotorController doesn't necessarily have an AbsoluteEncoder and an
-    // IncrementalEncoder, but will have at least one of the two
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
-    std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
+    std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     ActuationMode actuation_mode_;
 };
 
