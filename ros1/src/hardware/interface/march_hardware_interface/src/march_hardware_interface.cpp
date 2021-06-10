@@ -169,16 +169,33 @@ bool MarchHardwareInterface::init(
         MarchTemperatureSensorHandle temperature_sensor_handle(joint.getName(),
             &joint_temperature_[i], &joint_temperature_variance_[i]);
         march_temperature_interface_.registerHandle(temperature_sensor_handle);
+    }
 
+    // Prepare all joints for actuation
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
         // Enable high voltage on the IMC
         if (joint.canActuate()) {
             joint.prepareActuation();
+        }
+    }
+
+    // Wait a while for MotorControllers to be enabled
+    ros::Duration(/*t=*/5).sleep();
+
+    // Read the first encoder values for each joint
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+        if (joint.canActuate()) {
+            joint.readFirstEncoderValues();
 
             // Set the first target as the current position
             joint_position_[i] = joint.getPosition();
             joint_velocity_[i] = 0;
             joint_effort_[i] = 0;
 
+            auto actuation_mode
+                = joint.getMotorController()->getActuationMode();
             if (actuation_mode == march::ActuationMode::position) {
                 joint_position_command_[i] = joint_position_[i];
             } else if (actuation_mode == march::ActuationMode::torque) {
@@ -186,7 +203,8 @@ bool MarchHardwareInterface::init(
             }
         }
     }
-    ROS_INFO("Successfully actuated all joints");
+
+    ROS_INFO("All joints are ready for actuation!");
 
     this->registerInterface(&this->march_temperature_interface_);
     this->registerInterface(&this->joint_state_interface_);

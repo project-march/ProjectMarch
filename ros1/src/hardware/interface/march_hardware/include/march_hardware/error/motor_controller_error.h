@@ -5,8 +5,8 @@
 #include <array>
 #include <bitset>
 #include <climits>
-#include <string>
 #include <ros/ros.h>
+#include <string>
 
 namespace march {
 namespace error {
@@ -68,7 +68,6 @@ namespace error {
             std::string description;
             const auto size = sizeof(error) * CHAR_BIT;
             const std::bitset<size> bitset(error);
-
 
             for (size_t i = 0; i < size; i++) {
                 if (bitset.test(i)) {

@@ -58,17 +58,28 @@ void Joint::prepareActuation()
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
     motor_controller_->prepareActuation();
     ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
+}
 
-    if (motor_controller_->hasIncrementalEncoder()) {
-        previous_incremental_position_
-            = motor_controller_->getIncrementalPosition();
-    }
-    if (motor_controller_->hasAbsoluteEncoder()) {
-        position_ = motor_controller_->getAbsolutePosition();
+void Joint::readFirstEncoderValues()
+{
+    auto motor_controller_state = motor_controller_->getState();
+    if (motor_controller_state->isOperational()) {
+        if (motor_controller_->hasIncrementalEncoder()) {
+            previous_incremental_position_
+                = motor_controller_->getIncrementalPosition();
+        }
+        if (motor_controller_->hasAbsoluteEncoder()) {
+            position_ = motor_controller_->getAbsolutePosition();
+        } else {
+            position_ = previous_incremental_position_;
+        }
+        velocity_ = 0;
     } else {
-        position_ = previous_incremental_position_;
+        ROS_FATAL(
+            "%s", motor_controller_state->getErrorStatus().value().c_str());
+        throw error::HardwareException(
+            error::ErrorType::PREPARE_ACTUATION_ERROR);
     }
-    velocity_ = 0;
 }
 
 void Joint::actuate(float target)

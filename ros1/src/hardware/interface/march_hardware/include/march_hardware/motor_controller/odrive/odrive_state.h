@@ -123,15 +123,22 @@ public:
     std::optional<std::string> getErrorStatus() override
     {
         if (hasError()) {
-            ROS_INFO("Axis Error binary: %s", std::bitset<32>(axis_error_).to_string().c_str());
-            ROS_INFO("Motor Error binary: %s", std::bitset<32>(motor_error_).to_string().c_str());
-            ROS_INFO("Encoder Error binary: %s", std::bitset<32>(encoder_error_).to_string().c_str());
-            ROS_INFO("EM Error binary: %s", std::bitset<32>(encoder_manager_error_).to_string().c_str());
-            ROS_INFO("Controller Error binary: %s", std::bitset<32>(controller_error_).to_string().c_str());
+            ROS_INFO("Axis Error binary: %s",
+                std::bitset<32>(axis_error_).to_string().c_str());
+            ROS_INFO("Motor Error binary: %s",
+                std::bitset<32>(motor_error_).to_string().c_str());
+            ROS_INFO("Encoder Error binary: %s",
+                std::bitset<32>(encoder_error_).to_string().c_str());
+            ROS_INFO("EM Error binary: %s",
+                std::bitset<32>(encoder_manager_error_).to_string().c_str());
+            ROS_INFO("Controller Error binary: %s",
+                std::bitset<32>(controller_error_).to_string().c_str());
 
             std::ostringstream error_stream;
             error_stream
-                << "Axis: "
+                << "State: " << axis_state_.toString() << " ("
+                << axis_state_.value_ << ")"
+                << "\nAxis: "
                 << error::parseError(
                        axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
                 << "\nMotor: "

@@ -50,24 +50,15 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 
 void ODrive::prepareActuation()
 {
-    ros::Duration(/*t=*/1).sleep();
-    // Setting Axis state is not (yet) supported
     // if (!pre_calibrated_) {
     //     // Calibrate the ODrive first
     //     setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
     //     waitForState(ODriveAxisState::IDLE);
     // }
-    // if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-    //     // Set the ODrive to closed loop control
-    //     setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-    //     waitForState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-    // } 
 
-    auto odrive_state = getState();
-    if (odrive_state->hasError()) {
-        ROS_FATAL("%s", odrive_state->getErrorStatus().value().c_str());
-        throw error::HardwareException(
-            error::ErrorType::PREPARE_ACTUATION_ERROR);
+    if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+        // Set the ODrive to closed loop control
+        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     }
 }
 
@@ -78,14 +69,14 @@ void ODrive::waitForState(ODriveAxisState target_state)
         ROS_INFO("Waiting for '%s', currently in '%s'",
             target_state.toString().c_str(), current_state.toString().c_str());
 
-        ros::Duration(/*t=*/2).sleep();
+        ros::Duration(/*t=*/1).sleep();
         current_state = getAxisState();
     }
 }
 
 void ODrive::actuateTorque(float target_effort)
 {
-    // ROS_INFO("Effort: %f", target_effort);
+    ROS_INFO("Effort: %f", target_effort);
     float target_torque
         = target_effort * torque_constant_ * (float)getMotorDirection();
     // ROS_INFO("Torque: %f", target_torque);
@@ -155,7 +146,7 @@ bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
     // Almost no action is needed as the DieBoSlave make sure actuation is ready
     // when etherCAT connection is made. Only need to wait a second for the
     // EtherCAT network to become available.
-//    ros::Duration(/*t=*/1).sleep();
+    //    ros::Duration(/*t=*/1).sleep();
     return false;
 }
 
@@ -292,17 +283,16 @@ Encoder::Direction ODrive::getMotorDirection() const
     return this->incremental_encoder_->getDirection();
 }
 
+void ODrive::setAxisState(ODriveAxisState state)
+{
+    bit32 write_struct = { .ui = state.value_ };
+    this->write32(ODrivePDOmap::getMOSIByteOffset(
+                      ODriveObjectName::RequestedState, axis_),
+        write_struct);
+}
+
 // Throw NotImplemented error by default for functions not part of the Minimum
 // Viable Product
-void ODrive::setAxisState(ODriveAxisState /* state */)
-{
-    throw error::NotImplemented("setAxisState", "ODrive");
-    // Requested State is not yet implemented on the DieBoSlave
-    //    bit32 write_struct = { .ui = state.value_ };
-    //    this->write32(ODrivePDOmap::getMOSIByteOffset(
-    //                      ODriveObjectName::RequestedState, axis_),
-    //        write_struct);
-}
 
 void ODrive::actuateRadians(float /*target_position*/)
 {
