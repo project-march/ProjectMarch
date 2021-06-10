@@ -1,0 +1,6 @@
+stages:
+- print_date
+print-date:
+  stage: print_date
+  script:
+  - date
