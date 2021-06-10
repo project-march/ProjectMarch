@@ -172,6 +172,11 @@ flake8-container:build:
 flake8:
   variables:
     TAG: main
+  only:
+    refs:
+      - branches
+      - tags
+      - merge_requests
   extends:
     - .flake8-base
 
