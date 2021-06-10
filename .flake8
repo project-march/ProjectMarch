@@ -19,3 +19,4 @@ ignore =
     C812,
     C815,
     C816
+    PIE803,     # This is not relevant for the rclpy logger

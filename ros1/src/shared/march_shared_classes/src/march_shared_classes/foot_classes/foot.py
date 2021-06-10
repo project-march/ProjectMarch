@@ -20,7 +20,7 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 MID_CALCULATION_PRECISION_DIGITS = 10
 
 
-class Foot(object):
+class Foot:
     """Class for capturing the state (position and possible velocity) of a foot."""
 
     def __init__(self, foot_side, position, velocity=None):

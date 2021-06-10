@@ -20,7 +20,7 @@ from .com_calculator import CoMCalculator
 from march_data_collector.cp_calculator import CPCalculator
 
 
-class DataCollectorNode(object):
+class DataCollectorNode:
     """A node"""
 
     def __init__(

@@ -28,13 +28,11 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         for noticing the step height and ending the subgait earlier. This is
         therefore not possible during the first second of the subgait, to
         prevent accidental freezing."""
-        if (
+        return (
             self.elapsed_time < SHOULD_NOT_FREEZE_FIRST_SECS
             or self._should_freeze
             or self._is_frozen
-        ):
-            return False
-        return True
+        )
 
     @property
     def can_be_scheduled_early(self) -> bool:
