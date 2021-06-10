@@ -180,7 +180,8 @@ flake8:
         - ".gitlab/images/Dockerfile_flake8"
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - changes:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
         - ".flake8"
         - "**/*.py"
   extends:
