@@ -226,14 +226,14 @@ class RealSenseGait(SetpointsGait):
         frame_id_to_transform_to = self.get_frame_id_to_transfrom_to()
         if frame_id_to_transform_to is None:
             self._node.get_logger().warn(
-                "No frame id to transform to was found. gait will not be started"
+                "No frame id to transform to was not found. gait will not be started"
             )
             return GaitUpdate.empty()
 
-        service_call_succesful = self.make_realsense_service_call(
+        service_call_successful = self.make_realsense_service_call(
             frame_id_to_transform_to
         )
-        if not service_call_succesful:
+        if not service_call_successful:
             self._node.get_logger().warn("No service response received within timeout")
             return GaitUpdate.empty()
 
@@ -261,10 +261,6 @@ class RealSenseGait(SetpointsGait):
 
     def get_frame_id_to_transfrom_to(self):
         try:
-            self._node.get_logger().warn(
-                f"frame id = "
-                f"{self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[self._current_subgait.subgait_name]}"
-            )
             return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
                 self._current_subgait.subgait_name
             ]
