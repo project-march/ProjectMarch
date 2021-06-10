@@ -89,13 +89,14 @@ stages:
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
+    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
 
 # If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
 # then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
 container:tag:
   variables:
     BRANCH_NAME: $CI_COMMIT_BRANCH
+    DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
   extends:
     - .container:tag-base
     - .branches_to_run_pipeline_on
@@ -105,6 +106,23 @@ container:tag:
 container:tag for MRs:
   variables:
     BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
+  extends:
+    - .container:tag-base
+    - .merge_request_ref
+
+container_flake8:tag:
+  variables:
+    BRANCH_NAME: '"$CI_COMMIT_BRANCH"_flake8'
+    DEFAULT_BRANCH: '"$CI_DEFAULT_BRANCH"_flake8'
+  extends:
+    - .container:tag-base
+    - .branches_to_run_pipeline_on
+
+container_flake8:tag for MRs:
+  variables:
+    BRANCH_NAME: '"$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"_flake8'
+    DEFAULT_BRANCH: '"$CI_DEFAULT_BRANCH"_flake8'
   extends:
     - .container:tag-base
     - .merge_request_ref
