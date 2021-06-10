@@ -38,6 +38,9 @@
          "name":"stand"
       },
       {
+         "name":"exo_test"
+      },
+      {
          "name":"rocker_switch_increment",
          "callback":"publish_increment_step_size",
          "always_enabled":true

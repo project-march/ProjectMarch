@@ -52,13 +52,13 @@ void ODrive::prepareActuation()
 {
     // if (!pre_calibrated_) {
     //     // Calibrate the ODrive first
-    //     setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+    //     requestAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
     //     waitForState(ODriveAxisState::IDLE);
     // }
 
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         // Set the ODrive to closed loop control
-        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+        requestAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     }
 }
 
@@ -283,7 +283,7 @@ Encoder::Direction ODrive::getMotorDirection() const
     return this->incremental_encoder_->getDirection();
 }
 
-void ODrive::setAxisState(ODriveAxisState state)
+void ODrive::requestAxisState(ODriveAxisState state)
 {
     bit32 write_struct = { .ui = state.value_ };
     this->write32(ODrivePDOmap::getMOSIByteOffset(

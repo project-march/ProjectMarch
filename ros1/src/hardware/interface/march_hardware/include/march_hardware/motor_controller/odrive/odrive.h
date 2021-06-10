@@ -88,7 +88,7 @@ protected:
 
 private:
     // Getter and setter for the axis state
-    void setAxisState(ODriveAxisState state);
+    void requestAxisState(ODriveAxisState state);
     void waitForState(ODriveAxisState target_state);
     ODriveAxisState getAxisState();
 
