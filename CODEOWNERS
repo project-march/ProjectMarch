@@ -14,26 +14,47 @@ LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel
 .gitlab-ci.yml @ThijsRay
 Dockerfile @ThijsRay
 /.scripts/ @ThijsRay
+.flake8 @ThijsRay
 
-[C/C++]
+^[C/C++]
 *.cpp @ThijsRay
 *.hpp @ThijsRay
 *.c @ThijsRay
 *.h @ThijsRay
 
-^[Movement]
-/ros1/src/gaits/ @floorheijs @wnederpel
-/ros2/src/gaits/ @floorheijs @wnederpel
+[Movement]
+/ros1/src/gaits/march_gait_files @floorheijs @wnederpel
+/ros2/src/gaits/march_gait_files @floorheijs @wnederpel
+/ros1/src/gaits/march_rqt_gait_generator @wnederpel
 
 [Balance]
-/ros1/src/balance/ @kschmahl
+/ros1/src/balance/ @kschmahl @wnederpel @ttveen
 
 [Control]
-/ros1/src/control/ @MZZRD @Hvaneven @ttveen
+/ros1/src/control/ @MZZRD @Hvaneven @ttveen @BasVolkers
+/ros1/src/control/march_acado_mpc/ @MZZRD
 
 [Depth camera]
 /ros1/src/data/march_realsense_reader/ @kschmahl @ttveen @wnederpel
+/ros1/src/data/march_realsense_test_publisher/ @wnederpel
 
 [Data visualizations]
-/ros1/src/visualization/ @ttveen
-/ros2/src/visualization/ @ttveen
+/ros2/src/visualization/march_mpc_visualization @ttveen
+
+[Hardware]
+/ros1/src/hardware/ @BasVolkers
+
+[Simulation]
+/ros1/src/simulation @kschmahl
+
+[ROS2 transition]
+/ros2/src/simulation/march_fake_sensor_data @ThijsRay
+/ros2/src/visualization/march_rqt_input_device @kschmahl @BasVolkers
+/ros2/src/visualization/march_rqt_gait_version_tool @kschmahl
+/ros2/src/visualization/march_rqt_note_taker @BasVolkers
+/ros2/src/visualization/march_rqt_robot_monitor @BasVolkers
+/ros2/src/safety/march_safety @BasVolkers
+/ros2/src/shared/march_robot_information @BasVolkers
+/ros2/src/shared/march_utility @BasVolkers @kschmahl @wnederpel
+/ros2/src/shared/march_description @kschmahl @ttveen
+/ros2/src/gait/march_gait_selection @kschmahl BasVolkers
