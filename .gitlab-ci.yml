@@ -111,26 +111,6 @@ container:tag for MRs:
     - .container:tag-base
     - .merge_request_ref
 
-# If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
-# then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
-flake8:tag:
-  variables:
-    REG_IMAGE: $CI_REGISTRY_IMAGE/flake8
-    BRANCH_NAME: $CI_COMMIT_BRANCH
-  extends:
-    - .container:tag-base
-    - .branches_to_run_pipeline_on
-
-# If the pipeline is for merge_requests defined in `.merge_request_ref`,
-# then use $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME as the $BRANCH_NAME in the "tag" job.
-flake8:tag for MRs:
-  variables:
-    REG_IMAGE: $CI_REGISTRY_IMAGE/flake8
-    BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-  extends:
-    - .container:tag-base
-    - .merge_request_ref
-
 .container_builder:
   stage: Build container
   image:
@@ -188,21 +168,40 @@ flake8-container:build:
       - ".flake8"
       - "**/*.py"
 
-# The job for branches
+# The normal flake8 job runs on the image from main
 flake8:
+  variables:
+    TAG: main
+  extends:
+    - .flake8-base
+
+# When the Dockerfile has changed, we need to run one of the following
+# jobs, depending on whether it is executed in a branch or in a MR
+# The job for branches
+flake8 with new Dockerfile:
   variables:
     TAG: $CI_COMMIT_BRANCH
   extends:
     - .flake8-base
     - .branches
+  only:
+    changes:
+      - ".gitlab/images/Dockerfile_flake8"
+      - ".flake8"
+      - "**/*.py"
 
 # The job for merge_requests
-flake8 for MRs:
+flake8 for MRs with new Dockerfile:
   variables:
     TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
   extends:
     - .flake8-base
     - .merge_requests
+  only:
+    changes:
+      - ".gitlab/images/Dockerfile_flake8"
+      - ".flake8"
+      - "**/*.py"
 
 #######################
 # clang-format linter #
