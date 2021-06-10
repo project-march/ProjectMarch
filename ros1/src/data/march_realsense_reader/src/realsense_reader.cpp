@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <dynamic_reconfigure/server.h>
 #include <map>
@@ -40,6 +41,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     , realsense_category_(-1)
     , use_left_foot_(nullptr)
     , debugging_launch(false)
+    , publish_hull_area_debug_(nullptr)
 {
 
     // Create a subscriber for every pointcloud topic
@@ -283,13 +285,13 @@ void RealSenseReader::publishHullAreaCloud()
     float min_y = -1.5;
     float max_y = 1.5;
     // The number of points in each direction of the grid
-    int x_points = (max_x - min_x) / x_grid_size + 1;
-    int y_points = (max_y - min_y) / y_grid_size + 1;
+    int x_points = round((max_x - min_x) / x_grid_size) + 1;
+    int y_points = round((max_y - min_y) / y_grid_size) + 1;
     for (int i = 0; i < x_points; ++i) {
         for (int j = 0; j < y_points; ++j) {
             pcl::PointXY point;
-            point.x = min_x + i * x_grid_size;
-            point.y = min_y + j * y_grid_size;
+            point.x = min_x + (float)i * x_grid_size;
+            point.y = min_y + (float)j * y_grid_size;
             ground_cloud->push_back(point);
         }
     }
