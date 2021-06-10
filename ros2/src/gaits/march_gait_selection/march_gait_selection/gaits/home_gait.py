@@ -62,7 +62,11 @@ class HomeGait(GaitInterface):
         return self._final_position
 
     @property
-    def can_be_scheduled_early(self) -> bool:
+    def first_subgait_can_be_scheduled_early(self) -> bool:
+        return True
+
+    @property
+    def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
         return True
 
     @property

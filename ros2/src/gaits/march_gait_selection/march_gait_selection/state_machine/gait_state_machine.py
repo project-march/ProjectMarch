@@ -365,17 +365,13 @@ class GaitStateMachine:
         # )
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
-            self._gait_selection.get_logger().info(
-                f"Current state `{self._current_state}, gaits: "
-                f"{self._gait_selection._gaits}`"
-            )
             self._current_gait = self._gait_selection._gaits[self._current_state]
 
 
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            if self._current_gait.can_be_started_early:
+            if self._current_gait.first_subgait_can_be_scheduled_early:
                 gait_update = self._current_gait.start(
                     now, self._gait_selection._first_subgait_delay
                 )
@@ -412,7 +408,7 @@ class GaitStateMachine:
 
         self._handle_input()
 
-        if self._current_gait.can_be_scheduled_early:
+        if self._current_gait.subsequent_subgaits_can_be_scheduled_early:
             gait_update = self._current_gait.update(
                 now, self._gait_selection._early_schedule_duration
             )

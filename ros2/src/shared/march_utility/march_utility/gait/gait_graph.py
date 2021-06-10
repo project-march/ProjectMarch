@@ -29,7 +29,7 @@ class GaitGraph:
 
         self._named_positions: GaitGraph.NamedPositions = {}
         self._idle_transitions: GaitGraph.IdleTransitions = {}
-        self._dynamic_transitions: Set = set()
+        self._dynamic_transitions: Set[str] = set()
         self._gait_transitions: GaitGraph.GaitTransitions = {}
         self._unnamed_count = 0
 

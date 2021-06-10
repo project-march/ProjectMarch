@@ -78,11 +78,11 @@ class SetpointsGait(GaitInterface, Gait):
         )
 
     @property
-    def can_be_scheduled_early(self) -> bool:
+    def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
         return True
 
     @property
-    def can_be_started_early(self) -> bool:
+    def first_subgait_can_be_scheduled_early(self) -> bool:
         return True
 
     def _reset(self):

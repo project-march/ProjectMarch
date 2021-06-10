@@ -16,11 +16,6 @@ class GaitInterface:
         return ""
 
     @property
-    def can_freeze(self) -> bool:
-        """Returns whether the gait has a freeze functionality."""
-        return False
-
-    @property
     def subgait_name(self) -> str:
         """Returns the name of the currently executing trajectory."""
         return ""
@@ -52,12 +47,12 @@ class GaitInterface:
         return None
 
     @property
-    def can_be_scheduled_early(self) -> bool:
+    def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
         """Return whether this gait can be scheduled early, default is False."""
         return False
 
     @property
-    def can_be_started_early(self) -> bool:
+    def first_subgait_can_be_scheduled_early(self) -> bool:
         """Return whether this gait can be started early, this means that the first
         subgait will be delayed, with the first_subgait_delay, default is False."""
         return False

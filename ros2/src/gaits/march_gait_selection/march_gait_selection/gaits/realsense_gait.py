@@ -83,7 +83,7 @@ class RealSenseGait(SetpointsGait):
         self._final_position = final_position
 
     @property
-    def can_be_scheduled_early(self) -> bool:
+    def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
         """
         Whether a subgait can be scheduled early, this is not possible for the realsense
         gait, since this will later have a service call to determine the next subgait.
@@ -91,7 +91,7 @@ class RealSenseGait(SetpointsGait):
         return False
 
     @property
-    def can_be_started_early(self) -> bool:
+    def first_subgait_can_be_scheduled_early(self) -> bool:
         """
         Whether the first subgait can be started with a delay, this is possible for
         the realsense gait.
