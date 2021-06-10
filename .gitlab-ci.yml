@@ -89,14 +89,14 @@ stages:
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
+    - if ! podman manifest inspect $REG_IMAGE:$BRANCH_NAME; then podman pull $REG_IMAGE:$CI_DEFAULT_BRANCH && podman tag $REG_IMAGE:$CI_DEFAULT_BRANCH $REG_IMAGE:$BRANCH_NAME && podman push $REG_IMAGE:$BRANCH_NAME; fi;
 
 # If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
 # then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
 container:tag:
   variables:
+    REG_IMAGE: $CI_REGISTRY_IMAGE
     BRANCH_NAME: $CI_COMMIT_BRANCH
-    DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
   extends:
     - .container:tag-base
     - .branches_to_run_pipeline_on
@@ -105,24 +105,28 @@ container:tag:
 # then use $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME as the $BRANCH_NAME in the "tag" job.
 container:tag for MRs:
   variables:
+    REG_IMAGE: $CI_REGISTRY_IMAGE
     BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
   extends:
     - .container:tag-base
     - .merge_request_ref
 
-container_flake8:tag:
+# If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
+# then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
+flake8:tag:
   variables:
-    BRANCH_NAME: '"$CI_COMMIT_BRANCH"_flake8'
-    DEFAULT_BRANCH: '"$CI_DEFAULT_BRANCH"_flake8'
+    REG_IMAGE: $CI_REGISTRY_IMAGE/flake8
+    BRANCH_NAME: $CI_COMMIT_BRANCH
   extends:
     - .container:tag-base
     - .branches_to_run_pipeline_on
 
-container_flake8:tag for MRs:
+# If the pipeline is for merge_requests defined in `.merge_request_ref`,
+# then use $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME as the $BRANCH_NAME in the "tag" job.
+flake8:tag for MRs:
   variables:
-    BRANCH_NAME: '"$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"_flake8'
-    DEFAULT_BRANCH: '"$CI_DEFAULT_BRANCH"_flake8'
+    REG_IMAGE: $CI_REGISTRY_IMAGE/flake8
+    BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
   extends:
     - .container:tag-base
     - .merge_request_ref
@@ -157,7 +161,7 @@ container:build:
 
 flake8-container:build:
     script:
-      - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE:"$CI_COMMIT_BRANCH"_flake8 --cleanup
+      - /kaniko/executor --cache=false --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE/flake8:$CI_COMMIT_BRANCH --cleanup
     only:
       changes:
         - ".gitlab/images/Dockerfile_flake8"
@@ -171,6 +175,7 @@ flake8-container:build:
 # to avoid common mistakes
 .flake8-base:
   stage: Lint code
+  image: registry.gitlab.com/project-march/march/flake8:$TAG
   script:
     - rm -f codeclimate.json
     - python3 -m flake8 --format=codeclimate --config .flake8 --output-file codeclimate.json
@@ -185,14 +190,16 @@ flake8-container:build:
 
 # The job for branches
 flake8:
-  image: registry.gitlab.com/project-march/march:"$CI_COMMIT_BRANCH"_flake8
+  variables:
+    TAG: $CI_COMMIT_BRANCH
   extends:
     - .flake8-base
     - .branches
 
 # The job for merge_requests
 flake8 for MRs:
-  image: registry.gitlab.com/project-march/march:"$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"_flake8
+  variables:
+    TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
   extends:
     - .flake8-base
     - .merge_requests
