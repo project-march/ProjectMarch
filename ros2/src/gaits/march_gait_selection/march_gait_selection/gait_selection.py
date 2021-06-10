@@ -30,7 +30,6 @@ from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_utility.utilities.node_utils import get_robot_urdf
 from march_gait_selection.gaits.realsense_gait import RealSenseGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 

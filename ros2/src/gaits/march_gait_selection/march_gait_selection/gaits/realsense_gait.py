@@ -276,8 +276,9 @@ class RealSenseGait(SetpointsGait):
         """
         # Delay start until parameterisation is done
         self._start_is_delayed = True
-        self._start_time = current_time + Duration(seconds=10)
-
+        # Start time will be set later, but to prevent updates during the service
+        # calls to think the gait start time has passed, set start time in the future.
+        self._start_time = current_time + self.SERVICE_TIMEOUT * 3
         self._current_time = current_time
 
         # Currently, we hardcode foot_right in start, since this is almost
@@ -307,7 +308,6 @@ class RealSenseGait(SetpointsGait):
             first_subgait_delay = Duration(0)
         self._start_time = self._node.get_clock().now() + first_subgait_delay
         self._end_time = self._start_time + self._current_subgait.duration
-
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:

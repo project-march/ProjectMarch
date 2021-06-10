@@ -1,21 +1,7 @@
-from math import pi
 import unittest
 
-
-from march_utility.foot_classes.feet_state import FeetState
-from march_utility.foot_classes.foot import Foot
-from march_utility.gait.setpoint import Setpoint
-from march_utility.utilities.duration import Duration
-from march_utility.utilities.side import Side
-from march_utility.utilities.utility_functions import (
-    get_lengths_robot_for_inverse_kinematics,
-)
-from march_utility.utilities.vector_3d import Vector3d
-
 from march_utility.gait.edge_position import (
-    DynamicEdgePosition,
     EdgePosition,
-    StaticEdgePosition,
     UnknownEdgePosition,
 )
 

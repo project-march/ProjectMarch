@@ -1,4 +1,4 @@
-from typing import Dict, Set, List
+from typing import Dict, Set
 
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_state_machine_error import (

@@ -1,9 +1,5 @@
 from typing import Optional, Union
 from gazebo_msgs.msg import ContactsState
-from march_gait_selection.state_machine.gait_state_machine_error import (
-    GaitStateMachineError,
-)
-from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
@@ -19,8 +15,6 @@ from march_utility.utilities.side import Side
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 from std_msgs.msg import Header
-from std_srvs.srv import Trigger
-
 from .gait_update import GaitUpdate
 from .trajectory_scheduler import TrajectoryScheduler
 from ..gait_selection import GaitSelection
@@ -367,7 +361,6 @@ class GaitStateMachine:
         if self._current_gait is None:
             self._current_gait = self._gait_selection._gaits[self._current_state]
 
-
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
@@ -497,7 +490,7 @@ class GaitStateMachine:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
         self._current_state = UnknownEdgePosition()
-        self._gait_selection.get_logger().info(f"Transitioned to unknown")
+        self._gait_selection.get_logger().info("Transitioned to unknown")
 
     @staticmethod
     def _add_callback(callbacks, cb):
