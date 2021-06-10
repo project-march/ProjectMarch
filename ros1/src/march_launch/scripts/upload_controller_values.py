@@ -34,8 +34,12 @@ def main():
             actuating_joint_names.append(joint.name)
         else:
             fixed_joint_names.append(joint.name)
-    rospy.set_param("/march/joint_names", actuating_joint_names)
-    rospy.set_param("/march/controller/trajectory/joints", actuating_joint_names)
+    sorted_joint_names = sorted(actuating_joint_names)
+
+    rospy.loginfo(f"Joint names are {sorted_joint_names}")
+
+    rospy.set_param("/march/joint_names", sorted_joint_names)
+    rospy.set_param("/march/controller/trajectory/joints", sorted_joint_names)
 
     for joint in fixed_joint_names:
         for param in get_params_for_actuation(joint):
