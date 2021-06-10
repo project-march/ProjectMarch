@@ -264,7 +264,7 @@ class RealSenseGait(SetpointsGait):
             return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
                 self._current_subgait.subgait_name
             ]
-        except KeyError as e:
+        except KeyError:
             self._node.get_logger().warn(
                 f"The current subgait name {self._current_subgait.subgait_name} "
                 f"has no known associated frame id."
