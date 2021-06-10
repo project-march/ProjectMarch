@@ -63,7 +63,7 @@ class GaitStateMachine:
         self._gait_graph.generate_graph()
 
         # Current state is eiter an EdgePositions or a string representing the active gait
-        self._current_state = UnknownEdgePosition()
+        self._current_state: State = UnknownEdgePosition()
         self._current_gait = None
         self._shutdown_requested = False
 
@@ -396,7 +396,6 @@ class GaitStateMachine:
                     f"left={self._force_left_foot}, right={self._force_right_foot}"
                 )
             self._process_gait_update(gait_update)
-            return
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()

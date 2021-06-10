@@ -344,7 +344,7 @@ class GaitSelection(Node):
             )
 
         for gait in self._dynamic_edge_version_map:
-            self.get_logger().info(f"Adding gait {gait}")
+            self.get_logger().debug(f"Adding dynamic gait {gait}")
             gaits[gait] = DynamicEdgeSetpointsGait.from_file(
                 gait, self._gait_directory, self._robot, self._dynamic_edge_version_map
             )
