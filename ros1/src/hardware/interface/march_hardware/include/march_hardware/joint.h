@@ -47,8 +47,10 @@ public:
 
     // Prepare the joint for actuation
     // First calls the prepareActuation() method of the MotorController
-    // Then sets some initial values
     void prepareActuation();
+
+    // Set initial encoder values
+    void readFirstEncoderValues();
 
     // Actuate the joint if allow_actuation is true
     // Will throw a HardwareException if canActuate() is false
