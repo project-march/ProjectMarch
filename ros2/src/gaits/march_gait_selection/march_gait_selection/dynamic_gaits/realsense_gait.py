@@ -24,7 +24,6 @@ from rclpy.client import Client
 from urdf_parser_py import urdf
 
 
-
 class RealSenseGait(SetpointsGait):
     """
     The RealSenseGait class is used for creating gaits based on the parameters given
@@ -288,7 +287,7 @@ class RealSenseGait(SetpointsGait):
             realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
             frame_id_to_transform_to=frame_id_to_transform_to,
-            subgait_name=self._current_subgait.subgait_name
+            subgait_name=self._current_subgait.subgait_name,
         )
         self.realsense_service_event.clear()
         if self._get_gait_parameters_service.wait_for_service(
@@ -307,16 +306,22 @@ class RealSenseGait(SetpointsGait):
             )
             return False
 
-        event_wait = self.realsense_service_event.wait(timeout=self.SERVICE_TIMEOUT.seconds)
+        event_wait = self.realsense_service_event.wait(
+            timeout=self.SERVICE_TIMEOUT.seconds
+        )
         self._node.get_logger().warn(f"event_wait variable is {event_wait}")
         return event_wait
 
     def _realsense_response_cb(self, future: Future):
         """Set capture point result when the capture point service returns."""
         if future.done():
-            self._node.get_logger().warn("The future is done in the realsense responde cb")
+            self._node.get_logger().warn(
+                "The future is done in the realsense responde cb"
+            )
         else:
-            self._node.get_logger().warn("The future is NOT done in the realsense responde cb")
+            self._node.get_logger().warn(
+                "The future is NOT done in the realsense responde cb"
+            )
         self.realsense_service_result = future.result()
         self._node.get_logger().warn(f"The result is {self.realsense_service_result}")
         self.realsense_service_event.set()
