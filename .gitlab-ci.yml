@@ -109,27 +109,42 @@ container:tag for MRs:
     - .container:tag-base
     - .merge_request_ref
 
+.container_builder:
+  stage: Build container
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    # Equivalent to `docker login` but without installing docker"
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  only:
+    refs:
+      - branches
+
 # Build the container iff the Dockerfile has been changed. This only runs for
 # branches because this is a very long job. Running it for merge requests would
 # mean that this job is scheduled every time that a commit is pushed in a merge requests,
 # which is unnessecary if the Dockerfile is only changed once in the merge request.
 container:build:
-  stage: Build container
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
   script:
-    - mkdir -p /kaniko/.docker
-    # Equivalent to `docker login` but without installing docker"
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
     - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
   only:
-    refs:
-      - branches
     changes:
       - "Dockerfile"
+  extends:
+    - .container_builder
+
+flake8-container:build:
+    script:
+      - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE:"$CI_COMMIT_BRANCH"_flake8 --cleanup
+    only:
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+    extends:
+      - .container_builder
 
 #################
 # flake8 linter #
@@ -152,12 +167,14 @@ container:build:
 
 # The job for branches
 flake8:
+  image: registry.gitlab.com/project-march/march:"$CI_COMMIT_BRANCH"_flake8
   extends:
     - .flake8-base
     - .branches
 
 # The job for merge_requests
 flake8 for MRs:
+  image: registry.gitlab.com/project-march/march:"$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"_flake8
   extends:
     - .flake8-base
     - .merge_requests
