@@ -125,8 +125,8 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     }
 
     int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
-    ROS_INFO("Joint %s: ", joint_name.c_str());
-    ROS_INFO_STREAM("Slave index is " << slaveIndex);
+    ROS_INFO_STREAM("Joint " << joint_name.c_str() <<
+        " will be actuated with slave index " << slaveIndex);
 
     const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
@@ -388,7 +388,9 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
         int slaveIndex
             = getSlaveIndexFromJointConfig(joint_config[joint_name]);
         if (urdf_joint->type == urdf::Joint::FIXED) {
-            ROS_INFO_STREAM("Joint is fixed. " << slaveIndex);
+            ROS_INFO_STREAM("Joint " << joint_name << " with slaveIndex " <<
+                slaveIndex << " is fixed and will be removed from ethercat "
+                              "train config");
             if (slaveIndex != -1) {
                 fixedSlaveIndices.insert(slaveIndex);
             }
@@ -398,9 +400,6 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
     }
     for (int actuatingSlaveIndex : actuatingSlaveIndices) {
         fixedSlaveIndices.erase(actuatingSlaveIndex);
-    }
-    for (int fixedSlaveIndex : fixedSlaveIndices) {
-        ROS_INFO_STREAM("Fixed index: " << fixedSlaveIndex);
     }
     return fixedSlaveIndices;
 }
@@ -452,10 +451,6 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
                 joint_name.c_str());
         }
     }
-
-    ROS_INFO_STREAM("There are " << joints.size()
-                                 << " actuating joints initialized in "
-                                    "the robot");
 
     for (const auto& urdf_joint : this->urdf_.joints_) {
         if (urdf_joint.second->type != urdf::Joint::FIXED) {
