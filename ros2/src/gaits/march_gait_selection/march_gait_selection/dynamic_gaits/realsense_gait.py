@@ -205,7 +205,7 @@ class RealSenseGait(SetpointsGait):
         1) Make a service call to march_realsense_reader.
         2) Update all subgaits to interpolated subgaits with the given parameters
         (this will later become only some of the subgaits when the update function is
-         also used).
+        also used).
         3) Update the gait parameters to prepare for start
         4) Return the first subgait, if correct parameters were found.
 

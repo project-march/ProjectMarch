@@ -128,17 +128,17 @@ class SetpointsGait(GaitInterface, Gait):
         early_schedule_duration: Optional[Duration] = ZERO_DURATION,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
-        If the start was delayed and we have passed the start time,
-         we are now actually starting the gait.
-         Hence the is_new_subgait flag shuold be set to true.
-        If the previous subgait ended, schedule a new one.
-        If we haven't scheduled early yet, and we are within early_schedule_duration of
+        - If the start was delayed and we have passed the start time,
+        we are now actually starting the gait.
+        Hence the is_new_subgait flag shuold be set to true.
+        - If the previous subgait ended, schedule a new one.
+        - If we haven't scheduled early yet, and we are within early_schedule_duration of
         the end time, then schedule a new subgait early.
-        Else return nothing.
+        - Else return nothing.
         :param current_time: Current time
         :param early_schedule_duration: Optional duration to schedule early
         :returns: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
-                flags set to true, depending on the state of the Gait.
+        flags set to true, depending on the state of the Gait.
         """
         self._current_time = current_time
 

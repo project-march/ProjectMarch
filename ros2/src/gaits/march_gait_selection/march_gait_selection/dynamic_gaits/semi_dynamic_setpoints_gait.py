@@ -62,7 +62,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         If the current subgait is done, it will start the next subgait
         :param current_time: Current time
         :returns: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
-                flags set to true, depending on the state of the Gait.
+        flags set to true, depending on the state of the Gait.
         """
         self._current_time = current_time
         if self._should_freeze:
