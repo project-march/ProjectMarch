@@ -1,18 +1,22 @@
 ---
-generate-pipeline:
-  stage: build
+stages:
+    - Generating
+    - Executing
+
+Generating pipeline:
+  stage: Generating
   image: registry.gitlab.com/project-march/march/generate-pipeline:latest
   script: /usr/src/app/docker/gcip.sh
   artifacts:
     paths:
       - generated-config.yml
 
-run-pipeline:
-  stage: deploy
+Running pipeline:
+  stage: Executing
   needs:
-    - generate-pipeline
+    - Generating pipeline
   trigger:
     include:
       - artifact: generated-config.yml
-        job: generate-pipeline
+        job: Generating pipeline
     strategy: depend
