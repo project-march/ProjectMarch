@@ -163,50 +163,27 @@ flake8-container:build:
   artifacts:
     reports:
       codequality: codeclimate.json
-  only:
-    changes:
-      - ".flake8"
-      - "**/*.py"
 
-# The normal flake8 job runs on the image from main
 flake8:
   variables:
-    TAG: main
-  only:
-    refs:
-      - branches
-      - tags
-      - merge_requests
+    TAG: $CI_DEFAULT_BRANCH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - ".flake8"
+        - "**/*.py"
   extends:
     - .flake8-base
-
-# When the Dockerfile has changed, we need to run one of the following
-# jobs, depending on whether it is executed in a branch or in a MR
-# The job for branches
-flake8 with new Dockerfile:
-  variables:
-    TAG: $CI_COMMIT_BRANCH
-  extends:
-    - .flake8-base
-    - .branches
-  only:
-    changes:
-      - ".gitlab/images/Dockerfile_flake8"
-      - ".flake8"
-      - "**/*.py"
-
-# The job for merge_requests
-flake8 for MRs with new Dockerfile:
-  variables:
-    TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-  extends:
-    - .flake8-base
-    - .merge_requests
-  only:
-    changes:
-      - ".gitlab/images/Dockerfile_flake8"
-      - ".flake8"
-      - "**/*.py"
 
 #######################
 # clang-format linter #
