@@ -69,6 +69,9 @@ private:
     // camera topic as a .ply file to test with later
     bool saveCurrentPointcloud();
 
+    // Update the currently available file names
+    void updateFileNamesVector();
+
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
