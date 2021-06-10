@@ -125,8 +125,9 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     }
 
     int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
-    ROS_INFO_STREAM("Joint " << joint_name.c_str() <<
-        " will be actuated with slave index " << slaveIndex);
+    ROS_INFO_STREAM("Joint " << joint_name.c_str()
+                             << " will be actuated with slave index "
+                             << slaveIndex);
 
     const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
@@ -385,12 +386,12 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
     for (const YAML::Node& joint_config : joints_config) {
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
-        int slaveIndex
-            = getSlaveIndexFromJointConfig(joint_config[joint_name]);
+        int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
         if (urdf_joint->type == urdf::Joint::FIXED) {
-            ROS_INFO_STREAM("Joint " << joint_name << " with slaveIndex " <<
-                slaveIndex << " is fixed and will be removed from ethercat "
-                              "train config");
+            ROS_INFO_STREAM("Joint "
+                << joint_name << " with slaveIndex " << slaveIndex
+                << " is fixed and will be removed from ethercat "
+                   "train config");
             if (slaveIndex != -1) {
                 fixedSlaveIndices.insert(slaveIndex);
             }
