@@ -15,6 +15,7 @@ from march_utility.exceptions.gait_exceptions import (
 )
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.node_utils import get_robot_urdf
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
     get_joint_names_from_robot,
@@ -108,18 +109,18 @@ class GaitSelection(Node):
 
         if not self._validate_inverse_kinematics_is_possible():
             self.get_logger().warn(
-                f"The currently available joints are unsuitable for "
-                f"using inverse kinematics.\n"
-                f"Any interpolation on foot_location will return "
-                f"the base subgait instead. Realsense gaits will "
-                f"not be loaded."
+                "The currently available joints are unsuitable for "
+                "using inverse kinematics.\n"
+                "Any interpolation on foot_location will return "
+                "the base subgait instead. Realsense gaits will "
+                "not be loaded."
             )
         self.get_logger().info("Successfully initialized gait selection node.")
 
     def _validate_inverse_kinematics_is_possible(self):
         try:
             ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
-        except KeyError as e:
+        except KeyError:
             return False
         if ik_joint_names != get_joint_names_from_robot(self.robot):
             return False
