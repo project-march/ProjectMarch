@@ -3,7 +3,7 @@ project(march_gait_files)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY airgait-v minimal simulation_only-vi test_versions-vi training-v test_joint_gaits linear_testjoint_gaits rotational_testjoint_gaits
+install(DIRECTORY airgait-v minimal simulation_only-vi test_versions-vi training-v test_joint_gaits linear_testjoint_gaits rotational_testjoint_gaits endurance
     DESTINATION share/${PROJECT_NAME}
 )
 

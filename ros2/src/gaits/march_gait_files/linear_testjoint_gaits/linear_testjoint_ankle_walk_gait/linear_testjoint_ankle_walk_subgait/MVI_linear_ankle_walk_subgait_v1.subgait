@@ -2,24 +2,24 @@ description: MVI with no ADPF movements version 2
 duration: 1399999999
 gait_type: ''
 joints:
-  rotational_joint:
+  linear_joint:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.04360007
-    time_from_start: 0
+    time_from_start: 500000000
     velocity: 0.0
   - position: -0.13962634
-    time_from_start: 180000000
+    time_from_start: 680000000
     velocity: -0.34906585
   - position: 0.04363323
-    time_from_start: 550000000
+    time_from_start: 1050000000
     velocity: 0.0
   - position: 0.04360007
-    time_from_start: 1199999999
+    time_from_start: 1699999999
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1399999999
+    time_from_start: 1899999999
     velocity: 0.0
 name: linear_testjoint_ankle_walk_subgait
 version: MVI_linear_ankle_walk_subgait_v1

@@ -16,7 +16,7 @@ march:
         - linear_joint
 
       gains: # Required because we're controlling an effort interface
-        linear_joint: {p: 5, i: 0, d: 0, i_clamp: 10, publish_state: true, antiwindup: true}
+        linear_joint: {p: 120, i: 0, d: -5, i_clamp: 10, publish_state: true, antiwindup: true}
       # Note: these gains are tuned for the KFE joints in the exoskeleton
 
       constraints:

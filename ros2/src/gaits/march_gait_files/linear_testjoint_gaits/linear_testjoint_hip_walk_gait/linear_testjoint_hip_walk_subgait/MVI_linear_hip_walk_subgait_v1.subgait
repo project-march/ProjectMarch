@@ -2,7 +2,7 @@ description: MVI with no ADPF movements version 2
 duration: 1199999999
 gait_type: ''
 joints:
-  rotational_joint:
+  linear_joint:
       - position: 0.0
         time_from_start: 0
         velocity: 0.0

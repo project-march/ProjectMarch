@@ -3,14 +3,14 @@ description: Subgait generated using TestJointGaitGenerator, with a duration of 
 duration: 800000000
 gait_type: ''
 joints:
-  rotational_joint:
+  linear_joint:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 10.0
+  - position: 1.0
     time_from_start: 200000000
     velocity: 0.0
-  - position: -10.0
+  - position: -1.0
     time_from_start: 600000000
     velocity: 0.0
   - position: 0

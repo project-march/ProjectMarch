@@ -42,7 +42,7 @@
   {
     "name": "axis0.controller.config.vel_limit",
     "type": "float",
-    "value": 2.0
+    "value": 10.0
   },
   {
     "name": "axis0.motor.config.resistance_calib_max_voltage",
@@ -58,5 +58,10 @@
     "name": "axis0.motor.config.requested_current_range",
     "type": "float",
     "value": 10.0
+  },
+  {
+    "name": "odrv0.axis0.controller.config.enable_vel_limit",
+    "type": "bool",
+    "value": 0
   }
 ]
