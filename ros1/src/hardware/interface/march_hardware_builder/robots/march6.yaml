@@ -5,8 +5,8 @@
 # TODO: Update netNumbers if necessary
 march6:
   if_name: enp7s0
-  ecatCycleTime: 6
-  ecatSlaveTimeout: 100
+  ecatCycleTime: 4
+  ecatSlaveTimeout: 200
   joints:
     - left_ankle:
         allowActuation: true

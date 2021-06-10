@@ -1,0 +1,89 @@
+description: Slower version of MVI_walk_v4.
+duration: 3400000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.1047
+    time_from_start: 653800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1569400000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2353800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3400000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0611
+    time_from_start: 1605800000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 3400000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.1658
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.4712
+    time_from_start: 1360000000
+    velocity: 0.0534
+  - position: 0.4538
+    time_from_start: 1944200000
+    velocity: -0.2778
+  - position: 0.0
+    time_from_start: 3400000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 1088000000
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 1464200000
+    velocity: -0.3704
+  - position: 0.0
+    time_from_start: 3400000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3400000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0611
+    time_from_start: 784600000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 3400000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.3142
+    time_from_start: 0
+    velocity: -0.13
+  - position: 0.0
+    time_from_start: 3400000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3400000000
+    velocity: 0.0
+name: left_close
+version: MVI_walk_leftclose_v5

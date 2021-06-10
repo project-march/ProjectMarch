@@ -223,7 +223,7 @@ bool EthercatMaster::sendReceivePdo()
 {
     if (this->latest_lost_slave_ == -1) {
         ec_send_processdata();
-        const int wkc = ec_receive_processdata(EC_TIMEOUTRET);
+        const int wkc = ec_receive_processdata(EC_TIMEOUTRET3);
         if (wkc < this->expected_working_counter_) {
             ROS_WARN_THROTTLE(1,
                 "Working counter: %d  is lower than expected: %d", wkc,
