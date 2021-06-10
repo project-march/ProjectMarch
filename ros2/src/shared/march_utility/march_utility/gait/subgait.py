@@ -32,7 +32,7 @@ SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
-class Subgait(object):
+class Subgait:
     """Base class for usage of the defined subgaits."""
 
     joint_class = JointTrajectory

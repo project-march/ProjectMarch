@@ -16,7 +16,7 @@ from .subgait_graph import SubgaitGraph
 ALLOWED_ERROR_ENDPOINTS = 0.001
 
 
-class Gait(object):
+class Gait:
     """Base class for a generated gait."""
 
     def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):

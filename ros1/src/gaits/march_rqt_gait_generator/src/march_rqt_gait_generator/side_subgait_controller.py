@@ -1,7 +1,7 @@
 from numpy_ringbuffer import RingBuffer
 
 
-class SideSubgaitController(object):
+class SideSubgaitController:
     def __init__(
         self,
         default,
