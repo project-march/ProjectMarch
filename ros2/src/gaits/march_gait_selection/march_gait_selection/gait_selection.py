@@ -1,5 +1,4 @@
 import os
-from typing import Tuple
 
 import yaml
 from ament_index_python.packages import get_package_share_directory
@@ -16,12 +15,10 @@ from march_utility.utilities.duration import Duration
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
-from march_utility.utilities.dimensions import InterpolationDimensions
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_utility.utilities.node_utils import get_robot_urdf
 from march_gait_selection.dynamic_gaits.realsense_gait import RealSenseGait
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 
@@ -175,7 +172,7 @@ class GaitSelection(Node):
 
     @property
     def robot(self):
-        """ Return the robot obtained from the robot state publisher."""
+        """Return the robot obtained from the robot state publisher."""
         return self._robot
 
     @property

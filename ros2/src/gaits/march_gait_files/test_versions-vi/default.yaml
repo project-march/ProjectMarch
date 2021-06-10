@@ -28,14 +28,22 @@ gaits:
     right_open: MVI_RD_slopeup_rightopen_steep_v1
     right_swing: MVI_RD_slopeup_rightswing_steep_v1
   realsense_sit:
-    sit_down: MVI_sit_down_low_v1
-    sit_home: MVI_sit_home_low_v1
+    sit_down: MVI_sit_down_high_v1
+    sit_home: MVI_sit_home_high_v1
+  sit:
+    sit_down: MVI_sit_down_v2
+    sit_home: MVI_sit_home_v2
+    prepare_sit_down: MVI_prepare_sit_down_v2
+  stand:
+    prepare_stand_up: MVI_prepare_stand_up_v2
+    stand_up: MVI_stand_up_v2
+    stand_home: MVI_stand_home_v2
   realsense_stairs_up_single_step:
     left_close: MVI_stairsup_leftclose_low_undeep
     right_open: MVI_stairsup_rightopen_low_undeep
   realsense_stand:
-    prepare_stand_up: MVI_prepare_stand_up_low_v1
-    stand_up: MVI_stand_up_low_v1
+    prepare_stand_up: MVI_prepare_stand_up_high_v1
+    stand_up: MVI_stand_up_high_v1
   rough_terrain_first_middle_step:
     left_close: MV_RT_first_middlestep_leftclose_v2
     right_open: MV_RT_first_middlestep_rightopen_v2
@@ -63,11 +71,11 @@ gaits:
     left_close: MIV_final
     right_open: MIV_final
   stairs_down:
-    left_close: MVI_stairsdown_leftclose_low_undeep_v1
-    left_swing: MVI_stairsdown_leftswing_low_undeep_v1
-    right_close: MVI_stairsdown_rightclose_low_undeep_v1
-    right_open: MVI_stairsdown_rightopen_low_undeep_v1
-    right_swing: MVI_stairsdown_rightswing_low_undeep_v1
+    left_close: MVI_stairsdown_leftclose_cybathlon_v2
+    left_swing: MVI_stairsdown_leftswing_cybathlon_v2
+    right_close: MVI_stairsdown_rightclose_cybathlon_v2
+    right_open: MVI_stairsdown_rightopen_cybathlon_v2
+    right_swing: MVI_stairsdown_rightswing_cybathlon_v2
   stairs_down_backwards:
     left_close: MVI_stairsdownbackwards_leftclose_low_undeep_v1
     left_swing: MVI_stairsdownbackwards_leftswing_low_undeep_v1
@@ -75,11 +83,11 @@ gaits:
     right_open: MVI_stairsdownbackwards_rightopen_low_undeep_v1
     right_swing: MVI_stairsdownbackwards_rightswing_low_undeep_v1
   stairs_up:
-    left_close: MVI_stairsup_leftclose_cybathlon_v3
-    left_swing: MVI_stairsup_leftswing_cybathlon_v3
-    right_close: MVI_stairsup_rightclose_cybathlon_v3
-    right_open: MVI_stairsup_rightopen_cybathlon_v3
-    right_swing: MVI_stairsup_rightswing_cybathlon_v3
+    left_close: MVI_stairsup_leftclose_cybathlon_v4
+    left_swing: MVI_stairsup_leftswing_cybathlon_v4
+    right_close: MVI_stairsup_rightclose_cybathlon_v4
+    right_open: MVI_stairsup_rightopen_cybathlon_v4
+    right_swing: MVI_stairsup_rightswing_cybathlon_v4
   tilted_path_first_end:
     left_open: MV_TPend1_leftopen_v1
     right_close: MV_TPend1_rightclose_v1
@@ -299,17 +307,28 @@ positions:
       right_hip_aa: 0.1222
       right_hip_fe: -0.0873
       right_knee: 0.0
-  sit:
-    gait_type: walk_like
+  sit_without_haa:
+    gait_type: sit_like
     joints:
       left_ankle: 0.0
       left_hip_aa: 0.0349
-      left_hip_fe: 1.5708
-      left_knee: 1.7453
+      left_hip_fe: 1.4835
+      left_knee: 1.4835
       right_ankle: 0.0
       right_hip_aa: 0.0349
-      right_hip_fe: 1.5708
-      right_knee: 1.7453
+      right_hip_fe: 1.4835
+      right_knee: 1.4835
+  sit_with_haa:
+    gait_type: sit_like
+    joints:
+      left_ankle: 0.0
+      left_hip_aa: 0.0
+      left_hip_fe: 1.4835
+      left_knee: 1.4835
+      right_ankle: 0.0
+      right_hip_aa: 0.0
+      right_hip_fe: 1.4835
+      right_knee: 1.4835
   stand:
     gait_type: walk_like
     joints:

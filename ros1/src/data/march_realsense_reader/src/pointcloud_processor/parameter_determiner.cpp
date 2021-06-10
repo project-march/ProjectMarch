@@ -403,7 +403,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     if (debugging_) {
         geometry_msgs::Point marker_point;
         marker_point.x = optimal_foot_location.x;
-        marker_point.y = optimal_foot_location.x;
+        marker_point.y = optimal_foot_location.y;
         marker_point.z = optimal_foot_location.z;
         std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
 
@@ -561,7 +561,7 @@ bool HullParameterDeterminer::isValidLocation(
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
                     marker_color = color_utilities::PURPLE;
                 } else {
-                    marker_color = color_utilities::RED;
+                    marker_color = color_utilities::GREEN;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
@@ -600,7 +600,7 @@ bool HullParameterDeterminer::isValidLocation(
                 } else if (!(distance < max_distance_to_line)) {
                     marker_color = color_utilities::PURPLE;
                 } else {
-                    marker_color = color_utilities::RED;
+                    marker_color = color_utilities::GREEN;
                 }
                 possible_foot_locations_marker_list.points.push_back(
                     marker_point);
