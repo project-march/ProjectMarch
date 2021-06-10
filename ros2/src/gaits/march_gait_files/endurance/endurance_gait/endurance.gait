@@ -1,6 +1,0 @@
-name: endurance
-subgaits:
-  endurance_rotational:
-    to: end
-  start:
-    to: endurance_rotational

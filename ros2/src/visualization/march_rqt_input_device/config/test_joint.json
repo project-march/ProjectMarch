@@ -24,6 +24,9 @@
    ],
    [
       {
+         "name": "endurance_gait"
+      },
+      {
          "name": "rotational_sine_gait_1"
       },
       {

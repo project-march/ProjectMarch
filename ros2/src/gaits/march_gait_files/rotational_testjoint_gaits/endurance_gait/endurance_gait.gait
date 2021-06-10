@@ -1,0 +1,6 @@
+name: endurance_gait
+subgaits:
+  endurance_subgait:
+    to: end
+  start:
+    to: endurance_subgait

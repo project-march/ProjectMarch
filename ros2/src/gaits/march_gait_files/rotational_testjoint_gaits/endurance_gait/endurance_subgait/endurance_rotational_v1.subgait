@@ -7002,5 +7002,5 @@ joints:
   - position: 0.0
     time_from_start: 3621400000000
     velocity: 0.0
-name: endurance_rotational
+name: endurance_subgait
 version: endurance_rotational_v1
