@@ -109,7 +109,7 @@ march6:
           type: odrive
           actuationMode: torque
           slaveIndex: 1
-          axis: 1
+          axis: 0
           preCalibrated: true
           motorKV: 355
           absoluteEncoder:
@@ -128,7 +128,7 @@ march6:
           type: odrive
           actuationMode: torque
           slaveIndex: 1
-          axis: 0
+          axis: 1
           preCalibrated: true
           motorKV: 95
           absoluteEncoder:
