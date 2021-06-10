@@ -198,39 +198,32 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     // Determine parameters
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
-<<<<<<< HEAD
             hull_vector, polygon_vector, realsense_category, gait_parameters,
             frame_id_to_transform_to_);
-<<<<<<< HEAD
-
-=======
     // The debug output of the parameter determiner is made so that it can be
     // visualized even if the parameter determiner was not successful
->>>>>>> c8df6bf25... Format cpp code
     if (debugging_) {
         ROS_DEBUG(
-            "Done determining parameters, now publishing a marker array to "
-            "/camera/foot_locations_marker_array. The color coding of the "
-            "marker array is \n"
-            "Blue: a foot location to try \n"
-            "Yellow: a potential foot location which is outside the reachable "
-            "area \n"
-            "Purple: a potential foot locations which is invalid for a gait "
-            "specific reason "
-            "(i.e. lacking foot support or too far removed from the reachable "
-            "positions \n"
-            "Red: Gait information such as end points of gaits \n"
-            "Green: A valid foot location \n"
-            "White: The optimal foot location");
+                "Done determining parameters, now publishing a marker array to "
+                "/camera/foot_locations_marker_array. The color coding of the "
+                "marker array is \n"
+                "Blue: a foot location to try \n"
+                "Yellow: a potential foot location which is outside the reachable "
+                "area \n"
+                "Purple: a potential foot locations which is invalid for a gait "
+                "specific reason "
+                "(i.e. lacking foot support or too far removed from the reachable "
+                "positions \n"
+                "Red: Gait information such as end points of gaits \n"
+                "Green: A valid foot location \n"
+                "White: The optimal foot location");
         hull_parameter_determiner_publisher_.publish(
-            parameter_determiner_->debug_marker_array);
-=======
-            hull_vector, polygon_vector, realsense_category, gait_parameters);
-    if (debugging_ && publish_hull_area_debug_) {
-        ROS_DEBUG("Publishing hull area information to "
-                  "/camera/hull_area_cloud");
-        publishHullAreaCloud();
->>>>>>> d59041c78... Finish debug method
+                parameter_determiner_->debug_marker_array);
+        if (publish_hull_area_debug_) {
+            ROS_DEBUG("Publishing hull area information to "
+                      "/camera/hull_area_cloud");
+            publishHullAreaCloud();
+        }
     }
     if (not parameter_determining_was_successful) {
         res.error_message
@@ -239,14 +232,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         res.success = false;
         return;
     }
-<<<<<<< HEAD
-=======
-    if (debugging_) {
-        ROS_DEBUG("Done determining parameters, now publishing a marker to "
-                  "/camera/foot_locations_marker_array");
-        publishParameterDeterminerMarkerArray();
-    }
->>>>>>> f64fa6150... Start adding test functionality
 
     res.gait_parameters = *gait_parameters;
 
