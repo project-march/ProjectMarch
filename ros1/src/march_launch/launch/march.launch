@@ -75,7 +75,7 @@
             <arg name="controller_name" value="$(arg controller_name)"/>
             <arg name="if_name" value="$(arg if_name)"/>
             <arg name="remove_fixed_joints_from_ethercat_train"
-                 value="$(arg remove_fixed_joints_from_ethercat_train"/>
+                 value="$(arg remove_fixed_joints_from_ethercat_train)"/>
         </include>
     </group>
 

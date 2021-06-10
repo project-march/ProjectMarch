@@ -14,7 +14,7 @@
           type="upload_controller_values.py"/>
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
     <param name="remove_fixed_joints_from_ethercat_train"
-           value="$(arg remove_fixed_joints_from_ethercat_train"/>
+           value="$(arg remove_fixed_joints_from_ethercat_train)"/>
 
     <group ns="march">
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
