@@ -34,6 +34,10 @@ def main():
             actuating_joint_names.append(joint.name)
         else:
             fixed_joint_names.append(joint.name)
+
+    if len(actuating_joint_names) == 0:
+        rospy.logerr("No actuating joints were specified.")
+
     rospy.set_param("/march/joint_names", actuating_joint_names)
     rospy.set_param("/march/controller/trajectory/joints", actuating_joint_names)
 
