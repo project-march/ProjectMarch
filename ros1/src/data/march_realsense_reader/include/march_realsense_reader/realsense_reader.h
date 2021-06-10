@@ -82,6 +82,8 @@ public:
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
 
+    // Give an idea of the area of the hulls by cropping a large input grid to
+    // the hull vector
     void publishHullAreaCloud();
 
 private:

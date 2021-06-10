@@ -268,15 +268,21 @@ void RealSenseReader::publishCloud(
     publisher.publish(msg);
 }
 
+// Give an idea of the area of the hulls by cropping a large input grid to the
+// hull vector
 void RealSenseReader::publishHullAreaCloud()
 {
+    // Create the input cloud to be a grid on the ground
     PointCloud2D::Ptr ground_cloud = boost::make_shared<PointCloud2D>();
+    // The grid size
     float x_grid_size = 0.05;
     float y_grid_size = 0.05;
+    // The area lengths the grid should span
     float min_x = -3;
     float max_x = 0;
     float min_y = -1.5;
     float max_y = 1.5;
+    // The number of points in each direction of the grid
     int x_points = (max_x - min_x) / x_grid_size + 1;
     int y_points = (max_y - min_y) / y_grid_size + 1;
     for (int i = 0; i < x_points; ++i) {
@@ -287,6 +293,7 @@ void RealSenseReader::publishHullAreaCloud()
             ground_cloud->push_back(point);
         }
     }
+    // Crop the input (ground) cloud to the hull vector and publish the results
     PointNormalCloud::Ptr cropped_cloud
         = boost::make_shared<PointNormalCloud>();
     parameter_determiner_->cropCloudToHullVector(ground_cloud, cropped_cloud);
