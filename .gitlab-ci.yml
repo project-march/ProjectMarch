@@ -165,25 +165,32 @@ flake8-container:build:
       codequality: codeclimate.json
 
 flake8:
-  variables:
-    TAG: $CI_DEFAULT_BRANCH
   rules:
+    # If commit in MR and Dockerfile has changed, use different
+    # flake8 image that was build in previous stages
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - ".gitlab/images/Dockerfile_flake8"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    # To prevent running duplicate pipelines for branches and MRs
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
+    # If commit in branch and Dockerfile has changed, use different
+    # flake8 image that was build in previous stages
     - if: '$CI_COMMIT_BRANCH'
       changes:
         - ".gitlab/images/Dockerfile_flake8"
       variables:
         TAG: $CI_COMMIT_BRANCH
+    # If it is a commit to a MR or a branch, and a flake8 related or Python file
+    # has changed, run the flake8 with the image from main.
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
       changes:
         - ".flake8"
         - "**/*.py"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
   extends:
     - .flake8-base
 
