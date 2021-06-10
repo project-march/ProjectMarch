@@ -354,9 +354,6 @@ class GaitStateMachine:
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
-        # self._gait_selection.get_logger().info(
-        #     f"process gait state, current is {self._current_gait}"
-        # )
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
             self._current_gait = self._gait_selection._gaits[self._current_state]
