@@ -45,7 +45,7 @@
     <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
     <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
             EMS switch laptop on standard router"/>
-    <arg name="use_sim_time" default="false" doc="whether to use sim time"/>
+    <arg name="use_sim_time" default="$(eval configuration == 'simulation')" doc="whether to use sim time"/>
     <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
 <!-- ROS1 Gait selection        -->
