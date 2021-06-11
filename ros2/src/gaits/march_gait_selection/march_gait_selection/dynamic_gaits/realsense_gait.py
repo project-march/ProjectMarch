@@ -193,12 +193,10 @@ class RealSenseGait(SetpointsGait):
             )
         return cls.CAMERA_NAME_MAP[camera_name]
 
-    DEFAULT_DELAY = Duration(0)
-
     def start(
         self,
         current_time: Time,
-        first_subgait_delay: Optional[Duration] = DEFAULT_DELAY,
+        first_subgait_delay: Optional[Duration] = Duration(0)
     ) -> GaitUpdate:
         """
         This function is called to start the realsense gait, it does the following.

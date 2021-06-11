@@ -12,8 +12,6 @@ from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
 from .trajectory_scheduler import TrajectoryCommand
 
-ZERO_DURATION = Duration(0)
-
 
 class SetpointsGait(GaitInterface, Gait):
     """The standard gait built up from setpoints"""
@@ -96,7 +94,7 @@ class SetpointsGait(GaitInterface, Gait):
     def start(
         self,
         current_time: Time,
-        first_subgait_delay: Optional[Duration] = ZERO_DURATION,
+        first_subgait_delay: Optional[Duration] = Duration(0)
     ) -> GaitUpdate:
         """Start the gait.
         Sets current subgait to the first subgait, resets the
@@ -125,7 +123,7 @@ class SetpointsGait(GaitInterface, Gait):
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Optional[Duration] = ZERO_DURATION,
+        early_schedule_duration: Optional[Duration] = Duration(0)
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
         - If the start was delayed and we have passed the start time,
@@ -353,7 +351,7 @@ class SetpointsGait(GaitInterface, Gait):
     def _update_time_stamps(
         self,
         next_subgait: Subgait,
-        first_subgait_delay: Optional[Duration] = ZERO_DURATION,
+        first_subgait_delay: Optional[Duration] = Duration(0),
     ):
         """Update the starting and end time.
 
