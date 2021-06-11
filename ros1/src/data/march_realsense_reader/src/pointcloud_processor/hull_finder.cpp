@@ -29,12 +29,14 @@ HullFinder::HullFinder(bool debugging)
 // Construct a basic CHullFinder class
 CHullFinder::CHullFinder(bool debugging)
     : HullFinder(debugging)
+    , output_plane_information(false)
 {
 }
 
 bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
     Normals::Ptr pointcloud_normals,
-    boost::shared_ptr<RegionVector> region_vector,
+    boost::shared_ptr<PointsVector> points_vector,
+    boost::shared_ptr<NormalsVector> normals_vector,
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
     boost::shared_ptr<HullVector> hull_vector,
     boost::shared_ptr<PolygonVector> polygon_vector)
@@ -43,7 +45,8 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
-    region_vector_ = region_vector;
+    points_vector_ = points_vector;
+    normals_vector_ = normals_vector;
     plane_coefficients_vector_ = plane_coefficients_vector;
     hull_vector_ = hull_vector;
     polygon_vector_ = polygon_vector;
@@ -52,13 +55,12 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     bool success = true;
 
-    for (region_index_ = 0; region_index_ < region_vector_->size();
+    for (region_index_ = 0; region_index_ < points_vector_->size();
          region_index_++) {
-        region_ = region_vector_->at(region_index_);
-
         success &= getCHullFromRegion();
     }
 
+    ROS_DEBUG_STREAM("The number of hulls found is: " << hull_vector_->size());
     if (hull_vector_->size() != plane_coefficients_vector_->size()
         || hull_vector_->size() != polygon_vector_->size()) {
         ROS_WARN_STREAM("The hull vector does not have the same size as either "
@@ -86,6 +88,7 @@ void CHullFinder::readParameters(
     convex = config.hull_finder_convex;
     alpha = config.hull_finder_alpha;
     hull_dimension = config.hull_dimension;
+    output_plane_information = config.hull_finder_output_plane_information;
 
     debugging_ = config.debug;
 }
@@ -124,16 +127,12 @@ bool CHullFinder::getCHullFromRegion()
 // Get the points and normals of the region and initialize region variables
 bool CHullFinder::initializeRegionVariables()
 {
-    region_points_ = boost::make_shared<PointCloud>();
-    region_normals_ = boost::make_shared<Normals>();
+    region_points_ = points_vector_->at(region_index_);
+    region_normals_ = normals_vector_->at(region_index_);
     region_points_projected_ = boost::make_shared<PointCloud>();
     plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
     hull_ = boost::make_shared<Hull>();
     polygon_.clear();
-
-    pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
-    pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
-
     return true;
 }
 
@@ -159,7 +158,7 @@ bool CHullFinder::getPlaneCoefficientsRegion()
         -linear_algebra_utilities::dotProductVector<double>(
             average_point, average_normal));
 
-    if (success) {
+    if (success && debugging_ && output_plane_information) {
         ROS_DEBUG_STREAM("Region "
             << region_index_ << " has plane coefficients: "
             << output_utilities::vectorToString(plane_coefficients_->values));
