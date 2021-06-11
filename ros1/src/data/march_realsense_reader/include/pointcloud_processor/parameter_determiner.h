@@ -8,6 +8,8 @@
 #include <ros/package.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
+#include <tf2_ros/transform_listener.h>
+//#include <pcl_ros/transforms.h>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -109,21 +111,21 @@ protected:
     // Create a point cloud with points on the ground where the points represent
     // where it should be checked if there is a valid foot location
     bool getOptionalFootLocations(
-        const PointCloud2D::Ptr& foot_locations_to_try);
+        const PointCloud::Ptr& foot_locations_to_try);
 
     // Crops a single point to a hull vector.
-    bool cropPointToHullVector(pcl::PointXY const input_point,
+    bool cropPointToHullVector(pcl::PointXYZ const input_point,
         const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a cloud to a hull vector, but only puts each input point in
     // the highest hull it falls into
-    bool cropCloudToHullVectorUnique(PointCloud2D::Ptr const& input_cloud,
+    bool cropCloudToHullVectorUnique(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
     // Elevate the 2D points so they have z coordinate as if they lie on the
     // plane of the hull
     bool addZCoordinateToCloudFromPlaneCoefficients(
-        const PointCloud2D::Ptr& input_cloud,
+        const PointCloud::Ptr& input_cloud,
         const PlaneCoefficients::Ptr& plane_coefficients,
         const PointCloud::Ptr& elevated_cloud);
 
@@ -148,7 +150,7 @@ protected:
 
     // Fill a point cloud with vertices of the foot on the ground around a
     // possible foot location
-    void fillFootPointCloud(const PointCloud2D::Ptr& foot_pointcloud,
+    void fillFootPointCloud(const PointCloud::Ptr& foot_pointcloud,
         pcl::PointNormal possible_foot_location);
 
     // Verify that a possible foot location is valid for the requested gait
@@ -216,6 +218,10 @@ protected:
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
+
+    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener;
+
     visualization_msgs::Marker foot_locations_to_try_marker_list;
     visualization_msgs::Marker possible_foot_locations_marker_list;
     visualization_msgs::Marker gait_information_marker_list;
@@ -228,7 +234,7 @@ protected:
 
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
-    PointCloud2D::Ptr foot_locations_to_try;
+    PointCloud::Ptr foot_locations_to_try;
 };
 
 /** The simple parameter determiner

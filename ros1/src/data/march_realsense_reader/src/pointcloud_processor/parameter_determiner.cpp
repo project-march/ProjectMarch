@@ -13,6 +13,9 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <utility>
+#include <pcl_ros/transforms.h>
+//#include <pcl_ros/impl/transfoms.hpp>
+
 
 #define EPSILON 0.0001
 #define DEBUG_MARKER_SIZE 0.03
@@ -41,6 +44,8 @@ ParameterDeterminer::ParameterDeterminer(bool debugging)
 HullParameterDeterminer::HullParameterDeterminer(bool debugging)
     : ParameterDeterminer(debugging)
 {
+    tfBuffer = std::make_unique<tf2_ros::Buffer>();
+    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
 void HullParameterDeterminer::readParameters(
@@ -185,7 +190,8 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 {
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
-    marker_list.header.frame_id = frame_id_to_transform_to_;
+//    marker_list.header.frame_id = frame_id_to_transform_to_;
+    marker_list.header.frame_id = "world";
     // Places the marker up right (axis aligned with that of its frame id)
     marker_list.pose.orientation.w = 1.0;
     marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
@@ -356,7 +362,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 {
     bool success = true;
     // Get some locations on the ground we might want to place our foot
-    foot_locations_to_try = boost::make_shared<PointCloud2D>();
+    foot_locations_to_try = boost::make_shared<PointCloud>();
     success &= getOptionalFootLocations(foot_locations_to_try);
 
     // Crop those locations to only be left with locations where it is possible
@@ -598,7 +604,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     bool success = true;
     // First create a pointcloud containing the edge points (vertices) of the
     // foot on the ground
-    PointCloud2D::Ptr foot_pointcloud = boost::make_shared<PointCloud2D>();
+    PointCloud::Ptr foot_pointcloud = boost::make_shared<PointCloud>();
     fillFootPointCloud(foot_pointcloud, possible_foot_location);
 
     // Then find possible foot locations associated with the foot vertices
@@ -624,7 +630,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
 // Fill a point cloud with vertices of the foot on the ground around a possible
 // foot location
 void HullParameterDeterminer::fillFootPointCloud(
-    const PointCloud2D::Ptr& foot_pointcloud,
+    const PointCloud::Ptr& foot_pointcloud,
     pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(/*__new_size=*/4);
@@ -680,7 +686,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 // Create a point cloud with points on the ground where the points represent
 // where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(
-    const PointCloud2D::Ptr& foot_locations_to_try)
+    const PointCloud::Ptr& foot_locations_to_try)
 {
     bool success = true;
     foot_locations_to_try->points.resize(number_of_optional_foot_locations);
@@ -719,16 +725,42 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         return false;
     }
     for (int i = 0; i < number_of_optional_foot_locations; i++) {
-        float x_location = start
-            + (end - start) * (float)i
-                / ((float)number_of_optional_foot_locations - 1.0F);
-        foot_locations_to_try->points[i].x = x_location;
-        foot_locations_to_try->points[i].y = y_location;
+      float x_location = start
+                         + (end - start) * (float) i
+                           / ((float) number_of_optional_foot_locations - 1.0F);
+      foot_locations_to_try->points[i].x = x_location;
+      foot_locations_to_try->points[i].y = y_location;
+    }
 
-        if (debugging_) {
+    std::string pointcloud_frame_id = foot_locations_to_try->header.frame_id.c_str();
+    std::string error_msg;
+    if (tfBuffer->canTransform("world",
+                               frame_id_to_transform_to_, ros::Time(/*t=*/0), &error_msg)) {
+        geometry_msgs::TransformStamped transform_stamped_world;
+        geometry_msgs::TransformStamped transform_stamped;
+
+        transform_stamped_world
+                = tfBuffer->lookupTransform("world",
+                                            frame_id_to_transform_to_, ros::Time(/*t=*/0));
+
+        transform_stamped.transform.rotation.x = transform_stamped_world.transform.rotation.x;
+        transform_stamped.transform.rotation.y = transform_stamped_world.transform.rotation.y;
+        transform_stamped.transform.rotation.z = transform_stamped_world.transform.rotation.z;
+        transform_stamped.transform.translation = transform_stamped_world.transform.translation;
+
+        pcl_ros::transformPointCloud(
+                *foot_locations_to_try, *foot_locations_to_try, transform_stamped.transform);
+        ROS_DEBUG("Transformed");
+    } else {
+      ROS_INFO_STREAM(error_msg);
+    }
+
+    if (debugging_) {
+        for (int i = 0; i < number_of_optional_foot_locations; i++) {
+
             geometry_msgs::Point marker_point;
-            marker_point.x = x_location;
-            marker_point.y = y_location;
+            marker_point.x = foot_locations_to_try->points[i].x;
+            marker_point.y =  foot_locations_to_try->points[i].y;
             marker_point.z = 0;
 
             std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
@@ -747,7 +779,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
  * the input_cloud has been moved to the output cloud,
  * result is set to true, it is set to false otherwise **/
 bool HullParameterDeterminer::cropCloudToHullVector(
-    PointCloud2D::Ptr const& input_cloud,
+    PointCloud::Ptr const& input_cloud,
     const PointNormalCloud::Ptr& output_cloud)
 {
     if (input_cloud->points.size() == 0) {
@@ -784,9 +816,9 @@ bool HullParameterDeterminer::cropCloudToHullVector(
 
 // Crops a single point to a hull vector.
 bool HullParameterDeterminer::cropPointToHullVector(
-    pcl::PointXY const input_point, const PointNormalCloud::Ptr& output_cloud)
+    pcl::PointXYZ const input_point, const PointNormalCloud::Ptr& output_cloud)
 {
-    PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
+    PointCloud::Ptr input_cloud = boost::make_shared<PointCloud>();
     input_cloud->push_back(input_point);
 
     bool success = cropCloudToHullVector(input_cloud, output_cloud);
@@ -796,12 +828,12 @@ bool HullParameterDeterminer::cropPointToHullVector(
 // Crops a cloud to a hull vector, but only puts each input point in
 // the highest hull it falls into
 bool HullParameterDeterminer::cropCloudToHullVectorUnique(
-    PointCloud2D::Ptr const& input_cloud,
+    PointCloud::Ptr const& input_cloud,
     const PointNormalCloud::Ptr& output_cloud)
 {
     bool success = true;
 
-    for (pcl::PointXY ground_point : *input_cloud) {
+    for (pcl::PointXYZ ground_point : *input_cloud) {
         PointNormalCloud::Ptr potential_foot_locations_of_point
             = boost::make_shared<PointNormalCloud>();
         success &= HullParameterDeterminer::cropPointToHullVector(
@@ -821,7 +853,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
 // of the hull
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
-    PointCloud2D::Ptr const& input_cloud,
+    PointCloud::Ptr const& input_cloud,
     PlaneCoefficients::Ptr const& plane_coefficients,
     const PointCloud::Ptr& elevated_cloud)
 {
@@ -831,7 +863,7 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
     for (pcl::PointXYZ& elevated_point : *elevated_cloud) {
         // using z = - (d + by + ax) / c from plane equation ax + by + cz + d =
         // 0
-        pcl::PointXY input_point = input_cloud->points[point_index];
+        pcl::PointXYZ input_point = input_cloud->points[point_index];
         elevated_point.x = input_point.x;
         elevated_point.y = input_point.y;
         elevated_point.z = -(plane_coefficients->values[3]
