@@ -120,33 +120,34 @@ container:tag for MRs:
     - mkdir -p /kaniko/.docker
     # Equivalent to `docker login` but without installing docker"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-  only:
-    refs:
-      - branches
 
 # Build the container iff the Dockerfile has been changed. This only runs for
 # branches because this is a very long job. Running it for merge requests would
 # mean that this job is scheduled every time that a commit is pushed in a merge requests,
 # which is unnessecary if the Dockerfile is only changed once in the merge request.
-container:build:
+ROS container build:
   script:
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
     - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
-  only:
-    changes:
-      - "Dockerfile"
+  rules:
+    # If commit in branch and Dockerfile has changed, build a new container
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - "Dockerfile"
   extends:
     - .container_builder
 
-flake8-container:build:
-    script:
-      - /kaniko/executor --cache=false --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE/flake8:$CI_COMMIT_BRANCH --cleanup
-    only:
+flake8 container build:
+  script:
+    - /kaniko/executor --cache=false --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE/flake8:$CI_COMMIT_BRANCH --cleanup
+  rules:
+    # If commit in branch and Dockerfile has changed, build a new flake8 container
+    - if: '$CI_COMMIT_BRANCH'
       changes:
         - ".gitlab/images/Dockerfile_flake8"
-    extends:
-      - .container_builder
+  extends:
+    - .container_builder
 
 #################
 # flake8 linter #
