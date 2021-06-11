@@ -158,9 +158,9 @@ flake8 container build:
   stage: Lint code
   image: registry.gitlab.com/project-march/march/flake8:$TAG
   script:
-    - rm -f codeclimate.json
-    - python3 -m flake8 --format=codeclimate --config .flake8 --output-file codeclimate.json
-    - cat codeclimate.json
+    - python3 -m flake8 --format=codeclimate --config .flake8 --output-file codeclimate_raw.json
+    - cat codeclimate_raw.json | sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' > codeclimate.json
+    - rm -f codeclimate_raw.json
   artifacts:
     reports:
       codequality: codeclimate.json
