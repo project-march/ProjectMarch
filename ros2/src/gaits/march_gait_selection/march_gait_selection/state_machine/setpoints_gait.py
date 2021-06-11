@@ -91,10 +91,12 @@ class SetpointsGait(GaitInterface, Gait):
         self._scheduled_early = False
         self._next_subgait = None
 
+    DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
+
     def start(
         self,
         current_time: Time,
-        first_subgait_delay: Optional[Duration] = Duration(0)
+        first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> GaitUpdate:
         """Start the gait.
         Sets current subgait to the first subgait, resets the
@@ -120,10 +122,14 @@ class SetpointsGait(GaitInterface, Gait):
             self._update_time_stamps(self._current_subgait)
             return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
+    DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
+
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Optional[Duration] = Duration(0)
+        early_schedule_duration: Optional[
+            Duration
+        ] = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
         - If the start was delayed and we have passed the start time,
@@ -348,10 +354,14 @@ class SetpointsGait(GaitInterface, Gait):
         """
         return TrajectoryCommand.from_subgait(self._current_subgait, self._start_time)
 
+    DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY = Duration(0)
+
     def _update_time_stamps(
         self,
         next_subgait: Subgait,
-        first_subgait_delay: Optional[Duration] = Duration(0),
+        first_subgait_delay: Optional[
+            Duration
+        ] = DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY,
     ):
         """Update the starting and end time.
 

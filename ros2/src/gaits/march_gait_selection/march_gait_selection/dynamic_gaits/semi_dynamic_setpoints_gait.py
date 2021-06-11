@@ -8,6 +8,7 @@ from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
 SHOULD_NOT_FREEZE_FIRST_SECS = Duration(seconds=0.3)
+DEFAULT_SEDY_FREEZE_DURATION = Duration(seconds=3)
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
@@ -42,7 +43,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
     def elapsed_time(self) -> Duration:
         return Duration.from_ros_duration(self._current_time - self._start_time)
 
-    def freeze(self, duration: Duration = Duration(seconds=3)):
+    def freeze(self, duration: Duration = DEFAULT_SEDY_FREEZE_DURATION):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
