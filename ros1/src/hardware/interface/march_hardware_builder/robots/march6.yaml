@@ -8,43 +8,43 @@ march6:
   ecatCycleTime: 4
   ecatSlaveTimeout: 200
   joints:
-    - left_ankle:
-        allowActuation: true
-        motor_controller:
-          type: odrive
-          actuationMode: torque
-          slaveIndex: 4
-          axis: 0
-          preCalibrated: true
-          motorKV: 355
-          absoluteEncoder:
-            resolution: 14
-            direction: 1
-            minPositionIU: 9023
-            maxPositionIU: 10842
-          incrementalEncoder:
-            resolution: 13
-            transmission: 236
-            direction: -1
-
-    - left_hip_aa:
-        allowActuation: true
-        motor_controller:
-          type: odrive
-          actuationMode: torque
-          slaveIndex: 3
-          axis: 1
-          preCalibrated: true
-          motorKV: 355
-          absoluteEncoder:
-            resolution: 14
-            direction: -1
-            minPositionIU: 4782
-            maxPositionIU: 5665
-          incrementalEncoder:
-            resolution: 13
-            transmission: 240
-            direction: 1
+#    - left_ankle:
+#        allowActuation: true
+#        motor_controller:
+#          type: odrive
+#          actuationMode: torque
+#          slaveIndex: 4
+#          axis: 0
+#          preCalibrated: true
+#          motorKV: 355
+#          absoluteEncoder:
+#            resolution: 14
+#            direction: 1
+#            minPositionIU: 9023
+#            maxPositionIU: 10842
+#          incrementalEncoder:
+#            resolution: 13
+#            transmission: 236
+#            direction: -1
+#
+#    - left_hip_aa:
+#        allowActuation: true
+#        motor_controller:
+#          type: odrive
+#          actuationMode: torque
+#          slaveIndex: 3
+#          axis: 1
+#          preCalibrated: true
+#          motorKV: 355
+#          absoluteEncoder:
+#            resolution: 14
+#            direction: -1
+#            minPositionIU: 4782
+#            maxPositionIU: 5665
+#          incrementalEncoder:
+#            resolution: 13
+#            transmission: 240
+#            direction: 1
 
     - left_hip_fe:
         allowActuation: true
@@ -84,43 +84,43 @@ march6:
             resolution: 12
             transmission: 121
 
-    - right_ankle:
-        allowActuation: true
-        motor_controller:
-          type: odrive
-          actuationMode: torque
-          slaveIndex: 2
-          axis: 0
-          preCalibrated: true
-          motorKV: 355
-          absoluteEncoder:
-            resolution: 14
-            direction: 1
-            minPositionIU: 12551
-            maxPositionIU: 14446
-          incrementalEncoder:
-            resolution: 13
-            transmission: 236
-            direction: -1
-
-    - right_hip_aa:
-        allowActuation: true
-        motor_controller:
-          type: odrive
-          actuationMode: torque
-          slaveIndex: 1
-          axis: 0
-          preCalibrated: true
-          motorKV: 355
-          absoluteEncoder:
-            resolution: 14
-            direction: 1
-            minPositionIU: 3429
-            maxPositionIU: 4285
-          incrementalEncoder:
-            resolution: 13
-            transmission: 240
-            direction: 1
+#    - right_ankle:
+#        allowActuation: true
+#        motor_controller:
+#          type: odrive
+#          actuationMode: torque
+#          slaveIndex: 2
+#          axis: 0
+#          preCalibrated: true
+#          motorKV: 355
+#          absoluteEncoder:
+#            resolution: 14
+#            direction: 1
+#            minPositionIU: 12551
+#            maxPositionIU: 14446
+#          incrementalEncoder:
+#            resolution: 13
+#            transmission: 236
+#            direction: -1
+#
+#    - right_hip_aa:
+#        allowActuation: true
+#        motor_controller:
+#          type: odrive
+#          actuationMode: torque
+#          slaveIndex: 1
+#          axis: 0
+#          preCalibrated: true
+#          motorKV: 355
+#          absoluteEncoder:
+#            resolution: 14
+#            direction: 1
+#            minPositionIU: 3429
+#            maxPositionIU: 4285
+#          incrementalEncoder:
+#            resolution: 13
+#            transmission: 240
+#            direction: 1
             
     - right_hip_fe:
         allowActuation: true

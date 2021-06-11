@@ -321,16 +321,22 @@
         <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:march_joint
-            name="left_hip_aa"
-            parent="hip_base"
-            child="hip_aa_frame_left_side"
-            origin="0 ${-hip_base_height/2} 0"
-            axis="-1 0 0"
-            safety="${safety_values['haa']}"
-            limits="${joint_limits['left_haa']}"
-            reduction="${linear_reduction_hip}"
-    />
+<!--    <xacro:march_joint-->
+<!--            name="left_hip_aa"-->
+<!--            parent="hip_base"-->
+<!--            child="hip_aa_frame_left_side"-->
+<!--            origin="0 ${-hip_base_height/2} 0"-->
+<!--            axis="-1 0 0"-->
+<!--            safety="${safety_values['haa']}"-->
+<!--            limits="${joint_limits['left_haa']}"-->
+<!--            reduction="${linear_reduction_hip}"-->
+<!--    />-->
+
+    <joint name="left_hip_aa" type="fixed">
+        <parent link="hip_base"/>
+        <child link="hip_aa_frame_left_side"/>
+        <origin xyz="0 ${-hip_base_height/2} 0" rpy="0 0 0"/>
+    </joint>
 
     <joint name="left_hip_angle" type="fixed">
         <parent link="hip_aa_frame_left_side"/>
@@ -361,16 +367,22 @@
             limits="${joint_limits['left_knee']}"
     />
 
-    <xacro:march_joint
-            name="left_ankle"
-            parent="lower_leg_left"
-            child="ankle_plate_left"
-            safety="${safety_values['ankle']}"
-            origin="0 ${ankle_plate_offset} ${-lower_leg_height}"
-            axis="0 1 0"
-            reduction="${linear_reduction_ankle}"
-            limits="${joint_limits['left_ankle']}"
-    />
+<!--    <xacro:march_joint-->
+<!--            name="left_ankle"-->
+<!--            parent="lower_leg_left"-->
+<!--            child="ankle_plate_left"-->
+<!--            safety="${safety_values['ankle']}"-->
+<!--            origin="0 ${ankle_plate_offset} ${-lower_leg_height}"-->
+<!--            axis="0 1 0"-->
+<!--            reduction="${linear_reduction_ankle}"-->
+<!--            limits="${joint_limits['left_ankle']}"-->
+<!--    />-->
+
+    <joint name="left_ankle" type="fixed">
+        <parent link="lower_leg_left"/>
+        <child link="ankle_plate_left"/>
+        <origin xyz="0 ${ankle_plate_offset} ${-lower_leg_height}" rpy="0 0 0"/>
+    </joint>
 
     <joint name="left_foot_angle" type="fixed">
         <parent link="ankle_plate_left"/>
@@ -378,16 +390,22 @@
         <origin xyz="0 0 ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:march_joint
-            name="right_hip_aa"
-            parent="hip_base"
-            child="hip_aa_frame_right_side"
-            origin="0 ${hip_base_height/2} 0"
-            axis="1 0 0"
-            safety="${safety_values['haa']}"
-            reduction="${linear_reduction_ankle}"
-            limits="${joint_limits['right_haa']}"
-    />
+<!--    <xacro:march_joint-->
+<!--            name="right_hip_aa"-->
+<!--            parent="hip_base"-->
+<!--            child="hip_aa_frame_right_side"-->
+<!--            origin="0 ${hip_base_height/2} 0"-->
+<!--            axis="1 0 0"-->
+<!--            safety="${safety_values['haa']}"-->
+<!--            reduction="${linear_reduction_ankle}"-->
+<!--            limits="${joint_limits['right_haa']}"-->
+<!--    />-->
+
+    <joint name="right_hip_aa" type="fixed">
+        <parent link="hip_base"/>
+        <child link="hip_aa_frame_right_side"/>
+        <origin xyz="0 ${hip_base_height/2} 0" rpy="0 0 0"/>
+    </joint>
 
     <joint name="right_hip_angle" type="fixed">
         <parent link="hip_aa_frame_right_side"/>
@@ -417,16 +435,22 @@
             reduction="${rotary_reduction}"
     />
 
-    <xacro:march_joint
-            name="right_ankle"
-            parent="lower_leg_right"
-            child="ankle_plate_right"
-            safety="${safety_values['ankle']}"
-            origin="0 ${-ankle_plate_offset} ${-lower_leg_height}"
-            axis="0 1 0"
-            reduction="${linear_reduction_ankle}"
-            limits="${joint_limits['right_ankle']}"
-    />
+<!--    <xacro:march_joint-->
+<!--            name="right_ankle"-->
+<!--            parent="lower_leg_right"-->
+<!--            child="ankle_plate_right"-->
+<!--            safety="${safety_values['ankle']}"-->
+<!--            origin="0 ${-ankle_plate_offset} ${-lower_leg_height}"-->
+<!--            axis="0 1 0"-->
+<!--            reduction="${linear_reduction_ankle}"-->
+<!--            limits="${joint_limits['right_ankle']}"-->
+<!--    />-->
+
+    <joint name="right_ankle" type="fixed">
+        <parent link="lower_leg_right"/>
+        <child link="ankle_plate_right"/>
+        <origin xyz="0 ${-ankle_plate_offset} ${-lower_leg_height}" rpy="0 0 0"/>
+    </joint>
 
     <joint name="right_foot_angle" type="fixed">
         <parent link="ankle_plate_right"/>

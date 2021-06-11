@@ -68,7 +68,7 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
     { ODriveObjectName::TargetTorque,
         ODriveObject(/*offset=*/8, /*length=*/32) },
     { ODriveObjectName::RequestedState,
-        ODriveObject(/*offset=*/16, /*length=*/32) },
+        ODriveObject(/*offset=*/12, /*length=*/32) },
 };
 
 int8_t ODrivePDOmap::getMISOByteOffset(
