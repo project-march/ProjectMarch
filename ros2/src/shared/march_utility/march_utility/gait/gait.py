@@ -1,5 +1,7 @@
 import os
 from typing import Dict, Optional
+
+import rclpy
 import yaml
 
 from march_utility.gait.edge_position import (
@@ -21,7 +23,6 @@ from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
 ALLOWED_ERROR_ENDPOINTS = 0.001
-
 
 class Gait:
     """Base class for a generated gait."""
@@ -247,7 +248,7 @@ class Gait:
         """
         try:
             if self._validate_and_set_new_edge_positions(new_subgaits):
-                self.subgaits.update(new_subgaits)
+                self.subgaits = new_subgaits
                 self._validate_trajectory_transition()
                 return True
         except NonValidGaitContent as e:
@@ -271,10 +272,11 @@ class Gait:
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
-            try:
-                self.set_subgaits(new_subgaits)
-            except NonValidGaitContent as e:
-                raise e
+
+        try:
+            self.set_subgaits(new_subgaits)
+        except NonValidGaitContent as e:
+            raise e
 
     def __getitem__(self, name: str):
         """Returns a subgait from the loaded subgaits."""
