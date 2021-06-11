@@ -125,7 +125,6 @@ void RealSenseReader::readConfigCb(
 void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
-    clock_t start_of_processing_time = clock();
     Normals::Ptr normals = boost::make_shared<Normals>();
 
     // Preprocess

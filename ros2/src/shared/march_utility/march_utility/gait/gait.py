@@ -1,7 +1,6 @@
 import os
 from typing import Dict, Optional
 
-import rclpy
 import yaml
 
 from march_utility.gait.edge_position import (
@@ -23,6 +22,7 @@ from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
 ALLOWED_ERROR_ENDPOINTS = 0.001
+
 
 class Gait:
     """Base class for a generated gait."""
