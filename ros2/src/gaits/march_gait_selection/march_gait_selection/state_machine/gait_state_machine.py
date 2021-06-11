@@ -460,7 +460,7 @@ class GaitStateMachine:
                 )
 
     def _call_transition_callbacks(self):
-        """ Calls all transition callbacks when the current state changes. """
+        """Calls all transition callbacks when the current state changes."""
         self._call_callbacks(self._transition_callbacks, self._current_state)
 
     def _is_stop_requested(self):

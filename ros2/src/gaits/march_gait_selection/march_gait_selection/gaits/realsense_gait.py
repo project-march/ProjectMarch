@@ -348,7 +348,7 @@ class RealSenseGait(SetpointsGait):
         self.realsense_service_event.set()
 
     def interpolate_subgaits_from_parameters(self) -> bool:
-        """ Change all subgaits to one interpolated from the current parameters."""
+        """Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
         self._node.get_logger().info(
             f"Interpolating with parameters: {self.parameters}"
