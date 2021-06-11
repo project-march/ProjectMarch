@@ -1,4 +1,3 @@
-from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi

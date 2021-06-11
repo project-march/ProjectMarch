@@ -17,7 +17,6 @@ from march_utility.exceptions.gait_exceptions import (
     WrongRealSenseConfigurationError,
 )
 from rclpy import Future
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client
@@ -283,7 +282,7 @@ class RealSenseGait(SetpointsGait):
         self.realsense_service_event.set()
 
     def interpolate_subgaits_from_parameters(self) -> None:
-        """ Change all subgaits to one interpolated from the current parameters."""
+        """Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
             self._node.get_logger().debug(
