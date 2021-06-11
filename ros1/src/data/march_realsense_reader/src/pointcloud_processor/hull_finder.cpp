@@ -132,6 +132,7 @@ bool CHullFinder::initializeRegionVariables()
     region_points_projected_ = boost::make_shared<PointCloud>();
     plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
     hull_ = boost::make_shared<Hull>();
+    polygon_.clear();
     return true;
 }
 

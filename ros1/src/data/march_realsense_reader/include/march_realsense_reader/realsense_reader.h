@@ -82,6 +82,10 @@ public:
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
 
+    // Give an idea of the area of the hulls by cropping a large input grid to
+    // the hull vector
+    void publishHullAreaCloud();
+
 private:
     PointCloud last_pointcloud_;
 
@@ -98,6 +102,8 @@ private:
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher region_pointcloud_publisher_;
     ros::Publisher hull_marker_array_publisher_;
+    ros::Publisher hull_area_pointcloud_publisher_;
+    ros::Publisher hull_ground_pointcloud_publisher_;
     ros::Publisher hull_parameter_determiner_publisher_;
     ros::Publisher pointcloud_publisher_;
 
@@ -106,6 +112,9 @@ private:
 
     // Debugging flag, dynamically reconfigurable debugging_launch is true
     bool debugging_;
+
+    // Debugging flag for the hull area information, can be slow to compute
+    bool publish_hull_area_debug_;
 
     std::string frame_id_to_transform_to_;
 
