@@ -40,33 +40,33 @@ march:
         goal_time: 0.5
 #        left_ankle:
 #          margin_soft_limit_error: 0.5
-#          trajectory: 1.0
-#          goal: 1.0
+#          trajectory: 2.0
+#          goal: 2.0
 #        left_hip_aa:
 #          margin_soft_limit_error: 0.5
-#          trajectory: 1.0
-#          goal: 1.0
+#          trajectory: 2.0
+#          goal: 2.0
         left_hip_fe:
           margin_soft_limit_error: 0.5
-          trajectory: 1.0
-          goal: 1.0
+          trajectory: 2.0
+          goal: 2.0
         left_knee:
           margin_soft_limit_error: 0.5
-          trajectory: 1.0
-          goal: 1.0
+          trajectory: 2.0
+          goal: 2.0
 #        right_ankle:
 #          margin_soft_limit_error: 0.5
-#          trajectory: 1.0
-#          goal: 1.0
+#          trajectory: 2.0
+#          goal: 2.0
 #        right_hip_aa:
 #          margin_soft_limit_error: 0.5
-#          trajectory: 1.0
-#          goal: 1.0
+#          trajectory: 2.0
+#          goal: 2.0
         right_hip_fe:
           margin_soft_limit_error: 0.5
-          trajectory: 1.0
-          goal: 1.0
+          trajectory: 2.0
+          goal: 2.0
         right_knee:
           margin_soft_limit_error: 0.5
-          trajectory: 1.0
-          goal: 1.0
+          trajectory: 2.0
+          goal: 2.0
