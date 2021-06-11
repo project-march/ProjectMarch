@@ -3,7 +3,16 @@
 # rather than using the flake8 default of 79:
 max-line-length = 88
 show-source = false
-exclude = .git,__init__.py,ros1/build,ros1/install,ros1/log,ros2/build,ros2/install,ros2/log,ros2/src/libraries,venv,.scripts
+exclude =
+    .git,
+    __init__.py,
+    build,
+    install,
+    log,
+    libraries,
+    venv,
+    .scripts,
+    test
 enable-extensions =
     B901,
     B902,
