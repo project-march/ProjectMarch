@@ -154,7 +154,7 @@ flake8 container build:
 #################
 # Runs a Python linter on the code to see if the code style is consistent and
 # to avoid common mistakes
-.flake8-base:
+flake8:
   stage: Lint code
   image: registry.gitlab.com/project-march/march/flake8:$TAG
   script:
@@ -173,8 +173,6 @@ flake8 container build:
   artifacts:
     reports:
       codequality: codeclimate.json
-
-flake8:
   rules:
     # If commit in MR and Dockerfile has changed, use different
     # flake8 image that was build in previous stages
@@ -201,8 +199,6 @@ flake8:
         - "**/*.py"
       variables:
         TAG: $CI_DEFAULT_BRANCH
-  extends:
-    - .flake8-base
 
 #######################
 # clang-format linter #
