@@ -185,6 +185,7 @@ bool MarchHardwareInterface::init(
     // Wait a while for MotorControllers to be enabled
     ros::Duration(/*t=*/5).sleep();
 
+    // For debugging
     for (size_t i = 0; i < num_joints_; ++i) {
         march::Joint& joint = march_robot_->getJoint(i);
 
@@ -314,7 +315,7 @@ void MarchHardwareInterface::write(
         }
     }
     // Enforce limits on all joints in position mode
-//    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
     for (size_t i = 0; i < num_joints_; i++) {
         march::Joint& joint = march_robot_->getJoint(i);

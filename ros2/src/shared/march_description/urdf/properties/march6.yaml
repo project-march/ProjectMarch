@@ -95,28 +95,28 @@ safety:
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
     hfe:
       lower_soft_buffer: 0.5
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
     ankle:
       lower_soft_buffer: 0.5
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
     haa:
       lower_soft_buffer: 0.5
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
   simulation:
     knee:
@@ -124,26 +124,26 @@ safety:
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
     hfe:
       lower_soft_buffer: 0.5
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
     ankle:
       lower_soft_buffer: 0.5
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
     haa:
       lower_soft_buffer: 0.5
       upper_soft_buffer: 0.5
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 10.0
+      max_effort: 20.0
       max_velocity: 3.0
