@@ -176,7 +176,8 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
 {
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-        ROS_DEBUG_STREAM("");
+        ROS_DEBUG_STREAM("The ros::Time is " << ros::Time());
+        ROS_DEBUG_STREAM("The ros::Time::now() is " << ros::Time::now());
         if (tfBuffer->canTransform(frame_id_to_transform_to_,
                 pointcloud_frame_id, ros::Time(), ros::Duration(/*t=*/1.0))) {
             transform_stamped
