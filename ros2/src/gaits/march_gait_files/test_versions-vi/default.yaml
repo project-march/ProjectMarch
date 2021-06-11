@@ -336,7 +336,7 @@ positions:
       left_hip_aa: 0.0349
       left_hip_fe: 0.0
       left_knee: 0.0
-      right_ankle: 0.0
+      right_ankle: 0.5
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
       right_knee: 0.0
