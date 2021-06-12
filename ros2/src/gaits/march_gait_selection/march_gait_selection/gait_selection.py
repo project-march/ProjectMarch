@@ -8,10 +8,20 @@ from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
 
-from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
+from march_utility.exceptions.gait_exceptions import (
+    GaitError,
+    GaitNameNotFound,
+    NonValidGaitContent,
+)
 from march_utility.gait.subgait import Subgait
-from march_utility.utilities.node_utils import get_robot_urdf
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.node_utils import (
+    get_robot_urdf_from_service,
+    get_joint_names_from_robot,
+)
+from march_utility.utilities.utility_functions import (
+    validate_and_get_joint_names_for_inverse_kinematics,
+)
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
@@ -62,24 +72,26 @@ class GaitSelection(Node):
         self._directory_name = directory
         self._gait_directory = os.path.join(package_path, directory)
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
-        self._realsense_yaml = os.path.join(
-            self._gait_directory, "realsense_gaits.yaml"
-        )
-
         if not os.path.isdir(self._gait_directory):
             self.get_logger().error(f"Gait directory does not exist: {directory}")
+            raise FileNotFoundError(directory)
         if not os.path.isfile(self._default_yaml):
             self.get_logger().error(
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
 
+        self._robot = get_robot_urdf_from_service(self) if robot is None else robot
+        self._joint_names = get_joint_names_from_robot(self._robot)
+
+        self._realsense_yaml = os.path.join(
+            self._gait_directory, "realsense_gaits.yaml"
+        )
         self._realsense_gait_version_map = self._load_realsense_configuration()
         (
             self._gait_version_map,
             self._positions,
             self._semi_dynamic_gait_version_map,
         ) = self._load_configuration()
-        self._robot = get_robot_urdf(self) if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(
             msg_type=String,
@@ -98,7 +110,24 @@ class GaitSelection(Node):
             "first_subgait_delay"
         )
 
+        if not self._validate_inverse_kinematics_is_possible():
+            self.get_logger().warn(
+                "The currently available joints are unsuitable for "
+                "using inverse kinematics.\n"
+                "Any interpolation on foot_location will return "
+                "the base subgait instead. Realsense gaits will "
+                "not be loaded."
+            )
         self.get_logger().info("Successfully initialized gait selection node.")
+
+    def _validate_inverse_kinematics_is_possible(self):
+        try:
+            ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
+        except KeyError:
+            return False
+        if ik_joint_names != self._joint_names:
+            return False
+        return True
 
     def _create_services(self) -> None:
         self.create_service(
@@ -350,6 +379,8 @@ class GaitSelection(Node):
 
         :param gaits: The dictionary where the loaded gaits will be added to.
         """
+        if not self._validate_inverse_kinematics_is_possible():
+            return
         get_gait_parameters_service = self.create_client(
             srv_type=GetGaitParameters,
             srv_name="/camera/process_pointcloud",
@@ -399,7 +430,25 @@ class GaitSelection(Node):
                 msg="Gait version map: {gm}, is not valid".format(gm=version_map)
             )
 
-        return version_map, default_config["positions"], semi_dynamic_version_map
+        positions = {}
+
+        for position_name, position_values in default_config["positions"].items():
+            positions[position_name] = {
+                "gait_type": position_values["gait_type"],
+                "joints": {},
+            }
+            for joint, joint_value in position_values["joints"].items():
+                if joint in self._joint_names:
+                    positions[position_name]["joints"][joint] = joint_value
+
+            if set(positions[position_name]["joints"].keys()) != set(self._joint_names):
+                raise NonValidGaitContent(
+                    f"The position {position_name} does not "
+                    f"have a position for all required joits: it "
+                    f"has {positions[position_name]['joints'].keys()}, "
+                    f"required: {self._joint_names}"
+                )
+        return version_map, positions, semi_dynamic_version_map
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.

@@ -150,9 +150,11 @@ class SetpointTest(unittest.TestCase):
 
     def test_find_known_position_forward(self):
         setpoint_dict = {
+            "left_ankle": Setpoint(Duration(), 0, 0),
             "left_hip_aa": Setpoint(Duration(), 0, 0),
             "left_hip_fe": Setpoint(Duration(), pi / 2, 0),
             "left_knee": Setpoint(Duration(), 0, 0),
+            "right_ankle": Setpoint(Duration(), 0, 0),
             "right_hip_aa": Setpoint(Duration(), 0, 0),
             "right_hip_fe": Setpoint(Duration(), pi / 2, 0),
             "right_knee": Setpoint(Duration(), 0, 0),

@@ -1,3 +1,12 @@
+actuating_joints:
+  - left_ankle
+  - left_hip_aa
+  - left_hip_fe
+  - left_knee
+  - right_ankle
+  - right_hip_aa
+  - right_hip_fe
+  - right_knee
 dimensions:
   general:
     width: 0.05

@@ -67,6 +67,7 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
     this->initUrdf();
+    ROS_INFO("Done init urdf.");
     auto pdo_interface = march::PdoInterfaceImpl::create();
     auto sdo_interface = march::SdoInterfaceImpl::create();
 
@@ -122,6 +123,11 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     } else {
         ROS_WARN("Joint %s does not have a netNumber", joint_name.c_str());
     }
+
+    int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
+    ROS_INFO_STREAM("Joint " << joint_name.c_str()
+                             << " will be actuated with slave index "
+                             << slaveIndex);
 
     const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
@@ -362,23 +368,102 @@ void HardwareBuilder::initUrdf()
     }
 }
 
+int HardwareBuilder::getSlaveIndexFromJointConfig(const YAML::Node& joint) const
+{
+    if (joint["motor_controller"]) {
+        if (joint["motor_controller"]["slaveIndex"]) {
+            return joint["motor_controller"]["slaveIndex"].as<int>();
+        }
+    }
+    return -1;
+}
+
+std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
+    const YAML::Node& joints_config) const
+{
+    std::set<int> fixedSlaveIndices;
+    std::set<int> actuatingSlaveIndices;
+    for (const YAML::Node& joint_config : joints_config) {
+        const auto joint_name = joint_config.begin()->first.as<std::string>();
+        const auto urdf_joint = this->urdf_.getJoint(joint_name);
+        int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
+        if (urdf_joint->type == urdf::Joint::FIXED) {
+            ROS_INFO_STREAM("Joint "
+                << joint_name << " with slaveIndex " << slaveIndex
+                << " is fixed and will be removed from ethercat "
+                   "train config");
+            if (slaveIndex != -1) {
+                fixedSlaveIndices.insert(slaveIndex);
+            }
+        } else {
+            actuatingSlaveIndices.insert(slaveIndex);
+        }
+    }
+    for (int actuatingSlaveIndex : actuatingSlaveIndices) {
+        fixedSlaveIndices.erase(actuatingSlaveIndex);
+    }
+    return fixedSlaveIndices;
+}
+
+int HardwareBuilder::updateSlaveIndexBasedOnFixedJoints(
+    const YAML::Node& joint_config, const std::string& joint_name,
+    const std::set<int>& fixedSlaveIndices) const
+{
+    int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
+    int amountFixedBeforeSlave = 0;
+    for (int fixedSlaveIndex : fixedSlaveIndices) {
+        if (fixedSlaveIndex < slaveIndex) {
+            amountFixedBeforeSlave++;
+        }
+    }
+    return slaveIndex - amountFixedBeforeSlave;
+}
+
 std::vector<march::Joint> HardwareBuilder::createJoints(
     const YAML::Node& joints_config,
     const march::PdoInterfacePtr& pdo_interface,
     const march::SdoInterfacePtr& sdo_interface) const
 {
-    std::vector<march::Joint> joints;
-    for (const YAML::Node& joint_config : joints_config) {
+    // Use a sorted map to store the joint names and yaml configurations
+    std::map<std::string, YAML::Node> actuating_joint_names;
+
+    bool remove_fixed_joints_from_ethercat_train;
+    ros::param::get("remove_fixed_joints_from_ethercat_train",
+        remove_fixed_joints_from_ethercat_train);
+    std::set<int> fixedSlaveIndices;
+    if (remove_fixed_joints_from_ethercat_train) {
+        fixedSlaveIndices = getSlaveIndicesOfFixedJoints(joints_config);
+    }
+
+    for (YAML::Node joint_config : joints_config) {
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
-        if (urdf_joint->type == urdf::Joint::FIXED) {
+        if (urdf_joint->type != urdf::Joint::FIXED) {
+            if (remove_fixed_joints_from_ethercat_train) {
+                joint_config[joint_name]["motor_controller"]["slaveIndex"]
+                    = updateSlaveIndexBasedOnFixedJoints(
+                        joint_config, joint_name, fixedSlaveIndices);
+            }
+            actuating_joint_names.insert(
+                std::pair<std::string, YAML::Node>(joint_name, joint_config));
+        } else {
             ROS_WARN(
                 "Joint %s is fixed in the URDF, but defined in the robot yaml",
                 joint_name.c_str());
         }
+    }
+
+    std::vector<march::Joint> joints;
+    std::stringstream ss;
+    for (auto& entry : actuating_joint_names) {
+        const auto joint_name = entry.first;
+        const auto joint_config = entry.second;
+        const auto urdf_joint = this->urdf_.getJoint(joint_name);
         joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name],
             joint_name, urdf_joint, pdo_interface, sdo_interface));
+        ss << joint_name << ", ";
     }
+    ROS_INFO("Sorted actuating joints are: [%s]", ss.str().c_str());
 
     for (const auto& urdf_joint : this->urdf_.joints_) {
         if (urdf_joint.second->type != urdf::Joint::FIXED) {

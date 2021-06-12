@@ -18,13 +18,13 @@
               command="load" unless="$(eval ground_gait)"/>
     <rosparam file="$(find march_simulation)/config/groundgait/$(arg controller_type)/$(arg controller_name).yaml"
               command="load" if="$(eval ground_gait)"/>
+    <node name="upload_controller_values" pkg="march_launch"
+          type="upload_controller_values.py"/>
 
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
               respawn="false" output="screen"
               args="spawn controller/trajectory joint_state_controller"/>
-
-        <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
         <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
 
     </group>
