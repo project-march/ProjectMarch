@@ -424,7 +424,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     const march::PdoInterfacePtr& pdo_interface,
     const march::SdoInterfacePtr& sdo_interface) const
 {
-    std::vector<march::Joint> joints;
+    // Use a sorted map to store the joint names and yaml configurations
+    std::map<std::string, YAML::Node> actuating_joint_names;
 
     bool remove_fixed_joints_from_ethercat_train;
     ros::param::get("remove_fixed_joints_from_ethercat_train",
@@ -443,15 +444,26 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
                     = updateSlaveIndexBasedOnFixedJoints(
                         joint_config, joint_name, fixedSlaveIndices);
             }
-            joints.push_back(
-                HardwareBuilder::createJoint(joint_config[joint_name],
-                    joint_name, urdf_joint, pdo_interface, sdo_interface));
+            actuating_joint_names.insert(
+                std::pair<std::string, YAML::Node>(joint_name, joint_config));
         } else {
             ROS_WARN(
                 "Joint %s is fixed in the URDF, but defined in the robot yaml",
                 joint_name.c_str());
         }
     }
+
+    std::vector<march::Joint> joints;
+    std::stringstream ss;
+    for (auto& entry : actuating_joint_names) {
+        const auto joint_name = entry.first;
+        const auto joint_config = entry.second;
+        const auto urdf_joint = this->urdf_.getJoint(joint_name);
+        joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name],
+            joint_name, urdf_joint, pdo_interface, sdo_interface));
+        ss << joint_name << ", ";
+    }
+    ROS_INFO("Sorted actuating joints are: [%s]", ss.str().c_str());
 
     for (const auto& urdf_joint : this->urdf_.joints_) {
         if (urdf_joint.second->type != urdf::Joint::FIXED) {

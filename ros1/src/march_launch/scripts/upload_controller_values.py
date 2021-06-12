@@ -35,6 +35,7 @@ def main():
         else:
             fixed_joint_names.append(joint.name)
 
+    actuating_joint_names = sorted(actuating_joint_names)
     if len(actuating_joint_names) == 0:
         rospy.logerr("No actuating joints were specified.")
 
