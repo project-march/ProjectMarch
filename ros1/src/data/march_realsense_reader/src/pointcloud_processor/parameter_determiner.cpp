@@ -14,6 +14,7 @@
 #include <ros/package.h>
 #include <utility>
 #include <pcl_ros/transforms.h>
+#include "utilities/point_utilities.h"
 //#include <pcl_ros/impl/transfoms.hpp>
 
 
@@ -127,20 +128,22 @@ bool HullParameterDeterminer::determineParameters(
     // the same
     initializeGaitDimensions();
 
+    bool success = true;
+
+    success &= setGaitInformationToNewFrame();
+
     if (debugging_) {
         initializeDebugOutput();
         addDebugGaitInformation();
     }
 
-    bool success = true;
+
 
     // Only calculate the gait parameters if an optimal foot location has been
     // found
+
     if (success &= getOptimalFootLocation()) {
         success &= getGaitParametersFromFootLocation();
-        ROS_DEBUG("Point x loc after= %f\n", foot_locations_to_try->points[5].x);
-        ROS_DEBUG("Point y loc after= %f\n", foot_locations_to_try->points[5].y);
-        ROS_DEBUG("Point z loc after= %f\n", foot_locations_to_try->points[5].z);
     }
 
     if (debugging_) {
@@ -285,7 +288,79 @@ void HullParameterDeterminer::initializeGaitDimensions()
         }
     }
 }
+bool HullParameterDeterminer::setGaitInformationToNewFrame()
+{
+    gait_information_cloud = boost::make_shared<PointCloud>();
+    if(!gait_information_cloud->empty())
+    {
+        gait_information_cloud->erase(gait_information_cloud->begin());
+    }
 
+    pcl::PointXYZ point;
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
+            ROS_DEBUG("gait_information_cloud size: %li", gait_information_cloud->size());
+            point = point_utilities::makePoint(min_x_stairs, y_location, min_z_stairs);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePoint(max_x_stairs, y_location, min_z_stairs);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePoint(min_x_stairs, y_location, max_z_stairs);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePoint(max_x_stairs, y_location, max_z_stairs);
+            gait_information_cloud->push_back(point);
+
+            if (tfBuffer->canTransform("world",
+                                         frame_id_to_transform_to_, ros::Time(/*t=*/0))) {
+                geometry_msgs::TransformStamped transform_stamped_world;
+                geometry_msgs::TransformStamped transform_stamped;
+
+                transform_stamped_world
+                        = tfBuffer->lookupTransform("world",
+                                                    frame_id_to_transform_to_, ros::Time(/*t=*/0));
+
+//                transform_stamped.transform.rotation.x = transform_stamped_world.transform.rotation.x;
+//                transform_stamped.transform.rotation.y = transform_stamped_world.transform.rotation.y;
+//                transform_stamped.transform.rotation.z = transform_stamped_world.transform.rotation.z;
+//                transform_stamped.transform.rotation.w = transform_stamped_world.transform.rotation.w;
+    //        transform_stamped.transform.translation = transform_stamped_world.transform.translation;
+
+                pcl_ros::transformPointCloud(
+                        *gait_information_cloud, *gait_information_cloud, transform_stamped_world.transform);
+                min_x_stairs = gait_information_cloud->points[0].x;
+                max_x_stairs = gait_information_cloud->points[1].x;
+                min_z_stairs = gait_information_cloud->points[0].z;
+                max_z_stairs = gait_information_cloud->points[2].z;
+                ROS_DEBUG("Min_x_stairs = %f", min_x_stairs);
+                ROS_DEBUG("Max_x_stairs = %f", max_x_stairs);
+                ROS_DEBUG("Min_z_stairs = %f", min_z_stairs);
+                ROS_DEBUG("Max_z_stairs = %f", max_z_stairs);
+            }
+            break;
+        }
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+//            geometry_msgs::Point marker_point;
+//            marker_point.y = y_location;
+//
+//            marker_point.x = x_flat;
+//            marker_point.z = z_flat;
+//            gait_information_marker_list.points.push_back(marker_point);
+//            gait_information_marker_list.colors.push_back(marker_color);
+//
+//            marker_point.x = x_steep;
+//            marker_point.z = z_steep;
+//            gait_information_marker_list.points.push_back(marker_point);
+//            gait_information_marker_list.colors.push_back(marker_color);
+            break;
+        }
+            default: {
+                ROS_WARN_STREAM("gait information transform is not implemented yet "
+                                "for realsense category "
+                                        << realsense_category_.value());
+        }
+    }
+    return true;
+}
 // Find the parameters from the foot location by finding at what percentage of
 // the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
@@ -756,8 +831,8 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         transform_stamped.transform.rotation.w = transform_stamped_world.transform.rotation.w;
 //        transform_stamped.transform.translation = transform_stamped_world.transform.translation;
 
-        pcl_ros::transformPointCloud(
-                *foot_locations_to_try, *foot_locations_to_try, transform_stamped_world.transform);
+//        pcl_ros::transformPointCloud(
+//                *foot_locations_to_try, *foot_locations_to_try, transform_stamped_world.transform);
         ROS_DEBUG_STREAM("Transformed, foot locations to try frame id is " << foot_locations_to_try->header.frame_id.c_str());
     } else {
       ROS_INFO_STREAM(error_msg);

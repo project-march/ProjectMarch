@@ -195,6 +195,10 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    // Transforms the gait information from the world frame to the frame_id_to_transform_to,
+    // but keeps the roll and pitch of the world frame
+    bool setGaitInformationToNewFrame();
+
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
@@ -241,6 +245,7 @@ protected:
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud::Ptr foot_locations_to_try;
+    PointCloud::Ptr gait_information_cloud;
 };
 
 /** The simple parameter determiner
