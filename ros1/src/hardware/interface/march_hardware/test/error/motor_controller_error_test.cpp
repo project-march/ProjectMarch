@@ -7,7 +7,7 @@ TEST(MotionErrorTest, ParseNoMotionError)
 {
     ASSERT_EQ(march::error::parseError((uint16_t)0,
                   march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR),
-        "");
+        "None. ");
 }
 
 TEST(MotionErrorTest, ParseCorrectMotionError)
@@ -35,7 +35,7 @@ TEST(TestDetailedMotionError, ParseNoDetailedMotionError)
     ASSERT_EQ(
         march::error::parseError((uint16_t)0,
             march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR),
-        "");
+        "None. ");
 }
 
 TEST(TestDetailedMotionError, ParseCorrectDetailedMotionError)
@@ -65,7 +65,7 @@ TEST(TestSecondDetailedMotionError, ParseNoSecondDetailedMotionError)
     ASSERT_EQ(march::error::parseError((uint16_t)0,
                   march::error::ErrorRegister::
                       IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
-        "");
+        "None. ");
 }
 
 TEST(TestSecondDetailedMotionError, ParseCorrectSecondDetailedMotionError)

@@ -13,7 +13,7 @@ enum class ODriveAxis { Zero = 0, One = 1 };
 
 class ODriveAxisState {
 public:
-    enum Value : int8_t {
+    enum Value : uint32_t {
         UNDEFINED = 0,
         IDLE = 1,
         STARTUP_SEQUENCE = 2,
@@ -36,7 +36,7 @@ public:
     }
 
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
-    ODriveAxisState(int8_t state)
+    ODriveAxisState(int32_t state)
         : value_(Value(state))
     {
     }
@@ -72,7 +72,7 @@ public:
             case ENCODER_OFFSET_CALIBRATION:
                 return "Encoder offset calibration";
             case CLOSED_LOOP_CONTROL:
-                return "Close loop control";
+                return "Closed loop control";
             case LOCKIN_SPIN:
                 return "Lockin spin";
             case ENCODER_DIR_FIND:
@@ -115,8 +115,9 @@ public:
 
     bool hasError() override
     {
-        return axis_error_ || motor_error_ || encoder_error_
-            || encoder_manager_error_ || controller_error_;
+        return !isOperational();
+        // axis_error_ || motor_error_ || encoder_error_
+        //    || encoder_manager_error_ || controller_error_;
     }
 
     std::optional<std::string> getErrorStatus() override
@@ -124,22 +125,20 @@ public:
         if (hasError()) {
             std::ostringstream error_stream;
             error_stream
-                << "Axis: "
+                << "State: " << axis_state_.toString() << " ("
+                << axis_state_.value_ << ")"
+                << "\nAxis: "
                 << error::parseError(
                        axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
-                << ", "
                 << "\nMotor: "
                 << error::parseError(
                        motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR)
-                << ", "
                 << "\nEncoder: "
                 << error::parseError(encoder_error_,
                        error::ErrorRegister::ODRIVE_ENCODER_ERROR)
-                << ", "
                 << "\nEncoder Manager: "
                 << error::parseError(encoder_manager_error_,
                        error::ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR)
-                << ", "
                 << "\nController: "
                 << error::parseError(controller_error_,
                        error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
@@ -164,4 +163,4 @@ public:
 
 } // namespace march
 
-#endif // MARCH_HARDWARE_ODRIVE_STATE_OF_OPERATION_H
+#endif // MARCH_HARDWARE_ODRIVE_STATE_H

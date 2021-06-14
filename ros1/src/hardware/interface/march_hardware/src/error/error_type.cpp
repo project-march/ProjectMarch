@@ -60,6 +60,12 @@ namespace error {
                        "been lost";
             case ErrorType::ODRIVE_WRONG_AXIS_NUMBER:
                 return "ODrive axis number must be either 0 or 1";
+            case ErrorType::INVALID_MOTOR_CONTROLLER:
+                return "MotorController must be IMotionCube or ODrive";
+            case ErrorType::PREPARE_ACTUATION_ERROR:
+                return "Something went wrong with preparing for actuation";
+            case ErrorType::INVALID_ENCODER_DIRECTION:
+                return "Encoder direction must be either -1 or 1";
             default:
                 return "Unknown error occurred. Please create/use a documented "
                        "error";

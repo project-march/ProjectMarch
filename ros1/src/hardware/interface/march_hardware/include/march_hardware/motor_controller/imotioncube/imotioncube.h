@@ -58,6 +58,8 @@ public:
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
 
+    bool hasUniqueSlaves() const override;
+
     // Transform the ActuationMode to a number that is understood by the
     // IMotionCube
     int getActuationModeNumber() const override;
@@ -71,6 +73,9 @@ public:
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
+    float getActualEffort() override;
+
+    float effortMultiplicationConstant() override;
 
     constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
     // This value is slightly larger than the current limit of the

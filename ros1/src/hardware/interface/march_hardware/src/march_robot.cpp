@@ -148,12 +148,16 @@ bool MarchRobot::hasValidSlaves()
 
     ROS_INFO("Found configuration for %lu slaves.", slaveIndices.size());
 
-    // Sort the indices and check for duplicates.
-    // If there are no duplicates, the configuration is valid.
+    // Sort the indices
     ::std::sort(slaveIndices.begin(), slaveIndices.end());
-    auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
-    bool isUnique = (it == slaveIndices.end());
-    return isUnique;
+    if (jointList[0].getMotorController()->hasUniqueSlaves()) {
+        // Check for duplicates depending on the motor controller
+        auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
+        bool isUnique = (it == slaveIndices.end());
+        return isUnique;
+    } else {
+        return true;
+    }
 }
 
 bool MarchRobot::isEthercatOperational()

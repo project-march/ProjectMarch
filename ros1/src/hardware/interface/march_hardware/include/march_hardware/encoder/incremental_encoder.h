@@ -3,20 +3,25 @@
 #ifndef MARCH_HARDWARE_INCREMENTAL_ENCODER_H
 #define MARCH_HARDWARE_INCREMENTAL_ENCODER_H
 #include "march_hardware/encoder/encoder.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <ostream>
 
 namespace march {
 class IncrementalEncoder : public Encoder {
 public:
-    IncrementalEncoder(size_t number_of_bits, double transmission);
+    IncrementalEncoder(size_t resolution,
+        MotorControllerType motor_controller_type, Direction direction,
+        double transmission);
+    IncrementalEncoder(size_t resolution,
+        MotorControllerType motor_controller_type, double transmission);
 
     ~IncrementalEncoder() noexcept override = default;
 
     // Inherited methods
-    double getRadiansPerBit() const final;
-    double toRadians(double iu, bool /* use_zero_position */) const final;
-    double toIU(double radians, bool /* use_zero_position */) const final;
+    double getRadiansPerIU() const final;
+    double velocityRadiansToIU(double velocity) const override;
+    double velocityIUToRadians(double velocity) const override;
 
     double getTransmission() const;
 

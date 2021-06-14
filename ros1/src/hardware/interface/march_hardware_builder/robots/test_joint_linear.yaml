@@ -1,18 +1,23 @@
-testjoint_linear:
- if_name: enp2s0
- ecatCycleTime: 4
- ecatSlaveTimeout: 50
- joints:
-   - linear_joint:
-       allowActuation: true
-       motor_controller:
-         type: imotioncube
-         actuationMode: torque
-         slaveIndex: 1
-         absoluteEncoder:
-           resolution: 12
-           minPositionIU: 240
-           maxPositionIU: 445
-         incrementalEncoder:
-           resolution: 13
-           transmission: 200
+testsetup:
+  if_name: enp0s31f6
+  ecatCycleTime: 4
+  ecatSlaveTimeout: 250
+  joints:
+    - linear_joint:
+        allowActuation: true
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 1
+          axis: 1
+          preCalibrated: true
+          motorKV: 355
+          absoluteEncoder:
+            resolution: 14
+            direction: -1
+            minPositionIU: 4782
+            maxPositionIU: 5665
+          incrementalEncoder:
+            resolution: 13
+            transmission: 240
+            direction: 1

@@ -1,0 +1,80 @@
+description: The MVI small walk, with the version 2 HAA movements of normal walking
+duration: 1500000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.06108652
+    time_from_start: 338709680
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.19200018
+    time_from_start: 0
+    velocity: -0.34910076
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.13960016
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.06981317
+    time_from_start: 290322580
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 677419350
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.06108652
+    time_from_start: 677419350
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.1667
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.4887
+    time_from_start: 600000000
+    velocity: 0.14425333
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: 480000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+name: right_close
+version: MVI_walksmall_rightclose_v2

@@ -1,0 +1,86 @@
+description: Example test subgait with duration of 5s
+duration: 5000000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.15
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.05
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 5000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.5
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.5
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.15
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.05
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 5000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.5
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.5
+    time_from_start: 2500000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 5000000000
+    velocity: 0.0
+name: perform_test
+version: perform_test_v1

@@ -1,16 +1,20 @@
 #pragma once
 #include "march_hardware/encoder/encoder.h"
+#include "march_hardware/motor_controller/motor_controller_type.h"
 
 #include <gmock/gmock.h>
 
 class MockEncoder : public march::Encoder {
 public:
-    explicit MockEncoder(size_t number_of_bits)
-        : Encoder(number_of_bits)
+    explicit MockEncoder(size_t resolution)
+        : Encoder(resolution, march::MotorControllerType::IMotionCube)
     {
     }
 
-    MOCK_CONST_METHOD0(getRadiansPerBit, double());
-    MOCK_CONST_METHOD2(toRadians, double(double, bool));
-    MOCK_CONST_METHOD2(toIU, double(double, bool));
+    MOCK_CONST_METHOD0(getRadiansPerIU, double());
+
+    MOCK_CONST_METHOD1(positionIUToRadians, double(double));
+    MOCK_CONST_METHOD1(velocityIUToRadians, double(double));
+    MOCK_CONST_METHOD1(positionRadiansToIU, double(double));
+    MOCK_CONST_METHOD1(velocityRadiansToIU, double(double));
 };
