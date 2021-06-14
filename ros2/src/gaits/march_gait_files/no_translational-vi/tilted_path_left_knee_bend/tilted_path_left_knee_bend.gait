@@ -1,0 +1,6 @@
+name: tilted_path_left_knee_bend
+subgaits:
+  right_open:
+    to: end
+  start:
+    to: right_open

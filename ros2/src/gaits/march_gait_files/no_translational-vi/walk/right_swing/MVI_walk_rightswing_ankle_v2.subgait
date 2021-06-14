@@ -1,0 +1,104 @@
+description: MVI walk gait with no HAA movements
+duration: 1199999999
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 1199999999
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 450000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1199999999
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.3752
+    time_from_start: 0
+    velocity: -0.32
+  - position: 0.3386
+    time_from_start: 471300000
+    velocity: -0.5076
+  - position: -0.26179939
+    time_from_start: 1199999999
+    velocity: 0.31415927
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 240000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 816000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1199999999
+    velocity: 0.0
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.17453293
+    time_from_start: 272700000
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 709100000
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 1199999999
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 450000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1199999999
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.17453293
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.6981317
+    time_from_start: 470700000
+    velocity: 1.23309955
+  - position: 0.78539816
+    time_from_start: 720000000
+    velocity: 0.1280007
+  - position: 0.3752
+    time_from_start: 1199999999
+    velocity: -0.32
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.13446401
+    time_from_start: 504000000
+    velocity: 0.0
+  - position: 0.87269953
+    time_from_start: 769300000
+    velocity: -2.45929982
+  - position: 0.09690068
+    time_from_start: 1080000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1199999999
+    velocity: 0.0
+name: right_swing
+version: MVI_walk_rightswing_ankle_v2

@@ -62,7 +62,7 @@ void Joint::prepareActuation()
 
 void Joint::readFirstEncoderValues()
 {
-    ROS_INFO("[%s] Reading first encoder values", this->name_.c_str());
+    ROS_INFO("[%s] Reading first values", this->name_.c_str());
     auto motor_controller_state = motor_controller_->getState();
     if (motor_controller_state->isOperational()) {
         if (motor_controller_->hasIncrementalEncoder()) {
@@ -81,7 +81,7 @@ void Joint::readFirstEncoderValues()
         throw error::HardwareException(
             error::ErrorType::PREPARE_ACTUATION_ERROR);
     }
-    ROS_INFO("[%s] Successfully read first encoder values, initial position is: %f", this->name_.c_str(), position_);
+    ROS_INFO("[%s] Read first values", this->name_.c_str());
 }
 
 void Joint::actuate(float target)
