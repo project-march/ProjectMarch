@@ -93,15 +93,15 @@ safety:
     knee:
       lower_soft_buffer: 2.0
       upper_soft_buffer: 2.0
-      k_position: 13.1031
-      k_velocity: 20.9184
+      k_position: 9.656085595298899
+      k_velocity: 23.06987607064259
       max_effort: 28.0
       max_velocity: 3.0
     hfe:
       lower_soft_buffer: 2.0
       upper_soft_buffer: 2.0
-      k_position: 20000.0
-      k_velocity: 20000.0
+      k_position: 8.368683429790725
+      k_velocity: 26.185712977780618
       max_effort: 28.0
       max_velocity: 3.0
     ankle:
