@@ -89,7 +89,7 @@ public:
     /** Takes a 2D point cloud of potential foot locations and returns
      * the valid foot locations with associated height and normal vector.
      * Result indicates whether every original point ends up being valid.**/
-    bool cropCloudToHullVector(PointCloud2D::Ptr const& input_cloud,
+    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
 protected:
