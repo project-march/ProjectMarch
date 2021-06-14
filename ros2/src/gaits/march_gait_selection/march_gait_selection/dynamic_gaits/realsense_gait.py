@@ -216,13 +216,6 @@ class RealSenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
-        self._reset()
-        self._current_time = current_time
-        self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
-        self._next_subgait = self._current_subgait
-
-        # Currently, we hardcode foot_right in start, since this is almost
-        # always a right_open
         frame_id_to_transform_to = self.get_frame_id_to_transfrom_to()
         if frame_id_to_transform_to is None:
             self._node.get_logger().warn(
@@ -247,6 +240,11 @@ class RealSenseGait(SetpointsGait):
         self.update_parameters(gait_parameters_response.gait_parameters)
         self.interpolate_subgaits_from_parameters()
 
+        self._reset()
+        self._current_time = current_time
+        self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
+        self._next_subgait = self._current_subgait
+
         # Delay first subgait if duration is greater than zero
         if first_subgait_delay is not None and first_subgait_delay > Duration(0):
             self._start_is_delayed = True
@@ -261,9 +259,16 @@ class RealSenseGait(SetpointsGait):
 
     def get_frame_id_to_transfrom_to(self):
         try:
-            return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
-                self._current_subgait.subgait_name
-            ]
+            if self._current_subgait is not None:
+                return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
+                    self._current_subgait.subgait_name
+                ]
+            else:
+                # If there is no current subgait, assume it is because the gait is
+                # starting with a realsense gait and use the right open frame id.
+                return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
+                    "right_open"
+                ]
         except KeyError:
             self._node.get_logger().warn(
                 f"The current subgait name {self._current_subgait.subgait_name} "
