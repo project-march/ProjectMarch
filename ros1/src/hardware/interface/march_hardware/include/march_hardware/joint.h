@@ -112,7 +112,8 @@ private:
 
     // Keep track of the position and velocity of the joint, updated by
     // readEncoders()
-    double previous_incremental_position_ = 0.0;
+    double initial_incremental_position_ = 0.0;
+    double initial_absolute_position_ = 0.0;
     double position_ = 0.0;
     double velocity_ = 0.0;
 

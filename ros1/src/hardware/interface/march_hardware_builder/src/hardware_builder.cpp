@@ -463,7 +463,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     bool remove_fixed_joints_from_ethercat_train = false;
     ros::param::get("remove_fixed_joints_from_ethercat_train",
         remove_fixed_joints_from_ethercat_train);
-    ROS_INFO("Removing fixed from rosparam was: %d", remove_fixed_joints_from_ethercat_train);
+    ROS_INFO("Removing fixed from rosparam was: %d",
+        remove_fixed_joints_from_ethercat_train);
     std::set<int> fixedSlaveIndices;
     if (remove_fixed_joints_from_ethercat_train) {
         fixedSlaveIndices = getSlaveIndicesOfFixedJoints(joints_config);

@@ -60,30 +60,6 @@ void Joint::prepareActuation()
     ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 }
 
-void Joint::readFirstEncoderValues()
-{
-    ROS_INFO("[%s] Reading first values", this->name_.c_str());
-    auto motor_controller_state = motor_controller_->getState();
-    if (motor_controller_state->isOperational()) {
-        if (motor_controller_->hasIncrementalEncoder()) {
-            previous_incremental_position_
-                = motor_controller_->getIncrementalPosition();
-        }
-        if (motor_controller_->hasAbsoluteEncoder()) {
-            position_ = motor_controller_->getAbsolutePosition();
-        } else {
-            position_ = previous_incremental_position_;
-        }
-        velocity_ = 0;
-    } else {
-        ROS_FATAL(
-            "%s", motor_controller_state->getErrorStatus().value().c_str());
-        throw error::HardwareException(
-            error::ErrorType::PREPARE_ACTUATION_ERROR);
-    }
-    ROS_INFO("[%s] Read first values", this->name_.c_str());
-}
-
 void Joint::actuate(float target)
 {
     if (!this->canActuate()) {
@@ -93,23 +69,72 @@ void Joint::actuate(float target)
     motor_controller_->actuate(target);
 }
 
+void Joint::readFirstEncoderValues()
+{
+    ROS_INFO("[%s] Reading first values", this->name_.c_str());
+    auto motor_controller_state = motor_controller_->getState();
+    if (motor_controller_state->isOperational()) {
+        if (motor_controller_->hasIncrementalEncoder()) {
+            initial_incremental_position_
+                = motor_controller_->getIncrementalPosition();
+        }
+        if (motor_controller_->hasAbsoluteEncoder()) {
+            initial_absolute_position_
+                = motor_controller_->getAbsolutePosition();
+            position_ = initial_absolute_position_;
+        }
+    } else {
+        ROS_FATAL(
+            "%s", motor_controller_state->getErrorStatus().value().c_str());
+        throw error::HardwareException(
+            error::ErrorType::PREPARE_ACTUATION_ERROR);
+    }
+    ROS_INFO("[%s] Read first values", this->name_.c_str());
+}
+
 void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
     if (this->receivedDataUpdate()) {
+        /* Calculate position by using the base absolute position and adding
+         * the difference between the initial incremental position and the new
+         * incremental position
+         *
+         * Calculation example:
+         * Say the first time the encoders are read they have the following
+         * values:
+         *  - absolute:     0.5
+         *  - incremental:  0.7
+         *
+         *  Then the joint has an initial absolute position of 0.3 and an
+         * initial incremental position of 0.5 Since the joint uses the absolute
+         * encoder at startup, the initial position of the joint is 0.3
+         *
+         *  Say the second time the encoders are read they have the following
+         * values:
+         *  - absolute:     0.25
+         *  - incremental:  0.4
+         *
+         *  If the incremental encoder of the joint is more precise, then we
+         * should use that value. The difference in incremental position is 0.4
+         * - 0.7 = -0.3 Hence the new joint position is 0.5 - 0.3 = 0.2
+         *
+         *  If the absolute encoder of the joint is more precise, then we should
+         * use that value This would give us a new joint position of 0.25
+         */
         if (motor_controller_->isIncrementalEncoderMorePrecise()) {
             double new_incremental_position
                 = motor_controller_->getIncrementalPosition();
-            position_
-                += (new_incremental_position - previous_incremental_position_);
-            previous_incremental_position_ = new_incremental_position;
+            position_ = initial_absolute_position_
+                + (new_incremental_position - initial_incremental_position_);
         } else {
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        // Update positions with velocity from last time step
-        position_ += velocity_ * elapsed_time.toSec();
-        previous_incremental_position_ += velocity_ * elapsed_time.toSec();
+        ROS_WARN("Data was not updated within %.3fs, using old data",
+            elapsed_time.toSec());
+        //        // Update positions with velocity from last time step
+        //        position_ += velocity_ * elapsed_time.toSec();
     }
 }
 
