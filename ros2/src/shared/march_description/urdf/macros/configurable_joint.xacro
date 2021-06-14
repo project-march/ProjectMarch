@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:include filename="joint.xacro"/>
+    <xacro:macro name="march_configurable_joint"
+                 params="name parent child safety origin axis reduction limits">
+        <xacro:if value="${name in actuating_joints}">
+            <xacro:march_joint
+                name="${name}"
+                parent="${parent}"
+                child="${child}"
+                safety="${safety}"
+                origin="${origin}"
+                axis="${axis}"
+                reduction="${reduction}"
+                limits="${limits}"
+                />
+        </xacro:if>
+        <xacro:unless value="${name in actuating_joints}">
+            <joint name="${name}" type="fixed">
+                <parent link="${parent}"/>
+                <child link="${child}"/>
+                <origin xyz="${origin}" rpy="0 0 0"/>
+            </joint>
+            <gazebo reference="${name}">
+                <preserveFixedJoint>true</preserveFixedJoint>
+            </gazebo>
+        </xacro:unless>
+    </xacro:macro>
+</robot>
