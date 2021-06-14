@@ -732,6 +732,9 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
       foot_locations_to_try->points[i].y = y_location;
       foot_locations_to_try->points[i].z = 0;
     }
+
+    foot_locations_to_try->header.stamp = hull_vector_->at(0)->header.stamp;
+
     ROS_DEBUG("Point x loc = %f\n", foot_locations_to_try->points[1].x);
     ROS_DEBUG("Point y loc = %f\n", foot_locations_to_try->points[1].y);
     ROS_DEBUG("Point z loc = %f\n", foot_locations_to_try->points[1].z);

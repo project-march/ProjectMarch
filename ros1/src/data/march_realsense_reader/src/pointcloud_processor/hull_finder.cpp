@@ -204,6 +204,7 @@ bool CHullFinder::addCHullToVector()
     hull_vector_->push_back(hull_);
     polygon_vector_->push_back(polygon_);
     plane_coefficients_vector_->push_back(plane_coefficients_);
+    ROS_DEBUG_STREAM("hull has time stamp" << hull_->header.stamp);
 
     return true;
 }

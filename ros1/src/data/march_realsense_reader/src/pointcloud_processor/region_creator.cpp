@@ -100,6 +100,8 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
             << std::fixed << time_taken << std::setprecision(5) << " sec "
             << std::endl);
+
+        ROS_DEBUG_STREAM("The time of the first region is " << points_vector_->at(0)->header.stamp);
     }
 
     return success;
