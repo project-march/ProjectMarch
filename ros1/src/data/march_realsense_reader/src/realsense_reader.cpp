@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <dynamic_reconfigure/server.h>
 #include <map>
@@ -15,10 +16,13 @@
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
-using RegionVector = std::vector<pcl::PointIndices>;
+using PointsVector = std::vector<PointCloud::Ptr>;
+using NormalsVector = std::vector<Normals::Ptr>;
 using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
+using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
+using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 
 std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
 std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
@@ -38,6 +42,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     , realsense_category_(-1)
     , use_left_foot_(nullptr)
     , debugging_launch(false)
+    , publish_hull_area_debug_(nullptr)
 {
 
     // Create a subscriber for every pointcloud topic
@@ -82,6 +87,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
         hull_marker_array_publisher_
             = n_->advertise<visualization_msgs::Marker>(
                 "/camera/hull_marker_list", /*queue_size=*/1);
+        hull_area_pointcloud_publisher_ = n_->advertise<PointNormalCloud>(
+            "/camera/hull_area_cloud", /*queue_size=*/1);
         hull_parameter_determiner_publisher_
             = n_->advertise<visualization_msgs::MarkerArray>(
                 "/camera/foot_locations_marker_array", /*queue_size=*/1);
@@ -105,6 +112,9 @@ void RealSenseReader::readConfigCb(
             ros::console::notifyLoggerLevelsChanged();
         }
     }
+
+    publish_hull_area_debug_ = config.publish_hull_area_debug;
+
     preprocessor_->readParameters(config);
     region_creator_->readParameters(config);
     parameter_determiner_->readParameters(config);
@@ -115,7 +125,6 @@ void RealSenseReader::readConfigCb(
 void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
-    clock_t start_of_processing_time = clock();
     Normals::Ptr normals = boost::make_shared<Normals>();
 
     // Preprocess
@@ -137,11 +146,13 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     // Setup data structures for region creating
-    boost::shared_ptr<RegionVector> region_vector
-        = boost::make_shared<RegionVector>();
+    boost::shared_ptr<PointsVector> points_vector
+        = boost::make_shared<PointsVector>();
+    boost::shared_ptr<NormalsVector> normals_vector
+        = boost::make_shared<NormalsVector>();
     // Create regions
-    bool region_creating_was_successful
-        = region_creator_->createRegions(pointcloud, normals, region_vector);
+    bool region_creating_was_successful = region_creator_->createRegions(
+        pointcloud, normals, points_vector, normals_vector);
 
     if (not region_creating_was_successful) {
         res.error_message
@@ -167,9 +178,9 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     boost::shared_ptr<PolygonVector> polygon_vector
         = boost::make_shared<PolygonVector>();
     // Find hulls
-    bool hull_finding_was_successful
-        = hull_finder_->findHulls(pointcloud, normals, region_vector,
-            plane_coefficients_vector, hull_vector, polygon_vector);
+    bool hull_finding_was_successful = hull_finder_->findHulls(pointcloud,
+        normals, points_vector, normals_vector, plane_coefficients_vector,
+        hull_vector, polygon_vector);
 
     if (not hull_finding_was_successful) {
         res.error_message = "Hull finding was unsuccessful, see debug output "
@@ -193,7 +204,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
             hull_vector, polygon_vector, realsense_category, gait_parameters,
             frame_id_to_transform_to_);
-
+    // The debug output of the parameter determiner is made so that it can be
+    // visualized even if the parameter determiner was not successful
     if (debugging_) {
         ROS_DEBUG(
             "Done determining parameters, now publishing a marker array to "
@@ -211,6 +223,11 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             "White: The optimal foot location");
         hull_parameter_determiner_publisher_.publish(
             parameter_determiner_->debug_marker_array);
+        if (publish_hull_area_debug_) {
+            ROS_DEBUG("Publishing hull area information to "
+                      "/camera/hull_area_cloud");
+            publishHullAreaCloud();
+        }
     }
     if (not parameter_determining_was_successful) {
         res.error_message
@@ -221,15 +238,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     res.gait_parameters = *gait_parameters;
-
-    clock_t end_of_processing_time = clock();
-
-    double time_taken
-        = double(end_of_processing_time - start_of_processing_time)
-        / double(CLOCKS_PER_SEC);
-    ROS_DEBUG_STREAM("Time taken by point cloud processor is : "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
-        << std::endl);
 
     res.success = true;
     // Returning false means that the service was not able to respond at all,
@@ -253,6 +261,38 @@ void RealSenseReader::publishCloud(
     msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
+}
+
+// Give an idea of the area of the hulls by cropping a large input grid to the
+// hull vector
+void RealSenseReader::publishHullAreaCloud()
+{
+    // Create the input cloud to be a grid on the ground
+    PointCloud2D::Ptr ground_cloud = boost::make_shared<PointCloud2D>();
+    // The grid size
+    float x_grid_size = 0.05;
+    float y_grid_size = 0.05;
+    // The area lengths the grid should span
+    float min_x = -3;
+    float max_x = 0;
+    float min_y = -1.5;
+    float max_y = 1.5;
+    // The number of points in each direction of the grid
+    int x_points = int(round((max_x - min_x) / x_grid_size)) + 1;
+    int y_points = int(round((max_y - min_y) / y_grid_size)) + 1;
+    for (int i = 0; i < x_points; ++i) {
+        for (int j = 0; j < y_points; ++j) {
+            pcl::PointXY point {};
+            point.x = min_x + (float)i * x_grid_size;
+            point.y = min_y + (float)j * y_grid_size;
+            ground_cloud->push_back(point);
+        }
+    }
+    // Crop the input (ground) cloud to the hull vector and publish the results
+    PointNormalCloud::Ptr cropped_cloud
+        = boost::make_shared<PointNormalCloud>();
+    parameter_determiner_->cropCloudToHullVector(ground_cloud, cropped_cloud);
+    publishCloud(hull_area_pointcloud_publisher_, *cropped_cloud);
 }
 
 // Turn a HullVector into a marker with a list of points and publish for
@@ -322,6 +362,7 @@ bool RealSenseReader::processPointcloudCallback(
             = "Unknown camera given in the request, not available in the "
               "POINTCLOUD_TOPICS in the realsense_reader";
         res.success = false;
+        return true;
     }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
@@ -332,20 +373,32 @@ bool RealSenseReader::processPointcloudCallback(
                             "no processing could be done.";
         ROS_WARN_STREAM(res.error_message);
         res.success = false;
+        return true;
     }
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
+    clock_t start_of_processing_time = clock();
+
     processPointcloud(point_cloud, res);
 
+    clock_t end_of_processing_time = clock();
+
+    double time_taken_by_processing
+        = double(end_of_processing_time - start_of_processing_time)
+        / double(CLOCKS_PER_SEC);
+    ROS_DEBUG_STREAM("Time taken by point cloud processor is : "
+        << std::fixed << time_taken_by_processing << std::setprecision(5)
+        << " sec " << std::endl);
+
     time_t end_callback = clock();
-    double time_taken
+    double time_taken_by_callback
         = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
     ROS_DEBUG_STREAM("Time taken by process point cloud callback method: "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
-        << std::endl);
+        << std::fixed << time_taken_by_callback << std::setprecision(5)
+        << " sec " << std::endl);
     // Always return true, to show that the service was able to handle the
     // request. Otherwise, the bridge will fail.
     return true;
