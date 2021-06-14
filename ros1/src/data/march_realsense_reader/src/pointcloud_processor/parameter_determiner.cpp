@@ -138,6 +138,9 @@ bool HullParameterDeterminer::determineParameters(
     // found
     if (success &= getOptimalFootLocation()) {
         success &= getGaitParametersFromFootLocation();
+        ROS_DEBUG("Point x loc after= %f\n", foot_locations_to_try->points[5].x);
+        ROS_DEBUG("Point y loc after= %f\n", foot_locations_to_try->points[5].y);
+        ROS_DEBUG("Point z loc after= %f\n", foot_locations_to_try->points[5].z);
     }
 
     if (debugging_) {
@@ -190,8 +193,8 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 {
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
-    marker_list.header.frame_id = frame_id_to_transform_to_;
-//    marker_list.header.frame_id = "world";
+//    marker_list.header.frame_id = frame_id_to_transform_to_;
+    marker_list.header.frame_id = "world";
     // Places the marker up right (axis aligned with that of its frame id)
     marker_list.pose.orientation.w = 1.0;
     marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
@@ -732,9 +735,9 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
       foot_locations_to_try->points[i].y = y_location;
       foot_locations_to_try->points[i].z = 0;
     }
-    ROS_DEBUG("Point x loc = %f\n", foot_locations_to_try->points[1].x);
-    ROS_DEBUG("Point y loc = %f\n", foot_locations_to_try->points[1].y);
-    ROS_DEBUG("Point z loc = %f\n", foot_locations_to_try->points[1].z);
+    ROS_DEBUG("Point x loc = %f\n", foot_locations_to_try->points[30].x);
+    ROS_DEBUG("Point y loc = %f\n", foot_locations_to_try->points[30].y);
+    ROS_DEBUG("Point z loc = %f\n", foot_locations_to_try->points[30].z);
 
     std::string pointcloud_frame_id = foot_locations_to_try->header.frame_id.c_str();
     std::string error_msg;
@@ -754,21 +757,21 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
 //        transform_stamped.transform.translation = transform_stamped_world.transform.translation;
 
         pcl_ros::transformPointCloud(
-                *foot_locations_to_try, *foot_locations_to_try, transform_stamped.transform);
+                *foot_locations_to_try, *foot_locations_to_try, transform_stamped_world.transform);
         ROS_DEBUG_STREAM("Transformed, foot locations to try frame id is " << foot_locations_to_try->header.frame_id.c_str());
     } else {
       ROS_INFO_STREAM(error_msg);
     }
-    ROS_DEBUG("Point x loc after= %f\n", foot_locations_to_try->points[1].x);
-    ROS_DEBUG("Point y loc after= %f\n", foot_locations_to_try->points[1].y);
-    ROS_DEBUG("Point z loc after= %f\n", foot_locations_to_try->points[1].z);
+    ROS_DEBUG("Point x loc after= %f\n", foot_locations_to_try->points[30].x);
+    ROS_DEBUG("Point y loc after= %f\n", foot_locations_to_try->points[30].y);
+    ROS_DEBUG("Point z loc after= %f\n", foot_locations_to_try->points[30].z);
     if (debugging_) {
         for (int i = 0; i < number_of_optional_foot_locations; i++) {
 
             geometry_msgs::Point marker_point;
             marker_point.x = foot_locations_to_try->points[i].x;
             marker_point.y =  foot_locations_to_try->points[i].y;
-            marker_point.z = 0;
+            marker_point.z = foot_locations_to_try->points[i].z;
 
             std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
 
