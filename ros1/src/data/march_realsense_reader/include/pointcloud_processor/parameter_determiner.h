@@ -89,7 +89,7 @@ public:
     /** Takes a 2D point cloud of potential foot locations and returns
      * the valid foot locations with associated height and normal vector.
      * Result indicates whether every original point ends up being valid.**/
-    bool cropCloudToHullVector(PointCloud2D::Ptr const& input_cloud,
+    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
 protected:
@@ -113,11 +113,15 @@ protected:
     bool getOptionalFootLocations(
         const PointCloud::Ptr& foot_locations_to_try);
 
-    /** Takes a 2D point cloud of potential foot locations and returns
-     * the valid foot locations with associated height and normal vector.
-     * Result indicates whether every original point ends up being valid.**/
-    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
-        const PointNormalCloud::Ptr& output_cloud);
+    // Crops a single point to a hull vector.
+    bool cropPointToHullVector(pcl::PointXYZ const input_point,
+                               const PointNormalCloud::Ptr& output_cloud);
+
+//    /** Takes a 2D point cloud of potential foot locations and returns
+//     * the valid foot locations with associated height and normal vector.
+//     * Result indicates whether every original point ends up being valid.**/
+//    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
+//        const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a cloud to a hull vector, but only puts each input point in
     // the highest hull it falls into
