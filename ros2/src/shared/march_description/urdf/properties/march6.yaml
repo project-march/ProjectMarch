@@ -91,32 +91,32 @@ safety:
   # Soft buffers are given in degrees
   exoskeleton:
     knee:
-      lower_soft_buffer: 1.0
-      upper_soft_buffer: 1.0
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
       k_position: 13.1031
       k_velocity: 20.9184
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
     hfe:
-      lower_soft_buffer: 1.0
-      upper_soft_buffer: 1.0
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
     ankle:
-      lower_soft_buffer: 1.0
-      upper_soft_buffer: 1.0
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
     haa:
       lower_soft_buffer: 1.0
       upper_soft_buffer: 1.0
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
   simulation:
     knee:
@@ -124,26 +124,26 @@ safety:
       upper_soft_buffer: 1.0
       k_position: 13.1031
       k_velocity: 20.9184
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
     hfe:
       lower_soft_buffer: 1.0
       upper_soft_buffer: 1.0
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
     ankle:
       lower_soft_buffer: 1.0
       upper_soft_buffer: 1.0
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
     haa:
       lower_soft_buffer: 1.0
       upper_soft_buffer: 1.0
       k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 20.0
+      max_effort: 28.0
       max_velocity: 3.0
