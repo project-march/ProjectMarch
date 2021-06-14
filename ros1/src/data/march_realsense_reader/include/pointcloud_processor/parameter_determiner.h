@@ -85,6 +85,12 @@ public:
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
 
+    /** Takes a 2D point cloud of potential foot locations and returns
+     * the valid foot locations with associated height and normal vector.
+     * Result indicates whether every original point ends up being valid.**/
+    bool cropCloudToHullVector(PointCloud2D::Ptr const& input_cloud,
+        const PointNormalCloud::Ptr& output_cloud);
+
 protected:
     // Get the optimal foot location by finding which possible foot location is
     // closest to the most desirable foot location
@@ -105,12 +111,6 @@ protected:
     // where it should be checked if there is a valid foot location
     bool getOptionalFootLocations(
         const PointCloud2D::Ptr& foot_locations_to_try);
-
-    /** Takes a 2D point cloud of potential foot locations and returns
-     * the valid foot locations with associated height and normal vector.
-     * Result indicates whether every original point ends up being valid.**/
-    bool cropCloudToHullVector(PointCloud2D::Ptr const& input_cloud,
-        const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a single point to a hull vector.
     bool cropPointToHullVector(pcl::PointXY const input_point,

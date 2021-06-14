@@ -14,7 +14,7 @@ from march_utility.exceptions.gait_exceptions import (
 from march_utility.foot_classes.feet_state import FeetState
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
-    get_joint_names_for_inverse_kinematics,
+    validate_and_get_joint_names_for_inverse_kinematics,
 )
 from march_utility.utilities.dimensions import InterpolationDimensions
 from trajectory_msgs import msg as trajectory_msg
@@ -29,7 +29,7 @@ from ..utilities.dimensions import amount_of_subgaits, amount_of_parameters
 PARAMETRIC_GAITS_PREFIX = "_pg_"
 FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 SUBGAIT_SUFFIX = ".subgait"
-JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
 class Subgait(object):
@@ -706,6 +706,8 @@ class Subgait(object):
         :param parameter: Parameter for interpolation, between 0 and 1
         :return: A list of interpolated joint trajectories
         """
+        if JOINT_NAMES_IK is None:
+            return base_subgait.joints
         Subgait.check_foot_position_interpolation_is_safe(base_subgait, other_subgait)
 
         # The inverse kinematics needs access to the 'ith' setpoints of all joints
