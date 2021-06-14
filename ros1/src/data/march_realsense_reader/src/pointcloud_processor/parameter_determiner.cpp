@@ -298,7 +298,10 @@ void HullParameterDeterminer::initializeGaitDimensions()
     // If the subgait is a swing subgait, double the gait parameters as
     // the step size (and height) of a swing subgait are twice that of
     // an open or close subgait
-    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing") {
+    // Do the same when the gait name is left open as this subgait
+    // also traverses twice the distance of a normal open gait
+    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing"
+        || subgait_name_ == "left_open") {
         x_flat *= 2;
         x_steep *= 2;
         z_flat *= 2;

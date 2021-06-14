@@ -37,6 +37,12 @@ std::map<int, std::string> POINTCLOUD_TOPICS
               TOPIC_TEST_CLOUDS } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
+std::map<std::string, std::string> SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP
+    = { { "right_open" : "foot_right" }, { "left_open" : "foot_left" },
+          { "right_swing" : "foot_right" }, { "left_swing" : "foot_left" },
+          { "right_close" : "foot_right" }, { "left_close" : "foot_left" },
+          { "sit_down" : "foot_right" } };
+
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
     , realsense_category_(-1)
@@ -354,8 +360,9 @@ bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     realsense_category_ = req.realsense_category;
-    frame_id_to_transform_to_ = req.frame_id_to_transform_to;
     subgait_name_ = req.subgait_name;
+    frame_id_to_transform_to_
+        = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[subgait_name_];
 
     time_t start_callback = clock();
     if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {

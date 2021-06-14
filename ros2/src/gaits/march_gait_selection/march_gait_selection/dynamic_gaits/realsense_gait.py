@@ -43,15 +43,6 @@ class RealSenseGait(SetpointsGait):
         "ramp_down": GetGaitParameters.Request.RAMP_DOWN,
         "sit": GetGaitParameters.Request.SIT,
     }
-    SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP = {
-        "right_open": "foot_right",
-        "left_open": "foot_left",
-        "right_swing": "foot_right",
-        "left_swing": "foot_left",
-        "right_close": "foot_right",
-        "left_close": "foot_left",
-        "sit_down": "foot_right",
-    }
 
     def __init__(
         self,
@@ -216,16 +207,7 @@ class RealSenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
-        frame_id_to_transform_to = self.get_frame_id_to_transfrom_to()
-        if frame_id_to_transform_to is None:
-            self._node.get_logger().warn(
-                "No frame id to transform to was not found. gait will not be started"
-            )
-            return GaitUpdate.empty()
-
-        service_call_successful = self.make_realsense_service_call(
-            frame_id_to_transform_to
-        )
+        service_call_successful = self.make_realsense_service_call()
         if not service_call_successful:
             self._node.get_logger().warn("No service response received within timeout")
             return GaitUpdate.empty()
@@ -257,25 +239,6 @@ class RealSenseGait(SetpointsGait):
             self._update_time_stamps(self._current_subgait)
             return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
-    def get_frame_id_to_transfrom_to(self):
-        try:
-            if self._current_subgait is not None:
-                return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
-                    self._current_subgait.subgait_name
-                ]
-            else:
-                # If there is no current subgait, assume it is because the gait is
-                # starting with a realsense gait and use the right open frame id.
-                return self.SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[
-                    "right_open"
-                ]
-        except KeyError:
-            self._node.get_logger().warn(
-                f"The current subgait name {self._current_subgait.subgait_name} "
-                f"has no known associated frame id."
-            )
-            return None
-
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
         Make a call to the realsense service, if it is available
@@ -284,10 +247,15 @@ class RealSenseGait(SetpointsGait):
         :param frame_id_to_transform_to: The frame that should be given to the reader.
         :return: Whether the call was successful
         """
+        if self._current_subgait is not None:
+            subgait_name = self._current_subgait.subgait_name
+        else:
+            # Assume that the current subgait is being created and use the right open name
+            subgait_name = "right_open"
+
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
-            frame_id_to_transform_to=frame_id_to_transform_to,
             subgait_name=self._current_subgait.subgait_name,
         )
         self.realsense_service_event.clear()
