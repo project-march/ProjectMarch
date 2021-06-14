@@ -13,7 +13,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 1
           axis: 0
           preCalibrated: true
           motorKV: 355
@@ -32,7 +32,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 3
+          slaveIndex: 4
           axis: 1
           preCalibrated: true
           motorKV: 355
@@ -51,7 +51,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 3
+          slaveIndex: 4
           axis: 0
           preCalibrated: true
           motorKV: 95
@@ -70,7 +70,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 1
           axis: 1
           preCalibrated: true
           motorKV: 95
@@ -89,7 +89,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 2
+          slaveIndex: 3
           axis: 0
           preCalibrated: true
           motorKV: 355
@@ -108,7 +108,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
+          slaveIndex: 2
           axis: 0
           preCalibrated: true
           motorKV: 355
@@ -127,7 +127,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
+          slaveIndex: 2
           axis: 1
           preCalibrated: true
           motorKV: 95
@@ -146,7 +146,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 2
+          slaveIndex: 3
           axis: 1
           preCalibrated: true
           motorKV: 95
