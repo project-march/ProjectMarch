@@ -125,9 +125,7 @@ class GaitSelection(Node):
             ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
         except KeyError:
             return False
-        if ik_joint_names != self._joint_names:
-            return False
-        return True
+        return ik_joint_names == self._joint_names
 
     def _create_services(self) -> None:
         self.create_service(
