@@ -122,7 +122,7 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
         from_back_camera = yaml_utilities::grabParameter<bool>(
             pointcloud_config, "from_back_camera")
                                .value();
-        gait_name = yaml_utilities::grabParameter<std::string>(pointcloud_config, "gait_name").value();
+        subgait_name = yaml_utilities::grabParameter<std::string>(pointcloud_config, "subgait_name").value();
         from_realsense_viewer = yaml_utilities::grabParameter<bool>(
             pointcloud_config, "from_realsense_viewer")
                                     .value();
@@ -132,7 +132,7 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
             << pointcloud_file_name << ". Continuing with default parameters");
         realsense_category = 0;
         from_back_camera = false;
-        gait_name = "right_open";
+        subgait_name = "right_open";
         from_realsense_viewer = false;
     }
 }
@@ -353,7 +353,7 @@ void RealsenseTestPublisher::makeProcessPointcloudCall()
 {
     march_shared_msgs::GetGaitParameters service;
     service.request.realsense_category = realsense_category;
-    service.request.gait_name = gait_name;
+    service.request.subgait_name = subgait_name;
 
     // The image always comes from simulated camera topic (enum value 2)
     service.request.camera_to_use = 2;

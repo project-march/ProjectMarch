@@ -83,7 +83,7 @@ private:
     path write_path;
     PointCloud::Ptr pointcloud_to_publish;
     std::string pointcloud_file_name;
-    std::string gait_name;
+    std::string subgait_name;
     std::string save_pointcloud_name;
     std::string pointcloud_topic;
     bool should_publish;
