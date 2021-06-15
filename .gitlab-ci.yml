@@ -33,12 +33,12 @@ stages:
 # An overview of all the different types can be
 # found on https://docs.gitlab.com/ee/ci/yaml/README.html#onlyexcept-basic
 
+
+
 # This is a "hidden" stage that is not run by itself. It is run extended by other
-# stages that define different values for the variables.
+# stages that define different values for the variables. This avoids duplication.
 .container_builder:
   stage: Build container
-  variables:
-    CACHE: true
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -49,7 +49,7 @@ stages:
   script:
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
-    - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $DESTINATION --cleanup
+      - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup
   rules:
     # These rules act as a sort of XOR for MR pipelines and branch pipelines.
     # As described on https://docs.gitlab.com/ee/ci/yaml/#switch-between-branch-pipelines-and-merge-request-pipelines
@@ -72,16 +72,17 @@ stages:
 # which is unnessecary if the Dockerfile is only changed once in the merge request.
 ROS container build:
   variables:
+    CACHE: "true"
     DOCKER_FILE: "Dockerfile"
-    DESTINATION: $CI_REGISTRY_IMAGE:$TAG
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
   extends:
     - .container_builder
 
 flake8 container build:
   variables:
-    CACHE: false
+    CACHE: "false"
     DOCKER_FILE: ".gitlab/images/Dockerfile_flake8"
-    DESTINATION: $CI_REGISTRY_IMAGE/flake8:$TAG
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/flake8"
   extends:
     - .container_builder
 
