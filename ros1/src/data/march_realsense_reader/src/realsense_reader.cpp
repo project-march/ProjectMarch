@@ -257,7 +257,7 @@ void RealSenseReader::publishCloud(
 
     pcl::toROSMsg(cloud, msg);
 
-    msg.header.frame_id = frame_id_to_transform_to_;
+    msg.header.frame_id = "world";
     msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
@@ -268,7 +268,7 @@ void RealSenseReader::publishCloud(
 void RealSenseReader::publishHullAreaCloud()
 {
     // Create the input cloud to be a grid on the ground
-    PointCloud2D::Ptr ground_cloud = boost::make_shared<PointCloud2D>();
+    PointCloud::Ptr ground_cloud = boost::make_shared<PointCloud>();
     // The grid size
     float x_grid_size = 0.05;
     float y_grid_size = 0.05;
@@ -282,7 +282,7 @@ void RealSenseReader::publishHullAreaCloud()
     int y_points = int(round((max_y - min_y) / y_grid_size)) + 1;
     for (int i = 0; i < x_points; ++i) {
         for (int j = 0; j < y_points; ++j) {
-            pcl::PointXY point {};
+            pcl::PointXYZ point {};
             point.x = min_x + (float)i * x_grid_size;
             point.y = min_y + (float)j * y_grid_size;
             ground_cloud->push_back(point);
@@ -295,13 +295,13 @@ void RealSenseReader::publishHullAreaCloud()
     publishCloud(hull_area_pointcloud_publisher_, *cropped_cloud);
 }
 
-// Turn a HullVector into a marker with a list of points and publish for
+// Turn a HullVector into a marker wFith a list of points and publish for
 // visualization
 void RealSenseReader::publishHullMarkerArray(
     const boost::shared_ptr<HullVector>& hull_vector)
 {
     visualization_msgs::Marker marker_list;
-    marker_list.header.frame_id = frame_id_to_transform_to_;
+    marker_list.header.frame_id = "world";
     marker_list.header.stamp = ros::Time::now();
     marker_list.ns = "hulls";
     marker_list.action = visualization_msgs::Marker::ADD;
