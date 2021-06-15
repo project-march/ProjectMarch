@@ -116,6 +116,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     // Set general attributes
     state->motor_current_ = getMotorCurrent();
+    state->temperature_ = getTemperature();
     state->absolute_position_iu_ = getAbsolutePositionIU();
     state->incremental_position_iu_ = getIncrementalPositionIU();
     state->incremental_velocity_iu_ = getIncrementalVelocityIU();
@@ -139,6 +140,13 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 float ODrive::getTorque()
 {
     return getMotorCurrent() * torque_constant_;
+}
+
+float ODrive::getTemperature()
+{
+    return this->read32(ODrivePDOmap::getMISOByteOffset(
+        ODriveObjectName::Temperature, axis_))
+        .f;
 }
 
 bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)

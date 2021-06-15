@@ -383,6 +383,7 @@ void MarchHardwareInterface::reserveMemory()
 
     motor_controller_state_pub_->msg_.motor_current.resize(num_joints_);
     motor_controller_state_pub_->msg_.motor_voltage.resize(num_joints_);
+    motor_controller_state_pub_->msg_.temperature.resize(num_joints_);
 
     motor_controller_state_pub_->msg_.absolute_position_iu.resize(num_joints_);
     motor_controller_state_pub_->msg_.incremental_position_iu.resize(
@@ -516,6 +517,8 @@ void MarchHardwareInterface::updateMotorControllerState()
             = motor_controller_state->motor_current_;
         motor_controller_state_pub_->msg_.motor_voltage[i]
             = motor_controller_state->motor_voltage_;
+        motor_controller_state_pub_->msg_.temperature[i]
+            = motor_controller_state->temperature_;
 
         motor_controller_state_pub_->msg_.absolute_position_iu[i]
             = motor_controller_state->absolute_position_iu_;

@@ -47,7 +47,7 @@ public:
     {
     }
 
-    std::string toString()
+    std::string toString() const
     {
         return toString(value_);
     }
@@ -108,19 +108,19 @@ class ODriveState : public MotorControllerState {
 public:
     ODriveState() = default;
 
-    bool isOperational() override
+    bool isOperational() const override
     {
         return axis_state_.value_ == ODriveAxisState::CLOSED_LOOP_CONTROL;
     }
 
-    bool hasError() override
+    bool hasError() const override
     {
         return !isOperational();
         // axis_error_ || motor_error_ || encoder_error_
         //    || encoder_manager_error_ || controller_error_;
     }
 
-    std::optional<std::string> getErrorStatus() override
+    std::optional<std::string> getErrorStatus() const override
     {
         if (hasError()) {
             std::ostringstream error_stream;
@@ -148,7 +148,7 @@ public:
         }
     }
 
-    std::string getOperationalState() override
+    std::string getOperationalState() const override
     {
         return axis_state_.toString();
     }
