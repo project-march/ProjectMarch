@@ -256,7 +256,7 @@ class RealSenseGait(SetpointsGait):
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
-            subgait_name=self._current_subgait.subgait_name,
+            subgait_name=self.subgait_name,
         )
         self.realsense_service_event.clear()
         if self._get_gait_parameters_service.wait_for_service(
