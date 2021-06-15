@@ -1,0 +1,89 @@
+description: MVI_walk_v3 without the HAA movement
+duration: 1500000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.1047
+    time_from_start: 288500000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 692300000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1038500000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 708500000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.1658
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.4712
+    time_from_start: 600000000
+    velocity: 0.121
+  - position: 0.4538
+    time_from_start: 857700000
+    velocity: -0.6297
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 480000000
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 646000000
+    velocity: -0.8394
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 346200000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.3142
+    time_from_start: 0
+    velocity: -0.2773
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+name: left_close
+version: MVI_walk_leftclose_v5
