@@ -167,6 +167,9 @@ flake8 container build:
     # array. This adds the required "[", "]" and ","s for the file to be interpreted as
     # a valid JSON array.
     - python3 -m flake8 --format=codeclimate --config .flake8 | sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
+    # If the above statement succeeds, then codeclimate.json will be empty. We add an empty
+    # array to ensure that the codeclimate.json file still has a valid json syntax
+    - echo "[]" | tee codeclimate.json
   artifacts:
     reports:
       codequality: codeclimate.json
