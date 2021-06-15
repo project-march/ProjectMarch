@@ -33,8 +33,12 @@ stages:
 # An overview of all the different types can be
 # found on https://docs.gitlab.com/ee/ci/yaml/README.html#onlyexcept-basic
 
+# This is a "hidden" stage that is not run by itself. It is run extended by other
+# stages that define different values for the variables.
 .container_builder:
   stage: Build container
+  variables:
+    CACHE: true
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -42,32 +46,42 @@ stages:
     - mkdir -p /kaniko/.docker
     # Equivalent to `docker login` but without installing docker"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
+    # Information about all the parameters can be found there.
+    - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $DESTINATION --cleanup
+  rules:
+    # These rules act as a sort of XOR for MR pipelines and branch pipelines.
+    # As described on https://docs.gitlab.com/ee/ci/yaml/#switch-between-branch-pipelines-and-merge-request-pipelines
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
 
 # Build the container iff the Dockerfile has been changed. This only runs for
 # branches because this is a very long job. Running it for merge requests would
 # mean that this job is scheduled every time that a commit is pushed in a merge requests,
 # which is unnessecary if the Dockerfile is only changed once in the merge request.
 ROS container build:
-  script:
-    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
-    # Information about all the parameters can be found there.
-    - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
-  rules:
-    # If commit in branch and Dockerfile has changed, build a new container
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - "Dockerfile"
+  variables:
+    DOCKER_FILE: "Dockerfile"
+    DESTINATION: $CI_REGISTRY_IMAGE:$TAG
   extends:
     - .container_builder
 
 flake8 container build:
-  script:
-    - /kaniko/executor --cache=false --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE/flake8:$CI_COMMIT_BRANCH --cleanup
-  rules:
-    # If commit in branch and Dockerfile has changed, build a new flake8 container
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - ".gitlab/images/Dockerfile_flake8"
+  variables:
+    CACHE: false
+    DOCKER_FILE: ".gitlab/images/Dockerfile_flake8"
+    DESTINATION: $CI_REGISTRY_IMAGE/flake8:$TAG
   extends:
     - .container_builder
 
