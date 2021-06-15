@@ -19,6 +19,8 @@
 
 #include <ros/ros.h>
 
+//#define DEBUG_EFFORT
+
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -76,10 +78,12 @@ void ODrive::waitForState(ODriveAxisState target_state)
 
 void ODrive::actuateTorque(float target_effort)
 {
-    ROS_INFO("Effort: %f", target_effort);
     float target_torque
         = target_effort * torque_constant_ * (float)getMotorDirection();
+#ifdef DEBUG_EFFORT
+    ROS_INFO("Effort: %f", target_effort);
     ROS_INFO("Torque: %f", target_torque);
+#endif
     bit32 write_torque = { .f = target_torque };
     this->write32(
         ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
@@ -258,10 +262,11 @@ uint32_t ODrive::getMotorError()
 
 uint32_t ODrive::getEncoderManagerError()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
+    auto value = this->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::EncoderManagerError, axis_))
         .ui;
+    ROS_INFO("Time difference %.3f", ((float) value) / 1000);
+    return 0;
 }
 
 uint32_t ODrive::getEncoderError()

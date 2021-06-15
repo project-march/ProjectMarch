@@ -26,6 +26,8 @@
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/motor_controller/motor_controller.h"
 
+//#define DEBUG_JOINT_VALUES
+
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
 using hardware_interface::PositionJointInterface;
@@ -265,9 +267,11 @@ void MarchHardwareInterface::read(
         joint_position_[i] = joint.getPosition();
         joint_velocity_[i] = joint.getVelocity();
 
+#ifdef DEBUG_JOINT_VALUES
         ROS_INFO_STREAM("Joint " << joint.getName()
                                  << ", position= " << joint_position_[i]
                                  << ", velocity= " << joint_velocity_[i]);
+#endif
 
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
