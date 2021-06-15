@@ -26,7 +26,7 @@ from .setpoint import Setpoint
 ALLOWED_ERROR = 0.001
 
 
-class JointTrajectory(object):
+class JointTrajectory:
     """Base class for joint trajectory of a gait."""
 
     setpoint_class = Setpoint

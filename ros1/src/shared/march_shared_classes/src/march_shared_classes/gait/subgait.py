@@ -28,7 +28,7 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 SEC_TO_NSEC = 1e9
 
 
-class Subgait(object):
+class Subgait:
     """Base class for usage of the defined subgaits."""
 
     joint_class = JointTrajectory

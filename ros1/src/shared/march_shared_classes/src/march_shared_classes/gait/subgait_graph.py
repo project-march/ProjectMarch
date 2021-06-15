@@ -3,7 +3,7 @@ from collections import deque
 from march_shared_classes.exceptions.gait_exceptions import SubgaitGraphError
 
 
-class SubgaitGraph(object):
+class SubgaitGraph:
     START = "start"
     END = "end"
     TO = "to"

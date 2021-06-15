@@ -1,7 +1,7 @@
 import math
 
 
-class InvertedPendulum(object):
+class InvertedPendulum:
     G = 9.81
     EPSILON = 0.000001
 

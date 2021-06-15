@@ -30,7 +30,7 @@ MID_CALCULATION_PRECISION_DIGITS = 10
 ALLOWABLE_OVERSHOOT_FOOT_POSITION = 0.001
 
 
-class Foot(object):
+class Foot:
     """Class for capturing the state (position and possible velocity) of a foot."""
 
     def __init__(self, foot_side: Side, position: Vector3d, velocity: Vector3d) -> None:
