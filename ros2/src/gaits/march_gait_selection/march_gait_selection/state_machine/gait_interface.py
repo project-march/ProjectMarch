@@ -5,7 +5,7 @@ from rclpy.time import Time
 from .gait_update import GaitUpdate
 
 
-class GaitInterface(object):
+class GaitInterface:
     """The interface that defines the properties and functions that every gait
     should have."""
 
@@ -89,4 +89,3 @@ class GaitInterface(object):
 
     def end(self) -> bool:
         """Called when the gait has finished."""
-        pass

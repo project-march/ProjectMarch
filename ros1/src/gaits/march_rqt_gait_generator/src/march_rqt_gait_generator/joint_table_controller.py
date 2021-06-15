@@ -6,7 +6,7 @@ from .joint_setting_spin_box_delegate import JointSettingSpinBoxDelegate
 from .model.modifiable_setpoint import ModifiableSetpoint
 
 
-class JointTableController(object):
+class JointTableController:
     TABLE_DIGITS = 4
 
     def __init__(self, joint_table_widget, joint):

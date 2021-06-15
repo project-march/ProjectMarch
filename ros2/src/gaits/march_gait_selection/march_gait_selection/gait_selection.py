@@ -125,9 +125,7 @@ class GaitSelection(Node):
             ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
         except KeyError:
             return False
-        if ik_joint_names != self._joint_names:
-            return False
-        return True
+        return ik_joint_names == self._joint_names
 
     def _create_services(self) -> None:
         self.create_service(
@@ -232,13 +230,11 @@ class GaitSelection(Node):
             raise GaitNameNotFound(gait_name)
 
         # Only update versions that are different
-        version_map = dict(
-            [
-                (name, version)
-                for name, version in version_map.items()
-                if version != self._gait_version_map[gait_name][name]
-            ]
-        )
+        version_map = {
+            name: version
+            for name, version in version_map.items()
+            if version != self._gait_version_map[gait_name][name]
+        }
         self._loaded_gaits[gait_name].set_subgait_versions(
             self._robot, self._gait_directory, version_map
         )

@@ -8,7 +8,7 @@ class TransitionRequest(Enum):
     INCREASE_SIZE = 1
 
 
-class StateMachineInput(object):
+class StateMachineInput:
     def __init__(self, node):
         self._stopped = False
         self._paused = False

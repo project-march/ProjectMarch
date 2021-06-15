@@ -2,7 +2,7 @@ from python_qt_binding.QtWidgets import QCheckBox, QPushButton
 import rospy
 
 
-class SideSubgaitView(object):
+class SideSubgaitView:
     def __init__(self, widget, side: str = None):
         if side == "previous":
             self.import_button = widget.findChildren(
