@@ -1,0 +1,89 @@
+description: MVI_walk_v5 but slower
+duration: 1850000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.1047
+    time_from_start: 355800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 853800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1280800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1850000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0611
+    time_from_start: 873800000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1850000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.0785
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.541
+    time_from_start: 740000000
+    velocity: 0.0981
+  - position: 0.5236
+    time_from_start: 1057800000
+    velocity: -0.5106
+  - position: 0.0
+    time_from_start: 1850000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 592000000
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 796700000
+    velocity: -0.6806
+  - position: 0.0
+    time_from_start: 1850000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1850000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0611
+    time_from_start: 427000000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1850000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.4015
+    time_from_start: 0
+    velocity: -0.2248
+  - position: 0.0
+    time_from_start: 1850000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1850000000
+    velocity: 0.0
+name: left_close
+version: MVI_walk_leftclose_v6

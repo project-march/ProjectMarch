@@ -135,11 +135,11 @@ gaits:
     left_close: MV_TPstraight_leftclose_v1
     right_open: MV_TPstraight_rightopen_v1
   walk:
-    left_close: MVI_walk_leftclose_v3
-    left_swing: MVI_walk_leftswing_v3
-    right_close: MVI_walk_rightclose_v3
-    right_open: MVI_walk_rightopen_v3
-    right_swing: MVI_walk_rightswing_v3
+    left_close: MVI_walk_leftclose_v6
+    left_swing: MVI_walk_leftswing_v6
+    right_close: MVI_walk_rightclose_v6
+    right_open: MVI_walk_rightopen_v6
+    right_swing: MVI_walk_rightswing_v6
   walk_large:
     left_close: MVI_walklarge_leftclose_v3
     left_swing: MVI_walklarge_leftswing_v3
