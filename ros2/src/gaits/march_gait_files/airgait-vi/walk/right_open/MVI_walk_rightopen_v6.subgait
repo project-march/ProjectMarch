@@ -1,4 +1,4 @@
-description: MVI_walk_v4 without the HAA movement
+description: MVI_walk_v4 (the walk gait) without the HAA movement
 duration: 1600000000
 gait_type: walk_like
 joints:

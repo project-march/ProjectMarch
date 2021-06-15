@@ -10,16 +10,10 @@ joints:
     time_from_start: 1300000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
-    time_from_start: 325000000
-    velocity: 0.0
-  - position: 0.0349
-    time_from_start: 975000000
-    velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1300000000
     velocity: -0.0
   left_hip_fe:
@@ -56,13 +50,10 @@ joints:
     time_from_start: 1300000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
-    time_from_start: 651500000
-    velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1300000000
     velocity: -0.0
   right_hip_fe:
