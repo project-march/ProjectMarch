@@ -261,9 +261,9 @@ void MarchHardwareInterface::read(
         joint_position_[i] = joint.getPosition();
         joint_velocity_[i] = joint.getVelocity();
 
-        ROS_INFO_STREAM("Joint " << joint.getName()
-                                 << ", position= " << joint_position_[i]
-                                 << ", velocity= " << joint_velocity_[i]);
+//        ROS_INFO_STREAM("Joint " << joint.getName()
+//                                 << ", position= " << joint_position_[i]
+//                                 << ", velocity= " << joint_velocity_[i]);
 
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
