@@ -1,0 +1,36 @@
+FROM ros:foxy
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Build tools
+RUN apt update && apt install -y    python3-rosinstall-generator \
+                                    python3-pip \
+                                    python3-catkin-pkg \
+                                    python3-catkin-lint \
+                                    clang-tidy \
+                                    clang \
+                                    libssl-dev \
+                                    wget \
+                                    cmake \
+                                    git-lfs \
+                                    libbullet-dev \
+                                    python3-pytest-cov \
+                                    python3-setuptools && \
+    apt update && apt install -y --no-install-recommends  \
+                                    libasio-dev \
+                                    libtinyxml2-dev \
+                                    libcunit1-dev
+
+# Non-ROS Python dependencies
+COPY requirements.pip /march/requirements.pip
+RUN bash -c "python3 -m pip install mock argcomplete pytest-repeat pytest-rerunfailures pytest $(cat /march/requirements.pip | sort | tr '\n' ' ')"
+
+# Copy the project into the container to automatically detect all dependencies.
+COPY . /march
+
+# Install all ROS2 packages
+# This gets all the packages defined in package.xml and tries to install the relevant packages
+# associated with them.
+RUN bash -c "source /opt/ros/foxy/local_setup.bash && rosdep update && apt update && apt install -y $(rosdep keys --from-paths /march/ros2/src --rosdistro foxy | xargs rosdep resolve --rosdistro foxy | grep -v "^#" | sort | tr '\n' ' ' 2>/dev/null)"
+
+# Remove march files
+RUN rm -rf /march
