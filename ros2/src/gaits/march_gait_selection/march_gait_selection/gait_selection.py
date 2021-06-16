@@ -15,10 +15,12 @@ from march_utility.exceptions.gait_exceptions import (
 )
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.node_utils import get_robot_urdf
+from march_utility.utilities.node_utils import (
+    get_robot_urdf_from_service,
+    get_joint_names_from_robot,
+)
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
-    get_joint_names_from_robot,
 )
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
@@ -78,7 +80,8 @@ class GaitSelection(Node):
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
 
-        self._robot = get_robot_urdf(self) if robot is None else robot
+        self._robot = get_robot_urdf_from_service(self) if robot is None else robot
+        self._joint_names = get_joint_names_from_robot(self._robot)
 
         self._realsense_yaml = os.path.join(
             self._gait_directory, "realsense_gaits.yaml"
@@ -122,7 +125,7 @@ class GaitSelection(Node):
             ik_joint_names = validate_and_get_joint_names_for_inverse_kinematics()
         except KeyError:
             return False
-        if ik_joint_names != get_joint_names_from_robot(self.robot):
+        if ik_joint_names != self._joint_names:
             return False
         return True
 
@@ -427,7 +430,6 @@ class GaitSelection(Node):
                 msg="Gait version map: {gm}, is not valid".format(gm=version_map)
             )
 
-        joint_names = get_joint_names_from_robot(self.robot)
         positions = {}
 
         for position_name, position_values in default_config["positions"].items():
@@ -436,15 +438,15 @@ class GaitSelection(Node):
                 "joints": {},
             }
             for joint, joint_value in position_values["joints"].items():
-                if joint in joint_names:
+                if joint in self._joint_names:
                     positions[position_name]["joints"][joint] = joint_value
 
-            if set(positions[position_name]["joints"].keys()) != set(joint_names):
+            if set(positions[position_name]["joints"].keys()) != set(self._joint_names):
                 raise NonValidGaitContent(
                     f"The position {position_name} does not "
                     f"have a position for all required joits: it "
                     f"has {positions[position_name]['joints'].keys()}, "
-                    f"required: {joint_names}"
+                    f"required: {self._joint_names}"
                 )
         return version_map, positions, semi_dynamic_version_map
 

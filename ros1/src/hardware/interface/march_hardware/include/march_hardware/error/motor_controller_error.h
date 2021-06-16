@@ -4,6 +4,8 @@
 #define MARCH_HARDWARE_MOTOR_CONTROLLER_ERROR_H
 #include <array>
 #include <bitset>
+#include <climits>
+#include <ros/ros.h>
 #include <string>
 
 namespace march {
@@ -37,11 +39,11 @@ namespace error {
     extern const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE>
         ODRIVE_AXIS_ERRORS;
 
-    const size_t ODRIVE_MOTOR_ERRORS_SIZE = 26;
+    const size_t ODRIVE_MOTOR_ERRORS_SIZE = 27;
     extern const std::array<std::string, ODRIVE_MOTOR_ERRORS_SIZE>
         ODRIVE_MOTOR_ERRORS;
 
-    const size_t ODRIVE_ENCODER_ERRORS_SIZE = 11;
+    const size_t ODRIVE_ENCODER_ERRORS_SIZE = 10;
     extern const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE>
         ODRIVE_ENCODER_ERRORS;
 
@@ -49,7 +51,7 @@ namespace error {
     extern const std::array<std::string, ODRIVE_ENCODER_MANAGER_ERRORS_SIZE>
         ODRIVE_ENCODER_MANAGER_ERRORS;
 
-    const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 6;
+    const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 8;
     extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE>
         ODRIVE_CONTROLLER_ERRORS;
 
@@ -60,16 +62,20 @@ namespace error {
     template <typename T>
     std::string parseError(T error, ErrorRegister error_register)
     {
-        std::string description;
-        const auto size = sizeof(error) * 8;
-        const std::bitset<size> bitset(error);
+        if (error == 0) {
+            return "None. ";
+        } else {
+            std::string description;
+            const auto size = sizeof(error) * CHAR_BIT;
+            const std::bitset<size> bitset(error);
 
-        for (size_t i = 0; i < size; i++) {
-            if (bitset.test(i)) {
-                addErrorToDescription(i, error_register, description);
+            for (size_t i = 0; i < size; i++) {
+                if (bitset.test(i)) {
+                    addErrorToDescription(i, error_register, description);
+                }
             }
+            return description;
         }
-        return description;
     }
 
 } // namespace error

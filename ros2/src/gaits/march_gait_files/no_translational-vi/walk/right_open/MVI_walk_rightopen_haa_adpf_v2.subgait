@@ -1,0 +1,92 @@
+description: MVI ankle gait version 1 with HAA version 2 movement included
+duration: 1500000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.0875
+    time_from_start: 527538460
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: 1153846150
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.0785
+    time_from_start: 1500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1020000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 196153850
+    velocity: 0.0
+  - position: -0.10471976
+    time_from_start: 382038460
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1047
+    time_from_start: 750000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.57595865
+    time_from_start: 900000000
+    velocity: 0.12098622
+  - position: 0.31415927
+    time_from_start: 1500000000
+    velocity: -0.27733282
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.02509994
+    time_from_start: 630000000
+    velocity: 0.0
+  - position: 0.09690068
+    time_from_start: 1350000000
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 1500000000
+    velocity: 0.0
+name: right_open
+version: MVI_walk_rightopen_haa_adpf_v2
