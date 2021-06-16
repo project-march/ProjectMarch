@@ -12,15 +12,13 @@ from march_utility.gait.gait_graph import GaitGraph
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
+from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 from std_msgs.msg import Header
 from .gait_update import GaitUpdate
 from .trajectory_scheduler import TrajectoryScheduler
 from ..gait_selection import GaitSelection
-
-PRESSURE_SOLE_STANDING_FORCE = 8000
-DEFAULT_TIMER_PERIOD = 0.004
 
 State = Union[EdgePosition, str]
 
@@ -29,9 +27,10 @@ class GaitStateMachine:
     """The state machine used to make sure that only valid transitions will
     be made."""
 
-    def __init__(
-        self, gait_selection: GaitSelection, trajectory_scheduler: TrajectoryScheduler
-    ):
+
+    UNKNOWN = "unknown"
+
+    def __init__(self, gait_selection: Node, trajectory_scheduler: TrajectoryScheduler):
         """Generates a state machine from given gaits and resets it to
         UNKNOWN state.
 
@@ -45,9 +44,6 @@ class GaitStateMachine:
         self._trajectory_scheduler = trajectory_scheduler
 
         self._input = StateMachineInput(gait_selection)
-        self._timer_period = self._gait_selection.get_parameter_or(
-            "timer_period", alternative_value=DEFAULT_TIMER_PERIOD
-        )
 
         self._transition_callbacks = []
         self._gait_callbacks = []
@@ -68,6 +64,9 @@ class GaitStateMachine:
         self._is_stopping = False
 
         self.update_timer = None
+
+        self.timer_period = self._gait_selection.get_parameter(
+            "timer_period").get_parameter_value().double_value
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
@@ -122,15 +121,10 @@ class GaitStateMachine:
     def _update_foot_on_ground_cb(self, side, msg):
         """Update the status of the feet on ground based on pressure sole data,
         this is currently decided based on the force in simulation, but the numbers
-        for this will be updated when range of real pressure soles is known.
-        If the foot was not on the ground before and is now, the gait will freeze"""
+        for this will be updated when range of real pressure soles is known."""
         if len(msg.states) > 0:
             force = sum(state.total_wrench.force.z for state in msg.states)
-            if force > PRESSURE_SOLE_STANDING_FORCE:
-                if not self._right_foot_on_ground and side is Side.right:
-                    self._right_foot_on_ground = True
-                elif not self._left_foot_on_ground and side is Side.left:
-                    self._left_foot_on_ground = True
+
             # Assign force to specific foot
             if side is Side.right:
                 self._force_right_foot = force
@@ -140,10 +134,8 @@ class GaitStateMachine:
         # If there are no contacts, change foot on ground to False
         elif len(msg.states) == 0:
             if side is Side.right:
-                self._right_foot_on_ground = False
                 self._force_right_foot = 0
             else:
-                self._left_foot_on_ground = False
                 self._force_left_foot = 0
 
     def _possible_gaits_cb(self, request, response):
@@ -248,7 +240,7 @@ class GaitStateMachine:
     def run(self):
         """Runs the state machine until shutdown is requested."""
         self.update_timer = self._gait_selection.create_timer(
-            timer_period_sec=self._timer_period,
+            timer_period_sec=self.timer_period,
             callback=self.update,
         )
 
