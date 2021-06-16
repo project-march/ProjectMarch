@@ -7,14 +7,14 @@
 #define MARCH_POINT_UTILITIES_H
 
 namespace point_utilities {
-    pcl::PointXYZ makePoint(const float x, const float y, const float z)
-    {
-        pcl::PointXYZ point;
-        point.x = x;
-        point.y = y;
-        point.z = z;
-        return point;
-    }
+pcl::PointXYZ makePoint(const float x, const float y, const float z)
+{
+    pcl::PointXYZ point;
+    point.x = x;
+    point.y = y;
+    point.z = z;
+    return point;
 }
+} // namespace point_utilities
 
-#endif //MARCH_POINT_UTILITIES_H
+#endif // MARCH_POINT_UTILITIES_H

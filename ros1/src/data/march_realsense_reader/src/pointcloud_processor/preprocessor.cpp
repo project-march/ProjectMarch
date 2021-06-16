@@ -175,18 +175,19 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     geometry_msgs::TransformStamped& transform_stamped)
 
 {
-    //geometry_msgs::TransformStamped transform_stamped_rotation;
+    // geometry_msgs::TransformStamped transform_stamped_rotation;
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-        if (tfBuffer->canTransform("world",
-                pointcloud_frame_id, ros::Time(), ros::Duration(/*t=*/1.0))) {
-            transform_stamped
-                = tfBuffer->lookupTransform("world",
-                    pointcloud_frame_id, ros::Time(/*t=*/0));
-            //transform_stamped_rotation
-              //    = tfBuffer->lookupTransform("world",
-//                                              pointcloud_frame_id, ros::Time(/*t=*/0));
-//            transform_stamped.transform.rotation.z = transform_stamped_rotation.transform.rotation.z;
+        if (tfBuffer->canTransform("world", pointcloud_frame_id, ros::Time(),
+                ros::Duration(/*t=*/1.0))) {
+            transform_stamped = tfBuffer->lookupTransform(
+                "world", pointcloud_frame_id, ros::Time(/*t=*/0));
+            // transform_stamped_rotation
+            //    = tfBuffer->lookupTransform("world",
+            //                                              pointcloud_frame_id,
+            //                                              ros::Time(/*t=*/0));
+            //            transform_stamped.transform.rotation.z =
+            //            transform_stamped_rotation.transform.rotation.z;
         }
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);

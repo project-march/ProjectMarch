@@ -7,8 +7,8 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
-#include <visualization_msgs/MarkerArray.h>
 #include <tf2_ros/transform_listener.h>
+#include <visualization_msgs/MarkerArray.h>
 //#include <pcl_ros/transforms.h>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
@@ -110,8 +110,7 @@ protected:
 
     // Create a point cloud with points on the ground where the points represent
     // where it should be checked if there is a valid foot location
-    bool getOptionalFootLocations(
-        const PointCloud::Ptr& foot_locations_to_try);
+    bool getOptionalFootLocations(const PointCloud::Ptr& foot_locations_to_try);
 
     // Crops a single point to a hull vector.
     bool cropPointToHullVector(pcl::PointXYZ const input_point,
@@ -189,17 +188,17 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
-    // Transforms the gait information from the world frame to the frame_id_to_transform_to,
-    // but keeps the roll and pitch of the world frame
+    // Transforms the gait information from the world frame to the
+    // frame_id_to_transform_to, but keeps the roll and pitch of the world frame
     bool setGaitInformationToNewFrame();
 
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
-    float min_x_stairs {};
-    float max_x_stairs {};
-    float min_z_stairs {};
-    float max_z_stairs {};
+    float min_x_stairs {}, min_x_stairs_ {};
+    float max_x_stairs {}, max_x_stairs_ {};
+    float min_z_stairs {}, min_z_stairs_ {};
+    float max_z_stairs {}, max_z_stairs_ {};
     float y_location {};
     float foot_length_back {};
     float foot_length_front {};
