@@ -84,6 +84,9 @@ void HullParameterDeterminer::readParameters(
 
     y_location = (float)config.parameter_determiner_y_location;
 
+    min_sit_height = (float)config.parameter_determiner_min_sit_height;
+    max_sit_height = (float)config.parameter_determiner_max_sit_height;
+
     max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
@@ -246,6 +249,20 @@ void HullParameterDeterminer::addDebugGaitInformation()
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
+        }
+        case RealSenseCategory::sit: {
+            geometry_msgs::Point marker_point;
+            marker_point.y = y_location;
+
+            marker_point.x = x_flat;
+            marker_point.z = min_;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+
+            marker_point.x = x_steep;
+            marker_point.z = z_steep;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
         }
         default: {
             ROS_WARN_STREAM("gait debug information is not implemented yet "
