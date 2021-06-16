@@ -38,10 +38,13 @@ std::map<int, std::string> POINTCLOUD_TOPICS
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 std::map<std::string, std::string> SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP
-    = { { "right_open", "foot_right" }, { "left_open", "foot_left" },
-          { "right_swing", "foot_right" }, { "left_swing", "foot_left" },
-          { "right_close", "foot_right" }, { "left_close", "foot_left" },
-          { "sit_down", "foot_right" } };
+    = { { /*__x=*/"right_open", /*__y=*/"foot_right" },
+          { /*__x=*/"left_open", /*__y=*/"foot_left" },
+          { /*__x=*/"right_swing", /*__y=*/"foot_right" },
+          { /*__x=*/"left_swing", /*__y=*/"foot_left" },
+          { /*__x=*/"right_close", /*__y=*/"foot_right" },
+          { /*__x=*/"left_close", /*__y=*/"foot_left" },
+          { /*__x=*/"sit_down", /*__y=*/"foot_right" } };
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
