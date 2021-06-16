@@ -188,6 +188,10 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    bool getSitHeight();
+
+    bool fillSitGrid(PoitnCloud2D::Ptr sit_grid);
+
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
@@ -218,6 +222,12 @@ protected:
     float z_steep_up {};
     float ramp_min_search_area {};
     float max_distance_to_line {};
+    min_sit_height {};
+    max_sit_height {};
+    min_x_search_sit {};
+    max_x_search_sit {};
+    search_y_deviation_sit {};
+    sit_grid_size {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
     std::string subgait_name_;
@@ -235,6 +245,7 @@ protected:
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
+    PoitnCloud2D::Ptr sit_grid
 };
 
 /** The simple parameter determiner

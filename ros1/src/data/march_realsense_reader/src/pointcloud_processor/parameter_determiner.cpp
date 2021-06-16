@@ -88,10 +88,11 @@ void HullParameterDeterminer::readParameters(
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
     min_x_search_sit = (float)config.parameter_determiner_min_x_search_sit;
     max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
-    search_y_deviation_sit = (float)config.parameter_determiner_search_y_deviation_sit;
+    search_y_deviation_sit
+        = (float)config.parameter_determiner_search_y_deviation_sit;
     sit_grid_size = (float)config.parameter_determiner_sit_grid_size
 
-    max_allowed_z_deviation_foot
+                        max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
         = (float)config.parameter_determiner_ramp_max_distance_to_line;
@@ -263,7 +264,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
             marker_point.y = search_y_deviation_sit / 2.0f;
-            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f ;
+            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f;
 
             marker_point.z = min_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
@@ -354,7 +355,10 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
             success &= getGaitParametersFromFootLocationRamp();
             break;
         }
-        case RealSenseCategory::sit
+        case RealSenseCategory::sit: {
+            success &= getGaitParametersFromFootLocationSit();
+            break;
+        }
         default: {
             ROS_ERROR_STREAM(
                 "No way to transform a foot location to parameters "
@@ -365,6 +369,13 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
     }
     return success;
 }
+
+bool HullParameterDeterminer::getGaitParametersFromFootLocationSit()
+{
+    //    gait_parameters_first_parameter =
+    return false;
+}
+
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 {
     gait_parameters_->first_parameter = (optimal_foot_location.x - min_x_stairs)
@@ -411,6 +422,52 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
+    return true;
+}
+
+bool HullParameterDeterminer::getSitHeight()
+{
+    bool success = true;
+    sit_grid = boost::make_shared<PointCloud2D>();
+    sucess &= fillSitGrid(sit_grid);
+}
+
+bool HullParameterDeterminer::fillSitGrid(PoitnCloud2D::Ptr sit_grid)
+{
+    if (sit_grid_size < EPSILON) {
+        ROS_ERROR_STREAM("The grid size of the sit grid is too close to zero. "
+                         "Current value is "
+            << sit_grid_size << " but should be larger then " << EPSILON);
+        return false;
+    }
+    int x_points
+        = int(round((max_x_search_sit - min_x_search_sit) / sit_grid_size)) + 1;
+    int y_points = int(round((search_y_deviation_sit) / sit_grid_size)) + 1;
+
+    for (int x_index; x_index < x_points; ++x_index) {
+        for (int y_index; y_index < y_points; ++y_index) {
+            float x_location = x_index * sit_grid_size + min_x_search_sit;
+            float y_location = y_index * sit_grid_size;
+
+            int sit_grid_index = x_index + y_index * x_points;
+            sit_grid->points[sit_grid_index].x = x_location;
+            sit_grid->points[sit_grid_index].y = y_location;
+
+            if (debugging_) {
+                geometry_msgs::Point marker_point;
+                marker_point.x = x_location;
+                marker_point.y = y_location;
+                marker_point.z = 0;
+
+                std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
+
+                foot_locations_to_try_marker_list.points.push_back(
+                    marker_point);
+                foot_locations_to_try_marker_list.colors.push_back(
+                    marker_color);
+            }
+        }
+    }
     return true;
 }
 
