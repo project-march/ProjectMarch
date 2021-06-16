@@ -1,6 +1,11 @@
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
+  MAIN_DOCKERFILE: "Dockerfile"
+  ROS1_DOCKERFILE: ".gitlab/images/Dockerfile_ros1"
+  ROS2_DOCKERFILE: ".gitlab/images/Dockerfile_ros2"
+  FLAKE8_DOCKERFILE: ".gitlab/images/Dockerfile_flake8"
+  CLANG_FORMAT_DOCKERFILE: ".gitlab/images/Dockerfile_clang_format"
 
 # The different stages of the pipeline. They will occur in this order.
 # See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
@@ -70,19 +75,35 @@ stages:
 # branches because this is a very long job. Running it for merge requests would
 # mean that this job is scheduled every time that a commit is pushed in a merge requests,
 # which is unnessecary if the Dockerfile is only changed once in the merge request.
-ROS container build:
+ROS1 container build:
   variables:
     CACHE: "true"
-    DOCKER_FILE: "Dockerfile"
-    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
+    DOCKER_FILE: $ROS1_DOCKERFILE
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/ros1"
+  extends:
+    - .container_builder
+
+ROS2 container build:
+  variables:
+    CACHE: "true"
+    DOCKER_FILE: $ROS2_DOCKERFILE
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/ros2"
   extends:
     - .container_builder
 
 flake8 container build:
   variables:
     CACHE: "false"
-    DOCKER_FILE: ".gitlab/images/Dockerfile_flake8"
+    DOCKER_FILE: $FLAKE8_DOCKERFILE
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/flake8"
+  extends:
+    - .container_builder
+
+clang_format container build:
+  variables:
+    CACHE: "false"
+    DOCKER_FILE: $CLANG_FORMAT_DOCKERFILE
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/clang_format"
   extends:
     - .container_builder
 
@@ -93,9 +114,9 @@ flake8 container build:
 # to avoid common mistakes
 flake8:
   stage: Lint code
-  image: registry.gitlab.com/project-march/march/flake8:$TAG
+  image: $CI_REGISTRY_IMAGE/flake8:$TAG
   variables:
-      DOCKER_FILE: ".gitlab/images/Dockerfile_flake8"
+      DOCKER_FILE: $FLAKE8_DOCKERFILE
   script:
     # Return the return value of the rightmost failed command. It is unlikely that `sed` fails, but
     # the if the flake8 runner fails then everything is propagated through. This means that the
@@ -153,26 +174,50 @@ flake8:
 #######################
 # Check if the C++ code is consistent in code formatting (correct amount of tabs/spaces,
 # correct indentation etc.)
-.clang_format-base:
+clang-format:
   stage: Lint code
+  image: $CI_REGISTRY_IMAGE/clang_format:$TAG
+  variables:
+      DOCKER_FILE: $CLANG_FORMAT_DOCKERFILE
   script:
-    - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
-  only:
-    changes:
-      - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
-      - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
-
-# The job for branches
-clang_format:
-  extends:
-    - .clang_format-base
-    - .branches
-
-# The job for merge_requests
-clang_format for MRs:
-  extends:
-    - .clang_format-base
-    - .merge_requests
+    - run-clang-format.py -r ros1/src ros2/src --style=file
+  needs:
+    - job: "clang_format container build"
+      optional: true
+  rules:
+    # These rules are here to select a different Docker image depending on the
+    # running conditions. The statements are evaluated from top to bottom until a rule
+    # is matched.
+    # They can be interpreted as:
+    #   1. Run if the pipeline is a MR and the Dockerfile has changed with the image
+    #      created from the changed Dockerfile.
+    #   2. Don't run if the pipeline is both a branch and in a merge request
+    #      This is to avoid duplicate pipelines where both a MR pipeline and a branch pipeline
+    #      is scheduled.
+    #   3. Run if the pipline is for a branch without a MR and the Dockerfile has changed
+    #      with the image created from the changed Dockerfile.
+    #   4. In all other cases, if a clang_format, C or C++ related file has changed run with
+    #      the image from the Dockerfile in `main`.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - "ros1/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+        - "ros2/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+        - ".clang-format"
+        - ".clang-format-ignore"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
 
 ####################
 # Build code stage #
