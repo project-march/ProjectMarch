@@ -72,13 +72,11 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
     this->initUrdf();
-    ROS_INFO("Done init urdf.");
     auto pdo_interface = march::PdoInterfaceImpl::create();
     auto sdo_interface = march::SdoInterfaceImpl::create();
 
     const auto robot_name
         = this->robot_config_.begin()->first.as<std::string>();
-    ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
 
     // Remove top level robot name key
     YAML::Node config = this->robot_config_[robot_name];
