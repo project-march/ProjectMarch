@@ -430,6 +430,19 @@ bool HullParameterDeterminer::getSitHeight()
     bool success = true;
     sit_grid = boost::make_shared<PointCloud2D>();
     sucess &= fillSitGrid(sit_grid);
+
+    // Crop those locations to find where there is support for the exoskeleton
+    exo_support_points = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVectorUnique(
+            sit_grid, exo_support_points);
+
+    success &= sortPointCloudHeight();.
+
+    sucess &= getMedianHeight();
+
+    loc = median;
+
+
 }
 
 bool HullParameterDeterminer::fillSitGrid(PoitnCloud2D::Ptr sit_grid)
