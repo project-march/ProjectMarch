@@ -19,7 +19,6 @@ public:
         STARTUP_SEQUENCE = 2,
         FULL_CALIBRATION_SEQUENCE = 3,
         MOTOR_CALIBRATION = 4,
-        SENSORLESS_CONTROL = 5,
         ENCODER_INDEX_SEARCH = 6,
         ENCODER_OFFSET_CALIBRATION = 7,
         CLOSED_LOOP_CONTROL = 8,
@@ -65,8 +64,6 @@ public:
                 return "Full calibration sequence";
             case MOTOR_CALIBRATION:
                 return "Motor calibration";
-            case SENSORLESS_CONTROL:
-                return "Sensorless control";
             case ENCODER_INDEX_SEARCH:
                 return "Encoder index search";
             case ENCODER_OFFSET_CALIBRATION:

@@ -55,6 +55,7 @@ public:
 
     // Override functions for actuating the ODrive
     void prepareActuation() override;
+    void enableActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
     bool isIncrementalEncoderMorePrecise() const override;

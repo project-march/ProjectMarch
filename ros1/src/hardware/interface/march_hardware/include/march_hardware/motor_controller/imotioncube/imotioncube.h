@@ -55,6 +55,7 @@ public:
 
     // Override functions for actuating the IMotionCube
     void prepareActuation() override;
+    void enableActuation() override;
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
 

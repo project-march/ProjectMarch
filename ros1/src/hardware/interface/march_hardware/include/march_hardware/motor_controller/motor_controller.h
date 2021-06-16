@@ -50,6 +50,7 @@ public:
 
     // Prepare the MotorController for actuation, move it into its 'ready' state
     virtual void prepareActuation() = 0;
+    virtual void enableActuation() = 0;
 
     // Transform the ActuationMode to a number that is understood by the
     // MotorController

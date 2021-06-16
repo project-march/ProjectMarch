@@ -616,4 +616,9 @@ float IMotionCube::effortMultiplicationConstant()
 {
     return 1000.0;
 }
+
+void IMotionCube::enableActuation()
+{
+}
+
 } // namespace march

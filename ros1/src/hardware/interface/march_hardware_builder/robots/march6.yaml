@@ -148,7 +148,7 @@ march6:
           actuationMode: torque
           slaveIndex: 3
           axis: 1
-          preCalibrated: true
+          preCalibrated: false
           motorKV: 95
           absoluteEncoder:
             direction: 1

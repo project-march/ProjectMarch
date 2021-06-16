@@ -52,16 +52,17 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 
 void ODrive::prepareActuation()
 {
-    // if (!pre_calibrated_) {
-    //     // Calibrate the ODrive first
-    //     setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
-    //     waitForState(ODriveAxisState::IDLE);
-    // }
+//     if (!pre_calibrated_) {
+//         // Calibrate the ODrive first
+//         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+//         waitForState(ODriveAxisState::IDLE);
+//     }
+     setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+}
 
-    if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        // Set the ODrive to closed loop control
-        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-    }
+void ODrive::enableActuation()
+{
+    setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)

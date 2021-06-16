@@ -57,7 +57,12 @@ void Joint::prepareActuation()
     }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
     motor_controller_->prepareActuation();
-    ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
+}
+
+void Joint::enableActuation()
+{
+    motor_controller_->enableActuation();
+    ROS_INFO("[%s] Successfully enabled for actuation", this->name_.c_str());
 }
 
 void Joint::actuate(float target)
