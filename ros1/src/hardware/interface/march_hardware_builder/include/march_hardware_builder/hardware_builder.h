@@ -153,7 +153,7 @@ private:
     YAML::Node robot_config_;
     urdf::Model urdf_;
     bool init_urdf_ = true;
-    bool remove_fixed_joints_from_ethercat_train_;
+    bool remove_fixed_joints_from_ethercat_train_ = false;
 };
 
 /**
