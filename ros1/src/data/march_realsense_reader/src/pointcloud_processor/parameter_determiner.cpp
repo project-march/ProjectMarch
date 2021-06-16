@@ -323,7 +323,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
     bool success = true;
     switch (realsense_category_.value()) {
-        case RealsenseCategory::stairs_down:
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             success &= getGaitParametersFromFootLocationStairs();
             break;
@@ -434,6 +434,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 {
     bool success = true;
     switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down
         case RealSenseCategory::stairs_up: {
             // Get the location where we would ideally place the foot
             success &= getGeneralMostDesirableLocation();
@@ -452,7 +453,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             break;
         }
         default: {
-            ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
+            ROS_ERROR_STREAM("getOptimalFootLocationFromPossibleLocations method is not implemented "
                              "for selected obstacle "
                 << realsense_category_.value());
             return false;
@@ -734,7 +735,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
     bool success = true;
     foot_locations_to_try->points.resize(number_of_optional_foot_locations);
     switch (realsense_category_.value()) {
-        case RealsenseCategory::stairs_down:
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             success
                 &= fillOptionalFootLocationCloud(min_x_stairs, max_x_stairs);
