@@ -154,9 +154,7 @@ def generate_launch_description():
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(
-                name="timer_period",
-                default_value="0.004",
-                description=""
+                name="timer_period", default_value="0.004", description=""
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
@@ -225,8 +223,9 @@ def generate_launch_description():
                     ("use_sim_time", use_sim_time),
                     ("gait_package", gait_package),
                     ("balance", balance),
+                    ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
-                    ("timer_period", timer_period)
+                    ("timer_period", timer_period),
                 ],
             ),
             # Safety

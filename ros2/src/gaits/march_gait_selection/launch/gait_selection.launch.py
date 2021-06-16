@@ -44,9 +44,7 @@ def generate_launch_description():
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(
-                name="timer_period",
-                default_value="0.004",
-                description=""
+                name="timer_period", default_value="0.004", description=""
             ),
             Node(
                 package="march_gait_selection",
@@ -64,7 +62,7 @@ def generate_launch_description():
                             "early_schedule_duration"
                         )
                     },
-                    {"timer_period": LaunchConfiguration("timer_period")}
+                    {"timer_period": LaunchConfiguration("timer_period")},
                 ],
                 on_exit=Shutdown(),
             ),

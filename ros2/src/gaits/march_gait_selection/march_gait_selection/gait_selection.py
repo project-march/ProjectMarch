@@ -22,8 +22,6 @@ from march_utility.utilities.node_utils import (
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
 )
-from rcl_interfaces.msg import SetParametersResult
-from rclpy import Parameter
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
@@ -35,6 +33,7 @@ from march_gait_selection.gaits.realsense_gait import RealSenseGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
+
 
 class GaitSelection(Node):
     """Base class for the gait selection module."""
@@ -145,14 +144,33 @@ class GaitSelection(Node):
         default_yaml = os.path.join(gait_directory, "default.yaml")
 
         if not os.path.isdir(gait_directory):
-            self.get_logger().error(f"Gait directory does not exist: "
-                                    f"{gait_directory}")
+            self.get_logger().error(
+                f"Gait directory does not exist: " f"{gait_directory}"
+            )
         if not os.path.isfile(default_yaml):
             self.get_logger().error(
                 f"Gait default yaml file does not exist: "
                 f"{gait_directory}/default.yaml"
             )
         return gait_directory, default_yaml
+
+    def update_gaits(self):
+        """
+        Update the gaits after one of the gait attributes has been changed.
+        """
+        self._gait_directory, self._default_yaml = self._initialize_gaits()
+        self._realsense_yaml = os.path.join(
+            self._gait_directory, "realsense_gaits.yaml"
+        )
+
+        self._realsense_gait_version_map = self._load_realsense_configuration()
+        (
+            self._gait_version_map,
+            self._positions,
+            self._semi_dynamic_gait_version_map,
+        ) = self._load_configuration()
+
+        self._loaded_gaits = self._load_gaits()
 
     def _create_services(self) -> None:
         self.create_service(

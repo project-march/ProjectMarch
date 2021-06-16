@@ -65,8 +65,11 @@ class GaitStateMachine:
 
         self.update_timer = None
 
-        self.timer_period = self._gait_selection.get_parameter(
-            "timer_period").get_parameter_value().double_value
+        self.timer_period = (
+            self._gait_selection.get_parameter("timer_period")
+            .get_parameter_value()
+            .double_value
+        )
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
