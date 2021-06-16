@@ -1,6 +1,7 @@
 from threading import Event
 from typing import Optional, List
 
+from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
@@ -21,8 +22,6 @@ from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client
 from urdf_parser_py import urdf
-
-from march_gait_selection.state_machine.gait_update import GaitUpdate
 
 
 class RealSenseGait(SetpointsGait):
@@ -214,12 +213,8 @@ class RealSenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
-        # Currently, we hardcode foot_right in start, since this is almost
-        # always a right_open
-        service_call_succesful = self.make_realsense_service_call(
-            frame_id_to_transform_to="foot_right"
-        )
-        if not service_call_succesful:
+        service_call_successful = self.make_realsense_service_call()
+        if not service_call_successful:
             self._node.get_logger().warn("No service response received within timeout")
             return GaitUpdate.empty()
 
@@ -256,12 +251,18 @@ class RealSenseGait(SetpointsGait):
         and returns the response.
 
         :param frame_id_to_transform_to: The frame that should be given to the reader.
-        :return: Whether the call was succesful
+        :return: Whether the call was successful
         """
+        if self._current_subgait is not None:
+            subgait_name = self._current_subgait.subgait_name
+        else:
+            # Assume that the current subgait is being created and use the right open name
+            subgait_name = "right_open"
+
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
-            frame_id_to_transform_to=frame_id_to_transform_to,
+            subgait_name=subgait_name,
         )
         self.realsense_service_event.clear()
         if self._get_gait_parameters_service.wait_for_service(

@@ -8,14 +8,12 @@ uint8 RAMP_DOWN=3
 uint8 SIT=4
 uint8 realsense_category
 
-# The link to transform to, is generally set to either "foot_left" or "foot_right"
-string frame_id_to_transform_to
-
 uint8 CAMERA_FRONT=0
 uint8 CAMERA_BACK=1
 uint8 TEST_CLOUD=2
-
 uint8 camera_to_use
+
+string subgait_name
 ---
 # Whether a valid place to set the foot was found using the camera.
 bool success

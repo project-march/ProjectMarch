@@ -50,10 +50,14 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_foot_locations;
     hull_dimension = config.hull_dimension;
 
-    min_x_stairs = (float)config.parameter_determiner_stairs_locations_min_x;
-    max_x_stairs = (float)config.parameter_determiner_stairs_locations_max_x;
-    min_z_stairs = (float)config.parameter_determiner_stairs_locations_min_z;
-    max_z_stairs = (float)config.parameter_determiner_stairs_locations_max_z;
+    min_x_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_min_x;
+    max_x_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_max_x;
+    min_z_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_min_z;
+    max_z_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_max_z;
 
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
@@ -65,8 +69,8 @@ void HullParameterDeterminer::readParameters(
     foot_width = (float)config.parameter_determiner_foot_width;
     hull_dimension = config.hull_dimension;
 
-    max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
-    min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
+    ramp_min_search_area
+        = (float)config.parameter_determiner_ramp_min_search_area;
 
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
     z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
@@ -97,7 +101,7 @@ bool HullParameterDeterminer::determineParameters(
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
     boost::shared_ptr<GaitParameters> gait_parameters,
-    std::string frame_id_to_transform_to)
+    std::string frame_id_to_transform_to, std::string subgait_name)
 {
     time_t start_determine_parameters = clock();
 
@@ -108,6 +112,7 @@ bool HullParameterDeterminer::determineParameters(
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
     realsense_category_.emplace(realsense_category);
+    subgait_name_ = subgait_name;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
     // Initialize the optimal foot location at the origin and the gait
     // parameters at -1 in case the calculation fails
@@ -200,6 +205,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
     std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
     switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
             marker_point.y = y_location;
@@ -274,6 +280,36 @@ void HullParameterDeterminer::initializeGaitDimensions()
             z_steep = z_steep_up;
             break;
         }
+        case RealSenseCategory::stairs_up: {
+            min_x_stairs = min_x_stairs_up;
+            max_x_stairs = max_x_stairs_up;
+            min_z_stairs = min_z_stairs_up;
+            max_z_stairs = max_z_stairs_up;
+            break;
+        }
+        case RealSenseCategory::stairs_down: {
+            min_x_stairs = -min_x_stairs_up;
+            max_x_stairs = -max_x_stairs_up;
+            min_z_stairs = -min_z_stairs_up;
+            max_z_stairs = -max_z_stairs_up;
+            break;
+        }
+    }
+    // If the subgait is a swing subgait, double the gait parameters as
+    // the step size (and height) of a swing subgait are twice that of
+    // an open or close subgait
+    // Do the same when the gait name is left open as this subgait
+    // also traverses twice the distance of a normal open gait
+    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing"
+        || subgait_name_ == "left_open") {
+        x_flat *= 2;
+        x_steep *= 2;
+        z_flat *= 2;
+        z_steep *= 2;
+        min_x_stairs *= 2;
+        max_x_stairs *= 2;
+        min_z_stairs *= 2;
+        max_z_stairs *= 2;
     }
 }
 
@@ -692,8 +728,11 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            success &= fillOptionalFootLocationCloud(
-                min_search_area, max_search_area);
+            // A point further than x_flat can never be project on the right
+            // part of the potential foot locations line assuming that the
+            // x_flat > x_steep and z_flat < z_steep
+            success
+                &= fillOptionalFootLocationCloud(ramp_min_search_area, x_flat);
             break;
         }
         default: {
@@ -914,7 +953,7 @@ bool SimpleParameterDeterminer::determineParameters(
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
     boost::shared_ptr<GaitParameters> gait_parameters,
-    std::string frame_id_to_transform_to)
+    std::string frame_id_to_transform_to, std::string subgait_name)
 {
     ROS_DEBUG("Determining parameters with simple parameter determiner");
     hull_vector_ = hull_vector;

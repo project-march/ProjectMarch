@@ -37,6 +37,15 @@ std::map<int, std::string> POINTCLOUD_TOPICS
               TOPIC_TEST_CLOUDS } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
+std::map<std::string, std::string> SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP
+    = { { /*__x=*/"right_open", /*__y=*/"foot_right" },
+          { /*__x=*/"left_open", /*__y=*/"foot_left" },
+          { /*__x=*/"right_swing", /*__y=*/"foot_right" },
+          { /*__x=*/"left_swing", /*__y=*/"foot_left" },
+          { /*__x=*/"right_close", /*__y=*/"foot_right" },
+          { /*__x=*/"left_close", /*__y=*/"foot_left" },
+          { /*__x=*/"sit_down", /*__y=*/"foot_right" } };
+
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
     , realsense_category_(-1)
@@ -203,7 +212,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
             hull_vector, polygon_vector, realsense_category, gait_parameters,
-            frame_id_to_transform_to_);
+            frame_id_to_transform_to_, subgait_name_);
     // The debug output of the parameter determiner is made so that it can be
     // visualized even if the parameter determiner was not successful
     if (debugging_) {
@@ -354,7 +363,9 @@ bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     realsense_category_ = req.realsense_category;
-    frame_id_to_transform_to_ = req.frame_id_to_transform_to;
+    subgait_name_ = req.subgait_name;
+    frame_id_to_transform_to_
+        = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[subgait_name_];
 
     time_t start_callback = clock();
     if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {
