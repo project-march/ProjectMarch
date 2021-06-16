@@ -290,10 +290,11 @@ void HullParameterDeterminer::initializeGaitDimensions()
             break;
         }
         case RealSenseCategory::stairs_down: {
-            min_x_stairs = -min_x_stairs_up;
-            max_x_stairs = -max_x_stairs_up;
-            min_z_stairs = -min_z_stairs_up;
-            max_z_stairs = -max_z_stairs_up;
+            min_x_stairs = min_x_stairs_up;
+            max_x_stairs = max_x_stairs_up;
+            // Because the sign gets flipped, the minimum value becomes the maximum value.
+            max_z_stairs = -min_z_stairs_up;
+            min_z_stairs = -max_z_stairs_up;
             break;
         }
     }
@@ -321,8 +322,9 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
     bool success = true;
     switch (realsense_category_.value()) {
+        case RealsenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
-            success &= getGaitParametersFromFootLocationStairsUp();
+            success &= getGaitParametersFromFootLocationStairs();
             break;
         }
         case RealSenseCategory::ramp_down:
@@ -340,7 +342,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     }
     return success;
 }
-bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
+bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 {
     gait_parameters_->first_parameter = (optimal_foot_location.x - min_x_stairs)
         / (max_x_stairs - min_x_stairs);
@@ -349,6 +351,10 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
         / (max_z_stairs - min_z_stairs);
     // The side step parameter is unused for the stairs gait so we set it to -1
     gait_parameters_->side_step_parameter = -1;
+    // As the z coordinates are
+    if (realsense_category_.value() == RealSenseCategory::ramp_down) {
+        gait_parameters_->second_parameter = 1 - gait_parameters_->second_parameter;
+    }
     return true;
 }
 

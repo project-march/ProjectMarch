@@ -163,7 +163,7 @@ protected:
     bool getExecutableLocationsLine();
 
     // Find the stairs up parameters from the foot locations
-    bool getGaitParametersFromFootLocationStairsUp();
+    bool getGaitParametersFromFootLocationStairs();
 
     // Find the ramp parameter from the foot locations
     bool getGaitParametersFromFootLocationRamp();
