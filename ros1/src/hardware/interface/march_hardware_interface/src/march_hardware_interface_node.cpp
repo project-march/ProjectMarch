@@ -28,8 +28,13 @@ int main(int argc, char** argv)
     ROS_INFO_STREAM("Selected robot: " << selected_robot);
 
     bool reset_imc = ros::param::param<bool>("~reset_imc", false);
-    bool remove_fixed_joints_from_ethercat_train = ros::param::param<bool>(
-        "~remove_fixed_joints_from_ethercat_train", false);
+    bool remove_fixed_joints_from_ethercat_train;
+    if (ros::param::has("~remove_fixed_joints_from_ethercat_train")) {
+        ros::param::get("~remove_fixed_joints_from_ethercat_train", remove_fixed_joints_from_ethercat_train)
+    } else {
+        ROS_ERROR("Required parameter remove_fixed_joints_from_ethercat_train"
+                  " was not set.")
+    }
 
     spinner.start();
 
