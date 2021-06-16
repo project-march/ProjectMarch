@@ -33,8 +33,9 @@ int main(int argc, char** argv)
         ros::param::get("~remove_fixed_joints_from_ethercat_train",
             remove_fixed_joints_from_ethercat_train);
     } else {
-        ROS_ERROR("Required parameter remove_fixed_joints_from_ethercat_train"
+        ROS_FATAL("Required parameter remove_fixed_joints_from_ethercat_train"
                   " was not set.");
+        std::exit(/*__status=*/1);
     }
 
     spinner.start();
