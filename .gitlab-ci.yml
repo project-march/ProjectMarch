@@ -1,3 +1,7 @@
+# Before you change anything in this file, it is highly recommended to read the
+# reference on https://docs.gitlab.com/ee/ci/yaml/ and related pages. This file
+# won't make much sense without those pages.
+
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
