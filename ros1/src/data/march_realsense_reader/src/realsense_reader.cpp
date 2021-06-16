@@ -44,7 +44,7 @@ std::map<std::string, std::string> SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP
           { /*__x=*/"left_swing", /*__y=*/"foot_left" },
           { /*__x=*/"right_close", /*__y=*/"foot_right" },
           { /*__x=*/"left_close", /*__y=*/"foot_left" },
-          { /*__x=*/"sit_down", /*__y=*/"foot_right" } };
+          { /*__x=*/"sit_down", /*__y=*/"foot_left" } };
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)

@@ -88,6 +88,10 @@ void HullParameterDeterminer::readParameters(
 
     min_sit_height = (float)config.parameter_determiner_min_sit_height;
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
+    min_x_search_sit = (float)config.parameter_determiner_min_x_search_sit;
+    max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
+    search_y_deviation_sit = (float)config.parameter_determiner_search_y_deviation_sit;
+    sit_grid_size = (float)config.parameter_determiner_sit_grid_size
 
     max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
@@ -142,7 +146,13 @@ bool HullParameterDeterminer::determineParameters(
     // Only calculate the gait parameters if an optimal foot location has been
     // found
     if (success &= getOptimalFootLocation()) {
-        success &= getGaitParametersFromFootLocation();
+        if (realsense_category_.value() != RealSenseCategory::sit) {
+            success &= getGaitParametersFromLocation();
+        }
+    } else {
+        if (success &= getSitHeight()) {
+            succes &= getGaitParametersFromLocation();
+        }
     }
 
     if (debugging_) {
@@ -241,28 +251,27 @@ void HullParameterDeterminer::addDebugGaitInformation()
             geometry_msgs::Point marker_point;
             marker_point.y = y_location;
 
-            marker_point.x = x_flat;
-            marker_point.z = z_flat;
+            marker_point.x = min_sit_height;
+            marker_point.z = min_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
             marker_point.x = x_steep;
-            marker_point.z = z_steep;
+            marker_point.z = max_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
         }
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
-            marker_point.y = y_location;
+            marker_point.y = search_y_deviation_sit / 2.0f;
+            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f ;
 
-            marker_point.x = x_flat;
-            marker_point.z = min_;
+            marker_point.z = min_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
-            marker_point.x = x_steep;
-            marker_point.z = z_steep;
+            marker_point.z = max_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
         }
@@ -334,7 +343,7 @@ void HullParameterDeterminer::initializeGaitDimensions()
 
 // Find the parameters from the foot location by finding at what percentage of
 // the end points it is
-bool HullParameterDeterminer::getGaitParametersFromFootLocation()
+bool HullParameterDeterminer::getGaitParametersFromLocation()
 {
     bool success = true;
     switch (realsense_category_.value()) {
@@ -347,6 +356,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
             success &= getGaitParametersFromFootLocationRamp();
             break;
         }
+        case RealSenseCategory::sit
         default: {
             ROS_ERROR_STREAM(
                 "No way to transform a foot location to parameters "
@@ -399,6 +409,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
     }
 
     // The step height and side step parameter are unused for the ramp down
+    // gait, so they are set to -1
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;

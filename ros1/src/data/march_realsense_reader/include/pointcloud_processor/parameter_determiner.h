@@ -166,7 +166,7 @@ protected:
     bool getGaitParametersFromFootLocationStairsUp();
 
     // Find the ramp parameter from the foot locations
-    bool getGaitParametersFromFootLocationRamp();
+    bool getGaitParametersFromLocationRamp();
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
