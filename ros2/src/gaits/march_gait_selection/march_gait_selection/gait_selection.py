@@ -121,8 +121,10 @@ class GaitSelection(Node):
         self.get_logger().info("Successfully initialized gait selection node.")
 
     def _validate_inverse_kinematics_is_possible(self):
-        return validate_and_get_joint_names_for_inverse_kinematics(self.get_logger())\
-               is not None
+        return (
+            validate_and_get_joint_names_for_inverse_kinematics(self.get_logger())
+            is not None
+        )
 
     def _create_services(self) -> None:
         self.create_service(
