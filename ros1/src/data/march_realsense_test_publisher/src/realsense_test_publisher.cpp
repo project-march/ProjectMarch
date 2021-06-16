@@ -122,7 +122,9 @@ void RealsenseTestPublisher::getProcessPointcloudInputs()
         from_back_camera = yaml_utilities::grabParameter<bool>(
             pointcloud_config, "from_back_camera")
                                .value();
-        subgait_name = yaml_utilities::grabParameter<std::string>(pointcloud_config, "subgait_name").value();
+        subgait_name = yaml_utilities::grabParameter<std::string>(
+            pointcloud_config, "subgait_name")
+                           .value();
         from_realsense_viewer = yaml_utilities::grabParameter<bool>(
             pointcloud_config, "from_realsense_viewer")
                                     .value();
