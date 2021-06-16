@@ -292,7 +292,8 @@ void HullParameterDeterminer::initializeGaitDimensions()
         case RealSenseCategory::stairs_down: {
             min_x_stairs = min_x_stairs_up;
             max_x_stairs = max_x_stairs_up;
-            // Because the sign gets flipped, the minimum value becomes the maximum value.
+            // Because the sign gets flipped, the minimum value becomes the
+            // maximum value.
             max_z_stairs = -min_z_stairs_up;
             min_z_stairs = -max_z_stairs_up;
             break;
@@ -351,9 +352,12 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
         / (max_z_stairs - min_z_stairs);
     // The side step parameter is unused for the stairs gait so we set it to -1
     gait_parameters_->side_step_parameter = -1;
-    // As the z coordinates are
+    // As we interpret the second (height) parameter as being high when the
+    // stair is steep, flip it for the stairs down gait as it is one when the
+    // optimal location is close to the highest (not absolute) value.
     if (realsense_category_.value() == RealSenseCategory::ramp_down) {
-        gait_parameters_->second_parameter = 1 - gait_parameters_->second_parameter;
+        gait_parameters_->second_parameter
+            = 1 - gait_parameters_->second_parameter;
     }
     return true;
 }
@@ -555,6 +559,7 @@ bool HullParameterDeterminer::isValidLocation(
     // Less and larger than signs are swapped for the x coordinate as the
     // positive x axis points in the backwards direction of the exoskeleton
     switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
 
             if (debugging_) {
@@ -729,6 +734,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
     bool success = true;
     foot_locations_to_try->points.resize(number_of_optional_foot_locations);
     switch (realsense_category_.value()) {
+        case RealsenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             success
                 &= fillOptionalFootLocationCloud(min_x_stairs, max_x_stairs);
