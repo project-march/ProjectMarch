@@ -1,0 +1,18 @@
+FROM python:alpine
+
+# Add git for cloning the run-clang-format script
+# Add clang for the clang-format binary
+RUN apk add --no-cache git clang
+
+# Clone the script for GitHub, copy the script into a folder that is in the PATH and
+# remove the repository again to save space
+RUN git clone https://github.com/Sarcasm/run-clang-format.git && \
+    cp run-clang-format/run-clang-format.py /usr/bin/run-clang-format.py && \
+    rm -rf run-clang-format
+
+# Sanity check, if this fails then the installation failed
+RUN clang-format --version && \
+    run-clang-format.py -h
+
+# Remove git because it is no longer needed
+RUN apk del git
