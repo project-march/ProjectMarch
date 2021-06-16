@@ -318,7 +318,7 @@
     <joint name="hip" type="fixed">
         <parent link="imu_link"/>
         <child link="hip_base"/>
-        <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 0"/>
+        <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 ${0.25 * pi}"/>
     </joint>
 
     <xacro:march_configurable_joint

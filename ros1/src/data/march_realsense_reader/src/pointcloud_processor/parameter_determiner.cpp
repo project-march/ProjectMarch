@@ -7,7 +7,7 @@
 #include "utilities/point_utilities.h"
 #include "utilities/realsense_category_utilities.h"
 #include "yaml-cpp/yaml.h"
-#include <cmath>
+#include <math.h>
 #include <ctime>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
@@ -15,6 +15,9 @@
 #include <pcl_ros/transforms.h>
 #include <ros/package.h>
 #include <utility>
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+//#include "tf2_bullet/tf2_bullet.h"
+//#include "bt_Quaternion.h"
 //#include <pcl_ros/impl/transfoms.hpp>
 
 #define EPSILON 0.0001
@@ -293,6 +296,7 @@ bool HullParameterDeterminer::setGaitInformationToNewFrame()
         gait_information_cloud->erase(gait_information_cloud->begin());
     }
     geometry_msgs::TransformStamped transform_stamped_origin;
+    geometry_msgs::Transform yaw_msg;
     pcl::PointXYZ frame_id_to_transform_to_origin
         = point_utilities::makePoint(/*x=*/0, /*y=*/0, /*z=*/0);
 
@@ -301,12 +305,29 @@ bool HullParameterDeterminer::setGaitInformationToNewFrame()
 
         transform_stamped_origin = tfBuffer->lookupTransform(
             "world", frame_id_to_transform_to_, ros::Time(/*t=*/0));
+        ROS_DEBUG("Transformed");
     }
-    float origin_x = transform_stamped_origin.transform.translation.x;
-    y_location = transform_stamped_origin.transform.translation.y; //TODO: add old offset
-    float origin_z = transform_stamped_origin.transform.translation.z;
 
-    ROS_DEBUG("x = %f, y = %f, z = %f", origin_x, y_location, origin_z);
+    tf2::Quaternion frame_id_to_world_quaternion;
+    tf2::convert(transform_stamped_origin.transform.rotation, frame_id_to_world_quaternion);
+    ROS_DEBUG("Angle: %f", frame_id_to_world_quaternion.getAngle());
+    tf2::Matrix3x3 frame_id_to_world_matrix, yaw_matrix;
+    frame_id_to_world_matrix.setRotation(frame_id_to_world_quaternion);
+    tf2Scalar yaw, pitch, roll;
+    frame_id_to_world_matrix.getEulerYPR(yaw, pitch, roll);
+    yaw_matrix.setRPY(0, 0, yaw);
+
+//    pcl_ros::transformPointCloud(
+//            *gait_information_cloud,
+//            *gait_information_cloud,
+//            transform_stamped_origin.transform);
+
+    tf2::convert(yaw_matrix, yaw_msg);
+    ROS_DEBUG("sin yaw = %f, yaw = %f, cos yaw = %f", tf2Sin(yaw), yaw, tf2Cos(yaw));
+    y_location = transform_stamped_origin.transform.translation.y * tf2Sin(yaw); //TODO: add old offset
+
+//
+//    ROS_DEBUG("x = %f, y = %f, z = %f", origin_x, y_location, origin_z);
 
     pcl::PointXYZ point;
     switch (realsense_category_.value()) {
@@ -314,26 +335,26 @@ bool HullParameterDeterminer::setGaitInformationToNewFrame()
         case RealSenseCategory::stairs_up: {
             ROS_DEBUG("gait_information_cloud size: %li",
                 gait_information_cloud->size());
-            point = point_utilities::makePoint(min_x_stairs + origin_x,
-                y_location, min_z_stairs + origin_z);
+            point = point_utilities::makePoint(min_x_stairs * tf2Cos(yaw),
+                y_location, min_z_stairs);
             gait_information_cloud->push_back(point);
-            point = point_utilities::makePoint(max_x_stairs + origin_x,
-                y_location, min_z_stairs + origin_z);
+            point = point_utilities::makePoint(max_x_stairs * tf2Cos(yaw),
+                y_location, min_z_stairs);
             gait_information_cloud->push_back(point);
-            point = point_utilities::makePoint(min_x_stairs + origin_x,
-                y_location, max_z_stairs + origin_z);
+            point = point_utilities::makePoint(min_x_stairs * tf2Cos(yaw),
+                y_location, max_z_stairs);
             gait_information_cloud->push_back(point);
-            point = point_utilities::makePoint(max_x_stairs + origin_x,
-                y_location, max_z_stairs + origin_z);
+            point = point_utilities::makePoint(max_x_stairs * tf2Cos(yaw),
+                y_location, max_z_stairs);
             gait_information_cloud->push_back(point);
 
             if (tfBuffer->canTransform(
                     "world", frame_id_to_transform_to_, ros::Time(/*t=*/0))) {
                 geometry_msgs::TransformStamped transform_stamped_world;
                 geometry_msgs::TransformStamped transform_stamped;
-
-                transform_stamped_world = tfBuffer->lookupTransform(
-                    "world", frame_id_to_transform_to_, ros::Time(/*t=*/0));
+//
+//                transform_stamped_world = tfBuffer->lookupTransform(
+//                    "world", frame_id_to_transform_to_, ros::Time(/*t=*/0));
 
                 //                transform_stamped.transform.rotation.x =
                 //                transform_stamped_world.transform.rotation.x;
@@ -346,10 +367,10 @@ bool HullParameterDeterminer::setGaitInformationToNewFrame()
                 //        transform_stamped.transform.translation =
                 //        transform_stamped_world.transform.translation;
 
-                //                pcl_ros::transformPointCloud(
-                //                        *gait_information_cloud,
-                //                        *gait_information_cloud,
-                //                        transform_stamped_world.transform);
+                pcl_ros::transformPointCloud(
+                        *gait_information_cloud,
+                        *gait_information_cloud,
+                        transform_stamped_origin.transform);
                 min_x_stairs_ = gait_information_cloud->points[0].x;
                 max_x_stairs_ = gait_information_cloud->points[1].x;
                 min_z_stairs_ = gait_information_cloud->points[0].z;
