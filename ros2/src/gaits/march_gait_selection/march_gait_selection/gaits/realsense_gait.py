@@ -39,6 +39,7 @@ class RealSenseGait(SetpointsGait):
     """
 
     SERVICE_TIMEOUT = Duration(seconds=2.0)
+    INITIAL_START_DELAY_TIME = Duration(seconds=10.0)
     CAMERA_NAME_MAP = {
         "front": GetGaitParameters.Request.CAMERA_FRONT,
         "back": GetGaitParameters.Request.CAMERA_BACK,
@@ -278,7 +279,7 @@ class RealSenseGait(SetpointsGait):
         self._start_is_delayed = True
         # Start time will be set later, but to prevent updates during the service
         # calls to think the gait start time has passed, set start time in the future.
-        self._start_time = current_time + self.SERVICE_TIMEOUT * 3
+        self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
         # Currently, we hardcode foot_right in start, since this is almost
