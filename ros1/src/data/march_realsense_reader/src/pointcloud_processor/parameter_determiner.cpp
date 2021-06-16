@@ -434,7 +434,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 {
     bool success = true;
     switch (realsense_category_.value()) {
-        case RealSenseCategory::stairs_down
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             // Get the location where we would ideally place the foot
             success &= getGeneralMostDesirableLocation();
