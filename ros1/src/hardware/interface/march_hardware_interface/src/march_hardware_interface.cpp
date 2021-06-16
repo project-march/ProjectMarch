@@ -171,7 +171,7 @@ bool MarchHardwareInterface::init(
         march_temperature_interface_.registerHandle(temperature_sensor_handle);
     }
 
-     ros::Duration(/*t=*/5).sleep();
+    ros::Duration(/*t=*/5).sleep();
 
     // Prepare all joints for actuation
     for (size_t i = 0; i < num_joints_; ++i) {
@@ -189,7 +189,11 @@ bool MarchHardwareInterface::init(
     for (size_t i = 0; i < num_joints_; ++i) {
         march::Joint& joint = march_robot_->getJoint(i);
 
-        ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(), joint.getMotorController()->getState()->getOperationalState().c_str());
+        ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(),
+            joint.getMotorController()
+                ->getState()
+                ->getOperationalState()
+                .c_str());
     }
 
     // Read the first encoder values for each joint
