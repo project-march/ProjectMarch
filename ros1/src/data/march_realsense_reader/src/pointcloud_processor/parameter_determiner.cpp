@@ -453,7 +453,8 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             break;
         }
         default: {
-            ROS_ERROR_STREAM("getOptimalFootLocationFromPossibleLocations method is not implemented "
+            ROS_ERROR_STREAM("getOptimalFootLocationFromPossibleLocations "
+                             "method is not implemented "
                              "for selected obstacle "
                 << realsense_category_.value());
             return false;
