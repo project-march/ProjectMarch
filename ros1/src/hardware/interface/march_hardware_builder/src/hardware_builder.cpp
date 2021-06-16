@@ -465,8 +465,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     // Use a sorted map to store the joint names and yaml configurations
     std::map<std::string, YAML::Node> actuating_joint_names;
 
-    ROS_INFO("Removing fixed joints from ethercat train is: " <<
-        this->remove_fixed_joints_from_ethercat_train_)
+    ROS_INFO_STREAM("Removing fixed joints from ethercat train is: " <<
+        this->remove_fixed_joints_from_ethercat_train_);
     std::set<int> fixedSlaveIndices;
     if (this->remove_fixed_joints_from_ethercat_train_) {
         fixedSlaveIndices = getSlaveIndicesOfFixedJoints(joints_config);
