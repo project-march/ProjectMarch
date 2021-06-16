@@ -228,173 +228,215 @@ clang-format:
 # Besides compiling, this also produces a "compile_commands.json" file that is used
 # by subsequent C++ static analysis stages.
 
-# Build ROS 1 noetic iff a file in the ros1 folder has changed, or if .clang-tidy has
-# changed
-.noetic:build-base:
+# The following two hidden jobs are used to reduce duplication because these rules are
+# almost the same for a lot of subsequent jobs. They only vary in a few ways, which is why
+# some variables are introduced. The following three variables change, depending on the
+# version of ROS:
+#   1. ROS_VERSION, either 'ros1' or 'ros2'
+#   2. ROS_CODENAME, either 'noetic' or 'foxy'
+#   3. DOCKER_FILE, the path of the Dockerfile that defines the execution environment. This
+#      points to a ROS1 and ROS2 specific Dockerfile
+.only_on_ros_changes:
+  image: $CI_REGISTRY_IMAGE/$ROS_VERSION:$TAG
+  rules:
+    # These rules are here to select a different Docker image depending on the
+    # running conditions. The statements are evaluated from top to bottom until a rule
+    # is matched.
+    # They can be interpreted as:
+    #   1. Run if the pipeline is a MR and the Dockerfile has changed with the image
+    #      created from the changed Dockerfile.
+    #   2. Don't run if the pipeline is both a branch and in a merge request
+    #      This is to avoid duplicate pipelines where both a MR pipeline and a branch pipeline
+    #      is scheduled.
+    #   3. Run if the pipline is for a branch without a MR and the Dockerfile has changed
+    #      with the image created from the changed Dockerfile.
+    #   4. In all other cases, if a ROS or clang-tidy related file has changed run with
+    #      the image from the Dockerfile in `main`.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - "$ROS_VERSION/**/*"
+        - ".clang-tidy"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
+
+# Define the values of the ROS1 and ROS2 specific instances of
+# the ".only_on_ros_changes" job
+.only_on_ros1_changes:
+  variables:
+    ROS_VERSION: "ros1"
+    ROS_CODENAME: "noetic"
+    DOCKER_FILE: $ROS1_DOCKERFILE
+  needs:
+    - job: "ROS1 container build"
+      optional: true
+  extends:
+    - .only_on_ros_changes
+
+.only_on_ros2_changes:
+  variables:
+    ROS_VERSION: "ros2"
+    ROS_CODENAME: "foxy"
+    DOCKER_FILE: $ROS2_DOCKERFILE
+  needs:
+    - job: "ROS2 container build"
+      optional: true
+  extends:
+    - .only_on_ros_changes
+
+# A generic ROS builder that can run either for ROS1 or ROS2, depending on the given variables
+# $ROS_VERSION and $ROS_CODENAME
+.base_builder:
   stage: Build code
   artifacts:
     paths:
-      - ros1/build/
-      - ros1/install/
-      - ros1/log/
+      - $ROS_VERSION/build/
+      - $ROS_VERSION/install/
+      - $ROS_VERSION/log/
   script:
-    - cd ros1/
-    - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
-  only:
-    changes:
-      - "ros1/**/*"
-      - ".clang-tidy"
+    - cd $ROS_VERSION/
+    - source /opt/ros/$ROS_CODENAME/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
 
+# Define the two actual jobs that are created from both the ROS version specific variables AND
+# the generic base builder.
 noetic:build:
   extends:
-    - .noetic:build-base
-    - .branches
-
-noetic:build for MRs:
-  extends:
-    - .noetic:build-base
-    - .merge_requests
-
-# Build ROS 2 foxy iff a file in the ros2 folder has changed, or if .clang-tidy has
-# changed
-.foxy:build-base:
-  stage: Build code
-  artifacts:
-    paths:
-      - ros2/build/
-      - ros2/install/
-      - ros2/log/
-  script:
-    - cd ros2/
-    - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
-  only:
-    changes:
-      - "ros2/**/*"
-      - ".clang-tidy"
+    - .only_on_ros1_changes
+    - .base_builder
 
 foxy:build:
   extends:
-    - .foxy:build-base
-    - .branches
+    - .only_on_ros2_changes
+    - .base_builder
 
-foxy:build for MRs:
-  extends:
-    - .foxy:build-base
-    - .merge_requests
 
-###################
-# Test code stage #
-###################
-# Run the tests, both for noetic and foxy. These stages are separated because they
-# are not dependent on eachother. This enables extra parallelization.
 
-# Run noetic tests, if something in the ros1 folder has changed
-.noetic:test-base:
-  stage: Test code
-  dependencies:
-    - noetic:build
-  needs: ["noetic:build"]
-  script:
-    - cd ros1/
-    - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
-    - colcon test-result --verbose
-  only:
-    changes:
-      - "ros1/**/*"
 
-noetic:test:
-  extends:
-    - .noetic:test-base
-    - .branches
 
-noetic:test for MRs:
-  dependencies: ["noetic:build for MRs"]
-  needs: ["noetic:build for MRs"]
-  extends:
-    - .noetic:test-base
-    - .merge_requests
-
-# Run foxy tests, if something in the ros2 folder has changed
-.foxy:test-base:
-  stage: Test code
-  dependencies:
-    - foxy:build
-  needs: ["foxy:build"]
-  script:
-    - cd ros2/
-    - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
-    - colcon test-result --verbose
-  only:
-    changes:
-      - "ros2/**/*"
-
-foxy:test:
-  extends:
-    - .foxy:test-base
-    - .branches
-
-foxy:test for MRs:
-  dependencies: ["foxy:build for MRs"]
-  needs: ["foxy:build for MRs"]
-  extends:
-    - .foxy:test-base
-    - .merge_requests
-
-#######################
-# C++ static analysis #
-#######################
-# Run C++ static analysis. This is dependent on the `compile_commands.json` file that is
-# produced by the build stage. This runs when a C++ file has been changed or if the
-# static analysis configuration has changed. Currently, only clang-tidy is executed in
-# this stage. More information on clang-tidy can be found on https://clang.llvm.org/extra/clang-tidy/
-.noetic:clang_tidy-base:
-  stage: Static analysis on code
-  dependencies:
-    - noetic:build
-  needs: ["noetic:build"]
-  script:
-    - cd ros1/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
-  only:
-    changes:
-      - "ros1/**/*.{hpp,h,cpp}"
-      - "ros1/**/CMakeLists.txt"
-      - ".clang-tidy"
-
-noetic:clang_tidy:
-  extends:
-    - .noetic:clang_tidy-base
-    - .branches
-
-noetic:clang_tidy for MRs:
-  dependencies: ["noetic:build for MRs"]
-  needs: ["noetic:build for MRs"]
-  extends:
-    - .noetic:clang_tidy-base
-    - .merge_requests
-
-.foxy:clang_tidy-base:
-  stage: Static analysis on code
-  dependencies:
-    - foxy:build
-  needs: ["foxy:build"]
-  script:
-    - cd ros2/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
-  only:
-    changes:
-      - "ros2/**/*.{hpp,h,cpp}"
-      - "ros2/**/CMakeLists.txt"
-      - ".clang-tidy"
-
-foxy:clang_tidy:
-  extends:
-    - .foxy:clang_tidy-base
-    - .branches
-
-foxy:clang_tidy for MRs:
-  dependencies: ["foxy:build for MRs"]
-  needs: ["foxy:build for MRs"]
-  extends:
-    - .foxy:clang_tidy-base
-    - .merge_requests
+        ####################
+        ## Test code stage #
+        ####################
+        ## Run the tests, both for noetic and foxy. These stages are separated because they
+        ## are not dependent on eachother. This enables extra parallelization.
+        #
+        ## Run noetic tests, if something in the ros1 folder has changed
+        #.noetic:test-base:
+        #  stage: Test code
+        #  dependencies:
+        #    - noetic:build
+        #  needs: ["noetic:build"]
+        #  script:
+        #    - cd ros1/
+        #    - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
+        #    - colcon test-result --verbose
+        #  only:
+        #    changes:
+        #      - "ros1/**/*"
+        #
+        #noetic:test:
+        #  extends:
+        #    - .noetic:test-base
+        #    - .branches
+        #
+        #noetic:test for MRs:
+        #  dependencies: ["noetic:build for MRs"]
+        #  needs: ["noetic:build for MRs"]
+        #  extends:
+        #    - .noetic:test-base
+        #    - .merge_requests
+        #
+        ## Run foxy tests, if something in the ros2 folder has changed
+        #.foxy:test-base:
+        #  stage: Test code
+        #  dependencies:
+        #    - foxy:build
+        #  needs: ["foxy:build"]
+        #  script:
+        #    - cd ros2/
+        #    - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
+        #    - colcon test-result --verbose
+        #  only:
+        #    changes:
+        #      - "ros2/**/*"
+        #
+        #foxy:test:
+        #  extends:
+        #    - .foxy:test-base
+        #    - .branches
+        #
+        #foxy:test for MRs:
+        #  dependencies: ["foxy:build for MRs"]
+        #  needs: ["foxy:build for MRs"]
+        #  extends:
+        #    - .foxy:test-base
+        #    - .merge_requests
+        #
+        ########################
+        ## C++ static analysis #
+        ########################
+        ## Run C++ static analysis. This is dependent on the `compile_commands.json` file that is
+        ## produced by the build stage. This runs when a C++ file has been changed or if the
+        ## static analysis configuration has changed. Currently, only clang-tidy is executed in
+        ## this stage. More information on clang-tidy can be found on https://clang.llvm.org/extra/clang-tidy/
+        #.noetic:clang_tidy-base:
+        #  stage: Static analysis on code
+        #  dependencies:
+        #    - noetic:build
+        #  needs: ["noetic:build"]
+        #  script:
+        #    - cd ros1/
+        #    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+        #  only:
+        #    changes:
+        #      - "ros1/**/*.{hpp,h,cpp}"
+        #      - "ros1/**/CMakeLists.txt"
+        #      - ".clang-tidy"
+        #
+        #noetic:clang_tidy:
+        #  extends:
+        #    - .noetic:clang_tidy-base
+        #    - .branches
+        #
+        #noetic:clang_tidy for MRs:
+        #  dependencies: ["noetic:build for MRs"]
+        #  needs: ["noetic:build for MRs"]
+        #  extends:
+        #    - .noetic:clang_tidy-base
+        #    - .merge_requests
+        #
+        #.foxy:clang_tidy-base:
+        #  stage: Static analysis on code
+        #  dependencies:
+        #    - foxy:build
+        #  needs: ["foxy:build"]
+        #  script:
+        #    - cd ros2/
+        #    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+        #  only:
+        #    changes:
+        #      - "ros2/**/*.{hpp,h,cpp}"
+        #      - "ros2/**/CMakeLists.txt"
+        #      - ".clang-tidy"
+        #
+        #foxy:clang_tidy:
+        #  extends:
+        #    - .foxy:clang_tidy-base
+        #    - .branches
+        #
+        #foxy:clang_tidy for MRs:
+        #  dependencies: ["foxy:build for MRs"]
+        #  needs: ["foxy:build for MRs"]
+        #  extends:
+        #    - .foxy:clang_tidy-base
+        #    - .merge_requests
