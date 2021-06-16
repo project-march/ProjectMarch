@@ -27,19 +27,19 @@ public:
         const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
         return lhs.motor_current_ == rhs.motor_current_
-            && lhs.motor_voltage_ == rhs.motor_voltage_
-            && lhs.motor_current_ == rhs.motor_controller_voltage_
-            && lhs.temperature_ == rhs.temperature_
+//            && lhs.motor_voltage_ == rhs.motor_voltage_
+//            && lhs.motor_controller_voltage_ == rhs.motor_controller_voltage_
+//            && lhs.temperature_ == rhs.temperature_
             && lhs.absolute_position_iu_ == rhs.absolute_position_iu_
-            && lhs.incremental_position_iu_ == rhs.incremental_position_iu_
-            && lhs.absolute_velocity_iu_ == rhs.absolute_velocity_iu_
-            && lhs.incremental_velocity_iu_ == rhs.incremental_velocity_iu_
-            && lhs.absolute_position_ == rhs.absolute_position_
-            && lhs.incremental_position_ == rhs.incremental_position_
-            && lhs.absolute_velocity_ == rhs.absolute_velocity_
-            && lhs.incremental_velocity_ == rhs.incremental_velocity_
-            && lhs.isOperational() == rhs.isOperational()
-            && lhs.hasError() == rhs.hasError();
+            && lhs.incremental_position_iu_ == rhs.incremental_position_iu_;
+//            && lhs.absolute_velocity_iu_ == rhs.absolute_velocity_iu_
+//            && lhs.incremental_velocity_iu_ == rhs.incremental_velocity_iu_
+//            && lhs.absolute_position_ == rhs.absolute_position_
+//            && lhs.incremental_position_ == rhs.incremental_position_
+//            && lhs.absolute_velocity_ == rhs.absolute_velocity_
+//            && lhs.incremental_velocity_ == rhs.incremental_velocity_
+//            && lhs.isOperational() == rhs.isOperational()
+//            && lhs.hasError() == rhs.hasError();
     }
 
     /**

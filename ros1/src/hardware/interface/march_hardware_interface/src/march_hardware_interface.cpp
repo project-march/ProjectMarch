@@ -26,7 +26,7 @@
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/motor_controller/motor_controller.h"
 
-//#define DEBUG_JOINT_VALUES
+#define DEBUG_JOINT_VALUES
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;

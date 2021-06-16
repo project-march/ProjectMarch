@@ -49,6 +49,9 @@ gaits:
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
 
+  exo_test:
+    perform_test: perform_test_v1
+
 positions:
   stand:
     gait_type: walk_like

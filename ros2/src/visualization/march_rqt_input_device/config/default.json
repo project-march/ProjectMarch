@@ -231,6 +231,9 @@
          "name": "test_joint_gait"
       },
       {
+         "name": "exo_test"
+      },
+      {
          "name":"home_shutdown"
       }
    ]

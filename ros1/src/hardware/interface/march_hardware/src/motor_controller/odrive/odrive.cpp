@@ -19,7 +19,7 @@
 
 #include <ros/ros.h>
 
-//#define DEBUG_EFFORT
+#define DEBUG_EFFORT
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
@@ -262,10 +262,10 @@ uint32_t ODrive::getMotorError()
 
 uint32_t ODrive::getEncoderManagerError()
 {
-    auto value = this->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::EncoderManagerError, axis_))
-        .ui;
-    ROS_INFO("Time difference %.3f", ((float) value) / 1000);
+//    auto value = this->read32(ODrivePDOmap::getMISOByteOffset(
+//            ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
+//        .ui;
+//    ROS_INFO("Time difference %u ms", value);
     return 0;
 }
 

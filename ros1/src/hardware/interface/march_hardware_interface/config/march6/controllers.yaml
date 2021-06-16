@@ -31,10 +31,10 @@ march:
 #        right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 #        right_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 
-        left_hip_fe: { p: 20, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true }
-        left_knee: { p: 20, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true }
-        right_hip_fe: { p: 20, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true }
-        right_knee: { p: 35, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true }
+        left_hip_fe: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
+        left_knee: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
+        right_hip_fe: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
+        right_knee: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
 
       constraints:
         goal_time: 0.5
