@@ -98,4 +98,4 @@ joints:
     time_from_start: 3750000000
     velocity: -0.34906585
 name: right_open
-version: MVI_stairsdownbackwards_rightopen_cybathlon_v2
+version: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v2

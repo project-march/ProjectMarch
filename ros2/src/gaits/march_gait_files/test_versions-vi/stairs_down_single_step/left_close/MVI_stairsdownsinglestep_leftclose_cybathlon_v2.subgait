@@ -1,91 +1,73 @@
-description: Stairs up height of 22 cm and depth of 20
+description: Changed the HAA and ADPF movement with the sedygas stairsdown movements.
 duration: 3750000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 2080000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_aa:
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.03490659
+    time_from_start: 1993400000
     velocity: 0.0
   - position: 0.0349
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.0
+  - position: 0.6283
     time_from_start: 0
-    velocity: 0.1745
-  - position: 1.0472
-    time_from_start: 1700000000
-    velocity: 0.0
-  - position: 0.0873
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.0873
-    time_from_start: 3000000000
+    velocity: 0.2618
+  - position: 1.06465084
+    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   left_knee:
-  - position: 0.2443
+  - position: 1.44860059
     time_from_start: 0
-    velocity: 0.6981
-  - position: 1.6232
-    time_from_start: 1400000000
     velocity: 0.0
-  - position: 1.2008
-    time_from_start: 1888000000
-    velocity: -1.3331
-  - position: 0.0
-    time_from_start: 2750000000
+  - position: 1.57079633
+    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   right_ankle:
-  - position: 0.0436
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0
+  - position: -0.05235988
     time_from_start: 0
     velocity: 0.0
-  - position: -0.0611
-    time_from_start: 750000000
-    velocity: -0.1222
-  - position: -0.0611
-    time_from_start: 1750000000
-    velocity: 0.1222
   - position: 0.0349
     time_from_start: 3750000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.2712
+  - position: 0.28972466
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0873
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.0873
-    time_from_start: 3000000000
-    velocity: 0.0
+  - position: 0.23413766
+    time_from_start: 1520800000
+    velocity: -0.18825819
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   right_knee:
-  - position: 1.6794
+  - position: 0.33160034
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -95,4 +77,4 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsup_leftclose_high_undeep
+version: MVI_stairsdownsinglestep_leftclose_cybathlon_v2

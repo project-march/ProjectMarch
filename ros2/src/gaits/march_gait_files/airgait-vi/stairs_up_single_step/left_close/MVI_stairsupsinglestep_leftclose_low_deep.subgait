@@ -95,4 +95,4 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsup_leftclose_low_deep
+version: MVI_stairsupsinglestep_leftclose_low_deep

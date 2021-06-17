@@ -95,4 +95,4 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsdownbackwards_leftclose_cybathlon_v2
+version: MVI_stairsdownbackwardssinglestep_leftclose_cybathlon_v2
