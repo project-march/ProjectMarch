@@ -229,12 +229,12 @@ protected:
     float z_steep_up {};
     float ramp_min_search_area {};
     float max_distance_to_line {};
-    min_sit_height {};
-    max_sit_height {};
-    min_x_search_sit {};
-    max_x_search_sit {};
-    search_y_deviation_sit {};
-    sit_grid_size {};
+    float min_sit_height {};
+    float max_sit_height {};
+    float min_x_search_sit {};
+    float max_x_search_sit {};
+    float search_y_deviation_sit {};
+    float sit_grid_size {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
     std::string subgait_name_;
@@ -250,10 +250,10 @@ protected:
         = boost::make_shared<LineCoefficients>();
 
     pcl::PointNormal optimal_foot_location;
-    pcl::PointNormal sit_height;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
-    PoitnCloud2D::Ptr sit_grid
+    PointCloud2D::Ptr sit_grid;
+    float sit_height;
 };
 
 /** The simple parameter determiner
