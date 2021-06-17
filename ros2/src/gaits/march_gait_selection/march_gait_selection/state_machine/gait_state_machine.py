@@ -21,7 +21,7 @@ PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.004
 
 
-class GaitStateMachine(object):
+class GaitStateMachine:
     """The state machine used to make sure that only valid transitions will
     be made."""
 

@@ -97,7 +97,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
 
     # connect_plot tests
     def test_connect_plot_sig_plot_changed_call(self):
-        self.assertEqual(
+        self.assertEqual(  # noqa: ECE001
             self.gait_generator_view.joint_widgets[""]
             .Plot.getItem(0, 0)
             .plot_item.sigPlotChanged.connect.call_count,
@@ -105,7 +105,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         )
 
     def test_connect_plot_add_setpoint_call(self):
-        self.assertEqual(
+        self.assertEqual(  # noqa: ECE001
             self.gait_generator_view.joint_widgets[""]
             .Plot.getItem(0, 0)
             .add_setpoint.connect.call_count,
@@ -113,7 +113,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         )
 
     def test_connect_plot_remove_setpoint_call(self):
-        self.assertEqual(
+        self.assertEqual(  # noqa: ECE001
             self.gait_generator_view.joint_widgets[""]
             .Plot.getItem(0, 0)
             .add_setpoint.connect.call_count,
@@ -121,7 +121,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         )
 
     def test_connect_plot_table_changed_call(self):
-        self.assertEqual(
+        self.assertEqual(  # noqa: ECE001
             self.gait_generator_view.joint_widgets[
                 ""
             ].Table.itemChanged.connect.call_count,

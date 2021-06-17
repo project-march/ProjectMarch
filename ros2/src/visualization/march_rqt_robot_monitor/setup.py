@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Setup file for the march_rqt_robot_monitor package."""
 
 from setuptools import setup

@@ -89,12 +89,13 @@ stages:
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
+    - if ! podman manifest inspect $REG_IMAGE:$BRANCH_NAME; then podman pull $REG_IMAGE:$CI_DEFAULT_BRANCH && podman tag $REG_IMAGE:$CI_DEFAULT_BRANCH $REG_IMAGE:$BRANCH_NAME && podman push $REG_IMAGE:$BRANCH_NAME; fi;
 
 # If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
 # then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
 container:tag:
   variables:
+    REG_IMAGE: $CI_REGISTRY_IMAGE
     BRANCH_NAME: $CI_COMMIT_BRANCH
   extends:
     - .container:tag-base
@@ -104,32 +105,49 @@ container:tag:
 # then use $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME as the $BRANCH_NAME in the "tag" job.
 container:tag for MRs:
   variables:
+    REG_IMAGE: $CI_REGISTRY_IMAGE
     BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
   extends:
     - .container:tag-base
     - .merge_request_ref
 
-# Build the container iff the Dockerfile has been changed. This only runs for
-# branches because this is a very long job. Running it for merge requests would
-# mean that this job is scheduled every time that a commit is pushed in a merge requests,
-# which is unnessecary if the Dockerfile is only changed once in the merge request.
-container:build:
+.container_builder:
   stage: Build container
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  script:
+  before_script:
     - mkdir -p /kaniko/.docker
     # Equivalent to `docker login` but without installing docker"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+
+# Build the container iff the Dockerfile has been changed. This only runs for
+# branches because this is a very long job. Running it for merge requests would
+# mean that this job is scheduled every time that a commit is pushed in a merge requests,
+# which is unnessecary if the Dockerfile is only changed once in the merge request.
+ROS container build:
+  script:
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
     - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
-  only:
-    refs:
-      - branches
-    changes:
-      - "Dockerfile"
+  rules:
+    # If commit in branch and Dockerfile has changed, build a new container
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - "Dockerfile"
+  extends:
+    - .container_builder
+
+flake8 container build:
+  script:
+    - /kaniko/executor --cache=false --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE/flake8:$CI_COMMIT_BRANCH --cleanup
+  rules:
+    # If commit in branch and Dockerfile has changed, build a new flake8 container
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+  extends:
+    - .container_builder
 
 #################
 # flake8 linter #
@@ -138,29 +156,53 @@ container:build:
 # to avoid common mistakes
 .flake8-base:
   stage: Lint code
+  image: registry.gitlab.com/project-march/march/flake8:$TAG
   script:
-    - rm -f codeclimate.json
-    - python3 -m flake8 --format=codeclimate --config .flake8 --output-file codeclimate.json
-    - cat codeclimate.json
+    # Return the return value of the rightmost failed command. It is unlikely that `sed` fails, but
+    # the if the flake8 runner fails then everything is propagated through. This means that the
+    # return value of the whole pipe sequence will be the same as the return value of
+    # the flake8 command.
+    - set -o pipefail
+    # The codeclimate format returns violations on new lines, but GitLab expects a json
+    # array. This adds the required "[", "]" and ","s for the file to be interpreted as
+    # a valid JSON array.
+    - python3 -m flake8 --format=codeclimate --config .flake8 | sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
+    # If the above statement succeeds, then codeclimate.json will be empty. We add an empty
+    # array to ensure that the codeclimate.json file still has a valid json syntax
+    - echo "[]" | tee codeclimate.json
   artifacts:
     reports:
       codequality: codeclimate.json
-  only:
-    changes:
-      - ".flake8"
-      - "**/*.py"
 
-# The job for branches
 flake8:
+  rules:
+    # If commit in MR and Dockerfile has changed, use different
+    # flake8 image that was build in previous stages
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    # To prevent running duplicate pipelines for branches and MRs
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    # If commit in branch and Dockerfile has changed, use different
+    # flake8 image that was build in previous stages
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    # If it is a commit to a MR or a branch, and a flake8 related or Python file
+    # has changed, run the flake8 with the image from main.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - ".flake8"
+        - "**/*.py"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
   extends:
     - .flake8-base
-    - .branches
-
-# The job for merge_requests
-flake8 for MRs:
-  extends:
-    - .flake8-base
-    - .merge_requests
 
 #######################
 # clang-format linter #

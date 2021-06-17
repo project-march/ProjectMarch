@@ -53,11 +53,11 @@ gaits:
     right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v2
 
   walk:
-    left_close: MVI_walk_leftclose_v3
-    left_swing: MVI_walk_leftswing_v3
-    right_close: MVI_walk_rightclose_v3
-    right_open: MVI_walk_rightopen_v3
-    right_swing: MVI_walk_rightswing_v3
+    left_close: MVI_walk_leftclose_v6
+    left_swing: MVI_walk_leftswing_v6
+    right_close: MVI_walk_rightclose_v6
+    right_open: MVI_walk_rightopen_v6
+    right_swing: MVI_walk_rightswing_v6
 
   walk_single_step:
     right_open: MVI_walksinglestep_rightopen_v3
@@ -80,6 +80,16 @@ gaits:
     right_close: MVI_walksmall_rightclose_v3
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
+    
+  sit:
+    sit_down: MVI_sit_down_v2
+    sit_home: MVI_sit_home_v2
+    prepare_sit_down: MVI_prepare_sit_down_v2
+  
+  stand:
+    prepare_stand_up: MVI_prepare_stand_up_v2
+    stand_up: MVI_stand_up_v2
+    stand_home: MVI_stand_home_v2
 
   walk_single_step_small:
     right_open: MVI_walksinglestepsmall_rightopen_v3
