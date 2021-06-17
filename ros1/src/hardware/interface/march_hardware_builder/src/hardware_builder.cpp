@@ -40,8 +40,10 @@ const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset", "side" };
 
-HardwareBuilder::HardwareBuilder(AllowedRobot robot)
-    : HardwareBuilder(robot.getFilePath())
+HardwareBuilder::HardwareBuilder(
+    AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train)
+    : HardwareBuilder(
+        robot.getFilePath(), remove_fixed_joints_from_ethercat_train)
 {
 }
 
@@ -52,8 +54,11 @@ HardwareBuilder::HardwareBuilder(AllowedRobot robot, urdf::Model urdf)
 {
 }
 
-HardwareBuilder::HardwareBuilder(const std::string& yaml_path)
+HardwareBuilder::HardwareBuilder(
+    const std::string& yaml_path, bool remove_fixed_joints_from_ethercat_train)
     : robot_config_(YAML::LoadFile(yaml_path))
+    , remove_fixed_joints_from_ethercat_train_(
+          remove_fixed_joints_from_ethercat_train)
 {
 }
 
@@ -67,13 +72,11 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
     this->initUrdf();
-    ROS_INFO("Done init urdf.");
     auto pdo_interface = march::PdoInterfaceImpl::create();
     auto sdo_interface = march::SdoInterfaceImpl::create();
 
     const auto robot_name
         = this->robot_config_.begin()->first.as<std::string>();
-    ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
 
     // Remove top level robot name key
     YAML::Node config = this->robot_config_[robot_name];
@@ -427,11 +430,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     // Use a sorted map to store the joint names and yaml configurations
     std::map<std::string, YAML::Node> actuating_joint_names;
 
-    bool remove_fixed_joints_from_ethercat_train;
-    ros::param::get("remove_fixed_joints_from_ethercat_train",
-        remove_fixed_joints_from_ethercat_train);
     std::set<int> fixedSlaveIndices;
-    if (remove_fixed_joints_from_ethercat_train) {
+    if (this->remove_fixed_joints_from_ethercat_train_) {
         fixedSlaveIndices = getSlaveIndicesOfFixedJoints(joints_config);
     }
 
@@ -439,7 +439,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         if (urdf_joint->type != urdf::Joint::FIXED) {
-            if (remove_fixed_joints_from_ethercat_train) {
+            if (this->remove_fixed_joints_from_ethercat_train_) {
                 joint_config[joint_name]["motor_controller"]["slaveIndex"]
                     = updateSlaveIndexBasedOnFixedJoints(
                         joint_config, joint_name, fixedSlaveIndices);
