@@ -152,9 +152,6 @@ gaits:
     right_close: MVI_walksmall_rightclose_v3
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
-  ramp_down_last_step:
-    left_close: MVI_rampdownlaststep_leftclose_steep_v1
-    right_open: MVI_rampdownlaststep_rightopen_steep_v1
   stairs_up_single_step:
     right_open: MVI_stairsupsinglestep_rightopen_cybathlon_v4
     left_close: MVI_stairsupsinglestep_leftclose_cybathlon_v4

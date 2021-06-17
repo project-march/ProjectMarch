@@ -95,16 +95,6 @@ gaits:
     right_open: MVI_walksinglestepsmall_rightopen_v3
     left_close: MVI_walksinglestepsmall_leftclose_v3
 
-  sit:
-    sit_down: MVI_sit_down_v2
-    sit_home: MVI_sit_home_v2
-    prepare_sit_down: MVI_prepare_sit_down_v2
-
-  stand:
-    prepare_stand_up: MVI_prepare_stand_up_v2
-    stand_up: MVI_stand_up_v2
-    stand_home: MVI_stand_home_v2
-
 positions:
   stand:
     gait_type: walk_like
