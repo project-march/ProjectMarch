@@ -243,6 +243,7 @@ protected:
         = boost::make_shared<LineCoefficients>();
 
     pcl::PointNormal optimal_foot_location;
+    pcl::PointNormal sit_height;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
     PoitnCloud2D::Ptr sit_grid

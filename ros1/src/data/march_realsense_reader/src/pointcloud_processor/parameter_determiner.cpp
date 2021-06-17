@@ -250,13 +250,13 @@ void HullParameterDeterminer::addDebugGaitInformation()
             geometry_msgs::Point marker_point;
             marker_point.y = y_location;
 
-            marker_point.x = min_sit_height;
-            marker_point.z = min_sit_height;
+            marker_point.x = x_flat;
+            marker_point.z = z_flat;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
             marker_point.x = x_steep;
-            marker_point.z = max_sit_height;
+            marker_point.z = z_steep;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
@@ -372,7 +372,12 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationSit()
 {
-    //    gait_parameters_first_parameter =
+    gait_parameters_->first_parameter
+        = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
+    // The step height and side step parameter are unused for the ramp down
+    // gait, so they are set to -1
+    gait_parameters_->second_parameter = -1;
+    gait_parameters_->side_step_parameters = -1;
     return false;
 }
 
@@ -419,7 +424,6 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
-    // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
     return true;
@@ -433,16 +437,52 @@ bool HullParameterDeterminer::getSitHeight()
 
     // Crop those locations to find where there is support for the exoskeleton
     exo_support_points = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(
-            sit_grid, exo_support_points);
+    success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
 
-    success &= sortPointCloudHeight();.
+    success &= sortPointCloudOnHeight(exo_support_points);
 
-    sucess &= getMedianHeight();
+    pcl::pointNormal median_point;
+    sucess &= getMedianHeightSortedCloud(exo_support_points, median_point);
 
-    loc = median;
+    sit_height = median_point.z;
+}
 
+bool HullParameterDeterminer::getMedianHeightSortedCloud(
+    const PointNormalCloud::Ptr& cloud, pcl::PointNormal& median_point)
+{
+    int pointcloud_size = cloud->size();
+    if (pointcloud_size == 0) {
+        ROS_ERROR_STREAM(
+            "Pointcloud to retrieve median from contains no points.");
+        return false;
+    }
+    if (pointcloud_size % 2 == 0) {
+        pcl::PointNormal first_median_point
+            = cloud->points[pointcloud_size / 2];
+        pcl::PointNormal second_median_point
+            = cloud->points[pointcloud_size / 2 - 1];
+        // This sets the normal values to 0, they are not needed to determine
+        // parameters for the sit category
+        median_point = (first_median_point.getArray3fMap()
+                           + second_median_point.getArray3fMap())
+            / 2.0f;
+    } else {
+        median_point = cloud->points[(pointcloud_size - 1) / 2];
+    }
+    return true;
+}
 
+bool HullParameterDeterminer::sortPointCloudOnHeight(
+    PointNormalCloud::Ptr cloud)
+{
+    if (cloud->size() == 0) {
+        ROS_ERROR_STREAM(
+            "Pointcloud to sort has length 0. Returning with success = false.");
+        return false;
+    }
+    std::sort(cloud->points.begin(), cloud->points.end(),
+        linear_algebra_utilities::pointIsLower);
+    return true;
 }
 
 bool HullParameterDeterminer::fillSitGrid(PoitnCloud2D::Ptr sit_grid)
