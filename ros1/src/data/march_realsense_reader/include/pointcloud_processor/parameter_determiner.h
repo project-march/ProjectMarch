@@ -141,7 +141,7 @@ protected:
 
     // Find the parameters from the foot location by finding at what percentage
     // of the end points it is
-    bool getGaitParametersFromFootLocation();
+    bool getGaitParametersFromLocation();
 
     // Verify if there is support for the entire foot around the possible foot
     // location
@@ -166,7 +166,10 @@ protected:
     bool getGaitParametersFromFootLocationStairsUp();
 
     // Find the ramp parameter from the foot locations
-    bool getGaitParametersFromLocationRamp();
+    bool getGaitParametersFromfootLocationRamp();
+
+    // Find the sit parameter from the sit height
+    bool getGaitParametersFromSitHeight();
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)

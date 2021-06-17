@@ -90,9 +90,8 @@ void HullParameterDeterminer::readParameters(
     max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
     search_y_deviation_sit
         = (float)config.parameter_determiner_search_y_deviation_sit;
-    sit_grid_size = (float)config.parameter_determiner_sit_grid_size
-
-                        max_allowed_z_deviation_foot
+    sit_grid_size = (float)config.parameter_determiner_sit_grid_size;
+    max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
         = (float)config.parameter_determiner_ramp_max_distance_to_line;
@@ -151,7 +150,7 @@ bool HullParameterDeterminer::determineParameters(
     }
 
     if (success) {
-        succes &= getGaitParametersFromLocation();
+        success &= getGaitParametersFromLocation();
     }
 
     if (debugging_) {
@@ -356,7 +355,7 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
             break;
         }
         case RealSenseCategory::sit: {
-            success &= getGaitParametersFromFootLocationSit();
+            success &= getGaitParametersFromSitHeight();
             break;
         }
         default: {
@@ -370,7 +369,8 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
     return success;
 }
 
-bool HullParameterDeterminer::getGaitParametersFromFootLocationSit()
+// Find the sit parameter from the sit height
+bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
     gait_parameters_->first_parameter
         = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
