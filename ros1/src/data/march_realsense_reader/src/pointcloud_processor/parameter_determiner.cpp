@@ -377,7 +377,7 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
-    gait_parameters_->side_step_parameters = -1;
+    gait_parameters_->side_step_parameter = -1;
     return false;
 }
 
@@ -436,15 +436,18 @@ bool HullParameterDeterminer::getSitHeight()
 
     // Create a grid of points at the location where the exoskeleton should sit
     sit_grid = boost::make_shared<PointCloud2D>();
-    sucess &= fillSitGrid(sit_grid);
+    success &= fillSitGrid(sit_grid);
 
     // Crop those locations to find where there is support for the exoskeleton
-    exo_support_points = boost::make_shared<PointNormalCloud>();
+    PointNormalCloud::Ptr exo_support_points
+        = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
 
     // The support points will vary and some might not not be on the chair.
     // The median is taken to avoid these outliers
-    sucess &= getMedianHeightSortedCloud(exo_support_points, sit_height);
+    success &= getMedianHeightCloud(exo_support_points, sit_height);
+
+    return success;
 }
 
 // Get the median height value of a point cloud
@@ -459,14 +462,12 @@ bool HullParameterDeterminer::getMedianHeightCloud(
     }
     // Sort only the part of the array relevant for the median
     std::nth_element(cloud->points.begin(),
-        cloud->points.begin() + pointcloud_size.size() / 2, cloud->points.end(),
+        cloud->points.begin() + pointcloud_size / 2, cloud->points.end(),
         linear_algebra_utilities::pointIsLower);
 
     if (pointcloud_size % 2 == 0) {
-        pcl::PointNormal first_median_height
-            = cloud->points[pointcloud_size / 2].z;
-        pcl::PointNormal second_median_height
-            = cloud->points[pointcloud_size / 2 - 1].z;
+        float first_median_height = cloud->points[pointcloud_size / 2].z;
+        float second_median_height = cloud->points[pointcloud_size / 2 - 1].z;
         median_height = (first_median_height + second_median_height) / 2.0f;
     } else {
         median_point = cloud->points[(pointcloud_size - 1) / 2];
