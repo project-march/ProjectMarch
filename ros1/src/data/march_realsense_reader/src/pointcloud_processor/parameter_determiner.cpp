@@ -470,7 +470,7 @@ bool HullParameterDeterminer::getMedianHeightCloud(
         float second_median_height = cloud->points[pointcloud_size / 2 - 1].z;
         median_height = (first_median_height + second_median_height) / 2.0f;
     } else {
-        median_point = cloud->points[(pointcloud_size - 1) / 2];
+        median_height = cloud->points[(pointcloud_size - 1) / 2].z;
     }
     return true;
 }
