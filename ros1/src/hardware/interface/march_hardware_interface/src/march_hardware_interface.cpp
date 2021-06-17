@@ -26,7 +26,7 @@
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/motor_controller/motor_controller.h"
 
-#define DEBUG_JOINT_VALUES
+//#define DEBUG_JOINT_VALUES
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
@@ -185,7 +185,7 @@ bool MarchHardwareInterface::init(
     }
 
     // Wait a while for MotorControllers to be prepared
-    ros::Duration(/*t=*/5).sleep();
+    ros::Duration(/*t=*/15).sleep();
 
     // Enable all joints for actuation
     for (size_t i = 0; i < num_joints_; ++i) {
@@ -197,7 +197,7 @@ bool MarchHardwareInterface::init(
     }
 
     // Wait a while for MotorControllers to be enabled
-    ros::Duration(/*t=*/2).sleep();
+    ros::Duration(/*t=*/15).sleep();
 
     // For debugging
     for (size_t i = 0; i < num_joints_; ++i) {

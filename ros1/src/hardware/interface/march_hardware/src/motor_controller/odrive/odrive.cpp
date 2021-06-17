@@ -19,7 +19,7 @@
 
 #include <ros/ros.h>
 
-#define DEBUG_EFFORT
+//#define DEBUG_EFFORT
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,

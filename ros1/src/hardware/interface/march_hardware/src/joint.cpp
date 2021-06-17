@@ -90,7 +90,7 @@ void Joint::readFirstEncoderValues()
         }
     } else {
         ROS_FATAL(
-            "%s", motor_controller_state->getErrorStatus().value().c_str());
+            "[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().value().c_str());
         throw error::HardwareException(
             error::ErrorType::PREPARE_ACTUATION_ERROR);
     }
