@@ -23,7 +23,6 @@ from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
 )
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
-from march_utility.utilities.node_utils import joint_names_from_urdf, get_robot_urdf
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -438,7 +437,6 @@ class GaitSelection(Node):
                     f"required: {self._joint_names}"
                 )
         return version_map, positions, dynamic_edge_version_map
-
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.

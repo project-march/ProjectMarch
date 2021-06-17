@@ -71,7 +71,6 @@ class RobotInformation(Node):
 
         return get_joint_names_from_robot(robot)
 
-
     def make_get_parameters_request(
         self, node: str, names: List[str]
     ) -> List[ParameterValue]:
