@@ -89,8 +89,8 @@ void Joint::readFirstEncoderValues()
             position_ = initial_absolute_position_;
         }
     } else {
-        ROS_FATAL(
-            "[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().value().c_str());
+        ROS_FATAL("[%s]: %s", this->name_.c_str(),
+            motor_controller_state->getErrorStatus().value().c_str());
         throw error::HardwareException(
             error::ErrorType::PREPARE_ACTUATION_ERROR);
     }

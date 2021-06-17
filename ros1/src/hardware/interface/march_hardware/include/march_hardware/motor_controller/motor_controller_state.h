@@ -27,8 +27,9 @@ public:
         const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
         return lhs.motor_current_ == rhs.motor_current_
-//            && lhs.motor_voltage_ == rhs.motor_voltage_
-//            && lhs.motor_controller_voltage_ == rhs.motor_controller_voltage_
+            //            && lhs.motor_voltage_ == rhs.motor_voltage_
+            //            && lhs.motor_controller_voltage_ ==
+            //            rhs.motor_controller_voltage_
             && lhs.temperature_ == rhs.temperature_
             && lhs.absolute_position_iu_ == rhs.absolute_position_iu_
             && lhs.incremental_position_iu_ == rhs.incremental_position_iu_
