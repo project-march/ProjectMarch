@@ -144,14 +144,14 @@ bool HullParameterDeterminer::determineParameters(
 
     // Only calculate the gait parameters if an optimal foot location has been
     // found
-    if (success &= getOptimalFootLocation()) {
-        if (realsense_category_.value() != RealSenseCategory::sit) {
-            success &= getGaitParametersFromLocation();
-        }
+    if (realsense_category_.value() != RealSenseCategory::sit) {
+        success &= getOptimalFootLocation();
     } else {
-        if (success &= getSitHeight()) {
-            succes &= getGaitParametersFromLocation();
-        }
+        success &= getSitHeight();
+    }
+
+    if (success) {
+        succes &= getGaitParametersFromLocation();
     }
 
     if (debugging_) {
@@ -429,9 +429,12 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
     return true;
 }
 
+// The sit analogue of getOptimalFootLocation, find the height at which to sit
 bool HullParameterDeterminer::getSitHeight()
 {
     bool success = true;
+
+    // Create a grid of points at the location where the exoskeleton should sit
     sit_grid = boost::make_shared<PointCloud2D>();
     sucess &= fillSitGrid(sit_grid);
 
@@ -439,16 +442,14 @@ bool HullParameterDeterminer::getSitHeight()
     exo_support_points = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
 
-    success &= sortPointCloudOnHeight(exo_support_points);
-
-    pcl::pointNormal median_point;
-    sucess &= getMedianHeightSortedCloud(exo_support_points, median_point);
-
-    sit_height = median_point.z;
+    // The support points will vary and some might not not be on the chair.
+    // The median is taken to avoid these outliers
+    sucess &= getMedianHeightSortedCloud(exo_support_points, sit_height);
 }
 
-bool HullParameterDeterminer::getMedianHeightSortedCloud(
-    const PointNormalCloud::Ptr& cloud, pcl::PointNormal& median_point)
+// Get the median height value of a point cloud
+bool HullParameterDeterminer::getMedianHeightCloud(
+    const PointNormalCloud::Ptr& cloud, float median_height)
 {
     int pointcloud_size = cloud->size();
     if (pointcloud_size == 0) {
@@ -456,36 +457,25 @@ bool HullParameterDeterminer::getMedianHeightSortedCloud(
             "Pointcloud to retrieve median from contains no points.");
         return false;
     }
+    // Sort only the part of the array relevant for the median
+    std::nth_element(cloud->points.begin(),
+        cloud->points.begin() + pointcloud_size.size() / 2, cloud->points.end(),
+        linear_algebra_utilities::pointIsLower);
+
     if (pointcloud_size % 2 == 0) {
-        pcl::PointNormal first_median_point
-            = cloud->points[pointcloud_size / 2];
-        pcl::PointNormal second_median_point
-            = cloud->points[pointcloud_size / 2 - 1];
-        // This sets the normal values to 0, they are not needed to determine
-        // parameters for the sit category
-        median_point = (first_median_point.getArray3fMap()
-                           + second_median_point.getArray3fMap())
-            / 2.0f;
+        pcl::PointNormal first_median_height
+            = cloud->points[pointcloud_size / 2].z;
+        pcl::PointNormal second_median_height
+            = cloud->points[pointcloud_size / 2 - 1].z;
+        median_height = (first_median_height + second_median_height) / 2.0f;
     } else {
         median_point = cloud->points[(pointcloud_size - 1) / 2];
     }
     return true;
 }
 
-bool HullParameterDeterminer::sortPointCloudOnHeight(
-    PointNormalCloud::Ptr cloud)
-{
-    if (cloud->size() == 0) {
-        ROS_ERROR_STREAM(
-            "Pointcloud to sort has length 0. Returning with success = false.");
-        return false;
-    }
-    std::sort(cloud->points.begin(), cloud->points.end(),
-        linear_algebra_utilities::pointIsLower);
-    return true;
-}
-
-bool HullParameterDeterminer::fillSitGrid(PoitnCloud2D::Ptr sit_grid)
+// Fill a cloud with a grid of points where to look for exo support
+bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
 {
     if (sit_grid_size < EPSILON) {
         ROS_ERROR_STREAM("The grid size of the sit grid is too close to zero. "

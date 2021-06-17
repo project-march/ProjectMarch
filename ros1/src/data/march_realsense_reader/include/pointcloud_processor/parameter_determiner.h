@@ -188,9 +188,16 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    // The sit analogue of getOptimalFootLocation, find the height at which to
+    // sit
     bool getSitHeight();
 
-    bool fillSitGrid(PoitnCloud2D::Ptr sit_grid);
+    // Fill a cloud with a grid of points where to look for exo support
+    bool fillSitGrid(PointCloud2D::Ptr sit_grid);
+
+    // Get the median height value of a point cloud
+    bool getMedianHeightCloud(
+        const PointNormalCloud::Ptr& cloud, float median_height);
 
     // All relevant parameters
     int hull_dimension {};
