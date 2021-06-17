@@ -13,8 +13,6 @@
     <node name="upload_controller_values" pkg="march_launch"
           type="upload_controller_values.py"/>
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
-    <param name="remove_fixed_joints_from_ethercat_train"
-           value="$(arg remove_fixed_joints_from_ethercat_train)"/>
 
     <group ns="march">
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
@@ -35,6 +33,8 @@
         >
             <param name="reset_imc" value="$(arg reset_imc)"/>
             <param name="if_name" value="$(arg if_name)"/>
+            <param name="remove_fixed_joints_from_ethercat_train"
+                   value="$(arg remove_fixed_joints_from_ethercat_train)"/>
         </node>
     </group>
 </launch>
