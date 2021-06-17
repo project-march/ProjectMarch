@@ -52,12 +52,12 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 
 void ODrive::prepareActuation()
 {
-//     if (!pre_calibrated_) {
-//         // Calibrate the ODrive first
-//         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
-//         waitForState(ODriveAxisState::IDLE);
-//     }
-     setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+    //     if (!pre_calibrated_) {
+    //         // Calibrate the ODrive first
+    //         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+    //         waitForState(ODriveAxisState::IDLE);
+    //     }
+    setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
 }
 
 void ODrive::enableActuation()
@@ -149,8 +149,9 @@ float ODrive::getTorque()
 
 float ODrive::getTemperature()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(
-        ODriveObjectName::Temperature, axis_))
+    return this
+        ->read32(ODrivePDOmap::getMISOByteOffset(
+            ODriveObjectName::Temperature, axis_))
         .f;
 }
 
@@ -263,10 +264,10 @@ uint32_t ODrive::getMotorError()
 
 uint32_t ODrive::getEncoderManagerError()
 {
-//    auto value = this->read32(ODrivePDOmap::getMISOByteOffset(
-//            ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
-//        .ui;
-//    ROS_INFO("Time difference %u ms", value);
+    //    auto value = this->read32(ODrivePDOmap::getMISOByteOffset(
+    //            ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
+    //        .ui;
+    //    ROS_INFO("Time difference %u ms", value);
     return 0;
 }
 
