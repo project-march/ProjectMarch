@@ -8,6 +8,7 @@ from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
 SHOULD_NOT_FREEZE_FIRST_SECS = Duration(seconds=0.3)
+DEFAULT_SEDY_FREEZE_DURATION = Duration(seconds=3)
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
@@ -28,13 +29,11 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         for noticing the step height and ending the subgait earlier. This is
         therefore not possible during the first second of the subgait, to
         prevent accidental freezing."""
-        if (
+        return not (
             self.elapsed_time < SHOULD_NOT_FREEZE_FIRST_SECS
             or self._should_freeze
             or self._is_frozen
-        ):
-            return False
-        return True
+        )
 
     @property
     def can_be_scheduled_early(self) -> bool:
@@ -44,7 +43,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
     def elapsed_time(self) -> Duration:
         return Duration.from_ros_duration(self._current_time - self._start_time)
 
-    def freeze(self, duration: Duration = Duration(seconds=3)):
+    def freeze(self, duration: Duration = DEFAULT_SEDY_FREEZE_DURATION):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
@@ -62,7 +61,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         If the current subgait is done, it will start the next subgait
         :param current_time: Current time
         :returns: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
-                flags set to true, depending on the state of the Gait.
+        flags set to true, depending on the state of the Gait.
         """
         self._current_time = current_time
         if self._should_freeze:
@@ -134,21 +133,16 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             "description": "A subgait that stays in the same position",
             "duration": self._freeze_duration.nanoseconds,
             "gait_type": self._current_subgait.gait_type,
-            "joints": dict(
-                [
-                    (
-                        joint.name,
-                        [
-                            {
-                                "position": self._freeze_position[joint.name],
-                                "time_from_start": self._freeze_duration.nanoseconds,
-                                "velocity": 0,
-                            }
-                        ],
-                    )
-                    for joint in self._current_subgait.joints
+            "joints": {
+                joint.name: [
+                    {
+                        "position": self._freeze_position[joint.name],
+                        "time_from_start": self._freeze_duration.nanoseconds,
+                        "velocity": 0,
+                    }
                 ]
-            ),
+                for joint in self._current_subgait.joints
+            },
         }
 
         # freeze subgait

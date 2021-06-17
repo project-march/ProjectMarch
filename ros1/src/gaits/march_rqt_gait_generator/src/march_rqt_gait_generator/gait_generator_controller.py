@@ -19,7 +19,7 @@ from .model.modifiable_subgait import ModifiableSubgait
 from .side_subgait_controller import SideSubgaitController
 
 
-class GaitGeneratorController(object):
+class GaitGeneratorController:
     def __init__(self, view, robot):
         self.view = view
 

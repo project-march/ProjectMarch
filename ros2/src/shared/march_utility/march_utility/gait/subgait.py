@@ -32,7 +32,7 @@ SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
-class Subgait(object):
+class Subgait:
     """Base class for usage of the defined subgaits."""
 
     joint_class = JointTrajectory
@@ -554,20 +554,17 @@ class Subgait(object):
             "duration": self.duration.nanoseconds,
             "gait_type": self.gait_type,
             "joints": dict(
-                [
-                    (
-                        joint.name,
-                        [
-                            {
-                                "position": setpoint.position,
-                                "time_from_start": setpoint.time.nanoseconds,
-                                "velocity": setpoint.velocity,
-                            }
-                            for setpoint in joint.setpoints
-                        ],
-                    )
+                {
+                    joint.name: [
+                        {
+                            "position": setpoint.position,
+                            "time_from_start": setpoint.time.nanoseconds,
+                            "velocity": setpoint.velocity,
+                        }
+                        for setpoint in joint.setpoints
+                    ]
                     for joint in self.joints
-                ]
+                }
             ),
             "name": self.subgait_name,
             "version": self.version,

@@ -18,7 +18,7 @@ from march_shared_msgs.srv import (
 FRACTION_FALLING_TIME = 0.5
 
 
-class CPCalculator(object):
+class CPCalculator:
     """Base class to calculate capture point for the exoskeleton.
 
     The capture point calculator is coupled to a static foot and swing foot. The static foot is used as the base of

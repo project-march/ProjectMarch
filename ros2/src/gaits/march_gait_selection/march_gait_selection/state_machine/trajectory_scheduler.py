@@ -45,7 +45,7 @@ class TrajectoryCommand:
         )
 
 
-class TrajectoryScheduler(object):
+class TrajectoryScheduler:
     """Scheduler that sends sends the wanted trajectories to the topic listened
     to by the exoskeleton/simulation."""
 
