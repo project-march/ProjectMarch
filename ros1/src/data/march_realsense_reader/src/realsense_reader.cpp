@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <dynamic_reconfigure/server.h>
 #include <map>
@@ -20,6 +21,8 @@ using NormalsVector = std::vector<Normals::Ptr>;
 using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
+using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
+using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 
 std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
 std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
@@ -39,6 +42,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     , realsense_category_(-1)
     , use_left_foot_(nullptr)
     , debugging_launch(false)
+    , publish_hull_area_debug_(nullptr)
 {
 
     // Create a subscriber for every pointcloud topic
@@ -83,6 +87,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
         hull_marker_array_publisher_
             = n_->advertise<visualization_msgs::Marker>(
                 "/camera/hull_marker_list", /*queue_size=*/1);
+        hull_area_pointcloud_publisher_ = n_->advertise<PointNormalCloud>(
+            "/camera/hull_area_cloud", /*queue_size=*/1);
         hull_parameter_determiner_publisher_
             = n_->advertise<visualization_msgs::MarkerArray>(
                 "/camera/foot_locations_marker_array", /*queue_size=*/1);
@@ -106,6 +112,9 @@ void RealSenseReader::readConfigCb(
             ros::console::notifyLoggerLevelsChanged();
         }
     }
+
+    publish_hull_area_debug_ = config.publish_hull_area_debug;
+
     preprocessor_->readParameters(config);
     region_creator_->readParameters(config);
     parameter_determiner_->readParameters(config);
@@ -195,7 +204,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
             hull_vector, polygon_vector, realsense_category, gait_parameters,
             frame_id_to_transform_to_);
-
+    // The debug output of the parameter determiner is made so that it can be
+    // visualized even if the parameter determiner was not successful
     if (debugging_) {
         ROS_DEBUG(
             "Done determining parameters, now publishing a marker array to "
@@ -213,6 +223,11 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             "White: The optimal foot location");
         hull_parameter_determiner_publisher_.publish(
             parameter_determiner_->debug_marker_array);
+        if (publish_hull_area_debug_) {
+            ROS_DEBUG("Publishing hull area information to "
+                      "/camera/hull_area_cloud");
+            publishHullAreaCloud();
+        }
     }
     if (not parameter_determining_was_successful) {
         res.error_message
@@ -246,6 +261,38 @@ void RealSenseReader::publishCloud(
     msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
+}
+
+// Give an idea of the area of the hulls by cropping a large input grid to the
+// hull vector
+void RealSenseReader::publishHullAreaCloud()
+{
+    // Create the input cloud to be a grid on the ground
+    PointCloud2D::Ptr ground_cloud = boost::make_shared<PointCloud2D>();
+    // The grid size
+    float x_grid_size = 0.05;
+    float y_grid_size = 0.05;
+    // The area lengths the grid should span
+    float min_x = -3;
+    float max_x = 0;
+    float min_y = -1.5;
+    float max_y = 1.5;
+    // The number of points in each direction of the grid
+    int x_points = int(round((max_x - min_x) / x_grid_size)) + 1;
+    int y_points = int(round((max_y - min_y) / y_grid_size)) + 1;
+    for (int i = 0; i < x_points; ++i) {
+        for (int j = 0; j < y_points; ++j) {
+            pcl::PointXY point {};
+            point.x = min_x + (float)i * x_grid_size;
+            point.y = min_y + (float)j * y_grid_size;
+            ground_cloud->push_back(point);
+        }
+    }
+    // Crop the input (ground) cloud to the hull vector and publish the results
+    PointNormalCloud::Ptr cropped_cloud
+        = boost::make_shared<PointNormalCloud>();
+    parameter_determiner_->cropCloudToHullVector(ground_cloud, cropped_cloud);
+    publishCloud(hull_area_pointcloud_publisher_, *cropped_cloud);
 }
 
 // Turn a HullVector into a marker with a list of points and publish for

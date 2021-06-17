@@ -16,7 +16,7 @@ from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
-    get_joint_names_for_inverse_kinematics,
+    validate_and_get_joint_names_for_inverse_kinematics,
 )
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_for_inverse_kinematics,
@@ -25,12 +25,12 @@ from march_utility.utilities.utility_functions import (
 from march_utility.utilities.vector_3d import Vector3d
 
 VELOCITY_SCALE_FACTOR = 0.001
-JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 MID_CALCULATION_PRECISION_DIGITS = 10
 ALLOWABLE_OVERSHOOT_FOOT_POSITION = 0.001
 
 
-class Foot(object):
+class Foot:
     """Class for capturing the state (position and possible velocity) of a foot."""
 
     def __init__(self, foot_side: Side, position: Vector3d, velocity: Vector3d) -> None:
@@ -131,6 +131,12 @@ class Foot(object):
         """
         if foot_side != Side.left and foot_side != Side.right:
             raise SideSpecificationError(foot_side)
+
+        if JOINT_NAMES_IK is None:
+            raise SubgaitInterpolationError(
+                "Robot joints do not allow calculating the "
+                "joint angles from foot position."
+            )
         # Get relevant lengths from robot model, ul = upper leg etc.
         # see get_lengths_robot_for_inverse_kinematics() and unpack desired position
         [ul, ll, hl, ph, base] = get_lengths_robot_for_inverse_kinematics(foot_side)

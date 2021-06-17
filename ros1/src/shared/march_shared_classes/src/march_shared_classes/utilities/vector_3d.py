@@ -3,7 +3,7 @@ from math import sqrt
 from march_shared_classes.exceptions.general_exceptions import IncorrectCoordinateError
 
 
-class Vector3d(object):
+class Vector3d:
     """A 3d vector class."""
 
     def __init__(self, x, y, z):

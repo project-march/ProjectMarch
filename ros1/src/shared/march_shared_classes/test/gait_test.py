@@ -48,7 +48,9 @@ class GaitTest(unittest.TestCase):
 
     # __init__ (_validate_trajectory_transition) test
     def test_init_invalid_joint_trajectory_transition(self):
-        self.gait.subgaits["left_swing"].joints[0].setpoints[-1].position = 124
+        left_swing = (
+            self.gait.subgaits["left_swing"].joints[0].setpoints[-1].position
+        ) = 124
         with self.assertRaises(NonValidGaitContent):
             Gait(self.gait_name, self.gait.subgaits, self.gait.graph)
 
@@ -133,7 +135,9 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_set_new_subgait_version_invalid_transition(self):
-        self.gait.subgaits["right_swing"].joints[0].setpoints[-1].position = 124
+        right_swing = (
+            self.gait.subgaits["right_swing"].joints[0].setpoints[-1].position
+        ) = 124
         subgait_name = "left_close"
         new_version = "MIV_final"
         with self.assertRaises(NonValidGaitContent):
@@ -142,7 +146,9 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_set_new_subgait_version_invalid_start(self):
-        self.gait.subgaits["right_open"].joints[0].setpoints[0].position = 124
+        right_open = (
+            self.gait.subgaits["right_open"].joints[0].setpoints[0].position
+        ) = 124
         subgait_name = "right_open"
         new_version = "MIV_final"
         with self.assertRaises(NonValidGaitContent):
@@ -151,7 +157,9 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_set_new_subgait_version_invalid_final(self):
-        self.gait.subgaits["left_close"].joints[0].setpoints[-1].position = 124
+        left_close = (
+            self.gait.subgaits["left_close"].joints[0].setpoints[-1].position
+        ) = 124
         subgait_name = "left_close"
         new_version = "MIV_final"
         with self.assertRaises(NonValidGaitContent):

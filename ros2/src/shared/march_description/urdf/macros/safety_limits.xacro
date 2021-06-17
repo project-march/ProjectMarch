@@ -1,13 +1,40 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="safety_limits" params="safety limits">
+        <!--
+        The position limits can be supplied in 3 units: rad (radians), deg (degrees) or iu (internal units)
+        If the limits are supplied in radians, no calculation is applied.
+        If the limits are supplied in degrees, they are converted to radians through a multiplication of pi/180
+        If the limits are supplied in internal units, then some additional information is needed about the conversion:
+            - the resolution of the encoder
+            - the zero position of the encoder
+
+        The safety limits always have the following units:
+            - lower_soft_buffer [deg]
+            - upper_soft_buffer [deg]
+            - max_effort [A]
+            - max_velocity [rad/s]
+        -->
+        <xacro:if value="${limits['unit'] == 'rad'}">
+            <xacro:property name="lower_limit_rad" value="${limits['lower_limit']}"/>
+            <xacro:property name="upper_limit_rad" value="${limits['upper_limit']}"/>
+        </xacro:if>
+        <xacro:if value="${limits['unit'] == 'deg'}">
+            <xacro:property name="lower_limit_rad" value="${radians(limits['lower_limit'])}"/>
+            <xacro:property name="upper_limit_rad" value="${radians(limits['upper_limit'])}"/>
+        </xacro:if>
+        <xacro:if value="${limits['unit'] == 'iu'}">
+            <xacro:property name="iu_to_rad" value="${(2 * pi) / (2 ** limits['resolution'])}"/>
+            <xacro:property name="lower_limit_rad" value="${iu_to_rad * -(limits['zero_position'] - limits['lower_limit'])}"/>
+            <xacro:property name="upper_limit_rad" value="${iu_to_rad * (limits['upper_limit'] - limits['zero_position'])}"/>
+        </xacro:if>
         <limit velocity="${safety['max_velocity']}"
                effort="${safety['max_effort']}"
-               lower="${limits['lower_limit']*pi/180}"
-               upper="${limits['upper_limit']*pi/180}"/>
+               lower="${lower_limit_rad}"
+               upper="${upper_limit_rad}"/>
         <safety_controller
-                soft_lower_limit="${(limits['lower_limit'] + safety['lower_soft_buffer']) * pi / 180}"
-                soft_upper_limit="${(limits['upper_limit'] - safety['upper_soft_buffer']) * pi / 180}"
+                soft_lower_limit="${lower_limit_rad + radians(safety['lower_soft_buffer'])}"
+                soft_upper_limit="${upper_limit_rad - radians(safety['upper_soft_buffer'])}"
                 k_position="${safety['k_position']}"
                 k_velocity="${safety['k_velocity']}" />
     </xacro:macro>
