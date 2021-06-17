@@ -29,6 +29,7 @@ class SmartglassBridge(Node):
 
     def send_to_smartglasses(self, state: str):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             try:
                 host = socket.gethostbyname(self.host)
                 s.connect((host, self.port))
