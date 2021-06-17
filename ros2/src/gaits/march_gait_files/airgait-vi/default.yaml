@@ -27,8 +27,8 @@ gaits:
     right_swing: MVI_stairsup_rightswing_cybathlon_v4
 
   stairs_up_single_step:
-    right_open: MVI_stairsup_rightopen_cybathlon_v4
-    left_close: MVI_stairsup_leftclose_cybathlon_v4
+    right_open: MVI_stairsupsinglestep_rightopen_cybathlon_v4
+    left_close: MVI_stairsupsinglestep_leftclose_cybathlon_v4
 
   stairs_down:
     left_close: MVI_stairsdown_leftclose_cybathlon_v2
@@ -38,8 +38,8 @@ gaits:
     right_swing: MVI_stairsdown_rightswing_cybathlon_v2
 
   stairs_down_single_step:
-    left_close: MVI_stairsdown_leftclose_cybathlon_v2
-    right_open: MVI_stairsdown_rightopen_cybathlon_v2
+    left_close: MVI_stairsdownsinglestep_leftclose_cybathlon_v2
+    right_open: MVI_stairsdownsinglestep_rightopen_cybathlon_v2
 
   stairs_down_backwards:
     left_close: MVI_stairsdownbackwards_leftclose_cybathlon_v2
@@ -49,8 +49,8 @@ gaits:
     right_swing: MVI_stairsdownbackwards_rightswing_cybathlon_v2
 
   stairs_down_backwards_single_step:
-    left_close: MVI_stairsdownbackwards_leftclose_cybathlon_v2
-    right_open: MVI_stairsdownbackwards_rightopen_cybathlon_v2
+    left_close: MVI_stairsdownbackwardssinglestep_leftclose_cybathlon_v2
+    right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v2
 
   walk:
     left_close: MVI_walk_leftclose_v3
