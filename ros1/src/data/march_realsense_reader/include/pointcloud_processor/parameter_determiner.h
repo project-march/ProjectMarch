@@ -166,7 +166,7 @@ protected:
     bool getGaitParametersFromFootLocationStairsUp();
 
     // Find the ramp parameter from the foot locations
-    bool getGaitParametersFromfootLocationRamp();
+    bool getGaitParametersFromFootLocationRamp();
 
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
