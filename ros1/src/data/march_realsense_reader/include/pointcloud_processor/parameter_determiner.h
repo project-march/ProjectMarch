@@ -247,7 +247,7 @@ protected:
     visualization_msgs::Marker foot_locations_to_try_marker_list;
     visualization_msgs::Marker possible_foot_locations_marker_list;
     visualization_msgs::Marker gait_information_marker_list;
-    visualization_msgs::Marker optimal_foot_location_marker;
+    visualization_msgs::Marker optimal_location_marker;
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
     // [5])^T
