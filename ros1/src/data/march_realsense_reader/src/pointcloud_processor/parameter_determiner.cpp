@@ -141,20 +141,23 @@ bool HullParameterDeterminer::determineParameters(
         initializeDebugOutput();
         addDebugGaitInformation();
     }
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
 
     bool success = true;
 
-    // Only calculate the gait parameters if an optimal foot location has been
-    // found
     if (realsense_category_.value() != RealSenseCategory::sit) {
         success &= getOptimalFootLocation();
     } else {
         success &= getSitHeight();
     }
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
+    // Only calculate the gait parameters if an optimal foot location or sit
+    // height has been found
     if (success) {
         success &= getGaitParametersFromLocation();
     }
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     if (debugging_) {
         addDebugMarkersToArray();
@@ -378,7 +381,7 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
     if (sit_height > min_sit_height && sit_height < max_sit_height) {
         gait_parameters_->first_parameter
-                = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
+            = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
     } else {
         gait_parameters_->first_parameter = -1;
     }
@@ -441,15 +444,18 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
 bool HullParameterDeterminer::getSitHeight()
 {
     bool success = true;
-
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
     // Create a grid of points at the location where the exoskeleton should sit
     sit_grid = boost::make_shared<PointCloud2D>();
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
     success &= fillSitGrid(sit_grid);
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     // Crop those locations to find where there is support for the exoskeleton
     PointNormalCloud::Ptr exo_support_points
         = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     if (exo_support_points->size() / sit_grid->size()
         < minimal_needed_support_sit) {
@@ -457,6 +463,7 @@ bool HullParameterDeterminer::getSitHeight()
                          "unable to find parameters for sit category.");
         return false;
     }
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     // The support points will vary and some might not not be on the chair.
     // The median is taken to avoid these outliers
@@ -502,6 +509,7 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
     int x_points
         = int(round((max_x_search_sit - min_x_search_sit) / sit_grid_size)) + 1;
     int y_points = int(round((search_y_deviation_sit) / sit_grid_size)) + 1;
+    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
 
     for (int x_index; x_index < x_points; ++x_index) {
         for (int y_index; y_index < y_points; ++y_index) {
@@ -511,6 +519,7 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
             int sit_grid_index = x_index + y_index * x_points;
             sit_grid->points[sit_grid_index].x = x_location;
             sit_grid->points[sit_grid_index].y = y_location;
+            ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
 
             if (debugging_) {
                 geometry_msgs::Point marker_point;
@@ -525,6 +534,7 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
                 foot_locations_to_try_marker_list.colors.push_back(
                     marker_color);
             }
+            ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
         }
     }
     return true;
