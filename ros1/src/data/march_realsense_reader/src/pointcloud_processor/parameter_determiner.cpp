@@ -124,8 +124,9 @@ bool HullParameterDeterminer::determineParameters(
     subgait_name_ = subgait_name;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
     // Initialize the optimal foot location at the origin and the gait
-    // parameters at -1 in case the calculation fails
+    // parameters and sit height at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
+    sit_height = -1;
     gait_parameters_->first_parameter = -1;
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
@@ -375,8 +376,12 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    gait_parameters_->first_parameter
-        = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
+    if (sit_height > min_sit_height && sit_height < max_sit_height) {
+        gait_parameters_->first_parameter
+                = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
+    } else {
+        gait_parameters_->first_parameter = -1;
+    }
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
