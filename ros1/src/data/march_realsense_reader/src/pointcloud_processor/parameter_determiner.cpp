@@ -454,7 +454,7 @@ bool HullParameterDeterminer::getSitHeight()
 
     if (debugging_) {
         std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
-        for (pcl::PointNormal& exo_support_point : exo_support_points) {
+        for (pcl::PointNormal& exo_support_point : *exo_support_points) {
             geometry_msgs::Point marker_point;
             marker_point.x = exo_support_point.x;
             marker_point.y = exo_support_point.y;
@@ -483,9 +483,10 @@ bool HullParameterDeterminer::getSitHeight()
         geometry_msgs::Point marker_point;
         marker_point.y = search_y_deviation_sit / 2.0f;
         marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f;
-        marker_point.z = sit_height.z;
+        marker_point.z = sit_height;
 
-        optimal_location_marker
+        optimal_location_marker.points.push_back(marker_point);
+        optimal_location_marker.colors.push_back(marker_color);
     }
 
 
