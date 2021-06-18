@@ -383,9 +383,9 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
     } else {
         gait_parameters_->first_parameter = -1;
-        ROS_DEBUG_STREAM("The sit height should be between "
+        ROS_ERROR_STREAM("The sit height should be between "
             << min_sit_height << " and " << max_sit_height << " but was "
-            << sit_height); 
+            << sit_height);
         return false;
     }
     // The step height and side step parameter are unused for the ramp down
@@ -470,7 +470,7 @@ bool HullParameterDeterminer::getSitHeight()
         }
     }
 
-    if (exo_support_points->size() / sit_grid->size()
+    if ((float)exo_support_points->size() / (float)sit_grid->size()
         < minimal_needed_support_sit) {
         ROS_ERROR_STREAM("Not enough support for the exoskeleton is found, "
                          "unable to find parameters for sit category.");
@@ -497,7 +497,7 @@ bool HullParameterDeterminer::getSitHeight()
 
 // Get the median height value of a point cloud
 bool HullParameterDeterminer::getMedianHeightCloud(
-    const PointNormalCloud::Ptr& cloud, float median_height)
+    const PointNormalCloud::Ptr& cloud, float& median_height)
 {
     int pointcloud_size = cloud->size();
     if (pointcloud_size == 0) {
