@@ -239,6 +239,7 @@ protected:
     float max_x_search_sit {};
     float search_y_deviation_sit {};
     float sit_grid_size {};
+    float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
     std::string subgait_name_;

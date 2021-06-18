@@ -92,6 +92,8 @@ void HullParameterDeterminer::readParameters(
     max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
     search_y_deviation_sit
         = (float)config.parameter_determiner_search_y_deviation_sit;
+    minimal_needed_support_sit
+        = (float)config.parameter_determiner_minimal_needed_support_sit;
     sit_grid_size = (float)config.parameter_determiner_sit_grid_size;
     max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
@@ -274,6 +276,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
             marker_point.z = max_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
+            break;
         }
         default: {
             ROS_WARN_STREAM("gait debug information is not implemented yet "
@@ -444,6 +447,13 @@ bool HullParameterDeterminer::getSitHeight()
     PointNormalCloud::Ptr exo_support_points
         = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
+
+    if (exo_support_points.size() / sit_grid.size()
+        < minimal_needed_support_sit) {
+        ROS_ERROR_STREAM("Not enough support for the exoskeleton is found, "
+                         "unable to find parameters for sit category.");
+        return false;
+    }
 
     // The support points will vary and some might not not be on the chair.
     // The median is taken to avoid these outliers
