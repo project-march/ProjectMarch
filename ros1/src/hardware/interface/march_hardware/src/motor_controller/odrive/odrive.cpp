@@ -57,7 +57,7 @@ void ODrive::prepareActuation()
     //         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
     //         waitForState(ODriveAxisState::IDLE);
     //     }
-    setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+//    setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
 }
 
 void ODrive::enableActuation()
@@ -264,11 +264,9 @@ uint32_t ODrive::getMotorError()
 
 uint32_t ODrive::getEncoderManagerError()
 {
-    //    auto value = this->read32(ODrivePDOmap::getMISOByteOffset(
-    //            ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
-    //        .ui;
-    //    ROS_INFO("Time difference %u ms", value);
-    return 0;
+        return value = this->read32(ODrivePDOmap::getMISOByteOffset(
+                ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
+            .ui;
 }
 
 uint32_t ODrive::getEncoderError()
