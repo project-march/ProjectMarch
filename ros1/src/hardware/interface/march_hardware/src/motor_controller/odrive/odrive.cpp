@@ -264,7 +264,7 @@ uint32_t ODrive::getMotorError()
 
 uint32_t ODrive::getEncoderManagerError()
 {
-        return value = this->read32(ODrivePDOmap::getMISOByteOffset(
+        return this->read32(ODrivePDOmap::getMISOByteOffset(
                 ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
             .ui;
 }
