@@ -13,7 +13,7 @@ from .foot import Foot
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
-class FeetState(object):
+class FeetState:
     """Class for encapturing the entire state (position and velocity at a certain time) of both feet."""
 
     def __init__(self, right_foot, left_foot, time=None):

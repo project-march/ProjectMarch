@@ -27,7 +27,9 @@
     <arg name="hardware_interface" default="true" doc="Launches the hardware interface when config is 'exoskeleton."/>
     <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
                                         If not provided, then the value is read from the robot .yaml file."/>
-
+    <arg name="remove_fixed_joints_from_ethercat_train" default="true"
+         doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
+         are also not in the ethercat train."/>
 <!-- Data                       -->
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
@@ -72,6 +74,8 @@
             <arg name="robot_description" value="$(arg robot_description)"/>
             <arg name="controller_name" value="$(arg controller_name)"/>
             <arg name="if_name" value="$(arg if_name)"/>
+            <arg name="remove_fixed_joints_from_ethercat_train"
+                 value="$(arg remove_fixed_joints_from_ethercat_train)"/>
         </include>
     </group>
 
@@ -80,7 +84,6 @@
         <arg name="input_device" value="$(arg input_device)"/>
         <arg name="wireless" value="$(arg wireless)"/>
     </include>
-
 
 <!-- Data-->
     <node
@@ -139,6 +142,7 @@
                     ground_gait:=$(arg ground_gait) configuration:=$(arg configuration) realsense_simulation:=$(arg realsense_simulation)"/>
 
     <param name="balance" value="$(arg balance)"/>
+
 
     <group if="$(eval configuration == 'simulation')">
         <include file="$(find march_simulation)/launch/march_world.launch">

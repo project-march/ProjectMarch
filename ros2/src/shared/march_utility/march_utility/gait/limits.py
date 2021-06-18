@@ -1,4 +1,4 @@
-class Limits(object):
+class Limits:
     def __init__(
         self, lower, upper, velocity, effort=None, k_position=None, k_velocity=None
     ):

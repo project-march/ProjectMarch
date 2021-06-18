@@ -9,7 +9,7 @@ from march_utility.gait.calculation_setpoint import CalculationSetpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
-    get_joint_names_for_inverse_kinematics,
+    validate_and_get_joint_names_for_inverse_kinematics,
     merge_dictionaries,
 )
 
@@ -18,10 +18,10 @@ from march_utility.exceptions.gait_exceptions import (
 )
 from .foot import Foot
 
-JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
-class FeetState(object):
+class FeetState:
     """Class for encapturing the state of both feet."""
 
     def __init__(
@@ -48,7 +48,12 @@ class FeetState(object):
             A FeetState object with a left and right foot which each have a
             position and velocity corresponding to the setpoint dictionary
         """
-
+        if JOINT_NAMES_IK is None:
+            raise SubgaitInterpolationError(
+                "Robot joints do not allow IK, "
+                "so FeetState object can not be created "
+                "from setpoints."
+            )
         for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
                 raise KeyError(

@@ -130,7 +130,7 @@ class RealSenseGait(SetpointsGait):
                         f"the amount of dimensions for subgait {subgait_name}"
                     )
 
-            subgaits = dict()
+            subgaits = {}
             for subgait_name in subgait_version_map:
                 if subgait_name not in ("start", "end"):
                     subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
@@ -193,15 +193,21 @@ class RealSenseGait(SetpointsGait):
             )
         return cls.CAMERA_NAME_MAP[camera_name]
 
+    DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION = Duration(0)
+
     def start(
-        self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)
+        self,
+        current_time: Time,
+        first_subgait_delay: Optional[
+            Duration
+        ] = DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION,
     ) -> GaitUpdate:
         """
         This function is called to start the realsense gait, it does the following.
         1) Make a service call to march_realsense_reader.
         2) Update all subgaits to interpolated subgaits with the given parameters
         (this will later become only some of the subgaits when the update function is
-         also used).
+        also used).
         3) Update the gait parameters to prepare for start
         4) Return the first subgait, if correct parameters were found.
 

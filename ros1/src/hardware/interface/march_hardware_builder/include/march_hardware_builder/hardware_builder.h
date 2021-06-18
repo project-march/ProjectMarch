@@ -32,7 +32,8 @@ public:
      * @brief Initialises a HardwareBuilder with a robotName enumerator.
      * @details Grabs the .yaml file associated with the robot name.
      */
-    explicit HardwareBuilder(AllowedRobot robot);
+    explicit HardwareBuilder(
+        AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train);
 
     /**
      * @brief Initialises with a robot name and URDF.
@@ -42,7 +43,8 @@ public:
     /**
      * @brief Initialises a HardwareBuilder with a path to a .yaml file.
      */
-    explicit HardwareBuilder(const std::string& yaml_path);
+    explicit HardwareBuilder(const std::string& yaml_path,
+        bool remove_fixed_joints_from_ethercat_train);
 
     /**
      * @brief Initialises with a path to yaml and URDF.
@@ -113,18 +115,6 @@ public:
         const march::PdoInterfacePtr& pdo_interface,
         const march::SdoInterfacePtr& sdo_interface);
 
-    static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
-    static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
-    static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
-    static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
-    static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
-    static const std::vector<std::string>
-        POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
-    static const std::vector<std::string> JOINT_REQUIRED_KEYS;
-    static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
-    static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
-
-private:
     /**
      * Initializes the URDF if necessary.
      */
@@ -141,9 +131,29 @@ private:
         const march::PdoInterfacePtr& pdo_interface,
         const march::SdoInterfacePtr& sdo_interface) const;
 
+    static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
+    static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
+    static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
+    static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
+    static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
+    static const std::vector<std::string>
+        POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
+    static const std::vector<std::string> JOINT_REQUIRED_KEYS;
+    static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
+    static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
+
+private:
+    int updateSlaveIndexBasedOnFixedJoints(const YAML::Node& joint_config,
+        const std::string& joint_name,
+        const std::set<int>& fixedSlaveIndices) const;
+    std::set<int> getSlaveIndicesOfFixedJoints(
+        const YAML::Node& joints_config) const;
+    int getSlaveIndexFromJointConfig(const YAML::Node& joint_config) const;
+
     YAML::Node robot_config_;
     urdf::Model urdf_;
     bool init_urdf_ = true;
+    bool remove_fixed_joints_from_ethercat_train_ = false;
 };
 
 /**

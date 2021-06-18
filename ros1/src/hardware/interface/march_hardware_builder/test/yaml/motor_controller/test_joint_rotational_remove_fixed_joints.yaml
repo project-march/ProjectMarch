@@ -1,0 +1,27 @@
+testsetup:
+  if_name: enp2s0
+  ecatCycleTime: 4
+  ecatSlaveTimeout: 50
+  joints:
+    - rotational_joint:
+        allowActuation: true
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 2
+          axis: 0
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 29266
+            maxPositionIU: 52948
+    - joint_base_fixed_parent_joint:
+        allowActuation: true
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 1
+          axis: 0
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 29266
+            maxPositionIU: 52948

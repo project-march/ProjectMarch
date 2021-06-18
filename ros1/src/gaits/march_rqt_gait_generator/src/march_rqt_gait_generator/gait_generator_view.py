@@ -1,6 +1,7 @@
 import math
 import os
-import subprocess
+import subprocess  # noqa: S404
+from shlex import quote
 
 from .inverse_kinematics_pop_up import InverseKinematicsPopUpWindow
 
@@ -270,7 +271,13 @@ class GaitGeneratorView(QWidget):
 
     @staticmethod
     def notify(title, message):
-        subprocess.Popen(["notify-send", str(title), str(message)])
+        subprocess.Popen(  # noqa: S603
+            [
+                "/usr/bin/notify-send",
+                quote(str(title)),
+                quote(str(message)),
+            ]
+        )
 
     @property
     def control_button(self):

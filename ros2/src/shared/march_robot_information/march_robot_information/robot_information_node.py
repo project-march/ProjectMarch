@@ -2,6 +2,7 @@ from typing import List, Optional
 
 import rclpy
 from march_shared_msgs.srv import GetJointNames
+from march_utility.utilities.node_utils import get_joint_names_from_robot
 from rcl_interfaces.msg import ParameterValue
 from rcl_interfaces.srv import GetParameters
 from rclpy.node import Node
@@ -48,7 +49,7 @@ class RobotInformation(Node):
                 .string_array_value
             )
             if len(joint_names) > 0:
-                self.joint_names = joint_names
+                self.joint_names = sorted(joint_names)
             else:
                 self.joint_names = self.query_joint_names()
 
@@ -68,12 +69,7 @@ class RobotInformation(Node):
         )[0].string_value
         robot = urdf.Robot.from_xml_string(robot_description)
 
-        joint_names = []
-        for joint in robot.joints:
-            if joint.type != "fixed":
-                joint_names.append(joint.name)
-
-        return joint_names
+        return get_joint_names_from_robot(robot)
 
     def make_get_parameters_request(
         self, node: str, names: List[str]

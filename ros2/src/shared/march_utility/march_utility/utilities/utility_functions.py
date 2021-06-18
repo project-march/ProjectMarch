@@ -5,7 +5,7 @@ for general use cases.
 """
 
 import os
-from typing import List
+from typing import List, Optional
 
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
@@ -174,10 +174,12 @@ def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[flo
     return select_lengths_for_inverse_kinematics(LENGTHS_BOTH_SIDES, side)
 
 
-def get_joint_names_for_inverse_kinematics() -> List[str]:
+def validate_and_get_joint_names_for_inverse_kinematics(
+    logger=None,
+) -> Optional[List[str]]:
     """Get a list of the joint names that can be used for the inverse kinematics.
 
-    This also checks whether robot description contains the required joints.
+    Returns none if the robot description does not contain the required joints.
     :return: A list of joint names.
     """
     robot = urdf.Robot.from_xml_file(
@@ -195,10 +197,12 @@ def get_joint_names_for_inverse_kinematics() -> List[str]:
         "right_knee",
     ]
     for joint_name in joint_name_list:
-        if joint_name not in robot_joint_names:
-            raise KeyError(
-                f"Inverse kinematics calculation expected the robot to have joint "
-                f"{joint_name}, but {joint_name} was not found."
-            )
+        if (
+            joint_name not in robot_joint_names
+            or robot.joint_map[joint_name].type == "fixed"
+        ):
+            if logger is not None:
+                logger.warn(f"{joint_name} is fixed, but required for IK")
+            return None
 
-    return joint_name_list
+    return sorted(joint_name_list)
