@@ -381,13 +381,16 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
     } else {
         gait_parameters_->first_parameter = -1;
-
+        ROS_DEBUG_STREAM("The sit height should be between "
+            << min_sit_height << " and " << max_sit_height << " but was "
+            << sit_height); 
+        return false;
     }
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
-    return false;
+    return true;
 }
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
@@ -460,10 +463,8 @@ bool HullParameterDeterminer::getSitHeight()
             marker_point.y = exo_support_point.y;
             marker_point.z = exo_support_point.z;
 
-            possible_foot_locations_marker_list.points.push_back(
-                    marker_point);
-            possible_foot_locations_marker_list.colors.push_back(
-                    marker_color);
+            possible_foot_locations_marker_list.points.push_back(marker_point);
+            possible_foot_locations_marker_list.colors.push_back(marker_color);
         }
     }
 
@@ -488,7 +489,6 @@ bool HullParameterDeterminer::getSitHeight()
         optimal_location_marker.points.push_back(marker_point);
         optimal_location_marker.colors.push_back(marker_color);
     }
-
 
     return success;
 }
@@ -541,7 +541,7 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
 
             if (debugging_) {
                 geometry_msgs::Point marker_point;
-                marker_point.x = grid_point.x ;
+                marker_point.x = grid_point.x;
                 marker_point.y = grid_point.y;
                 marker_point.z = 0;
 
