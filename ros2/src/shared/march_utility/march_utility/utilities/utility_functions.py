@@ -174,7 +174,9 @@ def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[flo
     return select_lengths_for_inverse_kinematics(LENGTHS_BOTH_SIDES, side)
 
 
-def validate_and_get_joint_names_for_inverse_kinematics() -> Optional[List[str]]:
+def validate_and_get_joint_names_for_inverse_kinematics(
+    logger=None,
+) -> Optional[List[str]]:
     """Get a list of the joint names that can be used for the inverse kinematics.
 
     Returns none if the robot description does not contain the required joints.
@@ -199,6 +201,8 @@ def validate_and_get_joint_names_for_inverse_kinematics() -> Optional[List[str]]
             joint_name not in robot_joint_names
             or robot.joint_map[joint_name].type == "fixed"
         ):
+            if logger is not None:
+                logger.warn(f"{joint_name} is fixed, but required for IK")
             return None
 
     return sorted(joint_name_list)
