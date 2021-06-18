@@ -141,7 +141,6 @@ bool HullParameterDeterminer::determineParameters(
         initializeDebugOutput();
         addDebugGaitInformation();
     }
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
 
     bool success = true;
 
@@ -150,14 +149,12 @@ bool HullParameterDeterminer::determineParameters(
     } else {
         success &= getSitHeight();
     }
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     // Only calculate the gait parameters if an optimal foot location or sit
     // height has been found
     if (success) {
         success &= getGaitParametersFromLocation();
     }
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     if (debugging_) {
         addDebugMarkersToArray();
@@ -194,11 +191,11 @@ void HullParameterDeterminer::initializeDebugOutput()
     possible_foot_locations_marker_list = initializeMarkerListWithId(id);
 
     id = 2;
-    optimal_foot_location_marker = initializeMarkerListWithId(id);
+    optimal_location_marker = initializeMarkerListWithId(id);
     // Make the optimal foot location stand out more
-    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.2;
-    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.2;
-    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.2;
+    optimal_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.2;
+    optimal_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.2;
+    optimal_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.2;
 
     id = 3;
     gait_information_marker_list = initializeMarkerListWithId(id);
@@ -292,7 +289,7 @@ void HullParameterDeterminer::addDebugMarkersToArray()
 {
     debug_marker_array.markers.push_back(foot_locations_to_try_marker_list);
     debug_marker_array.markers.push_back(possible_foot_locations_marker_list);
-    debug_marker_array.markers.push_back(optimal_foot_location_marker);
+    debug_marker_array.markers.push_back(optimal_location_marker);
     debug_marker_array.markers.push_back(gait_information_marker_list);
 }
 
@@ -384,6 +381,7 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
     } else {
         gait_parameters_->first_parameter = -1;
+
     }
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
@@ -444,18 +442,30 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
 bool HullParameterDeterminer::getSitHeight()
 {
     bool success = true;
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
+
     // Create a grid of points at the location where the exoskeleton should sit
     sit_grid = boost::make_shared<PointCloud2D>();
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
     success &= fillSitGrid(sit_grid);
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     // Crop those locations to find where there is support for the exoskeleton
     PointNormalCloud::Ptr exo_support_points
         = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
+
+    if (debugging_) {
+        std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
+        for (pcl::PointNormal& exo_support_point : exo_support_points) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = exo_support_point.x;
+            marker_point.y = exo_support_point.y;
+            marker_point.z = exo_support_point.z;
+
+            possible_foot_locations_marker_list.points.push_back(
+                    marker_point);
+            possible_foot_locations_marker_list.colors.push_back(
+                    marker_color);
+        }
+    }
 
     if (exo_support_points->size() / sit_grid->size()
         < minimal_needed_support_sit) {
@@ -463,11 +473,21 @@ bool HullParameterDeterminer::getSitHeight()
                          "unable to find parameters for sit category.");
         return false;
     }
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed");
 
     // The support points will vary and some might not not be on the chair.
     // The median is taken to avoid these outliers
     success &= getMedianHeightCloud(exo_support_points, sit_height);
+
+    if (debugging_) {
+        std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
+        geometry_msgs::Point marker_point;
+        marker_point.y = search_y_deviation_sit / 2.0f;
+        marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f;
+        marker_point.z = sit_height.z;
+
+        optimal_location_marker
+    }
+
 
     return success;
 }
@@ -509,22 +529,19 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
     int x_points
         = int(round((max_x_search_sit - min_x_search_sit) / sit_grid_size)) + 1;
     int y_points = int(round((search_y_deviation_sit) / sit_grid_size)) + 1;
-    ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
 
-    for (int x_index; x_index < x_points; ++x_index) {
-        for (int y_index; y_index < y_points; ++y_index) {
-            float x_location = x_index * sit_grid_size + min_x_search_sit;
-            float y_location = y_index * sit_grid_size;
+    for (int x_index = 0; x_index < x_points; ++x_index) {
+        for (int y_index = 0; y_index < y_points; ++y_index) {
+            pcl::PointXY grid_point;
+            grid_point.x = x_index * sit_grid_size + min_x_search_sit;
+            grid_point.y = y_index * sit_grid_size;
 
-            int sit_grid_index = x_index + y_index * x_points;
-            sit_grid->points[sit_grid_index].x = x_location;
-            sit_grid->points[sit_grid_index].y = y_location;
-            ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
+            sit_grid->push_back(grid_point);
 
             if (debugging_) {
                 geometry_msgs::Point marker_point;
-                marker_point.x = x_location;
-                marker_point.y = y_location;
+                marker_point.x = grid_point.x ;
+                marker_point.y = grid_point.y;
                 marker_point.z = 0;
 
                 std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
@@ -534,7 +551,6 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
                 foot_locations_to_try_marker_list.colors.push_back(
                     marker_color);
             }
-            ROS_WARN_STREAM("line " << __LINE__ << " of method " << __FUNCTION__ << " in file " << __FILE__ << " has executed.");
         }
     }
     return true;
@@ -564,8 +580,8 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         marker_point.z = optimal_foot_location.z;
         std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
 
-        optimal_foot_location_marker.points.push_back(marker_point);
-        optimal_foot_location_marker.colors.push_back(marker_color);
+        optimal_location_marker.points.push_back(marker_point);
+        optimal_location_marker.colors.push_back(marker_color);
     }
 
     return success;
