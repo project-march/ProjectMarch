@@ -451,7 +451,7 @@ bool HullParameterDeterminer::getSitHeight()
         = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
 
-    if (exo_support_points.size() / sit_grid.size()
+    if (exo_support_points->size() / sit_grid->size()
         < minimal_needed_support_sit) {
         ROS_ERROR_STREAM("Not enough support for the exoskeleton is found, "
                          "unable to find parameters for sit category.");
