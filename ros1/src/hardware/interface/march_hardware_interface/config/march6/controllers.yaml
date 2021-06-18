@@ -11,7 +11,6 @@ march:
       publish_rate: 1
     trajectory:
       type: effort_controllers/JointTrajectoryController
-      #allow_partial_joints_goal: true
       joints:
         - left_ankle
         - left_hip_aa
@@ -24,17 +23,12 @@ march:
       gains: # Required because we're controlling an effort interface
         left_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
         left_hip_aa: {p: 150, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-#        left_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-#        left_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
         right_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
         right_hip_aa: {p: 150, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-
-        left_hip_fe: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
-        left_knee: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
-        right_hip_fe: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
-        right_knee: { p: 50, i: 0, d: 4, i_clamp: 100, publish_state: true, antiwindup: true }
+        right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
         goal_time: 0.5
