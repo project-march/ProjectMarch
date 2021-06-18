@@ -121,6 +121,9 @@ class ParameterServer:
 
 
 def main():
-    rospy.init_node("march_parameter_server_node")
-    ParameterServer()
-    rospy.spin()
+    try:
+        rospy.init_node("march_parameter_server_node")
+        ParameterServer()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
