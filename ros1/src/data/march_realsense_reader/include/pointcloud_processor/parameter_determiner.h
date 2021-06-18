@@ -200,7 +200,7 @@ protected:
 
     // Get the median height value of a point cloud
     bool getMedianHeightCloud(
-        const PointNormalCloud::Ptr& cloud, float median_height);
+        const PointNormalCloud::Ptr& cloud, float& median_height);
 
     // All relevant parameters
     int hull_dimension {};
