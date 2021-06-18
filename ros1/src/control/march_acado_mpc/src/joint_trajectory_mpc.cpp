@@ -254,7 +254,7 @@ void ModelPredictiveControllerInterface::updateCommand(
     }
 
     // Get "running" reference of each joint combined
-    for (int n = 0; n < desired_states.size() - 1; ++n) {
+    for (int n = 0; n < ACADO_N; ++n) {
         for (int i = 0; i < num_joints_; ++i) {
             reference.insert(reference.end(),
                 { desired_states[n].position[i],
