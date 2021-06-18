@@ -192,6 +192,8 @@ protected:
     // frame_id_to_transform_to, but keeps the roll and pitch of the world frame
     bool setGaitInformationToNewFrame();
 
+    void transformPointCloudToWorld(const PointCloud::Ptr&);
+
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
@@ -224,6 +226,9 @@ protected:
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
+    tf2::Quaternion frame_id_to_world_quaternion, yaw_quaternion;
+    tf2::Vector3 rotation_axis;
+    geometry_msgs::TransformStamped yaw_msg, transform_stamped_origin;
 
     visualization_msgs::Marker foot_locations_to_try_marker_list;
     visualization_msgs::Marker possible_foot_locations_marker_list;
