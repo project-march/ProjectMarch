@@ -51,7 +51,7 @@ public:
     void enableActuation();
 
     // Set initial encoder values
-    void readFirstEncoderValues();
+    void readFirstEncoderValues(bool operational_check);
 
     // Actuate the joint if allow_actuation is true
     // Will throw a HardwareException if canActuate() is false

@@ -74,25 +74,29 @@ void Joint::actuate(float target)
     motor_controller_->actuate(target);
 }
 
-void Joint::readFirstEncoderValues()
+void Joint::readFirstEncoderValues(bool operational_check)
 {
     ROS_INFO("[%s] Reading first values", this->name_.c_str());
-    auto motor_controller_state = motor_controller_->getState();
-    if (motor_controller_state->isOperational()) {
-        if (motor_controller_->hasIncrementalEncoder()) {
-            initial_incremental_position_
-                = motor_controller_->getIncrementalPosition();
+
+    // Preconditions check
+    if(operational_check) {
+        auto motor_controller_state = motor_controller_->getState();
+        if (!motor_controller_state->isOperational()) {
+            ROS_FATAL("[%s]: %s", this->name_.c_str(),
+                      motor_controller_state->getErrorStatus().value().c_str());
+            throw error::HardwareException(
+                error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
-        if (motor_controller_->hasAbsoluteEncoder()) {
-            initial_absolute_position_
-                = motor_controller_->getAbsolutePosition();
-            position_ = initial_absolute_position_;
-        }
-    } else {
-        ROS_FATAL("[%s]: %s", this->name_.c_str(),
-            motor_controller_state->getErrorStatus().value().c_str());
-        throw error::HardwareException(
-            error::ErrorType::PREPARE_ACTUATION_ERROR);
+    }
+
+    if (motor_controller_->hasIncrementalEncoder()) {
+        initial_incremental_position_
+            = motor_controller_->getIncrementalPosition();
+    }
+    if (motor_controller_->hasAbsoluteEncoder()) {
+        initial_absolute_position_
+            = motor_controller_->getAbsolutePosition();
+        position_ = initial_absolute_position_;
     }
     ROS_INFO("[%s] Read first values", this->name_.c_str());
 }
