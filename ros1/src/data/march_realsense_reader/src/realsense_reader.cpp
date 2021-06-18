@@ -366,7 +366,7 @@ bool RealSenseReader::processPointcloudCallback(
     subgait_name_ = req.subgait_name;
     try {
         frame_id_to_transform_to_
-            = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP[subgait_name_];
+            = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP.at(subgait_name_);
     } catch (std::out_of_range& ex) {
         res.error_message = "Provided subgait has no known associated frame id "
                             "to transform to.";
