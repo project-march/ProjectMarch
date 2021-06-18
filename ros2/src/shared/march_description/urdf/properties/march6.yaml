@@ -134,7 +134,7 @@ safety:  # This is still copied from MV
       upper_soft_buffer: 2.0
       k_position: 8.368683429790725
       k_velocity: 26.185712977780618
-      max_effort: 20.0
+      max_effort: 25.0
       max_velocity: 3.0
     ankle:
       lower_soft_buffer: 2.0
@@ -144,8 +144,8 @@ safety:  # This is still copied from MV
       max_effort: 20.0
       max_velocity: 3.0
     haa:
-      lower_soft_buffer: 1.0
-      upper_soft_buffer: 1.0
+      lower_soft_buffer: 0.0
+      upper_soft_buffer: 0.0
       k_position: 20000.0
       k_velocity: 20000.0
       max_effort: 20.0
@@ -163,7 +163,7 @@ safety:  # This is still copied from MV
       upper_soft_buffer: 2.0
       k_position: 8.368683429790725
       k_velocity: 26.185712977780618
-      max_effort: 20.0
+      max_effort: 25.0
       max_velocity: 3.0
     ankle:
       lower_soft_buffer: 2.0
