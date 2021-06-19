@@ -57,7 +57,7 @@ void ODrive::prepareActuation()
     //         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
     //         waitForState(ODriveAxisState::IDLE);
     //     }
-//    setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+    setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
 }
 
 void ODrive::enableActuation()

@@ -185,7 +185,7 @@ bool MarchHardwareInterface::init(
     }
 
     // Wait a while for MotorControllers to be prepared
-    ros::Duration(/*t=*/0).sleep();
+    ros::Duration(/*t=*/20).sleep();
 
     // Enable all joints for actuation
     for (size_t i = 0; i < num_joints_; ++i) {
@@ -197,7 +197,7 @@ bool MarchHardwareInterface::init(
     }
 
     // Wait a while for MotorControllers to be enabled
-    ros::Duration(/*t=*/10).sleep();
+    ros::Duration(/*t=*/5).sleep();
 
     // For debugging
     for (size_t i = 0; i < num_joints_; ++i) {
