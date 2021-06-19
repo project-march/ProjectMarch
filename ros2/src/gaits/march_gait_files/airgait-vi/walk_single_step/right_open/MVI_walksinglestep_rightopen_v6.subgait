@@ -1,4 +1,4 @@
-description: Single step of the slow walk gait (version4)
+description: Single step of the MVI_walk_v6 (slow without HAA)
 duration: 1600000000
 gait_type: walk_like
 joints:
