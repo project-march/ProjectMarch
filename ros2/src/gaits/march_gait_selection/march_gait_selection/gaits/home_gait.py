@@ -11,6 +11,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 
 
 DEFAULT_HOMEGAIT_DURATION = Duration(seconds=3)
+ZERO_DURATION = Duration(seconds=0)
 
 
 class HomeGait(GaitInterface):
@@ -74,7 +75,7 @@ class HomeGait(GaitInterface):
         return "home_gait_version"
 
     def start(
-        self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)
+        self, current_time: Time, first_subgait_delay: Optional[Duration] = ZERO_DURATION
     ) -> GaitUpdate:
         """Start the gait.
         Creates a trajectory command to go towards the idle position in the given duration.
@@ -107,11 +108,11 @@ class HomeGait(GaitInterface):
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Optional[Duration] = Duration(0),
-        node=None,
+        early_schedule_duration: Optional[Duration] = ZERO_DURATION,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
-        :param current_time: Current time
+        :param current_time: Current time.
+        :param early_schedule_duration: The duration to schedule the gait early.
         :returns Returns a GaitUpdate with only the is_finished set to either true or false.
         """
         if current_time >= self._end_time:
