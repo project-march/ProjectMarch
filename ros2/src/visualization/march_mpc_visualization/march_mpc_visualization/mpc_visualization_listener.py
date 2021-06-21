@@ -44,15 +44,10 @@ class MpcListener(Node):
             )
 
             # Estimation
-            self.new_estimation_position = (
-                msg.joint[joint_number].estimation.states[0].array[1:-1]
-            )
-            self.new_estimation_velocity = (
-                msg.joint[joint_number].estimation.states[1].array[1:-1]
-            )
-            self.new_estimation_input = (
-                msg.joint[joint_number].estimation.inputs[0].array
-            )
+            estimation = msg.joint[joint_number].estimation
+            self.new_estimation_position = estimation.states[0].array[1:-1]
+            self.new_estimation_velocity = estimation.states[1].array[1:-1]
+            self.new_estimation_input = estimation.inputs[0].array
 
     # @app.route("/measurement")
     def stream_measurement(self):

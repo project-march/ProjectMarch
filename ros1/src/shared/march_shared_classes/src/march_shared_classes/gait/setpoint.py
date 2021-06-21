@@ -9,7 +9,7 @@ VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
-class Setpoint(object):
+class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
     digits = 4

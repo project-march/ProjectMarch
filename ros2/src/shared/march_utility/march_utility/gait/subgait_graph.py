@@ -4,7 +4,7 @@ from typing import List
 from march_utility.exceptions.gait_exceptions import SubgaitGraphError
 
 
-class SubgaitGraph(object):
+class SubgaitGraph:
     START = "start"
     END = "end"
     TO = "to"
@@ -65,7 +65,7 @@ class SubgaitGraph(object):
             raise SubgaitGraphError(
                 "Subgait {n} has no `{t}` transition".format(n=name, t=self.TO)
             )
-        if not all([transition in self.TRANSITIONS for transition in subgait]):
+        if not all(transition in self.TRANSITIONS for transition in subgait):
             raise SubgaitGraphError(
                 "Subgait {n} has unknown transitions. Available transitions {t}".format(
                     n=name, t=self.TRANSITIONS

@@ -16,7 +16,7 @@ from .subgait_graph import SubgaitGraph
 ALLOWED_ERROR_ENDPOINTS = 0.001
 
 
-class Gait(object):
+class Gait:
     """Base class for a generated gait."""
 
     def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
@@ -84,18 +84,13 @@ class Gait(object):
         subgaits = gait_dictionary["subgaits"]
 
         graph = SubgaitGraph(subgaits)
-        subgaits = dict(
-            [
-                (
-                    name,
-                    cls.load_subgait(
-                        robot, gait_directory, gait_name, name, gait_version_map
-                    ),
-                )
-                for name in subgaits
-                if name not in ("start", "end")
-            ]
-        )
+        subgaits = {
+            name: cls.load_subgait(
+                robot, gait_directory, gait_name, name, gait_version_map
+            )
+            for name in subgaits
+            if name not in ("start", "end")
+        }
         return cls(gait_name, subgaits, graph)
 
     @staticmethod

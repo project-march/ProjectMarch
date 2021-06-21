@@ -19,11 +19,16 @@ RESIZABLE_OBSTACLES_BLOCK_LIKE = ['bench', 'stairs'] # for files which accept he
 current_model_name = {name: name for name in RESIZABLE_OBSTACLES_RAMP_LIKE +
     RESIZABLE_OBSTACLES_BLOCK_LIKE
 }
-rospy.init_node('set_obstacle_dimensions', anonymous=True)
+try:
+    rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
-spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
-delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
-get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
+    spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
+    delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+    get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
+except rospy.ROSInterruptException:
+    pass
+except rospy.ROSInitException:
+    pass
 
 
 def set_new_block_like_obstacle(name, length=0, width=0, height=0):
@@ -88,9 +93,11 @@ def set_size_ramp_like_callback(msg):
                                    ramp_up_length=msg.new_ramp_up_length)
         return SetObstacleSizeRampLikeResponse(success=True)
 
-
-change_block_like_obstacle_size = rospy.Service('/march/set_obstacle_size/block_like',
-                                                 SetObstacleSizeBlockLike, set_size_block_like_callback)
-change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size/ramp_like',
-                                               SetObstacleSizeRampLike, set_size_ramp_like_callback)
-rospy.spin()
+try:
+    change_block_like_obstacle_size = rospy.Service('/march/set_obstacle_size/block_like',
+                                                     SetObstacleSizeBlockLike, set_size_block_like_callback)
+    change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size/ramp_like',
+                                                   SetObstacleSizeRampLike, set_size_ramp_like_callback)
+    rospy.spin()
+except rospy.ROSInterruptException:
+    pass

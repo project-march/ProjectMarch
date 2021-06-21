@@ -9,7 +9,7 @@ from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 
 
-class InputDeviceController(object):
+class InputDeviceController:
     """
     The controller for the input device, uses the node provided in the rqt context.
     Subscriptions:

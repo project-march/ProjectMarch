@@ -24,7 +24,7 @@ import tf2_ros
 from visualization_msgs.msg import Marker
 
 
-class CoMCalculator(object):
+class CoMCalculator:
     def __init__(self, robot, tf_buffer):
         self.tf_buffer = tf_buffer
 

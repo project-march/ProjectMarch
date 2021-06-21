@@ -32,7 +32,8 @@ public:
      * @brief Initialises a HardwareBuilder with a robotName enumerator.
      * @details Grabs the .yaml file associated with the robot name.
      */
-    explicit HardwareBuilder(AllowedRobot robot);
+    explicit HardwareBuilder(
+        AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train);
 
     /**
      * @brief Initialises with a robot name and URDF.
@@ -42,7 +43,8 @@ public:
     /**
      * @brief Initialises a HardwareBuilder with a path to a .yaml file.
      */
-    explicit HardwareBuilder(const std::string& yaml_path);
+    explicit HardwareBuilder(const std::string& yaml_path,
+        bool remove_fixed_joints_from_ethercat_train);
 
     /**
      * @brief Initialises with a path to yaml and URDF.
@@ -151,6 +153,7 @@ private:
     YAML::Node robot_config_;
     urdf::Model urdf_;
     bool init_urdf_ = true;
+    bool remove_fixed_joints_from_ethercat_train_ = false;
 };
 
 /**
