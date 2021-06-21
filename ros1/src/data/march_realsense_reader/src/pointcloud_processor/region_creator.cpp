@@ -328,8 +328,8 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
 {
 
     for (pcl::PointIndices& region : *right_size_regions) {
-        if (region.indices.size() > min_valid_region_size
-            && region.indices.size() < max_valid_region_size) {
+        if (region.indices.size() > min_valid_cluster_size
+            && region.indices.size() < max_valid_cluster_size) {
             PointCloud::Ptr region_pointcloud
                 = boost::make_shared<PointCloud>();
             Normals::Ptr region_normals = boost::make_shared<Normals>();
