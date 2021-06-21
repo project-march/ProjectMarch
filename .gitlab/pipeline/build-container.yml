@@ -21,127 +21,82 @@
     # Information about all the parameters can be found there.
       - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup --context=dir://$CI_PROJECT_DIR
 
-# The following four stages look very similar, because they are.
-# They all use the ".container_builder" stage as a sort of template, and define different
-# variables to specify how the Dockerfile should be build.
-# Unfortunatly, GitLab CI does not support variables in the "rules:changes" section which
-# forces duplication like this.
-ROS1 container build:
+.ros_container_builder:
   variables:
     CACHE: "true"
-    DOCKER_FILE: ".gitlab/images/Dockerfile_noetic"
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/noetic"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$ROS_CODENAME"
   rules:
       # These rules will be present in a lot of jobs, but small variations between them.
-      # Rules are evaluated from top to bottom until a "when: never" is reached or until
-      # the last rule has been evaluated.
+      # Rules are evaluated from top to bottom until the last rule has been evaluated.
       #
       # They can be interpreted as follows:
       # - Don't run if the pipeline has been scheduled
-      # - Run if the pipeline is from a MR, iff a ROS1 or Docker noetic file has changed
+      # - Run if the pipeline is from a MR, iff a ROS or Dockerfile has changed
       # - Don't run if the pipeline is in a branch that has an open MR
-      # - Run if the pipeline is in a branch, iff a ROS1 or Docker noetic file has changed
+      # - Run if the pipeline is in a branch, iff a ROS or Dockerfile has changed
     - if: '$CI_PIPELINE_SOURCE == "scheduled"'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - ".gitlab/images/Dockerfile_noetic"
-        - "ros1/**/package.xml"
+        - ".gitlab/images/Dockerfile_$ROS_CODENAME"
+        - "$ROS_VERSION/**/package.xml"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - ".gitlab/images/Dockerfile_noetic"
-        - "ros1/**/package.xml"
+        - ".gitlab/images/Dockerfile_$ROS_CODENAME"
+        - "$ROS_VERSION/**/package.xml"
       variables:
         TAG: $CI_COMMIT_BRANCH
   extends:
     - .container_builder
 
-ROS2 container build:
-  variables:
-    CACHE: "true"
-    DOCKER_FILE: ".gitlab/images/Dockerfile_foxy"
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/foxy"
-  rules:
-      # The rules can be interpreted as follows:
-      # - Don't run if the pipeline has been scheduled
-      # - Run if the pipeline is from a MR, iff a ROS2 or Docker foxy file has changed
-      # - Don't run if the pipeline is in a branch that has an open MR
-      # - Run if the pipeline is in a branch, iff a ROS2 or Docker foxy file has changed
-    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - ".gitlab/images/Dockerfile_foxy"
-        - "ros2/**/package.xml"
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - ".gitlab/images/Dockerfile_foxy"
-        - "ros2/**/package.xml"
-      variables:
-        TAG: $CI_COMMIT_BRANCH
-  extends:
-    - .container_builder
-
-flake8 container build:
+.ci_container_builder:
   variables:
     CACHE: "false"
-    DOCKER_FILE: ".gitlab/images/Dockerfile_flake8"
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/flake8"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$JOB_TYPE"
   rules:
       # The rules can be interpreted as follows:
       # - Don't run if the pipeline has been scheduled
-      # - Run if the pipeline is from a MR, iff the flake8 Docker file has changed
+      # - Run if the pipeline is from a MR, iff the Dockerfile has changed
       # - Don't run if the pipeline is in a branch that has an open MR
-      # - Run if the pipeline is in a branch, iff the flake8 Docker file has changed
+      # - Run if the pipeline is in a branch, iff the Dockerfile has changed
     - if: '$CI_PIPELINE_SOURCE == "scheduled"'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - ".gitlab/images/Dockerfile_flake8"
+        - ".gitlab/images/Dockerfile_$JOB_TYPE"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - ".gitlab/images/Dockerfile_flake8"
+        - ".gitlab/images/Dockerfile_$JOB_TYPE"
       variables:
         TAG: $CI_COMMIT_BRANCH
   extends:
     - .container_builder
 
-clang_format container build:
-  variables:
-    CACHE: "false"
-    DOCKER_FILE: ".gitlab/images/Dockerfile_clang_format"
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/clang_format"
-  rules:
-      # The rules can be interpreted as follows:
-      # - Don't run if the pipeline has been scheduled
-      # - Run if the pipeline is from a MR, iff the clang_format Docker file has changed
-      # - Don't run if the pipeline is in a branch that has an open MR
-      # - Run if the pipeline is in a branch, iff the clang_format Docker file has changed
-    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - ".gitlab/images/Dockerfile_clang_format"
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - ".gitlab/images/Dockerfile_clang_format"
-      variables:
-        TAG: $CI_COMMIT_BRANCH
+
+# These jobs all use the ".container_builder" stage as a sort of template, and define different
+# variables to specify how the Dockerfile should be build.
+ROS container build:
+  parallel:
+    matrix:
+      - ROS_CODENAME: "noetic"
+        ROS_VERSION: "ros1"
+      - ROS_CODENAME: "foxy"
+        ROS_VERSION: "ros2"
   extends:
-    - .container_builder
+    - .ros_container_builder
+
+CI container build:
+  parallel:
+    matrix:
+      - JOB_TYPE: "flake8"
+      - JOB_TYPE: "clang_format"
+  extends:
+    - .ci_container_builder

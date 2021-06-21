@@ -5,7 +5,6 @@
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
-  CLANG_FORMAT_DOCKERFILE: ".gitlab/images/Dockerfile_clang_format"
 
 # The different stages of the pipeline. They will occur in this order.
 # See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
@@ -45,7 +44,11 @@ stages:
 # An overview of all the different types can be
 # found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 # under the variable "CI_PIPELINE_SOURCE".
+# 
+# You will see these three types in almost any job definition.
 
+# To make the main .gitlab-ci.yml file easier to follow, the actual job definitions
+# are split into different files. Each file specifies the jobs of a stage.
 include:
     - local: /.gitlab/pipeline/build-container.yml
 
