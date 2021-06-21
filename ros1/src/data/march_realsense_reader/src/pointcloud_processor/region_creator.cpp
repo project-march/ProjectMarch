@@ -263,30 +263,14 @@ bool RegionGrower::recursiveRegionGrower(
         last_pointcloud_normals, too_large_pointcloud,
         too_large_pointcloud_normals);
 
+    // Compute the new tolerances with which to do the next region growing step
     float large_tolerance = last_tolerance * tolerance_change_factor_increase;
     float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
-    // Compute the new tolerances with which to do the next region growing step
-    if (small_tolerance < smoothness_threshold_lower_bound) {
-        // When the small tolerance given is too small add the
-        // regions and end the recursive loop as the remaining regions are
-        // likely sufficiently flat
-        addRegionsToPointAndNormalVectors(
-            too_small_regions, last_pointcloud, last_pointcloud_normals);
-        return true;
-    }
-    if (large_tolerance > smoothness_threshold_upper_bound) {
-        // When the new tolerance is too large add the
-        // regions and end the recursive loop as the remaining regions are
-        // likely disjoint
-        addRegionsToPointAndNormalVectors(
-                too_large_regions, last_pointcloud, last_pointcloud_normals);
-        return true;
-    }
-
     // Process the invalid regions with the new tolerance
     // The processInvalidRegions method makes a call to the
-    // recursiveRegionGrower method if the invalid region is large enough
+    // recursiveRegionGrower method if the invalid region is large enough and
+    // the tolerance is within limits
     success &= processInvalidRegions(large_tolerance, too_small_pointcloud,
         too_small_pointcloud_normals, too_small_regions, last_pointcloud,
         last_pointcloud_normals);
@@ -305,7 +289,11 @@ bool RegionGrower::processInvalidRegions(const float& next_tolerance,
     const PointCloud::Ptr& last_pointcloud,
     const Normals::Ptr& last_pointcloud_normals)
 {
-    if (invalid_pointcloud->size() > min_desired_cluster_size) {
+    // If the invalid pointcloud size is large enough and the next tolerance is
+    // reasonable, grow new regions on the invalid pointcloud
+    if (invalid_pointcloud->size() > min_desired_cluster_size
+        && next_tolerance > smoothness_threshold_lower_bound
+        && next_tolerance < smoothness_threshold_upper_bound) {
         // Try region growing on the invalid regions with a new tolerance
         std::unique_ptr<RegionVector> potential_region_vector
             = std::make_unique<RegionVector>();
