@@ -14,7 +14,7 @@ class Encoder {
 public:
     enum Direction { Positive = 1, Negative = -1 };
     Encoder(size_t resolution, MotorControllerType motor_controller_type,
-            Direction direction);
+        Direction direction);
     Encoder(size_t resolution, MotorControllerType motor_controller_type);
 
     virtual ~Encoder() noexcept = default;

@@ -8,9 +8,9 @@
 #include <memory>
 namespace march {
 MotorController::MotorController(const Slave& slave,
-                                 std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                                 std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                                 ActuationMode actuation_mode)
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+    ActuationMode actuation_mode)
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
     , incremental_encoder_(std::move(incremental_encoder))
@@ -18,29 +18,30 @@ MotorController::MotorController(const Slave& slave,
 {
     if (!absolute_encoder_ || !incremental_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "A MotorController needs both an incremental and an absolute "
-                                       "encoder");
+            "A MotorController needs both an incremental and an absolute "
+            "encoder");
     }
 
     /* The most precise encoder can encode more positions.
        This means that every Internal Unit represents less radians. */
-    is_incremental_encoder_more_precise_ = incremental_encoder_->getRadiansPerIU()
-                                           < absolute_encoder_->getRadiansPerIU();
+    is_incremental_encoder_more_precise_
+        = incremental_encoder_->getRadiansPerIU()
+        < absolute_encoder_->getRadiansPerIU();
 }
 
 MotorController::MotorController(const Slave& slave,
-                                 std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                                 ActuationMode actuation_mode)
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    ActuationMode actuation_mode)
     : MotorController(
-    slave, std::move(absolute_encoder), nullptr, actuation_mode)
+        slave, std::move(absolute_encoder), nullptr, actuation_mode)
 {
 }
 
 MotorController::MotorController(const Slave& slave,
-                                 std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                                 ActuationMode actuation_mode)
+    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+    ActuationMode actuation_mode)
     : MotorController(
-    slave, nullptr, std::move(incremental_encoder), actuation_mode)
+        slave, nullptr, std::move(incremental_encoder), actuation_mode)
 {
 }
 
@@ -69,8 +70,8 @@ float MotorController::getAbsolutePosition()
 {
     if (!hasAbsoluteEncoder()) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "Cannot get absolute position,"
-                                       "the motor controller has no absolute encoder");
+            "Cannot get absolute position,"
+            "the motor controller has no absolute encoder");
     }
     return getAbsolutePositionUnchecked();
 }
@@ -79,8 +80,8 @@ float MotorController::getAbsoluteVelocity()
 {
     if (!hasAbsoluteEncoder()) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "Cannot get absolute velocity,"
-                                       "the motor controller has no absolute encoder");
+            "Cannot get absolute velocity,"
+            "the motor controller has no absolute encoder");
     }
     return getAbsoluteVelocityUnchecked();
 }
@@ -89,8 +90,8 @@ float MotorController::getIncrementalPosition()
 {
     if (!hasIncrementalEncoder()) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "Cannot get incremental position,"
-                                       "the motor controller has no incremental encoder");
+            "Cannot get incremental position,"
+            "the motor controller has no incremental encoder");
     }
     return getIncrementalPositionUnchecked();
 }
@@ -99,8 +100,8 @@ float MotorController::getIncrementalVelocity()
 {
     if (!hasIncrementalEncoder()) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "Cannot get incremental velocity,"
-                                       "the motor controller has no incremental encoder");
+            "Cannot get incremental velocity,"
+            "the motor controller has no incremental encoder");
     }
     return getIncrementalVelocityUnchecked();
 }
@@ -138,7 +139,7 @@ std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
 {
     if (!hasIncrementalEncoder()) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "Cannot get incremental encoder");
+            "Cannot get incremental encoder");
     }
     return incremental_encoder_;
 }
@@ -151,8 +152,8 @@ void MotorController::actuate(float target)
         actuateTorque(target);
     } else {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                       "Actuation mode %s is not supported",
-                                       actuation_mode_.toString().c_str());
+            "Actuation mode %s is not supported",
+            actuation_mode_.toString().c_str());
     }
 }
 

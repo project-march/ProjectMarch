@@ -5,8 +5,8 @@
 
 namespace march {
 IncrementalEncoder::IncrementalEncoder(size_t resolution,
-                                       MotorControllerType motor_controller_type, Direction direction,
-                                       double transmission)
+    MotorControllerType motor_controller_type, Direction direction,
+    double transmission)
     : Encoder(resolution, motor_controller_type, direction)
     , transmission_(transmission)
 {
@@ -14,9 +14,9 @@ IncrementalEncoder::IncrementalEncoder(size_t resolution,
 }
 
 IncrementalEncoder::IncrementalEncoder(size_t resolution,
-                                       MotorControllerType motor_controller_type, double transmission)
+    MotorControllerType motor_controller_type, double transmission)
     : IncrementalEncoder(
-    resolution, motor_controller_type, Direction::Positive, transmission)
+        resolution, motor_controller_type, Direction::Positive, transmission)
 {
 }
 

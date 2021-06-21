@@ -15,7 +15,7 @@
 
 namespace march {
 Joint::Joint(std::string name, int net_number, bool allow_actuation,
-             std::unique_ptr<MotorController> motor_controller)
+    std::unique_ptr<MotorController> motor_controller)
     : name_(std::move(name))
     , net_number_(net_number)
     , allow_actuation_(allow_actuation)
@@ -29,8 +29,8 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation,
 }
 
 Joint::Joint(std::string name, int net_number, bool allow_actuation,
-             std::unique_ptr<MotorController> motor_controller,
-             std::unique_ptr<TemperatureGES> temperature_ges)
+    std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<TemperatureGES> temperature_ges)
     : name_(std::move(name))
     , net_number_(net_number)
     , allow_actuation_(allow_actuation)
@@ -53,7 +53,7 @@ std::optional<ros::Duration> Joint::prepareActuation()
 {
     if (!canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-                                       "Failed to prepare joint %s for actuation", this->name_.c_str());
+            "Failed to prepare joint %s for actuation", this->name_.c_str());
     }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
     auto wait_duration = motor_controller_->prepareActuation();
@@ -65,7 +65,7 @@ std::optional<ros::Duration> Joint::enableActuation()
 {
     if (!this->canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-                                       "Joint %s is not allowed to actuate", this->name_.c_str());
+            "Joint %s is not allowed to actuate", this->name_.c_str());
     }
     ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
     auto wait_duration = motor_controller_->enableActuation();
@@ -77,7 +77,7 @@ void Joint::actuate(float target)
 {
     if (!this->canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-                                       "Joint %s is not allowed to actuate", this->name_.c_str());
+            "Joint %s is not allowed to actuate", this->name_.c_str());
     }
     motor_controller_->actuate(target);
 }
@@ -91,7 +91,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
         auto motor_controller_state = motor_controller_->getState();
         if (!motor_controller_state->isOperational()) {
             ROS_FATAL("[%s]: %s", this->name_.c_str(),
-                      motor_controller_state->getErrorStatus().value().c_str());
+                motor_controller_state->getErrorStatus().value().c_str());
             throw error::HardwareException(
                 error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
@@ -142,14 +142,14 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
             double new_incremental_position
                 = motor_controller_->getIncrementalPosition();
             position_ = initial_absolute_position_
-                        + (new_incremental_position - initial_incremental_position_);
+                + (new_incremental_position - initial_incremental_position_);
         } else {
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
         ROS_WARN("Data was not updated within %.3fs, using old data",
-                 elapsed_time.toSec());
+            elapsed_time.toSec());
         //        // Update positions with velocity from last time step
         //        position_ += velocity_ * elapsed_time.toSec();
     }

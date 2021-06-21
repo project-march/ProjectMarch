@@ -33,7 +33,7 @@ const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS
 const std::vector<std::string>
     HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS
     = { "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets",
-        "netDriverByteOffsets" };
+          "netDriverByteOffsets" };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS
     = { "allowActuation", "motor_controller" };
 const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
@@ -41,10 +41,10 @@ const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset", "side" };
 
-HardwareBuilder::HardwareBuilder(
-    AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train, std::string if_name)
+HardwareBuilder::HardwareBuilder(AllowedRobot robot,
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name)
     : HardwareBuilder(
-    robot.getFilePath(), remove_fixed_joints_from_ethercat_train, if_name)
+        robot.getFilePath(), remove_fixed_joints_from_ethercat_train, if_name)
 {
 }
 
@@ -55,11 +55,11 @@ HardwareBuilder::HardwareBuilder(AllowedRobot robot, urdf::Model urdf)
 {
 }
 
-HardwareBuilder::HardwareBuilder(
-    const std::string& yaml_path, bool remove_fixed_joints_from_ethercat_train, std::string if_name)
+HardwareBuilder::HardwareBuilder(const std::string& yaml_path,
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name)
     : robot_config_(YAML::LoadFile(yaml_path))
     , remove_fixed_joints_from_ethercat_train_(
-        remove_fixed_joints_from_ethercat_train)
+          remove_fixed_joints_from_ethercat_train)
     , if_name_(if_name)
 {
 }
@@ -99,14 +99,14 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     auto pressure_soles = createPressureSoles(
         config["pressure_soles"], pdo_interface, sdo_interface);
     return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_,
-                                               std::move(pdb), std::move(pressure_soles), if_name_, cycle_time,
-                                               slave_timeout);
+        std::move(pdb), std::move(pressure_soles), if_name_, cycle_time,
+        slave_timeout);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
-                                          const std::string& joint_name, const urdf::JointConstSharedPtr& urdf_joint,
-                                          const march::PdoInterfacePtr& pdo_interface,
-                                          const march::SdoInterfacePtr& sdo_interface)
+    const std::string& joint_name, const urdf::JointConstSharedPtr& urdf_joint,
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
     if (!urdf_joint) {
@@ -137,10 +137,10 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
         auto ges = HardwareBuilder::createTemperatureGES(
             joint_config["temperatureges"], pdo_interface, sdo_interface);
         return { joint_name, net_number, allow_actuation,
-                 std::move(motor_controller), std::move(ges) };
+            std::move(motor_controller), std::move(ges) };
     } else {
         return { joint_name, net_number, allow_actuation,
-                 std::move(motor_controller) };
+            std::move(motor_controller) };
     }
 }
 
@@ -150,7 +150,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
     const march::SdoInterfacePtr& sdo_interface)
 {
     HardwareBuilder::validateRequiredKeysExist(config,
-                                               HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
+        HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
 
     march::ActuationMode mode;
     if (config["actuationMode"]) {
@@ -198,9 +198,9 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
     return std::make_unique<march::IMotionCube>(
         march::Slave(slave_index, pdo_interface, sdo_interface),
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
-                                               march::MotorControllerType::IMotionCube, urdf_joint),
+            march::MotorControllerType::IMotionCube, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
-                                                  march::MotorControllerType::IMotionCube),
+            march::MotorControllerType::IMotionCube),
         setup, mode);
 }
 
@@ -232,7 +232,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     return std::make_unique<march::ODrive>(
         march::Slave(slave_index, pdo_interface, sdo_interface), axis,
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
-                                               march::MotorControllerType::ODrive, urdf_joint),
+            march::MotorControllerType::ODrive, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(
             incremental_encoder_config, march::MotorControllerType::ODrive),
         mode, index_found, motor_kv);
@@ -248,7 +248,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     }
 
     HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
-                                               HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
+        HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
 
     const auto resolution = absolute_encoder_config["resolution"].as<size_t>();
     const auto min_position
@@ -264,15 +264,15 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     } else {
         ROS_WARN("URDF joint %s has no defined soft limits, so using hard "
                  "limits as soft limits",
-                 urdf_joint->name.c_str());
+            urdf_joint->name.c_str());
         soft_lower_limit = urdf_joint->limits->lower;
         soft_upper_limit = urdf_joint->limits->upper;
     }
 
     return std::make_unique<march::AbsoluteEncoder>(resolution,
-                                                    motor_controller_type, getEncoderDirection(absolute_encoder_config),
-                                                    min_position, max_position, urdf_joint->limits->lower,
-                                                    urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
+        motor_controller_type, getEncoderDirection(absolute_encoder_config),
+        min_position, max_position, urdf_joint->limits->lower,
+        urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
 }
 
 std::unique_ptr<march::IncrementalEncoder>
@@ -285,16 +285,16 @@ HardwareBuilder::createIncrementalEncoder(
     }
 
     HardwareBuilder::validateRequiredKeysExist(incremental_encoder_config,
-                                               HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS,
-                                               "incrementalEncoder");
+        HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS,
+        "incrementalEncoder");
 
     const auto resolution
         = incremental_encoder_config["resolution"].as<size_t>();
     const auto transmission
         = incremental_encoder_config["transmission"].as<double>();
     return std::make_unique<march::IncrementalEncoder>(resolution,
-                                                       motor_controller_type, getEncoderDirection(incremental_encoder_config),
-                                                       transmission);
+        motor_controller_type, getEncoderDirection(incremental_encoder_config),
+        transmission);
 }
 
 march::Encoder::Direction HardwareBuilder::getEncoderDirection(
@@ -325,7 +325,7 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
     }
 
     HardwareBuilder::validateRequiredKeysExist(temperature_ges_config,
-                                               HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS, "temperatureges");
+        HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS, "temperatureges");
 
     const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
     const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
@@ -335,16 +335,16 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
 
 std::unique_ptr<march::PowerDistributionBoard>
 HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
-                                              const march::PdoInterfacePtr& pdo_interface,
-                                              const march::SdoInterfacePtr& sdo_interface)
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
 {
     if (!pdb) {
         return nullptr;
     }
 
     HardwareBuilder::validateRequiredKeysExist(pdb,
-                                               HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
-                                               "powerdistributionboard");
+        HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
+        "powerdistributionboard");
 
     const auto slave_index = pdb["slaveIndex"].as<int>();
     YAML::Node net_monitor_byte_offsets = pdb["netMonitorByteOffsets"];
@@ -368,8 +368,8 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
 
     BootShutdownOffsets boot_shutdown_offsets
         = BootShutdownOffsets(boot_shutdown_byte_offsets["masterOk"].as<int>(),
-                              boot_shutdown_byte_offsets["shutdown"].as<int>(),
-                              boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
+            boot_shutdown_byte_offsets["shutdown"].as<int>(),
+            boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
     return std::make_unique<march::PowerDistributionBoard>(
         march::Slave(slave_index, pdo_interface, sdo_interface),
@@ -377,7 +377,7 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
 }
 
 void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config,
-                                                const std::vector<std::string>& key_list, const std::string& object_name)
+    const std::vector<std::string>& key_list, const std::string& object_name)
 {
     for (const std::string& key : key_list) {
         if (!config[key]) {
@@ -418,9 +418,9 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
         int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
         if (urdf_joint->type == urdf::Joint::FIXED) {
             ROS_INFO_STREAM("Joint "
-                                << joint_name << " with slaveIndex " << slaveIndex
-                                << " is fixed and will be removed from ethercat "
-                                   "train config");
+                << joint_name << " with slaveIndex " << slaveIndex
+                << " is fixed and will be removed from ethercat "
+                   "train config");
             if (slaveIndex != -1) {
                 fixedSlaveIndices.insert(slaveIndex);
             }
@@ -468,7 +468,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
             if (this->remove_fixed_joints_from_ethercat_train_) {
                 joint_config[joint_name]["motor_controller"]["slaveIndex"]
                     = updateSlaveIndexBasedOnFixedJoints(
-                    joint_config, joint_name, fixedSlaveIndices);
+                        joint_config, joint_name, fixedSlaveIndices);
             }
             actuating_joint_names.insert(
                 std::pair<std::string, YAML::Node>(joint_name, joint_config));
@@ -486,7 +486,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         const auto joint_config = entry.second;
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name],
-                                                      joint_name, urdf_joint, pdo_interface, sdo_interface));
+            joint_name, urdf_joint, pdo_interface, sdo_interface));
         ss << joint_name << ", ";
     }
     ROS_INFO("Sorted actuating joints are: [%s]", ss.str().c_str());
@@ -500,7 +500,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
                 = std::find_if(joints.begin(), joints.end(), equals_joint_name);
             if (result == joints.end()) {
                 ROS_WARN("Joint %s in URDF is not defined in robot yaml",
-                         urdf_joint.first.c_str());
+                    urdf_joint.first.c_str());
             }
         }
     }
@@ -521,7 +521,7 @@ std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(
     for (const YAML::Node& pressure_sole_config : pressure_soles_config) {
         pressure_soles.push_back(HardwareBuilder::createPressureSole(
             pressure_sole_config[pressure_sole_config.begin()
-                ->first.as<std::string>()],
+                                     ->first.as<std::string>()],
             pdo_interface, sdo_interface));
     }
     return pressure_soles;
@@ -533,7 +533,7 @@ march::PressureSole HardwareBuilder::createPressureSole(
     const march::SdoInterfacePtr& sdo_interface)
 {
     HardwareBuilder::validateRequiredKeysExist(pressure_sole_config,
-                                               HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");
+        HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");
 
     const auto slave_index = pressure_sole_config["slaveIndex"].as<int>();
     const auto byte_offset = pressure_sole_config["byteOffset"].as<int>();
@@ -546,5 +546,5 @@ march::PressureSole HardwareBuilder::createPressureSole(
 std::string convertSWFileToString(std::ifstream& sw_file)
 {
     return std::string(std::istreambuf_iterator<char>(sw_file),
-                       std::istreambuf_iterator<char>());
+        std::istreambuf_iterator<char>());
 }

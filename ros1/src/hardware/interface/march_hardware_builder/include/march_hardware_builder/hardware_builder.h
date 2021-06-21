@@ -33,8 +33,8 @@ public:
      * @brief Initialises a HardwareBuilder with a robotName enumerator.
      * @details Grabs the .yaml file associated with the robot name.
      */
-    explicit HardwareBuilder(
-        AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train, std::string if_name);
+    explicit HardwareBuilder(AllowedRobot robot,
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name);
 
     /**
      * @brief Initialises with a robot name and URDF.
@@ -45,7 +45,7 @@ public:
      * @brief Initialises a HardwareBuilder with a path to a .yaml file.
      */
     explicit HardwareBuilder(const std::string& yaml_path,
-                             bool remove_fixed_joints_from_ethercat_train, std::string if_name);
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name);
 
     /**
      * @brief Initialises with a path to yaml and URDF.
@@ -70,14 +70,14 @@ public:
      * @throws MissingKeyException when required keys are missing.
      */
     static void validateRequiredKeysExist(const YAML::Node& config,
-                                          const std::vector<std::string>& key_list,
-                                          const std::string& object_name);
+        const std::vector<std::string>& key_list,
+        const std::string& object_name);
 
     static march::Joint createJoint(const YAML::Node& joint_config,
-                                    const std::string& joint_name,
-                                    const urdf::JointConstSharedPtr& urdf_joint,
-                                    const march::PdoInterfacePtr& pdo_interface,
-                                    const march::SdoInterfacePtr& sdo_interface);
+        const std::string& joint_name,
+        const urdf::JointConstSharedPtr& urdf_joint,
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
         const YAML::Node& absolute_encoder_config,
         const march::MotorControllerType motor_controller_type,
@@ -133,8 +133,8 @@ public:
      * @return list of created joints
      */
     std::vector<march::Joint> createJoints(const YAML::Node& joints_config,
-                                           const march::PdoInterfacePtr& pdo_interface,
-                                           const march::SdoInterfacePtr& sdo_interface) const;
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface) const;
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
@@ -149,8 +149,8 @@ public:
 
 private:
     int updateSlaveIndexBasedOnFixedJoints(const YAML::Node& joint_config,
-                                           const std::string& joint_name,
-                                           const std::set<int>& fixedSlaveIndices) const;
+        const std::string& joint_name,
+        const std::set<int>& fixedSlaveIndices) const;
     std::set<int> getSlaveIndicesOfFixedJoints(
         const YAML::Node& joints_config) const;
     int getSlaveIndexFromJointConfig(const YAML::Node& joint_config) const;

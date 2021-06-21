@@ -11,8 +11,8 @@ public:
     {
     }
 
-
-    double calculateRadiansPerIU() const final {
+    double calculateRadiansPerIU() const final
+    {
         return 0.0;
     }
 

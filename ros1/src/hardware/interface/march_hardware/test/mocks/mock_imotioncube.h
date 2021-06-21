@@ -15,8 +15,8 @@ class MockIMotionCube : public march::IMotionCube {
 public:
     MockIMotionCube()
         : IMotionCube(MockSlave(), std::make_unique<MockAbsoluteEncoder>(),
-                      std::make_unique<MockIncrementalEncoder>(),
-                      march::ActuationMode::unknown)
+            std::make_unique<MockIncrementalEncoder>(),
+            march::ActuationMode::unknown)
     {
     }
 

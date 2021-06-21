@@ -43,13 +43,13 @@ public:
      * nullptr.
      */
     IMotionCube(const Slave& slave,
-                std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                ActuationMode actuation_mode);
+        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        std::unique_ptr<IncrementalEncoder> incremental_encoder,
+        ActuationMode actuation_mode);
     IMotionCube(const Slave& slave,
-                std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                std::string& sw_stream, ActuationMode actuation_mode);
+        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        std::unique_ptr<IncrementalEncoder> incremental_encoder,
+        std::string& sw_stream, ActuationMode actuation_mode);
 
     ~IMotionCube() noexcept override = default;
 

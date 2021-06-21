@@ -7,10 +7,10 @@
 
 namespace march {
 AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
-                                 MotorControllerType motor_controller_type, Direction direction,
-                                 int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
-                                 double upper_limit_rad, double lower_soft_limit_rad,
-                                 double upper_soft_limit_rad)
+    MotorControllerType motor_controller_type, Direction direction,
+    int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
+    double upper_limit_rad, double lower_soft_limit_rad,
+    double upper_soft_limit_rad)
     : Encoder(resolution, motor_controller_type, direction)
     , lower_limit_iu_(lower_limit_iu)
     , upper_limit_iu_(upper_limit_iu)
@@ -28,12 +28,12 @@ AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
 }
 
 AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
-                                 MotorControllerType motor_controller_type, int32_t lower_limit_iu,
-                                 int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
-                                 double lower_soft_limit_rad, double upper_soft_limit_rad)
+    MotorControllerType motor_controller_type, int32_t lower_limit_iu,
+    int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
+    double lower_soft_limit_rad, double upper_soft_limit_rad)
     : AbsoluteEncoder(resolution, motor_controller_type, Direction::Positive,
-                      lower_limit_iu, upper_limit_iu, lower_limit_rad, upper_limit_rad,
-                      lower_soft_limit_rad, upper_soft_limit_rad)
+        lower_limit_iu, upper_limit_iu, lower_limit_rad, upper_limit_rad,
+        lower_soft_limit_rad, upper_soft_limit_rad)
 {
 }
 
@@ -54,16 +54,16 @@ void AbsoluteEncoder::checkRangeOfMotion(
 
     const double range_of_motion = upper_limit_rad - lower_limit_rad;
     const double encoder_range_of_motion = positionIUToRadians(upper_limit_iu_)
-                                           - positionIUToRadians(lower_limit_iu_);
+        - positionIUToRadians(lower_limit_iu_);
     const double difference
         = std::abs(encoder_range_of_motion - range_of_motion)
-          / encoder_range_of_motion;
+        / encoder_range_of_motion;
     if (difference > AbsoluteEncoder::MAX_RANGE_DIFFERENCE) {
         ROS_WARN("Difference in range of motion of %.2f%% exceeds %.2f%%\n"
                  "Absolute encoder range of motion = %f rad\n"
                  "Limits range of motion = %f rad",
-                 difference * 100, AbsoluteEncoder::MAX_RANGE_DIFFERENCE * 100,
-                 encoder_range_of_motion, range_of_motion);
+            difference * 100, AbsoluteEncoder::MAX_RANGE_DIFFERENCE * 100,
+            encoder_range_of_motion, range_of_motion);
     }
 }
 

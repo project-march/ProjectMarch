@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     if (!ec_init(&if_name[0])) {
         ROS_FATAL("No socket connection on %s. Confirm that you have selected "
                   "the right if_name",
-                  if_name.c_str());
+            if_name.c_str());
         nh.setParam(param, /*i=*/0);
         return 1;
     }

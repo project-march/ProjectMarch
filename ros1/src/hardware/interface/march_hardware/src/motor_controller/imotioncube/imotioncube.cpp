@@ -19,21 +19,21 @@
 
 namespace march {
 IMotionCube::IMotionCube(const Slave& slave,
-                         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                         ActuationMode actuation_mode)
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+    ActuationMode actuation_mode)
     : MotorController(slave, std::move(absolute_encoder),
-                      std::move(incremental_encoder), actuation_mode)
+        std::move(incremental_encoder), actuation_mode)
     , sw_string_(/*__s=*/"empty")
 {
 }
 
 IMotionCube::IMotionCube(const Slave& slave,
-                         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                         std::string& sw_stream, ActuationMode actuation_mode)
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+    std::string& sw_stream, ActuationMode actuation_mode)
     : IMotionCube(slave, std::move(absolute_encoder),
-                  std::move(incremental_encoder), actuation_mode)
+        std::move(incremental_encoder), actuation_mode)
 {
     this->sw_string_ = std::move(sw_stream);
 }
@@ -42,9 +42,9 @@ bool IMotionCube::initSdo(SdoSlaveInterface& sdo, int cycle_time)
 {
     if (this->actuation_mode_ == ActuationMode::unknown) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                       "Cannot write initial settings to "
-                                       "IMotionCube "
-                                       "as it has actuation mode of unknown");
+            "Cannot write initial settings to "
+            "IMotionCube "
+            "as it has actuation mode of unknown");
     }
 
     this->mapMisoPDOs(sdo);
@@ -90,7 +90,7 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
     if (!checksum_verified) {
         ROS_WARN("The .sw file for slave %d is not equal to the setup of the "
                  "drive, downloading is necessary",
-                 this->getSlaveIndex());
+            this->getSlaveIndex());
         this->downloadSetupToDrive(sdo);
         checksum_verified = this->verifySetup(sdo);
         if (checksum_verified) {
@@ -115,11 +115,11 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
 
     // position limit -- min position
     int min_pos_lim = sdo.write(/*index=*/0x607D, /*sub=*/1,
-                                          this->getAbsoluteEncoder()->getLowerSoftLimitIU());
+        this->getAbsoluteEncoder()->getLowerSoftLimitIU());
 
     // position limit -- max position
     int max_pos_lim = sdo.write(/*index=*/0x607D, /*sub=*/2,
-                                          this->getAbsoluteEncoder()->getUpperSoftLimitIU());
+        this->getAbsoluteEncoder()->getUpperSoftLimitIU());
 
     // Quick stop option
     int stop_opt = sdo.write<int16_t>(/*index=*/0x605A, /*sub=*/0, /*value=*/6);
@@ -144,8 +144,8 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
         = sdo.write<int16_t>(/*index=*/0x2108, /*sub=*/2, /*value=*/32767);
 
     if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl
-          && abort_con && rate_ec_x && rate_ec_y && volt_address
-          && volt_filter)) {
+            && abort_con && rate_ec_x && rate_ec_y && volt_address
+            && volt_filter)) {
         throw error::HardwareException(
             error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
             "Failed writing initial settings to IMC of slave %d",
@@ -158,8 +158,8 @@ void IMotionCube::actuateRadians(float target_position)
 {
     if (this->actuation_mode_ != ActuationMode::position) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                       "trying to actuate rad, while actuation mode is %s",
-                                       this->actuation_mode_.toString().c_str());
+            "trying to actuate rad, while actuation mode is %s",
+            this->actuation_mode_.toString().c_str());
     }
 
     if (std::abs(target_position - this->getAbsolutePositionUnchecked())
@@ -178,7 +178,7 @@ void IMotionCube::actuateRadians(float target_position)
 void IMotionCube::actuateIU(int32_t target_iu)
 {
     if (!this->getAbsoluteEncoder()->isValidTargetIU(
-        this->getAbsolutePositionIU(), target_iu)) {
+            this->getAbsolutePositionIU(), target_iu)) {
         throw error::HardwareException(
             error::ErrorType::INVALID_ACTUATE_POSITION,
             "Position %d is invalid for slave %d. (%d, %d)", target_iu,
@@ -200,8 +200,8 @@ void IMotionCube::actuateTorque(float target_torque)
     auto target_torque_iu = (int16_t)std::round(target_torque);
     if (this->actuation_mode_ != ActuationMode::torque) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                       "trying to actuate torque, while actuation mode is %s",
-                                       this->actuation_mode_.toString().c_str());
+            "trying to actuate torque, while actuation mode is %s",
+            this->actuation_mode_.toString().c_str());
     }
 
     if (target_torque >= MAX_TARGET_TORQUE) {
@@ -235,7 +235,7 @@ int32_t IMotionCube::getAbsolutePositionIU()
 {
     if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord())
         && !IMotionCubeTargetState::OPERATION_ENABLED.isReached(
-        this->getStatusWord())) {
+            this->getStatusWord())) {
         ROS_WARN_THROTTLE(
             10, "Invalid use of encoders, you're not in the correct state.");
     }
@@ -248,7 +248,7 @@ int32_t IMotionCube::getIncrementalPositionIU()
 {
     if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord())
         && !IMotionCubeTargetState::OPERATION_ENABLED.isReached(
-        this->getStatusWord())) {
+            this->getStatusWord())) {
         ROS_WARN_THROTTLE(
             10, "Invalid use of encoders, you're not in the correct state.");
     }
@@ -262,7 +262,7 @@ float IMotionCube::getAbsoluteVelocityIU()
     bit32 return_byte = this->read32(
         this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
     return return_byte.i
-           / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
+        / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
 }
 
 float IMotionCube::getIncrementalVelocityIU()
@@ -270,7 +270,7 @@ float IMotionCube::getIncrementalVelocityIU()
     bit32 return_byte = this->read32(
         this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
     return return_byte.i
-           / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
+        / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
 }
 
 uint16_t IMotionCube::getStatusWord()
@@ -312,10 +312,10 @@ float IMotionCube::getMotorCurrent()
 
     int16_t motor_current_iu
         = this->read16(this->miso_byte_offsets_.at(IMCObjectName::ActualTorque))
-            .i;
+              .i;
     return (2.0F * PEAK_CURRENT / IU_CONVERSION_CONST)
-           * static_cast<float>(
-               motor_current_iu); // Conversion to Amp, see Technosoft CoE
+        * static_cast<float>(
+            motor_current_iu); // Conversion to Amp, see Technosoft CoE
     // programming manual
 }
 
@@ -328,18 +328,18 @@ float IMotionCube::getMotorControllerVoltage()
     const float IU_CONVERSION_CONST = 65520.0;
 
     uint16_t imc_voltage_iu = this->read16(this->miso_byte_offsets_.at(
-        IMCObjectName::DCLinkVoltage))
-        .ui;
+                                               IMCObjectName::DCLinkVoltage))
+                                  .ui;
     return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST)
-           * static_cast<float>(
-               imc_voltage_iu); // Conversion to Volt, see Technosoft CoE
+        * static_cast<float>(
+            imc_voltage_iu); // Conversion to Volt, see Technosoft CoE
     // programming manual
 }
 
 float IMotionCube::getMotorVoltage()
 {
     return this->read16(
-        this->miso_byte_offsets_.at(IMCObjectName::MotorVoltage))
+                   this->miso_byte_offsets_.at(IMCObjectName::MotorVoltage))
         .ui;
 }
 
@@ -347,7 +347,7 @@ void IMotionCube::setControlWord(uint16_t control_word)
 {
     bit16 control_word_ui = { .ui = control_word };
     this->write16(this->mosi_byte_offsets_.at(IMCObjectName::ControlWord),
-                  control_word_ui);
+        control_word_ui);
 }
 
 void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
@@ -356,28 +356,28 @@ void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
     while (!target_state.isReached(this->getStatusWord())) {
         this->setControlWord(target_state.getControlWord());
         ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s",
-                                  target_state.getDescription().c_str(),
-                                  std::bitset<16>(this->getStatusWord()).to_string().c_str());
+            target_state.getDescription().c_str(),
+            std::bitset<16>(this->getStatusWord()).to_string().c_str());
         if (target_state.getState()
-            == IMotionCubeTargetState::OPERATION_ENABLED.getState()
+                == IMotionCubeTargetState::OPERATION_ENABLED.getState()
             && IMCStateOfOperation(this->getStatusWord())
-               == IMCStateOfOperation::FAULT) {
+                == IMCStateOfOperation::FAULT) {
             ROS_FATAL("IMotionCube went to fault state while attempting to go "
                       "to '%s'. Shutting down.",
-                      target_state.getDescription().c_str());
+                target_state.getDescription().c_str());
             ROS_FATAL("Motion Error (MER): %s",
-                      error::parseError(this->getMotionError(),
-                                        error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
-                          .c_str());
+                error::parseError(this->getMotionError(),
+                    error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
+                    .c_str());
             ROS_FATAL("Detailed Error (DER): %s",
-                      error::parseError(this->getDetailedError(),
-                                        error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
-                          .c_str());
+                error::parseError(this->getDetailedError(),
+                    error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
+                    .c_str());
             ROS_FATAL("Detailed Error 2 (DER2): %s",
-                      error::parseError(this->getSecondDetailedError(),
-                                        error::ErrorRegister::
-                                        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
-                          .c_str());
+                error::parseError(this->getSecondDetailedError(),
+                    error::ErrorRegister::
+                        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
+                    .c_str());
 
             throw std::domain_error("IMC to fault state");
         }
@@ -389,8 +389,8 @@ std::optional<ros::Duration> IMotionCube::prepareActuation()
 {
     if (this->actuation_mode_ == ActuationMode::unknown) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                       "Trying to go to operation enabled with "
-                                       "unknown actuation mode");
+            "Trying to go to operation enabled with "
+            "unknown actuation mode");
     }
     this->setControlWord(/*control_word=*/128);
 
@@ -403,17 +403,17 @@ std::optional<ros::Duration> IMotionCube::prepareActuation()
     //  hardlimits, move the joint to its current position. Otherwise shutdown
     if (abs(angle) <= 2) {
         throw error::HardwareException(error::ErrorType::ENCODER_RESET,
-                                       "Encoder of IMotionCube with slave index %d has reset. Read angle "
-                                       "%d IU",
-                                       this->getSlaveIndex(), angle);
+            "Encoder of IMotionCube with slave index %d has reset. Read angle "
+            "%d IU",
+            this->getSlaveIndex(), angle);
     } else if (!this->getAbsoluteEncoder()->isWithinHardLimitsIU(angle)) {
         throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
-                                       "Joint with slave index %d is outside hard limits (read value %d "
-                                       "IU, limits from %d "
-                                       "IU to %d IU)",
-                                       this->getSlaveIndex(), angle,
-                                       this->getAbsoluteEncoder()->getLowerHardLimitIU(),
-                                       this->getAbsoluteEncoder()->getUpperHardLimitIU());
+            "Joint with slave index %d is outside hard limits (read value %d "
+            "IU, limits from %d "
+            "IU to %d IU)",
+            this->getSlaveIndex(), angle,
+            this->getAbsoluteEncoder()->getLowerHardLimitIU(),
+            this->getAbsoluteEncoder()->getUpperHardLimitIU());
     }
 
     if (this->actuation_mode_ == ActuationMode::position) {
@@ -449,7 +449,7 @@ uint16_t IMotionCube::computeSWCheckSum(
         }
         if (pos == old_pos) {
             end_address = end_address + start_address
-                          - 1; // The -1 compensates the offset of the end_address
+                - 1; // The -1 compensates the offset of the end_address
             return sum;
         }
         end_address++;
@@ -459,7 +459,7 @@ uint16_t IMotionCube::computeSWCheckSum(
         // after the previous one
     }
     throw error::HardwareException(error::ErrorType::INVALID_SW_STRING,
-                                   "The .sw file has no delimiter of type %s", delimiter.c_str());
+        "The .sw file has no delimiter of type %s", delimiter.c_str());
 }
 
 bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
@@ -471,7 +471,7 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
     // set parameters to compute checksum on the imc
     const int checksum_setup = sdo.write<uint32_t>(
         /*index=*/0x2069, /*sub=*/0,
-                  (uint32_t)(end_address << 16U) | start_address);
+        (uint32_t)(end_address << 16U) | start_address);
 
     uint16_t imc_value;
     int value_size = sizeof(imc_value);
@@ -485,7 +485,7 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
     }
 
     ROS_DEBUG("The .sw checksum is : %d, and the drive checksum is %d",
-              sw_value, imc_value);
+        sw_value, imc_value);
     return sw_value == imc_value;
 }
 
@@ -504,8 +504,8 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
                 = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
             const uint16_t mem_setup = 9; // send 16-bits and auto increment
             result = (uint32_t)sdo.write<uint32_t>(/*index=*/0x2064, /*sub=*/0,
-                                                             (uint32_t)(mem_location << 16U)
-                                                             | mem_setup); // write the write-configuration
+                (uint32_t)(mem_location << 16U)
+                    | mem_setup); // write the write-configuration
             final_result |= result;
         } else {
             if (pos == old_pos) {
@@ -519,17 +519,17 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
                 uint32_t data = 0;
                 if (pos != old_pos) {
                     data = ((uint32_t)std::stoi(
-                        next_token, /*__idx=*/nullptr, /*__base=*/16)
-                        << 16U)
-                           | (uint32_t)std::stoi(
-                        token, /*__idx=*/nullptr, /*__base=*/16);
+                                next_token, /*__idx=*/nullptr, /*__base=*/16)
+                               << 16U)
+                        | (uint32_t)std::stoi(
+                            token, /*__idx=*/nullptr, /*__base=*/16);
                 } else {
                     data = (uint32_t)std::stoi(
                         token, /*__idx=*/nullptr, /*__base=*/16);
                 }
                 result = (uint32_t)sdo.write<uint32_t>(
                     /*index=*/0x2065, /*sub=*/0,
-                              data); // write the write-configuration
+                    data); // write the write-configuration
             }
         }
         final_result &= result;

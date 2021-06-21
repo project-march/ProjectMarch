@@ -14,15 +14,15 @@ namespace march {
 class MotorController : public Slave {
 public:
     MotorController(const Slave& slave,
-                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                    ActuationMode actuation_mode);
+        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        std::unique_ptr<IncrementalEncoder> incremental_encoder,
+        ActuationMode actuation_mode);
     MotorController(const Slave& slave,
-                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                    ActuationMode actuation_mode);
+        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        ActuationMode actuation_mode);
     MotorController(const Slave& slave,
-                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                    ActuationMode actuation_mode);
+        std::unique_ptr<IncrementalEncoder> incremental_encoder,
+        ActuationMode actuation_mode);
 
     // Get the most precise position or velocity
     float getPosition();
@@ -94,13 +94,13 @@ public:
         const MotorController& lhs, const MotorController& rhs)
     {
         return lhs.getSlaveIndex() == rhs.getSlaveIndex()
-               && ((lhs.absolute_encoder_ && rhs.absolute_encoder_
+            && ((lhs.absolute_encoder_ && rhs.absolute_encoder_
                     && *lhs.absolute_encoder_ == *rhs.absolute_encoder_)
-                   || (!lhs.absolute_encoder_ && !rhs.absolute_encoder_))
-               && ((lhs.incremental_encoder_ && rhs.incremental_encoder_
+                || (!lhs.absolute_encoder_ && !rhs.absolute_encoder_))
+            && ((lhs.incremental_encoder_ && rhs.incremental_encoder_
                     && *lhs.incremental_encoder_ == *rhs.incremental_encoder_)
-                   || (!lhs.incremental_encoder_ && !rhs.incremental_encoder_))
-               && lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
+                || (!lhs.incremental_encoder_ && !rhs.incremental_encoder_))
+            && lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
     }
     // Override stream operator for clean printing
     friend std::ostream& operator<<(

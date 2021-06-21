@@ -14,14 +14,14 @@ public:
      * Construct AbsoluteEncoder with both hard and soft limits.
      */
     AbsoluteEncoder(size_t resolution,
-                    MotorControllerType motor_controller_type, Direction direction,
-                    int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
-                    double upper_limit_rad, double lower_soft_limit_rad,
-                    double upper_soft_limit_rad);
+        MotorControllerType motor_controller_type, Direction direction,
+        int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
+        double upper_limit_rad, double lower_soft_limit_rad,
+        double upper_soft_limit_rad);
     AbsoluteEncoder(size_t resolution,
-                    MotorControllerType motor_controller_type, int32_t lower_limit_iu,
-                    int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
-                    double lower_soft_limit_rad, double upper_soft_limit_rad);
+        MotorControllerType motor_controller_type, int32_t lower_limit_iu,
+        int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
+        double lower_soft_limit_rad, double upper_soft_limit_rad);
 
     ~AbsoluteEncoder() noexcept override = default;
 
@@ -50,11 +50,11 @@ public:
         const AbsoluteEncoder& lhs, const AbsoluteEncoder& rhs)
     {
         return lhs.getTotalPositions() == rhs.getTotalPositions()
-               && lhs.upper_soft_limit_iu_ == rhs.upper_soft_limit_iu_
-               && lhs.lower_soft_limit_iu_ == rhs.lower_soft_limit_iu_
-               && lhs.upper_limit_iu_ == rhs.upper_limit_iu_
-               && lhs.lower_limit_iu_ == rhs.lower_limit_iu_
-               && lhs.zero_position_iu_ == rhs.zero_position_iu_;
+            && lhs.upper_soft_limit_iu_ == rhs.upper_soft_limit_iu_
+            && lhs.lower_soft_limit_iu_ == rhs.lower_soft_limit_iu_
+            && lhs.upper_limit_iu_ == rhs.upper_limit_iu_
+            && lhs.lower_limit_iu_ == rhs.lower_limit_iu_
+            && lhs.zero_position_iu_ == rhs.zero_position_iu_;
     }
     /** @brief Override stream operator for clean printing */
     friend std::ostream& operator<<(
