@@ -145,14 +145,14 @@ bool RegionGrower::setupRegionGrower()
     if (pointcloud_->size() == pointcloud_normals_->size()) {
         pcl::search::Search<pcl::PointXYZ>::Ptr tree(
             new pcl::search::KdTree<pcl::PointXYZ>);
-        region_grower.setMinClusterSize(min_valid_cluster_size);
-        region_grower.setMaxClusterSize(max_valid_cluster_size);
+//        region_grower.setMinClusterSize(min_valid_cluster_size);
+//        region_grower.setMaxClusterSize(max_valid_cluster_size);
         region_grower.setSearchMethod(tree);
         region_grower.setNumberOfNeighbours(number_of_neighbours);
         region_grower.setInputCloud(pointcloud_);
         region_grower.setInputNormals(pointcloud_normals_);
         region_grower.setSmoothnessThreshold(smoothness_threshold);
-        region_grower.setCurvatureThreshold(curvature_threshold);
+//        region_grower.setCurvatureThreshold(curvature_threshold);
         return true;
     } else {
         ROS_ERROR("pointcloud_ is of size: %lu, while pointcloud_normals_ is "
@@ -233,13 +233,13 @@ void RegionGrower::setupRecursiveRegionGrower()
 
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(
         new pcl::search::KdTree<pcl::PointXYZ>);
-    region_grower.setMinClusterSize(min_valid_cluster_size);
-    region_grower.setMaxClusterSize(max_valid_cluster_size);
+//    region_grower.setMinClusterSize(min_valid_cluster_size);
+//    region_grower.setMaxClusterSize(max_valid_cluster_size);
     region_grower.setSearchMethod(tree);
     // Set the number of neighbours smaller then teh min valid cluster size to
     // avoid combining small regions which are far apart
     region_grower.setNumberOfNeighbours(min_valid_cluster_size - 1);
-    region_grower.setCurvatureThreshold(curvature_threshold);
+//    region_grower.setCurvatureThreshold(curvature_threshold);
 }
 
 // Implements the region growing algorithm and recursively improves on too small
