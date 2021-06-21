@@ -269,24 +269,13 @@ bool RegionGrower::recursiveRegionGrower(
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
-    if (last_tolerance < smoothness_threshold_lower_bound
-        || last_tolerance > smoothness_threshold_upper_bound) {
-        // When the last tolerance given is too small or too large add the
-        // regions and end the recursive loop as the remaining regions are
-        // likely disjoint
-        addRegionsToPointAndNormalVectors(
-            too_small_regions, last_pointcloud, last_pointcloud_normals);
-        addRegionsToPointAndNormalVectors(
-            too_large_regions, last_pointcloud, last_pointcloud_normals);
-        return true;
-    }
-
     float large_tolerance = last_tolerance * tolerance_change_factor_increase;
     float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
     // Process the invalid regions with the new tolerance
     // The processInvalidRegions method makes a call to the
-    // recursiveRegionGrower method if the invalid region is large enough
+    // recursiveRegionGrower method if the invalid region is large enough and
+    // the tolerance is within limits
     success &= processInvalidRegions(large_tolerance, too_small_pointcloud,
         too_small_pointcloud_normals, too_small_regions, last_pointcloud,
         last_pointcloud_normals);
@@ -305,7 +294,11 @@ bool RegionGrower::processInvalidRegions(const float& next_tolerance,
     const PointCloud::Ptr& last_pointcloud,
     const Normals::Ptr& last_pointcloud_normals)
 {
-    if (invalid_pointcloud->size() > min_desired_cluster_size) {
+    // If the invalid pointcloud size is large enough and the next tolerance is
+    // reasonable, grow new regions on the invalid pointcloud
+    if (invalid_pointcloud->size() > min_desired_cluster_size
+        && next_tolerance < smoothness_threshold_upper_bound
+        && next_tolerance < smoothness_threshold_upper_bound) {
         // Try region growing on the invalid regions with a new tolerance
         std::unique_ptr<RegionVector> potential_region_vector
             = std::make_unique<RegionVector>();
@@ -313,8 +306,8 @@ bool RegionGrower::processInvalidRegions(const float& next_tolerance,
             invalid_pointcloud_normals, next_tolerance,
             potential_region_vector);
         if (success) {
-            // Investigate if the newly found region vector has valid regions
-            // and process its invalid regions again
+            // Investigate if the newly found region vector has valid
+            // regions and process its invalid regions again
             success &= recursiveRegionGrower(potential_region_vector,
                 invalid_pointcloud, invalid_pointcloud_normals, next_tolerance);
         }
@@ -334,15 +327,16 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
 
     for (pcl::PointIndices& region : *right_size_regions) {
         if (region.indices.size() > min_valid_cluster_size
-            && region.indices.size < max_valid_cluster_size)
+            && region.indices.size() < max_valid_cluster_size) {
             PointCloud::Ptr region_pointcloud
-                = boost::make_shared<PointCloud>();
-        Normals::Ptr region_normals = boost::make_shared<Normals>();
-        pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
-        pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
+                    = boost::make_shared<PointCloud>();
+            Normals::Ptr region_normals = boost::make_shared<Normals>();
+            pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
+            pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
 
-        points_vector_->push_back(region_pointcloud);
-        normals_vector_->push_back(region_normals);
+            points_vector_->push_back(region_pointcloud);
+            normals_vector_->push_back(region_normals);
+        }
     }
 }
 
@@ -360,8 +354,8 @@ void RegionGrower::fillInvalidClouds(
     Normals::Ptr invalid_region_normals = boost::make_shared<Normals>();
 
     for (pcl::PointIndices& invalid_region : *invalid_region_vector) {
-        // Extract the points and normals of the last cloud which were invalid
-        // into the region clouds
+        // Extract the points and normals of the last cloud which were
+        // invalid into the region clouds
         pcl::copyPointCloud(
             *last_pointcloud, invalid_region, *invalid_region_pointcloud);
         pcl::copyPointCloud(
@@ -397,7 +391,8 @@ void RegionGrower::segmentRegionVector(
     }
 }
 
-// Creates a potential region vector from a pointcloud with a certain tolerance
+// Creates a potential region vector from a pointcloud with a certain
+// tolerance
 bool RegionGrower::getRegionVectorFromTolerance(
     const PointCloud::Ptr& pointcloud, const Normals::Ptr& pointcloud_normals,
     const float& tolerance, std::unique_ptr<RegionVector>& region_vector)
