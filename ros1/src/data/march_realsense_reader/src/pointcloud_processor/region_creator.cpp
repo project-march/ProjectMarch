@@ -221,9 +221,9 @@ void RegionGrower::setupRecursiveRegionGrower()
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(
         new pcl::search::KdTree<pcl::PointXYZ>);
     region_grower.setSearchMethod(tree);
-    // Set the number of neighbours smaller then the min valid cluster size to
+    // Set the number of neighbours one smaller then the min valid cluster size to
     // avoid combining small regions which are far apart
-    region_grower.setNumberOfNeighbours(1);
+    region_grower.setNumberOfNeighbours(min_valid_region_size - 1);
 }
 
 // Implements the region growing algorithm and recursively improves on too small
