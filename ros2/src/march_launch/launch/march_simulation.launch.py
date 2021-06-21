@@ -22,6 +22,7 @@ def generate_launch_description():
     ground_gait = LaunchConfiguration("ground_gait")
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
+    simulation = LaunchConfiguration("simulation")
 
     # Simulation arguments
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -114,6 +115,11 @@ def generate_launch_description():
                 default_value="/camera_front/imu/data",
                 description="The topic that should be used to determine the orientation",
             ),
+            DeclareLaunchArgument(
+                name="simulation",
+                default_value="True",
+                description="Whether simulation is used"
+            ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
                 name="gait_package",
@@ -196,6 +202,7 @@ def generate_launch_description():
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
+                    ("simulation", simulation)
                 ],
             ),
         ]
