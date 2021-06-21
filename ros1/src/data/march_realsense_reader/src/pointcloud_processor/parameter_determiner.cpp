@@ -14,6 +14,7 @@
 #include <ros/package.h>
 #include <utility>
 
+
 #define EPSILON 0.0001
 #define DEBUG_MARKER_SIZE 0.03
 
@@ -133,6 +134,8 @@ bool HullParameterDeterminer::determineParameters(
     gait_parameters_->first_parameter = -1;
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
+
+    transformer_= std::make_unique<Transformer>(frame_id_to_transform_to);
 
     // Since the parameter determining for e.g. ramp down is very similar to
     // ramp up set variables like the size a step on a flat ramp equal to the

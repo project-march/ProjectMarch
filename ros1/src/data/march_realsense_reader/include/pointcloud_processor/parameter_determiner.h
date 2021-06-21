@@ -8,6 +8,7 @@
 #include <ros/package.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
+#include "utilities/transform_utilities.h"
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -252,6 +253,8 @@ protected:
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
     std::string subgait_name_;
+
+    std::unique_ptr<Transformer> transformer_;
 
     visualization_msgs::Marker foot_locations_to_try_marker_list;
     visualization_msgs::Marker possible_foot_locations_marker_list;
