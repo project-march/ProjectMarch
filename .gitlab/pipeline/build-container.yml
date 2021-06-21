@@ -87,7 +87,7 @@ ROS1 container build:
   variables:
     ROS_CODENAME: "noetic"
     ROS_VERSION: "ros1"
-    DOCKER_FILE: ".gitlab/dockerfiles/ros1"
+    DOCKER_FILE: ".gitlab/dockerfiles/noetic"
   extends:
     - .ros_container_builder
 
@@ -95,7 +95,7 @@ ROS2 container build:
   variables:
     ROS_CODENAME: "foxy"
     ROS_VERSION: "ros2"
-    DOCKER_FILE: ".gitlab/dockerfiles/ros2"
+    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
   extends:
     - .ros_container_builder
 
