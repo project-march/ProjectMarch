@@ -38,7 +38,7 @@
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - $DOCKER_FILE
+        - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
@@ -46,7 +46,7 @@
       when: never
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - $DOCKER_FILE
+        - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
       variables:
         TAG: $CI_COMMIT_BRANCH
@@ -67,14 +67,14 @@
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - $DOCKER_FILE
+        - "$DOCKER_FILE"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - $DOCKER_FILE
+        - "$DOCKER_FILE"
       variables:
         TAG: $CI_COMMIT_BRANCH
   extends:
@@ -87,7 +87,7 @@ ROS1 container build:
   variables:
     ROS_CODENAME: "noetic"
     ROS_VERSION: "ros1"
-    DOCKER_FILE: ".gitlab/dockerfiles/$ROS_CODENAME"
+    DOCKER_FILE: ".gitlab/dockerfiles/ros1"
   extends:
     - .ros_container_builder
 
@@ -95,20 +95,20 @@ ROS2 container build:
   variables:
     ROS_CODENAME: "foxy"
     ROS_VERSION: "ros2"
-    DOCKER_FILE: ".gitlab/dockerfiles/$ROS_CODENAME"
+    DOCKER_FILE: ".gitlab/dockerfiles/ros2"
   extends:
     - .ros_container_builder
 
 flake8 container build:
   variables:
     TOOL_NAME: "flake8"
-    DOCKER_FILE: ".gitlab/dockerfiles/$TOOL_NAME"
+    DOCKER_FILE: ".gitlab/dockerfiles/flake8"
   extends:
     - .ci_tool_container_builder
 
 clang_format container build:
   variables:
     TOOL_NAME: "clang_format"
-    DOCKER_FILE: ".gitlab/dockerfiles/$TOOL_NAME"
+    DOCKER_FILE: ".gitlab/dockerfiles/clang_format"
   extends:
     - .ci_tool_container_builder
