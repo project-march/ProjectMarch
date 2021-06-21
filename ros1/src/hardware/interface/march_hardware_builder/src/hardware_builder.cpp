@@ -256,6 +256,12 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const auto max_position
         = absolute_encoder_config["maxPositionIU"].as<int32_t>();
 
+    if (!urdf_joint->limits) {
+        throw march::error::HardwareException(
+            march::error::ErrorType::MISSING_REQUIRED_KEY,
+            "Missing limits in the urdf");
+    }
+
     double soft_lower_limit;
     double soft_upper_limit;
     if (urdf_joint->safety) {

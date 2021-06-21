@@ -150,8 +150,6 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
     } else {
         ROS_WARN("Data was not updated within %.3fs, using old data",
             elapsed_time.toSec());
-        //        // Update positions with velocity from last time step
-        //        position_ += velocity_ * elapsed_time.toSec();
     }
 }
 
