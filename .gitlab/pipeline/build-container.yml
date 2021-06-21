@@ -25,6 +25,7 @@
   variables:
     CACHE: "true"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$ROS_CODENAME"
+    DOCKER_FILE: ".gitlab/images/Dockerfile_$ROS_CODENAME"
   rules:
       # These rules will be present in a lot of jobs, but small variations between them.
       # Rules are evaluated from top to bottom until the last rule has been evaluated.
@@ -38,7 +39,7 @@
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - ".gitlab/images/Dockerfile_$ROS_CODENAME"
+        - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
@@ -46,7 +47,7 @@
       when: never
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - ".gitlab/images/Dockerfile_$ROS_CODENAME"
+        - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
       variables:
         TAG: $CI_COMMIT_BRANCH
@@ -57,6 +58,7 @@
   variables:
     CACHE: "false"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$TOOL_NAME"
+    DOCKER_FILE: ".gitlab/images/Dockerfile_$TOOL_NAME"
   rules:
       # The rules can be interpreted as follows:
       # - Don't run if the pipeline has been scheduled
@@ -67,14 +69,14 @@
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - ".gitlab/images/Dockerfile_$TOOL_NAME"
+        - "$DOCKER_FILE"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - ".gitlab/images/Dockerfile_$TOOL_NAME"
+        - "$DOCKER_FILE"
       variables:
         TAG: $CI_COMMIT_BRANCH
   extends:
