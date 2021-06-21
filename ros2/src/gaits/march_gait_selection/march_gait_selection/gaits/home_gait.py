@@ -75,7 +75,9 @@ class HomeGait(GaitInterface):
         return "home_gait_version"
 
     def start(
-        self, current_time: Time, first_subgait_delay: Optional[Duration] = ZERO_DURATION
+        self,
+        current_time: Time,
+        first_subgait_delay: Optional[Duration] = ZERO_DURATION,
     ) -> GaitUpdate:
         """Start the gait.
         Creates a trajectory command to go towards the idle position in the given duration.
