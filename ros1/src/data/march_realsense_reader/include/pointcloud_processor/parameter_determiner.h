@@ -196,7 +196,7 @@ protected:
     bool getSitHeight();
 
     // Fill a cloud with a grid of points where to look for exo support
-    bool fillSitGrid(PointCloud2D::Ptr sit_grid);
+    bool fillSitGrid(PointCloud2D::Ptr& sit_grid);
 
     // Get the median height value of a point cloud
     bool getMedianHeightCloud(
