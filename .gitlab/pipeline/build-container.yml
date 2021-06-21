@@ -1,0 +1,147 @@
+#########################
+# Build container stage #
+#########################
+# This stage builds Docker containers when a new dependency has been added or when
+# a new linter is installed. These stages will almost never run, unless
+# certain files have been changed.
+
+# This is a "hidden" stage that is not run by itself. It is run extended by other
+# stages that define different values for the variables. This avoids duplication.
+.container_builder:
+  stage: Build container
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    # Equivalent to `docker login` but without installing docker"
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
+    # Information about all the parameters can be found there.
+      - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup
+
+# The following four stages look very similar, because they are.
+# They all use the ".container_builder" stage as a sort of template, and define different
+# variables to specify how the Dockerfile should be build.
+# Unfortunatly, GitLab CI does not support variables in the "rules:changes" section which
+# forces duplication like this.
+ROS1 container build:
+  variables:
+    CACHE: "true"
+    DOCKER_FILE: ".gitlab/images/Docker_noetic"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/noetic"
+  rules:
+      # These rules will be present in a lot of jobs, but small variations between them.
+      # Rules are evaluated from top to bottom until a "when: never" is reached or until
+      # the last rule has been evaluated.
+      #
+      # They can be interpreted as follows:
+      # - Don't run if the pipeline has been scheduled
+      # - Run if the pipeline is from a MR, iff a ROS1 or Docker noetic file has changed
+      # - Don't run if the pipeline is in a branch that has an open MR
+      # - Run if the pipeline is in a branch, iff a ROS1 or Docker noetic file has changed
+    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - ".gitlab/images/Dockerfile_noetic"
+        - "ros1/**/package.xml"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - ".gitlab/images/Dockerfile_noetic"
+        - "ros1/**/package.xml"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .container_builder
+
+ROS2 container build:
+  variables:
+    CACHE: "true"
+    DOCKER_FILE: ".gitlab/images/Docker_foxy"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/foxy"
+  rules:
+      # The rules can be interpreted as follows:
+      # - Don't run if the pipeline has been scheduled
+      # - Run if the pipeline is from a MR, iff a ROS2 or Docker foxy file has changed
+      # - Don't run if the pipeline is in a branch that has an open MR
+      # - Run if the pipeline is in a branch, iff a ROS2 or Docker foxy file has changed
+    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - ".gitlab/images/Dockerfile_foxy"
+        - "ros2/**/package.xml"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - ".gitlab/images/Dockerfile_foxy"
+        - "ros2/**/package.xml"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .container_builder
+
+flake8 container build:
+  variables:
+    CACHE: "false"
+    DOCKER_FILE: ".gitlab/images/Dockerfile_flake8"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/flake8"
+  rules:
+      # The rules can be interpreted as follows:
+      # - Don't run if the pipeline has been scheduled
+      # - Run if the pipeline is from a MR, iff the flake8 Docker file has changed
+      # - Don't run if the pipeline is in a branch that has an open MR
+      # - Run if the pipeline is in a branch, iff the flake8 Docker file has changed
+    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - ".gitlab/images/Dockerfile_flake8"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .container_builder
+
+clang_format container build:
+  variables:
+    CACHE: "false"
+    DOCKER_FILE: ".gitlab/images/Dockerfile_clang_format"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/clang_format"
+  rules:
+      # The rules can be interpreted as follows:
+      # - Don't run if the pipeline has been scheduled
+      # - Run if the pipeline is from a MR, iff the clang_format Docker file has changed
+      # - Don't run if the pipeline is in a branch that has an open MR
+      # - Run if the pipeline is in a branch, iff the clang_format Docker file has changed
+    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - ".gitlab/images/Dockerfile_clang_format"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - ".gitlab/images/Dockerfile_clang_format"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .container_builder

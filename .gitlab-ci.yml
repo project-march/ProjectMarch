@@ -5,9 +5,6 @@
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
-  ROS1_DOCKERFILE: ".gitlab/images/Dockerfile_noetic"
-  ROS2_DOCKERFILE: ".gitlab/images/Dockerfile_foxy"
-  FLAKE8_DOCKERFILE: ".gitlab/images/Dockerfile_flake8"
   CLANG_FORMAT_DOCKERFILE: ".gitlab/images/Dockerfile_clang_format"
 
 # The different stages of the pipeline. They will occur in this order.
@@ -21,116 +18,36 @@ stages:
   - Static analysis on code
 
 # GitLab defines different job types, depending on how the job is scheduled.
-# Right now, we use two types: 1) branches and 2) merge_requests.
+# Right now, we use two types: 1) branches, 2) merge_requests
+# and 3) scheduled pipelines
 #
 # 1) Branches
 # Pipelines labeled "branches" are executed on the latest commit of a branch. All
 # jobs that are scheduled conditionally based on the file changes in the
-# latest commit (the "changes" keyword,
-# see https://docs.gitlab.com/ee/ci/yaml/README.html#onlychangesexceptchanges)
+# latest commit (the "rules" keyword,
+# see https://docs.gitlab.com/ee/ci/yaml/README.html#ruleschanges)
 #
 # 2) Merge requests
 # Pipelines labeled "merge_requests" are executed when commits are pushed to a
 # merge request. This pipeline runs on the difference between the target branch
-# and the source branch. The "changes" keywords covers ALL changes that differ
+# and the source branch. The "rules" keywords covers ALL changes that differ
 # between the two branches.
 #
-# In short: branches        = only latest commit
+# 3) Scheduled pipelines
+# Pipelines labeled "schedule" are executed on certain times of the day, as defined
+# on GitLab. These are the same as branch pipelines but then they are executed based
+# on the time of the day, instead of when a new commit has been pushed.
+#
+# In short: branches        = only latest commit, but when a new commit is pushed
 #           merge_requests  = all commits in in merge request
+#           schedule        = only latest commit, but when a predefined time of day is reached
 #
 # An overview of all the different types can be
-# found on https://docs.gitlab.com/ee/ci/yaml/README.html#onlyexcept-basic
+# found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+# under the variable "CI_PIPELINE_SOURCE".
 
-# This is a "hidden" stage that is not run by itself. It is run extended by other
-# stages that define different values for the variables. This avoids duplication.
-.container_builder:
-  stage: Build container
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    # Equivalent to `docker login` but without installing docker"
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-  script:
-    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
-    # Information about all the parameters can be found there.
-      - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup
-  rules:
-    # These rules act as a sort of XOR for MR pipelines and branch pipelines.
-    # As described on https://docs.gitlab.com/ee/ci/yaml/#switch-between-branch-pipelines-and-merge-request-pipelines
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - $DOCKER_FILE
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - $DOCKER_FILE
-      variables:
-        TAG: $CI_COMMIT_BRANCH
-
-.ros_container_builder:
-  rules:
-    # These rules act as a sort of XOR for MR pipelines and branch pipelines.
-    # As described on https://docs.gitlab.com/ee/ci/yaml/#switch-between-branch-pipelines-and-merge-request-pipelines
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - $DOCKER_FILE
-        - "$ROS_VERSION/**/package.xml"
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - $DOCKER_FILE
-        - "$ROS_VERSION/**/package.xml"
-      variables:
-        TAG: $CI_COMMIT_BRANCH
-  extends:
-    - .container_builder
-
-
-# Build the container iff the Dockerfile has been changed. This only runs for
-# branches because this is a very long job. Running it for merge requests would
-# mean that this job is scheduled every time that a commit is pushed in a merge requests,
-# which is unnessecary if the Dockerfile is only changed once in the merge request.
-ROS1 container build:
-  variables:
-    CACHE: "true"
-    ROS_VERSION: "ros1"
-    DOCKER_FILE: $ROS1_DOCKERFILE
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/noetic"
-  extends:
-    - .ros_container_builder
-
-ROS2 container build:
-  variables:
-    CACHE: "true"
-    ROS_VERSION: "ros2"
-    DOCKER_FILE: $ROS2_DOCKERFILE
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/foxy"
-  extends:
-    - .ros_container_builder
-
-flake8 container build:
-  variables:
-    CACHE: "false"
-    DOCKER_FILE: $FLAKE8_DOCKERFILE
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/flake8"
-  extends:
-    - .container_builder
-
-clang_format container build:
-  variables:
-    CACHE: "false"
-    DOCKER_FILE: $CLANG_FORMAT_DOCKERFILE
-    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/clang_format"
-  extends:
-    - .container_builder
+include:
+    - local: /.gitlab/pipeline/build-container.yml
 
 #################
 # flake8 linter #
