@@ -19,15 +19,15 @@ public:
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController.
     Joint(std::string name, int net_number, bool allow_actuation,
-        std::unique_ptr<MotorController> motor_controller);
+          std::unique_ptr<MotorController> motor_controller);
 
     // Initialize a Joint with motor controller and temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController. Temperature ges may be a nullptr, since a Joint may have
     // a Temperature ges.
     Joint(std::string name, int net_number, bool allow_actuation,
-        std::unique_ptr<MotorController> motor_controller,
-        std::unique_ptr<TemperatureGES> temperature_ges);
+          std::unique_ptr<MotorController> motor_controller,
+          std::unique_ptr<TemperatureGES> temperature_ges);
 
     virtual ~Joint() noexcept = default;
 
@@ -46,9 +46,12 @@ public:
     bool receivedDataUpdate();
 
     // Prepare the joint for actuation
-    // First calls the prepareActuation() method of the MotorController
-    void prepareActuation();
-    void enableActuation();
+    // Returns an optional wait duration
+    std::optional<ros::Duration> prepareActuation();
+
+    // Enable actuation for this joint
+    // Returns an optional wait duration
+    std::optional<ros::Duration> enableActuation();
 
     // Set initial encoder values
     void readFirstEncoderValues(bool operational_check);
@@ -78,13 +81,13 @@ public:
     friend bool operator==(const Joint& lhs, const Joint& rhs)
     {
         return lhs.name_ == rhs.name_
-            && ((lhs.motor_controller_ && rhs.motor_controller_
+               && ((lhs.motor_controller_ && rhs.motor_controller_
                     && *lhs.motor_controller_ == *rhs.motor_controller_)
-                || (!lhs.motor_controller_ && !rhs.motor_controller_))
-            && ((lhs.temperature_ges_ && rhs.temperature_ges_
+                   || (!lhs.motor_controller_ && !rhs.motor_controller_))
+               && ((lhs.temperature_ges_ && rhs.temperature_ges_
                     && *lhs.temperature_ges_ == *rhs.temperature_ges_)
-                || (!lhs.temperature_ges_ && !rhs.temperature_ges_))
-            && lhs.allow_actuation_ == rhs.allow_actuation_;
+                   || (!lhs.temperature_ges_ && !rhs.temperature_ges_))
+               && lhs.allow_actuation_ == rhs.allow_actuation_;
     }
 
     friend bool operator!=(const Joint& lhs, const Joint& rhs)

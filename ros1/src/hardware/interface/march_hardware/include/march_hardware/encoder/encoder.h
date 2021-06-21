@@ -14,7 +14,7 @@ class Encoder {
 public:
     enum Direction { Positive = 1, Negative = -1 };
     Encoder(size_t resolution, MotorControllerType motor_controller_type,
-        Direction direction);
+            Direction direction);
     Encoder(size_t resolution, MotorControllerType motor_controller_type);
 
     virtual ~Encoder() noexcept = default;
@@ -49,9 +49,10 @@ public:
      * This is a pure virtual function and must be implemented by subclasses,
      * since each type of encoder has a different way of calculating radians.
      */
-    virtual double getRadiansPerIU() const = 0;
+    virtual double calculateRadiansPerIU() const = 0;
 
     size_t getTotalPositions() const;
+    double getRadiansPerIU() const;
     Direction getDirection() const;
     MotorControllerType getMotorControllerType() const;
 
@@ -59,6 +60,9 @@ public:
     static const size_t MAX_RESOLUTION = 32;
 
     static constexpr double PI_2 = 2 * M_PI;
+
+protected:
+    double radians_per_iu_;
 
 private:
     /**

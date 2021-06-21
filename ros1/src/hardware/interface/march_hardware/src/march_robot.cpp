@@ -14,40 +14,40 @@
 
 namespace march {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
+                       ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
+                     ecatCycleTime, ecatSlaveTimeout)
     , pdb_(nullptr)
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
+                       std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
+                       ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
+                     ecatCycleTime, ecatSlaveTimeout)
     , pdb_(std::move(powerDistributionBoard))
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name,
-    int ecatCycleTime, int ecatSlaveTimeout)
+                       std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
+                       std::vector<PressureSole> pressureSoles, ::std::string if_name,
+                       int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
+                     ecatCycleTime, ecatSlaveTimeout)
     , pdb_(std::move(powerDistributionBoard))
     , pressureSoles(std::move(pressureSoles))
 {
 }
 
-void MarchRobot::startEtherCAT(bool reset_imc)
+void MarchRobot::startEtherCAT(bool reset_motor_controllers)
 {
     if (!hasValidSlaves()) {
         throw error::HardwareException(
@@ -63,10 +63,10 @@ void MarchRobot::startEtherCAT(bool reset_imc)
 
     bool sw_reset = ethercatMaster.start(this->jointList);
 
-    if (reset_imc || sw_reset) {
+    if (reset_motor_controllers || sw_reset) {
         ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or "
-                  "downloading of .sw fie: %d",
-            reset_imc, sw_reset);
+                  "downloading of .sw file: %d",
+                  reset_motor_controllers, sw_reset);
         resetMotorControllers();
 
         ROS_INFO("Restarting the EtherCAT Master");
@@ -137,9 +137,9 @@ bool MarchRobot::hasValidSlaves()
     slaveIndices.reserve(
         motorControllerIndices.size() + temperatureSlaveIndices.size());
     slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(),
-        motorControllerIndices.end());
+                        motorControllerIndices.end());
     slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
-        temperatureSlaveIndices.end());
+                        temperatureSlaveIndices.end());
 
     if (slaveIndices.size() == 1) {
         ROS_INFO("Found configuration for 1 slave.");
@@ -150,7 +150,7 @@ bool MarchRobot::hasValidSlaves()
 
     // Sort the indices
     ::std::sort(slaveIndices.begin(), slaveIndices.end());
-    if (jointList[0].getMotorController()->hasUniqueSlaves()) {
+    if (jointList[0].getMotorController()->requiresUniqueSlaves()) {
         // Check for duplicates depending on the motor controller
         auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
         bool isUnique = (it == slaveIndices.end());
@@ -167,7 +167,7 @@ bool MarchRobot::isEthercatOperational()
 
 std::exception_ptr MarchRobot::getLastEthercatException() const noexcept
 {
-    return this->ethercatMaster.getLastException();
+return this->ethercatMaster.getLastException();
 }
 
 void MarchRobot::waitForPdo()

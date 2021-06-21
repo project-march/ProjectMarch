@@ -23,46 +23,40 @@
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
+               std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+               std::unique_ptr<IncrementalEncoder> incremental_encoder,
+               ActuationMode actuation_mode, bool index_found, unsigned int motor_kv)
     : MotorController(slave, std::move(absolute_encoder),
-        std::move(incremental_encoder), actuation_mode)
+                      std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
-    , pre_calibrated_(pre_calibrated)
+    , index_found_(index_found)
 {
     torque_constant_ = KV_TO_TORQUE_CONSTANT / (float)motor_kv;
+    this->is_incremental_encoder_more_precise_ = true;
 }
 
-ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, bool pre_calibrated, unsigned int motor_kv)
-    : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode,
-        pre_calibrated, motor_kv)
+
+
+std::optional<ros::Duration> ODrive::prepareActuation()
 {
+    if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+        setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+        return ros::Duration(/*t=*/20);
+    }
+    else {
+        return std::nullopt;
+    }
 }
 
-ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode, unsigned int motor_kv)
-    : ODrive(slave, axis, std::move(absolute_encoder), actuation_mode,
-        /*pre_calibrated=*/true, motor_kv)
+std::optional<ros::Duration> ODrive::enableActuation()
 {
-}
-
-void ODrive::prepareActuation()
-{
-    //     if (!pre_calibrated_) {
-    //         // Calibrate the ODrive first
-    //         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
-    //         waitForState(ODriveAxisState::IDLE);
-    //     }
-    setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-}
-
-void ODrive::enableActuation()
-{
-    setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+    if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+        setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+        return ros::Duration(/*t=*/5);
+    }
+    else {
+        return std::nullopt;
+    }
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -70,7 +64,7 @@ void ODrive::waitForState(ODriveAxisState target_state)
     auto current_state = getAxisState();
     while (current_state != target_state) {
         ROS_INFO("Waiting for '%s', currently in '%s'",
-            target_state.toString().c_str(), current_state.toString().c_str());
+                 target_state.toString().c_str(), current_state.toString().c_str());
 
         ros::Duration(/*t=*/1).sleep();
         current_state = getAxisState();
@@ -110,7 +104,7 @@ int ODrive::getActuationModeNumber() const
     }
 }
 
-bool ODrive::hasUniqueSlaves() const
+bool ODrive::requiresUniqueSlaves() const
 {
     return false;
 }
@@ -157,10 +151,8 @@ float ODrive::getTemperature()
 
 bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
 {
-    // Almost no action is needed as the DieBoSlave make sure actuation is ready
-    // when etherCAT connection is made. Only need to wait a second for the
-    // EtherCAT network to become available.
-    //    ros::Duration(/*t=*/1).sleep();
+    // No action is needed as the DieBoSlave makes sure the slave is ready
+    // when etherCAT connection is made.
     return false;
 }
 
@@ -171,7 +163,7 @@ void ODrive::reset(SdoSlaveInterface& /*sdo*/)
 ODriveAxisState ODrive::getAxisState()
 {
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(
-                                            ODriveObjectName::AxisState, axis_))
+        ODriveObjectName::AxisState, axis_))
                                .ui);
 }
 
@@ -179,8 +171,8 @@ int32_t ODrive::getAbsolutePositionIU()
 {
     int32_t iu_value
         = this->read32(ODrivePDOmap::getMISOByteOffset(
-                           ODriveObjectName::ActualPosition, axis_))
-              .i;
+            ODriveObjectName::ActualPosition, axis_))
+            .i;
 
     switch (absolute_encoder_->getDirection()) {
         case Encoder::Direction::Positive:
@@ -196,17 +188,17 @@ int32_t ODrive::getAbsolutePositionIU()
 int32_t ODrive::getIncrementalPositionIU()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::MotorPosition, axis_))
+        ODriveObjectName::MotorPosition, axis_))
                .i
-        * incremental_encoder_->getDirection();
+           * incremental_encoder_->getDirection();
 }
 
 float ODrive::getIncrementalVelocityIU()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::ActualVelocity, axis_))
+        ODriveObjectName::ActualVelocity, axis_))
                .f
-        * (float)incremental_encoder_->getDirection();
+           * (float)incremental_encoder_->getDirection();
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -236,9 +228,9 @@ float ODrive::getIncrementalVelocityUnchecked()
 float ODrive::getMotorCurrent()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::ActualCurrent, axis_))
+        ODriveObjectName::ActualCurrent, axis_))
                .f
-        * (float)getMotorDirection();
+           * (float)getMotorDirection();
 }
 
 float ODrive::getActualEffort()
@@ -264,9 +256,9 @@ uint32_t ODrive::getMotorError()
 
 uint32_t ODrive::getEncoderManagerError()
 {
-        return this->read32(ODrivePDOmap::getMISOByteOffset(
-                ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
-            .ui;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(
+        ODriveObjectName::EncoderManagerError, ODriveAxis::Zero))
+        .ui;
 }
 
 uint32_t ODrive::getEncoderError()
@@ -285,11 +277,6 @@ uint32_t ODrive::getControllerError()
         .ui;
 }
 
-bool ODrive::isIncrementalEncoderMorePrecise() const
-{
-    return true;
-}
-
 Encoder::Direction ODrive::getMotorDirection() const
 {
     // Use the incremental encoder to determine motor direction
@@ -300,8 +287,8 @@ void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct = { .ui = state.value_ };
     this->write32(ODrivePDOmap::getMOSIByteOffset(
-                      ODriveObjectName::RequestedState, axis_),
-        write_struct);
+        ODriveObjectName::RequestedState, axis_),
+                  write_struct);
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum

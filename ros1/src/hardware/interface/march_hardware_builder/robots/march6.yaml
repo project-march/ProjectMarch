@@ -15,7 +15,6 @@ march6:
           actuationMode: torque
           slaveIndex: 1
           axis: 0
-          preCalibrated: true
           motorKV: 355
           absoluteEncoder:
             resolution: 14
@@ -34,7 +33,6 @@ march6:
           actuationMode: torque
           slaveIndex: 4
           axis: 1
-          preCalibrated: true
           motorKV: 355
           absoluteEncoder:
             resolution: 14
@@ -53,7 +51,6 @@ march6:
           actuationMode: torque
           slaveIndex: 4
           axis: 0
-          preCalibrated: true
           motorKV: 95
           absoluteEncoder:
             direction: 1
@@ -72,7 +69,6 @@ march6:
           actuationMode: torque
           slaveIndex: 1
           axis: 1
-          preCalibrated: true
           motorKV: 95
           absoluteEncoder:
             direction: -1
@@ -91,7 +87,6 @@ march6:
           actuationMode: torque
           slaveIndex: 3
           axis: 0
-          preCalibrated: true
           motorKV: 355
           absoluteEncoder:
             resolution: 14
@@ -110,7 +105,6 @@ march6:
           actuationMode: torque
           slaveIndex: 2
           axis: 1
-          preCalibrated: true
           motorKV: 355
           absoluteEncoder:
             resolution: 14
@@ -121,7 +115,7 @@ march6:
             resolution: 13
             transmission: 240
             direction: 1
-            
+
     - right_hip_fe:
         allowActuation: true
         motor_controller:
@@ -129,7 +123,6 @@ march6:
           actuationMode: torque
           slaveIndex: 2
           axis: 0
-          preCalibrated: true
           motorKV: 95
           absoluteEncoder:
             direction: -1

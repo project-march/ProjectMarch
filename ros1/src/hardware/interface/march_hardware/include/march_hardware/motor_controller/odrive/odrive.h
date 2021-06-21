@@ -39,28 +39,20 @@ public:
      * @throws error::HardwareException When an absolute encoder is nullptr.
      */
     ODrive(const Slave& slave, ODriveAxis axis,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode, bool pre_calibrated,
-        unsigned int motor_kv);
-    ODrive(const Slave& slave, ODriveAxis axis,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode, bool pre_calibrated,
-        unsigned int motor_kv);
-    ODrive(const Slave& slave, ODriveAxis axis,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode, unsigned int motor_kv);
+           std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+           std::unique_ptr<IncrementalEncoder> incremental_encoder,
+           ActuationMode actuation_mode, bool index_found,
+           unsigned int motor_kv);
 
     ~ODrive() noexcept override = default;
 
     // Override functions for actuating the ODrive
-    void prepareActuation() override;
-    void enableActuation() override;
+    std::optional<ros::Duration> prepareActuation() override;
+    std::optional<ros::Duration> enableActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
-    bool isIncrementalEncoderMorePrecise() const override;
 
-    bool hasUniqueSlaves() const override;
+    bool requiresUniqueSlaves() const override;
 
     // Transform the ActuationMode to a number that is understood by the ODrive
     int getActuationModeNumber() const override;
@@ -108,7 +100,7 @@ private:
     Encoder::Direction getMotorDirection() const;
 
     ODriveAxis axis_;
-    bool pre_calibrated_;
+    bool index_found_;
     float torque_constant_;
 };
 

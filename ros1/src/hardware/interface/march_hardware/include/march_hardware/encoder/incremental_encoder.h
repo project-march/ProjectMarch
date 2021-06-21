@@ -11,15 +11,15 @@ namespace march {
 class IncrementalEncoder : public Encoder {
 public:
     IncrementalEncoder(size_t resolution,
-        MotorControllerType motor_controller_type, Direction direction,
-        double transmission);
+                       MotorControllerType motor_controller_type, Direction direction,
+                       double transmission);
     IncrementalEncoder(size_t resolution,
-        MotorControllerType motor_controller_type, double transmission);
+                       MotorControllerType motor_controller_type, double transmission);
 
     ~IncrementalEncoder() noexcept override = default;
 
     // Inherited methods
-    double getRadiansPerIU() const final;
+    double calculateRadiansPerIU() const final;
     double velocityRadiansToIU(double velocity) const override;
     double velocityIUToRadians(double velocity) const override;
 
@@ -30,7 +30,7 @@ public:
         const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
     {
         return lhs.getTotalPositions() == rhs.getTotalPositions()
-            && lhs.transmission_ == rhs.transmission_;
+               && lhs.transmission_ == rhs.transmission_;
     }
     /** @brief Override stream operator for clean printing */
     friend std::ostream& operator<<(

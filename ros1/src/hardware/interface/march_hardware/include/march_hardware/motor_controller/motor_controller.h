@@ -14,15 +14,15 @@ namespace march {
 class MotorController : public Slave {
 public:
     MotorController(const Slave& slave,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode);
+                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                    ActuationMode actuation_mode);
     MotorController(const Slave& slave,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode);
+                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                    ActuationMode actuation_mode);
     MotorController(const Slave& slave,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode);
+                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                    ActuationMode actuation_mode);
 
     // Get the most precise position or velocity
     float getPosition();
@@ -48,9 +48,11 @@ public:
     // Actuate based on the actuation mode of the motor controller
     void actuate(float target);
 
-    // Prepare the MotorController for actuation, move it into its 'ready' state
-    virtual void prepareActuation() = 0;
-    virtual void enableActuation() = 0;
+    // Prepare the MotorController for actuation
+    virtual std::optional<ros::Duration> prepareActuation() = 0;
+
+    // Enable actuation for the MotorController, move it into its 'ready' state
+    virtual std::optional<ros::Duration> enableActuation() = 0;
 
     // Transform the ActuationMode to a number that is understood by the
     // MotorController
@@ -58,10 +60,10 @@ public:
 
     // Get whether the incremental encoder is more precise than the absolute
     // encoder
-    virtual bool isIncrementalEncoderMorePrecise() const;
+    bool isIncrementalEncoderMorePrecise() const;
 
     // Are the slaves of this MotorController unique
-    virtual bool hasUniqueSlaves() const = 0;
+    virtual bool requiresUniqueSlaves() const = 0;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
@@ -92,13 +94,13 @@ public:
         const MotorController& lhs, const MotorController& rhs)
     {
         return lhs.getSlaveIndex() == rhs.getSlaveIndex()
-            && ((lhs.absolute_encoder_ && rhs.absolute_encoder_
+               && ((lhs.absolute_encoder_ && rhs.absolute_encoder_
                     && *lhs.absolute_encoder_ == *rhs.absolute_encoder_)
-                || (!lhs.absolute_encoder_ && !rhs.absolute_encoder_))
-            && ((lhs.incremental_encoder_ && rhs.incremental_encoder_
+                   || (!lhs.absolute_encoder_ && !rhs.absolute_encoder_))
+               && ((lhs.incremental_encoder_ && rhs.incremental_encoder_
                     && *lhs.incremental_encoder_ == *rhs.incremental_encoder_)
-                || (!lhs.incremental_encoder_ && !rhs.incremental_encoder_))
-            && lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
+                   || (!lhs.incremental_encoder_ && !rhs.incremental_encoder_))
+               && lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
     }
     // Override stream operator for clean printing
     friend std::ostream& operator<<(
@@ -134,6 +136,8 @@ protected:
     std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
     std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     ActuationMode actuation_mode_;
+
+    bool is_incremental_encoder_more_precise_;
 };
 
 } // namespace march

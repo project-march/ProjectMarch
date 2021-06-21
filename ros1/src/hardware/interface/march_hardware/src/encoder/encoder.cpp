@@ -6,7 +6,7 @@
 
 namespace march {
 Encoder::Encoder(size_t resolution, MotorControllerType motor_controller_type,
-    Direction direction)
+                 Direction direction)
     : total_positions_(Encoder::calculateTotalPositions(resolution))
     , motor_controller_type_(motor_controller_type)
     , direction_(direction)
@@ -21,6 +21,11 @@ Encoder::Encoder(size_t resolution, MotorControllerType motor_controller_type)
 size_t Encoder::getTotalPositions() const
 {
     return this->total_positions_;
+}
+
+double Encoder::getRadiansPerIU() const
+{
+    return radians_per_iu_;
 }
 
 MotorControllerType Encoder::getMotorControllerType() const

@@ -35,7 +35,7 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 class MarchHardwareInterface : public hardware_interface::RobotHW {
 public:
     MarchHardwareInterface(
-        std::unique_ptr<march::MarchRobot> robot, bool reset_imc);
+        std::unique_ptr<march::MarchRobot> robot, bool reset_motor_controllers);
 
     /**
      * @brief Initialize the HardwareInterface by registering position
@@ -78,7 +78,6 @@ public:
     void waitForPdo();
 
 private:
-    void uploadJointNames(ros::NodeHandle& nh) const;
     /**
      * Uses the num_joints_ member to resize all vectors
      * in order to avoid allocation at runtime.
@@ -93,8 +92,8 @@ private:
     void outsideLimitsCheck(size_t joint_index);
     bool MotorControllerStateCheck(size_t joint_index);
     static void getSoftJointLimitsError(const std::string& name,
-        const urdf::JointConstSharedPtr& urdf_joint,
-        joint_limits_interface::SoftJointLimits& error_soft_limits);
+                                        const urdf::JointConstSharedPtr& urdf_joint,
+                                        joint_limits_interface::SoftJointLimits& error_soft_limits);
 
     /* Limit of the change in effort command over one cycle, can be overridden
      * by safety controller */
@@ -139,7 +138,7 @@ private:
     PowerNetOnOffCommand power_net_on_off_command_;
     bool master_shutdown_allowed_command_ = false;
     bool enable_high_voltage_command_ = true;
-    bool reset_imc_ = false;
+    bool reset_motor_controllers_ = false;
 
     bool has_actuated_ = false;
 

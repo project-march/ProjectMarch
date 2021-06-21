@@ -11,7 +11,10 @@ public:
     {
     }
 
-    MOCK_CONST_METHOD0(getRadiansPerIU, double());
+
+    double calculateRadiansPerIU() const final {
+        return 0.0;
+    }
 
     MOCK_CONST_METHOD1(positionIUToRadians, double(double));
     MOCK_CONST_METHOD1(velocityIUToRadians, double(double));

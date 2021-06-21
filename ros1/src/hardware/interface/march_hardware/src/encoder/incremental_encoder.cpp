@@ -5,21 +5,22 @@
 
 namespace march {
 IncrementalEncoder::IncrementalEncoder(size_t resolution,
-    MotorControllerType motor_controller_type, Direction direction,
-    double transmission)
+                                       MotorControllerType motor_controller_type, Direction direction,
+                                       double transmission)
     : Encoder(resolution, motor_controller_type, direction)
     , transmission_(transmission)
 {
+    radians_per_iu_ = calculateRadiansPerIU();
 }
 
 IncrementalEncoder::IncrementalEncoder(size_t resolution,
-    MotorControllerType motor_controller_type, double transmission)
+                                       MotorControllerType motor_controller_type, double transmission)
     : IncrementalEncoder(
-        resolution, motor_controller_type, Direction::Positive, transmission)
+    resolution, motor_controller_type, Direction::Positive, transmission)
 {
 }
 
-double IncrementalEncoder::getRadiansPerIU() const
+double IncrementalEncoder::calculateRadiansPerIU() const
 {
     return PI_2 / (getTotalPositions() * transmission_);
 }

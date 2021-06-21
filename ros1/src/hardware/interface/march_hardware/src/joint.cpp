@@ -15,7 +15,7 @@
 
 namespace march {
 Joint::Joint(std::string name, int net_number, bool allow_actuation,
-    std::unique_ptr<MotorController> motor_controller)
+             std::unique_ptr<MotorController> motor_controller)
     : name_(std::move(name))
     , net_number_(net_number)
     , allow_actuation_(allow_actuation)
@@ -29,8 +29,8 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation,
 }
 
 Joint::Joint(std::string name, int net_number, bool allow_actuation,
-    std::unique_ptr<MotorController> motor_controller,
-    std::unique_ptr<TemperatureGES> temperature_ges)
+             std::unique_ptr<MotorController> motor_controller,
+             std::unique_ptr<TemperatureGES> temperature_ges)
     : name_(std::move(name))
     , net_number_(net_number)
     , allow_actuation_(allow_actuation)
@@ -49,27 +49,35 @@ bool Joint::initSdo(int cycle_time)
     return reset;
 }
 
-void Joint::prepareActuation()
+std::optional<ros::Duration> Joint::prepareActuation()
 {
     if (!canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-            "Failed to prepare joint %s for actuation", this->name_.c_str());
+                                       "Failed to prepare joint %s for actuation", this->name_.c_str());
     }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
-    motor_controller_->prepareActuation();
+    auto wait_duration = motor_controller_->prepareActuation();
+    ROS_INFO("[%s] Prepared for actuation", this->name_.c_str());
+    return wait_duration;
 }
 
-void Joint::enableActuation()
+std::optional<ros::Duration> Joint::enableActuation()
 {
-    motor_controller_->enableActuation();
-    ROS_INFO("[%s] Successfully enabled for actuation", this->name_.c_str());
+    if (!this->canActuate()) {
+        throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
+                                       "Joint %s is not allowed to actuate", this->name_.c_str());
+    }
+    ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
+    auto wait_duration = motor_controller_->enableActuation();
+    ROS_INFO("[%s] Enabled for actuation", this->name_.c_str());
+    return wait_duration;
 }
 
 void Joint::actuate(float target)
 {
     if (!this->canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-            "Joint %s is not allowed to actuate", this->name_.c_str());
+                                       "Joint %s is not allowed to actuate", this->name_.c_str());
     }
     motor_controller_->actuate(target);
 }
@@ -83,7 +91,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
         auto motor_controller_state = motor_controller_->getState();
         if (!motor_controller_state->isOperational()) {
             ROS_FATAL("[%s]: %s", this->name_.c_str(),
-                motor_controller_state->getErrorStatus().value().c_str());
+                      motor_controller_state->getErrorStatus().value().c_str());
             throw error::HardwareException(
                 error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
@@ -113,9 +121,9 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
          *  - absolute:     0.5
          *  - incremental:  0.7
          *
-         *  Then the joint has an initial absolute position of 0.3 and an
-         * initial incremental position of 0.5 Since the joint uses the absolute
-         * encoder at startup, the initial position of the joint is 0.3
+         *  Then the joint has an initial absolute position of 0.5 and an
+         * initial incremental position of 0.7 Since the joint uses the absolute
+         * encoder at startup, the initial position of the joint is 0.5
          *
          *  Say the second time the encoders are read they have the following
          * values:
@@ -123,8 +131,9 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
          *  - incremental:  0.4
          *
          *  If the incremental encoder of the joint is more precise, then we
-         * should use that value. The difference in incremental position is 0.4
-         * - 0.7 = -0.3 Hence the new joint position is 0.5 - 0.3 = 0.2
+         * should use that value.
+         * The difference in incremental position is 0.4 - 0.7 = -0.3.
+         * Hence the new joint position is 0.5 - 0.3 = 0.2.
          *
          *  If the absolute encoder of the joint is more precise, then we should
          * use that value This would give us a new joint position of 0.25
@@ -133,14 +142,14 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
             double new_incremental_position
                 = motor_controller_->getIncrementalPosition();
             position_ = initial_absolute_position_
-                + (new_incremental_position - initial_incremental_position_);
+                        + (new_incremental_position - initial_incremental_position_);
         } else {
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
         ROS_WARN("Data was not updated within %.3fs, using old data",
-            elapsed_time.toSec());
+                 elapsed_time.toSec());
         //        // Update positions with velocity from last time step
         //        position_ += velocity_ * elapsed_time.toSec();
     }

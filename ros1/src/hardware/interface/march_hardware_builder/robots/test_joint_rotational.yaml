@@ -10,7 +10,6 @@ testsetup:
           actuationMode: torque
           slaveIndex: 1
           axis: 0
-          preCalibrated: true
           motorKV: 95
           absoluteEncoder:
             resolution: 20

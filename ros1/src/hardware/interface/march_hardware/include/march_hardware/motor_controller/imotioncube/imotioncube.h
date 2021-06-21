@@ -43,23 +43,23 @@ public:
      * nullptr.
      */
     IMotionCube(const Slave& slave,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode);
+                std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                ActuationMode actuation_mode);
     IMotionCube(const Slave& slave,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        std::string& sw_stream, ActuationMode actuation_mode);
+                std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                std::string& sw_stream, ActuationMode actuation_mode);
 
     ~IMotionCube() noexcept override = default;
 
     // Override functions for actuating the IMotionCube
-    void prepareActuation() override;
-    void enableActuation() override;
+    std::optional<ros::Duration> prepareActuation() override;
+    std::optional<ros::Duration> enableActuation() override;
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
 
-    bool hasUniqueSlaves() const override;
+    bool requiresUniqueSlaves() const override;
 
     // Transform the ActuationMode to a number that is understood by the
     // IMotionCube

@@ -15,14 +15,14 @@ class MockIMotionCube : public march::IMotionCube {
 public:
     MockIMotionCube()
         : IMotionCube(MockSlave(), std::make_unique<MockAbsoluteEncoder>(),
-            std::make_unique<MockIncrementalEncoder>(),
-            march::ActuationMode::unknown)
+                      std::make_unique<MockIncrementalEncoder>(),
+                      march::ActuationMode::unknown)
     {
     }
 
     MOCK_METHOD0(getState, std::unique_ptr<march::MotorControllerState>());
 
-    MOCK_METHOD0(prepareActuation, void());
+    MOCK_METHOD0(prepareActuation, std::optional<ros::Duration>());
 
     MOCK_METHOD0(isIncrementalEncoderMorePrecise, bool());
 
