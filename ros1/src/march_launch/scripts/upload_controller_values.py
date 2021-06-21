@@ -25,10 +25,14 @@ def main():
     and only controlling these. This way, there are not different config files required
     for every combination of joints.
     """
-    rospy.init_node("upload_controller_values")
+    try:
+        rospy.init_node("upload_controller_values")
+    except rospy.ROSInitException:
+        return
     robot = urdf.Robot.from_parameter_server("/robot_description")
     actuating_joint_names = []
     fixed_joint_names = []
+
     for joint in robot.joints:
         if joint.type != "fixed":
             actuating_joint_names.append(joint.name)
@@ -39,16 +43,20 @@ def main():
     if len(actuating_joint_names) == 0:
         rospy.logerr("No actuating joints were specified.")
 
-    rospy.set_param("/march/joint_names", actuating_joint_names)
-    rospy.set_param("/march/controller/trajectory/joints", actuating_joint_names)
+    if not rospy.is_shutdown():
+        rospy.set_param("/march/joint_names", actuating_joint_names)
+        rospy.set_param("/march/controller/trajectory/joints", actuating_joint_names)
 
-    for joint in fixed_joint_names:
-        for param in get_params_for_actuation(joint):
-            try:
-                rospy.delete_param(param)
-            except KeyError:
-                continue
+        for joint in fixed_joint_names:
+            for param in get_params_for_actuation(joint):
+                try:
+                    rospy.delete_param(param)
+                except KeyError:
+                    continue
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
