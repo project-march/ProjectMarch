@@ -263,21 +263,26 @@ bool RegionGrower::recursiveRegionGrower(
         last_pointcloud_normals, too_large_pointcloud,
         too_large_pointcloud_normals);
 
+    float large_tolerance = last_tolerance * tolerance_change_factor_increase;
+    float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
+
     // Compute the new tolerances with which to do the next region growing step
-    if (last_tolerance < smoothness_threshold_lower_bound
-        || last_tolerance > smoothness_threshold_upper_bound) {
-        // When the last tolerance given is too small or too large add the
+    if (small_tolerance < smoothness_threshold_lower_bound) {
+        // When the small tolerance given is too small add the
+        // regions and end the recursive loop as the remaining regions are
+        // likely sufficiently flat
+        addRegionsToPointAndNormalVectors(
+            too_small_regions, last_pointcloud, last_pointcloud_normals);
+        return true;
+    }
+    if (large_tolerance > smoothness_threshold_upper_bound) {
+        // When the new tolerance is too large add the
         // regions and end the recursive loop as the remaining regions are
         // likely disjoint
         addRegionsToPointAndNormalVectors(
-            too_small_regions, last_pointcloud, last_pointcloud_normals);
-        addRegionsToPointAndNormalVectors(
-            too_large_regions, last_pointcloud, last_pointcloud_normals);
+                too_large_regions, last_pointcloud, last_pointcloud_normals);
         return true;
     }
-
-    float large_tolerance = last_tolerance * tolerance_change_factor_increase;
-    float small_tolerance = last_tolerance * tolerance_change_factor_decrease;
 
     // Process the invalid regions with the new tolerance
     // The processInvalidRegions method makes a call to the
