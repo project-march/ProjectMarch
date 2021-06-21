@@ -69,38 +69,32 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
         )
         # size[0], size[1] and size[2] are used to grab relevant length of the link, e.g. the relevant length of the
         # hip base is in the y direction, that of the upper leg in the z direction.
-        base = (
-            robot.link_map["hip_base"].collisions[0].geometry.size[1]
-        )  # length of the hip base structure
-        l_ul = (
-            robot.link_map["upper_leg_left"].collisions[0].geometry.size[2]
-        )  # left upper leg length
-        l_ll = (
-            robot.link_map["lower_leg_left"].collisions[0].geometry.size[2]
-        )  # left lower leg length
-        l_hl = (
-            robot.link_map["hip_aa_frame_left_front"].collisions[0].geometry.size[0]
-        )  # left haa arm to leg
-        l_ph = (
-            robot.link_map["hip_aa_frame_left_side"].collisions[0].geometry.size[1]
-        )  # left pelvis to hip length
-        r_ul = (
-            robot.link_map["upper_leg_right"].collisions[0].geometry.size[2]
-        )  # right upper leg length
-        r_ll = (
-            robot.link_map["lower_leg_right"].collisions[0].geometry.size[2]
-        )  # right lower leg length
-        r_hl = (
-            robot.link_map["hip_aa_frame_right_front"].collisions[0].geometry.size[0]
-        )  # right haa arm to leg
-        r_ph = (
-            robot.link_map["hip_aa_frame_right_side"].collisions[0].geometry.size[1]
-        )  # right pelvis hip length
+        base_map = robot.link_map["hip_base"]
+        base = base_map.collisions[0].geometry.size[
+            1
+        ]  # length of the hip base structure
+        l_ul_map = robot.link_map["upper_leg_left"]
+        l_ul = l_ul_map.collisions[0].geometry.size[2]  # left upper leg length
+        l_ll_map = robot.link_map["lower_leg_left"]
+        l_ll = l_ll_map.collisions[0].geometry.size[2]  # left lower leg length
+        l_hl_map = robot.link_map["hip_aa_frame_left_front"]
+        l_hl = l_hl_map.collisions[0].geometry.size[0]  # left haa arm to leg
+        l_ph_map = robot.link_map["hip_aa_frame_left_side"]
+        l_ph = l_ph_map.collisions[0].geometry.size[1]  # left pelvis to hip length
+
+        r_ul_map = robot.link_map["upper_leg_right"]
+        r_ul = r_ul_map.collisions[0].geometry.size[2]  # right upper leg length
+        r_ll_map = robot.link_map["lower_leg_right"]
+        r_ll = r_ll_map.collisions[0].geometry.size[2]  # right lower leg length
+        r_hl_map = robot.link_map["hip_aa_frame_right_front"]
+        r_hl = r_hl_map.collisions[0].geometry.size[0]  # right haa arm to leg
+        r_ph_map = robot.link_map["hip_aa_frame_right_side"]
+        r_ph = r_ph_map.collisions[0].geometry.size[1]  # right pelvis hip length
+
         # the foot is a certain amount more to the inside of the exo then the leg structures.
         # The haa arms need to account for this.
-        off_set = (
-            robot.link_map["ankle_plate_right"].visual.origin.xyz[1] + base / 2 + r_hl
-        )
+        off_set_map = robot.link_map["ankle_plate_right"]
+        off_set = off_set_map.visual.origin.xyz[1] + base / 2 + r_hl
         r_ph = r_ph - off_set
         l_ph = l_ph - off_set
 

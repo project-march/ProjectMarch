@@ -21,7 +21,7 @@ GAIT_SOURCE_DIR = os.path.join(
 )
 
 
-class GaitVersionToolController(object):
+class GaitVersionToolController:
     def __init__(self, node):
         """Base class to communicate with the gait selection node."""
         self._node = node

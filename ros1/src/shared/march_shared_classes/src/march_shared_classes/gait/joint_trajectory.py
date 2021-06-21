@@ -8,7 +8,7 @@ from .setpoint import Setpoint
 ALLOWED_ERROR = 0.001
 
 
-class JointTrajectory(object):
+class JointTrajectory:
     """Base class for joint trajectory of a gait."""
 
     setpoint_class = Setpoint
@@ -105,13 +105,10 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        if (
+        return (
             abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
             and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
-        ):
-            return True
-
-        return False
+        )
 
     def _validate_boundary_points(self):
         """Validate the starting and ending of this joint are at t = 0 and t = duration, or that their speed is zero.

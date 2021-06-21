@@ -5,7 +5,6 @@ BUILD_TOOLS_NO_REC="libasio-dev libtinyxml2-dev libcunit1-dev"
 PYTHON_TOOLS="mock argcomplete pytest-repeat pytest-rerunfailures pytest"
 
 PYTHON_REQUIREMENTS=$(cat requirements.pip | sort | tr '\n' ' ')
-FLAKE8_REQUIREMENTS="flake8 flake8-codeclimate flake8-black"
 ROS_PACKAGES=$(./.scripts/package_list.sh | sort | tr '\n' ' ')
 
 echo "################################################################"
@@ -24,5 +23,5 @@ echo "FROM $BASE_IMAGE"
 echo "ARG DEBIAN_FRONTEND=noninteractive"
 echo "RUN apt update && apt upgrade -y && apt install -y apt-utils && apt install -y $BASE_PACKAGES"
 echo "RUN apt update && apt install -y $BUILD_TOOLS && apt install -y --no-install-recommends $BUILD_TOOLS_NO_REC"
-echo "RUN python3 -m pip install $PYTHON_TOOLS $PYTHON_REQUIREMENTS $FLAKE8_REQUIREMENTS"
+echo "RUN python3 -m pip install $PYTHON_TOOLS $PYTHON_REQUIREMENTS"
 echo "RUN bash -c \"source /opt/ros/foxy/local_setup.bash && rosdep update && apt update && apt install -y $ROS_PACKAGES\""

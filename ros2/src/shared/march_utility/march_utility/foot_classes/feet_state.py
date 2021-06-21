@@ -21,7 +21,7 @@ from .foot import Foot
 JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
-class FeetState(object):
+class FeetState:
     """Class for encapturing the state of both feet."""
 
     def __init__(
