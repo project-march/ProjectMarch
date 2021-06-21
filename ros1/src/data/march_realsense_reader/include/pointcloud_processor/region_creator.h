@@ -139,7 +139,6 @@ private:
     float smoothness_threshold;
     float smoothness_threshold_lower_bound;
     float smoothness_threshold_upper_bound;
-    float curvature_threshold;
     bool use_recursive_growing;
     float tolerance_change_factor_decrease;
     float tolerance_change_factor_increase;

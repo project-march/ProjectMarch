@@ -24,7 +24,6 @@ RegionGrower::RegionGrower(bool debugging)
     , min_desired_cluster_size(-1)
     , max_desired_cluster_size(-1)
     , smoothness_threshold(std::numeric_limits<float>::lowest())
-    , curvature_threshold(std::numeric_limits<float>::lowest())
     , smoothness_threshold_lower_bound(-1)
     , smoothness_threshold_upper_bound(-1)
     , use_recursive_growing(nullptr)
@@ -126,8 +125,6 @@ void RegionGrower::readParameters(
     smoothness_threshold_upper_bound
         = (float)config
               .region_creator_region_growing_smoothness_threshold_upper_bound;
-    curvature_threshold
-        = (float)config.region_creator_region_growing_curvature_threshold;
     use_recursive_growing
         = config.region_creator_region_growing_use_recursive_growing;
     tolerance_change_factor_increase
@@ -331,13 +328,17 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
 {
 
     for (pcl::PointIndices& region : *right_size_regions) {
-        PointCloud::Ptr region_pointcloud = boost::make_shared<PointCloud>();
-        Normals::Ptr region_normals = boost::make_shared<Normals>();
-        pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
-        pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
+        if (region.indices.size() > min_valid_region_size
+            && region.indices.size() < max_valid_region_size) {
+            PointCloud::Ptr region_pointcloud
+                = boost::make_shared<PointCloud>();
+            Normals::Ptr region_normals = boost::make_shared<Normals>();
+            pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
+            pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
 
-        points_vector_->push_back(region_pointcloud);
-        normals_vector_->push_back(region_normals);
+            points_vector_->push_back(region_pointcloud);
+            normals_vector_->push_back(region_normals);
+        }
     }
 }
 
