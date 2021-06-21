@@ -96,7 +96,7 @@ def generate_launch_description():
                                 " realsense_simulation:=",
                                 realsense_simulation,
                                 " configuration:=",
-                                ("exoskeleton" if not simulation else "simulation")
+                                ("exoskeleton" if not simulation else "simulation"),
                             ]
                         ),
                         "use_imu_data": use_imu_data,

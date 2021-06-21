@@ -128,7 +128,7 @@ def generate_launch_description():
                 name="simulation",
                 default_value="False",
                 description="Whether the exoskeleton is ran physically or in "
-                            "simulation.",
+                "simulation.",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
