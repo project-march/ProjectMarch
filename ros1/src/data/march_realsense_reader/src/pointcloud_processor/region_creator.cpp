@@ -145,8 +145,6 @@ bool RegionGrower::setupRegionGrower()
     if (pointcloud_->size() == pointcloud_normals_->size()) {
         pcl::search::Search<pcl::PointXYZ>::Ptr tree(
             new pcl::search::KdTree<pcl::PointXYZ>);
-        region_grower.setMinClusterSize(min_valid_cluster_size);
-        region_grower.setMaxClusterSize(max_valid_cluster_size);
         region_grower.setSearchMethod(tree);
         region_grower.setNumberOfNeighbours(number_of_neighbours);
         region_grower.setInputCloud(pointcloud_);
@@ -177,15 +175,8 @@ bool RegionGrower::extractRegions()
         points_vector_->reserve(region_vector_->size());
         normals_vector_->reserve(region_vector_->size());
 
-        for (const auto& region : *region_vector_) {
-            PointCloud::Ptr region_points = boost::make_shared<PointCloud>();
-            Normals::Ptr region_normals = boost::make_shared<Normals>();
-            pcl::copyPointCloud(*pointcloud_, region, *region_points);
-            pcl::copyPointCloud(*pointcloud_normals_, region, *region_normals);
-
-            points_vector_->push_back(region_points);
-            normals_vector_->push_back(region_normals);
-        }
+        addRegionsToPointAndNormalVectors(
+            region_vector_, pointcloud_, pointcloud_normals_);
     }
 
     return true;
@@ -233,8 +224,6 @@ void RegionGrower::setupRecursiveRegionGrower()
 
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(
         new pcl::search::KdTree<pcl::PointXYZ>);
-    region_grower.setMinClusterSize(min_valid_cluster_size);
-    region_grower.setMaxClusterSize(max_valid_cluster_size);
     region_grower.setSearchMethod(tree);
     // Set the number of neighbours smaller then teh min valid cluster size to
     // avoid combining small regions which are far apart
@@ -344,7 +333,10 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
 {
 
     for (pcl::PointIndices& region : *right_size_regions) {
-        PointCloud::Ptr region_pointcloud = boost::make_shared<PointCloud>();
+        if (region.indices.size() > min_valid_cluster_size
+            && region.indices.size < max_valid_cluster_size)
+            PointCloud::Ptr region_pointcloud
+                = boost::make_shared<PointCloud>();
         Normals::Ptr region_normals = boost::make_shared<Normals>();
         pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
         pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
