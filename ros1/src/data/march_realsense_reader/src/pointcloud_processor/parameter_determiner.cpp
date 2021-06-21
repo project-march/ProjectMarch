@@ -519,7 +519,7 @@ bool HullParameterDeterminer::getMedianHeightCloud(
 }
 
 // Fill a cloud with a grid of points where to look for exo support
-bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
+bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr& sit_grid)
 {
     if (sit_grid_size < EPSILON) {
         ROS_ERROR_STREAM("The grid size of the sit grid is too close to zero. "
@@ -533,9 +533,9 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr sit_grid)
 
     for (int x_index = 0; x_index < x_points; ++x_index) {
         for (int y_index = 0; y_index < y_points; ++y_index) {
-            pcl::PointXY grid_point;
-            grid_point.x = x_index * sit_grid_size + min_x_search_sit;
-            grid_point.y = y_index * sit_grid_size;
+            pcl::PointXY grid_point {};
+            grid_point.x = float(x_index * sit_grid_size) + min_x_search_sit;
+            grid_point.y = float(y_index * sit_grid_size);
 
             sit_grid->push_back(grid_point);
 
