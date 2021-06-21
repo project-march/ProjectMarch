@@ -43,8 +43,8 @@ const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot,
     bool remove_fixed_joints_from_ethercat_train, std::string if_name)
-    : HardwareBuilder(
-        robot.getFilePath(), remove_fixed_joints_from_ethercat_train, if_name)
+    : HardwareBuilder(robot.getFilePath(),
+        remove_fixed_joints_from_ethercat_train, std::move(if_name))
 {
 }
 
@@ -60,7 +60,7 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path,
     : robot_config_(YAML::LoadFile(yaml_path))
     , remove_fixed_joints_from_ethercat_train_(
           remove_fixed_joints_from_ethercat_train)
-    , if_name_(if_name)
+    , if_name_(std::move(if_name))
 {
 }
 

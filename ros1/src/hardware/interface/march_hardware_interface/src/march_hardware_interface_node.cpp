@@ -14,7 +14,7 @@ std::unique_ptr<march::MarchRobot> build(AllowedRobot robot,
     bool remove_fixed_joints_from_ethercat_train, std::string if_name)
 {
     HardwareBuilder builder(
-        robot, remove_fixed_joints_from_ethercat_train, if_name);
+        robot, remove_fixed_joints_from_ethercat_train, std::move(if_name));
     try {
         return builder.createMarchRobot();
     } catch (const std::exception& e) {
