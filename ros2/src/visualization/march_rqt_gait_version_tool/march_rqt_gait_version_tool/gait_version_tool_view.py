@@ -261,7 +261,7 @@ class GaitVersionToolView(QWidget):
         :param color_tag:
             The tag which represents the color of the text in the screen (info, warning, error)
         """
-        self._logger.appendHtml(f'<p style="color:{level.value}">{msg}</p>')
+        self._logger.appendHtml(f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>')
         scrollbar = self.Log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
@@ -313,7 +313,12 @@ class GaitVersionToolView(QWidget):
                 gait_name, subgait_names, versions
             )
             if success:
-                self._log(msg if msg else "Version change applied", LogLevel.SUCCESS)
+                if not msg:
+                    msg = f"Version change applied for {gait_name}: "
+
+                    for index, subgait in enumerate(subgait_names):
+                        msg += f"\n    - {subgait}:    {versions[index]}"
+                self._log(msg, LogLevel.SUCCESS)
             else:
                 self._log(
                     msg if msg else "Version change applied failed", LogLevel.ERROR
@@ -355,7 +360,7 @@ class GaitVersionToolView(QWidget):
             for version_name in versions:
                 match = pattern.match(version_name)
                 if match is not None:
-                    selected_versions = version_name
+                    selected_versions[subgait] = version_name
 
         for subgait_label, subgait_menu in zip(
             self._subgait_labels, self._subgait_menus
