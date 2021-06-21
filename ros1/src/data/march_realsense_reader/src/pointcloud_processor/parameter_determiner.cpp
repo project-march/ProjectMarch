@@ -265,8 +265,8 @@ void HullParameterDeterminer::addDebugGaitInformation()
         }
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
-            marker_point.y = search_y_deviation_sit / 2.0f;
-            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f;
+            marker_point.y = search_y_deviation_sit / 2.0F;
+            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
 
             marker_point.z = min_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
@@ -482,8 +482,8 @@ bool HullParameterDeterminer::getSitHeight()
     if (debugging_) {
         std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
         geometry_msgs::Point marker_point;
-        marker_point.y = search_y_deviation_sit / 2.0f;
-        marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0f;
+        marker_point.y = search_y_deviation_sit / 2.0F;
+        marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
         marker_point.z = sit_height;
 
         optimal_location_marker.points.push_back(marker_point);
@@ -511,7 +511,7 @@ bool HullParameterDeterminer::getMedianHeightCloud(
     if (pointcloud_size % 2 == 0) {
         float first_median_height = cloud->points[pointcloud_size / 2].z;
         float second_median_height = cloud->points[pointcloud_size / 2 - 1].z;
-        median_height = (first_median_height + second_median_height) / 2.0f;
+        median_height = (first_median_height + second_median_height) / 2.0F;
     } else {
         median_height = cloud->points[(pointcloud_size - 1) / 2].z;
     }
