@@ -40,6 +40,7 @@ ParameterDeterminer::ParameterDeterminer(bool debugging)
 // Construct a basic HullParameterDeterminer class
 HullParameterDeterminer::HullParameterDeterminer(bool debugging)
     : ParameterDeterminer(debugging)
+    , sit_height(-1)
 {
 }
 
