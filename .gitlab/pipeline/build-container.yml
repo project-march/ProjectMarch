@@ -25,7 +25,6 @@
   variables:
     CACHE: "true"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$ROS_CODENAME"
-    DOCKER_FILE: ".gitlab/dockerfiles/$ROS_CODENAME"
   rules:
       # These rules will be present in a lot of jobs, but small variations between them.
       # Rules are evaluated from top to bottom until the last rule has been evaluated.
@@ -58,7 +57,6 @@
   variables:
     CACHE: "false"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$TOOL_NAME"
-    DOCKER_FILE: ".gitlab/dockerfiles/$TOOL_NAME"
   rules:
       # The rules can be interpreted as follows:
       # - Don't run if the pipeline has been scheduled
@@ -89,6 +87,7 @@ ROS1 container build:
   variables:
     ROS_CODENAME: "noetic"
     ROS_VERSION: "ros1"
+    DOCKER_FILE: ".gitlab/dockerfiles/$ROS_CODENAME"
   extends:
     - .ros_container_builder
 
@@ -96,17 +95,20 @@ ROS2 container build:
   variables:
     ROS_CODENAME: "foxy"
     ROS_VERSION: "ros2"
+    DOCKER_FILE: ".gitlab/dockerfiles/$ROS_CODENAME"
   extends:
     - .ros_container_builder
 
 flake8 container build:
   variables:
     TOOL_NAME: "flake8"
+    DOCKER_FILE: ".gitlab/dockerfiles/$TOOL_NAME"
   extends:
     - .ci_tool_container_builder
 
 clang_format container build:
   variables:
     TOOL_NAME: "clang_format"
+    DOCKER_FILE: ".gitlab/dockerfiles/$TOOL_NAME"
   extends:
     - .ci_tool_container_builder
