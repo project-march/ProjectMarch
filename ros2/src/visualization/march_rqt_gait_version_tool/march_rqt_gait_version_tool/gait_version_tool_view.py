@@ -59,7 +59,7 @@ class GaitVersionToolView(QWidget):
         # bind functions to callbacks of buttons and menus
         self.Refresh.pressed.connect(lambda: self._refresh())
         self.Apply.pressed.connect(lambda: [self._apply(), self._refresh()])
-        self.SelectSameVersions.pressed.connect(self._select_same_versions())
+        self.SelectSameVersions.pressed.connect(self._select_same_versions)
         self.SaveDefault.pressed.connect(
             lambda: [self._apply(), self._save_default(), self._refresh()]
         )
