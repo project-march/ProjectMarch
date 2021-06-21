@@ -118,7 +118,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="simulation",
                 default_value="True",
-                description="Whether simulation is used"
+                description="Whether simulation is used",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -202,7 +202,7 @@ def generate_launch_description():
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
-                    ("simulation", simulation)
+                    ("simulation", simulation),
                 ],
             ),
         ]
