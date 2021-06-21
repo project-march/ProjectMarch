@@ -29,7 +29,7 @@
 ROS1 container build:
   variables:
     CACHE: "true"
-    DOCKER_FILE: ".gitlab/images/Docker_noetic"
+    DOCKER_FILE: ".gitlab/images/Dockerfile_noetic"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/noetic"
   rules:
       # These rules will be present in a lot of jobs, but small variations between them.
@@ -63,7 +63,7 @@ ROS1 container build:
 ROS2 container build:
   variables:
     CACHE: "true"
-    DOCKER_FILE: ".gitlab/images/Docker_foxy"
+    DOCKER_FILE: ".gitlab/images/Dockerfile_foxy"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/foxy"
   rules:
       # The rules can be interpreted as follows:
