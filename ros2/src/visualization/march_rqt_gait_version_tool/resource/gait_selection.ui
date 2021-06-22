@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1437</width>
+    <width>1936</width>
     <height>634</height>
    </rect>
   </property>
@@ -87,7 +87,7 @@ QGroupBox::title {
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1397</width>
+           <width>1896</width>
            <height>594</height>
           </rect>
          </property>
@@ -104,7 +104,7 @@ QGroupBox::title {
           <item row="0" column="0">
            <widget class="QFrame" name="LoggerFrame">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -157,7 +157,7 @@ QGroupBox::title {
                 <bool>false</bool>
                </property>
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -217,6 +217,26 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
               </widget>
              </item>
+             <item row="8" column="1" colspan="2">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="1" column="1" colspan="3">
+              <widget class="Line" name="line_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
              <item row="0" column="0" colspan="3">
               <widget class="QLabel" name="Actionlabel">
                <property name="sizePolicy">
@@ -238,7 +258,14 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1" colspan="2">
+             <item row="6" column="1" colspan="2">
+              <widget class="QPushButton" name="SelectSameVersions">
+               <property name="text">
+                <string>Select same versions</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1" colspan="2">
               <widget class="QPushButton" name="SaveDefault">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -248,26 +275,6 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
                <property name="text">
                 <string>save as defaults</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1" colspan="2">
-              <spacer name="verticalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="1" colspan="3">
-              <widget class="Line" name="line_6">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>

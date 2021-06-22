@@ -26,11 +26,7 @@ setup(
         (os.path.join("share", package_name), ["plugin.xml"]),
         (
             os.path.join("share", package_name),
-            [os.path.join("resource", "gait_selection.ui")],
-        ),
-        (
-            os.path.join("share", package_name),
-            [os.path.join("resource", "parametric_pop_up.ui")],
+            glob(os.path.join("resource", "*.ui")),
         ),
         (
             os.path.join("share", package_name, "resource", "img"),
