@@ -130,7 +130,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="gait_directory",
-                default_value="airgait-vi",
+                default_value="airgait_vi",
                 description="The directory in which the gait files to use are located, "
                 "relative to the gait_package.",
             ),
