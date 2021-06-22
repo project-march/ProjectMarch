@@ -49,9 +49,11 @@ public:
     void actuate(float target);
 
     // Prepare the MotorController for actuation
+    // Returns an optional wait duration
     virtual std::optional<ros::Duration> prepareActuation() = 0;
 
     // Enable actuation for the MotorController, move it into its 'ready' state
+    // Returns an optional wait duration
     virtual std::optional<ros::Duration> enableActuation() = 0;
 
     // Transform the ActuationMode to a number that is understood by the

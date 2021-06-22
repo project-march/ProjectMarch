@@ -62,7 +62,7 @@ public:
     static constexpr double PI_2 = 2 * M_PI;
 
 protected:
-    double radians_per_iu_;
+    double radians_per_iu_ = 0.0;
 
 private:
     /**
