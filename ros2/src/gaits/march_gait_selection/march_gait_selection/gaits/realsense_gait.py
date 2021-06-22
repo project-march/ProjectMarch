@@ -29,6 +29,7 @@ from rclpy.client import Client
 from urdf_parser_py import urdf
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.gait_selection import GaitSelection
 
 
 class RealSenseGait(SetpointsGait):
@@ -62,10 +63,12 @@ class RealSenseGait(SetpointsGait):
         camera_to_use: str,
         subgaits_to_interpolate: dict,
         dimensions: InterpolationDimensions,
-        parameters: List[float],
         process_service: Client,
         starting_position: EdgePosition,
         final_position: EdgePosition,
+        parameters: List[float],
+        dependent_on: List[str],
+        responsible_for: List[str],
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
         self._node = node
@@ -82,6 +85,8 @@ class RealSenseGait(SetpointsGait):
         self.realsense_service_result = None
         self._starting_position = starting_position
         self._final_position = final_position
+        self._dependent_on = dependent_on
+        self._responsible_for = responsible_for
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -135,7 +140,22 @@ class RealSenseGait(SetpointsGait):
         subgaits_to_interpolate = {}
         try:
             dimensions = InterpolationDimensions.from_integer(gait_config["dimensions"])
-            parameters = [float(param) for param in gait_config["default_parameters"]]
+            try:
+                parameters = [
+                    float(param) for param in gait_config["default_parameters"]
+                ]
+            except KeyError as e:
+                parameters = None
+
+            try:
+                dependent_on = gait_config["dependent_on"]
+            except KeyError as e:
+                dependent_on = None
+            try:
+                responsible_for = gait_config["responsible_for"]
+            except KeyError as e:
+                responsible_for = None
+
             if len(parameters) != amount_of_parameters(dimensions):
                 raise WrongRealSenseConfigurationError(
                     f"The amount of parameters in the config file ({len(parameters)}), "
@@ -203,6 +223,8 @@ class RealSenseGait(SetpointsGait):
             process_service,
             starting_position,
             final_position,
+            dependent_on,
+            responsible_for,
         )
 
     @classmethod
@@ -282,26 +304,20 @@ class RealSenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
-        # Currently, we hardcode foot_right in start, since this is almost
-        # always a right_open
-        service_call_succesful = self.make_realsense_service_call(
-            frame_id_to_transform_to="foot_right"
-        )
-        if not service_call_succesful:
-            self._node.get_logger().warn("No service response received within timeout")
-            return GaitUpdate.empty()
-
-        gait_parameters_response = self.realsense_service_result
-        if gait_parameters_response is None or not gait_parameters_response.success:
-            self._node.get_logger().warn(
-                "No gait parameters were found, gait will not be started, "
-                f"{gait_parameters_response}"
-            )
-            return GaitUpdate.empty()
-
-        self.update_parameters(gait_parameters_response.gait_parameters)
-        if not self.interpolate_subgaits_from_parameters():
-            return GaitUpdate.empty()
+        if self._dependent_on is None:
+            realsense_update_successful = self.process_realsense_update()
+            if not realsense_update_successful:
+                return GaitUpdate.empty()
+        else:
+            if self.parameters is not None:
+                if not self.interpolate_subgaits_from_parameters():
+                    return GaitUpdate.empty()
+                else:
+                    self._node.get_logger().warn(
+                        f"Gait {self.gait_name} is dependent on gait(s) "
+                        f"{self._dependent_on} but its realsense parameters were not set "
+                        f"upon execution"
+                    )
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
@@ -311,13 +327,41 @@ class RealSenseGait(SetpointsGait):
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
+    def process_realsense_update(self):
+        """
+        Makes a realsense service call and handles the result
+
+        :return: Whether the call was successful
+        """
+
+        # Currently, we hardcode foot_right in start, since this is almost
+        # always a right_open
+        service_call_succesful = self.make_realsense_service_call(
+            frame_id_to_transform_to="foot_right"
+        )
+        if not service_call_succesful:
+            self._node.get_logger().warn("No service response received within timeout")
+            return False
+
+        gait_parameters_response = self.realsense_service_result
+        if gait_parameters_response is None or not gait_parameters_response.success:
+            self._node.get_logger().warn(
+                "No gait parameters were found, gait will not be started, "
+                f"{gait_parameters_response}"
+            )
+            return False
+
+        self.update_parameters(gait_parameters_response.gait_parameters)
+
+        return self.interpolate_subgaits_from_parameters()
+
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
 
         :param frame_id_to_transform_to: The frame that should be given to the reader.
-        :return: Whether the call was succesful
+        :return: Whether the call was successful
         """
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
