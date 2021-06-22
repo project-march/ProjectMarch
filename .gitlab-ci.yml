@@ -365,7 +365,7 @@ foxy:test for MRs:
   needs: ["noetic:build"]
   script:
     - cd ros1/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P8 -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
     changes:
       - "ros1/**/*.{hpp,h,cpp}"
@@ -391,7 +391,7 @@ noetic:clang_tidy for MRs:
   needs: ["foxy:build"]
   script:
     - cd ros2/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P8 -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
     changes:
       - "ros2/**/*.{hpp,h,cpp}"
