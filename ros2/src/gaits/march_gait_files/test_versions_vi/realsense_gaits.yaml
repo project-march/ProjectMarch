@@ -59,16 +59,16 @@ realsense_stairs_up:
       - MVI_stairsup_rightclose_high_undeep
       - MVI_stairsup_rightclose_high_deep
 
-# EXAMPLE for future 1 dimension gaits that are coupled (implementation for coupled
-#  will be added to realsense gait later)
 realsense_sit:
   realsense_category: sit
   camera_to_use: back
   starting_position: static
   final_position: dynamic
   dimensions: 1
+  responsible_for:
+    - realsense_stand
   default_parameters:
-   - 0.5
+    - 0.5
   subgaits:
     sit_down:
     - MVI_sit_down_low_v1
@@ -76,16 +76,15 @@ realsense_sit:
     sit_home:
     - MVI_sit_home_low_v1
     - MVI_sit_home_high_v1
-#  responsible_for:
-#  - realsense_stand
+
 realsense_stand:
   realsense_category: sit
   camera_to_use: back
   starting_position: dynamic
   final_position: static
   dimensions: 1
-  default_parameters:
-  - 0.5
+  dependent_on:
+    - realsense_sit
   subgaits:
     prepare_stand_up:
     - MVI_prepare_stand_up_low_v1
@@ -93,4 +92,3 @@ realsense_stand:
     stand_up:
     - MVI_stand_up_low_v1
     - MVI_stand_up_high_v1
-#      dependent: True
