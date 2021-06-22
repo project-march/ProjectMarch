@@ -23,9 +23,6 @@ flake8:
   artifacts:
     reports:
       codequality: codeclimate.json
-  needs:
-    - job: "flake8 container build"
-      optional: true
   variables:
     DOCKER_FILE: ".gitlab/dockerfiles/flake8"
   rules:
@@ -62,9 +59,6 @@ clang-format:
       DOCKER_FILE: ".gitlab/dockerfiles/clang_format"
   script:
     - run-clang-format.py -r ros1/src ros2/src --style=file
-  needs:
-    - job: "clang_format container build"
-      optional: true
   rules:
     # These rules are here to select a different Docker image depending on the
     # running conditions. The statements are evaluated from top to bottom until a rule

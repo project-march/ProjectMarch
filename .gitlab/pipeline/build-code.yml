@@ -55,9 +55,6 @@ noetic:build:
     ROS_VERSION: "ros1"
     ROS_CODENAME: "noetic"
     DOCKER_FILE: ".gitlab/dockerfiles/noetic"
-  needs:
-    - job: "ROS1 container build"
-      optional: true
   extends:
     - .base_builder
 
@@ -66,8 +63,5 @@ foxy:build:
     ROS_VERSION: "ros2"
     ROS_CODENAME: "foxy"
     DOCKER_FILE: ".gitlab/dockerfiles/foxy"
-  needs:
-    - job: "ROS2 container build"
-      optional: true
   extends:
     - .base_builder
