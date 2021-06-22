@@ -1,5 +1,6 @@
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_utility.utilities.duration import Duration
+from march_utility.gait.edge_position import EdgePosition
 from rclpy.time import Time
 
 from .gait_update import GaitUpdate
@@ -13,11 +14,6 @@ class GaitInterface:
     def name(self) -> str:
         """Returns the name of the gait."""
         return ""
-
-    @property
-    def can_freeze(self) -> bool:
-        """Returns whether the gait has a freeze functionality."""
-        return False
 
     @property
     def subgait_name(self) -> str:
@@ -41,18 +37,24 @@ class GaitInterface:
         return ""
 
     @property
-    def starting_position(self) -> dict:
+    def starting_position(self) -> EdgePosition:
         """Returns the starting position of all joints."""
-        return {}
+        return None
 
     @property
-    def final_position(self) -> dict:
+    def final_position(self) -> EdgePosition:
         """Returns the position of all the joints after the gait has ended."""
-        return {}
+        return None
 
     @property
-    def can_be_scheduled_early(self) -> bool:
+    def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
         """Return whether this gait can be scheduled early, default is False."""
+        return False
+
+    @property
+    def first_subgait_can_be_scheduled_early(self) -> bool:
+        """Return whether this gait can be started early, this means that the first
+        subgait will be delayed, with the first_subgait_delay, default is False."""
         return False
 
     def start(self, current_time: Time) -> GaitUpdate:
