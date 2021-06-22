@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
 
+DEFAULT_PREFIX = "MVI"
+DEFAULT_POSTFIX = "v"
 
 class SameVersionsPopUpWindow(QDialog):
     def __init__(self, parent, ui_file):
@@ -31,6 +33,9 @@ class SameVersionsPopUpWindow(QDialog):
         if gait in self._previous_map:
             self.prefix_input.setText(self._previous_map[gait][0])
             self.postfix_input.setText(self._previous_map[gait][1])
+        else:
+            self.prefix_input.setText(DEFAULT_PREFIX)
+            self.postfix_input.setText(DEFAULT_POSTFIX)
 
         return super(SameVersionsPopUpWindow, self).exec_()
 
