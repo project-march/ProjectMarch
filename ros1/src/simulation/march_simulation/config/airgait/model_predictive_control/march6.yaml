@@ -25,36 +25,36 @@ march:
       # Both parameters are required for each joint
       weights:
         left_ankle:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         left_hip_aa:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         left_hip_fe:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         left_knee:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         right_ankle:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         right_hip_aa:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         right_hip_fe:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
         right_knee:
-          Q: [ 1000.0, 1.0 ]
-          R: [ 0.001 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
 
       state_publish_rate:  25            # Override default
