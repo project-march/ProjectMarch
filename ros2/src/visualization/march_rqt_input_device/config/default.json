@@ -114,7 +114,9 @@
       },
       {
          "name":"stairs_down_single_step"
-      },
+      }
+   ],
+   [
       {
          "name":"stairs_down_backwards"
       },
@@ -126,6 +128,18 @@
       },
       {
          "name":"realsense_stairs_up_single_step"
+      },
+      {
+         "name":"realsense_sit"
+      },
+      {
+         "name":"realsense_stand"
+      },
+      {
+         "name":"dynamic_sit"
+      },
+      {
+         "name":"dynamic_stand"
       }
    ],
    [
@@ -236,12 +250,6 @@
       },
       {
          "name":"ik_test_multiple_subgaits"
-      },
-      {
-         "name":"realsense_sit"
-      },
-      {
-         "name":"realsense_stand"
       }
    ],
    [

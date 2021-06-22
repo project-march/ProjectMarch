@@ -2,9 +2,9 @@ import os
 
 import yaml
 from ament_index_python.packages import get_package_share_directory
-from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
-from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
-    SemiDynamicSetpointsGait,
+from march_gait_selection.gaits.balance_gait import BalanceGait
+from march_gait_selection.gaits.dynamic_edge_setpoints_gait import (
+    DynamicEdgeSetpointsGait,
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
 
@@ -29,9 +29,8 @@ from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_gaits.realsense_gait import RealSenseGait
-from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
-
+from march_gait_selection.gaits.realsense_gait import RealSenseGait
+from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
 
@@ -39,7 +38,7 @@ NODE_NAME = "gait_selection"
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
-    def __init__(self, gait_package=None, directory=None, robot=None):
+    def __init__(self, gait_package=None, directory=None, robot=None, balance=None):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
@@ -57,10 +56,10 @@ class GaitSelection(Node):
                     .get_parameter_value()
                     .string_value
                 )
-
-            self._balance_used = (
-                self.get_parameter("balance").get_parameter_value().bool_value
-            )
+            if balance is None:
+                self._balance_used = (
+                    self.get_parameter("balance").get_parameter_value().bool_value
+                )
 
         except ParameterNotDeclaredException:
             self.get_logger().error(
@@ -81,7 +80,7 @@ class GaitSelection(Node):
             )
 
         self._robot = get_robot_urdf_from_service(self) if robot is None else robot
-        self._joint_names = get_joint_names_from_robot(self._robot)
+        self._joint_names = sorted(get_joint_names_from_robot(self._robot))
 
         self._realsense_yaml = os.path.join(
             self._gait_directory, "realsense_gaits.yaml"
@@ -90,7 +89,7 @@ class GaitSelection(Node):
         (
             self._gait_version_map,
             self._positions,
-            self._semi_dynamic_gait_version_map,
+            self._dynamic_edge_version_map,
         ) = self._load_configuration()
 
         self._robot_description_sub = self.create_subscription(
@@ -101,7 +100,7 @@ class GaitSelection(Node):
         )
 
         self._create_services()
-        self._loaded_gaits = self._load_gaits()
+        self._gaits = self._load_gaits()
 
         self._early_schedule_duration = self._parse_duration_parameter(
             "early_schedule_duration"
@@ -119,6 +118,10 @@ class GaitSelection(Node):
                 "not be loaded."
             )
         self.get_logger().info("Successfully initialized gait selection node.")
+
+    @property
+    def joint_names(self):
+        return self._joint_names
 
     def _validate_inverse_kinematics_is_possible(self):
         return (
@@ -187,7 +190,7 @@ class GaitSelection(Node):
     def shortest_subgait(self) -> Subgait:
         """Get the subgait with the smallest duration of all subgaits in the loaded gaits."""
         shortest_subgait = None
-        for gait in self._loaded_gaits.values():
+        for gait in self._gaits.values():
             for subgait in gait.subgaits.values():
                 if (
                     shortest_subgait is None
@@ -224,8 +227,7 @@ class GaitSelection(Node):
         :param str gait_name: Name of the gait to change versions
         :param dict version_map: Mapping subgait names to versions
         """
-        self.get_logger().info(f"Setting gait versions, should be {version_map}")
-        if gait_name not in self._loaded_gaits:
+        if gait_name not in self._gaits:
             raise GaitNameNotFound(gait_name)
 
         # Only update versions that are different
@@ -234,12 +236,12 @@ class GaitSelection(Node):
             for name, version in version_map.items()
             if version != self._gait_version_map[gait_name][name]
         }
-        self._loaded_gaits[gait_name].set_subgait_versions(
+        self._gaits[gait_name].set_subgait_versions(
             self._robot, self._gait_directory, version_map
         )
         self._gait_version_map[gait_name].update(version_map)
         self.get_logger().info(
-            f"Setting gait versions, is {self._gait_version_map[gait_name]}"
+            f"Setting gait versions successful: {self._gaits[gait_name]}"
         )
 
     def set_gait_versions_cb(self, request, response):
@@ -273,7 +275,7 @@ class GaitSelection(Node):
         :param request: service request
         :return: True when the gait and subgait are loaded
         """
-        gait = self._loaded_gaits.get(request.gait)
+        gait = self._gaits.get(request.gait)
         if gait is None:
             response.contains = False
             return response
@@ -323,12 +325,12 @@ class GaitSelection(Node):
 
         The to be added gait should implement `GaitInterface`.
         """
-        if gait.name in self._loaded_gaits:
+        if gait.name in self._gaits:
             self.get_logger().warn(
                 "Gait `{gait}` already exists in gait selection".format(gait=gait.name)
             )
         else:
-            self._loaded_gaits[gait.name] = gait
+            self._gaits[gait.name] = gait
 
     def _load_gaits(self):
         """Loads the gaits in the specified gait directory.
@@ -342,7 +344,12 @@ class GaitSelection(Node):
                 gait, self._gait_directory, self._robot, self._gait_version_map
             )
 
-        self._load_semi_dynamic_gaits(gaits)
+        for gait in self._dynamic_edge_version_map:
+            self.get_logger().debug(f"Adding dynamic gait {gait}")
+            gaits[gait] = DynamicEdgeSetpointsGait.from_file(
+                gait, self._gait_directory, self._robot, self._dynamic_edge_version_map
+            )
+            self._gait_version_map[gait] = self._dynamic_edge_version_map[gait]
         self._load_realsense_gaits(gaits)
         if self._balance_used and "balance_walk" in gaits.keys():
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
@@ -351,19 +358,6 @@ class GaitSelection(Node):
                 gaits["balanced_walk"] = balance_gait
 
         return gaits
-
-    def _load_semi_dynamic_gaits(self, gaits):
-        """
-        Loads the semi dynamic gaits, this is currently only 1 gait.
-        :param gaits: dict to add the semi dynamic gaits to
-        """
-        for gait in self._semi_dynamic_gait_version_map:
-            gaits[f"dynamic_{gait}"] = SemiDynamicSetpointsGait.from_file(
-                gait,
-                self._gait_directory,
-                self._robot,
-                self._semi_dynamic_gait_version_map,
-            )
 
     def _load_realsense_gaits(self, gaits):
         """
@@ -401,7 +395,7 @@ class GaitSelection(Node):
 
     def _load_realsense_configuration(self):
         if not os.path.isfile(self._realsense_yaml):
-            self.get_logger().warn(
+            self.get_logger().info(
                 "No realsense_yaml present, no realsense gaits will be created."
             )
             return {}
@@ -415,7 +409,9 @@ class GaitSelection(Node):
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         version_map = default_config["gaits"]
-        semi_dynamic_version_map = default_config.get("semi_dynamic_gaits", [])
+        dynamic_edge_version_map = {}
+        if "dynamic_edge_gaits" in default_config.keys():
+            dynamic_edge_version_map = default_config["dynamic_edge_gaits"]
 
         if not isinstance(version_map, dict):
             raise TypeError("Gait version map should be of type; dictionary")
@@ -443,7 +439,7 @@ class GaitSelection(Node):
                     f"has {positions[position_name]['joints'].keys()}, "
                     f"required: {self._joint_names}"
                 )
-        return version_map, positions, semi_dynamic_version_map
+        return version_map, positions, dynamic_edge_version_map
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.
@@ -468,8 +464,8 @@ class GaitSelection(Node):
 
     def __getitem__(self, name):
         """Returns a gait from the loaded gaits."""
-        return self._loaded_gaits.get(name)
+        return self._gaits.get(name)
 
     def __iter__(self):
         """Returns an iterator over all loaded gaits."""
-        return iter(self._loaded_gaits.values())
+        return iter(self._gaits.values())

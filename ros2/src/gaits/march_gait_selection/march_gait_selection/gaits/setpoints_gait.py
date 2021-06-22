@@ -1,16 +1,17 @@
 from typing import Optional
 
-from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
+from march_gait_selection.gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
+from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
-from .gait_update import GaitUpdate
-from .gait_interface import GaitInterface
-from .state_machine_input import TransitionRequest
-from .trajectory_scheduler import TrajectoryCommand
+from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.state_machine.gait_interface import GaitInterface
+from march_gait_selection.state_machine.state_machine_input import TransitionRequest
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
 
 class SetpointsGait(GaitInterface, Gait):
@@ -65,15 +66,23 @@ class SetpointsGait(GaitInterface, Gait):
             return None
 
     @property
-    def starting_position(self):
-        return self.subgaits[self.graph.start_subgaits()[0]].starting_position
+    def starting_position(self) -> EdgePosition:
+        return StaticEdgePosition(
+            self.subgaits[self.graph.start_subgaits()[0]].starting_position
+        )
 
     @property
-    def final_position(self):
-        return self.subgaits[self.graph.end_subgaits()[0]].final_position
+    def final_position(self) -> EdgePosition:
+        return StaticEdgePosition(
+            self.subgaits[self.graph.end_subgaits()[0]].final_position
+        )
 
     @property
-    def can_be_scheduled_early(self) -> bool:
+    def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
+        return True
+
+    @property
+    def first_subgait_can_be_scheduled_early(self) -> bool:
         return True
 
     def _reset(self):
@@ -146,10 +155,13 @@ class SetpointsGait(GaitInterface, Gait):
         """
         self._current_time = current_time
 
-        if self._start_is_delayed and self._current_time >= self._start_time:
-            # Reset start delayed flag and update first subgait
-            self._start_is_delayed = False
-            return GaitUpdate.subgait_updated()
+        if self._start_is_delayed:
+            if self._current_time >= self._start_time:
+                # Reset start delayed flag and update first subgait
+                self._start_is_delayed = False
+                return GaitUpdate.subgait_updated()
+            else:
+                return GaitUpdate.empty()
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
