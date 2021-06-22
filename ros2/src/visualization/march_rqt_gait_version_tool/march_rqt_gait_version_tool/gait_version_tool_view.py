@@ -261,7 +261,9 @@ class GaitVersionToolView(QWidget):
         :param color_tag:
             The tag which represents the color of the text in the screen (info, warning, error)
         """
-        self._logger.appendHtml(f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>')
+        self._logger.appendHtml(
+            f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>'
+        )
         scrollbar = self.Log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
