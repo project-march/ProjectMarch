@@ -1,3 +1,6 @@
+import re
+from enum import Enum
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QWidget
 from python_qt_binding import loadUi
@@ -5,10 +8,18 @@ from python_qt_binding import loadUi
 from .gait_version_tool_errors import GaitVersionToolError
 from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
+from .same_versions_pop_up import SameVersionsPopUpWindow
 
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 PARAMETRIC_GAIT_PREFIX = "_pg_"
 FOUR_PARAMETRIC_GAIT_PREFIX = "_fpg_"
+
+
+class LogLevel(Enum):
+    INFO = "#000000"
+    SUCCESS = "#009100"
+    ERRROR = "#FF0000"
+    WARNING = "#b27300"
 
 
 class GaitVersionToolView(QWidget):
@@ -26,13 +37,6 @@ class GaitVersionToolView(QWidget):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
-        # Coding flags
-        self._colors = {
-            "info": "#000000",
-            "success": "#009100",
-            "error": "#FF0000",
-            "warning": "#b27300",
-        }
         self._is_refresh_active = True
         self._is_update_active = True
 
@@ -55,6 +59,7 @@ class GaitVersionToolView(QWidget):
         # bind functions to callbacks of buttons and menus
         self.Refresh.pressed.connect(lambda: self._refresh())
         self.Apply.pressed.connect(lambda: [self._apply(), self._refresh()])
+        self.SelectSameVersions.pressed.connect(self._select_same_versions)
         self.SaveDefault.pressed.connect(
             lambda: [self._apply(), self._save_default(), self._refresh()]
         )
@@ -75,6 +80,9 @@ class GaitVersionToolView(QWidget):
         self._version_map_pop_up = PopUpWindow(self)
         self._parametric_pop_up = ParametricPopUpWindow(
             self, ui_file.replace("gait_selection.ui", "parametric_pop_up.ui")
+        )
+        self._same_versions_pop_up = SameVersionsPopUpWindow(
+            self, ui_file.replace("gait_selection.ui", "same_versions_pop_up.ui")
         )
 
         # populate gait menu for the first time
@@ -101,9 +109,8 @@ class GaitVersionToolView(QWidget):
 
             self._subgaits.layout().addRow(new_subgait_label, new_subgait_menu)
 
-    def update_version_menus(self):
-        """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
-
+    @staticmethod
+    def sort_versions(versions):
         def version_sorter(version):
             """Used in the sort function to sort based on the last 2 digits of the
             version name. If there is no version number, 0 is returned to have
@@ -122,6 +129,11 @@ class GaitVersionToolView(QWidget):
                     return 0
             except ValueError:
                 return 0
+
+        return sorted(versions, key=version_sorter)
+
+    def update_version_menus(self):
+        """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
 
         self._is_update_active = True
         if self._is_refresh_active:
@@ -144,7 +156,7 @@ class GaitVersionToolView(QWidget):
 
             subgait_menu.show()
             subgait_label.show()
-            versions = sorted(versions, key=version_sorter)
+            versions = self.sort_versions(versions)
 
             subgait_label.setText(subgait_name)
             subgait_menu.addItems(versions)
@@ -164,14 +176,14 @@ class GaitVersionToolView(QWidget):
                         "Default version of {gn} {sgn} does not exist in loaded gaits.".format(
                             gn=gait_name, sgn=subgait_name
                         ),
-                        "error",
+                        LogLevel.ERROR,
                     )
             except KeyError:
                 self._log(
                     "{gn} has no default version for {sgn}.".format(
                         gn=gait_name, sgn=subgait_name
                     ),
-                    "error",
+                    LogLevel.ERROR,
                 )
 
             latest_used_index = index + 1
@@ -202,7 +214,7 @@ class GaitVersionToolView(QWidget):
                             else:
                                 new_version = self.get_parametric_version()
                             subgait_label.setStyleSheet(
-                                "color:{color}".format(color=self._colors["warning"])
+                                f"color:{LogLevel.WARNING.value}"
                             )
                             subgait_menu.addItem(new_version)
                             subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
@@ -217,13 +229,9 @@ class GaitVersionToolView(QWidget):
                     if str(self.version_map[gait_name][subgait_name]) != str(
                         subgait_menu.currentText()
                     ):
-                        subgait_label.setStyleSheet(
-                            "color:{color}".format(color=self._colors["warning"])
-                        )
+                        subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
                     else:
-                        subgait_label.setStyleSheet(
-                            "color:{color}".format(color=self._colors["info"])
-                        )
+                        subgait_label.setStyleSheet(f"color:{LogLevel.INFO.value}")
                 except KeyError:
                     pass
 
@@ -237,15 +245,15 @@ class GaitVersionToolView(QWidget):
             self.version_map = self._controller.get_version_map()
             self._gait_menu.addItems(sorted(self.available_gaits.keys()))
 
-            self._log("Directory data refreshed", "success")
+            self._log("Directory data refreshed", LogLevel.SUCCESS)
         except GaitVersionToolError as e:
-            self._log(str(e), "error")
+            self._log(str(e), LogLevel.ERROR)
         finally:
             self._is_refresh_active = False
             self.update_version_menus()
 
     # logger
-    def _log(self, msg, color_tag="info"):
+    def _log(self, msg, level=LogLevel.INFO):
         """Use the logger window in the GUI to display data.
 
         :param msg:
@@ -253,12 +261,9 @@ class GaitVersionToolView(QWidget):
         :param color_tag:
             The tag which represents the color of the text in the screen (info, warning, error)
         """
-        try:
-            color = self._colors[color_tag]
-        except KeyError:
-            color = self._colors["error"]
-
-        self._logger.appendHtml('<p style="color:' + str(color) + '">' + msg + "</p>")
+        self._logger.appendHtml(
+            f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>'
+        )
         scrollbar = self.Log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
@@ -284,11 +289,13 @@ class GaitVersionToolView(QWidget):
         try:
             success, msg = self._controller.set_default_versions()
             if success:
-                self._log(msg if msg else "Set new default versions", "success")
+                self._log(msg if msg else "Set new default versions", LogLevel.SUCCESS)
             else:
-                self._log(msg if msg else "Failed to set default versions", "error")
+                self._log(
+                    msg if msg else "Failed to set default versions", LogLevel.ERROR
+                )
         except GaitVersionToolError as e:
-            self._log(str(e), "error")
+            self._log(str(e), LogLevel.ERRROR)
 
     def _apply(self):
         """Apply newly selected subgait versions to the gait selection node."""
@@ -308,18 +315,71 @@ class GaitVersionToolView(QWidget):
                 gait_name, subgait_names, versions
             )
             if success:
-                self._log(msg if msg else "Version change applied", "success")
+                if not msg:
+                    msg = f"Version change applied for {gait_name}: "
+
+                    for index, subgait in enumerate(subgait_names):
+                        msg += f"\n    - {subgait}:    {versions[index]}"
+                self._log(msg, LogLevel.SUCCESS)
             else:
-                self._log(msg if msg else "Version change applied failed", "failed")
+                self._log(
+                    msg if msg else "Version change applied failed", LogLevel.ERROR
+                )
         except GaitVersionToolError as e:
-            self._log(str(e), "error")
+            self._log(str(e), LogLevel.ERROR)
+
+    def _select_same_versions(self):
+        """Select same versions of subgaits using common pre- and postfixes.
+
+        For every version of every subgait:
+            - Find the first match with the specified prefix and postfix
+            - Set the subgait menu to that version
+        """
+        if not self._same_versions_pop_up.show_pop_up(self._gait_menu.currentText()):
+            return
+
+        prefix = self._same_versions_pop_up.prefix
+        postfix = self._same_versions_pop_up.postfix
+        if prefix == "" and postfix == "":
+            return
+
+        if prefix == "":
+            prefix = ".*"
+        if postfix == "":
+            postfix = ".*"
+
+        gait_name = self._gait_menu.currentText()
+        if gait_name not in self.version_map:
+            return
+
+        subgaits = self.available_gaits[gait_name]
+        selected_versions = {}
+        for subgait, versions in subgaits.items():
+            subgait_no_underscores = subgait.replace("_", "")
+            regex_string = f"{prefix}(_?{gait_name})?_({subgait}|{subgait_no_underscores})_{postfix}"
+            pattern = re.compile(regex_string)
+
+            for version_name in versions:
+                match = pattern.match(version_name)
+                if match is not None:
+                    selected_versions[subgait] = version_name
+
+        for subgait_label, subgait_menu in zip(
+            self._subgait_labels, self._subgait_menus
+        ):
+            subgait = subgait_label.text()
+            if subgait in selected_versions:
+                version_index = self.sort_versions(subgaits[subgait]).index(
+                    selected_versions[subgait]
+                )
+                subgait_menu.setCurrentIndex(version_index)
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""
         try:
             version_map = self._controller.get_version_map()
         except GaitVersionToolError as e:
-            self._log(str(e), "error")
+            self._log(str(e), LogLevel.ERROR)
             return
 
         version_map_string = ""
