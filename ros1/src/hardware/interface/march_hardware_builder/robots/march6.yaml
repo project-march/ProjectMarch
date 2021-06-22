@@ -16,6 +16,7 @@ march6:
           slaveIndex: 1
           axis: 0
           motorKV: 355
+          # indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -34,11 +35,12 @@ march6:
           slaveIndex: 4
           axis: 1
           motorKV: 355
+          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: -1
-            minPositionIU: 4782
-            maxPositionIU: 5665
+            minPositionIU: 4454
+            maxPositionIU: 5341
           incrementalEncoder:
             resolution: 13
             transmission: 240
@@ -52,6 +54,7 @@ march6:
           slaveIndex: 4
           axis: 0
           motorKV: 95
+          # indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
@@ -70,6 +73,7 @@ march6:
           slaveIndex: 1
           axis: 1
           motorKV: 95
+          # indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
@@ -88,6 +92,7 @@ march6:
           slaveIndex: 3
           axis: 0
           motorKV: 355
+          # indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -106,11 +111,12 @@ march6:
           slaveIndex: 2
           axis: 1
           motorKV: 355
+          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 3429
-            maxPositionIU: 4285
+            minPositionIU: 3468
+            maxPositionIU: 4338
           incrementalEncoder:
             resolution: 13
             transmission: 240
@@ -124,6 +130,7 @@ march6:
           slaveIndex: 2
           axis: 0
           motorKV: 95
+          # indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
@@ -143,6 +150,7 @@ march6:
           axis: 1
           preCalibrated: false
           motorKV: 95
+          # indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20

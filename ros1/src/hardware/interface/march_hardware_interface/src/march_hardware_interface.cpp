@@ -191,7 +191,7 @@ bool MarchHardwareInterface::init(
     wait_duration.sleep();
 
     // Enable all joints for actuation
-    wait_duration = ros::Duration(/*t=*/0);
+    wait_duration = ros::Duration(/*t=*/5);
     for (size_t i = 0; i < num_joints_; ++i) {
         march::Joint& joint = march_robot_->getJoint(i);
         // Enable high voltage on the IMC
