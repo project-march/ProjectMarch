@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from threading import Event
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, TYPE_CHECKING
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
-from march_gait_selection.gait_selection import GaitSelection
+if TYPE_CHECKING:
+    from march_gait_selection.gait_selection import GaitSelection
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.edge_position import (
