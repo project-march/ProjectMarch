@@ -328,9 +328,6 @@ class RealsenseGait(SetpointsGait):
 
         :return: Whether the call was successful
         """
-
-        # Currently, we hardcode foot_right in start, since this is almost
-        # always a right_open
         service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
             self._gait_selection.get_logger().warn(
@@ -364,7 +361,7 @@ class RealsenseGait(SetpointsGait):
                 if isinstance(gait, RealsenseGait):
                     gait.set_parameters(gait_parameters)
 
-    def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
+    def make_realsense_service_call(self) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
