@@ -27,7 +27,7 @@
     <arg name="hardware_interface" default="true" doc="Launches the hardware interface when config is 'exoskeleton."/>
     <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
                                         If not provided, then the value is read from the robot .yaml file."/>
-    <arg name="remove_fixed_joints_from_ethercat_train" default="true"
+    <arg name="remove_fixed_joints_from_ethercat_train" default="false"
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
 <!-- Data                       -->
