@@ -18,6 +18,7 @@
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 
 class RealSenseReader {
 public:

@@ -2,15 +2,15 @@
 #define MARCH_PARAMETER_DETERMINER_H
 #include "march_shared_msgs/GetGaitParameters.h"
 #include "utilities/realsense_category_utilities.h"
+#include "utilities/transform_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
-#include "utilities/transform_utilities.h"
 
-using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
+// using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -89,7 +89,7 @@ public:
     /** Takes a 2D point cloud of potential foot locations and returns
      * the valid foot locations with associated height and normal vector.
      * Result indicates whether every original point ends up being valid.**/
-    bool cropCloudToHullVector(PointCloud2D::Ptr const& input_cloud,
+    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
 protected:
@@ -114,22 +114,21 @@ protected:
 
     // Create a point cloud with points on the ground where the points represent
     // where it should be checked if there is a valid foot location
-    bool getOptionalFootLocations(
-        const PointCloud2D::Ptr& foot_locations_to_try);
+    bool getOptionalFootLocations(const PointCloud::Ptr& foot_locations_to_try);
 
     // Crops a single point to a hull vector.
-    bool cropPointToHullVector(pcl::PointXY const input_point,
+    bool cropPointToHullVector(pcl::PointXYZ const input_point,
         const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a cloud to a hull vector, but only puts each input point in
     // the highest hull it falls into
-    bool cropCloudToHullVectorUnique(PointCloud2D::Ptr const& input_cloud,
+    bool cropCloudToHullVectorUnique(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
     // Elevate the 2D points so they have z coordinate as if they lie on the
     // plane of the hull
     bool addZCoordinateToCloudFromPlaneCoefficients(
-        const PointCloud2D::Ptr& input_cloud,
+        const PointCloud::Ptr& input_cloud,
         const PlaneCoefficients::Ptr& plane_coefficients,
         const PointCloud::Ptr& elevated_cloud);
 
@@ -154,7 +153,7 @@ protected:
 
     // Fill a point cloud with vertices of the foot on the ground around a
     // possible foot location
-    void fillFootPointCloud(const PointCloud2D::Ptr& foot_pointcloud,
+    void fillFootPointCloud(const PointCloud::Ptr& foot_pointcloud,
         pcl::PointNormal possible_foot_location);
 
     // Verify that a possible foot location is valid for the requested gait
@@ -201,7 +200,7 @@ protected:
     bool getSitHeight();
 
     // Fill a cloud with a grid of points where to look for exo support
-    bool fillSitGrid(PointCloud2D::Ptr& sit_grid);
+    bool fillSitGrid(PointCloud::Ptr& sit_grid);
 
     // Get the median height value of a point cloud
     bool getMedianHeightCloud(
@@ -211,6 +210,9 @@ protected:
     void getValidExoSupport(
         const PointNormalCloud::Ptr& potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
+
+    bool transformGaitInformation();
+
 
     // All relevant parameters
     int hull_dimension {};
@@ -252,6 +254,7 @@ protected:
     float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
+
     std::string subgait_name_;
 
     std::unique_ptr<Transformer> transformer_;
@@ -268,9 +271,10 @@ protected:
 
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
-    PointCloud2D::Ptr foot_locations_to_try;
-    PointCloud2D::Ptr sit_grid;
+    PointCloud::Ptr sit_grid;
     float sit_height;
+    PointCloud::Ptr foot_locations_to_try;
+    PointCloud::Ptr gait_information_cloud;
 };
 
 /** The simple parameter determiner
