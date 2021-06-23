@@ -70,111 +70,111 @@ inertia:
     yy: 0.00659119
     yz: -0.00168033
     zz: 0.00630322
-joint_limits:  # TODO
+joint_limits:
   # The upper and lower limits of the joints
   left_knee:
     unit: iu
     lower_limit: 617728
     upper_limit: 939388
-    zero_position: 629250
+    zero_position: 632646
     resolution: 20
   right_knee:
     unit: iu
     lower_limit: 271431
     upper_limit: 621197
-    zero_position: 285839
+    zero_position: 282411
     resolution: 20
   left_hfe:
     unit: iu
     lower_limit: 213943
     upper_limit: 579571
-    zero_position: 293632
+    zero_position: 290053
     resolution: 20
   right_hfe:
     unit: iu
     lower_limit: 559641
     upper_limit: 925326
-    zero_position: 632992
+    zero_position: 626238
     resolution: 20
   left_ankle:
     unit: iu
     lower_limit: 9023
     upper_limit: 10842
-    zero_position: 10169
+    zero_position: 10712
     resolution: 14
   right_ankle:
     unit: iu
     lower_limit: 12551
     upper_limit: 14446
-    zero_position: 13754
+    zero_position: 13606
     resolution: 14
   left_haa:
     unit: iu
-    lower_limit: 4782
-    upper_limit: 5665
-    zero_position: 5307
+    lower_limit: 4454
+    upper_limit: 5341
+    zero_position: 4931
     resolution: 14
   right_haa:
     unit: iu
-    lower_limit: 3429
-    upper_limit: 4285
-    zero_position: 3837
+    lower_limit: 3468
+    upper_limit: 4338
+    zero_position: 3872
     resolution: 14
 safety:  # This is still copied from MV
   exoskeleton:
     knee:
-      lower_soft_buffer: 3.5    # degrees
-      upper_soft_buffer: 3.0      # degrees
-      k_position: 14.88
-      k_velocity: 20000.0
-      max_effort: 18000.0
-      max_velocity: 2.5
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
+      k_position: 9.656085595298899
+      k_velocity: 23.06987607064259
+      max_effort: 20.0
+      max_velocity: 3.0
     hfe:
-      lower_soft_buffer: 3.0
-      upper_soft_buffer: 3.0
-      k_position: 14.88
-      k_velocity: 20000.0
-      max_effort: 18000.0
-      max_velocity: 2.0
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
+      k_position: 8.368683429790725
+      k_velocity: 26.185712977780618
+      max_effort: 25.0
+      max_velocity: 3.0
     ankle:
-      lower_soft_buffer: 3.0
-      upper_soft_buffer: 5.0
-      k_position: 5.0
+      lower_soft_buffer: 0.5
+      upper_soft_buffer: 0.5
+      k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 22932.0
-      max_velocity: 1.0
+      max_effort: 20.0
+      max_velocity: 3.0
     haa:
-      lower_soft_buffer: 3.5
-      upper_soft_buffer: 3.5
-      k_position: 4.0
+      lower_soft_buffer: 0.0
+      upper_soft_buffer: 0.0
+      k_position: 20000.0
       k_velocity: 20000.0
-      max_effort: 22932.0
-      max_velocity: 1.0
+      max_effort: 20.0
+      max_velocity: 3.0
   simulation:
     knee:
-      lower_soft_buffer: 3.5    # degrees
-      upper_soft_buffer: 3.0      # degrees
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
       k_position: 5000.0
       k_velocity: 60.0
       max_effort: 200.0
-      max_velocity: 2.5
+      max_velocity: 3.0
     hfe:
-      lower_soft_buffer: 3.0
-      upper_soft_buffer: 3.0
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
       k_position: 5000.0
       k_velocity: 60.0
       max_effort: 200.0
-      max_velocity: 2.0
+      max_velocity: 3.0
     ankle:
-      lower_soft_buffer: 3.0
-      upper_soft_buffer: 5.0
+      lower_soft_buffer: 2.0
+      upper_soft_buffer: 2.0
       k_position: 5000.0
       k_velocity: 15.0
       max_effort: 200.0
       max_velocity: 1.0
     haa:
-      lower_soft_buffer: 3.5
-      upper_soft_buffer: 3.5
+      lower_soft_buffer: 1.0
+      upper_soft_buffer: 1.0
       k_position: 5000.0
       k_velocity: 60.0
       max_effort: 200.0

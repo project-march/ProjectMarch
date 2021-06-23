@@ -91,6 +91,9 @@ gaits:
     stand_up: MVI_stand_up_v4
     stand_home: MVI_stand_home_v4
 
+  exo_test:
+    perform_test: perform_test_v1
+
   walk_single_step_small:
     right_open: MVI_walksinglestepsmall_rightopen_v3
     left_close: MVI_walksinglestepsmall_leftclose_v3
@@ -107,7 +110,6 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
       right_knee: 0.0
-
   flat_ramp_stand:
     gait_type: walk_like
     joints:

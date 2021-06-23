@@ -54,9 +54,12 @@ public:
     ~IMotionCube() noexcept override = default;
 
     // Override functions for actuating the IMotionCube
-    void prepareActuation() override;
+    std::optional<ros::Duration> prepareActuation() override;
+    std::optional<ros::Duration> enableActuation() override;
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
+
+    bool requiresUniqueSlaves() const override;
 
     // Transform the ActuationMode to a number that is understood by the
     // IMotionCube
@@ -71,6 +74,9 @@ public:
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
+    float getActualEffort() override;
+
+    float effortMultiplicationConstant() override;
 
     constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
     // This value is slightly larger than the current limit of the

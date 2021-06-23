@@ -10,8 +10,20 @@
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
 
-std::unique_ptr<march::MarchRobot> build(
-    AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train);
+std::unique_ptr<march::MarchRobot> build(AllowedRobot robot,
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name)
+{
+    HardwareBuilder builder(
+        robot, remove_fixed_joints_from_ethercat_train, std::move(if_name));
+    try {
+        return builder.createMarchRobot();
+    } catch (const std::exception& e) {
+        ROS_FATAL(
+            "Hardware interface caught an exception during building hardware");
+        ROS_FATAL("%s", e.what());
+        std::exit(/*__status=*/1);
+    }
+}
 
 int main(int argc, char** argv)
 {
@@ -27,7 +39,8 @@ int main(int argc, char** argv)
     AllowedRobot selected_robot = AllowedRobot(argv[1]);
     ROS_INFO_STREAM("Selected robot: " << selected_robot);
 
-    bool reset_imc = ros::param::param<bool>("~reset_imc", false);
+    bool reset_motor_controllers
+        = ros::param::param<bool>("~reset_motor_controllers", false);
     bool remove_fixed_joints_from_ethercat_train;
     if (ros::param::has("~remove_fixed_joints_from_ethercat_train")) {
         ros::param::get("~remove_fixed_joints_from_ethercat_train",
@@ -38,11 +51,16 @@ int main(int argc, char** argv)
         std::exit(/*__status=*/1);
     }
 
+    std::string if_name = "";
+    if (argc > 2) {
+        if_name = argv[2];
+    }
+
     spinner.start();
 
     MarchHardwareInterface march(
-        build(selected_robot, remove_fixed_joints_from_ethercat_train),
-        reset_imc);
+        build(selected_robot, remove_fixed_joints_from_ethercat_train, if_name),
+        reset_motor_controllers);
 
     try {
         bool success = march.init(nh, nh);
@@ -78,18 +96,4 @@ int main(int argc, char** argv)
     }
 
     return 0;
-}
-
-std::unique_ptr<march::MarchRobot> build(
-    AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train)
-{
-    HardwareBuilder builder(robot, remove_fixed_joints_from_ethercat_train);
-    try {
-        return builder.createMarchRobot();
-    } catch (const std::exception& e) {
-        ROS_FATAL(
-            "Hardware interface caught an exception during building hardware");
-        ROS_FATAL("%s", e.what());
-        std::exit(/*__status=*/1);
-    }
 }

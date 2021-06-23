@@ -7,6 +7,12 @@
          "name":"home_stand"
       },
       {
+         "name": "home_sit_without_haa"
+      },
+      {
+         "name": "home_sit_with_haa"
+      },
+      {
          "name":"walk"
       },
       {
@@ -258,6 +264,9 @@
       },
       {
          "name": "test_joint_gait"
+      },
+      {
+         "name": "exo_test"
       },
       {
          "name":"home_shutdown"

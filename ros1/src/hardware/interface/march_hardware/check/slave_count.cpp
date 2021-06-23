@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     const std::string param = "/march/check/slave_count";
 
     ROS_INFO("Trying to start EtherCAT");
-    std::string if_name = "enp2s0";
+    std::string if_name = argv[1];
 
     // Initialise SOEM, bind socket to if_name
     if (!ec_init(&if_name[0])) {
