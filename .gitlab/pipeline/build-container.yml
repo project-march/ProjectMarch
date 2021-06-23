@@ -34,7 +34,7 @@
       # - Run if the pipeline is from a MR, iff a ROS or Dockerfile has changed
       # - Don't run if the pipeline is in a branch that has an open MR
       # - Run if the pipeline is in a branch, iff a ROS or Dockerfile has changed
-    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
@@ -65,7 +65,7 @@
       # - Run if the pipeline is from a MR, iff the Dockerfile has changed
       # - Don't run if the pipeline is in a branch that has an open MR
       # - Run if the pipeline is in a branch, iff the Dockerfile has changed
-    - if: '$CI_PIPELINE_SOURCE == "scheduled"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
