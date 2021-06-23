@@ -381,8 +381,8 @@ class RealsenseGait(SetpointsGait):
         if self._current_subgait is not None:
             subgait_name = self._current_subgait.subgait_name
         else:
-            # Assume that the current subgait is being created and use the right open name
-            subgait_name = "right_open"
+            # Assume that the gait is starting and use the first subgait name
+            subgait_name = self.graph.start_subgaits()[0]
 
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
