@@ -157,14 +157,14 @@ class RealsenseGait(SetpointsGait):
                 parameters = [
                     float(param) for param in gait_config["default_parameters"]
                 ]
+                if len(parameters) != amount_of_parameters(dimensions):
+                    raise WrongRealSenseConfigurationError(
+                        f"The amount of parameters in the config file ({len(parameters)}), "
+                        f"doesn't match the dimensions"
+                    )
             else:
                 parameters = None
 
-            if len(parameters) != amount_of_parameters(dimensions):
-                raise WrongRealSenseConfigurationError(
-                    f"The amount of parameters in the config file ({len(parameters)}), "
-                    f"doesn't match the dimensions"
-                )
             realsense_category = gait_config["realsense_category"]
             camera_to_use = gait_config["camera_to_use"]
             subgait_version_map = gait_config["subgaits"]
