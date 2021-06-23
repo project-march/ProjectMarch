@@ -298,7 +298,10 @@ class RealsenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
+        self._gait_selection.get_logger().info("Starting realsense gait.")
+
         if self._dependent_on is None:
+            self._gait_selection.get_logger().info("gait is not dependent")
             realsense_update_successful = self.get_realsense_update()
             if not realsense_update_successful:
                 return GaitUpdate.empty()
@@ -343,23 +346,31 @@ class RealsenseGait(SetpointsGait):
             )
             return False
 
-        self.update_parameters(gait_parameters_response.gait_parameters)
+        self._gait_selection.get_logger().info("Parameter call made")
 
-        return self.interpolate_subgaits_from_parameters()
+        return self.update_gaits_from_realsense_call(
+            gait_parameters_response.gait_parameters)
 
-    def update_parameters(self, gait_parameters: GaitParameters) -> None:
+    def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> Bool:
         """
         Update the gait parameters based on the message of the current gaits and its
         responsibilities.
 
         :param gait_parameters: The parameters to update to.
         """
+        success = True
         self.set_parameters(gait_parameters)
-        if self.responsible_for is not None:
-            for gait_name in self.responsible_for:
+        success &= self.interpolate_subgaits_from_parameters()
+        if self._responsible_for is not None:
+            for gait_name in self._responsible_for:
                 gait = self._gait_selection.gaits[gait_name]
                 if isinstance(gait, RealsenseGait):
                     gait.set_parameters(gait_parameters)
+                    success &= gait.interpolate_subgaits_from_parameters()
+                self._gait_selection.get_logger().info(f"Set the parameter of gait "
+                                                       f"{gait.name} and interpolate "
+                                                       f"the subgaits")
+        return success
 
     def make_realsense_service_call(self) -> bool:
         """
