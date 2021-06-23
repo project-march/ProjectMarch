@@ -67,7 +67,7 @@ foxy:build:
     ROS_CODENAME: "foxy"
     DOCKER_FILE: ".gitlab/dockerfiles/foxy"
   needs:
-    - job: "ROS2 container builder"
+    - job: ["ROS2 container builder"
       optional: true
   extends:
     - .base_builder

@@ -49,37 +49,10 @@ stages:
 # To make the main .gitlab-ci.yml file easier to follow, the actual job definitions
 # are split into different files. Each file specifies the jobs of a stage.
 include:
-    #    - local: /.gitlab/pipeline/build-container.yml
+    - local: /.gitlab/pipeline/build-container.yml
     - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
 
-#####################
-## Test code stage #
-####################
-## Run the tests, both for noetic and foxy. These stages are separated because they
-## are not dependent on eachother. This enables extra parallelization.
-#.base_tester:
-#  stage: Test code
-#  script:
-#    - cd $ROS_VERSION/
-#    - source /opt/ros/$ROS_CODENAME/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
-#    - colcon test-result --verbose
-#
-#noetic:test:
-#  dependencies:
-#    - noetic:build
-#  needs: ["noetic:build"]
-#  extends:
-#    - .only_on_ros1_changes
-#    - .base_tester
-#
-#foxy:test:
-#  dependencies:
-#    - foxy:build
-#  needs: ["foxy:build"]
-#  extends:
-#    - .only_on_ros2_changes
-#    - .base_tester
 #
 ########################
 ## C++ static analysis #

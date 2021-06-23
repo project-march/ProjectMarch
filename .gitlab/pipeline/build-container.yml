@@ -49,7 +49,7 @@
         - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
       variables:
-        TAG: $CI_COMMIT_BRANCH
+         TAG: $CI_COMMIT_BRANCH
   extends:
     - .container_builder
 
@@ -76,7 +76,7 @@
       changes:
         - "$DOCKER_FILE"
       variables:
-        TAG: $CI_COMMIT_BRANCH
+       TAG: $CI_COMMIT_BRANCH
   extends:
     - .container_builder
 
