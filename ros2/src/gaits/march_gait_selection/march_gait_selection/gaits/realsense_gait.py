@@ -281,8 +281,6 @@ class RealSenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
-        # Currently, we hardcode foot_right in start, since this is almost
-        # always a right_open
         service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
             self._node.get_logger().warn("No service response received within timeout")
