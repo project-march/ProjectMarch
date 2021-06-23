@@ -25,7 +25,6 @@ from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContent,
 )
 from rclpy import Future
-from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client
 from urdf_parser_py import urdf
