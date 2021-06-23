@@ -205,20 +205,20 @@ class RealsenseGait(SetpointsGait):
                 f" {gait_name}: {e}"
             )
         return cls(
-            gait_name,
-            subgaits,
-            graph,
-            gait_selection,
-            realsense_category,
-            camera_to_use,
-            subgaits_to_interpolate,
-            dimensions,
-            parameters,
-            process_service,
-            starting_position,
-            final_position,
-            dependent_on,
-            responsible_for,
+            gait_name=gait_name,
+            subgaits=subgaits,
+            graph=graph,
+            gait_selection=gait_selection,
+            realsense_category=realsense_category,
+            camera_to_use=camera_to_use,
+            subgaits_to_interpolate=subgaits_to_interpolate,
+            dimensions=dimensions,
+            process_service=process_service,
+            starting_position=starting_position,
+            final_position=final_position,
+            parameters=parameters,
+            dependent_on=dependent_on,
+            responsible_for=responsible_for,
         )
 
     @classmethod
