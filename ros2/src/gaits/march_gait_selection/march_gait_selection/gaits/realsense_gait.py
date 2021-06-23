@@ -2,6 +2,7 @@ from threading import Event
 from typing import Optional, List, Dict
 
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
+from march_gait_selection.gait_selection import GaitSelection
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.edge_position import (
@@ -58,7 +59,7 @@ class RealSenseGait(SetpointsGait):
         gait_name: str,
         subgaits: dict,
         graph: SubgaitGraph,
-        node: Node,
+        gait_selection: GaitSelection,
         realsense_category: str,
         camera_to_use: str,
         subgaits_to_interpolate: dict,
@@ -71,7 +72,7 @@ class RealSenseGait(SetpointsGait):
         responsible_for: List[str],
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
-        self._node = node
+        self._gait_selection = gait_selection
         self.parameters = parameters
         self.dimensions = dimensions
         self.realsense_category = self.realsense_category_from_string(
@@ -115,7 +116,7 @@ class RealSenseGait(SetpointsGait):
     @classmethod
     def from_yaml(
         cls,
-        node: Node,
+        gait_selection: GaitSelection,
         robot: urdf.Robot,
         gait_name: str,
         gait_config: dict,
@@ -126,7 +127,8 @@ class RealSenseGait(SetpointsGait):
         """
         Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
 
-        :param node: The node that will be used for making the service calls to the
+        :param gait_selection: The GaitSelection node that will be used for making the
+        service calls to the
         realsense reader.
         :param robot: The urdf robot that can be used to verify the limits of the
         subgaits.
@@ -214,7 +216,7 @@ class RealSenseGait(SetpointsGait):
             gait_name,
             subgaits,
             graph,
-            node,
+            gait_selection,
             realsense_category,
             camera_to_use,
             subgaits_to_interpolate,
@@ -323,7 +325,7 @@ class RealSenseGait(SetpointsGait):
         self._next_subgait = self._current_subgait
         if first_subgait_delay is None:
             first_subgait_delay = Duration(0)
-        self._start_time = self._node.get_clock().now() + first_subgait_delay
+        self._start_time = self._gait_selection.get_clock().now() + first_subgait_delay
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
@@ -340,12 +342,12 @@ class RealSenseGait(SetpointsGait):
             frame_id_to_transform_to="foot_right"
         )
         if not service_call_succesful:
-            self._node.get_logger().warn("No service response received within timeout")
+            self._gait_selection.get_logger().warn("No service response received within timeout")
             return False
 
         gait_parameters_response = self.realsense_service_result
         if gait_parameters_response is None or not gait_parameters_response.success:
-            self._node.get_logger().warn(
+            self._gait_selection.get_logger().warn(
                 "No gait parameters were found, gait will not be started, "
                 f"{gait_parameters_response}"
             )
@@ -379,7 +381,7 @@ class RealSenseGait(SetpointsGait):
                 self._realsense_response_cb
             )
         else:
-            self._node.get_logger().error(
+            self._gait_selection.get_logger().error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
                 f"available, is the realsense reader running?"
             )
@@ -395,7 +397,7 @@ class RealSenseGait(SetpointsGait):
     def interpolate_subgaits_from_parameters(self) -> bool:
         """Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
-        self._node.get_logger().info(
+        self._gait_selection.get_logger().info(
             f"Interpolating with parameters: {self.parameters}"
         )
         for subgait_name in self.subgaits.keys():
@@ -406,7 +408,7 @@ class RealSenseGait(SetpointsGait):
                 use_foot_position=True,
             )
         try:
-            self.set_subgaits(new_subgaits, self._node)
+            self.set_subgaits(new_subgaits, self._gait_selection)
         except NonValidGaitContent:
             return False
 
