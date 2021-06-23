@@ -123,6 +123,10 @@ class GaitSelection(Node):
     def joint_names(self):
         return self._joint_names
 
+    @property
+    def gaits(self):
+        return self._gaits
+
     def _validate_inverse_kinematics_is_possible(self):
         return (
             validate_and_get_joint_names_for_inverse_kinematics(self.get_logger())

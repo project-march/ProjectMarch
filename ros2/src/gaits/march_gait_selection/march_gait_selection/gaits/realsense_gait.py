@@ -143,13 +143,6 @@ class RealSenseGait(SetpointsGait):
         try:
             dimensions = InterpolationDimensions.from_integer(gait_config["dimensions"])
             try:
-                parameters = [
-                    float(param) for param in gait_config["default_parameters"]
-                ]
-            except KeyError as e:
-                parameters = None
-
-            try:
                 dependent_on = gait_config["dependent_on"]
             except KeyError as e:
                 dependent_on = None
@@ -157,6 +150,14 @@ class RealSenseGait(SetpointsGait):
                 responsible_for = gait_config["responsible_for"]
             except KeyError as e:
                 responsible_for = None
+
+            # Only set default parameters if the gait is not dependant on any other.
+            if dependent_on is None:
+                parameters = [
+                    float(param) for param in gait_config["default_parameters"]
+                ]
+            else:
+                parameters = None
 
             if len(parameters) != amount_of_parameters(dimensions):
                 raise WrongRealSenseConfigurationError(
@@ -307,15 +308,16 @@ class RealSenseGait(SetpointsGait):
         self._current_time = current_time
 
         if self._dependent_on is None:
-            realsense_update_successful = self.process_realsense_update()
+            realsense_update_successful = self.get_realsense_update()
             if not realsense_update_successful:
                 return GaitUpdate.empty()
         else:
             if self.parameters is not None:
-                if not self.interpolate_subgaits_from_parameters():
+                interpolation_successful = self.interpolate_subgaits_from_parameters()
+                if not interpolation_successful:
                     return GaitUpdate.empty()
                 else:
-                    self._node.get_logger().warn(
+                    self._gait_selection.get_logger().warn(
                         f"Gait {self.gait_name} is dependent on gait(s) "
                         f"{self._dependent_on} but its realsense parameters were not set "
                         f"upon execution"
@@ -329,7 +331,7 @@ class RealSenseGait(SetpointsGait):
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
-    def process_realsense_update(self):
+    def get_realsense_update(self):
         """
         Makes a realsense service call and handles the result
 
@@ -357,7 +359,21 @@ class RealSenseGait(SetpointsGait):
 
         self.update_parameters(gait_parameters_response.gait_parameters)
 
+        if self.resonsible_for is not None:
+            self.handle_realsense_responsibilities(
+                gait_parameters_response.gait_parameters)
+
         return self.interpolate_subgaits_from_parameters()
+
+    def handle_realsense_dependencies(self):
+        """
+        Update the gaits for which the current gait is responsible
+        """
+        if self.responsible_for is not None:
+            for gait_name in self.responsible_for:
+                gait = self._gait_selection.gaits[gait_name]
+                if isinstance(gait, RealsenseGait) gait
+                gait.update_parameters
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
