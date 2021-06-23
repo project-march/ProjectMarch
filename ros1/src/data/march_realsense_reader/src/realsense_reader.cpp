@@ -265,7 +265,7 @@ void RealSenseReader::publishCloud(
 
     pcl::toROSMsg(cloud, msg);
 
-    msg.header.frame_id = frame_id_to_transform_to_;
+    msg.header.frame_id = "world";
     msg.header.stamp = ros::Time::now();
 
     publisher.publish(msg);
@@ -309,7 +309,7 @@ void RealSenseReader::publishHullMarkerArray(
     const boost::shared_ptr<HullVector>& hull_vector)
 {
     visualization_msgs::Marker marker_list;
-    marker_list.header.frame_id = frame_id_to_transform_to_;
+    marker_list.header.frame_id = "world";
     marker_list.header.stamp = ros::Time::now();
     marker_list.ns = "hulls";
     marker_list.action = visualization_msgs::Marker::ADD;
