@@ -359,21 +359,21 @@ class RealsenseGait(SetpointsGait):
 
         self.update_parameters(gait_parameters_response.gait_parameters)
 
-        if self.resonsible_for is not None:
-            self.handle_realsense_responsibilities(
-                gait_parameters_response.gait_parameters)
-
         return self.interpolate_subgaits_from_parameters()
 
-    def handle_realsense_dependencies(self):
+    def update_parameters(self, gait_parameters: GaitParameters) -> None:
         """
-        Update the gaits for which the current gait is responsible
+        Update the gait parameters based on the message of the current gaits and its
+        responsibilities.
+
+        :param gait_parameters: The parameters to update to.
         """
+        self.set_parameters(gait_parameters)
         if self.responsible_for is not None:
             for gait_name in self.responsible_for:
                 gait = self._gait_selection.gaits[gait_name]
                 if isinstance(gait, RealsenseGait):
-                    gait.update_parameters
+                    gait.set_parameters(gait_parameters)
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
@@ -432,11 +432,11 @@ class RealsenseGait(SetpointsGait):
 
         return True
 
-    def update_parameters(self, gait_parameters: GaitParameters) -> None:
+    def set_parameters(self, gait_parameters: GaitParameters) -> None:
         """
-        Update the gait parameters based on the message.
+        Set the gait parameters based on the message.
 
-        :param gait_parameters: The parameters to update to.
+        :param gait_parameters: The parameters to set.
         """
         if self.dimensions == InterpolationDimensions.ONE_DIM:
             self.parameters = [gait_parameters.first_parameter]
