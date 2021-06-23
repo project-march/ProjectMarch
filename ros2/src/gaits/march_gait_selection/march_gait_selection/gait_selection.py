@@ -387,7 +387,7 @@ class GaitSelection(Node):
             with open(gait_path, "r") as gait_file:
                 gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
             gait = RealsenseGait.from_yaml(
-                node=self,
+                gait_selection=self,
                 robot=self._robot,
                 gait_name=gait_name,
                 gait_config=self._realsense_gait_version_map[gait_name],
