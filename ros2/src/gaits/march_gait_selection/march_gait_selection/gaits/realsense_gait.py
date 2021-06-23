@@ -33,9 +33,9 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.gait_selection import GaitSelection
 
 
-class RealSenseGait(SetpointsGait):
+class RealsenseGait(SetpointsGait):
     """
-    The RealSenseGait class is used for creating gaits based on the parameters given
+    The RealsenseGait class is used for creating gaits based on the parameters given
     by the realsense reader. It is based on the setpoints gait, and it uses the
     interpolation over 1 or 2 dimensions with 2 or 4 subgaits respectively.
     """
@@ -71,7 +71,7 @@ class RealSenseGait(SetpointsGait):
         dependent_on: List[str],
         responsible_for: List[str],
     ):
-        super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
+        super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
         self._gait_selection = gait_selection
         self.parameters = parameters
         self.dimensions = dimensions
@@ -136,7 +136,7 @@ class RealSenseGait(SetpointsGait):
         :param gait_config: The yaml node with the needed configurations.
         :param gait_graph: The graph from the .gait file with the subgait transitions.
         :param gait_directory: The gait_directory that is being used.
-        :return: The constructed RealSenseGait
+        :return: The constructed RealsenseGait
         """
         graph = SubgaitGraph(gait_graph)
         subgaits_to_interpolate = {}
@@ -372,8 +372,8 @@ class RealSenseGait(SetpointsGait):
         if self.responsible_for is not None:
             for gait_name in self.responsible_for:
                 gait = self._gait_selection.gaits[gait_name]
-                if isinstance(gait, RealsenseGait) gait
-                gait.update_parameters
+                if isinstance(gait, RealsenseGait):
+                    gait.update_parameters
 
     def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """

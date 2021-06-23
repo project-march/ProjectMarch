@@ -29,7 +29,7 @@ from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_gait_selection.gaits.realsense_gait import RealSenseGait
+from march_gait_selection.gaits.realsense_gait import RealsenseGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
@@ -386,7 +386,7 @@ class GaitSelection(Node):
             )
             with open(gait_path, "r") as gait_file:
                 gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
-            gait = RealSenseGait.from_yaml(
+            gait = RealsenseGait.from_yaml(
                 node=self,
                 robot=self._robot,
                 gait_name=gait_name,
