@@ -7,7 +7,7 @@ from rclpy.node import Node
 from march_shared_msgs.msg import CurrentGait
 
 
-class CheckGaitStatus(object):
+class CheckGaitStatus:
     """Base class to diagnose the gait status."""
 
     def __init__(self, node: Node, updater: Updater):

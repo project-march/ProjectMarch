@@ -1,45 +1,37 @@
 #ifndef MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 #define MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 
+#include <acado_auxiliary_functions.h>
 #include <iostream>
 #include <vector>
-#include <acado_auxiliary_functions.h>
 
 using namespace std;
 
 class ModelPredictiveController {
 
 public:
-    ModelPredictiveController(std::vector<std::vector<float>> Q);
+    explicit ModelPredictiveController(std::vector<float> W);
 
-    // Public variables
-    vector<double> x0{0,0};             // Current state
-    double u;                           // Calculated control input
-    vector<vector<double>> reference;   // Current reference
-    bool repeat_reference = true;       // Periodically Repeat the reference
-    std::string joint_name;
-    double cost;                        // Objective value
+    /**
+     * Controller variables
+     */
 
-    // Error enums
-    enum Error {
+    std::vector<double> command; // calculated input
 
-        // acado_preparationStep() errors
-        PREP_INTERNAL_ERROR = 1,
-
-        // acado_feedbackStep() errors
-        QP_ITERATION_LIMIT_REACHED = 1,
-        QP_INTERNAL_ERROR = -1,
-        QP_INFEASIBLE = -2,
-        QP_UNBOUNDED = -3
-    };
+    /**
+     * Diagnostic variables
+     */
 
     // Timing variables
-    acado_timer t;
-    double t_preparation, t_feedback;
+    acado_timer t {};
+    double t_preparation {}, t_feedback {};
 
-    // status variables
-    int preparationStepStatus;
-    int feedbackStepStatus;
+    // Status variables
+    int preparationStepStatus {};
+    int feedbackStepStatus {};
+
+    // Performance variables
+    double cost {}; // Objective value
 
     /**
      * \brief Initialise the model predictive controller
@@ -47,22 +39,28 @@ public:
     void init();
 
     /**
-    * \brief Set the initial state
-    * @param x0 - initial state
-    */
-    void setInitialState(vector<double> x0);
+     * \brief Set the initial state
+     * @param x0 - initial state
+     */
+    void setInitialState(std::vector<double>& x0);
 
     /**
-     * \brief Set the reference
+     * \brief Set the reference for nodes 0 to N-1
      * @param reference
      */
-    void setReference(vector<vector<double>> reference);
+    void setRunningReference(const std::vector<double>& reference);
 
     /**
-     * \brief Assign the weighting matrix values
-     * @param Q - weighting matrix
+     * \brief Set the reference for node N
+     * @param end_reference
      */
-    void assignWeightingMatrix(std::vector<std::vector<float>> Q);
+    void setEndReference(const std::vector<double>& end_reference);
+
+    /**
+     * \brief Assign the weighting array values
+     * @param W - weighting array
+     */
+    void assignWeightingMatrix(std::vector<float> W);
 
     /**
      * \brief Check status codes and other
@@ -73,14 +71,14 @@ public:
     /**
      * \brief Calculate the control input
      */
-    void calculateControlInput();
+    std::vector<double> calculateControlInput();
     /**
      * \brief Shift the state and control acadoVariables
      */
     void shiftStatesAndControl();
 
 private:
-    std::vector<std::vector<float>> Q_;
+    std::vector<float> W_;
 };
 
 #endif

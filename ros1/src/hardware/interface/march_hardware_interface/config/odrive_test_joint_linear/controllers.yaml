@@ -10,14 +10,26 @@ march:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
     trajectory:
-      type: effort_controllers/JointTrajectoryController
-      # When you switch to effort actuationmode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
+#      type: effort_controllers/JointTrajectoryController
+#      # When you switch to effort actuation-mode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
+      type: model_predictive_trajectory_controller/JointTrajectoryController
+      N: 10
       joints:
         - linear_joint
 
-      gains: # Required because we're controlling an effort interface
-        linear_joint: {p: 120, i: 0, d: -5, i_clamp: 10, publish_state: true, antiwindup: true}
-      # Note: these gains are tuned for the KFE joints in the exoskeleton
+#      gains: # Required because we're controlling an effort interface
+#        linear_joint: {p: 120, i: 0, d: -5, i_clamp: 10, publish_state: true, antiwindup: true}
+#      # Note: these gains are tuned for the KFE joints in the exoskeleton
+
+      # Controller tuning parameters
+      # Q and R are the weights on the states and inputs of the system respectively
+      # The parameters represent the values on the diagonal of the MPC weighting matrix
+      # Both parameters are required for each joint
+      weights:
+        linear_joint:
+          Q: [ 10.0, 1.0 ]
+          R: [ 1.0 ]
+
 
       constraints:
         linear_joint:

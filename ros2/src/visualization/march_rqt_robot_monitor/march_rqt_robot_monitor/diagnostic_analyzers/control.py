@@ -13,7 +13,7 @@ from urdf_parser_py import urdf
 WARN_PERCENTAGE = 5
 
 
-class CheckJointValues(object):
+class CheckJointValues:
     """Base class to diagnose the joint movement values."""
 
     def __init__(self, node: Node, topic: str, msg_type: type):

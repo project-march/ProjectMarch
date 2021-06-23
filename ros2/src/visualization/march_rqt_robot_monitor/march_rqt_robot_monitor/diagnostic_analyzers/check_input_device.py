@@ -6,7 +6,7 @@ from rclpy.node import Node
 from march_shared_msgs.msg import Alive
 
 
-class CheckInputDevice(object):
+class CheckInputDevice:
     """Base class to diagnose whether the input devices are connected properly."""
 
     def __init__(
