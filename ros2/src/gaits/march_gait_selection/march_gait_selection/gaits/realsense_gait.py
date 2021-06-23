@@ -142,11 +142,11 @@ class RealsenseGait(SetpointsGait):
             dimensions = InterpolationDimensions.from_integer(gait_config["dimensions"])
             try:
                 dependent_on = gait_config["dependent_on"]
-            except KeyError as e:
+            except KeyError:
                 dependent_on = None
             try:
                 responsible_for = gait_config["responsible_for"]
-            except KeyError as e:
+            except KeyError:
                 responsible_for = None
 
             # Only set default parameters if the gait is not dependant on any other.
