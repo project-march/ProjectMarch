@@ -40,6 +40,7 @@
       changes:
         - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
+        - "requirements.pip"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
@@ -48,6 +49,7 @@
       changes:
         - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
+        - "requirements.pip"
       variables:
          TAG: $CI_COMMIT_BRANCH
   extends:
