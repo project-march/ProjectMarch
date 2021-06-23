@@ -342,7 +342,9 @@ class RealSenseGait(SetpointsGait):
             frame_id_to_transform_to="foot_right"
         )
         if not service_call_succesful:
-            self._gait_selection.get_logger().warn("No service response received within timeout")
+            self._gait_selection.get_logger().warn(
+                "No service response received within timeout"
+            )
             return False
 
         gait_parameters_response = self.realsense_service_result
