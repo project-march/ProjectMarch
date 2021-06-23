@@ -62,6 +62,8 @@ namespace error {
     template <typename T>
     std::string parseError(T error, ErrorRegister error_register)
     {
+        // TODO: constraint template types
+        // https://gitlab.com/project-march/march/-/issues/982
         if (error == 0) {
             return "None. ";
         } else {

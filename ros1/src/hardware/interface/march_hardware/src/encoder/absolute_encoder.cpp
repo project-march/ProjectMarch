@@ -21,10 +21,12 @@ AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
     lower_soft_limit_iu_ = positionRadiansToIU(lower_soft_limit_rad);
     upper_soft_limit_iu_ = positionRadiansToIU(upper_soft_limit_rad);
 
-    // Temporarilty skip RoM for ODrive
-    //    if (motor_controller_type != MotorControllerType::ODrive) {
-    checkRangeOfMotion(lower_limit_rad, upper_limit_rad);
-    //    }
+
+    // TODO: Don't skip RoM check for ODrive
+    // https://gitlab.com/project-march/march/-/issues/982
+    if (motor_controller_type != MotorControllerType::ODrive) {
+        checkRangeOfMotion(lower_limit_rad, upper_limit_rad);
+    }
 }
 
 AbsoluteEncoder::AbsoluteEncoder(size_t resolution,

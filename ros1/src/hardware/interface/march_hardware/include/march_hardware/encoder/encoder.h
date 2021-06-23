@@ -77,6 +77,9 @@ private:
     static size_t calculateTotalPositions(size_t resolution);
 
     size_t total_positions_ = 0;
+
+    // TODO: Remove MotorControllerType from Encoder
+    // https://gitlab.com/project-march/march/-/issues/982
     MotorControllerType motor_controller_type_;
 
     // Not used in calculations, only when reading values
