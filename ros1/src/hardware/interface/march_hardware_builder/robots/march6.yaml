@@ -32,10 +32,10 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 5
           axis: 1
           motorKV: 355
-          indexFound: true
+          # indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: -1
@@ -51,7 +51,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 5
           axis: 0
           motorKV: 95
           # indexFound: true
@@ -111,7 +111,7 @@ march6:
           slaveIndex: 2
           axis: 1
           motorKV: 355
-          indexFound: true
+          # indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
