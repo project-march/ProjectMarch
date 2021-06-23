@@ -74,6 +74,7 @@ class RealsenseGait(SetpointsGait):
         super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
         self._gait_selection = gait_selection
         self.parameters = parameters
+        self._parameters_updated = False
         self.dimensions = dimensions
         self.realsense_category = self.realsense_category_from_string(
             realsense_category
@@ -152,18 +153,7 @@ class RealsenseGait(SetpointsGait):
             except KeyError:
                 responsible_for = None
 
-            # Only set default parameters if the gait is not dependant on any other.
-            if dependent_on is None:
-                parameters = [
-                    float(param) for param in gait_config["default_parameters"]
-                ]
-                if len(parameters) != amount_of_parameters(dimensions):
-                    raise WrongRealSenseConfigurationError(
-                        f"The amount of parameters in the config file ({len(parameters)}), "
-                        f"doesn't match the dimensions"
-                    )
-            else:
-                parameters = None
+            parameters = [0.0 for _ in range(amount_of_parameters(dimensions))]
 
             realsense_category = gait_config["realsense_category"]
             camera_to_use = gait_config["camera_to_use"]
@@ -313,7 +303,7 @@ class RealsenseGait(SetpointsGait):
             if not realsense_update_successful:
                 return GaitUpdate.empty()
         else:
-            if self.parameters is not None:
+            if self._parameters_updated:
                 interpolation_successful = self.interpolate_subgaits_from_parameters()
                 if not interpolation_successful:
                     return GaitUpdate.empty()
@@ -452,6 +442,7 @@ class RealsenseGait(SetpointsGait):
             ]
         else:
             raise UnknownDimensionsError(self.dimensions)
+        self._parameters_updated = True
 
     def set_edge_positions(
         self, starting_position: EdgePosition, final_position: EdgePosition

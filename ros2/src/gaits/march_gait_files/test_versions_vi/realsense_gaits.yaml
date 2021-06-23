@@ -9,9 +9,6 @@ realsense_stairs_up_single_step:
   starting_position: static
   final_position: static
   dimensions: 2
-  default_parameters:
-  - 0.5
-  - 0.5
   subgaits:
     right_open:
       - MVI_stairsup_rightopen_low_undeep
@@ -29,9 +26,6 @@ realsense_stairs_up:
   starting_position: static
   final_position: static
   dimensions: 2
-  default_parameters:
-  - 1.0
-  - 1.0
   subgaits:
     right_open:
       - MVI_stairsup_rightopen_low_undeep
@@ -67,8 +61,6 @@ realsense_sit:
   dimensions: 1
   responsible_for:
     - realsense_stand
-  default_parameters:
-    - 0.5
   subgaits:
     sit_down:
     - MVI_sit_down_low_v1
