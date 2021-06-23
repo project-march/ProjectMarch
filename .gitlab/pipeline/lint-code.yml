@@ -44,9 +44,6 @@ flake8:
       variables:
         TAG: $CI_COMMIT_BRANCH
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
-      changes:
-        - ".flake8"
-        - "**/*.py"
       variables:
         TAG: $CI_DEFAULT_BRANCH
 
