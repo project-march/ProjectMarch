@@ -201,6 +201,10 @@ protected:
     float max_x_stairs {};
     float min_z_stairs {};
     float max_z_stairs {};
+    float min_x_stairs_world {};
+    float max_x_stairs_world {};
+    float min_z_stairs_world {};
+    float max_z_stairs_world {};
     float y_location {};
     float foot_length_back {};
     float foot_length_front {};
