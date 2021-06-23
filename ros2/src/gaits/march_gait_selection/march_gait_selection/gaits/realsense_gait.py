@@ -133,6 +133,7 @@ class RealsenseGait(SetpointsGait):
         :param gait_config: The yaml node with the needed configurations.
         :param gait_graph: The graph from the .gait file with the subgait transitions.
         :param gait_directory: The gait_directory that is being used.
+        :param process_service: The service from which to get the gait parameters
         :return: The constructed RealsenseGait
         """
         graph = SubgaitGraph(gait_graph)
