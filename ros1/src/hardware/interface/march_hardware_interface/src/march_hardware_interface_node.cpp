@@ -10,7 +10,8 @@
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
 
-std::unique_ptr<march::MarchRobot> build(AllowedRobot robot);
+std::unique_ptr<march::MarchRobot> build(
+    AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train);
 
 int main(int argc, char** argv)
 {
@@ -27,10 +28,21 @@ int main(int argc, char** argv)
     ROS_INFO_STREAM("Selected robot: " << selected_robot);
 
     bool reset_imc = ros::param::param<bool>("~reset_imc", false);
+    bool remove_fixed_joints_from_ethercat_train;
+    if (ros::param::has("~remove_fixed_joints_from_ethercat_train")) {
+        ros::param::get("~remove_fixed_joints_from_ethercat_train",
+            remove_fixed_joints_from_ethercat_train);
+    } else {
+        ROS_FATAL("Required parameter remove_fixed_joints_from_ethercat_train"
+                  " was not set.");
+        std::exit(/*__status=*/1);
+    }
 
     spinner.start();
 
-    MarchHardwareInterface march(build(selected_robot), reset_imc);
+    MarchHardwareInterface march(
+        build(selected_robot, remove_fixed_joints_from_ethercat_train),
+        reset_imc);
 
     try {
         bool success = march.init(nh, nh);
@@ -68,9 +80,10 @@ int main(int argc, char** argv)
     return 0;
 }
 
-std::unique_ptr<march::MarchRobot> build(AllowedRobot robot)
+std::unique_ptr<march::MarchRobot> build(
+    AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train)
 {
-    HardwareBuilder builder(robot);
+    HardwareBuilder builder(robot, remove_fixed_joints_from_ethercat_train);
     try {
         return builder.createMarchRobot();
     } catch (const std::exception& e) {

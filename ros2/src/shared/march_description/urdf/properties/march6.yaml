@@ -71,31 +71,55 @@ inertia:
     yz: -0.00168033
     zz: 0.00630322
 joint_limits:  # TODO
-  # The upper and lower limits of the joints, given in degrees
+  # The upper and lower limits of the joints
   left_knee:
-    lower_limit: -5.012512207
-    upper_limit: 112.4230957
+    unit: iu
+    lower_limit: 617728
+    upper_limit: 939388
+    zero_position: 629250
+    resolution: 20
   right_knee:
-    lower_limit: -4.89440918
-    upper_limit: 115.3097534
+    unit: iu
+    lower_limit: 271431
+    upper_limit: 621197
+    zero_position: 285839
+    resolution: 20
   left_hfe:
-    lower_limit: -21.04431152
-    upper_limit: 98.97033691
+    unit: iu
+    lower_limit: 213943
+    upper_limit: 579571
+    zero_position: 293632
+    resolution: 20
   right_hfe:
-    lower_limit: -20.23406982
-    upper_limit: 99.48120117
+    unit: iu
+    lower_limit: 559641
+    upper_limit: 925326
+    zero_position: 632992
+    resolution: 20
   left_ankle:
-    lower_limit: -26.30401611
-    upper_limit: 15.88348389
+    unit: iu
+    lower_limit: 9023
+    upper_limit: 10842
+    zero_position: 10169
+    resolution: 14
   right_ankle:
-    lower_limit: -23.203125
-    upper_limit: 14.23828125
+    unit: iu
+    lower_limit: 12551
+    upper_limit: 14446
+    zero_position: 13754
+    resolution: 14
   left_haa:
-    lower_limit: -18.54492188
-    upper_limit: 16.34765625
+    unit: iu
+    lower_limit: 4782
+    upper_limit: 5665
+    zero_position: 5307
+    resolution: 14
   right_haa:
-    lower_limit: -18.10546875
-    upper_limit: 15.99609375
+    unit: iu
+    lower_limit: 3429
+    upper_limit: 4285
+    zero_position: 3837
+    resolution: 14
 safety:  # This is still copied from MV
   exoskeleton:
     knee:

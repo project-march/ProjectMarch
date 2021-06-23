@@ -2,7 +2,7 @@ import os
 import unittest
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
-from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
+from march_gait_selection.gaits.transition_subgait import TransitionSubgait
 from march_utility.gait.subgait import Subgait
 
 VALID_PACKAGE = "march_gait_selection"
