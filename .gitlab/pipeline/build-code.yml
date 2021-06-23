@@ -29,6 +29,8 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: always
+      variables:
+        TAG: $CI_COMMIT_REF_NAME
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - $DOCKER_FILE
