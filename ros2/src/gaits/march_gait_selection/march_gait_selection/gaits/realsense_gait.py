@@ -308,7 +308,7 @@ class RealSenseGait(SetpointsGait):
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
-    def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
+    def make_realsense_service_call(self) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
