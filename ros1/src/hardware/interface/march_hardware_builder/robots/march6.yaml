@@ -16,7 +16,7 @@ march6:
           slaveIndex: 1
           axis: 0
           motorKV: 355
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -32,10 +32,10 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 5
+          slaveIndex: 4
           axis: 1
           motorKV: 355
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: -1
@@ -51,10 +51,10 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 5
+          slaveIndex: 4
           axis: 0
           motorKV: 95
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
@@ -73,7 +73,7 @@ march6:
           slaveIndex: 1
           axis: 1
           motorKV: 95
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
@@ -92,7 +92,7 @@ march6:
           slaveIndex: 3
           axis: 0
           motorKV: 355
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -111,7 +111,7 @@ march6:
           slaveIndex: 2
           axis: 1
           motorKV: 355
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -130,7 +130,7 @@ march6:
           slaveIndex: 2
           axis: 0
           motorKV: 95
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
@@ -150,7 +150,7 @@ march6:
           axis: 1
           preCalibrated: false
           motorKV: 95
-          # indexFound: true
+          indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
