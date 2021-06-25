@@ -42,12 +42,14 @@ Sphinx build:
 ################
 Sphinx HTML proofer:
   stage: Test documentation
-  image: klakegg/html-proofer
+  image:
+    name: "klakegg/html-proofer"
+    entrypoint: [""]
   needs:
     - job: "Sphinx build"
       artifacts: true
   script:
-    - "docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/search.html --hydra_config '{\"max_concurrency\": 3}' --url-ignore '#'"
+    - "html-proofer docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/search.html --hydra_config '{\"max_concurrency\": 3}' --url-ignore '#'"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
