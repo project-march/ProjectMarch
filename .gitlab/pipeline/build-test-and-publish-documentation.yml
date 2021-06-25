@@ -70,10 +70,9 @@ Publish Sphinx on GitLab Pages:
     - cd docs
   script:
     - echo 'Publishing pages...'
-    - cp -R build/ public/
   artifacts:
     paths:
-      - public
+      - docs/build/
   rules:
     # TODO, only make this for main
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
