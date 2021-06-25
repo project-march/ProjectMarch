@@ -114,3 +114,10 @@ clang_format container build:
     DOCKER_FILE: ".gitlab/dockerfiles/clang_format"
   extends:
     - .ci_tool_container_builder
+
+sphinx container build:
+  variables:
+    TOOL_NAME: "sphinx"
+    DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
+  extends:
+    - .ci_tool_container_builder
