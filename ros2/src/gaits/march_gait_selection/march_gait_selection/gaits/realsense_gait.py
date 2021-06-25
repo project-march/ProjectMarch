@@ -5,6 +5,7 @@ from typing import Optional, List, Dict, TYPE_CHECKING
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
+
 if TYPE_CHECKING:
     from march_gait_selection.gait_selection import GaitSelection
 from march_shared_msgs.msg import GaitParameters
@@ -336,10 +337,9 @@ class RealsenseGait(SetpointsGait):
             )
             return False
 
-        self._gait_selection.get_logger().info("Parameter call made")
-
         return self.update_gaits_from_realsense_call(
-            gait_parameters_response.gait_parameters)
+            gait_parameters_response.gait_parameters
+        )
 
     def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> Bool:
         """
@@ -354,12 +354,10 @@ class RealsenseGait(SetpointsGait):
         if self._responsible_for is not None:
             for gait_name in self._responsible_for:
                 gait = self._gait_selection.gaits[gait_name]
+                # Make a recursive call to also handle the dependencies of the
+                # dependent gait
                 if isinstance(gait, RealsenseGait):
-                    gait.set_parameters(gait_parameters)
-                    success &= gait.interpolate_subgaits_from_parameters()
-                    self._gait_selection.get_logger().info(f"Set the parameter of gait "
-                                                           f"{gait.name} and interpolate "
-                                                           f"the subgaits")
+                    gait.update_gaits_from_realsense_call(gait_parameters)
         return success
 
     def make_realsense_service_call(self) -> bool:
@@ -407,10 +405,12 @@ class RealsenseGait(SetpointsGait):
 
     def interpolate_subgaits_from_parameters(self) -> bool:
         """Change all subgaits to one interpolated from the current parameters."""
-        new_subgaits = {}
-        self._gait_selection.get_logger().info(
-            f"Interpolating gait {self.gait_name} with parameters: {self.parameters}"
+        self._node.get_logger().info(
+            f"Interpolating gait {self.gait_name} with parameters:"
+            f" {self.parameters}"
         )
+
+        new_subgaits = {}
         for subgait_name in self.subgaits.keys():
             new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
                 dimensions=self.dimensions,
