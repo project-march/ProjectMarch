@@ -14,7 +14,7 @@ Sphinx build:
     DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
   artifacts:
     paths:
-      - build/
+      - docs/build/
   needs:
     - job: "sphinx container build"
       optional: true
