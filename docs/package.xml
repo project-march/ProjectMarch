@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>march_tutorials</name>
+  <version>0.1.0</version>
+  <description>The march_tutorials package</description>
+  <license>TODO</license>
+
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+
+  <author email="isha@projectmarch.nl">Isha Dijcks</author>
+  <author email="tim@projectmarch.nl">Tim Buckers</author>
+  <author email="o.dehaas@projectmarch.nl">Olav de Haas</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <doc_depend>rosdoc_lite</doc_depend>
+
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz</exec_depend>
+</package>
