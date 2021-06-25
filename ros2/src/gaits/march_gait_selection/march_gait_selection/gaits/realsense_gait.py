@@ -298,24 +298,14 @@ class RealsenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
-        self._gait_selection.get_logger().info("Starting realsense gait.")
-
         if self._dependent_on is None:
-            self._gait_selection.get_logger().info("gait is not dependent")
             realsense_update_successful = self.get_realsense_update()
             if not realsense_update_successful:
                 return GaitUpdate.empty()
         else:
-            if self._parameters_updated:
-                interpolation_successful = self.interpolate_subgaits_from_parameters()
-                if not interpolation_successful:
-                    return GaitUpdate.empty()
-                else:
-                    self._gait_selection.get_logger().warn(
-                        f"Gait {self.gait_name} is dependent on gait(s) "
-                        f"{self._dependent_on} but its realsense parameters were not set "
-                        f"upon execution"
-                    )
+            interpolation_successful = self.interpolate_subgaits_from_parameters()
+            if not interpolation_successful:
+                return GaitUpdate.empty()
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
@@ -367,9 +357,9 @@ class RealsenseGait(SetpointsGait):
                 if isinstance(gait, RealsenseGait):
                     gait.set_parameters(gait_parameters)
                     success &= gait.interpolate_subgaits_from_parameters()
-                self._gait_selection.get_logger().info(f"Set the parameter of gait "
-                                                       f"{gait.name} and interpolate "
-                                                       f"the subgaits")
+                    self._gait_selection.get_logger().info(f"Set the parameter of gait "
+                                                           f"{gait.name} and interpolate "
+                                                           f"the subgaits")
         return success
 
     def make_realsense_service_call(self) -> bool:
@@ -419,7 +409,7 @@ class RealsenseGait(SetpointsGait):
         """Change all subgaits to one interpolated from the current parameters."""
         new_subgaits = {}
         self._gait_selection.get_logger().info(
-            f"Interpolating with parameters: {self.parameters}"
+            f"Interpolating gait {self.gait_name} with parameters: {self.parameters}"
         )
         for subgait_name in self.subgaits.keys():
             new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
