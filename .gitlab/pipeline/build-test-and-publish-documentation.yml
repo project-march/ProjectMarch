@@ -70,7 +70,7 @@ Publish Sphinx on GitLab Pages:
     - cd docs
   script:
     - echo 'Publishing pages...'
-    - cp -R build/html/ public/
+    - cp -R build/ public/
   artifacts:
     paths:
       - public
