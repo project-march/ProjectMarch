@@ -9,7 +9,7 @@ Requirements
 ------------
 In order to follow the tutorials, we expect you to have at least some knowledge of the following tools:
 
-- `Ubuntu 20.04 <http://releases.ubuntu.com/20.04/>`_
+- `Ubuntu 20.04 <https://releases.ubuntu.com/20.04/>`_
 - Linux command line
 - `Git <https://git-scm.com/>`_
 
@@ -56,7 +56,7 @@ Documentation
 
 Attribution
 -----------
-The structure of this documentation is heavily inspired by that of `MoveIt! <http://docs.ros.org/melodic/api/moveit_tutorials/html/index.html>`_
+The structure of this documentation is heavily inspired by that of `MoveIt! <https://docs.ros.org/melodic/api/moveit_tutorials/html/index.html>`_
 
 
 .. toctree::

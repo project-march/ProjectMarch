@@ -28,7 +28,7 @@ Now all commands in this terminal are executed on the |march| computer.
 
 ROS Master URI
 --------------
-To use ros commands you need to setup the right `ROS_MASTER_URI <http://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
+To use ros commands you need to setup the right `ROS_MASTER_URI <https://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
 
     export ROS_MASTER_URI=http://<exoskeleton_ip>:11311/
 
@@ -40,7 +40,7 @@ Instead of running this command in every terminal you open, you can do this auto
 
 ROS IP
 --------------
-To use ros commands you also need to setup the right `ROS_IP <http://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
+To use ros commands you also need to setup the right `ROS_IP <https://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
 
     export ROS_IP=<your_ip>
 

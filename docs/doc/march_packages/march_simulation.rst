@@ -5,7 +5,7 @@ march_simulation
 
 Overview
 --------
-The march simulation package launches `Gazebo <http://gazebosim.org/>`_ and spawns the :ref:`URDF <robot-model-label>` of the |march|.
+The march simulation package launches `Gazebo <https://gazebosim.org/>`_ and spawns the :ref:`URDF <robot-model-label>` of the |march|.
 Its goal is to provide an interface for our high-level code to call similar to that of the :ref:`march-hardware-interface-label`.
 
 Usage

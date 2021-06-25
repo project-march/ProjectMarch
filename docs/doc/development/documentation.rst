@@ -8,8 +8,8 @@ This tutorial will teach you how to build the documentation locally and contribu
 
 Introduction
 ^^^^^^^^^^^^
-These tutorials are written in `rst <http://docutils.sourceforge.net/rst.html>`_, an easy-to-understand plaintext markup language.
-It is then build by `Sphinx <http://www.sphinx-doc.org/en/master/>`_ using the `rosdoc_lite <http://wiki.ros.org/rosdoc_lite>`_ package.
+These tutorials are written in `rst <https://docutils.sourceforge.io/rst.html>`_, an easy-to-understand plaintext markup language.
+It is then build by `Sphinx <https://www.sphinx-doc.org/en/master/>`_. 
 You can either build the documentation locally when following the tutorials or
 deploy it to `Gitlab pages <https://docs.gitlab.com/ee/user/project/pages/>`_ with the help of the GitLab CI.
 

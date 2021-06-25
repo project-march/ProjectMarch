@@ -89,7 +89,7 @@ For testing ROS packages we make a distinction between two different kinds of te
 Also, see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
 The unit tests are different for C++ and python projects. C++ projects use the
 `gtest <https://github.com/google/googletest>`_ framework, whereas Python projects use
-`unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.
+`unittest <https://pythontesting.net/framework/unittest/unittest-introduction/>`_.
 For node level tests, `rostest <https://wiki.ros.org/rostest>`_ is used.
 Rostest uses launch files to launch the nodes under test and the actual tests.
 See the following tutorials on writing tests using ROS:

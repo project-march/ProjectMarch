@@ -98,7 +98,7 @@ Subscribed Topics
 */march/temperature/\** (sensor_msgs/Temperature)
   Send temperature command to `ESP` for each joint.
 
-Subscribes to the tf frames trough a `tf2 <http://wiki.ros.org/tf2>`_ buffer.
+Subscribes to the tf frames trough a `tf2 <https://wiki.ros.org/tf2>`_ buffer.
 
 Published Topics
 ^^^^^^^^^^^^^^^^
@@ -117,7 +117,7 @@ Published Topics
 */march/pressure_soles* (march_shared_resources/JointValues)
   Send the data from the pressure soles.
 
-Publishes into tf via a `tf2 <http://wiki.ros.org/tf2>`_ broadcaster.
+Publishes into tf via a `tf2 <https://wiki.ros.org/tf2>`_ broadcaster.
 
 Parameters
 ^^^^^^^^^^

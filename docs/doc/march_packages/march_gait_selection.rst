@@ -87,7 +87,7 @@ the one introducing the principle is this `paper <https://ieeexplore-ieee-org.tu
 A capture point is calculated in the :ref:`march-data-collector-label` based on the inverted pendulum model and the movement of the center of mass.
 We use the motion planning framework MoveIt to calculate a trajectory for the swing leg towards this point. For the stance leg, the regular
 gait file is used to determine the endpoint and MoveIt is then used to calculate a trajectory towards this point.
-The balance gait class then uses the `python moveIt commander Interface <http://docs.ros.org/jade/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html>`_ to plan. More information on MoveIt and
+The balance gait class then uses the `python moveIt commander Interface <https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html>`_ to plan. More information on MoveIt and
 the integration can be found at :ref:`march-moveit-label`.
 
 .. note:: Improved versions of the balance walk gait are continuously researched and developed.
@@ -115,16 +115,16 @@ Published Topics
 
 Services
 ^^^^^^^^
-*/march/gait_selection/get_version_map* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
+*/march/gait_selection/get_version_map* (`std_srvs/srv/Trigger <https://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Returns the current loaded gait version map.
 
 */march/gait_selection/set_gait_version* (:march:`march_shared_resources/srv/SetGaitVersion <march_shared_resources/srv/SetGaitVersion.srv>`)
   Sets a new gait version map in the gait_selection.
 
-*/march/gait_selection/get_directory_structure* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
+*/march/gait_selection/get_directory_structure* (`std_srvs/srv/Trigger <https://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Returns the directory structure of the gait_files repository.
 
-*/march/gait_selection/update_default_versions* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
+*/march/gait_selection/update_default_versions* (`std_srvs/srv/Trigger <https://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Calls the update_default_versions function of the gait_selection.
 
 */march/gait_selection/contains_gait* (:march:`march_shared_resources/srv/ContainsGait <march_shared_resources/srv/ContainsGait.srv>`)

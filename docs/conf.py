@@ -80,7 +80,7 @@ extlinks = {'codedir': (gitlab_root + 'march/tree/' + html_context['gitlab_versi
             'gait-files': (gitlab_root + ros1_src + 'march_gait_files/%s', ''),
             'ethercat-slaves': (gitlab_root + 'ethercat-slaves/-/tree/main/%s', ''),
             'gait-generation': (gitlab_root + ros1_src + 'march_rqt_gait_generator/%s', ''),
-            'march_website': ('http://projectmarch.nl', '')}
+            'march_website': ('httpps://projectmarch.nl', '')}
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'MarchDocumentation'

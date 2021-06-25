@@ -5,11 +5,11 @@ How to view live data
 
 Introduction
 ^^^^^^^^^^^^
-This tutorial will teach you how to use the `rqt_multiplot <http://wiki.ros.org/rqt_multiplot>`_ tool to visualize ros data during run-time
+This tutorial will teach you how to use the `rqt_multiplot <https://wiki.ros.org/rqt_multiplot>`_ tool to visualize ros data during run-time
 
 rqt_multiplot
 ^^^^^^^^^^^^^
-`rqt_multiplot <http://wiki.ros.org/rqt_multiplot>`_ is an advanced version of `rqt_plot <http://wiki.ros.org/rqt_plot>`_
+`rqt_multiplot <https://wiki.ros.org/rqt_multiplot>`_ is an advanced version of `rqt_plot <https://wiki.ros.org/rqt_plot>`_
 which allows the user to easily create many plots with different topics.
 
 Please see the documentation linked above as it covers everything you need to know to use it.

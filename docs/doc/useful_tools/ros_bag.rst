@@ -4,12 +4,12 @@ ROS bag
 =======
 
 .. note ::
-  The official documentation for `rosbag <http://wiki.ros.org/rosbag>`_ and `rqt_bag <http://wiki.ros.org/rqt_bag>`_
+  The official documentation for `rosbag <https://wiki.ros.org/rosbag>`_ and `rqt_bag <https://wiki.ros.org/rqt_bag>`_
   are quite comprehensive. Please refer to them if you have any questions.
 
-`rosbag <http://wiki.ros.org/rosbag>`_ is an excellent tool which allows you to record any topics you want during runtime.
+`rosbag <https://wiki.ros.org/rosbag>`_ is an excellent tool which allows you to record any topics you want during runtime.
 The recorded topics are saved to a bagfile. These bags can be easily inspected with a rqt_plugin called
-`rqt_bag <http://wiki.ros.org/rqt_bag>`_ to plot the data.
+`rqt_bag <https://wiki.ros.org/rqt_bag>`_ to plot the data.
 
 .. figure:: images/example_ros_bag.png
    :align: center

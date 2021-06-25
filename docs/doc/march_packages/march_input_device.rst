@@ -12,7 +12,7 @@ to give input to the software running on the |march|. See the
 
 ROS API
 -------------
-The communication between the input device and the |march| is done with `rosserial <http://wiki.ros.org/rosserial>`_.
+The communication between the input device and the |march| is done with `rosserial <https://wiki.ros.org/rosserial>`_.
 This can be run wired via usb cable or wireless via wifi connection.
 
 Published Topics
@@ -20,7 +20,7 @@ Published Topics
 */march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
   Sends instructions to execute
 
-*/march/input_device/alive* (`std_msgs/Time <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
+*/march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
   Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
 
 Subscribed Topics

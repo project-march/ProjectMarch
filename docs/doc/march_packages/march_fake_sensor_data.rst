@@ -4,7 +4,7 @@ march_fake_sensor_data
 ======================
 The march_fake_sensor_data publishes fake sensor data to simulate real sensors when running a simulation of the exoskeleton.
 
-See `this tutorial <http://wiki.ros.org/dynamic_reconfigure/Tutorials/HowToWriteYourFirstCfgFile>`_
+See `this tutorial <https://wiki.ros.org/dynamic_reconfigure/Tutorials/HowToWriteYourFirstCfgFile>`_
 to implement dynamically reconfigurable parameters.
 
 Implemented sensors

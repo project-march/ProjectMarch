@@ -8,7 +8,7 @@ https://docs.projectmarch.nl
 
 Welcome to the primary documentation for the March exoskeleton.
 
-These tutorials use the [reStructuredText](http://www.sphinx-doc.org/en/stable/rest.html)
+These tutorials use the [reStructuredText](https://www.sphinx-doc.org/en/stable/rest.html)
 format commonly used in the Sphinx "Python Documentation Generator". This
 unfortunately differs from the common Markdown format, but its advantage is that
 it supports embedding code directly from source files for inline code tutorials.

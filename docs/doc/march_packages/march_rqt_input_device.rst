@@ -41,7 +41,7 @@ Nodes
 Published Topics
 ^^^^^^^^^^^^^^^^
 
-*/march/input_device/alive* (`std_msgs/Time <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
+*/march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
   Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
 
 */march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
