@@ -2,7 +2,7 @@
 
 import diagnostic_updater
 import rclpy
-from march_utility.utilities.node_utils import get_joint_names
+from march_utility.utilities.node_utils import get_joint_names_from_service
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
@@ -28,7 +28,7 @@ class DiagnosticUpdater(Node):
         self.updater = diagnostic_updater.Updater(node=self, period=PERIOD)
         self.updater.setHardwareID(HARDWARE_ID)
 
-        joint_names = get_joint_names(self)
+        joint_names = get_joint_names_from_service(self)
 
         # Frequency checks
         CheckInputDevice(self, "/march/input_device/alive", Alive, self.updater, 4)
