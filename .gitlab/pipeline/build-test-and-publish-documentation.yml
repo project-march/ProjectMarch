@@ -52,7 +52,7 @@ Sphinx HTML proofer:
   before_script:
     - cd docs/build
   script:
-    - htmlproofer . --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore html/genindex.html,html/search.html,html/index-msg.html
+    - htmlproofer . --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore ./search.html --hydra_config '{"max_concurrency": 3}' --url-ignore '#'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
