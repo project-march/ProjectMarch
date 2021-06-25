@@ -303,10 +303,8 @@ class RealsenseGait(SetpointsGait):
             realsense_update_successful = self.get_realsense_update()
             if not realsense_update_successful:
                 return GaitUpdate.empty()
-        else:
-            interpolation_successful = self.interpolate_subgaits_from_parameters()
-            if not interpolation_successful:
-                return GaitUpdate.empty()
+        # If a gait is dependent on some other gait its subgaits are already
+        # interpolated from parameters so we can skip the realsense call
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
@@ -405,7 +403,7 @@ class RealsenseGait(SetpointsGait):
 
     def interpolate_subgaits_from_parameters(self) -> bool:
         """Change all subgaits to one interpolated from the current parameters."""
-        self._node.get_logger().info(
+        self._gait_selection.get_logger().info(
             f"Interpolating gait {self.gait_name} with parameters:"
             f" {self.parameters}"
         )
