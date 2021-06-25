@@ -2,10 +2,11 @@ import os
 
 # Retrieve branch name
 if os.getenv('CI'):
-    branch_name = os.environ['CI_COMMIT_BRANCH']
+    branch_name = os.environ['TAG']
 else:
-    import pygit2
-    branch_name = pygit2.Repository('.').head.shorthand
+    import subprocess
+    command = subprocess.run(['git', 'branch', '--show-current'], capture_output=True)
+    branch_name = str(command.stdout, 'utf-8').strip()
 
 extensions = ['sphinx.ext.extlinks',
               'sphinx.ext.todo',
