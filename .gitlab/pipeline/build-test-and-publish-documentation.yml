@@ -55,7 +55,7 @@ Sphinx HTML proofer:
 #########
 # Pages #
 #########
-Sphinx HTML proofer:
+Publish Sphinx on GitLab Pages:
   stage: Publish documentation
   # The "$TAG" variable is set by the rules below
   image: klakegg/html-proofer
