@@ -17,8 +17,8 @@ todo_include_todos = True
 # The master toctree document.
 master_doc = 'index'
 
-project = 'Project March'
-copyright = '2020, Project March'
+project = 'Project MARCH'
+copyright = '2021, Project MARCH'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -43,7 +43,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['static']
 
 html_last_updated_fmt = '%b %d, %Y'
 html_show_copyright = True
@@ -51,18 +51,18 @@ html_show_copyright = True
 html_context = {
     'display_gitlab': True,
     'gitlab_user': 'project-march',
-    'gitlab_repo': 'tutorials',
+    'gitlab_repo': 'march',
     'gitlab_version': branch_name,
     'gitlab_url': 'https://gitlab.com/',
-    "conf_py_path": "/",
-    "css_files": ['_static/css/override.css'],
+    "conf_py_path": "/docs",
+    "css_files": ['static/css/override.css'],
     "favicon": "favicon.ico",
     "logo": "logo.png"
 }
 
 # Global substitutions
 rst_prolog = """
-.. |march| replace:: March exoskeleton
+.. |march| replace:: MARCH exoskeleton
 """
 
 gitlab_root = html_context['gitlab_url'] + html_context['gitlab_user'] + '/'
