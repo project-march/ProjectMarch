@@ -47,8 +47,6 @@ Sphinx HTML proofer:
   needs:
     - job: "Sphinx build"
       artifacts: true
-  before_script:
-    - cd docs
   script:
     - docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/html/genindex.html,docs/build/html/search.html,docs/build/html/index-msg.html
   rules:
