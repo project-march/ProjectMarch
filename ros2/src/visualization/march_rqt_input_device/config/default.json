@@ -13,7 +13,13 @@
          "name": "home_sit_with_haa"
       },
       {
+         "name": "home_5_dorsi_stand"
+      },
+      {
          "name": "home_dorsi_stand"
+      },
+      {
+         "name": "home_max_dorsi_stand"
       },
       {
          "name":"walk"
