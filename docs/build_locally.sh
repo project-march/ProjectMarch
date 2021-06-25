@@ -10,7 +10,7 @@ rm -rf build
 sphinx-build -W -b html . build
 
 # Validate if the HTML is valid (i.e. no missing links, images, etc.)
-htmlproofer ./build --only-4xx --http-status-ignore 429 --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#'
+htmlproofer build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --file-ignore docs/build/html/genindex.html,docs/build/html/search.html,docs/build/html/index-msg.html
 
 # Run
 xdg-open ./build/html/index.html
