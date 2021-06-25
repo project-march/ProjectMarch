@@ -14,7 +14,7 @@ Sphinx build:
     DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
   artifacts:
     paths:
-      - build
+      - build/
   needs:
     - job: "sphinx container build"
       optional: true
@@ -57,7 +57,6 @@ Sphinx HTML proofer:
 #########
 Publish Sphinx on GitLab Pages:
   stage: Publish documentation
-  # The "$TAG" variable is set by the rules below
   image: klakegg/html-proofer
   needs:
     - job: "Sphinx build"
