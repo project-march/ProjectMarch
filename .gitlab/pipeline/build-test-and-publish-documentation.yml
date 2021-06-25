@@ -1,5 +1,5 @@
 ###############
-# sphinx test #
+# Sphinx build #
 ###############
 # Build the documentation and checks it for warnings and errors.
 Sphinx build:
@@ -41,7 +41,7 @@ Sphinx build:
 # HTML proofer #
 ################
 Sphinx HTML proofer:
-  stage: Build documentation
+  stage: Test documentation
   # The "$TAG" variable is set by the rules below
   image: klakegg/html-proofer
   needs:
@@ -56,7 +56,7 @@ Sphinx HTML proofer:
 # Pages #
 #########
 Sphinx HTML proofer:
-  stage: Build documentation
+  stage: Publish documentation
   # The "$TAG" variable is set by the rules below
   image: klakegg/html-proofer
   needs:
