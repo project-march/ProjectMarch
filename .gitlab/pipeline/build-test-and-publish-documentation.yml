@@ -43,12 +43,16 @@ Sphinx build:
 Sphinx HTML proofer:
   stage: Test documentation
   # The "$TAG" variable is set by the rules below
-  image: klakegg/html-proofer
+  image:
+    name: klakegg/html-proofer
+    entrypoint: ["/bin/sh"]
   needs:
     - job: "Sphinx build"
       artifacts: true
+  before_script:
+    - cd docs/build
   script:
-    - docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/html/genindex.html,docs/build/html/search.html,docs/build/html/index-msg.html
+    - htmlproofer . --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore html/genindex.html,html/search.html,html/index-msg.html
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
@@ -60,7 +64,7 @@ Sphinx HTML proofer:
 #########
 Publish Sphinx on GitLab Pages:
   stage: Publish documentation
-  image: klakegg/html-proofer
+  image: alpine
   needs:
     - job: "Sphinx build"
       artifacts: true
