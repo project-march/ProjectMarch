@@ -42,17 +42,12 @@ Sphinx build:
 ################
 Sphinx HTML proofer:
   stage: Test documentation
-  # The "$TAG" variable is set by the rules below
-  image:
-    name: klakegg/html-proofer
-    entrypoint: ["/bin/sh"]
+  image: klakegg/html-proofer
   needs:
     - job: "Sphinx build"
       artifacts: true
-  before_script:
-    - cd docs/build
   script:
-    - "htmlproofer . --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore ./search.html --hydra_config '{\"max_concurrency\": 3}' --url-ignore '#'"
+    - "docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/search.html --hydra_config '{\"max_concurrency\": 3}' --url-ignore '#'"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
