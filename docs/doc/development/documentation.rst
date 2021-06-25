@@ -26,21 +26,21 @@ Clone the repository with either ssh or https:
 
 .. code:: bash
 
-    git clone git@gitlab.com:project-march/project-march.gitlab.io.git
+    git clone git@gitlab.com:project-march/march.git
 
 **https:**
 
 .. code:: bash
 
-    git clone https://gitlab.com/project-march/project-march.gitlab.io.git
+    git clone https://gitlab.com/project-march/march.git
 
-Install rosdoc_lite and Sphinx
+Install Sphinx
 ------------------------------
-We use the package rosdoc_lite to generate the documentation with Sphinx
+We use the Sphinx to generate the documentation
 
 .. code:: bash
 
-  sudo apt install ros-noetic-rosdoc-lite
+  sudo apt install sphinx-doc
 
 
 Install Gem and html-proofer
@@ -62,47 +62,24 @@ html-proofer is a tool that can validate your generated html for mistakes like b
 
 Install Additional dependencies
 -------------------------------
-Pygit is used so we can tell Sphinx what branch we are on. That way links to GitHub files can be verified against the proper branch.
-This prevents html-proofer from not being able to find newly added files on develop, as it checks against the current branch.
-Furthermore, we use the sphinx-rtd-theme for the theme of the pages.
-You can install both packages from the Ubuntu repositories:
+We need some additional packages for sphinx that can be installed via pip.
 
 .. code::
 
-  sudo apt install python3-pygit2 python3-sphinx-rtd-theme
+  pip install -r requirements.txt
 
 
 Generate the html
 -----------------
-First source ROS1 Noetic, and then run the :rootdir:`build_locally <build_locally.sh>` script to
+Run the :rootdir:`build_locally <build_locally.sh>` script to
 generate the docs and automatically open them in your browser.
 
 .. code::
 
-  source /opt/ros/noetic/local_setup.bash
-  cd ~/project-march.gitlab.io
   ./build_locally.sh
 
-.. warning::
-  You might get the following error if sphinx is installed using pip3:
-
-  .. code::
-
-    Exception occurred:
-      File "<frozen importlib._bootstrap>", line 222, in _call_with_frames_removed
-      File "/home/olav/march_ws/src/march_tutorials/_scripts/tutorialformatter.py", line 121
-        print 'tutorialformatter.py error: sub-tutorial %s not found.' % sub_name
-                                                                     ^
-    SyntaxError: Missing parentheses in call to 'print'
-
-  You can fix this by uninstalling python3 sphinx:
-
-  .. code::
-
-    pip3 uninstall sphinx
-
 .. note::
-  If you have added new files but not pushed to GitHub yet, html-proofer will probably complain about invalid links.
+  If you have added new files but not pushed to GitLab yet, html-proofer will probably complain about invalid links.
   Push your files and build locally again to solve this problem.
 
 sphinx-autobuild
@@ -125,9 +102,9 @@ Start the auto build:
 When you go to ``localhost:8000`` it should open the documentation and live refresh
 when a file is changed and saved to disk.
 
-Deploy with GitLabCI
-^^^^^^^^^^^^^^^^^^^^
-We make use of the `GitLabCI <https://docs.gitlab.com/ee/ci/>`_  to deploy our generated documentation to GitLab pages.
+Deploy with GitLab CI
+^^^^^^^^^^^^^^^^^^^^^
+We make use of the `GitLab CI <https://docs.gitlab.com/ee/ci/>`_  to deploy our generated documentation to GitLab pages.
 Please check the :rootdir:`.gitlab-ci.yml of this repository <.gitlab-ci.yml>` for the details.
 
 Add a new tutorial

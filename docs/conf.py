@@ -56,7 +56,7 @@ html_context = {
     'gitlab_version': branch_name,
     'gitlab_url': 'https://gitlab.com/',
     "conf_py_path": "/docs",
-    "css_files": ['static/css/override.css'],
+    "css_files": ['_static/css/override.css'],
     "favicon": "favicon.ico",
     "logo": "logo.png"
 }
@@ -70,8 +70,8 @@ gitlab_root = html_context['gitlab_url'] + html_context['gitlab_user'] + '/'
 ros1_src = 'march/-/blob/main/ros1/src/'
 
 # Links
-extlinks = {'codedir': (gitlab_root + 'project-march.gitlab.io/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
-            'rootdir': (gitlab_root + 'project-march.gitlab.io/tree/' + html_context['gitlab_version'] + '/%s', ''),
+extlinks = {'codedir': (gitlab_root + 'march/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
+            'rootdir': (gitlab_root + 'march/tree/' + html_context['gitlab_version'] + '/%s', ''),
             'hardware-interface': (gitlab_root + ros1_src + 'march_hardware_interface/%s', ''),
             'input-device': (gitlab_root + 'input-device/-/tree/main/%s', ''),
             'march': (gitlab_root + ros1_src + '%s', ''),
