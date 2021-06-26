@@ -46,6 +46,8 @@ class TestGaitSelection(unittest.TestCase):
         directory = self.gait_selection.scan_directory()
         directory_gaits = [
             "walk_medium",
+            "realsense_stand",
+            "realsense_sit"
             "balance_walk",
             "stairs_up",
             "walk_small",
