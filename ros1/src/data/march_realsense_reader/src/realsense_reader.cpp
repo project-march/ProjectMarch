@@ -368,8 +368,8 @@ bool RealSenseReader::processPointcloudCallback(
         frame_id_to_transform_to_
             = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP.at(subgait_name_);
     } catch (std::out_of_range& ex) {
-        res.error_message
-            = "Provided subgait name " + subgait_name_ + " has no known associated frame id "
+        res.error_message = "Provided subgait name " + subgait_name_
+            + " has no known associated frame id "
               "to transform to.";
         ROS_WARN_STREAM(res.error_message);
         res.success = false;
