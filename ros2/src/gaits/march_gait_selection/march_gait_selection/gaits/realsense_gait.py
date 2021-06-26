@@ -339,7 +339,7 @@ class RealsenseGait(SetpointsGait):
             gait_parameters_response.gait_parameters
         )
 
-    def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> Bool:
+    def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> bool:
         """
         Update the gait parameters based on the message of the current gaits and its
         responsibilities.
