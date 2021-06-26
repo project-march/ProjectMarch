@@ -16,7 +16,7 @@ class TestGaitSelection(unittest.TestCase):
     def setUpClass(cls):
         rclpy.init()
         cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
+            get_package_share_directory("march_description") + "/urdf/march6.urdf"
         )
 
     def setUp(self):
