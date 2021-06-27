@@ -75,7 +75,7 @@ class RealsenseGait(SetpointsGait):
         super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
         self._gait_selection = gait_selection
         self.parameters = parameters
-        self._parameters_updated = False
+        self.dimensions = dimensions
         self.dimensions = dimensions
         self.realsense_category = self.realsense_category_from_string(
             realsense_category
@@ -90,6 +90,14 @@ class RealsenseGait(SetpointsGait):
         self._final_position = final_position
         self._dependent_on = dependent_on
         self._responsible_for = responsible_for
+
+    @property
+    def dependent_on(self):
+        return self._dependent_on
+
+    @property
+    def responsible_for(self):
+        return self._responsible_for
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -438,7 +446,6 @@ class RealsenseGait(SetpointsGait):
             ]
         else:
             raise UnknownDimensionsError(self.dimensions)
-        self._parameters_updated = True
 
     def set_edge_positions(
         self, starting_position: EdgePosition, final_position: EdgePosition
