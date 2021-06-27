@@ -10,10 +10,14 @@ testsetup:
           actuationMode: torque
           slaveIndex: 2
           axis: 0
+          motorKV: 100
           absoluteEncoder:
             resolution: 17
             minPositionIU: 29266
             maxPositionIU: 52948
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
     - joint_base_fixed_parent_joint:
         allowActuation: true
         motor_controller:
@@ -21,7 +25,11 @@ testsetup:
           actuationMode: torque
           slaveIndex: 1
           axis: 0
+          motorKV: 100
           absoluteEncoder:
             resolution: 17
             minPositionIU: 29266
             maxPositionIU: 52948
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101

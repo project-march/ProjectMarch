@@ -60,7 +60,7 @@ public:
         }
     }
 
-    std::string toString()
+    std::string toString() const
     {
         switch (this->value_) {
             case NOT_READY_TO_SWITCH_ON:
@@ -105,17 +105,17 @@ class IMotionCubeState : public MotorControllerState {
 public:
     IMotionCubeState() = default;
 
-    bool isOperational() override
+    bool isOperational() const override
     {
         return state_of_operation_.value_ != march::IMCStateOfOperation::FAULT;
     }
 
-    bool hasError() override
+    bool hasError() const override
     {
         return motion_error_ || detailed_error_ || second_detailed_error_;
     }
 
-    std::optional<std::string> getErrorStatus() override
+    std::optional<std::string> getErrorStatus() const override
     {
         if (hasError()) {
             std::ostringstream error_stream;
@@ -139,7 +139,7 @@ public:
         }
     }
 
-    std::string getOperationalState() override
+    std::string getOperationalState() const override
     {
         return state_of_operation_.toString();
     }

@@ -26,10 +26,6 @@ IMotionCube::IMotionCube(const Slave& slave,
         std::move(incremental_encoder), actuation_mode)
     , sw_string_(/*__s=*/"empty")
 {
-    if (!absolute_encoder_ || !incremental_encoder_) {
-        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "An IMotionCube needs both an incremental and an absolute encoder");
-    }
 }
 
 IMotionCube::IMotionCube(const Slave& slave,
@@ -103,7 +99,7 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
             ROS_FATAL("writing of the setup data has failed");
         }
         return true; // Resets all imcs and restart the EtherCAT train
-                     // (necessary after downloading a "new" setup to the drive)
+        // (necessary after downloading a "new" setup to the drive)
     } else {
         ROS_DEBUG(
             "The .sw file for slave %d is equal to the setup of the drive.",
@@ -175,8 +171,8 @@ void IMotionCube::actuateRadians(float target_position)
             target_position, MAX_TARGET_DIFFERENCE,
             this->getAbsolutePositionUnchecked(), this->getSlaveIndex());
     }
-    this->actuateIU(this->absolute_encoder_->toIU(
-        target_position, /*use_zero_position=*/true));
+    this->actuateIU(
+        this->absolute_encoder_->positionRadiansToIU(target_position));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
@@ -228,6 +224,11 @@ float IMotionCube::getTorque()
     bit16 return_byte = this->read16(
         this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
     return return_byte.i;
+}
+
+float IMotionCube::getActualEffort()
+{
+    return getTorque();
 }
 
 int32_t IMotionCube::getAbsolutePositionIU()
@@ -307,7 +308,7 @@ float IMotionCube::getMotorCurrent()
     const float PEAK_CURRENT = 40.0; // Peak current of iMC drive
     const float IU_CONVERSION_CONST
         = 65520.0; // Conversion parameter, see Technosoft CoE programming
-                   // manual
+    // manual
 
     int16_t motor_current_iu
         = this->read16(this->miso_byte_offsets_.at(IMCObjectName::ActualTorque))
@@ -332,7 +333,7 @@ float IMotionCube::getMotorControllerVoltage()
     return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST)
         * static_cast<float>(
             imc_voltage_iu); // Conversion to Volt, see Technosoft CoE
-                             // programming manual
+    // programming manual
 }
 
 float IMotionCube::getMotorVoltage()
@@ -384,7 +385,7 @@ void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
     ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
 }
 
-void IMotionCube::prepareActuation()
+std::optional<ros::Duration> IMotionCube::prepareActuation()
 {
     if (this->actuation_mode_ == ActuationMode::unknown) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
@@ -423,6 +424,7 @@ void IMotionCube::prepareActuation()
     }
 
     this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
+    return std::nullopt;
 }
 
 void IMotionCube::reset(SdoSlaveInterface& sdo)
@@ -454,7 +456,7 @@ uint16_t IMotionCube::computeSWCheckSum(
         sum += std::stoi(token, /*__idx=*/nullptr,
             /*__base=*/16); // State that we are looking at hexadecimal numbers
         old_pos = pos + delimiter.length(); // Make sure to check the position
-                                            // after the previous one
+        // after the previous one
     }
     throw error::HardwareException(error::ErrorType::INVALID_SW_STRING,
         "The .sw file has no delimiter of type %s", delimiter.c_str());
@@ -532,7 +534,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
         }
         final_result &= result;
         old_pos = pos + delimiter.length(); // Make sure to check the position
-                                            // after the previous one
+        // after the previous one
     }
     if (final_result == 0) {
         throw error::HardwareException(
@@ -553,6 +555,11 @@ int IMotionCube::getActuationModeNumber() const
         default:
             return 0;
     }
+}
+
+bool IMotionCube::requiresUniqueSlaves() const
+{
+    return true;
 }
 
 std::unique_ptr<MotorControllerState> IMotionCube::getState()
@@ -584,26 +591,36 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 
 float IMotionCube::getAbsolutePositionUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->toRadians(
-        getAbsolutePositionIU(), /*use_zero_position=*/true);
+    return (float)this->getAbsoluteEncoder()->positionIUToRadians(
+        getAbsolutePositionIU());
 }
 
 float IMotionCube::getIncrementalPositionUnchecked()
 {
-    return (float)this->getIncrementalEncoder()->toRadians(
-        getIncrementalPositionIU(), true);
+    return (float)this->getIncrementalEncoder()->positionIUToRadians(
+        getIncrementalPositionIU());
 }
 
 float IMotionCube::getAbsoluteVelocityUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->toRadians(
-        getAbsoluteVelocityIU(), /*use_zero_position=*/false);
+    return (float)this->getAbsoluteEncoder()->velocityIUToRadians(
+        getAbsoluteVelocityIU());
 }
 
 float IMotionCube::getIncrementalVelocityUnchecked()
 {
-    return (float)this->getIncrementalEncoder()->toRadians(
-        getIncrementalVelocityIU(), false);
+    return (float)this->getIncrementalEncoder()->velocityIUToRadians(
+        getIncrementalVelocityIU());
+}
+
+float IMotionCube::effortMultiplicationConstant()
+{
+    return 1000.0;
+}
+
+std::optional<ros::Duration> IMotionCube::enableActuation()
+{
+    return std::nullopt;
 }
 
 } // namespace march
