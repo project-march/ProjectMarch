@@ -12,7 +12,7 @@ TEST_PACKAGE = "march_gait_selection"
 TEST_DIRECTORY = "test/resources"
 
 
-class TestSetpointsGait(unittest.TestCase):
+class TestRealsenseGait(unittest.TestCase):
     def setUp(self):
         self.robot = urdf.Robot.from_xml_file(
             get_package_share_directory("march_description") + "/urdf/march6.urdf"
@@ -33,4 +33,6 @@ class TestSetpointsGait(unittest.TestCase):
 
         self.realsense_sit_gait = realsense_sit_gait
         self.realsense_stand_gait = realsense_stand_gait
+
+
 
