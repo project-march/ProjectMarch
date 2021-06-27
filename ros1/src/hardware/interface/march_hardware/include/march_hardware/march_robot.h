@@ -51,7 +51,7 @@ public:
 
     void resetMotorControllers();
 
-    void startEtherCAT(bool reset_imc);
+    void startEtherCAT(bool reset_motor_controllers);
 
     void stopEtherCAT();
 
