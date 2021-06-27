@@ -7,6 +7,12 @@
          "name":"home_stand"
       },
       {
+         "name": "home_sit_without_haa"
+      },
+      {
+         "name": "home_sit_with_haa"
+      },
+      {
          "name":"walk"
       },
       {
@@ -114,7 +120,9 @@
       },
       {
          "name":"stairs_down_single_step"
-      },
+      }
+   ],
+   [
       {
          "name":"stairs_down_backwards"
       },
@@ -126,6 +134,18 @@
       },
       {
          "name":"realsense_stairs_up_single_step"
+      },
+      {
+         "name":"realsense_sit"
+      },
+      {
+         "name":"realsense_stand"
+      },
+      {
+         "name":"dynamic_sit"
+      },
+      {
+         "name":"dynamic_stand"
       }
    ],
    [
@@ -236,12 +256,6 @@
       },
       {
          "name":"ik_test_multiple_subgaits"
-      },
-      {
-         "name":"realsense_sit"
-      },
-      {
-         "name":"realsense_stand"
       }
    ],
    [
@@ -250,6 +264,9 @@
       },
       {
          "name": "test_joint_gait"
+      },
+      {
+         "name": "exo_test"
       },
       {
          "name":"home_shutdown"
