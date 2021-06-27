@@ -4,6 +4,7 @@ from ament_index_python import get_package_share_directory
 
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.gaits.realsense_gait import RealsenseGait
+from march_shared_msgs.msg import GaitParameters
 
 from urdf_parser_py import urdf
 
@@ -23,16 +24,36 @@ class TestRealsenseGait(unittest.TestCase):
         self.gait_selection = GaitSelection(
             gait_package=TEST_PACKAGE, directory=TEST_DIRECTORY, robot=self.robot
         )
+        self.load_realsense_gaits()
 
     def test_realsense_gaits_loading(self):
-        realsense_sit_gait = self.gait_selection.gaits["realsense_sit"]
-        realsense_stand_gait = self.gait_selection.gaits["realsense_stand"]
+        realsense_sit = self.gait_selection.gaits["realsense_sit"]
+        realsense_stand = self.gait_selection.gaits["realsense_stand"]
 
-        self.assertTrue(realsense_sit_gait, RealsenseGait)
-        self.assertTrue(realsense_stand_gait, RealsenseGait)
+        self.assertTrue(realsense_sit, RealsenseGait)
+        self.assertTrue(realsense_stand, RealsenseGait)
 
-        self.realsense_sit_gait = realsense_sit_gait
-        self.realsense_stand_gait = realsense_stand_gait
+    def load_realsense_gaits(self):
+        realsense_sit = self.gait_selection.gaits["realsense_sit"]
+        realsense_stand = self.gait_selection.gaits["realsense_stand"]
+
+        self.realsense_sit = realsense_sit
+        self.realsense_stand = realsense_stand
+
+    def test_gait_dependencies(self):
+        self.assertTrue(self.realsense_sit.responsible_for, self.realsense_stand.gait_name)
+        self.assertTrue(self.realsense_stand.dependent_on, self.realsense_sit.gait_name)
+
+    def test_updating_gait_with_responsibilities(self):
+        gait_parameters = GaitParameters
+        gait_parameters.first_parameter = 0.3
+        gait_parameters.second_parameter = 0.5
+        gait_parameters.side_step_parameter = 0.3
+
+        self.realsense_sit.update_gaits_from_realsense_call(
+            gait_parameters
+        )
+        self.assertTrue(self.realsense_stand.parameters[0], gait_parameters.first_parameter)
 
 
 
