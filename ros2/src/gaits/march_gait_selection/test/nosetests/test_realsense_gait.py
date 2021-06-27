@@ -24,7 +24,7 @@ class TestRealsenseGait(unittest.TestCase):
             gait_package=TEST_PACKAGE, directory=TEST_DIRECTORY, robot=self.robot
         )
 
-    def grab_realsense_gaits(self):
+    def test_realsense_gaits_loading(self):
         realsense_sit_gait = self.gait_selection.gaits["realsense_sit"]
         realsense_stand_gait = self.gait_selection.gaits["realsense_stand"]
 
