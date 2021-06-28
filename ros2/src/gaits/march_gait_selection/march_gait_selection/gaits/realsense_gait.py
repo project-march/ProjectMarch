@@ -282,9 +282,7 @@ class RealSenseGait(SetpointsGait):
 
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
-        service_call_succesful = self.make_realsense_service_call(
-            frame_id_to_transform_to="foot_right"
-        )
+        service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
             self._node.get_logger().warn("No service response received within timeout")
             return GaitUpdate.empty()
@@ -309,12 +307,11 @@ class RealSenseGait(SetpointsGait):
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
-    def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
+    def make_realsense_service_call(self) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
 
-        :param frame_id_to_transform_to: The frame that should be given to the reader.
         :return: Whether the call was successful
         """
         if self._current_subgait is not None:
