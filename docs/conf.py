@@ -90,7 +90,7 @@ extlinks = {
     "gait-files": (gitlab_root + ros1_src + "march_gait_files/%s", ""),
     "ethercat-slaves": (gitlab_root + "ethercat-slaves/-/tree/main/%s", ""),
     "gait-generation": (gitlab_root + ros1_src + "march_rqt_gait_generator/%s", ""),
-    "march_website": ("httpps://projectmarch.nl", ""),
+    "march_website": ("https://projectmarch.nl", ""),
 }
 
 # Output file base name for HTML help builder.
