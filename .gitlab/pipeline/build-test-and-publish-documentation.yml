@@ -49,6 +49,11 @@ Sphinx HTML proofer:
     - job: "Sphinx build"
       artifacts: true
   script:
+    # This runs "htmlproofer", a tool that checks whether the generated HTML has certain properties, such as
+    #   - a valid favicon
+    #   - valid html tags
+    #   - only https images and links
+    #   - all links in the docs are still available/online
     - "htmlproofer docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/search.html --hydra_config '{\"max_concurrency\": 3}' --url-ignore '#'"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
