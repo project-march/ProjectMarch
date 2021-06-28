@@ -71,11 +71,9 @@ Publish Sphinx on GitLab Pages:
     - job: "Sphinx build"
       artifacts: true
     - job: "Sphinx HTML proofer"
-  before_script:
-    - cd docs
   script:
     - echo 'Publishing pages...'
-    - mv docs/build public/
+    - mv docs/build/ public/
   artifacts:
     paths:
       - public
