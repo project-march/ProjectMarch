@@ -357,7 +357,7 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            success &= getGaitParametersFromFootLocationRamp();
+            success &= getGaitParametersFromRampSlope();
             break;
         }
         case RealSenseCategory::sit: {
@@ -407,34 +407,15 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
     return true;
 }
 
-bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
+bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 {
-    // As we can only execute gaits in a certain line,
-    // project to the line and find where on the line the point falls.
-    // The distance to the line is capped by max_distance_to_line
-    pcl::PointXYZ projected_optimal_foot_location
-        = linear_algebra_utilities::projectPointToLine(
-            optimal_foot_location, executable_locations_line_coefficients_);
-
-    optimal_foot_location.x = projected_optimal_foot_location.x;
-    optimal_foot_location.y = projected_optimal_foot_location.y;
-    optimal_foot_location.z = projected_optimal_foot_location.z;
-
-    double parameter_from_x
-        = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-    double parameter_from_z
-        = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
-
-    if (parameter_from_x - parameter_from_z < EPSILON) {
-        gait_parameters_->first_parameter
-            = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-    } else {
-        ROS_ERROR_STREAM(
-            "The optimal foot location for the ramp gait was not on a linear "
-            "line "
-            "between the flat and steep gait, unable to determine parameter.");
+    if (ramp_slope > max_slope || ramp_slope < min_slope) {
+        ROS_WARN_STREAM("The found ramp slope should be between "
+            << min_slope << " and " << max_slope << " but was " << ramp_slope);
         return false;
     }
+    gait_parameters_->first_parameter
+        = (ramp_slope - min_slope) / (max_slope - min_slope);
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
@@ -919,7 +900,8 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            // Look at a region in between the min and max x value of the step to find the average slope at
+            // Look at a region in between the min and max x value of the step
+            // to find the average slope at
             success &= fillOptionalFootLocationCloud(x_steep, x_flat);
             break;
         }
