@@ -1,8 +1,5 @@
 #include "utilities/transform_utilities.h"
 #include <pcl_ros/transforms.h>
-//#include <pcl/point_types.h>
-
-// using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 Transformer::Transformer(
     std::string frame_id_to_transform_to, std::string fixed_frame)
@@ -14,13 +11,28 @@ Transformer::Transformer(
     frame_id_to_transform_to_ = frame_id_to_transform_to;
     createTransform();
     copyYawToTransform();
-    ROS_DEBUG("Created Transformer");
 }
 
 void Transformer::transformPointCloud(const PointCloud::Ptr& cloud)
 {
     pcl_ros::transformPointCloud(
         *cloud, *cloud, transform_stamped_msg.transform);
+}
+
+void Transformer::transformPoint(std::shared_ptr<pcl::PointXYZ> point)
+{
+    boost::shared_ptr<PointCloud> cloud = boost::make_shared<PointCloud>();
+    cloud->push_back(*point);
+    transformPointCloud(cloud);
+    point->x = cloud->at(0).x;
+    point->y = cloud->at(0).y;
+    point->z = cloud->at(0).z;
+//    point_utilities::setSharedPtr(point, cloud->at(0));
+}
+
+std::string Transformer::getFixedFrame()
+{
+    return fixed_frame_;
 }
 
 void Transformer::createTransform()
@@ -35,7 +47,6 @@ void Transformer::createTransform()
         ROS_WARN_STREAM(error_str);
     }
     setYaw();
-    ROS_DEBUG("Created Transform");
 }
 
 void Transformer::setYaw()
@@ -46,7 +57,6 @@ void Transformer::setYaw()
     transform_matrix.getEulerYPR(yaw, pitch, roll);
     yaw_quaternion.setRPY(/*roll=*/0, /*pitch=*/0, yaw);
     tf2::convert(yaw_quaternion, yaw_stamped_msg.transform.rotation);
-    ROS_DEBUG("yaw in yaw_quaternion is: %f", yaw);
 }
 
 void Transformer::copyYawToTransform()
