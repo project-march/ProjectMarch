@@ -64,7 +64,8 @@ Sphinx HTML proofer:
 #########
 # Pages #
 #########
-Publish Sphinx on GitLab Pages:
+# Upload to GitLab pages
+pages:
   stage: Publish documentation
   image: alpine
   needs:
