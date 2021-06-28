@@ -303,6 +303,7 @@ class RealsenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
+
         # If a gait is dependent on some other gait its subgaits are already
         # interpolated from parameters so we can skip the realsense call
         if not self._dependent_on:
@@ -367,7 +368,6 @@ class RealsenseGait(SetpointsGait):
         Make a call to the realsense service, if it is available
         and returns the response.
 
-        :param frame_id_to_transform_to: The frame that should be given to the reader.
         :return: Whether the call was successful
         """
         if self._current_subgait is not None:
