@@ -635,8 +635,8 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         foot_locations_to_try, possible_foot_locations);
     if (possible_foot_locations->points.size() == 0) {
         ROS_ERROR_STREAM(
-                "The computed possible foot locations cloud is empty. "
-                "Unable to compute corresponding possible foot locations");
+            "The computed possible foot locations cloud is empty. "
+            "Unable to compute corresponding possible foot locations");
         return false;
     }
 
@@ -672,11 +672,12 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            pcl::Normal average_normal success
+            pcl::Normal average_normal;
+            success
                 &= getAverageNormal(possible_foot_locations, average_normal);
 
-            success &= getSlopeFromNormal(
-                average_normal, average_slope_degrees);
+            success
+                &= getSlopeFromNormal(average_normal, average_slope_degrees);
             break;
         }
         default: {
@@ -691,19 +692,20 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 }
 
 bool HullParameterDeterminer::getAverageNormal(
-        const PointNormalCloud::Ptr& possible_foot_locations,
-        pcl::normal& average_normal)
+    const PointNormalCloud::Ptr& possible_foot_locations,
+    pcl::Normal& average_normal)
 {
-    average_normal.normal_x =  possible_foot_locations->points[0].normal_x;
-    average_normal.normal_y =  possible_foot_locations->points[0].normal_y;
-    average_normal.normal_z =  possible_foot_locations->points[0].normal_z;
+    average_normal.normal_x = possible_foot_locations->points[0].normal_x;
+    average_normal.normal_y = possible_foot_locations->points[0].normal_y;
+    average_normal.normal_z = possible_foot_locations->points[0].normal_z;
+    return true;
 }
 
 bool HullParameterDeterminer::getSlopeFromNormal(
-    const float& normal,
-    float& slope)
+    const pcl::Normal& normal, float& slope)
 {
     slope = 10;
+    return true;
 }
 
 bool HullParameterDeterminer::getExecutableLocationsLine()

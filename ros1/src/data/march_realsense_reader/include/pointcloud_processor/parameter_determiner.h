@@ -212,14 +212,11 @@ protected:
         PointNormalCloud::Ptr& exo_support_points);
 
     // Computes the average normal of a given input cloud
-    bool getAverageNormal(
-            const PointNormalCloud::Ptr& possible_foot_locations,
-            pcl::normal& average_normal);
+    bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations,
+        pcl::Normal& average_normal);
 
     // Computes the slope in the x direction in degrees from a normal vector
-    bool getSlopeFromNormal(
-          const float& normal,
-          float& slope)
+    bool getSlopeFromNormal(const pcl::Normal& normal, float& slope);
 
     // All relevant parameters
     int hull_dimension {};
