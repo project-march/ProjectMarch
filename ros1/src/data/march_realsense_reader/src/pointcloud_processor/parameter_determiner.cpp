@@ -652,6 +652,32 @@ bool HullParameterDeterminer::getAverageNormal(
     const PointNormalCloud::Ptr& possible_foot_locations,
     pcl::Normal& average_normal)
 {
+
+    for (pcl::PointNormal& current_pointnormal : possible_foot_locations) {
+        average_normal.normal_x += current_pointnormal.normal_x;
+        average_normal.normal_y += current_pointnormal.normal_y;
+        average_normal.normal_z += current_pointnormal.normal_z;
+    }
+    average_normal.normal_x /= possible_foot_locations->size();
+    average_normal.normal_y /= possible_foot_locations->size();
+    average_normal.normal_z /= possible_foot_locations->size();
+
+    // If the normal is zero (<=> it has a norm of zero) it is invalid
+    // and it then cannot be used to calculate plane coefficients.
+    // The norm is generally close to 1, but this need not be the case
+    // e.g. if the orientation of the normals is not consistent.
+    float minimum_norm_allowed = 0.05;
+    if (linear_algebra_utilities::dotProductVector<double>(
+            average_normal, average_normal)
+        < minimum_norm_allowed) {
+        ROS_ERROR_STREAM("Computed average normal of region is too close "
+                         "to zero. Plane parameters will be inaccurate."
+                         "Average normal of region "
+            << region_index_ << " is "
+            << output_utilities::vectorToString(average_normal));
+        return false;
+    }
+
     average_normal.normal_x = possible_foot_locations->points[0].normal_x;
     average_normal.normal_y = possible_foot_locations->points[0].normal_y;
     average_normal.normal_z = possible_foot_locations->points[0].normal_z;
