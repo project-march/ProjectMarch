@@ -187,6 +187,16 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    // Computes the average normal of a given input cloud
+    bool getAverageNormal(
+            const PointNormalCloud::Ptr& possible_foot_locations,
+            pcl::normal& average_normal);
+
+    // Computes the slope in the x direction in degrees from a normal vector
+    bool getSlopeFromNormal(
+          const float& normal,
+          float& slope)
+
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
@@ -226,6 +236,7 @@ protected:
     LineCoefficients::Ptr executable_locations_line_coefficients_
         = boost::make_shared<LineCoefficients>();
 
+    float average_slope_degrees {};
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;

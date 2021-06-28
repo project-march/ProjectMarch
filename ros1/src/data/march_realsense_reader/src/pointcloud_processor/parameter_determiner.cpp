@@ -112,6 +112,7 @@ bool HullParameterDeterminer::determineParameters(
     // Initialize the optimal foot location at the origin and the gait
     // parameters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
+    average_slope_degrees = -1;
     gait_parameters_->first_parameter = -1;
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
@@ -364,6 +365,12 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(
         foot_locations_to_try, possible_foot_locations);
+    if (possible_foot_locations->points.size() == 0) {
+        ROS_ERROR_STREAM(
+                "The computed possible foot locations cloud is empty. "
+                "Unable to compute corresponding possible foot locations");
+        return false;
+    }
 
     success &= getOptimalFootLocationFromPossibleLocations();
 
@@ -396,11 +403,11 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            // Get the line on which it is possible to stand for a ramp gait.
-            success &= getExecutableLocationsLine();
+            pcl::Normal average_normal success
+                &= getAverageNormal(possible_foot_locations, average_normal);
 
-            // Get the possible location which is closest to the line
-            success &= getPossibleMostDesirableLocation();
+            success &= getSlopeFromNormal(
+                average_normal, average_slope_degrees);
             break;
         }
         default: {
@@ -411,6 +418,22 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
         }
     }
     return success;
+}
+
+bool HullParameterDeterminer::getAverageNormal(
+        const PointNormalCloud::Ptr& possible_foot_locations,
+        pcl::normal& average_normal)
+{
+    average_normal.normal_x =  possible_foot_locations->points[0].normal_x;
+    average_normal.normal_y =  possible_foot_locations->points[0].normal_y;
+    average_normal.normal_z =  possible_foot_locations->points[0].normal_z;
+}
+
+bool HullParameterDeterminer::getSlopeFromNormal(
+    const float& normal,
+    float& slope)
+{
+    slope = 10;
 }
 
 bool HullParameterDeterminer::getExecutableLocationsLine()
@@ -436,12 +459,6 @@ bool HullParameterDeterminer::getExecutableLocationsLine()
 bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 {
     bool success = true;
-    if (possible_foot_locations->points.size() == 0) {
-        ROS_ERROR_STREAM(
-            "The possible foot locations cloud is empty. "
-            "Unable to compute corresponding possible foot locations");
-        return false;
-    }
 
     double min_distance_to_object = std::numeric_limits<double>::max();
     double distance_to_object;
@@ -692,8 +709,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
-            success &= fillOptionalFootLocationCloud(
-                min_search_area, max_search_area);
+            success &= fillOptionalFootLocationCloud(x_steep, x_flat);
             break;
         }
         default: {
