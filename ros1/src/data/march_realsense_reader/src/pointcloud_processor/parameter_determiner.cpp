@@ -76,14 +76,13 @@ void HullParameterDeterminer::readParameters(
         = (float)config.parameter_determiner_ramp_max_search_area;
 
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
-    z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
     x_steep_down = (float)config.parameter_determiner_ramp_x_steep_down;
-    z_steep_down = (float)config.parameter_determiner_ramp_z_steep_down;
 
     x_flat_up = (float)config.parameter_determiner_ramp_x_flat_up;
-    z_flat_up = (float)config.parameter_determiner_ramp_z_flat_up;
     x_steep_up = (float)config.parameter_determiner_ramp_x_steep_up;
-    z_steep_up = (float)config.parameter_determiner_ramp_z_steep_up;
+
+    min_slope = (float)config.parameter_determiner_min_slope;
+    max_slope = (float)config.parameter_determiner_max_slope;
 
     y_location = (float)config.parameter_determiner_y_location;
 
@@ -129,8 +128,8 @@ bool HullParameterDeterminer::determineParameters(
     // Initialize the optimal foot location at the origin and the gait
     // parameters and sit height at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
+    ramp_slope = -1;
     sit_height = -1;
-    average_slope_degrees = -1;
     gait_parameters_->first_parameter = -1;
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
@@ -272,22 +271,6 @@ void HullParameterDeterminer::addDebugGaitInformation()
             gait_information_marker_list.colors.push_back(marker_color);
             break;
         }
-        case RealSenseCategory::ramp_down:
-        case RealSenseCategory::ramp_up: {
-            geometry_msgs::Point marker_point;
-            marker_point.y = y_location;
-
-            marker_point.x = x_flat;
-            marker_point.z = z_flat;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
-
-            marker_point.x = x_steep;
-            marker_point.z = z_steep;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
-            break;
-        }
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
             marker_point.y = search_y_deviation_sit / 2.0F;
@@ -303,7 +286,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
             break;
         }
         default: {
-            ROS_WARN_STREAM("gait debug information is not implemented yet "
+            ROS_WARN_STREAM("gait debug information is not implemented "
                             "for realsense category "
                 << realsense_category_.value());
         }
@@ -324,15 +307,11 @@ void HullParameterDeterminer::initializeGaitDimensions()
         case RealSenseCategory::ramp_down: {
             x_flat = x_flat_down;
             x_steep = x_steep_down;
-            z_flat = z_flat_down;
-            z_steep = z_steep_down;
             break;
         }
         case RealSenseCategory::ramp_up: {
             x_flat = x_flat_up;
             x_steep = x_steep_up;
-            z_flat = z_flat_up;
-            z_steep = z_steep_up;
             break;
         }
         case RealSenseCategory::stairs_up: {
@@ -361,8 +340,6 @@ void HullParameterDeterminer::initializeGaitDimensions()
         || subgait_name_ == "left_open") {
         x_flat *= 2;
         x_steep *= 2;
-        z_flat *= 2;
-        z_steep *= 2;
         min_x_stairs *= 2;
         max_x_stairs *= 2;
         min_z_stairs *= 2;
@@ -657,8 +634,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             success
                 &= getAverageNormal(possible_foot_locations, average_normal);
 
-            success
-                &= getSlopeFromNormal(average_normal, average_slope_degrees);
+            success &= getSlopeFromNormals(average_normal, ramp_slope);
             break;
         }
         default: {
@@ -682,27 +658,10 @@ bool HullParameterDeterminer::getAverageNormal(
     return true;
 }
 
-bool HullParameterDeterminer::getSlopeFromNormal(
+bool HullParameterDeterminer::getSlopeFromNormals(
     const pcl::Normal& normal, float& slope)
 {
     slope = 10;
-    return true;
-}
-
-bool HullParameterDeterminer::getExecutableLocationsLine()
-{
-    // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t + ([3], [4],
-    // [5])^T
-    executable_locations_line_coefficients_->values.resize(/*__new_size=*/6);
-
-    executable_locations_line_coefficients_->values[0] = x_flat - x_steep;
-    executable_locations_line_coefficients_->values[1] = 0;
-    executable_locations_line_coefficients_->values[2] = z_flat - z_steep;
-
-    executable_locations_line_coefficients_->values[3] = x_steep;
-    executable_locations_line_coefficients_->values[4] = y_location;
-    executable_locations_line_coefficients_->values[5] = z_steep;
-
     return true;
 }
 
@@ -931,8 +890,9 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
     } else {
         ROS_ERROR_STREAM(
             "No method for finding the general most desirable foot location "
-            "was given. "
-            "Unable to compute general most desirable foot location.");
+            "is implemented for realsense category. "
+            << realsense_category_.value()
+            << "Unable to compute general most desirable foot location.");
         return false;
     }
     if (debugging_) {

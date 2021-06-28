@@ -170,7 +170,7 @@ protected:
     bool getGaitParametersFromFootLocationStairs();
 
     // Find the ramp parameter from the foot locations
-    bool getGaitParametersFromFootLocationRamp();
+    bool getGaitParametersFromRampSlope();
 
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
@@ -195,6 +195,13 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    // Computes the average normal of a given input cloud
+    bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations,
+        pcl::Normal& average_normal);
+
+    // Computes the slope in the x direction in degrees from a normal vector
+    bool getSlopeFromNormals(const pcl::Normal& normal, float& slope);
+
     // The sit analogue of getOptimalFootLocation, find the height at which to
     // sit
     bool getSitHeight();
@@ -210,13 +217,6 @@ protected:
     void getValidExoSupport(
         const PointNormalCloud::Ptr& potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
-
-    // Computes the average normal of a given input cloud
-    bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations,
-        pcl::Normal& average_normal);
-
-    // Computes the slope in the x direction in degrees from a normal vector
-    bool getSlopeFromNormal(const pcl::Normal& normal, float& slope);
 
     // All relevant parameters
     int hull_dimension {};
@@ -239,13 +239,11 @@ protected:
     float x_steep {};
     float z_steep {};
     float x_flat_down {};
-    float z_flat_down {};
     float x_steep_down {};
-    float z_steep_down {};
     float x_flat_up {};
-    float z_flat_up {};
     float x_steep_up {};
-    float z_steep_up {};
+    float max_slope {};
+    float min_slope {};
     float ramp_min_search_area {};
     float ramp_max_search_area {};
     float max_distance_to_line {};
@@ -270,7 +268,7 @@ protected:
     LineCoefficients::Ptr executable_locations_line_coefficients_
         = boost::make_shared<LineCoefficients>();
 
-    float average_slope_degrees {};
+    float ramp_slope {};
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
