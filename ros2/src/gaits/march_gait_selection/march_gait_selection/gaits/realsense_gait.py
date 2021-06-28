@@ -1,7 +1,7 @@
 from threading import Event
 from typing import Optional, List, Dict
 
-from march_gait_selection.gaits.setpoints_gait import SetpointsGait
+from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.edge_position import (
@@ -27,8 +27,6 @@ from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client
 from urdf_parser_py import urdf
-
-from march_gait_selection.state_machine.gait_update import GaitUpdate
 
 
 class RealSenseGait(SetpointsGait):
@@ -317,12 +315,18 @@ class RealSenseGait(SetpointsGait):
         and returns the response.
 
         :param frame_id_to_transform_to: The frame that should be given to the reader.
-        :return: Whether the call was succesful
+        :return: Whether the call was successful
         """
+        if self._current_subgait is not None:
+            subgait_name = self._current_subgait.subgait_name
+        else:
+            # Assume that the current subgait is being created and use the right open name
+            subgait_name = "right_open"
+
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,
             camera_to_use=self.camera_to_use,
-            frame_id_to_transform_to=frame_id_to_transform_to,
+            subgait_name=subgait_name,
         )
         self.realsense_service_event.clear()
         if self._get_gait_parameters_service.wait_for_service(

@@ -40,6 +40,7 @@ ParameterDeterminer::ParameterDeterminer(bool debugging)
 // Construct a basic HullParameterDeterminer class
 HullParameterDeterminer::HullParameterDeterminer(bool debugging)
     : ParameterDeterminer(debugging)
+    , sit_height(-1)
 {
 }
 
@@ -50,10 +51,14 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_foot_locations;
     hull_dimension = config.hull_dimension;
 
-    min_x_stairs = (float)config.parameter_determiner_stairs_locations_min_x;
-    max_x_stairs = (float)config.parameter_determiner_stairs_locations_max_x;
-    min_z_stairs = (float)config.parameter_determiner_stairs_locations_min_z;
-    max_z_stairs = (float)config.parameter_determiner_stairs_locations_max_z;
+    min_x_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_min_x;
+    max_x_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_max_x;
+    min_z_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_min_z;
+    max_z_stairs_up
+        = (float)config.parameter_determiner_stairs_up_locations_max_z;
 
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
@@ -65,8 +70,8 @@ void HullParameterDeterminer::readParameters(
     foot_width = (float)config.parameter_determiner_foot_width;
     hull_dimension = config.hull_dimension;
 
-    max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
-    min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
+    ramp_min_search_area
+        = (float)config.parameter_determiner_ramp_min_search_area;
 
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
     z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
@@ -80,6 +85,15 @@ void HullParameterDeterminer::readParameters(
 
     y_location = (float)config.parameter_determiner_y_location;
 
+    min_sit_height = (float)config.parameter_determiner_min_sit_height;
+    max_sit_height = (float)config.parameter_determiner_max_sit_height;
+    min_x_search_sit = (float)config.parameter_determiner_min_x_search_sit;
+    max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
+    search_y_deviation_sit
+        = (float)config.parameter_determiner_search_y_deviation_sit;
+    minimal_needed_support_sit
+        = (float)config.parameter_determiner_minimal_needed_support_sit;
+    sit_grid_size = (float)config.parameter_determiner_sit_grid_size;
     max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
@@ -97,7 +111,7 @@ bool HullParameterDeterminer::determineParameters(
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
     boost::shared_ptr<GaitParameters> gait_parameters,
-    std::string frame_id_to_transform_to)
+    std::string frame_id_to_transform_to, std::string subgait_name)
 {
     time_t start_determine_parameters = clock();
 
@@ -108,11 +122,13 @@ bool HullParameterDeterminer::determineParameters(
     plane_coefficients_vector_ = plane_coefficients_vector;
     polygon_vector_ = polygon_vector;
     realsense_category_.emplace(realsense_category);
+    subgait_name_ = subgait_name;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
     // Initialize the optimal foot location at the origin and the gait
-    // parameters at -1 in case the calculation fails
+    // parameters and sit height at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
     average_slope_degrees = -1;
+    sit_height = -1;
     gait_parameters_->first_parameter = -1;
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
@@ -130,10 +146,16 @@ bool HullParameterDeterminer::determineParameters(
 
     bool success = true;
 
-    // Only calculate the gait parameters if an optimal foot location has been
-    // found
-    if (success &= getOptimalFootLocation()) {
-        success &= getGaitParametersFromFootLocation();
+    if (realsense_category_.value() != RealSenseCategory::sit) {
+        success &= getOptimalFootLocation();
+    } else {
+        success &= getSitHeight();
+    }
+
+    // Only calculate the gait parameters if an optimal foot location or sit
+    // height has been found
+    if (success) {
+        success &= getGaitParametersFromLocation();
     }
 
     if (debugging_) {
@@ -171,11 +193,11 @@ void HullParameterDeterminer::initializeDebugOutput()
     possible_foot_locations_marker_list = initializeMarkerListWithId(id);
 
     id = 2;
-    optimal_foot_location_marker = initializeMarkerListWithId(id);
+    optimal_location_marker = initializeMarkerListWithId(id);
     // Make the optimal foot location stand out more
-    optimal_foot_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.2;
-    optimal_foot_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.2;
-    optimal_foot_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.2;
+    optimal_location_marker.scale.x = DEBUG_MARKER_SIZE * 1.2;
+    optimal_location_marker.scale.y = DEBUG_MARKER_SIZE * 1.2;
+    optimal_location_marker.scale.z = DEBUG_MARKER_SIZE * 1.2;
 
     id = 3;
     gait_information_marker_list = initializeMarkerListWithId(id);
@@ -201,6 +223,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
     std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
     switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
             marker_point.y = y_location;
@@ -242,6 +265,20 @@ void HullParameterDeterminer::addDebugGaitInformation()
             gait_information_marker_list.colors.push_back(marker_color);
             break;
         }
+        case RealSenseCategory::sit: {
+            geometry_msgs::Point marker_point;
+            marker_point.y = search_y_deviation_sit / 2.0F;
+            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
+
+            marker_point.z = min_sit_height;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+
+            marker_point.z = max_sit_height;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+            break;
+        }
         default: {
             ROS_WARN_STREAM("gait debug information is not implemented yet "
                             "for realsense category "
@@ -254,7 +291,7 @@ void HullParameterDeterminer::addDebugMarkersToArray()
 {
     debug_marker_array.markers.push_back(foot_locations_to_try_marker_list);
     debug_marker_array.markers.push_back(possible_foot_locations_marker_list);
-    debug_marker_array.markers.push_back(optimal_foot_location_marker);
+    debug_marker_array.markers.push_back(optimal_location_marker);
     debug_marker_array.markers.push_back(gait_information_marker_list);
 }
 
@@ -275,12 +312,42 @@ void HullParameterDeterminer::initializeGaitDimensions()
             z_steep = z_steep_up;
             break;
         }
+        case RealSenseCategory::stairs_up: {
+            min_x_stairs = min_x_stairs_up;
+            max_x_stairs = max_x_stairs_up;
+            min_z_stairs = min_z_stairs_up;
+            max_z_stairs = max_z_stairs_up;
+            break;
+        }
+        case RealSenseCategory::stairs_down: {
+            min_x_stairs = -min_x_stairs_up;
+            max_x_stairs = -max_x_stairs_up;
+            min_z_stairs = -min_z_stairs_up;
+            max_z_stairs = -max_z_stairs_up;
+            break;
+        }
+    }
+    // If the subgait is a swing subgait, double the gait parameters as
+    // the step size (and height) of a swing subgait are twice that of
+    // an open or close subgait
+    // Do the same when the gait name is left open as this subgait
+    // also traverses twice the distance of a normal open gait
+    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing"
+        || subgait_name_ == "left_open") {
+        x_flat *= 2;
+        x_steep *= 2;
+        z_flat *= 2;
+        z_steep *= 2;
+        min_x_stairs *= 2;
+        max_x_stairs *= 2;
+        min_z_stairs *= 2;
+        max_z_stairs *= 2;
     }
 }
 
 // Find the parameters from the foot location by finding at what percentage of
 // the end points it is
-bool HullParameterDeterminer::getGaitParametersFromFootLocation()
+bool HullParameterDeterminer::getGaitParametersFromLocation()
 {
     bool success = true;
     switch (realsense_category_.value()) {
@@ -293,6 +360,10 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
             success &= getGaitParametersFromFootLocationRamp();
             break;
         }
+        case RealSenseCategory::sit: {
+            success &= getGaitParametersFromSitHeight();
+            break;
+        }
         default: {
             ROS_ERROR_STREAM(
                 "No way to transform a foot location to parameters "
@@ -303,6 +374,27 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     }
     return success;
 }
+
+// Find the sit parameter from the sit height
+bool HullParameterDeterminer::getGaitParametersFromSitHeight()
+{
+    if (sit_height > min_sit_height && sit_height < max_sit_height) {
+        gait_parameters_->first_parameter
+            = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
+    } else {
+        gait_parameters_->first_parameter = -1;
+        ROS_ERROR_STREAM("The sit height should be between "
+            << min_sit_height << " and " << max_sit_height << " but was "
+            << sit_height);
+        return false;
+    }
+    // The step height and side step parameter are unused for the ramp down
+    // gait, so they are set to -1
+    gait_parameters_->second_parameter = -1;
+    gait_parameters_->side_step_parameter = -1;
+    return true;
+}
+
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 {
     gait_parameters_->first_parameter = (optimal_foot_location.x - min_x_stairs)
@@ -351,6 +443,122 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRamp()
     return true;
 }
 
+// The sit analogue of getOptimalFootLocation, find the height at which to sit
+bool HullParameterDeterminer::getSitHeight()
+{
+    bool success = true;
+
+    // Create a grid of points at the location where the exoskeleton should sit
+    sit_grid = boost::make_shared<PointCloud2D>();
+    success &= fillSitGrid(sit_grid);
+
+    // Crop those locations to find where there is support for the exoskeleton
+    PointNormalCloud::Ptr exo_support_points
+        = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
+
+    if (debugging_) {
+        std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
+        for (pcl::PointNormal& exo_support_point : *exo_support_points) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = exo_support_point.x;
+            marker_point.y = exo_support_point.y;
+            marker_point.z = exo_support_point.z;
+
+            possible_foot_locations_marker_list.points.push_back(marker_point);
+            possible_foot_locations_marker_list.colors.push_back(marker_color);
+        }
+    }
+
+    if ((float)exo_support_points->size() / (float)sit_grid->size()
+        < minimal_needed_support_sit) {
+        ROS_ERROR_STREAM("Not enough support for the exoskeleton is found, "
+                         "unable to find parameters for sit category.");
+        return false;
+    }
+
+    // The support points will vary and some might not not be on the chair.
+    // The median is taken to avoid these outliers
+    success &= getMedianHeightCloud(exo_support_points, sit_height);
+
+    if (debugging_) {
+        std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
+        geometry_msgs::Point marker_point;
+        marker_point.y = search_y_deviation_sit / 2.0F;
+        marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
+        marker_point.z = sit_height;
+
+        optimal_location_marker.points.push_back(marker_point);
+        optimal_location_marker.colors.push_back(marker_color);
+    }
+
+    return success;
+}
+
+// Get the median height value of a point cloud
+bool HullParameterDeterminer::getMedianHeightCloud(
+    const PointNormalCloud::Ptr& cloud, float& median_height)
+{
+    int pointcloud_size = cloud->size();
+    if (pointcloud_size == 0) {
+        ROS_ERROR_STREAM(
+            "Pointcloud to retrieve median from contains no points.");
+        return false;
+    }
+    // Sort only the part of the array relevant for the median
+    std::nth_element(cloud->points.begin(),
+        cloud->points.begin() + pointcloud_size / 2, cloud->points.end(),
+        linear_algebra_utilities::pointIsLower);
+
+    if (pointcloud_size % 2 == 0) {
+        float first_median_height = cloud->points[pointcloud_size / 2].z;
+        float second_median_height = cloud->points[pointcloud_size / 2 - 1].z;
+        median_height = (first_median_height + second_median_height) / 2.0F;
+    } else {
+        median_height = cloud->points[(pointcloud_size - 1) / 2].z;
+    }
+    return true;
+}
+
+// Fill a cloud with a grid of points where to look for exo support
+bool HullParameterDeterminer::fillSitGrid(PointCloud2D::Ptr& sit_grid)
+{
+    if (sit_grid_size < EPSILON) {
+        ROS_ERROR_STREAM("The grid size of the sit grid is too close to zero. "
+                         "Current value is "
+            << sit_grid_size << " but should be larger then " << EPSILON);
+        return false;
+    }
+    int x_points
+        = int(round((max_x_search_sit - min_x_search_sit) / sit_grid_size)) + 1;
+    int y_points = int(round((search_y_deviation_sit) / sit_grid_size)) + 1;
+
+    for (int x_index = 0; x_index < x_points; ++x_index) {
+        for (int y_index = 0; y_index < y_points; ++y_index) {
+            pcl::PointXY grid_point {};
+            grid_point.x = float(x_index) * sit_grid_size + min_x_search_sit;
+            grid_point.y = float(y_index) * sit_grid_size;
+
+            sit_grid->push_back(grid_point);
+
+            if (debugging_) {
+                geometry_msgs::Point marker_point;
+                marker_point.x = grid_point.x;
+                marker_point.y = grid_point.y;
+                marker_point.z = 0;
+
+                std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
+
+                foot_locations_to_try_marker_list.points.push_back(
+                    marker_point);
+                foot_locations_to_try_marker_list.colors.push_back(
+                    marker_color);
+            }
+        }
+    }
+    return true;
+}
+
 // Get the optimal foot location by finding which possible foot location is
 // closest to the most desirable foot location
 bool HullParameterDeterminer::getOptimalFootLocation()
@@ -381,8 +589,8 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         marker_point.z = optimal_foot_location.z;
         std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
 
-        optimal_foot_location_marker.points.push_back(marker_point);
-        optimal_foot_location_marker.colors.push_back(marker_color);
+        optimal_location_marker.points.push_back(marker_point);
+        optimal_location_marker.colors.push_back(marker_color);
     }
 
     return success;
@@ -711,6 +919,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
+            // Look at a region in between the min and max x value of the step to find the average slope at
             success &= fillOptionalFootLocationCloud(x_steep, x_flat);
             break;
         }
@@ -932,7 +1141,7 @@ bool SimpleParameterDeterminer::determineParameters(
     boost::shared_ptr<PolygonVector> const polygon_vector,
     RealSenseCategory const realsense_category,
     boost::shared_ptr<GaitParameters> gait_parameters,
-    std::string frame_id_to_transform_to)
+    std::string frame_id_to_transform_to, std::string subgait_name)
 {
     ROS_DEBUG("Determining parameters with simple parameter determiner");
     hull_vector_ = hull_vector;
