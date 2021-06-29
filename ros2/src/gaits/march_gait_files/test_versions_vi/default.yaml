@@ -159,6 +159,17 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 0.0
       right_knee: 0.0
+  stand_on_ramp:
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.2618
+      left_hip_aa: 0.0349
+      left_hip_fe: 0.0
+      left_knee: 0.0
+      right_ankle: -0.2618
+      right_hip_aa: 0.0349
+      right_hip_fe: 0.0
+      right_knee: 0.0   
 dynamic_edge_gaits:
   dynamic_sit:
     sit_down: MIV_final
