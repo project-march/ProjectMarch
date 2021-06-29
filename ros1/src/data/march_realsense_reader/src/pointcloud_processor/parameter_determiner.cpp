@@ -160,9 +160,24 @@ bool HullParameterDeterminer::determineParameters(
     }
 
     if (success) {
-        ROS_DEBUG_STREAM("The optimal foot location is "
-            << output_utilities::pointToString(optimal_foot_location)
-            << "\n With corresponding parameters (size, height, side) ("
+        switch (realsense_category_.value()) {  
+            case RealSenseCategory::stairs_down:
+            case RealSenseCategory::stairs_up: {
+                ROS_DEBUG_STREAM("The optimal foot location is "
+                    << output_utilities::pointToString(optimal_foot_location));
+                break;
+            }
+            case RealSenseCategory::ramp_down:
+            case RealSenseCategory::ramp_up: {
+                ROS_DEBUG_STREAM("The slope of the ramp is " << ramp_slope);
+                break;
+            }
+            case RealSenseCategory::sit: {
+                ROS_DEBUG_STREAM("The sit height is " << sit_height);
+                break;
+            }
+        }
+        ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
             << gait_parameters_->first_parameter << ", "
             << gait_parameters_->second_parameter << ", "
             << gait_parameters_->side_step_parameter << ") ");
