@@ -187,6 +187,10 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    bool getRampSlope();
+
+    bool calculateRampSlope();
+
     // Computes the average normal of a given input cloud
     bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations,
         pcl::Normal& average_normal);
