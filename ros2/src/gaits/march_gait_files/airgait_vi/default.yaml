@@ -53,11 +53,11 @@ gaits:
     right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v2
 
   walk:
-    left_close: MVI_walk_leftclose_v5
-    left_swing: MVI_walk_leftswing_v5
-    right_close: MVI_walk_rightclose_v5
-    right_open: MVI_walk_rightopen_v5
-    right_swing: MVI_walk_rightswing_v5
+    left_close: MVI_walk_leftclose_v7
+    left_swing: MVI_walk_leftswing_v7
+    right_close: MVI_walk_rightclose_v7
+    right_open: MVI_walk_rightopen_v7
+    right_swing: MVI_walk_rightswing_v7
 
   walk_single_step:
     right_open: MVI_walksinglestep_rightopen_v5
