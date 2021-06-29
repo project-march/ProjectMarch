@@ -29,6 +29,11 @@ template <typename T> double dotProductNormal(T point1, T point2)
         + point1.normal_z * point2.normal_z;
 }
 
+template <typename T> double normNormal(T point)
+{
+    return sqrt(dotProductNormal(point, point));
+}
+
 // Calculate the distance between two points
 template <typename T, typename Q>
 double distanceBetweenPoints(T point1, Q point2)
@@ -77,7 +82,7 @@ pcl::PointXYZ projectPointToLine(
 inline bool normalizeNormal(
     const pcl::Normal& input_normal, pcl::Normal& normalized_normal)
 {
-    double input_normal_norm = dotProductNormal(input_normal, input_normal);
+    double input_normal_norm = normNormal(input_normal);
     if (input_normal_norm < EPSILON) {
         ROS_WARN_STREAM("Norm of normal to normalize is smaller then "
             << EPSILON << " result can be inaccurate");
@@ -85,8 +90,7 @@ inline bool normalizeNormal(
     normalized_normal.normal_x = input_normal.normal_x / input_normal_norm;
     normalized_normal.normal_y = input_normal.normal_y / input_normal_norm;
     normalized_normal.normal_z = input_normal.normal_z / input_normal_norm;
-    double normalized_normal_norm
-        = dotProductNormal(normalized_normal, normalized_normal);
+    double normalized_normal_norm = normNormal(normalized_normal);
     if (fabs(normalized_normal_norm - 1) > EPSILON) {
         ROS_WARN_STREAM(
             "Norm of normalized normal is too far from 1. The norm is "

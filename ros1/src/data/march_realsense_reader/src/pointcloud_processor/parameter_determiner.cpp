@@ -160,7 +160,7 @@ bool HullParameterDeterminer::determineParameters(
     }
 
     if (success) {
-        switch (realsense_category_.value()) {  
+        switch (realsense_category_.value()) {
             case RealSenseCategory::stairs_down:
             case RealSenseCategory::stairs_up: {
                 ROS_DEBUG_STREAM("The optimal foot location is "
