@@ -144,7 +144,22 @@ bool HullParameterDeterminer::determineParameters(
 
     bool success = true;
 
-    success &= getObstacleInformation();
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
+        case RealSenseCategory::stairs_up: {
+            success &= getOptimalFootLocation();
+            break;
+        }
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+            success &= getRampSlope();
+            break;
+        }
+        case RealSenseCategory::sit: {
+            success &= getSitHeight();
+            break;
+        }
+    }
 
     // Only calculate the gait parameters if an optimal foot location or sit
     // height has been found
@@ -191,29 +206,46 @@ bool HullParameterDeterminer::determineParameters(
     return success;
 };
 
-// Get relevant information from the environment for the current category
-// (e.g. sit -> get sit height, stair -> get foot location)
-bool HullParameterDeterminer::getObstacleInformation()
+bool HullParameterDeterminer::getRampSlope()
 {
-    switch (realsense_category_.value()) {
-        case RealSenseCategory::stairs_down:
-        case RealSenseCategory::stairs_up:
-        case RealSenseCategory::ramp_down:
-        case RealSenseCategory::ramp_up: {
-            return getOptimalFootLocation();
-            break;
-        }
-        case RealSenseCategory::sit: {
-            return getSitHeight();
-            break;
-        }
-        default: {
-            ROS_ERROR_STREAM(
-                "No way to get obstacle information for realsense category "
-                << realsense_category_.value() << " has been implemented.");
-            return false;
+    bool success = true;
+    // Get some locations on the ground of which we would like to know the
+    // orientation
+    foot_locations_to_try = boost::make_shared<PointCloud2D>();
+    success &= getOptionalFootLocations(foot_locations_to_try);
+
+    // Crop those locations to find the associated orientation of those points
+    possible_foot_locations = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVectorUnique(
+        foot_locations_to_try, possible_foot_locations);
+    if (possible_foot_locations->points.size() == 0) {
+        ROS_ERROR_STREAM("The computed possible foot locations cloud is empty. "
+                         "Unable to compute corresponding orientations");
+        return false;
+    }
+
+    if (debugging_) {
+        possible_foot_locations_marker_list for (pcl::PointNormal
+                                                     possible_foot_location :
+            possible_foot_locations)
+        {
+            geometry_msgs::Point marker_point { possible_foot_location.x,
+                possible_foot_location.y, possible_foot_location.z };
+
+            // Color the point based on the orientation
+            std_msgs::ColorRGBA marker_color
+                = color_utilities::colorRGBAInitRGBA(
+                    1 - possible_foot_locations.normal_x,
+                    possible_foot_locations.normal_x, 0.0);
+
+            possible_foot_locations_marker_list.points.push_back(marker_point);
+            possible_foot_locations_marker_list.colors.push_back(marker_color);
         }
     }
+
+    success &= calculateRampSlope();
+
+    return success;
 }
 
 void HullParameterDeterminer::initializeDebugOutput()
@@ -640,15 +672,6 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             success &= getPossibleMostDesirableLocation();
             break;
         }
-        case RealSenseCategory::ramp_down:
-        case RealSenseCategory::ramp_up: {
-            pcl::Normal average_normal;
-            success
-                &= getAverageNormal(possible_foot_locations, average_normal);
-
-            success &= getSlopeFromNormals(average_normal, ramp_slope);
-            break;
-        }
         default: {
             ROS_ERROR_STREAM("getOptimalFootLocationFromPossibleLocations "
                              "method is not implemented "
@@ -657,6 +680,18 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
             return false;
         }
     }
+    return success;
+}
+
+bool HullParameterDeterminer::calculateRampSlope()
+{
+    bool success = true;
+
+    pcl::Normal average_normal;
+    success &= getAverageNormal(possible_foot_locations, average_normal);
+
+    success &= getSlopeFromNormals(average_normal, ramp_slope);
+
     return success;
 }
 
