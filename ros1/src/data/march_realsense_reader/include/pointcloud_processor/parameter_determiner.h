@@ -191,8 +191,11 @@ protected:
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
 
+    // Get the slope of a ramp based on the orientation of points on the ramp
     bool getRampSlope();
 
+    // Calculate the slope of a ramp using the normals of the
+    // possible_foot_locations cloud
     bool calculateRampSlope();
 
     // Computes the average normal of a given input cloud

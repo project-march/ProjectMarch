@@ -6,8 +6,8 @@
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_category_utilities.h"
 #include "yaml-cpp/yaml.h"
-#include <math.h>
 #include <ctime>
+#include <math.h>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -198,6 +198,7 @@ bool HullParameterDeterminer::determineParameters(
     return success;
 };
 
+// Get the slope of a ramp based on the orientation of points on the ramp
 bool HullParameterDeterminer::getRampSlope()
 {
     bool success = true;
@@ -225,8 +226,8 @@ bool HullParameterDeterminer::getRampSlope()
             marker_point.z = possible_foot_location.z;
 
             // Color the point based on the orientation
-            float grey_scale
-                = 1 - fmin((acos(possible_foot_location.normal_z) * 180 / M_PI )
+            float grey_scale = 1
+                - fmin((acos(possible_foot_location.normal_z) * 180 / M_PI)
                         / max_slope,
                     1.0);
             std_msgs::ColorRGBA marker_color
@@ -666,6 +667,8 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
     return success;
 }
 
+// Calculate the slope of a ramp using the normals of the
+// possible_foot_locations cloud
 bool HullParameterDeterminer::calculateRampSlope()
 {
     bool success = true;
@@ -926,7 +929,8 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         case RealSenseCategory::ramp_up: {
             // Look at a region in between the min and max x value of the step
             // to find the average slope at
-            success &= fillOptionalFootLocationCloud(min_ramp_search, max_ramp_search);
+            success &= fillOptionalFootLocationCloud(
+                min_ramp_search, max_ramp_search);
             break;
         }
         default: {
