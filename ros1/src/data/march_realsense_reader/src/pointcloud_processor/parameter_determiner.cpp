@@ -225,18 +225,21 @@ bool HullParameterDeterminer::getRampSlope()
     }
 
     if (debugging_) {
-        possible_foot_locations_marker_list for (pcl::PointNormal
-                                                     possible_foot_location :
-            possible_foot_locations)
-        {
-            geometry_msgs::Point marker_point { possible_foot_location.x,
-                possible_foot_location.y, possible_foot_location.z };
+        for (pcl::PointNormal possible_foot_location :
+            *possible_foot_locations) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = possible_foot_location.x;
+            marker_point.y = possible_foot_location.y;
+            marker_point.z = possible_foot_location.z;
 
             // Color the point based on the orientation
+            float grey_scale
+                = min((acos(possible_foot_location.normal_z) * M_PI / 180)
+                        / max_slope,
+                    1.0);
             std_msgs::ColorRGBA marker_color
                 = color_utilities::colorRGBAInitRGBA(
-                    1 - possible_foot_locations.normal_x,
-                    possible_foot_locations.normal_x, 0.0);
+                    grey_scale, grey_scale, grey_scale);
 
             possible_foot_locations_marker_list.points.push_back(marker_point);
             possible_foot_locations_marker_list.colors.push_back(marker_color);
@@ -712,21 +715,16 @@ bool HullParameterDeterminer::getSlopeFromNormals(
 {
     // We want to find the angle with respect to the positive z direction as a
     // flat surface has a normal of {0, 0, 1}
-    pcl::Normal z_direction { 0, 0, 1 };
-    // Make use of dot(a, b) = norm(a) . norm(b) . cos(angle(a,b)) =
-    // cos(angle(a,b))
+    // Make use of
+    // dot(a, b) = norm(a) . norm(b) . cos(angle(a,b))
+    // With norm(a) = norm(b) = 1, as in our case, this gives
+    // acos(dot(normal, {0, 0, 1})) = acos(a_z) = angle(normal, {0, 0, 1}) =
+    // slope
     pcl::Normal normalized_normal;
     if (!linear_algebra_utilities::normalizeNormal(normal, normalized_normal)) {
         return false;
     }
-    float cosine_of_slope = (float)linear_algebra_utilities::dotProductNormal(
-        normalized_normal, z_direction);
-    if (cosine_of_slope < 0.0F || cosine_of_slope > 1.0F) {
-        ROS_ERROR_STREAM("The cosine of the found slope is not between 0 and "
-                         "1, corresponding slope would be unrealistic.");
-        return false;
-    }
-    float slope_radians = acos(cosine_of_slope);
+    float slope_radians = acos(normalized_normal.normal_z);
     slope = slope_radians * 180.0 / (M_PI);
 
     return true;
