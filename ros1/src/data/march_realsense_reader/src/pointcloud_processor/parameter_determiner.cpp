@@ -652,42 +652,36 @@ bool HullParameterDeterminer::getAverageNormal(
     const PointNormalCloud::Ptr& possible_foot_locations,
     pcl::Normal& average_normal)
 {
-
-    for (pcl::PointNormal& current_pointnormal : possible_foot_locations) {
+    for (pcl::PointNormal& current_pointnormal : *possible_foot_locations) {
         average_normal.normal_x += current_pointnormal.normal_x;
         average_normal.normal_y += current_pointnormal.normal_y;
         average_normal.normal_z += current_pointnormal.normal_z;
     }
-    average_normal.normal_x /= possible_foot_locations->size();
-    average_normal.normal_y /= possible_foot_locations->size();
-    average_normal.normal_z /= possible_foot_locations->size();
-
-    // If the normal is zero (<=> it has a norm of zero) it is invalid
-    // and it then cannot be used to calculate plane coefficients.
-    // The norm is generally close to 1, but this need not be the case
-    // e.g. if the orientation of the normals is not consistent.
-    float minimum_norm_allowed = 0.05;
-    if (linear_algebra_utilities::dotProductVector<double>(
-            average_normal, average_normal)
-        < minimum_norm_allowed) {
-        ROS_ERROR_STREAM("Computed average normal of region is too close "
-                         "to zero. Plane parameters will be inaccurate."
-                         "Average normal of region "
-            << region_index_ << " is "
-            << output_utilities::vectorToString(average_normal));
-        return false;
-    }
-
-    average_normal.normal_x = possible_foot_locations->points[0].normal_x;
-    average_normal.normal_y = possible_foot_locations->points[0].normal_y;
-    average_normal.normal_z = possible_foot_locations->points[0].normal_z;
-    return true;
+    return linear_algebra_utilities::normalizeNormal(average_normal);
 }
 
 bool HullParameterDeterminer::getSlopeFromNormals(
     const pcl::Normal& normal, float& slope)
 {
-    slope = 10;
+    // We want to find the angle with respect to the positive z direction as a
+    // flat surface has a normal of {0, 0, 1}
+    pcl::Normal z_direction { 0, 0, 1 };
+    // Make use of dot(a, b) = norm(a) . norm(b) . cos(angle(a,b)) =
+    // cos(angle(a,b))
+    pcl::Normal normalized_normal;
+    if (!linear_algebra_utilities::normalizeNormal(normal, normalized_normal)) {
+        return false;
+    }
+    float cosine_of_slope = (float)linear_algebra_utilities::dotProductNormal(
+        normalized_normal, z_direction);
+    if (cosine_of_slope < 0.0F || cosine_of_slope > 1.0F) {
+        ROS_ERROR_STREAM("The cosine of the found slope is not between 0 and "
+                         "1, corresponding slope would be unrealistic.");
+        return false;
+    }
+    float slope_radians = acos(cosine_of_slope);
+    slope = slope_radians * 180.0 / (M_PI);
+
     return true;
 }
 

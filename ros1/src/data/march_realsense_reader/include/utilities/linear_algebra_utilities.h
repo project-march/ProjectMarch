@@ -1,7 +1,7 @@
 #ifndef MARCH_LINEAR_ALGEBRA_UTILITIES_H
 #define MARCH_LINEAR_ALGEBRA_UTILITIES_H
 
-#include <cmath>
+#include <math.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
 #include <vector>
@@ -9,6 +9,7 @@
 namespace linear_algebra_utilities {
 // Calculate a dot product of two vectors
 #define EPSILON 0.0001
+
 template <typename T>
 T dotProductVector(std::vector<T> vector1, std::vector<T> vector2)
 {
@@ -73,38 +74,62 @@ pcl::PointXYZ projectPointToLine(
     return projected_point;
 }
 
-template <typename T>
-bool normalizeVector(
-    std::Vector<T> input_vector, std::Vector<T> normalized_vector)
-{
-    pcl::Normal input_normal {};
-    pcl::Normal output_normal {};
-    input_normal.normal_x = input_vector[0];
-    input_normal.normal_y = input_vector[1];
-    input_normal.normal_z = input_vector[2];
-    return normalizeNormal(input_normal, normalized_normal);
-}
-
-bool normalizeNormal(pcl::Normal input_normal, pcl::Normal normalized_normal)
+inline bool normalizeNormal(
+    const pcl::Normal& input_normal, pcl::Normal& normalized_normal)
 {
     double input_normal_norm = dotProductNormal(input_normal, input_normal);
     if (input_normal_norm < EPSILON) {
         ROS_WARN_STREAM("Norm of normal to normalize is smaller then "
             << EPSILON << " result can be inaccurate");
     }
-    normalized_normal.normal_x = input_normal_norm.normal_x / input_normal_norm;
-    normalized_normal.normal_y = input_normal_norm.normal_y / input_normal_norm;
-    normalized_normal.normal_z = input_normal_norm.normal_z / input_normal_norm;
+    normalized_normal.normal_x = input_normal.normal_x / input_normal_norm;
+    normalized_normal.normal_y = input_normal.normal_y / input_normal_norm;
+    normalized_normal.normal_z = input_normal.normal_z / input_normal_norm;
     double normalized_normal_norm
         = dotProductNormal(normalized_normal, normalized_normal);
-    if (abs(normalized_normal_norm - 1) > EPSILON) {
+    if (fabs(normalized_normal_norm - 1) > EPSILON) {
         ROS_WARN_STREAM(
             "Norm of normalized normal is too far from 1. The norm is "
             << normalized_normal_norm << " which is more then " << EPSILON
-            << "Away from 1. Normalizing not successful");
-        return false
+            << "Away from 1. Normalizing not successful.");
+        return false;
     }
     return true;
+}
+
+inline bool normalizeNormal(pcl::Normal& input_normal)
+{
+    return normalizeNormal(input_normal, input_normal);
+}
+
+template <typename T>
+bool normalize3DVector(
+    const std::vector<T>& input_vector, std::vector<T>& normalized_vector)
+{
+    if (input_vector.size() != 3) {
+        ROS_WARN_STREAM("The length of the input vector is not 3. Unable to "
+                        "normalize vector.");
+        return false;
+    }
+    pcl::Normal input_normal {};
+    input_normal.normal_x = input_vector[0];
+    input_normal.normal_y = input_vector[1];
+    input_normal.normal_z = input_vector[2];
+
+    pcl::Normal normalized_normal {};
+    if (!normalizeNormal(input_normal, normalized_normal)) {
+        return false;
+    }
+
+    normalized_vector[0] = normalized_normal.normal_x;
+    normalized_vector[1] = normalized_normal.normal_y;
+    normalized_vector[2] = normalized_normal.normal_z;
+    return true;
+}
+
+template <typename T> bool normalize3DVector(std::vector<T>& input_vector)
+{
+    return normalize3DVector<T>(input_vector, input_vector);
 }
 
 // Calculate the distance between a point and a line
