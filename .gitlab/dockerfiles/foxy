@@ -1,4 +1,5 @@
-FROM ros:foxy     # See https://hub.docker.com/_/ros
+# See https://hub.docker.com/_/ros
+FROM ros:foxy
 
 # Because we build this image in a non-interactive environment, we should notify Debian that
 # we cannot respond to required interaction. This will assume the default values in case
