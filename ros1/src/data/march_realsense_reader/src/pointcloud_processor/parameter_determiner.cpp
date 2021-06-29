@@ -6,7 +6,7 @@
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_category_utilities.h"
 #include "yaml-cpp/yaml.h"
-#include <cmath>
+#include <math.h>
 #include <ctime>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
@@ -69,14 +69,8 @@ void HullParameterDeterminer::readParameters(
     foot_width = (float)config.parameter_determiner_foot_width;
     hull_dimension = config.hull_dimension;
 
-    ramp_min_search_area
-        = (float)config.parameter_determiner_ramp_min_search_area;
-
-    x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
-    x_steep_down = (float)config.parameter_determiner_ramp_x_steep_down;
-
-    x_flat_up = (float)config.parameter_determiner_ramp_x_flat_up;
-    x_steep_up = (float)config.parameter_determiner_ramp_x_steep_up;
+    max_ramp_search = (float)config.parameter_determiner_ramp_max_search_area;
+    min_ramp_search = (float)config.parameter_determiner_ramp_min_search_area;
 
     min_slope = (float)config.parameter_determiner_min_slope;
     max_slope = (float)config.parameter_determiner_max_slope;
@@ -232,7 +226,7 @@ bool HullParameterDeterminer::getRampSlope()
 
             // Color the point based on the orientation
             float grey_scale
-                = min((acos(possible_foot_location.normal_z) * M_PI / 180)
+                = 1 - fmin((acos(possible_foot_location.normal_z) * 180 / M_PI )
                         / max_slope,
                     1.0);
             std_msgs::ColorRGBA marker_color
@@ -349,16 +343,6 @@ void HullParameterDeterminer::addDebugMarkersToArray()
 void HullParameterDeterminer::initializeGaitDimensions()
 {
     switch (realsense_category_.value()) {
-        case RealSenseCategory::ramp_down: {
-            x_flat = x_flat_down;
-            x_steep = x_steep_down;
-            break;
-        }
-        case RealSenseCategory::ramp_up: {
-            x_flat = x_flat_up;
-            x_steep = x_steep_up;
-            break;
-        }
         case RealSenseCategory::stairs_up: {
             min_x_stairs = min_x_stairs_up;
             max_x_stairs = max_x_stairs_up;
@@ -381,8 +365,6 @@ void HullParameterDeterminer::initializeGaitDimensions()
     // also traverses twice the distance of a normal open gait
     if (subgait_name_.substr(subgait_name_.size() - 5) == "swing"
         || subgait_name_ == "left_open") {
-        x_flat *= 2;
-        x_steep *= 2;
         min_x_stairs *= 2;
         max_x_stairs *= 2;
         min_z_stairs *= 2;
@@ -903,7 +885,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
         case RealSenseCategory::ramp_up: {
             // Look at a region in between the min and max x value of the step
             // to find the average slope at
-            success &= fillOptionalFootLocationCloud(x_steep, x_flat);
+            success &= fillOptionalFootLocationCloud(min_ramp_search, max_ramp_search);
             break;
         }
         default: {
