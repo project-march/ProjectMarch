@@ -1,39 +1,29 @@
-FROM ros:noetic
+FROM ros:noetic     # See https://hub.docker.com/_/ros
+
+# Because we build this image in a non-interactive environment, we should notify Debian that
+# we cannot respond to required interaction. This will assume the default values in case
+# an interactive window pops up.
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Build tools
-RUN apt update && apt install -y    python3-rosinstall-generator \
-                                    build-essential \
-                                    python3-colcon-common-extensions \
-                                    python3-pip \
-                                    python3-catkin-pkg \
-                                    python3-catkin-lint \
-                                    clang-tidy \
-                                    clang \
-                                    libssl-dev \
-                                    wget \
-                                    cmake \
-                                    git \
-                                    git-lfs \
-                                    libbullet-dev \
-                                    python3-pytest-cov \
-                                    python3-setuptools && \
-    apt update && apt install -y --no-install-recommends  \
-                                    libasio-dev \
-                                    libtinyxml2-dev \
-                                    libcunit1-dev
+RUN apt update && apt install -y    python3-pip \       # We need pip to install certain python dependencies
+                                    clang \             # clang is used to compile C++ code
+                                    clang-tidy \        # clang-tidy is used in a different pipeline stage
+                                    git \               # We need git and git-lfs to get repo information from
+                                    git-lfs             # inside the container.
 
 # Non-ROS Python dependencies
 COPY requirements.pip /march/requirements.pip
 RUN bash -c "python3 -m pip install mock argcomplete pytest-repeat pytest-rerunfailures pytest $(cat /march/requirements.pip | sort | tr '\n' ' ')"
 
 # Copy the project into the container to automatically detect all dependencies.
-COPY . /march
+COPY ros1/src /march/src
 
 # Install all ROS1 packages
-# This gets all the packages defined in package.xml and tries to install the relevant packages
-# associated with them.
-RUN bash -c "source /opt/ros/noetic/local_setup.bash && rosdep update && apt update && apt install -y $(rosdep keys --from-paths /march/ros1/src --rosdistro noetic | xargs rosdep resolve --rosdistro noetic | grep -v "^#" | sort | tr '\n' ' ' 2>/dev/null)"
+# This runs the `rosdep` program, which automatically finds dependencies declared in package.xml files
+# and installs them. See https://docs.ros.org/en/independent/api/rosdep/html/commands.html for
+# command line reference.
+RUN apt update && rosdep update --rosdistro noetic && rosdep install --rosdistro noetic -y --from-paths /march/src --ignore-src
 
-# Remove march files
+# Remove march files to save space
 RUN rm -rf /march
