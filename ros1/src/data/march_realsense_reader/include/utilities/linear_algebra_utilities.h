@@ -1,7 +1,7 @@
 #ifndef MARCH_LINEAR_ALGEBRA_UTILITIES_H
 #define MARCH_LINEAR_ALGEBRA_UTILITIES_H
 
-#include <math.h>
+#include <cmath>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
 #include <vector>
@@ -82,7 +82,7 @@ pcl::PointXYZ projectPointToLine(
 inline bool normalizeNormal(
     const pcl::Normal& input_normal, pcl::Normal& normalized_normal)
 {
-    double input_normal_norm = normNormal(input_normal);
+    float input_normal_norm = (float)normNormal(input_normal);
     if (input_normal_norm < EPSILON) {
         ROS_WARN_STREAM("Norm of normal to normalize is smaller then "
             << EPSILON << " result can be inaccurate");

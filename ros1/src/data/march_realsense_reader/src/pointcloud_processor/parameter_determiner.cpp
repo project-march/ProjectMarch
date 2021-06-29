@@ -1,13 +1,12 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
-#include "pointcloud_processor/parameter_determiner.h"
 #include "utilities/color_utilities.h"
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_category_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <ctime>
-#include <math.h>
+#include <cmath>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -226,10 +225,10 @@ bool HullParameterDeterminer::getRampSlope()
             marker_point.z = possible_foot_location.z;
 
             // Color the point based on the orientation
-            float grey_scale = 1
-                - fmin((acos(possible_foot_location.normal_z) * 180 / M_PI)
+            double grey_scale = 1.0
+                - fmin((acos(possible_foot_location.normal_z) * 180.0 / M_PI)
                         / max_slope,
-                    1.0);
+                    /*__y=*/1.0);
             std_msgs::ColorRGBA marker_color
                 = color_utilities::colorRGBAInitRGBA(
                     grey_scale, grey_scale, grey_scale);
