@@ -217,6 +217,7 @@ protected:
     float x_steep_up {};
     float z_steep_up {};
     float ramp_min_search_area {};
+    float ramp_max_search_area {};
     float max_distance_to_line {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
