@@ -15,7 +15,6 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
-using LineCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
@@ -163,9 +162,6 @@ protected:
     bool getDistanceToObject(
         pcl::PointNormal possible_foot_location, double& distance);
 
-    // Get the line on which it is possible to stand for a ramp gait.
-    bool getExecutableLocationsLine();
-
     // Find the stairs up parameters from the foot locations
     bool getGaitParametersFromFootLocationStairs();
 
@@ -245,8 +241,6 @@ protected:
     float max_slope {};
     float min_slope {};
     float ramp_min_search_area {};
-    float ramp_max_search_area {};
-    float max_distance_to_line {};
     float min_sit_height {};
     float max_sit_height {};
     float min_x_search_sit {};
@@ -262,11 +256,7 @@ protected:
     visualization_msgs::Marker possible_foot_locations_marker_list;
     visualization_msgs::Marker gait_information_marker_list;
     visualization_msgs::Marker optimal_location_marker;
-    pcl::PointXYZ most_desirable_foot_location_;
-    // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
-    // [5])^T
-    LineCoefficients::Ptr executable_locations_line_coefficients_
-        = boost::make_shared<LineCoefficients>();
+    pcl::PointXYZ most_desirable_foot_location_;f
 
     float ramp_slope {};
     pcl::PointNormal optimal_foot_location;

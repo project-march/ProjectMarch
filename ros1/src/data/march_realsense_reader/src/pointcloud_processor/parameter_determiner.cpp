@@ -23,7 +23,6 @@ using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
-using LineCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
@@ -97,8 +96,6 @@ void HullParameterDeterminer::readParameters(
     sit_grid_size = (float)config.parameter_determiner_sit_grid_size;
     max_allowed_z_deviation_foot
         = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
-    max_distance_to_line
-        = (float)config.parameter_determiner_ramp_max_distance_to_line;
 
     debugging_ = config.debug;
 }
@@ -748,15 +745,6 @@ bool HullParameterDeterminer::getDistanceToObject(
                 possible_foot_location, most_desirable_foot_location_);
             break;
         }
-        case RealSenseCategory::ramp_up:
-        case RealSenseCategory::ramp_down: {
-            // For the ramp find which point is closest to the possible
-            // locations line
-            distance = linear_algebra_utilities::distancePointToLine(
-                possible_foot_location,
-                executable_locations_line_coefficients_);
-            break;
-        }
         default: {
             ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
                              "for selected obstacle "
@@ -809,42 +797,6 @@ bool HullParameterDeterminer::isValidLocation(
                 && possible_foot_location.z > min_z_stairs
                 && possible_foot_location.z < max_z_stairs
                 && entireFootCanBePlaced(possible_foot_location));
-        }
-        case RealSenseCategory::ramp_down:
-        case RealSenseCategory::ramp_up: {
-            pcl::PointXYZ projected_point
-                = linear_algebra_utilities::projectPointToLine(
-                    possible_foot_location,
-                    executable_locations_line_coefficients_);
-            double distance = linear_algebra_utilities::distanceBetweenPoints(
-                projected_point, possible_foot_location);
-
-            if (debugging_) {
-                geometry_msgs::Point marker_point;
-                marker_point.x = possible_foot_location.x;
-                marker_point.y = possible_foot_location.y;
-                marker_point.z = possible_foot_location.z;
-
-                std_msgs::ColorRGBA marker_color;
-                if (!(projected_point.x < x_steep
-                        && projected_point.x > x_flat)) {
-                    marker_color = color_utilities::YELLOW;
-                } else if (!(distance < max_distance_to_line)) {
-                    marker_color = color_utilities::PURPLE;
-                } else {
-                    marker_color = color_utilities::GREEN;
-                }
-                possible_foot_locations_marker_list.points.push_back(
-                    marker_point);
-                possible_foot_locations_marker_list.colors.push_back(
-                    marker_color);
-            }
-
-            // only points which are close enough to the line are valid
-            // Only points on the line which are between the two given values
-            // are valid
-            return (projected_point.x < x_steep && projected_point.x > x_flat
-                && distance < max_distance_to_line);
         }
         default: {
             ROS_ERROR_STREAM(
