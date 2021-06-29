@@ -234,14 +234,8 @@ protected:
     float foot_length_front {};
     float foot_width {};
     float max_allowed_z_deviation_foot {};
-    float x_flat {};
-    float z_flat {};
-    float x_steep {};
-    float z_steep {};
-    float x_flat_down {};
-    float x_steep_down {};
-    float x_flat_up {};
-    float x_steep_up {};
+    float max_ramp_search {};
+    float min_ramp_search {};
     float max_slope {};
     float min_slope {};
     float ramp_min_search_area {};
