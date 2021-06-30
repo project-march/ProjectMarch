@@ -4,12 +4,52 @@
 #include <cmath>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
+#include <ros/ros.h>
 #include <vector>
 
 namespace linear_algebra_utilities {
 // Calculate a dot product of two vectors
-#define EPSILON 0.0001
+template <typename T>
+T dotProductVector(std::vector<T> vector1, std::vector<T> vector2);
 
+// Calculate a dot product of two objects with x, y and z attributes
+template <typename T> double dotProductPoint(T point1, T point2);
+
+template <typename T> double dotProductNormal(T point1, T point2);
+
+template <typename T> double normNormal(T point);
+
+// Calculate the distance between two points
+template <typename T, typename Q>
+double distanceBetweenPoints(T point1, Q point2);
+
+// Project a point to a line
+template <typename T>
+pcl::PointXYZ projectPointToLine(
+    T point, const pcl::ModelCoefficients::Ptr& line_coefficients);
+
+bool normalizeNormal(
+    const pcl::Normal& input_normal, pcl::Normal& normalized_normal);
+
+bool normalizeNormal(pcl::Normal& input_normal);
+
+template <typename T>
+bool normalize3DVector(
+    const std::vector<T>& input_vector, std::vector<T>& normalized_vector);
+
+template <typename T> bool normalize3DVector(std::vector<T>& input_vector);
+
+// Calculate the distance between a point and a line
+template <typename T>
+double distancePointToLine(
+    T point, pcl::ModelCoefficients::Ptr line_coefficients);
+
+// Return true if the z coordinate of point1 is lower then that of point2
+bool pointIsLower(pcl::PointNormal point1, pcl::PointNormal point2);
+
+// Implement the templated functions in the header
+
+// Calculate a dot product of two vectors
 template <typename T>
 T dotProductVector(std::vector<T> vector1, std::vector<T> vector2)
 {
@@ -79,33 +119,6 @@ pcl::PointXYZ projectPointToLine(
     return projected_point;
 }
 
-inline bool normalizeNormal(
-    const pcl::Normal& input_normal, pcl::Normal& normalized_normal)
-{
-    double input_normal_norm = normNormal(input_normal);
-    if (input_normal_norm < EPSILON) {
-        ROS_WARN_STREAM("Norm of normal to normalize is smaller then "
-            << EPSILON << " result can be inaccurate");
-    }
-    normalized_normal.normal_x = input_normal.normal_x / float(input_normal_norm);
-    normalized_normal.normal_y = input_normal.normal_y / float(input_normal_norm);
-    normalized_normal.normal_z = input_normal.normal_z / float(input_normal_norm);
-    double normalized_normal_norm = normNormal(normalized_normal);
-    if (fabs(normalized_normal_norm - 1) > EPSILON) {
-        ROS_WARN_STREAM(
-            "Norm of normalized normal is too far from 1. The norm is "
-            << normalized_normal_norm << " which is more then " << EPSILON
-            << "Away from 1. Normalizing not successful.");
-        return false;
-    }
-    return true;
-}
-
-inline bool normalizeNormal(pcl::Normal& input_normal)
-{
-    return normalizeNormal(input_normal, input_normal);
-}
-
 template <typename T>
 bool normalize3DVector(
     const std::vector<T>& input_vector, std::vector<T>& normalized_vector)
@@ -144,12 +157,6 @@ double distancePointToLine(
     pcl::PointXYZ projected_point
         = projectPointToLine<T>(point, line_coefficients);
     return distanceBetweenPoints<T, pcl::PointXYZ>(point, projected_point);
-}
-
-// Return true if the z coordinate of point1 is lower then that of point2
-inline bool pointIsLower(pcl::PointNormal point1, pcl::PointNormal point2)
-{
-    return point1.z < point2.z;
 }
 
 } // namespace linear_algebra_utilities
