@@ -21,7 +21,7 @@ march6:
             resolution: 14
             direction: 1
             minPositionIU: 9063
-            maxPositionIU: 11118gitcm
+            maxPositionIU: 11118
 
           incrementalEncoder:
             resolution: 13
@@ -147,7 +147,7 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
+          slaveIndex: 2
           axis: 1
           preCalibrated: false
           motorKV: 95
