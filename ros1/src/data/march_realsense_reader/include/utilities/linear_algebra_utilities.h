@@ -82,14 +82,14 @@ pcl::PointXYZ projectPointToLine(
 inline bool normalizeNormal(
     const pcl::Normal& input_normal, pcl::Normal& normalized_normal)
 {
-    float input_normal_norm = (float)normNormal(input_normal);
+    double input_normal_norm = normNormal(input_normal);
     if (input_normal_norm < EPSILON) {
         ROS_WARN_STREAM("Norm of normal to normalize is smaller then "
             << EPSILON << " result can be inaccurate");
     }
-    normalized_normal.normal_x = input_normal.normal_x / input_normal_norm;
-    normalized_normal.normal_y = input_normal.normal_y / input_normal_norm;
-    normalized_normal.normal_z = input_normal.normal_z / input_normal_norm;
+    normalized_normal.normal_x = input_normal.normal_x / float(input_normal_norm);
+    normalized_normal.normal_y = input_normal.normal_y / float(input_normal_norm);
+    normalized_normal.normal_z = input_normal.normal_z / float(input_normal_norm);
     double normalized_normal_norm = normNormal(normalized_normal);
     if (fabs(normalized_normal_norm - 1) > EPSILON) {
         ROS_WARN_STREAM(

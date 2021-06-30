@@ -707,7 +707,7 @@ bool HullParameterDeterminer::getSlopeFromNormals(
         return false;
     }
     float slope_radians = acos(normalized_normal.normal_z);
-    slope = slope_radians * 180.0 / (M_PI);
+    slope = slope_radians * float(180.0 / (M_PI));
 
     return true;
 }
