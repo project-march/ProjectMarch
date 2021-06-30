@@ -132,3 +132,9 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
   doc/march_packages/march_simulation
+
+.. toctree::
+    :caption: MARCH packages
+    :glob:
+
+    doc/march_packages/readme/*

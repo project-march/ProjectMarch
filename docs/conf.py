@@ -14,13 +14,7 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx.ext.todo",
     "sphinx_rtd_theme",
-    "myst_parser",
 ]
-
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.md': 'markdown',
-}
 
 todo_include_todos = True
 
