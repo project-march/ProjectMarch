@@ -1,7 +1,11 @@
+mock
+argcomplete
+pytest-repeat
+pytest-rerunfailures
+pytest
 pyqtgraph==0.11.0
 numpy_ringbuffer==0.2.1
 Flask==1.1.2
 scipy
-mock
 parameterized
 numpy

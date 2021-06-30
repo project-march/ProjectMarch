@@ -16,7 +16,7 @@ RUN apt update && apt install -y python3-pip clang clang-tidy git git-lfs
 
 # Non-ROS Python dependencies
 COPY requirements.pip /march/requirements.pip
-RUN bash -c "python3 -m pip install mock argcomplete pytest-repeat pytest-rerunfailures pytest $(cat /march/requirements.pip | sort | tr '\n' ' ')"
+RUN bash -c "python3 -m pip install -r /march/requirements.pip"
 
 # Copy the project into the container to automatically detect all dependencies.
 COPY ros2/src /march/src
