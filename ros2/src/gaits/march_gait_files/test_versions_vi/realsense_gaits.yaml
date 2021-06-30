@@ -1,9 +1,7 @@
 # All realsense gaits that will be parameterized on 2 dimensions, this will generally
 # be done by first parameterizing the 1st with the 2nd & 3rd with the 4th using the
 # depth parameter and then the two created subgaits with the height pararmeter
-
 realsense_stairs_up_single_step:
-  # The gait realsense category must match an available category in GetGaitParameters.srv
   realsense_category: stairs_up
   camera_to_use: front
   starting_position: static

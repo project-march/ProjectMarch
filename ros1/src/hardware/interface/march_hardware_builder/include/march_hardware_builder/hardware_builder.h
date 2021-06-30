@@ -18,6 +18,7 @@
 #include <march_hardware/march_robot.h>
 #include <march_hardware/motor_controller/actuation_mode.h>
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
@@ -32,8 +33,8 @@ public:
      * @brief Initialises a HardwareBuilder with a robotName enumerator.
      * @details Grabs the .yaml file associated with the robot name.
      */
-    explicit HardwareBuilder(
-        AllowedRobot robot, bool remove_fixed_joints_from_ethercat_train);
+    explicit HardwareBuilder(AllowedRobot robot,
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name);
 
     /**
      * @brief Initialises with a robot name and URDF.
@@ -44,7 +45,7 @@ public:
      * @brief Initialises a HardwareBuilder with a path to a .yaml file.
      */
     explicit HardwareBuilder(const std::string& yaml_path,
-        bool remove_fixed_joints_from_ethercat_train);
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name);
 
     /**
      * @brief Initialises with a path to yaml and URDF.
@@ -79,9 +80,13 @@ public:
         const march::SdoInterfacePtr& sdo_interface);
     static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
         const YAML::Node& absolute_encoder_config,
+        const march::MotorControllerType motor_controller_type,
         const urdf::JointConstSharedPtr& urdf_joint);
     static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
-        const YAML::Node& incremental_encoder_config);
+        const YAML::Node& incremental_encoder_config,
+        const march::MotorControllerType motor_controller_type);
+    static march::Encoder::Direction getEncoderDirection(
+        const YAML::Node& encoder_config);
     static std::unique_ptr<march::MotorController> createMotorController(
         const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
         const march::PdoInterfacePtr& pdo_interface,
@@ -154,6 +159,7 @@ private:
     urdf::Model urdf_;
     bool init_urdf_ = true;
     bool remove_fixed_joints_from_ethercat_train_ = false;
+    std::string if_name_ = "";
 };
 
 /**

@@ -48,8 +48,13 @@ public:
     // Actuate based on the actuation mode of the motor controller
     void actuate(float target);
 
-    // Prepare the MotorController for actuation, move it into its 'ready' state
-    virtual void prepareActuation() = 0;
+    // Prepare the MotorController for actuation
+    // Returns an optional wait duration
+    virtual std::optional<ros::Duration> prepareActuation() = 0;
+
+    // Enable actuation for the MotorController, move it into its 'ready' state
+    // Returns an optional wait duration
+    virtual std::optional<ros::Duration> enableActuation() = 0;
 
     // Transform the ActuationMode to a number that is understood by the
     // MotorController
@@ -58,6 +63,9 @@ public:
     // Get whether the incremental encoder is more precise than the absolute
     // encoder
     bool isIncrementalEncoderMorePrecise() const;
+
+    // Are the slaves of this MotorController unique
+    virtual bool requiresUniqueSlaves() const = 0;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
@@ -72,9 +80,14 @@ public:
     virtual float getMotorCurrent() = 0;
     virtual float getMotorControllerVoltage() = 0;
     virtual float getMotorVoltage() = 0;
+    virtual float getActualEffort() = 0;
 
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;
+
+    // Effort may have to be multiplied by a constant
+    // because ROS control limits the pid values to a certain maximum
+    virtual float effortMultiplicationConstant();
 
     ~MotorController() override = default;
 
@@ -122,11 +135,11 @@ protected:
     virtual float getAbsoluteVelocityUnchecked() = 0;
     virtual float getIncrementalVelocityUnchecked() = 0;
 
-    // A MotorController doesn't necessarily have an AbsoluteEncoder and an
-    // IncrementalEncoder, but will have at least one of the two
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
-    std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
+    std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
+    std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     ActuationMode actuation_mode_;
+
+    bool is_incremental_encoder_more_precise_;
 };
 
 } // namespace march

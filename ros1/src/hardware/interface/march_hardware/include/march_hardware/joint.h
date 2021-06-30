@@ -46,9 +46,15 @@ public:
     bool receivedDataUpdate();
 
     // Prepare the joint for actuation
-    // First calls the prepareActuation() method of the MotorController
-    // Then sets some initial values
-    void prepareActuation();
+    // Returns an optional wait duration
+    std::optional<ros::Duration> prepareActuation();
+
+    // Enable actuation for this joint
+    // Returns an optional wait duration
+    std::optional<ros::Duration> enableActuation();
+
+    // Set initial encoder values
+    void readFirstEncoderValues(bool operational_check);
 
     // Actuate the joint if allow_actuation is true
     // Will throw a HardwareException if canActuate() is false
@@ -110,7 +116,8 @@ private:
 
     // Keep track of the position and velocity of the joint, updated by
     // readEncoders()
-    double previous_incremental_position_ = 0.0;
+    double initial_incremental_position_ = 0.0;
+    double initial_absolute_position_ = 0.0;
     double position_ = 0.0;
     double velocity_ = 0.0;
 

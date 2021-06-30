@@ -4,6 +4,7 @@
 
 #include <march_hardware/joint.h>
 #include <march_hardware/motor_controller/actuation_mode.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
 #include <march_shared_msgs/PressureSoleData.h>
 #include <march_shared_msgs/PressureSolesData.h>
@@ -25,6 +26,8 @@
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/motor_controller/motor_controller.h"
 
+//#define DEBUG_JOINT_VALUES
+
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
 using hardware_interface::PositionJointInterface;
@@ -34,10 +37,10 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
 
 MarchHardwareInterface::MarchHardwareInterface(
-    std::unique_ptr<march::MarchRobot> robot, bool reset_imc)
+    std::unique_ptr<march::MarchRobot> robot, bool reset_motor_controllers)
     : march_robot_(std::move(robot))
     , num_joints_(this->march_robot_->size())
-    , reset_imc_(reset_imc)
+    , reset_motor_controllers_(reset_motor_controllers)
 {
 }
 
@@ -60,12 +63,10 @@ bool MarchHardwareInterface::init(
             march_shared_msgs::AfterLimitJointCommand>>(
             nh, "/march/controller/after_limit_joint_command/", 4);
 
-    this->uploadJointNames(nh);
-
     this->reserveMemory();
 
     // Start ethercat cycle in the hardware
-    this->march_robot_->startEtherCAT(this->reset_imc_);
+    this->march_robot_->startEtherCAT(this->reset_motor_controllers_);
 
     for (size_t i = 0; i < num_joints_; ++i) {
         const std::string name = this->march_robot_->getJoint(i).getName();
@@ -168,16 +169,67 @@ bool MarchHardwareInterface::init(
         MarchTemperatureSensorHandle temperature_sensor_handle(joint.getName(),
             &joint_temperature_[i], &joint_temperature_variance_[i]);
         march_temperature_interface_.registerHandle(temperature_sensor_handle);
+    }
 
+    // Wait some time to make sure the EtherCAT network is ready
+    ros::Duration(/*t=*/5).sleep();
+
+    // Prepare all joints for actuation
+    ros::Duration wait_duration(/*t=*/0);
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
         // Enable high voltage on the IMC
         if (joint.canActuate()) {
-            joint.prepareActuation();
+            auto joint_wait_duration = joint.prepareActuation();
+            if (joint_wait_duration.has_value()
+                && joint_wait_duration.value() > wait_duration) {
+                wait_duration = joint_wait_duration.value();
+            }
+        }
+    }
+    // Wait a while for MotorControllers to be prepared
+    wait_duration.sleep();
+
+    // Enable all joints for actuation
+    wait_duration = ros::Duration(/*t=*/5);
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+        // Enable high voltage on the IMC
+        if (joint.canActuate()) {
+            auto joint_wait_duration = joint.enableActuation();
+            if (joint_wait_duration.has_value()
+                && joint_wait_duration.value() > wait_duration) {
+                wait_duration = joint_wait_duration.value();
+            }
+        }
+    }
+    // Wait a while for MotorControllers to be enabled
+    wait_duration.sleep();
+
+    // For debugging
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+
+        ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(),
+            joint.getMotorController()
+                ->getState()
+                ->getOperationalState()
+                .c_str());
+    }
+
+    // Read the first encoder values for each joint
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+        if (joint.canActuate()) {
+            joint.readFirstEncoderValues(/*operational_check/=*/true);
 
             // Set the first target as the current position
             joint_position_[i] = joint.getPosition();
-            joint_velocity_[i] = joint.getVelocity();
+            joint_velocity_[i] = 0;
             joint_effort_[i] = 0;
 
+            auto actuation_mode
+                = joint.getMotorController()->getActuationMode();
             if (actuation_mode == march::ActuationMode::position) {
                 joint_position_command_[i] = joint_position_[i];
             } else if (actuation_mode == march::ActuationMode::torque) {
@@ -185,7 +237,8 @@ bool MarchHardwareInterface::init(
             }
         }
     }
-    ROS_INFO("Successfully actuated all joints");
+
+    ROS_INFO("All joints are ready for actuation!");
 
     this->registerInterface(&this->march_temperature_interface_);
     this->registerInterface(&this->joint_state_interface_);
@@ -233,10 +286,16 @@ void MarchHardwareInterface::read(
         joint_position_[i] = joint.getPosition();
         joint_velocity_[i] = joint.getVelocity();
 
+#ifdef DEBUG_JOINT_VALUES
+        ROS_INFO_STREAM("Joint " << joint.getName()
+                                 << ", position= " << joint_position_[i]
+                                 << ", velocity= " << joint_velocity_[i]);
+#endif
+
         if (joint.hasTemperatureGES()) {
             joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
         }
-        joint_effort_[i] = joint.getMotorController()->getTorque();
+        joint_effort_[i] = joint.getMotorController()->getActualEffort();
     }
 
     this->updateMotorControllerState();
@@ -247,12 +306,15 @@ void MarchHardwareInterface::read(
 }
 
 void MarchHardwareInterface::write(
-    const ros::Time& /* time */, const ros::Duration& elapsed_time)
+    const ros::Time& /*time*/, const ros::Duration& elapsed_time)
 {
     for (size_t i = 0; i < num_joints_; i++) {
-        // Enlarge joint_effort_command because ROS control limits the pid
-        // values to a certain maximum
-        joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
+        // Enlarge joint_effort_command for IMotionCube because ROS control
+        // limits the pid values to a certain maximum
+        joint_effort_command_[i] = joint_effort_command_[i]
+            * march_robot_->getJoint(i)
+                  .getMotorController()
+                  ->effortMultiplicationConstant();
         if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i])
             > MAX_EFFORT_CHANGE) {
             joint_effort_command_[i] = joint_last_effort_command_[i]
@@ -310,16 +372,6 @@ int MarchHardwareInterface::getEthercatCycleTime() const
     return this->march_robot_->getEthercatCycleTime();
 }
 
-void MarchHardwareInterface::uploadJointNames(ros::NodeHandle& nh) const
-{
-    std::vector<std::string> joint_names;
-    for (const auto& joint : *this->march_robot_) {
-        joint_names.push_back(joint.getName());
-    }
-    std::sort(joint_names.begin(), joint_names.end());
-    nh.setParam("/march/joint_names", joint_names);
-}
-
 void MarchHardwareInterface::reserveMemory()
 {
     joint_position_.resize(num_joints_);
@@ -344,6 +396,7 @@ void MarchHardwareInterface::reserveMemory()
 
     motor_controller_state_pub_->msg_.motor_current.resize(num_joints_);
     motor_controller_state_pub_->msg_.motor_voltage.resize(num_joints_);
+    motor_controller_state_pub_->msg_.temperature.resize(num_joints_);
 
     motor_controller_state_pub_->msg_.absolute_position_iu.resize(num_joints_);
     motor_controller_state_pub_->msg_.incremental_position_iu.resize(
@@ -477,6 +530,8 @@ void MarchHardwareInterface::updateMotorControllerState()
             = motor_controller_state->motor_current_;
         motor_controller_state_pub_->msg_.motor_voltage[i]
             = motor_controller_state->motor_voltage_;
+        motor_controller_state_pub_->msg_.temperature[i]
+            = motor_controller_state->temperature_;
 
         motor_controller_state_pub_->msg_.absolute_position_iu[i]
             = motor_controller_state->absolute_position_iu_;
