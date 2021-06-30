@@ -80,9 +80,9 @@ joint_limits:
     resolution: 20
   right_knee:
     unit: iu
-    lower_limit: 271431
+    lower_limit: 271046
     upper_limit: 621197
-    zero_position: 282411
+    zero_position: 286053
     resolution: 20
   left_hfe:
     unit: iu
