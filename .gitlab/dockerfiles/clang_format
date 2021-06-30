@@ -1,8 +1,8 @@
 FROM python:alpine
 
 # Add git for cloning the run-clang-format script
-# Add clang for the clang-format binary
-RUN apk add --no-cache git clang clang-format
+# Add clang-dev for the clang-format binary
+RUN apk add --no-cache git clang-dev
 
 # Clone the script for GitHub, copy the script into a folder that is in the PATH and
 # remove the repository again to save space

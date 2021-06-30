@@ -7,11 +7,12 @@ FROM ros:noetic
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Build tools
-RUN apt update && apt install -y    python3-pip \       # We need pip to install certain python dependencies
-                                    clang \             # clang is used to compile C++ code
-                                    clang-tidy \        # clang-tidy is used in a different pipeline stage
-                                    git \               # We need git and git-lfs to get repo information from
-                                    git-lfs             # inside the container.
+# We need pip to install certain python dependencies
+# clang is used to compile C++ code
+# clang-tidy is used in a different pipeline stage
+# We need git and git-lfs to get repo information from
+# inside the container.
+RUN apt update && apt install -y python3-pip clang clang-tidy git git-lfs
 
 # Non-ROS Python dependencies
 COPY requirements.pip /march/requirements.pip
