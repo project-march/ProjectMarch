@@ -15,7 +15,7 @@ function readmes_to_sphinx ()
 
     # List all README.md files
     INPUT=$(mktemp)
-    find $1 -name "README.md" | grep '^' > $INPUT
+    find $1 -name "README.md" | grep -v "libraries" | grep '^' > $INPUT
 
     # Extract the package name by removing the "README.md" part and by removing
     # everything before "/march"
