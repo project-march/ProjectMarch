@@ -8,6 +8,7 @@
     <arg name="remove_fixed_joints_from_ethercat_train" default="false"
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
+    <arg name="slave_configuration" default="default" doc="Which slave indices to use"/>
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg controller_name)/controllers.yaml" command="load"/>
     <node name="upload_controller_values" pkg="march_launch"
@@ -27,7 +28,7 @@
                 name="hardware_interface"
                 pkg="march_hardware_interface"
                 type="march_hardware_interface_node"
-                args="$(arg robot) $(arg if_name)"
+                args="$(arg robot) $(arg if_name) $(arg slave_configuration)"
                 output="screen"
                 required="true"
         >

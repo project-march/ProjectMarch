@@ -20,7 +20,8 @@ protected:
     urdf::JointSharedPtr joint;
     march::PdoInterfacePtr pdo_interface;
     march::SdoInterfacePtr sdo_interface;
-    const march::MotorControllerType motor_controller_type
+    HardwareBuilder hw_builder = HardwareBuilder()
+        const march::MotorControllerType motor_controller_type
         = march::MotorControllerType::IMotionCube;
 
     void SetUp() override

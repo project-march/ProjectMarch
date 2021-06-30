@@ -30,27 +30,48 @@
 class HardwareBuilder {
 public:
     /**
+     * @brief Initialises a HardwareBuilder with a path to a .yaml file.
+     */
+    explicit HardwareBuilder(const std::string& yaml_path,
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+        std::string slave_configuration,
+        march::PdoInterfacePtr pdo_interface = nullptr,
+        march::SdoInterfacePtr sdo_interface = nullptr);
+
+    /**
      * @brief Initialises a HardwareBuilder with a robotName enumerator.
      * @details Grabs the .yaml file associated with the robot name.
      */
     explicit HardwareBuilder(AllowedRobot robot,
-        bool remove_fixed_joints_from_ethercat_train, std::string if_name);
-
-    /**
-     * @brief Initialises with a robot name and URDF.
-     */
-    HardwareBuilder(AllowedRobot robot, urdf::Model urdf);
-
-    /**
-     * @brief Initialises a HardwareBuilder with a path to a .yaml file.
-     */
-    explicit HardwareBuilder(const std::string& yaml_path,
-        bool remove_fixed_joints_from_ethercat_train, std::string if_name);
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+        std::string slave_configuration,
+        march::PdoInterfacePtr pdo_interface = nullptr,
+        march::SdoInterfacePtr sdo_interface = nullptr);
 
     /**
      * @brief Initialises with a path to yaml and URDF.
      */
-    HardwareBuilder(const std::string& yaml_path, urdf::Model urdf);
+    HardwareBuilder(const std::string& yaml_path, urdf::Model urdf,
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+        std::string slave_configuration,
+        march::PdoInterfacePtr pdo_interface = nullptr,
+        march::SdoInterfacePtr sdo_interface = nullptr);
+
+    /**
+     * @brief Initialises with a robot name and URDF.
+     */
+    HardwareBuilder(AllowedRobot robot, urdf::Model urdf,
+        bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+        std::string slave_configuration,
+        march::PdoInterfacePtr pdo_interface = nullptr,
+        march::SdoInterfacePtr sdo_interface = nullptr);
+
+    /**
+     * @brief Setup the hardware builder.
+     * @details Reads and sets all parameters from the top-level configuration.
+     *          Called by the constructor.
+     */
+    void setup();
 
     /**
      * @brief Creates a MarchRobot. Loads a URDF from the parameter server
@@ -73,52 +94,34 @@ public:
         const std::vector<std::string>& key_list,
         const std::string& object_name);
 
-    static march::Joint createJoint(const YAML::Node& joint_config,
-        const std::string& joint_name,
-        const urdf::JointConstSharedPtr& urdf_joint,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
-    static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
+    march::Joint createJoint(const YAML::Node& joint_config,
+        const std::string& joint_name, const int slaveIndex,
+        const urdf::JointConstSharedPtr& urdf_joint);
+    std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
         const YAML::Node& absolute_encoder_config,
         const march::MotorControllerType motor_controller_type,
         const urdf::JointConstSharedPtr& urdf_joint);
-    static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
+    std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
         const YAML::Node& incremental_encoder_config,
         const march::MotorControllerType motor_controller_type);
-    static march::Encoder::Direction getEncoderDirection(
+    march::Encoder::Direction getEncoderDirection(
         const YAML::Node& encoder_config);
-    static std::unique_ptr<march::MotorController> createMotorController(
-        const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
-    static std::unique_ptr<march::IMotionCube> createIMotionCube(
+    std::unique_ptr<march::MotorController> createMotorController(
+        const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint);
+    std::unique_ptr<march::IMotionCube> createIMotionCube(
         const YAML::Node& imc_config, march::ActuationMode mode,
-        const urdf::JointConstSharedPtr& urdf_joint,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
-    static std::unique_ptr<march::ODrive> createODrive(
-        const YAML::Node& odrive_config, march::ActuationMode mode,
-        const urdf::JointConstSharedPtr& urdf_joint,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
-    static std::unique_ptr<march::TemperatureGES> createTemperatureGES(
-        const YAML::Node& temperature_ges_config,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
-    static std::unique_ptr<march::PowerDistributionBoard>
-    createPowerDistributionBoard(
-        const YAML::Node& power_distribution_board_config,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
+        const urdf::JointConstSharedPtr& urdf_joint);
+    std::unique_ptr<march::ODrive> createODrive(const YAML::Node& odrive_config,
+        march::ActuationMode mode, const urdf::JointConstSharedPtr& urdf_joint);
+    std::unique_ptr<march::TemperatureGES> createTemperatureGES(
+        const YAML::Node& temperature_ges_config);
+    std::unique_ptr<march::PowerDistributionBoard> createPowerDistributionBoard(
+        const YAML::Node& power_distribution_board_config);
 
-    static std::vector<march::PressureSole> createPressureSoles(
-        const YAML::Node& pressure_soles_config,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
-    static march::PressureSole createPressureSole(
-        const YAML::Node& pressure_sole_config,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
+    std::vector<march::PressureSole> createPressureSoles(
+        const YAML::Node& pressure_soles_config);
+    march::PressureSole createPressureSole(
+        const YAML::Node& pressure_sole_config);
 
     /**
      * Initializes the URDF if necessary.
@@ -132,9 +135,8 @@ public:
      * @param joints_config YAML node that contains a sequence of joint objects
      * @return list of created joints
      */
-    std::vector<march::Joint> createJoints(const YAML::Node& joints_config,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface) const;
+    std::vector<march::Joint> createJoints(
+        const YAML::Node& joints_config, YAML::Node& slave_indices);
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
@@ -148,18 +150,24 @@ public:
     static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
 
 private:
-    int updateSlaveIndexBasedOnFixedJoints(const YAML::Node& joint_config,
-        const std::string& joint_name,
-        const std::set<int>& fixedSlaveIndices) const;
+    int updateSlaveIndexBasedOnFixedJoints(
+        int slaveIndex, const std::set<int>& fixedSlaveIndices) const;
     std::set<int> getSlaveIndicesOfFixedJoints(
-        const YAML::Node& joints_config) const;
-    int getSlaveIndexFromJointConfig(const YAML::Node& joint_config) const;
+        const YAML::Node& joints_config, const YAML::Node& slave_indices) const;
 
     YAML::Node robot_config_;
     urdf::Model urdf_;
     bool init_urdf_ = true;
     bool remove_fixed_joints_from_ethercat_train_ = false;
     std::string if_name_ = "";
+    std::string slave_configuration_ = "";
+
+    march::PdoInterfacePtr pdo_interface_ = nullptr;
+    march::SdoInterfacePtr sdo_interface_ = nullptr;
+
+    std::string robot_name_;
+    YAML::Node config_;
+    YAML::Node slave_indices_;
 };
 
 /**

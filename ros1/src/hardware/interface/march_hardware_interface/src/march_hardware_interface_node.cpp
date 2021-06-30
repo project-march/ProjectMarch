@@ -11,10 +11,11 @@
 #include <ros/ros.h>
 
 std::unique_ptr<march::MarchRobot> build(AllowedRobot robot,
-    bool remove_fixed_joints_from_ethercat_train, std::string if_name)
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+    std::string slave_configuration)
 {
-    HardwareBuilder builder(
-        robot, remove_fixed_joints_from_ethercat_train, std::move(if_name));
+    HardwareBuilder builder(robot, remove_fixed_joints_from_ethercat_train,
+        std::move(if_name), std::move(slave_configuration));
     try {
         return builder.createMarchRobot();
     } catch (const std::exception& e) {
@@ -56,10 +57,16 @@ int main(int argc, char** argv)
         if_name = argv[2];
     }
 
+    std::string slave_configuration = "";
+    if (argc > 3) {
+        slave_configuration = argv[3];
+    }
+
     spinner.start();
 
     MarchHardwareInterface march(
-        build(selected_robot, remove_fixed_joints_from_ethercat_train, if_name),
+        build(selected_robot, remove_fixed_joints_from_ethercat_train, if_name,
+            slave_configuration),
         reset_motor_controllers);
 
     try {

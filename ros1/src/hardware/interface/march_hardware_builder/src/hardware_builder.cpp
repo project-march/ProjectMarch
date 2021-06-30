@@ -29,84 +29,116 @@ const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS
     = { "axis", "absoluteEncoder", "motorKV" };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS
-    = { "slaveIndex", "byteOffset" };
+    = { "byteOffset" };
 const std::vector<std::string>
     HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS
-    = { "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets",
+    = { "bootShutdownOffsets", "netMonitorByteOffsets",
           "netDriverByteOffsets" };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS
     = { "allowActuation", "motor_controller" };
 const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
-    = { "slaveIndex", "type" };
+    = { "type" };
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
-    = { "slaveIndex", "byteOffset", "side" };
-
-HardwareBuilder::HardwareBuilder(AllowedRobot robot,
-    bool remove_fixed_joints_from_ethercat_train, std::string if_name)
-    : HardwareBuilder(robot.getFilePath(),
-        remove_fixed_joints_from_ethercat_train, std::move(if_name))
-{
-}
-
-HardwareBuilder::HardwareBuilder(AllowedRobot robot, urdf::Model urdf)
-    : robot_config_(YAML::LoadFile(robot.getFilePath()))
-    , urdf_(std::move(urdf))
-    , init_urdf_(false)
-{
-}
+    = { "byteOffset", "side" };
 
 HardwareBuilder::HardwareBuilder(const std::string& yaml_path,
-    bool remove_fixed_joints_from_ethercat_train, std::string if_name)
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+    std::string slave_configuration, march::PdoInterfacePtr pdo_interface,
+    march::SdoInterfacePtr sdo_interface)
     : robot_config_(YAML::LoadFile(yaml_path))
     , remove_fixed_joints_from_ethercat_train_(
           remove_fixed_joints_from_ethercat_train)
     , if_name_(std::move(if_name))
+    , slave_configuration_(std::move(slave_configuration))
+    , pdo_interface_(std::move(pdo_interface))
+    , sdo_interface_(std::move(sdo_interface))
+{
+    setup();
+}
+
+HardwareBuilder::HardwareBuilder(AllowedRobot robot,
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+    std::string slave_configuration, march::PdoInterfacePtr pdo_interface,
+    march::SdoInterfacePtr sdo_interface)
+    : HardwareBuilder(robot.getFilePath(),
+        remove_fixed_joints_from_ethercat_train, std::move(if_name),
+        std::move(slave_configuration), std::move(pdo_interface),
+        std::move(sdo_interface))
 {
 }
 
-HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
+HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf,
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+    std::string slave_configuration, march::PdoInterfacePtr pdo_interface,
+    march::SdoInterfacePtr sdo_interface)
     : robot_config_(YAML::LoadFile(yaml_path))
     , urdf_(std::move(urdf))
     , init_urdf_(false)
+    , remove_fixed_joints_from_ethercat_train_(
+          remove_fixed_joints_from_ethercat_train)
+    , if_name_(std::move(if_name))
+    , slave_configuration_(std::move(slave_configuration))
+    , pdo_interface_(std::move(pdo_interface))
+    , sdo_interface_(std::move(sdo_interface))
 {
+    setup();
+}
+
+HardwareBuilder::HardwareBuilder(AllowedRobot robot, urdf::Model urdf,
+    bool remove_fixed_joints_from_ethercat_train, std::string if_name,
+    std::string slave_configuration, march::PdoInterfacePtr pdo_interface,
+    march::SdoInterfacePtr sdo_interface)
+    : HardwareBuilder(robot.getFilePath(), urdf,
+        remove_fixed_joints_from_ethercat_train, std::move(if_name),
+        std::move(slave_configuration), std::move(pdo_interface),
+        std::move(sdo_interface))
+{
+}
+
+void HardwareBuilder::setup()
+{
+    this->initUrdf();
+
+    if (!pdo_interface_ || !sdo_interface_) {
+        pdo_interface_ = march::PdoInterfaceImpl::create();
+        sdo_interface_ = march::SdoInterfaceImpl::create();
+    }
+
+    robot_name_ = this->robot_config_.begin()->first.as<std::string>();
+    config_ = this->robot_config_[robot_name_];
+
+    if (slave_configuration_ == ""
+        || !config_["slaveIndices"][slave_configuration_]) {
+        slave_indices_ = config_["slaveIndices"]["default"];
+    } else {
+        slave_indices_ = config_["slaveIndices"][slave_configuration_];
+    }
 }
 
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
-    this->initUrdf();
-    auto pdo_interface = march::PdoInterfaceImpl::create();
-    auto sdo_interface = march::SdoInterfaceImpl::create();
-    const auto robot_name
-        = this->robot_config_.begin()->first.as<std::string>();
-
-    // Remove top level robot name key
-    YAML::Node config = this->robot_config_[robot_name];
-
     // Read if name from robot config if is an empty value
     if (if_name_ == "") {
-        if_name_ = config["if_name"].as<std::string>();
+        if_name_ = config_["if_name"].as<std::string>();
     }
 
-    const auto cycle_time = config["ecatCycleTime"].as<int>();
-    const auto slave_timeout = config["ecatSlaveTimeout"].as<int>();
+    const auto cycle_time = config_["ecatCycleTime"].as<int>();
+    const auto slave_timeout = config_["ecatSlaveTimeout"].as<int>();
 
     std::vector<march::Joint> joints
-        = this->createJoints(config["joints"], pdo_interface, sdo_interface);
+        = this->createJoints(config_["joints"], slave_indices_);
 
-    YAML::Node pdb_config = config["powerDistributionBoard"];
     auto pdb = HardwareBuilder::createPowerDistributionBoard(
-        pdb_config, pdo_interface, sdo_interface);
-    auto pressure_soles = createPressureSoles(
-        config["pressure_soles"], pdo_interface, sdo_interface);
+        config_["powerDistributionBoard"]);
+    auto pressure_soles = createPressureSoles(config_["pressure_soles"]);
     return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_,
         std::move(pdb), std::move(pressure_soles), if_name_, cycle_time,
         slave_timeout);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
-    const std::string& joint_name, const urdf::JointConstSharedPtr& urdf_joint,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const std::string& joint_name, const int slaveIndex,
+    const urdf::JointConstSharedPtr& urdf_joint)
 {
     ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
     if (!urdf_joint) {
@@ -122,7 +154,6 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
         net_number = joint_config["netNumber"].as<int>();
     }
 
-    int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
     ROS_INFO_STREAM("Joint " << joint_name.c_str()
                              << " will be actuated with slave index "
                              << slaveIndex);
@@ -130,12 +161,11 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
     auto motor_controller = HardwareBuilder::createMotorController(
-        joint_config["motor_controller"], urdf_joint, pdo_interface,
-        sdo_interface);
+        joint_config["motor_controller"], urdf_joint);
 
     if (joint_config["temperatureges"]) {
         auto ges = HardwareBuilder::createTemperatureGES(
-            joint_config["temperatureges"], pdo_interface, sdo_interface);
+            joint_config["temperatureges"]);
         return { joint_name, net_number, allow_actuation,
             std::move(motor_controller), std::move(ges) };
     } else {
@@ -145,9 +175,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
 }
 
 std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
-    const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint)
 {
     HardwareBuilder::validateRequiredKeysExist(config,
         HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
@@ -160,11 +188,9 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
     std::unique_ptr<march::MotorController> motor_controller;
     auto type = config["type"].as<std::string>();
     if (type == "imotioncube") {
-        motor_controller = createIMotionCube(
-            config, mode, urdf_joint, pdo_interface, sdo_interface);
+        motor_controller = createIMotionCube(config, mode, urdf_joint);
     } else if (type == "odrive") {
-        motor_controller = createODrive(
-            config, mode, urdf_joint, pdo_interface, sdo_interface);
+        motor_controller = createODrive(config, mode, urdf_joint);
     } else {
         throw march::error::HardwareException(
             march::error::ErrorType::INVALID_MOTOR_CONTROLLER,
@@ -175,9 +201,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
 
 std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
     const YAML::Node& imc_config, march::ActuationMode mode,
-    const urdf::JointConstSharedPtr& urdf_joint,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const urdf::JointConstSharedPtr& urdf_joint)
 {
     if (!imc_config || !urdf_joint) {
         return nullptr;
@@ -196,7 +220,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
             .append("/config/sw_files/" + urdf_joint->name + ".sw"));
     std::string setup = convertSWFileToString(imc_setup_data);
     return std::make_unique<march::IMotionCube>(
-        march::Slave(slave_index, pdo_interface, sdo_interface),
+        march::Slave(slave_index, pdo_interface_, sdo_interface_),
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
             march::MotorControllerType::IMotionCube, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(incremental_encoder_config,
@@ -206,9 +230,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(
 
 std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     const YAML::Node& odrive_config, march::ActuationMode mode,
-    const urdf::JointConstSharedPtr& urdf_joint,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const urdf::JointConstSharedPtr& urdf_joint)
 {
     if (!odrive_config || !urdf_joint) {
         return nullptr;
@@ -230,7 +252,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     auto motor_kv = odrive_config["motorKV"].as<unsigned int>();
 
     return std::make_unique<march::ODrive>(
-        march::Slave(slave_index, pdo_interface, sdo_interface), axis,
+        march::Slave(slave_index, pdo_interface_, sdo_interface_), axis,
         HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
             march::MotorControllerType::ODrive, urdf_joint),
         HardwareBuilder::createIncrementalEncoder(
@@ -322,9 +344,7 @@ march::Encoder::Direction HardwareBuilder::getEncoderDirection(
 }
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
-    const YAML::Node& temperature_ges_config,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const YAML::Node& temperature_ges_config)
 {
     if (!temperature_ges_config) {
         return nullptr;
@@ -336,13 +356,11 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
     const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
     const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
     return std::make_unique<march::TemperatureGES>(
-        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
+        march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset);
 }
 
 std::unique_ptr<march::PowerDistributionBoard>
-HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb)
 {
     if (!pdb) {
         return nullptr;
@@ -378,7 +396,7 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
             boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
     return std::make_unique<march::PowerDistributionBoard>(
-        march::Slave(slave_index, pdo_interface, sdo_interface),
+        march::Slave(slave_index, pdo_interface_, sdo_interface_),
         net_monitor_offsets, net_driver_offsets, boot_shutdown_offsets);
 }
 
@@ -403,25 +421,15 @@ void HardwareBuilder::initUrdf()
     }
 }
 
-int HardwareBuilder::getSlaveIndexFromJointConfig(const YAML::Node& joint) const
-{
-    if (joint["motor_controller"]) {
-        if (joint["motor_controller"]["slaveIndex"]) {
-            return joint["motor_controller"]["slaveIndex"].as<int>();
-        }
-    }
-    return -1;
-}
-
 std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
-    const YAML::Node& joints_config) const
+    const YAML::Node& joints_config, const YAML::Node& slave_indices) const
 {
     std::set<int> fixedSlaveIndices;
     std::set<int> actuatingSlaveIndices;
     for (const YAML::Node& joint_config : joints_config) {
         const auto joint_name = joint_config.begin()->first.as<std::string>();
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
-        int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
+        int slaveIndex = slave_indices[joint_name].as<int>();
         if (urdf_joint->type == urdf::Joint::FIXED) {
             ROS_INFO_STREAM("Joint "
                 << joint_name << " with slaveIndex " << slaveIndex
@@ -441,10 +449,8 @@ std::set<int> HardwareBuilder::getSlaveIndicesOfFixedJoints(
 }
 
 int HardwareBuilder::updateSlaveIndexBasedOnFixedJoints(
-    const YAML::Node& joint_config, const std::string& joint_name,
-    const std::set<int>& fixedSlaveIndices) const
+    int slaveIndex, const std::set<int>& fixedSlaveIndices) const
 {
-    int slaveIndex = getSlaveIndexFromJointConfig(joint_config[joint_name]);
     int amountFixedBeforeSlave = 0;
     for (int fixedSlaveIndex : fixedSlaveIndices) {
         if (fixedSlaveIndex < slaveIndex) {
@@ -455,16 +461,15 @@ int HardwareBuilder::updateSlaveIndexBasedOnFixedJoints(
 }
 
 std::vector<march::Joint> HardwareBuilder::createJoints(
-    const YAML::Node& joints_config,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface) const
+    const YAML::Node& joints_config, YAML::Node& slave_indices)
 {
     // Use a sorted map to store the joint names and yaml configurations
     std::map<std::string, YAML::Node> actuating_joint_names;
 
     std::set<int> fixedSlaveIndices;
     if (this->remove_fixed_joints_from_ethercat_train_) {
-        fixedSlaveIndices = getSlaveIndicesOfFixedJoints(joints_config);
+        fixedSlaveIndices
+            = getSlaveIndicesOfFixedJoints(joints_config, slave_indices);
     }
 
     for (YAML::Node joint_config : joints_config) {
@@ -472,9 +477,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         if (urdf_joint->type != urdf::Joint::FIXED) {
             if (this->remove_fixed_joints_from_ethercat_train_) {
-                joint_config[joint_name]["motor_controller"]["slaveIndex"]
-                    = updateSlaveIndexBasedOnFixedJoints(
-                        joint_config, joint_name, fixedSlaveIndices);
+                slave_indices[joint_name] = updateSlaveIndexBasedOnFixedJoints(
+                    slave_indices[joint_name].as<int>(), fixedSlaveIndices);
             }
             actuating_joint_names.insert(
                 std::pair<std::string, YAML::Node>(joint_name, joint_config));
@@ -492,7 +496,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         const auto joint_config = entry.second;
         const auto urdf_joint = this->urdf_.getJoint(joint_name);
         joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name],
-            joint_name, urdf_joint, pdo_interface, sdo_interface));
+            joint_name, slave_indices[joint_name].as<int>(), urdf_joint));
         ss << joint_name << ", ";
     }
     ROS_INFO("Sorted actuating joints are: [%s]", ss.str().c_str());
@@ -516,9 +520,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
 }
 
 std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(
-    const YAML::Node& pressure_soles_config,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const YAML::Node& pressure_soles_config)
 {
     std::vector<march::PressureSole> pressure_soles;
     if (!pressure_soles_config) {
@@ -527,16 +529,13 @@ std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(
     for (const YAML::Node& pressure_sole_config : pressure_soles_config) {
         pressure_soles.push_back(HardwareBuilder::createPressureSole(
             pressure_sole_config[pressure_sole_config.begin()
-                                     ->first.as<std::string>()],
-            pdo_interface, sdo_interface));
+                                     ->first.as<std::string>()]));
     }
     return pressure_soles;
 }
 
 march::PressureSole HardwareBuilder::createPressureSole(
-    const YAML::Node& pressure_sole_config,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
+    const YAML::Node& pressure_sole_config)
 {
     HardwareBuilder::validateRequiredKeysExist(pressure_sole_config,
         HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");
@@ -545,7 +544,7 @@ march::PressureSole HardwareBuilder::createPressureSole(
     const auto byte_offset = pressure_sole_config["byteOffset"].as<int>();
     const auto side = pressure_sole_config["side"].as<std::string>();
     return march::PressureSole(
-        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset,
+        march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset,
         side);
 }
 

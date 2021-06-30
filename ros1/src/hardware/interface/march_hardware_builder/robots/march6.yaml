@@ -7,6 +7,25 @@ march6:
   if_name: enp7s0
   ecatCycleTime: 8
   ecatSlaveTimeout: 200
+  slaveIndices:
+    default:
+      left_ankle: 4
+      left_hip_aa: 3
+      left_hip_fe: 3
+      left_knee: 4
+      right_ankle: 2
+      right_hip_aa: 1
+      right_hip_fe: 1
+      right_knee: 2
+    custom:
+      left_ankle: 1
+      left_hip_aa: 4
+      left_hip_fe: 4
+      left_knee: 1
+      right_ankle: 2
+      right_hip_aa: 3
+      right_hip_fe: 3
+      right_knee: 2
   joints:
     - left_ankle:
         allowActuation: true
