@@ -17,6 +17,9 @@
 #      points to a ROS1 and ROS2 specific Dockerfile
 .base_builder:
   stage: Build code
+  # Depending on the rules below, `TAG` has a different value.
+  # In most cases, this will just be `main`, unless the Dockerfile has
+  # changed.
   image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
   artifacts:
     paths:
@@ -27,6 +30,9 @@
     - cd $ROS_VERSION/
     - source /opt/ros/$ROS_CODENAME/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
   rules:
+    # These rules are checking if certain values have the correct values.
+    # These variables are predefined by GitLab and their definitions
+    # can be found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: always
       variables:
