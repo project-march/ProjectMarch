@@ -106,8 +106,18 @@ namespace error {
             "Hall not calibrated yet. ",
         };
 
-    const std::array<std::string, ODRIVE_ENCODER_MANAGER_ERRORS_SIZE>
-        ODRIVE_ENCODER_MANAGER_ERRORS = { "Error. " };
+    const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE>
+        ODRIVE_DIEBOSLAVE_ERRORS = {
+            "Invalid axis. ",
+            "Request state failed. ",
+            "Motor not ready. ",
+            "Motor not calibrated. ",
+            "Encoder not ready. ",
+            "Encoder index not yet found. ",
+            "Encoder not precalibrated. ",
+            "Encoder: absolute position not valid. ",
+            "Encoder: absolute gpio pin not valid. ",
+        };
 
     const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE>
         ODRIVE_CONTROLLER_ERRORS = {
@@ -156,9 +166,9 @@ namespace error {
                     description += ODRIVE_ENCODER_ERRORS[index];
                 }
                 break;
-            case ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR:
-                if (index < ODRIVE_ENCODER_MANAGER_ERRORS.size()) {
-                    description += ODRIVE_ENCODER_MANAGER_ERRORS[index];
+            case ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR:
+                if (index < ODRIVE_DIEBOSLAVE_ERRORS.size()) {
+                    description += ODRIVE_DIEBOSLAVE_ERRORS[index];
                 }
                 break;
             case ErrorRegister::ODRIVE_CONTROLLER_ERROR:
