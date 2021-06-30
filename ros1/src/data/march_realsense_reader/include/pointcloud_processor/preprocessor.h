@@ -24,8 +24,8 @@ public:
     // Removes a point from a pointcloud (and optionally the corresponding
     // pointcloud_normals as well) at a given index
     void removePointsFromIndices(
-            const pcl::PointIndices::Ptr& indices_to_remove,
-            const bool& remove_normals);
+        const pcl::PointIndices::Ptr& indices_to_remove,
+        const bool& remove_normals);
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -99,9 +99,6 @@ protected:
     // Removes all points which do not roughly have a normal in a certain
     // direction (specified in the parameter file)
     bool filterOnNormalOrientation();
-
-//    // Remove NaN's from the pointcloud added when removing points
-//    void cleanUpPointClouds();
 
     // Downsampling parameters
     bool voxel_grid_filter {};

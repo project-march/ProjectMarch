@@ -46,8 +46,7 @@ NormalsPreprocessor::NormalsPreprocessor(bool debugging)
 
 // Removes the points at indices_to_remove from the pointcloud and its normals
 void Preprocessor::removePointsFromIndices(
-    const pcl::PointIndices::Ptr& indices_to_remove,
-    const bool& remove_normals)
+    const pcl::PointIndices::Ptr& indices_to_remove, const bool& remove_normals)
 {
     pcl::ExtractIndices<pcl::PointXYZ> extract_points;
     extract_points.setInputCloud(pointcloud_);
@@ -79,7 +78,7 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
 
     success &= downsample();
 
-    // Filten on distance before the transform to be able to find points close
+    // Filter on distance before the transform to be able to find points close
     // the camera and remove them
     success &= filterOnDistanceFromOrigin();
 
@@ -91,9 +90,6 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     success &= fillNormalCloud(transform_stamped);
 
     success &= filterOnNormalOrientation();
-
-    // Remove NaN's from the pointcloud added when removing points
-//    cleanUpPointClouds();
 
     clock_t end_preprocess = clock();
 
@@ -151,15 +147,6 @@ void NormalsPreprocessor::readParameters(
         = robot_properties["dimensions"]["general"]["width"].as<double>();
     debugging_ = config.debug;
 }
-
-//// Remove NaN's from the pointcloud added when removing points
-//void NormalsPreprocessor::cleanUpPointClouds()
-//{
-//    // This method requires indices, they are unused in this code.
-//    pcl::PointIndices::Ptr point_indices;
-//    pcl::removeNaNFromPointCloud(*pointcloud_, *pointcloud_, point_indices);
-//    removePointsFromIndices(point_indices, pointcloud_);
-//}
 
 // Downsample the number of points in the pointcloud to have a more workable
 // number of points
