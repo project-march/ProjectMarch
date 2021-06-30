@@ -129,6 +129,7 @@
 
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>
+            <arg name="robot" value="$(arg robot)"/>
         </include>
 
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
