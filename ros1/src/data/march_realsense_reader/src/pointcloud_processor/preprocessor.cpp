@@ -1,8 +1,11 @@
 #include "yaml-cpp/yaml.h"
+#include <cmath>
 #include <ctime>
 #include <filesystem>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
+#include <pcl/filters/extract_indices.h>
+#include <pcl/filters/filter.h>
 #include <pcl/filters/random_sample.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
@@ -41,31 +44,22 @@ NormalsPreprocessor::NormalsPreprocessor(bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-// Removes a point from a pointcloud (and optionally the corresponding
-// pointcloud_normals as well) at a given index
-void Preprocessor::removePointByIndex(int const index,
-    const PointCloud::Ptr& pointcloud, const Normals::Ptr& pointcloud_normals)
+// Removes the points at indices_to_remove from the pointcloud and its normals
+void Preprocessor::removePointsFromIndices(
+    const pcl::PointIndices::Ptr& indices_to_remove,
+    const bool& remove_normals)
 {
-    if (index < pointcloud->points.size() && index >= 0) {
-        if (pointcloud_normals != nullptr) {
-            if (index < pointcloud_normals->points.size() && index >= 0) {
-                pointcloud_normals->points[index]
-                    = pointcloud_normals
-                          ->points[pointcloud_normals->points.size() - 1];
-                pointcloud_normals->points.resize(
-                    pointcloud_normals->points.size() - 1);
-            } else {
-                ROS_WARN_STREAM("Index "
-                    << index
-                    << " to be removed is not valid for pointcloud_normals");
-            }
-        }
-        pointcloud->points[index]
-            = pointcloud->points[pointcloud->points.size() - 1];
-        pointcloud->points.resize(pointcloud->points.size() - 1);
-    } else {
-        ROS_WARN_STREAM(
-            "Index " << index << " to be removed is not valid for pointcloud");
+    pcl::ExtractIndices<pcl::PointXYZ> extract_points;
+    extract_points.setInputCloud(pointcloud_);
+    extract_points.setIndices(indices_to_remove);
+    extract_points.setNegative(true);
+    extract_points.filter(*pointcloud_);
+    if (remove_normals) {
+        pcl::ExtractIndices<pcl::Normal> extract_normals;
+        extract_normals.setInputCloud(pointcloud_normals_);
+        extract_normals.setIndices(indices_to_remove);
+        extract_normals.setNegative(true);
+        extract_normals.filter(*pointcloud_normals_);
     }
 }
 
@@ -85,14 +79,21 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
 
     success &= downsample();
 
+    // Filten on distance before the transform to be able to find points close
+    // the camera and remove them
+    success &= filterOnDistanceFromOrigin();
+
     geometry_msgs::TransformStamped transform_stamped;
     success &= transformPointCloudFromUrdf(transform_stamped);
 
-    success &= filterOnDistanceFromOrigin();
-
+    // Fill normal cloud after transformation so the normals do not have to be
+    // transformed
     success &= fillNormalCloud(transform_stamped);
 
     success &= filterOnNormalOrientation();
+
+    // Remove NaN's from the pointcloud added when removing points
+//    cleanUpPointClouds();
 
     clock_t end_preprocess = clock();
 
@@ -127,7 +128,8 @@ void NormalsPreprocessor::readParameters(
     remaining_points = config.preprocessor_downsampling_remainig_points;
 
     // Distance Filter parameters
-    distance_threshold = config.preprocessor_distance_filter_threshold;
+    maximum_distance_threshold = config.preprocessor_maximum_distance_threshold;
+    minimum_distance_threshold = config.preprocessor_minimum_distance_threshold;
 
     // Normal Estimation parameters
     use_tree_search_method
@@ -149,6 +151,15 @@ void NormalsPreprocessor::readParameters(
         = robot_properties["dimensions"]["general"]["width"].as<double>();
     debugging_ = config.debug;
 }
+
+//// Remove NaN's from the pointcloud added when removing points
+//void NormalsPreprocessor::cleanUpPointClouds()
+//{
+//    // This method requires indices, they are unused in this code.
+//    pcl::PointIndices::Ptr point_indices;
+//    pcl::removeNaNFromPointCloud(*pointcloud_, *pointcloud_, point_indices);
+//    removePointsFromIndices(point_indices, pointcloud_);
+//}
 
 // Downsample the number of points in the pointcloud to have a more workable
 // number of points
@@ -212,22 +223,29 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
 // distance
 bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
-    double distance_threshold_squared = distance_threshold * distance_threshold;
+    pcl::PointIndices::Ptr indices_to_remove
+        = boost::make_shared<pcl::PointIndices>();
 
     // Removed any point too far from the origin
-    for (int p = 0; p < pointcloud_->points.size(); p++) {
+    for (int point_index = 0; point_index < pointcloud_->points.size();
+         ++point_index) {
         // find the squared distance from the origin
-        float point_distance_squared
-            = (pointcloud_->points[p].x * pointcloud_->points[p].x)
-            + (pointcloud_->points[p].y * pointcloud_->points[p].y)
-            + (pointcloud_->points[p].z * pointcloud_->points[p].z);
+        float point_distance = sqrt((pointcloud_->points[point_index].x
+                                        * pointcloud_->points[point_index].x)
+            + (pointcloud_->points[point_index].y
+                * pointcloud_->points[point_index].y)
+            + (pointcloud_->points[point_index].z
+                * pointcloud_->points[point_index].z));
 
         // remove point if it's outside the threshold distance
-        if (point_distance_squared > distance_threshold_squared) {
-            removePointByIndex(p, pointcloud_);
-            p--;
+        if (point_distance > maximum_distance_threshold
+            || point_distance < minimum_distance_threshold) {
+            indices_to_remove->indices.push_back(point_index);
         }
     }
+
+    removePointsFromIndices(indices_to_remove, /*remove_normals=*/false);
+
     return true;
 }
 
@@ -262,23 +280,27 @@ bool NormalsPreprocessor::fillNormalCloud(
 // point. This can work because the normals are of unit length.
 bool NormalsPreprocessor::filterOnNormalOrientation()
 {
+    pcl::PointIndices::Ptr indices_to_remove
+        = boost::make_shared<pcl::PointIndices>();
+
     // Remove any point who's normal does not fall into the desired region
     if (pointcloud_->points.size() == pointcloud_normals_->points.size()) {
-        for (int p = 0; p < pointcloud_->points.size(); p++) {
+        for (int point_index = 0; point_index < pointcloud_->points.size();
+             ++point_index) {
             // remove point if its normal is too far from what is desired
-            if (pointcloud_normals_->points[p].normal_x
-                        * pointcloud_normals_->points[p].normal_x
+            if (pointcloud_normals_->points[point_index].normal_x
+                        * pointcloud_normals_->points[point_index].normal_x
                     > allowed_length_x
-                || pointcloud_normals_->points[p].normal_y
-                        * pointcloud_normals_->points[p].normal_y
+                || pointcloud_normals_->points[point_index].normal_y
+                        * pointcloud_normals_->points[point_index].normal_y
                     > allowed_length_y
-                || pointcloud_normals_->points[p].normal_z
-                        * pointcloud_normals_->points[p].normal_z
+                || pointcloud_normals_->points[point_index].normal_z
+                        * pointcloud_normals_->points[point_index].normal_z
                     > allowed_length_z) {
-                removePointByIndex(p, pointcloud_, pointcloud_normals_);
-                p--;
+                indices_to_remove->indices.push_back(point_index);
             }
         }
+        removePointsFromIndices(indices_to_remove, /*remove_normals=*/true);
     } else {
         ROS_ERROR("The size of the pointcloud and the normal pointcloud are "
                   "not the same. Cannot filter on normals.");
