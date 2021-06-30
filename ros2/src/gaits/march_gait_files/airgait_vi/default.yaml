@@ -60,8 +60,8 @@ gaits:
     right_swing: MVI_walk_rightswing_v7
 
   walk_single_step:
-    right_open: MVI_walksinglestep_rightopen_v5
-    left_close: MVI_walksinglestep_leftclose_v5
+    right_open: MVI_walksinglestep_rightopen_v7
+    left_close: MVI_walksinglestep_leftclose_v7
   
   walk_large:
     left_close: MVI_walklarge_leftclose_v3
