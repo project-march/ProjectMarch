@@ -29,7 +29,7 @@ enum class ODriveObjectName {
     ActualVelocity,
     AxisError,
     MotorError,
-    EncoderManagerError,
+    DieBOSlaveError,
     EncoderError,
     ControllerError,
     AxisState,

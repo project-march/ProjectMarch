@@ -136,9 +136,9 @@ public:
                 << error::parseError(encoder_error_,
                        error::ErrorRegister::ODRIVE_ENCODER_ERROR)
                 << std::endl
-                << "Encoder Manager: "
-                << error::parseError(encoder_manager_error_,
-                       error::ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR)
+                << "DieBOSlave: "
+                << error::parseError(dieboslave_error_,
+                       error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR)
                 << std::endl
                 << "Controller: "
                 << error::parseError(controller_error_,
@@ -158,7 +158,7 @@ public:
     uint32_t axis_error_ {};
     uint32_t motor_error_ {};
     uint32_t encoder_error_ {};
-    uint32_t encoder_manager_error_ {};
+    uint32_t dieboslave_error_ {};
     uint32_t controller_error_ {};
 };
 
