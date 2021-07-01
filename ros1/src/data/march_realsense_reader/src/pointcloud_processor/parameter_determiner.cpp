@@ -181,6 +181,31 @@ bool HullParameterDeterminer::determineParameters(
     return success;
 };
 
+// Get relevant information from the environment for the current category
+// (e.g. sit -> get sit height, stair -> get foot location)
+bool HullParameterDeterminer::getObstacleInformation()
+{
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
+        case RealSenseCategory::stairs_up:
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+            return getOptimalFootLocation();
+            break;
+        }
+        case RealSenseCategory::sit: {
+            return getSitHeight();
+            break;
+        }
+        default: {
+            ROS_ERROR_STREAM(
+                    "No way to get obstacle information for realsense category "
+                            << realsense_category_.value() << " has been implemented.");
+            return false;
+        }
+    }
+}
+
 void HullParameterDeterminer::initializeDebugOutput()
 {
     visualization_msgs::MarkerArray debug_marker_array;
