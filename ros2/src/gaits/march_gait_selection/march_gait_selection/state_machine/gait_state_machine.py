@@ -12,7 +12,6 @@ from march_utility.gait.gait_graph import GaitGraph
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
-from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 from std_msgs.msg import Header
@@ -27,10 +26,11 @@ class GaitStateMachine:
     """The state machine used to make sure that only valid transitions will
     be made."""
 
-
     UNKNOWN = "unknown"
 
-    def __init__(self, gait_selection: Node, trajectory_scheduler: TrajectoryScheduler):
+    def __init__(
+        self, gait_selection: GaitSelection, trajectory_scheduler: TrajectoryScheduler
+    ):
         """Generates a state machine from given gaits and resets it to
         UNKNOWN state.
 
