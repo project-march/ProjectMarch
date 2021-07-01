@@ -52,11 +52,11 @@ gaits:
     stand_up: MVI_stand_up_v2
     stand_home: MVI_stand_home_v2
   walk:
-    left_close: MVI_walk_leftclose_v3
-    left_swing: MVI_walk_leftswing_v3
-    right_close: MVI_walk_rightclose_v3
-    right_open: MVI_walk_rightopen_v3
-    right_swing: MVI_walk_rightswing_v3
+    left_close: MVI_walk_leftclose_v7
+    left_swing: MVI_walk_leftswing_v7
+    right_close: MVI_walk_rightclose_v7
+    right_open: MVI_walk_rightopen_v7
+    right_swing: MVI_walk_rightswing_v7
   walk_large:
     left_close: MVI_walklarge_leftclose_v3
     left_swing: MVI_walklarge_leftswing_v3
