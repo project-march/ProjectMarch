@@ -2,10 +2,10 @@
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller file"/>
-    <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
+    <arg name="reset_motor_controllers" default="false" doc="Reset the MotorControllers if this argument is set to true"/>
     <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
                                         If not provided, then the value is read from the robot .yaml file."/>
-    <arg name="remove_fixed_joints_from_ethercat_train" default="true"
+    <arg name="remove_fixed_joints_from_ethercat_train" default="false"
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
 
@@ -27,12 +27,11 @@
                 name="hardware_interface"
                 pkg="march_hardware_interface"
                 type="march_hardware_interface_node"
-                args="$(arg robot)"
+                args="$(arg robot) $(arg if_name)"
                 output="screen"
                 required="true"
         >
-            <param name="reset_imc" value="$(arg reset_imc)"/>
-            <param name="if_name" value="$(arg if_name)"/>
+            <param name="reset_motor_controllers" value="$(arg reset_motor_controllers)"/>
             <param name="remove_fixed_joints_from_ethercat_train"
                    value="$(arg remove_fixed_joints_from_ethercat_train)"/>
         </node>

@@ -58,7 +58,7 @@ namespace error {
               "Estop requested. ",
               "Homing without endstop. ",
               "Over temperature. ",
-              "Invalid encoder chosen. ",
+              "Unknown position. ",
           };
 
     const std::array<std::string, ODRIVE_MOTOR_ERRORS_SIZE> ODRIVE_MOTOR_ERRORS
@@ -89,6 +89,7 @@ namespace error {
               "Unknown voltage command. ",
               "Unknown gains. ",
               "Controller initializing. ",
+              "Unbalanced phases.",
           };
 
     const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE>
@@ -102,8 +103,7 @@ namespace error {
             "ABS SPI timeout. ",
             "ABS SPI communication failure. ",
             "ABS SPI not ready. ",
-            "Insufficient resources. ",
-            "Infeasible IO num. ",
+            "Hall not calibrated yet. ",
         };
 
     const std::array<std::string, ODRIVE_ENCODER_MANAGER_ERRORS_SIZE>
@@ -117,6 +117,8 @@ namespace error {
             "Invalid mirror axis. ",
             "Invalid load encoder. ",
             "Invalid estimate. ",
+            "Invalid circular range. ",
+            "Spinout detected. ",
         };
 
     void addErrorToDescription(
@@ -165,6 +167,7 @@ namespace error {
                 }
                 break;
             default:
+                description += "Unknown error. ";
                 break;
         }
     }
