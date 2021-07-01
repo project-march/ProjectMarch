@@ -60,17 +60,15 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
             param.name == "early_schedule_delay"
             and param.type_ == Parameter.Type.DOUBLE
         ):
-            value = param.value
-            if value < 0:
-                value = 0
-            gait_selection._early_schedule_duration = Duration(seconds=value)
+            if param.value < 0:
+                return SetParametersResult(successful=False)
+            gait_selection._early_schedule_duration = Duration(seconds=param.value)
         elif (
             param.name == "first_subgait_delay" and param.type_ == Parameter.Type.DOUBLE
         ):
-            value = param.value
-            if value < 0:
-                value = 0
-            gait_selection._first_subgait_delay = Duration(seconds=value)
+            if param.value < 0:
+                return SetParametersResult(successful=False)
+            gait_selection._first_subgait_delay = Duration(seconds=param.value)
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
             gaits_updated = True
@@ -79,6 +77,8 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
             gaits_updated = True
         elif param.name == "timer_period" and param.type_ == Parameter.Type.DOUBLE:
             gait_state_machine.timer_period = param.value
+            if gait_state_machine.update_timer is not None:
+                gait_state_machine.update_timer.destroy()
             gait_state_machine.run()
 
     if gaits_updated:
