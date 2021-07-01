@@ -92,6 +92,10 @@ public:
         const PointNormalCloud::Ptr& output_cloud);
 
 protected:
+    // Get relevant information from the environment for the current category
+    // (e.g. sit -> get sit height, stair -> get foot location)
+    bool getObstacleInformation();
+    
     // Get the optimal foot location by finding which possible foot location is
     // closest to the most desirable foot location
     bool getOptimalFootLocation();
