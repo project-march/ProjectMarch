@@ -137,4 +137,4 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
     :caption: MARCH packages
     :glob:
 
-    doc/march_packages/readme/*
+    doc/march_packages/from_readme/**/README
