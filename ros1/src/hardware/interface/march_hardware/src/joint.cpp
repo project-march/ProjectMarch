@@ -110,7 +110,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
                 error::ErrorType::OUTSIDE_HARD_LIMITS,
                 "Joint %s is outside hard limits, value is %d, limits are [%d, "
                 "%d]",
-                name_, initial_absolute_position_,
+                name_.c_str(), initial_absolute_position_,
                 motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
                 motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
         }
