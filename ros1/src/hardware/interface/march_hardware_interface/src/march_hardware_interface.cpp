@@ -321,11 +321,19 @@ void MarchHardwareInterface::write(
                 + std::copysign(MAX_EFFORT_CHANGE,
                     joint_effort_command_[i] - joint_last_effort_command_[i]);
         }
+
+        // Clamp effort to (-MAX_EFFORT, MAX_EFFORT)
+        auto effort_limit
+            = march_robot_->getJoint(i).getMotorController()->getEffortLimit();
+        joint_effort_command_[i]
+            = std::clamp(joint_effort_command_[i], -effort_limit, effort_limit);
+
         has_actuated_ |= (joint_effort_command_[i] != 0);
     }
 
     // Enforce limits on all joints in effort mode
-    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    // TODO: enable this check when the safety controller works again
+    //    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
     if (not has_actuated_) {
         bool found_non_zero = false;

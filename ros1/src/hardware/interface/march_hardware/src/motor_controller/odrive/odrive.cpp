@@ -289,6 +289,11 @@ void ODrive::setAxisState(ODriveAxisState state)
         write_struct);
 }
 
+double ODrive::getEffortLimit()
+{
+    return EFFORT_LIMIT;
+}
+
 // Throw NotImplemented error by default for functions not part of the Minimum
 // Viable Product
 
