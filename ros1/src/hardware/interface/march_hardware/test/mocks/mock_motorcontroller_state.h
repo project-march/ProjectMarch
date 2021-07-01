@@ -10,21 +10,21 @@ public:
     {
     }
 
-    bool isOperational() override
+    bool isOperational() const override
     {
         return true;
     };
 
-    bool hasError() override
+    bool hasError() const override
     {
         return false;
     }
 
-    std::optional<std::string> getErrorStatus() override
+    std::optional<std::string> getErrorStatus() const override
     {
         return "";
     };
-    std::string getOperationalState() override
+    std::string getOperationalState() const override
     {
         return "";
     };

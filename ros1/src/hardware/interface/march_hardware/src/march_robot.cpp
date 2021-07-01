@@ -47,7 +47,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
 {
 }
 
-void MarchRobot::startEtherCAT(bool reset_imc)
+void MarchRobot::startEtherCAT(bool reset_motor_controllers)
 {
     if (!hasValidSlaves()) {
         throw error::HardwareException(
@@ -63,10 +63,10 @@ void MarchRobot::startEtherCAT(bool reset_imc)
 
     bool sw_reset = ethercatMaster.start(this->jointList);
 
-    if (reset_imc || sw_reset) {
+    if (reset_motor_controllers || sw_reset) {
         ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or "
-                  "downloading of .sw fie: %d",
-            reset_imc, sw_reset);
+                  "downloading of .sw file: %d",
+            reset_motor_controllers, sw_reset);
         resetMotorControllers();
 
         ROS_INFO("Restarting the EtherCAT Master");
@@ -148,12 +148,16 @@ bool MarchRobot::hasValidSlaves()
 
     ROS_INFO("Found configuration for %lu slaves.", slaveIndices.size());
 
-    // Sort the indices and check for duplicates.
-    // If there are no duplicates, the configuration is valid.
+    // Sort the indices
     ::std::sort(slaveIndices.begin(), slaveIndices.end());
-    auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
-    bool isUnique = (it == slaveIndices.end());
-    return isUnique;
+    if (jointList[0].getMotorController()->requiresUniqueSlaves()) {
+        // Check for duplicates depending on the motor controller
+        auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
+        bool isUnique = (it == slaveIndices.end());
+        return isUnique;
+    } else {
+        return true;
+    }
 }
 
 bool MarchRobot::isEthercatOperational()

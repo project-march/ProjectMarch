@@ -5,6 +5,7 @@ string[] operational_state
 
 float32[] motor_current
 float32[] motor_voltage
+float32[] temperature
 
 float32[] absolute_position_iu
 float32[] incremental_position_iu

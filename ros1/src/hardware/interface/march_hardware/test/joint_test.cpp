@@ -150,16 +150,10 @@ TEST_F(JointTest, ResetController)
 
 TEST_F(JointTest, TestPrepareActuation)
 {
-    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
-        .WillOnce(Return(/*value=*/5));
-    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
-        .WillOnce(Return(/*value=*/3));
     EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
-    ASSERT_EQ(joint.getPosition(), 3);
-    ASSERT_EQ(joint.getVelocity(), 0);
 }
 
 TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
@@ -220,6 +214,7 @@ TEST_F(JointTest, TestReadEncodersOnce)
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
+    joint.readFirstEncoderValues(/*operational_check=*/false);
     joint.readEncoders(elapsed_time);
 
     double expected_position = initial_absolute_position
@@ -264,6 +259,7 @@ TEST_F(JointTest, TestReadEncodersTwice)
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
+    joint.readFirstEncoderValues(/*operational_check=*/false);
     joint.readEncoders(elapsed_time);
     joint.readEncoders(elapsed_time);
 
@@ -302,12 +298,12 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
+    joint.readFirstEncoderValues(/*operational_check=*/false);
     joint.readEncoders(elapsed_time);
     joint.readEncoders(elapsed_time);
 
     double expected_position = initial_absolute_position
-        + (second_incremental_position - first_incremental_position)
-        + velocity * elapsed_time.toSec();
+        + (second_incremental_position - first_incremental_position);
 
     ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
     ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);

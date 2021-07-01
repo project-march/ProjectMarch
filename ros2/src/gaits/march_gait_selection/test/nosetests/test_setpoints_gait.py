@@ -1,7 +1,7 @@
 import os
 import unittest
 from ament_index_python import get_package_share_directory
-from march_gait_selection.state_machine.setpoints_gait import (
+from march_gait_selection.gaits.setpoints_gait import (
     SetpointsGait,
 )
 from march_gait_selection.gait_selection import GaitSelection
