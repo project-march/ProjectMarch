@@ -52,13 +52,13 @@ void Preprocessor::removePointsFromIndices(
     pcl::ExtractIndices<pcl::PointXYZ> extract_points;
     extract_points.setInputCloud(pointcloud_);
     extract_points.setIndices(indices_to_remove);
-    extract_points.setNegative(true);
+    extract_points.setNegative(/*negative=*/true);
     extract_points.filter(*pointcloud_);
     if (remove_normals) {
         pcl::ExtractIndices<pcl::Normal> extract_normals;
         extract_normals.setInputCloud(pointcloud_normals_);
         extract_normals.setIndices(indices_to_remove);
-        extract_normals.setNegative(true);
+        extract_normals.setNegative(/*negative=*/true);
         extract_normals.filter(*pointcloud_normals_);
     }
 }
