@@ -135,22 +135,7 @@ bool HullParameterDeterminer::determineParameters(
 
     bool success = true;
 
-    switch (realsense_category_.value()) {
-        case RealSenseCategory::stairs_down:
-        case RealSenseCategory::stairs_up: {
-            success &= getOptimalFootLocation();
-            break;
-        }
-        case RealSenseCategory::ramp_down:
-        case RealSenseCategory::ramp_up: {
-            success &= getRampSlope();
-            break;
-        }
-        case RealSenseCategory::sit: {
-            success &= getSitHeight();
-            break;
-        }
-    }
+    success &= getObstacleInformation();
 
     // Only calculate the gait parameters if an optimal foot location or sit
     // height has been found
@@ -196,6 +181,34 @@ bool HullParameterDeterminer::determineParameters(
 
     return success;
 };
+
+// Get relevant information from the environment for the current category
+// (e.g. sit -> get sit height, stair -> get foot location)
+bool HullParameterDeterminer::getObstacleInformation()
+{
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
+        case RealSenseCategory::stairs_up: {
+            return getOptimalFootLocation();
+            break;
+        }
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+            return getRampSlope();
+            break;
+        }
+        case RealSenseCategory::sit: {
+            return getSitHeight();
+            break;
+        }
+        default: {
+            ROS_ERROR_STREAM(
+                "No way to get obstacle information for realsense category "
+                << realsense_category_.value() << " has been implemented.");
+            return false;
+        }
+    }
+}
 
 // Get the slope of a ramp based on the orientation of points on the ramp
 bool HullParameterDeterminer::getRampSlope()
