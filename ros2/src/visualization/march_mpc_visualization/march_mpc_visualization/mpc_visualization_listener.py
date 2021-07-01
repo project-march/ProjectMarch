@@ -15,8 +15,8 @@ class MpcListener(Node):
         )
 
         self.number_of_joints = 0
-        self.future_time_steps = 0  # TODO: read from message after MPC MR
-        self.sampling_time = 0.02  # TODO: read from message after MPC MR
+        self.future_time_steps = 0
+        self.sampling_time = 0.02
 
         self.new_measurement_position = []
         self.new_measurement_velocity = []
