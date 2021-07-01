@@ -72,6 +72,8 @@ void HullParameterDeterminer::readParameters(
 
     ramp_min_search_area
         = (float)config.parameter_determiner_ramp_min_search_area;
+    ramp_max_search_area
+        = (float)config.parameter_determiner_ramp_max_search_area;
 
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
     z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
@@ -145,11 +147,7 @@ bool HullParameterDeterminer::determineParameters(
 
     bool success = true;
 
-    if (realsense_category_.value() != RealSenseCategory::sit) {
-        success &= getOptimalFootLocation();
-    } else {
-        success &= getSitHeight();
-    }
+    success &= getObstacleInformation();
 
     // Only calculate the gait parameters if an optimal foot location or sit
     // height has been found
@@ -180,6 +178,31 @@ bool HullParameterDeterminer::determineParameters(
 
     return success;
 };
+
+// Get relevant information from the environment for the current category
+// (e.g. sit -> get sit height, stair -> get foot location)
+bool HullParameterDeterminer::getObstacleInformation()
+{
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
+        case RealSenseCategory::stairs_up:
+        case RealSenseCategory::ramp_down:
+        case RealSenseCategory::ramp_up: {
+            return getOptimalFootLocation();
+            break;
+        }
+        case RealSenseCategory::sit: {
+            return getSitHeight();
+            break;
+        }
+        default: {
+            ROS_ERROR_STREAM(
+                "No way to get obstacle information for realsense category "
+                << realsense_category_.value() << " has been implemented.");
+            return false;
+        }
+    }
+}
 
 void HullParameterDeterminer::initializeDebugOutput()
 {
@@ -903,8 +926,8 @@ bool HullParameterDeterminer::getOptionalFootLocations(
             // A point further than x_flat can never be project on the right
             // part of the potential foot locations line assuming that the
             // x_flat > x_steep and z_flat < z_steep
-            success
-                &= fillOptionalFootLocationCloud(ramp_min_search_area, x_flat);
+            success &= fillOptionalFootLocationCloud(
+                ramp_min_search_area, ramp_max_search_area);
             break;
         }
         default: {
