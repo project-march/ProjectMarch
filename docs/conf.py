@@ -29,9 +29,9 @@ copyright = "2021, Project MARCH"  # noqa: A001
 # built documents.
 #
 # The short X.Y version.
-version = "Noetic"
+version = "VI"
 # The full version, including alpha/beta/rc tags.
-release = "Noetic"
+release = "VI"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "default"
