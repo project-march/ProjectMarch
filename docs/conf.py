@@ -53,7 +53,7 @@ html_last_updated_fmt = "%b %d, %Y"
 html_show_copyright = True
 
 html_context = {
-    "display_gitlab": True,
+    "display_gitlab": False,
     "gitlab_user": "project-march",
     "gitlab_repo": "march",
     "gitlab_version": branch_name,
