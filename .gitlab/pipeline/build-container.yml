@@ -124,7 +124,7 @@ sphinx container build:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - "$DOCKER_FILE"
-        - "docs/requirements.txt"
+        - "docs/requirements.pip"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
@@ -132,7 +132,7 @@ sphinx container build:
     - if: '$CI_COMMIT_BRANCH'
       changes:
         - "$DOCKER_FILE"
-        - "docs/requirements.txt"
+        - "docs/requirements.pip"
       variables:
        TAG: $CI_COMMIT_BRANCH
   extends:
