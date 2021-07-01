@@ -197,8 +197,8 @@ bool HullParameterDeterminer::getObstacleInformation()
         }
         default: {
             ROS_ERROR_STREAM(
-                    "No way to get obstacle information for realsense category "
-                            << realsense_category_.value() << " has been implemented.");
+                "No way to get obstacle information for realsense category "
+                << realsense_category_.value() << " has been implemented.");
             return false;
         }
     }
