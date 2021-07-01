@@ -281,8 +281,6 @@ class RealSenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
-        # Currently, we hardcode foot_right in start, since this is almost
-        # always a right_open
         service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
             self._node.get_logger().warn("No service response received within timeout")
@@ -308,7 +306,7 @@ class RealSenseGait(SetpointsGait):
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
-    def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
+    def make_realsense_service_call(self) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
@@ -319,8 +317,8 @@ class RealSenseGait(SetpointsGait):
         if self._current_subgait is not None:
             subgait_name = self._current_subgait.subgait_name
         else:
-            # Assume that the current subgait is being created and use the right open name
-            subgait_name = "right_open"
+            # Assume that the gait is starting and use the first subgait name
+            subgait_name = self.graph.start_subgaits()[0]
 
         request = GetGaitParameters.Request(
             realsense_category=self.realsense_category,

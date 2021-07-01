@@ -72,6 +72,8 @@ void HullParameterDeterminer::readParameters(
 
     ramp_min_search_area
         = (float)config.parameter_determiner_ramp_min_search_area;
+    ramp_max_search_area
+        = (float)config.parameter_determiner_ramp_max_search_area;
 
     x_flat_down = (float)config.parameter_determiner_ramp_x_flat_down;
     z_flat_down = (float)config.parameter_determiner_ramp_z_flat_down;
@@ -924,8 +926,8 @@ bool HullParameterDeterminer::getOptionalFootLocations(
             // A point further than x_flat can never be project on the right
             // part of the potential foot locations line assuming that the
             // x_flat > x_steep and z_flat < z_steep
-            success
-                &= fillOptionalFootLocationCloud(ramp_min_search_area, x_flat);
+            success &= fillOptionalFootLocationCloud(
+                ramp_min_search_area, ramp_max_search_area);
             break;
         }
         default: {

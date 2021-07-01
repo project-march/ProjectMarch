@@ -1,3 +1,7 @@
+# Before you change anything in this or any related file, it is highly recommended to read the
+# reference on https://docs.gitlab.com/ee/ci/yaml/ and related pages. The configuration
+# of the GitLab CI/CD won't make much sense without the information on those pages.
+
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
@@ -6,7 +10,6 @@ variables:
 # See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
 # on how this should be interpreted.
 stages:
-  - Tag container
   - Build container
   - Lint code
   - Build code
@@ -14,398 +17,40 @@ stages:
   - Static analysis on code
 
 # GitLab defines different job types, depending on how the job is scheduled.
-# Right now, we use two types: 1) branches and 2) merge_requests.
+# Right now, we use two types: 1) branches, 2) merge_requests
+# and 3) scheduled pipelines
 #
 # 1) Branches
 # Pipelines labeled "branches" are executed on the latest commit of a branch. All
 # jobs that are scheduled conditionally based on the file changes in the
-# latest commit (the "changes" keyword,
-# see https://docs.gitlab.com/ee/ci/yaml/README.html#onlychangesexceptchanges)
+# latest commit (the "rules" keyword,
+# see https://docs.gitlab.com/ee/ci/yaml/README.html#ruleschanges)
 #
 # 2) Merge requests
 # Pipelines labeled "merge_requests" are executed when commits are pushed to a
 # merge request. This pipeline runs on the difference between the target branch
-# and the source branch. The "changes" keywords covers ALL changes that differ
+# and the source branch. The "rules" keywords covers ALL changes that differ
 # between the two branches.
 #
-# In short: branches        = only latest commit
+# 3) Scheduled pipelines
+# Pipelines labeled "schedule" are executed on certain times of the day, as defined
+# on GitLab. These are the same as branch pipelines but then they are executed based
+# on the time of the day, instead of when a new commit has been pushed.
+#
+# In short: branches        = only latest commit, but when a new commit is pushed
 #           merge_requests  = all commits in in merge request
+#           schedule        = only latest commit, but when a predefined time of day is reached
 #
 # An overview of all the different types can be
-# found on https://docs.gitlab.com/ee/ci/yaml/README.html#onlyexcept-basic
-
-# These following jobs are so called "hidden jobs"
-#   (see https://docs.gitlab.com/ee/ci/yaml/README.html#hide-jobs). 
-# These jobs are not actually used here, but used in other jobs with the help of
-# the "extends" keyword (sort of like #include or import, 
-#   see https://docs.gitlab.com/ee/ci/yaml/README.html#extends)
-# They are used to extract statements that are included in almost every job, to
-# prevent duplication.
-
-# Only run when the pipeline is for a branch that does not start with some digits
-# followed by a `-`, i.e. all branches that are not created via issues.
-.branches_to_run_pipeline_on:
-  only:
-    refs:
-      - branches
-  except:
-    refs:
-      # Regular expression that matches branches that start with some digits, followed by a '-'
-      # i.e. all branches that are created from an issue. 
-      - /^[\d]+-.*$/
-
-# Only run when the pipeline is for a merge_request
-.merge_request_ref:
-  only:
-    refs:
-      - merge_requests
-
-# Use a specific Docker image when it is a branch. These two are different
-# because "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" does not exist for branches.
-.branches:
-    image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
-    extends:
-      - .branches_to_run_pipeline_on
-
-# Use a specific Docker image when it is a merge request. These two are different
-# because "$CI_COMMIT_BRANCH" does not exist for merge requests.
-.merge_requests:
-    image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    extends:
-      - .merge_request_ref
-
-# Allow each branch to run their own container. This allows a branch to add
-# dependencies to their package.xml and use them as expected. This process works as
-# follows:
-# 1. If an image with the tag of the current branch is not available, the base image
-#   is pulled and tagged as the image for this branch.
-# 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
-#   container. This will use remote caches from GitLab to speed up the process.
-.container:tag-base:
-  stage: Tag container
-  image: quay.io/podman/stable
-  variables:
-    GIT_CHECKOUT: "true"
-  before_script:
-    - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - if ! podman manifest inspect $REG_IMAGE:$BRANCH_NAME; then podman pull $REG_IMAGE:$CI_DEFAULT_BRANCH && podman tag $REG_IMAGE:$CI_DEFAULT_BRANCH $REG_IMAGE:$BRANCH_NAME && podman push $REG_IMAGE:$BRANCH_NAME; fi;
-
-# If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
-# then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
-container:tag:
-  variables:
-    REG_IMAGE: $CI_REGISTRY_IMAGE
-    BRANCH_NAME: $CI_COMMIT_BRANCH
-  extends:
-    - .container:tag-base
-    - .branches_to_run_pipeline_on
-
-# If the pipeline is for merge_requests defined in `.merge_request_ref`,
-# then use $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME as the $BRANCH_NAME in the "tag" job.
-container:tag for MRs:
-  variables:
-    REG_IMAGE: $CI_REGISTRY_IMAGE
-    BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-  extends:
-    - .container:tag-base
-    - .merge_request_ref
-
-.container_builder:
-  stage: Build container
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    # Equivalent to `docker login` but without installing docker"
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-
-# Build the container iff the Dockerfile has been changed. This only runs for
-# branches because this is a very long job. Running it for merge requests would
-# mean that this job is scheduled every time that a commit is pushed in a merge requests,
-# which is unnessecary if the Dockerfile is only changed once in the merge request.
-ROS container build:
-  script:
-    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
-    # Information about all the parameters can be found there.
-    - /kaniko/executor --cache=true --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
-  rules:
-    # If commit in branch and Dockerfile has changed, build a new container
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - "Dockerfile"
-  extends:
-    - .container_builder
-
-flake8 container build:
-  script:
-    - /kaniko/executor --cache=false --dockerfile $CI_PROJECT_DIR/.gitlab/images/Dockerfile_flake8 --destination $CI_REGISTRY_IMAGE/flake8:$CI_COMMIT_BRANCH --cleanup
-  rules:
-    # If commit in branch and Dockerfile has changed, build a new flake8 container
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - ".gitlab/images/Dockerfile_flake8"
-  extends:
-    - .container_builder
-
-#################
-# flake8 linter #
-#################
-# Runs a Python linter on the code to see if the code style is consistent and
-# to avoid common mistakes
-.flake8-base:
-  stage: Lint code
-  image: registry.gitlab.com/project-march/march/flake8:$TAG
-  script:
-    # Return the return value of the rightmost failed command. It is unlikely that `sed` fails, but
-    # the if the flake8 runner fails then everything is propagated through. This means that the
-    # return value of the whole pipe sequence will be the same as the return value of
-    # the flake8 command.
-    - set -o pipefail
-    # The codeclimate format returns violations on new lines, but GitLab expects a json
-    # array. This adds the required "[", "]" and ","s for the file to be interpreted as
-    # a valid JSON array.
-    - python3 -m flake8 --format=codeclimate --config .flake8 | sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
-    # If the above statement succeeds, then codeclimate.json will be empty. We add an empty
-    # array to ensure that the codeclimate.json file still has a valid json syntax
-    - echo "[]" | tee codeclimate.json
-  artifacts:
-    reports:
-      codequality: codeclimate.json
-
-flake8:
-  rules:
-    # If commit in MR and Dockerfile has changed, use different
-    # flake8 image that was build in previous stages
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - ".gitlab/images/Dockerfile_flake8"
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    # To prevent running duplicate pipelines for branches and MRs
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    # If commit in branch and Dockerfile has changed, use different
-    # flake8 image that was build in previous stages
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - ".gitlab/images/Dockerfile_flake8"
-      variables:
-        TAG: $CI_COMMIT_BRANCH
-    # If it is a commit to a MR or a branch, and a flake8 related or Python file
-    # has changed, run the flake8 with the image from main.
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
-      changes:
-        - ".flake8"
-        - "**/*.py"
-      variables:
-        TAG: $CI_DEFAULT_BRANCH
-  extends:
-    - .flake8-base
-
-#######################
-# clang-format linter #
-#######################
-# Check if the C++ code is consistent in code formatting (correct amount of tabs/spaces,
-# correct indentation etc.)
-.clang_format-base:
-  stage: Lint code
-  script:
-    - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
-  only:
-    changes:
-      - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
-      - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
-
-# The job for branches
-clang_format:
-  extends:
-    - .clang_format-base
-    - .branches
-
-# The job for merge_requests
-clang_format for MRs:
-  extends:
-    - .clang_format-base
-    - .merge_requests
-
-####################
-# Build code stage #
-####################
-# Run the build command to see if everything compiles without errors. This is a
-# separate stage for the noetic and for the foxy code, because they are not dependent
-# on each other and can therefore be run in parallel.
-# Besides compiling, this also produces a "compile_commands.json" file that is used
-# by subsequent C++ static analysis stages.
-
-# Build ROS 1 noetic iff a file in the ros1 folder has changed, or if .clang-tidy has
-# changed
-.noetic:build-base:
-  stage: Build code
-  artifacts:
-    paths:
-      - ros1/build/
-      - ros1/install/
-      - ros1/log/
-  script:
-    - cd ros1/
-    - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
-  only:
-    changes:
-      - "ros1/**/*"
-      - ".clang-tidy"
-
-noetic:build:
-  extends:
-    - .noetic:build-base
-    - .branches
-
-noetic:build for MRs:
-  extends:
-    - .noetic:build-base
-    - .merge_requests
-
-# Build ROS 2 foxy iff a file in the ros2 folder has changed, or if .clang-tidy has
-# changed
-.foxy:build-base:
-  stage: Build code
-  artifacts:
-    paths:
-      - ros2/build/
-      - ros2/install/
-      - ros2/log/
-  script:
-    - cd ros2/
-    - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
-  only:
-    changes:
-      - "ros2/**/*"
-      - ".clang-tidy"
-
-foxy:build:
-  extends:
-    - .foxy:build-base
-    - .branches
-
-foxy:build for MRs:
-  extends:
-    - .foxy:build-base
-    - .merge_requests
-
-###################
-# Test code stage #
-###################
-# Run the tests, both for noetic and foxy. These stages are separated because they
-# are not dependent on eachother. This enables extra parallelization.
-
-# Run noetic tests, if something in the ros1 folder has changed
-.noetic:test-base:
-  stage: Test code
-  dependencies:
-    - noetic:build
-  needs: ["noetic:build"]
-  script:
-    - cd ros1/
-    - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
-    - colcon test-result --verbose
-  only:
-    changes:
-      - "ros1/**/*"
-
-noetic:test:
-  extends:
-    - .noetic:test-base
-    - .branches
-
-noetic:test for MRs:
-  dependencies: ["noetic:build for MRs"]
-  needs: ["noetic:build for MRs"]
-  extends:
-    - .noetic:test-base
-    - .merge_requests
-
-# Run foxy tests, if something in the ros2 folder has changed
-.foxy:test-base:
-  stage: Test code
-  dependencies:
-    - foxy:build
-  needs: ["foxy:build"]
-  script:
-    - cd ros2/
-    - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
-    - colcon test-result --verbose
-  only:
-    changes:
-      - "ros2/**/*"
-
-foxy:test:
-  extends:
-    - .foxy:test-base
-    - .branches
-
-foxy:test for MRs:
-  dependencies: ["foxy:build for MRs"]
-  needs: ["foxy:build for MRs"]
-  extends:
-    - .foxy:test-base
-    - .merge_requests
-
-#######################
-# C++ static analysis #
-#######################
-# Run C++ static analysis. This is dependent on the `compile_commands.json` file that is
-# produced by the build stage. This runs when a C++ file has been changed or if the
-# static analysis configuration has changed. Currently, only clang-tidy is executed in
-# this stage. More information on clang-tidy can be found on https://clang.llvm.org/extra/clang-tidy/
-.noetic:clang_tidy-base:
-  stage: Static analysis on code
-  dependencies:
-    - noetic:build
-  needs: ["noetic:build"]
-  script:
-    - cd ros1/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P8 -I{} -- clang-tidy -p build {} 2> /dev/null
-  only:
-    changes:
-      - "ros1/**/*.{hpp,h,cpp}"
-      - "ros1/**/CMakeLists.txt"
-      - ".clang-tidy"
-
-noetic:clang_tidy:
-  extends:
-    - .noetic:clang_tidy-base
-    - .branches
-
-noetic:clang_tidy for MRs:
-  dependencies: ["noetic:build for MRs"]
-  needs: ["noetic:build for MRs"]
-  extends:
-    - .noetic:clang_tidy-base
-    - .merge_requests
-
-.foxy:clang_tidy-base:
-  stage: Static analysis on code
-  dependencies:
-    - foxy:build
-  needs: ["foxy:build"]
-  script:
-    - cd ros2/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P8 -I{} -- clang-tidy -p build {} 2> /dev/null
-  only:
-    changes:
-      - "ros2/**/*.{hpp,h,cpp}"
-      - "ros2/**/CMakeLists.txt"
-      - ".clang-tidy"
-
-foxy:clang_tidy:
-  extends:
-    - .foxy:clang_tidy-base
-    - .branches
-
-foxy:clang_tidy for MRs:
-  dependencies: ["foxy:build for MRs"]
-  needs: ["foxy:build for MRs"]
-  extends:
-    - .foxy:clang_tidy-base
-    - .merge_requests
+# found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+# under the variable "CI_PIPELINE_SOURCE".
+#
+# You will see these three types in almost any job definition.
+# To make the main .gitlab-ci.yml file easier to follow, the actual job definitions
+# are split into different files. Each file specifies the jobs of a stage.
+include:
+    - local: /.gitlab/pipeline/build-container.yml
+    - local: /.gitlab/pipeline/lint-code.yml
+    - local: /.gitlab/pipeline/build-code.yml
+    - local: /.gitlab/pipeline/test-code.yml
+    - local: /.gitlab/pipeline/static-analysis.yml
