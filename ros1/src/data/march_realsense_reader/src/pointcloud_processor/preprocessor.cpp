@@ -44,7 +44,8 @@ NormalsPreprocessor::NormalsPreprocessor(bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-// Removes the points at indices_to_remove from the pointcloud and its normals
+// Removes points from a pointcloud (and optionally the corresponding
+// pointcloud_normals as well) at given indices
 void Preprocessor::removePointsFromIndices(
     const pcl::PointIndices::Ptr& indices_to_remove, const bool& remove_normals)
 {
@@ -206,8 +207,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     return true;
 }
 
-// Remove all the points which are far away from the origin in 3d euclidean
-// distance
+// Remove all points which are too far or too close to the origin
 bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
     pcl::PointIndices::Ptr indices_to_remove
