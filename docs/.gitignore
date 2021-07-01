@@ -2,7 +2,7 @@
 *.pyc
 doc/manifest.yaml
 doc/html
-doc/march_packages/from_readme
+doc/march_packages
 build
 Gemfile
 native_build
