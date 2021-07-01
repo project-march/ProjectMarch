@@ -31,8 +31,6 @@ add_message_files(
     PressureSolesData.msg
 )
 add_message_files(
-#    DIRECTORY
-#    msg/mpc_msgs
     FILES
     MpcArray.msg
     MpcStateVectors.msg
