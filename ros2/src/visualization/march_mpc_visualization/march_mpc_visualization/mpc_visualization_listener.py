@@ -115,8 +115,7 @@ class MpcListener(Node):
             self.response_body_measurement["time"] = [self.new_time]
 
         response = make_response(jsonify(self.response_body_measurement))
-        response = self.set_headers(response)
-        return response
+        return self.set_headers(response)
 
     # @app.route("/estimation")
     def stream_estimation(self):
