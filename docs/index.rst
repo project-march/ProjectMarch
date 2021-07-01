@@ -106,29 +106,34 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/development/style_guide
    doc/development/add_a_new_gait
 
+.. toctree::
+    :caption: MARCH packages
+    :glob:
+
+    doc/march_packages/**/README
 
 .. toctree::
   :caption: March Packages
   :maxdepth: 4
   :hidden:
 
-  doc/march_packages/march_data_collector
-  doc/march_packages/march_description
-  doc/march_packages/march_ems_projects
-  doc/march_packages/march_fake_sensor_data
-  doc/march_packages/march_gain_scheduling
-  doc/march_packages/march_gait_files
-  doc/march_packages/march_gait_selection
-  doc/march_packages/march_hardware
-  doc/march_packages/march_hardware_builder
-  doc/march_packages/march_hardware_interface
-  doc/march_packages/march_imu_manager
-  doc/march_packages/march_input_device
-  doc/march_packages/march_launch
-  doc/march_packages/march_moveit
-  doc/march_packages/march_realsense_reader
-  doc/march_packages/march_rqt_input_device
-  doc/march_packages/march_safety
-  doc/march_packages/march_shared_classes
-  doc/march_packages/march_shared_resources
-  doc/march_packages/march_simulation
+  doc/march_packages_old/march_data_collector
+  doc/march_packages_old/march_description
+  doc/march_packages_old/march_ems_projects
+  doc/march_packages_old/march_fake_sensor_data
+  doc/march_packages_old/march_gain_scheduling
+  doc/march_packages_old/march_gait_files
+  doc/march_packages_old/march_gait_selection
+  doc/march_packages_old/march_hardware
+  doc/march_packages_old/march_hardware_builder
+  doc/march_packages_old/march_hardware_interface
+  doc/march_packages_old/march_imu_manager
+  doc/march_packages_old/march_input_device
+  doc/march_packages_old/march_launch
+  doc/march_packages_old/march_moveit
+  doc/march_packages_old/march_realsense_reader
+  doc/march_packages_old/march_rqt_input_device
+  doc/march_packages_old/march_safety
+  doc/march_packages_old/march_shared_classes
+  doc/march_packages_old/march_shared_resources
+  doc/march_packages_old/march_simulation
