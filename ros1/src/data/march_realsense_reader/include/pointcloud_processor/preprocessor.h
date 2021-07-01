@@ -21,8 +21,8 @@ public:
 
     virtual ~Preprocessor() = default;
 
-    // Removes a point from a pointcloud (and optionally the corresponding
-    // pointcloud_normals as well) at a given index
+    // Removes points from a pointcloud (and optionally the corresponding
+    // pointcloud_normals as well) at given indices
     void removePointsFromIndices(
         const pcl::PointIndices::Ptr& indices_to_remove,
         const bool& remove_normals);
@@ -87,8 +87,7 @@ protected:
     bool transformPointCloudFromUrdf(
         geometry_msgs::TransformStamped& transform_stamped);
 
-    // Removes all points which are futher away then a certain distance from the
-    // origin (specified in the parameter file)
+    // Remove all points which are too far or too close to the origin
     bool filterOnDistanceFromOrigin();
 
     // Estimates the normals of the pointcloud and fills the pointcloud_normals_
