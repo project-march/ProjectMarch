@@ -145,11 +145,7 @@ bool HullParameterDeterminer::determineParameters(
 
     bool success = true;
 
-    if (realsense_category_.value() != RealSenseCategory::sit) {
-        success &= getOptimalFootLocation();
-    } else {
-        success &= getSitHeight();
-    }
+    success &= getObstacleInformation();
 
     // Only calculate the gait parameters if an optimal foot location or sit
     // height has been found
