@@ -84,7 +84,7 @@ class InputDeviceController:
                 Alive, "/march/input_device/alive", 10
             )
             self._alive_timer = self._node.create_timer(
-                timer_period_sec=0.2,
+                timer_period_sec=0.1,
                 callback=self._timer_callback,
                 clock=self._node.get_clock(),
             )
