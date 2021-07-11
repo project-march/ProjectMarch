@@ -91,7 +91,8 @@ class GaitGraph:
                     position_name = self._new_unnamed()
                     self._gait_selection.get_logger().warn(
                         f"No named position given for starting position of gait `"
-                        f"{gait.name}, creating {position_name}."
+                        f"{gait.name}, creating {position_name}. The starting position "
+                        f"is {gait.starting_position}"
                     )
                     self._named_positions[gait.starting_position] = position_name
             self._add_idle_transition(gait.starting_position, gait.gait_name)
@@ -101,7 +102,8 @@ class GaitGraph:
                     position_name = self._new_unnamed()
                     self._gait_selection.get_logger().warn(
                         f"No named position given for final position of gait `"
-                        f"{gait.name}, creating {position_name}"
+                        f"{gait.name}, creating {position_name}. The final position is "
+                        f"{gait.final_position}"
                     )
                     self._named_positions[gait.final_position] = position_name
             self._gait_transitions[gait.gait_name] = gait.final_position
