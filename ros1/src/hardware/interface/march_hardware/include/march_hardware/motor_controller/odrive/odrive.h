@@ -91,7 +91,7 @@ private:
 
     uint32_t getAxisError();
     uint32_t getMotorError();
-    uint32_t getEncoderManagerError();
+    uint32_t getDieBOSlaveError();
     uint32_t getEncoderError();
     uint32_t getControllerError();
 

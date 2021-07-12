@@ -17,7 +17,7 @@ namespace error {
         ODRIVE_AXIS_ERROR,
         ODRIVE_MOTOR_ERROR,
         ODRIVE_ENCODER_ERROR,
-        ODRIVE_ENCODER_MANAGER_ERROR,
+        ODRIVE_DIEBOSLAVE_ERROR,
         ODRIVE_CONTROLLER_ERROR,
     };
 
@@ -47,9 +47,9 @@ namespace error {
     extern const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE>
         ODRIVE_ENCODER_ERRORS;
 
-    const size_t ODRIVE_ENCODER_MANAGER_ERRORS_SIZE = 1;
-    extern const std::array<std::string, ODRIVE_ENCODER_MANAGER_ERRORS_SIZE>
-        ODRIVE_ENCODER_MANAGER_ERRORS;
+    const size_t ODRIVE_DIEBOSLAVE_ERRORS_SIZE = 9;
+    extern const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE>
+        ODRIVE_DIEBOSLAVE_ERRORS;
 
     const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 8;
     extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE>

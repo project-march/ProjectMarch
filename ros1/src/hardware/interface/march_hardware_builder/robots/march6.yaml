@@ -13,15 +13,16 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
-          axis: 0
+          slaveIndex: 4
+          axis: 1
           motorKV: 355
-          # indexFound: true
+#          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 9023
-            maxPositionIU: 10842
+            minPositionIU: 9063
+            maxPositionIU: 11118
+
           incrementalEncoder:
             resolution: 13
             transmission: 236
@@ -32,15 +33,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 3
           axis: 1
           motorKV: 355
-          indexFound: true
+#          indexFound: true
           absoluteEncoder:
             resolution: 14
-            direction: -1
-            minPositionIU: 4454
-            maxPositionIU: 5341
+            direction: 1
+            minPositionIU: 2947
+            maxPositionIU: 3867
           incrementalEncoder:
             resolution: 13
             transmission: 240
@@ -51,15 +52,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 3
           axis: 0
           motorKV: 95
-          # indexFound: true
+#          indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
             minPositionIU: 213943
-            maxPositionIU: 579571
+            maxPositionIU: 579238
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -70,15 +71,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
-          axis: 1
+          slaveIndex: 4
+          axis: 0
           motorKV: 95
-          # indexFound: true
+#          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 617728
-            maxPositionIU: 939388
+            minPositionIU: 617091
+            maxPositionIU: 966355
           incrementalEncoder:
             direction: -1
             resolution: 12
@@ -89,15 +90,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 3
+          slaveIndex: 2
           axis: 0
           motorKV: 355
-          # indexFound: true
+#          indexFound: true
           absoluteEncoder:
             resolution: 14
-            direction: 1
-            minPositionIU: 12551
-            maxPositionIU: 14446
+            direction: -1
+            minPositionIU: 3836
+            maxPositionIU: 5915
           incrementalEncoder:
             resolution: 13
             transmission: 236
@@ -108,15 +109,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 2
+          slaveIndex: 1
           axis: 1
           motorKV: 355
-          indexFound: true
+#          indexFound: true
           absoluteEncoder:
             resolution: 14
-            direction: 1
-            minPositionIU: 3468
-            maxPositionIU: 4338
+            direction: -1
+            minPositionIU: 11447
+            maxPositionIU: 12337
           incrementalEncoder:
             resolution: 13
             transmission: 240
@@ -127,15 +128,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 2
+          slaveIndex: 1
           axis: 0
           motorKV: 95
-          # indexFound: true
+#          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 559641
-            maxPositionIU: 925326
+            minPositionIU: 559360
+            maxPositionIU: 930308
           incrementalEncoder:
             direction: -1
             resolution: 12
@@ -146,15 +147,15 @@ march6:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 3
+          slaveIndex: 2
           axis: 1
           preCalibrated: false
           motorKV: 95
-          # indexFound: true
+#          indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
-            minPositionIU: 271431
+            minPositionIU: 271046
             maxPositionIU: 621197
           incrementalEncoder:
             direction: 1
