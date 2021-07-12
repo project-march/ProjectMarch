@@ -53,8 +53,7 @@ int main(int argc, char** argv)
 
     bool enable_safety_controller;
     if (ros::param::has("~enable_safety_controller")) {
-        ros::param::get("~enable_safety_controller",
-                        enable_safety_controller);
+        ros::param::get("~enable_safety_controller", enable_safety_controller);
     } else {
         ROS_FATAL("Required parameter enable_safety_controller"
                   " was not set.");

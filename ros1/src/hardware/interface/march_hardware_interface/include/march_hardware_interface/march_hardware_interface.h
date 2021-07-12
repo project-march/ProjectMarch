@@ -34,8 +34,8 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
  */
 class MarchHardwareInterface : public hardware_interface::RobotHW {
 public:
-    MarchHardwareInterface(
-        std::unique_ptr<march::MarchRobot> robot, bool reset_motor_controllers, bool enable_safety_controller);
+    MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot,
+        bool reset_motor_controllers, bool enable_safety_controller);
 
     /**
      * @brief Initialize the HardwareInterface by registering position
