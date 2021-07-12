@@ -7,6 +7,9 @@
          "name": "test_joint_gait"
       },
       {
+         "name": "test_joint_gait_continuous"
+      },
+      {
          "name":"stop",
          "callback":"publish_stop",
          "always_enabled":true
