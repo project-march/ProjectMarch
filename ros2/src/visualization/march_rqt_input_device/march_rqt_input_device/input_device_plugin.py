@@ -41,7 +41,9 @@ class InputDevicePlugin(Plugin):
         )
 
         self._node: Node = context.node
-        self._node.declare_parameter("ping_safety_node")
+        # Declare with default = True, so that if ping_safety_node is not given (when
+        # using march_monitor), the ipd always sends alive pings to the safety node
+        self._node.declare_parameter("ping_safety_node", True)
         self._node.declare_parameter("layout_file")
         layout_file = (
             self._node.get_parameter("layout_file").get_parameter_value().string_value
