@@ -37,6 +37,7 @@ def generate_launch_description():
     balance = LaunchConfiguration("balance")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -152,6 +153,9 @@ def generate_launch_description():
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
+            DeclareLaunchArgument(
+                name="timer_period", default_value="0.004", description=""
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -219,8 +223,9 @@ def generate_launch_description():
                     ("use_sim_time", use_sim_time),
                     ("gait_package", gait_package),
                     ("balance", balance),
-                    ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
+                    ("first_subgait_delay", first_subgait_delay),
+                    ("timer_period", timer_period),
                 ],
             ),
             # Safety
