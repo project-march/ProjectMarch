@@ -138,7 +138,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     // Preprocess
     bool preprocessing_was_successful = preprocessor_->preprocess(
-        pointcloud, normals, frame_id_to_transform_to_);
+        pointcloud, normals, frame_id_to_transform_to_, realsense_category);
 
     if (not preprocessing_was_successful) {
         res.error_message = "Preprocessing was unsuccessful, see debug output "
