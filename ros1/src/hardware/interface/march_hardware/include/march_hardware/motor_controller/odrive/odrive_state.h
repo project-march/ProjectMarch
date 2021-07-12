@@ -121,28 +121,27 @@ public:
     {
         if (hasError()) {
             std::ostringstream error_stream;
-            error_stream
-                << "State: " << axis_state_.toString() << " ("
-                << axis_state_.value_ << ")" << std::endl
-                << "Axis: "
-                << error::parseError(
-                       axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
-                << std::endl
-                << "Motor: "
-                << error::parseError(
-                       motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR)
-                << std::endl
-                << "Encoder: "
-                << error::parseError(encoder_error_,
-                       error::ErrorRegister::ODRIVE_ENCODER_ERROR)
-                << std::endl
-                << "Encoder Manager: "
-                << error::parseError(encoder_manager_error_,
-                       error::ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR)
-                << std::endl
-                << "Controller: "
-                << error::parseError(controller_error_,
-                       error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
+            error_stream << "State: " << axis_state_.toString() << " ("
+                         << axis_state_.value_ << ")" << std::endl
+                         << "Axis: "
+                         << error::parseError(axis_error_,
+                                error::ErrorRegister::ODRIVE_AXIS_ERROR)
+                         << std::endl
+                         << "Motor: "
+                         << error::parseError(motor_error_,
+                                error::ErrorRegister::ODRIVE_MOTOR_ERROR)
+                         << std::endl
+                         << "Encoder: "
+                         << error::parseError(encoder_error_,
+                                error::ErrorRegister::ODRIVE_ENCODER_ERROR)
+                         << std::endl
+                         << "DieBOSlave: "
+                         << error::parseError(dieboslave_error_,
+                                error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR)
+                         << std::endl
+                         << "Controller: "
+                         << error::parseError(controller_error_,
+                                error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
             return error_stream.str();
         } else {
             return std::nullopt;
@@ -158,7 +157,7 @@ public:
     uint32_t axis_error_ {};
     uint32_t motor_error_ {};
     uint32_t encoder_error_ {};
-    uint32_t encoder_manager_error_ {};
+    uint32_t dieboslave_error_ {};
     uint32_t controller_error_ {};
 };
 

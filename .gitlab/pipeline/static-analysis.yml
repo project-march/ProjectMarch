@@ -1,0 +1,57 @@
+#######################
+# C++ static analysis #
+#######################
+# Run C++ static analysis. This is dependent on the `compile_commands.json` file that is
+# produced by the build stage. This runs when a C++ file has been changed or if the
+# static analysis configuration has changed. Currently, only clang-tidy is executed in
+# this stage. More information on clang-tidy can be found on https://clang.llvm.org/extra/clang-tidy/
+.clang_tidy_base:
+  stage: Static analysis on code
+  image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
+  script:
+    - cd $ROS_VERSION/
+    # Find all C and C++ related files, filter all files that are not part of the march code
+    # and run clang-tidy on the files
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p build {} 2> /dev/null
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - "$ROS_VERSION/**/*.{hpp,h,cpp,c}"
+        - "$ROS_VERSION/**/CMakeLists.txt"
+        - ".clang-tidy"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
+
+noetic:clang-tidy:
+  variables:
+    ROS_VERSION: "ros1"
+    ROS_CODENAME: "noetic"
+    DOCKER_FILE: ".gitlab/dockerfiles/noetic"
+  needs:
+    - job: "noetic:build"
+      artifacts: true
+  extends:
+    - .clang_tidy_base
+
+foxy:clang-tidy:
+  variables:
+    ROS_VERSION: "ros2"
+    ROS_CODENAME: "foxy"
+    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
+  needs:
+    - job: "foxy:build"
+      artifacts: true
+  extends:
+    - .clang_tidy_base
