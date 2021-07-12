@@ -1,6 +1,6 @@
 testsetup:
   if_name: enp0s31f6
-  ecatCycleTime: 4
+  ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
     - rotational_joint:
@@ -13,10 +13,10 @@ testsetup:
           motorKV: 95
           absoluteEncoder:
             resolution: 20
-            minPositionIU: 559641
-            maxPositionIU: 925326
-            direction: -1
+            minPositionIU: 294481
+            maxPositionIU: 565958
+            direction: 1
           incrementalEncoder:
             resolution: 12
             transmission: 121
-            direction: -1
+            direction: 1
