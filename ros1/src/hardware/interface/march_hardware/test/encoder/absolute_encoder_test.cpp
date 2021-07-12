@@ -125,8 +125,8 @@ TEST_F(AbsoluteEncoderTest, CorrectToRad)
 
 INSTANTIATE_TEST_SUITE_P(ParameterizedLimits, TestEncoderParameterizedLimits,
     testing::Values(std::make_tuple(2053 - 1, false),
-        std::make_tuple(2053, false), std::make_tuple(2053 + 1, true),
-        std::make_tuple(45617 - 1, true), std::make_tuple(45617, false),
+        std::make_tuple(2053, true), std::make_tuple(2053 + 1, true),
+        std::make_tuple(45617 - 1, true), std::make_tuple(45617, true),
         std::make_tuple(45617 + 1, false), std::make_tuple(3000, true),
         std::make_tuple(0, false), std::make_tuple(60001, false),
         std::make_tuple(-2020, false)));
@@ -141,8 +141,8 @@ TEST_P(TestEncoderParameterizedLimits, IsWithinHardLimits)
 INSTANTIATE_TEST_SUITE_P(ParameterizedSoftLimits,
     TestEncoderParameterizedSoftLimits,
     testing::Values(std::make_tuple(3095 - 1, false),
-        std::make_tuple(3095, false), std::make_tuple(3095 + 1, true),
-        std::make_tuple(44699 - 1, true), std::make_tuple(44699, false),
+        std::make_tuple(3095, true), std::make_tuple(3095 + 1, true),
+        std::make_tuple(44699 - 1, true), std::make_tuple(44699, true),
         std::make_tuple(44699 + 1, false), std::make_tuple(4500, true),
         std::make_tuple(0, false), std::make_tuple(60001, false),
         std::make_tuple(-101, false)));
