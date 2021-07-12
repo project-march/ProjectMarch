@@ -28,8 +28,11 @@ class InputDeviceController:
     def __init__(self, node):
         self._node = node
 
-        self._ping = self._node.get_parameter("ping_safety_node")\
-            .get_parameter_value().bool_value
+        self._ping = (
+            self._node.get_parameter("ping_safety_node")
+            .get_parameter_value()
+            .bool_value
+        )
 
         self._instruction_gait_pub = self._node.create_publisher(
             msg_type=GaitInstruction,
