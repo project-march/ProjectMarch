@@ -1,3 +1,4 @@
+#include "utilities/realsense_category_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <cmath>
 #include <ctime>
@@ -64,11 +65,13 @@ void Preprocessor::removePointsFromIndices(
 }
 
 bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
+    Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to,
+    RealSenseCategory const realsense_category)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
+    realsense_category_.emplace(realsense_category);
 
     ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: "
         << pointcloud_->points.size());
@@ -226,7 +229,8 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 
         // remove point if it's outside the threshold distance
         if (point_distance > maximum_distance_threshold
-            || point_distance < minimum_distance_threshold) {
+            || (realsense_category_.value() != RealSenseCategory::sit
+                && point_distance < minimum_distance_threshold)) {
             indices_to_remove->indices.push_back(point_index);
         }
     }
