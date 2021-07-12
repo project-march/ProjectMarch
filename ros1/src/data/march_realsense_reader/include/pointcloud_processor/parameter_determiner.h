@@ -207,7 +207,7 @@ protected:
         const PointNormalCloud::Ptr& cloud, float& median_height);
 
     // Trim exo support cloud to only contain reachable points
-    bool getValidExoSupport(
+    void getValidExoSupport(
         const PointNormalCloud::Ptr potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
 
