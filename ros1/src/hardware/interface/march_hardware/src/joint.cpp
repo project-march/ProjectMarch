@@ -106,15 +106,21 @@ void Joint::readFirstEncoderValues(bool operational_check)
         uint32_t position_iu
             = motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(
                 initial_absolute_position_);
-        if (!motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsIU(
-                position_iu)) {
-            throw error::HardwareException(
-                error::ErrorType::OUTSIDE_HARD_LIMITS,
-                "Joint %s is outside hard limits, value is %d, limits are [%d, "
-                "%d]",
-                name_.c_str(), position_iu,
-                motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
-                motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
+
+        if (operational_check) {
+            if (!motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsIU(
+                    position_iu)) {
+                throw error::HardwareException(
+                    error::ErrorType::OUTSIDE_HARD_LIMITS,
+                    "Joint %s is outside hard limits, value is %d, limits are "
+                    "[%d, "
+                    "%d]",
+                    name_.c_str(), position_iu,
+                    motor_controller_->getAbsoluteEncoder()
+                        ->getLowerHardLimitIU(),
+                    motor_controller_->getAbsoluteEncoder()
+                        ->getUpperHardLimitIU());
+            }
         }
         position_ = initial_absolute_position_;
     }
