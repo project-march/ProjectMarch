@@ -36,8 +36,6 @@
     <!-- Harmonic Drive: 101, Belt: 1,2-->
     <xacro:property name="rotary_reduction" value="${101 * 1.2}"/>
 
-    <xacro:property name="actuating_joints" value="${(properties['actuating_joints'])}"/>
-
     <!-- Used for fixing robot to Gazebo 'base_link' -->
     <link name="world"/>
 
