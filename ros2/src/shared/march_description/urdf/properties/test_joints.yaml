@@ -1,6 +1,5 @@
 actuating_joints:
   - rotational_joint
-  - linear_joint
 joint_limits:
   rotational_joint:
     unit: iu
