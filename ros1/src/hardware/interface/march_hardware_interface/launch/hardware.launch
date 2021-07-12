@@ -8,6 +8,7 @@
     <arg name="remove_fixed_joints_from_ethercat_train" default="false"
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
+    <arg name="enable_safety_controller" default="false" doc="Whether to enable the safety controller"/>
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg controller_name)/controllers.yaml" command="load"/>
     <node name="upload_controller_values" pkg="march_launch"
