@@ -50,6 +50,9 @@ gaits:
   stairs_down_single_step:
     left_close: MVI_stairsdownsinglestep_leftclose_cybathlon_v3
     right_open: MVI_stairsdownsinglestep_rightopen_cybathlon_v3
+  stairs_down_backwards_single_step:
+    left_close: MVI_stairsdownbackwardssinglestep_leftclose_cybathlon_v5
+    right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v5
   stairs_up:
     left_close: MVI_stairsup_leftclose_cybathlon_v4
     left_swing: MVI_stairsup_leftswing_cybathlon_v4
