@@ -37,10 +37,11 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
 
 MarchHardwareInterface::MarchHardwareInterface(
-    std::unique_ptr<march::MarchRobot> robot, bool reset_motor_controllers)
+    std::unique_ptr<march::MarchRobot> robot, bool reset_motor_controllers, bool enable_safety_controller)
     : march_robot_(std::move(robot))
     , num_joints_(this->march_robot_->size())
     , reset_motor_controllers_(reset_motor_controllers)
+    , enable_safety_controller_(enable_safety_controller)
 {
 }
 
@@ -332,8 +333,9 @@ void MarchHardwareInterface::write(
     }
 
     // Enforce limits on all joints in effort mode
-    // TODO: enable this check when the safety controller works again
-    //    effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    if (enable_safety_controller_) {
+            effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    }
 
     if (not has_actuated_) {
         bool found_non_zero = false;
@@ -350,7 +352,9 @@ void MarchHardwareInterface::write(
         }
     }
     // Enforce limits on all joints in position mode
-    position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    if (enable_safety_controller_) {
+        position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+    }
 
     for (size_t i = 0; i < num_joints_; i++) {
         march::Joint& joint = march_robot_->getJoint(i);
