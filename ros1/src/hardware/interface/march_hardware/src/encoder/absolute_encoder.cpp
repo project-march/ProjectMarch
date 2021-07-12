@@ -85,12 +85,12 @@ double AbsoluteEncoder::positionRadiansToIU(double position) const
 
 bool AbsoluteEncoder::isWithinHardLimitsIU(int32_t iu) const
 {
-    return (iu >= lower_limit_iu_ && iu <= upper_limit_iu_);
+    return (iu > lower_limit_iu_ && iu < upper_limit_iu_);
 }
 
 bool AbsoluteEncoder::isWithinSoftLimitsIU(int32_t iu) const
 {
-    return (iu >= lower_soft_limit_iu_ && iu <= upper_soft_limit_iu_);
+    return (iu > lower_soft_limit_iu_ && iu < upper_soft_limit_iu_);
 }
 
 bool AbsoluteEncoder::isValidTargetIU(

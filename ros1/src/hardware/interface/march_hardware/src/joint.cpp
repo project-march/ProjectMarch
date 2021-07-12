@@ -103,17 +103,6 @@ void Joint::readFirstEncoderValues(bool operational_check)
     }
     if (motor_controller_->hasAbsoluteEncoder()) {
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
-
-        if (!motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsIU(
-                initial_absolute_position_)) {
-            throw error::HardwareException(
-                error::ErrorType::OUTSIDE_HARD_LIMITS,
-                "Joint %s is outside hard limits, value is %d, limits are [%d, "
-                "%d]",
-                name_.c_str(), initial_absolute_position_,
-                motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
-                motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
-        }
         position_ = initial_absolute_position_;
     }
     ROS_INFO("[%s] Read first values", this->name_.c_str());
