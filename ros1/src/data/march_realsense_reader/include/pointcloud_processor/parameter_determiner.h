@@ -206,6 +206,11 @@ protected:
     bool getMedianHeightCloud(
         const PointNormalCloud::Ptr& cloud, float& median_height);
 
+    // Trim exo support cloud to only contain reachable points
+    bool getValidExoSupport(
+        const PointNormalCloud::Ptr potential_exo_support_points,
+        PointNormalCloud::Ptr& exo_support_points);
+
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};

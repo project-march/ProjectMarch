@@ -475,22 +475,16 @@ bool HullParameterDeterminer::getSitHeight()
     success &= fillSitGrid(sit_grid);
 
     // Crop those locations to find where there is support for the exoskeleton
+    PointNormalCloud::Ptr potential_exo_support_points
+        = boost::make_shared<PointNormalCloud>();
+    success
+        &= cropCloudToHullVectorUnique(sit_grid, potential_exo_support_points);
+
+    // Trim exo support cloud to only contain reachable points
     PointNormalCloud::Ptr exo_support_points
         = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
-
-    if (debugging_) {
-        std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
-        for (pcl::PointNormal& exo_support_point : *exo_support_points) {
-            geometry_msgs::Point marker_point;
-            marker_point.x = exo_support_point.x;
-            marker_point.y = exo_support_point.y;
-            marker_point.z = exo_support_point.z;
-
-            possible_foot_locations_marker_list.points.push_back(marker_point);
-            possible_foot_locations_marker_list.colors.push_back(marker_color);
-        }
-    }
+    success
+        &= getValidExoSupport(potential_exo_supportPoints, exo_support_points);
 
     if ((float)exo_support_points->size() / (float)sit_grid->size()
         < minimal_needed_support_sit) {
@@ -515,6 +509,37 @@ bool HullParameterDeterminer::getSitHeight()
     }
 
     return success;
+}
+
+// Trim exo support cloud to only contain reachable points
+bool HullParameterDeterminer::getValidExoSupport(
+    const PointNormalCloud::Ptr potential_exo_support_points,
+    PointNormalCloud::Ptr& exo_support_points)
+{
+    for (pcl::PointNormal& potential_exo_support_point :
+        *potential_support_poitns) {
+        if (potential_exo_support_point.z < max_sit_height
+            && potential_exo_support_point.z > min_sit_height) {
+            exo_support_points->push_back(potential_exo_support_point);
+            if (debugging_) {
+                std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
+            }
+        } else {
+            if (debugging_) {
+                std_msgs::ColorRGBA marker_color = color_utilities::YELLOW;
+            }
+        }
+
+        if (debugging_) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = potential_exo_support_point.x;
+            marker_point.y = potential_exo_support_point.y;
+            marker_point.z = potential_exo_support_point.z;
+
+            possible_foot_locations_marker_list.points.push_back(marker_point);
+            possible_foot_locations_marker_list.colors.push_back(marker_color);
+        }
+    }
 }
 
 // Get the median height value of a point cloud
