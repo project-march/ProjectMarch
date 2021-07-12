@@ -410,7 +410,7 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             << sit_height);
         return false;
     }
-    // The step height and side step parameter are unused for the ramp down
+    // The step height and side step parameter are unused for the sit
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
