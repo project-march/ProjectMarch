@@ -512,7 +512,7 @@ bool HullParameterDeterminer::getSitHeight()
 
 // Trim exo support cloud to only contain reachable points
 void HullParameterDeterminer::getValidExoSupport(
-    const PointNormalCloud::Ptr potential_exo_support_points,
+    const PointNormalCloud::Ptr& potential_exo_support_points,
     PointNormalCloud::Ptr& exo_support_points)
 {
     for (pcl::PointNormal& potential_exo_support_point :
