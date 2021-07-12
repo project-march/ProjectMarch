@@ -208,7 +208,7 @@ protected:
 
     // Trim exo support cloud to only contain reachable points
     void getValidExoSupport(
-        const PointNormalCloud::Ptr potential_exo_support_points,
+        const PointNormalCloud::Ptr& potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
 
     // All relevant parameters
