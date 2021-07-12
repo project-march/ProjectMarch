@@ -1,0 +1,9 @@
+*~
+*.pyc
+doc/manifest.yaml
+doc/html
+build
+Gemfile
+native_build
+public
+.idea/
