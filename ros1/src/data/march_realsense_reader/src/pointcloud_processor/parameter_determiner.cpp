@@ -483,8 +483,7 @@ bool HullParameterDeterminer::getSitHeight()
     // Trim exo support cloud to only contain reachable points
     PointNormalCloud::Ptr exo_support_points
         = boost::make_shared<PointNormalCloud>();
-    success
-        &= getValidExoSupport(potential_exo_supportPoints, exo_support_points);
+    getValidExoSupport(potential_exo_support_points, exo_support_points);
 
     if ((float)exo_support_points->size() / (float)sit_grid->size()
         < minimal_needed_support_sit) {
@@ -512,22 +511,25 @@ bool HullParameterDeterminer::getSitHeight()
 }
 
 // Trim exo support cloud to only contain reachable points
-bool HullParameterDeterminer::getValidExoSupport(
+void HullParameterDeterminer::getValidExoSupport(
     const PointNormalCloud::Ptr potential_exo_support_points,
     PointNormalCloud::Ptr& exo_support_points)
 {
     for (pcl::PointNormal& potential_exo_support_point :
-        *potential_support_poitns) {
+        *potential_exo_support_points) {
+
+        std_msgs::ColorRGBA marker_color;
+
         if (potential_exo_support_point.z < max_sit_height
             && potential_exo_support_point.z > min_sit_height) {
+
             exo_support_points->push_back(potential_exo_support_point);
+
             if (debugging_) {
-                std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
+                marker_color = color_utilities::GREEN;
             }
-        } else {
-            if (debugging_) {
-                std_msgs::ColorRGBA marker_color = color_utilities::YELLOW;
-            }
+        } else if (debugging_) {
+            marker_color = color_utilities::YELLOW;
         }
 
         if (debugging_) {
