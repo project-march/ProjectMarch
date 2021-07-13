@@ -7,13 +7,13 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.0
+  - position: 0.01
     time_from_start: 6000000000
     velocity: 0.0
-  - position: -1.0
+  - position: -0.01
     time_from_start: 18000000000
     velocity: 0.0
-  - position: 0
+  - position: 0.0
     time_from_start: 24000000000
     velocity: 0.0
 name: linear_sine_subgait_1
