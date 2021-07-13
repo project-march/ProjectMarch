@@ -3,7 +3,7 @@
 
 #include <utility>
 
-#define TORQUE_CONSTANT 8.27/95
+#define TORQUE_CONSTANT 8.27/355
 
 namespace march
 {
