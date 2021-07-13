@@ -100,7 +100,7 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
         ROS_ERROR_STREAM("The number of points in pointcloud and "
                          "pointcloud_normals is not equal after preprocessing. "
             << "Points in pointcloud: " << pointcloud_->points.size()
-            << "Points in pointcloud_normals: "
+            << " Points in pointcloud_normals: "
             << pointcloud_normals_->points.size());
         return false;
     }

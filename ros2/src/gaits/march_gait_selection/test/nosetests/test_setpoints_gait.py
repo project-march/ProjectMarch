@@ -20,7 +20,7 @@ class TestSetpointsGait(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
+            get_package_share_directory("march_description") + "/urdf/march6.urdf"
         )
         cls.gait_directory = os.path.join(
             get_package_share_directory(VALID_PACKAGE), VALID_DIRECTORY

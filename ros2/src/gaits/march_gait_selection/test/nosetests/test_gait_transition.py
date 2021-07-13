@@ -12,7 +12,7 @@ VALID_DIRECTORY = "test/resources"
 class TestTransitionTrajectory(unittest.TestCase):
     def setUp(self):
         self.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
+            get_package_share_directory("march_description") + "/urdf/march6.urdf"
         )
         self.resources = os.path.join(
             get_package_share_directory(VALID_PACKAGE), VALID_DIRECTORY
