@@ -1,5 +1,5 @@
-description: MVI_walk_v4 (the walk gait) without the HAA movement, at half speed
-duration: 3000000000
+description: MVI_walk_v4 (the walk gait) without any HAA movement
+duration: 1500000000
 gait_type: walk_like
 joints:
   left_ankle:
@@ -7,86 +7,86 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3000000000
+    time_from_start: 1500000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 750000000
+  - position: 0.0349
+    time_from_start: 375000000
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 2250000000
+  - position: 0.0349
+    time_from_start: 1125000000
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 3000000000
+  - position: 0.0349
+    time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.3142
     time_from_start: 0
-    velocity: -0.13
+    velocity: -0.26
   - position: -0.1658
-    time_from_start: 3000000000
+    time_from_start: 1500000000
     velocity: 0.0
   left_knee:
   - position: 0.1396
     time_from_start: 0
     velocity: 0.0
   - position: 0.2094
-    time_from_start: 600000000
+    time_from_start: 300000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: 2040000000
+    time_from_start: 1020000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: 3000000000
+    time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: -0.1396
-    time_from_start: 450000000
+    time_from_start: 225000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1374800000
+    time_from_start: 687400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 3000000000
+    time_from_start: 1500000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 1503600000
+  - position: 0.0349
+    time_from_start: 751800000
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 3000000000
+  - position: 0.0349
+    time_from_start: 1500000000
     velocity: -0.0
   right_hip_fe:
   - position: -0.1658
     time_from_start: 0
     velocity: 0.0
   - position: 0.6109
-    time_from_start: 1750000000
+    time_from_start: 875000000
     velocity: 0.0
   - position: 0.3142
-    time_from_start: 3000000000
-    velocity: -0.13
+    time_from_start: 1500000000
+    velocity: -0.26
   right_knee:
   - position: 0.1396
     time_from_start: 0
     velocity: 0.0
   - position: 1.1345
-    time_from_start: 1260000000
+    time_from_start: 630000000
     velocity: 0.0
   - position: 1.1345
-    time_from_start: 1670600000
+    time_from_start: 835300000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: 3000000000
+    time_from_start: 1500000000
     velocity: 0.0
 name: right_swing
-version: MVI_walk_rightswing_v6_half_speed
+version: MVI_walk_rightswing_v8
