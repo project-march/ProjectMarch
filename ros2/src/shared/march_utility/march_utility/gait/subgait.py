@@ -59,7 +59,7 @@ class Subgait:
 
     # region Create subgait
     @classmethod
-    def from_file(cls, robot: urdf.Robot, file_name: str) -> Subgait:
+    def from_file(cls, robot: urdf.Robot, file_name: str, node = None,) -> Subgait:
         """
         Extract sub gait data of the given yaml.
 
@@ -259,7 +259,7 @@ class Subgait:
             subgait_dict["description"] if subgait_dict.get("description") else ""
         )
 
-        return cls(
+        gait =  cls(
             joint_list,
             duration,
             subgait_type,
@@ -269,6 +269,7 @@ class Subgait:
             subgait_description,
             robot,
         )
+        return gait
 
     # endregion
 

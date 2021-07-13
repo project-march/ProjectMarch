@@ -166,7 +166,7 @@ class Gait:
     def _validate_new_edge_position(
         self,
         old_edge_position: EdgePosition,
-        new_edge_position_values: Dict[str, float],
+        new_edge_position_values: Dict[str, float], node
     ) -> EdgePosition:
         """
         Validate that the edge position has made an acceptable change, this means:
@@ -177,6 +177,7 @@ class Gait:
         :param new_edge_position: The new edge position that should be validated
         :raises: NonValidGaitContent if the transition is not valid.
         """
+        node.get_logger().warn(f"setting new version from old {old_edge_position} to new {new_edge_position_values}")
         if isinstance(old_edge_position, StaticEdgePosition):
             if old_edge_position != StaticEdgePosition(new_edge_position_values):
                 raise NonValidGaitContent(
@@ -184,6 +185,7 @@ class Gait:
                     "static old version"
                 )
             else:
+                node.get_logger().warn(f"returning {StaticEdgePosition(new_edge_position_values)}")
                 return StaticEdgePosition(new_edge_position_values)
         elif isinstance(old_edge_position, UnknownEdgePosition):
             raise NonValidGaitContent(
@@ -192,7 +194,7 @@ class Gait:
         elif isinstance(old_edge_position, DynamicEdgePosition):
             return DynamicEdgePosition(new_edge_position_values)
 
-    def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait]):
+    def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait], node):
         """
         Validate that both the starting position and the final position changed in a
         valid way.
@@ -204,10 +206,12 @@ class Gait:
             if from_subgait_name == self.graph.START:
                 new_subgait = new_subgaits[to_subgait_name]
                 new_starting_position_values = new_subgait.starting_position
+                node.get_logger().warn(f"The new start position values are {new_starting_position_values}")
+                node.get_logger().warn(f"The old start position values are {self.starting_position}")
                 try:
                     new_starting_position = self._validate_new_edge_position(
                         self.starting_position,
-                        new_starting_position_values,
+                        new_starting_position_values, node
                     )
                 except NonValidGaitContent as e:
                     raise e
@@ -215,10 +219,12 @@ class Gait:
             elif to_subgait_name == self.graph.END:
                 new_subgait = new_subgaits[from_subgait_name]
                 new_final_position_values = new_subgait.final_position
+                node.get_logger().warn(f"The new final position values are {new_final_position_values}")
+                node.get_logger().warn(f"The old final position values are {self.final_position}")
                 try:
                     new_final_position = self._validate_new_edge_position(
                         self.final_position,
-                        new_final_position_values,
+                        new_final_position_values, node
                     )
                 except NonValidGaitContent as e:
                     raise e
@@ -246,8 +252,9 @@ class Gait:
         :param new_subgaits: The dictionary with the new subgaits to use
         :param node: A node to use for logging the warnings
         """
+        node.get_logger().warn(f"The old final position values are {self.final_position}")
         try:
-            if self._validate_and_set_new_edge_positions(new_subgaits):
+            if self._validate_and_set_new_edge_positions(new_subgaits, node):
                 self.subgaits = new_subgaits
                 self._validate_trajectory_transition()
                 return True
@@ -257,7 +264,7 @@ class Gait:
             raise e
 
     def set_subgait_versions(
-        self, robot: urdf.Robot, gait_directory: str, version_map: dict
+        self, robot: urdf.Robot, gait_directory: str, version_map: dict, node: Node
     ):
         """Updates the given subgait versions and verifies transitions.
 
@@ -265,16 +272,23 @@ class Gait:
         :param str gait_directory: path to the gait directory
         :param dict version_map: Mapping subgait names to versions
         """
+        node.get_logger().warn("setting subgait versions")
+        node.get_logger().warn(f"The old final position values are {self.final_position} 11")
         new_subgaits = self.subgaits
+        node.get_logger().warn(f"The old final position values are {self.final_position} 22")
+
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
                 raise SubgaitNameNotFound(subgait_name, self.gait_name)
+            node.get_logger().warn(f"The old final position values are {self.final_position} {version}")
+            node.get_logger().warn(f"The old start position values are {self.starting_position} {version}")
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
-
+            node.get_logger().warn(f"The old final position values are {self.final_position} {version}")
+            node.get_logger().warn(f"The old start position values are {self.starting_position} {version}")
         try:
-            self.set_subgaits(new_subgaits)
+            self.set_subgaits(new_subgaits, node)
         except NonValidGaitContent as e:
             raise e
 

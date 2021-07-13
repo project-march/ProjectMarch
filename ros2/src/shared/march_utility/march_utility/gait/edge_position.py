@@ -25,15 +25,20 @@ class EdgePosition:
 
     def __eq__(self, other):
         if isinstance(other, EdgePosition):
-            return all(
-                math.isclose(
-                    value,
-                    other.values[i],
-                    rel_tol=0,
-                    abs_tol=self.ALLOWED_ERROR_ENDPOINTS,
-                )
-                for i, value in enumerate(self.values)
-            )
+            for i, value in enumerate(self.values):
+                if not math.isclose(value, other.values[i], rel_tol=0, abs_tol=self.ALLOWED_ERROR_ENDPOINTS):
+                    return False
+            return True
+            # return all(
+            #     math.isclose(
+            #         value,
+            #         other.values[i],
+            #         rel_tol=0,
+            #         abs_tol=self.ALLOWED_ERROR_ENDPOINTS,
+            #     )
+            #     for i, value in enumerate(self.values)
+            # )
+
 
     def __str__(self):
         return str(self.values)

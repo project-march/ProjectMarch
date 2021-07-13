@@ -325,7 +325,7 @@ class SetpointsGait(GaitInterface, Gait):
         """Called when the gait has finished."""
         self._current_subgait = None
 
-    def set_subgait_versions(self, robot, gait_directory, version_map):
+    def set_subgait_versions(self, robot, gait_directory, version_map, node):
         """
         Change the versions of the subgaits.
         :param robot: The robot model used.
@@ -334,7 +334,7 @@ class SetpointsGait(GaitInterface, Gait):
         """
         if self._current_subgait is None:
             super(SetpointsGait, self).set_subgait_versions(
-                robot, gait_directory, version_map
+                robot, gait_directory, version_map, node
             )
         else:
             raise GaitError(
