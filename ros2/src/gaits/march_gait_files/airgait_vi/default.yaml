@@ -143,7 +143,7 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 1.4835
       right_knee: 1.4835
-  sit_with_haa:
+  sit:
     gait_type: sit_like
     joints:
       left_ankle: 0.0
