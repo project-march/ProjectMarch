@@ -1,6 +1,7 @@
 #ifndef MARCH_PREPROCESSOR_H
 #define MARCH_PREPROCESSOR_H
 
+#include "utilities/realsense_category_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
