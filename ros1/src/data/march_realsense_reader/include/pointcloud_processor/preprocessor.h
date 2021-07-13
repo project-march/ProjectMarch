@@ -111,7 +111,9 @@ protected:
     int remaining_points {};
 
     // Distance filter parameters
-    double minimum_distance_threshold {};
+    double minimum_distance_threshold_x {};
+    double minimum_distance_threshold_y {};
+    double minimum_distance_threshold_z {};
     double maximum_distance_threshold {};
 
     // Normal estimation parameters
