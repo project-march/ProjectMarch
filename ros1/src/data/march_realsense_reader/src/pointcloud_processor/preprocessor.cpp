@@ -129,7 +129,12 @@ void NormalsPreprocessor::readParameters(
 
     // Distance Filter parameters
     maximum_distance_threshold = config.preprocessor_maximum_distance_threshold;
-    minimum_distance_threshold = config.preprocessor_minimum_distance_threshold;
+    minimum_distance_threshold_x
+        = config.preprocessor_minimum_distance_threshold_x;
+    minimum_distance_threshold_y
+        = config.preprocessor_minimum_distance_threshold_y;
+    minimum_distance_threshold_z
+        = config.preprocessor_minimum_distance_threshold_z;
 
     // Normal Estimation parameters
     use_tree_search_method
@@ -217,20 +222,20 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
         = boost::make_shared<pcl::PointIndices>();
 
     // Removed any point too far from the origin
-    for (int point_index = 0; point_index < pointcloud_->points.size();
-         ++point_index) {
-        // find the squared distance from the origin
-        float point_distance = sqrt((pointcloud_->points[point_index].x
-                                        * pointcloud_->points[point_index].x)
-            + (pointcloud_->points[point_index].y
-                * pointcloud_->points[point_index].y)
-            + (pointcloud_->points[point_index].z
-                * pointcloud_->points[point_index].z));
+    for (int point_index = 0; point_index < pointcloud_->points.size(); ++point_index) {
+        pcl::PointXYZ point = pointcloud_->points[point_index];
+
+            // find the squared distance from the origin
+        float point_distance = sqrt(
+            (point.x * point.x) + (point.y * point.y) + (point.z * point.z));
 
         // remove point if it's outside the threshold distance
-        if (point_distance > maximum_distance_threshold
-            || (realsense_category_.value() != RealSenseCategory::sit
-                && point_distance < minimum_distance_threshold)) {
+        if (point_distance > maximum_distance_threshold) {
+            indices_to_remove->indices.push_back(point_index);
+        } else if (realsense_category_.value() != RealSenseCategory::sit
+            && (abs(point.x) < minimum_distance_threshold_x
+                || abs(point.y) < minimum_distance_threshold_y
+                || abs(point.z < minimum_distance_threshold_z))) {
             indices_to_remove->indices.push_back(point_index);
         }
     }
