@@ -234,8 +234,8 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
             indices_to_remove->indices.push_back(point_index);
         } else if (realsense_category_.value() != RealSenseCategory::sit
             && (abs(point.x) < minimum_distance_threshold_x
-                || abs(point.y) < minimum_distance_threshold_y
-                || abs(point.z < minimum_distance_threshold_z))) {
+                && abs(point.y) < minimum_distance_threshold_y
+                && abs(point.z < minimum_distance_threshold_z))) {
             indices_to_remove->indices.push_back(point_index);
         }
     }
