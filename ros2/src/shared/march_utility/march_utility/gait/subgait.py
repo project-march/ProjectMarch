@@ -259,7 +259,7 @@ class Subgait:
             subgait_dict["description"] if subgait_dict.get("description") else ""
         )
 
-        gait =  cls(
+        return cls(
             joint_list,
             duration,
             subgait_type,
@@ -269,7 +269,6 @@ class Subgait:
             subgait_description,
             robot,
         )
-        return gait
 
     # endregion
 
