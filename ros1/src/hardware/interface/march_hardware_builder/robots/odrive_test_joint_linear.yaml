@@ -14,4 +14,4 @@ testsetup:
             maxPositionIU: 445
           incrementalEncoder:
             resolution: 13
-            transmission: 3.141592
+            transmission: 0.00314159265359
