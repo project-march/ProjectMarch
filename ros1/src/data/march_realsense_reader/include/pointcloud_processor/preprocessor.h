@@ -16,8 +16,9 @@ public:
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
-        Normals::Ptr normal_pointcloud, std::string frame_id_to_transform_to_,
-        RealSenseCategory const realsense_category)
+        Normals::Ptr normal_pointcloud,
+        RealSenseCategory const realsense_category,
+        std::string frame_id_to_transform_to_)
         = 0;
 
     virtual ~Preprocessor() = default;
@@ -52,8 +53,8 @@ public:
 
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
-        std::string frame_id_to_transform_to = "foot_left",
-        RealSenseCategory const realsense_category) override;
+        RealSenseCategory const realsense_category,
+        std::string frame_id_to_transform_to = "foot_left") override;
 
 protected:
     /** Calls the tf listener, to know transform at current time and transforms
@@ -76,6 +77,7 @@ public:
     // Calls all subsequent methods to preprocess a pointlcoud using normal
     // vectors
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+        RealSenseCategory const realsense_category,
         std::string frame_id_to_transform_to = "foot_left") override;
 
     void readParameters(

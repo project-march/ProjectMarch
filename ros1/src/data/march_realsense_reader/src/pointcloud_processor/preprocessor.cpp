@@ -65,8 +65,8 @@ void Preprocessor::removePointsFromIndices(
 }
 
 bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to,
-    RealSenseCategory const realsense_category)
+    Normals::Ptr pointcloud_normals, RealSenseCategory const realsense_category,
+    std::string frame_id_to_transform_to)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
@@ -304,7 +304,8 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 // Preprocess the pointcloud, this means only transforming for the simple
 // preprocessor
 bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
+    Normals::Ptr pointcloud_normals, RealSenseCategory const realsense_category,
+    std::string frame_id_to_transform_to)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
