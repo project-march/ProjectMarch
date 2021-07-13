@@ -57,24 +57,14 @@ class MpcListener(Node):
             # Current position and velocity
             joint_pos = msg.joint[joint_number].estimation.states[0]
             joint_vel = msg.joint[joint_number].estimation.states[1]
-            joint_input =  msg.joint[joint_number].estimation.inputs[0]
-            self.new_measurement_position.insert(
-                joint_number, joint_pos.array[0]
-            )
-            self.new_measurement_velocity.insert(
-                joint_number, joint_vel.array[0]
-            )
+            joint_input = msg.joint[joint_number].estimation.inputs[0]
+            self.new_measurement_position.insert(joint_number, joint_pos.array[0])
+            self.new_measurement_velocity.insert(joint_number, joint_vel.array[0])
 
             # Estimation
-            self.new_estimation_position[joint_number, :] = (
-                joint_pos.array[1:]
-            )
-            self.new_estimation_velocity[joint_number, :] = (
-                joint_vel.array[1:]
-            )
-            self.new_estimation_input[joint_number, :] = (
-                joint_input.array
-            )
+            self.new_estimation_position[joint_number, :] = joint_pos.array[1:]
+            self.new_estimation_velocity[joint_number, :] = joint_vel.array[1:]
+            self.new_estimation_input[joint_number, :] = joint_input.array
 
         # Get time
         self.new_time = msg.header.stamp.sec + msg.header.stamp.nanosec * NANO
