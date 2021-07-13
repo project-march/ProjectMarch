@@ -20,10 +20,10 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.0
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: -0.1745
     time_from_start: 1500000000
     velocity: 0.0
   left_knee:
@@ -51,10 +51,10 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.0
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: -0.1745
     time_from_start: 1500000000
     velocity: 0.0
   right_knee:
@@ -64,5 +64,5 @@ joints:
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
-name: sit_down
-version: MVI_sit_down_v2
+name: prepare_sit_down
+version: MVI_prepare_sit_down_v2

@@ -167,11 +167,11 @@ positions:
     joints:
       left_ankle: 0.0
       left_hip_aa: 0.0349
-      left_hip_fe: 0.0
+      left_hip_fe: -0.1745
       left_knee: 0.0
       right_ankle: 0.0
       right_hip_aa: 0.0349
-      right_hip_fe: 0.0
+      right_hip_fe: -0.1745
       right_knee: 0.0
 dynamic_edge_gaits:
   dynamic_sit:
