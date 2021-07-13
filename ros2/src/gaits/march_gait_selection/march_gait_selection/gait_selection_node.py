@@ -1,3 +1,4 @@
+import os
 import signal
 import sys
 
@@ -80,6 +81,9 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
             if gait_state_machine.update_timer is not None:
                 gait_state_machine.update_timer.destroy()
             gait_state_machine.run()
+        elif param.name == 'use_pressure_soles_to_delay_subgaits' and param.type_ \
+             == Parameter.Type.BOOL:
+            gait_state_machine.use_pressure_soles_to_delay_subgaits = param.value
 
     if gaits_updated:
         gait_selection.update_gaits()
@@ -87,3 +91,4 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
         gait_selection.get_logger().info("Gaits were updated")
 
     return SetParametersResult(successful=True)
+

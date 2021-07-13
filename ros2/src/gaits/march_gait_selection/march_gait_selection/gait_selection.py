@@ -34,7 +34,6 @@ from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
 
-
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
@@ -42,18 +41,17 @@ class GaitSelection(Node):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
-        self._balance_used = False
         try:
             # Initialize all parameters once, and set up a callback for dynamically
             # reconfiguring
             if gait_package is None:
-                gait_package = (
+                self._gait_package = (
                     self.get_parameter("gait_package")
                     .get_parameter_value()
                     .string_value
                 )
             if directory is None:
-                directory = (
+                self._directory_name = (
                     self.get_parameter("gait_directory")
                     .get_parameter_value()
                     .string_value
@@ -63,6 +61,12 @@ class GaitSelection(Node):
                     self.get_parameter("balance").get_parameter_value().bool_value
                 )
 
+            self._early_schedule_duration = self._parse_duration_parameter(
+                "early_schedule_duration"
+            )
+            self._first_subgait_delay = self._parse_duration_parameter(
+                "first_subgait_delay"
+            )
             self._early_schedule_duration = self._parse_duration_parameter(
                 "early_schedule_duration"
             )
@@ -90,6 +94,7 @@ class GaitSelection(Node):
         self._robot = get_robot_urdf_from_service(self) if robot is None else robot
         self._joint_names = sorted(get_joint_names_from_robot(self._robot))
 
+
         self._realsense_yaml = os.path.join(
             self._gait_directory, "realsense_gaits.yaml"
         )
@@ -111,13 +116,6 @@ class GaitSelection(Node):
         self._create_services()
         self._gaits = self._load_gaits()
 
-        self._early_schedule_duration = self._parse_duration_parameter(
-            "early_schedule_duration"
-        )
-        self._first_subgait_delay = self._parse_duration_parameter(
-            "first_subgait_delay"
-        )
-
         if not self._validate_inverse_kinematics_is_possible():
             self.get_logger().warn(
                 "The currently available joints are unsuitable for "
@@ -137,6 +135,7 @@ class GaitSelection(Node):
             validate_and_get_joint_names_for_inverse_kinematics(self.get_logger())
             is not None
         )
+
 
     def _initialize_gaits(self):
         package_path = get_package_share_directory(self._gait_package)
@@ -171,6 +170,7 @@ class GaitSelection(Node):
         ) = self._load_configuration()
 
         self._loaded_gaits = self._load_gaits()
+
 
     def _create_services(self) -> None:
         self.create_service(

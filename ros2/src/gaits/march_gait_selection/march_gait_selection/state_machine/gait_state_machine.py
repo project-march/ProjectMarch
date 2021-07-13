@@ -13,6 +13,7 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
 from rclpy.callback_groups import ReentrantCallbackGroup
+from std_srvs.srv import Trigger
 
 from std_msgs.msg import Header
 from .gait_update import GaitUpdate
@@ -20,7 +21,6 @@ from .trajectory_scheduler import TrajectoryScheduler
 from ..gait_selection import GaitSelection
 
 State = Union[EdgePosition, str]
-
 
 class GaitStateMachine:
     """The state machine used to make sure that only valid transitions will
@@ -71,6 +71,12 @@ class GaitStateMachine:
             .double_value
         )
 
+        self.use_pressure_soles_to_delay_subgaits = (
+            self._gait_selection.get_parameter("use_pressure_soles_to_delay_subgaits")
+            .get_parameter_value()
+            .bool_value
+        )
+
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
@@ -114,12 +120,36 @@ class GaitStateMachine:
             callback_group=ReentrantCallbackGroup(),
         )
 
+        self.right_service = self._gait_selection.create_service(
+            srv_type=Trigger,
+            srv_name="/right",
+            callback=self._right_on_ground,
+            callback_group=ReentrantCallbackGroup(),
+        )
+
+        self.left_service = self._gait_selection.create_service(
+            srv_type=Trigger,
+            srv_name="/left",
+            callback=self._left_on_ground,
+            callback_group=ReentrantCallbackGroup(),
+        )
+
         self.add_transition_callback(self._current_state_cb)
         self.add_gait_callback(self._current_gait_cb)
         self._gait_selection.get_logger().debug("Initialized state machine")
 
     def _is_idle(self):
         return isinstance(self._current_state, EdgePosition)
+
+    def _right_on_ground(self, req, res):
+        self._force_left_foot = 0
+        self._force_right_foot = 500
+        return res
+
+    def _left_on_ground(self, req, res):
+        self._force_left_foot = 500
+        self._force_right_foot = 0
+        return res
 
     def _update_foot_on_ground_cb(self, side, msg):
         """Update the status of the feet on ground based on pressure sole data,
@@ -129,17 +159,17 @@ class GaitStateMachine:
             force = sum(state.total_wrench.force.z for state in msg.states)
 
             # Assign force to specific foot
-            if side is Side.right:
-                self._force_right_foot = force
-            else:
-                self._force_left_foot = force
+            # if side is Side.right:
+            #     self._force_right_foot = force
+            # else:
+            #     self._force_left_foot = force
 
         # If there are no contacts, change foot on ground to False
-        elif len(msg.states) == 0:
-            if side is Side.right:
-                self._force_right_foot = 0
-            else:
-                self._force_left_foot = 0
+        # elif len(msg.states) == 0:
+            # if side is Side.right:
+                # self._force_right_foot = 0
+            # else:
+            #     self._force_left_foot = 0
 
     def _possible_gaits_cb(self, request, response):
         """Standard callback for the get possible gaits service"""
@@ -361,7 +391,9 @@ class GaitStateMachine:
                     now, self._gait_selection._first_subgait_delay
                 )
             else:
-                gait_update = self._current_gait.start(now)
+                if self.check_correct_foot_pressure() or not \
+                        self.use_pressure_soles_to_delay_subgaits:
+                    gait_update = self._current_gait.start(now)
 
             if gait_update == GaitUpdate.empty():
                 self._input.gait_finished()
@@ -398,9 +430,25 @@ class GaitStateMachine:
             )
         else:
             gait_update = self._current_gait.update(now)
+
+        # self._gait_selection.get_logger().info(f"Gait update: {gait_update}")
         self._process_gait_update(gait_update)
 
     def _process_gait_update(self, gait_update: GaitUpdate):
+        if gait_update.is_new_subgait:
+            self._gait_selection.get_logger().info("New subgait")
+            if not self.check_correct_foot_pressure() and \
+                    self.use_pressure_soles_to_delay_subgaits:
+                self._gait_selection.get_logger().info("Next subgait is delayed due to "
+                                                       "incorrect foot pressure")
+                self._trajectory_scheduler.cancel_active_goals()
+                self._trajectory_scheduler.send_position_hold()
+                # self._trajectory_scheduler.cancel_active_goals()
+                self._current_gait.subgait_failed()
+                return
+            elif gait_update.new_trajectory_command is not None:
+                self._trajectory_scheduler.schedule(gait_update.new_trajectory_command)
+
         # Call gait callback if there is a new subgait
         if gait_update.is_new_subgait:
             self._call_gait_callbacks()

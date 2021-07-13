@@ -44,7 +44,15 @@ def generate_launch_description():
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(
-                name="timer_period", default_value="0.004", description=""
+                name="use_pressure_soles_to_delay_subgaits",
+                default_value="False",
+                description="Whether to delay the subgait based on the pressure on "
+                            "the pressure soles."
+            ),
+            DeclareLaunchArgument(
+                name="timer_period",
+                default_value="0.004",
+                description=""
             ),
             Node(
                 package="march_gait_selection",
@@ -62,7 +70,9 @@ def generate_launch_description():
                             "early_schedule_duration"
                         )
                     },
-                    {"timer_period": LaunchConfiguration("timer_period")},
+                    {"use_pressure_soles_to_delay_subgaits":
+                     LaunchConfiguration("use_pressure_soles_to_delay_subgaits")},
+                    {"timer_period": LaunchConfiguration("timer_period")}
                 ],
                 on_exit=Shutdown(),
             ),

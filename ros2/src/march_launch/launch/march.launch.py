@@ -37,6 +37,8 @@ def generate_launch_description():
     balance = LaunchConfiguration("balance")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    use_pressure_soles_to_delay_subgaits = LaunchConfiguration(
+        "use_pressure_soles_to_delay_subgaits")
     timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
@@ -154,7 +156,15 @@ def generate_launch_description():
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(
-                name="timer_period", default_value="0.004", description=""
+                name="use_pressure_soles_to_delay_subgaits",
+                default_value="False",
+                description="Whether to delay the subgait based on the pressure on "
+                            "the pressure soles."
+            ),
+            DeclareLaunchArgument(
+                name="timer_period",
+                default_value="0.004",
+                description=""
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
@@ -225,7 +235,9 @@ def generate_launch_description():
                     ("balance", balance),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
-                    ("timer_period", timer_period),
+                    ("use_pressure_soles_to_delay_subgaits",
+                     use_pressure_soles_to_delay_subgaits),
+                    ("timer_period", timer_period)
                 ],
             ),
             # Safety
