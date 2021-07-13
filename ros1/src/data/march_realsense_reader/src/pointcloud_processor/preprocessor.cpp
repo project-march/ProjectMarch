@@ -222,10 +222,11 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
         = boost::make_shared<pcl::PointIndices>();
 
     // Removed any point too far from the origin
-    for (int point_index = 0; point_index < pointcloud_->points.size(); ++point_index) {
+    for (int point_index = 0; point_index < pointcloud_->points.size();
+         ++point_index) {
         pcl::PointXYZ point = pointcloud_->points[point_index];
 
-            // find the squared distance from the origin
+        // find the squared distance from the origin
         float point_distance = sqrt(
             (point.x * point.x) + (point.y * point.y) + (point.z * point.z));
 
@@ -233,9 +234,9 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
         if (point_distance > maximum_distance_threshold) {
             indices_to_remove->indices.push_back(point_index);
         } else if (realsense_category_.value() != RealSenseCategory::sit
-            && (abs(point.x) < minimum_distance_threshold_x
-                && abs(point.y) < minimum_distance_threshold_y
-                && abs(point.z < minimum_distance_threshold_z))) {
+            && abs(point.x) < minimum_distance_threshold_x
+            && abs(point.y) < minimum_distance_threshold_y
+            && abs(point.z < minimum_distance_threshold_z)) {
             indices_to_remove->indices.push_back(point_index);
         }
     }
