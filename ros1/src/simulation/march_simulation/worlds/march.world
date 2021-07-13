@@ -21,5 +21,11 @@
       </camera>
     </gui>
 
+    <physics type="ode">
+      <max_step_size>0.02</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>50</real_time_update_rate>
+    </physics>
+
   </world>
 </sdf>
