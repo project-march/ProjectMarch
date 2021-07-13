@@ -47,12 +47,21 @@ gaits:
     right_close: MVI_stairsdownbackwards_rightclose_low_undeep_v1
     right_open: MVI_stairsdownbackwards_rightopen_low_undeep_v1
     right_swing: MVI_stairsdownbackwards_rightswing_low_undeep_v1
+  stairs_down_single_step:
+    left_close: MVI_stairsdownsinglestep_leftclose_cybathlon_v3
+    right_open: MVI_stairsdownsinglestep_rightopen_cybathlon_v3
+  stairs_down_backwards_single_step:
+    left_close: MVI_stairsdownbackwardssinglestep_leftclose_cybathlon_v5
+    right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v5
   stairs_up:
     left_close: MVI_stairsup_leftclose_cybathlon_v4
     left_swing: MVI_stairsup_leftswing_cybathlon_v4
     right_close: MVI_stairsup_rightclose_cybathlon_v4
     right_open: MVI_stairsup_rightopen_cybathlon_v4
     right_swing: MVI_stairsup_rightswing_cybathlon_v4
+  stairs_up_single_step:
+    right_open: MVI_stairsupsinglestep_rightopen_cybathlon_v5
+    left_close: MVI_stairsupsinglestep_leftclose_cybathlon_v5
   stand:
     prepare_stand_up: MVI_prepare_stand_up_v2
     stand_up: MVI_stand_up_v2
@@ -76,6 +85,17 @@ gaits:
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
 positions:
+  ten_degree_hip_stand:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: -0.1745
+      left_knee: 0.0
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: -0.1745
+      right_knee: 0.0
   low_sit:
     gait_type: sit_like
     joints:
