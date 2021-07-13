@@ -27,8 +27,8 @@ march:
       # Both parameters are required for each joint
       weights:
         linear_joint:
-          Q: [ 10.0, 1.0 ]
-          R: [ 1.0 ]
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
 
       constraints:
