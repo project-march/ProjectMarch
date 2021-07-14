@@ -1,5 +1,4 @@
-description: First version of a flat ramp_up gait, but with more hip flexion in both
-  legs
+description: ramp up v2 but without haa
 duration: 2500000000
 gait_type: stairs_like
 joints:
