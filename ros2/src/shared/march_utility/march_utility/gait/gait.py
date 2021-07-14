@@ -274,7 +274,7 @@ class Gait:
         """
         node.get_logger().warn("setting subgait versions")
         node.get_logger().warn(f"The old final position values are {self.final_position} 11")
-        new_subgaits = self.subgaits
+        new_subgaits = self.subgaits.copy()
         node.get_logger().warn(f"The old final position values are {self.final_position} 22")
 
         for subgait_name, version in version_map.items():
