@@ -265,7 +265,7 @@ class Gait:
         :param str gait_directory: path to the gait directory
         :param dict version_map: Mapping subgait names to versions
         """
-        new_subgaits = self.subgaits
+        new_subgaits = self.subgaits.copy()
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
                 raise SubgaitNameNotFound(subgait_name, self.gait_name)
