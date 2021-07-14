@@ -1,4 +1,4 @@
-name: ramp_door_slope_up
+name: ramp_up
 subgaits:
   start:
     to: right_open
