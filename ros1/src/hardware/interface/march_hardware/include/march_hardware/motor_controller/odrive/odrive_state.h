@@ -26,7 +26,9 @@ public:
         ENCODER_DIR_FIND = 10,
         HOMING = 11,
         ENCODER_HALL_POLARITY_CALIBRATION = 12,
-        ENCODER_HALL_PHASE_CALIBRATION = 13
+        ENCODER_HALL_PHASE_CALIBRATION = 13,
+        FIND_ABS_INDEX_REPRESENTATION = 14,
+        SET_INCR_INDEX_WITH_ABS = 15
     };
 
     ODriveAxisState()
@@ -80,6 +82,10 @@ public:
                 return "Encoder hall polarity calibration";
             case ENCODER_HALL_PHASE_CALIBRATION:
                 return "Encoder hall phase calibration";
+            case FIND_ABS_INDEX_REPRESENTATION:
+                return "Finding abs index representation";
+            case SET_INCR_INDEX_WITH_ABS:
+                return "Setting the incremental index with absolute encoder";
             default:
                 return "Unrecognized ODrive axis state";
         }
