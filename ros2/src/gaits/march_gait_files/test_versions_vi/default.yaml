@@ -2,6 +2,9 @@ gaits:
   curb_sdg:
     left_close: curb_sdg_leftclose_v1
     right_open: curb_sdg_rightopen_v1
+  curb_up:
+    right_open: MVI_curbup_rightopen_v1
+    left_close: MVI_curbup_leftclose_v1
   ramp_door_last_step:
     left_close: MVI_RD_laststep_leftclose_steep_v1
     right_open: MVI_RD_laststep_rightopen_steep_v1
