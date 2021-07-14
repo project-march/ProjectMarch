@@ -429,16 +429,19 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    if (sit_height > min_sit_height && sit_height < max_sit_height) {
-        gait_parameters_->first_parameter
-            = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
-    } else {
-        gait_parameters_->first_parameter = -1;
-        ROS_ERROR_STREAM("The sit height should be between "
-            << min_sit_height << " and " << max_sit_height << " but was "
-            << sit_height);
+    if (sit_height > max_sit_height + allowed_deviation_from_reachable_bench
+        || sit_height
+            < min_sit_height - allowed_deviation_from_reachable_bench) {
+        ROS_WARN_STREAM("The found sit height should be between "
+            << min_sit_height << "( -" << allowed_deviation_from_reachable_bench
+            << " ) and " << max_sit_height << "( +"
+            << allowed_deviation_from_reachable_bench << " ) but was "
+            << ramp_slope);
         return false;
     }
+
+    gait_parameters_->first_parameter = calculateParameter(sit_height, min_sit_height, max_sit_height);
+
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
@@ -448,11 +451,9 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 {
-    gait_parameters_->first_parameter = (optimal_foot_location.x - min_x_stairs)
-        / (max_x_stairs - min_x_stairs);
-    gait_parameters_->second_parameter
-        = (optimal_foot_location.z - min_z_stairs)
-        / (max_z_stairs - min_z_stairs);
+    gait_parameters_->first_parameter = calculateParameter(optimal_foot_location.x, min_x_stairs, max_x_stairs);
+    gait_parameters_->second_parameter = calculateParameter(optimal_foot_location.z, min_z_stairs, max_z_stairs);
+
     // The side step parameter is unused for the stairs gait so we set it to -1
     gait_parameters_->side_step_parameter = -1;
     return true;
@@ -460,13 +461,17 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 
 bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 {
-    if (ramp_slope > max_slope || ramp_slope < min_slope) {
+    if (ramp_slope > max_slope + allowed_deviation_from_reachable_ramp
+        || ramp_slope < min_slope - allowed_deviation_from_reachable_ramp) {
         ROS_WARN_STREAM("The found ramp slope should be between "
-            << min_slope << " and " << max_slope << " but was " << ramp_slope);
+            << min_slope << "( -" << allowed_deviation_from_reachable_ramp
+            << " ) and " << max_slope << "( +"
+            << allowed_deviation_from_reachable_ramp << " ) but was "
+            << ramp_slope);
         return false;
     }
-    gait_parameters_->first_parameter
-        = (ramp_slope - min_slope) / (max_slope - min_slope);
+
+    gait_parameters_->first_parameter = calculateParameter(ramp_slope, min_ramp_slope, max_ramp_slope);
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
@@ -474,6 +479,8 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
     gait_parameters_->side_step_parameter = -1;
     return true;
 }
+
+float HullParameterDeterminer::calculateParameter(float valid_gait_information, float minimal_)
 
 // The sit analogue of getOptimalFootLocation, find the height at which to sit
 bool HullParameterDeterminer::getSitHeight()
@@ -791,10 +798,14 @@ bool HullParameterDeterminer::isValidLocation(
             // A possible foot location for the stairs gait is valid if it is
             // reachable by the stairs gait and the location offers support
             // for the entire foot
-            return (possible_foot_location.x < min_x_stairs
-                && possible_foot_location.x > max_x_stairs
-                && possible_foot_location.z > min_z_stairs
-                && possible_foot_location.z < max_z_stairs
+            return (possible_foot_location.x
+                    < min_x_stairs + allowed_deviation_from_reachable_stair
+                && possible_foot_location.x
+                    > max_x_stairs - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z
+                    > min_z_stairs - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z
+                    < max_z_stairs + allowed_deviation_from_reachable_stair
                 && entireFootCanBePlaced(possible_foot_location));
         }
         default: {
