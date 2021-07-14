@@ -311,7 +311,6 @@ class RealSenseGait(SetpointsGait):
         Make a call to the realsense service, if it is available
         and returns the response.
 
-        :param frame_id_to_transform_to: The frame that should be given to the reader.
         :return: Whether the call was successful
         """
         if self._current_subgait is not None:

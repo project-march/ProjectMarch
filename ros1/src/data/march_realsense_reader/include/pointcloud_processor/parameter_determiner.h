@@ -15,7 +15,6 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
-using LineCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
@@ -163,14 +162,11 @@ protected:
     bool getDistanceToObject(
         pcl::PointNormal possible_foot_location, double& distance);
 
-    // Get the line on which it is possible to stand for a ramp gait.
-    bool getExecutableLocationsLine();
-
     // Find the stairs up parameters from the foot locations
     bool getGaitParametersFromFootLocationStairsUp();
 
     // Find the ramp parameter from the foot locations
-    bool getGaitParametersFromFootLocationRamp();
+    bool getGaitParametersFromRampSlope();
 
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
@@ -194,6 +190,20 @@ protected:
 
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
+
+    // Get the slope of a ramp based on the orientation of points on the ramp
+    bool getRampSlope();
+
+    // Calculate the slope of a ramp using the normals of the
+    // possible_foot_locations cloud
+    bool calculateRampSlope();
+
+    // Computes the average normal of a given input cloud
+    bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations,
+        pcl::Normal& average_normal);
+
+    // Computes the slope in the x direction in degrees from a normal vector
+    bool getSlopeFromNormals(const pcl::Normal& normal, float& slope);
 
     // The sit analogue of getOptimalFootLocation, find the height at which to
     // sit
@@ -222,21 +232,10 @@ protected:
     float foot_length_front {};
     float foot_width {};
     float max_allowed_z_deviation_foot {};
-    float x_flat {};
-    float z_flat {};
-    float x_steep {};
-    float z_steep {};
-    float x_flat_down {};
-    float z_flat_down {};
-    float x_steep_down {};
-    float z_steep_down {};
-    float x_flat_up {};
-    float z_flat_up {};
-    float x_steep_up {};
-    float z_steep_up {};
-    float ramp_min_search_area {};
-    float ramp_max_search_area {};
-    float max_distance_to_line {};
+    float max_ramp_search {};
+    float min_ramp_search {};
+    float max_slope {};
+    float min_slope {};
     float min_sit_height {};
     float max_sit_height {};
     float min_x_search_sit {};
@@ -253,11 +252,8 @@ protected:
     visualization_msgs::Marker gait_information_marker_list;
     visualization_msgs::Marker optimal_location_marker;
     pcl::PointXYZ most_desirable_foot_location_;
-    // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
-    // [5])^T
-    LineCoefficients::Ptr executable_locations_line_coefficients_
-        = boost::make_shared<LineCoefficients>();
 
+    float ramp_slope {};
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
