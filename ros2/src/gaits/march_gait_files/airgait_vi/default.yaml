@@ -27,8 +27,8 @@ gaits:
     right_swing: MVI_stairsup_rightswing_cybathlon_v4
 
   stairs_up_single_step:
-    right_open: MVI_stairsupsinglestep_rightopen_cybathlon_v4
-    left_close: MVI_stairsupsinglestep_leftclose_cybathlon_v4
+    right_open: MVI_stairsupsinglestep_rightopen_cybathlon_v5
+    left_close: MVI_stairsupsinglestep_leftclose_cybathlon_v5
 
   stairs_down:
     left_close: MVI_stairsdown_leftclose_cybathlon_v2
@@ -38,8 +38,8 @@ gaits:
     right_swing: MVI_stairsdown_rightswing_cybathlon_v2
 
   stairs_down_single_step:
-    left_close: MVI_stairsdownsinglestep_leftclose_cybathlon_v2
-    right_open: MVI_stairsdownsinglestep_rightopen_cybathlon_v2
+    left_close: MVI_stairsdownsinglestep_leftclose_cybathlon_v3
+    right_open: MVI_stairsdownsinglestep_rightopen_cybathlon_v3
 
   stairs_down_backwards:
     left_close: MVI_stairsdownbackwards_leftclose_cybathlon_v2
@@ -49,8 +49,8 @@ gaits:
     right_swing: MVI_stairsdownbackwards_rightswing_cybathlon_v2
 
   stairs_down_backwards_single_step:
-    left_close: MVI_stairsdownbackwardssinglestep_leftclose_cybathlon_v2
-    right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v2
+    left_close: MVI_stairsdownbackwardssinglestep_leftclose_cybathlon_v5
+    right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v5
 
   walk:
     left_close: MVI_walk_leftclose_v7
@@ -110,28 +110,6 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: -0.1745
       right_knee: 0.0
-  five_degree_hip_stand:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0
-      left_hip_aa: 0.0349
-      left_hip_fe: -0.0873
-      left_knee: 0.0
-      right_ankle: 0.0
-      right_hip_aa: 0.0349
-      right_hip_fe: -0.0873
-      right_knee: 0.0
-  ten_degree_hip_stand:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0
-      left_hip_aa: 0.0349
-      left_hip_fe: -0.1745
-      left_knee: 0.0
-      right_ankle: 0.0
-      right_hip_aa: 0.0349
-      right_hip_fe: -0.1745
-      right_knee: 0.0
   flat_ramp_stand:
     gait_type: walk_like
     joints:
@@ -165,7 +143,7 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 1.4835
       right_knee: 1.4835
-  sit_with_haa:
+  sit:
     gait_type: sit_like
     joints:
       left_ankle: 0.0
