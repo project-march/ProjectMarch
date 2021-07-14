@@ -58,6 +58,10 @@ void HullParameterDeterminer::readParameters(
     max_z_stairs_up
         = (float)config.parameter_determiner_stairs_up_locations_max_z;
 
+    allowed_deviation_from_reachable_stair
+        = (float)config
+              .parameter_determiner_allowed_deviation_from_reachable_stair;
+
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
@@ -74,10 +78,17 @@ void HullParameterDeterminer::readParameters(
     min_slope = (float)config.parameter_determiner_min_slope;
     max_slope = (float)config.parameter_determiner_max_slope;
 
+    allowed_deviation_from_reachable_ramp
+        = (float)
+              config.parameter_determiner_allowed_deviation_from_reachable_ramp;
+
     y_location = (float)config.parameter_determiner_y_location;
 
     min_sit_height = (float)config.parameter_determiner_min_sit_height;
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
+    allowed_deviation_from_reachable_bench
+        = (float)config
+              .parameter_determiner_allowed_deviation_from_reachable_bench;
     min_x_search_sit = (float)config.parameter_determiner_min_x_search_sit;
     max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
     search_y_deviation_sit
