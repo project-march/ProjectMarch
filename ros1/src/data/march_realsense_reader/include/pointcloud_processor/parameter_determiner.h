@@ -92,6 +92,10 @@ public:
         const PointNormalCloud::Ptr& output_cloud);
 
 protected:
+    // Get relevant information from the environment for the current category
+    // (e.g. sit -> get sit height, stair -> get foot location)
+    bool getObstacleInformation();
+
     // Get the optimal foot location by finding which possible foot location is
     // closest to the most desirable foot location
     bool getOptimalFootLocation();
@@ -141,7 +145,7 @@ protected:
 
     // Find the parameters from the foot location by finding at what percentage
     // of the end points it is
-    bool getGaitParametersFromFootLocation();
+    bool getGaitParametersFromLocation();
 
     // Verify if there is support for the entire foot around the possible foot
     // location
@@ -168,6 +172,9 @@ protected:
     // Find the ramp parameter from the foot locations
     bool getGaitParametersFromFootLocationRamp();
 
+    // Find the sit parameter from the sit height
+    bool getGaitParametersFromSitHeight();
+
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
@@ -187,6 +194,17 @@ protected:
 
     // Add the marker lists to the marker array
     void addDebugMarkersToArray();
+
+    // The sit analogue of getOptimalFootLocation, find the height at which to
+    // sit
+    bool getSitHeight();
+
+    // Fill a cloud with a grid of points where to look for exo support
+    bool fillSitGrid(PointCloud2D::Ptr& sit_grid);
+
+    // Get the median height value of a point cloud
+    bool getMedianHeightCloud(
+        const PointNormalCloud::Ptr& cloud, float& median_height);
 
     // All relevant parameters
     int hull_dimension {};
@@ -219,6 +237,13 @@ protected:
     float ramp_min_search_area {};
     float ramp_max_search_area {};
     float max_distance_to_line {};
+    float min_sit_height {};
+    float max_sit_height {};
+    float min_x_search_sit {};
+    float max_x_search_sit {};
+    float search_y_deviation_sit {};
+    float sit_grid_size {};
+    float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
     std::string subgait_name_;
@@ -226,7 +251,7 @@ protected:
     visualization_msgs::Marker foot_locations_to_try_marker_list;
     visualization_msgs::Marker possible_foot_locations_marker_list;
     visualization_msgs::Marker gait_information_marker_list;
-    visualization_msgs::Marker optimal_foot_location_marker;
+    visualization_msgs::Marker optimal_location_marker;
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
     // [5])^T
@@ -236,6 +261,8 @@ protected:
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
+    PointCloud2D::Ptr sit_grid;
+    float sit_height;
 };
 
 /** The simple parameter determiner
