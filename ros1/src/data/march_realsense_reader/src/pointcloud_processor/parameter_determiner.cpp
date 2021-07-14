@@ -440,7 +440,8 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
         return false;
     }
 
-    gait_parameters_->first_parameter = calculateParameter(sit_height, min_sit_height, max_sit_height);
+    gait_parameters_->first_parameter
+        = calculateParameter(sit_height, min_sit_height, max_sit_height);
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
@@ -451,8 +452,10 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 {
-    gait_parameters_->first_parameter = calculateParameter(optimal_foot_location.x, min_x_stairs, max_x_stairs);
-    gait_parameters_->second_parameter = calculateParameter(optimal_foot_location.z, min_z_stairs, max_z_stairs);
+    gait_parameters_->first_parameter = calculateParameter(
+        optimal_foot_location.x, min_x_stairs, max_x_stairs);
+    gait_parameters_->second_parameter = calculateParameter(
+        optimal_foot_location.z, min_z_stairs, max_z_stairs);
 
     // The side step parameter is unused for the stairs gait so we set it to -1
     gait_parameters_->side_step_parameter = -1;
@@ -471,7 +474,8 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
         return false;
     }
 
-    gait_parameters_->first_parameter = calculateParameter(ramp_slope, min_ramp_slope, max_ramp_slope);
+    gait_parameters_->first_parameter
+        = calculateParameter(ramp_slope, min_ramp_slope, max_ramp_slope);
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
@@ -480,7 +484,15 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
     return true;
 }
 
-float HullParameterDeterminer::calculateParameter(float valid_gait_information, float minimal_)
+// Transform valid gait information into a parameter
+float HullParameterDeterminer::calculateParameter(const float& valid_value,
+    const float& minimum_value, const float& maximum_value)
+{
+    float parameter
+        = (valid_value - minimum_value) / (maximum_value - minimum_value);
+    // Always return a value between 0 and 1
+    return fmax(min(parameter, 1.0), 0.0);
+}
 
 // The sit analogue of getOptimalFootLocation, find the height at which to sit
 bool HullParameterDeterminer::getSitHeight()

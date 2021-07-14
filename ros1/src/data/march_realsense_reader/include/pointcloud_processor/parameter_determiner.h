@@ -216,6 +216,10 @@ protected:
     bool getMedianHeightCloud(
         const PointNormalCloud::Ptr& cloud, float& median_height);
 
+    // Transform valid gait information into a parameter
+    float calculateParameter(const float& valid_value,
+        const float& minimum_value, const float& maximum_val);
+
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
