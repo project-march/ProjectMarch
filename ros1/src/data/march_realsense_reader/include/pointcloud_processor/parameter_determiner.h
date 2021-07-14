@@ -231,6 +231,7 @@ protected:
     float max_x_stairs {};
     float min_z_stairs {};
     float max_z_stairs {};
+    float allowed_deviation_from_reachable_stair {};
     float y_location {};
     float foot_length_back {};
     float foot_length_front {};
@@ -240,8 +241,10 @@ protected:
     float min_ramp_search {};
     float max_slope {};
     float min_slope {};
+    float allowed_deviation_from_reachable_ramp {};
     float min_sit_height {};
     float max_sit_height {};
+    float allowed_deviation_from_reachable_bench {};
     float min_x_search_sit {};
     float max_x_search_sit {};
     float search_y_deviation_sit {};
