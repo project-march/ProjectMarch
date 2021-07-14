@@ -1,4 +1,4 @@
-name: ramp_door_last_step
+name: ramp_down_last_step
 subgaits:
   left_close:
     to: end
