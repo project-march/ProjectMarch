@@ -1,7 +1,7 @@
 FROM python:alpine
 
 # Some dependencies that are required for building plugins.
-RUN apk add gcc musl-dev
+RUN apk add --no-cache gcc musl-dev
 
 # All plugins that are executed in flake8.
 RUN pip install flake8 flake8-codeclimate flake8-black flake8-2020 flake8-assertive flake8-bandit flake8-blind-except flake8-bugbear flake8-builtins flake8-commas flake8-comprehensions flake8-deprecated flake8-eradicate flake8-executable flake8-expression-complexity flake8-pie flake8-print flake8-printf-formatting flake8-rst-docstrings flake8-string-format flake8-todos pep8-naming pylint

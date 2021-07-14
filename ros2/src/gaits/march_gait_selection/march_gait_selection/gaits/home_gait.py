@@ -84,7 +84,7 @@ class HomeGait(GaitInterface):
         :returns Returns a GaitUpdate that usually contains a TrajectoryCommand.
         """
         if first_subgait_delay is not None and first_subgait_delay > Duration(0):
-            self._start_time = current_time + self._duration
+            self._start_time = current_time + first_subgait_delay
             self._end_time = self._start_time + self._duration
             self._scheduled_early = True
             return GaitUpdate.should_schedule_early(

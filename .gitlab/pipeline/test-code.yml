@@ -1,0 +1,62 @@
+###################
+# Test code stage #
+###################
+# Run the tests, both for noetic and foxy. These stages are separated because they
+# are not dependent on eachother. This enables extra parallelization.
+.base_tester:
+  stage: Test code
+  # Depending on the rules below, `TAG` has a different value.
+  # In most cases, this will just be `main`, unless the Dockerfile has
+  # changed.
+  image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
+  script:
+    - cd $ROS_VERSION/
+    - source /opt/ros/$ROS_CODENAME/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
+    - colcon test-result --verbose
+  rules:
+    # These rules are checking if certain values have the correct values.
+    # These variables are predefined by GitLab and their definitions
+    # can be found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+      variables:
+        TAG: $CI_COMMIT_REF_NAME
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - "$ROS_VERSION/**/*"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
+
+noetic:test:
+  variables:
+    ROS_VERSION: "ros1"
+    ROS_CODENAME: "noetic"
+    DOCKER_FILE: ".gitlab/dockerfiles/noetic"
+  needs:
+    - job: "noetic:build"
+      artifacts: true
+  extends:
+    - .base_tester
+
+foxy:test:
+  variables:
+    ROS_VERSION: "ros2"
+    ROS_CODENAME: "foxy"
+    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
+  needs:
+    - job: "foxy:build"
+      artifacts: true
+  extends:
+    - .base_tester

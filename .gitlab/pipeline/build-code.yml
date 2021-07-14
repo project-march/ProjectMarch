@@ -1,0 +1,81 @@
+####################
+# Build code stage #
+####################
+# Run the build command to see if everything compiles without errors. This is a
+# separate stage for the noetic and for the foxy code, because they are not dependent
+# on each other and can therefore be run in parallel.
+# Besides compiling, this also produces a "compile_commands.json" file that is used
+# by subsequent C++ static analysis stages.
+
+# The following two hidden jobs are used to reduce duplication because these rules are
+# almost the same for a lot of subsequent jobs. They only vary in a few ways, which is why
+# some variables are introduced. The following three variables change, depending on the
+# version of ROS:
+#   1. ROS_VERSION, either 'ros1' or 'ros2'
+#   2. ROS_CODENAME, either 'noetic' or 'foxy'
+#   3. DOCKER_FILE, the path of the Dockerfile that defines the execution environment. This
+#      points to a ROS1 and ROS2 specific Dockerfile
+.base_builder:
+  stage: Build code
+  # Depending on the rules below, `TAG` has a different value.
+  # In most cases, this will just be `main`, unless the Dockerfile has
+  # changed.
+  image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
+  artifacts:
+    paths:
+      - $ROS_VERSION/build/
+      - $ROS_VERSION/install/
+      - $ROS_VERSION/log/
+  script:
+    - cd $ROS_VERSION/
+    - source /opt/ros/$ROS_CODENAME/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+  rules:
+    # These rules are checking if certain values have the correct values.
+    # These variables are predefined by GitLab and their definitions
+    # can be found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+      variables:
+        TAG: $CI_COMMIT_REF_NAME
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - "$ROS_VERSION/**/*"
+        - ".clang-tidy"
+      variables:
+        TAG: $CI_DEFAULT_BRANCH
+
+# Define the values of the ROS1 and ROS2 specific instances of
+# the ".base_builder" job
+noetic:build:
+  variables:
+    ROS_VERSION: "ros1"
+    ROS_CODENAME: "noetic"
+    DOCKER_FILE: ".gitlab/dockerfiles/noetic"
+  needs:
+    - job: "ROS1 container build"
+      optional: true
+  extends:
+    - .base_builder
+
+foxy:build:
+  variables:
+    ROS_VERSION: "ros2"
+    ROS_CODENAME: "foxy"
+    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
+  needs:
+    - job: "ROS2 container build"
+      optional: true
+  extends:
+    - .base_builder
