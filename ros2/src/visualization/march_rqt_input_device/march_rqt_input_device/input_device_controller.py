@@ -27,8 +27,11 @@ class InputDeviceController:
 
     def __init__(self, node):
         self._node = node
+
         self._ping = (
-            node.get_parameter("ping_safety_node").get_parameter_value().bool_value
+            self._node.get_parameter("ping_safety_node")
+            .get_parameter_value()
+            .bool_value
         )
 
         self._instruction_gait_pub = self._node.create_publisher(
@@ -78,7 +81,7 @@ class InputDeviceController:
                 Alive, "/march/input_device/alive", 10
             )
             self._alive_timer = self._node.create_timer(
-                timer_period_sec=0.2,
+                timer_period_sec=0.1,
                 callback=self._timer_callback,
                 clock=self._node.get_clock(),
             )
