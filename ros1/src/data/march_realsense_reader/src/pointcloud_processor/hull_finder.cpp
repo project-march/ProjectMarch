@@ -61,23 +61,25 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
         // polygons if it is valid
         if (hull_->points.size() == 0) {
             ROS_WARN_STREAM("Hull of region "
-                                    << region_index_
-                                    << " Consists of zero points, not adding it the the hull vector.");
+                << region_index_
+                << " Consists of zero points, not adding it the the hull "
+                   "vector.");
         } else if (!success) {
             ROS_WARN_STREAM("Computation of hull of region "
-                                    << region_index_
-                                    << " went wrong, not adding it the the hull vector.");
+                << region_index_
+                << " went wrong, not adding it the the hull vector.");
         } else {
-            success &= addCHullToVector();
+            addCHullToVector();
         }
     }
 
     ROS_DEBUG_STREAM("The number of hulls found is: " << hull_vector_->size());
     if (hull_vector_->size() != plane_coefficients_vector_->size()
         || hull_vector_->size() != polygon_vector_->size()) {
-        ROS_ERROR_STREAM("The hull vector does not have the same size as either "
-                        "the plane coefficients vector or"
-                        "the polygon vector. Returning with false.");
+        ROS_ERROR_STREAM(
+            "The hull vector does not have the same size as either "
+            "the plane coefficients vector or"
+            "the polygon vector. Returning with false.");
         return false;
     } else if (hull_vector_->size() == 0) {
         ROS_ERROR_STREAM("No hulls were found. Returning with false.");
@@ -201,13 +203,11 @@ bool CHullFinder::getCHullFromProjectedRegion()
 }
 
 // Add the hull to a vector together with its plane coefficients and polygons
-bool CHullFinder::addCHullToVector()
+void CHullFinder::addCHullToVector()
 {
     hull_vector_->push_back(hull_);
     polygon_vector_->push_back(polygon_);
     plane_coefficients_vector_->push_back(plane_coefficients_);
-
-    return true;
 }
 
 // Calculate the average normal and point of a region
@@ -250,8 +250,8 @@ bool CHullFinder::getAveragePointAndNormal(
                 average_normal, average_normal)
             < minimum_norm_allowed) {
             ROS_WARN_STREAM("Computed average normal of region is too close "
-                             "to zero. Plane parameters will be inaccurate."
-                             "Average normal of region "
+                            "to zero. Plane parameters will be inaccurate."
+                            "Average normal of region "
                 << region_index_ << " is "
                 << output_utilities::vectorToString(average_normal));
             return false;
