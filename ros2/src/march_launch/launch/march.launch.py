@@ -22,6 +22,7 @@ def generate_launch_description():
     robot_description = LaunchConfiguration("robot_description")
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
+    simulation = LaunchConfiguration("simulation")
 
     # HUD arguments
     use_hud = LaunchConfiguration("use_hud")
@@ -96,7 +97,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="ground_gait",
-                default_value="False",
+                default_value=use_imu_data,
                 description="Whether the simulation should be simulating "
                 "ground_gaiting instead of airgaiting.",
             ),
@@ -122,6 +123,12 @@ def generate_launch_description():
                 name="imu_topic",
                 default_value="/camera_front/imu/data",
                 description="The topic that should be used to determine the orientation",
+            ),
+            DeclareLaunchArgument(
+                name="simulation",
+                default_value="False",
+                description="Whether the exoskeleton is ran physically or in "
+                "simulation.",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -206,6 +213,7 @@ def generate_launch_description():
                     ("balance", balance),
                     ("use_imu_data", use_imu_data),
                     ("imu_topic", imu_topic),
+                    ("simulation", simulation),
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),

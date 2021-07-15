@@ -22,6 +22,7 @@ def generate_launch_description():
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
     to_world_transform = LaunchConfiguration("to_world_transform")
+    simulation = LaunchConfiguration("simulation")
 
     return LaunchDescription(
         [
@@ -94,11 +95,14 @@ def generate_launch_description():
                                 ground_gait,
                                 " realsense_simulation:=",
                                 realsense_simulation,
+                                " configuration:=",
+                                ("exoskeleton" if not simulation else "simulation"),
                             ]
                         ),
                         "use_imu_data": use_imu_data,
                         "to_world_transform": to_world_transform,
                         "imu_topic": imu_topic,
+                        "simulation": simulation,
                     }
                 ],
             ),
