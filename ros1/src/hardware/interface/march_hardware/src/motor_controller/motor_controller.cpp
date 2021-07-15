@@ -16,17 +16,28 @@ MotorController::MotorController(const Slave& slave,
     , incremental_encoder_(std::move(incremental_encoder))
     , actuation_mode_(actuation_mode)
 {
-    if (!absolute_encoder_ || !incremental_encoder_) {
+    if (!absolute_encoder_ && !incremental_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "A MotorController needs both an incremental and an absolute "
+            "A MotorController needs at least an incremental or an absolute "
             "encoder");
     }
+    else if (absolute_encoder_ && incremental_encoder_) {
+        /* The most precise encoder can encode more positions.
+        This means that every Internal Unit represents less radians. */
+        is_incremental_encoder_more_precise_
+            = incremental_encoder_->getRadiansPerIU()
+              < absolute_encoder_->getRadiansPerIU();
+    }
+    else if (!absolute_encoder_ && incremental_encoder_) {
+        is_incremental_encoder_more_precise_ = true;
+    }
+    else {
+        is_incremental_encoder_more_precise_ = false;
+    }
 
-    /* The most precise encoder can encode more positions.
-       This means that every Internal Unit represents less radians. */
-    is_incremental_encoder_more_precise_
-        = incremental_encoder_->getRadiansPerIU()
-        < absolute_encoder_->getRadiansPerIU();
+    ROS_INFO("is inc more preices: %d", is_incremental_encoder_more_precise_);
+
+
 }
 
 MotorController::MotorController(const Slave& slave,
