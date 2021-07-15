@@ -55,6 +55,7 @@ endif()
 #           test_joint_linear
 set(MODEL_NAME haa_stiff_leg)
 
+
 # Define a variable that points to the location of the chosen ACADO model_export directory. This
 # location is chosen by FetchContent_Declare.
 set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src/models/${MODEL_NAME}/model_export")

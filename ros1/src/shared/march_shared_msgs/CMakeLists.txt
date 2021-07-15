@@ -29,9 +29,6 @@ add_message_files(
     PressureSole.msg
     PressureSoleData.msg
     PressureSolesData.msg
-)
-add_message_files(
-    FILES
     MpcArray.msg
     MpcStateVectors.msg
     MpcTuning.msg
