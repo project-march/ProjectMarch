@@ -55,14 +55,6 @@ class MpcListener(Node):
             )
 
             # Current position and velocity
-            self.new_measurement_position.insert(
-                joint_number, msg.joint[joint_number].estimation.states[0].array[0]
-            )
-            self.new_measurement_velocity.insert(
-                joint_number, msg.joint[joint_number].estimation.states[1].array[0]
-            )
-
-            # Current position and velocity
             joint_pos = msg.joint[joint_number].estimation.states[0]
             joint_vel = msg.joint[joint_number].estimation.states[1]
             joint_input = msg.joint[joint_number].estimation.inputs[0]
