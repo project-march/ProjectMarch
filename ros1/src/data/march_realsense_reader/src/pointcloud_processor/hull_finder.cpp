@@ -75,7 +75,7 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
     ROS_DEBUG_STREAM("The number of hulls found is: " << hull_vector_->size());
     if (hull_vector_->size() != plane_coefficients_vector_->size()
         || hull_vector_->size() != polygon_vector_->size()) {
-        ROS_WARN_STREAM("The hull vector does not have the same size as either "
+        ROS_ERROR_STREAM("The hull vector does not have the same size as either "
                         "the plane coefficients vector or"
                         "the polygon vector. Returning with false.");
         return false;
@@ -249,7 +249,7 @@ bool CHullFinder::getAveragePointAndNormal(
         if (linear_algebra_utilities::dotProductVector<double>(
                 average_normal, average_normal)
             < minimum_norm_allowed) {
-            ROS_ERROR_STREAM("Computed average normal of region is too close "
+            ROS_WARN_STREAM("Computed average normal of region is too close "
                              "to zero. Plane parameters will be inaccurate."
                              "Average normal of region "
                 << region_index_ << " is "
@@ -257,7 +257,7 @@ bool CHullFinder::getAveragePointAndNormal(
             return false;
         }
     } else {
-        ROS_ERROR_STREAM("Region with index "
+        ROS_WARN_STREAM("Region with index "
             << region_index_
             << " does not have the same number of points and normals, "
                " unable to calculate average point and normal. "
