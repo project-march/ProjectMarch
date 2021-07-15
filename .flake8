@@ -29,5 +29,6 @@ ignore =
     C815,
     C816
     PIE803,     # This is not relevant for the rclpy logger
+    PIE808,     # TODO: enable this
     RST201,
     RST206,

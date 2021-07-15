@@ -1,0 +1,116 @@
+#########################
+# Build container stage #
+#########################
+# This stage builds Docker containers when a new dependency has been added or when
+# a new linter is installed. These stages will almost never run, unless
+# certain files have been changed.
+
+# This is a "hidden" stage that is not run by itself. It is run extended by other
+# stages that define different values for the variables. This avoids duplication.
+.container_builder:
+  stage: Build container
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    # Equivalent to `docker login` but without installing docker"
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
+    # Information about all the parameters can be found there.
+      - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup --context=dir://$CI_PROJECT_DIR
+
+.ros_container_builder:
+  variables:
+    CACHE: "true"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$ROS_CODENAME"
+  rules:
+      # These rules will be present in a lot of jobs, but small variations between them.
+      # Rules are evaluated from top to bottom until the last rule has been evaluated.
+      #
+      # They can be interpreted as follows:
+      # - Don't run if the pipeline has been scheduled
+      # - Run if the pipeline is from a MR, iff a ROS or Dockerfile has changed
+      # - Don't run if the pipeline is in a branch that has an open MR
+      # - Run if the pipeline is in a branch, iff a ROS or Dockerfile has changed
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "$DOCKER_FILE"
+        - "$ROS_VERSION/**/package.xml"
+        - "requirements.pip"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - "$DOCKER_FILE"
+        - "$ROS_VERSION/**/package.xml"
+        - "requirements.pip"
+      variables:
+         TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .container_builder
+
+.ci_tool_container_builder:
+  variables:
+    CACHE: "false"
+    REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$TOOL_NAME"
+  rules:
+      # The rules can be interpreted as follows:
+      # - Don't run if the pipeline has been scheduled
+      # - Run if the pipeline is from a MR, iff the Dockerfile has changed
+      # - Don't run if the pipeline is in a branch that has an open MR
+      # - Run if the pipeline is in a branch, iff the Dockerfile has changed
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "$DOCKER_FILE"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - "$DOCKER_FILE"
+      variables:
+       TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .container_builder
+
+
+# These jobs all use the ".container_builder" stage as a sort of template, and define different
+# variables to specify how the Dockerfile should be build.
+ROS1 container build:
+  variables:
+    ROS_CODENAME: "noetic"
+    ROS_VERSION: "ros1"
+    DOCKER_FILE: ".gitlab/dockerfiles/noetic"
+  extends:
+    - .ros_container_builder
+
+ROS2 container build:
+  variables:
+    ROS_CODENAME: "foxy"
+    ROS_VERSION: "ros2"
+    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
+  extends:
+    - .ros_container_builder
+
+flake8 container build:
+  variables:
+    TOOL_NAME: "flake8"
+    DOCKER_FILE: ".gitlab/dockerfiles/flake8"
+  extends:
+    - .ci_tool_container_builder
+
+clang_format container build:
+  variables:
+    TOOL_NAME: "clang_format"
+    DOCKER_FILE: ".gitlab/dockerfiles/clang_format"
+  extends:
+    - .ci_tool_container_builder

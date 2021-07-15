@@ -18,7 +18,7 @@ FOUR_PARAMETRIC_GAIT_PREFIX = "_fpg_"
 class LogLevel(Enum):
     INFO = "#000000"
     SUCCESS = "#009100"
-    ERRROR = "#FF0000"
+    ERROR = "#FF0000"
     WARNING = "#b27300"
 
 

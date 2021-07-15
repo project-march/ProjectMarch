@@ -126,7 +126,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     state->axis_state_ = getAxisState();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();
-    state->encoder_manager_error_ = getEncoderManagerError();
+    state->dieboslave_error_ = getDieBOSlaveError();
     state->encoder_error_ = getEncoderError();
     state->controller_error_ = getControllerError();
 
@@ -251,11 +251,11 @@ uint32_t ODrive::getMotorError()
         .ui;
 }
 
-uint32_t ODrive::getEncoderManagerError()
+uint32_t ODrive::getDieBOSlaveError()
 {
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::EncoderManagerError, axis_))
+            ODriveObjectName::DieBOSlaveError, axis_))
         .ui;
 }
 
