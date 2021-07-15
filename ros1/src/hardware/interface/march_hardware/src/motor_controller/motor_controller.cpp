@@ -20,24 +20,19 @@ MotorController::MotorController(const Slave& slave,
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
             "A MotorController needs at least an incremental or an absolute "
             "encoder");
-    }
-    else if (absolute_encoder_ && incremental_encoder_) {
+    } else if (absolute_encoder_ && incremental_encoder_) {
         /* The most precise encoder can encode more positions.
         This means that every Internal Unit represents less radians. */
         is_incremental_encoder_more_precise_
             = incremental_encoder_->getRadiansPerIU()
-              < absolute_encoder_->getRadiansPerIU();
-    }
-    else if (!absolute_encoder_ && incremental_encoder_) {
+            < absolute_encoder_->getRadiansPerIU();
+    } else if (!absolute_encoder_ && incremental_encoder_) {
         is_incremental_encoder_more_precise_ = true;
-    }
-    else {
+    } else {
         is_incremental_encoder_more_precise_ = false;
     }
 
     ROS_INFO("is inc more preices: %d", is_incremental_encoder_more_precise_);
-
-
 }
 
 MotorController::MotorController(const Slave& slave,

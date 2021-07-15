@@ -28,8 +28,8 @@ IMotionCube::IMotionCube(const Slave& slave,
 {
     if (!absolute_encoder_ || !incremental_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                       "An IMotionCube needs both an incremental and an absolute "
-                                       "encoder");
+            "An IMotionCube needs both an incremental and an absolute "
+            "encoder");
     }
 }
 
