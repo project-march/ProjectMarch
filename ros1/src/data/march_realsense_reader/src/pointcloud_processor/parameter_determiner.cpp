@@ -491,7 +491,7 @@ float HullParameterDeterminer::calculateParameter(const float& valid_value,
     float parameter
         = (valid_value - minimum_value) / (maximum_value - minimum_value);
     // Always return a value between 0 and 1
-    return fmax(fmin(parameter, 1.0), 0.0);
+    return fmax(fmin(parameter, /*__y=*/1.0), /*__y=*/0.0);
 }
 
 // The sit analogue of getOptimalFootLocation, find the height at which to sit
