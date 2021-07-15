@@ -20,7 +20,7 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
   left_hip_fe:
-  - position: -0.1745
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0873
@@ -30,7 +30,7 @@ joints:
     time_from_start: 750000000
     velocity: 0.0
   - position: 0.0873
-    time_from_start: 2500000000
+    time_from_start: 1500000000
     velocity: 0.0235
   - position: -0.0873
     time_from_start: 3500000000
@@ -66,7 +66,7 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
   right_hip_fe:
-  - position: -0.1745
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0873
@@ -78,7 +78,7 @@ joints:
   - position: 1.0996
     time_from_start: 2750000000
     velocity: -0.1745
-  - position: 0.8264
+  - position: 0.8439
     time_from_start: 3500000000
     velocity: 0.0
   right_knee:
@@ -91,8 +91,8 @@ joints:
   - position: 1.5882
     time_from_start: 2350000000
     velocity: -0.5236
-  - position: 0.6519
+  - position: 0.7854
     time_from_start: 3500000000
     velocity: 0.0
 name: right_open
-version: MVI_stairsup_rightopen_low_deep
+version: MVI_stairsup_rightopen_low_deep_v2

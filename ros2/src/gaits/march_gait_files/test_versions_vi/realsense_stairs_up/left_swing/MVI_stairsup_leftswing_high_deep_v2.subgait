@@ -32,7 +32,7 @@ joints:
   - position: 1.4661
     time_from_start: 1845000000
     velocity: 0.0
-  - position: 1.1845
+  - position: 1.2043
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
@@ -42,11 +42,11 @@ joints:
   - position: 1.9024
     time_from_start: 1465000000
     velocity: 0.0
-  - position: 1.2017
+  - position: 1.2741
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
-  - position: 0.0436
+  - position: -0.0873
     time_from_start: 0
     velocity: 0.0
   - position: 0.0436
@@ -63,14 +63,14 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.1845
+  - position: 1.2043
     time_from_start: 0
     velocity: 0.0
   - position: -0.0873
     time_from_start: 2500000000
     velocity: 0.1745
   right_knee:
-  - position: 1.2017
+  - position: 1.2741
     time_from_start: 0
     velocity: 0.0
   - position: 0.1396
@@ -80,4 +80,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.7679
 name: left_swing
-version: MVI_stairsup_leftswing_high_deep
+version: MVI_stairsup_leftswing_high_deep_v2

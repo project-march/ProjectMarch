@@ -1,4 +1,4 @@
-description: Stairs up with height of 12 cm and depth of 20 cm
+description: Stairs up with height of 13 cm and depth of 45 cm
 duration: 3750000000
 gait_type: stairs_like
 joints:
@@ -20,11 +20,11 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.0
+  - position: -0.0873
     time_from_start: 0
     velocity: 0.1745
-  - position: 0.8727
-    time_from_start: 1700000000
+  - position: 0.9108
+    time_from_start: 1437900000
     velocity: 0.0
   - position: 0.0873
     time_from_start: 2750000000
@@ -32,19 +32,16 @@ joints:
   - position: 0.0873
     time_from_start: 3000000000
     velocity: 0.0
-  - position: -0.1745
+  - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   left_knee:
   - position: 0.2443
     time_from_start: 0
-    velocity: 0.6981
-  - position: 1.3963
+    velocity: 0.7679
+  - position: 1.5708
     time_from_start: 1400000000
     velocity: 0.0
-  - position: 1.0472
-    time_from_start: 1888000000
-    velocity: -1.3331
   - position: 0.0
     time_from_start: 2750000000
     velocity: 0.0
@@ -52,7 +49,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_ankle:
-  - position: 0.0436
+  - position: -0.0873
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -72,7 +69,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.911
+  - position: 0.8439
     time_from_start: 0
     velocity: 0.0
   - position: 0.0873
@@ -81,11 +78,11 @@ joints:
   - position: 0.0873
     time_from_start: 3000000000
     velocity: 0.0
-  - position: -0.1745
+  - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
   right_knee:
-  - position: 1.1715
+  - position: 0.7854
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -95,4 +92,4 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsup_leftclose_low_undeep
+version: MVI_stairsup_leftclose_low_deep_v2
