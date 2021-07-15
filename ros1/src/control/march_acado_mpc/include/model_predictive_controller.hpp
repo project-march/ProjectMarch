@@ -12,19 +12,26 @@ class ModelPredictiveController {
 public:
     explicit ModelPredictiveController(std::vector<float> W);
 
-    // Public variables
-    vector<double> x0 { 0, 0 }; // Current state
-    double u {}; // Calculated control input
-    std::string joint_name;
-    double cost {}; // Objective value
+    /**
+     * Controller variables
+     */
+
+    std::vector<double> command; // calculated input
+
+    /**
+     * Diagnostic variables
+     */
 
     // Timing variables
     acado_timer t {};
     double t_preparation {}, t_feedback {};
 
-    // status variables
+    // Status variables
     int preparationStepStatus {};
     int feedbackStepStatus {};
+
+    // Performance variables
+    double cost {}; // Objective value
 
     /**
      * \brief Initialise the model predictive controller
@@ -35,14 +42,19 @@ public:
      * \brief Set the initial state
      * @param x0 - initial state
      */
-    void setInitialState(vector<double> x0);
+    void setInitialState(std::vector<double>& x0);
 
     /**
-     * \brief Set the reference for time step n in [0, N]
-     * @param n
+     * \brief Set the reference for nodes 0 to N-1
      * @param reference
      */
-    void setReference(int n, const std::vector<double>& reference);
+    void setRunningReference(const std::vector<double>& reference);
+
+    /**
+     * \brief Set the reference for node N
+     * @param end_reference
+     */
+    void setEndReference(const std::vector<double>& end_reference);
 
     /**
      * \brief Assign the weighting array values
@@ -59,7 +71,7 @@ public:
     /**
      * \brief Calculate the control input
      */
-    void calculateControlInput();
+    std::vector<double> calculateControlInput();
     /**
      * \brief Shift the state and control acadoVariables
      */

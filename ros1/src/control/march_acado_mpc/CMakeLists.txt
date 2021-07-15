@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "main"
+    GIT_TAG "18-create-a-model-file-containing-a-simple-model-for-the-left-and-right-haa-only"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
@@ -50,9 +50,11 @@ if(NOT acado-solver_POPULATED)
 endif()
 
 # Choose which model to use
-# Models:   test_joint_rotational,
+# Models:   march6_simulation_uncoupled
+#           test_joint_rotational,
 #           test_joint_linear
-set(MODEL_NAME test_joint_rotational)
+set(MODEL_NAME haa_stiff_leg)
+
 
 # Define a variable that points to the location of the chosen ACADO model_export directory. This
 # location is chosen by FetchContent_Declare.
