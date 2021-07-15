@@ -356,6 +356,9 @@ void MarchHardwareInterface::write(
     if (enable_safety_controller_) {
         position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
     }
+    else {
+        ROS_INFO("Not using safetyy controler :_)))))")
+    }
 
     for (size_t i = 0; i < num_joints_; i++) {
         march::Joint& joint = march_robot_->getJoint(i);

@@ -5,7 +5,7 @@ joint_limits:
     unit: iu
     lower_limit: 294481
     upper_limit: 565958
-    zero_position: 350000
+    zero_position: 320000
     resolution: 20
 safety:
   exoskeleton:

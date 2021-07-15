@@ -1,0 +1,16 @@
+description: Testjoint subgait with velocity of 1.6 rad/s
+duration: 500000000
+gait_type: ''
+joints:
+  rotational_joint:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.4
+    time_from_start: 250000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 500000000
+    velocity: 0.0
+name: perform_test
+version: example
