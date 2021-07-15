@@ -475,7 +475,7 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
     }
 
     gait_parameters_->first_parameter
-        = calculateParameter(ramp_slope, min_ramp_slope, max_ramp_slope);
+        = calculateParameter(ramp_slope, min_slope, max_slope);
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
