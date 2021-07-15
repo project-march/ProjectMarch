@@ -135,10 +135,10 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
     Normals::Ptr normals = boost::make_shared<Normals>();
-
+    auto realsense_category = (RealSenseCategory)realsense_category_;
     // Preprocess
     bool preprocessing_was_successful = preprocessor_->preprocess(
-        pointcloud, normals, frame_id_to_transform_to_);
+        pointcloud, normals, realsense_category, frame_id_to_transform_to_);
 
     if (not preprocessing_was_successful) {
         res.error_message = "Preprocessing was unsuccessful, see debug output "
@@ -205,7 +205,6 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     }
 
     // Setup data structures for parameter determining
-    auto realsense_category = (RealSenseCategory)realsense_category_;
     boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
         = boost::make_shared<march_shared_msgs::GaitParameters>();
     // Determine parameters
