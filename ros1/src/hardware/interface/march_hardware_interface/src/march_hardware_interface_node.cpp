@@ -51,6 +51,15 @@ int main(int argc, char** argv)
         std::exit(/*__status=*/1);
     }
 
+    bool enable_safety_controller;
+    if (ros::param::has("~enable_safety_controller")) {
+        ros::param::get("~enable_safety_controller", enable_safety_controller);
+    } else {
+        ROS_FATAL("Required parameter enable_safety_controller"
+                  " was not set.");
+        std::exit(/*__status=*/1);
+    }
+
     std::string if_name = "";
     if (argc > 2) {
         if_name = argv[2];
@@ -60,7 +69,7 @@ int main(int argc, char** argv)
 
     MarchHardwareInterface march(
         build(selected_robot, remove_fixed_joints_from_ethercat_train, if_name),
-        reset_motor_controllers);
+        reset_motor_controllers, enable_safety_controller);
 
     try {
         bool success = march.init(nh, nh);

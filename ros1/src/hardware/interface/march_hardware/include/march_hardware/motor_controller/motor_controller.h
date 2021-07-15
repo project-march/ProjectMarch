@@ -87,7 +87,10 @@ public:
 
     // Effort may have to be multiplied by a constant
     // because ROS control limits the pid values to a certain maximum
-    virtual float effortMultiplicationConstant();
+    virtual double effortMultiplicationConstant();
+
+    // Get the effort limit of the motor controller
+    virtual double getEffortLimit() = 0;
 
     ~MotorController() override = default;
 

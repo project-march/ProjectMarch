@@ -157,7 +157,7 @@ void MotorController::actuate(float target)
     }
 }
 
-float MotorController::effortMultiplicationConstant()
+double MotorController::effortMultiplicationConstant()
 {
     return 1.0;
 }

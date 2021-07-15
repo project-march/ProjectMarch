@@ -70,6 +70,13 @@ void ODrive::waitForState(ODriveAxisState target_state)
 
 void ODrive::actuateTorque(float target_effort)
 {
+    if (target_effort > EFFORT_LIMIT || target_effort < -EFFORT_LIMIT) {
+        throw error::HardwareException(
+            error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+            "Target effort of %f exceeds effort limit of %f", target_effort,
+            EFFORT_LIMIT);
+    }
+
     float target_torque
         = target_effort * torque_constant_ * (float)getMotorDirection();
 #ifdef DEBUG_EFFORT
@@ -287,6 +294,11 @@ void ODrive::setAxisState(ODriveAxisState state)
     this->write32(ODrivePDOmap::getMOSIByteOffset(
                       ODriveObjectName::RequestedState, axis_),
         write_struct);
+}
+
+double ODrive::getEffortLimit()
+{
+    return EFFORT_LIMIT;
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum

@@ -613,9 +613,14 @@ float IMotionCube::getIncrementalVelocityUnchecked()
         getIncrementalVelocityIU());
 }
 
-float IMotionCube::effortMultiplicationConstant()
+double IMotionCube::effortMultiplicationConstant()
 {
-    return 1000.0;
+    return EFFORT_MULTIPLICATION_CONSTANT;
+}
+
+double IMotionCube::getEffortLimit()
+{
+    return MAX_TARGET_TORQUE;
 }
 
 std::optional<ros::Duration> IMotionCube::enableActuation()
