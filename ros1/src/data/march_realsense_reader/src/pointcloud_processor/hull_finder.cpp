@@ -53,11 +53,23 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
 
-    bool success = true;
-
     for (region_index_ = 0; region_index_ < points_vector_->size();
          region_index_++) {
-        success &= getCHullFromRegion();
+        bool success = getCHullFromRegion();
+
+        // Add the hull to a vector together with its plane coefficients and
+        // polygons if it is valid
+        if (hull_->points.size() == 0) {
+            ROS_WARN_STREAM("Hull of region "
+                                    << region_index_
+                                    << " Consists of zero points, not adding it the the hull vector.");
+        } else if (!success) {
+            ROS_WARN_STREAM("Computation of hull of region "
+                                    << region_index_
+                                    << " went wrong, not adding it the the hull vector.");
+        } else {
+            success &= addCHullToVector();
+        }
     }
 
     ROS_DEBUG_STREAM("The number of hulls found is: " << hull_vector_->size());
@@ -80,7 +92,7 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
 
-    return success;
+    return true;
 }
 void CHullFinder::readParameters(
     march_realsense_reader::pointcloud_parametersConfig& config)
@@ -110,16 +122,6 @@ bool CHullFinder::getCHullFromRegion()
 
     // Create the hull
     success &= getCHullFromProjectedRegion();
-
-    // Add the hull to a vector together with its plane coefficients and
-    // polygons
-    success &= addCHullToVector();
-
-    if (hull_->points.size() == 0) {
-        ROS_ERROR_STREAM(
-            "Hull of region " << region_index_ << " Consists of zero points");
-        return false;
-    }
 
     return success;
 }
