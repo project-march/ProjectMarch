@@ -1,4 +1,4 @@
-description: Right open of the curb up .
+description: Curb up left close with less knee flexion for more depth.
 duration: 3750000000
 gait_type: stairs_like
 joints:
@@ -79,8 +79,8 @@ joints:
   - position: 1.8326
     time_from_start: 2386700000
     velocity: 0.2571
-  - position: 1.4486
+  - position: 1.3265
     time_from_start: 3750000000
     velocity: 0.0
 name: right_open
-version: MVI_curbup_rightopen_v1
+version: MVI_curbup_rightopen_v2
