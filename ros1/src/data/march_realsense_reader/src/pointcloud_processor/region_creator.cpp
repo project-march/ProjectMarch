@@ -113,7 +113,7 @@ void RegionGrower::readParameters(
     number_of_neighbours
         = config.region_creator_region_growing_number_of_neighbours;
     number_of_neighbours_no_seeds
-        = config.region_creator_region_growing_number_of_neightbours_no_seeds;
+        = config.region_creator_region_growing_number_of_neighbours_no_seeds;
     min_valid_cluster_size
         = config.region_creator_region_growing_min_valid_cluster_size;
     max_valid_cluster_size
