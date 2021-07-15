@@ -212,6 +212,7 @@ bool CHullFinder::addCHullToVector()
 bool CHullFinder::getAveragePointAndNormal(
     std::vector<double>& average_point, std::vector<double>& average_normal)
 {
+    bool success = true;
     // Initialize the average point and normal to zero
     std::fill(average_point.begin(), average_point.end(), 0);
     std::fill(average_normal.begin(), average_normal.end(), 0);
@@ -227,33 +228,17 @@ bool CHullFinder::getAveragePointAndNormal(
             average_normal[0] += current_normal.normal_x;
             average_normal[1] += current_normal.normal_y;
             average_normal[2] += current_normal.normal_z;
+
             average_point[0] += current_point.x;
             average_point[1] += current_point.y;
             average_point[2] += current_point.z;
         }
-        average_normal[0] /= number_of_normals;
-        average_normal[1] /= number_of_normals;
-        average_normal[2] /= number_of_normals;
-
         average_point[0] /= number_of_points;
         average_point[1] /= number_of_points;
         average_point[2] /= number_of_points;
 
-        // If the normal is zero (<=> it has a norm of zero) it is invalid
-        // and it then cannot be used to calculate plane coefficients.
-        // The norm is generally close to 1, but this need not be the case
-        // e.g. if the orientation of the normals is not consistent.
-        float minimum_norm_allowed = 0.05;
-        if (linear_algebra_utilities::dotProductVector<double>(
-                average_normal, average_normal)
-            < minimum_norm_allowed) {
-            ROS_ERROR_STREAM("Computed average normal of region is too close "
-                             "to zero. Plane parameters will be inaccurate."
-                             "Average normal of region "
-                << region_index_ << " is "
-                << output_utilities::vectorToString(average_normal));
-            return false;
-        }
+        success &= linear_algebra_utilities::normalize3DVector<double>(
+            average_normal);
     } else {
         ROS_ERROR_STREAM("Region with index "
             << region_index_
@@ -265,5 +250,5 @@ bool CHullFinder::getAveragePointAndNormal(
         return false;
     }
 
-    return true;
+    return success;
 }
