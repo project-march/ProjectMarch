@@ -44,7 +44,7 @@ std::map<std::string, std::string> SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP
           { /*__x=*/"left_swing", /*__y=*/"foot_left" },
           { /*__x=*/"right_close", /*__y=*/"foot_right" },
           { /*__x=*/"left_close", /*__y=*/"foot_left" },
-          { /*__x=*/"sit_down", /*__y=*/"foot_right" } };
+          { /*__x=*/"prepare_sit_down", /*__y=*/"foot_left" } };
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
@@ -219,7 +219,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         ROS_DEBUG(
             "Done determining parameters, now publishing a marker array to "
             "/camera/foot_locations_marker_array. The color coding of the "
-            "marker array is \n"
+            "marker array is: \n"
             "Blue: a foot location to try \n"
             "Yellow: a potential foot location which is outside the reachable "
             "area \n"
@@ -229,7 +229,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             "positions \n"
             "Red: Gait information such as end points of gaits \n"
             "Green: A valid foot location \n"
-            "White: The optimal foot location");
+            "White: The optimal foot location \n"
+            "Ramp gait is colored based on the orientation of the surface");
         hull_parameter_determiner_publisher_.publish(
             parameter_determiner_->debug_marker_array);
         if (publish_hull_area_debug_) {
