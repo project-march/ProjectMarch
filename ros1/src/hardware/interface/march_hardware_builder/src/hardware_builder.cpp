@@ -231,20 +231,20 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     if (odrive_config["absoluteEncoder"]) {
         YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
         return std::make_unique<march::ODrive>(
-            march::Slave(slave_index, pdo_interface, sdo_interface), axis,  HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, march::MotorControllerType::ODrive, urdf_joint),
-        HardwareBuilder::createIncrementalEncoder(
-            incremental_encoder_config, march::MotorControllerType::ODrive),
+            march::Slave(slave_index, pdo_interface, sdo_interface), axis,
+            HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config,
+                march::MotorControllerType::ODrive, urdf_joint),
+            HardwareBuilder::createIncrementalEncoder(
+                incremental_encoder_config, march::MotorControllerType::ODrive),
             mode, index_found, motor_kv);
-    }
-    else {
+    } else {
         return std::make_unique<march::ODrive>(
-            march::Slave(slave_index, pdo_interface, sdo_interface), axis, /*absolute_encoder=*/nullptr,
-        HardwareBuilder::createIncrementalEncoder(
-            incremental_encoder_config, march::MotorControllerType::ODrive),
+            march::Slave(slave_index, pdo_interface, sdo_interface), axis,
+            /*absolute_encoder=*/nullptr,
+            HardwareBuilder::createIncrementalEncoder(
+                incremental_encoder_config, march::MotorControllerType::ODrive),
             mode, index_found, motor_kv);
     }
-
-
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
