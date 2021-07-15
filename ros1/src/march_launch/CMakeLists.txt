@@ -5,7 +5,7 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-catkin_install_python(PROGRAMS scripts/upload_controller_values.py
+catkin_install_python(PROGRAMS scripts/upload_controller_values.py scripts/spawn_all_controllers.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

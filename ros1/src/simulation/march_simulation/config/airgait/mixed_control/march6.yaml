@@ -1,0 +1,66 @@
+march:
+  controller:
+    joint_state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 50
+
+    # Regular PID trajectory effort controller
+    trajectory:
+      type: effort_controllers/JointTrajectoryController
+      joints:
+        - left_ankle
+        - left_hip_fe
+        - left_knee
+        - right_ankle
+        - right_hip_fe
+        - right_knee
+
+      gains:
+        left_ankle: { p: 1000,  d: 10, i: 0, i_clamp: 0 }
+        left_hip_fe: { p: 1500,  d: 150, i: 0, i_clamp: 0 }
+        left_knee: { p: 1000,  d: 10, i: 0, i_clamp: 0 }
+        right_ankle: { p: 1000,  d: 10, i: 0, i_clamp: 0 }
+        right_hip_fe: { p: 1500,  d: 150, i: 0, i_clamp: 0 }
+        right_knee: { p: 1000,  d: 10, i: 0, i_clamp: 0 }
+
+      state_publish_rate: 25
+      action_monitor_rate: 30
+      stop_trajectory_duration: 0
+
+      constraints:
+        goal_time: 0.2
+        left_ankle:
+          trajectory: 0.5
+        left_hip_fe:
+          trajectory: 0.5
+        left_knee:
+          trajectory: 0.5
+        right_ankle:
+          trajectory: 0.5
+        right_hip_fe:
+          trajectory: 0.5
+        right_knee:
+          trajectory: 0.5
+
+    # Trajectory effort controller specifically for MPC
+    # TODO: actually use MPC here
+    trajectory_mpc:
+      type: effort_controllers/JointTrajectoryController
+      joints:
+        - left_hip_aa
+        - right_hip_aa
+
+      gains:
+        left_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        right_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+
+      state_publish_rate:  25
+      action_monitor_rate: 30
+      stop_trajectory_duration: 0
+
+      constraints:
+        goal_time: 0.2
+        left_hip_aa:
+          trajectory: 0.5
+        right_hip_aa:
+          trajectory: 0.5

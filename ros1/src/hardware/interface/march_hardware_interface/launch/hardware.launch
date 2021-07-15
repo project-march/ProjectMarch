@@ -2,6 +2,7 @@
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller file"/>
+    <arg name="controller_type" default="effort_control" doc="Changes the controller used by the hardware interface."/>
     <arg name="reset_motor_controllers" default="false" doc="Reset the MotorControllers if this argument is set to true"/>
     <arg name="if_name" default="" doc="Ethernet port to use, can be found by running 'ifconfig' in the terminal.
                                         If not provided, then the value is read from the robot .yaml file."/>
@@ -9,7 +10,7 @@
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
 
-    <rosparam file="$(find march_hardware_interface)/config/$(arg controller_name)/controllers.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/$(arg controller_type)/$(arg controller_name).yaml" command="load"/>
     <node name="upload_controller_values" pkg="march_launch"
           type="upload_controller_values.py"/>
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
@@ -17,9 +18,15 @@
     <group ns="march">
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
-        <node name="controller_spawner" pkg="controller_manager" type="controller_manager" respawn="false"
-              output="screen"
-              args="spawn controller/joint_state controller/temperature_sensor controller/trajectory"
+        <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
+              respawn="false" output="screen"
+              args="spawn controller/trajectory controller/joint_state controller/temperature_sensor"
+              if="$(eval controller_type != 'mixed_control')"
+        />
+        <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
+              respawn="false" output="screen"
+              args="spawn controller/trajectory controller/joint_state controller/trajectory_mpc controller/temperature_sensor"
+              if="$(eval controller_type == 'mixed_control')"
         />
 
         <node
