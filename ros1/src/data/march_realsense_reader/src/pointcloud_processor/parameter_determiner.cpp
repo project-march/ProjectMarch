@@ -1,10 +1,11 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
-#include "pointcloud_processor/parameter_determiner.h"
+//#include "pointcloud_processor/parameter_determiner.h"
 #include "utilities/color_utilities.h"
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_category_utilities.h"
+#include "utilities/point_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <cmath>
 #include <ctime>
@@ -14,10 +15,11 @@
 #include <ros/package.h>
 #include <utility>
 
+
 #define EPSILON 0.0001
 #define DEBUG_MARKER_SIZE 0.03
 
-using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
+// using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -116,6 +118,7 @@ bool HullParameterDeterminer::determineParameters(
     realsense_category_.emplace(realsense_category);
     subgait_name_ = subgait_name;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
+
     // Initialize the optimal foot location at the origin and the gait
     // parameters at -1 in case the calculation fails
     optimal_foot_location = pcl::PointNormal();
@@ -123,25 +126,27 @@ bool HullParameterDeterminer::determineParameters(
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
 
+    bool success = true;
+
     // Since the parameter determining for e.g. ramp down is very similar to
     // ramp up set variables like the size a step on a flat ramp equal to the
     // relevant (up or down) value and continue treating ramp up and ramp down
     // the same
     initializeGaitDimensions();
+    transformer_ = std::make_unique<Transformer>(frame_id_to_transform_to);
+    most_desirable_foot_location_ = std::make_shared<pcl::PointXYZ>();
+
+    success = transformGaitInformation();
 
     if (debugging_) {
         initializeDebugOutput();
         addDebugGaitInformation();
     }
-
-    bool success = true;
-
     // Only calculate the gait parameters if an optimal foot location has been
     // found
     if (success &= getOptimalFootLocation()) {
         success &= getGaitParametersFromFootLocation();
     }
-
     if (debugging_) {
         addDebugMarkersToArray();
     }
@@ -192,7 +197,7 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 {
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
-    marker_list.header.frame_id = frame_id_to_transform_to_;
+    marker_list.header.frame_id = "world";
     // Places the marker up right (axis aligned with that of its frame id)
     marker_list.pose.orientation.w = 1.0;
     marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
@@ -210,27 +215,38 @@ void HullParameterDeterminer::addDebugGaitInformation()
         case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
-            marker_point.y = y_location;
 
-            marker_point.x = min_x_stairs;
-            marker_point.z = min_z_stairs;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
+            for (int i = 0; i < 4; i++) {
+                marker_point.x = gait_information_cloud->points[i].x;
+                marker_point.y = gait_information_cloud->points[i].y;
+                marker_point.z = gait_information_cloud->points[i].z;
 
-            marker_point.x = max_x_stairs;
-            marker_point.z = min_z_stairs;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
+                gait_information_marker_list.points.push_back(marker_point);
+                gait_information_marker_list.colors.push_back(marker_color);
+            }
 
-            marker_point.x = min_x_stairs;
-            marker_point.z = max_z_stairs;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
+            /*        marker_point.y = y_location;
 
-            marker_point.x = max_x_stairs;
-            marker_point.z = max_z_stairs;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
+                      marker_point.x = min_x_stairs;
+                      marker_point.z = min_z_stairs;
+                      gait_information_marker_list.points.push_back(marker_point);
+                      gait_information_marker_list.colors.push_back(marker_color);
+
+                      marker_point.x = max_x_stairs;
+                      marker_point.z = min_z_stairs;
+                      gait_information_marker_list.points.push_back(marker_point);
+                      gait_information_marker_list.colors.push_back(marker_color);
+
+                      marker_point.x = min_x_stairs;
+                      marker_point.z = max_z_stairs;
+                      gait_information_marker_list.points.push_back(marker_point);
+                      gait_information_marker_list.colors.push_back(marker_color);
+
+                      marker_point.x = max_x_stairs;
+                      marker_point.z = max_z_stairs;
+                      gait_information_marker_list.points.push_back(marker_point);
+                      gait_information_marker_list.colors.push_back(marker_color);
+                      */
             break;
         }
         case RealSenseCategory::ramp_down:
@@ -315,6 +331,45 @@ void HullParameterDeterminer::initializeGaitDimensions()
     }
 }
 
+bool HullParameterDeterminer::transformGaitInformation()
+{
+    gait_information_cloud = boost::make_shared<PointCloud>();
+    pcl::PointXYZ point;
+    switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_up: {
+            point = point_utilities::makePointXYZ(
+                min_x_stairs, y_location, min_z_stairs);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePointXYZ(
+                max_x_stairs, y_location, min_z_stairs);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePointXYZ(
+                min_x_stairs, y_location, max_z_stairs);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePointXYZ(
+                max_x_stairs, y_location, max_z_stairs);
+            gait_information_cloud->push_back(point);
+
+            transformer_->transformPointCloud(gait_information_cloud);
+
+            min_x_stairs_world = gait_information_cloud->points[0].x;
+            max_x_stairs_world = gait_information_cloud->points[1].x;
+            min_z_stairs_world = gait_information_cloud->points[0].z;
+            max_z_stairs_world = gait_information_cloud->points[2].z;
+
+            break;
+        }
+
+        default: {
+            ROS_WARN_STREAM("Gait information transform is not implemented yet "
+                            "for realsense category "
+                << realsense_category_.value());
+        }
+    }
+
+    return true;
+}
+
 // Find the parameters from the foot location by finding at what percentage of
 // the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
@@ -394,12 +449,14 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 {
     bool success = true;
     // Get some locations on the ground we might want to place our foot
-    foot_locations_to_try = boost::make_shared<PointCloud2D>();
+    foot_locations_to_try = boost::make_shared<PointCloud>();
     success &= getOptionalFootLocations(foot_locations_to_try);
 
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
+    ROS_DEBUG("x location foot_locations_to_try: %f",
+        foot_locations_to_try->points[0].x);
     success &= cropCloudToHullVectorUnique(
         foot_locations_to_try, possible_foot_locations);
 
@@ -519,7 +576,7 @@ bool HullParameterDeterminer::getDistanceToObject(
             // For stairs gait find which point is closest to the most desirable
             // location
             distance = linear_algebra_utilities::distanceBetweenPoints(
-                possible_foot_location, most_desirable_foot_location_);
+                possible_foot_location, *most_desirable_foot_location_);
             break;
         }
         case RealSenseCategory::ramp_up:
@@ -558,10 +615,11 @@ bool HullParameterDeterminer::isValidLocation(
                 marker_point.z = possible_foot_location.z;
 
                 std_msgs::ColorRGBA marker_color;
-                if (!(possible_foot_location.x < min_x_stairs
-                        && possible_foot_location.x > max_x_stairs
-                        && possible_foot_location.z > min_z_stairs
-                        && possible_foot_location.z < max_z_stairs)) {
+
+                if (!(possible_foot_location.x < min_x_stairs_world
+                        && possible_foot_location.x > max_x_stairs_world
+                        && possible_foot_location.z > min_z_stairs_world
+                        && possible_foot_location.z < max_z_stairs_world)) {
                     marker_color = color_utilities::YELLOW;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
                     marker_color = color_utilities::PURPLE;
@@ -636,7 +694,9 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     bool success = true;
     // First create a pointcloud containing the edge points (vertices) of the
     // foot on the ground
-    PointCloud2D::Ptr foot_pointcloud = boost::make_shared<PointCloud2D>();
+    PointCloud::Ptr foot_pointcloud = boost::make_shared<PointCloud>();
+    //    ROS_DEBUG("x location possible_foot_pointclcoud: %f",
+    //    possible_foot_location.x);
     fillFootPointCloud(foot_pointcloud, possible_foot_location);
 
     // Then find possible foot locations associated with the foot vertices
@@ -662,7 +722,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
 // Fill a point cloud with vertices of the foot on the ground around a possible
 // foot location
 void HullParameterDeterminer::fillFootPointCloud(
-    const PointCloud2D::Ptr& foot_pointcloud,
+    const PointCloud::Ptr& foot_pointcloud,
     pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(/*__new_size=*/4);
@@ -687,14 +747,15 @@ void HullParameterDeterminer::fillFootPointCloud(
 // Compute the optimal foot location as if one were not limited by anything.
 bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 {
+    ROS_WARN("HAAAAAAAAAAAAAAAA, %f", most_desirable_foot_location_->x);
     if (general_most_desirable_location_is_mid) {
-        most_desirable_foot_location_.x = (min_x_stairs + max_x_stairs) / 2.0F;
-        most_desirable_foot_location_.y = y_location;
-        most_desirable_foot_location_.z = (min_z_stairs + max_z_stairs) / 2.0F;
+        most_desirable_foot_location_->x = (min_x_stairs + max_x_stairs) / 2.0F;
+        most_desirable_foot_location_->y = y_location;
+        most_desirable_foot_location_->z = (min_z_stairs + max_z_stairs) / 2.0F;
     } else if (general_most_desirable_location_is_small) {
-        most_desirable_foot_location_.x = min_x_stairs;
-        most_desirable_foot_location_.y = y_location;
-        most_desirable_foot_location_.z = min_z_stairs;
+        most_desirable_foot_location_->x = min_x_stairs_world;
+        most_desirable_foot_location_->y = y_location;
+        most_desirable_foot_location_->z = min_z_stairs_world;
     } else {
         ROS_ERROR_STREAM(
             "No method for finding the general most desirable foot location "
@@ -702,12 +763,19 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
             "Unable to compute general most desirable foot location.");
         return false;
     }
+        ROS_DEBUG("most desirable y, before: %f",
+        most_desirable_foot_location_->y);
+        transformer_->transformPoint(most_desirable_foot_location_);
+        ROS_DEBUG("most desirable xy, after: %f",
+        most_desirable_foot_location_->y);
+
     if (debugging_) {
         std_msgs::ColorRGBA marker_color = color_utilities::RED;
         geometry_msgs::Point marker_point;
-        marker_point.x = most_desirable_foot_location_.x;
-        marker_point.y = most_desirable_foot_location_.y;
-        marker_point.z = most_desirable_foot_location_.z;
+//        marker_point.header.frame_id = transformer_->getFixedFrame();
+        marker_point.x = most_desirable_foot_location_->x;
+        marker_point.y = most_desirable_foot_location_->y;
+        marker_point.z = most_desirable_foot_location_->z;
 
         gait_information_marker_list.points.push_back(marker_point);
         gait_information_marker_list.colors.push_back(marker_color);
@@ -718,7 +786,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 // Create a point cloud with points on the ground where the points represent
 // where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(
-    const PointCloud2D::Ptr& foot_locations_to_try)
+    const PointCloud::Ptr& foot_locations_to_try)
 {
     bool success = true;
     foot_locations_to_try->points.resize(number_of_optional_foot_locations);
@@ -765,12 +833,15 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
                 / ((float)number_of_optional_foot_locations - 1.0F);
         foot_locations_to_try->points[i].x = x_location;
         foot_locations_to_try->points[i].y = y_location;
-
+        foot_locations_to_try->points[i].z = 0;
+    }
+    transformer_->transformPointCloud(foot_locations_to_try);
+    for (int i = 0; i < number_of_optional_foot_locations; i++) {
         if (debugging_) {
             geometry_msgs::Point marker_point;
-            marker_point.x = x_location;
-            marker_point.y = y_location;
-            marker_point.z = 0;
+            marker_point.x = foot_locations_to_try->points[i].x;
+            marker_point.y = foot_locations_to_try->points[i].y;
+            marker_point.z = foot_locations_to_try->points[i].z;
 
             std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
 
@@ -788,7 +859,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
  * the input_cloud has been moved to the output cloud,
  * result is set to true, it is set to false otherwise **/
 bool HullParameterDeterminer::cropCloudToHullVector(
-    PointCloud2D::Ptr const& input_cloud,
+    PointCloud::Ptr const& input_cloud,
     const PointNormalCloud::Ptr& output_cloud)
 {
     if (input_cloud->points.size() == 0) {
@@ -819,15 +890,17 @@ bool HullParameterDeterminer::cropCloudToHullVector(
 
         *output_cloud += *elevated_cloud_with_normals;
     }
-
+    //    ROS_DEBUG("output_cloud.x = %f", output_cloud->points[0].x);
+    //    ROS_DEBUG("output_cloud.z = %f", output_cloud->points[0].y);
+    //    ROS_DEBUG("output_cloud.y = %f", output_cloud->points[0].z);
     return success;
 }
 
 // Crops a single point to a hull vector.
 bool HullParameterDeterminer::cropPointToHullVector(
-    pcl::PointXY const input_point, const PointNormalCloud::Ptr& output_cloud)
+    pcl::PointXYZ const input_point, const PointNormalCloud::Ptr& output_cloud)
 {
-    PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
+    PointCloud::Ptr input_cloud = boost::make_shared<PointCloud>();
     input_cloud->push_back(input_point);
 
     bool success = cropCloudToHullVector(input_cloud, output_cloud);
@@ -837,12 +910,13 @@ bool HullParameterDeterminer::cropPointToHullVector(
 // Crops a cloud to a hull vector, but only puts each input point in
 // the highest hull it falls into
 bool HullParameterDeterminer::cropCloudToHullVectorUnique(
-    PointCloud2D::Ptr const& input_cloud,
+    PointCloud::Ptr const& input_cloud,
     const PointNormalCloud::Ptr& output_cloud)
 {
     bool success = true;
 
-    for (pcl::PointXY ground_point : *input_cloud) {
+    for (pcl::PointXYZ ground_point : *input_cloud) {
+
         PointNormalCloud::Ptr potential_foot_locations_of_point
             = boost::make_shared<PointNormalCloud>();
         success &= HullParameterDeterminer::cropPointToHullVector(
@@ -862,7 +936,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
 // of the hull
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
-    PointCloud2D::Ptr const& input_cloud,
+    PointCloud::Ptr const& input_cloud,
     PlaneCoefficients::Ptr const& plane_coefficients,
     const PointCloud::Ptr& elevated_cloud)
 {
@@ -872,9 +946,12 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
     for (pcl::PointXYZ& elevated_point : *elevated_cloud) {
         // using z = - (d + by + ax) / c from plane equation ax + by + cz + d =
         // 0
-        pcl::PointXY input_point = input_cloud->points[point_index];
+        pcl::PointXYZ input_point = input_cloud->points[point_index];
         elevated_point.x = input_point.x;
         elevated_point.y = input_point.y;
+        //        ROS_DEBUG("elevated.x = %f", elevated_point.x);
+        //        ROS_DEBUG("elevated.y = %f", elevated_point.y);
+        //        ROS_DEBUG("elevated.z = %f", elevated_point.z);
         elevated_point.z = -(plane_coefficients->values[3]
                                + plane_coefficients->values[1]
                                    * input_cloud->points[point_index].y
