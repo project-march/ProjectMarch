@@ -3,7 +3,7 @@ duration: 4000000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0
+  - position: 0.0873
     time_from_start: 0
     velocity: 0.0
   - position: -0.1047
