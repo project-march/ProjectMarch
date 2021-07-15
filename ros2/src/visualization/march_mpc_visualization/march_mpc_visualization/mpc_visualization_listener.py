@@ -131,7 +131,5 @@ class MpcListener(Node):
                 endpoint=False,
             ).tolist()
 
-            response = make_response(jsonify(self.response_body_estimation))
-            response = self.set_headers(response)
-
-        return response
+        response = make_response(jsonify(self.response_body_estimation))
+        return self.set_headers(response)
