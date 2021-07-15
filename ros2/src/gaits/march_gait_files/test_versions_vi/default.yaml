@@ -2,6 +2,23 @@ gaits:
   curb_sdg:
     left_close: curb_sdg_leftclose_v1
     right_open: curb_sdg_rightopen_v1
+  ramp_up:
+    left_close: MVI_rampup_leftclose_steep_v3
+    left_open: MVI_rampup_leftopen_steep_v3
+    left_swing: MVI_rampup_leftswing_steep_v3
+    right_close: MVI_rampup_rightclose_steep_v3
+    right_open: MVI_rampup_rightopen_steep_v3
+    right_swing: MVI_rampup_rightswing_steep_v3
+  ramp_down:
+    left_close: MVI_rampdown_leftclose_steep_v3
+    left_open: MVI_rampdown_leftopen_steep_v3
+    left_swing: MVI_rampdown_leftswing_steep_v3
+    right_close: MVI_rampdown_rightclose_steep_v3
+    right_open: MVI_rampdown_rightopen_steep_v3
+    right_swing: MVI_rampdown_rightswing_steep_v3
+  ramp_down_last_step:
+    left_close: MVI_rampdownlaststep_leftclose_steep_v1
+    right_open: MVI_rampdownlaststep_rightopen_steep_v1
   ramp_door_last_step:
     left_close: MVI_RD_laststep_leftclose_steep_v1
     right_open: MVI_RD_laststep_rightopen_steep_v1
@@ -12,6 +29,12 @@ gaits:
     right_close: MVI_RD_slopedown_rightclose_steep_v2
     right_open: MVI_RD_slopedown_rightopen_steep_v2
     right_swing: MVI_RD_slopedown_rightswing_steep_v2
+  ramp_down_continue:
+    left_close: MVI_rampdown_continue_leftclose_steep_v3
+    left_swing: MVI_rampdown_continue_leftswing_steep_v3
+    right_close: MVI_rampdown_continue_rightclose_steep_v3
+    right_open: MVI_rampdown_continue_rightopen_steep_v3
+    right_swing: MVI_rampdown_continue_rightswing_steep_v3
   ramp_door_slope_up:
     left_close: MVI_RD_slopeup_leftclose_steep_v1
     left_open: MVI_RD_slopeup_leftopen_steep_v1
@@ -165,6 +188,17 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: -0.1745
       right_knee: 0.0
+  stand_on_ramp:
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.2618
+      left_hip_aa: 0.0349
+      left_hip_fe: 0.0
+      left_knee: 0.0
+      right_ankle: -0.2618
+      right_hip_aa: 0.0349
+      right_hip_fe: 0.0
+      right_knee: 0.0   
 dynamic_edge_gaits:
   dynamic_sit:
     sit_down: MIV_final

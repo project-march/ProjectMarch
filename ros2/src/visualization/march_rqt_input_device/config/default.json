@@ -197,6 +197,9 @@
       },
       {
          "name":"ramp_door_slope_down_single"
+      },
+      {
+         "name":"ramp_down_continue"
       }
    ],
    [
