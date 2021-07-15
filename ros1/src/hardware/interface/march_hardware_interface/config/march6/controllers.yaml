@@ -5,32 +5,70 @@ march:
       publish_rate: 50
     joint_state:
       type: joint_state_controller/JointStateController
-      publish_rate: 250
+      publish_rate: 50
     temperature_sensor:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
       publish_rate: 1
     trajectory:
-      type: effort_controllers/JointTrajectoryController
+      type: model_predictive_trajectory_controller/JointTrajectoryController
+      N: 10
       joints:
-        - left_ankle
+#        - left_ankle
         - left_hip_aa
-        - left_hip_fe
-        - left_knee
-        - right_ankle
+#        - left_hip_fe
+#        - left_knee
+#        - right_ankle
         - right_hip_aa
-        - right_hip_fe
-        - right_knee
-      gains: # Required because we're controlling an effort interface
-        left_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_hip_aa: {p: 330, i: 0, d: 10, i_clamp: 100, publish_state: true,
-                      antiwindup: true}
-        left_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_hip_aa: {p: 330, i: 0, d: 10, i_clamp: 100, publish_state: true,
-                       antiwindup: true}
-        right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        - right_hip_fe
+#        - right_knee
+#      gains: # Required because we're controlling an effort interface
+#        left_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
+#        left_hip_aa: {p: 330, i: 0, d: 10, i_clamp: 100, publish_state: true,
+#                      antiwindup: true}
+#        left_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        left_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        right_ankle: {p: 50, i: 0, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
+#        right_hip_aa: {p: 330, i: 0, d: 10, i_clamp: 100, publish_state: true,
+#                       antiwindup: true}
+#        right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        right_knee: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+
+      # Controller tuning parameters
+      # Q and R are the weights on the states and inputs of the system respectively
+      # The parameters represent the values on the diagonal of the MPC weighting matrix
+      # Both parameters are required for each joint
+      weights:
+#        left_ankle:
+#          Q: [ 100.0, 1.0 ]
+#          R: [ 0.01 ]
+
+        left_hip_aa:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+#        left_hip_fe:
+#          Q: [ 100.0, 1.0 ]
+#          R: [ 0.01 ]
+
+#        left_knee:
+#          Q: [ 100.0, 1.0 ]
+#          R: [ 0.01 ]
+#
+#        right_ankle:
+#          Q: [ 100.0, 1.0 ]
+#          R: [ 0.01 ]
+
+        right_hip_aa:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+#        right_hip_fe:
+#          Q: [ 100.0, 1.0 ]
+#          R: [ 0.01 ]
+
+#        right_knee:
+#          Q: [ 100.0, 1.0 ]
+#          R: [ 0.01 ]
 
       constraints:
         goal_time: 0.5
