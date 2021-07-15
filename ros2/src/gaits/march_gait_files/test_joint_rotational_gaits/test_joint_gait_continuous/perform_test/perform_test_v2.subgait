@@ -1,5 +1,5 @@
-description: Testjoint subgait with velocity of 1 rad/s
-duration: 1600000000
+description: Testjoint subgait with velocity of 2.0 rad/s
+duration: 800000000
 gait_type: ''
 joints:
   rotational_joint:
@@ -7,10 +7,10 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.8
-    time_from_start: 800000000
+    time_from_start: 400000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1600000000
+    time_from_start: 800000000
     velocity: 0.0
 name: perform_test
 version: example
