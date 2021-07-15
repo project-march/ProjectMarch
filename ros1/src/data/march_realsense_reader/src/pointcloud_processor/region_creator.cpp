@@ -34,13 +34,15 @@ RegionGrower::RegionGrower(bool debugging)
 {
 }
 
-bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals,
+bool RegionGrower::createRegions(const PointCloud::Ptr pointcloud,
+    const Normals::Ptr pointcloud_normals,
+    const RealSenseCategory realsense_category,
     boost::shared_ptr<PointsVector> points_vector,
     boost::shared_ptr<NormalsVector> normals_vector)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
+    realsense_category_.emplace(realsense_category);
     points_vector_ = points_vector;
     normals_vector_ = normals_vector;
     ROS_DEBUG_STREAM("Creating regions with region growing");
@@ -110,6 +112,8 @@ void RegionGrower::readParameters(
 {
     number_of_neighbours
         = config.region_creator_region_growing_number_of_neighbours;
+    number_of_neighbours_no_seeds
+        = config.region_creator_region_growing_number_of_neightbours_no_seeds;
     min_valid_cluster_size
         = config.region_creator_region_growing_min_valid_cluster_size;
     max_valid_cluster_size
@@ -146,11 +150,17 @@ bool RegionGrower::setupRegionGrower()
         pcl::search::Search<pcl::PointXYZ>::Ptr tree(
             new pcl::search::KdTree<pcl::PointXYZ>);
         region_grower.setSearchMethod(tree);
-        region_grower.setNumberOfNeighbours(number_of_neighbours);
         region_grower.setInputCloud(pointcloud_);
         region_grower.setInputNormals(pointcloud_normals_);
         region_grower.setSmoothnessThreshold(smoothness_threshold);
-        region_grower.setCurvatureThreshold(curvature_threshold);
+        if (realsense_category_.value() == RealSenseCategory::ramp_up
+            || realsense_category_.value() == RealSenseCategory::ramp_down) {
+            region_grower.setCurvatureThreshold(/*curvature=*/-1);
+            region_grower.setNumberOfNeighbours(number_of_neighbours_no_seeds);
+        } else {
+            region_grower.setNumberOfNeighbours(number_of_neighbours);
+            region_grower.setCurvatureThreshold(curvature_threshold);
+        }
         return true;
     } else {
         ROS_ERROR("pointcloud_ is of size: %lu, while pointcloud_normals_ is "

@@ -159,9 +159,10 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         = boost::make_shared<PointsVector>();
     boost::shared_ptr<NormalsVector> normals_vector
         = boost::make_shared<NormalsVector>();
+    auto realsense_category = (RealSenseCategory)realsense_category_;
     // Create regions
     bool region_creating_was_successful = region_creator_->createRegions(
-        pointcloud, normals, points_vector, normals_vector);
+        pointcloud, normals, realsense_category, points_vector, normals_vector);
 
     if (not region_creating_was_successful) {
         res.error_message
