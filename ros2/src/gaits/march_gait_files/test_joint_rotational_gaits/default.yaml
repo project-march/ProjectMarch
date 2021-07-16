@@ -1,6 +1,6 @@
 gaits:
   test_joint_gait:
-    perform_test: perform_test_v0
+    perform_test: perform_test_v1
   test_joint_gait_continuous:
     perform_test: perform_test_v1
     wait_test: wait_test_v1
