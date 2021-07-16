@@ -478,7 +478,7 @@ class GaitSelection(Node):
             if set(positions[position_name]["joints"].keys()) != set(self._joint_names):
                 raise NonValidGaitContentError(
                     f"The position {position_name} does not "
-                    f"have a position for all required joits: it "
+                    f"have a position for all required joints: it "
                     f"has {positions[position_name]['joints'].keys()}, "
                     f"required: {self._joint_names}"
                 )
