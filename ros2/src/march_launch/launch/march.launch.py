@@ -110,14 +110,14 @@ def generate_launch_description():
                 name="ground_gait",
                 default_value=use_imu_data,
                 description="Whether the simulation should be simulating "
-                            "ground_gaiting instead of airgaiting.",
+                "ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
                 default_value=ground_gait,
                 description="Whether a transform from the world to base_link is "
-                            "necessary, this is the case when you are "
-                            "groundgaiting.",
+                "necessary, this is the case when you are "
+                "groundgaiting.",
             ),
             DeclareLaunchArgument(
                 name="imu_topic",
