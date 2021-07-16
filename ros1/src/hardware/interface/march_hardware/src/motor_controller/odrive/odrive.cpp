@@ -234,7 +234,7 @@ float ODrive::getMotorCurrent()
     return this->read32(ODrivePDOmap::getMISOByteOffset(
                             ODriveObjectName::ActualCurrent, axis_))
                .f
-        * (float)getMotorDirection() * -1;
+        * (float)getMotorDirection();
 }
 
 float ODrive::getActualEffort()
