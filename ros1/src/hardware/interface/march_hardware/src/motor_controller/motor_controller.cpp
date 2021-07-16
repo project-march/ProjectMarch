@@ -31,8 +31,6 @@ MotorController::MotorController(const Slave& slave,
     } else {
         is_incremental_encoder_more_precise_ = false;
     }
-
-    ROS_INFO("is inc more preices: %d", is_incremental_encoder_more_precise_);
 }
 
 MotorController::MotorController(const Slave& slave,
