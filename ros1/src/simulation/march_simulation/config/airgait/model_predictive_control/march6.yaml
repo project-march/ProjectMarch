@@ -8,7 +8,7 @@ march:
   controller:
     trajectory:
       type: model_predictive_trajectory_controller/JointTrajectoryController
-      N: 20
+      N: 10
       joints:
         - left_ankle
         - left_hip_aa
