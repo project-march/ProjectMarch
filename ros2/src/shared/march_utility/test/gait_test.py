@@ -6,9 +6,9 @@ from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 import yaml
 from march_utility.exceptions.gait_exceptions import (
-    SubgaitNameNotFound,
-    NonValidGaitContent,
-    GaitNameNotFound,
+    SubGaitNameNotFoundError,
+    NonValidGaitContentError,
+    GaitNameNotFoundError,
 )
 from march_utility.gait.gait import Gait
 from march_utility.gait.subgait import Subgait
@@ -49,7 +49,7 @@ class GaitTest(unittest.TestCase):
     # __init__ (_validate_trajectory_transition) test
     def test_init_invalid_joint_trajectory_transition(self):
         self.gait.subgaits["left_swing"].joints[0].setpoints[-1].position = 124
-        with self.assertRaises(NonValidGaitContent):
+        with self.assertRaises(NonValidGaitContentError):
             Gait(self.gait_name, self.gait.subgaits, self.gait.graph)
 
     # load_subgait tests
@@ -64,7 +64,7 @@ class GaitTest(unittest.TestCase):
         self.assertIsInstance(subgait, Subgait)
 
     def test_load_subgait_unexisting_gait_error(self):
-        with self.assertRaises(GaitNameNotFound):
+        with self.assertRaises(GaitNameNotFoundError):
             Gait.load_subgait(
                 self.robot,
                 self.resources_folder,
@@ -74,7 +74,7 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_load_subgait_unexisting_subgait_error(self):
-        with self.assertRaises(SubgaitNameNotFound):
+        with self.assertRaises(SubGaitNameNotFoundError):
             Gait.load_subgait(
                 self.robot,
                 self.resources_folder,
@@ -121,7 +121,7 @@ class GaitTest(unittest.TestCase):
         self.assertEqual(new_version, self.gait.subgaits[subgait_name2].version)
 
     def test_set_version_non_existing_subgait(self):
-        with self.assertRaises(SubgaitNameNotFound):
+        with self.assertRaises(SubGaitNameNotFoundError):
             self.gait.set_subgait_versions(
                 self.robot, self.resources_folder, {"this_subgait_does_not_exist": "1"}
             )
@@ -136,7 +136,7 @@ class GaitTest(unittest.TestCase):
         self.gait.subgaits["right_swing"].joints[0].setpoints[-1].position = 124
         subgait_name = "left_close"
         new_version = "MIV_final"
-        with self.assertRaises(NonValidGaitContent):
+        with self.assertRaises(NonValidGaitContentError):
             self.gait.set_subgait_versions(
                 self.robot, self.resources_folder, {subgait_name: new_version}
             )
@@ -144,13 +144,13 @@ class GaitTest(unittest.TestCase):
     def test_set_new_subgait_version_invalid_start(self):
         new_subgaits = deepcopy(self.gait.subgaits)
         new_subgaits["right_open"].joints[0].setpoints[0].position = 124
-        with self.assertRaises(NonValidGaitContent):
+        with self.assertRaises(NonValidGaitContentError):
             self.gait.set_subgaits(new_subgaits)
 
     def test_set_new_subgait_version_invalid_final(self):
         new_subgaits = deepcopy(self.gait.subgaits)
         new_subgaits["left_close"].joints[0].setpoints[-1].position = 124
-        with self.assertRaises(NonValidGaitContent):
+        with self.assertRaises(NonValidGaitContentError):
             self.gait.set_subgaits(new_subgaits)
 
 
