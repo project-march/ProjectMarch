@@ -1,0 +1,8 @@
+name: curb_down
+subgaits:
+  left_close:
+    to: end
+  right_open:
+    to: left_close
+  start:
+    to: right_open
