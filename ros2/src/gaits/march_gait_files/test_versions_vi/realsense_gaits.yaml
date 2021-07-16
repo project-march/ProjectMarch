@@ -51,6 +51,63 @@ realsense_stairs_up:
       - MVI_stairsup_rightclose_high_undeep
       - MVI_stairsup_rightclose_high_deep_v2
 
+realsense_stairs_down_single_step:
+  realsense_category: stairs_down
+  camera_to_use: front
+  starting_position: static
+  final_position: static
+  dimensions: 2
+  default_parameters:
+    - 0.5
+    - 0.5
+  subgaits:
+    right_open:
+      - MVI_stairsdown_rightopen_low_undeep_v1
+      - MVI_stairsdown_rightopen_low_deep_v1
+      - MVI_stairsdown_rightopen_high_undeep_v1
+      - MVI_stairsdown_rightopen_high_deep_v1
+    left_close:
+      - MVI_stairsdown_leftclose_low_undeep_v1
+      - MVI_stairsdown_leftclose_low_deep_v1
+      - MVI_stairsdown_leftclose_high_undeep_v1
+      - MVI_stairsdown_leftclose_high_deep_v1
+
+realsense_stairs_down:
+  realsense_category: stairs_down
+  camera_to_use: front
+  starting_position: static
+  final_position: static
+  dimensions: 2
+  default_parameters:
+    - 0.5
+    - 0.5
+  subgaits:
+    right_open:
+      - MVI_stairsdown_rightopen_low_undeep_v1
+      - MVI_stairsdown_rightopen_low_deep_v1
+      - MVI_stairsdown_rightopen_high_undeep_v1
+      - MVI_stairsdown_rightopen_high_deep_v1
+    left_swing:
+      - MVI_stairsdown_leftswing_low_undeep_v1
+      - MVI_stairsdown_leftswing_low_deep_v1
+      - MVI_stairsdown_leftswing_high_undeep_v1
+      - MVI_stairsdown_leftswing_high_deep_v1
+    right_swing:
+      - MVI_stairsdown_rightswing_low_undeep_v1
+      - MVI_stairsdown_rightswing_low_deep_v1
+      - MVI_stairsdown_rightswing_high_undeep_v1
+      - MVI_stairsdown_rightswing_high_deep_v1
+    left_close:
+      - MVI_stairsdown_leftclose_low_undeep_v1
+      - MVI_stairsdown_leftclose_low_deep_v1
+      - MVI_stairsdown_leftclose_high_undeep_v1
+      - MVI_stairsdown_leftclose_high_deep_v1
+    right_close:
+      - MVI_stairsdown_rightclose_low_undeep_v1
+      - MVI_stairsdown_rightclose_low_deep_v1
+      - MVI_stairsdown_rightclose_high_undeep_v1
+      - MVI_stairsdown_rightclose_high_deep_v1
+
 realsense_sit:
   realsense_category: sit
   camera_to_use: back
