@@ -6,7 +6,7 @@ from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 import yaml
 from march_utility.exceptions.gait_exceptions import (
-    SubGaitNameNotFoundError,
+    SubgaitNameNotFoundError,
     NonValidGaitContentError,
     GaitNameNotFoundError,
 )
@@ -74,7 +74,7 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_load_subgait_unexisting_subgait_error(self):
-        with self.assertRaises(SubGaitNameNotFoundError):
+        with self.assertRaises(SubgaitNameNotFoundError):
             Gait.load_subgait(
                 self.robot,
                 self.resources_folder,
@@ -121,7 +121,7 @@ class GaitTest(unittest.TestCase):
         self.assertEqual(new_version, self.gait.subgaits[subgait_name2].version)
 
     def test_set_version_non_existing_subgait(self):
-        with self.assertRaises(SubGaitNameNotFoundError):
+        with self.assertRaises(SubgaitNameNotFoundError):
             self.gait.set_subgait_versions(
                 self.robot, self.resources_folder, {"this_subgait_does_not_exist": "1"}
             )

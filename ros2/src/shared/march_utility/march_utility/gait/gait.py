@@ -15,7 +15,7 @@ from urdf_parser_py import urdf
 from march_utility.exceptions.gait_exceptions import (
     GaitNameNotFoundError,
     NonValidGaitContentError,
-    SubGaitNameNotFoundError,
+    SubgaitNameNotFoundError,
 )
 
 from .subgait import Subgait
@@ -134,7 +134,7 @@ class Gait:
         if gait_name not in gait_version_map:
             raise GaitNameNotFoundError(gait_name)
         if subgait_name not in gait_version_map[gait_name]:
-            raise SubGaitNameNotFoundError(subgait_name, gait_name)
+            raise SubgaitNameNotFoundError(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
         return Subgait.from_name_and_version(
@@ -268,7 +268,7 @@ class Gait:
         new_subgaits = self.subgaits.copy()
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
-                raise SubGaitNameNotFoundError(subgait_name, self.gait_name)
+                raise SubgaitNameNotFoundError(subgait_name, self.gait_name)
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )

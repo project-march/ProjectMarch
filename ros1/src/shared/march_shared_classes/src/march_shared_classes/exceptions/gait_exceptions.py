@@ -23,7 +23,7 @@ class GaitNameNotFoundError(GaitError):
         super(GaitNameNotFoundError, self).__init__(msg)
 
 
-class SubGaitNameNotFoundError(GaitError):
+class SubgaitNameNotFoundError(GaitError):
     def __init__(self, subgait_name, gait_name, msg=None):
         """Class to raise an error when given subgait name does not exists .
 
@@ -35,7 +35,7 @@ class SubGaitNameNotFoundError(GaitError):
                 subgait=subgait_name, gait=gait_name
             )
 
-        super(SubGaitNameNotFoundError, self).__init__(msg)
+        super(SubgaitNameNotFoundError, self).__init__(msg)
 
 
 class NonValidGaitContentError(GaitError):
