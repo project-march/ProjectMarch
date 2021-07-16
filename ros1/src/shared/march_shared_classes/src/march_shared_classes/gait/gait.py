@@ -3,9 +3,9 @@ import os
 import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import (
-    GaitNameNotFound,
-    NonValidGaitContent,
-    SubgaitNameNotFound,
+    GaitNameNotFoundError,
+    NonValidGaitContentError,
+    SubgaitNameNotFoundError,
 )
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
 
@@ -92,9 +92,9 @@ class Gait:
             if gait and subgait names are valid return populated Gait object
         """
         if gait_name not in gait_version_map:
-            raise GaitNameNotFound(gait_name)
+            raise GaitNameNotFoundError(gait_name)
         if subgait_name not in gait_version_map[gait_name]:
-            raise SubgaitNameNotFound(subgait_name, gait_name)
+            raise SubgaitNameNotFoundError(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
         return Subgait.from_name_and_version(
@@ -117,7 +117,7 @@ class Gait:
             to_subgait = self.subgaits[to_subgait_name]
 
             if not from_subgait.validate_subgait_transition(to_subgait):
-                raise NonValidGaitContent(
+                raise NonValidGaitContentError(
                     msg="Gait {gait} with end setpoint of subgait {sn} to subgait {ns} "
                     "does not match".format(
                         gait=self.gait_name,
@@ -136,7 +136,7 @@ class Gait:
         new_subgaits = {}
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
-                raise SubgaitNameNotFound(subgait_name, self.gait_name)
+                raise SubgaitNameNotFoundError(subgait_name, self.gait_name)
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
@@ -157,7 +157,7 @@ class Gait:
                             )
                             >= ALLOWED_ERROR_ENDPOINTS
                         ):
-                            raise NonValidGaitContent(
+                            raise NonValidGaitContentError(
                                 msg="The starting position of new version {gait} {subgait} does not match".format(
                                     gait=self.gait_name, subgait=to_subgait_name
                                 )
@@ -176,7 +176,7 @@ class Gait:
                             )
                             >= ALLOWED_ERROR_ENDPOINTS
                         ):
-                            raise NonValidGaitContent(
+                            raise NonValidGaitContentError(
                                 msg="The final position of new version {gait} {subgait} does not match".format(
                                     gait=self.gait_name, subgait=from_subgait_name
                                 )
@@ -190,7 +190,7 @@ class Gait:
                     )
 
                     if not from_subgait.validate_subgait_transition(to_subgait):
-                        raise NonValidGaitContent(
+                        raise NonValidGaitContentError(
                             msg="Gait {gait} with end setpoint of subgait {sn} to subgait {ns} does not match".format(
                                 gait=self.gait_name,
                                 sn=from_subgait.subgait_name,

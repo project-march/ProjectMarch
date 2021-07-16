@@ -5,7 +5,7 @@ from march_utility.utilities.duration import Duration
 from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (
-    NonValidGaitContent,
+    NonValidGaitContentError,
     SubgaitInterpolationError,
 )
 from march_utility.gait.joint_trajectory import JointTrajectory
@@ -138,7 +138,7 @@ class SubgaitTest(unittest.TestCase):
             version=other_version,
         )
         other_subgait = Subgait.from_file(self.robot, other_subgait_path)
-        with self.assertRaises(NonValidGaitContent):
+        with self.assertRaises(NonValidGaitContentError):
             other_subgait.validate_subgait_transition(self.subgait)
 
     # getters tests

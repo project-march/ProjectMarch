@@ -9,7 +9,7 @@ class GaitError(Exception):
         super(GaitError, self).__init__(msg)
 
 
-class GaitNameNotFound(GaitError):
+class GaitNameNotFoundError(GaitError):
     def __init__(self, gait_name: str, msg: str = None):
         """Class to raise an error when given gait name does not exists .
 
@@ -19,10 +19,10 @@ class GaitNameNotFound(GaitError):
         if msg is None:
             msg = "Could not find gait name: {gait} in map.".format(gait=gait_name)
 
-        super(GaitNameNotFound, self).__init__(msg)
+        super(GaitNameNotFoundError, self).__init__(msg)
 
 
-class SubgaitNameNotFound(GaitError):
+class SubgaitNameNotFoundError(GaitError):
     def __init__(self, subgait_name: str, gait_name: str, msg: str = None):
         """Class to raise an error when given subgait name does not exists .
 
@@ -34,10 +34,10 @@ class SubgaitNameNotFound(GaitError):
                 subgait=subgait_name, gait=gait_name
             )
 
-        super(SubgaitNameNotFound, self).__init__(msg)
+        super(SubgaitNameNotFoundError, self).__init__(msg)
 
 
-class NonValidGaitContent(GaitError):
+class NonValidGaitContentError(GaitError):
     def __init__(self, gait_name: str = None, msg: str = None):
         """Class to raise an error when given gait has incorrect content .
 
@@ -47,7 +47,7 @@ class NonValidGaitContent(GaitError):
         if msg is None:
             msg = "The given gait: {gn} has incorrect information".format(gn=gait_name)
 
-        super(NonValidGaitContent, self).__init__(msg)
+        super(NonValidGaitContentError, self).__init__(msg)
 
 
 class SubgaitGraphError(GaitError):
