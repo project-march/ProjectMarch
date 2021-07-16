@@ -34,6 +34,8 @@
     <arg name="remove_fixed_joints_from_ethercat_train" default="false"
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
+    <arg name="enable_safety_controller" default="false" doc="Whether to enable the safety controller"/>
+
 <!-- Data                       -->
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
@@ -80,6 +82,8 @@
             <arg name="if_name" value="$(arg if_name)"/>
             <arg name="remove_fixed_joints_from_ethercat_train"
                  value="$(arg remove_fixed_joints_from_ethercat_train)"/>
+            <arg name="enable_safety_controller"
+                 value="$(arg enable_safety_controller)"/>
         </include>
     </group>
 
