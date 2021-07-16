@@ -15,7 +15,7 @@
     <arg name="rviz" default="false" doc="Launches RViz."/>
     <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
 
-    <arg name="use_imu_data" default="false" doc="Whether the imu data will be used to "
+    <arg name="use_imu_data" default="false" doc="Whether the imu data will be used to"/>
     <arg name="ground_gait" default="$(arg use_imu_data)"
          doc="Exoskeleton will ground gait in gazebo_ui if true. When the imu data is used,
          this version of the urdf is also required, because we want the robot state publisher
