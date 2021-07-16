@@ -1,4 +1,4 @@
-description: Testjoint subgait with velocity of 1.5 rad/s
+description: Testjoint subgait with maximum velocity of ~ 2.2 rad/s
 duration: 1333333333
 gait_type: ''
 joints:
