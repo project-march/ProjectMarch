@@ -96,6 +96,17 @@ def generate_launch_description():
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
+                name="use_hud",
+                default_value="False",
+                description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
+            ),
+            DeclareLaunchArgument(
+                name="use_imu_data",
+                default_value="False",
+                description="Whether to use the camera imu to know the real "
+                "orientation of the exoskeleton",
+            ),
+            DeclareLaunchArgument(
                 name="ground_gait",
                 default_value=use_imu_data,
                 description="Whether the simulation should be simulating "
@@ -107,17 +118,6 @@ def generate_launch_description():
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting.",
-            ),
-            DeclareLaunchArgument(
-                name="use_hud",
-                default_value="False",
-                description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
-            ),
-            DeclareLaunchArgument(
-                name="use_imu_data",
-                default_value="False",
-                description="Whether to use the camera imu to know the real "
-                "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
                 name="imu_topic",
