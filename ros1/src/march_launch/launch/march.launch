@@ -82,6 +82,8 @@
             <arg name="if_name" value="$(arg if_name)"/>
             <arg name="remove_fixed_joints_from_ethercat_train"
                  value="$(arg remove_fixed_joints_from_ethercat_train)"/>
+            <arg name="enable_safety_controller"
+                 value="$(arg enable_safety_controller)"/>
         </include>
     </group>
 
