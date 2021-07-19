@@ -41,7 +41,9 @@ class TestRealsenseGait(unittest.TestCase):
         self.realsense_stand = realsense_stand
 
     def test_gait_dependencies(self):
-        self.assertTrue(self.realsense_sit.responsible_for, self.realsense_stand.gait_name)
+        self.assertTrue(
+            self.realsense_sit.responsible_for, self.realsense_stand.gait_name
+        )
         self.assertTrue(self.realsense_stand.dependent_on, self.realsense_sit.gait_name)
 
     def test_updating_gait_with_responsibilities(self):
@@ -50,10 +52,7 @@ class TestRealsenseGait(unittest.TestCase):
         gait_parameters.second_parameter = 0.5
         gait_parameters.side_step_parameter = 0.3
 
-        self.realsense_sit.update_gaits_from_realsense_call(
-            gait_parameters
+        self.realsense_sit.update_gaits_from_realsense_call(gait_parameters)
+        self.assertTrue(
+            self.realsense_stand.parameters[0], gait_parameters.first_parameter
         )
-        self.assertTrue(self.realsense_stand.parameters[0], gait_parameters.first_parameter)
-
-
-

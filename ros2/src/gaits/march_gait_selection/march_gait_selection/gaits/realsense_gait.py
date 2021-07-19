@@ -37,8 +37,10 @@ from urdf_parser_py import urdf
 class RealsenseGait(SetpointsGait):
     """
     The RealsenseGait class is used for creating gaits based on the parameters given
-    by the realsense reader. It is based on the setpoints gait, and it uses the
-    interpolation over 1 or 2 dimensions with 2 or 4 subgaits respectively.
+    by the realsense reader. From these parameters the subgaits to interpolate are
+    interpolated after a realsense call during the start of the gait. It is based on the
+    setpoints gait, and it uses the interpolation over 1 or 2 dimensions with 2 or 4
+    subgaits respectively.
     """
 
     SERVICE_TIMEOUT = Duration(seconds=2.0)
