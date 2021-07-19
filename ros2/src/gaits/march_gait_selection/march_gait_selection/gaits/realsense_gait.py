@@ -155,14 +155,8 @@ class RealsenseGait(SetpointsGait):
         subgaits_to_interpolate = {}
         try:
             dimensions = InterpolationDimensions.from_integer(gait_config["dimensions"])
-            try:
-                dependent_on = gait_config["dependent_on"]
-            except KeyError:
-                dependent_on = None
-            try:
-                responsible_for = gait_config["responsible_for"]
-            except KeyError:
-                responsible_for = None
+            dependent_on = gait_config.get("dependent_on", [])
+            responsible_for = gait_config.get("responsible_for", [])
 
             parameters = [0.0 for _ in range(amount_of_parameters(dimensions))]
 
@@ -311,7 +305,7 @@ class RealsenseGait(SetpointsGait):
 
         # If a gait is dependent on some other gait its subgaits are already
         # interpolated from parameters so we can skip the realsense call
-        if self._dependent_on is None:
+        if not self._dependent_on:
             realsense_update_successful = self.get_realsense_update()
             if not realsense_update_successful:
                 return GaitUpdate.empty()
@@ -359,7 +353,7 @@ class RealsenseGait(SetpointsGait):
         success = True
         self.set_parameters(gait_parameters)
         success &= self.interpolate_subgaits_from_parameters()
-        if self._responsible_for is not None and success:
+        if not self._responsible_for and success:
             for gait_name in self._responsible_for:
                 gait = self._gait_selection.gaits[gait_name]
                 # Make a recursive call to also handle the dependencies of the
