@@ -43,7 +43,7 @@ flake8:
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
       variables:
         TAG: $CI_DEFAULT_BRANCH
 
@@ -88,7 +88,7 @@ clang-format:
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
       changes:
         - "ros1/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - "ros2/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
