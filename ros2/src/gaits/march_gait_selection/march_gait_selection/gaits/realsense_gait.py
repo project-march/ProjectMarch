@@ -309,12 +309,12 @@ class RealsenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
+        # If a gait is dependent on some other gait its subgaits are already
+        # interpolated from parameters so we can skip the realsense call
         if self._dependent_on is None:
             realsense_update_successful = self.get_realsense_update()
             if not realsense_update_successful:
                 return GaitUpdate.empty()
-        # If a gait is dependent on some other gait its subgaits are already
-        # interpolated from parameters so we can skip the realsense call
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
