@@ -14,7 +14,7 @@ import rclpy
 
 from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
-    NonValidGaitContent,
+    NonValidGaitContentError,
 )
 from march_utility.utilities.duration import Duration
 from scipy.interpolate import BPoly
@@ -159,7 +159,7 @@ class JointTrajectory:
             True if ending and starting point are identical else False
         """
         if not self._validate_boundary_points():
-            raise NonValidGaitContent(
+            raise NonValidGaitContentError(
                 self.name,
                 msg=f"Invalid boundary points for begin setpoint {self.setpoints[0]} "
                 f"and end setpoint {self.setpoints[-1]} with duration {self.duration}",

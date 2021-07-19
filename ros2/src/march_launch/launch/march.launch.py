@@ -22,6 +22,7 @@ def generate_launch_description():
     robot_description = LaunchConfiguration("robot_description")
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
+    simulation = LaunchConfiguration("simulation")
 
     # HUD arguments
     use_hud = LaunchConfiguration("use_hud")
@@ -37,6 +38,7 @@ def generate_launch_description():
     balance = LaunchConfiguration("balance")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -94,19 +96,6 @@ def generate_launch_description():
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
-                name="ground_gait",
-                default_value="False",
-                description="Whether the simulation should be simulating "
-                "ground_gaiting instead of airgaiting.",
-            ),
-            DeclareLaunchArgument(
-                name="to_world_transform",
-                default_value=ground_gait,
-                description="Whether a transform from the world to base_link is "
-                "necessary, this is the case when you are "
-                "groundgaiting.",
-            ),
-            DeclareLaunchArgument(
                 name="use_hud",
                 default_value="False",
                 description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
@@ -118,9 +107,28 @@ def generate_launch_description():
                 "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
+                name="ground_gait",
+                default_value=use_imu_data,
+                description="Whether the simulation should be simulating "
+                "ground_gaiting instead of airgaiting.",
+            ),
+            DeclareLaunchArgument(
+                name="to_world_transform",
+                default_value=ground_gait,
+                description="Whether a transform from the world to base_link is "
+                "necessary, this is the case when you are "
+                "groundgaiting.",
+            ),
+            DeclareLaunchArgument(
                 name="imu_topic",
                 default_value="/camera_front/imu/data",
                 description="The topic that should be used to determine the orientation",
+            ),
+            DeclareLaunchArgument(
+                name="simulation",
+                default_value="False",
+                description="Whether the exoskeleton is ran physically or in "
+                "simulation.",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -151,6 +159,9 @@ def generate_launch_description():
                 default_value="0.2",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
+            ),
+            DeclareLaunchArgument(
+                name="timer_period", default_value="0.004", description=""
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
@@ -202,6 +213,7 @@ def generate_launch_description():
                     ("balance", balance),
                     ("use_imu_data", use_imu_data),
                     ("imu_topic", imu_topic),
+                    ("simulation", simulation),
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),
@@ -219,8 +231,9 @@ def generate_launch_description():
                     ("use_sim_time", use_sim_time),
                     ("gait_package", gait_package),
                     ("balance", balance),
-                    ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
+                    ("first_subgait_delay", first_subgait_delay),
+                    ("timer_period", timer_period),
                 ],
             ),
             # Safety

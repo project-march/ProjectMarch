@@ -22,6 +22,7 @@ def generate_launch_description():
     ground_gait = LaunchConfiguration("ground_gait")
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
+    simulation = LaunchConfiguration("simulation")
 
     # Simulation arguments
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -33,6 +34,7 @@ def generate_launch_description():
     balance = LaunchConfiguration("balance")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -113,6 +115,11 @@ def generate_launch_description():
                 default_value="/camera_front/imu/data",
                 description="The topic that should be used to determine the orientation",
             ),
+            DeclareLaunchArgument(
+                name="simulation",
+                default_value="True",
+                description="Whether simulation is used",
+            ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
                 name="gait_package",
@@ -142,6 +149,11 @@ def generate_launch_description():
                 default_value="0.2",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
+            ),
+            DeclareLaunchArgument(
+                "timer_period",
+                default_value="0.004",
+                description="",
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
@@ -186,9 +198,11 @@ def generate_launch_description():
                     ("balance", balance),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
+                    ("timer_period", timer_period),
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
+                    ("simulation", simulation),
                 ],
             ),
         ]

@@ -17,7 +17,7 @@ VELOCITY_SCALE_FACTOR = 0.001
 class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
-    digits = 8
+    digits = 4
 
     def __init__(
         self, time: Duration, position: float, velocity: Optional[float] = None

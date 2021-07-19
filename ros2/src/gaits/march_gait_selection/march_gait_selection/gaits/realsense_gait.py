@@ -26,7 +26,7 @@ from march_utility.utilities.dimensions import (
 from march_utility.exceptions.gait_exceptions import (
     UnknownDimensionsError,
     WrongRealSenseConfigurationError,
-    NonValidGaitContent,
+    NonValidGaitContentError,
 )
 from rclpy import Future
 from rclpy.time import Time

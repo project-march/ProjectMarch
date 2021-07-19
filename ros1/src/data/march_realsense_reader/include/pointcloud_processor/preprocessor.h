@@ -1,6 +1,7 @@
 #ifndef MARCH_PREPROCESSOR_H
 #define MARCH_PREPROCESSOR_H
 
+#include "utilities/realsense_category_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -16,15 +17,18 @@ public:
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
-        Normals::Ptr normal_pointcloud, std::string frame_id_to_transform_to_)
+        Normals::Ptr normal_pointcloud,
+        RealSenseCategory const realsense_category,
+        std::string frame_id_to_transform_to_)
         = 0;
 
     virtual ~Preprocessor() = default;
 
-    // Removes a point from a pointcloud (and optionally the corresponding
-    // pointcloud_normals as well) at a given index
-    void removePointByIndex(int const index, const PointCloud::Ptr& pointcloud,
-        const Normals::Ptr& pointcloud_normals = nullptr);
+    // Removes points from a pointcloud (and optionally the corresponding
+    // pointcloud_normals as well) at given indices
+    void removePointsFromIndices(
+        const pcl::PointIndices::Ptr& indices_to_remove,
+        const bool& remove_normals);
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -36,6 +40,7 @@ public:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
     bool debugging_;
+    std::optional<RealSenseCategory> realsense_category_ = std::nullopt;
 };
 
 /** The SimplePreprocessor is mostly for debug purposes, it does only the most
@@ -49,6 +54,7 @@ public:
 
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+        RealSenseCategory const realsense_category,
         std::string frame_id_to_transform_to = "foot_left") override;
 
 protected:
@@ -72,6 +78,7 @@ public:
     // Calls all subsequent methods to preprocess a pointlcoud using normal
     // vectors
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+        RealSenseCategory const realsense_category,
         std::string frame_id_to_transform_to = "foot_left") override;
 
     void readParameters(
@@ -86,8 +93,7 @@ protected:
     bool transformPointCloudFromUrdf(
         geometry_msgs::TransformStamped& transform_stamped);
 
-    // Removes all points which are futher away then a certain distance from the
-    // origin (specified in the parameter file)
+    // Remove all points which are too far or too close to the origin
     bool filterOnDistanceFromOrigin();
 
     // Estimates the normals of the pointcloud and fills the pointcloud_normals_
@@ -106,7 +112,10 @@ protected:
     int remaining_points {};
 
     // Distance filter parameters
-    double distance_threshold {};
+    double minimum_distance_threshold_x {};
+    double minimum_distance_threshold_y {};
+    double minimum_distance_threshold_z {};
+    double maximum_distance_threshold {};
 
     // Normal estimation parameters
     bool use_tree_search_method {};

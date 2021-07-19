@@ -76,12 +76,15 @@ public:
     float getMotorVoltage() override;
     float getActualEffort() override;
 
-    float effortMultiplicationConstant() override;
+    double effortMultiplicationConstant() override;
+    static constexpr double EFFORT_MULTIPLICATION_CONSTANT = 1000.0;
+
+    double getEffortLimit() override;
 
     constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
     // This value is slightly larger than the current limit of the
     // linear joints defined in the URDF.
-    const static int16_t MAX_TARGET_TORQUE = 23500;
+    constexpr static int16_t MAX_TARGET_TORQUE = 23500;
 
     // Constant used for converting a fixed point 16.16 bit number to a float,
     // which is done by dividing by 2^16

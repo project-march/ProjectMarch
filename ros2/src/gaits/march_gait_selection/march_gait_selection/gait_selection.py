@@ -10,8 +10,8 @@ from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameter
 
 from march_utility.exceptions.gait_exceptions import (
     GaitError,
-    GaitNameNotFound,
-    NonValidGaitContent,
+    GaitNameNotFoundError,
+    NonValidGaitContentError,
 )
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
@@ -44,6 +44,8 @@ class GaitSelection(Node):
         )
         self._balance_used = False
         try:
+            # Initialize all parameters once, and set up a callback for dynamically
+            # reconfiguring
             if gait_package is None:
                 gait_package = (
                     self.get_parameter("gait_package")
@@ -61,16 +63,22 @@ class GaitSelection(Node):
                     self.get_parameter("balance").get_parameter_value().bool_value
                 )
 
+            self._early_schedule_duration = self._parse_duration_parameter(
+                "early_schedule_duration"
+            )
+            self._first_subgait_delay = self._parse_duration_parameter(
+                "first_subgait_delay"
+            )
+
         except ParameterNotDeclaredException:
             self.get_logger().error(
                 "Gait selection node started without required parameters "
                 "gait_package, gait_directory and balance"
             )
 
-        package_path = get_package_share_directory(gait_package)
         self._directory_name = directory
-        self._gait_directory = os.path.join(package_path, directory)
-        self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
+        self._gait_package = gait_package
+        self._gait_directory, self._default_yaml = self._initialize_gaits()
         if not os.path.isdir(self._gait_directory):
             self.get_logger().error(f"Gait directory does not exist: {directory}")
             raise FileNotFoundError(directory)
@@ -85,6 +93,7 @@ class GaitSelection(Node):
         self._realsense_yaml = os.path.join(
             self._gait_directory, "realsense_gaits.yaml"
         )
+
         self._realsense_gait_version_map = self._load_realsense_configuration()
         (
             self._gait_version_map,
@@ -132,6 +141,40 @@ class GaitSelection(Node):
             validate_and_get_joint_names_for_inverse_kinematics(self.get_logger())
             is not None
         )
+
+    def _initialize_gaits(self):
+        package_path = get_package_share_directory(self._gait_package)
+        gait_directory = os.path.join(package_path, self._directory_name)
+        default_yaml = os.path.join(gait_directory, "default.yaml")
+
+        if not os.path.isdir(gait_directory):
+            self.get_logger().error(
+                f"Gait directory does not exist: " f"{gait_directory}"
+            )
+        if not os.path.isfile(default_yaml):
+            self.get_logger().error(
+                f"Gait default yaml file does not exist: "
+                f"{gait_directory}/default.yaml"
+            )
+        return gait_directory, default_yaml
+
+    def update_gaits(self):
+        """
+        Update the gaits after one of the gait attributes has been changed.
+        """
+        self._gait_directory, self._default_yaml = self._initialize_gaits()
+        self._realsense_yaml = os.path.join(
+            self._gait_directory, "realsense_gaits.yaml"
+        )
+
+        self._realsense_gait_version_map = self._load_realsense_configuration()
+        (
+            self._gait_version_map,
+            self._positions,
+            self._semi_dynamic_gait_version_map,
+        ) = self._load_configuration()
+
+        self._loaded_gaits = self._load_gaits()
 
     def _create_services(self) -> None:
         self.create_service(
@@ -232,7 +275,7 @@ class GaitSelection(Node):
         :param dict version_map: Mapping subgait names to versions
         """
         if gait_name not in self._gaits:
-            raise GaitNameNotFound(gait_name)
+            raise GaitNameNotFoundError(gait_name)
 
         # Only update versions that are different
         version_map = {
@@ -437,9 +480,9 @@ class GaitSelection(Node):
                     positions[position_name]["joints"][joint] = joint_value
 
             if set(positions[position_name]["joints"].keys()) != set(self._joint_names):
-                raise NonValidGaitContent(
+                raise NonValidGaitContentError(
                     f"The position {position_name} does not "
-                    f"have a position for all required joits: it "
+                    f"have a position for all required joints: it "
                     f"has {positions[position_name]['joints'].keys()}, "
                     f"required: {self._joint_names}"
                 )

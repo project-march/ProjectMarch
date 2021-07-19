@@ -68,6 +68,9 @@ public:
     float getActualEffort() override;
     float getTemperature();
 
+    double getEffortLimit() override;
+    static constexpr double EFFORT_LIMIT = 30.0; // [A]
+
 protected:
     // Override protected functions from Slave class
     bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
@@ -91,7 +94,7 @@ private:
 
     uint32_t getAxisError();
     uint32_t getMotorError();
-    uint32_t getEncoderManagerError();
+    uint32_t getDieBOSlaveError();
     uint32_t getEncoderError();
     uint32_t getControllerError();
 

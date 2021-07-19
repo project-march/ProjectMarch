@@ -167,7 +167,7 @@ protected:
     bool getExecutableLocationsLine();
 
     // Find the stairs up parameters from the foot locations
-    bool getGaitParametersFromFootLocationStairsUp();
+    bool getGaitParametersFromFootLocationStairs();
 
     // Find the ramp parameter from the foot locations
     bool getGaitParametersFromFootLocationRamp();
@@ -205,6 +205,11 @@ protected:
     // Get the median height value of a point cloud
     bool getMedianHeightCloud(
         const PointNormalCloud::Ptr& cloud, float& median_height);
+
+    // Trim exo support cloud to only contain reachable points
+    void getValidExoSupport(
+        const PointNormalCloud::Ptr& potential_exo_support_points,
+        PointNormalCloud::Ptr& exo_support_points);
 
     // All relevant parameters
     int hull_dimension {};

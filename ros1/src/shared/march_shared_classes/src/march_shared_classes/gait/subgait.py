@@ -7,7 +7,7 @@ from trajectory_msgs import msg as trajectory_msg
 import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import (
-    NonValidGaitContent,
+    NonValidGaitContentError,
     SubgaitInterpolationError,
 )
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
@@ -268,7 +268,7 @@ class Subgait:
         to_subgait_joint_names = set(next_subgait.get_joint_names())
 
         if from_subgait_joint_names != to_subgait_joint_names:
-            raise NonValidGaitContent(
+            raise NonValidGaitContentError(
                 msg="Gait {gait}, structure of joints does not match between "
                 "subgait {fn} and subgait {tn}".format(
                     gait=self.gait_name,

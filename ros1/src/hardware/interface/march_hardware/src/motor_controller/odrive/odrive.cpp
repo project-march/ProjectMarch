@@ -70,6 +70,13 @@ void ODrive::waitForState(ODriveAxisState target_state)
 
 void ODrive::actuateTorque(float target_effort)
 {
+    if (target_effort > EFFORT_LIMIT || target_effort < -EFFORT_LIMIT) {
+        throw error::HardwareException(
+            error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+            "Target effort of %f exceeds effort limit of %f", target_effort,
+            EFFORT_LIMIT);
+    }
+
     float target_torque
         = target_effort * torque_constant_ * (float)getMotorDirection();
 #ifdef DEBUG_EFFORT
@@ -113,20 +120,24 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     // Set general attributes
     state->motor_current_ = getMotorCurrent();
     state->temperature_ = getTemperature();
-    state->absolute_position_iu_ = getAbsolutePositionIU();
-    state->incremental_position_iu_ = getIncrementalPositionIU();
-    state->incremental_velocity_iu_ = getIncrementalVelocityIU();
 
-    state->absolute_position_ = getAbsolutePositionUnchecked();
-    state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
-    state->incremental_position_ = getIncrementalPositionUnchecked();
-    state->incremental_velocity_ = getIncrementalVelocityUnchecked();
+    if (hasAbsoluteEncoder()) {
+        state->absolute_position_iu_ = getAbsolutePositionIU();
+        state->absolute_position_ = getAbsolutePositionUnchecked();
+        state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
+    }
+    if (hasIncrementalEncoder()) {
+        state->incremental_position_iu_ = getIncrementalPositionIU();
+        state->incremental_velocity_iu_ = getIncrementalVelocityIU();
+        state->incremental_position_ = getIncrementalPositionUnchecked();
+        state->incremental_velocity_ = getIncrementalVelocityUnchecked();
+    }
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();
-    state->encoder_manager_error_ = getEncoderManagerError();
+    state->dieboslave_error_ = getDieBOSlaveError();
     state->encoder_error_ = getEncoderError();
     state->controller_error_ = getControllerError();
 
@@ -251,11 +262,11 @@ uint32_t ODrive::getMotorError()
         .ui;
 }
 
-uint32_t ODrive::getEncoderManagerError()
+uint32_t ODrive::getDieBOSlaveError()
 {
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::EncoderManagerError, axis_))
+            ODriveObjectName::DieBOSlaveError, axis_))
         .ui;
 }
 
@@ -287,6 +298,11 @@ void ODrive::setAxisState(ODriveAxisState state)
     this->write32(ODrivePDOmap::getMOSIByteOffset(
                       ODriveObjectName::RequestedState, axis_),
         write_struct);
+}
+
+double ODrive::getEffortLimit()
+{
+    return EFFORT_LIMIT;
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum

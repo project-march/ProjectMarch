@@ -27,29 +27,29 @@ realsense_stairs_up:
   subgaits:
     right_open:
       - MVI_stairsup_rightopen_low_undeep
-      - MVI_stairsup_rightopen_low_deep
+      - MVI_stairsup_rightopen_low_deep_v2
       - MVI_stairsup_rightopen_high_undeep
-      - MVI_stairsup_rightopen_high_deep
+      - MVI_stairsup_rightopen_high_deep_v2
     left_swing:
       - MVI_stairsup_leftswing_low_undeep
-      - MVI_stairsup_leftswing_low_deep
+      - MVI_stairsup_leftswing_low_deep_v2
       - MVI_stairsup_leftswing_high_undeep
-      - MVI_stairsup_leftswing_high_deep
+      - MVI_stairsup_leftswing_high_deep_v2
     right_swing:
       - MVI_stairsup_rightswing_low_undeep
-      - MVI_stairsup_rightswing_low_deep
+      - MVI_stairsup_rightswing_low_deep_v2
       - MVI_stairsup_rightswing_high_undeep
-      - MVI_stairsup_rightswing_high_deep
+      - MVI_stairsup_rightswing_high_deep_v2
     left_close:
       - MVI_stairsup_leftclose_low_undeep
-      - MVI_stairsup_leftclose_low_deep
+      - MVI_stairsup_leftclose_low_deep_v2
       - MVI_stairsup_leftclose_high_undeep
-      - MVI_stairsup_leftclose_high_deep
+      - MVI_stairsup_leftclose_high_deep_v2
     right_close:
       - MVI_stairsup_rightclose_low_undeep
-      - MVI_stairsup_rightclose_low_deep
+      - MVI_stairsup_rightclose_low_deep_v2
       - MVI_stairsup_rightclose_high_undeep
-      - MVI_stairsup_rightclose_high_deep
+      - MVI_stairsup_rightclose_high_deep_v2
 
 realsense_sit:
   realsense_category: sit
