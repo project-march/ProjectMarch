@@ -71,18 +71,30 @@ class MpcListener(Node):
             self.new_measurement_velocity[joint_number] = joint_vel.array[0]
 
             # And its reference
-            self.last_reference_position[joint_number] = self.future_reference_position[joint_number, 0]
-            self.last_reference_velocity[joint_number] = self.future_reference_position[joint_number, 0]
-            self.last_reference_input[joint_number] = self.future_reference_position[joint_number, 0]
+            self.last_reference_position[joint_number] = self.future_reference_position[
+                joint_number, 0
+            ]
+            self.last_reference_velocity[joint_number] = self.future_reference_position[
+                joint_number, 0
+            ]
+            self.last_reference_input[joint_number] = self.future_reference_position[
+                joint_number, 0
+            ]
 
             # Estimation
             self.new_estimation_position[joint_number, :] = joint_pos.array[1:]
             self.new_estimation_velocity[joint_number, :] = joint_vel.array[1:]
             self.new_estimation_input[joint_number, :] = joint_input.array
 
-            self.future_reference_position[joint_number, :] = joint_reference.states[0].array[1:]
-            self.future_reference_velocity[joint_number, :] = joint_reference.states[1].array[1:]
-            self.future_reference_input[joint_number, :] = joint_reference.inputs[0].array
+            self.future_reference_position[joint_number, :] = joint_reference.states[
+                0
+            ].array[1:]
+            self.future_reference_velocity[joint_number, :] = joint_reference.states[
+                1
+            ].array[1:]
+            self.future_reference_input[joint_number, :] = joint_reference.inputs[
+                0
+            ].array
 
         # Get time
         self.new_time = msg.header.stamp.sec + msg.header.stamp.nanosec * NANO
@@ -131,16 +143,16 @@ class MpcListener(Node):
             self.response_body_measurement[f"joint_{joint_number}_position"] = [
                 self.new_measurement_position[joint_number],
             ]
-            self.response_body_measurement[f"joint_{joint_number}_reference_position"] = [
-                self.last_reference_position[joint_number]
-            ]
+            self.response_body_measurement[
+                f"joint_{joint_number}_reference_position"
+            ] = [self.last_reference_position[joint_number]]
 
             self.response_body_measurement[f"joint_{joint_number}_velocity"] = [
                 self.new_measurement_velocity[joint_number],
             ]
-            self.response_body_measurement[f"joint_{joint_number}_reference_velocity"] = [
-                self.last_reference_velocity[joint_number]
-            ]
+            self.response_body_measurement[
+                f"joint_{joint_number}_reference_velocity"
+            ] = [self.last_reference_velocity[joint_number]]
 
             self.response_body_measurement[f"joint_{joint_number}_input"] = [
                 self.last_input[joint_number],
