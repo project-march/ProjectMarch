@@ -45,7 +45,7 @@
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
-    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
         - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
@@ -74,7 +74,7 @@
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
-    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
         - "$DOCKER_FILE"
       variables:
