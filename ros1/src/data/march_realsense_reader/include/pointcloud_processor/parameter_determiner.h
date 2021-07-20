@@ -264,6 +264,8 @@ protected:
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
     PointCloud2D::Ptr sit_grid;
+    PointNormalCloud::Ptr points_on_ramp;
+    PointCloud2D::Ptr locations_to_compute_ramp;
     float sit_height;
 };
 

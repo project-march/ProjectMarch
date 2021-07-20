@@ -216,13 +216,13 @@ bool HullParameterDeterminer::getRampSlope()
     bool success = true;
     // Get some locations on the ground of which we would like to know the
     // orientation
-    foot_locations_to_try = boost::make_shared<PointCloud2D>();
-    success &= getOptionalFootLocations(foot_locations_to_try);
+    locations_to_compute_ramp = boost::make_shared<PointCloud2D>();
+    success &= getOptionalFootLocations(locations_to_compute_ramp);
 
     // Crop those locations to find the associated orientation of those points
-    possible_foot_locations = boost::make_shared<PointNormalCloud>();
+    points_on_ramp = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(
-        foot_locations_to_try, possible_foot_locations);
+            locations_to_compute_ramp, points_on_ramp);
     if (possible_foot_locations->points.size() == 0) {
         ROS_ERROR_STREAM("The computed possible foot locations cloud is empty. "
                          "Unable to compute corresponding orientations");
@@ -230,16 +230,16 @@ bool HullParameterDeterminer::getRampSlope()
     }
 
     if (debugging_) {
-        for (pcl::PointNormal possible_foot_location :
-            *possible_foot_locations) {
+        for (pcl::PointNormal point_on_ramp :
+            *points_on_ramp) {
             geometry_msgs::Point marker_point;
-            marker_point.x = possible_foot_location.x;
-            marker_point.y = possible_foot_location.y;
-            marker_point.z = possible_foot_location.z;
+            marker_point.x = point_on_ramp.x;
+            marker_point.y = point_on_ramp.y;
+            marker_point.z = point_on_ramp.z;
 
             // Color the point based on the orientation
             double grey_scale = 1.0
-                - fmin((acos(possible_foot_location.normal_z) * 180.0 / M_PI)
+                - fmin((acos(point_on_ramp.normal_z) * 180.0 / M_PI)
                         / max_slope,
                     /*__y=*/1.0);
             std_msgs::ColorRGBA marker_color
@@ -686,7 +686,7 @@ bool HullParameterDeterminer::calculateRampSlope()
     bool success = true;
 
     pcl::Normal average_normal;
-    success &= getAverageNormal(possible_foot_locations, average_normal);
+    success &= getAverageNormal(points_on_ramp, average_normal);
 
     success &= getSlopeFromNormals(average_normal, ramp_slope);
 
