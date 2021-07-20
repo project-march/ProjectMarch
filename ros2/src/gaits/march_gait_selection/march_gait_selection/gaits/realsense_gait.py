@@ -353,7 +353,7 @@ class RealsenseGait(SetpointsGait):
         success = True
         self.set_parameters(gait_parameters)
         success &= self.interpolate_subgaits_from_parameters()
-        if not self._responsible_for and success:
+        if self._responsible_for and success:
             for gait_name in self._responsible_for:
                 gait = self._gait_selection.gaits[gait_name]
                 # Make a recursive call to also handle the dependencies of the
