@@ -315,11 +315,20 @@
         <child link="imu_link"/>
     </joint>
 
-    <joint name="hip" type="fixed">
-        <parent link="imu_link"/>
-        <child link="hip_base"/>
-        <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 0"/>
-    </joint>
+    <xacro:if value="$(eval configuration == 'exoskeleton')">
+        <joint name="hip" type="fixed">
+            <parent link="imu_link"/>
+            <child link="hip_base"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </joint>
+    </xacro:if>
+    <xacro:unless value="$(eval configuration == 'exoskeleton')">
+        <joint name="hip" type="fixed">
+            <parent link="imu_link"/>
+            <child link="hip_base"/>
+            <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 0"/>
+        </joint>
+    </xacro:unless>
 
     <xacro:march_configurable_joint
             name="left_hip_aa"

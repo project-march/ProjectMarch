@@ -68,6 +68,9 @@ public:
     float getActualEffort() override;
     float getTemperature();
 
+    double getEffortLimit() override;
+    static constexpr double EFFORT_LIMIT = 30.0; // [A]
+
 protected:
     // Override protected functions from Slave class
     bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;

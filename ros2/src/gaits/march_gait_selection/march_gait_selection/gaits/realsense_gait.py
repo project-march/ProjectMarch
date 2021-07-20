@@ -21,7 +21,7 @@ from march_utility.utilities.dimensions import (
 from march_utility.exceptions.gait_exceptions import (
     UnknownDimensionsError,
     WrongRealSenseConfigurationError,
-    NonValidGaitContent,
+    NonValidGaitContentError,
 )
 from rclpy import Future
 from rclpy.node import Node
@@ -363,7 +363,7 @@ class RealSenseGait(SetpointsGait):
             )
         try:
             self.set_subgaits(new_subgaits, self._node)
-        except NonValidGaitContent:
+        except NonValidGaitContentError:
             return False
 
         return True

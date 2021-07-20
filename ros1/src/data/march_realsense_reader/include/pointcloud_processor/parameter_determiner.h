@@ -163,10 +163,13 @@ protected:
         pcl::PointNormal possible_foot_location, double& distance);
 
     // Find the stairs up parameters from the foot locations
-    bool getGaitParametersFromFootLocationStairsUp();
+    bool getGaitParametersFromFootLocationStairs();
 
     // Find the ramp parameter from the foot locations
     bool getGaitParametersFromRampSlope();
+
+    // Find the sit parameter from the sit height
+    bool getGaitParametersFromSitHeight();
 
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
@@ -219,6 +222,11 @@ protected:
     // Transform valid gait information into a parameter
     float calculateParameter(const float& valid_value,
         const float& minimum_value, const float& maximum_val);
+
+    // Trim exo support cloud to only contain reachable points
+    void getValidExoSupport(
+        const PointNormalCloud::Ptr& potential_exo_support_points,
+        PointNormalCloud::Ptr& exo_support_points);
 
     // All relevant parameters
     int hull_dimension {};

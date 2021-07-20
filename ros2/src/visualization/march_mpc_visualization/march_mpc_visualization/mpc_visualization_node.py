@@ -10,11 +10,16 @@ def main():
 
     # Add stream method to flask app
     app.add_url_rule(
-        "/measurement", "stream_measurement", mpc_listener.stream_measurement
+        rule="/measurement",
+        endpoint="stream_measurement",
+        view_func=mpc_listener.stream_measurement,
+        methods=["GET", "OPTIONS", "POST"],
     )
-    app.add_url_rule("/estimation", "stream_estimation", mpc_listener.stream_estimation)
-
-    # ROS Node and Flask app need to run in seperatie thread
+    app.add_url_rule(
+        rule="/estimation",
+        view_func=mpc_listener.stream_estimation,
+        methods=["GET", "OPTIONS", "POST"],
+    )
 
     # We want to bind to all interfaces
     flask_thread = threading.Thread(

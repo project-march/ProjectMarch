@@ -50,9 +50,11 @@ if(NOT acado-solver_POPULATED)
 endif()
 
 # Choose which model to use
-# Models:   test_joint_rotational,
+# Models:   march6_simulation_uncoupled
+#           test_joint_rotational,
 #           test_joint_linear
-set(MODEL_NAME test_joint_rotational)
+set(MODEL_NAME march6_simulation_uncoupled)
+
 
 # Define a variable that points to the location of the chosen ACADO model_export directory. This
 # location is chosen by FetchContent_Declare.

@@ -26,6 +26,11 @@ IMotionCube::IMotionCube(const Slave& slave,
         std::move(incremental_encoder), actuation_mode)
     , sw_string_(/*__s=*/"empty")
 {
+    if (!absolute_encoder_ || !incremental_encoder_) {
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
+            "An IMotionCube needs both an incremental and an absolute "
+            "encoder");
+    }
 }
 
 IMotionCube::IMotionCube(const Slave& slave,
@@ -613,9 +618,14 @@ float IMotionCube::getIncrementalVelocityUnchecked()
         getIncrementalVelocityIU());
 }
 
-float IMotionCube::effortMultiplicationConstant()
+double IMotionCube::effortMultiplicationConstant()
 {
-    return 1000.0;
+    return EFFORT_MULTIPLICATION_CONSTANT;
+}
+
+double IMotionCube::getEffortLimit()
+{
+    return MAX_TARGET_TORQUE;
 }
 
 std::optional<ros::Duration> IMotionCube::enableActuation()

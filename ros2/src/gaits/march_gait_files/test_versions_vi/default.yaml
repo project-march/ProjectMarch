@@ -2,6 +2,12 @@ gaits:
   curb_sdg:
     left_close: curb_sdg_leftclose_v1
     right_open: curb_sdg_rightopen_v1
+  curb_up:
+    right_open: MVI_curbup_rightopen_v1
+    left_close: MVI_curbup_leftclose_v1
+  curb_down:
+    right_open: MVI_curbdown_rightopen_v1
+    left_close: MVI_curbdown_leftclose_v1
   ramp_door_last_step:
     left_close: MVI_RD_laststep_leftclose_steep_v1
     right_open: MVI_RD_laststep_rightopen_steep_v1
@@ -67,11 +73,14 @@ gaits:
     stand_up: MVI_stand_up_v2
     stand_home: MVI_stand_home_v2
   walk:
-    left_close: MVI_walk_leftclose_v7
-    left_swing: MVI_walk_leftswing_v7
-    right_close: MVI_walk_rightclose_v7
-    right_open: MVI_walk_rightopen_v7
-    right_swing: MVI_walk_rightswing_v7
+    left_close: MVI_walk_leftclose_v8
+    left_swing: MVI_walk_leftswing_v8
+    right_close: MVI_walk_rightclose_v8
+    right_open: MVI_walk_rightopen_v8
+    right_swing: MVI_walk_rightswing_v8
+  walk_single_step:
+    right_open: MVI_walksinglestep_rightopen_v8
+    left_close: MVI_walksinglestep_leftclose_v8
   walk_large:
     left_close: MVI_walklarge_leftclose_v3
     left_swing: MVI_walklarge_leftswing_v3
@@ -85,17 +94,6 @@ gaits:
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
 positions:
-  ten_degree_hip_stand:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0
-      left_hip_aa: 0.0349
-      left_hip_fe: -0.1745
-      left_knee: 0.0
-      right_ankle: 0.0
-      right_hip_aa: 0.0349
-      right_hip_fe: -0.1745
-      right_knee: 0.0
   low_sit:
     gait_type: sit_like
     joints:
@@ -151,7 +149,7 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: 1.4835
       right_knee: 1.4835
-  sit_with_haa:
+  sit:
     gait_type: sit_like
     joints:
       left_ankle: 0.0
