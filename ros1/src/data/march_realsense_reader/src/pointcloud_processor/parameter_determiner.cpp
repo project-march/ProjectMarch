@@ -905,9 +905,9 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
     } else {
         ROS_ERROR_STREAM(
             "No method for finding the general most desirable foot location "
-            "is implemented for realsense category. "
+            "is implemented for realsense category: "
             << realsense_category_.value()
-            << "Unable to compute general most desirable foot location.");
+            << ". Unable to compute general most desirable foot location.");
         return false;
     }
     if (debugging_) {
