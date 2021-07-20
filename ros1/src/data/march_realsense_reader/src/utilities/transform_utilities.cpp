@@ -8,7 +8,7 @@ Transformer::Transformer(std::shared_ptr<tf2_ros::Buffer> tfBuffer,
     pitch = 0.0;
     roll = 0.0;
 
-    tfBuffer_ = tfBuffer;
+    tfBuffer_ = std::move(tfBuffer);
     fixed_frame_ = std::move(fixed_frame);
     frame_id_to_transform_to_ = std::move(frame_id_to_transform_to);
     createTransform();
