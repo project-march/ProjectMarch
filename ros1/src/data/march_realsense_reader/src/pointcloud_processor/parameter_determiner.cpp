@@ -4,8 +4,8 @@
 #include "utilities/color_utilities.h"
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
-#include "utilities/realsense_category_utilities.h"
 #include "utilities/point_utilities.h"
+#include "utilities/realsense_category_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <cmath>
 #include <ctime>
@@ -14,7 +14,6 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <utility>
-
 
 #define EPSILON 0.0001
 #define DEBUG_MARKER_SIZE 0.03
@@ -252,7 +251,9 @@ void HullParameterDeterminer::addDebugGaitInformation()
     std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
     switch (realsense_category_.value()) {
-        case RealSenseCategory::stairs_down:
+        case RealSenseCategory::stairs_down: {
+            break;
+        }
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
 
@@ -393,6 +394,8 @@ bool HullParameterDeterminer::transformGaitInformation()
     pcl::PointXYZ point;
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up: {
+            // Create the points, in frame_id_to_transform_to frame,
+            // with the min and max gait dimensions,
             point = point_utilities::makePointXYZ(
                 min_x_stairs, y_location, min_z_stairs);
             gait_information_cloud->push_back(point);
@@ -406,8 +409,10 @@ bool HullParameterDeterminer::transformGaitInformation()
                 max_x_stairs, y_location, max_z_stairs);
             gait_information_cloud->push_back(point);
 
+            // Transform to the fixed frame
             transformer_->transformPointCloud(gait_information_cloud);
 
+            // Update gait dimensions as seen from fixed frame
             min_x_stairs_world = gait_information_cloud->points[0].x;
             max_x_stairs_world = gait_information_cloud->points[1].x;
             min_z_stairs_world = gait_information_cloud->points[0].z;
@@ -420,6 +425,8 @@ bool HullParameterDeterminer::transformGaitInformation()
             ROS_WARN_STREAM("Gait information transform is not implemented yet "
                             "for realsense category "
                 << realsense_category_.value());
+
+            break;
         }
     }
 
@@ -983,7 +990,6 @@ void HullParameterDeterminer::fillFootPointCloud(
 // Compute the optimal foot location as if one were not limited by anything.
 bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 {
-    ROS_WARN("HAAAAAAAAAAAAAAAA, %f", most_desirable_foot_location_->x);
     if (general_most_desirable_location_is_mid) {
         most_desirable_foot_location_->x = (min_x_stairs + max_x_stairs) / 2.0F;
         most_desirable_foot_location_->y = y_location;
@@ -999,24 +1005,22 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
             "Unable to compute general most desirable foot location.");
         return false;
     }
-        ROS_DEBUG("most desirable y, before: %f",
         most_desirable_foot_location_->y);
         transformer_->transformPoint(most_desirable_foot_location_);
-        ROS_DEBUG("most desirable xy, after: %f",
-        most_desirable_foot_location_->y);
+        ROS_DEBUG(
+            "most desirable xy, after: %f", most_desirable_foot_location_->y);
 
-    if (debugging_) {
-        std_msgs::ColorRGBA marker_color = color_utilities::RED;
-        geometry_msgs::Point marker_point;
-//        marker_point.header.frame_id = transformer_->getFixedFrame();
-        marker_point.x = most_desirable_foot_location_->x;
-        marker_point.y = most_desirable_foot_location_->y;
-        marker_point.z = most_desirable_foot_location_->z;
+        if (debugging_) {
+            std_msgs::ColorRGBA marker_color = color_utilities::RED;
+            geometry_msgs::Point marker_point;
+            marker_point.x = most_desirable_foot_location_->x;
+            marker_point.y = most_desirable_foot_location_->y;
+            marker_point.z = most_desirable_foot_location_->z;
 
-        gait_information_marker_list.points.push_back(marker_point);
-        gait_information_marker_list.colors.push_back(marker_color);
-    }
-    return true;
+            gait_information_marker_list.points.push_back(marker_point);
+            gait_information_marker_list.colors.push_back(marker_color);
+        }
+        return true;
 }
 
 // Create a point cloud with points on the ground where the points represent

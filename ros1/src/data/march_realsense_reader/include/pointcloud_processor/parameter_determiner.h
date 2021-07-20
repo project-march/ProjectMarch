@@ -213,7 +213,6 @@ protected:
 
     bool transformGaitInformation();
 
-
     // All relevant parameters
     int hull_dimension {};
     int number_of_optional_foot_locations {};
