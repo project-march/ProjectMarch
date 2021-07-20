@@ -10,7 +10,6 @@
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
 
-// using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -86,7 +85,7 @@ public:
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
 
-    /** Takes a 2D point cloud of potential foot locations and returns
+    /** Takes a point cloud of potential foot locations and returns
      * the valid foot locations with associated height and normal vector.
      * Result indicates whether every original point ends up being valid.**/
     bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
@@ -125,7 +124,7 @@ protected:
     bool cropCloudToHullVectorUnique(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
-    // Elevate the 2D points so they have z coordinate as if they lie on the
+    // Elevate the points so they have z coordinate as if they lie on the
     // plane of the hull
     bool addZCoordinateToCloudFromPlaneCoefficients(
         const PointCloud::Ptr& input_cloud,
@@ -257,6 +256,7 @@ protected:
     float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
+    float sit_height;
 
     std::string subgait_name_;
 
@@ -276,7 +276,6 @@ protected:
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud::Ptr sit_grid;
-    float sit_height;
     PointCloud::Ptr foot_locations_to_try;
     PointCloud::Ptr gait_information_cloud;
 };

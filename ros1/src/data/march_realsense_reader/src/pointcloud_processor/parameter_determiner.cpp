@@ -18,7 +18,6 @@
 #define EPSILON 0.0001
 #define DEBUG_MARKER_SIZE 0.03
 
-// using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -1147,7 +1146,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
     return success;
 }
 
-// Elevate the 2D points so they have z coordinate as if they lie on the plane
+// Elevate the points so they have z coordinate as if they lie on the plane
 // of the hull
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
     PointCloud::Ptr const& input_cloud,
@@ -1163,9 +1162,6 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
         pcl::PointXYZ input_point = input_cloud->points[point_index];
         elevated_point.x = input_point.x;
         elevated_point.y = input_point.y;
-        //        ROS_DEBUG("elevated.x = %f", elevated_point.x);
-        //        ROS_DEBUG("elevated.y = %f", elevated_point.y);
-        //        ROS_DEBUG("elevated.z = %f", elevated_point.z);
         elevated_point.z = -(plane_coefficients->values[3]
                                + plane_coefficients->values[1]
                                    * input_cloud->points[point_index].y
