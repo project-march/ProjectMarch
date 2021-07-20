@@ -362,7 +362,8 @@ void HullParameterDeterminer::initializeGaitDimensions()
     }
 }
 
-// Updates the gait information limits after calling a transform to the fixed frame
+// Updates the gait information limits after calling a transform to the fixed
+// frame
 bool HullParameterDeterminer::transformGaitInformation()
 {
     gait_information_cloud = boost::make_shared<PointCloud>();

@@ -210,7 +210,8 @@ protected:
         const PointNormalCloud::Ptr& potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
 
-    // Updates the gait information limits after calling a transform to the fixed frame
+    // Updates the gait information limits after calling a transform to the
+    // fixed frame
     bool transformGaitInformation();
 
     // All relevant parameters
