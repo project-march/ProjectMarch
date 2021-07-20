@@ -251,9 +251,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
     std_msgs::ColorRGBA marker_color = color_utilities::RED;
 
     switch (realsense_category_.value()) {
-        case RealSenseCategory::stairs_down: {
-            break;
-        }
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
 
@@ -265,29 +263,6 @@ void HullParameterDeterminer::addDebugGaitInformation()
                 gait_information_marker_list.points.push_back(marker_point);
                 gait_information_marker_list.colors.push_back(marker_color);
             }
-
-            /*        marker_point.y = y_location;
-
-                      marker_point.x = min_x_stairs;
-                      marker_point.z = min_z_stairs;
-                      gait_information_marker_list.points.push_back(marker_point);
-                      gait_information_marker_list.colors.push_back(marker_color);
-
-                      marker_point.x = max_x_stairs;
-                      marker_point.z = min_z_stairs;
-                      gait_information_marker_list.points.push_back(marker_point);
-                      gait_information_marker_list.colors.push_back(marker_color);
-
-                      marker_point.x = min_x_stairs;
-                      marker_point.z = max_z_stairs;
-                      gait_information_marker_list.points.push_back(marker_point);
-                      gait_information_marker_list.colors.push_back(marker_color);
-
-                      marker_point.x = max_x_stairs;
-                      marker_point.z = max_z_stairs;
-                      gait_information_marker_list.points.push_back(marker_point);
-                      gait_information_marker_list.colors.push_back(marker_color);
-                      */
             break;
         }
         case RealSenseCategory::ramp_down:
@@ -393,6 +368,7 @@ bool HullParameterDeterminer::transformGaitInformation()
     gait_information_cloud = boost::make_shared<PointCloud>();
     pcl::PointXYZ point;
     switch (realsense_category_.value()) {
+        case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
             // Create the points, in frame_id_to_transform_to frame,
             // with the min and max gait dimensions,
@@ -1005,22 +981,19 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
             "Unable to compute general most desirable foot location.");
         return false;
     }
-        most_desirable_foot_location_->y);
-        transformer_->transformPoint(most_desirable_foot_location_);
-        ROS_DEBUG(
-            "most desirable xy, after: %f", most_desirable_foot_location_->y);
+    transformer_->transformPoint(most_desirable_foot_location_);
 
-        if (debugging_) {
-            std_msgs::ColorRGBA marker_color = color_utilities::RED;
-            geometry_msgs::Point marker_point;
-            marker_point.x = most_desirable_foot_location_->x;
-            marker_point.y = most_desirable_foot_location_->y;
-            marker_point.z = most_desirable_foot_location_->z;
+    if (debugging_) {
+        std_msgs::ColorRGBA marker_color = color_utilities::RED;
+        geometry_msgs::Point marker_point;
+        marker_point.x = most_desirable_foot_location_->x;
+        marker_point.y = most_desirable_foot_location_->y;
+        marker_point.z = most_desirable_foot_location_->z;
 
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
-        }
-        return true;
+        gait_information_marker_list.points.push_back(marker_point);
+        gait_information_marker_list.colors.push_back(marker_color);
+    }
+    return true;
 }
 
 // Create a point cloud with points on the ground where the points represent
