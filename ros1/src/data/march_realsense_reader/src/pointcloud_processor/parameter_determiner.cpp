@@ -1,6 +1,5 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
-//#include "pointcloud_processor/parameter_determiner.h"
 #include "utilities/color_utilities.h"
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
@@ -156,6 +155,7 @@ bool HullParameterDeterminer::determineParameters(
 
     // Only calculate the gait parameters if an optimal foot location has been
     // found
+
     if (success &= getOptimalFootLocation()) {
         success &= getGaitParametersFromLocation();
     }
@@ -235,7 +235,7 @@ visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
 {
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
-    marker_list.header.frame_id = "world";
+    marker_list.header.frame_id = transformer_->fixed_frame;
     // Places the marker up right (axis aligned with that of its frame id)
     marker_list.pose.orientation.w = 1.0;
     marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
@@ -670,8 +670,6 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
-    ROS_DEBUG("x location foot_locations_to_try: %f",
-        foot_locations_to_try->points[0].x);
     success &= cropCloudToHullVectorUnique(
         foot_locations_to_try, possible_foot_locations);
 
@@ -913,8 +911,6 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     // First create a pointcloud containing the edge points (vertices) of the
     // foot on the ground
     PointCloud::Ptr foot_pointcloud = boost::make_shared<PointCloud>();
-    //    ROS_DEBUG("x location possible_foot_pointclcoud: %f",
-    //    possible_foot_location.x);
     fillFootPointCloud(foot_pointcloud, possible_foot_location);
 
     // Then find possible foot locations associated with the foot vertices
@@ -1102,159 +1098,160 @@ bool HullParameterDeterminer::cropCloudToHullVector(
             elevated_cloud_with_normals);
 
         *output_cloud += *elevated_cloud_with_normals;
+        return success;
     }
-    //    ROS_DEBUG("output_cloud.x = %f", output_cloud->points[0].x);
-    //    ROS_DEBUG("output_cloud.z = %f", output_cloud->points[0].y);
-    //    ROS_DEBUG("output_cloud.y = %f", output_cloud->points[0].z);
-    return success;
-}
 
-// Crops a single point to a hull vector.
-bool HullParameterDeterminer::cropPointToHullVector(
-    pcl::PointXYZ const input_point, const PointNormalCloud::Ptr& output_cloud)
-{
-    PointCloud::Ptr input_cloud = boost::make_shared<PointCloud>();
-    input_cloud->push_back(input_point);
+    // Crops a single point to a hull vector.
+    bool HullParameterDeterminer::cropPointToHullVector(
+        pcl::PointXYZ const input_point,
+        const PointNormalCloud::Ptr& output_cloud)
+    {
+        PointCloud::Ptr input_cloud = boost::make_shared<PointCloud>();
+        input_cloud->push_back(input_point);
 
-    bool success = cropCloudToHullVector(input_cloud, output_cloud);
-    return success;
-}
+        bool success = cropCloudToHullVector(input_cloud, output_cloud);
+        return success;
+    }
 
-// Crops a cloud to a hull vector, but only puts each input point in
-// the highest hull it falls into
-bool HullParameterDeterminer::cropCloudToHullVectorUnique(
-    PointCloud::Ptr const& input_cloud,
-    const PointNormalCloud::Ptr& output_cloud)
-{
-    bool success = true;
+    // Crops a cloud to a hull vector, but only puts each input point in
+    // the highest hull it falls into
+    bool HullParameterDeterminer::cropCloudToHullVectorUnique(
+        PointCloud::Ptr const& input_cloud,
+        const PointNormalCloud::Ptr& output_cloud)
+    {
+        bool success = true;
 
-    for (pcl::PointXYZ ground_point : *input_cloud) {
+        for (pcl::PointXYZ ground_point : *input_cloud) {
 
-        PointNormalCloud::Ptr potential_foot_locations_of_point
-            = boost::make_shared<PointNormalCloud>();
-        success &= HullParameterDeterminer::cropPointToHullVector(
-            ground_point, potential_foot_locations_of_point);
+            PointNormalCloud::Ptr potential_foot_locations_of_point
+                = boost::make_shared<PointNormalCloud>();
+            success &= HullParameterDeterminer::cropPointToHullVector(
+                ground_point, potential_foot_locations_of_point);
 
-        if (potential_foot_locations_of_point->points.size() != 0) {
-            auto result
-                = std::max_element(potential_foot_locations_of_point->begin(),
+            if (potential_foot_locations_of_point->points.size() != 0) {
+                auto result = std::max_element(
+                    potential_foot_locations_of_point->begin(),
                     potential_foot_locations_of_point->end(),
                     linear_algebra_utilities::pointIsLower);
-            output_cloud->push_back(*result);
+                output_cloud->push_back(*result);
+            }
         }
-    }
-    return success;
-}
-
-// Elevate the points so they have z coordinate as if they lie on the plane
-// of the hull
-bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
-    PointCloud::Ptr const& input_cloud,
-    PlaneCoefficients::Ptr const& plane_coefficients,
-    const PointCloud::Ptr& elevated_cloud)
-{
-    elevated_cloud->points.resize(input_cloud->points.size());
-
-    int point_index = 0;
-    for (pcl::PointXYZ& elevated_point : *elevated_cloud) {
-        // using z = - (d + by + ax) / c from plane equation ax + by + cz + d =
-        // 0
-        pcl::PointXYZ input_point = input_cloud->points[point_index];
-        elevated_point.x = input_point.x;
-        elevated_point.y = input_point.y;
-        elevated_point.z = -(plane_coefficients->values[3]
-                               + plane_coefficients->values[1]
-                                   * input_cloud->points[point_index].y
-                               + plane_coefficients->values[0]
-                                   * input_cloud->points[point_index].x)
-            / plane_coefficients->values[2];
-
-        point_index++;
-    }
-    return true;
-}
-
-// Remove all points from a cloud which do not fall in the hull
-bool HullParameterDeterminer::cropCloudToHull(
-    const PointCloud::Ptr& elevated_cloud, const Hull::Ptr& hull,
-    const Polygon& polygon)
-{
-    if (elevated_cloud->points.size() == 0) {
-        ROS_WARN_STREAM("The cloud to be cropped in the "
-                        "HullParameterDeterminer contains no points.");
-        return false;
-    }
-    pcl::CropHull<pcl::PointXYZ> crop_filter;
-    crop_filter.setInputCloud(elevated_cloud);
-    crop_filter.setHullCloud(hull);
-    crop_filter.setHullIndices(polygon);
-    crop_filter.setDim(hull_dimension);
-    crop_filter.filter(*elevated_cloud);
-    return true;
-}
-
-// Add normals to the elevated cloud which correspond to the normal vector of
-// the plane
-bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
-    PointCloud::Ptr const& elevated_cloud,
-    PlaneCoefficients::Ptr const& plane_coefficients,
-    const PointNormalCloud::Ptr& elevated_cloud_with_normals)
-{
-    elevated_cloud_with_normals->width = elevated_cloud->width;
-    elevated_cloud_with_normals->height = elevated_cloud->height;
-    elevated_cloud_with_normals->points.resize(elevated_cloud->points.size());
-
-    float normalising_constant
-        = plane_coefficients->values[0] * plane_coefficients->values[0]
-        + plane_coefficients->values[1] * plane_coefficients->values[1]
-        + plane_coefficients->values[2] * plane_coefficients->values[2];
-
-    if (normalising_constant < std::numeric_limits<double>::epsilon()) {
-        ROS_ERROR_STREAM("The normal vector of the current plane is too close "
-                         "to the zero vector.");
-        return false;
+        return success;
     }
 
-    int point_index = 0;
-    for (pcl::PointNormal& elevated_point_with_normal :
-        *elevated_cloud_with_normals) {
-        pcl::PointXYZ elevated_point = elevated_cloud->points[point_index];
-        elevated_point_with_normal.x = elevated_point.x;
-        elevated_point_with_normal.y = elevated_point.y;
-        elevated_point_with_normal.z = elevated_point.z;
+    // Elevate the points so they have z coordinate as if they lie on the plane
+    // of the hull
+    bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
+        PointCloud::Ptr const& input_cloud,
+        PlaneCoefficients::Ptr const& plane_coefficients,
+        const PointCloud::Ptr& elevated_cloud)
+    {
+        elevated_cloud->points.resize(input_cloud->points.size());
 
-        // using that [a b c]^T is perpendicular to the plane in plane equation
-        // ax + by + cz + d = 0
-        elevated_point_with_normal.normal_x
-            = plane_coefficients->values[0] / normalising_constant;
-        elevated_point_with_normal.normal_y
-            = plane_coefficients->values[1] / normalising_constant;
-        elevated_point_with_normal.normal_z
-            = plane_coefficients->values[2] / normalising_constant;
-        point_index++;
+        int point_index = 0;
+        for (pcl::PointXYZ& elevated_point : *elevated_cloud) {
+            // using z = - (d + by + ax) / c from plane equation ax + by + cz +
+            // d =
+            // 0
+            pcl::PointXYZ input_point = input_cloud->points[point_index];
+            elevated_point.x = input_point.x;
+            elevated_point.y = input_point.y;
+            elevated_point.z = -(plane_coefficients->values[3]
+                                   + plane_coefficients->values[1]
+                                       * input_cloud->points[point_index].y
+                                   + plane_coefficients->values[0]
+                                       * input_cloud->points[point_index].x)
+                / plane_coefficients->values[2];
+
+            point_index++;
+        }
+        return true;
     }
-    return true;
-}
 
-bool SimpleParameterDeterminer::determineParameters(
-    boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
-    boost::shared_ptr<HullVector> const hull_vector,
-    boost::shared_ptr<PolygonVector> const polygon_vector,
-    RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters,
-    std::string frame_id_to_transform_to, std::string subgait_name)
-{
-    ROS_DEBUG("Determining parameters with simple parameter determiner");
-    hull_vector_ = hull_vector;
-    realsense_category_.emplace(realsense_category);
-    gait_parameters_ = gait_parameters;
-    plane_coefficients_vector_ = plane_coefficients_vector;
-    polygon_vector_ = polygon_vector;
-    frame_id_to_transform_to_ = frame_id_to_transform_to;
+    // Remove all points from a cloud which do not fall in the hull
+    bool HullParameterDeterminer::cropCloudToHull(
+        const PointCloud::Ptr& elevated_cloud, const Hull::Ptr& hull,
+        const Polygon& polygon)
+    {
+        if (elevated_cloud->points.size() == 0) {
+            ROS_WARN_STREAM("The cloud to be cropped in the "
+                            "HullParameterDeterminer contains no points.");
+            return false;
+        }
+        pcl::CropHull<pcl::PointXYZ> crop_filter;
+        crop_filter.setInputCloud(elevated_cloud);
+        crop_filter.setHullCloud(hull);
+        crop_filter.setHullIndices(polygon);
+        crop_filter.setDim(hull_dimension);
+        crop_filter.filter(*elevated_cloud);
+        return true;
+    }
 
-    // Return a standard step parameter, which works for medium stairs and
-    // medium ramp
-    gait_parameters_->first_parameter = 0.5;
-    gait_parameters_->second_parameter = 0.5;
-    return true;
-};
+    // Add normals to the elevated cloud which correspond to the normal vector
+    // of the plane
+    bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
+        PointCloud::Ptr const& elevated_cloud,
+        PlaneCoefficients::Ptr const& plane_coefficients,
+        const PointNormalCloud::Ptr& elevated_cloud_with_normals)
+    {
+        elevated_cloud_with_normals->width = elevated_cloud->width;
+        elevated_cloud_with_normals->height = elevated_cloud->height;
+        elevated_cloud_with_normals->points.resize(
+            elevated_cloud->points.size());
+
+        float normalising_constant
+            = plane_coefficients->values[0] * plane_coefficients->values[0]
+            + plane_coefficients->values[1] * plane_coefficients->values[1]
+            + plane_coefficients->values[2] * plane_coefficients->values[2];
+
+        if (normalising_constant < std::numeric_limits<double>::epsilon()) {
+            ROS_ERROR_STREAM(
+                "The normal vector of the current plane is too close "
+                "to the zero vector.");
+            return false;
+        }
+
+        int point_index = 0;
+        for (pcl::PointNormal& elevated_point_with_normal :
+            *elevated_cloud_with_normals) {
+            pcl::PointXYZ elevated_point = elevated_cloud->points[point_index];
+            elevated_point_with_normal.x = elevated_point.x;
+            elevated_point_with_normal.y = elevated_point.y;
+            elevated_point_with_normal.z = elevated_point.z;
+
+            // using that [a b c]^T is perpendicular to the plane in plane
+            // equation ax + by + cz + d = 0
+            elevated_point_with_normal.normal_x
+                = plane_coefficients->values[0] / normalising_constant;
+            elevated_point_with_normal.normal_y
+                = plane_coefficients->values[1] / normalising_constant;
+            elevated_point_with_normal.normal_z
+                = plane_coefficients->values[2] / normalising_constant;
+            point_index++;
+        }
+        return true;
+    }
+
+    bool SimpleParameterDeterminer::determineParameters(
+        boost::shared_ptr<PlaneCoefficientsVector> const
+            plane_coefficients_vector,
+        boost::shared_ptr<HullVector> const hull_vector,
+        boost::shared_ptr<PolygonVector> const polygon_vector,
+        RealSenseCategory const realsense_category,
+        boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to, std::string subgait_name)
+    {
+        ROS_DEBUG("Determining parameters with simple parameter determiner");
+        hull_vector_ = hull_vector;
+        realsense_category_.emplace(realsense_category);
+        gait_parameters_ = gait_parameters;
+        plane_coefficients_vector_ = plane_coefficients_vector;
+        polygon_vector_ = polygon_vector;
+        frame_id_to_transform_to_ = frame_id_to_transform_to;
+
+        // Return a standard step parameter, which works for medium stairs and
+        // medium ramp
+        gait_parameters_->first_parameter = 0.5;
+        gait_parameters_->second_parameter = 0.5;
+        return true;
+    };

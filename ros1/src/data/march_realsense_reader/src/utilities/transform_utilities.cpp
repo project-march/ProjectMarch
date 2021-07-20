@@ -27,7 +27,6 @@ void Transformer::transformPoint(std::shared_ptr<pcl::PointXYZ> point)
     point->x = cloud->at(0).x;
     point->y = cloud->at(0).y;
     point->z = cloud->at(0).z;
-    //    point_utilities::setSharedPtr(point, cloud->at(0));
 }
 
 std::string Transformer::getFixedFrame()
