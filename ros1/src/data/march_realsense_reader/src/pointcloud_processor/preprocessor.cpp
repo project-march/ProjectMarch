@@ -191,6 +191,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);
     } catch (tf2::TransformException& ex) {
+        ROS_WARN("Het gaat mis in de preprocessor");
         ROS_WARN_STREAM(
             "Something went wrong when transforming the pointcloud: "
             << ex.what());

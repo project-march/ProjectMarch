@@ -69,7 +69,6 @@ public:
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker);
 
-
     // Create a marker list from the 'foot locations to try' and publish it and
     // publish for visualization
     void fillPossibleFootLocationsMarker(

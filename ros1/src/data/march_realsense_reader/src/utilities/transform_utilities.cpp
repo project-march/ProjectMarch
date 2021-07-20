@@ -40,12 +40,19 @@ std::string Transformer::getFixedFrame()
 void Transformer::createTransform()
 {
     if (tfBuffer->canTransform(fixed_frame_, frame_id_to_transform_to_,
-            ros::Time(/*t=*/0), ros::Duration(/*t=*/1.0), &error_str)) {
+            ros::Time(), ros::Duration(/*t=*/1.0), &error_str)) {
         transform_stamped_msg = tfBuffer->lookupTransform(
             fixed_frame_, frame_id_to_transform_to_, ros::Time(/*t=*/0));
         ROS_DEBUG_STREAM(
             "Can transform. frame_id: " << frame_id_to_transform_to_);
     } else {
+        transform_stamped_msg.transform.translation.x = 0;
+        transform_stamped_msg.transform.translation.y = 0;
+        transform_stamped_msg.transform.translation.z = 0;
+        transform_stamped_msg.transform.rotation.x = 0;
+        transform_stamped_msg.transform.rotation.y = 0;
+        transform_stamped_msg.transform.rotation.z = 0;
+        transform_stamped_msg.transform.rotation.w = 1;
         ROS_WARN_STREAM(error_str);
     }
     setYaw();
