@@ -6,9 +6,12 @@ Transformer::Transformer(
 {
     tfBuffer = std::make_unique<tf2_ros::Buffer>();
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+    yaw = 0.0;
+    pitch = 0.0;
+    roll = 0.0;
 
-    fixed_frame_ = fixed_frame;
-    frame_id_to_transform_to_ = frame_id_to_transform_to;
+    fixed_frame_ = std::move(fixed_frame);
+    frame_id_to_transform_to_ = std::move(frame_id_to_transform_to);
     createTransform();
     copyYawToTransform();
 }
@@ -19,14 +22,14 @@ void Transformer::transformPointCloud(const PointCloud::Ptr& cloud)
         *cloud, *cloud, transform_stamped_msg.transform);
 }
 
-void Transformer::transformPoint(std::shared_ptr<pcl::PointXYZ> point)
+void Transformer::transformPoint(std::shared_ptr<pcl::PointXYZ>& point)
 {
     boost::shared_ptr<PointCloud> cloud = boost::make_shared<PointCloud>();
     cloud->push_back(*point);
     transformPointCloud(cloud);
-    point->x = cloud->at(0).x;
-    point->y = cloud->at(0).y;
-    point->z = cloud->at(0).z;
+    point->x = cloud->at(/*n=*/0).x;
+    point->y = cloud->at(/*n=*/0).y;
+    point->z = cloud->at(/*n=*/0).z;
 }
 
 std::string Transformer::getFixedFrame()
@@ -37,7 +40,7 @@ std::string Transformer::getFixedFrame()
 void Transformer::createTransform()
 {
     if (tfBuffer->canTransform(fixed_frame_, frame_id_to_transform_to_,
-            ros::Time(/*t=*/0), ros::Duration(1.0), &error_str)) {
+            ros::Time(/*t=*/0), ros::Duration(/*t=*/1.0), &error_str)) {
         transform_stamped_msg = tfBuffer->lookupTransform(
             fixed_frame_, frame_id_to_transform_to_, ros::Time(/*t=*/0));
         ROS_DEBUG_STREAM(

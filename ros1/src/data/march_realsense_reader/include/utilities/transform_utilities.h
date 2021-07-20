@@ -19,7 +19,7 @@ public:
         std::string fixed_frame = "world");
 
     void transformPointCloud(const PointCloud::Ptr& cloud);
-    void transformPoint(std::shared_ptr<pcl::PointXYZ> point);
+    void transformPoint(std::shared_ptr<pcl::PointXYZ>& point);
     std::string getFixedFrame();
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
