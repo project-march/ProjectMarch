@@ -222,7 +222,7 @@ bool HullParameterDeterminer::getRampSlope()
     // Crop those locations to find the associated orientation of those points
     points_on_ramp = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(
-            locations_to_compute_ramp, points_on_ramp);
+        locations_to_compute_ramp, points_on_ramp);
     if (possible_foot_locations->points.size() == 0) {
         ROS_ERROR_STREAM("The computed possible foot locations cloud is empty. "
                          "Unable to compute corresponding orientations");
@@ -230,8 +230,7 @@ bool HullParameterDeterminer::getRampSlope()
     }
 
     if (debugging_) {
-        for (pcl::PointNormal point_on_ramp :
-            *points_on_ramp) {
+        for (pcl::PointNormal point_on_ramp : *points_on_ramp) {
             geometry_msgs::Point marker_point;
             marker_point.x = point_on_ramp.x;
             marker_point.y = point_on_ramp.y;
@@ -239,8 +238,8 @@ bool HullParameterDeterminer::getRampSlope()
 
             // Color the point based on the orientation
             double grey_scale = 1.0
-                - fmin((acos(point_on_ramp.normal_z) * 180.0 / M_PI)
-                        / max_slope,
+                - fmin(
+                    (acos(point_on_ramp.normal_z) * 180.0 / M_PI) / max_slope,
                     /*__y=*/1.0);
             std_msgs::ColorRGBA marker_color
                 = color_utilities::colorRGBAInitRGBA(
