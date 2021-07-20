@@ -13,9 +13,9 @@ from rclpy.node import Node
 from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (
-    GaitNameNotFound,
-    NonValidGaitContent,
-    SubgaitNameNotFound,
+    GaitNameNotFoundError,
+    NonValidGaitContentError,
+    SubgaitNameNotFoundError,
 )
 
 from .subgait import Subgait
@@ -132,9 +132,9 @@ class Gait:
         :return: Gait if gait and subgait names are valid return populated Gait object
         """
         if gait_name not in gait_version_map:
-            raise GaitNameNotFound(gait_name)
+            raise GaitNameNotFoundError(gait_name)
         if subgait_name not in gait_version_map[gait_name]:
-            raise SubgaitNameNotFound(subgait_name, gait_name)
+            raise SubgaitNameNotFoundError(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
         return Subgait.from_name_and_version(
@@ -157,7 +157,7 @@ class Gait:
             to_subgait = self.subgaits[to_subgait_name]
 
             if not from_subgait.validate_subgait_transition(to_subgait):
-                raise NonValidGaitContent(
+                raise NonValidGaitContentError(
                     msg=f"Gait {self.gait_name} with end setpoint of subgait "
                     f"{from_subgait.subgait_name} to subgait "
                     f"{to_subgait.subgait_name} does not match"
@@ -175,18 +175,18 @@ class Gait:
         DynamicEdgePosition -> Values can change.
         :param old_edge_position: The position the gait has now
         :param new_edge_position: The new edge position that should be validated
-        :raises: NonValidGaitContent if the transition is not valid.
+        :raises: NonValidGaitContentError if the transition is not valid.
         """
         if isinstance(old_edge_position, StaticEdgePosition):
             if old_edge_position != StaticEdgePosition(new_edge_position_values):
-                raise NonValidGaitContent(
+                raise NonValidGaitContentError(
                     msg="The edge position of new version does not match to the "
                     "static old version"
                 )
             else:
                 return StaticEdgePosition(new_edge_position_values)
         elif isinstance(old_edge_position, UnknownEdgePosition):
-            raise NonValidGaitContent(
+            raise NonValidGaitContentError(
                 msg="Gaits with unknown edge positions should not be updated"
             )
         elif isinstance(old_edge_position, DynamicEdgePosition):
@@ -209,7 +209,7 @@ class Gait:
                         self.starting_position,
                         new_starting_position_values,
                     )
-                except NonValidGaitContent as e:
+                except NonValidGaitContentError as e:
                     raise e
 
             elif to_subgait_name == self.graph.END:
@@ -220,7 +220,7 @@ class Gait:
                         self.final_position,
                         new_final_position_values,
                     )
-                except NonValidGaitContent as e:
+                except NonValidGaitContentError as e:
                     raise e
         self.set_edge_positions(new_starting_position, new_final_position)
         return True
@@ -251,7 +251,7 @@ class Gait:
                 self.subgaits = new_subgaits
                 self._validate_trajectory_transition()
                 return True
-        except NonValidGaitContent as e:
+        except NonValidGaitContentError as e:
             if node is not None:
                 node.get_logger().warn(f"New subgaits were invalid: {e}")
             raise e
@@ -268,14 +268,14 @@ class Gait:
         new_subgaits = self.subgaits.copy()
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
-                raise SubgaitNameNotFound(subgait_name, self.gait_name)
+                raise SubgaitNameNotFoundError(subgait_name, self.gait_name)
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
 
         try:
             self.set_subgaits(new_subgaits)
-        except NonValidGaitContent as e:
+        except NonValidGaitContentError as e:
             raise e
 
     def __getitem__(self, name: str):

@@ -15,7 +15,11 @@
     <arg name="rviz" default="false" doc="Launches RViz."/>
     <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
 
-    <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
+    <arg name="use_imu_data" default="false" doc="Whether the imu data will be used to"/>
+    <arg name="ground_gait" default="$(arg use_imu_data)"
+         doc="Exoskeleton will ground gait in gazebo_ui if true. When the imu data is used,
+         this version of the urdf is also required, because we want the robot state publisher
+         to publish the transform from world to baselink."/>
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world in rviz"/>
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
@@ -30,6 +34,8 @@
     <arg name="remove_fixed_joints_from_ethercat_train" default="false"
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
+    <arg name="enable_safety_controller" default="false" doc="Whether to enable the safety controller"/>
+
 <!-- Data                       -->
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
@@ -76,6 +82,8 @@
             <arg name="if_name" value="$(arg if_name)"/>
             <arg name="remove_fixed_joints_from_ethercat_train"
                  value="$(arg remove_fixed_joints_from_ethercat_train)"/>
+            <arg name="enable_safety_controller"
+                 value="$(arg enable_safety_controller)"/>
         </include>
     </group>
 

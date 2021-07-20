@@ -120,6 +120,12 @@
       },
       {
          "name":"stairs_down_single_step"
+      },
+      {
+         "name":"curb_up"
+      },
+      {
+      	 "name":"curb_down"
       }
    ],
    [

@@ -10,8 +10,8 @@ from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameter
 
 from march_utility.exceptions.gait_exceptions import (
     GaitError,
-    GaitNameNotFound,
-    NonValidGaitContent,
+    GaitNameNotFoundError,
+    NonValidGaitContentError,
 )
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
@@ -271,7 +271,7 @@ class GaitSelection(Node):
         :param dict version_map: Mapping subgait names to versions
         """
         if gait_name not in self._gaits:
-            raise GaitNameNotFound(gait_name)
+            raise GaitNameNotFoundError(gait_name)
 
         # Only update versions that are different
         version_map = {
@@ -476,9 +476,9 @@ class GaitSelection(Node):
                     positions[position_name]["joints"][joint] = joint_value
 
             if set(positions[position_name]["joints"].keys()) != set(self._joint_names):
-                raise NonValidGaitContent(
+                raise NonValidGaitContentError(
                     f"The position {position_name} does not "
-                    f"have a position for all required joits: it "
+                    f"have a position for all required joints: it "
                     f"has {positions[position_name]['joints'].keys()}, "
                     f"required: {self._joint_names}"
                 )

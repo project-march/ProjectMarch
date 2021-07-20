@@ -8,6 +8,7 @@ march:
   controller:
     trajectory:
       type: model_predictive_trajectory_controller/JointTrajectoryController
+      N: 20
       joints:
         - left_ankle
         - left_hip_aa
@@ -18,15 +19,42 @@ march:
         - right_hip_fe
         - right_knee
 
-    gains:
-      left_ankle: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      left_hip_aa: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      left_hip_fe: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      left_knee: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      right_ankle: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      right_hip_aa: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      right_hip_fe: {p: 0,  d: 0, i: 0, i_clamp: 0}
-      right_knee: {p: 0,  d: 0, i: 0, i_clamp: 0}
+      # Controller tuning parameters
+      # Q and R are the weights on the states and inputs of the system respectively
+      # The parameters represent the values on the diagonal of the MPC weighting matrix
+      # Both parameters are required for each joint
+      weights:
+        left_ankle:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        left_hip_aa:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        left_hip_fe:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        left_knee:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        right_ankle:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        right_hip_aa:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        right_hip_fe:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
+
+        right_knee:
+          Q: [ 100.0, 1.0 ]
+          R: [ 0.01 ]
 
 
       state_publish_rate:  25            # Override default
