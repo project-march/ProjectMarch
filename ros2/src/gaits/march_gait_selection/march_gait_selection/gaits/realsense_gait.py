@@ -422,7 +422,7 @@ class RealsenseGait(SetpointsGait):
             )
         try:
             self.set_subgaits(new_subgaits, self._gait_selection)
-        except NonValidGaitContent:
+        except NonValidGaitContentError:
             return False
 
         return True
