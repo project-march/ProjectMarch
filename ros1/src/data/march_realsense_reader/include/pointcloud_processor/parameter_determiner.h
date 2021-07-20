@@ -171,9 +171,6 @@ protected:
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
 
-    // Find the sit parameter from the sit height
-    bool getGaitParametersFromSitHeight();
-
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
