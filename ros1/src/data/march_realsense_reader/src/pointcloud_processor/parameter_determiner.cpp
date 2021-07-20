@@ -41,6 +41,8 @@ HullParameterDeterminer::HullParameterDeterminer(bool debugging)
     : ParameterDeterminer(debugging)
     , sit_height(-1)
 {
+    tfBuffer = std::make_shared<tf2_ros::Buffer>();
+    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
 void HullParameterDeterminer::readParameters(
@@ -141,7 +143,8 @@ bool HullParameterDeterminer::determineParameters(
     // relevant (up or down) value and continue treating ramp up and ramp down
     // the same
     initializeGaitDimensions();
-    transformer_ = std::make_unique<Transformer>(frame_id_to_transform_to);
+    transformer_
+        = std::make_unique<Transformer>(tfBuffer, frame_id_to_transform_to);
     most_desirable_foot_location_ = std::make_shared<pcl::PointXYZ>();
 
     success = transformGaitInformation();
@@ -463,11 +466,12 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 {
-    gait_parameters_->first_parameter = (optimal_foot_location.x - min_x_stairs)
-        / (max_x_stairs - min_x_stairs);
+    gait_parameters_->first_parameter
+        = (optimal_foot_location.x - min_x_stairs_world)
+        / (max_x_stairs_world - min_x_stairs_world);
     gait_parameters_->second_parameter
-        = (optimal_foot_location.z - min_z_stairs)
-        / (max_z_stairs - min_z_stairs);
+        = (optimal_foot_location.z - min_z_stairs_world)
+        / (max_z_stairs_world - min_z_stairs_world);
     // The side step parameter is unused for the stairs gait so we set it to -1
     gait_parameters_->side_step_parameter = -1;
     // As we interpret the second (height) parameter as being high when the
@@ -853,10 +857,10 @@ bool HullParameterDeterminer::isValidLocation(
             // A possible foot location for the stairs gait is valid if it is
             // reachable by the stairs gait and the location offers support
             // for the entire foot
-            return (possible_foot_location.x < min_x_stairs
-                && possible_foot_location.x > max_x_stairs
-                && possible_foot_location.z > min_z_stairs
-                && possible_foot_location.z < max_z_stairs
+            return (possible_foot_location.x < min_x_stairs_world
+                && possible_foot_location.x > max_x_stairs_world
+                && possible_foot_location.z > min_z_stairs_world
+                && possible_foot_location.z < max_z_stairs_world
                 && entireFootCanBePlaced(possible_foot_location));
         }
         case RealSenseCategory::ramp_down:

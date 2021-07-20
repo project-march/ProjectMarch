@@ -1,15 +1,14 @@
 #include "utilities/transform_utilities.h"
 #include <pcl_ros/transforms.h>
 
-Transformer::Transformer(
+Transformer::Transformer(std::shared_ptr<tf2_ros::Buffer> tfBuffer,
     std::string frame_id_to_transform_to, std::string fixed_frame)
 {
-    tfBuffer = std::make_unique<tf2_ros::Buffer>();
-    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
     yaw = 0.0;
     pitch = 0.0;
     roll = 0.0;
 
+    tfBuffer_ = tfBuffer;
     fixed_frame_ = std::move(fixed_frame);
     frame_id_to_transform_to_ = std::move(frame_id_to_transform_to);
     createTransform();
@@ -39,9 +38,9 @@ std::string Transformer::getFixedFrame()
 
 void Transformer::createTransform()
 {
-    if (tfBuffer->canTransform(fixed_frame_, frame_id_to_transform_to_,
+    if (tfBuffer_->canTransform(fixed_frame_, frame_id_to_transform_to_,
             ros::Time(), ros::Duration(/*t=*/1.0), &error_str)) {
-        transform_stamped_msg = tfBuffer->lookupTransform(
+        transform_stamped_msg = tfBuffer_->lookupTransform(
             fixed_frame_, frame_id_to_transform_to_, ros::Time(/*t=*/0));
         ROS_DEBUG_STREAM(
             "Can transform. frame_id: " << frame_id_to_transform_to_);

@@ -15,21 +15,20 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class Transformer {
 public:
-    explicit Transformer(std::string frame_id_to_transform_to,
+    explicit Transformer(std::shared_ptr<tf2_ros::Buffer> tfBuffer,
+        std::string frame_id_to_transform_to,
         std::string fixed_frame = "world");
 
     void transformPointCloud(const PointCloud::Ptr& cloud);
     void transformPoint(std::shared_ptr<pcl::PointXYZ>& point);
     std::string getFixedFrame();
 
-    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
-    std::unique_ptr<tf2_ros::TransformListener> tfListener;
-
 private:
     void createTransform();
     void setYaw();
     void copyYawToTransform();
 
+    std::shared_ptr<tf2_ros::Buffer> tfBuffer_;
     geometry_msgs::TransformStamped transform_stamped_msg, yaw_stamped_msg;
     tf2::Quaternion transform_quaternion, yaw_quaternion;
     tf2::Matrix3x3 transform_matrix;

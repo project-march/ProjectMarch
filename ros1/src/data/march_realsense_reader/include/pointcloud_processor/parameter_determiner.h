@@ -262,6 +262,8 @@ protected:
 
     std::string subgait_name_;
 
+    std::shared_ptr<tf2_ros::Buffer> tfBuffer;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener;
     std::unique_ptr<Transformer> transformer_;
 
     visualization_msgs::Marker foot_locations_to_try_marker_list;
