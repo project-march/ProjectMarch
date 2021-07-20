@@ -42,8 +42,6 @@ void Transformer::createTransform()
             ros::Time(), ros::Duration(/*t=*/1.0), &error_str)) {
         transform_stamped_msg = tfBuffer_->lookupTransform(
             fixed_frame_, frame_id_to_transform_to_, ros::Time(/*t=*/0));
-        ROS_DEBUG_STREAM(
-            "Can transform. frame_id: " << frame_id_to_transform_to_);
     } else {
         transform_stamped_msg.transform.translation.x = 0;
         transform_stamped_msg.transform.translation.y = 0;
