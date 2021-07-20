@@ -18,7 +18,6 @@
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
-using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 
 class RealSenseReader {
 public:
@@ -70,11 +69,6 @@ public:
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker);
 
-    // Create a marker list from the 'foot locations to try' and publish it and
-    // publish for visualization
-    void fillFootLocationsToTryMarker(
-        PointCloud2D::Ptr const& foot_locations_to_try,
-        visualization_msgs::Marker& marker_list);
 
     // Create a marker list from the 'foot locations to try' and publish it and
     // publish for visualization
