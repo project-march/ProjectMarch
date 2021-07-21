@@ -68,6 +68,9 @@ realsense_sit:
   default_parameters:
    - 0.5
   subgaits:
+    prepare_sit_down:
+    - MVI_prepare_sit_down_high_v1
+    - MVI_prepare_sit_down_low_v1
     sit_down:
     - MVI_sit_down_low_v1
     - MVI_sit_down_high_v1
