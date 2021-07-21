@@ -479,18 +479,6 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
     return true;
 }
 
-bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
-{
-    gait_parameters_->first_parameter = calculateParameter(
-        optimal_foot_location.x, min_x_stairs, max_x_stairs);
-    gait_parameters_->second_parameter = calculateParameter(
-        optimal_foot_location.z, min_z_stairs, max_z_stairs);
-
-    // The side step parameter is unused for the stairs gait so we set it to -1
-    gait_parameters_->side_step_parameter = -1;
-    return true;
-}
-
 bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 {
     if (ramp_slope > max_slope + allowed_deviation_from_reachable_ramp
