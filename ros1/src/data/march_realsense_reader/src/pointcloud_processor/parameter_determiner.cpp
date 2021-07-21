@@ -86,12 +86,9 @@ void HullParameterDeterminer::readParameters(
 
     min_sit_height = (float)config.parameter_determiner_min_sit_height;
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
-<<<<<<< HEAD
     allowed_deviation_from_reachable_bench
         = (float)config
               .parameter_determiner_allowed_deviation_from_reachable_bench;
-=======
->>>>>>> main
     min_x_search_sit = (float)config.parameter_determiner_min_x_search_sit;
     max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
     search_y_deviation_sit
@@ -202,7 +199,6 @@ bool HullParameterDeterminer::getObstacleInformation()
 {
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_down:
-<<<<<<< HEAD
         case RealSenseCategory::stairs_up: {
             return getOptimalFootLocation();
             break;
@@ -210,12 +206,6 @@ bool HullParameterDeterminer::getObstacleInformation()
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
             return getRampSlope();
-=======
-        case RealSenseCategory::stairs_up:
-        case RealSenseCategory::ramp_down:
-        case RealSenseCategory::ramp_up: {
-            return getOptimalFootLocation();
->>>>>>> main
             break;
         }
         case RealSenseCategory::sit: {
@@ -231,7 +221,6 @@ bool HullParameterDeterminer::getObstacleInformation()
     }
 }
 
-<<<<<<< HEAD
 // Get the slope of a ramp based on the orientation of points on the ramp
 bool HullParameterDeterminer::getRampSlope()
 {
@@ -278,8 +267,6 @@ bool HullParameterDeterminer::getRampSlope()
     return success;
 }
 
-=======
->>>>>>> main
 void HullParameterDeterminer::initializeDebugOutput()
 {
     visualization_msgs::MarkerArray debug_marker_array;
@@ -462,8 +449,6 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
-<<<<<<< HEAD
-=======
 {
     if (sit_height > min_sit_height && sit_height < max_sit_height) {
         gait_parameters_->first_parameter
@@ -483,7 +468,6 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 }
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
->>>>>>> main
 {
     if (sit_height > max_sit_height + allowed_deviation_from_reachable_bench
         || sit_height
@@ -547,7 +531,6 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
     return true;
 }
 
-<<<<<<< HEAD
 // Transform valid gait information into a parameter
 float HullParameterDeterminer::calculateParameter(const float& valid_value,
     const float& minimum_value, const float& maximum_value)
@@ -558,8 +541,6 @@ float HullParameterDeterminer::calculateParameter(const float& valid_value,
     return fmax(fmin(parameter, /*__y=*/1.0F), /*__y=*/0.0F);
 }
 
-=======
->>>>>>> main
 // The sit analogue of getOptimalFootLocation, find the height at which to sit
 bool HullParameterDeterminer::getSitHeight()
 {
@@ -570,24 +551,6 @@ bool HullParameterDeterminer::getSitHeight()
     success &= fillSitGrid(sit_grid);
 
     // Crop those locations to find where there is support for the exoskeleton
-<<<<<<< HEAD
-    PointNormalCloud::Ptr exo_support_points
-        = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(sit_grid, exo_support_points);
-
-    if (debugging_) {
-        std_msgs::ColorRGBA marker_color = color_utilities::GREEN;
-        for (pcl::PointNormal& exo_support_point : *exo_support_points) {
-            geometry_msgs::Point marker_point;
-            marker_point.x = exo_support_point.x;
-            marker_point.y = exo_support_point.y;
-            marker_point.z = exo_support_point.z;
-
-            possible_foot_locations_marker_list.points.push_back(marker_point);
-            possible_foot_locations_marker_list.colors.push_back(marker_color);
-        }
-    }
-=======
     PointNormalCloud::Ptr potential_exo_support_points
         = boost::make_shared<PointNormalCloud>();
     success
@@ -597,7 +560,6 @@ bool HullParameterDeterminer::getSitHeight()
     PointNormalCloud::Ptr exo_support_points
         = boost::make_shared<PointNormalCloud>();
     getValidExoSupport(potential_exo_support_points, exo_support_points);
->>>>>>> main
 
     if ((float)exo_support_points->size() / (float)sit_grid->size()
         < minimal_needed_support_sit) {
@@ -624,8 +586,6 @@ bool HullParameterDeterminer::getSitHeight()
     return success;
 }
 
-<<<<<<< HEAD
-=======
 // Trim exo support cloud to only contain reachable points
 void HullParameterDeterminer::getValidExoSupport(
     const PointNormalCloud::Ptr& potential_exo_support_points,
@@ -660,7 +620,6 @@ void HullParameterDeterminer::getValidExoSupport(
     }
 }
 
->>>>>>> main
 // Get the median height value of a point cloud
 bool HullParameterDeterminer::getMedianHeightCloud(
     const PointNormalCloud::Ptr& cloud, float& median_height)
