@@ -147,7 +147,7 @@ bool HullParameterDeterminer::determineParameters(
         = std::make_unique<Transformer>(tfBuffer, frame_id_to_transform_to);
     most_desirable_foot_location_ = std::make_shared<pcl::PointXYZ>();
 
-    success = transformGaitInformation();
+    success &= transformGaitInformation();
 
     if (debugging_) {
         initializeDebugOutput();
@@ -257,10 +257,10 @@ void HullParameterDeterminer::addDebugGaitInformation()
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
 
-            for (int i = 0; i < 4; i++) {
-                marker_point.x = gait_information_cloud->points[i].x;
-                marker_point.y = gait_information_cloud->points[i].y;
-                marker_point.z = gait_information_cloud->points[i].z;
+            for (pcl::PointXYZ gait_information_point : *gait_information_cloud) {
+                marker_point.x = gait_information_point.x;
+                marker_point.y = gait_information_point.y;
+                marker_point.z = gait_information_point.z;
 
                 gait_information_marker_list.points.push_back(marker_point);
                 gait_information_marker_list.colors.push_back(marker_color);
@@ -1157,8 +1157,7 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
     int point_index = 0;
     for (pcl::PointXYZ& elevated_point : *elevated_cloud) {
         // using z = - (d + by + ax) / c from plane equation ax + by + cz +
-        // d =
-        // 0
+        // d = 0
         pcl::PointXYZ input_point = input_cloud->points[point_index];
         elevated_point.x = input_point.x;
         elevated_point.y = input_point.y;
