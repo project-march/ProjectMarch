@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from threading import Event
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, TYPE_CHECKING
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
+
+if TYPE_CHECKING:
+    from march_gait_selection.gait_selection import GaitSelection
 from march_shared_msgs.msg import GaitParameters
 from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.edge_position import (
@@ -24,17 +29,18 @@ from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContentError,
 )
 from rclpy import Future
-from rclpy.node import Node
 from rclpy.time import Time
 from rclpy.client import Client
 from urdf_parser_py import urdf
 
 
-class RealSenseGait(SetpointsGait):
+class RealsenseGait(SetpointsGait):
     """
-    The RealSenseGait class is used for creating gaits based on the parameters given
-    by the realsense reader. It is based on the setpoints gait, and it uses the
-    interpolation over 1 or 2 dimensions with 2 or 4 subgaits respectively.
+    The RealsenseGait class is used for creating gaits based on the parameters given
+    by the realsense reader. From these parameters the subgaits to interpolate are
+    interpolated after a realsense call during the start of the gait. It is based on the
+    setpoints gait, and it uses the interpolation over 1 or 2 dimensions with 2 or 4
+    subgaits respectively.
     """
 
     SERVICE_TIMEOUT = Duration(seconds=2.0)
@@ -56,19 +62,22 @@ class RealSenseGait(SetpointsGait):
         gait_name: str,
         subgaits: dict,
         graph: SubgaitGraph,
-        node: Node,
+        gait_selection: GaitSelection,
         realsense_category: str,
         camera_to_use: str,
         subgaits_to_interpolate: dict,
         dimensions: InterpolationDimensions,
-        parameters: List[float],
         process_service: Client,
         starting_position: EdgePosition,
         final_position: EdgePosition,
+        parameters: List[float],
+        dependent_on: List[str],
+        responsible_for: List[str],
     ):
-        super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
-        self._node = node
+        super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
+        self._gait_selection = gait_selection
         self.parameters = parameters
+        self.dimensions = dimensions
         self.dimensions = dimensions
         self.realsense_category = self.realsense_category_from_string(
             realsense_category
@@ -81,6 +90,16 @@ class RealSenseGait(SetpointsGait):
         self.realsense_service_result = None
         self._starting_position = starting_position
         self._final_position = final_position
+        self._dependent_on = dependent_on
+        self._responsible_for = responsible_for
+
+    @property
+    def dependent_on(self):
+        return self._dependent_on
+
+    @property
+    def responsible_for(self):
+        return self._responsible_for
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -109,7 +128,7 @@ class RealSenseGait(SetpointsGait):
     @classmethod
     def from_yaml(
         cls,
-        node: Node,
+        gait_selection: GaitSelection,
         robot: urdf.Robot,
         gait_name: str,
         gait_config: dict,
@@ -120,7 +139,8 @@ class RealSenseGait(SetpointsGait):
         """
         Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
 
-        :param node: The node that will be used for making the service calls to the
+        :param gait_selection: The GaitSelection node that will be used for making the
+        service calls to the
         realsense reader.
         :param robot: The urdf robot that can be used to verify the limits of the
         subgaits.
@@ -128,18 +148,18 @@ class RealSenseGait(SetpointsGait):
         :param gait_config: The yaml node with the needed configurations.
         :param gait_graph: The graph from the .gait file with the subgait transitions.
         :param gait_directory: The gait_directory that is being used.
-        :return: The constructed RealSenseGait
+        :param process_service: The service from which to get the gait parameters
+        :return: The constructed RealsenseGait
         """
         graph = SubgaitGraph(gait_graph)
         subgaits_to_interpolate = {}
         try:
             dimensions = InterpolationDimensions.from_integer(gait_config["dimensions"])
-            parameters = [float(param) for param in gait_config["default_parameters"]]
-            if len(parameters) != amount_of_parameters(dimensions):
-                raise WrongRealSenseConfigurationError(
-                    f"The amount of parameters in the config file ({len(parameters)}), "
-                    f"doesn't match the dimensions"
-                )
+            dependent_on = gait_config.get("dependent_on", [])
+            responsible_for = gait_config.get("responsible_for", [])
+
+            parameters = [0.0 for _ in range(amount_of_parameters(dimensions))]
+
             realsense_category = gait_config["realsense_category"]
             camera_to_use = gait_config["camera_to_use"]
             subgait_version_map = gait_config["subgaits"]
@@ -190,18 +210,20 @@ class RealSenseGait(SetpointsGait):
                 f" {gait_name}: {e}"
             )
         return cls(
-            gait_name,
-            subgaits,
-            graph,
-            node,
-            realsense_category,
-            camera_to_use,
-            subgaits_to_interpolate,
-            dimensions,
-            parameters,
-            process_service,
-            starting_position,
-            final_position,
+            gait_name=gait_name,
+            subgaits=subgaits,
+            graph=graph,
+            gait_selection=gait_selection,
+            realsense_category=realsense_category,
+            camera_to_use=camera_to_use,
+            subgaits_to_interpolate=subgaits_to_interpolate,
+            dimensions=dimensions,
+            process_service=process_service,
+            starting_position=starting_position,
+            final_position=final_position,
+            parameters=parameters,
+            dependent_on=dependent_on,
+            responsible_for=responsible_for,
         )
 
     @classmethod
@@ -281,30 +303,64 @@ class RealSenseGait(SetpointsGait):
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
 
-        service_call_succesful = self.make_realsense_service_call()
-        if not service_call_succesful:
-            self._node.get_logger().warn("No service response received within timeout")
-            return GaitUpdate.empty()
-
-        gait_parameters_response = self.realsense_service_result
-        if gait_parameters_response is None or not gait_parameters_response.success:
-            self._node.get_logger().warn(
-                "No gait parameters were found, gait will not be started, "
-                f"{gait_parameters_response}"
-            )
-            return GaitUpdate.empty()
-
-        self.update_parameters(gait_parameters_response.gait_parameters)
-        if not self.interpolate_subgaits_from_parameters():
-            return GaitUpdate.empty()
+        # If a gait is dependent on some other gait its subgaits are already
+        # interpolated from parameters so we can skip the realsense call
+        if not self._dependent_on:
+            realsense_update_successful = self.get_realsense_update()
+            if not realsense_update_successful:
+                return GaitUpdate.empty()
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
         if first_subgait_delay is None:
             first_subgait_delay = Duration(0)
-        self._start_time = self._node.get_clock().now() + first_subgait_delay
+        self._start_time = self._gait_selection.get_clock().now() + first_subgait_delay
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
+
+    def get_realsense_update(self):
+        """
+        Makes a realsense service call and handles the result
+
+        :return: Whether the call was successful
+        """
+        service_call_succesful = self.make_realsense_service_call()
+        if not service_call_succesful:
+            self._gait_selection.get_logger().warn(
+                "No service response received within timeout"
+            )
+            return False
+
+        gait_parameters_response = self.realsense_service_result
+        if gait_parameters_response is None or not gait_parameters_response.success:
+            self._gait_selection.get_logger().warn(
+                "No gait parameters were found, gait will not be started, "
+                f"{gait_parameters_response}"
+            )
+            return False
+
+        return self.update_gaits_from_realsense_call(
+            gait_parameters_response.gait_parameters
+        )
+
+    def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> bool:
+        """
+        Update the gait parameters based on the message of the current gaits and its
+        responsibilities.
+
+        :param gait_parameters: The parameters to update to.
+        """
+        success = True
+        self.set_parameters(gait_parameters)
+        success &= self.interpolate_subgaits_from_parameters()
+        if self._responsible_for and success:
+            for gait_name in self._responsible_for:
+                gait = self._gait_selection.gaits[gait_name]
+                # Make a recursive call to also handle the dependencies of the
+                # dependent gait
+                if isinstance(gait, RealsenseGait):
+                    gait.update_gaits_from_realsense_call(gait_parameters)
+        return success
 
     def make_realsense_service_call(self) -> bool:
         """
@@ -336,7 +392,7 @@ class RealSenseGait(SetpointsGait):
                 self._realsense_response_cb
             )
         else:
-            self._node.get_logger().error(
+            self._gait_selection.get_logger().error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
                 f"available, is the realsense reader running?"
             )
@@ -351,10 +407,12 @@ class RealSenseGait(SetpointsGait):
 
     def interpolate_subgaits_from_parameters(self) -> bool:
         """Change all subgaits to one interpolated from the current parameters."""
-        new_subgaits = {}
-        self._node.get_logger().info(
-            f"Interpolating with parameters: {self.parameters}"
+        self._gait_selection.get_logger().info(
+            f"Interpolating gait {self.gait_name} with parameters:"
+            f" {self.parameters}"
         )
+
+        new_subgaits = {}
         for subgait_name in self.subgaits.keys():
             new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
                 dimensions=self.dimensions,
@@ -363,17 +421,17 @@ class RealSenseGait(SetpointsGait):
                 use_foot_position=True,
             )
         try:
-            self.set_subgaits(new_subgaits, self._node)
+            self.set_subgaits(new_subgaits, self._gait_selection)
         except NonValidGaitContentError:
             return False
 
         return True
 
-    def update_parameters(self, gait_parameters: GaitParameters) -> None:
+    def set_parameters(self, gait_parameters: GaitParameters) -> None:
         """
-        Update the gait parameters based on the message.
+        Set the gait parameters based on the message.
 
-        :param gait_parameters: The parameters to update to.
+        :param gait_parameters: The parameters to set.
         """
         if self.dimensions == InterpolationDimensions.ONE_DIM:
             self.parameters = [gait_parameters.first_parameter]

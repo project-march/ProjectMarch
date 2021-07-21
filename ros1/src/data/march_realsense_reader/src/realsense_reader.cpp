@@ -44,7 +44,7 @@ std::map<std::string, std::string> SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP
           { /*__x=*/"left_swing", /*__y=*/"foot_left" },
           { /*__x=*/"right_close", /*__y=*/"foot_right" },
           { /*__x=*/"left_close", /*__y=*/"foot_left" },
-          { /*__x=*/"sit_down", /*__y=*/"foot_left" } };
+          { /*__x=*/"prepare_sit_down", /*__y=*/"foot_left" } };
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
@@ -367,8 +367,8 @@ bool RealSenseReader::processPointcloudCallback(
         frame_id_to_transform_to_
             = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP.at(subgait_name_);
     } catch (std::out_of_range& ex) {
-        res.error_message
-            = "Provided subgait name has no known associated frame id "
+        res.error_message = "Provided subgait name " + subgait_name_
+            + " has no known associated frame id "
               "to transform to.";
         ROS_WARN_STREAM(res.error_message);
         res.success = false;

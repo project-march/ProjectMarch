@@ -16,7 +16,7 @@ class TestGaitSelection(unittest.TestCase):
     def setUpClass(cls):
         rclpy.init()
         cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
+            get_package_share_directory("march_description") + "/urdf/march6.urdf"
         )
 
     def setUp(self):
@@ -46,6 +46,8 @@ class TestGaitSelection(unittest.TestCase):
         directory = self.gait_selection.scan_directory()
         directory_gaits = [
             "walk_medium",
+            "realsense_stand",
+            "realsense_sit",
             "balance_walk",
             "stairs_up",
             "walk_small",
