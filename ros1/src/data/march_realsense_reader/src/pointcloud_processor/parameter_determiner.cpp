@@ -154,12 +154,9 @@ bool HullParameterDeterminer::determineParameters(
         addDebugGaitInformation();
     }
 
-    success &= getObstacleInformation();
-
     // Only calculate the gait parameters if an optimal foot location has been
     // found
-
-    if (success &= getOptimalFootLocation()) {
+    if (success &= getObstacleInformation()) {
         success &= getGaitParametersFromLocation();
     }
 
@@ -1051,12 +1048,12 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         foot_locations_to_try->points[i].z = 0;
     }
     transformer_->transformPointCloud(foot_locations_to_try);
-    for (int i = 0; i < number_of_optional_foot_locations; i++) {
+    for (pcl::PointXYZ foot_locations_to_try_point : *foot_locations_to_try) {
         if (debugging_) {
             geometry_msgs::Point marker_point;
-            marker_point.x = foot_locations_to_try->points[i].x;
-            marker_point.y = foot_locations_to_try->points[i].y;
-            marker_point.z = foot_locations_to_try->points[i].z;
+            marker_point.x = foot_locations_to_try_point.x;
+            marker_point.y = foot_locations_to_try_point.y;
+            marker_point.z = foot_locations_to_try_point.z;
 
             std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
 

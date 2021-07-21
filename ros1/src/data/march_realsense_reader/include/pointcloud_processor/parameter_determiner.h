@@ -85,9 +85,10 @@ public:
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
 
-    /** Takes a point cloud of potential foot locations and returns
-     * the valid foot locations with associated height and normal vector.
-     * Result indicates whether every original point ends up being valid.**/
+    /** Takes a point cloud, with an expected z = 0, of potential foot locations
+     * and returns the valid foot locations with associated height and normal
+     * vector. Result indicates whether every original point ends up being
+     * valid.**/
     bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
         const PointNormalCloud::Ptr& output_cloud);
 
