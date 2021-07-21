@@ -254,7 +254,8 @@ void HullParameterDeterminer::addDebugGaitInformation()
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
 
-            for (pcl::PointXYZ gait_information_point : *gait_information_cloud) {
+            for (pcl::PointXYZ gait_information_point :
+                *gait_information_cloud) {
                 marker_point.x = gait_information_point.x;
                 marker_point.y = gait_information_point.y;
                 marker_point.z = gait_information_point.z;
