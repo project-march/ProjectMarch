@@ -348,20 +348,6 @@ void HullParameterDeterminer::addDebugGaitInformation()
             gait_information_marker_list.colors.push_back(marker_color);
             break;
         }
-        case RealSenseCategory::sit: {
-            geometry_msgs::Point marker_point;
-            marker_point.y = search_y_deviation_sit / 2.0F;
-            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
-
-            marker_point.z = min_sit_height;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
-
-            marker_point.z = max_sit_height;
-            gait_information_marker_list.points.push_back(marker_point);
-            gait_information_marker_list.colors.push_back(marker_color);
-            break;
-        }
         default: {
             ROS_WARN_STREAM("gait debug information is not implemented "
                             "for realsense category "
@@ -426,10 +412,6 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
             success &= getGaitParametersFromRampSlope();
-            break;
-        }
-        case RealSenseCategory::sit: {
-            success &= getGaitParametersFromSitHeight();
             break;
         }
         case RealSenseCategory::sit: {
