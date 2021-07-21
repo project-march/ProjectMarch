@@ -171,7 +171,7 @@ bool HullParameterDeterminer::determineParameters(
             }
             case RealSenseCategory::ramp_down:
             case RealSenseCategory::ramp_up: {
-                    ROS_DEBUG_STREAM("The slope of the ramp is " << ramp_slope);
+                ROS_DEBUG_STREAM("The slope of the ramp is " << ramp_slope);
                 break;
             }
             case RealSenseCategory::sit: {
