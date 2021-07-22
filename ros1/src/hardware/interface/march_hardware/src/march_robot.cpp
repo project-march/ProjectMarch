@@ -19,30 +19,17 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
           ecatCycleTime, ecatSlaveTimeout)
-    , pdb_(nullptr)
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
-    : jointList(std::move(jointList))
-    , urdf_(std::move(urdf))
-    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
-    , pdb_(std::move(powerDistributionBoard))
-{
-}
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
     std::vector<PressureSole> pressureSoles, ::std::string if_name,
     int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
           ecatCycleTime, ecatSlaveTimeout)
-    , pdb_(std::move(powerDistributionBoard))
     , pressureSoles(std::move(pressureSoles))
 {
 }
@@ -224,16 +211,6 @@ MarchRobot::iterator MarchRobot::begin()
 MarchRobot::iterator MarchRobot::end()
 {
     return this->jointList.end();
-}
-
-bool MarchRobot::hasPowerDistributionboard() const
-{
-    return this->pdb_ != nullptr;
-}
-
-PowerDistributionBoard* MarchRobot::getPowerDistributionBoard() const
-{
-    return this->pdb_.get();
 }
 
 bool MarchRobot::hasPressureSoles() const

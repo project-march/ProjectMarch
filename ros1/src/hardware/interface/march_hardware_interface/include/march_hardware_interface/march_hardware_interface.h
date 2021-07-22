@@ -1,9 +1,7 @@
 // Copyright 2019 Project March
 #ifndef MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
 #define MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
-#include "march_hardware_interface/march_pdb_state_interface.h"
 #include "march_hardware_interface/march_temperature_sensor_interface.h"
-#include "march_hardware_interface/power_net_type.h"
 
 #include <memory>
 #include <vector>
@@ -83,9 +81,6 @@ private:
      * in order to avoid allocation at runtime.
      */
     void reserveMemory();
-    void updatePowerNet();
-    void updateHighVoltageEnable();
-    void updatePowerDistributionBoard();
     void updateAfterLimitJointCommand();
     void updateMotorControllerState();
     void updatePressureSoleData();
@@ -114,7 +109,6 @@ private:
         effort_joint_soft_limits_interface_;
 
     MarchTemperatureSensorInterface march_temperature_interface_;
-    MarchPdbStateInterface march_pdb_interface_;
 
     /* Shared memory */
     size_t num_joints_ = 0;
@@ -135,7 +129,6 @@ private:
     std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
     std::vector<joint_limits_interface::SoftJointLimits> soft_limits_error_;
 
-    PowerNetOnOffCommand power_net_on_off_command_;
     bool master_shutdown_allowed_command_ = false;
     bool enable_high_voltage_command_ = true;
     bool reset_motor_controllers_ = false;

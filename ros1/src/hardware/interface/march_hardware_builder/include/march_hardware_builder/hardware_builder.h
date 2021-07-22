@@ -20,7 +20,6 @@
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive.h>
-#include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 #include <march_hardware/temperature/temperature_ges.h>
 
@@ -105,11 +104,6 @@ public:
         const YAML::Node& temperature_ges_config,
         const march::PdoInterfacePtr& pdo_interface,
         const march::SdoInterfacePtr& sdo_interface);
-    static std::unique_ptr<march::PowerDistributionBoard>
-    createPowerDistributionBoard(
-        const YAML::Node& power_distribution_board_config,
-        const march::PdoInterfacePtr& pdo_interface,
-        const march::SdoInterfacePtr& sdo_interface);
 
     static std::vector<march::PressureSole> createPressureSoles(
         const YAML::Node& pressure_soles_config,
@@ -141,8 +135,6 @@ public:
     static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
     static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
     static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
-    static const std::vector<std::string>
-        POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;
     static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
     static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
