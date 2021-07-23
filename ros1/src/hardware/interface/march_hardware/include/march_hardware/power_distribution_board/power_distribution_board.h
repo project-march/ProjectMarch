@@ -30,7 +30,6 @@ public:
     PowerDistributionBoardData read();
 
     constexpr static unsigned int POWER_DISTRIBUTION_BOARD_DATA_LENGTH = 14;
-    bool is_operational_;
 
 private:
     const uint8_t byte_offset_;
