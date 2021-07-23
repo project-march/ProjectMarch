@@ -608,6 +608,7 @@ void MarchHardwareInterface::updatePowerDistributionBoardData()
     hv_msg.hv1_current = pdb_data.hv1_current;
     hv_msg.hv2_current = pdb_data.hv2_current;
     hv_msg.hv3_current = pdb_data.hv3_current;
+    hv_msg.hv4_current = pdb_data.hv4_current;
     pdb_state_msg.hv_state = hv_msg;
 
     march_shared_msgs::LowVoltageState lv_msg;
