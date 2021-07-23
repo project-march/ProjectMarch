@@ -36,6 +36,9 @@ const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
     = { "slaveIndex", "type" };
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset", "side" };
+const std::vector<std::string>
+    HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS
+    = { "slaveIndex", "byteOffset" };
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot,
     bool remove_fixed_joints_from_ethercat_train, std::string if_name)
@@ -91,8 +94,12 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 
     auto pressure_soles = createPressureSoles(
         config["pressure_soles"], pdo_interface, sdo_interface);
+    auto power_distribution_board = createPowerDistributionBoard(
+        config["power_distribution_board"], pdo_interface, sdo_interface);
     return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_,
-        std::move(pressure_soles), if_name_, cycle_time, slave_timeout);
+        std::move(pressure_soles), if_name_, cycle_time, slave_timeout,
+        std::make_optional<march::PowerDistributionBoard>(
+            power_distribution_board));
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
@@ -505,6 +512,24 @@ march::PressureSole HardwareBuilder::createPressureSole(
     return march::PressureSole(
         march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset,
         side);
+}
+
+march::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
+    const YAML::Node& power_distribution_board_config,
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
+{
+    HardwareBuilder::validateRequiredKeysExist(power_distribution_board_config,
+        HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
+        "power_distribution_board");
+
+    const auto slave_index
+        = power_distribution_board_config["slaveIndex"].as<int>();
+    const auto byte_offset
+        = power_distribution_board_config["byteOffset"].as<int>();
+
+    return march::PowerDistributionBoard(
+        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
 std::string convertSWFileToString(std::ifstream& sw_file)
