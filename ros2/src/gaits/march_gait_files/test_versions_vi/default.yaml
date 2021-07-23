@@ -77,8 +77,6 @@ gaits:
     right_close: MVI_walksmall_rightclose_v3
     right_open: MVI_walksmall_rightopen_v3
     right_swing: MVI_walksmall_rightswing_v3
-
-dynamic_edge_gaits:
   ramp_down_last_step:
     left_close: MVI_rampdownlaststep_leftclose_flat_v2
     right_open: MVI_rampdownlaststep_rightopen_flat_v2
