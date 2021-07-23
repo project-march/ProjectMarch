@@ -6,17 +6,18 @@
 
 namespace march {
 struct PowerDistributionBoardData {
-    float emergency_button_state;
+    uint32_t emergency_button_state;
     float pdb_current;
     float hv_total_current;
-    float stop_button_state;
+    uint32_t stop_button_state;
     float hv1_current;
     float hv2_current;
     float hv3_current;
+    float hv4_current;
     float lv1_current;
     float lv2_current;
-    float lv1_ok;
-    float lv2_ok;
+    uint32_t lv1_ok;
+    uint32_t lv2_ok;
     float battery_percentage;
     float battery_voltage;
     float battery_temperature;
@@ -29,7 +30,7 @@ public:
 
     PowerDistributionBoardData read();
 
-    constexpr static unsigned int POWER_DISTRIBUTION_BOARD_DATA_LENGTH = 14;
+    constexpr static unsigned int POWER_DISTRIBUTION_BOARD_DATA_LENGTH = 15;
 
 private:
     const uint8_t byte_offset_;

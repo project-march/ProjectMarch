@@ -11,13 +11,12 @@ PowerDistributionBoard::PowerDistributionBoard(
 
 PowerDistributionBoardData PowerDistributionBoard::read()
 {
-    std::array<float, POWER_DISTRIBUTION_BOARD_DATA_LENGTH> data {};
-    for (unsigned int i = 0; i < data.size(); i++) {
+    PowerDistributionBoardData data {};
+    for (unsigned int i = 0; i < POWER_DISTRIBUTION_BOARD_DATA_LENGTH; i++) {
         data[i] = this->read32(byte_offset_ + i * sizeof(float)).f;
     }
-    static_assert(POWER_DISTRIBUTION_BOARD_DATA_LENGTH == 14);
-    return { data[0], data[1], data[2], data[3], data[4], data[5], data[6],
-        data[7], data[8], data[9], data[10], data[11], data[12], data[13] };
+    static_assert(POWER_DISTRIBUTION_BOARD_DATA_LENGTH == 15);
+    return data;
 }
 
 } // namespace march
