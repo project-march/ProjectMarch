@@ -303,7 +303,6 @@ class RealsenseGait(SetpointsGait):
         # calls to think the gait start time has passed, set start time in the future.
         self._start_time = current_time + self.INITIAL_START_DELAY_TIME
         self._current_time = current_time
-
         # If a gait is dependent on some other gait its subgaits are already
         # interpolated from parameters so we can skip the realsense call
         if not self._dependent_on:
