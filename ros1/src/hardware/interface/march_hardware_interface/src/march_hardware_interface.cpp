@@ -599,29 +599,29 @@ void MarchHardwareInterface::updatePowerDistributionBoardData()
     march_shared_msgs::PowerDistributionBoardData pdb_state_msg;
     // Fill the general pdb state fields
     pdb_state_msg.header.stamp = ros::Time::now();
-    pdb_state_msg.emergency_button_state = pdb_data.emergency_button_state;
-    pdb_state_msg.pdb_current = pdb_data.pdb_current;
-    pdb_state_msg.stop_button_state = pdb_data.stop_button_state;
+    pdb_state_msg.emergency_button_state = pdb_data.emergency_button_state.ui;
+    pdb_state_msg.pdb_current = pdb_data.pdb_current.f;
+    pdb_state_msg.stop_button_state = pdb_data.stop_button_state.ui;
 
     march_shared_msgs::HighVoltageState hv_msg;
-    hv_msg.total_current = pdb_data.hv_total_current;
-    hv_msg.hv1_current = pdb_data.hv1_current;
-    hv_msg.hv2_current = pdb_data.hv2_current;
-    hv_msg.hv3_current = pdb_data.hv3_current;
-    hv_msg.hv4_current = pdb_data.hv4_current;
+    hv_msg.total_current = pdb_data.hv_total_current.f;
+    hv_msg.hv1_current = pdb_data.hv1_current.f;
+    hv_msg.hv2_current = pdb_data.hv2_current.f;
+    hv_msg.hv3_current = pdb_data.hv3_current.f;
+    hv_msg.hv4_current = pdb_data.hv4_current.f;
     pdb_state_msg.hv_state = hv_msg;
 
     march_shared_msgs::LowVoltageState lv_msg;
-    lv_msg.lv1_current = pdb_data.lv1_current;
-    lv_msg.lv2_current = pdb_data.lv2_current;
-    lv_msg.lv1_ok = pdb_data.lv1_ok;
-    lv_msg.lv2_ok = pdb_data.lv2_ok;
+    lv_msg.lv1_current = pdb_data.lv1_current.f;
+    lv_msg.lv2_current = pdb_data.lv2_current.f;
+    lv_msg.lv1_ok = pdb_data.lv1_ok.ui;
+    lv_msg.lv2_ok = pdb_data.lv2_ok.ui;
     pdb_state_msg.lv_state = lv_msg;
 
     march_shared_msgs::BatteryState battery_msg;
-    battery_msg.percentage = pdb_data.battery_percentage;
-    battery_msg.voltage = pdb_data.battery_voltage;
-    battery_msg.temperature = pdb_data.battery_temperature;
+    battery_msg.percentage = pdb_data.battery_percentage.f;
+    battery_msg.voltage = pdb_data.battery_voltage.f;
+    battery_msg.temperature = pdb_data.battery_temperature.f;
     pdb_state_msg.battery_state = battery_msg;
 
     power_distribution_board_data_pub_->msg_ = pdb_state_msg;

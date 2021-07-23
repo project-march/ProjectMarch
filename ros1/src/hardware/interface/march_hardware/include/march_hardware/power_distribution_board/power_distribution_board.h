@@ -3,24 +3,26 @@
 
 #include <march_hardware/ethercat/slave.h>
 #include <string>
+#include "march_hardware/ethercat/pdo_types.h"
 
 namespace march {
+
 struct PowerDistributionBoardData {
-    uint32_t emergency_button_state;
-    float pdb_current;
-    float hv_total_current;
-    uint32_t stop_button_state;
-    float hv1_current;
-    float hv2_current;
-    float hv3_current;
-    float hv4_current;
-    float lv1_current;
-    float lv2_current;
-    uint32_t lv1_ok;
-    uint32_t lv2_ok;
-    float battery_percentage;
-    float battery_voltage;
-    float battery_temperature;
+    bit32 emergency_button_state;
+    bit32 pdb_current;
+    bit32 hv_total_current;
+    bit32 stop_button_state;
+    bit32 hv1_current;
+    bit32 hv2_current;
+    bit32 hv3_current;
+    bit32 hv4_current;
+    bit32 lv1_current;
+    bit32 lv2_current;
+    bit32 lv1_ok;
+    bit32 lv2_ok;
+    bit32 battery_percentage;
+    bit32 battery_voltage;
+    bit32 battery_temperature;
 };
 
 class PowerDistributionBoard : public Slave {
@@ -35,6 +37,7 @@ public:
 private:
     const uint8_t byte_offset_;
 };
+
 } // namespace march
 
 #endif // MARCH_POWER_DISTRIBUTION_BOARD_H
