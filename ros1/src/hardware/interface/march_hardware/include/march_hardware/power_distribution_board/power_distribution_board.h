@@ -1,9 +1,9 @@
 #ifndef MARCH_POWER_DISTRIBUTION_BOARD_H
 #define MARCH_POWER_DISTRIBUTION_BOARD_H
 
+#include "march_hardware/ethercat/pdo_types.h"
 #include <march_hardware/ethercat/slave.h>
 #include <string>
-#include "march_hardware/ethercat/pdo_types.h"
 
 namespace march {
 
