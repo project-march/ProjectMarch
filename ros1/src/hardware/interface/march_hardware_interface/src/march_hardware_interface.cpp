@@ -5,6 +5,11 @@
 #include <march_hardware/motor_controller/actuation_mode.h>
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
+#include <march_hardware/power_distribution_board/power_distribution_board.h>
+#include <march_shared_msgs/BatteryState.h>
+#include <march_shared_msgs/HighVoltageState.h>
+#include <march_shared_msgs/LowVoltageState.h>
+#include <march_shared_msgs/PowerDistributionBoardData.h>
 #include <march_shared_msgs/PressureSoleData.h>
 #include <march_shared_msgs/PressureSolesData.h>
 
@@ -58,6 +63,11 @@ bool MarchHardwareInterface::init(
         = std::make_unique<realtime_tools::RealtimePublisher<
             march_shared_msgs::PressureSolesData>>(
             nh, "/march/pressure_sole_data/", 4);
+
+    power_distribution_board_data_pub_
+        = std::make_unique<realtime_tools::RealtimePublisher<
+            march_shared_msgs::PowerDistributionBoardData>>(
+            nh, "/march/pdb_data/", 4);
 
     this->after_limit_joint_command_pub_
         = std::make_unique<realtime_tools::RealtimePublisher<
@@ -270,6 +280,10 @@ void MarchHardwareInterface::read(
 
     if (march_robot_->hasPressureSoles()) {
         updatePressureSoleData();
+    }
+
+    if (march_robot_->hasPowerDistributionBoard()) {
+        updatePowerDistributionBoardData();
     }
 }
 
@@ -573,4 +587,42 @@ void MarchHardwareInterface::updatePressureSoleData()
         }
     }
     pressure_sole_data_pub_->unlockAndPublish();
+}
+
+void MarchHardwareInterface::updatePowerDistributionBoardData()
+{
+    if (!power_distribution_board_data_pub_->trylock()) {
+        return;
+    }
+    march::PowerDistributionBoardData pdb_data
+        = march_robot_->getPowerDistributionBoard().read();
+    march_shared_msgs::PowerDistributionBoardData pdb_state_msg;
+    // Fill the general pdb state fields
+    pdb_state_msg.header.stamp = ros::Time::now();
+    pdb_state_msg.emergency_button_state = pdb_data.emergency_button_state;
+    pdb_state_msg.pdb_current = pdb_data.pdb_current;
+    pdb_state_msg.stop_button_state = pdb_data.stop_button_state;
+
+    march_shared_msgs::HighVoltageState hv_msg;
+    hv_msg.total_current = pdb_data.hv_total_current;
+    hv_msg.hv1_current = pdb_data.hv1_current;
+    hv_msg.hv2_current = pdb_data.hv2_current;
+    hv_msg.hv3_current = pdb_data.hv3_current;
+    pdb_state_msg.hv_state = hv_msg;
+
+    march_shared_msgs::LowVoltageState lv_msg;
+    lv_msg.lv1_current = pdb_data.lv1_current;
+    lv_msg.lv2_current = pdb_data.lv2_current;
+    lv_msg.lv1_ok = pdb_data.lv1_ok;
+    lv_msg.lv2_ok = pdb_data.lv2_ok;
+    pdb_state_msg.lv_state = lv_msg;
+
+    march_shared_msgs::BatteryState battery_msg;
+    battery_msg.percentage = pdb_data.battery_percentage;
+    battery_msg.voltage = pdb_data.battery_voltage;
+    battery_msg.temperature = pdb_data.battery_temperature;
+    pdb_state_msg.battery_state = battery_msg;
+
+    power_distribution_board_data_pub_->msg_ = pdb_state_msg;
+    power_distribution_board_data_pub_->unlockAndPublish();
 }
