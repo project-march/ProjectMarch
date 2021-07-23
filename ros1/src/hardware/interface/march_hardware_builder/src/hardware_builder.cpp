@@ -92,8 +92,7 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     auto pressure_soles = createPressureSoles(
         config["pressure_soles"], pdo_interface, sdo_interface);
     return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_,
-        std::move(pressure_soles), if_name_, cycle_time,
-        slave_timeout);
+        std::move(pressure_soles), if_name_, cycle_time, slave_timeout);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
