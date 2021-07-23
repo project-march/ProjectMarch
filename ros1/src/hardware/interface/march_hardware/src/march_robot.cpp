@@ -22,7 +22,6 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
 {
 }
 
-
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     std::vector<PressureSole> pressureSoles, ::std::string if_name,
     int ecatCycleTime, int ecatSlaveTimeout)
