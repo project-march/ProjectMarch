@@ -49,6 +49,7 @@ add_library(${PROJECT_NAME}
     src/pointcloud_processor/hull_finder.cpp
     src/pointcloud_processor/parameter_determiner.cpp
     src/utilities/transform_utilities.cpp
+    src/utilities/linear_algebra_utilities.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
