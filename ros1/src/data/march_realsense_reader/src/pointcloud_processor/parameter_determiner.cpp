@@ -1026,7 +1026,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         cloud_to_fill->points[i].y = y_location;
         cloud_to_fill->points[i].z = 0;
     }
-    transformer_->transformPointCloud(foot_locations_to_try);
+    transformer_->transformPointCloud(cloud_to_fill);
     for (pcl::PointXYZ cloud_to_fill_point : *cloud_to_fill) {
         if (debugging_) {
             geometry_msgs::Point marker_point;
