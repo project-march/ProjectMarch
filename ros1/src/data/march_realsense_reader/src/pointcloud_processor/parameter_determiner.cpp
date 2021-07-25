@@ -317,8 +317,8 @@ void HullParameterDeterminer::addDebugGaitInformation()
         }
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
-            marker_point.y = search_y_deviation_sit / 2.0F;
-            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
+            marker_point.y = sit_pos_y;
+            marker_point.x = sit_pos_x;
 
             marker_point.z = min_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
@@ -417,6 +417,28 @@ bool HullParameterDeterminer::transformGaitInformation()
             max_x_stairs_world = gait_information_cloud->points[1].x;
             min_z_stairs_world = gait_information_cloud->points[0].z;
             max_z_stairs_world = gait_information_cloud->points[2].z;
+
+            break;
+        }
+
+        case RealSenseCategory::sit: {
+            point = point_utilities::makePointXYZ(
+                (min_x_search_sit + max_x_search_sit) / 2.0F,
+                search_y_deviation_sit / 2.0F, min_sit_height);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePointXYZ(
+                (min_x_search_sit + max_x_search_sit) / 2.0F,
+                search_y_deviation_sit / 2.0F, max_sit_height);
+            gait_information_cloud->push_back(point);
+
+            // Transform to the fixed frame
+            transformer_->transformPointCloud(gait_information_cloud);
+
+            // Update gait dimensions as seen from fixed frame
+            min_sit_height = gait_information_cloud->points[0].z;
+            max_sit_height = gait_information_cloud->points[1].z;
+            sit_pos_x = gait_information_cloud->points[0].x;
+            sit_pos_y = gait_information_cloud->points[0].y;
 
             break;
         }
@@ -555,8 +577,8 @@ bool HullParameterDeterminer::getSitHeight()
     if (debugging_) {
         std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
         geometry_msgs::Point marker_point;
-        marker_point.y = search_y_deviation_sit / 2.0F;
-        marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
+        marker_point.y = sit_pos_y;
+        marker_point.x = sit_pos_x;
         marker_point.z = sit_height;
 
         optimal_location_marker.points.push_back(marker_point);
@@ -646,20 +668,22 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud::Ptr& sit_grid)
             grid_point.z = 0.0;
 
             sit_grid->push_back(grid_point);
+        }
+    }
 
-            if (debugging_) {
-                geometry_msgs::Point marker_point;
-                marker_point.x = grid_point.x;
-                marker_point.y = grid_point.y;
-                marker_point.z = grid_point.z;
+    transformer_->transformPointCloud(sit_grid);
 
-                std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
+    if (debugging_) {
+        for (pcl::PointXYZ sit_grid_point : *sit_grid) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = sit_grid_point.x;
+            marker_point.y = sit_grid_point.y;
+            marker_point.z = sit_grid_point.z;
 
-                foot_locations_to_try_marker_list.points.push_back(
-                    marker_point);
-                foot_locations_to_try_marker_list.colors.push_back(
-                    marker_color);
-            }
+            std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
+
+            foot_locations_to_try_marker_list.points.push_back(marker_point);
+            foot_locations_to_try_marker_list.colors.push_back(marker_color);
         }
     }
     return true;
@@ -688,7 +712,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 
     success &= getOptimalFootLocationFromPossibleLocations();
 
-    if (debugging_) {
+    for (pcl::PointXYZ gait_information_point : *gait_information_cloud) {
         geometry_msgs::Point marker_point;
         marker_point.x = optimal_foot_location.x;
         marker_point.y = optimal_foot_location.y;
@@ -698,7 +722,6 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         optimal_location_marker.points.push_back(marker_point);
         optimal_location_marker.colors.push_back(marker_color);
     }
-
     return success;
 }
 
