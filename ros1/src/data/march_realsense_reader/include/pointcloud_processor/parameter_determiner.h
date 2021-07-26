@@ -112,8 +112,7 @@ protected:
 
     // Create a point cloud with points on the ground where the points represent
     // where it should be checked if there is a valid foot location
-    bool getOptionalFootLocations(
-        const PointCloud2D::Ptr& foot_locations_to_try);
+    bool getOptionalFootLocations(const PointCloud2D::Ptr& cloud_to_fill);
 
     // Crops a single point to a hull vector.
     bool cropPointToHullVector(pcl::PointXY const input_point,
@@ -173,7 +172,8 @@ protected:
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
-    bool fillOptionalFootLocationCloud(float start, float end);
+    bool fillOptionalFootLocationCloud(
+        const PointCloud2D::Ptr& cloud_to_fill, float start, float end);
 
     // Set the gait dimension variables to the relevant value
     void initializeGaitDimensions();
@@ -270,6 +270,8 @@ protected:
     PointNormalCloud::Ptr possible_foot_locations;
     PointCloud2D::Ptr foot_locations_to_try;
     PointCloud2D::Ptr sit_grid;
+    PointNormalCloud::Ptr points_on_ramp;
+    PointCloud2D::Ptr locations_to_compute_ramp;
     float sit_height;
 };
 

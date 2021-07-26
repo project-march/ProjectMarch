@@ -75,12 +75,11 @@ void HullParameterDeterminer::readParameters(
     max_ramp_search = (float)config.parameter_determiner_ramp_max_search_area;
     min_ramp_search = (float)config.parameter_determiner_ramp_min_search_area;
 
-    min_slope = (float)config.parameter_determiner_min_slope;
-    max_slope = (float)config.parameter_determiner_max_slope;
-
     allowed_deviation_from_reachable_ramp
         = (float)
               config.parameter_determiner_allowed_deviation_from_reachable_ramp;
+    min_slope = (float)config.parameter_determiner_min_slope;
+    max_slope = (float)config.parameter_determiner_max_slope;
 
     y_location = (float)config.parameter_determiner_y_location;
 
@@ -227,14 +226,12 @@ bool HullParameterDeterminer::getRampSlope()
     bool success = true;
     // Get some locations on the ground of which we would like to know the
     // orientation
-    foot_locations_to_try = boost::make_shared<PointCloud2D>();
-    success &= getOptionalFootLocations(foot_locations_to_try);
-
+    locations_to_compute_ramp = boost::make_shared<PointCloud2D>();
+    success &= getOptionalFootLocations(locations_to_compute_ramp);
     // Crop those locations to find the associated orientation of those points
-    possible_foot_locations = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(
-        foot_locations_to_try, possible_foot_locations);
-    if (possible_foot_locations->points.size() == 0) {
+    points_on_ramp = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVector(locations_to_compute_ramp, points_on_ramp);
+    if (points_on_ramp->size() == 0) {
         ROS_ERROR_STREAM("The computed possible foot locations cloud is empty. "
                          "Unable to compute corresponding orientations");
         return false;
@@ -346,6 +343,12 @@ void HullParameterDeterminer::addDebugGaitInformation()
             marker_point.z = max_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
+            break;
+        }
+        case RealSenseCategory::ramp_up:
+        case RealSenseCategory::ramp_down: {
+            // There is no relevant gait debug information for the current ramp
+            // parameter calculation
             break;
         }
         default: {
@@ -490,6 +493,8 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
             << ramp_slope);
         return false;
     }
+    gait_parameters_->first_parameter
+        = (ramp_slope - min_slope) / (max_slope - min_slope);
 
     gait_parameters_->first_parameter
         = calculateParameter(ramp_slope, min_slope, max_slope);
@@ -723,7 +728,7 @@ bool HullParameterDeterminer::calculateRampSlope()
     bool success = true;
 
     pcl::Normal average_normal;
-    success &= getAverageNormal(possible_foot_locations, average_normal);
+    success &= getAverageNormal(points_on_ramp, average_normal);
 
     success &= getSlopeFromNormals(average_normal, ramp_slope);
 
@@ -950,9 +955,9 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
     } else {
         ROS_ERROR_STREAM(
             "No method for finding the general most desirable foot location "
-            "is implemented for realsense category. "
+            "is implemented for realsense category: "
             << realsense_category_.value()
-            << "Unable to compute general most desirable foot location.");
+            << ". Unable to compute general most desirable foot location.");
         return false;
     }
     if (debugging_) {
@@ -971,15 +976,15 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 // Create a point cloud with points on the ground where the points represent
 // where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(
-    const PointCloud2D::Ptr& foot_locations_to_try)
+    const PointCloud2D::Ptr& cloud_to_fill)
 {
     bool success = true;
-    foot_locations_to_try->points.resize(number_of_optional_foot_locations);
+    cloud_to_fill->points.resize(number_of_optional_foot_locations);
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
-            success
-                &= fillOptionalFootLocationCloud(min_x_stairs, max_x_stairs);
+            success &= fillOptionalFootLocationCloud(
+                cloud_to_fill, min_x_stairs, max_x_stairs);
             break;
         }
         case RealSenseCategory::ramp_down:
@@ -987,7 +992,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
             // Look at a region in between the min and max x value of the step
             // to find the average slope at
             success &= fillOptionalFootLocationCloud(
-                min_ramp_search, max_ramp_search);
+                cloud_to_fill, min_ramp_search, max_ramp_search);
             break;
         }
         default: {
@@ -1004,7 +1009,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
 // Fill the foot locations to try cloud with a line of points from (start, 0) to
 // (end, 0)
 bool HullParameterDeterminer::fillOptionalFootLocationCloud(
-    float start, float end)
+    const PointCloud2D::Ptr& cloud_to_fill, float start, float end)
 {
     if (number_of_optional_foot_locations == 0) {
         ROS_WARN_STREAM(
@@ -1016,8 +1021,8 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         float x_location = start
             + (end - start) * (float)i
                 / ((float)number_of_optional_foot_locations - 1.0F);
-        foot_locations_to_try->points[i].x = x_location;
-        foot_locations_to_try->points[i].y = y_location;
+        cloud_to_fill->points[i].x = x_location;
+        cloud_to_fill->points[i].y = y_location;
 
         if (debugging_) {
             geometry_msgs::Point marker_point;
@@ -1037,9 +1042,8 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
 /** For each hull, the input cloud's z coordinate is set so that it
  * lies on the corresponding plane, then the input cloud is cropped, the points
  * inside the hull (the cropped cloud) are moved to the output cloud with the
- * normal of the plane This process is repeated for each hull. If each point in
- * the input_cloud has been moved to the output cloud,
- * result is set to true, it is set to false otherwise **/
+ * normal of the plane This process is repeated for each hull. Returns whether
+ * the calculations were executed successfully **/
 bool HullParameterDeterminer::cropCloudToHullVector(
     PointCloud2D::Ptr const& input_cloud,
     const PointNormalCloud::Ptr& output_cloud)
