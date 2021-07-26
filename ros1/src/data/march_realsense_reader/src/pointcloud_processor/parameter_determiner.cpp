@@ -470,7 +470,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
     if (optimal_foot_location.z > max_z_stairs + allowed_deviation_from_reachable_stair
         || optimal_foot_location.z
             < min_z_stairs - allowed_deviation_from_reachable_stair) {
-        ROS_ERROR_STREAM("The found stair depth should be between "
+        ROS_ERROR_STREAM("The found stair height should be between "
             << min_z_stairs << "( -" << allowed_deviation_from_reachable_stair
             << " ) and " << max_z_stairs << "( +"
             << allowed_deviation_from_reachable_stair << " ) but was "
