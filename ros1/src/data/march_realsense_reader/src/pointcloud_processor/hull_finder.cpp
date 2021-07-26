@@ -187,6 +187,12 @@ bool CHullFinder::projectRegionToPlane()
 // corresponding polygons
 bool CHullFinder::getCHullFromProjectedRegion()
 {
+    if (region_points_projected->size() < 3) {
+        ROS_WARN_STREAM("A minimum of 3 points are needed to construct a hull. "
+                        "The number of points projected to the region plane is "
+            << region_points_projected->size() << ". Ignoring region.");
+        return false;
+    }
     if (convex) {
         pcl::ConvexHull<pcl::PointXYZ> convex_hull;
         convex_hull.setInputCloud(region_points_projected_);
