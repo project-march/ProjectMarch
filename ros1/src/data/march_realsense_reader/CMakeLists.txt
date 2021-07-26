@@ -48,6 +48,7 @@ add_library(${PROJECT_NAME}
     src/pointcloud_processor/region_creator.cpp
     src/pointcloud_processor/hull_finder.cpp
     src/pointcloud_processor/parameter_determiner.cpp
+    src/utilities/transform_utilities.cpp
     src/utilities/linear_algebra_utilities.cpp
 )
 
