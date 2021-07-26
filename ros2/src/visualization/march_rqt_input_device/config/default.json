@@ -163,6 +163,12 @@
          "name":"realsense_stand"
       },
       {
+         "name":"realsense_ramp_up"
+      },
+      {
+         "name":"realsense_ramp_down"
+      },
+      {
          "name":"dynamic_sit"
       },
       {
