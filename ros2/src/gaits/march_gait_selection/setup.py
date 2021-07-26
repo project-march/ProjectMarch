@@ -19,6 +19,10 @@ def data_files():
             os.path.join("share", package_name, "test", "resources"),
             [os.path.join(test_gait_files_source, "default.yaml")],
         ),
+        (
+            os.path.join("share", package_name, "test", "resources"),
+            [os.path.join(test_gait_files_source, "realsense_gaits.yaml")],
+        ),
         (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
     ]
     for file in iglob(

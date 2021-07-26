@@ -21,12 +21,12 @@
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
-    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
       changes:
         - "$ROS_VERSION/**/*.{hpp,h,cpp,c}"
         - "$ROS_VERSION/**/CMakeLists.txt"

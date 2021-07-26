@@ -29,7 +29,7 @@ from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_gait_selection.gaits.realsense_gait import RealSenseGait
+from march_gait_selection.gaits.realsense_gait import RealsenseGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
@@ -131,6 +131,10 @@ class GaitSelection(Node):
     @property
     def joint_names(self):
         return self._joint_names
+
+    @property
+    def gaits(self):
+        return self._gaits
 
     def _validate_inverse_kinematics_is_possible(self):
         return (
@@ -425,8 +429,8 @@ class GaitSelection(Node):
             )
             with open(gait_path, "r") as gait_file:
                 gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
-            gait = RealSenseGait.from_yaml(
-                node=self,
+            gait = RealsenseGait.from_yaml(
+                gait_selection=self,
                 robot=self._robot,
                 gait_name=gait_name,
                 gait_config=self._realsense_gait_version_map[gait_name],
@@ -478,7 +482,7 @@ class GaitSelection(Node):
             if set(positions[position_name]["joints"].keys()) != set(self._joint_names):
                 raise NonValidGaitContentError(
                     f"The position {position_name} does not "
-                    f"have a position for all required joits: it "
+                    f"have a position for all required joints: it "
                     f"has {positions[position_name]['joints'].keys()}, "
                     f"required: {self._joint_names}"
                 )

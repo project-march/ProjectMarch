@@ -120,14 +120,18 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     // Set general attributes
     state->motor_current_ = getMotorCurrent();
     state->temperature_ = getTemperature();
-    state->absolute_position_iu_ = getAbsolutePositionIU();
-    state->incremental_position_iu_ = getIncrementalPositionIU();
-    state->incremental_velocity_iu_ = getIncrementalVelocityIU();
 
-    state->absolute_position_ = getAbsolutePositionUnchecked();
-    state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
-    state->incremental_position_ = getIncrementalPositionUnchecked();
-    state->incremental_velocity_ = getIncrementalVelocityUnchecked();
+    if (hasAbsoluteEncoder()) {
+        state->absolute_position_iu_ = getAbsolutePositionIU();
+        state->absolute_position_ = getAbsolutePositionUnchecked();
+        state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
+    }
+    if (hasIncrementalEncoder()) {
+        state->incremental_position_iu_ = getIncrementalPositionIU();
+        state->incremental_velocity_iu_ = getIncrementalVelocityIU();
+        state->incremental_position_ = getIncrementalPositionUnchecked();
+        state->incremental_velocity_ = getIncrementalVelocityUnchecked();
+    }
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
