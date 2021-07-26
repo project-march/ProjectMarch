@@ -98,24 +98,24 @@ gaits:
     left_close: MVI_walksinglestepsmall_leftclose_v5
 
   ramp_down:
-    left_close: MVI_rampdown_leftclose_flat_v4
-    left_open: MVI_rampdown_leftopen_flat_v4
-    left_swing: MVI_rampdown_leftswing_flat_v4
-    right_close: MVI_rampdown_rightclose_flat_v4
-    right_open: MVI_rampdown_rightopen_flat_v4
-    right_swing: MVI_rampdown_rightswing_flat_v4
+    left_close: MVI_rampdown_leftclose_steep_v4
+    left_open: MVI_rampdown_leftopen_steep_v4
+    left_swing: MVI_rampdown_leftswing_steep_v4
+    right_close: MVI_rampdown_rightclose_steep_v4
+    right_open: MVI_rampdown_rightopen_steep_v4
+    right_swing: MVI_rampdown_rightswing_steep_v4
 
   ramp_down_single_step:
-    left_close: MVI_rampdown_singlestep_leftclose_flat_v4
-    right_open: MVI_rampdown_singlestep_rightopen_flat_v4
+    left_close: MVI_rampdown_singlestep_leftclose_steep_v4
+    right_open: MVI_rampdown_singlestep_rightopen_steep_v4
 
   ramp_down_start_single_step:
-    left_close: MVI_rampdown_startsinglestep_leftclose_flat_v4
-    right_open: MVI_rampdown_startsinglestep_rightopen_flat_v4
+    left_close: MVI_rampdown_startsinglestep_leftclose_steep_v4
+    right_open: MVI_rampdown_startsinglestep_rightopen_steep_v4
 
   ramp_down_last_step:
-    left_close: MVI_rampdownlaststep_leftclose_flat_v1
-    right_open: MVI_rampdownlaststep_rightopen_flat_v1
+    left_close: MVI_rampdownlaststep_leftclose_steep_v2
+    right_open: MVI_rampdownlaststep_rightopen_steep_v2
 
 positions:
   stand:
