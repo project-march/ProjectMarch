@@ -31,16 +31,15 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
                 self.subgaits[self.graph.end_subgaits()[0]].final_position
             )
 
-
     @classmethod
     def dynamic_from_file(
-            cls,
-            gait_name: str,
-            gait_directory: str,
-            robot: urdf.Robot,
-            gait_version_map: dict,
-            start_is_dynamic: bool,
-            final_is_dynamic: bool
+        cls,
+        gait_name: str,
+        gait_directory: str,
+        robot: urdf.Robot,
+        gait_version_map: dict,
+        start_is_dynamic: bool,
+        final_is_dynamic: bool,
     ):
         """Extract the data from the .gait file.
 
@@ -58,18 +57,24 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
         with open(gait_path, "r") as gait_file:
             gait_dictionary = yaml.load(gait_file, Loader=yaml.SafeLoader)
 
-        return cls.dynamic_from_dict(robot, gait_dictionary, gait_directory,
-                             gait_version_map, start_is_dynamic, final_is_dynamic)
+        return cls.dynamic_from_dict(
+            robot,
+            gait_dictionary,
+            gait_directory,
+            gait_version_map,
+            start_is_dynamic,
+            final_is_dynamic,
+        )
 
     @classmethod
     def dynamic_from_dict(
-            cls,
-            robot: urdf.Robot,
-            gait_dictionary: dict,
-            gait_directory: str,
-            gait_version_map: dict,
-            start_is_dynamic: bool,
-            final_is_dynamic: bool
+        cls,
+        robot: urdf.Robot,
+        gait_dictionary: dict,
+        gait_directory: str,
+        gait_version_map: dict,
+        start_is_dynamic: bool,
+        final_is_dynamic: bool,
     ):
         """Create a new gait object using the .gait and .subgait files.
 
@@ -96,7 +101,7 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
             for name in subgaits
             if name not in ("start", "end")
         }
-        return cls(gait_name, subgaits, graph, start_is_dynamic,  final_is_dynamic)
+        return cls(gait_name, subgaits, graph, start_is_dynamic, final_is_dynamic)
 
     @property
     def starting_position(self):
