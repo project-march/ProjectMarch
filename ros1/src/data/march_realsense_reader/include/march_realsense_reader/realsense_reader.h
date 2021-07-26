@@ -71,12 +71,6 @@ public:
 
     // Create a marker list from the 'foot locations to try' and publish it and
     // publish for visualization
-    void fillFootLocationsToTryMarker(
-        PointCloud2D::Ptr const& foot_locations_to_try,
-        visualization_msgs::Marker& marker_list);
-
-    // Create a marker list from the 'foot locations to try' and publish it and
-    // publish for visualization
     void fillPossibleFootLocationsMarker(
         PointNormalCloud::Ptr const& possible_foot_locations,
         pcl::PointNormal const optimal_foot_location,
