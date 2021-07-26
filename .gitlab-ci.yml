@@ -25,6 +25,9 @@ variables:
 # on how this should be interpreted.
 stages:
   - Build container
+  - Build documentation
+  - Test documentation
+  - Publish documentation
   - Lint code
   - Build code
   - Test code
@@ -64,6 +67,7 @@ stages:
 # are split into different files. Each file specifies the jobs of a stage.
 include:
     - local: /.gitlab/pipeline/build-container.yml
+    - local: /.gitlab/pipeline/build-test-and-publish-documentation.yml
     - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
     - local: /.gitlab/pipeline/test-code.yml
