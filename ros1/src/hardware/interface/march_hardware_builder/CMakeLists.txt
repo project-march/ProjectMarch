@@ -59,7 +59,6 @@ if(CATKIN_ENABLE_TESTING)
         test/motor_controller_builder_test.cpp
         test/incremental_encoder_builder_test.cpp
         test/joint_builder_test.cpp
-        test/pdb_builder_test.cpp
         test/test_runner.cpp
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})

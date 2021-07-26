@@ -65,12 +65,6 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/motor_controller/odrive/odrive_state.h
     include/${PROJECT_NAME}/joint.h
     include/${PROJECT_NAME}/march_robot.h
-    include/${PROJECT_NAME}/power/boot_shutdown_offsets.h
-    include/${PROJECT_NAME}/power/high_voltage.h
-    include/${PROJECT_NAME}/power/low_voltage.h
-    include/${PROJECT_NAME}/power/net_driver_offsets.h
-    include/${PROJECT_NAME}/power/net_monitor_offsets.h
-    include/${PROJECT_NAME}/power/power_distribution_board.h
     include/${PROJECT_NAME}/temperature/temperature_ges.h
     include/${PROJECT_NAME}/temperature/temperature_sensor.h
     include/${PROJECT_NAME}/pressure_sole/pressure_sole.h
@@ -90,9 +84,6 @@ add_library(${PROJECT_NAME}
     src/motor_controller/imotioncube/imotioncube_target_state.cpp
     src/joint.cpp
     src/march_robot.cpp
-    src/power/high_voltage.cpp
-    src/power/low_voltage.cpp
-    src/power/power_distribution_board.cpp
     src/temperature/temperature_ges.cpp
     src/pressure_sole/pressure_sole.cpp
 )
@@ -141,12 +132,6 @@ if(CATKIN_ENABLE_TESTING)
         test/mocks/mock_sdo_interface.h
         test/mocks/mock_slave.h
         test/mocks/mock_temperature_ges.h
-        test/power/boot_shutdown_offsets_test.cpp
-        test/power/high_voltage_test.cpp
-        test/power/low_voltage_test.cpp
-        test/power/net_driver_offsets_test.cpp
-        test/power/net_monitor_offsets_test.cpp
-        test/power/power_distribution_board_test.cpp
         test/temperature/temperature_ges_test.cpp
         test/pressure_sole/pressure_sole_test.cpp
         test/test_runner.cpp
