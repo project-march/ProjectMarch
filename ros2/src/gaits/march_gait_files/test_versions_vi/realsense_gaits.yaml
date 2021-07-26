@@ -10,14 +10,14 @@ realsense_stairs_up_single_step:
   subgaits:
     right_open:
       - MVI_stairsup_rightopen_low_undeep
-      - MVI_stairsup_rightopen_low_deep
+      - MVI_stairsup_rightopen_low_deep_v2
       - MVI_stairsup_rightopen_high_undeep
-      - MVI_stairsup_rightopen_high_deep
+      - MVI_stairsup_rightopen_high_deep_v2
     left_close:
       - MVI_stairsup_leftclose_low_undeep
-      - MVI_stairsup_leftclose_low_deep
+      - MVI_stairsup_leftclose_low_deep_v2
       - MVI_stairsup_leftclose_high_undeep
-      - MVI_stairsup_leftclose_high_deep
+      - MVI_stairsup_leftclose_high_deep_v2
 realsense_stairs_up:
   realsense_category: stairs_up
   camera_to_use: front
@@ -61,8 +61,8 @@ realsense_sit:
     - realsense_stand
   subgaits:
     prepare_sit_down:
-    - MVI_prepare_sit_down_v1
-    - MVI_prepare_sit_down_v1
+      - MVI_prepare_sit_down_v1
+      - MVI_prepare_sit_down_v1
     sit_down:
       - MVI_sit_down_low_v1
       - MVI_sit_down_high_v1
@@ -88,3 +88,73 @@ realsense_stand:
     stand_home:
     - MVI_stand_home_low_v2
     - MVI_stand_home_high_v2
+
+realsense_ramp_up:
+  realsense_category: ramp_up
+  camera_to_use: front
+  starting_position: static
+  final_position: static
+  dimensions: 1
+  subgaits:
+    right_open:
+      - MVI_rampup_rightopen_flat_v2
+      - MVI_rampup_rightopen_steep_v2
+    left_swing:
+      - MVI_rampup_leftswing_flat_v2
+      - MVI_rampup_leftswing_steep_v2
+    right_swing:
+      - MVI_rampup_rightswing_flat_v2
+      - MVI_rampup_rightswing_steep_v2
+    left_close:
+      - MVI_rampup_leftclose_flat_v2
+      - MVI_rampup_leftclose_steep_v2
+    right_close:
+      - MVI_rampup_rightclose_flat_v2
+      - MVI_rampup_rightclose_steep_v2
+    left_open:
+      - MVI_rampup_leftopen_flat_v2
+      - MVI_rampup_leftopen_steep_v2
+
+realsense_ramp_down:
+  realsense_category: ramp_down
+  camera_to_use: front
+  starting_position: static
+  final_position: dynamic
+  dimensions: 1
+  responsible_for:
+    - realsense_ramp_down_last_step
+  subgaits:
+    right_open:
+      - MVI_rampdown_rightopen_flat_v2
+      - MVI_rampdown_rightopen_steep_v2
+    left_swing:
+      - MVI_rampdown_leftswing_flat_v2
+      - MVI_rampdown_leftswing_steep_v2
+    right_swing:
+      - MVI_rampdown_rightswing_flat_v2
+      - MVI_rampdown_rightswing_steep_v2
+    left_close:
+      - MVI_rampdown_leftclose_flat_v2
+      - MVI_rampdown_leftclose_steep_v2
+    right_close:
+      - MVI_rampdown_rightclose_flat_v2
+      - MVI_rampdown_rightclose_steep_v2
+    left_open:
+      - MVI_rampdown_leftopen_flat_v2
+      - MVI_rampdown_leftopen_steep_v2
+
+realsense_ramp_down_last_step:
+  realsense_category: ramp_down
+  camera_to_use: front
+  starting_position: dynamic
+  final_position: static
+  dimensions: 1
+  dependent_on:
+    - realsense_ramp_down
+  subgaits:
+    right_open:
+      - MVI_rampdownlaststep_rightopen_flat_v1
+      - MVI_rampdownlaststep_rightopen_steep_v1
+    left_close:
+      - MVI_rampdownlaststep_leftclose_flat_v1
+      - MVI_rampdownlaststep_leftclose_steep_v1
