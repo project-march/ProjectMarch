@@ -366,8 +366,7 @@ void HullParameterDeterminer::addDebugMarkersToArray()
     debug_marker_array.markers.push_back(gait_information_marker_list);
 }
 
-void HullParameterDeterminer::initializeGaitDimensions()
-{
+void HullParameterDeterminer::initializeGaitDimensions() {
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up: {
             min_x_stairs = min_x_stairs_up;
@@ -434,43 +433,58 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    if (sit_height > min_sit_height && sit_height < max_sit_height) {
-        gait_parameters_->first_parameter
-            = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
-    } else {
-        gait_parameters_->first_parameter = -1;
-        ROS_ERROR_STREAM("The sit height should be between "
-            << min_sit_height << " and " << max_sit_height << " but was "
-            << sit_height);
-        return false;
-    }
-    // The step height and side step parameter are unused for the sit
-    // gait, so they are set to -1
-    gait_parameters_->second_parameter = -1;
-    gait_parameters_->side_step_parameter = -1;
-    return true;
-}
-
-bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
-{
     if (sit_height > max_sit_height + allowed_deviation_from_reachable_bench
         || sit_height
-            < min_sit_height - allowed_deviation_from_reachable_bench) {
-        ROS_WARN_STREAM("The found sit height should be between "
-            << min_sit_height << "( -" << allowed_deviation_from_reachable_bench
-            << " ) and " << max_sit_height << "( +"
-            << allowed_deviation_from_reachable_bench << " ) but was "
-            << ramp_slope);
+           < min_sit_height - allowed_deviation_from_reachable_bench) {
+        ROS_ERROR_STREAM("The found sit height should be between "
+                                << min_sit_height << "( -" << allowed_deviation_from_reachable_bench
+                                << " ) and " << max_sit_height << "( +"
+                                << allowed_deviation_from_reachable_bench << " ) but was "
+                                << ramp_slope);
         return false;
     }
 
     gait_parameters_->first_parameter
-        = calculateParameter(sit_height, min_sit_height, max_sit_height);
+            = calculateParameter(sit_height, min_sit_height, max_sit_height);
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
+}
+
+bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
+{
+    if (optimal_foot_location.x > max_x_stairs + allowed_deviation_from_reachable_stair
+        || optimal_foot_location.z
+            < min_x_stairs - allowed_deviation_from_reachable_stair) {
+        ROS_ERROR_STREAM("The found stair depth should be between "
+            << min_x_stairs << "( -" << allowed_deviation_from_reachable_stair
+            << " ) and " << max_x_stairs << "( +"
+            << allowed_deviation_from_reachable_stair << " ) but was "
+            << optimal_foot_location.x);
+        return false;
+    }
+    if (optimal_foot_location.z > max_z_stairs + allowed_deviation_from_reachable_stair
+        || optimal_foot_location.z
+            < min_z_stairs - allowed_deviation_from_reachable_stair) {
+        ROS_ERROR_STREAM("The found stair depth should be between "
+            << min_z_stairs << "( -" << allowed_deviation_from_reachable_stair
+            << " ) and " << max_z_stairs << "( +"
+            << allowed_deviation_from_reachable_stair << " ) but was "
+            << optimal_foot_location.z);
+        return false;
+    }
+
+    gait_parameters_->first_parameter
+        = calculateParameter(optimal_foot_location.x, min_x_stairs, max_x_stairs);
+    gait_parameters_->second_parameter
+        = calculateParameter(optimal_foot_location.z, min_z_stairs, max_z_stairs);
+
+    // The side step parameter is unused for the stairs
+    // gait, so it is set to -1
+    gait_parameters_->side_step_parameter = -1;
+
     // As we interpret the second (height) parameter as being high when the
     // stair is steep, flip it for the stairs down gait as it is one when
     // the optimal location is close to the highest (not absolute) value.
@@ -485,7 +499,7 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 {
     if (ramp_slope > max_slope + allowed_deviation_from_reachable_ramp
         || ramp_slope < min_slope - allowed_deviation_from_reachable_ramp) {
-        ROS_WARN_STREAM("The found ramp slope should be between "
+        ROS_ERROR_STREAM("The found ramp slope should be between "
             << min_slope << "( -" << allowed_deviation_from_reachable_ramp
             << " ) and " << max_slope << "( +"
             << allowed_deviation_from_reachable_ramp << " ) but was "
@@ -1015,7 +1029,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
     const PointCloud2D::Ptr& cloud_to_fill, float start, float end)
 {
     if (number_of_optional_foot_locations == 0) {
-        ROS_WARN_STREAM(
+        ROS_ERROR_STREAM(
             "The number of optional foot locations parameter is set to 0, "
             "not filling the foot_locations_to_try cloud");
         return false;
@@ -1057,7 +1071,7 @@ bool HullParameterDeterminer::cropCloudToHullVector(
                         "No cropping can be done, returning.");
         return false;
     } else if (hull_vector_->size() == 0) {
-        ROS_WARN_STREAM(
+        ROS_ERROR_STREAM(
             "cropCloudToHull method called with emtpy hull_vector_. "
             "No cropping can be done, returning.");
         return false;
