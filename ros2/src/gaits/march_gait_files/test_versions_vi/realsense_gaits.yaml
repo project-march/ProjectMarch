@@ -57,9 +57,6 @@ realsense_stairs_down_single_step:
   starting_position: static
   final_position: static
   dimensions: 2
-  default_parameters:
-    - 0.5
-    - 0.5
   subgaits:
     right_open:
       - MVI_stairsdown_rightopen_low_undeep_v1
@@ -78,9 +75,6 @@ realsense_stairs_down:
   starting_position: static
   final_position: static
   dimensions: 2
-  default_parameters:
-    - 0.5
-    - 0.5
   subgaits:
     right_open:
       - MVI_stairsdown_rightopen_low_undeep_v1

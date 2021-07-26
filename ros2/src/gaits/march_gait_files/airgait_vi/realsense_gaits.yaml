@@ -75,7 +75,7 @@ realsense_stairs_up_single_step:
       - MVI_stairsup_leftclose_low_deep_v2
       - MVI_stairsup_leftclose_high_undeep
       - MVI_stairsup_leftclose_high_deep_v2
-      -
+
 realsense_stairs_up:
   realsense_category: stairs_up
   camera_to_use: front
