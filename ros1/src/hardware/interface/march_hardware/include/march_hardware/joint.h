@@ -9,7 +9,6 @@
 
 #include <march_hardware/motor_controller/motor_controller.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
-#include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
 
 namespace march {
