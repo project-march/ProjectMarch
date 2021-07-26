@@ -256,6 +256,8 @@ protected:
     float min_x_search_sit {};
     float max_x_search_sit {};
     float search_y_deviation_sit {};
+    float sit_pos_x {};
+    float sit_pos_y {};
     float sit_grid_size {};
     float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
