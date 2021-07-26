@@ -187,7 +187,7 @@ bool CHullFinder::projectRegionToPlane()
 // corresponding polygons
 bool CHullFinder::getCHullFromProjectedRegion()
 {
-    if (region_points_projected->size() < 3) {
+    if (region_points_projected_->size() < 3) {
         ROS_WARN_STREAM("A minimum of 3 points are needed to construct a hull. "
                         "The number of points projected to the region plane is "
             << region_points_projected->size() << ". Ignoring region.");
