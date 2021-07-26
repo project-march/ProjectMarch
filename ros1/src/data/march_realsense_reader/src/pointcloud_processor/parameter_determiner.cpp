@@ -447,7 +447,7 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
     gait_parameters_->first_parameter
             = calculateParameter(sit_height, min_sit_height, max_sit_height);
 
-    // The step height and side step parameter are unused for the ramp down
+    // The step height and side step parameter are unused for the sit
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
@@ -508,13 +508,11 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
             << ramp_slope);
         return false;
     }
-    gait_parameters_->first_parameter
-        = (ramp_slope - min_slope) / (max_slope - min_slope);
 
     gait_parameters_->first_parameter
         = calculateParameter(ramp_slope, min_slope, max_slope);
 
-    // The step height and side step parameter are unused for the ramp down
+    // The step height and side step parameter are unused for the ramp
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
