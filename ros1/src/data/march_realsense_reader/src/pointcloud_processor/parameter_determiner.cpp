@@ -712,7 +712,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 
     success &= getOptimalFootLocationFromPossibleLocations();
 
-    for (pcl::PointXYZ gait_information_point : *gait_information_cloud) {
+    if (debugging_) {
         geometry_msgs::Point marker_point;
         marker_point.x = optimal_foot_location.x;
         marker_point.y = optimal_foot_location.y;
