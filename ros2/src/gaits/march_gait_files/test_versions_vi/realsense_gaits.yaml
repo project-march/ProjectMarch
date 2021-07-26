@@ -80,14 +80,14 @@ realsense_stand:
     - realsense_sit
   subgaits:
     prepare_stand_up:
-    - MVI_prepare_stand_up_low_v1
-    - MVI_prepare_stand_up_high_v1
+    - MVI_prepare_stand_up_low_v2
+    - MVI_prepare_stand_up_high_v2
     stand_up:
-    - MVI_stand_up_low_v1
-    - MVI_stand_up_high_v1
+    - MVI_stand_up_low_v2
+    - MVI_stand_up_high_v2
     stand_home:
-    - MVI_stand_home_v1
-    - MVI_stand_home_v1
+    - MVI_stand_home_low_v2
+    - MVI_stand_home_high_v2
 
 realsense_ramp_up:
   realsense_category: ramp_up
