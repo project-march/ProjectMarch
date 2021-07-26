@@ -451,6 +451,8 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
+
+    return true;
 }
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
