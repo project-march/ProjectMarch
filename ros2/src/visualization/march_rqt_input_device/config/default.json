@@ -42,6 +42,15 @@
          "name": "ramp_down_last_step"
       },
       {
+         "name": "ramp_up_single_step"
+      },
+      {
+         "name": "ramp_down_start_single_step"
+      },
+      {
+         "name": "ramp_down_single_step"
+      },
+      {
          "name": "walk_single_step"
       },
       {
