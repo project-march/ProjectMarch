@@ -14,6 +14,7 @@ PowerDistributionBoardData PowerDistributionBoard::read()
 {
     std::array<bit32, POWER_DISTRIBUTION_BOARD_DATA_LENGTH> data {};
     for (unsigned int i = 0; i < data.size(); i++) {
+        // Increment the offset by 4 bytes each iteration
         data[i] = this->read32(byte_offset_ + i * sizeof(float));
     }
     static_assert(POWER_DISTRIBUTION_BOARD_DATA_LENGTH == 15);

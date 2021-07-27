@@ -114,7 +114,7 @@ public:
         const YAML::Node& pressure_sole_config,
         const march::PdoInterfacePtr& pdo_interface,
         const march::SdoInterfacePtr& sdo_interface);
-    static march::PowerDistributionBoard createPowerDistributionBoard(
+    static std::optional<march::PowerDistributionBoard> createPowerDistributionBoard(
         const YAML::Node& power_distribution_config,
         const march::PdoInterfacePtr& pdo_interface,
         const march::SdoInterfacePtr& sdo_interface);
