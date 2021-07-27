@@ -20,6 +20,7 @@
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_msgs/AfterLimitJointCommand.h>
 #include <march_shared_msgs/MotorControllerState.h>
+#include <march_shared_msgs/PowerDistributionBoardData.h>
 #include <march_shared_msgs/PressureSolesData.h>
 
 template <typename T>
@@ -84,6 +85,7 @@ private:
     void updateAfterLimitJointCommand();
     void updateMotorControllerState();
     void updatePressureSoleData();
+    void updatePowerDistributionBoardData();
     void outsideLimitsCheck(size_t joint_index);
     bool MotorControllerStateCheck(size_t joint_index);
     static void getSoftJointLimitsError(const std::string& name,
@@ -143,6 +145,8 @@ private:
         motor_controller_state_pub_;
     RtPublisherPtr<march_shared_msgs::PressureSolesData>
         pressure_sole_data_pub_;
+    RtPublisherPtr<march_shared_msgs::PowerDistributionBoardData>
+        power_distribution_board_data_pub_;
 };
 
 #endif // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

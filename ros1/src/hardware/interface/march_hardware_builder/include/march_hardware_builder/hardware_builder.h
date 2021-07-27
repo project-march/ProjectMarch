@@ -20,6 +20,7 @@
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive.h>
+#include <march_hardware/power_distribution_board/power_distribution_board.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 #include <march_hardware/temperature/temperature_ges.h>
 
@@ -113,6 +114,10 @@ public:
         const YAML::Node& pressure_sole_config,
         const march::PdoInterfacePtr& pdo_interface,
         const march::SdoInterfacePtr& sdo_interface);
+    static std::optional<march::PowerDistributionBoard>
+    createPowerDistributionBoard(const YAML::Node& power_distribution_config,
+        const march::PdoInterfacePtr& pdo_interface,
+        const march::SdoInterfacePtr& sdo_interface);
 
     /**
      * Initializes the URDF if necessary.
@@ -138,6 +143,8 @@ public:
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;
     static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
     static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
+    static const std::vector<std::string>
+        POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
 
 private:
     int updateSlaveIndexBasedOnFixedJoints(const YAML::Node& joint_config,
