@@ -528,8 +528,9 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
         || optimal_foot_location.z
             < min_x_stairs_world - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair depth should be between "
-            << min_x_stairs_world << "( -" << allowed_deviation_from_reachable_stair
-            << " ) and " << max_x_stairs_world << "( +"
+            << min_x_stairs_world << "( -"
+            << allowed_deviation_from_reachable_stair << " ) and "
+            << max_x_stairs_world << "( +"
             << allowed_deviation_from_reachable_stair << " ) but was "
             << optimal_foot_location.x);
         return false;
@@ -539,8 +540,9 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
         || optimal_foot_location.z
             < min_z_stairs_world - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair height should be between "
-            << min_z_stairs_world << "( -" << allowed_deviation_from_reachable_stair
-            << " ) and " << max_z_stairs_world << "( +"
+            << min_z_stairs_world << "( -"
+            << allowed_deviation_from_reachable_stair << " ) and "
+            << max_z_stairs_world << "( +"
             << allowed_deviation_from_reachable_stair << " ) but was "
             << optimal_foot_location.z);
         return false;
@@ -952,14 +954,14 @@ bool HullParameterDeterminer::isValidLocation(
             // A possible foot location for the stairs gait is valid if it
             // is reachable by the stairs gait and the location offers
             // support for the entire foot
-            return (possible_foot_location.x
-                    < min_x_stairs_world + allowed_deviation_from_reachable_stair
-                && possible_foot_location.x
-                    > max_x_stairs_world - allowed_deviation_from_reachable_stair
-                && possible_foot_location.z
-                    > min_z_stairs_world - allowed_deviation_from_reachable_stair
-                && possible_foot_location.z
-                    < max_z_stairs_world + allowed_deviation_from_reachable_stair
+            return (possible_foot_location.x < min_x_stairs_world
+                        + allowed_deviation_from_reachable_stair
+                && possible_foot_location.x > max_x_stairs_world
+                        - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z > min_z_stairs_world
+                        - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z < max_z_stairs_world
+                        + allowed_deviation_from_reachable_stair
                 && entireFootCanBePlaced(possible_foot_location));
         }
         default: {
