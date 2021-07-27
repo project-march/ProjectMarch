@@ -104,4 +104,3 @@ joints:
     time_from_start: 1250000000
     velocity: 0.0
 name: left_swing
-version: MIII_old

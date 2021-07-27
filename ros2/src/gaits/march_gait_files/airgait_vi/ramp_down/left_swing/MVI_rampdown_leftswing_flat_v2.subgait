@@ -75,4 +75,3 @@ joints:
     time_from_start: 3000000000
     velocity: -0.0
 name: left_swing
-version: MVI_rampdown_leftswing_flat_v2

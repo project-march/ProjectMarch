@@ -105,4 +105,3 @@ joints:
     time_from_start: 1100000000
     velocity: 0.0
 name: right_swing
-version: MV_walk_rightswing_v4

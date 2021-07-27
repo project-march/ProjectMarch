@@ -69,4 +69,3 @@ joints:
     time_from_start: 3000000000
     velocity: 0.5818
 name: left_swing
-version: MV_stairsup_leftswing_v17

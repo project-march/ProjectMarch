@@ -95,4 +95,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: left_open
-version: MIV_8deg_more_hip_extension_both_sides_pause

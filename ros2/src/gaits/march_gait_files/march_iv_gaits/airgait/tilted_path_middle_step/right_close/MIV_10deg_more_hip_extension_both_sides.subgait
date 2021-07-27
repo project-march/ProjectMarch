@@ -98,4 +98,3 @@ joints:
     time_from_start: 2600000000
     velocity: 0.0
 name: right_close
-version: MIV_10deg_more_hip_extension_both_sides

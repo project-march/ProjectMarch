@@ -89,4 +89,3 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
 name: stand_up
-version: MIV_with_ankle_movements_ankle_0

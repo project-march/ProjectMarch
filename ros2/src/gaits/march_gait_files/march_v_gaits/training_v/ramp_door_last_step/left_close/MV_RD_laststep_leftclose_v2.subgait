@@ -83,4 +83,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: left_close
-version: MV_RD_laststep_leftclose_v2

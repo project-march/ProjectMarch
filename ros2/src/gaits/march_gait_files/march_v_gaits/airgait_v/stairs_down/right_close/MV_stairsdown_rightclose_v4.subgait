@@ -71,4 +71,3 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
 name: right_close
-version: MV_stairsdown_rightclose_v4

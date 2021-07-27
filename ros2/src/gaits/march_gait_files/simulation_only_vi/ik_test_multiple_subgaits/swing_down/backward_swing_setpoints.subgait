@@ -119,4 +119,3 @@ joints:
     time_from_start: 8000000000
     velocity: 0.0
 name: swing_down
-version: backward_swing_setpoints

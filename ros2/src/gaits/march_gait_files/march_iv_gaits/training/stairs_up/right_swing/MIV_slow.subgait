@@ -100,4 +100,3 @@ joints:
     time_from_start: 4000000000
     velocity: -0.9425
 name: right_swing
-version: MIV_slow

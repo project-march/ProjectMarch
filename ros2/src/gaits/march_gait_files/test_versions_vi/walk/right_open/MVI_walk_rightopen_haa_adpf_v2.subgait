@@ -89,4 +89,3 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MVI_walk_rightopen_haa_adpf_v2

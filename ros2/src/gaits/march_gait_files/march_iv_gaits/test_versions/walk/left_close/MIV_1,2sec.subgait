@@ -80,4 +80,3 @@ joints:
     time_from_start: 1199999999
     velocity: 0.0
 name: left_close
-version: MIV_1,2sec

@@ -101,4 +101,3 @@ joints:
     time_from_start: 3000000000
     velocity: -0.6981
 name: right_open
-version: MV_RD_slopedown_fixed_rightopen_v2

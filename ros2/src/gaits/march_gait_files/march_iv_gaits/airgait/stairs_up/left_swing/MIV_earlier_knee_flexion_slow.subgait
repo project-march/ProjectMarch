@@ -100,4 +100,3 @@ joints:
     time_from_start: 4000000000
     velocity: 1.228
 name: left_swing
-version: MIV_earlier_knee_flexion_slow

@@ -95,4 +95,3 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
 name: set_ankle_to_five
-version: from_0_to_5_degrees

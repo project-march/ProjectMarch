@@ -99,4 +99,3 @@ joints:
     time_from_start: 3000000000
     velocity: -0.5236
 name: right_swing
-version: MIV_less_knee_extension

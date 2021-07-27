@@ -92,4 +92,3 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
 name: right_open
-version: MV_RT_highstep_rightopen_v1

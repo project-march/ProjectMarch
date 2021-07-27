@@ -35,4 +35,3 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
 name: home_sit
-version: home_sit_3sec_less_hip_extension

@@ -36,4 +36,3 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
 name: home_sit
-version: MIV_ankle_0

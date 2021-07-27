@@ -131,4 +131,3 @@ joints:
     time_from_start: 25000000000
     velocity: 0.0
 name: ankle_test_stand
-version: ankle_test_stand
