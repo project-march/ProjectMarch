@@ -84,3 +84,4 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
 name: left_close
+version: MV_RD_slopedown_fixed_leftclose_v1

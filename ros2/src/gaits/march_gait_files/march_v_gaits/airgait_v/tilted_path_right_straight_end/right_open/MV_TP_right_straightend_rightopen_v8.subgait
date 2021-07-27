@@ -71,3 +71,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
+version: MV_TP_right_straightend_rightopen_v8

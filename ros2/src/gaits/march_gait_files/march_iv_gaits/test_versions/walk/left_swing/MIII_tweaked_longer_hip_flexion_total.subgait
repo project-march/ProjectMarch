@@ -127,3 +127,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.3491
 name: left_swing
+version: MIII_tweaked_longer_hip_flexion_total

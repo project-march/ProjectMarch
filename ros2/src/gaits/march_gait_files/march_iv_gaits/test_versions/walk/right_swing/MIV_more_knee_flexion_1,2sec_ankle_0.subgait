@@ -87,3 +87,4 @@ joints:
     time_from_start: 1199999999
     velocity: 0.0
 name: right_swing
+version: MIV_more_knee_flexion_1,2sec_ankle_0

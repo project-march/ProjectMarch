@@ -74,3 +74,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: left_open
+version: MV_RD_slopeup_leftopen_v3

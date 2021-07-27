@@ -94,3 +94,4 @@ joints:
     time_from_start: 4000000000
     velocity: -1.3875
 name: right_open
+version: MIV_4sec_ankle_2.5

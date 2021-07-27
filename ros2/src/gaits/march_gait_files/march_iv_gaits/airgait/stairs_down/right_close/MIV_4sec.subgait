@@ -90,3 +90,4 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
 name: right_close
+version: MIV_4sec

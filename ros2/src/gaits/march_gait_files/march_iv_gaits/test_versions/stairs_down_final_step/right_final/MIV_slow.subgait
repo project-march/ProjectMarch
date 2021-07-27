@@ -100,3 +100,4 @@ joints:
     time_from_start: 6000000000
     velocity: -1.3875
 name: right_final
+version: MIV_slow

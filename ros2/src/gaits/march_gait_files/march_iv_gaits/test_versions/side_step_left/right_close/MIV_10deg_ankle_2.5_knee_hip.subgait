@@ -77,3 +77,4 @@ joints:
     time_from_start: 2000000000
     velocity: 0.0
 name: right_close
+version: MIV_10deg_ankle_2.5_knee_hip

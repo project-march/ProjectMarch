@@ -107,3 +107,4 @@ joints:
     time_from_start: 23000000000
     velocity: 0.0
 name: ankle_test_sit
+version: right
