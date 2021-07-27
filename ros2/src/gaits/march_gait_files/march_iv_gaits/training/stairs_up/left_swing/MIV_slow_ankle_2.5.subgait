@@ -94,4 +94,3 @@ joints:
     time_from_start: 4000000000
     velocity: 1.228
 name: left_swing
-version: MIV_slow_ankle_2.5

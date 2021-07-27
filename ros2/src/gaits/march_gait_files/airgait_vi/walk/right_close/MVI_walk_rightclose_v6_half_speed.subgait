@@ -80,4 +80,3 @@ joints:
     time_from_start: 3400000000
     velocity: 0.0
 name: right_close
-version: MVI_walk_rightclose_v6_half_speed

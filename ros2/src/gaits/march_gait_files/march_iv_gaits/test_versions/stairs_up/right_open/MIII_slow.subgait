@@ -116,4 +116,3 @@ joints:
     time_from_start: 5500000000
     velocity: -0.5236
 name: right_open
-version: MIII_slow

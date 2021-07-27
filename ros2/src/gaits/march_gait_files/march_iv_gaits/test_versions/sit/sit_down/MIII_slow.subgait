@@ -96,4 +96,3 @@ joints:
     time_from_start: 3500000000
     velocity: 0.0
 name: sit_down
-version: MIII_slow

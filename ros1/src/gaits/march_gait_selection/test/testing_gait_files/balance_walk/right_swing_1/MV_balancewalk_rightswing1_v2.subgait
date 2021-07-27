@@ -72,4 +72,3 @@ joints:
     time_from_start: 550000000
     velocity: -1.2544
 name: right_swing_1
-version: MV_balancewalk_rightswing1_v2

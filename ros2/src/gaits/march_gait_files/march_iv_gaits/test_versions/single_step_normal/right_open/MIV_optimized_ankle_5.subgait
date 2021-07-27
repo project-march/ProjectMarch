@@ -83,4 +83,3 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MIV_optimized_ankle_5

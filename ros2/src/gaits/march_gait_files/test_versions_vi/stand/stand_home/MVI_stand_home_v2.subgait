@@ -65,4 +65,3 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: sit_down
-version: MVI_sit_down_v2

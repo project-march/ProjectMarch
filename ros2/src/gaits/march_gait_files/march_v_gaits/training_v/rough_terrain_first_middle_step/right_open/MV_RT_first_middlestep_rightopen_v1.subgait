@@ -78,4 +78,3 @@ joints:
     time_from_start: 2000000000
     velocity: -0.5236
 name: right_open
-version: MV_RT_first_middlestep_rightopen_v1

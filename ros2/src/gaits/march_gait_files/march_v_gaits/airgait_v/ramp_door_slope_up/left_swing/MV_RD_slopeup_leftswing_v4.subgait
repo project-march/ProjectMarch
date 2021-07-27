@@ -68,4 +68,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.6981
 name: left_swing
-version: MV_RD_slopeup_leftswing_v4

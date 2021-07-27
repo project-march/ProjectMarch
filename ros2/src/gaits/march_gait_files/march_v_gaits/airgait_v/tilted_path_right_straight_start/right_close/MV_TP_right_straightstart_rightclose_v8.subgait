@@ -83,4 +83,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_close
-version: MV_TP_right_straightstart_rightclose_v8

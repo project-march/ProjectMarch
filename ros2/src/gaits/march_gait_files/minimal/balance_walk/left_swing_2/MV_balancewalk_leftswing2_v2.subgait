@@ -68,4 +68,3 @@ joints:
     time_from_start: 550000000
     velocity: 0.0
 name: left_swing_2
-version: MV_balancewalk_leftswing2_v2

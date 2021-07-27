@@ -77,4 +77,3 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
-version: MV_TP_left_singlestep_rightopen_v3

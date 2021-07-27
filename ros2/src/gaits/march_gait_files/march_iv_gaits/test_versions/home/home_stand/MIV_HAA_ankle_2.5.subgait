@@ -36,4 +36,3 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
 name: home_stand
-version: MIV_HAA_ankle_2.5

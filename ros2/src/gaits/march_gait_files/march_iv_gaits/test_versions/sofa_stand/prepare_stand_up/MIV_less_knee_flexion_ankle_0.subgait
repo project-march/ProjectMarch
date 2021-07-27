@@ -60,4 +60,3 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
 name: prepare_stand_up
-version: MIV_less_knee_flexion_ankle_0

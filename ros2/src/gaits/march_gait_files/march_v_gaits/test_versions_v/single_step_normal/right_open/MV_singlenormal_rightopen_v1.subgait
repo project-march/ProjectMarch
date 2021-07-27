@@ -83,4 +83,3 @@ joints:
     time_from_start: 1300000000
     velocity: 0.0
 name: right_open
-version: MV_singlenormal_rightopen_v1

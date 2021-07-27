@@ -84,4 +84,3 @@ joints:
     time_from_start: 3000000000
     velocity: -0.0
 name: right_close
-version: MV_RD_slopedown_rightclose_v5

@@ -90,4 +90,3 @@ joints:
     time_from_start: 5000000000
     velocity: 0.0
 name: left_final
-version: MIV_less_knee_extension_slow

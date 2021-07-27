@@ -60,4 +60,3 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
 name: right_open
-version: MV_TP_left_kneebend_rightopen_v5

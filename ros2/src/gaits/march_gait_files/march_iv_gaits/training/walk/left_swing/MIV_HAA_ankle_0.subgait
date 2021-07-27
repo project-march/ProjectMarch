@@ -81,4 +81,3 @@ joints:
     time_from_start: 1300000000
     velocity: 0.0
 name: left_swing
-version: MIV_HAA_ankle_0

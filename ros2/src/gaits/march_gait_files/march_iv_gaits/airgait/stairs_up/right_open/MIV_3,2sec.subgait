@@ -120,4 +120,3 @@ joints:
     time_from_start: 3200000000
     velocity: -0.9425
 name: right_open
-version: MIV_3,2sec

@@ -99,4 +99,3 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
 name: right_final
-version: MIII_continuous

@@ -90,4 +90,3 @@ joints:
     time_from_start: 2700000000
     velocity: 0.0
 name: stand_up
-version: MVI_stand_up_low_v1
