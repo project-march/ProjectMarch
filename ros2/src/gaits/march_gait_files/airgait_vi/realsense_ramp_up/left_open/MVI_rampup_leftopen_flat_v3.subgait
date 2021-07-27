@@ -1,4 +1,4 @@
-description: ramp up v2 but without haa
+description: version 2 but then with no HAA
 duration: 2500000000
 gait_type: stairs_like
 joints:

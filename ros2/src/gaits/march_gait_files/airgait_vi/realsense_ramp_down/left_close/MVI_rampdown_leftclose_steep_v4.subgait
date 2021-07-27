@@ -4,18 +4,12 @@ duration: 1800000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0698
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.2618
-    time_from_start: 283600000
-    velocity: 0.0
-  - position: -0.0827
-    time_from_start: 851900000
-    velocity: 0
   - position: -0.4363
     time_from_start: 1800000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -44,15 +38,12 @@ joints:
     time_from_start: 1800000000
     velocity: -0.0
   right_ankle:
-  - position: -0.4363
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: -0.4363
-    time_from_start: 900000000
-    velocity: -0.0
-  - position: -0.4363
     time_from_start: 1800000000
-    velocity: -0.0
+    velocity: 0.0
   right_hip_aa:
   - position: 0.0349
     time_from_start: 0
