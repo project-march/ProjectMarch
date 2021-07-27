@@ -5,6 +5,7 @@ from numpy_ringbuffer import RingBuffer
 import rospkg
 import rospy
 from typing import Dict
+import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_shared_classes.gait.subgait import Subgait
@@ -363,7 +364,13 @@ class GaitGeneratorController:
             os.makedirs(output_file_directory)
 
         with open(output_file_path, "w") as output_file:
-            output_file.write(subgait.to_yaml())
+            subgait_dict = subgait.to_dict()
+            # remove the version field when writing because it is
+            # superfluous considering the file name
+            if "version" in subgait_dict:
+                del subgait_dict["version"]
+
+            output_file.write(yaml.dump(subgait_dict))
 
         self.view.notify("Gait Saved", output_file_path)
 
