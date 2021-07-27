@@ -184,7 +184,7 @@ realsense_ramp_down:
   subgaits:
     right_open:
       - MVI_rampdown_rightopen_flat_v4
-      - MVI_rampdown_rightopen_steep_v4
+      - MVI_rampdown_rightopen_steep_v5
     left_swing:
       - MVI_rampdown_leftswing_flat_v4
       - MVI_rampdown_leftswing_steep_v4
