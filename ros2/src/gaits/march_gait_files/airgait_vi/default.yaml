@@ -74,11 +74,11 @@ gaits:
     left_close: MVI_walksinglesteplarge_leftclose_v3
  
   walk_small:
-    left_close: MVI_walksmall_leftclose_v3
-    left_swing: MVI_walksmall_leftswing_v3
-    right_close: MVI_walksmall_rightclose_v3
-    right_open: MVI_walksmall_rightopen_v3
-    right_swing: MVI_walksmall_rightswing_v3
+    left_close: MVI_walksmall_leftclose_v5
+    left_swing: MVI_walksmall_leftswing_v5
+    right_close: MVI_walksmall_rightclose_v5
+    right_open: MVI_walksmall_rightopen_v5
+    right_swing: MVI_walksmall_rightswing_v5
     
   sit:
     sit_down: MVI_sit_down_v2
@@ -94,8 +94,8 @@ gaits:
     perform_test: perform_test_v1
 
   walk_single_step_small:
-    right_open: MVI_walksinglestepsmall_rightopen_v3
-    left_close: MVI_walksinglestepsmall_leftclose_v3
+    right_open: MVI_walksinglestepsmall_rightopen_v5
+    left_close: MVI_walksinglestepsmall_leftclose_v5
 
   ramp_down:
     left_close: MVI_rampdown_leftclose_flat_v4
