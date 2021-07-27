@@ -1,6 +1,5 @@
 // Copyright 2019 Project March.
 #include "march_hardware_interface/march_hardware_interface.h"
-#include "march_hardware_interface/power_net_on_off_command.h"
 
 #include <march_hardware/joint.h>
 #include <march_hardware/motor_controller/actuation_mode.h>
@@ -88,39 +87,6 @@ bool MarchHardwareInterface::init(
 
         soft_limits_[i] = soft_limits;
         soft_limits_error_[i] = soft_limits_error;
-    }
-
-    if (this->march_robot_->hasPowerDistributionboard()) {
-        // Create march_pdb_state interface
-        MarchPdbStateHandle march_pdb_state_handle("PDBhandle",
-            this->march_robot_->getPowerDistributionBoard(),
-            &master_shutdown_allowed_command_, &enable_high_voltage_command_,
-            &power_net_on_off_command_);
-        march_pdb_interface_.registerHandle(march_pdb_state_handle);
-
-        for (const auto& joint : *this->march_robot_) {
-            const int net_number = joint.getNetNumber();
-            if (net_number == -1) {
-                std::ostringstream error_stream;
-                error_stream << "Joint " << joint.getName()
-                             << " has no net number";
-                throw std::runtime_error(error_stream.str());
-            }
-            while (!march_robot_->getPowerDistributionBoard()
-                        ->getHighVoltage()
-                        .getNetOperational(net_number)) {
-                march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
-                    .setNetOnOff(/*on=*/true, net_number);
-                usleep(/*__useconds=*/100000);
-                ROS_WARN(
-                    "[%s] Waiting on high voltage", joint.getName().c_str());
-            }
-        }
-
-        this->registerInterface(&this->march_pdb_interface_);
-    } else {
-        ROS_WARN("Running without Power Distribution Board");
     }
 
     // Initialize interfaces for each joint
@@ -374,10 +340,6 @@ void MarchHardwareInterface::write(
     }
 
     this->updateAfterLimitJointCommand();
-
-    if (this->march_robot_->hasPowerDistributionboard()) {
-        updatePowerDistributionBoard();
-    }
 }
 
 int MarchHardwareInterface::getEthercatCycleTime() const
@@ -422,79 +384,6 @@ void MarchHardwareInterface::reserveMemory()
     motor_controller_state_pub_->msg_.incremental_position.resize(num_joints_);
     motor_controller_state_pub_->msg_.absolute_velocity.resize(num_joints_);
     motor_controller_state_pub_->msg_.incremental_velocity.resize(num_joints_);
-}
-
-void MarchHardwareInterface::updatePowerDistributionBoard()
-{
-    march_robot_->getPowerDistributionBoard()->setMasterOnline();
-    march_robot_->getPowerDistributionBoard()->setMasterShutDownAllowed(
-        master_shutdown_allowed_command_);
-    updateHighVoltageEnable();
-    updatePowerNet();
-}
-
-void MarchHardwareInterface::updateHighVoltageEnable()
-{
-    try {
-        if (march_robot_->getPowerDistributionBoard()
-                ->getHighVoltage()
-                .getHighVoltageEnabled()
-            != enable_high_voltage_command_) {
-            march_robot_->getPowerDistributionBoard()
-                ->getHighVoltage()
-                .enableDisableHighVoltage(enable_high_voltage_command_);
-        } else if (!march_robot_->getPowerDistributionBoard()
-                        ->getHighVoltage()
-                        .getHighVoltageEnabled()) {
-            ROS_WARN_THROTTLE(2, "High voltage disabled");
-        }
-    } catch (std::exception& exception) {
-        ROS_ERROR("%s", exception.what());
-        ROS_DEBUG("Reverting the enable_high_voltage_command input, in attempt "
-                  "to prevent this exception is thrown "
-                  "again");
-        enable_high_voltage_command_ = !enable_high_voltage_command_;
-    }
-}
-
-void MarchHardwareInterface::updatePowerNet()
-{
-    if (power_net_on_off_command_.getType() == PowerNetType::high_voltage) {
-        try {
-            if (march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
-                    .getNetOperational(power_net_on_off_command_.getNetNumber())
-                != power_net_on_off_command_.isOnOrOff()) {
-                march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
-                    .setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                        power_net_on_off_command_.getNetNumber());
-            }
-        } catch (std::exception& exception) {
-            ROS_ERROR("%s", exception.what());
-            ROS_DEBUG("Reset power net command, in attempt to prevent this "
-                      "exception is thrown again");
-            power_net_on_off_command_.reset();
-        }
-    } else if (power_net_on_off_command_.getType()
-        == PowerNetType::low_voltage) {
-        try {
-            if (march_robot_->getPowerDistributionBoard()
-                    ->getLowVoltage()
-                    .getNetOperational(power_net_on_off_command_.getNetNumber())
-                != power_net_on_off_command_.isOnOrOff()) {
-                march_robot_->getPowerDistributionBoard()
-                    ->getLowVoltage()
-                    .setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                        power_net_on_off_command_.getNetNumber());
-            }
-        } catch (std::exception& exception) {
-            ROS_ERROR("%s", exception.what());
-            ROS_WARN("Reset power net command, in attempt to prevent this "
-                     "exception is thrown again");
-            power_net_on_off_command_.reset();
-        }
-    }
 }
 
 void MarchHardwareInterface::updateAfterLimitJointCommand()
