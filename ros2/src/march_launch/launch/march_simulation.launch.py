@@ -23,6 +23,7 @@ def generate_launch_description():
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
+    jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -155,6 +156,11 @@ def generate_launch_description():
                 default_value="0.004",
                 description="",
             ),
+            DeclareLaunchArgument(
+                "jointless",
+                default_value="False",
+                description="If true, no joints will be actuated",
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -203,6 +209,7 @@ def generate_launch_description():
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
+                    ("jointlesss", jointless)
                 ],
             ),
         ]

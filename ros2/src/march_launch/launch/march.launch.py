@@ -23,6 +23,7 @@ def generate_launch_description():
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
+    jointless = LaunchConfiguration("jointless")
 
     # HUD arguments
     use_hud = LaunchConfiguration("use_hud")
@@ -120,6 +121,11 @@ def generate_launch_description():
                 "groundgaiting.",
             ),
             DeclareLaunchArgument(
+                "jointless",
+                default_value="False",
+                description="If true, no joints will be actuated",
+            ),
+            DeclareLaunchArgument(
                 name="imu_topic",
                 default_value="/camera_front/imu/data",
                 description="The topic that should be used to determine the orientation",
@@ -214,6 +220,7 @@ def generate_launch_description():
                     ("use_imu_data", use_imu_data),
                     ("imu_topic", imu_topic),
                     ("simulation", simulation),
+                    ("jointless", jointless)
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),
