@@ -71,3 +71,4 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: left_open
+version: MIV_10deg_ankle_-5_knee_hip_hip_extension_1,5sec

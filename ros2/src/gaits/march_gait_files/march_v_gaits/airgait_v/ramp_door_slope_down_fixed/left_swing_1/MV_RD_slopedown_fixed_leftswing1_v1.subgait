@@ -93,3 +93,4 @@ joints:
     time_from_start: 4000000000
     velocity: 1.2566
 name: left_swing_1
+version: MV_RD_slopedown_fixed_leftswing1_v1

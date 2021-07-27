@@ -65,3 +65,4 @@ joints:
     time_from_start: 2000000000
     velocity: 0.0
 name: left_open
+version: MIV_optimized_bigger_10deg_step_ankle_2.5

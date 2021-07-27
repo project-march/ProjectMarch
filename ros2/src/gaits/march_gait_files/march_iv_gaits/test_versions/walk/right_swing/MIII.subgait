@@ -104,3 +104,4 @@ joints:
     time_from_start: 1250000000
     velocity: -0.6981
 name: right_swing
+version: MIII

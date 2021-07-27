@@ -83,3 +83,4 @@ joints:
     time_from_start: 3200000000
     velocity: 0.0
 name: right_close
+version: MIV_earlier_knee_flexion_3,2sec

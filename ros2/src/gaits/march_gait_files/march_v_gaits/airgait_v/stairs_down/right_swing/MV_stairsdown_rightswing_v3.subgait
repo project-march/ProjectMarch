@@ -74,3 +74,4 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
 name: right_swing
+version: MV_stairsdown_rightswing_v3

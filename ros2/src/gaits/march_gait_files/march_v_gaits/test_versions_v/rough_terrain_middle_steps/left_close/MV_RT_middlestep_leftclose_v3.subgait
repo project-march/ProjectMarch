@@ -86,3 +86,4 @@ joints:
     time_from_start: 2000000000
     velocity: 0.0
 name: left_close
+version: MV_RT_middlestep_leftclose_v3

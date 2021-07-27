@@ -102,3 +102,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: sit_down
+version: with_ankle_joint_movements_fluent_ankle_0

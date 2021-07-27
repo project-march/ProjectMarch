@@ -83,3 +83,4 @@ joints:
     time_from_start: 1600000000
     velocity: -0.6981
 name: right_open
+version: MIII_ankle_0

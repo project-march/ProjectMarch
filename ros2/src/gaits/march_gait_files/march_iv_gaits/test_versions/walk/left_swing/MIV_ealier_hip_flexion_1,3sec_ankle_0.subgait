@@ -93,3 +93,4 @@ joints:
     time_from_start: 1300000000
     velocity: 0.6981
 name: left_swing
+version: MIV_ealier_hip_flexion_1,3sec_ankle_0

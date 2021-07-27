@@ -86,3 +86,4 @@ joints:
     time_from_start: 2700000000
     velocity: 0.0
 name: left_close
+version: MV_TP_left_straightstart_leftclose_v2

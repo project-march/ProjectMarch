@@ -74,3 +74,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_swing
+version: MV_RD_slopeup_rightswing_v3
