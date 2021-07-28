@@ -74,7 +74,6 @@ TEST_F(JointTest, ActuateTorque)
     ASSERT_NO_THROW(joint.actuate(expected_torque));
 }
 
-
 TEST_F(JointTest, PrepareForActuationAllowed)
 {
     EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);

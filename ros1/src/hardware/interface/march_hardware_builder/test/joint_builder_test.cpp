@@ -106,7 +106,6 @@ TEST_F(JointBuilderTest, ValidNotActuated)
     ASSERT_EQ(expected, created);
 }
 
-
 TEST_F(JointBuilderTest, NoTemperatureGES)
 {
     YAML::Node config = this->loadTestYaml("/joint_no_temperature_ges.yaml");

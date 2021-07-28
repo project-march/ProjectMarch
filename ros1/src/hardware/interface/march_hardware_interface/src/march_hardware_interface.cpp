@@ -195,10 +195,8 @@ void MarchHardwareInterface::startJoints()
 
     // If all joints are operational we can skip the start up sequence
     if (!(all(is_operational))) {
-        // Prepare all joints for actuation
-        ros::Duration wait_duration(/*t=*/0);
-
         // Tell every non-operational joint to prepare for actuation
+        ros::Duration wait_duration(/*t=*/0);
         for (size_t i = 0; i < num_joints_; ++i) {
             march::Joint& joint = march_robot_->getJoint(i);
             if (!is_operational[i]) {
@@ -210,36 +208,37 @@ void MarchHardwareInterface::startJoints()
                 }
             }
         }
-
         // Wait a while for the joints to be prepared
         wait_duration.sleep();
 
         // Tell every non-operational joint to enable actuation
         for (size_t i = 0; i < num_joints_; ++i) {
-            march::Joint& joint = march_robot_->getJoint(i);
-
-            auto joint_wait_duration = joint.enableActuation();
-            if (joint_wait_duration.has_value()
-                && joint_wait_duration.value() > wait_duration) {
-                wait_duration = joint_wait_duration.value();
+            march_robot_->getJoint(i).enableActuation();
+        }
+        do {
+            for (size_t i = 0; i < num_joints_; ++i) {
+                is_operational[i] = march_robot_->getJoint(i)
+                                        .getMotorController()
+                                        ->getState()
+                                        ->isOperational();
             }
-        }
-        // Wait a while for MotorControllers to be enabled
-        wait_duration.sleep();
 
-        while (!(all(is_operational))) {
-        }
-    }
+            if (!all(is_operational)) {
+                ROS_INFO("Waiting for all joints to become operational...");
+                // For debugging
+                for (size_t i = 0; i < num_joints_; ++i) {
+                    march::Joint& joint = march_robot_->getJoint(i);
+                    ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(),
+                        joint.getMotorController()
+                            ->getState()
+                            ->getOperationalState()
+                            .c_str());
+                }
+            }
 
-    // For debugging
-    for (size_t i = 0; i < num_joints_; ++i) {
-        march::Joint& joint = march_robot_->getJoint(i);
-
-        ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(),
-            joint.getMotorController()
-                ->getState()
-                ->getOperationalState()
-                .c_str());
+            // Sleep before checking again
+            ros::Duration(2).sleep();
+        } while (!all(is_operational));
     }
 
     // Read the first encoder values for each joint
