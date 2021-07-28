@@ -35,6 +35,12 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     this->is_incremental_encoder_more_precise_ = true;
 }
 
+std::optional<ros::Duration> ODrive::reset()
+{
+    setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
+    return std::make_optional<ros::Duration>(1);
+}
+
 std::optional<ros::Duration> ODrive::prepareActuation()
 {
     if (!index_found_
@@ -51,6 +57,7 @@ void ODrive::enableActuation()
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     }
+    actuateTorque(0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -152,10 +159,6 @@ float ODrive::getTemperature()
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::Temperature, axis_))
         .f;
-}
-
-void ODrive::reset()
-{
 }
 
 ODriveAxisState ODrive::getAxisState()

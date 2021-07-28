@@ -26,7 +26,14 @@ public:
         ENCODER_DIR_FIND = 10,
         HOMING = 11,
         ENCODER_HALL_POLARITY_CALIBRATION = 12,
-        ENCODER_HALL_PHASE_CALIBRATION = 13
+        ENCODER_HALL_PHASE_CALIBRATION = 13,
+
+        // Custom MARCH-made request-only states
+        // This will execute functions on the DieBoSlave while the ODrive stays
+        // in Idle state
+        CLEAR_ODRIVE_ERRORS = 32,
+        CLEAR_DIEBOSLAVE_ERRORS = 33,
+        CLEAR_ALL_ERRORS = 34
     };
 
     ODriveAxisState()

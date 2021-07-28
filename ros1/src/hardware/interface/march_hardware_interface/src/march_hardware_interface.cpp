@@ -197,8 +197,24 @@ void MarchHardwareInterface::startJoints()
 
     // If all joints are operational we can skip the start up sequence
     if (!(all(is_operational))) {
-        // Tell every non-operational joint to prepare for actuation
+        // Tell every MotorController to clear its errors
         ros::Duration wait_duration(/*t=*/0);
+        for (size_t i = 0; i < num_joints_; ++i) {
+            march::Joint& joint = march_robot_->getJoint(i);
+            if (!is_operational[i]) {
+                std::optional<ros::Duration> joint_wait_duration
+                    = joint.getMotorController()->reset();
+                if (joint_wait_duration.has_value()) {
+                    wait_duration
+                        = std::max(joint_wait_duration.value(), wait_duration);
+                }
+            }
+        }
+        // Wait a while for the joints to be prepared
+        wait_duration.sleep();
+
+        // Tell every non-operational joint to prepare for actuation
+        wait_duration = ros::Duration(/*t=*/0);
         for (size_t i = 0; i < num_joints_; ++i) {
             march::Joint& joint = march_robot_->getJoint(i);
             if (!is_operational[i]) {

@@ -49,8 +49,9 @@ MotorController::MotorController(const Slave& slave,
 {
 }
 
-void MotorController::reset()
+std::optional<ros::Duration> MotorController::reset()
 {
+    return std::nullopt;
 }
 
 bool MotorController::isIncrementalEncoderMorePrecise() const

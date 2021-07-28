@@ -52,7 +52,7 @@ public:
     void actuateRadians(float target_position) override;
 
     // Override reset function
-    void reset() override;
+    std::optional<ros::Duration> reset() override;
 
     bool requiresUniqueSlaves() const override;
 
