@@ -1,4 +1,5 @@
-description: v4 but with a slower right open
+description: ramp down v3 but with less hip fe flexion, smaller steps and more ankle
+  flexion without ankle
 duration: 1800000000
 gait_type: stairs_like
 joints:
@@ -29,6 +30,9 @@ joints:
   left_knee:
   - position: 0.0
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 486000000
     velocity: 0.0
   - position: 1.1345
     time_from_start: 1800000000
@@ -61,8 +65,8 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.6712
-    time_from_start: 617200000
+  - position: 0.8727
+    time_from_start: 486000000
     velocity: 0.0
   - position: 0.1998
     time_from_start: 1134000000
@@ -71,4 +75,4 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
 name: right_open
-version: MVI_rampdown_rightopen_steep_v5
+version: MVI_rampdown_rightopen_steep_v4

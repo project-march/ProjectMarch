@@ -1,4 +1,4 @@
-description: Steep ramp down singlestep smaller faster step improved ankle  without ankle
+description: v4 but slower right open without ankle
 duration: 1800000000
 gait_type: stairs_like
 joints:
@@ -61,9 +61,9 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.8727
-    time_from_start: 540000000
-    velocity: 0.0
+  - position: 0.6632
+    time_from_start: 596800000
+    velocity: 0.3491
   - position: 0.1998
     time_from_start: 1260000000
     velocity: 0.0
@@ -71,4 +71,4 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
 name: right_open
-version: MVI_rampdown_singlestep_rightopen_steep_v4
+version: MVI_rampdown_singlestep_rightopen_steep_v5

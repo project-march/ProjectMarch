@@ -1,9 +1,9 @@
-description: Steep ramp down singlestep smaller faster step improved ankle  without ankle
+description: 'v4 imporved after groundgait  without ankle'
 duration: 1800000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: -0.4363
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -13,28 +13,31 @@ joints:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
+  - position: 0.0
+    time_from_start: 926200000
+    velocity: 0.0
   - position: 0.0349
     time_from_start: 1800000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.1745
     time_from_start: 0
-    velocity: -0.0
-  - position: -0.0873
-    time_from_start: 900000000
-    velocity: 0.1455
-  - position: 0.0
+    velocity: 0.0
+  - position: 0.2618
     time_from_start: 1800000000
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: 0
-    velocity: -0.0
-  - position: 1.1345
+    velocity: 0.0
+  - position: 0.1745
+    time_from_start: 596200000
+    velocity: 0.0
+  - position: 0.0873
     time_from_start: 1800000000
     velocity: 0.0
   right_ankle:
-  - position: -0.4363
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -44,31 +47,31 @@ joints:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
+  - position: 0.0
+    time_from_start: 406000000
+    velocity: 0.0
   - position: 0.0349
     time_from_start: 1800000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.1745
     time_from_start: 0
-    velocity: -0.0
-  - position: 0.3491
-    time_from_start: 540200000
-    velocity: 0.2415
-  - position: -0.0349
+    velocity: 0.0
+  - position: 1.0123
+    time_from_start: 1166700000
+    velocity: 0.9951
+  - position: 1.1345
     time_from_start: 1800000000
     velocity: 0.0
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.8727
-    time_from_start: 540000000
-    velocity: 0.0
-  - position: 0.1998
-    time_from_start: 1260000000
-    velocity: 0.0
-  - position: 0.2618
+  - position: 1.2741
+    time_from_start: 1000000000
+    velocity: -0.6736
+  - position: 1.1345
     time_from_start: 1800000000
     velocity: 0.0
 name: right_open
-version: MVI_rampdown_singlestep_rightopen_steep_v4
+version: MVI_rampup_rightopen_steep_v5
