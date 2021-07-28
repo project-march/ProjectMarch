@@ -47,7 +47,7 @@ public:
 
     // Override functions for actuating the ODrive
     std::optional<ros::Duration> prepareActuation() override;
-    std::optional<ros::Duration> enableActuation() override;
+    void enableActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
 

@@ -54,11 +54,10 @@ std::optional<ros::Duration> Joint::prepareActuation()
     return wait_duration;
 }
 
-std::optional<ros::Duration> Joint::enableActuation()
+void Joint::enableActuation()
 {
     ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
-    auto wait_duration = motor_controller_->enableActuation();
-    return wait_duration;
+    motor_controller_->enableActuation();
 }
 
 void Joint::actuate(float target)

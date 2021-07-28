@@ -628,9 +628,8 @@ double IMotionCube::getEffortLimit()
     return MAX_TARGET_TORQUE;
 }
 
-std::optional<ros::Duration> IMotionCube::enableActuation()
+void IMotionCube::enableActuation()
 {
-    return std::nullopt;
 }
 
 } // namespace march

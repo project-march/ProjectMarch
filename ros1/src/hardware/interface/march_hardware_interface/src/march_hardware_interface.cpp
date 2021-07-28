@@ -170,7 +170,8 @@ bool all(std::vector<bool> vec)
 void MarchHardwareInterface::startJoints()
 {
     // Make sure that all slaves send valid EtherCAT data
-    std::vector<bool> data_is_valid(false, num_joints_);
+    std::vector<bool> data_is_valid;
+    data_is_valid.resize(num_joints_);
     do {
         for (size_t i = 0; i < num_joints_; ++i) {
             data_is_valid[i] = march_robot_->getJoint(i)
@@ -185,7 +186,8 @@ void MarchHardwareInterface::startJoints()
     } while (!all(data_is_valid));
     ROS_INFO("All slaves are sending EtherCAT data");
 
-    std::vector<bool> is_operational(false, num_joints_);
+    std::vector<bool> is_operational;
+    is_operational.resize(num_joints_);
     for (size_t i = 0; i < num_joints_; ++i) {
         is_operational[i] = march_robot_->getJoint(i)
                                 .getMotorController()
@@ -228,7 +230,7 @@ void MarchHardwareInterface::startJoints()
                 // For debugging
                 for (size_t i = 0; i < num_joints_; ++i) {
                     march::Joint& joint = march_robot_->getJoint(i);
-                    ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(),
+                    ROS_INFO("[%s] \t Current state: [%s]", joint.getName().c_str(),
                         joint.getMotorController()
                             ->getState()
                             ->getOperationalState()

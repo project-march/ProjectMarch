@@ -55,7 +55,7 @@ public:
 
     // Override functions for actuating the IMotionCube
     std::optional<ros::Duration> prepareActuation() override;
-    std::optional<ros::Duration> enableActuation() override;
+    void enableActuation() override;
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
 

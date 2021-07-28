@@ -50,7 +50,7 @@ public:
 
     // Enable actuation for this joint
     // Returns an optional wait duration
-    std::optional<ros::Duration> enableActuation();
+    void enableActuation();
 
     // Set initial encoder values
     void readFirstEncoderValues(bool operational_check);
