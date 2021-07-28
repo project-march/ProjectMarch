@@ -14,6 +14,7 @@ add_message_files(
     FILES
     AfterLimitJointCommand.msg
     Alive.msg
+    BatteryState.msg
     CurrentGait.msg
     CurrentIPDState.msg
     CurrentState.msg
@@ -21,11 +22,11 @@ add_message_files(
     GaitInstruction.msg
     GaitInstructionResponse.msg
     GaitParameters.msg
-    HighVoltageNet.msg
+    HighVoltageState.msg
     MotorControllerState.msg
     JointValues.msg
-    LowVoltageNet.msg
-    PowerDistributionBoardState.msg
+    LowVoltageState.msg
+    PowerDistributionBoardData.msg
     PressureSole.msg
     PressureSoleData.msg
     PressureSolesData.msg

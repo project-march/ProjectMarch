@@ -1,0 +1,7 @@
+Header header
+uint32 emergency_button_state
+float32 pdb_current
+HighVoltageState hv_state
+uint32 stop_button_state
+LowVoltageState lv_state
+BatteryState battery_state
