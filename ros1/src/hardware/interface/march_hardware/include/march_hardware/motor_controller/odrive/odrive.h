@@ -51,6 +51,9 @@ public:
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
 
+    // Override reset function
+    void reset() override;
+
     bool requiresUniqueSlaves() const override;
 
     // Transform the ActuationMode to a number that is understood by the ODrive
@@ -72,10 +75,6 @@ public:
     static constexpr double EFFORT_LIMIT = 30.0; // [A]
 
 protected:
-    // Override protected functions from Slave class
-    bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
-    void reset(SdoSlaveInterface& sdo) override;
-
     // Override protected functions from MotorController class
     float getAbsolutePositionUnchecked() override;
     float getIncrementalPositionUnchecked() override;

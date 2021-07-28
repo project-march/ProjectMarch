@@ -432,7 +432,7 @@ std::optional<ros::Duration> IMotionCube::prepareActuation()
     return std::nullopt;
 }
 
-void IMotionCube::reset(SdoSlaveInterface& sdo)
+void IMotionCube::resetSlave(SdoSlaveInterface& sdo)
 {
     this->setControlWord(/*control_word=*/0);
     ROS_DEBUG("Slave: %d, Try to reset IMC", this->getSlaveIndex());

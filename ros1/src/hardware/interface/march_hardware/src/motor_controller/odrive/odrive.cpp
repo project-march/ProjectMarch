@@ -154,14 +154,7 @@ float ODrive::getTemperature()
         .f;
 }
 
-bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
-{
-    // No action is needed as the DieBoSlave makes sure the slave is ready
-    // when etherCAT connection is made.
-    return false;
-}
-
-void ODrive::reset(SdoSlaveInterface& /*sdo*/)
+void ODrive::reset()
 {
 }
 

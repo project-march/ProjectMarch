@@ -96,7 +96,7 @@ public:
 protected:
     // Override protected functions from Slave class
     bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
-    void reset(SdoSlaveInterface& sdo) override;
+    void resetSlave(SdoSlaveInterface& sdo) override;
 
     // Override protected functions from MotorController class
     float getAbsolutePositionUnchecked() override;

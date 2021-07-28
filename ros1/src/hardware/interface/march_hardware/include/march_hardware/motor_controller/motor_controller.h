@@ -48,6 +48,10 @@ public:
     // Actuate based on the actuation mode of the motor controller
     void actuate(float target);
 
+    // Reset the MotorController
+    // Can be overridden by child classes
+    virtual void reset();
+
     // Prepare the MotorController for actuation
     // Returns an optional wait duration
     virtual std::optional<ros::Duration> prepareActuation() = 0;

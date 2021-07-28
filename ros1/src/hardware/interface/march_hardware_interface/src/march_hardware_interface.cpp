@@ -230,7 +230,8 @@ void MarchHardwareInterface::startJoints()
                 // For debugging
                 for (size_t i = 0; i < num_joints_; ++i) {
                     march::Joint& joint = march_robot_->getJoint(i);
-                    ROS_INFO("[%s] \t Current state: [%s]", joint.getName().c_str(),
+                    ROS_INFO("[%s] \t Current state: [%s]",
+                        joint.getName().c_str(),
                         joint.getMotorController()
                             ->getState()
                             ->getOperationalState()

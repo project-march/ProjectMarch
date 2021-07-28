@@ -87,7 +87,7 @@ void MarchRobot::stopEtherCAT()
 void MarchRobot::resetMotorControllers()
 {
     for (auto& joint : jointList) {
-        joint.getMotorController()->Slave::reset();
+        joint.getMotorController()->Slave::resetSlave();
     }
 }
 

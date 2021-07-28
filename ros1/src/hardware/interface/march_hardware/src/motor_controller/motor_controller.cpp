@@ -49,6 +49,10 @@ MotorController::MotorController(const Slave& slave,
 {
 }
 
+void MotorController::reset()
+{
+}
+
 bool MotorController::isIncrementalEncoderMorePrecise() const
 {
     return is_incremental_encoder_more_precise_;

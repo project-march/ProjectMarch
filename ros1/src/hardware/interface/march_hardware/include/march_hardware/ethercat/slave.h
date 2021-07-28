@@ -44,11 +44,11 @@ public:
         return this->initSdo(sdo_slave_interface, cycle_time);
     }
 
-    void reset()
+    void resetSlave()
     {
         SdoSlaveInterface sdo_slave_interface(
             this->slave_index_, this->sdo_interface_);
-        this->reset(sdo_slave_interface);
+        this->resetSlave(sdo_slave_interface);
     }
 
 protected:
@@ -57,7 +57,7 @@ protected:
         return false;
     }
 
-    virtual void reset(SdoSlaveInterface& /* sdo */)
+    virtual void resetSlave(SdoSlaveInterface& /* sdo */)
     {
     }
 

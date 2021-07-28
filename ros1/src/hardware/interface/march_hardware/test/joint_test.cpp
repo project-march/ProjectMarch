@@ -90,10 +90,10 @@ TEST_F(JointTest, hasTemperatureGes)
 
 TEST_F(JointTest, ResetController)
 {
-    EXPECT_CALL(*this->imc, reset(_)).Times(/*n=*/1);
+    EXPECT_CALL(*this->imc, resetSlave(_)).Times(/*n=*/1);
     march::Joint joint(
         "reset_controller", /*net_number=*/0, std::move(this->imc));
-    ASSERT_NO_THROW(joint.getMotorController()->reset());
+    ASSERT_NO_THROW(joint.getMotorController()->resetSlave());
 }
 
 TEST_F(JointTest, TestPrepareActuation)
