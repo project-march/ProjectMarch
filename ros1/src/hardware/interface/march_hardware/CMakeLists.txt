@@ -68,6 +68,7 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/temperature/temperature_ges.h
     include/${PROJECT_NAME}/temperature/temperature_sensor.h
     include/${PROJECT_NAME}/pressure_sole/pressure_sole.h
+    include/${PROJECT_NAME}/power_distribution_board/power_distribution_board.h
     src/encoder/absolute_encoder.cpp
     src/encoder/encoder.cpp
     src/encoder/incremental_encoder.cpp
@@ -86,6 +87,7 @@ add_library(${PROJECT_NAME}
     src/march_robot.cpp
     src/temperature/temperature_ges.cpp
     src/pressure_sole/pressure_sole.cpp
+    src/power_distribution_board/power_distribution_board.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)
