@@ -1,4 +1,4 @@
-description: v1 but with faster smaller step, and more ankle flex without ankle
+description: v2 without ankle
 duration: 1800000000
 gait_type: walk_like
 joints:

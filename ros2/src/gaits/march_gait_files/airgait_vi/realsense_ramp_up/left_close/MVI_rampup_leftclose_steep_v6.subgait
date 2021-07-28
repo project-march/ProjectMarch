@@ -1,5 +1,4 @@
-description: Ramp v4 but imporved after groundgaiting without ankle
-duration: 1800000000
+description: v5 without ankle
 gait_type: stairs_like
 joints:
   left_ankle:
