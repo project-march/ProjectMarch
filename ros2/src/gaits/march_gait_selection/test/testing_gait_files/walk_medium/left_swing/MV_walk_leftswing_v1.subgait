@@ -86,4 +86,3 @@ joints:
     time_from_start: 1199999999
     velocity: 0.0
 name: left_swing
-version: MV_walk_leftswing_v1

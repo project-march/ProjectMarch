@@ -13,4 +13,3 @@ joints:
     time_from_start: 1100000000
     velocity: 0.0
 name: perform_test
-version: perform_test_v3
