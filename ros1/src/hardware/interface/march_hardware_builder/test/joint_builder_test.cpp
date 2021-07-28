@@ -67,8 +67,8 @@ TEST_F(JointBuilderTest, ValidJointHip)
         march::Slave(
             /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
         2);
-    march::Joint expected(name, /*net_number=*/-1, /*allow_actuation=*/true,
-        std::move(imc), std::move(ges));
+    march::Joint expected(
+        name, /*net_number=*/-1, std::move(imc), std::move(ges));
 
     ASSERT_EQ(expected, created);
 }
@@ -100,20 +100,12 @@ TEST_F(JointBuilderTest, ValidNotActuated)
         march::Slave(
             /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
         2);
-    march::Joint expected("test_joint_hip", /*net_number=*/-1,
-        /*allow_actuation=*/false, std::move(imc), std::move(ges));
+    march::Joint expected(
+        "test_joint_hip", /*net_number=*/-1, std::move(imc), std::move(ges));
 
     ASSERT_EQ(expected, created);
 }
 
-TEST_F(JointBuilderTest, NoActuate)
-{
-    YAML::Node config = this->loadTestYaml("/joint_no_actuate.yaml");
-
-    ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_actuate",
-                     this->joint, this->pdo_interface, this->sdo_interface),
-        MissingKeyException);
-}
 
 TEST_F(JointBuilderTest, NoTemperatureGES)
 {
@@ -141,7 +133,7 @@ TEST_F(JointBuilderTest, ValidActuationMode)
             this->pdo_interface, this->sdo_interface);
 
     march::Joint expected("test_joint_hip", /*net_number=*/-1,
-        /*allow_actuation=*/false,
+
         std::make_unique<march::IMotionCube>(
             march::Slave(
                 /*slave_index=*/1, this->pdo_interface, this->sdo_interface),

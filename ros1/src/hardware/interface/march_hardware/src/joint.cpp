@@ -14,11 +14,10 @@
 #include <utility>
 
 namespace march {
-Joint::Joint(std::string name, int net_number, bool allow_actuation,
+Joint::Joint(std::string name, int net_number,
     std::unique_ptr<MotorController> motor_controller)
     : name_(std::move(name))
     , net_number_(net_number)
-    , allow_actuation_(allow_actuation)
     , motor_controller_(std::move(motor_controller))
 {
     if (!motor_controller_) {
@@ -28,12 +27,11 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation,
     }
 }
 
-Joint::Joint(std::string name, int net_number, bool allow_actuation,
+Joint::Joint(std::string name, int net_number,
     std::unique_ptr<MotorController> motor_controller,
     std::unique_ptr<TemperatureGES> temperature_ges)
     : name_(std::move(name))
     , net_number_(net_number)
-    , allow_actuation_(allow_actuation)
     , motor_controller_(std::move(motor_controller))
     , temperature_ges_(std::move(temperature_ges))
 {
@@ -51,34 +49,20 @@ bool Joint::initSdo(int cycle_time)
 
 std::optional<ros::Duration> Joint::prepareActuation()
 {
-    if (!canActuate()) {
-        throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-            "Failed to prepare joint %s for actuation", this->name_.c_str());
-    }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
     auto wait_duration = motor_controller_->prepareActuation();
-    ROS_INFO("[%s] Prepared for actuation", this->name_.c_str());
     return wait_duration;
 }
 
 std::optional<ros::Duration> Joint::enableActuation()
 {
-    if (!this->canActuate()) {
-        throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-            "Joint %s is not allowed to actuate", this->name_.c_str());
-    }
     ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
     auto wait_duration = motor_controller_->enableActuation();
-    ROS_INFO("[%s] Enabled for actuation", this->name_.c_str());
     return wait_duration;
 }
 
 void Joint::actuate(float target)
 {
-    if (!this->canActuate()) {
-        throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-            "Joint %s is not allowed to actuate", this->name_.c_str());
-    }
     motor_controller_->actuate(target);
 }
 
@@ -182,11 +166,6 @@ double Joint::getVelocity() const
     return velocity_;
 }
 
-void Joint::setAllowActuation(bool allow_actuation)
-{
-    this->allow_actuation_ = allow_actuation;
-}
-
 int Joint::getNetNumber() const
 {
     return net_number_;
@@ -200,11 +179,6 @@ std::string Joint::getName() const
 bool Joint::hasTemperatureGES() const
 {
     return temperature_ges_ != nullptr;
-}
-
-bool Joint::canActuate() const
-{
-    return allow_actuation_;
 }
 
 bool Joint::receivedDataUpdate()

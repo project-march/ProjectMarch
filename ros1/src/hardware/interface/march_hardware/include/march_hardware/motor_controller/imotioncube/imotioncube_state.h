@@ -113,12 +113,14 @@ public:
 
     bool isOperational() const override
     {
-        return state_of_operation_.value_ != march::IMCStateOfOperation::FAULT;
+        return state_of_operation_.value_
+            != march::IMCStateOfOperation::OPERATION_ENABLED;
     }
 
     bool hasError() const override
     {
-        return motion_error_ || detailed_error_ || second_detailed_error_;
+        return state_of_operation_.value_ == march::IMCStateOfOperation::FAULT
+            || motion_error_ || detailed_error_ || second_detailed_error_;
     }
 
     std::optional<std::string> getErrorStatus() const override
