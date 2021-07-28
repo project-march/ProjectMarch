@@ -161,6 +161,7 @@ bool MarchHardwareInterface::init(
     return true;
 }
 
+// Are all booleans in a vector true?
 bool all(std::vector<bool> vec)
 {
     return find(vec.begin(), vec.end(), false) == vec.end();
