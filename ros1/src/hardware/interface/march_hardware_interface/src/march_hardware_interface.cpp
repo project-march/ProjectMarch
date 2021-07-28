@@ -256,7 +256,7 @@ void MarchHardwareInterface::startJoints()
             }
 
             // Sleep before checking again
-            ros::Duration(2).sleep();
+            ros::Duration(/*t=*/2).sleep();
         } while (!all(is_operational));
     }
 

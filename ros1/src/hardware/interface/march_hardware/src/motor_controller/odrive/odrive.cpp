@@ -57,7 +57,9 @@ void ODrive::enableActuation()
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     }
-    actuateTorque(0.0);
+
+    // Reset target torque
+    actuateTorque(/*target_torque=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
