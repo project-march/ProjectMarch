@@ -15,9 +15,6 @@
   </p>
 </div>
 
-
-
-
 ## About
 Project MARCH is a student team of the TU Delft that is involved in the development of
 a user-friendly and versatile exoskeleton, a motorized robotic suit, that can be used
@@ -43,7 +40,7 @@ All code is built on top of the Robot Operating System (ROS). More information a
 All documentation can be found at https://docs.projectmarch.nl
 
 ## Contributing
-At the moment, it is not possible to contribute to the code base without explicit permission from Project MARCH. We hope to change this as soon as possible.
+We don't have any contributing guidelines at this moment, but you are free to modify the code under the terms of the license. Contributions are greatly appreciated.
 
 ## License
 This program is free software: you can redistribute it and/or modify
