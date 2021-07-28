@@ -1,4 +1,4 @@
-description: v4 but slower right open without ankle
+description: v5 but slower right open
 duration: 1800000000
 gait_type: stairs_like
 joints:

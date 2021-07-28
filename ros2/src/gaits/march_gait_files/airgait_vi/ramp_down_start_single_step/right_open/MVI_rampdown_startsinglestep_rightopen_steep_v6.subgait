@@ -1,4 +1,4 @@
-description: v4 with slower step without ankle
+description: v5 with slower step
 duration: 1800000000
 gait_type: stairs_like
 joints:
