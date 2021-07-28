@@ -43,6 +43,14 @@ public:
     }
 
     /**
+     * Check whether the motor controller data is valid
+     * @details Used by the joint to verify that etherCAT connection has been
+     * made
+     * @return true if the motor controller data is valid
+     */
+    virtual bool dataIsValid() const = 0;
+
+    /**
      * Check whether the motor controller is in an operational state
      * @return true if the motor controller is in an operational state,
      * otherwise false

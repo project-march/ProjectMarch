@@ -105,6 +105,12 @@ class IMotionCubeState : public MotorControllerState {
 public:
     IMotionCubeState() = default;
 
+    bool dataIsValid() const override
+    {
+        return state_of_operation_.value_
+            != march::IMCStateOfOperation::UNKNOWN;
+    }
+
     bool isOperational() const override
     {
         return state_of_operation_.value_ != march::IMCStateOfOperation::FAULT;

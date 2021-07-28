@@ -149,8 +149,40 @@ bool MarchHardwareInterface::init(
         march_temperature_interface_.registerHandle(temperature_sensor_handle);
     }
 
-    // Wait some time to make sure the EtherCAT network is ready
-    ros::Duration(/*t=*/5).sleep();
+    startJoints();
+
+    this->registerInterface(&this->march_temperature_interface_);
+    this->registerInterface(&this->joint_state_interface_);
+    this->registerInterface(&this->position_joint_interface_);
+    this->registerInterface(&this->effort_joint_interface_);
+    this->registerInterface(&this->position_joint_soft_limits_interface_);
+    this->registerInterface(&this->effort_joint_soft_limits_interface_);
+
+    return true;
+}
+
+bool all(std::vector<bool> vec)
+{
+    return find(vec.begin(), vec.end(), false) == vec.end();
+}
+
+void MarchHardwareInterface::startJoints()
+{
+    // Make sure that all slaves send valid EtherCAT data
+    std::vector<bool> data_is_valid(false, num_joints_);
+    do {
+        for (size_t i = 0; i < num_joints_; ++i) {
+            march::Joint& joint = march_robot_->getJoint(i);
+
+            data_is_valid[i]
+                = joint.getMotorController()->getState()->dataIsValid();
+        }
+
+        if (!all(data_is_valid)) {
+            ROS_INFO_ONCE("Waiting for slaves to send EtherCAT data...");
+        }
+    } while (!all(data_is_valid));
+    ROS_INFO("All slaves are sending EtherCAT data");
 
     // Prepare all joints for actuation
     ros::Duration wait_duration(/*t=*/0);
@@ -217,15 +249,6 @@ bool MarchHardwareInterface::init(
     }
 
     ROS_INFO("All joints are ready for actuation!");
-
-    this->registerInterface(&this->march_temperature_interface_);
-    this->registerInterface(&this->joint_state_interface_);
-    this->registerInterface(&this->position_joint_interface_);
-    this->registerInterface(&this->effort_joint_interface_);
-    this->registerInterface(&this->position_joint_soft_limits_interface_);
-    this->registerInterface(&this->effort_joint_soft_limits_interface_);
-
-    return true;
 }
 
 void MarchHardwareInterface::validate()

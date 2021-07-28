@@ -105,6 +105,11 @@ class ODriveState : public MotorControllerState {
 public:
     ODriveState() = default;
 
+    bool dataIsValid() const override
+    {
+        return axis_state_.value_ != ODriveAxisState::UNDEFINED;
+    }
+
     bool isOperational() const override
     {
         return axis_state_.value_ == ODriveAxisState::CLOSED_LOOP_CONTROL;

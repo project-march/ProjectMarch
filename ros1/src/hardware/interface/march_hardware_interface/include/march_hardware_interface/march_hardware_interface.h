@@ -67,6 +67,11 @@ public:
         const ros::Time& time, const ros::Duration& elapsed_time) override;
 
     /**
+     * Perform the start up sequence of all joints
+     */
+    void startJoints();
+
+    /**
      * Returns the ethercat cycle time in milliseconds.
      */
     int getEthercatCycleTime() const;
