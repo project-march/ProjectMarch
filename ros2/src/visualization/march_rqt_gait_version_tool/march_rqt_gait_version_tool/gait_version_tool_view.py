@@ -268,8 +268,8 @@ class GaitVersionToolView(QWidget):
         elif level == LogLevel.ERROR:
             self._controller._node.get_logger().error(msg)
         else:
-            self._controller._node.get_logger().warn(f"Invalid log level specified, logging "
-                                               f"as a warning. message: {msg}", )
+            self._controller._node.get_logger().error(f"Invalid log level specified, "
+                                                      f"logging for message: {msg}", )
             return
         self._logger.appendHtml(
             f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>'
