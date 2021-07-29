@@ -261,6 +261,16 @@ class GaitVersionToolView(QWidget):
         :param color_tag:
             The tag which represents the color of the text in the screen (info, warning, error)
         """
+        if level == LogLevel.SUCCESS or level == LogLevel.INFO:
+            self._controller._node.get_logger().info(msg)
+        elif level == LogLevel.WARNING:
+            self._controller._node.get_logger().warn(msg)
+        elif level == LogLevel.ERROR:
+            self._controller._node.get_logger().error(msg)
+        else:
+            self._controller._node.get_logger().warn(f"Invalid log level specified, logging "
+                                               f"as a warning. message: {msg}", )
+            return
         self._logger.appendHtml(
             f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>'
         )
