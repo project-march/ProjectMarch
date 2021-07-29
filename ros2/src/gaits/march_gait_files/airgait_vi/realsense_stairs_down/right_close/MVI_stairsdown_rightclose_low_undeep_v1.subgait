@@ -74,4 +74,3 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
 name: right_close
-version: MVI_stairsdown_rightclose_low_undeep_v1
