@@ -80,4 +80,3 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: right_open
-version: MVI_curbup_rightopen_v2

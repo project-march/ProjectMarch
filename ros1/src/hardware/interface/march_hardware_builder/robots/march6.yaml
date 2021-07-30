@@ -161,3 +161,6 @@ march6:
             direction: 1
             resolution: 12
             transmission: 121
+#  power_distribution_board:
+#      slaveIndex: 5
+#      byteOffset: 0

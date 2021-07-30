@@ -60,4 +60,3 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
 name: sit_home
-version: MVI_sit_home_low_v1

@@ -95,4 +95,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MVI_sidestepright_rightopen_v1

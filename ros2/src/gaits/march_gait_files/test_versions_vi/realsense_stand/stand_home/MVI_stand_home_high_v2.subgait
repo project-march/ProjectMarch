@@ -65,4 +65,3 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: stand_home
-version: MVI_stand_home_high_v2

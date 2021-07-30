@@ -418,9 +418,9 @@ class Subgait:
 
     # endregion
 
-    def to_yaml(self):
-        """Returns a YAML string representation of the subgait."""
-        output = {
+    def to_dict(self):
+        """Get the subgait represented as a dictionary."""
+        return {
             "description": self.description,
             "duration": self.sec_to_nsec(self.duration),
             "gait_type": self.gait_type,
@@ -438,7 +438,10 @@ class Subgait:
             "name": self.subgait_name,
             "version": self.version,
         }
-        return yaml.dump(output)
+
+    def to_yaml(self):
+        """Returns a YAML string representation of the subgait."""
+        return yaml.dump(self.to_dict())
 
     # region Class methods
     def __getitem__(self, index):
