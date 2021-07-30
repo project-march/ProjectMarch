@@ -1,4 +1,5 @@
 description: v5 without ankle
+duration: 1800000000
 gait_type: stairs_like
 joints:
   left_ankle:
