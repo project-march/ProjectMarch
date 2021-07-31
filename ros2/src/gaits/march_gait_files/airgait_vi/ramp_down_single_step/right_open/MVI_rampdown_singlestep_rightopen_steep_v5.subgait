@@ -1,4 +1,4 @@
-description: v4 without ankle
+description: v5 but slower right open
 duration: 1800000000
 gait_type: stairs_like
 joints:
@@ -52,7 +52,7 @@ joints:
     time_from_start: 0
     velocity: -0.0
   - position: 0.3491
-    time_from_start: 540200000
+    time_from_start: 690200000
     velocity: 0.2415
   - position: -0.0349
     time_from_start: 1800000000
@@ -61,9 +61,9 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.8727
-    time_from_start: 540000000
-    velocity: 0.0
+  - position: 0.6632
+    time_from_start: 596800000
+    velocity: 0.3491
   - position: 0.1998
     time_from_start: 1260000000
     velocity: 0.0
@@ -71,4 +71,3 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
 name: right_open
-version: MVI_rampdown_singlestep_rightopen_steep_v4
