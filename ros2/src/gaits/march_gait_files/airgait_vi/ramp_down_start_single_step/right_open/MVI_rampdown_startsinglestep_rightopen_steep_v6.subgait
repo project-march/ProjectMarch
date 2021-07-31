@@ -52,7 +52,7 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.4363
-    time_from_start: 540200000
+    time_from_start: 690200000
     velocity: 0.2414
   - position: 0.0175
     time_from_start: 1800000000
@@ -71,4 +71,3 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
 name: right_open
-version: MVI_rampdown_startsinglestep_rightopen_steep_v5
