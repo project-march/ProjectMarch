@@ -1,12 +1,12 @@
-description: 'Right open for the last step of the steep (20 deg) ramp down. '
+description: Version 1 but then the step size decreased.
 duration: 2500000000
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: -0.2618
+  - position: -0.0873
     time_from_start: 0
     velocity: -0.0
-  - position: -0.1745
+  - position: -0.0873
     time_from_start: 2500000000
     velocity: -0.0
   left_hip_aa:
@@ -40,7 +40,7 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
-  - position: -0.2618
+  - position: -0.0873
     time_from_start: 0
     velocity: -0.0
   - position: 0.0
@@ -66,10 +66,10 @@ joints:
   - position: -0.0873
     time_from_start: 0
     velocity: -0.0
-  - position: 0.5585
+  - position: 0.3665
     time_from_start: 1500000000
     velocity: 0.1396
-  - position: 0.3142
+  - position: 0.2618
     time_from_start: 2500000000
     velocity: -0.3491
   right_knee:

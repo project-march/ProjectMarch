@@ -1,4 +1,4 @@
-description: 'v4 imporved after groundgait '
+description: v5 without ankle
 duration: 1800000000
 gait_type: stairs_like
 joints:
@@ -7,11 +7,8 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 755700000
-    velocity: 0.0
-  - position: -0.1745
     time_from_start: 1800000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -40,13 +37,7 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.2618
-    time_from_start: 169600000
-    velocity: 0.0
   - position: 0.0
-    time_from_start: 421400000
-    velocity: 0.0
-  - position: 0.0698
     time_from_start: 1800000000
     velocity: 0.0
   right_hip_aa:
