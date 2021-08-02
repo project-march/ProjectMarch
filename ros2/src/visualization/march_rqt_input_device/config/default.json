@@ -169,7 +169,7 @@
          "name": "realsense_ramp_down"
       },
       {
-         "name": "realsense_ramp_down_last_step"
+         "name": "realsense_ramp_up_single_step"
       },
       {
          "name": "dynamic_sit"
