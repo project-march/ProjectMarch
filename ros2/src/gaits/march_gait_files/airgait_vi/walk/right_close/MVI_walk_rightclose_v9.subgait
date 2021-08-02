@@ -1,4 +1,4 @@
-description: MVI_walk_v3 without the HAA movement
+description: MVI_walk_v5 without any HAA movement
 duration: 1500000000
 gait_type: walk_like
 joints:
@@ -10,10 +10,10 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
@@ -47,10 +47,10 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 0
     velocity: -0.0
-  - position: 0.0
+  - position: 0.0349
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_fe:
