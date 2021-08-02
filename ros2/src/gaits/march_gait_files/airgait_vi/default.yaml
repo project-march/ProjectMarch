@@ -129,6 +129,18 @@ positions:
       right_hip_aa: 0.0349
       right_hip_fe: -0.1745
       right_knee: 0.0
+  stand_hfe_zero_degrees:
+    # Easier for checking whether hfe's are aligned
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0
+      left_hip_aa: 0.0349
+      left_hip_fe: 0.0
+      left_knee: 0.0
+      right_ankle: 0.0
+      right_hip_aa: 0.0349
+      right_hip_fe: 0.0
+      right_knee: 0.0
   flat_ramp_stand:
     gait_type: walk_like
     joints:
