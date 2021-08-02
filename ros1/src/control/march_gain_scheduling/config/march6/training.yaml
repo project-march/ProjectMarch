@@ -1,6 +1,6 @@
 gait_types:
   sit_like:
-     left_ankle: {p: 160, i: 0, d: 10}
+    left_ankle: {p: 160, i: 0, d: 10}
     left_hip_aa: {p: 330, i: 0, d: 10}
     left_hip_fe: {p: 60, i: 0, d: 5}
     left_knee: {p: 60, i: 0, d: 10}
