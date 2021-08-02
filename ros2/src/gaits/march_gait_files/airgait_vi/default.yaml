@@ -52,15 +52,15 @@ gaits:
     right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v5
 
   walk:
-    left_close: MVI_walk_leftclose_v8
-    left_swing: MVI_walk_leftswing_v8
-    right_close: MVI_walk_rightclose_v8
-    right_open: MVI_walk_rightopen_v8
-    right_swing: MVI_walk_rightswing_v8
+    left_close: MVI_walk_leftclose_v9
+    left_swing: MVI_walk_leftswing_v9
+    right_close: MVI_walk_rightclose_v9
+    right_open: MVI_walk_rightopen_v9
+    right_swing: MVI_walk_rightswing_v9
 
   walk_single_step:
-    right_open: MVI_walksinglestep_rightopen_v8
-    left_close: MVI_walksinglestep_leftclose_v8
+    right_open: MVI_walksinglestep_rightopen_v9
+    left_close: MVI_walksinglestep_leftclose_v9
   
   walk_large:
     left_close: MVI_walklarge_leftclose_v5
@@ -97,26 +97,29 @@ gaits:
     right_open: MVI_walksinglestepsmall_rightopen_v5
     left_close: MVI_walksinglestepsmall_leftclose_v5
 
+dynamic_edge_gaits:
   ramp_down:
-    left_close: MVI_rampdown_leftclose_flat_v5
-    left_open: MVI_rampdown_leftopen_flat_v5
-    left_swing: MVI_rampdown_leftswing_flat_v5
-    right_close: MVI_rampdown_rightclose_flat_v5
-    right_open: MVI_rampdown_rightopen_flat_v5
-    right_swing: MVI_rampdown_rightswing_flat_v5
-
-  ramp_down_single_step:
-    left_close: MVI_rampdown_singlestep_leftclose_steep_v5
-    right_open: MVI_rampdown_singlestep_rightopen_steep_v5
+    start_is_dynamic: false
+    final_is_dynamic: true
+    left_close: MVI_rampdown_leftclose_steep_v7
+    left_open: MVI_rampdown_leftopen_steep_v7
+    left_swing: MVI_rampdown_leftswing_steep_v7
+    right_close: MVI_rampdown_rightclose_steep_v7
+    right_open: MVI_rampdown_rightopen_steep_v7
+    right_swing: MVI_rampdown_rightswing_steep_v7
 
   ramp_down_start_single_step:
+    start_is_dynamic: false
+    final_is_dynamic: true
     left_close: MVI_rampdown_startsinglestep_leftclose_steep_v5
     right_open: MVI_rampdown_startsinglestep_rightopen_steep_v5
 
   ramp_down_last_step:
-    left_close: MVI_rampdownlaststep_leftclose_flat_v2
-    right_open: MVI_rampdownlaststep_rightopen_flat_v2
-
+    start_is_dynamic: true
+    final_is_dynamic: false
+    left_close: MVI_rampdownlaststep_leftclose_steep_v3
+    right_open: MVI_rampdownlaststep_rightopen_steep_v3
+    
 positions:
   stand:
     gait_type: walk_like
