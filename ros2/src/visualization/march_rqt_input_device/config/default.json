@@ -300,6 +300,9 @@
       },
       {
          "name": "home_shutdown"
+      },
+      {
+         "name": "home_stand_hfe_zero_degrees"
       }
    ]
 ]
