@@ -56,11 +56,11 @@ class CheckPDBStatus:
             lv1_state = self._pdb_data.lv_state.lv1_ok
             lv2_state = self._pdb_data.lv_state.lv2_ok
 
-            stat.add("Emergency button status", emergency_button_status)
-            stat.add("Total current state", total_current_state)
-            stat.add("Stop button status", stop_button_state)
-            stat.add("LV1 status", lv1_state)
-            stat.add("LV2 status", lv2_state)
+            stat.add("Emergency button status", str(emergency_button_status))
+            stat.add("Total current state", str(total_current_state))
+            stat.add("Stop button status", str(stop_button_state))
+            stat.add("LV1 status", str(lv1_state))
+            stat.add("LV2 status", str(lv2_state))
 
             for state in [emergency_button_status, stop_button_state, lv2_state,
                           lv1_state]:

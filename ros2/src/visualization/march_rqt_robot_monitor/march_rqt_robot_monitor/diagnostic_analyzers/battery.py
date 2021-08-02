@@ -55,25 +55,27 @@ class CheckBatteryStatus:
 
         def d(stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
             if self._pdb_data is None:
-                stat.summary(DiagnosticStatus.STALE, "No battert")
+                stat.summary(DiagnosticStatus.STALE, "No battery data")
                 return stat
 
             battery_percentage = self._pdb_data.battery_state.percentage
             battery_voltage = self._pdb_data.battery_state.voltage
             battery_temperature = self._pdb_data.battery_state.temperature
 
-            stat.add("Battery percentage", battery_percentage)
-            stat.add("Battery voltage", battery_voltage)
-            stat.add("Battery temperature", battery_temperature)
+            stat.add("Battery percentage", f"{battery_percentage}")
+            stat.add("Battery voltage", f"{battery_voltage}")
+            stat.add("Battery temperature", f"{battery_temperature}")
 
             if battery_percentage <= self.BATTERY_PERCENTAGE_ERROR_THRESHOLD:
-                stat.summary(DiagnosticStatus.ERROR, battery_percentage)
+                stat.summary(DiagnosticStatus.ERROR, f"Battery percentage "
+                                                     f"{battery_percentage}")
             elif battery_voltage <= self.BATTERY_VOLTAGE_ERROR_THRESHOLD:
                 stat.summary(DiagnosticStatus.ERROR, battery_voltage)
             elif battery_temperature >= self.BATTERY_TEMPERATURE_ERROR_THRESHOLD:
                 stat.summary(DiagnosticStatus.ERROR, battery_temperature)
             elif battery_percentage <= self.BATTERY_PERCENTAGE_WARNING_THRESHOLD:
-                stat.summary(DiagnosticStatus.WARN, battery_percentage)
+                stat.summary(DiagnosticStatus.WARN, f"Battery percentage "
+                                                    f"{battery_percentage}")
             elif battery_voltage <= self.BATTERY_VOLTAGE_WARNING_THRESHOLD:
                 stat.summary(DiagnosticStatus.WARN, battery_voltage)
             elif battery_temperature >= self.BATTERY_TEMPERATURE_WARNING_THRESHOLD:
