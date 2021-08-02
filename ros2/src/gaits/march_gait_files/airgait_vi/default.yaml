@@ -103,10 +103,10 @@ dynamic_edge_gaits:
     final_is_dynamic: true
     left_close: MVI_rampdown_leftclose_steep_v5
     left_open: MVI_rampdown_leftopen_steep_v5
-    left_swing: MVI_rampdown_leftswing_steep_5
-    right_close: MVI_rampdown_rightclose_stee5
-    right_open: MVI_rampdown_rightopen_steep_5
-    right_swing: MVI_rampdown_rightswing_stee5
+    left_swing: MVI_rampdown_leftswing_steep_v5
+    right_close: MVI_rampdown_rightclose_steep_v5
+    right_open: MVI_rampdown_rightopen_steep_v5
+    right_swing: MVI_rampdown_rightswing_steep_v5
 
   ramp_down_single_step:
     start_is_dynamic: true
