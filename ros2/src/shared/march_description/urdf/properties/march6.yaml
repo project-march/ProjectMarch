@@ -99,7 +99,7 @@ joint_limits:
   left_ankle:
     unit: iu
     lower_limit: 9063
-    upper_limit: 11118
+    upper_limit: 11212
     zero_position: 10827
     resolution: 14
   right_ankle:
@@ -116,9 +116,9 @@ joint_limits:
     resolution: 14
   right_haa:
     unit: iu
-    lower_limit: 11447
+    lower_limit: 11433
     upper_limit: 12337
-    zero_position: 11851
+    zero_position: 11837
     resolution: 14
 safety:  # This is still copied from MV
   exoskeleton:
