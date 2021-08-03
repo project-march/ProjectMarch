@@ -217,11 +217,9 @@ void MarchHardwareInterface::startJoints()
 {
     // Make sure that all slaves send valid EtherCAT data
     ROS_INFO("Waiting for slaves to send EtherCAT data...");
-    std::function<bool(march::Joint&)> is_data_valid_function
-        = [](march::Joint& joint) {
-              return joint.getMotorController()->getState()->dataIsValid();
-          };
-    call_busy_waiting_function_for_each_joint(is_data_valid_function);
+    call_busy_waiting_function_for_each_joint([](march::Joint& joint) {
+        return joint.getMotorController()->getState()->dataIsValid();
+    });
     ROS_INFO("All slaves are sending EtherCAT data");
 
     auto is_operational = march_robot_->areJointsOperational();
