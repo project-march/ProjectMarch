@@ -208,9 +208,10 @@ void MarchHardwareInterface::call_busy_waiting_function_for_each_joint(
     }
 
     if (!all(is_ok)) {
-        throw march::error::HardwareException(march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
+        throw march::error::HardwareException(march::error::ErrorType::
+                BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
     }
-}
+}unsigned maximum_tries = 10)
 
 void MarchHardwareInterface::startJoints()
 {
