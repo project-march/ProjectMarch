@@ -167,97 +167,85 @@ bool all(std::vector<bool> vec)
     return find(vec.begin(), vec.end(), false) == vec.end();
 }
 
+void MarchHardwareInterface::call_sleeping_function_for_each_joint(
+    std::function<std::optional<ros::Duration>(march::Joint&)> f)
+{
+    auto is_operational = march_robot_->areJointsOperational();
+
+    ros::Duration wait_duration(/*t=*/0);
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+
+        // Skip a joint if it is already operational
+        if (!is_operational[i]) {
+            std::optional<ros::Duration> joint_wait_duration = f(joint);
+            if (joint_wait_duration.has_value()) {
+                wait_duration
+                    = std::max(joint_wait_duration.value(), wait_duration);
+            }
+        }
+    }
+
+    wait_duration.sleep();
+}
+
+void MarchHardwareInterface::call_busy_waiting_function_for_each_joint(
+    std::function<bool(march::Joint&)> f, unsigned maximum_tries = 10)
+{
+    std::vector<bool> is_ok;
+    is_ok.resize(num_joints_);
+
+    unsigned int num_tries = 0;
+    while (!all(is_ok) && num_tries < maximum_tries) {
+        for (size_t i = 0; i < num_joints_; ++i) {
+            is_ok[i] = f(march_robot_->getJoint(i));
+        }
+
+        // Sleep before checking again
+        ros::Duration(/*t=*/1).sleep();
+
+        num_tries++;
+    }
+
+    if (!all(is_ok)) {
+        throw march::error::HardwareException(march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
+    }
+}
+
 void MarchHardwareInterface::startJoints()
 {
     // Make sure that all slaves send valid EtherCAT data
-    std::vector<bool> data_is_valid;
-    data_is_valid.resize(num_joints_);
-    do {
-        for (size_t i = 0; i < num_joints_; ++i) {
-            data_is_valid[i] = march_robot_->getJoint(i)
-                                   .getMotorController()
-                                   ->getState()
-                                   ->dataIsValid();
-        }
-
-        if (!all(data_is_valid)) {
-            ROS_INFO_ONCE("Waiting for slaves to send EtherCAT data...");
-        }
-    } while (!all(data_is_valid));
+    ROS_INFO("Waiting for slaves to send EtherCAT data...");
+    std::function<bool(march::Joint&)> is_data_valid_function
+        = [](march::Joint& joint) {
+              return joint.getMotorController()->getState()->dataIsValid();
+          };
+    call_busy_waiting_function_for_each_joint(is_data_valid_function);
     ROS_INFO("All slaves are sending EtherCAT data");
 
-    std::vector<bool> is_operational;
-    is_operational.resize(num_joints_);
-    for (size_t i = 0; i < num_joints_; ++i) {
-        is_operational[i] = march_robot_->getJoint(i)
-                                .getMotorController()
-                                ->getState()
-                                ->isOperational();
-    }
-
+    auto is_operational = march_robot_->areJointsOperational();
     // If all joints are operational we can skip the start up sequence
     if (!(all(is_operational))) {
         // Tell every MotorController to clear its errors
-        ros::Duration wait_duration(/*t=*/0);
-        for (size_t i = 0; i < num_joints_; ++i) {
-            march::Joint& joint = march_robot_->getJoint(i);
-            if (!is_operational[i]) {
-                std::optional<ros::Duration> joint_wait_duration
-                    = joint.getMotorController()->reset();
-                if (joint_wait_duration.has_value()) {
-                    wait_duration
-                        = std::max(joint_wait_duration.value(), wait_duration);
-                }
-            }
-        }
-        // Wait a while for the joints to be prepared
-        wait_duration.sleep();
+        ROS_INFO("Clearing errors of joints");
+        call_sleeping_function_for_each_joint([](march::Joint& joint) {
+            return joint.getMotorController()->reset();
+        });
 
-        // Tell every non-operational joint to prepare for actuation
-        wait_duration = ros::Duration(/*t=*/0);
-        for (size_t i = 0; i < num_joints_; ++i) {
-            march::Joint& joint = march_robot_->getJoint(i);
-            if (!is_operational[i]) {
-                std::optional<ros::Duration> joint_wait_duration
-                    = joint.prepareActuation();
-                if (joint_wait_duration.has_value()) {
-                    wait_duration
-                        = std::max(joint_wait_duration.value(), wait_duration);
-                }
-            }
-        }
-        // Wait a while for the joints to be prepared
-        wait_duration.sleep();
+        ROS_INFO("Preparing every joint for actuation");
+        // Tell every joint to prepare for actuation
+        call_sleeping_function_for_each_joint([](march::Joint& joint) {
+            return joint.prepareActuation();
+        });
 
-        // Tell every non-operational joint to enable actuation
+        // Tell every joint to enable actuation
+        ROS_INFO("Enabling every joint for actuation");
         for (size_t i = 0; i < num_joints_; ++i) {
             march_robot_->getJoint(i).enableActuation();
         }
-        do {
-            for (size_t i = 0; i < num_joints_; ++i) {
-                is_operational[i] = march_robot_->getJoint(i)
-                                        .getMotorController()
-                                        ->getState()
-                                        ->isOperational();
-            }
-
-            if (!all(is_operational)) {
-                ROS_INFO("Waiting for all joints to become operational...");
-                // For debugging
-                for (size_t i = 0; i < num_joints_; ++i) {
-                    march::Joint& joint = march_robot_->getJoint(i);
-                    ROS_INFO("[%s] \t Current state: [%s]",
-                        joint.getName().c_str(),
-                        joint.getMotorController()
-                            ->getState()
-                            ->getOperationalState()
-                            .c_str());
-                }
-            }
-
-            // Sleep before checking again
-            ros::Duration(/*t=*/2).sleep();
-        } while (!all(is_operational));
+        call_busy_waiting_function_for_each_joint([](march::Joint& joint) {
+            return joint.getMotorController()->getState()->isOperational();
+        });
     }
 
     // Read the first encoder values for each joint

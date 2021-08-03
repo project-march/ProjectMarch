@@ -255,4 +255,15 @@ const urdf::Model& MarchRobot::getUrdf() const
     return this->urdf_;
 }
 
+std::vector<bool> MarchRobot::areJointsOperational()
+{
+    std::vector<bool> is_operational;
+    is_operational.resize(jointList.size());
+    for (size_t i = 0; i < jointList.size(); ++i) {
+        is_operational[i]
+            = jointList[i].getMotorController()->getState()->isOperational();
+    }
+    return is_operational;
+}
+
 } // namespace march

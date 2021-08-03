@@ -97,6 +97,21 @@ private:
         const urdf::JointConstSharedPtr& urdf_joint,
         joint_limits_interface::SoftJointLimits& error_soft_limits);
 
+    /**
+     * Call a function that returns an optional sleeping duration for each joint
+     * @param f Function to call
+     */
+    void call_sleeping_function_for_each_joint(
+        std::function<std::optional<ros::Duration>(march::Joint&)> f);
+
+    /**
+     * Call a function that returns true when successful for each joint
+     * Busy waits until all joints return true
+     * @param f Function to call
+     */
+    void call_busy_waiting_function_for_each_joint(
+        std::function<bool(march::Joint&)> f, unsigned maximum_tries);
+
     /* Limit of the change in effort command over one cycle, can be overridden
      * by safety controller */
     static constexpr double MAX_EFFORT_CHANGE = 5000;
