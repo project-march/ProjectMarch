@@ -259,6 +259,8 @@ protected:
     float min_sit_height {};
     float max_sit_height {};
     float allowed_deviation_from_reachable_bench {};
+    float min_sit_height_world {};
+    float max_sit_height_world {};
     float min_x_search_sit {};
     float max_x_search_sit {};
     float search_y_deviation_sit {};

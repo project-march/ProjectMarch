@@ -92,4 +92,3 @@ joints:
     time_from_start: 4000000000
     velocity: 0.4363
 name: left_swing
-version: MVI_stairsdown_leftswing_low_deep_v1

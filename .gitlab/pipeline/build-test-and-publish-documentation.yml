@@ -9,7 +9,7 @@ Sphinx build:
   before_script:
     - cd docs
   script:
-    - sphinx-build -W -b html . build
+    - bash build_locally.sh
   variables:
     DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
   artifacts:
@@ -34,6 +34,9 @@ Sphinx build:
       variables:
         TAG: $CI_COMMIT_BRANCH
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH'
+      changes:
+        - "ros1/src/**/README.md"
+        - "ros2/src/**/README.md"
       variables:
         TAG: $CI_DEFAULT_BRANCH
 

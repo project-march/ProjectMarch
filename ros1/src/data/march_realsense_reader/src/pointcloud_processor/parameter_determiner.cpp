@@ -445,8 +445,8 @@ bool HullParameterDeterminer::transformGaitInformation()
             transformer_->transformPointCloud(gait_information_cloud);
 
             // Update gait dimensions as seen from fixed frame
-            min_sit_height = gait_information_cloud->points[0].z;
-            max_sit_height = gait_information_cloud->points[1].z;
+            min_sit_height_world = gait_information_cloud->points[0].z;
+            max_sit_height_world = gait_information_cloud->points[1].z;
             sit_pos_x = gait_information_cloud->points[0].x;
             sit_pos_y = gait_information_cloud->points[0].y;
 
@@ -499,19 +499,22 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    if (sit_height > max_sit_height + allowed_deviation_from_reachable_bench
+    if (sit_height > max_sit_height_world +
+            allowed_deviation_from_reachable_bench
         || sit_height
-            < min_sit_height - allowed_deviation_from_reachable_bench) {
+            < min_sit_height_world - allowed_deviation_from_reachable_bench) {
+        gait_parameters_->first_parameter = -1;
         ROS_ERROR_STREAM("The found sit height should be between "
-            << min_sit_height << "( -" << allowed_deviation_from_reachable_bench
-            << " ) and " << max_sit_height << "( +"
+            << min_sit_height_world << "( -"
+            << allowed_deviation_from_reachable_bench << " ) and "
+            << max_sit_height_world << "( +"
             << allowed_deviation_from_reachable_bench << " ) but was "
             << ramp_slope);
-        return false;
     }
 
     gait_parameters_->first_parameter
-        = calculateParameter(sit_height, min_sit_height, max_sit_height);
+        = calculateParameter(sit_height, min_sit_height_world,
+            max_sit_height_world);
 
     // The step height and side step parameter are unused for the sit
     // gait, so they are set to -1
@@ -657,8 +660,8 @@ void HullParameterDeterminer::getValidExoSupport(
 
         std_msgs::ColorRGBA marker_color;
 
-        if (potential_exo_support_point.z < max_sit_height
-            && potential_exo_support_point.z > min_sit_height) {
+        if (potential_exo_support_point.z < max_sit_height_world
+            && potential_exo_support_point.z > min_sit_height_world) {
 
             exo_support_points->push_back(potential_exo_support_point);
 
@@ -1269,9 +1272,9 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
     elevated_cloud_with_normals->points.resize(elevated_cloud->points.size());
 
     float normalising_constant
-        = plane_coefficients->values[0] * plane_coefficients->values[0]
-        + plane_coefficients->values[1] * plane_coefficients->values[1]
-        + plane_coefficients->values[2] * plane_coefficients->values[2];
+        = sqrt(plane_coefficients->values[0] * plane_coefficients->values[0]
+            + plane_coefficients->values[1] * plane_coefficients->values[1]
+            + plane_coefficients->values[2] * plane_coefficients->values[2]);
 
     if (normalising_constant < std::numeric_limits<double>::epsilon()) {
         ROS_ERROR_STREAM("The normal vector of the current plane is too close "

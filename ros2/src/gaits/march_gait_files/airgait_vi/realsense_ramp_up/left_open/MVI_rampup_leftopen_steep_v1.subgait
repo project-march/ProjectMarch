@@ -1,4 +1,4 @@
-description: The right open gait for the 20 degrees slope up
+description: The right open gait for the 20 degrees ramp up
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -71,4 +71,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: left_open
-version: MVI_rampup_leftopen_steep_v1

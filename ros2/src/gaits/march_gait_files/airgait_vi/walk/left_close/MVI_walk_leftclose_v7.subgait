@@ -80,4 +80,3 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
 name: left_close
-version: MVI_walk_leftclose_v7

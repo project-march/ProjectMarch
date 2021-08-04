@@ -94,7 +94,7 @@ joint_limits:
     unit: iu
     lower_limit: 559360
     upper_limit: 930308
-    zero_position: 626238
+    zero_position: 632238
     resolution: 20
   left_ankle:
     unit: iu
@@ -106,13 +106,13 @@ joint_limits:
     unit: iu
     lower_limit: 3836
     upper_limit: 5915
-    zero_position: 5471
+    zero_position: 5541
     resolution: 14
   left_haa:
     unit: iu
     lower_limit: 2947
     upper_limit: 3867
-    zero_position: 3429
+    zero_position: 3129
     resolution: 14
   right_haa:
     unit: iu
