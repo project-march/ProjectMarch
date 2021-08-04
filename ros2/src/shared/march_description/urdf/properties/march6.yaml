@@ -120,7 +120,6 @@ joint_limits:
     upper_limit: 12337
     zero_position: 11837
     resolution: 14
-    
 safety:  # This is still copied from MV
   exoskeleton:
     knee:
