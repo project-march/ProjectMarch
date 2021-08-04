@@ -53,8 +53,6 @@ class DiagnosticUpdater(Node):
         # PDB checks
         CheckPDBStatus(self, self.updater)
 
-
-
     def update(self):
         """Update the DiagnosticUpdater if there are more than 0 tasks."""
         if len(self.updater.tasks) > 0:

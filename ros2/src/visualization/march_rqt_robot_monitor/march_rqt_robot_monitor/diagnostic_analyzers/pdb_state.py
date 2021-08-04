@@ -55,14 +55,19 @@ class CheckPDBStatus:
 
             battery_temperature = self._pdb_data.battery_state.temperature
             if battery_temperature >= self.BATTERY_TEMPERATURE_ERROR_THRESHOLD:
-                stat.summary(DiagnosticStatus.ERROR, f"Battery temperature too high: "
-                                                     f"{battery_temperature}")
+                stat.summary(
+                    DiagnosticStatus.ERROR,
+                    f"Battery temperature too high: " f"{battery_temperature}",
+                )
             elif battery_temperature >= self.BATTERY_TEMPERATURE_WARNING_THRESHOLD:
-                stat.summary(DiagnosticStatus.WARN, f"Battery temperature high: "
-                                                    f"{battery_temperature}")
+                stat.summary(
+                    DiagnosticStatus.WARN,
+                    f"Battery temperature high: " f"{battery_temperature}",
+                )
             else:
                 stat.summary(DiagnosticStatus.OK, f"OK: {battery_temperature}")
             return stat
+
         return d
 
     def _battery_percentage_diagnostic(self) -> Callable:  # noqa: D202
@@ -73,17 +78,22 @@ class CheckPDBStatus:
 
             battery_percentage = self._pdb_data.battery_state.percentage
             if battery_percentage <= self.BATTERY_PERCENTAGE_ERROR_THRESHOLD:
-                stat.summary(DiagnosticStatus.ERROR, f"Battery percentage too low: "
-                                                     f"{battery_percentage}")
+                stat.summary(
+                    DiagnosticStatus.ERROR,
+                    f"Battery percentage too low: " f"{battery_percentage}",
+                )
             elif battery_percentage <= self.BATTERY_PERCENTAGE_WARNING_THRESHOLD:
-                stat.summary(DiagnosticStatus.WARN, f"Battery percentage low: "
-                                                    f"{battery_percentage}")
+                stat.summary(
+                    DiagnosticStatus.WARN,
+                    f"Battery percentage low: " f"{battery_percentage}",
+                )
             else:
                 stat.summary(DiagnosticStatus.OK, f"OK: {battery_percentage}")
             return stat
+
         return d
 
-    def _battery_voltage_diagnostic(self) -> Callable: # noqa: D202:
+    def _battery_voltage_diagnostic(self) -> Callable:  # noqa: D202:
         def d(stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
             if self._pdb_data is None:
                 stat.summary(DiagnosticStatus.STALE, "No battery data")
@@ -91,18 +101,22 @@ class CheckPDBStatus:
 
             battery_voltage = self._pdb_data.battery_state.voltage
             if battery_voltage <= self.BATTERY_VOLTAGE_ERROR_THRESHOLD:
-                stat.summary(DiagnosticStatus.ERROR, f"Battery voltage too low: "
-                                                     f"{battery_voltage}")
+                stat.summary(
+                    DiagnosticStatus.ERROR,
+                    f"Battery voltage too low: " f"{battery_voltage}",
+                )
             elif battery_voltage <= self.BATTERY_PERCENTAGE_WARNING_THRESHOLD:
-                stat.summary(DiagnosticStatus.WARN, f"Battery voltage low: "
-                                                    f"{battery_voltage}")
+                stat.summary(
+                    DiagnosticStatus.WARN, f"Battery voltage low: " f"{battery_voltage}"
+                )
             else:
                 stat.summary(DiagnosticStatus.OK, f"OK: {battery_voltage}")
 
             return stat
+
         return d
 
-    def _lv_diagnostic(self) -> Callable: # noqa: D202
+    def _lv_diagnostic(self) -> Callable:  # noqa: D202
         def d(stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
             if self._pdb_data is None:
                 stat.summary(DiagnosticStatus.STALE, "No pdb data")
@@ -112,20 +126,27 @@ class CheckPDBStatus:
             lv2_state = self._pdb_data.lv_state.lv2_ok
 
             if lv1_state != 1 or lv2_state != 1:
-                stat.summary(DiagnosticStatus.ERROR, f"LV error,\n LV1 state:"
-                                                     f" {lv1_state}\n "
-                                                    f"LV2 state: {lv2_state}")
+                stat.summary(
+                    DiagnosticStatus.ERROR,
+                    f"LV error,\n LV1 state:"
+                    f" {lv1_state}\n "
+                    f"LV2 state: {lv2_state}",
+                )
 
             else:
-                stat.summary(DiagnosticStatus.OK, f"LV OK\n"
-                                                  f"Current lv1: "
-                                                  f"{self._pdb_data.lv_state.lv1_current}\n"
-                                                  f"Current lv2: "
-                                                  f"{self._pdb_data.lv_state.lv2_current}")
+                stat.summary(
+                    DiagnosticStatus.OK,
+                    f"LV OK\n"
+                    f"Current lv1: "
+                    f"{self._pdb_data.lv_state.lv1_current}\n"
+                    f"Current lv2: "
+                    f"{self._pdb_data.lv_state.lv2_current}",
+                )
             return stat
+
         return d
 
-    def _hv_diagnostic(self) -> Callable: # noqa: D202
+    def _hv_diagnostic(self) -> Callable:  # noqa: D202
         def d(stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
             if self._pdb_data is None:
                 stat.summary(DiagnosticStatus.STALE, "No pdb data")
@@ -133,18 +154,22 @@ class CheckPDBStatus:
 
             hv_state = self._pdb_data.hv_state
 
-            stat.summary(DiagnosticStatus.OK, f"HV OK\n"
-                                              f"Total current: "
-                                              f"{hv_state.total_current}\n"
-                                              f"Current hv1: "
-                                              f"{hv_state.hv1_current}\n"
-                                              f"Current hv2: "
-                                              f"{hv_state.hv2_current}\n"
-                                              f"Current hv3: "
-                                              f"{hv_state.hv3_current}\n"
-                                              f"Current hv4: "
-                                              f"{hv_state.hv4_current}")
+            stat.summary(
+                DiagnosticStatus.OK,
+                f"HV OK\n"
+                f"Total current: "
+                f"{hv_state.total_current}\n"
+                f"Current hv1: "
+                f"{hv_state.hv1_current}\n"
+                f"Current hv2: "
+                f"{hv_state.hv2_current}\n"
+                f"Current hv3: "
+                f"{hv_state.hv3_current}\n"
+                f"Current hv4: "
+                f"{hv_state.hv4_current}",
+            )
             return stat
+
         return d
 
     def _stop_diagnostic(self) -> Callable:  # noqa: D202
@@ -173,8 +198,9 @@ class CheckPDBStatus:
             elif stop_button_state != 1:
                 stat.summary(DiagnosticStatus.ERROR, f"Stop button pressed")
             else:
-                stat.summary(DiagnosticStatus.OK, "OK, no stop or emergency button "
-                                                  "pressed")
+                stat.summary(
+                    DiagnosticStatus.OK, "OK, no stop or emergency button " "pressed"
+                )
 
             return stat
 
