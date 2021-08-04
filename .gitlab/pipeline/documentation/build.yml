@@ -1,0 +1,43 @@
+###############
+# Sphinx build #
+###############
+# Build the documentation and checks it for warnings and errors.
+Sphinx build:
+  stage: Build documentation
+  # The "$TAG" variable is set by the rules below
+  image: $CI_REGISTRY_IMAGE/sphinx:$TAG
+  before_script:
+    - cd docs
+  script:
+    - bash build_locally.sh
+  variables:
+    DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
+    TAG: $CI_DEFAULT_BRANCH
+  artifacts:
+    paths:
+      - docs/build/
+  needs:
+    - job: "sphinx container build"
+      optional: true
+  rules:
+    # The first three rules are only relevant when the Dockerfile has changed, because
+    # it defines the correct TAG
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event'
+      changes:
+        - "ros1/src/**/README.md"
+        - "ros2/src/**/README.md"
+    # If we are in the main branch and one of these files has changed, then
+    # we need to trigger a downstream pipeline to publish the changes online.
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+        - "ros1/src/**/README.md"
+        - "ros2/src/**/README.md"
+      trigger:
+        include: test-and-publish-documentation.yml
+        strategy: depend
