@@ -23,6 +23,6 @@ ros2 launch march_smartglasses_bridge smartglasses_bridge.launch.py \
 
 ### Launch arguments
 The bridge can be configured with the following launch arguments:
-* `hud_host`: The IP address of the smartglasses (Default = `localhost`)
-* `hud_port`: The port on which the smartglasses listen for incoming 
+- `hud_host`: The IP address of the smartglasses (Default = `localhost`)
+- `hud_port`: The port on which the smartglasses listen for incoming
 messages (Default = `53003`)

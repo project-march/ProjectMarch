@@ -83,23 +83,36 @@ gaits:
   walk_single_step_small:
     right_open: MVI_walksinglestepsmall_rightopen_v5
     left_close: MVI_walksinglestepsmall_leftclose_v5
-  ramp_down_last_step:
-    left_close: MVI_rampdownlaststep_leftclose_flat_v2
-    right_open: MVI_rampdownlaststep_rightopen_flat_v2
+
+dynamic_edge_gaits:
   ramp_down:
+    start_is_dynamic: false
+    final_is_dynamic: true
     left_close: MVI_rampdown_leftclose_flat_v4
     left_open: MVI_rampdown_leftopen_flat_v4
     left_swing: MVI_rampdown_leftswing_flat_v4
     right_close: MVI_rampdown_rightclose_flat_v4
     right_open: MVI_rampdown_rightopen_flat_v4
     right_swing: MVI_rampdown_rightswing_flat_v4
-  ramp_down_start_single_step:
-    right_open: MVI_rampdown_startsinglestep_rightopen_flat_v4
-    left_close: MVI_rampdown_startsinglestep_leftclose_flat_v4
-  ramp_down_single_step:
-    right_open: MVI_rampdown_singlestep_rightopen_flat_v4
-    left_close: MVI_rampdown_singlestep_leftclose_flat_v4
 
+  ramp_down_single_step:
+    start_is_dynamic: true
+    final_is_dynamic: true
+    left_close: MVI_rampdown_singlestep_leftclose_flat_v4
+    right_open: MVI_rampdown_singlestep_rightopen_flat_v4
+
+  ramp_down_start_single_step:
+    start_is_dynamic: false
+    final_is_dynamic: true
+    left_close: MVI_rampdown_startsinglestep_leftclose_flat_v4
+    right_open: MVI_rampdown_startsinglestep_rightopen_flat_v4
+
+  ramp_down_last_step:
+    start_is_dynamic: true
+    final_is_dynamic: false
+    left_close: MVI_rampdownlaststep_leftclose_flat_v1
+    right_open: MVI_rampdownlaststep_rightopen_flat_v1
+    
 positions:
   low_sit:
     gait_type: sit_like

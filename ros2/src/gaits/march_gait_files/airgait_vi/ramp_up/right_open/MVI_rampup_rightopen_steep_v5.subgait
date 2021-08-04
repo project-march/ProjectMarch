@@ -16,9 +16,6 @@ joints:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 926200000
-    velocity: 0.0
   - position: 0.0349
     time_from_start: 1800000000
     velocity: 0.0
@@ -55,9 +52,6 @@ joints:
   right_hip_aa:
   - position: 0.0349
     time_from_start: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 406000000
     velocity: 0.0
   - position: 0.0349
     time_from_start: 1800000000
