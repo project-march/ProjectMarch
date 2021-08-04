@@ -26,6 +26,7 @@ variables:
 stages:
   - Build container
   - Build documentation
+  - Test and publish documentation
   - Lint code
   - Build code
   - Test code

@@ -38,6 +38,19 @@ Sphinx build:
         - $DOCKER_FILE
         - "ros1/src/**/README.md"
         - "ros2/src/**/README.md"
-      trigger:
-        include: test-and-publish-documentation.yml
-        strategy: depend
+
+Test and publish documentation:
+  stage: Test and publish documentation
+  needs:
+    - job: "Sphinx build"
+  trigger:
+    include: test-and-publish-documentation.yml
+    strategy: depend
+  rules:
+    # If we are in the main branch and one of these files has changed, then
+    # we need to trigger a downstream pipeline to publish the changes online.
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - ".gitlab/dockerfiles/sphinx"
+        - "ros1/src/**/README.md"
+        - "ros2/src/**/README.md"
