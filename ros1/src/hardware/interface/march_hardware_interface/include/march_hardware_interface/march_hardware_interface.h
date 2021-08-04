@@ -102,7 +102,7 @@ private:
      * @param f Function to call
      */
     void call_sleeping_function_for_each_joint(
-        std::function<std::optional<ros::Duration>(march::Joint&)> f);
+        std::function<std::optional<ros::Duration>(march::Joint&)> const &f);
 
     /**
      * Call a function that returns true when successful for each joint
@@ -110,7 +110,7 @@ private:
      * @param f Function to call
      */
     void call_busy_waiting_function_for_each_joint(
-        std::function<bool(march::Joint&)> f, unsigned maximum_tries);
+        std::function<bool(march::Joint&)> const &f, unsigned maximum_tries);
 
     /* Limit of the change in effort command over one cycle, can be overridden
      * by safety controller */

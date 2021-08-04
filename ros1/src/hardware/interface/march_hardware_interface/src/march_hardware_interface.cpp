@@ -168,7 +168,7 @@ bool all(std::vector<bool> vec)
 }
 
 void MarchHardwareInterface::call_sleeping_function_for_each_joint(
-    std::function<std::optional<ros::Duration>(march::Joint&)> f)
+    std::function<std::optional<ros::Duration>(march::Joint&)> const &f)
 {
     auto is_operational = march_robot_->areJointsOperational();
 
@@ -190,7 +190,7 @@ void MarchHardwareInterface::call_sleeping_function_for_each_joint(
 }
 
 void MarchHardwareInterface::call_busy_waiting_function_for_each_joint(
-    std::function<bool(march::Joint&)> f, unsigned maximum_tries = 10)
+    std::function<bool(march::Joint&)> const &f, unsigned maximum_tries = 10)
 {
     std::vector<bool> is_ok;
     is_ok.resize(num_joints_);
