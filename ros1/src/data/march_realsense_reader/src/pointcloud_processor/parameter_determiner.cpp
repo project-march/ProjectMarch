@@ -660,11 +660,11 @@ void HullParameterDeterminer::getValidExoSupport(
 
         std_msgs::ColorRGBA marker_color;
 
-        if (potential_exo_support_point.z < max_sit_height_world
-            && potential_exo_support_point.z > min_sit_height_world) {
-
+        if (potential_exo_support_point.z < max_sit_height_world +
+                    allowed_deviation_from_reachable_bench
+            && potential_exo_support_point.z > min_sit_height_world -
+                    allowed_deviation_from_reachable_bench) {
             exo_support_points->push_back(potential_exo_support_point);
-
             if (debugging_) {
                 marker_color = color_utilities::GREEN;
             }
