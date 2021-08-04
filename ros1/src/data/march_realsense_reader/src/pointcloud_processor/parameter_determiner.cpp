@@ -499,8 +499,8 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    if (sit_height > max_sit_height_world +
-            allowed_deviation_from_reachable_bench
+    if (sit_height
+            > max_sit_height_world + allowed_deviation_from_reachable_bench
         || sit_height
             < min_sit_height_world - allowed_deviation_from_reachable_bench) {
         gait_parameters_->first_parameter = -1;
@@ -512,9 +512,8 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             << ramp_slope);
     }
 
-    gait_parameters_->first_parameter
-        = calculateParameter(sit_height, min_sit_height_world,
-            max_sit_height_world);
+    gait_parameters_->first_parameter = calculateParameter(
+        sit_height, min_sit_height_world, max_sit_height_world);
 
     // The step height and side step parameter are unused for the sit
     // gait, so they are set to -1
@@ -660,10 +659,10 @@ void HullParameterDeterminer::getValidExoSupport(
 
         std_msgs::ColorRGBA marker_color;
 
-        if (potential_exo_support_point.z < max_sit_height_world +
-                    allowed_deviation_from_reachable_bench
-            && potential_exo_support_point.z > min_sit_height_world -
-                    allowed_deviation_from_reachable_bench) {
+        if (potential_exo_support_point.z
+                < max_sit_height_world + allowed_deviation_from_reachable_bench
+            && potential_exo_support_point.z > min_sit_height_world
+                    - allowed_deviation_from_reachable_bench) {
             exo_support_points->push_back(potential_exo_support_point);
             if (debugging_) {
                 marker_color = color_utilities::GREEN;
