@@ -88,7 +88,8 @@ private:
      * @return Returns a vector: The weight values belonging to the diagonal of
      * the MPC weight matrix.
      */
-    std::vector<float> getWeights(std::vector<std::string> joint_names);
+    std::vector<float> getWeights(
+        std::vector<std::string> joint_names, ros::NodeHandle& nh);
 
     // Pointer to the joints to control
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
@@ -112,7 +113,7 @@ private:
     std::vector<double> end_reference;
 
     // Vector to store the command calculated by the controller
-    std::vector<double> command;
+    std::vector<double> mpc_command;
 
     // Unique pointer to the ModelPredictiveController class
     std::unique_ptr<ModelPredictiveController> model_predictive_controller_;
@@ -121,6 +122,15 @@ private:
     std::unique_ptr<
         realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>
         mpc_pub_;
+
+    // PID
+    typedef std::shared_ptr<control_toolbox::Pid> PidPtr;
+    std::vector<PidPtr> pids_;
+
+    std::vector<bool> joint_uses_mpc_;
+
+    unsigned int num_pid_joints_ {};
+    unsigned int num_mpc_joints_ {};
 };
 
 // Assign an alias to the class definition

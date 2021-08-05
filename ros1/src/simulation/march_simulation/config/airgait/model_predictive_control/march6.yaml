@@ -19,6 +19,18 @@ march:
         - right_hip_fe
         - right_knee
 
+      mpc_joints:
+        - left_hip_aa
+        - right_hip_aa
+
+      pid_joints:
+        - left_ankle
+        - left_hip_fe
+        - left_knee
+        - right_ankle
+        - right_hip_fe
+        - right_knee
+
       # Controller tuning parameters
       # Q and R are the weights on the states and inputs of the system respectively
       # The parameters represent the values on the diagonal of the MPC weighting matrix
