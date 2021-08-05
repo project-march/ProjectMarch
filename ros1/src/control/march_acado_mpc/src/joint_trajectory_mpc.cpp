@@ -348,7 +348,7 @@ void ModelPredictiveControllerInterface::updateCommand(
     pid_index = 0;
     int mpc_index = 0;
     for (int i = 0; i < num_joints_; ++i) {
-        if (!joint_uses_mpc_[i]) {
+        if (joint_uses_mpc_[i]) {
             // Apply command
             (*joint_handles_ptr_)[i].setCommand(mpc_command[mpc_index]);
 
