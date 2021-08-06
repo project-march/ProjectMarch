@@ -1,6 +1,6 @@
 """The module motor_controller_state.py contains the CheckMotorControllerStatus Class."""
 
-from typing import List, Callable
+from typing import Callable
 
 from diagnostic_msgs.msg import DiagnosticStatus
 from diagnostic_updater import Updater, DiagnosticStatusWrapper
@@ -33,12 +33,12 @@ class CheckPDBStatus:
         )
         self._pdb_data = None
 
-        updater.add(f"PowerDistributionBoard stop state", self._stop_diagnostic())
-        updater.add(f"PowerDistributionBoard lv", self._lv_diagnostic())
-        updater.add(f"PowerDistributionBoard hv", self._hv_diagnostic())
-        updater.add(f"Battery percentage", self._battery_percentage_diagnostic())
-        updater.add(f"Battery voltage", self._battery_voltage_diagnostic())
-        updater.add(f"Battery temperature", self._battery_temperature_diagnostic())
+        updater.add("PowerDistributionBoard stop state", self._stop_diagnostic())
+        updater.add("PowerDistributionBoard lv", self._lv_diagnostic())
+        updater.add("PowerDistributionBoard hv", self._hv_diagnostic())
+        updater.add("Battery percentage", self._battery_percentage_diagnostic())
+        updater.add("Battery voltage", self._battery_voltage_diagnostic())
+        updater.add("Battery temperature", self._battery_temperature_diagnostic())
 
     def _cb(self, msg: PowerDistributionBoardData):
         """Set the motor_controller_states.
@@ -57,12 +57,12 @@ class CheckPDBStatus:
             if battery_temperature >= self.BATTERY_TEMPERATURE_ERROR_THRESHOLD:
                 stat.summary(
                     DiagnosticStatus.ERROR,
-                    f"Battery temperature too high: " f"{battery_temperature}",
+                    f"Battery temperature too high: {battery_temperature}",
                 )
             elif battery_temperature >= self.BATTERY_TEMPERATURE_WARNING_THRESHOLD:
                 stat.summary(
                     DiagnosticStatus.WARN,
-                    f"Battery temperature high: " f"{battery_temperature}",
+                    f"Battery temperature high: {battery_temperature}",
                 )
             else:
                 stat.summary(DiagnosticStatus.OK, f"OK: {battery_temperature}")
@@ -80,12 +80,12 @@ class CheckPDBStatus:
             if battery_percentage <= self.BATTERY_PERCENTAGE_ERROR_THRESHOLD:
                 stat.summary(
                     DiagnosticStatus.ERROR,
-                    f"Battery percentage too low: " f"{battery_percentage}",
+                    f"Battery percentage too low: {battery_percentage}",
                 )
             elif battery_percentage <= self.BATTERY_PERCENTAGE_WARNING_THRESHOLD:
                 stat.summary(
                     DiagnosticStatus.WARN,
-                    f"Battery percentage low: " f"{battery_percentage}",
+                    f"Battery percentage low: {battery_percentage}",
                 )
             else:
                 stat.summary(DiagnosticStatus.OK, f"OK: {battery_percentage}")
@@ -103,11 +103,11 @@ class CheckPDBStatus:
             if battery_voltage <= self.BATTERY_VOLTAGE_ERROR_THRESHOLD:
                 stat.summary(
                     DiagnosticStatus.ERROR,
-                    f"Battery voltage too low: " f"{battery_voltage}",
+                    f"Battery voltage too low: {battery_voltage}",
                 )
             elif battery_voltage <= self.BATTERY_PERCENTAGE_WARNING_THRESHOLD:
                 stat.summary(
-                    DiagnosticStatus.WARN, f"Battery voltage low: " f"{battery_voltage}"
+                    DiagnosticStatus.WARN, f"Battery voltage low: {battery_voltage}"
                 )
             else:
                 stat.summary(DiagnosticStatus.OK, f"OK: {battery_voltage}")
@@ -182,9 +182,9 @@ class CheckPDBStatus:
             stat.add("Stop button status", str(stop_button_state))
 
             if emergency_button_status != 1:
-                stat.summary(DiagnosticStatus.ERROR, f"Emergency button pressed")
+                stat.summary(DiagnosticStatus.ERROR, "Emergency button pressed")
             elif stop_button_state != 1:
-                stat.summary(DiagnosticStatus.ERROR, f"Stop button pressed")
+                stat.summary(DiagnosticStatus.ERROR, "Stop button pressed")
             else:
                 stat.summary(
                     DiagnosticStatus.OK, "OK, no stop or emergency button " "pressed"
