@@ -12,10 +12,10 @@ from march_shared_msgs.msg import PowerDistributionBoardData
 class CheckPDBStatus:
     """Base class to diagnose the motor_controller statuses."""
 
-    BATTERY_PERCENTAGE_WARNING_THRESHOLD = 20
-    BATTERY_PERCENTAGE_ERROR_THRESHOLD = 5
+    BATTERY_PERCENTAGE_WARNING_THRESHOLD = 10
+    BATTERY_PERCENTAGE_ERROR_THRESHOLD = 2
     BATTERY_VOLTAGE_WARNING_THRESHOLD = 48
-    BATTERY_VOLTAGE_ERROR_THRESHOLD = 46
+    BATTERY_VOLTAGE_ERROR_THRESHOLD = 47.5
     BATTERY_TEMPERATURE_WARNING_THRESHOLD = 40
     BATTERY_TEMPERATURE_ERROR_THRESHOLD = 50
 
@@ -122,26 +122,14 @@ class CheckPDBStatus:
                 stat.summary(DiagnosticStatus.STALE, "No pdb data")
                 return stat
 
-            lv1_state = self._pdb_data.lv_state.lv1_ok
-            lv2_state = self._pdb_data.lv_state.lv2_ok
-
-            if lv1_state != 1 or lv2_state != 1:
-                stat.summary(
-                    DiagnosticStatus.ERROR,
-                    f"LV error,\n LV1 state:"
-                    f" {lv1_state}\n "
-                    f"LV2 state: {lv2_state}",
-                )
-
-            else:
-                stat.summary(
-                    DiagnosticStatus.OK,
-                    f"LV OK\n"
-                    f"Current lv1: "
-                    f"{self._pdb_data.lv_state.lv1_current}\n"
-                    f"Current lv2: "
-                    f"{self._pdb_data.lv_state.lv2_current}",
-                )
+            stat.summary(
+                DiagnosticStatus.OK,
+                f"LV OK\n"
+                f"Current lv1: "
+                f"{self._pdb_data.lv_state.lv1_current}\n"
+                f"Current lv2: "
+                f"{self._pdb_data.lv_state.lv2_current}",
+            )
             return stat
 
         return d
