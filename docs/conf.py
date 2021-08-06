@@ -29,9 +29,9 @@ copyright = "2021, Project MARCH"  # noqa: A001
 # built documents.
 #
 # The short X.Y version.
-version = "Noetic"
+version = "VI"
 # The full version, including alpha/beta/rc tags.
-release = "Noetic"
+release = "VI"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "default"
@@ -53,7 +53,7 @@ html_last_updated_fmt = "%b %d, %Y"
 html_show_copyright = True
 
 html_context = {
-    "display_gitlab": True,
+    "display_gitlab": False,
     "gitlab_user": "project-march",
     "gitlab_repo": "march",
     "gitlab_version": branch_name,
