@@ -74,4 +74,3 @@ joints:
     time_from_start: 2500000000
     velocity: -0.0
 name: right_close
-version: MVI_rampdown_rightclose_flat_v4

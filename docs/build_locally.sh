@@ -6,11 +6,60 @@ set -e
 # Setup Environment
 rm -rf build
 
-# Build without ros wrapper to catch warnings and errors
+function readmes_to_sphinx ()
+{
+    echo "Converting READMEs to reStructuredText..."
+    echo "Create empty directory $2"
+    rm -rf "$2"
+    mkdir -p "$2"
+
+    echo "Find all relevant README.md files in main repository"
+    INPUT_FILE=$(mktemp)
+    find $1 -name "README.md" | grep -v "libraries" | grep '^' | xargs readlink -f > $INPUT_FILE
+
+    # Extract the package name by removing the "README.md" part and by removing
+    # everything before the latest "/"
+    # Append `.rst` to the end of the name
+
+    # For example 
+    # /march/ros2/src/hardware/interface/march_smartglasses_bridge/README.md
+    # becomes
+    # march_smartglasses_bridge
+    echo "Extract package name from README files"
+    OUTPUT_DIR=$(readlink -f $2)
+    OUTPUT_FILE=$(mktemp)
+    cat $INPUT_FILE | sed "s#/README.md##" \
+                 | sed "s#.*/##" \
+                 | sed "s#^#$OUTPUT_DIR/#" > $OUTPUT_FILE
+
+    # Read the contents of the files into arrays
+    readarray -t INPUT < $INPUT_FILE
+    readarray -t OUTPUT < $OUTPUT_FILE
+
+    CURRENT_DIR=$(pwd)
+    # Loop through the indices of the arrays
+    for ((i=0; i < ${#INPUT[@]}; i++))
+    do
+        # Transform each markdown file to a reStructuredText file with pandoc
+        # It extracts certain files like images from the relative location of the README
+        # and stores a copy close to the converted file.
+        cd $(dirname ${INPUT[i]})
+        STATIC_DIR=${OUTPUT[i]}/static
+        mkdir -p $STATIC_DIR
+        echo "Converting ${INPUT[i]} to ${OUTPUT[i]}/README.rst"
+        pandoc -f commonmark -t rst --fail-if-warning --extract-media "$STATIC_DIR" ${INPUT[i]} \
+            | sed "s#${OUTPUT[i]}/##" > ${OUTPUT[i]}/README.rst
+    done
+    cd "$CURRENT_DIR"
+
+    # Remove the temporary files
+    rm $INPUT_FILE
+    rm $OUTPUT_FILE
+
+    echo "Succesfully converted READMEs to reStructuredText!"
+}
+
+readmes_to_sphinx "../ros1/src ../ros2/src" "doc/march_packages/"
+
+# Build the sphinx documentation while catching warnings and errors
 sphinx-build -W -b html . build
-
-# Validate if the HTML is valid (i.e. no missing links, images, etc.)
-htmlproofer docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/html/genindex.html,docs/build/html/search.html,docs/build/html/index-ms g.html,docs/build/search.html --hydra-config '{"max_concurrency": 3}' --url-ignore '#'
-
-# Run
-xdg-open ./build/html/index.html

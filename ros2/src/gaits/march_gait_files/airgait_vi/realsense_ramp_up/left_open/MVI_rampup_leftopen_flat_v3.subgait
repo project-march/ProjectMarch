@@ -1,4 +1,4 @@
-description: ramp up v2 but without haa
+description: version 2 but then with no HAA
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -71,4 +71,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.3491
 name: left_open
-version: MVI_rampup_leftopen_flat_v3

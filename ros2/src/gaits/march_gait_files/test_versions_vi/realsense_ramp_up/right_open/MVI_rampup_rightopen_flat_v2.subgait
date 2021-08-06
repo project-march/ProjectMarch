@@ -1,4 +1,5 @@
-description: First version of a flat ramp_up gait, but with more hip flexion in both legs
+description: First version of a flat ramp_up gait, but with more hip flexion in both
+  legs
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -74,4 +75,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MVI_rampup_rightopen_flat_v2

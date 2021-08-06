@@ -90,4 +90,3 @@ joints:
     time_from_start: 1200000000
     velocity: 0.0
 name: left_swing
-version: MVI_walklarge_leftswing_v2
