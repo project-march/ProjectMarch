@@ -1,11 +1,15 @@
 // Copyright 2019 Project March.
 #include "march_hardware_interface/march_hardware_interface.h"
-#include "march_hardware_interface/power_net_on_off_command.h"
 
 #include <march_hardware/joint.h>
 #include <march_hardware/motor_controller/actuation_mode.h>
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
+#include <march_hardware/power_distribution_board/power_distribution_board.h>
+#include <march_shared_msgs/BatteryState.h>
+#include <march_shared_msgs/HighVoltageState.h>
+#include <march_shared_msgs/LowVoltageState.h>
+#include <march_shared_msgs/PowerDistributionBoardData.h>
 #include <march_shared_msgs/PressureSoleData.h>
 #include <march_shared_msgs/PressureSolesData.h>
 
@@ -60,6 +64,11 @@ bool MarchHardwareInterface::init(
             march_shared_msgs::PressureSolesData>>(
             nh, "/march/pressure_sole_data/", 4);
 
+    power_distribution_board_data_pub_
+        = std::make_unique<realtime_tools::RealtimePublisher<
+            march_shared_msgs::PowerDistributionBoardData>>(
+            nh, "/march/pdb_data/", 4);
+
     this->after_limit_joint_command_pub_
         = std::make_unique<realtime_tools::RealtimePublisher<
             march_shared_msgs::AfterLimitJointCommand>>(
@@ -88,39 +97,6 @@ bool MarchHardwareInterface::init(
 
         soft_limits_[i] = soft_limits;
         soft_limits_error_[i] = soft_limits_error;
-    }
-
-    if (this->march_robot_->hasPowerDistributionboard()) {
-        // Create march_pdb_state interface
-        MarchPdbStateHandle march_pdb_state_handle("PDBhandle",
-            this->march_robot_->getPowerDistributionBoard(),
-            &master_shutdown_allowed_command_, &enable_high_voltage_command_,
-            &power_net_on_off_command_);
-        march_pdb_interface_.registerHandle(march_pdb_state_handle);
-
-        for (const auto& joint : *this->march_robot_) {
-            const int net_number = joint.getNetNumber();
-            if (net_number == -1) {
-                std::ostringstream error_stream;
-                error_stream << "Joint " << joint.getName()
-                             << " has no net number";
-                throw std::runtime_error(error_stream.str());
-            }
-            while (!march_robot_->getPowerDistributionBoard()
-                        ->getHighVoltage()
-                        .getNetOperational(net_number)) {
-                march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
-                    .setNetOnOff(/*on=*/true, net_number);
-                usleep(/*__useconds=*/100000);
-                ROS_WARN(
-                    "[%s] Waiting on high voltage", joint.getName().c_str());
-            }
-        }
-
-        this->registerInterface(&this->march_pdb_interface_);
-    } else {
-        ROS_WARN("Running without Power Distribution Board");
     }
 
     // Initialize interfaces for each joint
@@ -305,6 +281,10 @@ void MarchHardwareInterface::read(
     if (march_robot_->hasPressureSoles()) {
         updatePressureSoleData();
     }
+
+    if (march_robot_->hasPowerDistributionBoard()) {
+        updatePowerDistributionBoardData();
+    }
 }
 
 void MarchHardwareInterface::write(
@@ -374,10 +354,6 @@ void MarchHardwareInterface::write(
     }
 
     this->updateAfterLimitJointCommand();
-
-    if (this->march_robot_->hasPowerDistributionboard()) {
-        updatePowerDistributionBoard();
-    }
 }
 
 int MarchHardwareInterface::getEthercatCycleTime() const
@@ -422,79 +398,6 @@ void MarchHardwareInterface::reserveMemory()
     motor_controller_state_pub_->msg_.incremental_position.resize(num_joints_);
     motor_controller_state_pub_->msg_.absolute_velocity.resize(num_joints_);
     motor_controller_state_pub_->msg_.incremental_velocity.resize(num_joints_);
-}
-
-void MarchHardwareInterface::updatePowerDistributionBoard()
-{
-    march_robot_->getPowerDistributionBoard()->setMasterOnline();
-    march_robot_->getPowerDistributionBoard()->setMasterShutDownAllowed(
-        master_shutdown_allowed_command_);
-    updateHighVoltageEnable();
-    updatePowerNet();
-}
-
-void MarchHardwareInterface::updateHighVoltageEnable()
-{
-    try {
-        if (march_robot_->getPowerDistributionBoard()
-                ->getHighVoltage()
-                .getHighVoltageEnabled()
-            != enable_high_voltage_command_) {
-            march_robot_->getPowerDistributionBoard()
-                ->getHighVoltage()
-                .enableDisableHighVoltage(enable_high_voltage_command_);
-        } else if (!march_robot_->getPowerDistributionBoard()
-                        ->getHighVoltage()
-                        .getHighVoltageEnabled()) {
-            ROS_WARN_THROTTLE(2, "High voltage disabled");
-        }
-    } catch (std::exception& exception) {
-        ROS_ERROR("%s", exception.what());
-        ROS_DEBUG("Reverting the enable_high_voltage_command input, in attempt "
-                  "to prevent this exception is thrown "
-                  "again");
-        enable_high_voltage_command_ = !enable_high_voltage_command_;
-    }
-}
-
-void MarchHardwareInterface::updatePowerNet()
-{
-    if (power_net_on_off_command_.getType() == PowerNetType::high_voltage) {
-        try {
-            if (march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
-                    .getNetOperational(power_net_on_off_command_.getNetNumber())
-                != power_net_on_off_command_.isOnOrOff()) {
-                march_robot_->getPowerDistributionBoard()
-                    ->getHighVoltage()
-                    .setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                        power_net_on_off_command_.getNetNumber());
-            }
-        } catch (std::exception& exception) {
-            ROS_ERROR("%s", exception.what());
-            ROS_DEBUG("Reset power net command, in attempt to prevent this "
-                      "exception is thrown again");
-            power_net_on_off_command_.reset();
-        }
-    } else if (power_net_on_off_command_.getType()
-        == PowerNetType::low_voltage) {
-        try {
-            if (march_robot_->getPowerDistributionBoard()
-                    ->getLowVoltage()
-                    .getNetOperational(power_net_on_off_command_.getNetNumber())
-                != power_net_on_off_command_.isOnOrOff()) {
-                march_robot_->getPowerDistributionBoard()
-                    ->getLowVoltage()
-                    .setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                        power_net_on_off_command_.getNetNumber());
-            }
-        } catch (std::exception& exception) {
-            ROS_ERROR("%s", exception.what());
-            ROS_WARN("Reset power net command, in attempt to prevent this "
-                     "exception is thrown again");
-            power_net_on_off_command_.reset();
-        }
-    }
 }
 
 void MarchHardwareInterface::updateAfterLimitJointCommand()
@@ -684,4 +587,43 @@ void MarchHardwareInterface::updatePressureSoleData()
         }
     }
     pressure_sole_data_pub_->unlockAndPublish();
+}
+
+void MarchHardwareInterface::updatePowerDistributionBoardData()
+{
+    if (!power_distribution_board_data_pub_->trylock()) {
+        return;
+    }
+    march::PowerDistributionBoardData pdb_data
+        = march_robot_->getPowerDistributionBoard().read();
+    march_shared_msgs::PowerDistributionBoardData pdb_state_msg;
+    // Fill the general pdb state fields
+    pdb_state_msg.header.stamp = ros::Time::now();
+    pdb_state_msg.emergency_button_state = pdb_data.emergency_button_state.ui;
+    pdb_state_msg.pdb_current = pdb_data.pdb_current.f;
+    pdb_state_msg.stop_button_state = pdb_data.stop_button_state.ui;
+
+    march_shared_msgs::HighVoltageState hv_msg;
+    hv_msg.total_current = pdb_data.hv_total_current.f;
+    hv_msg.hv1_current = pdb_data.hv1_current.f;
+    hv_msg.hv2_current = pdb_data.hv2_current.f;
+    hv_msg.hv3_current = pdb_data.hv3_current.f;
+    hv_msg.hv4_current = pdb_data.hv4_current.f;
+    pdb_state_msg.hv_state = hv_msg;
+
+    march_shared_msgs::LowVoltageState lv_msg;
+    lv_msg.lv1_current = pdb_data.lv1_current.f;
+    lv_msg.lv2_current = pdb_data.lv2_current.f;
+    lv_msg.lv1_ok = pdb_data.lv1_ok.ui;
+    lv_msg.lv2_ok = pdb_data.lv2_ok.ui;
+    pdb_state_msg.lv_state = lv_msg;
+
+    march_shared_msgs::BatteryState battery_msg;
+    battery_msg.percentage = pdb_data.battery_percentage.f;
+    battery_msg.voltage = pdb_data.battery_voltage.f;
+    battery_msg.temperature = pdb_data.battery_temperature.f;
+    pdb_state_msg.battery_state = battery_msg;
+
+    power_distribution_board_data_pub_->msg_ = pdb_state_msg;
+    power_distribution_board_data_pub_->unlockAndPublish();
 }

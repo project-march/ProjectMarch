@@ -19,31 +19,30 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
           ecatCycleTime, ecatSlaveTimeout)
-    , pdb_(nullptr)
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
-    : jointList(std::move(jointList))
-    , urdf_(std::move(urdf))
-    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
-    , pdb_(std::move(powerDistributionBoard))
-{
-}
-
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
     std::vector<PressureSole> pressureSoles, ::std::string if_name,
     int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
           ecatCycleTime, ecatSlaveTimeout)
-    , pdb_(std::move(powerDistributionBoard))
     , pressureSoles(std::move(pressureSoles))
+{
+}
+
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+    std::vector<PressureSole> pressureSoles, ::std::string if_name,
+    int ecatCycleTime, int ecatSlaveTimeout,
+    std::optional<PowerDistributionBoard> power_distribution_board)
+    : jointList(std::move(jointList))
+    , urdf_(std::move(urdf))
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
+          ecatCycleTime, ecatSlaveTimeout)
+    , pressureSoles(std::move(pressureSoles))
+    , powerDistributionBoard(std::move(power_distribution_board))
 {
 }
 
@@ -226,16 +225,6 @@ MarchRobot::iterator MarchRobot::end()
     return this->jointList.end();
 }
 
-bool MarchRobot::hasPowerDistributionboard() const
-{
-    return this->pdb_ != nullptr;
-}
-
-PowerDistributionBoard* MarchRobot::getPowerDistributionBoard() const
-{
-    return this->pdb_.get();
-}
-
 bool MarchRobot::hasPressureSoles() const
 {
     return pressureSoles.size() > 0;
@@ -244,6 +233,16 @@ bool MarchRobot::hasPressureSoles() const
 std::vector<PressureSole> MarchRobot::getPressureSoles() const
 {
     return pressureSoles;
+}
+
+bool MarchRobot::hasPowerDistributionBoard() const
+{
+    return powerDistributionBoard.has_value();
+}
+
+PowerDistributionBoard MarchRobot::getPowerDistributionBoard() const
+{
+    return powerDistributionBoard.value();
 }
 
 MarchRobot::~MarchRobot()

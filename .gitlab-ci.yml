@@ -9,12 +9,12 @@
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_TAG'
-      when: never
-    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
+    - when: never
 
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
@@ -26,8 +26,7 @@ variables:
 stages:
   - Build container
   - Build documentation
-  - Test documentation
-  - Publish documentation
+  - Test and publish documentation
   - Lint code
   - Build code
   - Test code
@@ -67,7 +66,7 @@ stages:
 # are split into different files. Each file specifies the jobs of a stage.
 include:
     - local: /.gitlab/pipeline/build-container.yml
-    - local: /.gitlab/pipeline/build-test-and-publish-documentation.yml
+    - local: /.gitlab/pipeline/documentation/build.yml
     - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
     - local: /.gitlab/pipeline/test-code.yml

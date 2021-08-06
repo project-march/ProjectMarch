@@ -393,8 +393,19 @@ class GaitSelection(Node):
 
         for gait in self._dynamic_edge_version_map:
             self.get_logger().debug(f"Adding dynamic gait {gait}")
-            gaits[gait] = DynamicEdgeSetpointsGait.from_file(
-                gait, self._gait_directory, self._robot, self._dynamic_edge_version_map
+            start_is_dynamic = self._dynamic_edge_version_map[gait].pop(
+                "start_is_dynamic", True
+            )
+            final_is_dynamic = self._dynamic_edge_version_map[gait].pop(
+                "final_is_dynamic", True
+            )
+            gaits[gait] = DynamicEdgeSetpointsGait.dynamic_from_file(
+                gait,
+                self._gait_directory,
+                self._robot,
+                self._dynamic_edge_version_map,
+                start_is_dynamic,
+                final_is_dynamic,
             )
             self._gait_version_map[gait] = self._dynamic_edge_version_map[gait]
         self._load_realsense_gaits(gaits)

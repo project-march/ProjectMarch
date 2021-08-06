@@ -32,7 +32,7 @@ joints:
   left_knee:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.1396
     time_from_start: 1700000000
     velocity: 0.0
@@ -75,7 +75,7 @@ joints:
   right_knee:
   - position: 0.0
     time_from_start: 0
-    velocity: -0.0
+    velocity: 0.0
   - position: 0.8727
     time_from_start: 1050000000
     velocity: 0.0
@@ -86,4 +86,3 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MVI_rampdownlaststep_rightopen_steep_v1

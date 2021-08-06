@@ -253,9 +253,13 @@ protected:
     float ramp_min_search_area {};
     float min_sit_height {};
     float max_sit_height {};
+    float min_sit_height_world {};
+    float max_sit_height_world {};
     float min_x_search_sit {};
     float max_x_search_sit {};
     float search_y_deviation_sit {};
+    float sit_pos_x {};
+    float sit_pos_y {};
     float sit_grid_size {};
     float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};

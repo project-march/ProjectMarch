@@ -21,8 +21,7 @@ march6:
             resolution: 14
             direction: 1
             minPositionIU: 9063
-            maxPositionIU: 11118
-
+            maxPositionIU: 11212
           incrementalEncoder:
             resolution: 13
             transmission: 236
@@ -40,8 +39,8 @@ march6:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 2947
-            maxPositionIU: 3867
+            minPositionIU: 2264
+            maxPositionIU: 3187
           incrementalEncoder:
             resolution: 13
             transmission: 240
@@ -116,7 +115,7 @@ march6:
           absoluteEncoder:
             resolution: 14
             direction: -1
-            minPositionIU: 11447
+            minPositionIU: 11433
             maxPositionIU: 12337
           incrementalEncoder:
             resolution: 13
@@ -161,3 +160,6 @@ march6:
             direction: 1
             resolution: 12
             transmission: 121
+  power_distribution_board:
+      slaveIndex: 5
+      byteOffset: 0

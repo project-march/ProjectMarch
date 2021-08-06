@@ -317,8 +317,8 @@ void HullParameterDeterminer::addDebugGaitInformation()
         }
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
-            marker_point.y = search_y_deviation_sit / 2.0F;
-            marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
+            marker_point.y = sit_pos_y;
+            marker_point.x = sit_pos_x;
 
             marker_point.z = min_sit_height;
             gait_information_marker_list.points.push_back(marker_point);
@@ -421,6 +421,28 @@ bool HullParameterDeterminer::transformGaitInformation()
             break;
         }
 
+        case RealSenseCategory::sit: {
+            point = point_utilities::makePointXYZ(
+                (min_x_search_sit + max_x_search_sit) / 2.0F,
+                search_y_deviation_sit / 2.0F, min_sit_height);
+            gait_information_cloud->push_back(point);
+            point = point_utilities::makePointXYZ(
+                (min_x_search_sit + max_x_search_sit) / 2.0F,
+                search_y_deviation_sit / 2.0F, max_sit_height);
+            gait_information_cloud->push_back(point);
+
+            // Transform to the fixed frame
+            transformer_->transformPointCloud(gait_information_cloud);
+
+            // Update gait dimensions as seen from fixed frame
+            min_sit_height_world = gait_information_cloud->points[0].z;
+            max_sit_height_world = gait_information_cloud->points[1].z;
+            sit_pos_x = gait_information_cloud->points[0].x;
+            sit_pos_y = gait_information_cloud->points[0].y;
+
+            break;
+        }
+
         default: {
             ROS_WARN_STREAM("Gait information transform is not implemented yet "
                             "for realsense category "
@@ -467,14 +489,15 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    if (sit_height > min_sit_height && sit_height < max_sit_height) {
-        gait_parameters_->first_parameter
-            = (sit_height - min_sit_height) / (max_sit_height - min_sit_height);
+    if (sit_height > min_sit_height_world
+        && sit_height < max_sit_height_world) {
+        gait_parameters_->first_parameter = (sit_height - min_sit_height_world)
+            / (max_sit_height_world - min_sit_height_world);
     } else {
         gait_parameters_->first_parameter = -1;
         ROS_ERROR_STREAM("The sit height should be between "
-            << min_sit_height << " and " << max_sit_height << " but was "
-            << sit_height);
+            << min_sit_height_world << " and " << max_sit_height_world
+            << " but was " << sit_height);
         return false;
     }
     // The step height and side step parameter are unused for the sit
@@ -555,8 +578,8 @@ bool HullParameterDeterminer::getSitHeight()
     if (debugging_) {
         std_msgs::ColorRGBA marker_color = color_utilities::WHITE;
         geometry_msgs::Point marker_point;
-        marker_point.y = search_y_deviation_sit / 2.0F;
-        marker_point.x = (min_x_search_sit + max_x_search_sit) / 2.0F;
+        marker_point.y = sit_pos_y;
+        marker_point.x = sit_pos_x;
         marker_point.z = sit_height;
 
         optimal_location_marker.points.push_back(marker_point);
@@ -576,8 +599,8 @@ void HullParameterDeterminer::getValidExoSupport(
 
         std_msgs::ColorRGBA marker_color;
 
-        if (potential_exo_support_point.z < max_sit_height
-            && potential_exo_support_point.z > min_sit_height) {
+        if (potential_exo_support_point.z < max_sit_height_world
+            && potential_exo_support_point.z > min_sit_height_world) {
 
             exo_support_points->push_back(potential_exo_support_point);
 
@@ -646,20 +669,22 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud::Ptr& sit_grid)
             grid_point.z = 0.0;
 
             sit_grid->push_back(grid_point);
+        }
+    }
 
-            if (debugging_) {
-                geometry_msgs::Point marker_point;
-                marker_point.x = grid_point.x;
-                marker_point.y = grid_point.y;
-                marker_point.z = grid_point.z;
+    transformer_->transformPointCloud(sit_grid);
 
-                std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
+    if (debugging_) {
+        for (pcl::PointXYZ sit_grid_point : *sit_grid) {
+            geometry_msgs::Point marker_point;
+            marker_point.x = sit_grid_point.x;
+            marker_point.y = sit_grid_point.y;
+            marker_point.z = sit_grid_point.z;
 
-                foot_locations_to_try_marker_list.points.push_back(
-                    marker_point);
-                foot_locations_to_try_marker_list.colors.push_back(
-                    marker_color);
-            }
+            std_msgs::ColorRGBA marker_color = color_utilities::BLUE;
+
+            foot_locations_to_try_marker_list.points.push_back(marker_point);
+            foot_locations_to_try_marker_list.colors.push_back(marker_color);
         }
     }
     return true;
@@ -698,7 +723,6 @@ bool HullParameterDeterminer::getOptimalFootLocation()
         optimal_location_marker.points.push_back(marker_point);
         optimal_location_marker.colors.push_back(marker_color);
     }
-
     return success;
 }
 
@@ -1179,9 +1203,9 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
     elevated_cloud_with_normals->points.resize(elevated_cloud->points.size());
 
     float normalising_constant
-        = plane_coefficients->values[0] * plane_coefficients->values[0]
-        + plane_coefficients->values[1] * plane_coefficients->values[1]
-        + plane_coefficients->values[2] * plane_coefficients->values[2];
+        = sqrt(plane_coefficients->values[0] * plane_coefficients->values[0]
+            + plane_coefficients->values[1] * plane_coefficients->values[1]
+            + plane_coefficients->values[2] * plane_coefficients->values[2]);
 
     if (normalising_constant < std::numeric_limits<double>::epsilon()) {
         ROS_ERROR_STREAM("The normal vector of the current plane is too close "

@@ -30,16 +30,15 @@ const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS
     = { "axis", "incrementalEncoder", "motorKV" };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset" };
-const std::vector<std::string>
-    HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS
-    = { "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets",
-          "netDriverByteOffsets" };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS
     = { "allowActuation", "motor_controller" };
 const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
     = { "slaveIndex", "type" };
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset", "side" };
+const std::vector<std::string>
+    HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS
+    = { "slaveIndex", "byteOffset" };
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot,
     bool remove_fixed_joints_from_ethercat_train, std::string if_name)
@@ -93,14 +92,13 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
     std::vector<march::Joint> joints
         = this->createJoints(config["joints"], pdo_interface, sdo_interface);
 
-    YAML::Node pdb_config = config["powerDistributionBoard"];
-    auto pdb = HardwareBuilder::createPowerDistributionBoard(
-        pdb_config, pdo_interface, sdo_interface);
     auto pressure_soles = createPressureSoles(
         config["pressure_soles"], pdo_interface, sdo_interface);
+    auto power_distribution_board = createPowerDistributionBoard(
+        config["power_distribution_board"], pdo_interface, sdo_interface);
     return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_,
-        std::move(pdb), std::move(pressure_soles), if_name_, cycle_time,
-        slave_timeout);
+        std::move(pressure_soles), if_name_, cycle_time, slave_timeout,
+        power_distribution_board);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
@@ -348,49 +346,6 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
         march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
-std::unique_ptr<march::PowerDistributionBoard>
-HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
-    const march::PdoInterfacePtr& pdo_interface,
-    const march::SdoInterfacePtr& sdo_interface)
-{
-    if (!pdb) {
-        return nullptr;
-    }
-
-    HardwareBuilder::validateRequiredKeysExist(pdb,
-        HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
-        "powerdistributionboard");
-
-    const auto slave_index = pdb["slaveIndex"].as<int>();
-    YAML::Node net_monitor_byte_offsets = pdb["netMonitorByteOffsets"];
-    YAML::Node net_driver_byte_offsets = pdb["netDriverByteOffsets"];
-    YAML::Node boot_shutdown_byte_offsets = pdb["bootShutdownOffsets"];
-
-    NetMonitorOffsets net_monitor_offsets = NetMonitorOffsets(
-        net_monitor_byte_offsets["powerDistributionBoardCurrent"].as<int>(),
-        net_monitor_byte_offsets["lowVoltageNet1Current"].as<int>(),
-        net_monitor_byte_offsets["lowVoltageNet2Current"].as<int>(),
-        net_monitor_byte_offsets["highVoltageNetCurrent"].as<int>(),
-        net_monitor_byte_offsets["lowVoltageState"].as<int>(),
-        net_monitor_byte_offsets["highVoltageOvercurrentTrigger"].as<int>(),
-        net_monitor_byte_offsets["highVoltageEnabled"].as<int>(),
-        net_monitor_byte_offsets["highVoltageState"].as<int>());
-
-    NetDriverOffsets net_driver_offsets = NetDriverOffsets(
-        net_driver_byte_offsets["lowVoltageNetOnOff"].as<int>(),
-        net_driver_byte_offsets["highVoltageNetOnOff"].as<int>(),
-        net_driver_byte_offsets["allHighVoltageOnOff"].as<int>());
-
-    BootShutdownOffsets boot_shutdown_offsets
-        = BootShutdownOffsets(boot_shutdown_byte_offsets["masterOk"].as<int>(),
-            boot_shutdown_byte_offsets["shutdown"].as<int>(),
-            boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
-
-    return std::make_unique<march::PowerDistributionBoard>(
-        march::Slave(slave_index, pdo_interface, sdo_interface),
-        net_monitor_offsets, net_driver_offsets, boot_shutdown_offsets);
-}
-
 void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config,
     const std::vector<std::string>& key_list, const std::string& object_name)
 {
@@ -556,6 +511,29 @@ march::PressureSole HardwareBuilder::createPressureSole(
     return march::PressureSole(
         march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset,
         side);
+}
+
+std::optional<march::PowerDistributionBoard>
+HardwareBuilder::createPowerDistributionBoard(
+    const YAML::Node& power_distribution_board_config,
+    const march::PdoInterfacePtr& pdo_interface,
+    const march::SdoInterfacePtr& sdo_interface)
+{
+    if (!power_distribution_board_config) {
+        return std::nullopt;
+    }
+    ROS_INFO("Running with PowerDistributionBoard");
+    HardwareBuilder::validateRequiredKeysExist(power_distribution_board_config,
+        HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
+        "power_distribution_board");
+
+    const auto slave_index
+        = power_distribution_board_config["slaveIndex"].as<int>();
+    const auto byte_offset
+        = power_distribution_board_config["byteOffset"].as<int>();
+
+    return std::make_optional<march::PowerDistributionBoard>(
+        march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
 std::string convertSWFileToString(std::ifstream& sw_file)

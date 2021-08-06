@@ -80,4 +80,3 @@ joints:
     time_from_start: 1550000000
     velocity: 0.0
 name: right_close
-version: MV_walk_rightclose_v6

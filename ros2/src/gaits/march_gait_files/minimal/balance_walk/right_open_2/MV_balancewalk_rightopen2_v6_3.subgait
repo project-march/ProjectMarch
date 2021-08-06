@@ -75,4 +75,3 @@ joints:
     time_from_start: 700000000
     velocity: 0.0
 name: right_open_2
-version: MV_balancewalk_rightopen2_v6_3

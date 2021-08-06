@@ -68,4 +68,3 @@ joints:
     time_from_start: 1600000000
     velocity: 0.0
 name: right_open
-version: MVI_walksinglestep_rightopen_v6

@@ -1,4 +1,5 @@
-description: 'The right swing step for the 5 degrees  ramp down. With the same peaks as steep version 2. '
+description: 'The right swing step for the 5 degrees  ramp down. With the same peaks
+  as steep version 2. '
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -74,4 +75,3 @@ joints:
     time_from_start: 3000000000
     velocity: -0.0
 name: right_swing
-version: MVI_rampdown_rightswing_flat_v2
