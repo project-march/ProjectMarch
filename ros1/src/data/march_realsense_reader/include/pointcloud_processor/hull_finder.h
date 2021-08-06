@@ -90,7 +90,7 @@ protected:
 
     // Add the hull to a vector together with its plane coefficients and
     // polygons
-    bool addCHullToVector();
+    void addCHullToVector();
 
     // Calculate the average normal and point of a region
     bool getAveragePointAndNormal(std::vector<double>& average_point,
