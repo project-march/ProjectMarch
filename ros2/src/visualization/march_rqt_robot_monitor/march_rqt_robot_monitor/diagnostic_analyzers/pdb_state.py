@@ -33,7 +33,7 @@ class CheckPDBStatus:
         )
         self._pdb_data = None
 
-        updater.add(pdb
+        updater.add(
             "PowerDistributionBoard stop state",
             self._pdb_diagnostic(self._stop_diagnostic),
         )
