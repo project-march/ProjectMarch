@@ -50,6 +50,8 @@ bool ModelPredictiveControllerInterface::init(
     // Initialize desired inputs
     desired_inputs.reserve(ACADO_NU);
     desired_inputs.resize(ACADO_NU, 0.0);
+    desired_inputs[0] = 3.0;
+    desired_inputs[1] = 3.0;
 
     // Initialize state and reference vectors
     initial_state.reserve(ACADO_NX);
