@@ -24,7 +24,7 @@
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
               respawn="false" output="screen"
-              args="spawn controller/trajectory joint_state_controller"/>
+              args="spawn controller/trajectory controller/joint_state"/>
         <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
 
     </group>
