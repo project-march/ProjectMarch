@@ -232,7 +232,7 @@ realsense_ramp_down_single_step:
   starting_position: dynamic
   final_position: dynamic
   dimensions: 1
-  dependant_on:
+  dependent_on:
     - realsense_ramp_down_start_single_step
   subgaits:
     right_open:
