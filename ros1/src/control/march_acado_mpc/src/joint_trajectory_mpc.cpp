@@ -75,7 +75,7 @@ bool ModelPredictiveControllerInterface::init(
     for (unsigned int i = 0; i < pids_.size(); ++i) {
         // Node handle to PID gains
         ros::NodeHandle joint_nh(
-            nh, std::string("gains/") + pid_joint_names[i]);
+            nh, std::string(/*__s=*/"gains/") + pid_joint_names[i]);
 
         // Init PID gains from ROS parameter server
         pids_[i].reset(new control_toolbox::Pid());
