@@ -123,14 +123,18 @@ private:
         realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>
         mpc_pub_;
 
-    // PID
+    // Everything for mixed control is from here
     typedef std::shared_ptr<control_toolbox::Pid> PidPtr;
     std::vector<PidPtr> pids_;
 
+    // Vector indicating for each joint whether it uses mpc
     std::vector<bool> joint_uses_mpc_;
 
     unsigned int num_pid_joints_ {};
     unsigned int num_mpc_joints_ {};
+
+    // Vector to store the command calculated by the controller
+    std::vector<double> pid_command_;
 };
 
 // Assign an alias to the class definition

@@ -28,6 +28,7 @@ bool ModelPredictiveControllerInterface::init(
     std::vector<std::string> pid_joint_names;
     nh.getParam("pid_joints", pid_joint_names);
     num_pid_joints_ = pid_joint_names.size();
+    pid_command_.resize(num_pid_joints_);
 
     std::vector<std::string> mpc_joint_names;
     nh.getParam("mpc_joints", mpc_joint_names);
@@ -334,13 +335,10 @@ void ModelPredictiveControllerInterface::updateCommand(
     mpc_command = model_predictive_controller_->calculateControlInput();
 
     // Calculate pid command
-    std::vector<double> pid_command;
-    pid_command.resize(num_pid_joints_);
-
     int pid_index = 0;
     for (int i = 0; i < num_joints_; ++i) {
         if (!joint_uses_mpc_[i]) {
-            pid_command[pid_index] = pids_[pid_index]->computeCommand(
+            pid_command_[pid_index] = pids_[pid_index]->computeCommand(
                 state_error.position[i], state_error.velocity[i], period);
             pid_index++;
         }
@@ -359,7 +357,7 @@ void ModelPredictiveControllerInterface::updateCommand(
 
             mpc_index++;
         } else {
-            (*joint_handles_ptr_)[i].setCommand(pid_command[pid_index]);
+            (*joint_handles_ptr_)[i].setCommand(pid_command_[pid_index]);
             pid_index++;
         }
     }
