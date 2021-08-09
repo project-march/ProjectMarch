@@ -1,4 +1,4 @@
-description: Move to the location Sjaan felt comfortable in, for a chair of 55 cm.
+description: Move to the location Koen felt comfortable in, for a chair of 55 cm.
 duration: 1000000000
 gait_type: sit_like
 joints:
@@ -10,10 +10,10 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
@@ -38,10 +38,10 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
