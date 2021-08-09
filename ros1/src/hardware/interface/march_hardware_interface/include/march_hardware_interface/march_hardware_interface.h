@@ -101,7 +101,7 @@ private:
      * Call a function that returns an optional sleeping duration for each joint
      * @param f Function to call
      */
-    void call_sleeping_function_for_each_joint(
+    void call_and_wait_once_for_each_joint(
         std::function<std::optional<ros::Duration>(march::Joint&)> const& f);
 
     /**
@@ -109,8 +109,8 @@ private:
      * Busy waits until all joints return true
      * @param f Function to call
      */
-    void call_busy_waiting_function_for_each_joint(
-        std::function<bool(march::Joint&)> const& f, unsigned maximum_tries);
+    void call_and_wait_continuously_for_each_joint(
+        std::function<bool(march::Joint&)> const& f, const ros::Duration, const unsigned maximum_tries);
 
     /* Limit of the change in effort command over one cycle, can be overridden
      * by safety controller */
