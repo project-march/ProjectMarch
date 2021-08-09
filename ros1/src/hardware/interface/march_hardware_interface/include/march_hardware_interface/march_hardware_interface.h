@@ -109,8 +109,9 @@ private:
      * Busy waits until all joints return true
      * @param f Function to call
      */
-    void call_and_wait_continuously_for_each_joint(
-        std::function<bool(march::Joint&)> const& f, const ros::Duration, const unsigned maximum_tries);
+    void call_and_wait_while_checking_for_each_joint(
+        std::function<bool(march::Joint&)> const& f, const ros::Duration,
+        const unsigned maximum_tries);
 
     /* Limit of the change in effort command over one cycle, can be overridden
      * by safety controller */

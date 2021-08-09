@@ -189,8 +189,10 @@ void MarchHardwareInterface::call_and_wait_once_for_each_joint(
     wait_duration.sleep();
 }
 
-void MarchHardwareInterface::call_and_wait_continuously_for_each_joint(
-    std::function<bool(march::Joint&)> const& f, const ros::Duration wait_duration = ros::Duration(/*t=*/1), const unsigned maximum_tries = 10)
+void MarchHardwareInterface::call_and_wait_while_checking_for_each_joint(
+    std::function<bool(march::Joint&)> const& f,
+    const ros::Duration wait_duration = ros::Duration(/*t=*/1),
+    const unsigned maximum_tries = 10)
 {
     std::vector<bool> is_ok;
     is_ok.resize(num_joints_);
@@ -217,7 +219,7 @@ void MarchHardwareInterface::startJoints()
 {
     // Make sure that all slaves send valid EtherCAT data
     ROS_INFO("Waiting for slaves to send EtherCAT data...");
-    call_and_wait_continuously_for_each_joint([](march::Joint& joint) {
+    call_and_wait_while_checking_for_each_joint([](march::Joint& joint) {
         return joint.getMotorController()->getState()->dataIsValid();
     });
     ROS_INFO("All slaves are sending EtherCAT data");
@@ -242,7 +244,7 @@ void MarchHardwareInterface::startJoints()
         for (size_t i = 0; i < num_joints_; ++i) {
             march_robot_->getJoint(i).enableActuation();
         }
-        call_and_wait_continuously_for_each_joint([](march::Joint& joint) {
+        call_and_wait_while_checking_for_each_joint([](march::Joint& joint) {
             return joint.getMotorController()->getState()->isOperational();
         });
     }
