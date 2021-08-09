@@ -527,8 +527,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 {
     if (abs(optimal_foot_location.x)
             > abs(max_x_stairs_world) + allowed_deviation_from_reachable_stair
-        || abs(optimal_foot_location.x)
-            < abs(min_x_stairs_world)
+        || abs(optimal_foot_location.x) < abs(min_x_stairs_world)
                 - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair depth should be between "
             << min_x_stairs_world << "( -"
@@ -540,9 +539,8 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
     }
     if (abs(optimal_foot_location.z)
             > abs(max_z_stairs_world) + allowed_deviation_from_reachable_stair
-        || abs(optimal_foot_location.z)
-            < abs(min_z_stairs_world) -
-                allowed_deviation_from_reachable_stair) {
+        || abs(optimal_foot_location.z) < abs(min_z_stairs_world)
+                - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair height should be between "
             << min_z_stairs_world << "( -"
             << allowed_deviation_from_reachable_stair << " ) and "
@@ -552,12 +550,12 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
         return false;
     }
 
-    gait_parameters_->first_parameter = calculateParameter(
-        std::abs(optimal_foot_location.x), min_x_stairs_world,
-        max_x_stairs_world);
-    gait_parameters_->second_parameter = calculateParameter(
-        std::abs(optimal_foot_location.z), min_z_stairs_world,
-        max_z_stairs_world);
+    gait_parameters_->first_parameter
+        = calculateParameter(std::abs(optimal_foot_location.x),
+            min_x_stairs_world, max_x_stairs_world);
+    gait_parameters_->second_parameter
+        = calculateParameter(std::abs(optimal_foot_location.z),
+            min_z_stairs_world, max_z_stairs_world);
 
     // The side step parameter is unused for the stairs
     // gait, so it is set to -1
@@ -575,10 +573,10 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 
 bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 {
-    if (std::abs(ramp_slope) > std::abs(max_slope) +
-                allowed_deviation_from_reachable_ramp
-        || std::abs(ramp_slope) < std::abs(min_slope) -
-                allowed_deviation_from_reachable_ramp) {
+    if (std::abs(ramp_slope)
+            > std::abs(max_slope) + allowed_deviation_from_reachable_ramp
+        || std::abs(ramp_slope)
+            < std::abs(min_slope) - allowed_deviation_from_reachable_ramp) {
         ROS_ERROR_STREAM("The found ramp slope should be between "
             << min_slope << "( -" << allowed_deviation_from_reachable_ramp
             << " ) and " << max_slope << "( +"
