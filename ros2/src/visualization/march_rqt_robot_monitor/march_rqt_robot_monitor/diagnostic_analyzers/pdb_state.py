@@ -1,4 +1,4 @@
-"""The module motor_controller_state.py contains the CheckMotorControllerStatus Class."""
+"""The module pdb_state.py contains the CheckPDBStatus Class."""
 
 from typing import Callable
 
@@ -10,7 +10,7 @@ from march_shared_msgs.msg import PowerDistributionBoardData
 
 
 class CheckPDBStatus:
-    """Base class to diagnose the motor_controller statuses."""
+    """Base class to diagnose the PDB statuses."""
 
     BATTERY_PERCENTAGE_WARNING_THRESHOLD = 10
     BATTERY_PERCENTAGE_ERROR_THRESHOLD = 2
@@ -20,7 +20,7 @@ class CheckPDBStatus:
     BATTERY_TEMPERATURE_ERROR_THRESHOLD = 50
 
     def __init__(self, node: Node, updater: Updater):
-        """Initialize an PDB diagnostic which analyzes MotorController states.
+        """Initialize an PDB diagnostic which analyzes PDB states.
 
         :type updater: diagnostic_updater.Updater
         """
@@ -54,9 +54,9 @@ class CheckPDBStatus:
         )
 
     def _cb(self, msg: PowerDistributionBoardData):
-        """Set the motor_controller_states.
+        """Set the pdb state.
 
-        :type msg: MotorControllerState
+        :type msg: PowerDistributionBoardData
         """
         self._pdb_data = msg
 
