@@ -26,13 +26,24 @@ bool ModelPredictiveControllerInterface::init(
     nh.getParam("joints", joint_names);
 
     std::vector<std::string> pid_joint_names;
-    nh.getParam("pid_joints", pid_joint_names);
-    num_pid_joints_ = pid_joint_names.size();
+    if (nh.hasParam("pid_joints")) {
+        nh.getParam("pid_joints", pid_joint_names);
+        num_pid_joints_ = pid_joint_names.size();
+    } else {
+        // Assume there are no pid joints
+        num_pid_joints_ = 0;
+    }
     pid_command_.resize(num_pid_joints_);
 
     std::vector<std::string> mpc_joint_names;
-    nh.getParam("mpc_joints", mpc_joint_names);
-    num_mpc_joints_ = mpc_joint_names.size();
+    if (nh.hasParam("mpc_joints")) {
+        nh.getParam("mpc_joints", mpc_joint_names);
+        num_mpc_joints_ = mpc_joint_names.size();
+    } else {
+        // Assume all joints use mpc
+        mpc_joint_names = joint_names;
+        num_mpc_joints_ = mpc_joint_names.size();
+    }
 
     // Determine which joints use mpc and which use pid
     joint_uses_mpc_.resize(joint_names.size());
