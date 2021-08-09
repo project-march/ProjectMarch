@@ -1,9 +1,9 @@
-description: Ramp v4 but imporved after groundgaiting
+description: Single step of v7
 duration: 1800000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0698
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -17,40 +17,6 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.1345
-    time_from_start: 0
-    velocity: 0.0
-  - position: -0.1745
-    time_from_start: 1800000000
-    velocity: 0.0
-  left_knee:
-  - position: 1.2741
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 1800000000
-    velocity: 0.0
-  right_ankle:
-  - position: -0.2618
-    time_from_start: 0
-    velocity: 0.0
-  - position: -0.4363
-    time_from_start: 200600000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 445400000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 1800000000
-    velocity: 0.0
-  right_hip_aa:
-  - position: 0.0349
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.0349
-    time_from_start: 1800000000
-    velocity: 0.0
-  right_hip_fe:
   - position: 0.2618
     time_from_start: 0
     velocity: 0.0
@@ -63,7 +29,7 @@ joints:
   - position: -0.1745
     time_from_start: 1800000000
     velocity: 0.0
-  right_knee:
+  left_knee:
   - position: 0.0873
     time_from_start: 0
     velocity: 0.0
@@ -73,4 +39,32 @@ joints:
   - position: 0.0
     time_from_start: 1800000000
     velocity: 0.0
-name: right_close
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1800000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1800000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 1.117
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.1745
+    time_from_start: 1800000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.9599
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1800000000
+    velocity: 0.0
+name: left_close

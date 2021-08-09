@@ -1,9 +1,9 @@
-description: Ramp v4 but imporved after groundgaiting
+description: lefclose of the v9 right open
 duration: 1800000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0698
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -17,28 +17,28 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.1345
+  - position: -0.0873
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.6545
+    time_from_start: 1000000000
     velocity: 0.0
   - position: -0.1745
     time_from_start: 1800000000
     velocity: 0.0
   left_knee:
-  - position: 1.2741
+  - position: 0.0873
     time_from_start: 0
+    velocity: 0.0
+  - position: 1.3265
+    time_from_start: 900000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1800000000
     velocity: 0.0
   right_ankle:
-  - position: -0.2618
-    time_from_start: 0
-    velocity: 0.0
-  - position: -0.4363
-    time_from_start: 200600000
-    velocity: 0.0
   - position: 0.0
-    time_from_start: 445400000
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
     time_from_start: 1800000000
@@ -51,26 +51,17 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.2618
+  - position: 0.5585
     time_from_start: 0
     velocity: 0.0
-  - position: 0.5934
-    time_from_start: 672700000
-    velocity: 0.599
-  - position: 0.7156
-    time_from_start: 1008000000
-    velocity: -0.4849
   - position: -0.1745
     time_from_start: 1800000000
     velocity: 0.0
   right_knee:
-  - position: 0.0873
+  - position: 0.3491
     time_from_start: 0
-    velocity: 0.0
-  - position: 1.3963
-    time_from_start: 900000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1800000000
     velocity: 0.0
-name: right_close
+name: left_close

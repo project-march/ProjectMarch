@@ -1,14 +1,17 @@
-description: Ramp v4 but imporved after groundgaiting
+description: Faster version of v4
 duration: 1800000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0698
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1800000000
+    time_from_start: 900000000
     velocity: 0.0
+  - position: -0.0873
+    time_from_start: 1800000000
+    velocity: -0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -17,32 +20,35 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.1345
+  - position: 0.1745
     time_from_start: 0
     velocity: 0.0
-  - position: -0.1745
-    time_from_start: 1800000000
+  - position: 0.6109
+    time_from_start: 953400000
     velocity: 0.0
+  - position: -0.0873
+    time_from_start: 1800000000
+    velocity: -0.0
   left_knee:
-  - position: 1.2741
+  - position: 0.6981
     time_from_start: 0
+    velocity: -0.0
+  - position: 1.1553
+    time_from_start: 720000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1800000000
-    velocity: 0.0
+    velocity: -0.0
   right_ankle:
-  - position: -0.2618
+  - position: -0.0873
     time_from_start: 0
     velocity: 0.0
-  - position: -0.4363
-    time_from_start: 200600000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 445400000
-    velocity: 0.0
-  - position: 0.0
+  - position: -0.0873
+    time_from_start: 900000000
+    velocity: -0.0
+  - position: -0.0873
     time_from_start: 1800000000
-    velocity: 0.0
+    velocity: -0.0
   right_hip_aa:
   - position: 0.0349
     time_from_start: 0
@@ -51,26 +57,20 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.2618
+  - position: 0.3665
     time_from_start: 0
-    velocity: 0.0
-  - position: 0.5934
-    time_from_start: 672700000
-    velocity: 0.599
-  - position: 0.7156
-    time_from_start: 1008000000
-    velocity: -0.4849
-  - position: -0.1745
+    velocity: -0.0
+  - position: -0.0873
     time_from_start: 1800000000
-    velocity: 0.0
+    velocity: -0.0
   right_knee:
-  - position: 0.0873
+  - position: 0.2065
     time_from_start: 0
-    velocity: 0.0
-  - position: 1.3963
-    time_from_start: 900000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1170000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1800000000
     velocity: 0.0
-name: right_close
+name: left_close
