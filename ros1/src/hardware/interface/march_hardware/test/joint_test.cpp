@@ -34,56 +34,22 @@ TEST_F(JointTest, InitializeWithoutTemperatureGes)
     const int expected_cycle = 3;
     EXPECT_CALL(*this->imc, initSdo(_, Eq(expected_cycle))).Times(/*n=*/1);
 
-    march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/false,
-        std::move(this->imc));
+    march::Joint joint("test", /*net_number=*/0, std::move(this->imc));
     ASSERT_NO_THROW(joint.initSdo(expected_cycle));
-}
-
-TEST_F(JointTest, AllowActuation)
-{
-    march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/true,
-        std::move(this->imc));
-    ASSERT_TRUE(joint.canActuate());
-}
-
-TEST_F(JointTest, DisableActuation)
-{
-    march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/false,
-        std::move(this->imc));
-    ASSERT_FALSE(joint.canActuate());
-}
-
-TEST_F(JointTest, SetAllowActuation)
-{
-    march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/false,
-        std::move(this->imc));
-    ASSERT_FALSE(joint.canActuate());
-    joint.setAllowActuation(/*allow_actuation=*/true);
-    ASSERT_TRUE(joint.canActuate());
 }
 
 TEST_F(JointTest, GetName)
 {
     const std::string expected_name = "test";
-    march::Joint joint(expected_name, /*net_number=*/0,
-        /*allow_actuation=*/false, std::move(this->imc));
+    march::Joint joint(expected_name, /*net_number=*/0, std::move(this->imc));
     ASSERT_EQ(expected_name, joint.getName());
 }
 
 TEST_F(JointTest, GetNetNumber)
 {
     const int expected_net_number = 2;
-    march::Joint joint("test", expected_net_number, /*allow_actuation=*/false,
-        std::move(this->imc));
+    march::Joint joint("test", expected_net_number, std::move(this->imc));
     ASSERT_EQ(expected_net_number, joint.getNetNumber());
-}
-
-TEST_F(JointTest, ActuatePositionDisableActuation)
-{
-    march::Joint joint("actuate_false", /*net_number=*/0,
-        /*allow_actuation=*/false, std::move(this->imc));
-    EXPECT_FALSE(joint.canActuate());
-    ASSERT_THROW(joint.actuate(0.3), march::error::HardwareException);
 }
 
 TEST_F(JointTest, ActuatePosition)
@@ -91,19 +57,10 @@ TEST_F(JointTest, ActuatePosition)
     const double expected_rad = 5;
     EXPECT_CALL(*this->imc, actuateRadians(Eq(expected_rad))).Times(/*n=*/1);
 
-    march::Joint joint("actuate_false", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_false", /*net_number=*/0, std::move(this->imc));
     joint.getMotorController()->setActuationMode(
         march::ActuationMode::position);
     ASSERT_NO_THROW(joint.actuate(expected_rad));
-}
-
-TEST_F(JointTest, ActuateTorqueDisableActuation)
-{
-    march::Joint joint("actuate_false", /*net_number=*/0,
-        /*allow_actuation=*/false, std::move(this->imc));
-    EXPECT_FALSE(joint.canActuate());
-    ASSERT_THROW(joint.actuate(3), march::error::HardwareException);
 }
 
 TEST_F(JointTest, ActuateTorque)
@@ -111,56 +68,45 @@ TEST_F(JointTest, ActuateTorque)
     const double expected_torque = 5;
     EXPECT_CALL(*this->imc, actuateTorque(Eq(expected_torque))).Times(/*n=*/1);
 
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     joint.getMotorController()->setActuationMode(march::ActuationMode::torque);
 
     ASSERT_NO_THROW(joint.actuate(expected_torque));
 }
 
-TEST_F(JointTest, PrepareForActuationNotAllowed)
-{
-    march::Joint joint("actuate_false", /*net_number=*/0,
-        /*allow_actuation=*/false, std::move(this->imc));
-    ASSERT_THROW(joint.prepareActuation(), march::error::HardwareException);
-}
-
 TEST_F(JointTest, PrepareForActuationAllowed)
 {
     EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     ASSERT_NO_THROW(joint.prepareActuation());
 }
 
 TEST_F(JointTest, hasTemperatureGes)
 {
-    march::Joint joint("get_temperature", /*net_number=*/0,
-        /*allow_actuation=*/false, std::move(this->imc));
+    march::Joint joint(
+        "get_temperature", /*net_number=*/0, std::move(this->imc));
     ASSERT_FALSE(joint.hasTemperatureGES());
 }
 
 TEST_F(JointTest, ResetController)
 {
-    EXPECT_CALL(*this->imc, reset(_)).Times(/*n=*/1);
-    march::Joint joint("reset_controller", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
-    ASSERT_NO_THROW(joint.getMotorController()->reset());
+    EXPECT_CALL(*this->imc, resetSlave(_)).Times(/*n=*/1);
+    march::Joint joint(
+        "reset_controller", /*net_number=*/0, std::move(this->imc));
+    ASSERT_NO_THROW(joint.getMotorController()->resetSlave());
 }
 
 TEST_F(JointTest, TestPrepareActuation)
 {
     EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     joint.prepareActuation();
 }
 
 TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
 {
     EXPECT_CALL(*this->imc, getState()).Times(/*n=*/1);
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     ASSERT_TRUE(joint.receivedDataUpdate());
 }
 
@@ -172,8 +118,7 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
     EXPECT_CALL(*this->imc, getState())
         .WillOnce(Return(ByMove(std::move(basic_state))))
         .WillOnce(Return(ByMove(std::move(new_state))));
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     ASSERT_TRUE(joint.receivedDataUpdate());
     ASSERT_TRUE(joint.receivedDataUpdate());
 }
@@ -185,8 +130,7 @@ TEST_F(JointTest, TestReceivedDataUpdateFalse)
     EXPECT_CALL(*this->imc, getState())
         .WillOnce(Return(ByMove(std::move(basic_state))))
         .WillOnce(Return(ByMove(std::move(new_state))));
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     ASSERT_TRUE(joint.receivedDataUpdate());
     ASSERT_FALSE(joint.receivedDataUpdate());
 }
@@ -211,8 +155,7 @@ TEST_F(JointTest, TestReadEncodersOnce)
     EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
         .WillOnce(Return(/*value=*/velocity));
 
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     joint.prepareActuation();
     joint.readFirstEncoderValues(/*operational_check=*/false);
     joint.readEncoders(elapsed_time);
@@ -256,8 +199,7 @@ TEST_F(JointTest, TestReadEncodersTwice)
         .WillOnce(Return(first_velocity))
         .WillOnce(Return(second_velocity));
 
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     joint.prepareActuation();
     joint.readFirstEncoderValues(/*operational_check=*/false);
     joint.readEncoders(elapsed_time);
@@ -295,8 +237,7 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
     EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
         .WillOnce(Return(velocity));
 
-    march::Joint joint("actuate_true", /*net_number=*/0,
-        /*allow_actuation=*/true, std::move(this->imc));
+    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     joint.prepareActuation();
     joint.readFirstEncoderValues(/*operational_check=*/false);
     joint.readEncoders(elapsed_time);

@@ -149,74 +149,7 @@ bool MarchHardwareInterface::init(
         march_temperature_interface_.registerHandle(temperature_sensor_handle);
     }
 
-    // Wait some time to make sure the EtherCAT network is ready
-    ros::Duration(/*t=*/5).sleep();
-
-    // Prepare all joints for actuation
-    ros::Duration wait_duration(/*t=*/0);
-    for (size_t i = 0; i < num_joints_; ++i) {
-        march::Joint& joint = march_robot_->getJoint(i);
-        // Enable high voltage on the IMC
-        if (joint.canActuate()) {
-            auto joint_wait_duration = joint.prepareActuation();
-            if (joint_wait_duration.has_value()
-                && joint_wait_duration.value() > wait_duration) {
-                wait_duration = joint_wait_duration.value();
-            }
-        }
-    }
-    // Wait a while for MotorControllers to be prepared
-    wait_duration.sleep();
-
-    // Enable all joints for actuation
-    wait_duration = ros::Duration(/*t=*/5);
-    for (size_t i = 0; i < num_joints_; ++i) {
-        march::Joint& joint = march_robot_->getJoint(i);
-        // Enable high voltage on the IMC
-        if (joint.canActuate()) {
-            auto joint_wait_duration = joint.enableActuation();
-            if (joint_wait_duration.has_value()
-                && joint_wait_duration.value() > wait_duration) {
-                wait_duration = joint_wait_duration.value();
-            }
-        }
-    }
-    // Wait a while for MotorControllers to be enabled
-    wait_duration.sleep();
-
-    // For debugging
-    for (size_t i = 0; i < num_joints_; ++i) {
-        march::Joint& joint = march_robot_->getJoint(i);
-
-        ROS_INFO("[%s] \t state: [%s]", joint.getName().c_str(),
-            joint.getMotorController()
-                ->getState()
-                ->getOperationalState()
-                .c_str());
-    }
-
-    // Read the first encoder values for each joint
-    for (size_t i = 0; i < num_joints_; ++i) {
-        march::Joint& joint = march_robot_->getJoint(i);
-        if (joint.canActuate()) {
-            joint.readFirstEncoderValues(/*operational_check/=*/true);
-
-            // Set the first target as the current position
-            joint_position_[i] = joint.getPosition();
-            joint_velocity_[i] = 0;
-            joint_effort_[i] = 0;
-
-            auto actuation_mode
-                = joint.getMotorController()->getActuationMode();
-            if (actuation_mode == march::ActuationMode::position) {
-                joint_position_command_[i] = joint_position_[i];
-            } else if (actuation_mode == march::ActuationMode::torque) {
-                joint_effort_command_[i] = 0;
-            }
-        }
-    }
-
-    ROS_INFO("All joints are ready for actuation!");
+    startJoints();
 
     this->registerInterface(&this->march_temperature_interface_);
     this->registerInterface(&this->joint_state_interface_);
@@ -226,6 +159,115 @@ bool MarchHardwareInterface::init(
     this->registerInterface(&this->effort_joint_soft_limits_interface_);
 
     return true;
+}
+
+// Are all booleans in a vector true?
+bool all(std::vector<bool> vec)
+{
+    return find(vec.begin(), vec.end(), false) == vec.end();
+}
+
+void MarchHardwareInterface::call_and_wait_once_for_each_joint(
+    std::function<std::optional<ros::Duration>(march::Joint&)> const& f)
+{
+    auto is_operational = march_robot_->areJointsOperational();
+
+    ros::Duration wait_duration(/*t=*/0);
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+
+        // Skip a joint if it is already operational
+        if (!is_operational[i]) {
+            std::optional<ros::Duration> joint_wait_duration = f(joint);
+            if (joint_wait_duration.has_value()) {
+                wait_duration
+                    = std::max(joint_wait_duration.value(), wait_duration);
+            }
+        }
+    }
+
+    wait_duration.sleep();
+}
+
+void MarchHardwareInterface::call_and_wait_while_checking_for_each_joint(
+    std::function<bool(march::Joint&)> const& f,
+    const ros::Duration wait_duration = ros::Duration(/*t=*/1),
+    const unsigned maximum_tries = 10)
+{
+    std::vector<bool> is_ok;
+    is_ok.resize(num_joints_);
+
+    unsigned int num_tries = 0;
+    while (!all(is_ok) && num_tries < maximum_tries) {
+        for (size_t i = 0; i < num_joints_; ++i) {
+            is_ok[i] = f(march_robot_->getJoint(i));
+        }
+
+        // Sleep before checking again
+        wait_duration.sleep();
+
+        num_tries++;
+    }
+
+    if (!all(is_ok)) {
+        throw march::error::HardwareException(march::error::ErrorType::
+                BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
+    }
+}
+
+void MarchHardwareInterface::startJoints()
+{
+    // Make sure that all slaves send valid EtherCAT data
+    ROS_INFO("Waiting for slaves to send EtherCAT data...");
+    call_and_wait_while_checking_for_each_joint([](march::Joint& joint) {
+        return joint.getMotorController()->getState()->dataIsValid();
+    });
+    ROS_INFO("All slaves are sending EtherCAT data");
+
+    auto is_operational = march_robot_->areJointsOperational();
+    // If all joints are operational we can skip the start up sequence
+    if (!(all(is_operational))) {
+        // Tell every MotorController to clear its errors
+        ROS_INFO("Clearing errors of joints");
+        call_and_wait_once_for_each_joint([](march::Joint& joint) {
+            return joint.getMotorController()->reset();
+        });
+
+        // Tell every joint to prepare for actuation
+        ROS_INFO("Preparing every joint for actuation");
+        call_and_wait_once_for_each_joint([](march::Joint& joint) {
+            return joint.prepareActuation();
+        });
+
+        // Tell every joint to enable actuation
+        ROS_INFO("Enabling every joint for actuation");
+        for (size_t i = 0; i < num_joints_; ++i) {
+            march_robot_->getJoint(i).enableActuation();
+        }
+        call_and_wait_while_checking_for_each_joint([](march::Joint& joint) {
+            return joint.getMotorController()->getState()->isOperational();
+        });
+    }
+
+    // Read the first encoder values for each joint
+    for (size_t i = 0; i < num_joints_; ++i) {
+        march::Joint& joint = march_robot_->getJoint(i);
+        joint.readFirstEncoderValues(/*operational_check/=*/true);
+
+        // Set the first target as the current position
+        joint_position_[i] = joint.getPosition();
+        joint_velocity_[i] = 0;
+        joint_effort_[i] = 0;
+
+        auto actuation_mode = joint.getMotorController()->getActuationMode();
+        if (actuation_mode == march::ActuationMode::position) {
+            joint_position_command_[i] = joint_position_[i];
+        } else if (actuation_mode == march::ActuationMode::torque) {
+            joint_effort_command_[i] = 0;
+        }
+    }
+
+    ROS_INFO("All joints are ready for actuation!");
 }
 
 void MarchHardwareInterface::validate()
@@ -340,16 +382,13 @@ void MarchHardwareInterface::write(
     for (size_t i = 0; i < num_joints_; i++) {
         march::Joint& joint = march_robot_->getJoint(i);
 
-        if (joint.canActuate()) {
-            joint_last_effort_command_[i] = joint_effort_command_[i];
+        joint_last_effort_command_[i] = joint_effort_command_[i];
 
-            auto actuation_mode
-                = joint.getMotorController()->getActuationMode();
-            if (actuation_mode == march::ActuationMode::position) {
-                joint.actuate(joint_position_command_[i]);
-            } else if (actuation_mode == march::ActuationMode::torque) {
-                joint.actuate(joint_effort_command_[i]);
-            }
+        auto actuation_mode = joint.getMotorController()->getActuationMode();
+        if (actuation_mode == march::ActuationMode::position) {
+            joint.actuate(joint_position_command_[i]);
+        } else if (actuation_mode == march::ActuationMode::torque) {
+            joint.actuate(joint_effort_command_[i]);
         }
     }
 
@@ -505,16 +544,14 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
                 soft_limits_error_[joint_index].max_position,
                 joint_position_[joint_index]);
 
-            if (joint.canActuate()) {
-                std::ostringstream error_stream;
-                error_stream
-                    << "Joint " << joint.getName()
-                    << " is out of its soft limits ("
-                    << soft_limits_[joint_index].min_position << ", "
-                    << soft_limits_[joint_index].max_position
-                    << "). Actual position: " << joint_position_[joint_index];
-                throw std::runtime_error(error_stream.str());
-            }
+            std::ostringstream error_stream;
+            error_stream << "Joint " << joint.getName()
+                         << " is out of its soft limits ("
+                         << soft_limits_[joint_index].min_position << ", "
+                         << soft_limits_[joint_index].max_position
+                         << "). Actual position: "
+                         << joint_position_[joint_index];
+            throw std::runtime_error(error_stream.str());
         }
 
         ROS_WARN_THROTTLE(1,

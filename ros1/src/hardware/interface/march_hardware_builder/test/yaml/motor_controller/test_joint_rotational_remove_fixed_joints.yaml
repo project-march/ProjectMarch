@@ -4,7 +4,6 @@ testsetup:
   ecatSlaveTimeout: 50
   joints:
     - rotational_joint:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -19,7 +18,6 @@ testsetup:
             resolution: 12
             transmission: 101
     - joint_base_fixed_parent_joint:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque

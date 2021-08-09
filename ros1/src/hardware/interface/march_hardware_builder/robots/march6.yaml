@@ -9,7 +9,6 @@ march6:
   ecatSlaveTimeout: 200
   joints:
     - left_ankle:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -28,7 +27,6 @@ march6:
             direction: -1
 
     - left_hip_aa:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -47,7 +45,6 @@ march6:
             direction: 1
 
     - left_hip_fe:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -66,7 +63,6 @@ march6:
             transmission: 121
 
     - left_knee:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -85,7 +81,6 @@ march6:
             transmission: 121
 
     - right_ankle:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -104,7 +99,6 @@ march6:
             direction: -1
 
     - right_hip_aa:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -123,7 +117,6 @@ march6:
             direction: 1
 
     - right_hip_fe:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque
@@ -142,7 +135,6 @@ march6:
             transmission: 121
 
     - right_knee:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque

@@ -66,6 +66,8 @@ namespace error {
                 return "Something went wrong with preparing for actuation";
             case ErrorType::INVALID_ENCODER_DIRECTION:
                 return "Encoder direction must be either -1 or 1";
+            case ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED:
+                return "Busy waiting function reached maximum number of tries";
             default:
                 return "Unknown error occurred. Please create/use a documented "
                        "error";

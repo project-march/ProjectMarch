@@ -31,7 +31,7 @@ const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS
     = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS
-    = { "allowActuation", "motor_controller" };
+    = { "motor_controller" };
 const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS
     = { "slaveIndex", "type" };
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS
@@ -125,8 +125,6 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
                              << " will be actuated with slave index "
                              << slaveIndex);
 
-    const auto allow_actuation = joint_config["allowActuation"].as<bool>();
-
     auto motor_controller = HardwareBuilder::createMotorController(
         joint_config["motor_controller"], urdf_joint, pdo_interface,
         sdo_interface);
@@ -134,11 +132,10 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config,
     if (joint_config["temperatureges"]) {
         auto ges = HardwareBuilder::createTemperatureGES(
             joint_config["temperatureges"], pdo_interface, sdo_interface);
-        return { joint_name, net_number, allow_actuation,
-            std::move(motor_controller), std::move(ges) };
+        return { joint_name, net_number, std::move(motor_controller),
+            std::move(ges) };
     } else {
-        return { joint_name, net_number, allow_actuation,
-            std::move(motor_controller) };
+        return { joint_name, net_number, std::move(motor_controller) };
     }
 }
 

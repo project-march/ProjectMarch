@@ -48,13 +48,19 @@ public:
     // Actuate based on the actuation mode of the motor controller
     void actuate(float target);
 
+    /* Reset the MotorController
+     * Can be overridden by child classes
+     * @returns Returns an optional wait duration
+     */
+    virtual std::optional<ros::Duration> reset();
+
     // Prepare the MotorController for actuation
     // Returns an optional wait duration
     virtual std::optional<ros::Duration> prepareActuation() = 0;
 
     // Enable actuation for the MotorController, move it into its 'ready' state
     // Returns an optional wait duration
-    virtual std::optional<ros::Duration> enableActuation() = 0;
+    virtual void enableActuation() = 0;
 
     // Transform the ActuationMode to a number that is understood by the
     // MotorController
