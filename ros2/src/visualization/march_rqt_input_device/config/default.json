@@ -161,15 +161,26 @@
       },
       {
          "name": "realsense_stand"
-      },
+      }
+   ],
+   [
       {
          "name": "realsense_ramp_up"
+      },
+      {
+         "name": "realsense_ramp_up_single_step"
       },
       {
          "name": "realsense_ramp_down"
       },
       {
-         "name": "realsense_ramp_up_single_step"
+         "name": "realsense_ramp_down_start_single_step"
+      },
+      {
+         "name": "realsense_ramp_down_single_step"
+      },
+      {
+         "name": "realsense_ramp_down_last_step"
       },
       {
          "name": "dynamic_sit"

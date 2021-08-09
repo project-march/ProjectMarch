@@ -7,9 +7,6 @@ realsense_stairs_down_single_step:
   starting_position: static
   final_position: static
   dimensions: 2
-  default_parameters:
-    - 0.5
-    - 0.5
   subgaits:
     right_open:
       - MVI_stairsdown_rightopen_low_undeep_v1
@@ -28,9 +25,6 @@ realsense_stairs_down:
   starting_position: static
   final_position: static
   dimensions: 2
-  default_parameters:
-    - 0.5
-    - 0.5
   subgaits:
     right_open:
       - MVI_stairsdown_rightopen_low_undeep_v1
@@ -181,11 +175,11 @@ realsense_ramp_up_single_step:
   dimensions: 1
   subgaits:
     right_open:
-      - MVI_rampup_singlestep_rightopen_flat_v4
-      - MVI_rampup_singlestep_rightopen_steep_v4
+      - MVI_rampup_singlestep_rightopen_flat_v9
+      - MVI_rampup_singlestep_rightopen_steep_v9
     left_close:
-      - MVI_rampup_singlestep_leftclose_flat_v4
-      - MVI_rampup_singlestep_leftclose_steep_v4
+      - MVI_rampup_singlestep_leftclose_flat_v9
+      - MVI_rampup_singlestep_leftclose_steep_v9
 
 realsense_ramp_down:
   realsense_category: ramp_down
@@ -242,11 +236,11 @@ realsense_ramp_down_single_step:
     - realsense_ramp_down_start_single_step
   subgaits:
     right_open:
-      - MVI_rampdown_singlestep_rightopen_flat_v4
-      - MVI_rampdown_singlestep_rightopen_steep_v4
+      - MVI_rampdown_singlestep_rightopen_flat_v5
+      - MVI_rampdown_singlestep_rightopen_steep_v5
     left_close:
-      - MVI_rampdown_singlestep_leftclose_flat_v4
-      - MVI_rampdown_singlestep_leftclose_steep_v4
+      - MVI_rampdown_singlestep_leftclose_flat_v5
+      - MVI_rampdown_singlestep_leftclose_steep_v5
 
 realsense_ramp_down_start_single_step:
   realsense_category: ramp_down
@@ -259,8 +253,8 @@ realsense_ramp_down_start_single_step:
     - realsense_ramp_down_last_step
   subgaits:
     right_open:
-      - MVI_rampdown_startsinglestep_rightopen_flat_v4
-      - MVI_rampdown_startsinglestep_rightopen_steep_v4
+      - MVI_rampdown_startsinglestep_rightopen_flat_v5
+      - MVI_rampdown_startsinglestep_rightopen_steep_v5
     left_close:
-      - MVI_rampdown_startsinglestep_leftclose_flat_v4
-      - MVI_rampdown_startsinglestep_leftclose_steep_v4
+      - MVI_rampdown_startsinglestep_leftclose_flat_v5
+      - MVI_rampdown_startsinglestep_leftclose_steep_v5
