@@ -12,6 +12,7 @@ from .diagnostic_analyzers.check_input_device import CheckInputDevice
 from .diagnostic_analyzers.control import CheckJointValues
 from .diagnostic_analyzers.gait_state import CheckGaitStatus
 from .diagnostic_analyzers.motor_controller_state import CheckMotorControllerStatus
+from .diagnostic_analyzers.pdb_state import CheckPDBStatus
 
 NODE_NAME = "rqt_robot_monitor"
 HARDWARE_ID = "MARCH VI"
@@ -48,6 +49,9 @@ class DiagnosticUpdater(Node):
 
         # Gait information
         CheckGaitStatus(self, self.updater)
+
+        # PDB checks
+        CheckPDBStatus(self, self.updater)
 
     def update(self):
         """Update the DiagnosticUpdater if there are more than 0 tasks."""
