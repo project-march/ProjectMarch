@@ -258,7 +258,7 @@ class Foot:
             slope_foot_to_origin = z_position / y_position
             angle_foot_to_origin = atan(slope_foot_to_origin)
             if y_position > 0:
-                haa = (
+                return (
                     acos(
                         pelvis_hip_length
                         / sqrt(z_position * z_position + y_position * y_position)
@@ -266,7 +266,7 @@ class Foot:
                     - angle_foot_to_origin
                 )
             else:
-                haa = (
+                return (
                     acos(
                         pelvis_hip_length
                         / sqrt(z_position * z_position + y_position * y_position)
@@ -276,7 +276,7 @@ class Foot:
                 )
         else:
             angle_foot_to_origin = pi / 2
-            haa = (
+            return (
                 acos(
                     pelvis_hip_length
                     / sqrt(z_position * z_position + y_position * y_position)
@@ -284,7 +284,6 @@ class Foot:
                 - angle_foot_to_origin
             )
 
-        return haa
 
     @staticmethod
     def calculate_hfe_kfe_angles_default_situation(
