@@ -33,3 +33,4 @@ ignore =
     PIE808,     # TODO: enable this
     RST201,
     RST206,
+    SIM106,     # Gives a lot of false positives
