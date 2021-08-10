@@ -3,7 +3,7 @@
 # rather than using the flake8 default of 79:
 max-line-length = 88
 show-source = false
-min-coverage-percents = 5
+min-coverage-percents = 100
 exclude =
     .git,
     __init__.py,
