@@ -284,7 +284,6 @@ class Foot:
                 - angle_foot_to_origin
             )
 
-
     @staticmethod
     def calculate_hfe_kfe_angles_default_situation(
         transformed_x: float, transformed_z: float, upper_leg: float, lower_leg: float
