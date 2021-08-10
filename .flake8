@@ -34,3 +34,4 @@ ignore =
     RST201,
     RST206,
     SIM106,     # Gives a lot of false positives
+    VNE001,     # Not really necessary
