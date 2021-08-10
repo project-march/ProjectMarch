@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from pathlib import Path
 import yaml
 import copy
@@ -25,6 +26,7 @@ new_stand_position_start = {
     "right_knee": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
 }
 new_stand_position_end = copy.deepcopy(new_stand_position_start)
+
 
 # actually for dicts in dicts
 def almost_equal_nested_dict(dict1, dict2):
@@ -59,11 +61,11 @@ for path in Path(
             new_stand_position_end[joint]["time_from_start"] = final_time
 
         if almost_equal_nested_dict(current_start_position, old_stand_position_start):
-            for joint, setpoint_list in content["joints"].items():
+            for joint in content["joints"].keys():
                 content["joints"][joint][0] = new_stand_position_start[joint]
             start_positions_set += 1
         if almost_equal_nested_dict(current_end_position, old_stand_position_end):
-            for joint, setpoint_list in content["joints"].items():
+            for joint in content["joints"].keys():
                 content["joints"][joint][-1] = new_stand_position_end[joint]
             end_positions_set += 1
         file.close()
@@ -71,7 +73,7 @@ for path in Path(
         file = open(path, "w")
         yaml.dump(content, file)
 
-    except Exception as e:
+    except Exception as e:  # noqa: B902
         paths_that_failed.append(path)
         print(e)
 

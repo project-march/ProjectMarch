@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from pathlib import Path
 import yaml
 
@@ -14,7 +15,7 @@ for path in Path("/home/pmarch/march/ros1/src").rglob("*.subgait"):
         file.close()
         file = open(path, "w")
         yaml.dump(content, file)
-    except Exception as e:
+    except Exception as e:  # noqa: B902
         paths_that_failed.append(path)
         print(e)
 
