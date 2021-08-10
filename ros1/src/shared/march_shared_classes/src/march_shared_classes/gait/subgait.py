@@ -559,7 +559,7 @@ class Subgait:
         )
         new_setpoints = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using the inverse kinematics
-        for setpoint_index in range(0, number_of_setpoints):
+        for setpoint_index in range(number_of_setpoints):
             base_feet_state = FeetState.from_setpoints(
                 base_setpoints_to_interpolate[setpoint_index]
             )

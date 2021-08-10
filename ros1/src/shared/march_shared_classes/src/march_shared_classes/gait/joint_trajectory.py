@@ -129,7 +129,7 @@ class JointTrajectory:
 
         time, position, velocity = self.get_setpoints_unzipped()
         yi = []
-        for i in range(0, len(time)):
+        for i in range(len(time)):
             yi.append([position[i], velocity[i]])
 
         # We do a cubic spline here, just like the ros1 joint_trajectory_action_controller,

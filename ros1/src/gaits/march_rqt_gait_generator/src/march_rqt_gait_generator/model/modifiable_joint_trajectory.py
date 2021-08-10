@@ -73,7 +73,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.save_setpoints()
         # Calculate at what index the new setpoint should be added.
         new_index = len(self.setpoints)
-        for i in range(0, len(self.setpoints)):
+        for i in range(len(self.setpoints)):
             if self.setpoints[i].time > setpoint.time:
                 new_index = i
                 break
