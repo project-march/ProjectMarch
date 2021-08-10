@@ -272,10 +272,9 @@ class SetpointsGait(GaitInterface, Gait):
             ]
 
         if next_subgait_name == self.graph.END:
-            next_subgait = None
+            return None
         else:
-            next_subgait = self.subgaits[next_subgait_name]
-        return next_subgait
+            return self.subgaits[next_subgait_name]
 
     def transition(self, transition_request) -> bool:
         """
