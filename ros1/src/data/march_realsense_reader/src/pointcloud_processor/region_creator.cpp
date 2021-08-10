@@ -143,7 +143,7 @@ void RegionGrower::readParameters(
         = (float)config
               .region_creator_region_growing_tolerance_change_factor_decrease;
     use_no_seed_growing
-        = (float)config.region_creator_region_growing_use_no_seed_growing;
+        = config.region_creator_region_growing_use_no_seed_growing;
 
     debugging_ = config.debug;
 }
