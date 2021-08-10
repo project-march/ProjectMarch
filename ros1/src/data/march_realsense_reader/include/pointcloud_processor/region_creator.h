@@ -150,6 +150,7 @@ private:
     float tolerance_change_factor_increase;
     std::unique_ptr<RegionVector> region_vector_;
     int number_of_recursive_calls;
+    bool use_no_seed_growing;
 };
 
 #endif // MARCH_REGION_CREATOR_H
