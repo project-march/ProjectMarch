@@ -44,7 +44,7 @@ Test and publish documentation:
   needs:
     - job: "Sphinx build"
   trigger:
-    include: test-and-publish-documentation.yml
+    include: ".gitlab/pipeline/documentation/test-and-publish-documentation.yml"
     strategy: depend
   rules:
     # If we are in the main branch and one of these files has changed, then
