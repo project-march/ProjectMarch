@@ -7,12 +7,12 @@ gaits:
     left_close: MVI_curbdown_leftclose_v1
     
   ramp_up:
-    left_close: MVI_rampup_leftclose_flat_v7
-    left_open: MVI_rampup_leftopen_flat_v9
-    left_swing: MVI_rampup_leftswing_flat_v7
-    right_close: MVI_rampup_rightclose_flat_v7
-    right_open: MVI_rampup_rightopen_flat_v9
-    right_swing: MVI_rampup_rightswing_flat_v7
+    left_close: MVI_rampup_leftclose_flat_v8
+    left_open: MVI_rampup_leftopen_flat_v11
+    left_swing: MVI_rampup_leftswing_flat_v8
+    right_close: MVI_rampup_rightclose_flat_v8
+    right_open: MVI_rampup_rightopen_flat_v11
+    right_swing: MVI_rampup_rightswing_flat_v8
 
   ramp_up_single_step:
     left_close: MVI_rampup_singlestep_leftclose_flat_v9
