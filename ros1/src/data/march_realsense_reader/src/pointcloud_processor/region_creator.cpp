@@ -143,8 +143,7 @@ void RegionGrower::readParameters(
         = (float)config
               .region_creator_region_growing_tolerance_change_factor_decrease;
     use_no_seed_growing
-        = (float)config
-                .region_creator_region_growing_use_no_seed_growing;
+        = (float)config.region_creator_region_growing_use_no_seed_growing;
 
     debugging_ = config.debug;
 }
@@ -159,7 +158,8 @@ bool RegionGrower::setupRegionGrower()
         region_grower.setInputNormals(pointcloud_normals_);
         region_grower.setSmoothnessThreshold(smoothness_threshold);
         if ((realsense_category_.value() == RealSenseCategory::ramp_up
-        || realsense_category_.value() == RealSenseCategory::ramp_down) && use_no_seed_growing {
+                || realsense_category_.value() == RealSenseCategory::ramp_down)
+            && use_no_seed_growing) {
             region_grower.setCurvatureThreshold(/*curvature=*/-1);
             region_grower.setNumberOfNeighbours(number_of_neighbours_no_seeds);
         } else {
