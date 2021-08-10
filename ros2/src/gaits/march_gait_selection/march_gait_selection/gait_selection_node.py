@@ -11,6 +11,8 @@ from .gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_state_machine import GaitStateMachine
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 
+from contextlib import suppress
+
 
 def sys_exit(*_):
     sys.exit(0)
@@ -32,10 +34,8 @@ def main():
 
     signal.signal(signal.SIGTERM, sys_exit)
 
-    try:
+    with suppress(KeyboardInterrupt):
         rclpy.spin(gait_selection, executor)
-    except KeyboardInterrupt:
-        pass
 
     rclpy.shutdown()
 

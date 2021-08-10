@@ -122,7 +122,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
             side, f"Side should be either 'left', 'right' or 'both', but was {side}"
         )
     try:
-        yaml_file = open(
+        with open(
             os.path.join(
                 get_package_share_directory("march_description"),
                 "urdf",
@@ -130,9 +130,8 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
                 "march6.yaml",
             ),
             "r",
-        )
-
-        robot_dimensions = yaml.safe_load(yaml_file)["dimensions"]
+        ) as yaml_file:
+            robot_dimensions = yaml.safe_load(yaml_file)["dimensions"]
 
         base_length = robot_dimensions["hip_base"]["length"]
         hip_side_length = robot_dimensions["hip_aa_side"]["length"]

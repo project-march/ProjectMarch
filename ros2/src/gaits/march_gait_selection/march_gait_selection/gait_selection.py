@@ -229,10 +229,9 @@ class GaitSelection(Node):
             value = self.get_parameter(name).value
             if value < 0:
                 value = 0
-            duration = Duration(seconds=value)
+            return Duration(seconds=value)
         else:
-            duration = Duration(0)
-        return duration
+            return Duration(0)
 
     def shortest_subgait(self) -> Subgait:
         """Get the subgait with the smallest duration of all subgaits in the loaded gaits."""
@@ -409,7 +408,7 @@ class GaitSelection(Node):
             )
             self._gait_version_map[gait] = self._dynamic_edge_version_map[gait]
         self._load_realsense_gaits(gaits)
-        if self._balance_used and "balance_walk" in gaits.keys():
+        if self._balance_used and "balance_walk" in gaits:
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
             if balance_gait is not None:
                 self.get_logger().info("Successfully created a balance gait")
@@ -458,8 +457,7 @@ class GaitSelection(Node):
             )
             return {}
         with open(self._realsense_yaml, "r") as realsense_config_file:
-            realsense_config = yaml.load(realsense_config_file, Loader=yaml.SafeLoader)
-        return realsense_config
+            return yaml.load(realsense_config_file, Loader=yaml.SafeLoader)
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
@@ -468,7 +466,7 @@ class GaitSelection(Node):
 
         version_map = default_config["gaits"]
         dynamic_edge_version_map = {}
-        if "dynamic_edge_gaits" in default_config.keys():
+        if "dynamic_edge_gaits" in default_config:
             dynamic_edge_version_map = default_config["dynamic_edge_gaits"]
 
         if not isinstance(version_map, dict):

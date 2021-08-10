@@ -34,6 +34,8 @@ class EdgePosition:
                 )
                 for i, value in enumerate(self.values)
             )
+        else:
+            return False
 
     def __str__(self):
         return str(self.values)

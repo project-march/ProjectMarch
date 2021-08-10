@@ -40,6 +40,7 @@ class EntryModel(QAbstractTableModel):
     def headerData(self, section: int, orientation, role=None):  # noqa: N802
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return EntryModel.columns[section].capitalize()
+        return None
 
     def data(self, index, role=Qt.DisplayRole):
         column = index.column()
@@ -55,9 +56,8 @@ class EntryModel(QAbstractTableModel):
                 elif column == "entry":
                     return entry.content
 
-            if role == Qt.ForegroundRole:
-                if column == "entry" and entry.is_error:
-                    return QBrush(Qt.darkRed)
+            if role == Qt.ForegroundRole and column == "entry" and entry.is_error:
+                return QBrush(Qt.darkRed)
 
         return None
 
