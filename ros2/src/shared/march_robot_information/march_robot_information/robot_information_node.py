@@ -8,6 +8,7 @@ from rcl_interfaces.srv import GetParameters
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 from urdf_parser_py import urdf
+from contextlib import suppress
 
 NODE_NAME = "robot_information_node"
 
@@ -18,10 +19,8 @@ def main():
 
     node = RobotInformation()
 
-    try:
+    with suppress(KeyboardInterrupt):
         rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
 
     rclpy.shutdown()
 
