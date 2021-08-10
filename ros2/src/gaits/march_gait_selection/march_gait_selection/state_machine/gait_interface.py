@@ -39,12 +39,12 @@ class GaitInterface:
     @property
     def starting_position(self) -> EdgePosition:
         """Returns the starting position of all joints."""
-        return None
+        return
 
     @property
     def final_position(self) -> EdgePosition:
         """Returns the position of all the joints after the gait has ended."""
-        return None
+        return
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
