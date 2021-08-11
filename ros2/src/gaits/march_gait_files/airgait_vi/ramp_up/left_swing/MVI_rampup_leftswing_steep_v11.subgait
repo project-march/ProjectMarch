@@ -1,4 +1,4 @@
-description: v7 with HAA movements
+description: v9 with HAA movements
 duration: 1800000000
 gait_type: stairs_like
 joints:
@@ -10,24 +10,30 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0
+  - position: -0.0873
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 1800000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.5585
+  - position: 0.0873
     time_from_start: 0
     velocity: 0.0
-  - position: -0.1745
+  - position: 1.2741
+    time_from_start: 1116000000
+    velocity: 0.0
+  - position: 1.117
     time_from_start: 1800000000
     velocity: 0.0
   left_knee:
-  - position: 0.2618
+  - position: 0.0873
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 1.3963
+    time_from_start: 900000000
+    velocity: 0.0
+  - position: 0.9599
     time_from_start: 1800000000
     velocity: 0.0
   right_ankle:
@@ -38,30 +44,24 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
   right_hip_aa:
-  - position: -0.0873
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
+  - position: -0.0873
     time_from_start: 1800000000
     velocity: 0.0
   right_hip_fe:
-  - position: -0.0873
+  - position: 1.117
     time_from_start: 0
     velocity: 0.0
-  - position: 0.6545
-    time_from_start: 1000000000
-    velocity: 0.0
-  - position: -0.1745
+  - position: 0.0873
     time_from_start: 1800000000
     velocity: 0.0
   right_knee:
-  - position: 0.0873
+  - position: 0.9599
     time_from_start: 0
     velocity: 0.0
-  - position: 1.3265
-    time_from_start: 900000000
-    velocity: 0.0
-  - position: 0.0
+  - position: 0.0873
     time_from_start: 1800000000
     velocity: 0.0
-name: right_close
+name: left_swing
