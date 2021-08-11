@@ -455,7 +455,7 @@
 
     <xacro:sensor_d435 name="camera_back" topics_ns="camera_back" parent="hip_base"
                        plugin="$(arg realsense_simulation)">
-        <origin xyz="0 0.22 0" rpy="0 ${75/180 * pi} 0"/>
+        <origin xyz="0 0.22 0" rpy="${pi} ${105/180 * pi} ${pi}"/>
     </xacro:sensor_d435>
 
 </robot>
