@@ -142,7 +142,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     if (not preprocessing_was_successful) {
         res.message = "Preprocessing was unsuccessful, see debug output "
-                            "for more information";
+                      "for more information";
         res.success = false;
         return;
     }
@@ -164,9 +164,8 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         pointcloud, normals, points_vector, normals_vector);
 
     if (not region_creating_was_successful) {
-        res.message
-            = "Region creating was unsuccessful, see debug output "
-              "for more information";
+        res.message = "Region creating was unsuccessful, see debug output "
+                      "for more information";
         res.success = false;
         return;
     }
@@ -193,7 +192,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     if (not hull_finding_was_successful) {
         res.message = "Hull finding was unsuccessful, see debug output "
-                            "for more information";
+                      "for more information";
         res.success = false;
         return;
     }
@@ -250,9 +249,9 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     res.success = true;
     res.message = "The found parameters (size, height, side) are ("
-            + std::to_string(gait_parameters->first_parameter) + ", "
-            + std::to_string(gait_parameters->second_parameter) + ", "
-            + std::to_string(gait_parameters->side_step_parameter) + ") ";
+        + std::to_string(gait_parameters->first_parameter) + ", "
+        + std::to_string(gait_parameters->second_parameter) + ", "
+        + std::to_string(gait_parameters->side_step_parameter) + ") ";
     // Returning false means that the service was not able to respond at all,
     // this causes problems with the bridge, therefore always return true!
     return;
@@ -394,7 +393,7 @@ bool RealSenseReader::processPointcloudCallback(
 
     if (input_cloud == nullptr) {
         res.message = "No pointcloud published within timeout, so "
-                            "no processing could be done.";
+                      "no processing could be done.";
         ROS_WARN_STREAM(res.message);
         res.success = false;
         return true;

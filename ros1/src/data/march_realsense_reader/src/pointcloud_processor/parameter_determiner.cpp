@@ -183,8 +183,12 @@ bool HullParameterDeterminer::determineParameters(
                 break;
             }
         }
-        if (gait_parameters_->first_parameter == 0 || gait_parameters_->first_parameter == 1 || gait_parameters_->second_parameter == 0 || gait_parameters_->second_parameter == 1) {
-            ROS_WARN_STREAM("The found dimensions are outside the gait limits, but inside the allowed deviation from them.");
+        if (gait_parameters_->first_parameter == 0
+            || gait_parameters_->first_parameter == 1
+            || gait_parameters_->second_parameter == 0
+            || gait_parameters_->second_parameter == 1) {
+            ROS_WARN_STREAM("The found dimensions are outside the gait limits, "
+                            "but inside the allowed deviation from them.");
         }
         ROS_INFO_STREAM("");
         ROS_INFO_STREAM("");
