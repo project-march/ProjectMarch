@@ -18,7 +18,7 @@ string subgait_name
 # Whether a valid place to set the foot was found using the camera.
 bool success
 
-# This string should provide more information as to what the result of the call is
-string message
+# If success is false, this string should provide more information as to what went wrong
+string error_message
 
 GaitParameters gait_parameters
