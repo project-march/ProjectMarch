@@ -25,8 +25,7 @@ variables:
 # on how this should be interpreted.
 stages:
   - Build container
-  - Build documentation
-  - Test and publish documentation
+  - Documentation
   - Lint code
   - Build code
   - Test code

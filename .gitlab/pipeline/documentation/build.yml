@@ -31,20 +31,13 @@ Sphinx build:
       changes:
         - "ros1/src/**/README.md"
         - "ros2/src/**/README.md"
-    # If we are in the main branch and one of these files has changed, then
-    # we need to trigger a downstream pipeline to publish the changes online.
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      changes:
-        - $DOCKER_FILE
-        - "ros1/src/**/README.md"
-        - "ros2/src/**/README.md"
 
-Test and publish documentation:
-  stage: Test and publish documentation
-  needs:
-    - job: "Sphinx build"
+# Run a separate pipeline if we are merged into main.
+# This will actually publish the files to docs.projectmarch.nl
+Build, test and publish documentation:
+  stage: Documentation
   trigger:
-    include: ".gitlab/pipeline/documentation/test-and-publish-documentation.yml"
+    include: ".gitlab/pipeline/documentation/build-test-and-publish.yml"
     strategy: depend
   rules:
     # If we are in the main branch and one of these files has changed, then
