@@ -6,7 +6,7 @@ desired_digits = 4
 paths_that_failed = []
 
 for path in Path(
-        "/home/pmarch/march/ros2/src/gaits/march_gait_files/airgait_vi/"
+    "/home/pmarch/march/ros2/src/gaits/march_gait_files/airgait_vi/"
 ).rglob("*.subgait"):
     try:
         file = open(path, "r")
