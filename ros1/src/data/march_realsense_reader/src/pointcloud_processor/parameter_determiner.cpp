@@ -460,6 +460,13 @@ bool HullParameterDeterminer::transformGaitInformation()
             break;
         }
 
+        case RealSenseCategory::ramp_up:
+        case RealSenseCategory::ramp_down: {
+            // There is no relevant gait debug information transform
+            // for the current ramp parameter calculation
+            break;
+        }
+
         default: {
             ROS_WARN_STREAM("Gait information transform is not implemented yet "
                             "for realsense category "
