@@ -1,4 +1,4 @@
-description: Stairs up with height of 12 cm and depth of 20 cm, based on cybathlon_v6
+description: Fast cybathlon_v5
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -19,12 +19,12 @@ joints:
   left_hip_fe:
   - position: 0.0873
     time_from_start: 0
-    velocity: 0.2036
-  - position: 0.8727
+    velocity: 0.2181
+  - position: 0.9599
     time_from_start: 1200000000
-    velocity: -0.5236
+    velocity: -0.6981
   - position: 0.0873
-    time_from_start: 2000000000
+    time_from_start: 2062500000
     velocity: 0.0
   - position: -0.1745
     time_from_start: 3000000000
@@ -32,12 +32,12 @@ joints:
   left_knee:
   - position: 0.2443
     time_from_start: 0
-    velocity: 0.8145
-  - position: 1.5716
-    time_from_start: 1003400000
-    velocity: -0.5236
+    velocity: 0.4363
+  - position: 1.5708
+    time_from_start: 975000000
+    velocity: 0.0
   - position: 0.0
-    time_from_start: 2000000000
+    time_from_start: 2062500000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3000000000
@@ -57,21 +57,21 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.911
+  - position: 1.2217
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.1091
   - position: 0.0873
-    time_from_start: 2000000000
+    time_from_start: 2062500000
     velocity: 0.0
   - position: -0.1745
     time_from_start: 3000000000
     velocity: 0.0
   right_knee:
-  - position: 1.2566
+  - position: 1.4486
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 2000000000
+    time_from_start: 2062500000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3000000000
