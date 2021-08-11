@@ -73,7 +73,7 @@ for path in Path(
         file = open(path, "w")
         yaml.dump(content, file)
 
-    except Exception as e:  # noqa: B902
+    except Exception as e:  # noqa: B902 PIE786
         paths_that_failed.append(path)
         print(e)
 
