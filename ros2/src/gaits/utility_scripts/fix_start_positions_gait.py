@@ -4,32 +4,90 @@ import yaml
 import copy
 
 old_stand_position_start = {
-    "left_ankle": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
-    "left_hip_aa": {"position": 0.0349, "time_from_start": 0, "velocity": 0.0},
-    "left_hip_fe":
-        {"position": -0.1745, "time_from_start": 0, "velocity": 0.0},
-    "left_knee": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
-    "right_ankle": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
-    "right_hip_aa":
-        {"position": 0.0349, "time_from_start": 0, "velocity": 0.0},
-    "right_hip_fe":
-        {"position": -0.1745, "time_from_start": 0, "velocity": 0.0},
-    "right_knee": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
+    "left_ankle": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_hip_aa": {
+        "position": 0.0349,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_hip_fe": {
+        "position": -0.1745,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_knee": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_ankle": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_hip_aa": {
+        "position": 0.0349,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_hip_fe": {
+        "position": -0.1745,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_knee": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
 }
 old_stand_position_end = copy.deepcopy(old_stand_position_start)
 
 new_stand_position_start = {
-    "left_ankle": {"position": 0.0524, "time_from_start": 0, "velocity": 0.0},
-    "left_hip_aa": {"position": 0.0349, "time_from_start": 0, "velocity": 0.0},
-    "left_hip_fe":
-        {"position": -0.1745, "time_from_start": 0, "velocity": 0.0},
-    "left_knee": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
-    "right_ankle": {"position": 0.0524, "time_from_start": 0, "velocity": 0.0},
+    "left_ankle": {
+        "position": 0.0524,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_hip_aa": {
+        "position": 0.0349,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_hip_fe": {
+        "position": -0.1745,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_knee": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_ankle": {
+        "position": 0.0524,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
     "right_hip_aa": {
-        "position": 0.0349, "time_from_start": 0, "velocity": 0.0},
-    "right_hip_fe":
-        {"position": -0.1745, "time_from_start": 0, "velocity": 0.0},
-    "right_knee": {"position": 0.0, "time_from_start": 0, "velocity": 0.0},
+        "position": 0.0349,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_hip_fe": {
+        "position": -0.1745,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_knee": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
 }
 new_stand_position_end = copy.deepcopy(new_stand_position_start)
 
@@ -71,9 +129,7 @@ for path in Path(
                 old_stand_position_start,
             ):
                 for joint in content["joints"].keys():
-                    content["joints"][joint][0] = new_stand_position_start[
-                        joint
-                    ]
+                    content["joints"][joint][0] = new_stand_position_start[joint]
                 start_positions_set += 1
 
             if almost_equal_nested_dict(
@@ -81,9 +137,7 @@ for path in Path(
                 old_stand_position_end,
             ):
                 for joint in content["joints"].keys():
-                    content["joints"][joint][-1] = new_stand_position_end[
-                        joint
-                    ]
+                    content["joints"][joint][-1] = new_stand_position_end[joint]
                 end_positions_set += 1
             subgait_file.close()
 
