@@ -3,7 +3,7 @@
 ###############
 # Build the documentation and checks it for warnings and errors.
 Sphinx build:
-  stage: Build documentation
+  stage: Documentation
   # The "$TAG" variable is set by the rules below
   image: $CI_REGISTRY_IMAGE/sphinx:$TAG
   before_script:
