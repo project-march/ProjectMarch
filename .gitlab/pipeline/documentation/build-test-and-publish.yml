@@ -1,6 +1,23 @@
 stages:
+  - Build documentation
   - Test documentation
   - Publish documentation
+
+###############
+# Sphinx build #
+###############
+# Build the documentation and checks it for warnings and errors.
+Sphinx build:
+  stage: Build documentation
+  # The "$TAG" variable is set by the rules below
+  image: $CI_REGISTRY_IMAGE/sphinx:$CI_DEFAULT_BRANCH
+  before_script:
+    - cd docs
+  script:
+    - bash build_locally.sh
+  artifacts:
+    paths:
+      - docs/build/
 
 ################
 # HTML proofer #

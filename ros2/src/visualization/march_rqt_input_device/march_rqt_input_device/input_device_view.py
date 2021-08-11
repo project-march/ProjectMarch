@@ -64,7 +64,8 @@ class InputDeviceView(QWidget):
         """
         Creates all the buttons, new buttons should be added here.
         """
-        json_content = json.loads(open(self._layout_file).read())
+        with open(self._layout_file) as file:
+            json_content = json.loads(file.read())
 
         button_layout = [
             [self.create_button(**button_dict) for button_dict in row]
