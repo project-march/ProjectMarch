@@ -1,4 +1,4 @@
-description: 'v6 with increased step size by more hip and less knee flexion. '
+description: V9 with HAA movements.
 duration: 1800000000
 gait_type: stairs_like
 joints:
