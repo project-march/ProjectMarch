@@ -1,0 +1,91 @@
+description: Fast version 5
+duration: 3000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1336000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.1745
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0873
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 0.0873
+    time_from_start: 2400000000
+    velocity: 0.0294
+  - position: 0.0873
+    time_from_start: 3000000000
+    velocity: 0.2181
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 0.1642
+    time_from_start: 2403400000
+    velocity: 0.0436
+  - position: 0.2443
+    time_from_start: 3000000000
+    velocity: 0.4363
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.1745
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0873
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 1.4137
+    time_from_start: 2400000000
+    velocity: -0.2181
+  - position: 1.3265
+    time_from_start: 2640000000
+    velocity: -0.4363
+  - position: 1.2217
+    time_from_start: 3000000000
+    velocity: -0.1091
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 1.8326
+    time_from_start: 1909400000
+    velocity: 0.3213
+  - position: 1.4486
+    time_from_start: 3000000000
+    velocity: 0.0
+name: right_open
