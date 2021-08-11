@@ -164,23 +164,30 @@ bool HullParameterDeterminer::determineParameters(
     }
 
     if (success) {
+        ROS_INFO_STREAM("");
+        ROS_INFO_STREAM("");
         switch (realsense_category_.value()) {
             case RealSenseCategory::stairs_down:
             case RealSenseCategory::stairs_up: {
-                ROS_DEBUG_STREAM("The optimal foot location is "
+                ROS_INFO_STREAM("The optimal foot location is "
                     << output_utilities::pointToString(optimal_foot_location));
                 break;
             }
             case RealSenseCategory::ramp_down:
             case RealSenseCategory::ramp_up: {
-                ROS_DEBUG_STREAM("The slope of the ramp is " << ramp_slope);
+                ROS_INFO_STREAM("The slope of the ramp is " << ramp_slope);
                 break;
             }
             case RealSenseCategory::sit: {
-                ROS_DEBUG_STREAM("The sit height is " << sit_height);
+                ROS_INFO_STREAM("The sit height is " << sit_height);
                 break;
             }
         }
+        if (gait_parameters_->first_parameter == 0 || gait_parameters_->first_parameter == 1 || gait_parameters_->second_parameter == 0 || gait_parameters_->second_parameter == 1) {
+            ROS_WARN_STREAM("The found dimensions are outside the gait limits, but inside the allowed deviation from them.");
+        }
+        ROS_INFO_STREAM("");
+        ROS_INFO_STREAM("");
         ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
             << gait_parameters_->first_parameter << ", "
             << gait_parameters_->second_parameter << ", "

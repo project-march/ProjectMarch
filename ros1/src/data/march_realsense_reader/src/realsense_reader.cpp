@@ -141,7 +141,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         pointcloud, normals, realsense_category, frame_id_to_transform_to_);
 
     if (not preprocessing_was_successful) {
-        res.error_message = "Preprocessing was unsuccessful, see debug output "
+        res.message = "Preprocessing was unsuccessful, see debug output "
                             "for more information";
         res.success = false;
         return;
@@ -164,7 +164,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         pointcloud, normals, points_vector, normals_vector);
 
     if (not region_creating_was_successful) {
-        res.error_message
+        res.message
             = "Region creating was unsuccessful, see debug output "
               "for more information";
         res.success = false;
@@ -192,7 +192,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         hull_vector, polygon_vector);
 
     if (not hull_finding_was_successful) {
-        res.error_message = "Hull finding was unsuccessful, see debug output "
+        res.message = "Hull finding was unsuccessful, see debug output "
                             "for more information";
         res.success = false;
         return;
@@ -239,7 +239,7 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         }
     }
     if (not parameter_determining_was_successful) {
-        res.error_message
+        res.message
             = "Parameter determining was unsuccessful, see debug output "
               "for more information";
         res.success = false;
@@ -249,6 +249,10 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
     res.gait_parameters = *gait_parameters;
 
     res.success = true;
+    res.message = "The found parameters (size, height, side) are ("
+            << gait_parameters->first_parameter << ", "
+            << gait_parameters->second_parameter << ", "
+            << gait_parameters->side_step_parameter << ") "
     // Returning false means that the service was not able to respond at all,
     // this causes problems with the bridge, therefore always return true!
     return;
@@ -368,17 +372,17 @@ bool RealSenseReader::processPointcloudCallback(
         frame_id_to_transform_to_
             = SUBGAIT_NAME_TO_REALSENSE_FRAME_ID_MAP.at(subgait_name_);
     } catch (std::out_of_range& ex) {
-        res.error_message = "Provided subgait name " + subgait_name_
+        res.message = "Provided subgait name " + subgait_name_
             + " has no known associated frame id "
               "to transform to.";
-        ROS_WARN_STREAM(res.error_message);
+        ROS_WARN_STREAM(res.message);
         res.success = false;
         return true;
     }
 
     time_t start_callback = clock();
     if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {
-        res.error_message
+        res.message
             = "Unknown camera given in the request, not available in the "
               "POINTCLOUD_TOPICS in the realsense_reader";
         res.success = false;
@@ -389,9 +393,9 @@ bool RealSenseReader::processPointcloudCallback(
             POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
 
     if (input_cloud == nullptr) {
-        res.error_message = "No pointcloud published within timeout, so "
+        res.message = "No pointcloud published within timeout, so "
                             "no processing could be done.";
-        ROS_WARN_STREAM(res.error_message);
+        ROS_WARN_STREAM(res.message);
         res.success = false;
         return true;
     }
