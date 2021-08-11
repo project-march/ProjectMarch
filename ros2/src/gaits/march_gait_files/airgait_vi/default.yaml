@@ -52,26 +52,26 @@ gaits:
     right_open: MVI_stairsdownbackwardssinglestep_rightopen_cybathlon_v5
 
   walk:
-    left_close: MVI_walk_leftclose_v10
-    left_swing: MVI_walk_leftswing_v10
-    right_close: MVI_walk_rightclose_v10
-    right_open: MVI_walk_rightopen_v10
-    right_swing: MVI_walk_rightswing_v10
+    left_close: MVI_walk_leftclose_v9
+    left_swing: MVI_walk_leftswing_v9
+    right_close: MVI_walk_rightclose_v9
+    right_open: MVI_walk_rightopen_v9
+    right_swing: MVI_walk_rightswing_v9
 
   walk_single_step:
-    right_open: MVI_walksinglestep_rightopen_v10
-    left_close: MVI_walksinglestep_leftclose_v10
+    right_open: MVI_walksinglestep_rightopen_v9
+    left_close: MVI_walksinglestep_leftclose_v9
   
   walk_large:
-    left_close: MVI_walklarge_leftclose_v10
-    left_swing: MVI_walklarge_leftswing_v10
-    right_close: MVI_walklarge_rightclose_v10
-    right_open: MVI_walklarge_rightopen_v10
-    right_swing: MVI_walklarge_rightswing_v10
+    left_close: MVI_walklarge_leftclose_v9
+    left_swing: MVI_walklarge_leftswing_v9
+    right_close: MVI_walklarge_rightclose_v9
+    right_open: MVI_walklarge_rightopen_v9
+    right_swing: MVI_walklarge_rightswing_v9
 
   walk_single_step_large:
-    right_open: MVI_walksinglesteplarge_rightopen_v10
-    left_close: MVI_walksinglesteplarge_leftclose_v10
+    right_open: MVI_walksinglesteplarge_rightopen_v9
+    left_close: MVI_walksinglesteplarge_leftclose_v9
  
   walk_small:
     left_close: MVI_walksmall_leftclose_v5
