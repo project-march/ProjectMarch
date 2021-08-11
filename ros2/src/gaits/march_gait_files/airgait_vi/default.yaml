@@ -15,8 +15,8 @@ gaits:
     right_swing: MVI_rampup_rightswing_flat_v12
 
   ramp_up_single_step:
-    left_close: MVI_rampup_singlestep_leftclose_flat_v10
-    right_open: MVI_rampup_singlestep_rightopen_flat_v10
+    left_close: MVI_rampup_singlestep_leftclose_flat_v12
+    right_open: MVI_rampup_singlestep_rightopen_flat_v12
 
   stairs_up:
     left_close: MVI_stairsup_leftclose_cybathlon_v4
