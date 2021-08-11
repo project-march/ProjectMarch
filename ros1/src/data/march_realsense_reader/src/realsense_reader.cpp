@@ -250,9 +250,9 @@ void RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     res.success = true;
     res.message = "The found parameters (size, height, side) are ("
-            << gait_parameters->first_parameter << ", "
-            << gait_parameters->second_parameter << ", "
-            << gait_parameters->side_step_parameter << ") "
+            + std::to_string(gait_parameters->first_parameter) + ", "
+            + std::to_string(gait_parameters->second_parameter) + ", "
+            + std::to_string(gait_parameters->side_step_parameter) + ") ";
     // Returning false means that the service was not able to respond at all,
     // this causes problems with the bridge, therefore always return true!
     return;
