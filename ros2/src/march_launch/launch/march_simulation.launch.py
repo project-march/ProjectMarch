@@ -112,9 +112,7 @@ def generate_launch_description():
                 "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
-                name="imu_to_use",
-                default_value="back",
-                description="Which imu to use"
+                name="imu_to_use", default_value="back", description="Which imu to use"
             ),
             DeclareLaunchArgument(
                 name="imu_topic",

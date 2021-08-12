@@ -21,7 +21,6 @@ def generate_launch_description():
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
     robot_description = LaunchConfiguration("robot_description")
     use_imu_data = LaunchConfiguration("use_imu_data")
-    imu_to_use = LaunchConfiguration("imu_to_use")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
 
@@ -110,7 +109,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="imu_to_use",
                 default_value="back",
-                description="Which imu to use for knowing the exoskeleton orientation"
+                description="Which imu to use for knowing the exoskeleton orientation",
             ),
             DeclareLaunchArgument(
                 name="ground_gait",
