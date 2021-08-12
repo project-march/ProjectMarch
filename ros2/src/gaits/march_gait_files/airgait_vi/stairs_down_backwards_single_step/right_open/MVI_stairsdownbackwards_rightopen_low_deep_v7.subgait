@@ -1,0 +1,79 @@
+description: Version 6 with HAA
+duration: 3000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.1745
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0873
+    time_from_start: 1000000000
+    velocity: -0.0
+  - position: 0.925
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: -0.0
+  - position: 0.9599
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0873
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: -0.1745
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0873
+    time_from_start: 1000000000
+    velocity: -0.0
+  - position: 0.8727
+    time_from_start: 1800000000
+    velocity: -0.0
+  - position: -0.0873
+    time_from_start: 3000000000
+    velocity: -0.2036
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1000000000
+    velocity: -0.0
+  - position: 1.5708
+    time_from_start: 1880000000
+    velocity: -0.0
+  - position: 0.2443
+    time_from_start: 3000000000
+    velocity: -0.8959
+name: right_open

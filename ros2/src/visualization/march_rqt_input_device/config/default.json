@@ -151,6 +151,9 @@
          "name": "realsense_stairs_down_single_step"
       },
       {
+         "name": "realsense_stairs_down_backwards_single_step"
+      },
+      {
          "name": "realsense_stairs_up"
       },
       {
