@@ -527,8 +527,8 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 {
     if (optimal_foot_location.x
             < max_x_stairs_world - allowed_deviation_from_reachable_stair
-        || optimal_foot_location.x > min_x_stairs_world
-                + allowed_deviation_from_reachable_stair) {
+        || optimal_foot_location.x
+            > min_x_stairs_world + allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair depth should be between "
             << min_x_stairs_world << " ( -"
             << allowed_deviation_from_reachable_stair << " ) and "
@@ -539,8 +539,8 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
     }
     if (optimal_foot_location.z
             > max_z_stairs_world + allowed_deviation_from_reachable_stair
-        || optimal_foot_location.z < min_z_stairs_world
-                - allowed_deviation_from_reachable_stair) {
+        || optimal_foot_location.z
+            < min_z_stairs_world - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair height should be between "
             << min_z_stairs_world << " ( -"
             << allowed_deviation_from_reachable_stair << " ) and "
@@ -550,17 +550,14 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
         return false;
     }
 
-    gait_parameters_->first_parameter
-        = calculateParameter(optimal_foot_location.x,
-            min_x_stairs_world, max_x_stairs_world);
+    gait_parameters_->first_parameter = calculateParameter(
+        optimal_foot_location.x, min_x_stairs_world, max_x_stairs_world);
     if (realsense_category_.value() == RealSenseCategory::stairs_down) {
-        gait_parameters_->second_parameter
-            = calculateParameter(optimal_foot_location.z,
-                                 max_z_stairs_world, min_z_stairs_world);
+        gait_parameters_->second_parameter = calculateParameter(
+            optimal_foot_location.z, max_z_stairs_world, min_z_stairs_world);
     } else {
-        gait_parameters_->second_parameter
-        = calculateParameter(optimal_foot_location.z,
-                             min_z_stairs_world, max_z_stairs_world);
+        gait_parameters_->second_parameter = calculateParameter(
+            optimal_foot_location.z, min_z_stairs_world, max_z_stairs_world);
     }
 
     // The side step parameter is unused for the stairs
