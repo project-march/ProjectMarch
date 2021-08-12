@@ -1,4 +1,4 @@
-description: Stairs up height of 22 cm and depth of 20, based on cybathlon_v6
+description: Version 6 with HAA
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -14,34 +14,34 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: -0.0873
     time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.0873
-    time_from_start: 0
-    velocity: 0.2036
-  - position: 1.0472
-    time_from_start: 890000000
-    velocity: 0.0
-  - position: 0.0873
-    time_from_start: 2000000000
-    velocity: 0.0
   - position: -0.1745
-    time_from_start: 3000000000
-    velocity: 0.0
-  left_knee:
-  - position: 0.2443
     time_from_start: 0
-    velocity: 0.8145
-  - position: 1.8391
-    time_from_start: 847000000
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 2000000000
+  - position: 0.0873
+    time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.0
+  - position: 0.0873
+    time_from_start: 2142900000
+    velocity: 0.0274
+  - position: -0.0873
     time_from_start: 3000000000
+    velocity: 0.2036
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
     velocity: 0.0
+  - position: 0.1396
+    time_from_start: 2614300000
+    velocity: 0.1018
+  - position: 0.2443
+    time_from_start: 3000000000
+    velocity: 0.8959
   right_ankle:
   - position: 0.0
     time_from_start: 0
@@ -54,26 +54,35 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.2915
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
   - position: 0.0873
-    time_from_start: 2000000000
+    time_from_start: 1000000000
     velocity: 0.0
-  - position: -0.1745
+  - position: 1.0996
+    time_from_start: 2357100000
+    velocity: -0.2036
+  - position: 0.925
     time_from_start: 3000000000
     velocity: 0.0
   right_knee:
-  - position: 1.6232
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 2200000000
+    time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.0
+  - position: 1.5882
+    time_from_start: 2014300000
+    velocity: -0.6109
+  - position: 0.9599
     time_from_start: 3000000000
     velocity: 0.0
-name: left_close
+name: right_open

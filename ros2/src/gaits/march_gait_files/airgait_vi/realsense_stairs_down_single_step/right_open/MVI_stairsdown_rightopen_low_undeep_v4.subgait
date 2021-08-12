@@ -1,4 +1,4 @@
-description: Stairs down of MVI for the stair with a heigth of 12 and depth op 20
+description: Verison 4
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -61,9 +61,9 @@ joints:
     time_from_start: 893700000
     velocity: 0.5586
   - position: 0.7854
-    time_from_start: 1656800000
+    time_from_start: 1750000000
     velocity: -0.2792
-  - position: 0.384
+  - position: 0.4363
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
