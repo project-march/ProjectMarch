@@ -57,7 +57,7 @@ class GaitVersionToolController:
         self.wait_for_service(gait_dir_client)
         gait_directory = gait_dir_client.call(Trigger.Request()).message
         gait_dir_client.destroy()
-        return gait_directory
+        return gait_directory  # noqa: R504
 
     def get_version_map(self):
         """Get the gait version map used in the gait selection node."""

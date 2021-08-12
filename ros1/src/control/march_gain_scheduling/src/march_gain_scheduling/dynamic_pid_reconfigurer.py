@@ -101,8 +101,7 @@ class DynamicPIDReconfigurer:
         return [gains["p"], gains["i"], gains["d"]]
 
     def done_interpolation_test(self, needed_gains):
-        done = True
-        for i in range(len(self._joint_list)):
-            if self.current_gains[i] != needed_gains[i]:
-                done = False
-        return done
+        return all(
+            self.current_gains[i] == needed_gains[i]
+            for i in range(len(self._joint_list))
+        )

@@ -177,14 +177,12 @@ class Foot:
             slope_foot_to_origin = z_position / y_position
             angle_foot_to_origin = atan(slope_foot_to_origin)
             if y_position > 0:
-                haa = acos(haa_arm_to_z_y_distance_ration) - angle_foot_to_origin
+                return acos(haa_arm_to_z_y_distance_ration) - angle_foot_to_origin
             else:
-                haa = acos(haa_arm_to_z_y_distance_ration) - pi - angle_foot_to_origin
+                return acos(haa_arm_to_z_y_distance_ration) - pi - angle_foot_to_origin
         else:
             angle_foot_to_origin = pi / 2
-            haa = acos(haa_arm_to_z_y_distance_ration) - angle_foot_to_origin
-
-        return haa
+            return acos(haa_arm_to_z_y_distance_ration) - angle_foot_to_origin
 
     @staticmethod
     def calculate_hfe_kfe_angles(transformed_x, transformed_z, upper_leg, lower_leg):

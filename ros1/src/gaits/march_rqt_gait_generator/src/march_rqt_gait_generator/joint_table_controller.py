@@ -43,7 +43,7 @@ class JointTableController:
 
     def to_setpoints(self):
         setpoints = []
-        for i in range(0, self.table_widget.rowCount()):
+        for i in range(self.table_widget.rowCount()):
             time = float(self.table_widget.item(i, 0).text())
             position = math.radians(float(self.table_widget.item(i, 1).text()))
             velocity = math.radians(float(self.table_widget.item(i, 2).text()))

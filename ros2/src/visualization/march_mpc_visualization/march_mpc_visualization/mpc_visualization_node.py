@@ -3,6 +3,8 @@ from march_mpc_visualization.mpc_visualization_listener import MpcListener
 from march_mpc_visualization import app
 import threading
 
+from contextlib import suppress
+
 
 def main():
     rclpy.init()
@@ -30,9 +32,7 @@ def main():
     flask_thread.daemon = True
     flask_thread.start()
 
-    try:
+    with suppress(KeyboardInterrupt):
         rclpy.spin(mpc_listener)
-    except KeyboardInterrupt:
-        pass
 
     rclpy.shutdown()

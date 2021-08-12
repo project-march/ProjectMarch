@@ -175,7 +175,7 @@ class BalanceGait(GaitInterface):
 
         :param name: the name of the subgait
         """
-        if name == "right_open_2":
+        if name == "right_open_2":  # noqa: SIM116
             return self.construct_trajectory("right_leg", name)
         elif name == "left_swing_2":
             return self.construct_trajectory("left_leg", name)
