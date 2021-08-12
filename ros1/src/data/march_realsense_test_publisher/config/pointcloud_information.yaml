@@ -195,4 +195,8 @@ zitblok-centrum-voor-uitvoeren-01-08-2021-14:35:25.ply:
   subgait_name: "prepare_sit_down"
   from_back_camera: true
   from_realsense_viewer: false
-
+increasing_ramp.ply:
+  realsense_category: 2 
+  frame_id_to_transform_to: "foot_right"
+  from_back_camera: false
+  from_realsense_viewer: true
