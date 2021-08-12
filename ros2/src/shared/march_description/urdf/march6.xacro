@@ -58,10 +58,14 @@
     <!-- Linearised around 0 -->
     <xacro:property name="linear_reduction_hip" value="240"/>
     <xacro:property name="linear_reduction_ankle" value="236"/>
-    <xacro:property name="actuating_joints" value="[]"/>
+
+    <xacro:if value="$(arg jointless)">
+        <xacro:property name="actuating_joints" value="[]"/>
+    </xacro:if>
     <xacro:unless value="$(arg jointless)">
         <xacro:property name="actuating_joints" value="${(properties['actuating_joints'])}"/>
     </xacro:unless>
+
     <!-- Constants for robot dimensions -->
     <!-- Masses determined in Catia, see https://confluence.projectmarch.nl:8443/display/51/URDF+description -->
     <xacro:property name="width"
