@@ -209,7 +209,7 @@ def generate_launch_description():
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
-                    ("jointlesss", jointless)
+                    ("jointlesss", jointless),
                 ],
             ),
         ]

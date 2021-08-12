@@ -220,7 +220,7 @@ def generate_launch_description():
                     ("use_imu_data", use_imu_data),
                     ("imu_topic", imu_topic),
                     ("simulation", simulation),
-                    ("jointless", jointless)
+                    ("jointless", jointless),
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),
