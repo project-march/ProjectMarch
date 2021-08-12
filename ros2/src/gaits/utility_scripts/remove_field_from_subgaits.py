@@ -6,7 +6,7 @@ field_to_remove = "version"
 
 paths_that_failed = []
 for path in Path(
-    "/home/pmarch/march/ros2/src/gaits/march_gait_files/airgait_vi/",
+    "../march_gait_files/airgait_vi/",
 ).rglob("*.subgait"):
     try:
         with open(path, "r") as subgait_file:
