@@ -23,6 +23,8 @@
 <!-- Data                       -->
     <arg name="rosbag" default="false" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
+    <arg name="imu_to_use" default="back"/>
+
 
     <arg name="realsense" default="false"
          doc="Launches the realsense reader node when true."/>
