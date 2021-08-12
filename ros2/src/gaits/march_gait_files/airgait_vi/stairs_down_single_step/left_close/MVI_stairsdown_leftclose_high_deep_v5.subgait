@@ -1,4 +1,4 @@
-description: Stairs down of MVI for the stair with a heigth of 12 and depth op 20
+description: Version 4 with HAA
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -10,28 +10,28 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0349
+  - position: -0.0524
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.8576
+  - position: 0.9939
     time_from_start: 0
     velocity: 0.0
-  - position: 1.1345
-    time_from_start: 1200000000
+  - position: 1.2149
+    time_from_start: 1268200000
     velocity: 0.0
   - position: -0.1745
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
-  - position: 1.3963
+  - position: 1.9098
     time_from_start: 0
     velocity: 0.0
-  - position: 1.5708
-    time_from_start: 1200000000
+  - position: 1.9098
+    time_from_start: 1256200000
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
@@ -44,17 +44,17 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.4363
+  - position: 0.5934
     time_from_start: 0
     velocity: 0.0
-  - position: 0.2618
+  - position: 0.3491
     time_from_start: 893700000
     velocity: 0.0
   - position: -0.1745
@@ -64,8 +64,8 @@ joints:
   - position: 0.3316
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 1833300000
+  - position: 0.3491
+    time_from_start: 937500000
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000

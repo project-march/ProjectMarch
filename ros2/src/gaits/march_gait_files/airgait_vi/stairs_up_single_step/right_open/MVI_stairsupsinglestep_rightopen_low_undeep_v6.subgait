@@ -1,4 +1,4 @@
-description: Stairs up height 12 cm and depth 20, based on cybathlon_v6
+description: Stairs up with height of 13 cm and depth of 20 cm, based on cybathlon_v6
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -12,6 +12,9 @@ joints:
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1000000000
     velocity: 0.0
   - position: 0.0349
     time_from_start: 3000000000
@@ -54,6 +57,9 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: 0.0349
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
@@ -66,7 +72,7 @@ joints:
   - position: 1.2043
     time_from_start: 2357100000
     velocity: 0.0
-  - position: 0.911
+  - position: 0.925
     time_from_start: 3000000000
     velocity: 0.0
   right_knee:
@@ -79,7 +85,7 @@ joints:
   - position: 1.7453
     time_from_start: 2014300000
     velocity: 0.0
-  - position: 1.2566
+  - position: 1.2043
     time_from_start: 3000000000
     velocity: 0.0
 name: right_open

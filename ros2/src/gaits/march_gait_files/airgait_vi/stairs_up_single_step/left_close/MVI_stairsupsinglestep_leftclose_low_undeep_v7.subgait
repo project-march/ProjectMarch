@@ -1,4 +1,4 @@
-description: Stairs up height of 22 cm and depth of 20, based on cybathlon_v6
+description: Version 6 with HAA
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -10,8 +10,11 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0349
+  - position: -0.0873
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0349
     time_from_start: 3000000000
@@ -20,9 +23,9 @@ joints:
   - position: 0.0873
     time_from_start: 0
     velocity: 0.2036
-  - position: 1.0472
-    time_from_start: 890000000
-    velocity: 0.0
+  - position: 0.8727
+    time_from_start: 1200000000
+    velocity: -0.5236
   - position: 0.0873
     time_from_start: 2000000000
     velocity: 0.0
@@ -33,9 +36,9 @@ joints:
   - position: 0.2443
     time_from_start: 0
     velocity: 0.8145
-  - position: 1.8391
-    time_from_start: 847000000
-    velocity: 0.0
+  - position: 1.5716
+    time_from_start: 1003400000
+    velocity: -0.5236
   - position: 0.0
     time_from_start: 2000000000
     velocity: 0.0
@@ -50,14 +53,17 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0349
     time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.2915
+  - position: 0.925
     time_from_start: 0
     velocity: 0.0
   - position: 0.0873
@@ -67,11 +73,11 @@ joints:
     time_from_start: 3000000000
     velocity: 0.0
   right_knee:
-  - position: 1.6232
+  - position: 1.2043
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 2200000000
+    time_from_start: 2000000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3000000000

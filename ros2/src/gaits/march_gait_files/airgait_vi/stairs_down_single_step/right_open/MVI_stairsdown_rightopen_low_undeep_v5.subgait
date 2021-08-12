@@ -1,4 +1,4 @@
-description: Stairs down of MVI for the stair with a heigth of 12 and depth op 20
+description: Version 4 with HAA
 duration: 2500000000
 gait_type: stairs_like
 joints:
@@ -13,27 +13,30 @@ joints:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
+  - position: -0.0524
     time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.8576
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
-  - position: 1.1345
-    time_from_start: 1200000000
+  - position: 0.3491
+    time_from_start: 1250000000
     velocity: 0.0
-  - position: -0.1745
+  - position: 0.8576
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
-  - position: 1.3963
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 1.5708
-    time_from_start: 1200000000
-    velocity: 0.0
-  - position: 0.0
+  - position: 0.5411
+    time_from_start: 937500000
+    velocity: -0.2792
+  - position: 0.5236
+    time_from_start: 1250000000
+    velocity: 0.1397
+  - position: 1.3963
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -47,27 +50,30 @@ joints:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.4363
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
-  - position: 0.2618
+  - position: 0.6109
     time_from_start: 893700000
-    velocity: 0.0
-  - position: -0.1745
+    velocity: 0.5586
+  - position: 0.7854
+    time_from_start: 1750000000
+    velocity: -0.2792
+  - position: 0.384
     time_from_start: 2500000000
     velocity: 0.0
   right_knee:
-  - position: 0.3316
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start: 1833300000
-    velocity: 0.0
-  - position: 0.0
+  - position: 1.2217
+    time_from_start: 937500000
+    velocity: -0.4189
+  - position: 0.3316
     time_from_start: 2500000000
     velocity: 0.0
-name: left_close
+name: right_open
