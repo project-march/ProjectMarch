@@ -17,14 +17,14 @@ public:
     // Initialize a Joint with motor controller and without temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController.
-    Joint(std::string name, int net_number, bool allow_actuation,
+    Joint(std::string name, int net_number,
         std::unique_ptr<MotorController> motor_controller);
 
     // Initialize a Joint with motor controller and temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController. Temperature ges may be a nullptr, since a Joint may have
     // a Temperature ges.
-    Joint(std::string name, int net_number, bool allow_actuation,
+    Joint(std::string name, int net_number,
         std::unique_ptr<MotorController> motor_controller,
         std::unique_ptr<TemperatureGES> temperature_ges);
 
@@ -50,13 +50,12 @@ public:
 
     // Enable actuation for this joint
     // Returns an optional wait duration
-    std::optional<ros::Duration> enableActuation();
+    void enableActuation();
 
     // Set initial encoder values
     void readFirstEncoderValues(bool operational_check);
 
-    // Actuate the joint if allow_actuation is true
-    // Will throw a HardwareException if canActuate() is false
+    // Actuate the joint
     void actuate(float target);
 
     // Get the position and velocity of the joint
@@ -67,7 +66,6 @@ public:
     std::string getName() const;
     int getNetNumber() const;
     bool canActuate() const;
-    void setAllowActuation(bool allow_actuation);
 
     // A joint must have a MotorController
     std::unique_ptr<MotorController>& getMotorController();
@@ -85,8 +83,7 @@ public:
                 || (!lhs.motor_controller_ && !rhs.motor_controller_))
             && ((lhs.temperature_ges_ && rhs.temperature_ges_
                     && *lhs.temperature_ges_ == *rhs.temperature_ges_)
-                || (!lhs.temperature_ges_ && !rhs.temperature_ges_))
-            && lhs.allow_actuation_ == rhs.allow_actuation_;
+                || (!lhs.temperature_ges_ && !rhs.temperature_ges_));
     }
 
     friend bool operator!=(const Joint& lhs, const Joint& rhs)
@@ -97,7 +94,6 @@ public:
     friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
     {
         os << "name: " << joint.name_ << ", "
-           << "allowActuation: " << joint.allow_actuation_ << ", "
            << "MotorController: " << *joint.motor_controller_;
         os << ", temperatureges: ";
         if (joint.hasTemperatureGES()) {
@@ -111,7 +107,6 @@ public:
 private:
     const std::string name_;
     const int net_number_;
-    bool allow_actuation_ = false;
 
     // Keep track of the position and velocity of the joint, updated by
     // readEncoders()

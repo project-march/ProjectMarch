@@ -26,12 +26,24 @@ bool ModelPredictiveControllerInterface::init(
     nh.getParam("joints", joint_names);
 
     std::vector<std::string> pid_joint_names;
-    nh.getParam("pid_joints", pid_joint_names);
-    num_pid_joints_ = pid_joint_names.size();
+    if (nh.hasParam("pid_joints")) {
+        nh.getParam("pid_joints", pid_joint_names);
+        num_pid_joints_ = pid_joint_names.size();
+    } else {
+        // Assume there are no pid joints
+        num_pid_joints_ = 0;
+    }
+    pid_command_.resize(num_pid_joints_);
 
     std::vector<std::string> mpc_joint_names;
-    nh.getParam("mpc_joints", mpc_joint_names);
-    num_mpc_joints_ = mpc_joint_names.size();
+    if (nh.hasParam("mpc_joints")) {
+        nh.getParam("mpc_joints", mpc_joint_names);
+        num_mpc_joints_ = mpc_joint_names.size();
+    } else {
+        // Assume all joints use mpc
+        mpc_joint_names = joint_names;
+        num_mpc_joints_ = mpc_joint_names.size();
+    }
 
     // Determine which joints use mpc and which use pid
     joint_uses_mpc_.resize(joint_names.size());
@@ -50,6 +62,8 @@ bool ModelPredictiveControllerInterface::init(
     // Initialize desired inputs
     desired_inputs.reserve(ACADO_NU);
     desired_inputs.resize(ACADO_NU, 0.0);
+    desired_inputs[0] = 3.0;
+    desired_inputs[1] = 3.0;
 
     // Initialize state and reference vectors
     initial_state.reserve(ACADO_NX);
@@ -72,7 +86,7 @@ bool ModelPredictiveControllerInterface::init(
     for (unsigned int i = 0; i < pids_.size(); ++i) {
         // Node handle to PID gains
         ros::NodeHandle joint_nh(
-            nh, std::string("gains/") + pid_joint_names[i]);
+            nh, std::string(/*__s=*/"gains/") + pid_joint_names[i]);
 
         // Init PID gains from ROS parameter server
         pids_[i].reset(new control_toolbox::Pid());
@@ -332,13 +346,10 @@ void ModelPredictiveControllerInterface::updateCommand(
     mpc_command = model_predictive_controller_->calculateControlInput();
 
     // Calculate pid command
-    std::vector<double> pid_command;
-    pid_command.resize(num_pid_joints_);
-
     int pid_index = 0;
     for (int i = 0; i < num_joints_; ++i) {
         if (!joint_uses_mpc_[i]) {
-            pid_command[pid_index] = pids_[pid_index]->computeCommand(
+            pid_command_[pid_index] = pids_[pid_index]->computeCommand(
                 state_error.position[i], state_error.velocity[i], period);
             pid_index++;
         }
@@ -357,7 +368,7 @@ void ModelPredictiveControllerInterface::updateCommand(
 
             mpc_index++;
         } else {
-            (*joint_handles_ptr_)[i].setCommand(pid_command[pid_index]);
+            (*joint_handles_ptr_)[i].setCommand(pid_command_[pid_index]);
             pid_index++;
         }
     }

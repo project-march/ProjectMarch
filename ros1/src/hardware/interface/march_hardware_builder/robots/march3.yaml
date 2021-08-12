@@ -4,7 +4,6 @@ march3:
   joints:
     - right_hip:
         actuationMode: position
-        allowActuation: true
         imotioncube:
           slaveIndex: 8
           absoluteEncoder:
@@ -16,7 +15,6 @@ march3:
 
     - left_hip:
         actuationMode: position
-        allowActuation: true
         imotioncube:
           slaveIndex: 3
           absoluteEncoder:
@@ -28,7 +26,6 @@ march3:
 
     - right_knee:
         actuationMode: position
-        allowActuation: true
         imotioncube:
           slaveIndex: 10
           absoluteEncoder:
@@ -40,7 +37,6 @@ march3:
 
     - left_knee:
         actuationMode: position
-        allowActuation: true
         imotioncube:
           slaveIndex: 5
           absoluteEncoder:
@@ -52,7 +48,6 @@ march3:
 
     - right_ankle:
         actuationMode: position
-        allowActuation: true
         imotioncube:
           slaveIndex: 12
           absoluteEncoder:
@@ -64,7 +59,6 @@ march3:
 
     - left_ankle:
         actuationMode: position
-        allowActuation: true
         imotioncube:
           slaveIndex: 7
           absoluteEncoder:

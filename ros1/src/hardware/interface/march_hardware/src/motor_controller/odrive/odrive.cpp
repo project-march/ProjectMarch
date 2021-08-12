@@ -35,25 +35,31 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     this->is_incremental_encoder_more_precise_ = true;
 }
 
+std::optional<ros::Duration> ODrive::reset()
+{
+    setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
+    return std::make_optional<ros::Duration>(1);
+}
+
 std::optional<ros::Duration> ODrive::prepareActuation()
 {
     if (!index_found_
         && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-        return ros::Duration(/*t=*/20);
+        return ros::Duration(/*t=*/10);
     } else {
         return std::nullopt;
     }
 }
 
-std::optional<ros::Duration> ODrive::enableActuation()
+void ODrive::enableActuation()
 {
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-        return ros::Duration(/*t=*/5);
-    } else {
-        return std::nullopt;
     }
+
+    // Reset target torque
+    actuateTorque(/*target_torque=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -155,17 +161,6 @@ float ODrive::getTemperature()
         ->read32(ODrivePDOmap::getMISOByteOffset(
             ODriveObjectName::Temperature, axis_))
         .f;
-}
-
-bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
-{
-    // No action is needed as the DieBoSlave makes sure the slave is ready
-    // when etherCAT connection is made.
-    return false;
-}
-
-void ODrive::reset(SdoSlaveInterface& /*sdo*/)
-{
 }
 
 ODriveAxisState ODrive::getAxisState()

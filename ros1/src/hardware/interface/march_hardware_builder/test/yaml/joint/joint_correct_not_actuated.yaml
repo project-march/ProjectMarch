@@ -1,4 +1,3 @@
-allowActuation: false
 motor_controller:
   type: imotioncube
   slaveIndex: 2

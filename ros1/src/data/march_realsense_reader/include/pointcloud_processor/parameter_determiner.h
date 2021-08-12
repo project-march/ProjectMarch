@@ -217,6 +217,10 @@ protected:
     bool getMedianHeightCloud(
         const PointNormalCloud::Ptr& cloud, float& median_height);
 
+    // Transform valid gait information into a parameter
+    float calculateParameter(const float& valid_value,
+        const float& minimum_value, const float& maximum_val);
+
     // Trim exo support cloud to only contain reachable points
     void getValidExoSupport(
         const PointNormalCloud::Ptr& potential_exo_support_points,
@@ -237,6 +241,7 @@ protected:
     float max_x_stairs {};
     float min_z_stairs {};
     float max_z_stairs {};
+    float allowed_deviation_from_reachable_stair {};
     float min_x_stairs_world {};
     float max_x_stairs_world {};
     float min_z_stairs_world {};
@@ -250,9 +255,10 @@ protected:
     float min_ramp_search {};
     float max_slope {};
     float min_slope {};
-    float ramp_min_search_area {};
+    float allowed_deviation_from_reachable_ramp {};
     float min_sit_height {};
     float max_sit_height {};
+    float allowed_deviation_from_reachable_bench {};
     float min_sit_height_world {};
     float max_sit_height_world {};
     float min_x_search_sit {};

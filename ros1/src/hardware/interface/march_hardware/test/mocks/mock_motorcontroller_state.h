@@ -10,6 +10,11 @@ public:
     {
     }
 
+    bool dataIsValid() const override
+    {
+        return true;
+    }
+
     bool isOperational() const override
     {
         return true;

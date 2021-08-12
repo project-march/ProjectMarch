@@ -55,7 +55,7 @@ public:
 
     // Override functions for actuating the IMotionCube
     std::optional<ros::Duration> prepareActuation() override;
-    std::optional<ros::Duration> enableActuation() override;
+    void enableActuation() override;
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;
 
@@ -96,7 +96,7 @@ public:
 protected:
     // Override protected functions from Slave class
     bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
-    void reset(SdoSlaveInterface& sdo) override;
+    void resetSlave(SdoSlaveInterface& sdo) override;
 
     // Override protected functions from MotorController class
     float getAbsolutePositionUnchecked() override;

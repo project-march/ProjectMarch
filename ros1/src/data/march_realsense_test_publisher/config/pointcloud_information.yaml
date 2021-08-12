@@ -15,6 +15,51 @@
 #
 # Whether the pointcloud has been taken from the front camera position or the back camera position
 # bool from_back_camera
+bankje-centrum-01-08-2021-14:33:44.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+bankje-centrum-01-08-2021-14:33:48.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+bankje-centrum-01-08-2021-14:33:55.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+bankje-centrum-01-08-2021-14:33:58.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+bankje-centrum-met-merel-01-08-2021-14:34:10.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+route-bankje-centrum-03-08-2021-14:37:58.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+route-bankje-centrum-03-08-2021-14:38:14.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+route-bankje-centrum-03-08-2021-14:39:03.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+route-bankje-centrum-03-08-2021-14:39:26.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
 chair1.ply:
   realsense_category: 4
   subgait_name: "right_open"
@@ -140,3 +185,14 @@ stairs_down2.ply:
   subgait_name: "right_open"
   from_back_camera: false
   from_realsense_viewer: true
+zitblok-centrum-01-08-2021-13:38:52.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+zitblok-centrum-voor-uitvoeren-01-08-2021-14:35:25.ply:
+  realsense_category: 4
+  subgait_name: "prepare_sit_down"
+  from_back_camera: true
+  from_realsense_viewer: false
+

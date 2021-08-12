@@ -312,6 +312,7 @@ class RealsenseGait(SetpointsGait):
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
+        self._should_stop = False
         if first_subgait_delay is None:
             first_subgait_delay = Duration(0)
         self._start_time = self._gait_selection.get_clock().now() + first_subgait_delay
@@ -421,6 +422,7 @@ class RealsenseGait(SetpointsGait):
             )
         try:
             self.set_subgaits(new_subgaits, self._gait_selection)
+
         except NonValidGaitContentError:
             return False
 

@@ -1,11 +1,8 @@
-# this file represents the controller being used
 march:
-  # Publish all joint states -----------------------------------
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 50
-
   controller:
+    joint_state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 50
     trajectory:
       type: model_predictive_trajectory_controller/JointTrajectoryController
       N: 20

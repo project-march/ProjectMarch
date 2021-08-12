@@ -53,19 +53,33 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
 
-    bool success = true;
-
     for (region_index_ = 0; region_index_ < points_vector_->size();
          region_index_++) {
-        success &= getCHullFromRegion();
+        bool success = getCHullFromRegion();
+
+        // Add the hull to a vector together with its plane coefficients and
+        // polygons if it is valid
+        if (hull_->points.size() == 0) {
+            ROS_WARN_STREAM("Hull of region "
+                << region_index_
+                << " Consists of zero points, not adding it the the hull "
+                   "vector.");
+        } else if (!success) {
+            ROS_WARN_STREAM("Computation of hull of region "
+                << region_index_
+                << " went wrong, not adding it the the hull vector.");
+        } else {
+            addCHullToVector();
+        }
     }
 
     ROS_DEBUG_STREAM("The number of hulls found is: " << hull_vector_->size());
     if (hull_vector_->size() != plane_coefficients_vector_->size()
         || hull_vector_->size() != polygon_vector_->size()) {
-        ROS_WARN_STREAM("The hull vector does not have the same size as either "
-                        "the plane coefficients vector or"
-                        "the polygon vector. Returning with false.");
+        ROS_ERROR_STREAM(
+            "The hull vector does not have the same size as either "
+            "the plane coefficients vector or"
+            "the polygon vector. Returning with false.");
         return false;
     } else if (hull_vector_->size() == 0) {
         ROS_ERROR_STREAM("No hulls were found. Returning with false.");
@@ -80,7 +94,7 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
 
-    return success;
+    return true;
 }
 void CHullFinder::readParameters(
     march_realsense_reader::pointcloud_parametersConfig& config)
@@ -110,16 +124,6 @@ bool CHullFinder::getCHullFromRegion()
 
     // Create the hull
     success &= getCHullFromProjectedRegion();
-
-    // Add the hull to a vector together with its plane coefficients and
-    // polygons
-    success &= addCHullToVector();
-
-    if (hull_->points.size() == 0) {
-        ROS_ERROR_STREAM(
-            "Hull of region " << region_index_ << " Consists of zero points");
-        return false;
-    }
 
     return success;
 }
@@ -199,13 +203,11 @@ bool CHullFinder::getCHullFromProjectedRegion()
 }
 
 // Add the hull to a vector together with its plane coefficients and polygons
-bool CHullFinder::addCHullToVector()
+void CHullFinder::addCHullToVector()
 {
     hull_vector_->push_back(hull_);
     polygon_vector_->push_back(polygon_);
     plane_coefficients_vector_->push_back(plane_coefficients_);
-
-    return true;
 }
 
 // Calculate the average normal and point of a region
@@ -240,7 +242,7 @@ bool CHullFinder::getAveragePointAndNormal(
         success &= linear_algebra_utilities::normalize3DVector<double>(
             average_normal);
     } else {
-        ROS_ERROR_STREAM("Region with index "
+        ROS_WARN_STREAM("Region with index "
             << region_index_
             << " does not have the same number of points and normals, "
                " unable to calculate average point and normal. "
