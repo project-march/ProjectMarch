@@ -6,8 +6,8 @@ if os.getenv("CI"):
 else:
     import subprocess  # noqa: S404
 
-    g = ["git", "branch", "--show-current"]
-    command = subprocess.run(g, capture_output=True)  # noqa: S603, S607
+    git = ["git", "branch", "--show-current"]
+    command = subprocess.run(git, capture_output=True)  # noqa: S603, S607
     branch_name = str(command.stdout, "utf-8").strip()
 
 extensions = [
@@ -22,7 +22,7 @@ todo_include_todos = True
 master_doc = "index"
 
 project = "Project MARCH"
-copyright = "2021, Project MARCH"  # noqa: A001
+copyright = "2021, Project MARCH"  # noqa: A001, VNE003
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

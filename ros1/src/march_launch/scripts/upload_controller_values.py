@@ -4,6 +4,8 @@ from typing import List
 import rospy
 from urdf_parser_py import urdf
 
+from contextlib import suppress
+
 
 def get_params_for_actuation(joint: str) -> List[str]:
     """
@@ -56,7 +58,5 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
+    with suppress(rospy.ROSInterruptException):
         main()
-    except rospy.ROSInterruptException:
-        pass

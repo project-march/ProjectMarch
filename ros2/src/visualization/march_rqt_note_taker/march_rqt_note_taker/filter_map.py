@@ -8,7 +8,9 @@ class FilterMap:
     """Filter class that can add filters and mappings for accepting logs"""
 
     def __init__(self):
-        self._filter_maps: List[Tuple[Callable[[Log], bool], Callable[[str], Any]]] = []
+        self._filter_maps: List[  # noqa: TAE002
+            Tuple[Callable[[Log], bool], Callable[[str], Any]]
+        ] = []
 
     def add_filter(
         self,

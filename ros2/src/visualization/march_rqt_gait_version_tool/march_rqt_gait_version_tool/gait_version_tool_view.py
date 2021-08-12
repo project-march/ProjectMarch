@@ -206,7 +206,7 @@ class GaitVersionToolView(QWidget):
             subgait_name = subgait_label.text()
             if subgait_name != "Unused":
                 try:
-                    if "parametric" == str(subgait_menu.currentText()):
+                    if str(subgait_menu.currentText()) == "parametric":
                         versions = self.available_gaits[gait_name][subgait_name]
                         if self._show_parametric_pop_up(versions):
                             if self._parametric_pop_up.four_subgait_interpolation:
@@ -261,7 +261,7 @@ class GaitVersionToolView(QWidget):
         :param color_tag:
             The tag which represents the color of the text in the screen (info, warning, error)
         """
-        if level == LogLevel.SUCCESS or level == LogLevel.INFO:
+        if level in [LogLevel.SUCCESS, LogLevel.INFO]:
             self._controller._node.get_logger().info(msg)
         elif level == LogLevel.WARNING:
             self._controller._node.get_logger().warn(msg)

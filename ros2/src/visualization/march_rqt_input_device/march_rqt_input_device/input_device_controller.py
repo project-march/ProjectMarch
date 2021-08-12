@@ -105,15 +105,18 @@ class InputDeviceController:
 
         :type msg: GaitInstructionResponse
         """
-        if msg.result == GaitInstructionResponse.GAIT_ACCEPTED:
-            if callable(self.accepted_cb):
-                self.accepted_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_FINISHED:
-            if callable(self.finished_cb):
-                self.finished_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_REJECTED:
-            if callable(self.rejected_cb):
-                self.rejected_cb()
+        if msg.result == GaitInstructionResponse.GAIT_ACCEPTED and callable(
+            self.accepted_cb
+        ):
+            self.accepted_cb()
+        elif msg.result == GaitInstructionResponse.GAIT_FINISHED and callable(
+            self.finished_cb
+        ):
+            self.finished_cb()
+        elif msg.result == GaitInstructionResponse.GAIT_REJECTED and callable(
+            self.rejected_cb
+        ):
+            self.rejected_cb()
 
     def _current_gait_callback(self, msg: String) -> None:
         """
