@@ -20,8 +20,7 @@
     <exec_depend>march_data_collector</exec_depend>
     <exec_depend>march_gain_scheduling</exec_depend>
     <exec_depend>march_hardware_interface</exec_depend>
-    <exec_depend>march_moveit</exec_depend>
-    <exec_depend>march_parameter_server</exec_depend>
+    <exec_depend>march_moveit</exec_depend>f
 
     <exec_depend>realsense2_camera</exec_depend>
     <exec_depend>rviz</exec_depend>
