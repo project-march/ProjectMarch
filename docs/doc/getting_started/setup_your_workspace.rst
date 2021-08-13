@@ -126,25 +126,43 @@ In order to run ROS2, you have to source both ROS2 Foxy and the ROS2 MARCH packa
 
 Convenient aliases
 ^^^^^^^^^^^^^^^^^^
-These aliases provide shortcuts to easily build and run the code. It is recommended you add them to your ~/.bashrc file.
-The 'bash -i -c' makes sure that the sourcing happens only within the command. This allows you to use ros1 and ros2
-aliases in the same terminal without problems. However, if you use one of the first 4 aliases, this will make the
-terminal usable for only ROS1 or only ROS2. For most cases, it is advised to have three separate terminals, one used
-for all ROS1 building and running, one for the bridge and one for all ROS2 code
+These aliases provide shortcuts to easily build and run the code, and some other utilities. It is recommended you add them to your ~/.bashrc file.
 
 .. code:: bash
 
+    # Source ROS distribution
     alias snoe='source /opt/ros/noetic/local_setup.bash'
     alias sfox='source /opt/ros/foxy/local_setup.bash'
 
+    # Source MARCH packages
     alias sros1='source ~/march/ros1/install/local_setup.bash'
     alias sros2='source ~/march/ros2/install/local_setup.bash'
 
-    alias march_build_ros1='bash -i -c "snoe && cd ~/march/ros1 && colcon build"'
-    alias march_run_ros1='bash -i -c "snoe && sros1 && roslaunch march_launch march_simulation.launch"'
+    # Navigate to MARCH directory
+    alias cm1='cd ~/march/ros1/'
+    alias cm='cd ~/march/'
+    alias cm2='cd ~/march/ros2/'
 
-    alias march_build_ros2='bash -i -c "sfox && cd ~/march/ros2 && colcon build"'
-    alias march_run_ros2='bash -i -c "sfox && sros2 && ros2 launch march_launch march_simulation.launch.py"'
+    # Build and run ROS1
+    alias march_build_ros1='snoe && sros1 && cm1 && colcon build'
+    alias march_run_ros1_sim='snoe && sros1 && roslaunch march_launch march_simulation.launch'
+    alias march_run_ros1_airgait='snoe && sros1 && roslaunch march_launch march.launch if_name:=enp2s0f0'
+    alias march_run_ros1_groundgait='march_run_ros1_airgait ground_gait:=true gain_tuning:=groundgait'
+    alias march_run_ros1_training='march_run_ros1_groundgait gain_tuning:=training'
 
-    alias march_build_bridge='bash -i -c "snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs"'
-    alias march_run_bridge='bash -i -c "snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics"'
+    # Build and run ROS2
+    alias march_build_ros2='sfox && cm2 && colcon build'
+    alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
+    alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py'
+
+    # Build and run the bridge
+    alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
+    alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge parameter_bridge'
+
+    # Install dependencies
+    alias install_dep_ros1='cm1 && snoe && rosdep install --from-paths src --ignore-src -y --rosdistro noetic'
+    alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-src -y --rosdistro foxy'
+
+    # Format code
+    alias format_cpp='cm && python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file -i'
+    alias format_py='cm && black .'

@@ -26,6 +26,7 @@ class GaitGeneratorController:
 
         # Default values
         self.gait_directory = None
+        self.current_gait_path = None
 
         self.playback_speed = 100
         self.time_slider_thread = None
@@ -264,7 +265,7 @@ class GaitGeneratorController:
             self.start_time_slider_thread()
 
     def import_gait(self):
-        file_name, f = self.view.open_file_dialogue()
+        file_name, f = self.view.open_file_dialogue(self.current_gait_path)
 
         if file_name != "":
             gait = ModifiableSubgait.from_file(self.robot, file_name, self)
@@ -289,13 +290,15 @@ class GaitGeneratorController:
         if was_playing:
             self.start_time_slider_thread()
 
-        # The gait directory of the selected gait is always 3 directories behind the .subgait file
+        # The gait directory of the selected gait is always 3 directories
+        # behind the .subgait file
         # (gait_directory/gait/subgait/version.subgait).
-        self.gait_directory = os.path.dirname(
-            os.path.dirname(os.path.dirname(file_name))
-        )
+        self.current_gait_path = os.path.dirname(os.path.dirname(file_name))
+        self.gait_directory = os.path.dirname(self.current_gait_path)
+
         rospy.loginfo("Setting gait directory to %s", str(self.gait_directory))
-        # Display only the actual directory under which gaits will be saved for readability
+        # Display only the actual directory under
+        # which gaits will be saved for readability
         gait_directory_text = "gait directory: " + os.path.basename(self.gait_directory)
         self.view.change_gait_directory_button.setText(gait_directory_text)
 

@@ -1,6 +1,7 @@
 #ifndef MARCH_REGION_CREATOR_H
 #define MARCH_REGION_CREATOR_H
 
+#include "utilities/realsense_category_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl/segmentation/region_growing.h>
@@ -19,8 +20,9 @@ class RegionCreator {
 public:
     explicit RegionCreator(bool debugging);
     // This function is required to be implemented by any region creator
-    virtual bool createRegions(PointCloud::Ptr pointcloud,
-        Normals::Ptr pointcloud_normals,
+    virtual bool createRegions(const PointCloud::Ptr pointcloud,
+        const Normals::Ptr pointcloud_normals,
+        const RealSenseCategory realsense_category,
         boost::shared_ptr<PointsVector> points_vector,
         boost::shared_ptr<NormalsVector> normals_vector)
         = 0;
@@ -37,6 +39,7 @@ public:
 protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
+    std::optional<RealSenseCategory> realsense_category_ = std::nullopt;
     boost::shared_ptr<PointsVector> points_vector_;
     boost::shared_ptr<NormalsVector> normals_vector_;
     bool debugging_;
@@ -49,8 +52,9 @@ public:
     /** Create cluster using the region growing algorithm, takes algorithm
      * configuration from the dynamic parameter server, and fills parameter
      * region_vector with clusters. **/
-    bool createRegions(PointCloud::Ptr pointcloud,
-        Normals::Ptr pointcloud_normals,
+    bool createRegions(const PointCloud::Ptr pointcloud,
+        const Normals::Ptr pointcloud_normals,
+        const RealSenseCategory realsense_category,
         boost::shared_ptr<PointsVector> points_vector,
         boost::shared_ptr<NormalsVector> normals_vector) override;
 
@@ -132,6 +136,7 @@ private:
 
     // Region Growing configuration parameters
     int number_of_neighbours;
+    int number_of_neighbours_no_seeds;
     int min_valid_cluster_size;
     int max_valid_cluster_size;
     int min_desired_cluster_size;
@@ -145,6 +150,7 @@ private:
     float tolerance_change_factor_increase;
     std::unique_ptr<RegionVector> region_vector_;
     int number_of_recursive_calls;
+    bool use_no_seed_growing;
 };
 
 #endif // MARCH_REGION_CREATOR_H
