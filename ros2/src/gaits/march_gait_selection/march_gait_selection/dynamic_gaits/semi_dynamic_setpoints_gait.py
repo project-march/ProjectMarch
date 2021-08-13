@@ -116,13 +116,11 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self.graph.graph[subgait_after_freeze.subgait_name] = {
                 "to": self.graph[(self._previous_subgait, self.graph.TO)]
             }
+            return subgait_after_freeze
         else:
             # If the current subgait was already done,
             # go to the next subgait after freeze
-            subgait_after_freeze = self.subgaits[
-                self.graph[(self._previous_subgait, self.graph.TO)]
-            ]
-        return subgait_after_freeze
+            return self.subgaits[self.graph[(self._previous_subgait, self.graph.TO)]]
 
     def _freeze_subgait(self):
         """

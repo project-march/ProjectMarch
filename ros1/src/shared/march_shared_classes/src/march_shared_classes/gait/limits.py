@@ -32,4 +32,4 @@ class Limits:
         )
 
     def __ne__(self, other):
-        return not self == other
+        return not self == other  # noqa: SIM201

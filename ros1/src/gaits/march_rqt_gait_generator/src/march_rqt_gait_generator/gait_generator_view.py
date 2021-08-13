@@ -221,11 +221,15 @@ class GaitGeneratorView(QWidget):
         )
         return answer == QMessageBox.Yes
 
-    def open_file_dialogue(self):
+    def open_file_dialogue(self, path_to_open: os.path = None):
+        if path_to_open is None:
+            path_to_open = os.path.join(
+                self.march_path, "ros2", "src", "gaits", "march_gait_files"
+            )
         return QFileDialog.getOpenFileName(
             self,
             "Select a subgait to import.",
-            os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files"),
+            path_to_open,
             "March Subgait (*.subgait)",
         )
 

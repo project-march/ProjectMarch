@@ -84,6 +84,13 @@ public:
 
     const urdf::Model& getUrdf() const;
 
+    /**
+     * Are the joints of the robot operational
+     * Calls the isOperational method of the MotorControler of the joint
+     * @return List of booleans, true when a joint is operational, false if not.
+     */
+    std::vector<bool> areJointsOperational();
+
     /** @brief Override comparison operator */
     friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)
     {

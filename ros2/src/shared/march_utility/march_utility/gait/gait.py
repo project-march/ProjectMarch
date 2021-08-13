@@ -6,7 +6,6 @@ import yaml
 from march_utility.gait.edge_position import (
     StaticEdgePosition,
     DynamicEdgePosition,
-    UnknownEdgePosition,
     EdgePosition,
 )
 from rclpy.node import Node
@@ -185,12 +184,12 @@ class Gait:
                 )
             else:
                 return StaticEdgePosition(new_edge_position_values)
-        elif isinstance(old_edge_position, UnknownEdgePosition):
+        elif isinstance(old_edge_position, DynamicEdgePosition):
+            return DynamicEdgePosition(new_edge_position_values)
+        else:
             raise NonValidGaitContentError(
                 msg="Gaits with unknown edge positions should not be updated"
             )
-        elif isinstance(old_edge_position, DynamicEdgePosition):
-            return DynamicEdgePosition(new_edge_position_values)
 
     def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait]):
         """

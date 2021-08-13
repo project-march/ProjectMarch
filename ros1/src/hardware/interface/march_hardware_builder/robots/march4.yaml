@@ -5,7 +5,6 @@ march4:
   ecatSlaveTimeout: 50
   joints:
     - left_ankle:
-        allowActuation: true
         netNumber: 8
         temperatureges: {slaveIndex: 1, byteOffset: 0}
         motor_controller:
@@ -21,7 +20,6 @@ march4:
             transmission: 200
 
     - left_hip_aa:
-        allowActuation: true
         netNumber: 5
         temperatureges: {slaveIndex: 7, byteOffset: 0}
         motor_controller:
@@ -37,7 +35,6 @@ march4:
             transmission: 200
 
     - left_hip_fe:
-        allowActuation: true
         netNumber: 6
         temperatureges: {slaveIndex: 5, byteOffset: 0}
         motor_controller:
@@ -53,7 +50,6 @@ march4:
             transmission: 101
 
     - left_knee:
-        allowActuation: true
         netNumber: 7
         temperatureges: {slaveIndex: 5, byteOffset: 4}
         motor_controller:
@@ -69,7 +65,6 @@ march4:
             transmission: 101
 
     - right_ankle:
-        allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 13, byteOffset: 0}
         motor_controller:
@@ -85,7 +80,6 @@ march4:
             transmission: 200
 
     - right_hip_aa:
-        allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 7, byteOffset: 4}
         motor_controller:
@@ -101,7 +95,6 @@ march4:
             transmission: 200
 
     - right_hip_fe:
-        allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 9, byteOffset: 0}
         motor_controller:
@@ -117,7 +110,6 @@ march4:
             transmission: 101
 
     - right_knee:
-        allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 9, byteOffset: 4}
         motor_controller:

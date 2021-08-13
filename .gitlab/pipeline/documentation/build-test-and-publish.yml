@@ -1,0 +1,57 @@
+stages:
+  - Build documentation
+  - Test documentation
+  - Publish documentation
+
+###############
+# Sphinx build #
+###############
+# Build the documentation and checks it for warnings and errors.
+Sphinx build:
+  stage: Build documentation
+  # The "$TAG" variable is set by the rules below
+  image: $CI_REGISTRY_IMAGE/sphinx:$CI_DEFAULT_BRANCH
+  before_script:
+    - cd docs
+  script:
+    - bash build_locally.sh
+  artifacts:
+    paths:
+      - docs/build/
+
+################
+# HTML proofer #
+################
+Sphinx HTML proofer:
+  stage: Test documentation
+  image:
+    name: "klakegg/html-proofer"
+    entrypoint: [""]
+  needs:
+    - job: "Sphinx build"
+      artifacts: true
+  script:
+    # This runs "htmlproofer", a tool that checks whether the generated HTML has certain properties, such as
+    #   - a valid favicon
+    #   - valid html tags
+    #   - only https images and links
+    #   - all links in the docs are still available/online
+    - "htmlproofer docs/build/ --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/search.html --hydra_config '{\"max_concurrency\": 1}' --url-ignore '#'"
+
+#########
+# Pages #
+#########
+# Upload to GitLab pages
+pages:
+  stage: Publish documentation
+  image: alpine
+  needs:
+    - job: "Sphinx build"
+      artifacts: true
+    - job: "Sphinx HTML proofer"
+  script:
+    - echo 'Publishing pages...'
+    - mv docs/build/ public/
+  artifacts:
+    paths:
+      - public

@@ -4,7 +4,6 @@ testsetup:
   ecatSlaveTimeout: 250
   joints:
     - rotational_joint:
-        allowActuation: true
         motor_controller:
           type: odrive
           actuationMode: torque

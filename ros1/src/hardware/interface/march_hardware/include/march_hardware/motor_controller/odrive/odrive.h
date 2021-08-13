@@ -47,9 +47,12 @@ public:
 
     // Override functions for actuating the ODrive
     std::optional<ros::Duration> prepareActuation() override;
-    std::optional<ros::Duration> enableActuation() override;
+    void enableActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
+
+    // Override reset function
+    std::optional<ros::Duration> reset() override;
 
     bool requiresUniqueSlaves() const override;
 
@@ -72,10 +75,6 @@ public:
     static constexpr double EFFORT_LIMIT = 30.0; // [A]
 
 protected:
-    // Override protected functions from Slave class
-    bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
-    void reset(SdoSlaveInterface& sdo) override;
-
     // Override protected functions from MotorController class
     float getAbsolutePositionUnchecked() override;
     float getIncrementalPositionUnchecked() override;
