@@ -51,6 +51,7 @@ def generate_launch_description():
                 executable="march_gait_selection",
                 output="screen",
                 name="gait_selection",
+                namespace="march",
                 parameters=[
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"gait_package": LaunchConfiguration("gait_package")},

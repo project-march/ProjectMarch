@@ -44,6 +44,7 @@ def generate_launch_description() -> LaunchDescription:
                 package="march_rqt_robot_monitor",
                 executable="march_rqt_robot_monitor_node",
                 name="march_rqt_robot_monitor_node",
+                namespace="march",
                 parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
             ),
         ]
