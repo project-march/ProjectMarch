@@ -459,7 +459,7 @@
         <!--    Attached to the hip_base, since this is most comparable to the backpack -->
         <!--    in amount of movement, the distance from hip base is based on first design.-->
         <origin xyz="-0.32 0.22 0.16" rpy="${0.5 * pi} ${48/180 * pi} ${pi}"/>
-        <!-- Rotate to be vertical and pointing down 45 degrees -->
+        <!-- Rotate to be vertical and pointing down 48 degrees -->
     </xacro:sensor_d435>
 
 
