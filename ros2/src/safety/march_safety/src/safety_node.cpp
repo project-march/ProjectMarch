@@ -11,7 +11,6 @@
 
 #include "march_shared_msgs/msg/error.hpp"
 #include "march_shared_msgs/msg/gait_instruction.hpp"
-#include "march_shared_msgs/srv/get_param_string_list.hpp"
 
 #include "march_utility/node_utils.hpp"
 

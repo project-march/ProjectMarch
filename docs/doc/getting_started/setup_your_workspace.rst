@@ -152,8 +152,8 @@ These aliases provide shortcuts to easily build and run the code, and some other
 
     # Build and run ROS2
     alias march_build_ros2='sfox && cm2 && colcon build'
-    alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py gait_directory:=airgait_vi'
-    alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py gait_directory:=airgait_vi'
+    alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
+    alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py'
 
     # Build and run the bridge
     alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'

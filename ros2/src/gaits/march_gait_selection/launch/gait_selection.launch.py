@@ -21,7 +21,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "gait_directory",
-                default_value="training-v",
+                default_value="airgait_vi",
                 description="The directory in which the gait files to use are "
                 "located, relative to the gait_package.",
             ),
@@ -51,6 +51,7 @@ def generate_launch_description():
                 executable="march_gait_selection",
                 output="screen",
                 name="gait_selection",
+                namespace="march",
                 parameters=[
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"gait_package": LaunchConfiguration("gait_package")},

@@ -21,6 +21,7 @@ def generate_launch_description():
                 package="march_fake_sensor_data",
                 executable="march_fake_sensor_data_node",
                 name="fake_sensor_data",
+                namespace="march",
                 output="screen",
                 parameters=[
                     {
