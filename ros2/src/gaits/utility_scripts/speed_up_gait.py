@@ -13,14 +13,17 @@ versions_to_speed_up = {
     "right_swing": "MVI_walk_rightswing_v9",
 }
 
+new_version_extension = "v100"
+new_description = "v9 but faster"
+
 paths_that_failed = []
 subgait_suffix = ".subgait"
 
 for subgait_name, version in versions_to_speed_up.items():
-    path = os.path.join(gait_to_speed_up, subgait_name, version + subgait_suffix)
+    read_path = os.path.join(gait_to_speed_up, subgait_name, version + subgait_suffix)
     try:
-        with open(path, "r") as subgait_file:
-            print(path)
+        with open(read_path, "r") as subgait_file:
+            print(read_path)
             content = yaml.full_load(subgait_file)
             content["duration"] = round(content["duration"] / 1.1)
             for joint in content["joints"]:
@@ -31,10 +34,12 @@ for subgait_name, version in versions_to_speed_up.items():
                     content["joints"][joint][index]["velocity"] = round(
                         setpoint["velocity"] * 1.1, 4
                     )
-
-        with open(path, "w") as subgait_file:
+        if new_version_extension != "":
+            new_version_name = version[:version.rfind("_") + 1] + new_version_extension
+        write_path = os.path.join(gait_to_speed_up, subgait_name, new_version_name + subgait_suffix)
+        with open(write_path, "w") as subgait_file:
             yaml.dump(content, subgait_file)
     except Exception as e:  # noqa: B902 PIE786
-        paths_that_failed.append(path)
+        paths_that_failed.append(read_path)
         print(e)
 print(f"the paths {paths_that_failed} failed.")
