@@ -36,6 +36,8 @@ for subgait_name, version in versions_to_speed_up.items():
                     )
         if new_version_extension != "":
             new_version_name = version[:version.rfind("_") + 1] + new_version_extension
+        if new_description != "":
+            content["description"] = new_description
         write_path = os.path.join(gait_to_speed_up, subgait_name, new_version_name + subgait_suffix)
         with open(write_path, "w") as subgait_file:
             yaml.dump(content, subgait_file)
