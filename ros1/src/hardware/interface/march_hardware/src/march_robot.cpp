@@ -110,6 +110,7 @@ bool MarchRobot::hasValidSlaves()
 {
     ::std::vector<int> motorControllerIndices;
     ::std::vector<int> temperatureSlaveIndices;
+    ::std::vector<int> pdbSlaveIndices;
 
     for (auto& joint : jointList) {
         if (joint.hasTemperatureGES()) {
@@ -122,6 +123,12 @@ bool MarchRobot::hasValidSlaves()
             = joint.getMotorController()->getSlaveIndex();
         motorControllerIndices.push_back(motorControllerSlaveIndex);
     }
+
+    if (hasPowerDistributionBoard()) {
+        int index = getPowerDistributionBoard().getSlaveIndex();
+        pdbSlaveIndices.push_back(index);
+    }
+
     // Multiple temperature sensors may be connected to the same slave.
     // Remove duplicate temperatureSlaveIndices so they don't trigger as
     // duplicates later.
@@ -139,6 +146,8 @@ bool MarchRobot::hasValidSlaves()
         motorControllerIndices.end());
     slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
         temperatureSlaveIndices.end());
+    slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(),
+        pdbSlaveIndices.end());
 
     if (slaveIndices.size() == 1) {
         ROS_INFO("Found configuration for 1 slave.");

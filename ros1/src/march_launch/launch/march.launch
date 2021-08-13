@@ -86,6 +86,7 @@
                  value="$(arg remove_fixed_joints_from_ethercat_train)"/>
             <arg name="enable_safety_controller"
                  value="$(arg enable_safety_controller)"/>
+            <arg name="jointless" value="$(arg jointless)"/>
         </include>
     </group>
 
