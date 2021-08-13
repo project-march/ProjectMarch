@@ -168,16 +168,19 @@ bool HullParameterDeterminer::determineParameters(
             case RealSenseCategory::stairs_down:
             case RealSenseCategory::stairs_up: {
                 ROS_INFO_STREAM(" --- The optimal foot location is "
-                    << output_utilities::pointToString(optimal_foot_location) << " --- ");
+                    << output_utilities::pointToString(optimal_foot_location)
+                    << " --- ");
                 break;
             }
             case RealSenseCategory::ramp_down:
             case RealSenseCategory::ramp_up: {
-                ROS_INFO_STREAM(" --- The slope of the ramp is " << ramp_slope << " --- ");
+                ROS_INFO_STREAM(
+                    " --- The slope of the ramp is " << ramp_slope << " --- ");
                 break;
             }
             case RealSenseCategory::sit: {
-                ROS_INFO_STREAM(" --- The sit height is " << sit_height << " --- ");
+                ROS_INFO_STREAM(
+                    " --- The sit height is " << sit_height << " --- ");
                 break;
             }
         }
