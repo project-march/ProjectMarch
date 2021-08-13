@@ -313,7 +313,6 @@
     <joint name="imu_joint" type="fixed">
         <parent link="${parent_name}"/>
         <child link="imu_link"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
 
     <xacro:if value="$(eval configuration == 'exoskeleton')">
