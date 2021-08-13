@@ -146,8 +146,8 @@ bool MarchRobot::hasValidSlaves()
         motorControllerIndices.end());
     slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
         temperatureSlaveIndices.end());
-    slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(),
-        pdbSlaveIndices.end());
+    slaveIndices.insert(
+        slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
 
     if (slaveIndices.size() == 1) {
         ROS_INFO("Found configuration for 1 slave.");
