@@ -397,13 +397,13 @@ void HullParameterDeterminer::initializeGaitDimensions()
     if (frame_id_to_transform_to_ == "foot_right") {
         y_deviation_foot = y_deviation_right_foot;
     } else if (frame_id_to_transform_to_ == "foot_left") {
-        y_deviation_foot = -y_devaition_right_foot;
+        y_deviation_foot = -y_deviation_right_foot;
     } else {
         ROS_WARN_STREAM("The frame id "
-            << frame_id_to_tranform_to
+            << frame_id_to_transform_to_
             << " should be either foot_right or foot_left. Unable to interpret "
                "the y_deviation_foot, setting it to 0");
-        y_devation_foot = 0;
+        y_deviation_foot = 0;
     }
 }
 

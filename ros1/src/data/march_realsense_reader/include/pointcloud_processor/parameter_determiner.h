@@ -246,8 +246,8 @@ protected:
     float max_x_stairs_world {};
     float min_z_stairs_world {};
     float max_z_stairs_world {};
-    float y_devation_right_foot {};
-    float y_devation_foot {};
+    float y_deviation_right_foot {};
+    float y_deviation_foot {};
     float foot_length_back {};
     float foot_length_front {};
     float foot_width {};
