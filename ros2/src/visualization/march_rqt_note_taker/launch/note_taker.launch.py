@@ -21,6 +21,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 executable="note_taker",
                 output="screen",
                 name="note_taker",
+                namespace="march",
                 parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
             ),
         ]
