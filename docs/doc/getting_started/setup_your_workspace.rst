@@ -144,14 +144,14 @@ These aliases provide shortcuts to easily build and run the code, and some other
     alias cm2='cd ~/march/ros2/'
 
     # Build and run ROS1
-    alias march_build_ros1='snoe && sros1 && cm1 && colcon build"'
+    alias march_build_ros1='snoe && sros1 && cm1 && colcon build'
     alias march_run_ros1_sim='snoe && sros1 && roslaunch march_launch march_simulation.launch'
     alias march_run_ros1_airgait='snoe && sros1 && roslaunch march_launch march.launch if_name:=enp2s0f0'
     alias march_run_ros1_groundgait='march_run_ros1_airgait ground_gait:=true gain_tuning:=groundgait'
     alias march_run_ros1_training='march_run_ros1_groundgait gain_tuning:=training'
 
     # Build and run ROS2
-    alias march_build_ros2='sfox && cm2 && colcon build"'
+    alias march_build_ros2='sfox && cm2 && colcon build'
     alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py gait_directory:=airgait_vi'
     alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py gait_directory:=airgait_vi'
 
