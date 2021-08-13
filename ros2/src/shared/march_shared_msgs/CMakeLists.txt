@@ -70,16 +70,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetObstacleSizeBlockLike.srv"
   "srv/GetGaitParameters.srv"
   "srv/GetMoveItTrajectory.srv"
-  "srv/GetParamStringList.srv"
-  "srv/GetParamString.srv"
-  "srv/GetParamBool.srv"
-  "srv/GetParamInt.srv"
-  "srv/GetParamFloat.srv"
-  "srv/SetParamStringList.srv"
-  "srv/SetParamString.srv"
-  "srv/SetParamBool.srv"
-  "srv/SetParamInt.srv"
-  "srv/SetParamFloat.srv"
   "srv/GetJointNames.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs
         trajectory_msgs control_msgs actionlib_msgs sensor_msgs
