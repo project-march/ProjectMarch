@@ -5,13 +5,21 @@ import yaml
 speed_up_percentage = 1.1
 
 gait_to_speed_up = "../march_gait_files/airgait_vi/walk"
-versions_to_speed_up = {
-    "left_close": "MVI_walk_leftclose_v9",
-    "left_swing": "MVI_walk_leftswing_v9",
-    "right_close": "MVI_walk_rightclose_v9",
-    "right_open": "MVI_walk_rightopen_v9",
-    "right_swing": "MVI_walk_rightswing_v9",
-}
+common_prefix = "MVI_walk_"
+common_suffix = "_v9"
+gaits = ["left_close", "left_swing", "right_close", "right_open", "right_swing"]
+versions_to_speed_up = {}
+for gait_name in gaits:
+    versions_to_speed_up[gait_name] = (
+        common_prefix + gait_name.replace("_", "") + common_suffix
+    )
+# versions_to_speed_up = {
+#     "left_close": "MVI_walk_leftclose_v9",
+#     "left_swing": "MVI_walk_leftswing_v9",
+#     "right_close": "MVI_walk_rightclose_v9",
+#     "right_open": "MVI_walk_rightopen_v9",
+#     "right_swing": "MVI_walk_rightswing_v9",
+# }
 
 new_version_extension = "v100"
 new_description = "v9 but faster"
