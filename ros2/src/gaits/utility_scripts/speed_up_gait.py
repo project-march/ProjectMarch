@@ -13,13 +13,13 @@ for gait_name in gaits:
     versions_to_speed_up[gait_name] = (
         common_prefix + gait_name.replace("_", "") + common_suffix
     )
-# versions_to_speed_up = {
-#     "left_close": "MVI_walk_leftclose_v9",
-#     "left_swing": "MVI_walk_leftswing_v9",
-#     "right_close": "MVI_walk_rightclose_v9",
-#     "right_open": "MVI_walk_rightopen_v9",
-#     "right_swing": "MVI_walk_rightswing_v9",
-# }
+# versions_to_speed_up = {  # noqa: E800
+#     "left_close": "MVI_walk_leftclose_v9",  # noqa: E800
+#     "left_swing": "MVI_walk_leftswing_v9",  # noqa: E800
+#     "right_close": "MVI_walk_rightclose_v9",  # noqa: E800
+#     "right_open": "MVI_walk_rightopen_v9",  # noqa: E800
+#     "right_swing": "MVI_walk_rightswing_v9",  # noqa: E800
+# }  # noqa: E800
 
 new_version_extension = "v100"
 new_description = "v9 but faster"
