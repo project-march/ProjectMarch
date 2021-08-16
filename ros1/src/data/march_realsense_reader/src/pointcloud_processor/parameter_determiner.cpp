@@ -395,8 +395,8 @@ void HullParameterDeterminer::initializeGaitDimensions()
         max_z_stairs *= 2;
     }
 
-    // We cannot guarantee that the camera has vision right in front of the right foot,
-    // since its vision can be blocked by the RHFE
+    // We cannot guarantee that the camera has vision right in front of the
+    // right foot, since its vision can be blocked by the RHFE
     if (frame_id_to_transform_to_ == "foot_right") {
         y_deviation_foot = y_deviation_right_foot;
     } else if (frame_id_to_transform_to_ == "foot_left") {
