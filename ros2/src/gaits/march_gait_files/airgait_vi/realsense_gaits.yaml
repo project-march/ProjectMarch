@@ -101,7 +101,7 @@ realsense_stairs_up:
       - MVI_stairsup_rightclose_low_undeep_v6
       - MVI_stairsup_rightclose_low_deep_v6
       - MVI_stairsup_rightclose_high_undeep_v6
-      - MVI_stairsup_rightclose_high_deep_v6
+      - MVI_stairsup_rightclose_high_deep_v6git
 
 realsense_sit:
   realsense_category: sit
