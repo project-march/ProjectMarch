@@ -330,11 +330,11 @@ void HullParameterDeterminer::addDebugGaitInformation()
             marker_point.y = sit_pos_y;
             marker_point.x = sit_pos_x;
 
-            marker_point.z = min_sit_height;
+            marker_point.z = min_sit_height_world;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
-            marker_point.z = max_sit_height;
+            marker_point.z = max_sit_height_world;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
