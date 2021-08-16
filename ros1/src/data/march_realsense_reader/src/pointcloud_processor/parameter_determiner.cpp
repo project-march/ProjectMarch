@@ -83,7 +83,8 @@ void HullParameterDeterminer::readParameters(
     min_slope = (float)config.parameter_determiner_min_slope;
     max_slope = (float)config.parameter_determiner_max_slope;
 
-    y_location = (float)config.parameter_determiner_y_location;
+    y_deviation_right_foot
+        = (float)config.parameter_determiner_y_deviation_right_foot;
 
     min_sit_height = (float)config.parameter_determiner_min_sit_height;
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
@@ -403,6 +404,20 @@ void HullParameterDeterminer::initializeGaitDimensions()
         min_z_stairs *= 2;
         max_z_stairs *= 2;
     }
+
+    // We cannot guarantee that the camera has vision right in front of the
+    // right foot, since its vision can be blocked by the RHFE
+    if (frame_id_to_transform_to_ == "foot_right") {
+        y_deviation_foot = y_deviation_right_foot;
+    } else if (frame_id_to_transform_to_ == "foot_left") {
+        y_deviation_foot = 0;
+    } else {
+        ROS_WARN_STREAM("The frame id "
+            << frame_id_to_transform_to_
+            << " should be either foot_right or foot_left. Unable to interpret "
+               "the y_deviation_foot, setting it to 0");
+        y_deviation_foot = 0;
+    }
 }
 
 // Updates the gait information limits after calling a transform to the fixed
@@ -417,16 +432,16 @@ bool HullParameterDeterminer::transformGaitInformation()
             // Create the points, in frame_id_to_transform_to frame,
             // with the min and max gait dimensions,
             point = point_utilities::makePointXYZ(
-                min_x_stairs, y_location, min_z_stairs);
+                min_x_stairs, y_deviation_foot, min_z_stairs);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                max_x_stairs, y_location, min_z_stairs);
+                max_x_stairs, y_deviation_foot, min_z_stairs);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                min_x_stairs, y_location, max_z_stairs);
+                min_x_stairs, y_deviation_foot, max_z_stairs);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                max_x_stairs, y_location, max_z_stairs);
+                max_x_stairs, y_deviation_foot, max_z_stairs);
             gait_information_cloud->push_back(point);
 
             // Transform to the fixed frame
@@ -1060,11 +1075,11 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 {
     if (general_most_desirable_location_is_mid) {
         most_desirable_foot_location_->x = (min_x_stairs + max_x_stairs) / 2.0F;
-        most_desirable_foot_location_->y = y_location;
+        most_desirable_foot_location_->y = y_deviation_foot;
         most_desirable_foot_location_->z = (min_z_stairs + max_z_stairs) / 2.0F;
     } else if (general_most_desirable_location_is_small) {
         most_desirable_foot_location_->x = min_x_stairs_world;
-        most_desirable_foot_location_->y = y_location;
+        most_desirable_foot_location_->y = y_deviation_foot;
         most_desirable_foot_location_->z = min_z_stairs_world;
     } else {
         ROS_ERROR_STREAM("No method for finding the general most desirable "
@@ -1139,7 +1154,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
             + (end - start) * (float)i
                 / ((float)number_of_optional_foot_locations - 1.0F);
         cloud_to_fill->points[i].x = x_location;
-        cloud_to_fill->points[i].y = y_location;
+        cloud_to_fill->points[i].y = y_deviation_foot;
         cloud_to_fill->points[i].z = 0;
     }
     transformer_->transformPointCloud(cloud_to_fill);
