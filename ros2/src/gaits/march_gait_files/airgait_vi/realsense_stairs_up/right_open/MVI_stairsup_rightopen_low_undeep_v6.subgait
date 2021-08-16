@@ -72,7 +72,7 @@ joints:
   - position: 1.2043
     time_from_start: 2357100000
     velocity: 0.0
-  - position: 0.925
+  - position: 0.9425
     time_from_start: 3000000000
     velocity: 0.0
   right_knee:
@@ -85,7 +85,7 @@ joints:
   - position: 1.7453
     time_from_start: 2014300000
     velocity: 0.0
-  - position: 1.2043
+  - position: 1.0996
     time_from_start: 3000000000
     velocity: 0.0
 name: right_open
