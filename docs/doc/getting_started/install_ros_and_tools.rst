@@ -41,37 +41,9 @@ Or use https:
 Install ROS1 Noetic
 ^^^^^^^^^^^^^^^^^^^
 
-This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/noetic/Installation/Ubuntu>`_.
+To install ROS1, just follow: `Install ROS1 Noetic <https://wiki.ros.org/noetic/Installation/Ubuntu>`_.
 
-1. First, install some tools:
-
-..  code:: bash
-
-    sudo apt install lsb-release gnupg2
-
-
-2. The next step is to setup your sources.list:
-
-.. code:: bash
-
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-
-3. Then, setup your keys:
-
-.. code:: bash
-
-    sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-
-4. If these steps went well, you should be able to install colcon and ROS Noetic:
-
-.. code:: bash
-
-    sudo apt update
-    sudo apt install python3-colcon-common-extensions
-    sudo apt install ros-noetic-desktop-full
-
-
-5. Once you have ROS installed, make sure you have the most up to date packages:
+Once you have ROS installed, make sure you have the most up to date packages:
 
 .. code:: bash
 
@@ -81,7 +53,7 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
   sudo apt update
   sudo apt full-upgrade
 
-6. Finally, the following will install any ROS1 Noetic package dependencies not already in your workspace:
+Install dependencies using rosdep:
 
 .. code:: bash
 
@@ -93,50 +65,9 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
 
 Install ROS2 Foxy
 ^^^^^^^^^^^^^^^^^
-Installing ROS2 Foxy requires some more effort than installing ROS1 Noetic.
-This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Development-Setup/>`_.
+To install ROS2, just follow: `Install ROS2 Foxy <https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Binary.html>`_.
 
-1. The first step is to make sure the right locale is set:
-
-.. code:: bash
-
-    locale  # check for UTF-8
-
-    sudo apt update && sudo apt install locales
-    sudo locale-gen en_US en_US.UTF-8
-    sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-    export LANG=en_US.UTF-8
-
-    locale  # verify settings
-
-2. Now we can add the ROS2 apt repository:
-
-.. code:: bash
-
-    sudo apt update && sudo apt install curl gnupg2 lsb-release
-    curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-
-3. And add the repository to the sources list
-
-.. code:: bash
-
-    sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
-
-4. Update your apt repository caches after setting up the repositories.
-
-.. code:: bash
-
-    sudo apt update
-    sudo apt install ros-foxy-desktop
-
-5. Install argcomplete (optional), this is used for autocompletion on command line
-
-.. code:: bash
-
-    sudo apt install -y python3-pip
-    pip3 install -U argcomplete
-
-6. Install dependencies using rosdep:
+Install dependencies using rosdep:
 
 .. code:: bash
 

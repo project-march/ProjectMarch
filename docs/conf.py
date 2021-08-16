@@ -1,14 +1,5 @@
-import os
-
 # Retrieve branch name
-if os.getenv("CI"):
-    branch_name = os.environ["TAG"]
-else:
-    import subprocess  # noqa: S404
-
-    git = ["git", "branch", "--show-current"]
-    command = subprocess.run(git, capture_output=True)  # noqa: S603, S607
-    branch_name = str(command.stdout, "utf-8").strip()
+branch_name = "main"
 
 extensions = [
     "sphinx.ext.extlinks",

@@ -113,7 +113,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
     doc/march_packages/**/README
 
 .. toctree::
-  :caption: March Packages
+  :caption: March Packages (Semi-outdated)
   :maxdepth: 4
   :hidden:
 

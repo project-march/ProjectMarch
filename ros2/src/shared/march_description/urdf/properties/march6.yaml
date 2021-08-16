@@ -110,9 +110,9 @@ joint_limits:
     resolution: 14
   left_haa:
     unit: iu
-    lower_limit: 2264
-    upper_limit: 3187
-    zero_position: 2620
+    lower_limit: 1143
+    upper_limit: 2008
+    zero_position: 1547
     resolution: 14
   right_haa:
     unit: iu
