@@ -21,3 +21,13 @@ diag_agg:
       path: Gait
       contains: ['Gait']
       remove_prefix: ['march_rqt_robot_monitor_node: ']
+    power_distribution_board:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: PDB
+      contains: ['PowerDistributionBoard']
+      remove_prefix: ['march_rqt_robot_monitor_node: PowerDistributionBoard']
+    battery:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: Battery
+      contains: ['Battery']
+      remove_prefix: ['march_rqt_robot_monitor_node: Battery']
