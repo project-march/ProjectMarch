@@ -44,7 +44,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="layout",
-                default_value="default",
+                default_value="training",
                 description="Layout .json file to use. Must be in the config directory.",
             ),
             Node(
