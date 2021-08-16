@@ -129,7 +129,9 @@ for path in Path(
                 old_stand_position_start,
             ):
                 for joint in content["joints"].keys():
-                    content["joints"][joint][0] = new_stand_position_start[joint]
+                    content["joints"][joint][0] = new_stand_position_start[
+                        joint
+                    ]  # noqa: E501
                 start_positions_set += 1
 
             if almost_equal_nested_dict(
@@ -137,7 +139,9 @@ for path in Path(
                 old_stand_position_end,
             ):
                 for joint in content["joints"].keys():
-                    content["joints"][joint][-1] = new_stand_position_end[joint]
+                    content["joints"][joint][-1] = new_stand_position_end[
+                        joint
+                    ]  # noqa: E501
                 end_positions_set += 1
             subgait_file.close()
 
