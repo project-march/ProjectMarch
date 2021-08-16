@@ -80,4 +80,3 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
 name: left_close
-version: MVI_rampdownlaststep_leftclose_steep_v2
