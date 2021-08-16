@@ -65,7 +65,7 @@ Install dependencies using rosdep:
 
 Install ROS2 Foxy
 ^^^^^^^^^^^^^^^^^
-To install ROS2, just follow: `Install ROS2 Foxy <https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Binary.html  />`_.
+To install ROS2, just follow: `Install ROS2 Foxy <https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Binary.html>`_.
 
 Install dependencies using rosdep:
 
