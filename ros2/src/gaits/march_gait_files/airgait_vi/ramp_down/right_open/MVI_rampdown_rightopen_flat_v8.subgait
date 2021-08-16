@@ -1,5 +1,5 @@
 description: v7 but faster
-duration: 1100000000
+duration: 1200000000
 gait_type: stairs_like
 joints:
   left_ankle:
@@ -7,76 +7,76 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.1745
     time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: 550000000
-    velocity: 0.239
+    time_from_start: 600000000
+    velocity: 0.2191
   - position: 0.1745
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 330000000
+    time_from_start: 360000000
     velocity: 0.0
   - position: 0.6981
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 183333334
+    time_from_start: 200000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: 916666666
+    time_from_start: 1000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0349
     time_from_start: 0
     velocity: 0.0
   - position: 0.0349
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.1745
     time_from_start: 0
     velocity: 0.0
   - position: 0.3491
-    time_from_start: 330061111
-    velocity: 0.396
+    time_from_start: 360100000
+    velocity: 1.0181
   - position: 0.3665
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
   right_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.6981
-    time_from_start: 330000000
+  - position: 0.6108
+    time_from_start: 445700000
     velocity: 0.0
   - position: 0.1998
-    time_from_start: 770000000
+    time_from_start: 840000000
     velocity: 0.0
   - position: 0.2065
-    time_from_start: 1100000000
+    time_from_start: 1200000000
     velocity: 0.0
 name: right_open
