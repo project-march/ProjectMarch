@@ -19,22 +19,22 @@ gaits:
     right_open: MVI_rampup_singlestep_rightopen_flat_v13
 
   stairs_up:
-    left_close: MVI_stairsup_leftclose_cybathlon_v4
-    left_swing: MVI_stairsup_leftswing_cybathlon_v4
-    right_close: MVI_stairsup_rightclose_cybathlon_v4
-    right_open: MVI_stairsup_rightopen_cybathlon_v4
-    right_swing: MVI_stairsup_rightswing_cybathlon_v4
+    left_close: MVI_stairsup_leftclose_high_undeep_v6
+    left_swing: MVI_stairsup_leftswing_high_undeep_v6
+    right_close: MVI_stairsup_rightclose_high_undeep_v6
+    right_open: MVI_stairsup_rightopen_high_undeep_v6
+    right_swing: MVI_stairsup_rightswing_high_undeep_v6
 
   stairs_up_single_step:
-    right_open: MVI_stairsupsinglestep_rightopen_high_undeep_v7
-    left_close: MVI_stairsupsinglestep_leftclose_high_undeep_v7
+    right_open: MVI_stairsupsinglestep_rightopen_high_undeep_v6
+    left_close: MVI_stairsupsinglestep_leftclose_high_undeep_v6
 
   stairs_down:
-    left_close: MVI_stairsdown_leftclose_cybathlon_v2
-    left_swing: MVI_stairsdown_leftswing_cybathlon_v2
-    right_close: MVI_stairsdown_rightclose_cybathlon_v2
-    right_open: MVI_stairsdown_rightopen_cybathlon_v2
-    right_swing: MVI_stairsdown_rightswing_cybathlon_v2
+    left_close: MVI_stairsdown_leftclose_high_undeep_v4
+    left_swing: MVI_stairsdown_leftswing_high_undeep_v4
+    right_swing: MVI_stairsdown_rightswing_high_undeep_v4
+    right_close: MVI_stairsdown_rightclose_high_undeep_v4
+    right_open: MVI_stairsdown_rightopen_high_undeep_v4
 
   stairs_down_single_step:
     left_close: MVI_stairsdownsinglestep_leftclose_cybathlon_v3
