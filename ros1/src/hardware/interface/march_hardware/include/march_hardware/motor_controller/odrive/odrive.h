@@ -72,7 +72,7 @@ public:
     float getTemperature();
 
     double getEffortLimit() override;
-    static constexpr double EFFORT_LIMIT = 30.0; // [A]
+    static constexpr double EFFORT_LIMIT = 35.0; // [A]
 
 protected:
     // Override protected functions from MotorController class
