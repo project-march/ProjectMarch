@@ -56,7 +56,7 @@ joints:
     velocity: 0.0
   - position: 0.0873
     time_from_start: 1800000000
-    velocity: 0.2424
+    velocity: 0.2036
   right_knee:
   - position: 1.6232
     time_from_start: 0
@@ -66,5 +66,5 @@ joints:
     velocity: 0.0
   - position: 0.2443
     time_from_start: 1800000000
-    velocity: 0.9696
+    velocity: 0.8145
 name: left_swing

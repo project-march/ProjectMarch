@@ -27,7 +27,7 @@ realsense_stairs_down:
   dimensions: 2
   subgaits:
     right_open:
-      - MVI_stairsdown_rightopen_low_undeep_4
+      - MVI_stairsdown_rightopen_low_undeep_v4
       - MVI_stairsdown_rightopen_low_deep_v4
       - MVI_stairsdown_rightopen_high_undeep_v4
       - MVI_stairsdown_rightopen_high_deep_v4
@@ -101,7 +101,7 @@ realsense_stairs_up:
       - MVI_stairsup_rightclose_low_undeep_v6
       - MVI_stairsup_rightclose_low_deep_v6
       - MVI_stairsup_rightclose_high_undeep_v6
-      - MVI_stairsup_rightclose_high_deep_v6git
+      - MVI_stairsup_rightclose_high_deep_v6
 
 realsense_sit:
   realsense_category: sit
