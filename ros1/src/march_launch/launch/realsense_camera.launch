@@ -20,6 +20,7 @@
 <!--    Determines whether camera info is printed to the terminal,
         change this to `screen` if you  want all output-->
     <arg name="camera_output" default="log"/>
+    <arg name="imu_to_use" default="back"/>
 
     <arg name="enable_fisheye"          default="false"/>
     <arg name="depth_width"             default="640"/>
@@ -38,10 +39,10 @@
 
     <arg name="gyro_fps"                default="400"/>
     <arg name="accel_fps"               default="250"/>
-    <arg name="enable_gyro"             default="true"/>
-    <arg name="enable_accel"            default="true"/>
-    <arg name="enable_gyro_camera_back" default="false"/>
-    <arg name="enable_accel_camera_back" default="false"/>
+    <arg name="enable_gyro"             default="$(eval imu_to_use == 'front')"/>
+    <arg name="enable_accel"            default="$(eval imu_to_use == 'front')"/>
+    <arg name="enable_gyro_camera_back" default="$(eval imu_to_use == 'back')"/>
+    <arg name="enable_accel_camera_back" default="$(eval imu_to_use == 'back')"/>
 
     <arg name="enable_pointcloud"         default="true"/>
     <arg name="pointcloud_texture_stream" default="RS2_STREAM_COLOR"/>
@@ -116,7 +117,8 @@
             <arg name="allow_no_texture_points"  value="$(arg allow_no_texture_points)"/>
         </include>
 
-        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter"
+              if="$(eval imu_to_use == 'front')">
             <param name="use_mag" type="bool" value="false" />
             <param name="publish_tf" type="bool" value="false" />
             <param name="_world_frame" type="string" value="nwu" />
@@ -173,6 +175,14 @@
             <arg name="publish_odom_tf"          value="$(arg publish_odom_tf)"/>
             <arg name="allow_no_texture_points"  value="$(arg allow_no_texture_points)"/>
         </include>
+
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter"
+              if="$(eval imu_to_use == 'back')">
+            <param name="use_mag" type="bool" value="false" />
+            <param name="publish_tf" type="bool" value="false" />
+            <param name="_world_frame" type="string" value="nwu" />
+            <remap from="imu/data_raw" to="imu"/>
+        </node>
     </group>
 
 </launch>

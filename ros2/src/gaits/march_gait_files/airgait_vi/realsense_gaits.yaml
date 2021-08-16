@@ -9,15 +9,15 @@ realsense_stairs_down_single_step:
   dimensions: 2
   subgaits:
     right_open:
-      - MVI_stairsdown_rightopen_low_undeep_v1
-      - MVI_stairsdown_rightopen_low_deep_v1
-      - MVI_stairsdown_rightopen_high_undeep_v1
-      - MVI_stairsdown_rightopen_high_deep_v1
+      - MVI_stairsdown_rightopen_low_undeep_v4
+      - MVI_stairsdown_rightopen_low_deep_v4
+      - MVI_stairsdown_rightopen_high_undeep_v4
+      - MVI_stairsdown_rightopen_high_deep_v4
     left_close:
-      - MVI_stairsdown_leftclose_low_undeep_v1
-      - MVI_stairsdown_leftclose_low_deep_v1
-      - MVI_stairsdown_leftclose_high_undeep_v1
-      - MVI_stairsdown_leftclose_high_deep_v1
+      - MVI_stairsdown_leftclose_low_undeep_v4
+      - MVI_stairsdown_leftclose_low_deep_v4
+      - MVI_stairsdown_leftclose_high_undeep_v4
+      - MVI_stairsdown_leftclose_high_deep_v4
 
 realsense_stairs_down:
   realsense_category: stairs_down
@@ -60,15 +60,15 @@ realsense_stairs_up_single_step:
   dimensions: 2
   subgaits:
     right_open:
-      - MVI_stairsup_rightopen_low_undeep
-      - MVI_stairsup_rightopen_low_deep_v2
-      - MVI_stairsup_rightopen_high_undeep
-      - MVI_stairsup_rightopen_high_deep_v2
+      - MVI_stairsupsinglestep_rightopen_low_undeep_v6
+      - MVI_stairsupsinglestep_rightopen_low_deep_v6
+      - MVI_stairsupsinglestep_rightopen_high_undeep_v6
+      - MVI_stairsupsinglestep_rightopen_high_deep_v6
     left_close:
-      - MVI_stairsup_leftclose_low_undeep
-      - MVI_stairsup_leftclose_low_deep_v2
-      - MVI_stairsup_leftclose_high_undeep
-      - MVI_stairsup_leftclose_high_deep_v2
+      - MVI_stairsupsinglestep_leftclose_low_undeep_v6
+      - MVI_stairsupsinglestep_leftclose_low_deep_v6
+      - MVI_stairsupsinglestep_leftclose_high_undeep_v6
+      - MVI_stairsupsinglestep_leftclose_high_deep_v6
 
 realsense_stairs_up:
   realsense_category: stairs_up
