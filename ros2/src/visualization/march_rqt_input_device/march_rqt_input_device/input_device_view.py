@@ -4,6 +4,10 @@ from typing import List, Callable, Tuple, Optional, Union
 
 from pathlib import Path
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QToolButton
+
 from .input_device_controller import InputDeviceController
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
@@ -157,7 +161,7 @@ class InputDeviceView(QWidget):
         name: str,
         callback: Optional[Union[str, Callable]] = None,
         image_path: Optional[str] = None,
-        size: Tuple[int, int] = (128, 128),
+        size: Tuple[int, int] = (130, 150),
         always_enabled: bool = False,
     ):
         """Create a push button which can be pressed to execute a gait instruction.
@@ -176,15 +180,15 @@ class InputDeviceView(QWidget):
         :return:
             A QPushButton object which contains the passed arguments
         """
+        qt_button = QToolButton()
+        qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        qt_button.setIconSize(QSize(100, 100))
+        qt_button.setText(check_string(name))
+        qt_button.setStyleSheet("QToolButton {background-color: lightgrey}")
         if image_path is not None:
-            qt_button = ImageButton(get_image_path(image_path))
-        elif name + "2.png" in self._image_names:
-            qt_button = ImageButton(get_image_path(name))
-        else:
-            qt_button = QPushButton()
-
-            text = check_string(name)
-            qt_button.setText(text)
+            qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
+        elif name + ".png" in self._image_names:
+            qt_button.setIcon(QIcon(QPixmap(get_image_path(name))))
         qt_button.setObjectName(name)
 
         if always_enabled:
@@ -236,7 +240,7 @@ def get_image_path(image_path: str) -> str:
             get_package_share_directory("march_rqt_input_device"),
             "resource",
             "img",
-            f"{image_path}2.png",
+            f"{image_path}.png",
         )
 
 
