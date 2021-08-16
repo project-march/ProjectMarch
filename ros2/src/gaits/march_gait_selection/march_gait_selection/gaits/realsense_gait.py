@@ -297,7 +297,8 @@ class RealsenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
-        # Delay start until parameterisation is done
+        self._reset()
+        # Delay start until parameterization is done
         self._start_is_delayed = True
         # Start time will be set later, but to prevent updates during the service
         # calls to think the gait start time has passed, set start time in the future.
@@ -312,7 +313,6 @@ class RealsenseGait(SetpointsGait):
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
-        self._should_stop = False
         if first_subgait_delay is None:
             first_subgait_delay = self.DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION
         self._start_time = self._gait_selection.get_clock().now() + first_subgait_delay
