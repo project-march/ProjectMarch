@@ -183,8 +183,8 @@ class InputDeviceView(QWidget):
         else:
             qt_button = QPushButton()
 
-        text = check_string(name)
-        qt_button.setText(text)
+            text = check_string(name)
+            qt_button.setText(text)
         qt_button.setObjectName(name)
 
         if always_enabled:
