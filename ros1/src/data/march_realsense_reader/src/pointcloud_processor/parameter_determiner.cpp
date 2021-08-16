@@ -394,10 +394,13 @@ void HullParameterDeterminer::initializeGaitDimensions()
         min_z_stairs *= 2;
         max_z_stairs *= 2;
     }
+
+    // We cannot guarantee that the camera has vision right in front of the right foot,
+    // since its vision can be blocked by the RHFE
     if (frame_id_to_transform_to_ == "foot_right") {
         y_deviation_foot = y_deviation_right_foot;
     } else if (frame_id_to_transform_to_ == "foot_left") {
-        y_deviation_foot = -y_deviation_right_foot;
+        y_deviation_foot = 0;
     } else {
         ROS_WARN_STREAM("The frame id "
             << frame_id_to_transform_to_
