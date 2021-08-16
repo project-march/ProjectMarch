@@ -167,21 +167,31 @@ bool HullParameterDeterminer::determineParameters(
         switch (realsense_category_.value()) {
             case RealSenseCategory::stairs_down:
             case RealSenseCategory::stairs_up: {
-                ROS_DEBUG_STREAM("The optimal foot location is "
-                    << output_utilities::pointToString(optimal_foot_location));
+                ROS_INFO_STREAM(" --- The optimal foot location is "
+                    << output_utilities::pointToString(optimal_foot_location)
+                    << " --- ");
                 break;
             }
             case RealSenseCategory::ramp_down:
             case RealSenseCategory::ramp_up: {
-                ROS_DEBUG_STREAM("The slope of the ramp is " << ramp_slope);
+                ROS_INFO_STREAM(
+                    " --- The slope of the ramp is " << ramp_slope << " --- ");
                 break;
             }
             case RealSenseCategory::sit: {
-                ROS_DEBUG_STREAM("The sit height is " << sit_height);
+                ROS_INFO_STREAM(
+                    " --- The sit height is " << sit_height << " --- ");
                 break;
             }
         }
-        ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
+        if (gait_parameters_->first_parameter == 0
+            || gait_parameters_->first_parameter == 1
+            || gait_parameters_->second_parameter == 0
+            || gait_parameters_->second_parameter == 1) {
+            ROS_WARN_STREAM("The found dimensions are outside the gait limits, "
+                            "but inside the allowed deviation from them.");
+        }
+        ROS_INFO_STREAM("With corresponding parameters (size, height, side) ("
             << gait_parameters_->first_parameter << ", "
             << gait_parameters_->second_parameter << ", "
             << gait_parameters_->side_step_parameter << ") ");
@@ -450,6 +460,13 @@ bool HullParameterDeterminer::transformGaitInformation()
             sit_pos_x = gait_information_cloud->points[0].x;
             sit_pos_y = gait_information_cloud->points[0].y;
 
+            break;
+        }
+
+        case RealSenseCategory::ramp_up:
+        case RealSenseCategory::ramp_down: {
+            // There is no relevant gait debug information transform
+            // for the current ramp parameter calculation
             break;
         }
 
