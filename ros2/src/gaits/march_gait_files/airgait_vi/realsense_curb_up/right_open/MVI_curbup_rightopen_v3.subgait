@@ -1,4 +1,4 @@
-description: The low curb up for a curb of 5 cm
+description: The curb up for the route in Delft (9 cm)
 duration: 3000000000
 gait_type: stairs_like
 joints:
@@ -26,7 +26,7 @@ joints:
   - position: 0.0
     time_from_start: 1600000000
     velocity: 0.0294
-  - position: -0.1571
+  - position: -0.0873
     time_from_start: 3000000000
     velocity: 0.2181
   left_knee:
@@ -66,7 +66,7 @@ joints:
   - position: 0.9599
     time_from_start: 2400000000
     velocity: -0.2181
-  - position: 0.6801
+  - position: 0.8215
     time_from_start: 3000000000
     velocity: 0.0
   right_knee:
@@ -79,7 +79,7 @@ joints:
   - position: 1.3963
     time_from_start: 1909400000
     velocity: 0.3214
-  - position: 0.8037
+  - position: 0.9703
     time_from_start: 3000000000
     velocity: 0.0
 name: right_open

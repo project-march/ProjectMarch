@@ -27,10 +27,10 @@ joints:
     time_from_start: 2000000000
     velocity: 0.0
   left_knee:
-  - position: 1.2327
+  - position: 1.2991
     time_from_start: 0
     velocity: 0.0
-  - position: 1.309
+  - position: 1.3963
     time_from_start: 760000000
     velocity: 0.0
   - position: 0.0
@@ -51,7 +51,7 @@ joints:
     time_from_start: 2000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.4311
+  - position: 0.5372
     time_from_start: 0
     velocity: 0.0
   - position: 0.2341
