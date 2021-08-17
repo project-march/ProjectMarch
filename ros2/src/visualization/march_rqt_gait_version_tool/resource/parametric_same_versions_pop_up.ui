@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1393</width>
+    <height>526</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>480</y>
+     <width>171</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QSlider" name="firstParameterSlider">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>20</y>
+     <width>465</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
+   </property>
+   <property name="whatsThis">
+    <string>ello</string>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="singleStep">
+    <number>1</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="tickPosition">
+    <enum>QSlider::TicksBelow</enum>
+   </property>
+   <property name="tickInterval">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="firstParameterLabel">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>148</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
+   </property>
+   <property name="text">
+    <string>first parameter = 0.00</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="secondParameterLabel">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>50</y>
+     <width>168</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
+   </property>
+   <property name="text">
+    <string>second parameter = 0.00</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="secondParameterSlider">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>50</y>
+     <width>465</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
+   </property>
+   <property name="whatsThis">
+    <string>ello</string>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="singleStep">
+    <number>1</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="tickPosition">
+    <enum>QSlider::TicksBelow</enum>
+   </property>
+   <property name="tickInterval">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="fourSubgaitInterpolation">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>10</y>
+     <width>431</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Interpolate between four subgaits</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="prefix_input1">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>110</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="postfix_input1">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>150</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="prefix_label1">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Prefix</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="postfix_label1">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Postfix</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="selectedSubgaits1">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>241</y>
+     <width>300</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="selectedSubgaits2">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>241</y>
+     <width>300</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="postfix_input2">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>150</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="prefix_label2">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>110</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Prefix</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="postfix_label2">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>150</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Postfix</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="prefix_input2">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>110</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="selectedSubgaits3">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>240</y>
+     <width>300</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="postfix_input3">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>150</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="prefix_label3">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>110</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Prefix</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="postfix_label3">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>150</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Postfix</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="prefix_input3">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>110</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="selectedSubgaits4">
+   <property name="geometry">
+    <rect>
+     <x>1050</x>
+     <y>240</y>
+     <width>300</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="postfix_input4">
+   <property name="geometry">
+    <rect>
+     <x>1090</x>
+     <y>150</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="prefix_label4">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>110</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Prefix</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="postfix_label4">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>150</y>
+     <width>51</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+   </property>
+   <property name="text">
+    <string>Postfix</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="prefix_input4">
+   <property name="geometry">
+    <rect>
+     <x>1090</x>
+     <y>110</y>
+     <width>241</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="subgaitButtonBox1">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>180</y>
+     <width>166</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="subgaitButtonBox2">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>180</y>
+     <width>166</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="subgaitButtonBox3">
+   <property name="geometry">
+    <rect>
+     <x>770</x>
+     <y>190</y>
+     <width>166</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="subgaitButtonBox4">
+   <property name="geometry">
+    <rect>
+     <x>1130</x>
+     <y>190</y>
+     <width>166</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="selectedSubgaitsLabel1">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>220</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Selected Subgaits</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="selectedSubgaitsLabel2">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>220</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Selected Subgaits</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="selectedSubgaitsLabel3">
+   <property name="geometry">
+    <rect>
+     <x>790</x>
+     <y>220</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Selected Subgaits</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="selectedSubgaitsLabel4">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>220</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Selected Subgaits</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="resetAllButton">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>450</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Reset all</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

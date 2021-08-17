@@ -1,3 +1,4 @@
+import ast
 import re
 from enum import Enum
 
@@ -9,6 +10,8 @@ from .gait_version_tool_errors import GaitVersionToolError
 from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
 from .same_versions_pop_up import SameVersionsPopUpWindow
+from .parametric_same_versions_pop_up import ParametricSameVersionsPopUpWindow
+from .subgait_version_select import select_same_subgait_versions
 
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 PARAMETRIC_GAIT_PREFIX = "_pg_"
@@ -60,6 +63,7 @@ class GaitVersionToolView(QWidget):
         self.Refresh.pressed.connect(lambda: self._refresh())
         self.Apply.pressed.connect(lambda: [self._apply(), self._refresh()])
         self.SelectSameVersions.pressed.connect(self._select_same_versions)
+        self.ParametricSameVersions.pressed.connect(self._parameterize_same_versions)
         self.SaveDefault.pressed.connect(
             lambda: [self._apply(), self._save_default(), self._refresh()]
         )
@@ -83,6 +87,10 @@ class GaitVersionToolView(QWidget):
         )
         self._same_versions_pop_up = SameVersionsPopUpWindow(
             self, ui_file.replace("gait_selection.ui", "same_versions_pop_up.ui")
+        )
+        self._parametric_same_versions_pop_up = ParametricSameVersionsPopUpWindow(
+            self,
+            ui_file.replace("gait_selection.ui", "parametric_same_versions_pop_up.ui"),
         )
 
         # populate gait menu for the first time
@@ -351,39 +359,87 @@ class GaitVersionToolView(QWidget):
 
         prefix = self._same_versions_pop_up.prefix
         postfix = self._same_versions_pop_up.postfix
-        if prefix == "" and postfix == "":
-            return
-
-        if prefix == "":
-            prefix = ".*"
-        if postfix == "":
-            postfix = ".*"
 
         gait_name = self._gait_menu.currentText()
         if gait_name not in self.version_map:
             return
-
         subgaits = self.available_gaits[gait_name]
-        selected_versions = {}
-        for subgait, versions in subgaits.items():
-            subgait_no_underscores = subgait.replace("_", "")
-            regex_string = f"{prefix}(_?{gait_name})?_({subgait}|{subgait_no_underscores})_{postfix}"
-            pattern = re.compile(regex_string)
 
-            for version_name in versions:
-                match = pattern.match(version_name)
-                if match is not None:
-                    selected_versions[subgait] = version_name
+        selected_versions = select_same_subgait_versions(
+            gait_name, subgaits, prefix, postfix
+        )
 
+        self._update_selected_subgaits(selected_versions)
+
+    def _update_selected_subgaits(self, selected_versions):
         for subgait_label, subgait_menu in zip(
             self._subgait_labels, self._subgait_menus
         ):
             subgait = subgait_label.text()
             if subgait in selected_versions:
-                version_index = self.sort_versions(subgaits[subgait]).index(
-                    selected_versions[subgait]
-                )
+                version_index = self.sort_versions(
+                    self.available_gaits[self._gait_menu.currentText()][subgait]
+                ).index(selected_versions[subgait])
                 subgait_menu.setCurrentIndex(version_index)
+
+    def _parameterize_same_versions(self):
+        """"""
+        gait = self._gait_menu.currentText()
+        if not self._parametric_same_versions_pop_up.show_pop_up(
+            gait, self.available_gaits[gait]
+        ):
+            return
+
+        selected_versions1 = ast.literal_eval(
+            self._parametric_same_versions_pop_up.selectedSubgaits1.toPlainText()
+        )
+        selected_versions2 = ast.literal_eval(
+            self._parametric_same_versions_pop_up.selectedSubgaits2.toPlainText()
+        )
+        first_parameter = (
+            self._parametric_same_versions_pop_up.firstParameterSlider.value() / 100
+        )
+
+        uses_four_subgait_interpolation = (
+            self._parametric_same_versions_pop_up.fourSubgaitInterpolation.isChecked()
+        )
+        if uses_four_subgait_interpolation:
+            selected_versions3 = ast.literal_eval(
+                self._parametric_same_versions_pop_up.selectedSubgaits3.toPlainText()
+            )
+            selected_versions4 = ast.literal_eval(
+                self._parametric_same_versions_pop_up.selectedSubgaits4.toPlainText()
+            )
+            second_parameter = (
+                self._parametric_same_versions_pop_up.secondParameterSlider.value()
+                / 100
+            )
+
+        for subgait_label, subgait_menu in zip(
+            self._subgait_labels, self._subgait_menus
+        ):
+            subgait = subgait_label.text()
+            if not uses_four_subgait_interpolation:
+                new_version = "{0}{1}_({2})_({3})".format(
+                    PARAMETRIC_GAIT_PREFIX,
+                    first_parameter,
+                    selected_versions1[subgait],
+                    selected_versions2[subgait],
+                )
+            else:
+                new_version = "{0}{1}_{2}_({3})_({4})_({5})_({6})".format(
+                    FOUR_PARAMETRIC_GAIT_PREFIX,
+                    first_parameter,
+                    second_parameter,
+                    selected_versions1[subgait],
+                    selected_versions2[subgait],
+                    selected_versions3[subgait],
+                    selected_versions4[subgait],
+                )
+
+            subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
+            subgait_menu.addItem(new_version)
+            subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""

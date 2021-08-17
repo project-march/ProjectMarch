@@ -20,19 +20,15 @@ class ParametricPopUpWindow(QDialog):
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
         self.firstParameterSlider.valueChanged.connect(
-            self.first_parameter_value_changed
+            lambda: ParametricPopUpWindow.first_parameter_value_changed(self)
         )
         self.secondParameterSlider.valueChanged.connect(
-            self.second_parameter_value_changed
+            lambda: ParametricPopUpWindow.second_parameter_value_changed(self)
         )
         self.fourSubgaitInterpolation.stateChanged.connect(
-            self.four_subgait_interpolation_changed
+            lambda: self.four_subgait_interpolation_changed()
         )
-
-        # Initialize the third and fourth combo box and the second parameter slider as blocked
-        self.thirdVersionComboBox.setEnabled(False)
-        self.fourthVersionComboBox.setEnabled(False)
-        self.secondParameterSlider.setEnabled(False)
+        self.set_second_parameterize_enabled(False)
 
     def show_pop_up(self, versions):
         """Reset and show pop up."""
@@ -65,32 +61,35 @@ class ParametricPopUpWindow(QDialog):
         self.fourth_version = ""
         return super(ParametricPopUpWindow, self).exec_()
 
-    def first_parameter_value_changed(self):
+    @staticmethod
+    def first_parameter_value_changed(parametric_pop_up):
         """Puts the new slider value in the label next to it."""
-        self.firstParameterLabel.setText(
+        parametric_pop_up.firstParameterLabel.setText(
             "first parameter = {val:.2f}".format(
-                val=self.firstParameterSlider.value() / 100.0
+                val=parametric_pop_up.firstParameterSlider.value() / 100.0
             )
         )
 
-    def second_parameter_value_changed(self):
+    @staticmethod
+    def second_parameter_value_changed(parametric_pop_up):
         """Puts the new slider value in the label next to it."""
-        self.secondParameterLabel.setText(
+        parametric_pop_up.secondParameterLabel.setText(
             "second parameter = {val:.2f}".format(
-                val=self.secondParameterSlider.value() / 100.0
+                val=parametric_pop_up.secondParameterSlider.value() / 100.0
             )
         )
 
     def four_subgait_interpolation_changed(self):
         """Unlocks the buttons for four subgait interpolation when it is enabled"""
         if self.fourSubgaitInterpolation.isChecked():
-            self.thirdVersionComboBox.setEnabled(True)
-            self.fourthVersionComboBox.setEnabled(True)
-            self.secondParameterSlider.setEnabled(True)
+            self.set_second_parameterize_enabled(True)
         else:
-            self.thirdVersionComboBox.setEnabled(False)
-            self.fourthVersionComboBox.setEnabled(False)
-            self.secondParameterSlider.setEnabled(False)
+            self.set_second_parameterize_enabled(False)
+
+    def set_second_parameterize_enabled(self, value: bool):
+        self.thirdVersionComboBox.setEnabled(value)
+        self.fourthVersionComboBox.setEnabled(value)
+        self.secondParameterSlider.setEnabled(value)
 
     def cancel(self):
         """Close without applying the values."""
