@@ -29,20 +29,9 @@ The node starts publishing to two adresses:
   - Data in JSON format, containing the last measured position, velocity, input and its references, for all joints controlled by MPC.  
 - http://0.0.0.0:5000/estimation 
   - Data in JSON format, containing the last estimation of position, velocity, input and its references, for all joints controlled by MPC.  
-<!-- <ul>
-<li> http://0.0.0.0:5000/measurements </li>
-<ul>
-    <li>- Data in JSON format, containing the last measured position, velocity, input and its references, for all joints controlled by MPC.  </li>
-</ul>
-<li> - http://0.0.0.0:5000/estimation  </li>
-<ul>
-<li> - Data in JSON format, containing the last estimation of position, velocity, input and its references, for all joints controlled by MPC.  </li>
-</ul>
-</ul> -->
 
 .. hint:: Change the host to the IP of the publishing device
-<!-- .. hint:: When accessing from a different device, the host changes when to the IP of the publishing device  
- -->
+
 ## Testing
 To check if the node is operating as expected, check the adresses mentioned in the section above.
 
