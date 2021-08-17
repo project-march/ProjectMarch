@@ -4,9 +4,8 @@ Model predictive controllers (MPC) provide estimation of future states. Visualis
 since RQT does not support data in the future. This package provides a way to publish these estimates to the local network,
 so that custom visualization tool can be used.
 
-| :exclamation:  This node requires manual launching |
-|----------------------------------------------------|
-
+.. hint:: This node requires manual launching
+  
 ## How to build
 ```bash
 source /opt/ros/foxy/local_setup.bash
@@ -24,8 +23,13 @@ ros2 launch march_mpc_visualization march_mpc_visualization.launch.py
 ```
 
 ## Publishing
-The node starts publishing to two adresses:
-<ul>
+The node starts publishing to two adresses:  
+
+- http://0.0.0.0:5000/measurements  
+  - Data in JSON format, containing the last measured position, velocity, input and its references, for all joints controlled by MPC.  
+- http://0.0.0.0:5000/estimation 
+  - Data in JSON format, containing the last estimation of position, velocity, input and its references, for all joints controlled by MPC.  
+<!-- <ul>
 <li> http://0.0.0.0:5000/measurements </li>
 <ul>
     <li>- Data in JSON format, containing the last measured position, velocity, input and its references, for all joints controlled by MPC.  </li>
@@ -34,11 +38,11 @@ The node starts publishing to two adresses:
 <ul>
 <li> - Data in JSON format, containing the last estimation of position, velocity, input and its references, for all joints controlled by MPC.  </li>
 </ul>
-</ul>
+</ul> -->
 
-| :exclamation: When accessing from a different device, the host changes when to the IP of the publishing device |
-|-----------------------------------------------------------------------------------------------------------------|
-
+.. hint:: Change the host to the IP of the publishing device
+<!-- .. hint:: When accessing from a different device, the host changes when to the IP of the publishing device  
+ -->
 ## Testing
 To check if the node is operating as expected, check the adresses mentioned in the section above.
 
