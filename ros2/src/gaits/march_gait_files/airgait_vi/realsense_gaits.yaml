@@ -259,3 +259,31 @@ realsense_ramp_down_start_single_step:
     left_close:
       - MVI_rampdown_startsinglestep_leftclose_flat_v7
       - MVI_rampdown_startsinglestep_leftclose_steep_v5
+
+realsense_curb_up:
+  realsense_category: curb
+  camera_to_use: front
+  starting_position: static
+  final_position: dynamic
+  dimensions: 1
+  subgaits:
+    right_open:
+      - MVI_curbup_rightopen_low
+      - MVI_curbup_rightopen_high
+    left_close:
+      - MVI_curbup_leftclose_low
+      - MVI_curbup_leftclose_high
+
+realsense_curb_down:
+  realsense_category: curb
+  camera_to_use: front
+  starting_position: static
+  final_position: dynamic
+  dimensions: 1
+  subgaits:
+    right_open:
+      - MVI_curbdown_rightopen_low
+      - MVI_curbdown_rightopen_high
+    left_close:
+      - MVI_curbdown_leftclose_low
+      - MVI_curbdown_leftclose_high
