@@ -127,7 +127,7 @@ safety:  # This is still copied from MV
       upper_soft_buffer: 2.0
       k_position: 9.656085595298899
       k_velocity: 23.06987607064259
-      max_effort: 35.0
+      max_effort: 30.0
       max_velocity: 3.5
     hfe:
       lower_soft_buffer: 2.0
