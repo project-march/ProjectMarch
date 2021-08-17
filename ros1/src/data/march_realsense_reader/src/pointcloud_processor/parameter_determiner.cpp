@@ -902,7 +902,7 @@ bool HullParameterDeterminer::getCurbHeight()
     getValidPointsOnCurb(points_on_curb, valid_points_on_curb);
 
     if (valid_points_on_curb->size() == 0) {
-        ROS_ERROR_STREAM("No valid point on the curb are found, "
+        ROS_ERROR_STREAM("No valid points on the curb are found, "
                          "unable to find parameters for curb category.");
         return false;
     }
@@ -933,6 +933,7 @@ void HullParameterDeterminer::getValidPointsOnCurb(
     for (pcl::PointNormal point_on_curb : *points_on_curb) {
         if (isValidLocation(point_on_curb)) {
             valid_points_on_curb->push_back(point_on_curb);
+            ROS_WARN_STREAM("Adding a point to the valid curb cloud");
         }
     }
 }
@@ -1183,7 +1184,7 @@ bool HullParameterDeterminer::isValidLocation(
             // support for the entire foot
             return (possible_foot_location.z > min_curb_height_world
                         - allowed_deviation_from_reachable_stair
-                && possible_foot_location.z < max_z_stairs_world
+                        && possible_foot_location.z < max_curb_height_world
                         + allowed_deviation_from_reachable_stair
                 && entireFootCanBePlaced(possible_foot_location));
         }
