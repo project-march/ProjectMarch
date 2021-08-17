@@ -1164,7 +1164,7 @@ bool HullParameterDeterminer::isValidLocation(
                 std_msgs::ColorRGBA marker_color;
                 if (!(possible_foot_location.z > min_curb_height_world
                                 - allowed_deviation_from_reachable_stair
-                        && possible_foot_location.z < max_z_stairs_world
+                        && possible_foot_location.z < max_curb_height_world
                                 + allowed_deviation_from_reachable_stair)) {
                     marker_color = color_utilities::YELLOW;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
