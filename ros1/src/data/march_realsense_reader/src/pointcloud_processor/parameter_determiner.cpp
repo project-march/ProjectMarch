@@ -108,8 +108,9 @@ void HullParameterDeterminer::readParameters(
         = (float)
               config.parameter_determiner_allowed_deviation_from_reachable_curb;
     min_curb_search
-        = (float)config.parameter_determiner_min_curb_search max_curb_search
-        = (float)config.parameter_determiner_max_curb_search
+        = (float)config.parameter_determiner_min_curb_search;
+    max_curb_search
+        = (float)config.parameter_determiner_max_curb_search;
 
               debugging_
         = config.debug;
