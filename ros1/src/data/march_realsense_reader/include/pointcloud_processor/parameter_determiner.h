@@ -233,9 +233,8 @@ protected:
         PointNormalCloud::Ptr& exo_support_points);
 
     // Check which points on the curb are reachable and give foot support
-    void getValidPointsOnCurb(
-            const PointNormalCloud::Ptr& points_on_curb,
-            PointNormalCloud::Ptr& valid_points_on_curb);
+    void getValidPointsOnCurb(const PointNormalCloud::Ptr& points_on_curb,
+        PointNormalCloud::Ptr& valid_points_on_curb);
 
     // Updates the gait information limits after calling a transform to the
     // fixed frame
@@ -290,6 +289,8 @@ protected:
     float allowed_deviation_from_reachable_curb {};
     float curb_position_x {};
     float curb_position_y {};
+    float min_curb_search {};
+    float max_curb_search {};
     float curb_height {};
     float ramp_slope {};
 

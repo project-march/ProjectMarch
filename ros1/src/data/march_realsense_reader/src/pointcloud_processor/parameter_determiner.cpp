@@ -104,8 +104,15 @@ void HullParameterDeterminer::readParameters(
 
     min_curb_height = (float)config.parameter_determiner_min_curb_height;
     max_curb_height = (float)config.parameter_determiner_max_curb_height;
+    allowed_deviation_from_reachable_curb
+        = (float)
+              config.parameter_determiner_allowed_deviation_from_reachable_curb;
+    min_curb_search
+        = (float)config.parameter_determiner_min_curb_search max_curb_search
+        = (float)config.parameter_determiner_max_curb_search
 
-    debugging_ = config.debug;
+              debugging_
+        = config.debug;
 }
 
 /** This function takes in a pointcloud with matching normals and
@@ -179,9 +186,8 @@ bool HullParameterDeterminer::determineParameters(
                 break;
             }
             case RealSenseCategory::curb: {
-                ROS_INFO_STREAM(" --- The curb height is "
-                    << output_utilities::pointToString(optimal_foot_location)
-                    << " --- ");
+                ROS_INFO_STREAM(
+                    " --- The curb height is " << curb_height << " --- ");
                 break;
             }
             case RealSenseCategory::ramp_down:
@@ -233,6 +239,7 @@ bool HullParameterDeterminer::getObstacleInformation()
         }
         case RealSenseCategory::curb: {
             return getCurbHeight();
+            break;
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
@@ -363,6 +370,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
             marker_point.z = max_curb_height_world;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
+            break;
         }
         case RealSenseCategory::sit: {
             geometry_msgs::Point marker_point;
@@ -485,11 +493,11 @@ bool HullParameterDeterminer::transformGaitInformation()
         }
         case RealSenseCategory::curb: {
             point = point_utilities::makePointXYZ(
-                (min_x_stairs_up + max_x_stairs_up), y_deviation_foot,
+                (min_x_stairs_up + max_x_stairs_up) / 2.0, y_deviation_foot,
                 min_curb_height);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                (min_x_stairs_up + max_x_stairs_up), y_deviation_foot,
+                (min_x_stairs_up + max_x_stairs_up) / 2.0, y_deviation_foot,
                 max_curb_height);
             gait_information_cloud->push_back(point);
 
@@ -501,6 +509,7 @@ bool HullParameterDeterminer::transformGaitInformation()
             max_curb_height_world = gait_information_cloud->points[1].z;
             curb_position_x = gait_information_cloud->points[0].x;
             curb_position_y = gait_information_cloud->points[0].y;
+            break;
         }
 
         case RealSenseCategory::sit: {
@@ -557,6 +566,7 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
         }
         case RealSenseCategory::curb: {
             success &= getGaitParametersFromCurbHeight();
+            break;
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
@@ -592,6 +602,7 @@ bool HullParameterDeterminer::getGaitParametersFromCurbHeight()
             << max_curb_height_world << " ( +"
             << allowed_deviation_from_reachable_curb << " ) but was "
             << std::abs(curb_height));
+        return false;
     }
 
     gait_parameters_->first_parameter = calculateParameter(
@@ -601,6 +612,8 @@ bool HullParameterDeterminer::getGaitParametersFromCurbHeight()
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
+
+    return true;
 }
 
 // Find the sit parameter from the sit height
@@ -617,6 +630,7 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             << max_sit_height_world << " ( +"
             << allowed_deviation_from_reachable_bench << " ) but was "
             << ramp_slope);
+        return false;
     }
 
     gait_parameters_->first_parameter = calculateParameter(
@@ -877,10 +891,10 @@ bool HullParameterDeterminer::getCurbHeight()
     points_on_curb = boost::make_shared<PointNormalCloud>();
     success
         &= cropCloudToHullVectorUnique(foot_locations_to_try, points_on_curb);
-    if (possible_foot_locations->points.size() == 0) {
-        ROS_ERROR_STREAM(
-            "The computed possible foot locations cloud is empty. "
-            "Unable to compute corresponding possible foot locations");
+
+    if (points_on_curb->points.size() == 0) {
+        ROS_ERROR_STREAM("The computed points on curb cloud is empty. "
+                         "Unable to compute corresponding curb height");
         return false;
     }
 
@@ -889,7 +903,7 @@ bool HullParameterDeterminer::getCurbHeight()
 
     getValidPointsOnCurb(points_on_curb, valid_points_on_curb);
 
-    if (exo_support_points->size() == 0) {
+    if (valid_points_on_curb->size() == 0) {
         ROS_ERROR_STREAM("No valid point on the curb are found, "
                          "unable to find parameters for curb category.");
         return false;
@@ -914,7 +928,7 @@ bool HullParameterDeterminer::getCurbHeight()
 }
 
 // Check which points on the curb are reachable and give foot support
-bool HullParameterDeterminer::getValidPointsOnCurb(
+void HullParameterDeterminer::getValidPointsOnCurb(
     const PointNormalCloud::Ptr& points_on_curb,
     PointNormalCloud::Ptr& valid_points_on_curb)
 {
@@ -1283,10 +1297,14 @@ bool HullParameterDeterminer::getOptionalFootLocations(
     cloud_to_fill->points.resize(number_of_optional_foot_locations);
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_down:
-        case RealSenseCategory::stairs_up:
-        case RealSenseCategory::curb: {
+        case RealSenseCategory::stairs_up: {
             success &= fillOptionalFootLocationCloud(
                 cloud_to_fill, min_x_stairs, max_x_stairs);
+            break;
+        }
+        case RealSenseCategory::curb: {
+            success &= fillOptionalFootLocationCloud(
+                cloud_to_fill, min_curb_search, max_curb_search);
             break;
         }
         case RealSenseCategory::ramp_down:
