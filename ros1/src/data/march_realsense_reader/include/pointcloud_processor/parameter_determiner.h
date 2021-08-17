@@ -271,7 +271,15 @@ protected:
     float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
-    float sit_height;
+    float sit_height {};
+    float max_curb_height {};
+    float max_curb_height_world {};
+    float min_curb_height {};
+    float min_curb_height_world {};
+    float allowed_deviation_from_reachable_curb {};
+    float curb_position_x {};
+    float curb_position_y {};
+    float ramp_height {};
     float ramp_slope {};
 
     std::string subgait_name_;
