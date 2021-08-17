@@ -12,7 +12,7 @@
       "always_enabled": true
     },
     {
-      "name": "force unknown",
+      "name": "force_unknown",
       "callback": "publish_sm_to_unknown",
       "always_enabled": true
     }
