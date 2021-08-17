@@ -1184,7 +1184,7 @@ bool HullParameterDeterminer::isValidLocation(
             // support for the entire foot
             return (possible_foot_location.z > min_curb_height_world
                         - allowed_deviation_from_reachable_stair
-                        && possible_foot_location.z < max_curb_height_world
+                && possible_foot_location.z < max_curb_height_world
                         + allowed_deviation_from_reachable_stair
                 && entireFootCanBePlaced(possible_foot_location));
         }
