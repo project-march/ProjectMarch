@@ -107,6 +107,11 @@ def generate_launch_description():
                 "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
+                name="imu_to_use",
+                default_value="back",
+                description="Which imu to use for knowing the exoskeleton orientation",
+            ),
+            DeclareLaunchArgument(
                 name="ground_gait",
                 default_value=use_imu_data,
                 description="Whether the simulation should be simulating "
@@ -121,7 +126,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="imu_topic",
-                default_value="/camera_front/imu/data",
+                default_value="/camera_back/imu/data",
                 description="The topic that should be used to determine the orientation",
             ),
             DeclareLaunchArgument(

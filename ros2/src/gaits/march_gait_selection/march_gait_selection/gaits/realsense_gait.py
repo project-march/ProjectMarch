@@ -108,7 +108,7 @@ class RealsenseGait(SetpointsGait):
         Whether a subgait can be scheduled early, this is not possible for the realsense
         gait, since this will later have a service call to determine the next subgait.
         """
-        return False
+        return True
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
@@ -297,7 +297,8 @@ class RealsenseGait(SetpointsGait):
         :return: A gait update that tells the state machine what to do. Empty means
         that that state machine should not start a gait.
         """
-        # Delay start until parameterisation is done
+        self._reset()
+        # Delay start until parameterization is done
         self._start_is_delayed = True
         # Start time will be set later, but to prevent updates during the service
         # calls to think the gait start time has passed, set start time in the future.
@@ -312,9 +313,8 @@ class RealsenseGait(SetpointsGait):
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
-        self._should_stop = False
         if first_subgait_delay is None:
-            first_subgait_delay = Duration(0)
+            first_subgait_delay = self.DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION
         self._start_time = self._gait_selection.get_clock().now() + first_subgait_delay
         self._end_time = self._start_time + self._current_subgait.duration
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())

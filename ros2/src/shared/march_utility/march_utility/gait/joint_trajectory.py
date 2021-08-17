@@ -170,13 +170,13 @@ class JointTrajectory:
 
         logger = rclpy.logging.get_logger("march_utility_logger")
 
-        if not abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR:
+        if abs(from_setpoint.velocity - to_setpoint.velocity) > ALLOWED_ERROR:
             logger.warning(
                 f"joint {self.name} has an invalid velocity transition as {from_setpoint.velocity} != {to_setpoint.velocity}"
             )
             return False
 
-        if not abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
+        if abs(from_setpoint.position - to_setpoint.position) > ALLOWED_ERROR:
             logger.warning(
                 f"joint {self.name} has an invalid position transition as {from_setpoint.position} != {to_setpoint.position}"
             )
@@ -211,7 +211,7 @@ class JointTrajectory:
 
         time, position, velocity = self.get_setpoints_unzipped()
         yi = []
-        for i in range(0, len(time)):
+        for i in range(len(time)):
             yi.append([position[i], velocity[i]])
 
         # We do a cubic spline here, like the ros joint_trajectory_action_controller,

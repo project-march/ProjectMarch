@@ -109,7 +109,7 @@ class JointPlot(pg.PlotItem):
     def to_setpoints(self):
         plot_data = self.plot_item.getData()
         setpoints = []
-        for i in range(0, len(plot_data[0])):
+        for i in range(len(plot_data[0])):
             velocity = self.velocities[i]
             time = plot_data[0][i]
             position = math.radians(plot_data[1][i])
@@ -123,7 +123,7 @@ class JointPlot(pg.PlotItem):
         self.setXRange(-0.01 * self.duration, 1.01 * self.duration, padding=0)
         self.time_line.setBounds((0, self.duration))
 
-        for i in range(0, len(position)):
+        for i in range(len(position)):
             position[i] = math.degrees(position[i])
 
         self.create_velocity_markers(joint.setpoints, show_velocity_plot)
@@ -136,7 +136,7 @@ class JointPlot(pg.PlotItem):
         min_effort_data, max_effort_data = self.calculate_min_max_effort(
             position_data, velocity_data
         )
-        for i in range(0, len(position_data)):
+        for i in range(len(position_data)):
             position_data[i] = math.degrees(position_data[i])
             velocity_data[i] = self.scale_parameter(
                 velocity_data[i], self.limits.velocity

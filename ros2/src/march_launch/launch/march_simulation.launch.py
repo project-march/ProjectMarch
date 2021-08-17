@@ -21,6 +21,7 @@ def generate_launch_description():
     robot_description = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")
     use_imu_data = LaunchConfiguration("use_imu_data")
+    imu_to_use = LaunchConfiguration("imu_to_use")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
 
@@ -111,8 +112,11 @@ def generate_launch_description():
                 "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
+                name="imu_to_use", default_value="back", description="Which imu to use"
+            ),
+            DeclareLaunchArgument(
                 name="imu_topic",
-                default_value="/camera_front/imu/data",
+                default_value="/camera_back/imu/data",
                 description="The topic that should be used to determine the orientation",
             ),
             DeclareLaunchArgument(
@@ -128,7 +132,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="gait_directory",
-                default_value="test_versions_vi",
+                default_value="airgait_vi",
                 description="The directory in which the gait files to use are located, "
                 "relative to the gait_package.",
             ),
@@ -189,6 +193,7 @@ def generate_launch_description():
                     ("robot_state_publisher", robot_state_publisher),
                     ("use_imu_data", use_imu_data),
                     ("imu_topic", imu_topic),
+                    ("imu_to_use", imu_to_use),
                     ("robot_description", robot_description),
                     ("ground_gait", ground_gait),
                     ("realsense_simulation", realsense_simulation),

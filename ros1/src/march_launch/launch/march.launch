@@ -45,6 +45,8 @@
          doc="Whether the simulation camera or the physical camera should be used"/>
     <arg name="realsense_test_data" default="$(eval realsense)" doc="Whether the node which can publish pointclouds
     from datasets should be started."/>
+    <arg name="imu_to_use" default="back"
+         doc="Which imu to use for determining exo orientation"/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
              if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
     <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
@@ -121,9 +123,6 @@
 
 
 <!-- Bridge -->
-        <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
-
-
         <!-- To prevent unnecessary topics and messages, we disable the plugins that
          send a lot of compressed versions of the camera topics. -->
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"

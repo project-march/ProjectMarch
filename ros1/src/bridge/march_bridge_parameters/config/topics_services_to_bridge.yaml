@@ -47,6 +47,7 @@ topics:
   - { topic: 'tf_static', type: 'tf2_msgs/msg/TFMessage' }
   - { topic: 'march/motor_controller_states', type: 'march_shared_msgs/msg/MotorControllerState'}
   - { topic: 'camera_front/imu/data', type: 'sensor_msgs/msg/Imu'}
+  - { topic: 'camera_back/imu/data', type: 'sensor_msgs/msg/Imu'}
   - { topic: 'march/mpc', type: 'march_shared_msgs/msg/MpcMsg'}
   - { topic: 'march/input_device/current_state', type: 'march_shared_msgs/msg/CurrentIPDState'}
   - { topic: 'march/pdb_data', type: 'march_shared_msgs/msg/PowerDistributionBoardData'}
@@ -76,23 +77,3 @@ services_2_to_1:
       type: 'march_shared_msgs/SetObstacleSizeBlockLike' }
   - { service: '/march/set_obstacle_size/ramp_like',
       type: 'march_shared_msgs/SetObstacleSizeRampLike' }
-  - { service: '/march/parameter_server/get_param_bool',
-      type: 'march_shared_msgs/GetParamBool' }
-  - { service: '/march/parameter_server/get_param_float',
-      type: 'march_shared_msgs/GetParamFloat' }
-  - { service: '/march/parameter_server/get_param_int',
-      type: 'march_shared_msgs/GetParamInt' }
-  - { service: '/march/parameter_server/get_param_string',
-      type: 'march_shared_msgs/GetParamString' }
-  - { service: '/march/parameter_server/get_param_string_list',
-      type: 'march_shared_msgs/GetParamStringList' }
-  - { service: '/march/parameter_server/set_param_bool',
-      type: 'march_shared_msgs/SetParamBool' }
-  - { service: '/march/parameter_server/set_param_float',
-      type: 'march_shared_msgs/SetParamFloat' }
-  - { service: '/march/parameter_server/set_param_int',
-      type: 'march_shared_msgs/SetParamInt' }
-  - { service: '/march/parameter_server/set_param_string',
-      type: 'march_shared_msgs/SetParamString' }
-  - { service: '/march/parameter_server/set_param_string_list',
-      type: 'march_shared_msgs/SetParamStringList' }

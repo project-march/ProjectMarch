@@ -72,7 +72,7 @@ class GaitGraph:
         :param position: The position to get the name from.
         :return: The name.
         """
-        if position in self._named_positions.keys():
+        if position in self._named_positions:
             return self._named_positions[position]
         else:
             return f"unnamed: {position}"
@@ -86,26 +86,28 @@ class GaitGraph:
         to the final position is added.
         """
         for gait in self._gait_selection._gaits.values():
-            if gait.starting_position not in self._named_positions:
-                if isinstance(gait.starting_position, StaticEdgePosition):
-                    position_name = self._new_unnamed()
-                    self._gait_selection.get_logger().warn(
-                        f"No named position given for starting position of gait `"
-                        f"{gait.name}, creating {position_name}. The starting position "
-                        f"is {gait.starting_position}"
-                    )
-                    self._named_positions[gait.starting_position] = position_name
+            if (gait.starting_position not in self._named_positions) and isinstance(
+                gait.starting_position, StaticEdgePosition
+            ):
+                position_name = self._new_unnamed()
+                self._gait_selection.get_logger().warn(
+                    f"No named position given for starting position of gait `"
+                    f"{gait.name}, creating {position_name}. The starting position "
+                    f"is {gait.starting_position}"
+                )
+                self._named_positions[gait.starting_position] = position_name
             self._add_idle_transition(gait.starting_position, gait.gait_name)
 
-            if gait.final_position not in self._named_positions:
-                if isinstance(gait.final_position, StaticEdgePosition):
-                    position_name = self._new_unnamed()
-                    self._gait_selection.get_logger().warn(
-                        f"No named position given for final position of gait `"
-                        f"{gait.name}, creating {position_name}. The final position is "
-                        f"{gait.final_position}"
-                    )
-                    self._named_positions[gait.final_position] = position_name
+            if (gait.final_position not in self._named_positions) and isinstance(
+                gait.final_position, StaticEdgePosition
+            ):
+                position_name = self._new_unnamed()
+                self._gait_selection.get_logger().warn(
+                    f"No named position given for final position of gait `"
+                    f"{gait.name}, creating {position_name}. The final position is "
+                    f"{gait.final_position}"
+                )
+                self._named_positions[gait.final_position] = position_name
             self._gait_transitions[gait.gait_name] = gait.final_position
 
     def _make_home_gaits(self):
@@ -184,9 +186,9 @@ class GaitGraph:
         The first time this will give the position unnamed_0.
         The unnamed count is increased each call.
         """
-        name = f"{GaitGraph.UNNAMED}_{self._unnamed_count}"
+        count = self._unnamed_count
         self._unnamed_count += 1
-        return name
+        return f"{GaitGraph.UNNAMED}_{count}"
 
     def __str__(self) -> str:
         """Convert the gait graph to a human-friendly string."""

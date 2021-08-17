@@ -155,7 +155,9 @@ class NotesWidget(QWidget):
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
                 try:
-                    self._autosave_file = open(self._last_save_file, "r+")
+                    self._autosave_file = open(  # noqa: SIM115
+                        self._last_save_file, "r+"
+                    )
                     self._autosave_file.seek(0, os.SEEK_END)
                 except IOError as err:
                     self._node.get_logger().error(

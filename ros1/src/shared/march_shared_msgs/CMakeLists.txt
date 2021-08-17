@@ -45,22 +45,12 @@ add_service_files(
     ContainsGait.srv
     GetGaitParameters.srv
     GetMoveItTrajectory.srv
-    GetParamBool.srv
-    GetParamFloat.srv
-    GetParamInt.srv
-    GetParamString.srv
-    GetParamStringList.srv
     GetPossibleComLevels.srv
     PossibleGaits.srv
     PublishTestDataset.srv
     SetGaitVersion.srv
     SetObstacleSizeRampLike.srv
     SetObstacleSizeBlockLike.srv
-    SetParamBool.srv
-    SetParamFloat.srv
-    SetParamInt.srv
-    SetParamString.srv
-    SetParamStringList.srv
 )
 
 generate_messages(

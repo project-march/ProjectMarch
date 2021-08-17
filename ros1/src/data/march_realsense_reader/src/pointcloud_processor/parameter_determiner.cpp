@@ -83,7 +83,8 @@ void HullParameterDeterminer::readParameters(
     min_slope = (float)config.parameter_determiner_min_slope;
     max_slope = (float)config.parameter_determiner_max_slope;
 
-    y_location = (float)config.parameter_determiner_y_location;
+    y_deviation_right_foot
+        = (float)config.parameter_determiner_y_deviation_right_foot;
 
     min_sit_height = (float)config.parameter_determiner_min_sit_height;
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
@@ -167,21 +168,31 @@ bool HullParameterDeterminer::determineParameters(
         switch (realsense_category_.value()) {
             case RealSenseCategory::stairs_down:
             case RealSenseCategory::stairs_up: {
-                ROS_DEBUG_STREAM("The optimal foot location is "
-                    << output_utilities::pointToString(optimal_foot_location));
+                ROS_INFO_STREAM(" --- The optimal foot location is "
+                    << output_utilities::pointToString(optimal_foot_location)
+                    << " --- ");
                 break;
             }
             case RealSenseCategory::ramp_down:
             case RealSenseCategory::ramp_up: {
-                ROS_DEBUG_STREAM("The slope of the ramp is " << ramp_slope);
+                ROS_INFO_STREAM(
+                    " --- The slope of the ramp is " << ramp_slope << " --- ");
                 break;
             }
             case RealSenseCategory::sit: {
-                ROS_DEBUG_STREAM("The sit height is " << sit_height);
+                ROS_INFO_STREAM(
+                    " --- The sit height is " << sit_height << " --- ");
                 break;
             }
         }
-        ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
+        if (gait_parameters_->first_parameter == 0
+            || gait_parameters_->first_parameter == 1
+            || gait_parameters_->second_parameter == 0
+            || gait_parameters_->second_parameter == 1) {
+            ROS_WARN_STREAM("The found dimensions are outside the gait limits, "
+                            "but inside the allowed deviation from them.");
+        }
+        ROS_INFO_STREAM("With corresponding parameters (size, height, side) ("
             << gait_parameters_->first_parameter << ", "
             << gait_parameters_->second_parameter << ", "
             << gait_parameters_->side_step_parameter << ") ");
@@ -330,11 +341,11 @@ void HullParameterDeterminer::addDebugGaitInformation()
             marker_point.y = sit_pos_y;
             marker_point.x = sit_pos_x;
 
-            marker_point.z = min_sit_height;
+            marker_point.z = min_sit_height_world;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
 
-            marker_point.z = max_sit_height;
+            marker_point.z = max_sit_height_world;
             gait_information_marker_list.points.push_back(marker_point);
             gait_information_marker_list.colors.push_back(marker_color);
             break;
@@ -393,6 +404,20 @@ void HullParameterDeterminer::initializeGaitDimensions()
         min_z_stairs *= 2;
         max_z_stairs *= 2;
     }
+
+    // We cannot guarantee that the camera has vision right in front of the
+    // right foot, since its vision can be blocked by the RHFE
+    if (frame_id_to_transform_to_ == "foot_right") {
+        y_deviation_foot = y_deviation_right_foot;
+    } else if (frame_id_to_transform_to_ == "foot_left") {
+        y_deviation_foot = 0;
+    } else {
+        ROS_WARN_STREAM("The frame id "
+            << frame_id_to_transform_to_
+            << " should be either foot_right or foot_left. Unable to interpret "
+               "the y_deviation_foot, setting it to 0");
+        y_deviation_foot = 0;
+    }
 }
 
 // Updates the gait information limits after calling a transform to the fixed
@@ -407,16 +432,16 @@ bool HullParameterDeterminer::transformGaitInformation()
             // Create the points, in frame_id_to_transform_to frame,
             // with the min and max gait dimensions,
             point = point_utilities::makePointXYZ(
-                min_x_stairs, y_location, min_z_stairs);
+                min_x_stairs, y_deviation_foot, min_z_stairs);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                max_x_stairs, y_location, min_z_stairs);
+                max_x_stairs, y_deviation_foot, min_z_stairs);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                min_x_stairs, y_location, max_z_stairs);
+                min_x_stairs, y_deviation_foot, max_z_stairs);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                max_x_stairs, y_location, max_z_stairs);
+                max_x_stairs, y_deviation_foot, max_z_stairs);
             gait_information_cloud->push_back(point);
 
             // Transform to the fixed frame
@@ -450,6 +475,13 @@ bool HullParameterDeterminer::transformGaitInformation()
             sit_pos_x = gait_information_cloud->points[0].x;
             sit_pos_y = gait_information_cloud->points[0].y;
 
+            break;
+        }
+
+        case RealSenseCategory::ramp_up:
+        case RealSenseCategory::ramp_down: {
+            // There is no relevant gait debug information transform
+            // for the current ramp parameter calculation
             break;
         }
 
@@ -505,9 +537,9 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
             < min_sit_height_world - allowed_deviation_from_reachable_bench) {
         gait_parameters_->first_parameter = -1;
         ROS_ERROR_STREAM("The found sit height should be between "
-            << min_sit_height_world << "( -"
+            << min_sit_height_world << " ( -"
             << allowed_deviation_from_reachable_bench << " ) and "
-            << max_sit_height_world << "( +"
+            << max_sit_height_world << " ( +"
             << allowed_deviation_from_reachable_bench << " ) but was "
             << ramp_slope);
     }
@@ -525,37 +557,40 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 {
-    if (abs(optimal_foot_location.x)
-            > abs(max_x_stairs_world) + allowed_deviation_from_reachable_stair
-        || abs(optimal_foot_location.x) < abs(min_x_stairs_world)
-                - allowed_deviation_from_reachable_stair) {
+    if (optimal_foot_location.x
+            < max_x_stairs_world - allowed_deviation_from_reachable_stair
+        || optimal_foot_location.x
+            > min_x_stairs_world + allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair depth should be between "
-            << min_x_stairs_world << "( -"
+            << min_x_stairs_world << " ( -"
             << allowed_deviation_from_reachable_stair << " ) and "
-            << max_x_stairs_world << "( +"
+            << max_x_stairs_world << " ( +"
             << allowed_deviation_from_reachable_stair << " ) but was "
             << optimal_foot_location.x);
         return false;
     }
-    if (abs(optimal_foot_location.z)
-            > abs(max_z_stairs_world) + allowed_deviation_from_reachable_stair
-        || abs(optimal_foot_location.z) < abs(min_z_stairs_world)
-                - allowed_deviation_from_reachable_stair) {
+    if (optimal_foot_location.z
+            > max_z_stairs_world + allowed_deviation_from_reachable_stair
+        || optimal_foot_location.z
+            < min_z_stairs_world - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair height should be between "
-            << min_z_stairs_world << "( -"
+            << min_z_stairs_world << " ( -"
             << allowed_deviation_from_reachable_stair << " ) and "
-            << max_z_stairs_world << "( +"
+            << max_z_stairs_world << " ( +"
             << allowed_deviation_from_reachable_stair << " ) but was "
             << optimal_foot_location.z);
         return false;
     }
 
-    gait_parameters_->first_parameter
-        = calculateParameter(std::abs(optimal_foot_location.x),
-            min_x_stairs_world, max_x_stairs_world);
-    gait_parameters_->second_parameter
-        = calculateParameter(std::abs(optimal_foot_location.z),
-            min_z_stairs_world, max_z_stairs_world);
+    gait_parameters_->first_parameter = calculateParameter(
+        optimal_foot_location.x, min_x_stairs_world, max_x_stairs_world);
+    if (realsense_category_.value() == RealSenseCategory::stairs_down) {
+        gait_parameters_->second_parameter = calculateParameter(
+            optimal_foot_location.z, max_z_stairs_world, min_z_stairs_world);
+    } else {
+        gait_parameters_->second_parameter = calculateParameter(
+            optimal_foot_location.z, min_z_stairs_world, max_z_stairs_world);
+    }
 
     // The side step parameter is unused for the stairs
     // gait, so it is set to -1
@@ -1040,11 +1075,11 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 {
     if (general_most_desirable_location_is_mid) {
         most_desirable_foot_location_->x = (min_x_stairs + max_x_stairs) / 2.0F;
-        most_desirable_foot_location_->y = y_location;
+        most_desirable_foot_location_->y = y_deviation_foot;
         most_desirable_foot_location_->z = (min_z_stairs + max_z_stairs) / 2.0F;
     } else if (general_most_desirable_location_is_small) {
         most_desirable_foot_location_->x = min_x_stairs_world;
-        most_desirable_foot_location_->y = y_location;
+        most_desirable_foot_location_->y = y_deviation_foot;
         most_desirable_foot_location_->z = min_z_stairs_world;
     } else {
         ROS_ERROR_STREAM("No method for finding the general most desirable "
@@ -1119,7 +1154,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
             + (end - start) * (float)i
                 / ((float)number_of_optional_foot_locations - 1.0F);
         cloud_to_fill->points[i].x = x_location;
-        cloud_to_fill->points[i].y = y_location;
+        cloud_to_fill->points[i].y = y_deviation_foot;
         cloud_to_fill->points[i].z = 0;
     }
     transformer_->transformPointCloud(cloud_to_fill);
