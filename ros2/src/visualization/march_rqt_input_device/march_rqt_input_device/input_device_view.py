@@ -62,8 +62,6 @@ class InputDeviceView(QWidget):
                 get_package_share_directory("march_rqt_input_device"), "resource", "img"
             ).glob("*.png")
         ]
-        logger = rclpy.logging.get_logger("ipd-view")
-        logger.info(f"{self._image_names}")
         self._create_buttons()
         self._update_possible_gaits()
 
@@ -190,8 +188,6 @@ class InputDeviceView(QWidget):
                                 "font: 'Times New Roman'}")
         qt_button.setIconSize(QSize(90, 90))
         qt_button.setText(check_string(name))
-        logger = rclpy.logging.get_logger("ipd-view")
-        logger.info(f"{name}")
         if image_path is not None:
             qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
         elif name + ".png" in self._image_names:
