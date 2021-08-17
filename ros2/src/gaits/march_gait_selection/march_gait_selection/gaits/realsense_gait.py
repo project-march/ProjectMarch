@@ -56,6 +56,7 @@ class RealsenseGait(SetpointsGait):
         "ramp_up": GetGaitParameters.Request.RAMP_UP,
         "ramp_down": GetGaitParameters.Request.RAMP_DOWN,
         "sit": GetGaitParameters.Request.SIT,
+        "curb": GetGaitParameters.Request.CURB
     }
 
     def __init__(
