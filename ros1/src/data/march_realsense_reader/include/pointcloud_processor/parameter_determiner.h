@@ -171,6 +171,9 @@ protected:
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
 
+    // Find the curb parameter from the curb height
+    bool getGaitParametersFromCurbHeight();
+
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(
@@ -209,6 +212,9 @@ protected:
     // The sit analogue of getOptimalFootLocation, find the height at which to
     // sit
     bool getSitHeight();
+
+    // The curb analogue of getOptimalFootLocation, find the height of the curb
+    bool getCurbHeight();
 
     // Fill a cloud with a grid of points where to look for exo support
     bool fillSitGrid(PointCloud::Ptr& sit_grid);
@@ -279,7 +285,7 @@ protected:
     float allowed_deviation_from_reachable_curb {};
     float curb_position_x {};
     float curb_position_y {};
-    float ramp_height {};
+    float curb_height {};
     float ramp_slope {};
 
     std::string subgait_name_;
@@ -300,6 +306,7 @@ protected:
     PointCloud::Ptr foot_locations_to_try;
     PointCloud::Ptr gait_information_cloud;
     PointNormalCloud::Ptr points_on_ramp;
+    PointNormalCloud::Ptr points_on_curb;
     PointCloud::Ptr locations_to_compute_ramp;
 };
 
