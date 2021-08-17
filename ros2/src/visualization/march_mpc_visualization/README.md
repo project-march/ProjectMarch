@@ -40,7 +40,7 @@ The node starts publishing to two adresses:
 |-----------------------------------------------------------------------------------------------------------------|
 
 ## Testing
-To check if the node is operating as expected, check the adresses mentioned in [`Publishing`](#Publishing).
+To check if the node is operating as expected, check the adresses mentioned in the section above.
 
 If there is no data present, but the pages do exist, check if ROS2 contains the correct information:
 
