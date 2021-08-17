@@ -913,7 +913,7 @@ bool HullParameterDeterminer::getCurbHeight()
     return success;
 }
 
-// Check which one
+// Check which points on the curb are reachable and give foot support
 bool HullParameterDeterminer::getValidPointsOnCurb(
     const PointNormalCloud::Ptr& points_on_curb,
     PointNormalCloud::Ptr& valid_points_on_curb)

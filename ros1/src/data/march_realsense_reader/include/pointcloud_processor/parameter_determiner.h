@@ -232,6 +232,11 @@ protected:
         const PointNormalCloud::Ptr& potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
 
+    // Check which points on the curb are reachable and give foot support
+    void getValidPointsOnCurb(
+            const PointNormalCloud::Ptr& points_on_curb,
+            PointNormalCloud::Ptr& valid_points_on_curb);
+
     // Updates the gait information limits after calling a transform to the
     // fixed frame
     bool transformGaitInformation();
