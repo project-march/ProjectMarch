@@ -4,6 +4,7 @@ from typing import List, Callable, Tuple, Optional, Union
 
 from pathlib import Path
 
+import rclpy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QToolButton
@@ -18,7 +19,7 @@ from ament_index_python.packages import get_package_share_directory
 from .image_button import ImageButton
 
 DEFAULT_LAYOUT_FILE = os.path.join(
-    get_package_share_directory("march_rqt_input_device"), "config", "default.json"
+    get_package_share_directory("march_rqt_input_device"), "config", "training.json"
 )
 
 
@@ -83,7 +84,7 @@ class InputDeviceView(QWidget):
         self.content.setLayout(qt_layout)
 
         # Make the frame as tight as possible with spacing between the buttons.
-        qt_layout.setSpacing(15)
+        qt_layout.setSpacing(10)
         self.content.adjustSize()
 
     def _accepted_cb(self) -> None:
@@ -161,7 +162,7 @@ class InputDeviceView(QWidget):
         name: str,
         callback: Optional[Union[str, Callable]] = None,
         image_path: Optional[str] = None,
-        size: Tuple[int, int] = (130, 150),
+        size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
     ):
         """Create a push button which can be pressed to execute a gait instruction.
@@ -182,9 +183,11 @@ class InputDeviceView(QWidget):
         """
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        qt_button.setIconSize(QSize(100, 100))
+        qt_button.setStyleSheet("QToolButton {background-color: lightgrey; "
+                                "font-size: 13px;"
+                                "font: 'Times New Roman'}")
+        qt_button.setIconSize(QSize(90, 90))
         qt_button.setText(check_string(name))
-        qt_button.setStyleSheet("QToolButton {background-color: lightgrey}")
         if image_path is not None:
             qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
         elif name + ".png" in self._image_names:
@@ -254,8 +257,13 @@ def check_string(text: str) -> str:
     """
     words = text.replace("_", " ").split(" ")
     new_string = words[0]
+    characters_since_line_break = len(new_string)
     for index, word in enumerate(words[1:], 1):
-        new_string = (
-            new_string + "\n" + word if index % 3 == 0 else new_string + " " + word
-        )
+        if characters_since_line_break + len(word) > 17:
+            new_string = new_string + "\n" + word
+            characters_since_line_break = len(word)
+        else:
+            new_string = new_string + " " + word
+            characters_since_line_break = len(word) + characters_since_line_break + 1
+
     return new_string
