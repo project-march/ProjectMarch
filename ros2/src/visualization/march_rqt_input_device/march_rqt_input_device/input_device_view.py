@@ -4,7 +4,6 @@ from typing import List, Callable, Tuple, Optional, Union
 
 from pathlib import Path
 
-import rclpy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QToolButton
@@ -13,10 +12,8 @@ from .input_device_controller import InputDeviceController
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
-from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
-from .image_button import ImageButton
 
 DEFAULT_LAYOUT_FILE = os.path.join(
     get_package_share_directory("march_rqt_input_device"), "config", "training.json"
@@ -183,9 +180,11 @@ class InputDeviceView(QWidget):
         """
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        qt_button.setStyleSheet("QToolButton {background-color: lightgrey; "
-                                "font-size: 13px;"
-                                "font: 'Times New Roman'}")
+        qt_button.setStyleSheet(
+            "QToolButton {background-color: lightgrey; "
+            "font-size: 13px;"
+            "font: 'Times New Roman'}"
+        )
         qt_button.setIconSize(QSize(90, 90))
         qt_button.setText(check_string(name))
         if image_path is not None:
