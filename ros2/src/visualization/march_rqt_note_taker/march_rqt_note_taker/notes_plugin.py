@@ -31,8 +31,9 @@ USEFUL_MESSAGE_TEXTS = [
     "reconnected",
     "Interpolating",
     "March is fully operational",
-    "Exoskeleton was started with gain tuning"
+    "Exoskeleton was started with gain tuning",
 ]
+
 
 def main(args=None):
     """The main function used to start up the rqt note taker."""
@@ -50,8 +51,6 @@ def main(args=None):
 
 
 class NotesPlugin(Plugin):
-
-
     def __init__(self, context):
         """Initialize the NotesPLugin."""
         super(NotesPlugin, self).__init__(context)
@@ -91,17 +90,20 @@ class NotesPlugin(Plugin):
             Trigger, "/march/gait_selection/get_version_map"
         )
 
-        config_client = self._node.create_client(Trigger,
-                                     "/march/gain_scheduling/get_configuration")
+        config_client = self._node.create_client(
+            Trigger, "/march/gain_scheduling/get_configuration"
+        )
         if not config_client.service_is_ready():
             while config_client.wait_for_service(timeout_sec=1):
-                self._node.get_logger().warn("Failed to contact gain scheduling config "
-                                             "service")
+                self._node.get_logger().warn(
+                    "Failed to contact gain scheduling config " "service"
+                )
         future = config_client.call_async(Trigger.Request())
-        future.add_done_callback(lambda res: self._model.insert_row(
-            Entry(f"Configuration is {future.result().message}")
-        ))
-
+        future.add_done_callback(
+            lambda res: self._model.insert_row(
+                Entry(f"Configuration is {future.result().message}")
+            )
+        )
 
     def filter_useful_text(self, log):
         for text in USEFUL_MESSAGE_TEXTS:

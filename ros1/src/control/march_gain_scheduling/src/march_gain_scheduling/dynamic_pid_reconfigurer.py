@@ -25,13 +25,14 @@ class DynamicPIDReconfigurer:
         rospy.Service(
             "/march/gain_scheduling/get_configuration",
             Trigger,
-            handler=self.configuration_cb
+            handler=self.configuration_cb,
         )
         self._linearize = rospy.get_param("~linearize_gain_scheduling")
         self._gradient = rospy.get_param("~linear_slope")
         self._configuration = rospy.get_param("~configuration")
-        rospy.loginfo(f"Exoskeleton was started with gain tuning for "
-                      f"{self._configuration}")
+        rospy.loginfo(
+            f"Exoskeleton was started with gain tuning for " f"{self._configuration}"
+        )
 
     def gait_selection_callback(self, msg):
         new_gait_type = msg.gait_type

@@ -20,7 +20,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 "default_save_directory",
                 default_value="note-taker-notes",
                 description="Where to autosave the notes, if nothing is done by the "
-                            "monitor."
+                "monitor.",
             ),
             Node(
                 package="march_rqt_note_taker",
@@ -28,9 +28,14 @@ def generate_launch_description() -> launch.LaunchDescription:
                 output="screen",
                 name="note_taker",
                 namespace="march",
-                parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")},
-                            {"default_save_directory": LaunchConfiguration(
-                                "default_save_directory")}],
+                parameters=[
+                    {"use_sim_time": LaunchConfiguration("use_sim_time")},
+                    {
+                        "default_save_directory": LaunchConfiguration(
+                            "default_save_directory"
+                        )
+                    },
+                ],
             ),
         ]
     )
