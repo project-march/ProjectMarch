@@ -933,7 +933,6 @@ void HullParameterDeterminer::getValidPointsOnCurb(
     for (pcl::PointNormal point_on_curb : *points_on_curb) {
         if (isValidLocation(point_on_curb)) {
             valid_points_on_curb->push_back(point_on_curb);
-            ROS_WARN_STREAM("Adding a point to the valid curb cloud");
         }
     }
 }
