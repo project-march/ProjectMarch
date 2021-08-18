@@ -238,7 +238,7 @@ class GaitVersionToolView(QWidget):
     def _refresh(self):
         """Request the gait map from the gait selection node and display the available gaits in the gait menu."""
         self._is_refresh_active = True
-        self._clear_gui(clear_gait_menu=True)
+        self._clear_gui()
 
         try:
             self.available_gaits = self._controller.get_directory_structure()
