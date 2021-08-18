@@ -505,11 +505,11 @@ bool HullParameterDeterminer::transformGaitInformation()
         case RealSenseCategory::curb_up:
         case RealSenseCategory::curb_down: {
             point = point_utilities::makePointXYZ(
-                    (min_curb_search + max_curb_search) / 2.0, y_deviation_foot,
+                (min_curb_search + max_curb_search) / 2.0, y_deviation_foot,
                 min_curb_height);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                    (min_curb_search + max_curb_search) / 2.0, y_deviation_foot,
+                (min_curb_search + max_curb_search) / 2.0, y_deviation_foot,
                 max_curb_height);
             gait_information_cloud->push_back(point);
 
