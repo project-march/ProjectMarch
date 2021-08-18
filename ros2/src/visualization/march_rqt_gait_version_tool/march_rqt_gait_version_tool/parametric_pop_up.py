@@ -1,3 +1,5 @@
+from typing import List
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
@@ -29,6 +31,10 @@ class ParametricPopUpWindow(QDialog):
             lambda: self.four_subgait_interpolation_changed()
         )
         self.set_second_parameterize_enabled(False)
+
+        self.uses_four_subgait_interpolation = False
+        self.parameters: List[float] = []
+        self.selected_versions: List[str] = []
 
     def show_pop_up(self, versions):
         """Reset and show pop up."""
@@ -97,17 +103,17 @@ class ParametricPopUpWindow(QDialog):
 
     def save(self):
         """Check and save value while closing, close if successful."""
-        self.four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
+        self.uses_four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
+
+        self.parameters = [self.firstParameterSlider.value() / 100.0]
+        self.selected_versions = [
+            self.firstVersionComboBox.currentText(),
+            self.secondVersionComboBox.currentText(),
+        ]
+
         if self.four_subgait_interpolation:
-            self.first_version = self.firstVersionComboBox.currentText()
-            self.second_version = self.secondVersionComboBox.currentText()
-            self.third_version = self.thirdVersionComboBox.currentText()
-            self.fourth_version = self.fourthVersionComboBox.currentText()
-            self.first_parameter = self.firstParameterSlider.value() / 100.0
-            self.second_parameter = self.secondParameterSlider.value() / 100.0
-            self.accept()
-        else:
-            self.base_version = self.firstVersionComboBox.currentText()
-            self.other_version = self.secondVersionComboBox.currentText()
-            self.parameter = self.firstParameterSlider.value() / 100.0
-            self.accept()
+            self.parameters.append(self.secondParameterSlider.value() / 100.0)
+            self.selected_versions.append(self.thirdVersionComboBox.currentText())
+            self.selected_versions.append(self.fourthVersionComboBox.currentText())
+
+        self.accept()

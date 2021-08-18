@@ -1,12 +1,23 @@
-import re
+import ast
+from typing import Dict, List
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QTextBrowser, QDialogButtonBox, QLineEdit
 from python_qt_binding import loadUi
 from .parametric_pop_up import ParametricPopUpWindow
 from .subgait_version_select import select_same_subgait_versions
 
 NUM_SECTIONS = 4
+
+
+class ParseException(Exception):
+    def __init__(self, msg: str):
+        super().__init__(f"Something went wrong while parsing input: {msg}")
+
+
+class ParseSubgaitException(ParseException):
+    def __init__(self, index: int):
+        super().__init__(f"Unable to parse selected subgaits of box {index}")
 
 
 class ParametricSameVersionsPopUpWindow(QDialog):
@@ -16,7 +27,7 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         )
         loadUi(ui_file, self)
 
-        self.buttonBox.accepted.connect(self.ok)
+        self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
 
         self.firstParameterSlider.valueChanged.connect(
@@ -57,6 +68,9 @@ class ParametricSameVersionsPopUpWindow(QDialog):
 
         self.gait = ""
         self.subgaits = {}
+        self.uses_four_subgait_interpolation = False
+        self.parameters: List[float] = []
+        self.all_selected_versions: List[Dict[str, str]] = []
 
         self._init_sliders()
 
@@ -81,9 +95,27 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         """Close without applying the values."""
         self.reject()
 
-    def ok(self):
+    def save(self):
         """Save value while closing."""
-        self.accept()
+        try:
+            self.uses_four_subgait_interpolation = (
+                self.fourSubgaitInterpolation.isChecked()
+            )
+
+            self.parameters = [self.firstParameterSlider.value() / 100]
+            self.all_selected_versions = [
+                self._get_selected_subgaits(1),
+                self._get_selected_subgaits(2),
+            ]
+
+            if self.uses_four_subgait_interpolation:
+                self.parameters.append(self.secondParameterSlider.value() / 100)
+                self.all_selected_versions.append(self._get_selected_subgaits(3))
+                self.all_selected_versions.append(self._get_selected_subgaits(4))
+
+            self.accept()
+        except ParseException:
+            self.reject()
 
     def four_subgait_interpolation_changed(self):
         """Unlocks the buttons for four subgait interpolation when it is enabled"""
@@ -93,14 +125,14 @@ class ParametricSameVersionsPopUpWindow(QDialog):
             self.set_second_parameterize_enabled(False)
 
     def set_second_parameterize_enabled(self, value: bool):
-        self.prefix_input3.setEnabled(value)
-        self.prefix_input4.setEnabled(value)
-        self.postfix_input3.setEnabled(value)
-        self.postfix_input4.setEnabled(value)
-        self.subgaitButtonBox3.setEnabled(value)
-        self.subgaitButtonBox4.setEnabled(value)
-        self.selectedSubgaits3.setEnabled(value)
-        self.selectedSubgaits4.setEnabled(value)
+        self.get_prefix_input_line_edit(3).setEnabled(value)
+        self.get_prefix_input_line_edit(4).setEnabled(value)
+        self.get_postfix_input_line_edit(3).setEnabled(value)
+        self.get_postfix_input_line_edit(4).setEnabled(value)
+        self._get_subgait_button_box(3).setEnabled(value)
+        self._get_subgait_button_box(4).setEnabled(value)
+        self._get_selected_subgaits_text_browser(3).setEnabled(value)
+        self._get_selected_subgaits_text_browser(4).setEnabled(value)
         self.secondParameterSlider.setEnabled(value)
 
     def _select_same_versions(self, index: int):
@@ -121,9 +153,37 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         return self.__getattribute__(f"postfix_input{index}").text()
 
     def _clear_subgait_selection(self, index: int):
-        self.__getattribute__(f"prefix_input{index}").setText("")
-        self.__getattribute__(f"postfix_input{index}").setText("")
-        self.__getattribute__(f"selectedSubgaits{index}").setText("")
+        self.get_prefix_input_line_edit(index).setText("")
+        self.get_postfix_input_line_edit(index).setText("")
+        self._get_selected_subgaits_text_browser(index).setText("")
+
+    def _get_selected_subgaits_text_browser(self, index) -> QTextBrowser:
+        return self.__getattribute__(f"selectedSubgaits{index}")
+
+    def _get_subgait_button_box(self, index) -> QDialogButtonBox:
+        return self.__getattribute__(f"subgaitButtonBox{index}")
+
+    def get_prefix_input_line_edit(self, index) -> QLineEdit:
+        return self.__getattribute__(f"prefix_input{index}")
+
+    def get_postfix_input_line_edit(self, index) -> QLineEdit:
+        return self.__getattribute__(f"postfix_input{index}")
+
+    def _get_selected_subgaits(self, index: int) -> dict:
+        text = self._get_selected_subgaits_text_browser(index).toPlainText()
+
+        if text == "":
+            raise ParseSubgaitException(index)
+
+        try:
+            selected_subgaits = ast.literal_eval(text)
+        except SyntaxError:
+            raise ParseSubgaitException(index)
+
+        if not isinstance(selected_subgaits, dict):
+            raise ParseSubgaitException(index)
+
+        return selected_subgaits
 
     def _reset_all(self):
         for i in range(NUM_SECTIONS):
