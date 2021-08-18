@@ -63,11 +63,11 @@ gaits:
     left_close: MVI_walksinglestep_leftclose_v12
   
   walk_large:
-    left_close: MVI_walklarge_leftclose_v12
-    left_swing: MVI_walklarge_leftswing_v12
-    right_close: MVI_walklarge_rightclose_v12
-    right_open: MVI_walklarge_rightopen_v12
-    right_swing: MVI_walklarge_rightswing_v12
+    left_close: MVI_walklarge_leftclose_v14
+    left_swing: MVI_walklarge_leftswing_v14
+    right_close: MVI_walklarge_rightclose_v14
+    right_open: MVI_walklarge_rightopen_v14
+    right_swing: MVI_walklarge_rightswing_v14
 
   walk_single_step_large:
     right_open: MVI_walksinglesteplarge_rightopen_v12
