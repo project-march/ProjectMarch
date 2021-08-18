@@ -625,9 +625,6 @@ bool HullParameterDeterminer::getGaitParametersFromCurbHeight()
             curb_height, min_curb_height_world, max_curb_height_world);
     }
 
-    gait_parameters_->first_parameter = calculateParameter(
-        curb_height, min_curb_height_world, max_curb_height_world);
-
     // The step height and side step parameter are unused for the sit
     // gait, so they are set to -1
     gait_parameters_->second_parameter = -1;
