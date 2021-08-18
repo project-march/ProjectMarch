@@ -117,6 +117,20 @@
   ],
   [
     {
+      "name": "curb_up"
+    },
+    {
+      "name": "curb_down"
+    },
+    {
+      "name": "realsense_curb_up"
+    },
+    {
+      "name": "realsense_curb_down"
+    }
+  ],
+  [
+    {
       "name": "stairs_down_backwards"
     },
     {
