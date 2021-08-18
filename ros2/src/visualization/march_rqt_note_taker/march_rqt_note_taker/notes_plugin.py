@@ -27,6 +27,13 @@ from .filter_map import FilterMap
 from .notes_widget import NotesWidget
 
 
+USEFUL_MESSAGE_TEXTS = [
+    "reconnected",
+    "Interpolating",
+    "March is fully operational",
+    "Exoskeleton was started with gain tuning"
+]
+
 def main(args=None):
     """The main function used to start up the rqt note taker."""
     rclpy.init(args=args)
@@ -43,6 +50,8 @@ def main(args=None):
 
 
 class NotesPlugin(Plugin):
+
+
     def __init__(self, context):
         """Initialize the NotesPLugin."""
         super(NotesPlugin, self).__init__(context)
@@ -52,7 +61,7 @@ class NotesPlugin(Plugin):
         )
 
         self._node: Node = context.node
-
+        self._node.declare_parameter("default_save_directory")
         self._model = EntryModel()
         self._widget = NotesWidget(self._model, ui_file, self._node)
         context.add_widget(self._widget)
@@ -63,8 +72,9 @@ class NotesPlugin(Plugin):
         # or when the content is 'March is fully operational'
         self._filter_map = FilterMap()
         self._filter_map.add_filter_on_minimal_level(Log.ERROR)
+
         self._filter_map.add_filter_on_level(
-            level=Log.INFO, msg_filter=lambda l: l.msg == "March is fully operational"
+            level=Log.INFO, msg_filter=self.filter_useful_text
         )
 
         self._node.create_subscription(
@@ -80,6 +90,24 @@ class NotesPlugin(Plugin):
         self._get_gait_version_map_client = self._node.create_client(
             Trigger, "/march/gait_selection/get_version_map"
         )
+
+        config_client = self._node.create_client(Trigger,
+                                     "/march/gain_scheduling/get_configuration")
+        if not config_client.service_is_ready():
+            while config_client.wait_for_service(timeout_sec=1):
+                self._node.get_logger().warn("Failed to contact gain scheduling config "
+                                             "service")
+        future = config_client.call_async(Trigger.Request())
+        future.add_done_callback(lambda res: self._model.insert_row(
+            Entry(f"Configuration is {future.result().message}")
+        ))
+
+
+    def filter_useful_text(self, log):
+        for text in USEFUL_MESSAGE_TEXTS:
+            if text in log.msg:
+                return True
+        return False
 
     def _should_use_current_time(self) -> bool:
         """Determine whether the rqt_note_taker should use the current time

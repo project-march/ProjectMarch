@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from pathlib import Path
 
 from python_qt_binding import QtCore, loadUi
 from python_qt_binding.QtCore import QAbstractTableModel
@@ -27,7 +29,14 @@ class NotesWidget(QWidget):
         self._can_save = True
         self._has_autosave = True
         self._autosave_file = None
-        self._last_save_file = None
+        default_save_dir = node.get_parameter(
+            "default_save_directory").get_parameter_value().string_value
+        default_save_path = f"{Path.home()}/.ros/{default_save_dir}"
+        if not os.path.exists(default_save_path):
+            os.makedirs(default_save_path)
+
+        self._last_save_file = f"{default_save_path}/note-taker" \
+                               f"-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
 
         self._node = node
 
@@ -152,9 +161,11 @@ class NotesWidget(QWidget):
         :param last: the last index of affected entries in the model(inclusive)
         :param action: Either INSERT or REMOVE
         """
+        self._node.get_logger().info("Autosaving")
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
                 try:
+                    self._node.get_logger().info(f"Opening last: {self._last_save_file}")
                     self._autosave_file = open(  # noqa: SIM115
                         self._last_save_file, "r+"
                     )
@@ -166,6 +177,7 @@ class NotesWidget(QWidget):
                     )
                     return
             try:
+                self._node.get_logger().info(f"Action: {action}")
                 if action == self.INSERT:
                     if first != 0:
                         self._autosave_file.write("\n")

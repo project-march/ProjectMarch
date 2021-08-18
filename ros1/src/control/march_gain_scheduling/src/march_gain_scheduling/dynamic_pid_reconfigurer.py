@@ -2,6 +2,7 @@ from dynamic_reconfigure.client import Client
 import rospy
 
 from march_shared_msgs.msg import CurrentGait
+from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 
 from .one_step_linear_interpolation import interpolate
 
@@ -21,8 +22,16 @@ class DynamicPIDReconfigurer:
             CurrentGait,
             callback=self.gait_selection_callback,
         )
+        rospy.Service(
+            "/march/gain_scheduling/get_configuration",
+            Trigger,
+            handler=self.configuration_cb
+        )
         self._linearize = rospy.get_param("~linearize_gain_scheduling")
         self._gradient = rospy.get_param("~linear_slope")
+        self._configuration = rospy.get_param("~configuration")
+        rospy.loginfo(f"Exoskeleton was started with gain tuning for "
+                      f"{self._configuration}")
 
     def gait_selection_callback(self, msg):
         new_gait_type = msg.gait_type
@@ -105,3 +114,6 @@ class DynamicPIDReconfigurer:
             self.current_gains[i] == needed_gains[i]
             for i in range(len(self._joint_list))
         )
+
+    def configuration_cb(self, req: TriggerRequest):
+        return TriggerResponse(success=True, message=self._configuration)
