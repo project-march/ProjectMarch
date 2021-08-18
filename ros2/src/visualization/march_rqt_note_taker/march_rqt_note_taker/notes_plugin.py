@@ -106,10 +106,7 @@ class NotesPlugin(Plugin):
         )
 
     def filter_useful_text(self, log):
-        for text in USEFUL_MESSAGE_TEXTS:
-            if text in log.msg:
-                return True
-        return False
+        return any(text in log.msg for text in USEFUL_MESSAGE_TEXTS)
 
     def _should_use_current_time(self) -> bool:
         """Determine whether the rqt_note_taker should use the current time
