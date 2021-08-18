@@ -257,7 +257,7 @@ def check_string(text: str) -> str:
     words = text.replace("_", " ").split(" ")
     new_string = words[0]
     characters_since_line_break = len(new_string)
-    for index, word in enumerate(words[1:], 1):
+    for _, word in enumerate(words[1:], 1):
         if characters_since_line_break + len(word) > 17:
             new_string = new_string + "\n" + word
             characters_since_line_break = len(word)
