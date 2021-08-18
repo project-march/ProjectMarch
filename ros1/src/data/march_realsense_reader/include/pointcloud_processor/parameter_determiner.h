@@ -282,8 +282,10 @@ protected:
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
     float sit_height {};
+    float max_curb_up_height {};
     float max_curb_height {};
     float max_curb_height_world {};
+    float min_curb_up_height {};
     float min_curb_height {};
     float min_curb_height_world {};
     float allowed_deviation_from_reachable_curb {};
