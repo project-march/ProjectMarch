@@ -18,7 +18,7 @@ from ament_index_python.packages import get_package_share_directory
 DEFAULT_LAYOUT_FILE = os.path.join(
     get_package_share_directory("march_rqt_input_device"), "config", "training.json"
 )
-
+MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
 class InputDeviceView(QWidget):
     """
@@ -258,7 +258,7 @@ def check_string(text: str) -> str:
     new_string = words[0]
     characters_since_line_break = len(new_string)
     for _, word in enumerate(words[1:], 1):
-        if characters_since_line_break + len(word) > 17:
+        if characters_since_line_break + len(word) > MAX_CHARACTERS_PER_LINE_BUTTON:
             new_string = new_string + "\n" + word
             characters_since_line_break = len(word)
         else:
