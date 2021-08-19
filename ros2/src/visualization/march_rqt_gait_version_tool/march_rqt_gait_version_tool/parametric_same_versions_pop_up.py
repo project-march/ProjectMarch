@@ -23,7 +23,7 @@ class ParseError(Exception):
         super().__init__(f"Something went wrong while parsing input: {msg}")
 
 
-class ParseSubgaitException(ParseError):
+class ParseSubgaitError(ParseError):
     def __init__(self, index: int):
         super().__init__(f"Unable to parse selected subgaits of box {index}")
 
@@ -41,11 +41,9 @@ class ParametricSameVersionsPopUpWindow(QDialog):
 
         # Connect parameter sliders to parameter labels
         self._get_parameter_slider(1).valueChanged.connect(
-            lambda: self._parameter_value_changed(1)
-        )
+                lambda: self._parameter_value_changed(1))
         self._get_parameter_slider(2).valueChanged.connect(
-            lambda: self._parameter_value_changed(2)
-        )
+                lambda: self._parameter_value_changed(2))
 
         self.fourSubgaitInterpolation.stateChanged.connect(
             lambda: self._four_subgait_interpolation_changed()
@@ -53,26 +51,22 @@ class ParametricSameVersionsPopUpWindow(QDialog):
 
         # Connect subgaitButtonBoxes to selecting same versions
         self._get_subgait_button_box(1).accepted.connect(
-            lambda: self._select_same_versions(1)
-        )
+            lambda: self._select_same_versions(1))
         self._get_subgait_button_box(1).rejected.connect(
             lambda: self._clear_subgait_selection(1)
         )
         self._get_subgait_button_box(2).accepted.connect(
-            lambda: self._select_same_versions(2)
-        )
+            lambda: self._select_same_versions(2))
         self._get_subgait_button_box(2).rejected.connect(
             lambda: self._clear_subgait_selection(2)
         )
         self._get_subgait_button_box(3).accepted.connect(
-            lambda: self._select_same_versions(3)
-        )
+            lambda: self._select_same_versions(3))
         self._get_subgait_button_box(3).rejected.connect(
             lambda: self._clear_subgait_selection(3)
         )
         self._get_subgait_button_box(4).accepted.connect(
-            lambda: self._select_same_versions(4)
-        )
+            lambda: self._select_same_versions(4))
         self._get_subgait_button_box(4).rejected.connect(
             lambda: self._clear_subgait_selection(4)
         )
@@ -136,12 +130,13 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         else:
             return
         self._get_parameter_label(index).setText(
-            f"{index_str} parameter = {self._get_parameter_slider(index).value() / 100:.2f}"
-        )
+            f"{index_str} parameter = {self._get_parameter_slider(index).value() / 100:.2f}")
 
     def _four_subgait_interpolation_changed(self):
         """Unlocks the buttons for four subgait interpolation when it is enabled"""
-        self.uses_four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
+        self.uses_four_subgait_interpolation = (
+            self.fourSubgaitInterpolation.isChecked()
+        )
         if self.uses_four_subgait_interpolation:
             self.set_second_parameterize_enabled(True)
         else:
@@ -174,9 +169,7 @@ class ParametricSameVersionsPopUpWindow(QDialog):
             )
 
             if len(selected_versions) != len(self.subgaits):
-                difference = set(self.subgaits.keys()).difference(
-                    set(selected_versions.keys())
-                )
+                difference = set(self.subgaits.keys()).difference(set(selected_versions.keys()))
                 output = f"Could not find version for subgaits: {difference}"
             else:
                 output = str(selected_versions)
@@ -219,15 +212,15 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         text = self._get_selected_subgaits_text_browser(index).toPlainText()
 
         if text == "":
-            raise ParseSubgaitException(index)
+            raise ParseSubgaitError(index)
 
         try:
             selected_subgaits = ast.literal_eval(text)
         except SyntaxError:
-            raise ParseSubgaitException(index)
+            raise ParseSubgaitError(index)
 
         if not isinstance(selected_subgaits, dict) or len(selected_subgaits) == 0:
-            raise ParseSubgaitException(index)
+            raise ParseSubgaitError(index)
 
         return selected_subgaits
 
