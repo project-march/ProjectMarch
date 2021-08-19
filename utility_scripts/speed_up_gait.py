@@ -4,7 +4,7 @@ import yaml
 
 speed_up_factor = 1.1
 
-directory_path = "../march_gait_files/airgait_vi/"
+directory_path = "../ros2/src/gaits/march_gait_files/airgait_vi/"
 gait_name = "walk"
 common_prefix = "MVI_" + gait_name.replace("_", "") + "_"
 common_suffix = "_v9"

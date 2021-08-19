@@ -107,7 +107,7 @@ start_positions_set = 0
 end_positions_set = 0
 paths_that_failed = []
 for path in Path(
-    "../march_gait_files/airgait_vi/",
+    "../ros2/src/gaits/march_gait_files/airgait_vi/",
 ).rglob("*.subgait"):
     try:
         with open(path, "r") as subgait_file:
