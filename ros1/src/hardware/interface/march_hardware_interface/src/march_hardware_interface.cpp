@@ -191,6 +191,9 @@ void MarchHardwareInterface::call_and_wait_once_for_each_joint(
 
 void MarchHardwareInterface::call_and_wait_while_checking_for_each_joint(
     std::function<bool(march::Joint&)> const& f,
+    std::optional<std::function<void(march::Joint&)>> const&
+        maximum_tries_debug_f
+    = std::nullopt,
     const ros::Duration wait_duration = ros::Duration(/*t=*/1),
     const unsigned maximum_tries = 10)
 {
@@ -210,6 +213,13 @@ void MarchHardwareInterface::call_and_wait_while_checking_for_each_joint(
     }
 
     if (!all(is_ok)) {
+        if (maximum_tries_debug_f.has_value()) {
+            auto callable = maximum_tries_debug_f.value();
+            for (size_t i = 0; i < num_joints_; ++i) {
+                callable(march_robot_->getJoint(i));
+            }
+        }
+
         throw march::error::HardwareException(march::error::ErrorType::
                 BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
     }
@@ -219,9 +229,14 @@ void MarchHardwareInterface::startJoints()
 {
     // Make sure that all slaves send valid EtherCAT data
     ROS_INFO("Waiting for slaves to send EtherCAT data...");
-    call_and_wait_while_checking_for_each_joint([](march::Joint& joint) {
-        return joint.getMotorController()->getState()->dataIsValid();
-    });
+    call_and_wait_while_checking_for_each_joint(
+        [](march::Joint& joint) {
+            return joint.getMotorController()->getState()->dataIsValid();
+        },
+        [](march::Joint& joint) {
+            ROS_INFO(
+                "Joints %s is not receiving data", joint.getName().c_str());
+        });
     ROS_INFO("All slaves are sending EtherCAT data");
 
     auto is_operational = march_robot_->areJointsOperational();
@@ -244,9 +259,14 @@ void MarchHardwareInterface::startJoints()
         for (size_t i = 0; i < num_joints_; ++i) {
             march_robot_->getJoint(i).enableActuation();
         }
-        call_and_wait_while_checking_for_each_joint([](march::Joint& joint) {
-            return joint.getMotorController()->getState()->isOperational();
-        });
+        call_and_wait_while_checking_for_each_joint(
+            [](march::Joint& joint) {
+                return joint.getMotorController()->getState()->isOperational();
+            },
+            [](march::Joint& joint) {
+                ROS_INFO("Joints %s is not in operational state",
+                    joint.getName().c_str());
+            });
     }
 
     // Read the first encoder values for each joint
