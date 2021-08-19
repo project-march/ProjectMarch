@@ -18,12 +18,12 @@ from .subgait_version_select import select_same_subgait_versions
 NUM_SECTIONS = 4
 
 
-class ParseException(Exception):
+class ParseError(Exception):
     def __init__(self, msg: str):
         super().__init__(f"Something went wrong while parsing input: {msg}")
 
 
-class ParseSubgaitException(ParseException):
+class ParseSubgaitException(ParseError):
     def __init__(self, index: int):
         super().__init__(f"Unable to parse selected subgaits of box {index}")
 
@@ -37,6 +37,7 @@ class ParametricSameVersionsPopUpWindow(QDialog):
 
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
 
         # Connect parameter sliders to parameter labels
         self._get_parameter_slider(1).valueChanged.connect(
@@ -51,13 +52,30 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         )
 
         # Connect subgaitButtonBoxes to selecting same versions
-        for i in range(1, 5):
-            self._get_subgait_button_box(i).accepted.connect(
-                lambda: self._select_same_versions(i)
-            )
-            self._get_subgait_button_box(i).rejected.connect(
-                lambda: self._clear_subgait_selection(i)
-            )
+        self._get_subgait_button_box(1).accepted.connect(
+            lambda: self._select_same_versions(1)
+        )
+        self._get_subgait_button_box(1).rejected.connect(
+            lambda: self._clear_subgait_selection(1)
+        )
+        self._get_subgait_button_box(2).accepted.connect(
+            lambda: self._select_same_versions(2)
+        )
+        self._get_subgait_button_box(2).rejected.connect(
+            lambda: self._clear_subgait_selection(2)
+        )
+        self._get_subgait_button_box(3).accepted.connect(
+            lambda: self._select_same_versions(3)
+        )
+        self._get_subgait_button_box(3).rejected.connect(
+            lambda: self._clear_subgait_selection(3)
+        )
+        self._get_subgait_button_box(4).accepted.connect(
+            lambda: self._select_same_versions(4)
+        )
+        self._get_subgait_button_box(4).rejected.connect(
+            lambda: self._clear_subgait_selection(4)
+        )
 
         self.resetAllButton.clicked.connect(self._reset_all)
 
@@ -83,6 +101,8 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         self.gait = gait
         self.subgaits = subgaits
 
+        self.allVersions.setText(str(self.subgaits))
+
         return super(ParametricSameVersionsPopUpWindow, self).exec_()
 
     def cancel(self):
@@ -92,23 +112,19 @@ class ParametricSameVersionsPopUpWindow(QDialog):
     def save(self):
         """Save value while closing."""
         try:
-            self.uses_four_subgait_interpolation = (
-                self.fourSubgaitInterpolation.isChecked()
-            )
-
-            self.parameters = [self.firstParameterSlider.value() / 100]
+            self.parameters = [self._get_parameter_slider(1).value() / 100]
             self.all_selected_versions = [
                 self._get_selected_subgaits(1),
                 self._get_selected_subgaits(2),
             ]
 
             if self.uses_four_subgait_interpolation:
-                self.parameters.append(self.secondParameterSlider.value() / 100)
+                self.parameters.append(self._get_parameter_slider(2).value() / 100)
                 self.all_selected_versions.append(self._get_selected_subgaits(3))
                 self.all_selected_versions.append(self._get_selected_subgaits(4))
 
             self.accept()
-        except ParseException:
+        except ParseError:
             self.reject()
 
     def _parameter_value_changed(self, index: int):
@@ -125,10 +141,12 @@ class ParametricSameVersionsPopUpWindow(QDialog):
 
     def _four_subgait_interpolation_changed(self):
         """Unlocks the buttons for four subgait interpolation when it is enabled"""
-        if self.fourSubgaitInterpolation.isChecked():
+        self.uses_four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
+        if self.uses_four_subgait_interpolation:
             self.set_second_parameterize_enabled(True)
         else:
             self.set_second_parameterize_enabled(False)
+        self._verify_input()
 
     def set_second_parameterize_enabled(self, value: bool):
         widgets: List[QWidget] = [
@@ -150,18 +168,23 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         prefix = self.get_subgait_prefix(index)
         postfix = self.get_subgait_postfix(index)
 
-        selected_versions = select_same_subgait_versions(
-            self.gait, self.subgaits, prefix, postfix
-        )
-
-        if len(selected_versions) != self.subgaits:
-            difference = set(self.subgaits.keys()).difference(
-                set(selected_versions.keys())
+        if not (prefix == "" and postfix == ""):
+            selected_versions = select_same_subgait_versions(
+                self.gait, self.subgaits, prefix, postfix
             )
-            output = f"Could not find version for subgaits: {difference}"
+
+            if len(selected_versions) != len(self.subgaits):
+                difference = set(self.subgaits.keys()).difference(
+                    set(selected_versions.keys())
+                )
+                output = f"Could not find version for subgaits: {difference}"
+            else:
+                output = str(selected_versions)
         else:
-            output = str(selected_versions)
+            output = "Prefix and postfix cannot both be empty"
         self.__getattribute__(f"selectedSubgaits{index}").setText(output)
+
+        self._verify_input()
 
     def get_subgait_prefix(self, index: int):
         return self.__getattribute__(f"prefix_input{index}").text()
@@ -203,7 +226,7 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         except SyntaxError:
             raise ParseSubgaitException(index)
 
-        if not isinstance(selected_subgaits, dict):
+        if not isinstance(selected_subgaits, dict) or len(selected_subgaits) == 0:
             raise ParseSubgaitException(index)
 
         return selected_subgaits
@@ -212,3 +235,21 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         for i in range(NUM_SECTIONS):
             self._clear_subgait_selection(i + 1)
         self._init_sliders()
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+
+    def _verify_input(self):
+        # Try parsing every necessary subgait selection box
+        try:
+            self._get_selected_subgaits(1)
+            self._get_selected_subgaits(2)
+
+            if self.uses_four_subgait_interpolation:
+                self._get_selected_subgaits(3)
+                self._get_selected_subgaits(4)
+
+        except ParseError:
+            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+            return
+
+        # Enable the ok button if input is valid
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
