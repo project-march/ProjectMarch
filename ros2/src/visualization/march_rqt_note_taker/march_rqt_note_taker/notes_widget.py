@@ -166,13 +166,9 @@ class NotesWidget(QWidget):
         :param last: the last index of affected entries in the model(inclusive)
         :param action: Either INSERT or REMOVE
         """
-        self._node.get_logger().info("Autosaving")
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
                 try:
-                    self._node.get_logger().info(
-                        f"Opening last: {self._last_save_file}"
-                    )
                     self._autosave_file = open(  # noqa: SIM115
                         self._last_save_file, "r+"
                     )
@@ -184,7 +180,6 @@ class NotesWidget(QWidget):
                     )
                     return
             try:
-                self._node.get_logger().info(f"Action: {action}")
                 if action == self.INSERT:
                     if first != 0:
                         self._autosave_file.write("\n")
