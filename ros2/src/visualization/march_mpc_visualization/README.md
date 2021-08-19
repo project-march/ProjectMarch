@@ -1,7 +1,7 @@
 # MPC Visualization
 Package that subscribes to the `/march/mpc` topic in `ROS2`, and publishes to the local network via HTTP.  
 Model predictive controllers (MPC) provide estimation of future states. Visualising these estimations via ROS is difficult,
-since RQT does not support data in the future. This package provides a way to publish these estimates to the local network,
+since RQT only supports visualizing time-series. This package provides a way to publish these estimates to the local network,
 so that custom visualization tool can be used.
 
 .. hint:: This node requires manual launching
@@ -9,6 +9,7 @@ so that custom visualization tool can be used.
 ## How to build
 ```bash
 source /opt/ros/foxy/local_setup.bash
+# In your ros2 directory
 colcon build --packages-select march_mpc_visualization
 ```  
 
