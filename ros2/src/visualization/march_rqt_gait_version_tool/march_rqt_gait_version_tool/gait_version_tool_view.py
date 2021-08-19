@@ -1,5 +1,3 @@
-import ast
-import re
 from enum import Enum
 from typing import List
 
@@ -10,8 +8,8 @@ from python_qt_binding import loadUi
 from .gait_version_tool_errors import GaitVersionToolError
 from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
-from .same_versions_pop_up import SameVersionsPopUpWindow
 from .parametric_same_versions_pop_up import ParametricSameVersionsPopUpWindow
+from .same_versions_pop_up import SameVersionsPopUpWindow
 from .subgait_version_select import select_same_subgait_versions
 
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3

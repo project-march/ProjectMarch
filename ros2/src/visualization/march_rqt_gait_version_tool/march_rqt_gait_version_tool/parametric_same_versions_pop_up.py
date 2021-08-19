@@ -2,9 +2,17 @@ import ast
 from typing import Dict, List
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QTextBrowser, QDialogButtonBox, QLineEdit
+from PyQt5.QtWidgets import (
+    QDialog,
+    QTextBrowser,
+    QDialogButtonBox,
+    QLineEdit,
+    QLabel,
+    QSlider,
+    QWidget,
+)
 from python_qt_binding import loadUi
-from .parametric_pop_up import ParametricPopUpWindow
+
 from .subgait_version_select import select_same_subgait_versions
 
 NUM_SECTIONS = 4
@@ -30,41 +38,28 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
 
-        self.firstParameterSlider.valueChanged.connect(
-            lambda: ParametricPopUpWindow.first_parameter_value_changed(self)
+        # Connect parameter sliders to parameter labels
+        self._get_parameter_slider(1).valueChanged.connect(
+            lambda: self._parameter_value_changed(1)
         )
-        self.secondParameterSlider.valueChanged.connect(
-            lambda: ParametricPopUpWindow.second_parameter_value_changed(self)
+        self._get_parameter_slider(2).valueChanged.connect(
+            lambda: self._parameter_value_changed(2)
         )
+
         self.fourSubgaitInterpolation.stateChanged.connect(
-            lambda: self.four_subgait_interpolation_changed()
+            lambda: self._four_subgait_interpolation_changed()
         )
 
         # Connect subgaitButtonBoxes to selecting same versions
-        # for i in range(1, 5):
-        #     self.__getattribute__(f"subgaitButtonBox{i}").accepted.connect(lambda: self._select_same_versions(i))
-        #     self.__getattribute__(f"subgaitButtonBox{i}").rejected.connect(lambda: self._clear_subgait_selection(i))
-
-        self.subgaitButtonBox1.accepted.connect(lambda: self._select_same_versions(1))
-        self.subgaitButtonBox1.rejected.connect(
-            lambda: self._clear_subgait_selection(1)
-        )
-        self.subgaitButtonBox2.accepted.connect(lambda: self._select_same_versions(2))
-        self.subgaitButtonBox2.rejected.connect(
-            lambda: self._clear_subgait_selection(2)
-        )
-        self.subgaitButtonBox3.accepted.connect(lambda: self._select_same_versions(3))
-        self.subgaitButtonBox3.rejected.connect(
-            lambda: self._clear_subgait_selection(3)
-        )
-        self.subgaitButtonBox4.accepted.connect(lambda: self._select_same_versions(4))
-        self.subgaitButtonBox4.rejected.connect(
-            lambda: self._clear_subgait_selection(4)
-        )
+        for i in range(1, 5):
+            self._get_subgait_button_box(i).accepted.connect(
+                lambda: self._select_same_versions(i)
+            )
+            self._get_subgait_button_box(i).rejected.connect(
+                lambda: self._clear_subgait_selection(i)
+            )
 
         self.resetAllButton.clicked.connect(self._reset_all)
-
-        self.set_second_parameterize_enabled(False)
 
         self.gait = ""
         self.subgaits = {}
@@ -72,17 +67,16 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         self.parameters: List[float] = []
         self.all_selected_versions: List[Dict[str, str]] = []
 
+        self.set_second_parameterize_enabled(False)
         self._init_sliders()
 
     def _init_sliders(self, value: float = 50):
-        self.firstParameterSlider.setValue(value)
-        self.firstParameterLabel.setText(
-            f"first parameter = {self.firstParameterSlider.value() / 100}"
-        )
-        self.secondParameterSlider.setValue(value)
-        self.secondParameterLabel.setText(
-            f"second parameter = {self.secondParameterSlider.value() / 100}"
-        )
+        self._get_parameter_slider(1).setValue(value)
+        self._get_parameter_slider(2).setValue(value)
+
+        value_ratio = value / 100
+        self._get_parameter_label(1).setText(f"first parameter = {value_ratio}")
+        self._get_parameter_label(2).setText(f"second parameter = {value_ratio}")
 
     def show_pop_up(self, gait: str, subgaits: dict):
         """Reset and show pop up."""
@@ -117,7 +111,19 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         except ParseException:
             self.reject()
 
-    def four_subgait_interpolation_changed(self):
+    def _parameter_value_changed(self, index: int):
+        """Puts the new slider value in the label next to it."""
+        if index == 1:
+            index_str = "first"
+        elif index == 2:
+            index_str = "second"
+        else:
+            return
+        self._get_parameter_label(index).setText(
+            f"{index_str} parameter = {self._get_parameter_slider(index).value() / 100:.2f}"
+        )
+
+    def _four_subgait_interpolation_changed(self):
         """Unlocks the buttons for four subgait interpolation when it is enabled"""
         if self.fourSubgaitInterpolation.isChecked():
             self.set_second_parameterize_enabled(True)
@@ -125,15 +131,20 @@ class ParametricSameVersionsPopUpWindow(QDialog):
             self.set_second_parameterize_enabled(False)
 
     def set_second_parameterize_enabled(self, value: bool):
-        self.get_prefix_input_line_edit(3).setEnabled(value)
-        self.get_prefix_input_line_edit(4).setEnabled(value)
-        self.get_postfix_input_line_edit(3).setEnabled(value)
-        self.get_postfix_input_line_edit(4).setEnabled(value)
-        self._get_subgait_button_box(3).setEnabled(value)
-        self._get_subgait_button_box(4).setEnabled(value)
-        self._get_selected_subgaits_text_browser(3).setEnabled(value)
-        self._get_selected_subgaits_text_browser(4).setEnabled(value)
-        self.secondParameterSlider.setEnabled(value)
+        widgets: List[QWidget] = [
+            self._get_prefix_input_line_edit(3),
+            self._get_prefix_input_line_edit(4),
+            self._get_postfix_input_line_edit(3),
+            self._get_postfix_input_line_edit(4),
+            self._get_subgait_button_box(3),
+            self._get_subgait_button_box(4),
+            self._get_selected_subgaits_text_browser(3),
+            self._get_selected_subgaits_text_browser(4),
+            self._get_parameter_slider(2),
+        ]
+
+        for widget in widgets:
+            widget.setEnabled(value)
 
     def _select_same_versions(self, index: int):
         prefix = self.get_subgait_prefix(index)
@@ -143,7 +154,13 @@ class ParametricSameVersionsPopUpWindow(QDialog):
             self.gait, self.subgaits, prefix, postfix
         )
 
-        output = str(selected_versions)
+        if len(selected_versions) != self.subgaits:
+            difference = set(self.subgaits.keys()).difference(
+                set(selected_versions.keys())
+            )
+            output = f"Could not find version for subgaits: {difference}"
+        else:
+            output = str(selected_versions)
         self.__getattribute__(f"selectedSubgaits{index}").setText(output)
 
     def get_subgait_prefix(self, index: int):
@@ -153,8 +170,8 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         return self.__getattribute__(f"postfix_input{index}").text()
 
     def _clear_subgait_selection(self, index: int):
-        self.get_prefix_input_line_edit(index).setText("")
-        self.get_postfix_input_line_edit(index).setText("")
+        self._get_prefix_input_line_edit(index).setText("")
+        self._get_postfix_input_line_edit(index).setText("")
         self._get_selected_subgaits_text_browser(index).setText("")
 
     def _get_selected_subgaits_text_browser(self, index) -> QTextBrowser:
@@ -163,11 +180,17 @@ class ParametricSameVersionsPopUpWindow(QDialog):
     def _get_subgait_button_box(self, index) -> QDialogButtonBox:
         return self.__getattribute__(f"subgaitButtonBox{index}")
 
-    def get_prefix_input_line_edit(self, index) -> QLineEdit:
+    def _get_prefix_input_line_edit(self, index) -> QLineEdit:
         return self.__getattribute__(f"prefix_input{index}")
 
-    def get_postfix_input_line_edit(self, index) -> QLineEdit:
+    def _get_postfix_input_line_edit(self, index) -> QLineEdit:
         return self.__getattribute__(f"postfix_input{index}")
+
+    def _get_parameter_slider(self, index) -> QSlider:
+        return self.__getattribute__(f"parameterSlider{index}")
+
+    def _get_parameter_label(self, index) -> QLabel:
+        return self.__getattribute__(f"parameterLabel{index}")
 
     def _get_selected_subgaits(self, index: int) -> dict:
         text = self._get_selected_subgaits_text_browser(index).toPlainText()

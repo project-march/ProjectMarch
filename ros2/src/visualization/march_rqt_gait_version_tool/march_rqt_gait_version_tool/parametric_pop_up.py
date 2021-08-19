@@ -67,21 +67,19 @@ class ParametricPopUpWindow(QDialog):
         self.fourth_version = ""
         return super(ParametricPopUpWindow, self).exec_()
 
-    @staticmethod
-    def first_parameter_value_changed(parametric_pop_up):
+    def first_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
-        parametric_pop_up.firstParameterLabel.setText(
+        self.firstParameterLabel.setText(
             "first parameter = {val:.2f}".format(
-                val=parametric_pop_up.firstParameterSlider.value() / 100.0
+                val=self.firstParameterSlider.value() / 100.0
             )
         )
 
-    @staticmethod
-    def second_parameter_value_changed(parametric_pop_up):
+    def second_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
-        parametric_pop_up.secondParameterLabel.setText(
+        self.secondParameterLabel.setText(
             "second parameter = {val:.2f}".format(
-                val=parametric_pop_up.secondParameterSlider.value() / 100.0
+                val=self.secondParameterSlider.value() / 100.0
             )
         )
 
