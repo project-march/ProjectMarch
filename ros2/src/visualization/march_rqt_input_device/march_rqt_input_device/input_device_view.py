@@ -20,6 +20,7 @@ DEFAULT_LAYOUT_FILE = os.path.join(
 )
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
+
 class InputDeviceView(QWidget):
     """
     The View of the input device, inialized based on a ui file and a controller.
