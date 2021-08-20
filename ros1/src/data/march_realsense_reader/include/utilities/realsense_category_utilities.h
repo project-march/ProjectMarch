@@ -10,7 +10,9 @@ enum RealSenseCategory {
     stairs_down = 1,
     ramp_up = 2,
     ramp_down = 3,
-    sit = 4
+    sit = 4,
+    curb_up = 5,
+    curb_down = 6,
 };
 
 #endif // MARCH_REALSENSE_CATEGORY_UTILITIES_H
