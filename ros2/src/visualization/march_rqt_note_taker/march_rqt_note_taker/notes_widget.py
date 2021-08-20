@@ -15,6 +15,7 @@ from .entry import Entry
 class NotesWidget(QWidget):
     INSERT = 0
     REMOVE = 1
+    SAVE_DIRECTORY_FROM_HOME="/.ros/note-taker-notes"
 
     def __init__(self, model: QAbstractTableModel, ui_file: str, node: Node):
         """Initialize the NotesWidget.
@@ -29,17 +30,12 @@ class NotesWidget(QWidget):
         self._can_save = True
         self._has_autosave = True
         self._autosave_file = None
-        default_save_dir = (
-            node.get_parameter("default_save_directory")
-            .get_parameter_value()
-            .string_value
-        )
-        default_save_path = f"{Path.home()}/.ros/{default_save_dir}"
-        if not os.path.exists(default_save_path):
-            os.makedirs(default_save_path)
+        save_path = f"{Path.home()}{self.SAVE_DIRECTORY_FROM_HOME}"
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
 
         self._last_save_file = (
-            f"{default_save_path}/note-taker"
+            f"{save_path}/note-taker"
             f"-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
         )
 

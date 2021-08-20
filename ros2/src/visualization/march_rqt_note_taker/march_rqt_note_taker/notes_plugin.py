@@ -60,7 +60,6 @@ class NotesPlugin(Plugin):
         )
 
         self._node: Node = context.node
-        self._node.declare_parameter("default_save_directory")
         self._model = EntryModel()
         self._widget = NotesWidget(self._model, ui_file, self._node)
         context.add_widget(self._widget)
