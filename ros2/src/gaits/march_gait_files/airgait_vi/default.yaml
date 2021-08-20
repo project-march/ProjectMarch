@@ -1,10 +1,10 @@
 gaits:
   curb_up:
-    right_open: MVI_curbup_rightopen_v1
-    left_close: MVI_curbup_leftclose_v1
+    right_open: MVI_curbup_rightopen_v3
+    left_close: MVI_curbup_leftclose_v3
   curb_down:
-    right_open: MVI_curbdown_rightopen_v1
-    left_close: MVI_curbdown_leftclose_v1
+    right_open: MVI_curbdown_rightopen_v3
+    left_close: MVI_curbdown_leftclose_v3
     
   ramp_up:
     left_close: MVI_rampup_leftclose_flat_v14
