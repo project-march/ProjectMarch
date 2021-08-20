@@ -214,7 +214,7 @@ void MarchHardwareInterface::call_and_wait_while_checking_for_each_joint(
 
     if (!all(is_ok)) {
         if (maximum_tries_debug_f.has_value()) {
-            auto callable = maximum_tries_debug_f.value();
+            auto const& callable = maximum_tries_debug_f.value();
             for (size_t i = 0; i < num_joints_; ++i) {
                 callable(march_robot_->getJoint(i));
             }
