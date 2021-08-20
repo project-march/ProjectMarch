@@ -445,17 +445,19 @@
 
 
     <xacro:include filename="camera/_d435.urdf.xacro"/>
-    <xacro:sensor_d435 name="camera_front" topics_ns="camera_front" parent="hip_base"
+
+    <xacro:sensor_d435 name="camera_back" topics_ns="camera_back" parent="hip_aa_frame_right_side"
+                       plugin="$(arg realsense_simulation)">
+        <origin xyz="0 0.06725 0" rpy="0 ${75/180 * pi} 0"/>
+    </xacro:sensor_d435>
+    <xacro:sensor_d435 name="camera_front" topics_ns="camera_front"
+                       parent="hip_base"
                        plugin="$(arg realsense_simulation)">
         <!--    Attached to the hip_base, since this is most comparable to the backpack -->
         <!--    in amount of movement, the distance from hip base is based on first design.-->
-        <origin xyz="-0.32 0.22 0.16" rpy="${0.5 * pi} ${0.29 * pi} ${pi}"/>
-        <!-- Rotate to be vertical and pointing down 45 degrees -->
+        <origin xyz="-0.32 0.20 0.20" rpy="${0.5 * pi} ${48/180 * pi} ${pi}"/>
+        <!-- Rotate to be vertical and pointing down 48 degrees -->
     </xacro:sensor_d435>
 
-    <xacro:sensor_d435 name="camera_back" topics_ns="camera_back" parent="hip_base"
-                       plugin="$(arg realsense_simulation)">
-        <origin xyz="0 0.22 0" rpy="0 ${0.48 * pi} 0"/>
-    </xacro:sensor_d435>
 
 </robot>

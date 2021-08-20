@@ -71,4 +71,3 @@ joints:
     time_from_start: 1800000000
     velocity: 0.0
 name: left_open
-version: MVI_rampup_leftopen_steep_v5

@@ -171,6 +171,9 @@ protected:
     // Find the sit parameter from the sit height
     bool getGaitParametersFromSitHeight();
 
+    // Find the curb parameter from the curb height
+    bool getGaitParametersFromCurbHeight();
+
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(
@@ -210,6 +213,9 @@ protected:
     // sit
     bool getSitHeight();
 
+    // The curb analogue of getOptimalFootLocation, find the height of the curb
+    bool getCurbHeight();
+
     // Fill a cloud with a grid of points where to look for exo support
     bool fillSitGrid(PointCloud::Ptr& sit_grid);
 
@@ -225,6 +231,10 @@ protected:
     void getValidExoSupport(
         const PointNormalCloud::Ptr& potential_exo_support_points,
         PointNormalCloud::Ptr& exo_support_points);
+
+    // Check which points on the curb are reachable and give foot support
+    void getValidPointsOnCurb(const PointNormalCloud::Ptr& points_on_curb,
+        PointNormalCloud::Ptr& valid_points_on_curb);
 
     // Updates the gait information limits after calling a transform to the
     // fixed frame
@@ -246,7 +256,8 @@ protected:
     float max_x_stairs_world {};
     float min_z_stairs_world {};
     float max_z_stairs_world {};
-    float y_location {};
+    float y_deviation_right_foot {};
+    float y_deviation_foot {};
     float foot_length_back {};
     float foot_length_front {};
     float foot_width {};
@@ -270,7 +281,19 @@ protected:
     float minimal_needed_support_sit {};
     bool general_most_desirable_location_is_mid {};
     bool general_most_desirable_location_is_small {};
-    float sit_height;
+    float sit_height {};
+    float max_curb_up_height {};
+    float max_curb_height {};
+    float max_curb_height_world {};
+    float min_curb_up_height {};
+    float min_curb_height {};
+    float min_curb_height_world {};
+    float allowed_deviation_from_reachable_curb {};
+    float curb_position_x {};
+    float curb_position_y {};
+    float min_curb_search {};
+    float max_curb_search {};
+    float curb_height {};
     float ramp_slope {};
 
     std::string subgait_name_;
@@ -291,6 +314,7 @@ protected:
     PointCloud::Ptr foot_locations_to_try;
     PointCloud::Ptr gait_information_cloud;
     PointNormalCloud::Ptr points_on_ramp;
+    PointNormalCloud::Ptr points_on_curb;
     PointCloud::Ptr locations_to_compute_ramp;
 };
 

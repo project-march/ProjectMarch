@@ -161,6 +161,12 @@
       },
       {
          "name": "realsense_stand"
+      },
+      {
+         "name": "realsense_curb_up"
+      },
+      {
+         "name": "realsense_curb_down"
       }
    ],
    [
