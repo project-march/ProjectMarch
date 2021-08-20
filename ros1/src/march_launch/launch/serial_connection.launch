@@ -4,7 +4,16 @@
     <arg name="arduino_master_baud" default="57600" doc="Baud rate to set for the arduino master connection."/>
 
     <arg name="input_device" default="true" doc="Launches the input device serial node when true."/>
-    <arg name="input_device_port" default="/dev/ttyUSB0" doc="Device port to use for input device serial connection. Only used when `wireless` is false."/>
+    <!--
+    By default, the device name is "/dev/input-device". Normally, this device does not exist.
+    However, you can create a udev rule that creates this device when the input device is
+    plugged in.
+
+    Filename: /etc/udev/rules.d/83-input-device.rules
+    Content:
+    KERNEL=="ttyUSB[0-9]*", SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="input-device"
+    -->
+    <arg name="input_device_port" default="/dev/input-device" doc="Device port to use for input device serial connection. Only used when `wireless` is false."/>
     <arg name="input_device_baud" default="115200" doc="Baud rate to set for the input device connection. Only used when `wireless` is false."/>
     <arg name="wireless" default="false" doc="Use wireless connection to input device. Defaults to false."/>
 
