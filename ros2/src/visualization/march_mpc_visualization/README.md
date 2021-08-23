@@ -26,9 +26,9 @@ ros2 launch march_mpc_visualization march_mpc_visualization.launch.py
 ## Publishing
 The node starts publishing to two adresses:  
 
-- http://0.0.0.0:5000/measurements  
+- 0.0.0.0:5000/measurements
   - Data in JSON format, containing the last measured position, velocity, input and its references, for all joints controlled by MPC.  
-- http://0.0.0.0:5000/estimation 
+- 0.0.0.0:5000/estimation
   - Data in JSON format, containing the last estimation of position, velocity, input and its references, for all joints controlled by MPC.  
 
 .. hint:: Change the host to the IP of the publishing device
