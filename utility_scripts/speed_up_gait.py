@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# Author: Wolf Nederpel
+# Date: 25-8-2021
+# Description: Speeds up selected gaits
+# usage: set the subgaits to speed up either by a suffix and prefix or by giving the entire name,
+# optionally set the neww extension and description and run ./speed_up_gait.py
 import os
 import yaml
 
@@ -75,4 +80,4 @@ for subgait_name, version in versions_to_speed_up.items():
     except Exception as e:  # noqa: B902 PIE786
         paths_that_failed.append(read_path)
         print(e)
-print(f"the paths {paths_that_failed} failed.")
+print(f"The paths {paths_that_failed} failed.")

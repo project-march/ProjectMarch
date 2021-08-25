@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Author: Wolf Nederpel
+# Date: 25-8-2021
+# Description: Removes a selected field from the subgait files under the specified path
+# usage: set the right field to remove, fix the path from which to remove and run ./remove_field_from_subgait.py
 from pathlib import Path
 import yaml
 
@@ -22,4 +26,4 @@ for path in Path(
         paths_that_failed.append(path)
         print(e)
 
-print(f"the paths {paths_that_failed} failed.")
+print(f"The paths {paths_that_failed} failed.")

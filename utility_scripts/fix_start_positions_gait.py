@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# Author: Wolf Nederpel
+# Date: 25-8-2021
+# Description: Updates the starting postions of the specified gaits
+# usage: set the right old and new stand positions,
+# fix the path from which to change and run ./fix_start_positions_gait.py
 from pathlib import Path
 import yaml
 import copy
@@ -103,8 +108,8 @@ def almost_equal_nested_dict(dict1: dict, dict2: dict) -> bool:
     return result
 
 
-start_positions_set = 0
-end_positions_set = 0
+amount_of_start_positions_set = 0
+amount_of_end_positions_set = 0
 paths_that_failed = []
 for path in Path(
     "../ros2/src/gaits/march_gait_files/airgait_vi/",
@@ -132,7 +137,7 @@ for path in Path(
                     content["joints"][joint][0] = new_stand_position_start[
                         joint
                     ]  # noqa: E501
-                start_positions_set += 1
+                amount_of_start_positions_set += 1
 
             if almost_equal_nested_dict(
                 current_end_position,
@@ -142,7 +147,7 @@ for path in Path(
                     content["joints"][joint][-1] = new_stand_position_end[
                         joint
                     ]  # noqa: E501
-                end_positions_set += 1
+                amount_of_end_positions_set += 1
             subgait_file.close()
 
         with open(path, "w") as subgait_file:
@@ -151,6 +156,6 @@ for path in Path(
         paths_that_failed.append(path)
         print(e)
 
-print(f"the paths {paths_that_failed} failed.")
-print(f"there were {start_positions_set} start positions changed")
-print(f"there were {end_positions_set} end positions changed")
+print(f"The paths {paths_that_failed} failed.")
+print(f"There were {start_positions_set} start positions changed")
+print(f"There were {end_positions_set} end positions changed")
