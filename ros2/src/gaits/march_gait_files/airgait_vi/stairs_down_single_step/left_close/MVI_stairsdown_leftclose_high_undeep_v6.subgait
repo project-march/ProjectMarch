@@ -1,0 +1,76 @@
+description: Stairs down of MVI for the stair with a heigth of 22 and depth op 20
+duration: 2500000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1386700000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 1.0695
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.3963
+    time_from_start: 1000000000
+    velocity: 0.0
+  - position: -0.1745
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_knee:
+  - position: 1.9098
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.9098
+    time_from_start: 800000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.4363
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2341
+    time_from_start: 1013900000
+    velocity: -0.2824
+  - position: -0.1745
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.3316
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1833300000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+name: left_close
