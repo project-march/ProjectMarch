@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # Author: Wolf Nederpel
+# Date: 25 - 08 - 2021  # noqa: E800
 # Description: Updates the starting postions of the specified gaits
-# usage: set the right old and new stand positions,
+# Usage: set the right old and new stand positions,
 # fix the path from which to change and run ./fix_start_positions_gait.py
 from pathlib import Path
 import yaml

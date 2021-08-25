@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # Author: Wolf Nederpel
+# Date: 25 - 08 - 2021  # noqa: E800
 # Description: Rounds velocity and position of the subgait files for easier reading and transitions
-# usage: set the desired number of digits to round to and run ./round_gait_files.py
+# Usage: set the desired number of digits to round to and run ./round_gait_files.py
 from pathlib import Path
 import yaml
 

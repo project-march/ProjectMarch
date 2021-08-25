@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # Author: Wolf Nederpel
+# Date: 25 - 08 - 2021  # noqa: E800
 # Description: Speeds up selected gaits
-# usage: set the subgaits to speed up either by a suffix and prefix or by giving the entire name,
+# Usage: set the subgaits to speed up either by a suffix and prefix or by giving the entire name,
 # optionally set the neww extension and description and run ./speed_up_gait.py
 import os
 import yaml
