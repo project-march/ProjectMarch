@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Author: Wolf Nederpel
-# Date: 25-8-2021
 # Description: Speeds up selected gaits
 # usage: set the subgaits to speed up either by a suffix and prefix or by giving the entire name,
 # optionally set the neww extension and description and run ./speed_up_gait.py

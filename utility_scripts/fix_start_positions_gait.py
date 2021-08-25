@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Author: Wolf Nederpel
-# Date: 25-8-2021
 # Description: Updates the starting postions of the specified gaits
 # usage: set the right old and new stand positions,
 # fix the path from which to change and run ./fix_start_positions_gait.py
@@ -157,5 +156,5 @@ for path in Path(
         print(e)
 
 print(f"The paths {paths_that_failed} failed.")
-print(f"There were {start_positions_set} start positions changed")
-print(f"There were {end_positions_set} end positions changed")
+print(f"There were {amount_of_start_positions_set} start positions changed")
+print(f"There were {amount_of_end_positions_set} end positions changed")
