@@ -77,3 +77,5 @@ services_2_to_1:
       type: 'march_shared_msgs/SetObstacleSizeBlockLike' }
   - { service: '/march/set_obstacle_size/ramp_like',
       type: 'march_shared_msgs/SetObstacleSizeRampLike' }
+  - { service: '/march/gain_scheduling/get_configuration',
+      type: 'std_srvs/Trigger' }
