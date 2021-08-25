@@ -27,7 +27,8 @@ def generate_launch_description():
     # HUD arguments
     use_hud = LaunchConfiguration("use_hud")
 
-    # Simulation arguments
+    # RealSense/simulation arguments
+    realsense = LaunchConfiguration("realsense")
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
@@ -91,6 +92,12 @@ def generate_launch_description():
                 "This file must be available in the march_desrciption/urdf/ folder",
             ),
             DeclareLaunchArgument(
+              name="realsense",
+              default_value="True",
+              description="Whether to start up everything for working with the "
+                          "realsense"
+            ),
+            DeclareLaunchArgument(
                 name="realsense_simulation",
                 default_value="False",
                 description="Whether the simulation camera or the physical camera should be used",
@@ -102,7 +109,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
-                default_value="False",
+                default_value=realsense,
                 description="Whether to use the camera imu to know the real "
                 "orientation of the exoskeleton",
             ),
