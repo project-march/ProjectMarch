@@ -66,7 +66,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="layout",
-                default_value="default",
+                default_value="training",
                 description="Input device layout .json file to use.",
             ),
             DeclareLaunchArgument(

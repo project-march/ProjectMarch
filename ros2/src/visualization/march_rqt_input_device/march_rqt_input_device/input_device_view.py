@@ -4,18 +4,21 @@ from typing import List, Callable, Tuple, Optional, Union
 
 from pathlib import Path
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QToolButton
+
 from .input_device_controller import InputDeviceController
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
-from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
-from .image_button import ImageButton
 
 DEFAULT_LAYOUT_FILE = os.path.join(
-    get_package_share_directory("march_rqt_input_device"), "config", "default.json"
+    get_package_share_directory("march_rqt_input_device"), "config", "training.json"
 )
+MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
 
 class InputDeviceView(QWidget):
@@ -79,7 +82,7 @@ class InputDeviceView(QWidget):
         self.content.setLayout(qt_layout)
 
         # Make the frame as tight as possible with spacing between the buttons.
-        qt_layout.setSpacing(15)
+        qt_layout.setSpacing(10)
         self.content.adjustSize()
 
     def _accepted_cb(self) -> None:
@@ -157,7 +160,7 @@ class InputDeviceView(QWidget):
         name: str,
         callback: Optional[Union[str, Callable]] = None,
         image_path: Optional[str] = None,
-        size: Tuple[int, int] = (128, 160),
+        size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
     ):
         """Create a push button which can be pressed to execute a gait instruction.
@@ -176,15 +179,19 @@ class InputDeviceView(QWidget):
         :return:
             A QPushButton object which contains the passed arguments
         """
+        qt_button = QToolButton()
+        qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        qt_button.setStyleSheet(
+            "QToolButton {background-color: lightgrey; "
+            "font-size: 13px;"
+            "font: 'Times New Roman'}"
+        )
+        qt_button.setIconSize(QSize(90, 90))
+        qt_button.setText(check_string(name))
         if image_path is not None:
-            qt_button = ImageButton(get_image_path(image_path))
+            qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
         elif name + ".png" in self._image_names:
-            qt_button = ImageButton(get_image_path(name))
-        else:
-            qt_button = QPushButton()
-
-            text = check_string(name)
-            qt_button.setText(text)
+            qt_button.setIcon(QIcon(QPixmap(get_image_path(name))))
         qt_button.setObjectName(name)
 
         if always_enabled:
@@ -250,8 +257,13 @@ def check_string(text: str) -> str:
     """
     words = text.replace("_", " ").split(" ")
     new_string = words[0]
-    for index, word in enumerate(words[1:], 1):
-        new_string = (
-            new_string + "\n" + word if index % 3 == 0 else new_string + " " + word
-        )
+    characters_since_line_break = len(new_string)
+    for _, word in enumerate(words[1:], 1):
+        if characters_since_line_break + len(word) > MAX_CHARACTERS_PER_LINE_BUTTON:
+            new_string = new_string + "\n" + word
+            characters_since_line_break = len(word)
+        else:
+            new_string = new_string + " " + word
+            characters_since_line_break = len(word) + characters_since_line_break + 1
+
     return new_string
