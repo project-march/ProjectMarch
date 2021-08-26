@@ -92,10 +92,10 @@ def generate_launch_description():
                 "This file must be available in the march_desrciption/urdf/ folder",
             ),
             DeclareLaunchArgument(
-              name="realsense",
-              default_value="True",
-              description="Whether to start up everything for working with the "
-                          "realsense"
+                name="realsense",
+                default_value="True",
+                description="Whether to start up everything for working with the "
+                "realsense",
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
