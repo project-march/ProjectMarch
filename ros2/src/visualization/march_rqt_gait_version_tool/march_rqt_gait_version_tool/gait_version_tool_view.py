@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Dict
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QWidget
@@ -367,7 +367,11 @@ class GaitVersionToolView(QWidget):
 
         self._update_selected_subgaits(selected_versions)
 
-    def _update_selected_subgaits(self, selected_versions):
+    def _update_selected_subgaits(self, selected_versions: Dict[str, str]):
+        """Set the subgait dropdown menus to the subgaits of the selected versions
+
+        :param selected_versions Dictionary mapping subgait to selected version
+        """
         for subgait_label, subgait_menu in zip(
             self._subgait_labels, self._subgait_menus
         ):
@@ -379,7 +383,11 @@ class GaitVersionToolView(QWidget):
                 subgait_menu.setCurrentIndex(version_index)
 
     def _parameterize_same_versions(self):
-        """"""
+        """Parameterize subgait that share a common pre- and postfix
+
+        This can be seen as a combination of the 'select_same_versions' pop up and the
+        'parametric' pop up.
+        """
         if not self._parametric_same_versions_pop_up.show_pop_up(
             self.current_gait, self.available_gaits[self.current_gait]
         ):
@@ -403,13 +411,15 @@ class GaitVersionToolView(QWidget):
             self._subgait_labels, self._subgait_menus
         ):
             subgait = subgait_label.text()
-            new_version = self.get_parametric_version(
-                parameters, subgait_versions[subgait]
-            )
 
-            subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
-            subgait_menu.addItem(new_version)
-            subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
+            if subgait != "Unused":
+                new_version = self.get_parametric_version(
+                    parameters, subgait_versions[subgait]
+                )
+
+                subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
+                subgait_menu.addItem(new_version)
+                subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""
@@ -437,6 +447,12 @@ class GaitVersionToolView(QWidget):
 
     @staticmethod
     def get_parametric_version(parameters: List[float], subgait_versions: List[str]):
+        """Create a parametric version name based on a list of subgait versions and a
+        list of parameters.
+
+        :param parameters List of parameters, either one or two parameters.
+        :param subgait_versions Subgait base, other, third, fourth versions.
+        """
         if len(parameters) == 1 and len(subgait_versions) == 2:
             return "{0}{1}_({2})_({3})".format(
                 PARAMETRIC_GAIT_PREFIX,

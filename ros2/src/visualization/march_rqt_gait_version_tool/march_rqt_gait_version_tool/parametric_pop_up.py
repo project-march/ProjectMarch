@@ -51,7 +51,7 @@ class ParametricPopUpWindow(QDialog):
         self.secondParameterSlider.setValue(50)
         self.secondParameterLabel.setText("second parameter = 0.50")
 
-        self.four_subgait_interpolation = False
+        self.uses_four_subgait_interpolation = False
 
         # For 'normal' parametric gaits between two subgaits
         self.parameter = 0.0
@@ -109,7 +109,7 @@ class ParametricPopUpWindow(QDialog):
             self.secondVersionComboBox.currentText(),
         ]
 
-        if self.four_subgait_interpolation:
+        if self.uses_four_subgait_interpolation:
             self.parameters.append(self.secondParameterSlider.value() / 100.0)
             self.selected_versions.append(self.thirdVersionComboBox.currentText())
             self.selected_versions.append(self.fourthVersionComboBox.currentText())
