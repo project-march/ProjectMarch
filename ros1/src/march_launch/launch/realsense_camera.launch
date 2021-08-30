@@ -2,7 +2,7 @@
 <!--    These serial numbers should always be updated to correspond with the actual
         cameras, you can find these using `rs-enumerate-devices` command if you
         have all realsense dependencies installed or printed on the camera-->
-    <arg name="serial_no_camera_front"    default="033322070612"/>
+    <arg name="serial_no_camera_front"    default="109122070820"/>
     <arg name="serial_no_camera_back"     default="048322070237"/>
     <arg name="use_camera_back" default="false"
          doc="Whether to start the second (back) camera"/>

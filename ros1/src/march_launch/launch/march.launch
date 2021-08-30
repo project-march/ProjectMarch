@@ -15,11 +15,6 @@
     <arg name="rviz" default="false" doc="Launches RViz."/>
     <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
 
-    <arg name="use_imu_data" default="false" doc="Whether the imu data will be used to"/>
-    <arg name="ground_gait" default="$(arg use_imu_data)"
-         doc="Exoskeleton will ground gait in gazebo_ui if true. When the imu data is used,
-         this version of the urdf is also required, because we want the robot state publisher
-         to publish the transform from world to baselink."/>
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world in rviz"/>
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
@@ -42,11 +37,19 @@
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
-    <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
+    <arg name="realsense" default="true"
+         doc="Launches the realsense reader node when true."/>
     <arg name="realsense_simulation" default="false"
          doc="Whether the simulation camera or the physical camera should be used"/>
     <arg name="realsense_test_data" default="$(eval realsense)" doc="Whether the node which can publish pointclouds
     from datasets should be started."/>
+
+    <arg name="use_imu_data" default="$(arg realsense)"
+         doc="Whether the imu data will be used to"/>
+    <arg name="ground_gait" default="$(arg use_imu_data)"
+         doc="Exoskeleton will ground gait in gazebo_ui if true. When the imu data is used,
+         this version of the urdf is also required, because we want the robot state publisher
+         to publish the transform from world to baselink."/>
     <arg name="imu_to_use" default="back"
          doc="Which imu to use for determining exo orientation"/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
