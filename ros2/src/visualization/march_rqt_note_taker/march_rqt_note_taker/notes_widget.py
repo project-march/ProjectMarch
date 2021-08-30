@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from pathlib import Path
 
 from python_qt_binding import QtCore, loadUi
 from python_qt_binding.QtCore import QAbstractTableModel
@@ -13,6 +15,7 @@ from .entry import Entry
 class NotesWidget(QWidget):
     INSERT = 0
     REMOVE = 1
+    SAVE_DIRECTORY_FROM_HOME = "/.ros/note-taker-notes"
 
     def __init__(self, model: QAbstractTableModel, ui_file: str, node: Node):
         """Initialize the NotesWidget.
@@ -27,7 +30,13 @@ class NotesWidget(QWidget):
         self._can_save = True
         self._has_autosave = True
         self._autosave_file = None
-        self._last_save_file = None
+        save_path = f"{Path.home()}{self.SAVE_DIRECTORY_FROM_HOME}"
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
+        self._last_save_file = (
+            f"{save_path}/note-taker" f"-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
+        )
 
         self._node = node
 

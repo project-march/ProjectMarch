@@ -27,30 +27,30 @@ realsense_stairs_down:
   dimensions: 2
   subgaits:
     right_open:
-      - MVI_stairsdown_rightopen_low_undeep_v1
-      - MVI_stairsdown_rightopen_low_deep_v1
-      - MVI_stairsdown_rightopen_high_undeep_v1
-      - MVI_stairsdown_rightopen_high_deep_v1
+      - MVI_stairsdown_rightopen_low_undeep_v4
+      - MVI_stairsdown_rightopen_low_deep_v4
+      - MVI_stairsdown_rightopen_high_undeep_v4
+      - MVI_stairsdown_rightopen_high_deep_v4
     left_swing:
-      - MVI_stairsdown_leftswing_low_undeep_v1
-      - MVI_stairsdown_leftswing_low_deep_v1
-      - MVI_stairsdown_leftswing_high_undeep_v1
-      - MVI_stairsdown_leftswing_high_deep_v1
+      - MVI_stairsdown_leftswing_low_undeep_v4
+      - MVI_stairsdown_leftswing_low_deep_v4
+      - MVI_stairsdown_leftswing_high_undeep_v4
+      - MVI_stairsdown_leftswing_high_deep_v4
     right_swing:
-      - MVI_stairsdown_rightswing_low_undeep_v1
-      - MVI_stairsdown_rightswing_low_deep_v1
-      - MVI_stairsdown_rightswing_high_undeep_v1
-      - MVI_stairsdown_rightswing_high_deep_v1
+      - MVI_stairsdown_rightswing_low_undeep_v4
+      - MVI_stairsdown_rightswing_low_deep_v4
+      - MVI_stairsdown_rightswing_high_undeep_v4
+      - MVI_stairsdown_rightswing_high_deep_v4
     left_close:
-      - MVI_stairsdown_leftclose_low_undeep_v1
-      - MVI_stairsdown_leftclose_low_deep_v1
-      - MVI_stairsdown_leftclose_high_undeep_v1
-      - MVI_stairsdown_leftclose_high_deep_v1
+      - MVI_stairsdown_leftclose_low_undeep_v4
+      - MVI_stairsdown_leftclose_low_deep_v4
+      - MVI_stairsdown_leftclose_high_undeep_v4
+      - MVI_stairsdown_leftclose_high_deep_v4
     right_close:
-      - MVI_stairsdown_rightclose_low_undeep_v1
-      - MVI_stairsdown_rightclose_low_deep_v1
-      - MVI_stairsdown_rightclose_high_undeep_v1
-      - MVI_stairsdown_rightclose_high_deep_v1
+      - MVI_stairsdown_rightclose_low_undeep_v4
+      - MVI_stairsdown_rightclose_low_deep_v4
+      - MVI_stairsdown_rightclose_high_undeep_v4
+      - MVI_stairsdown_rightclose_high_deep_v4
 
 realsense_stairs_up_single_step:
   realsense_category: stairs_up
@@ -78,30 +78,30 @@ realsense_stairs_up:
   dimensions: 2
   subgaits:
     right_open:
-      - MVI_stairsup_rightopen_low_undeep
-      - MVI_stairsup_rightopen_low_deep_v2
-      - MVI_stairsup_rightopen_high_undeep
-      - MVI_stairsup_rightopen_high_deep_v2
+      - MVI_stairsup_rightopen_low_undeep_v6
+      - MVI_stairsup_rightopen_low_deep_v6
+      - MVI_stairsup_rightopen_high_undeep_v6
+      - MVI_stairsup_rightopen_high_deep_v6
     left_swing:
-      - MVI_stairsup_leftswing_low_undeep
-      - MVI_stairsup_leftswing_low_deep_v2
-      - MVI_stairsup_leftswing_high_undeep
-      - MVI_stairsup_leftswing_high_deep_v2
+      - MVI_stairsup_leftswing_low_undeep_v6
+      - MVI_stairsup_leftswing_low_deep_v6
+      - MVI_stairsup_leftswing_high_undeep_v6
+      - MVI_stairsup_leftswing_high_deep_v6
     right_swing:
-      - MVI_stairsup_rightswing_low_undeep
-      - MVI_stairsup_rightswing_low_deep_v2
-      - MVI_stairsup_rightswing_high_undeep
-      - MVI_stairsup_rightswing_high_deep_v2
+      - MVI_stairsup_rightswing_low_undeep_v6
+      - MVI_stairsup_rightswing_low_deep_v6
+      - MVI_stairsup_rightswing_high_undeep_v6
+      - MVI_stairsup_rightswing_high_deep_v6
     left_close:
-      - MVI_stairsup_leftclose_low_undeep
-      - MVI_stairsup_leftclose_low_deep_v2
-      - MVI_stairsup_leftclose_high_undeep
-      - MVI_stairsup_leftclose_high_deep_v2
+      - MVI_stairsup_leftclose_low_undeep_v6
+      - MVI_stairsup_leftclose_low_deep_v6
+      - MVI_stairsup_leftclose_high_undeep_v6
+      - MVI_stairsup_leftclose_high_deep_v6
     right_close:
-      - MVI_stairsup_rightclose_low_undeep
-      - MVI_stairsup_rightclose_low_deep_v2
-      - MVI_stairsup_rightclose_high_undeep
-      - MVI_stairsup_rightclose_high_deep_v2
+      - MVI_stairsup_rightclose_low_undeep_v6
+      - MVI_stairsup_rightclose_low_deep_v6
+      - MVI_stairsup_rightclose_high_undeep_v6
+      - MVI_stairsup_rightclose_high_deep_v6
 
 realsense_sit:
   realsense_category: sit
@@ -149,22 +149,22 @@ realsense_ramp_up:
   dimensions: 1
   subgaits:
     right_open:
-      - MVI_rampup_rightopen_flat_v13
+      - MVI_rampup_rightopen_flat_v14
       - MVI_rampup_rightopen_steep_v9
     left_swing:
-      - MVI_rampup_leftswing_flat_v13
+      - MVI_rampup_leftswing_flat_v14
       - MVI_rampup_leftswing_steep_v9
     right_swing:
-      - MVI_rampup_rightswing_flat_v13
+      - MVI_rampup_rightswing_flat_v14
       - MVI_rampup_rightswing_steep_v9
     left_close:
-      - MVI_rampup_leftclose_flat_v13
+      - MVI_rampup_leftclose_flat_v14
       - MVI_rampup_leftclose_steep_v9
     right_close:
-      - MVI_rampup_rightclose_flat_v13
+      - MVI_rampup_rightclose_flat_v14
       - MVI_rampup_rightclose_steep_v9
     left_open:
-      - MVI_rampup_leftopen_flat_v13
+      - MVI_rampup_leftopen_flat_v14
       - MVI_rampup_leftopen_steep_v9
 
 realsense_ramp_up_single_step:
@@ -175,10 +175,10 @@ realsense_ramp_up_single_step:
   dimensions: 1
   subgaits:
     right_open:
-      - MVI_rampup_singlestep_rightopen_flat_v13
+      - MVI_rampup_singlestep_rightopen_flat_v14
       - MVI_rampup_singlestep_rightopen_steep_v9
     left_close:
-      - MVI_rampup_singlestep_leftclose_flat_v13
+      - MVI_rampup_singlestep_leftclose_flat_v14
       - MVI_rampup_singlestep_leftclose_steep_v9
 
 
@@ -192,22 +192,22 @@ realsense_ramp_down:
     - realsense_ramp_down_last_step
   subgaits:
     right_open:
-      - MVI_rampdown_rightopen_flat_v7
+      - MVI_rampdown_rightopen_flat_v8
       - MVI_rampdown_rightopen_steep_v5
     left_swing:
-      - MVI_rampdown_leftswing_flat_v7
+      - MVI_rampdown_leftswing_flat_v8
       - MVI_rampdown_leftswing_steep_v5
     right_swing:
-      - MVI_rampdown_rightswing_flat_v7
+      - MVI_rampdown_rightswing_flat_v8
       - MVI_rampdown_rightswing_steep_v5
     left_close:
-      - MVI_rampdown_leftclose_flat_v7
+      - MVI_rampdown_leftclose_flat_v8
       - MVI_rampdown_leftclose_steep_v5
     right_close:
-      - MVI_rampdown_rightclose_flat_v7
+      - MVI_rampdown_rightclose_flat_v8
       - MVI_rampdown_rightclose_steep_v5
     left_open:
-      - MVI_rampdown_leftopen_flat_v7
+      - MVI_rampdown_leftopen_flat_v8
       - MVI_rampdown_leftopen_steep_v5
 
 realsense_ramp_down_last_step:
@@ -221,10 +221,10 @@ realsense_ramp_down_last_step:
     - realsense_ramp_down_start_single_step
   subgaits:
     right_open:
-      - MVI_rampdownlaststep_rightopen_flat_v5
+      - MVI_rampdownlaststep_rightopen_flat_v8
       - MVI_rampdownlaststep_rightopen_steep_v3
     left_close:
-      - MVI_rampdownlaststep_leftclose_flat_v5
+      - MVI_rampdownlaststep_leftclose_flat_v8
       - MVI_rampdownlaststep_leftclose_steep_v3
 
 realsense_ramp_down_single_step:
@@ -237,10 +237,10 @@ realsense_ramp_down_single_step:
     - realsense_ramp_down_start_single_step
   subgaits:
     right_open:
-      - MVI_rampdown_singlestep_rightopen_flat_v7
+      - MVI_rampdown_singlestep_rightopen_flat_v8
       - MVI_rampdown_singlestep_rightopen_steep_v5
     left_close:
-      - MVI_rampdown_singlestep_leftclose_flat_v7
+      - MVI_rampdown_singlestep_leftclose_flat_v8
       - MVI_rampdown_singlestep_leftclose_steep_v5
 
 realsense_ramp_down_start_single_step:
@@ -254,8 +254,36 @@ realsense_ramp_down_start_single_step:
     - realsense_ramp_down_last_step
   subgaits:
     right_open:
-      - MVI_rampdown_startsinglestep_rightopen_flat_v7
+      - MVI_rampdown_startsinglestep_rightopen_flat_v8
       - MVI_rampdown_startsinglestep_rightopen_steep_v5
     left_close:
-      - MVI_rampdown_startsinglestep_leftclose_flat_v7
+      - MVI_rampdown_startsinglestep_leftclose_flat_v8
       - MVI_rampdown_startsinglestep_leftclose_steep_v5
+
+realsense_curb_up:
+  realsense_category: curb_up
+  camera_to_use: front
+  starting_position: static
+  final_position: static
+  dimensions: 1
+  subgaits:
+    right_open:
+      - MVI_curbup_rightopen_low
+      - MVI_curbup_rightopen_high
+    left_close:
+      - MVI_curbup_leftclose_low
+      - MVI_curbup_leftclose_high
+
+realsense_curb_down:
+  realsense_category: curb_down
+  camera_to_use: front
+  starting_position: static
+  final_position: static
+  dimensions: 1
+  subgaits:
+    right_open:
+      - MVI_curbdown_rightopen_low
+      - MVI_curbdown_rightopen_high
+    left_close:
+      - MVI_curbdown_leftclose_low
+      - MVI_curbdown_leftclose_high

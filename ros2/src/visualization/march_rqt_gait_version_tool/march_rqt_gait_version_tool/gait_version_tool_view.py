@@ -245,7 +245,7 @@ class GaitVersionToolView(QWidget):
     def _refresh(self):
         """Request the gait map from the gait selection node and display the available gaits in the gait menu."""
         self._is_refresh_active = True
-        self._clear_gui(clear_gait_menu=True)
+        self._clear_gui()
 
         try:
             self.available_gaits = self._controller.get_directory_structure()
@@ -276,7 +276,7 @@ class GaitVersionToolView(QWidget):
             self._controller._node.get_logger().error(msg)
         else:
             self._controller._node.get_logger().error(
-                f"Invalid log level specified, " f"logging for message: {msg}",
+                f"Unknown log level specified for message: {msg}",
             )
             return
         self._logger.appendHtml(

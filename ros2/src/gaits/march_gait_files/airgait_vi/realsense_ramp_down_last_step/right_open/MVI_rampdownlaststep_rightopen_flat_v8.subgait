@@ -1,0 +1,88 @@
+description: v5 but faster
+duration: 1100000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0873
+    time_from_start: 1100000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 412438889
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 550000000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1100000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.1667
+    time_from_start: 1100000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.1396
+    time_from_start: 748000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1100000000
+    velocity: 0.0
+  right_ankle:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 916666666
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1100000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 412438889
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 550000000
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 1100000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.3665
+    time_from_start: 660000000
+    velocity: 0.3173
+  - position: 0.2618
+    time_from_start: 1100000000
+    velocity: -0.7935
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: 462000000
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: 990000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1100000000
+    velocity: 0.0
+name: right_open

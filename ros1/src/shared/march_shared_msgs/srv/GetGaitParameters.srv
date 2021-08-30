@@ -6,6 +6,8 @@ uint8 STAIRS_DOWN=1
 uint8 RAMP_UP=2
 uint8 RAMP_DOWN=3
 uint8 SIT=4
+uint8 CURB_UP=5
+uint8 CURB_DOWN=6
 uint8 realsense_category
 
 uint8 CAMERA_FRONT=0

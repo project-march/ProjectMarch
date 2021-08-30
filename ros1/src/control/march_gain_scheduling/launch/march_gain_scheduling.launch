@@ -8,5 +8,6 @@
         <rosparam command="load" file="$(find march_gain_scheduling)/config/$(arg robot)/$(arg configuration).yaml"/>
         <param name="linearize_gain_scheduling" type="bool" value="$(arg linear)"/>
         <param name="linear_slope" type="double" value="$(arg slope)"/>
+        <param name="configuration" type="string" value="$(arg configuration)"/>
     </node>
 </launch>

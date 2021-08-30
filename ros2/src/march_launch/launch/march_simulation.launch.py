@@ -24,6 +24,7 @@ def generate_launch_description():
     imu_to_use = LaunchConfiguration("imu_to_use")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
+    jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -63,7 +64,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="layout",
-                default_value="default",
+                default_value="training",
                 description="Input device layout .json file to use.",
             ),
             DeclareLaunchArgument(
@@ -159,6 +160,11 @@ def generate_launch_description():
                 default_value="0.004",
                 description="",
             ),
+            DeclareLaunchArgument(
+                "jointless",
+                default_value="False",
+                description="If true, no joints will be actuated",
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -208,6 +214,7 @@ def generate_launch_description():
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
+                    ("jointlesss", jointless),
                 ],
             ),
         ]
