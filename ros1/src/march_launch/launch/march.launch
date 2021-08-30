@@ -86,6 +86,7 @@
             <arg name="robot" value="$(arg robot)"/>
             <arg name="robot_description" value="$(arg robot_description)"/>
             <arg name="controller_name" value="$(arg controller_name)"/>
+            <arg name="controller_type" value="$(arg controller_type)"/>
             <arg name="if_name" value="$(arg if_name)"/>
             <arg name="remove_fixed_joints_from_ethercat_train"
                  value="$(arg remove_fixed_joints_from_ethercat_train)"/>

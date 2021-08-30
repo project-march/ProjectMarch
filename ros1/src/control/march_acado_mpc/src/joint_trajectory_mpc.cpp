@@ -23,11 +23,47 @@ bool ModelPredictiveControllerInterface::init(
 
     // Get the names of the joints to control
     std::vector<std::string> joint_names;
-    ros::param::get("/march/joint_names", joint_names);
+    nh.getParam("joints", joint_names);
+
+    std::vector<std::string> pid_joint_names;
+    if (nh.hasParam("pid_joints")) {
+        nh.getParam("pid_joints", pid_joint_names);
+        num_pid_joints_ = pid_joint_names.size();
+    } else {
+        // Assume there are no pid joints
+        num_pid_joints_ = 0;
+    }
+    pid_command_.resize(num_pid_joints_);
+
+    std::vector<std::string> mpc_joint_names;
+    if (nh.hasParam("mpc_joints")) {
+        nh.getParam("mpc_joints", mpc_joint_names);
+        num_mpc_joints_ = mpc_joint_names.size();
+    } else {
+        // Assume all joints use mpc
+        mpc_joint_names = joint_names;
+        num_mpc_joints_ = mpc_joint_names.size();
+    }
+
+    // Determine which joints use mpc and which use pid
+    joint_uses_mpc_.resize(joint_names.size());
+    for (unsigned int i = 0; i < joint_names.size(); ++i) {
+        if (std::find(
+                pid_joint_names.begin(), pid_joint_names.end(), joint_names[i])
+            != pid_joint_names.end()) {
+            // Is a pid joint
+            joint_uses_mpc_[i] = false;
+        } else {
+            // Is a mpc joint
+            joint_uses_mpc_[i] = true;
+        }
+    }
 
     // Initialize desired inputs
     desired_inputs.reserve(ACADO_NU);
     desired_inputs.resize(ACADO_NU, 0.0);
+    desired_inputs[0] = 3.0;
+    desired_inputs[1] = 3.0;
 
     // Initialize state and reference vectors
     initial_state.reserve(ACADO_NX);
@@ -38,12 +74,28 @@ bool ModelPredictiveControllerInterface::init(
     mpc_pub_ = std::make_unique<
         realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(
         nh, "/march/mpc/", 10);
-    mpc_pub_->msg_.joint.resize(num_joints_);
+    mpc_pub_->msg_.joint.resize(num_mpc_joints_);
 
     // Initialize the model predictive controller
-    model_predictive_controller_
-        = std::make_unique<ModelPredictiveController>(getWeights(joint_names));
+    model_predictive_controller_ = std::make_unique<ModelPredictiveController>(
+        getWeights(mpc_joint_names, nh));
     model_predictive_controller_->init();
+
+    // Initialize PIDs
+    pids_.resize(pid_joint_names.size());
+    for (unsigned int i = 0; i < pids_.size(); ++i) {
+        // Node handle to PID gains
+        ros::NodeHandle joint_nh(
+            nh, std::string(/*__s=*/"gains/") + pid_joint_names[i]);
+
+        // Init PID gains from ROS parameter server
+        pids_[i].reset(new control_toolbox::Pid());
+        if (!pids_[i]->init(joint_nh)) {
+            ROS_WARN_STREAM(
+                "Failed to initialize PID gains from ROS parameter server.");
+            return false;
+        }
+    }
 
     // Initialize the MPC message
     initMpcMsg();
@@ -53,11 +105,8 @@ bool ModelPredictiveControllerInterface::init(
 
 // Retrieve the weights from the parameter server for a joint.
 std::vector<float> ModelPredictiveControllerInterface::getWeights(
-    std::vector<std::string> joint_names)
+    std::vector<std::string> mpc_joint_names, ros::NodeHandle& nh)
 {
-    // get path to controller parameters
-    std::string parameter_path = "/march/controller/trajectory";
-
     // Get Q and R from controller config
     std::vector<float> Q, Q_temp;
     std::vector<float> R, R_temp;
@@ -67,15 +116,15 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(
     Q.reserve(ACADO_NX);
     R.reserve(ACADO_NU);
     W.reserve(ACADO_NY);
-    JOINT_NX.reserve(num_joints_);
-    JOINT_NU.reserve(num_joints_);
+    JOINT_NX.reserve(num_mpc_joints_);
+    JOINT_NU.reserve(num_mpc_joints_);
 
-    for (int i = 0; i < num_joints_; i++) {
+    for (int i = 0; i < num_mpc_joints_; i++) {
+        std::string Q_param = "weights/" + mpc_joint_names[i] + "/Q";
+        std::string R_param = "weights/" + mpc_joint_names[i] + "/R";
 
-        ros::param::get(
-            parameter_path + "/weights/" + joint_names[i] + "/Q", Q_temp);
-        ros::param::get(
-            parameter_path + "/weights/" + joint_names[i] + "/R", R_temp);
+        nh.getParam(Q_param, Q_temp);
+        nh.getParam(R_param, R_temp);
 
         // Add Q_temp and R_temp to Q and R respectively
         Q.insert(Q.end(), Q_temp.begin(), Q_temp.end());
@@ -87,9 +136,11 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(
 
         // Check for validity of the weighting arrays
         ROS_ERROR_STREAM_COND(Q_temp.empty(),
-            joint_names[i] << ", Q array has not been supplied or is empty");
+            mpc_joint_names[i]
+                << ", Q array has not been supplied or is empty");
         ROS_ERROR_STREAM_COND(R_temp.empty(),
-            joint_names[i] << ", R array has not been supplied or is empty");
+            mpc_joint_names[i]
+                << ", R array has not been supplied or is empty");
 
         // Set Q and R for the mpc msg
         mpc_pub_->msg_.joint[i].tuning.q_weights.assign(
@@ -126,7 +177,7 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 void ModelPredictiveControllerInterface::initMpcMsg()
 {
     // Loop trough all joints
-    for (unsigned int i = 0; i < num_joints_; i++) {
+    for (unsigned int i = 0; i < num_mpc_joints_; i++) {
         mpc_pub_->msg_.joint[i].tuning.horizon = ACADO_N;
 
         mpc_pub_->msg_.joint[i].estimation.states.resize(JOINT_NX[i]);
@@ -248,17 +299,21 @@ void ModelPredictiveControllerInterface::updateCommand(
 
     // Get initial state of each joint combined
     for (int i = 0; i < num_joints_; ++i) {
-        initial_state.insert(initial_state.end(),
-            { (*joint_handles_ptr_)[i].getPosition(),
-                (*joint_handles_ptr_)[i].getVelocity() });
+        if (joint_uses_mpc_[i]) {
+            initial_state.insert(initial_state.end(),
+                { (*joint_handles_ptr_)[i].getPosition(),
+                    (*joint_handles_ptr_)[i].getVelocity() });
+        }
     }
 
     // Get "running" reference of each joint combined
     for (int n = 0; n < ACADO_N; ++n) {
         for (int i = 0; i < num_joints_; ++i) {
-            reference.insert(reference.end(),
-                { desired_states[n].position[i],
-                    desired_states[n].velocity[i] });
+            if (joint_uses_mpc_[i]) {
+                reference.insert(reference.end(),
+                    { desired_states[n].position[i],
+                        desired_states[n].velocity[i] });
+            }
         }
         reference.insert(
             reference.end(), desired_inputs.begin(), desired_inputs.end());
@@ -266,9 +321,11 @@ void ModelPredictiveControllerInterface::updateCommand(
 
     // Get "end" reference of each joint combined
     for (int i = 0; i < num_joints_; ++i) {
-        end_reference.insert(end_reference.end(),
-            { desired_states[ACADO_N].position[i],
-                desired_states[ACADO_N].velocity[i] });
+        if (joint_uses_mpc_[i]) {
+            end_reference.insert(end_reference.end(),
+                { desired_states[ACADO_N].position[i],
+                    desired_states[ACADO_N].velocity[i] });
+        }
     }
 
     // Set initial state
@@ -286,14 +343,34 @@ void ModelPredictiveControllerInterface::updateCommand(
     end_reference.clear();
 
     // Calculate mpc and apply command
-    command = model_predictive_controller_->calculateControlInput();
+    mpc_command = model_predictive_controller_->calculateControlInput();
 
+    // Calculate pid command
+    int pid_index = 0;
     for (int i = 0; i < num_joints_; ++i) {
-        // Apply command
-        (*joint_handles_ptr_)[i].setCommand(command[i]);
+        if (!joint_uses_mpc_[i]) {
+            pid_command_[pid_index] = pids_[pid_index]->computeCommand(
+                state_error.position[i], state_error.velocity[i], period);
+            pid_index++;
+        }
+    }
 
-        // Fill MPC message with information
-        setMpcMsg(i);
+    // Set command
+    pid_index = 0;
+    int mpc_index = 0;
+    for (int i = 0; i < num_joints_; ++i) {
+        if (joint_uses_mpc_[i]) {
+            // Apply command
+            (*joint_handles_ptr_)[i].setCommand(mpc_command[mpc_index]);
+
+            // Fill MPC message with information
+            setMpcMsg(mpc_index);
+
+            mpc_index++;
+        } else {
+            (*joint_handles_ptr_)[i].setCommand(pid_command_[pid_index]);
+            pid_index++;
+        }
     }
 
     // Shift the solver for next time step
