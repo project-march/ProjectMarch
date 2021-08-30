@@ -191,6 +191,20 @@ background-color: #F2F1F0
 QPushButton{color:  #FFFFFF}</string>
             </property>
             <layout class="QGridLayout" name="GaitFrame">
+             <item row="1" column="1" colspan="3">
+              <widget class="Line" name="line_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1" colspan="2">
+              <widget class="QPushButton" name="SelectSameVersions">
+               <property name="text">
+                <string>Select same versions</string>
+               </property>
+              </widget>
+             </item>
              <item row="4" column="1" colspan="2">
               <widget class="QPushButton" name="Apply">
                <property name="sizePolicy">
@@ -201,39 +215,6 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
                <property name="text">
                 <string>apply</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1" colspan="2">
-              <widget class="QPushButton" name="Refresh">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>refresh</string>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="1" colspan="2">
-              <spacer name="verticalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="1" colspan="3">
-              <widget class="Line" name="line_6">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>
@@ -258,26 +239,6 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
               </widget>
              </item>
-             <item row="6" column="1" colspan="2">
-              <widget class="QPushButton" name="SelectSameVersions">
-               <property name="text">
-                <string>Select same versions</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1" colspan="2">
-              <widget class="QPushButton" name="SaveDefault">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>save as defaults</string>
-               </property>
-              </widget>
-             </item>
              <item row="2" column="1" colspan="3">
               <spacer name="horizontalSpacer">
                <property name="orientation">
@@ -290,6 +251,52 @@ QPushButton{color:  #FFFFFF}</string>
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="8" column="1" colspan="2">
+              <widget class="QPushButton" name="SaveDefault">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>save as defaults</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1" colspan="2">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="3" column="1" colspan="2">
+              <widget class="QPushButton" name="Refresh">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>refresh</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1" colspan="2">
+              <widget class="QPushButton" name="ParametricSameVersions">
+               <property name="text">
+                <string>Parameterize same versions</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

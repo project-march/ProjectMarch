@@ -1,5 +1,5 @@
-import re
 from enum import Enum
+from typing import List, Dict
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QWidget
@@ -8,7 +8,9 @@ from python_qt_binding import loadUi
 from .gait_version_tool_errors import GaitVersionToolError
 from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
+from .parametric_same_versions_pop_up import ParametricSameVersionsPopUpWindow
 from .same_versions_pop_up import SameVersionsPopUpWindow
+from .subgait_version_select import select_same_subgait_versions
 
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 PARAMETRIC_GAIT_PREFIX = "_pg_"
@@ -60,6 +62,7 @@ class GaitVersionToolView(QWidget):
         self.Refresh.pressed.connect(lambda: self._refresh())
         self.Apply.pressed.connect(lambda: [self._apply(), self._refresh()])
         self.SelectSameVersions.pressed.connect(self._select_same_versions)
+        self.ParametricSameVersions.pressed.connect(self._parameterize_same_versions)
         self.SaveDefault.pressed.connect(
             lambda: [self._apply(), self._save_default(), self._refresh()]
         )
@@ -83,6 +86,10 @@ class GaitVersionToolView(QWidget):
         )
         self._same_versions_pop_up = SameVersionsPopUpWindow(
             self, ui_file.replace("gait_selection.ui", "same_versions_pop_up.ui")
+        )
+        self._parametric_same_versions_pop_up = ParametricSameVersionsPopUpWindow(
+            self,
+            ui_file.replace("gait_selection.ui", "parametric_same_versions_pop_up.ui"),
         )
 
         # populate gait menu for the first time
@@ -141,8 +148,8 @@ class GaitVersionToolView(QWidget):
 
         self._clear_gui()
 
-        gait_name = self._gait_menu.currentText()
-        subgaits = self.available_gaits[gait_name]
+        gait_name = self.current_gait
+        subgaits = self.available_gaits[self.current_gait]
 
         if len(subgaits) > len(self._subgait_labels):
             amount_of_new_subgait_menus = len(subgaits) - len(self._subgait_labels)
@@ -199,7 +206,7 @@ class GaitVersionToolView(QWidget):
         if self._is_update_active or self._is_refresh_active:
             return
 
-        gait_name = self._gait_menu.currentText()
+        gait_name = self.current_gait
         for subgait_label, subgait_menu in zip(
             self._subgait_labels, self._subgait_menus
         ):
@@ -209,10 +216,10 @@ class GaitVersionToolView(QWidget):
                     if str(subgait_menu.currentText()) == "parametric":
                         versions = self.available_gaits[gait_name][subgait_name]
                         if self._show_parametric_pop_up(versions):
-                            if self._parametric_pop_up.four_subgait_interpolation:
-                                new_version = self.get_four_parametric_version()
-                            else:
-                                new_version = self.get_parametric_version()
+                            new_version = self.get_parametric_version(
+                                self._parametric_pop_up.parameters,
+                                self._parametric_pop_up.selected_versions,
+                            )
                             subgait_label.setStyleSheet(
                                 f"color:{LogLevel.WARNING.value}"
                             )
@@ -310,7 +317,7 @@ class GaitVersionToolView(QWidget):
 
     def _apply(self):
         """Apply newly selected subgait versions to the gait selection node."""
-        gait_name = self._gait_menu.currentText()
+        gait_name = self.current_gait
         subgait_names = []
         versions = []
 
@@ -346,53 +353,73 @@ class GaitVersionToolView(QWidget):
             - Find the first match with the specified prefix and postfix
             - Set the subgait menu to that version
         """
-        if not self._same_versions_pop_up.show_pop_up(self._gait_menu.currentText()):
+        gait_name = self.current_gait
+        if not self._same_versions_pop_up.show_pop_up(gait_name):
             return
 
         prefix = self._same_versions_pop_up.prefix
         postfix = self._same_versions_pop_up.postfix
-        if prefix == "" and postfix == "":
-            return
-
-        if prefix == "":
-            prefix = ".*"
-        if postfix == "":
-            postfix = ".*"
-
-        gait_name = self._gait_menu.currentText()
-        if gait_name not in self.version_map:
-            return
-
         subgaits = self.available_gaits[gait_name]
-        selected_versions = {}
-        for subgait, versions in subgaits.items():
 
-            subgait_no_underscores = subgait.replace("_", "")
-            regex_string = f"{prefix}(_?{gait_name})?_({subgait}|{subgait_no_underscores})_{postfix}"
-            pattern = re.compile(regex_string)
+        selected_versions = select_same_subgait_versions(
+            gait_name, subgaits, prefix, postfix
+        )
 
-            version_is_found = False
-            for version_name in versions:
-                match = pattern.match(version_name)
-                if match is not None:
-                    selected_versions[subgait] = version_name
-                    version_is_found = True
+        self._update_selected_subgaits(selected_versions)
 
-            if not version_is_found:
-                self._log(
-                    f"Unable to find a matching version for subgait {subgait}",
-                    LogLevel.WARNING,
-                )
+    def _update_selected_subgaits(self, selected_versions: Dict[str, str]):
+        """Set the subgait dropdown menus to the subgaits of the selected versions
 
+        :param selected_versions Dictionary mapping subgait to selected version
+        """
         for subgait_label, subgait_menu in zip(
             self._subgait_labels, self._subgait_menus
         ):
             subgait = subgait_label.text()
             if subgait in selected_versions:
-                version_index = self.sort_versions(subgaits[subgait]).index(
-                    selected_versions[subgait]
-                )
+                version_index = self.sort_versions(
+                    self.available_gaits[self.current_gait][subgait]
+                ).index(selected_versions[subgait])
                 subgait_menu.setCurrentIndex(version_index)
+
+    def _parameterize_same_versions(self):
+        """Parameterize subgait that share a common pre- and postfix
+
+        This can be seen as a combination of the 'select_same_versions' pop up and the
+        'parametric' pop up.
+        """
+        if not self._parametric_same_versions_pop_up.show_pop_up(
+            self.current_gait, self.available_gaits[self.current_gait]
+        ):
+            return
+
+        parameters = self._parametric_same_versions_pop_up.parameters
+        all_selected_versions = (
+            self._parametric_same_versions_pop_up.all_selected_versions
+        )
+
+        # Convert list of subgait dictionaries to dictionary with a list for each subgait
+        subgait_versions = {
+            subgait: [
+                selected_subgaits[subgait]
+                for selected_subgaits in all_selected_versions
+            ]
+            for subgait in self.available_gaits[self.current_gait]
+        }
+
+        for subgait_label, subgait_menu in zip(
+            self._subgait_labels, self._subgait_menus
+        ):
+            subgait = subgait_label.text()
+
+            if subgait != "Unused":
+                new_version = self.get_parametric_version(
+                    parameters, subgait_versions[subgait]
+                )
+
+                subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
+                subgait_menu.addItem(new_version)
+                subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""
@@ -418,21 +445,36 @@ class GaitVersionToolView(QWidget):
         parameter for a parametric subgait."""
         return self._parametric_pop_up.show_pop_up(versions)
 
-    def get_parametric_version(self):
-        return "{0}{1}_({2})_({3})".format(
-            PARAMETRIC_GAIT_PREFIX,
-            self._parametric_pop_up.parameter,
-            self._parametric_pop_up.base_version,
-            self._parametric_pop_up.other_version,
-        )
+    @staticmethod
+    def get_parametric_version(parameters: List[float], subgait_versions: List[str]):
+        """Create a parametric version name based on a list of subgait versions and a
+        list of parameters.
 
-    def get_four_parametric_version(self):
-        return "{0}{1}_{2}_({3})_({4})_({5})_({6})".format(
-            FOUR_PARAMETRIC_GAIT_PREFIX,
-            self._parametric_pop_up.first_parameter,
-            self._parametric_pop_up.second_parameter,
-            self._parametric_pop_up.first_version,
-            self._parametric_pop_up.second_version,
-            self._parametric_pop_up.third_version,
-            self._parametric_pop_up.fourth_version,
-        )
+        :param parameters List of parameters, either one or two parameters.
+        :param subgait_versions Subgait base, other, third, fourth versions.
+        """
+        if len(parameters) == 1 and len(subgait_versions) == 2:
+            return "{0}{1}_({2})_({3})".format(
+                PARAMETRIC_GAIT_PREFIX,
+                parameters[0],
+                subgait_versions[0],
+                subgait_versions[1],
+            )
+        elif len(parameters) == 2 and len(subgait_versions) == 4:
+            return "{0}{1}_{2}_({3})_({4})_({5})_({6})".format(
+                FOUR_PARAMETRIC_GAIT_PREFIX,
+                parameters[0],
+                parameters[1],
+                subgait_versions[0],
+                subgait_versions[1],
+                subgait_versions[2],
+                subgait_versions[3],
+            )
+        else:
+            raise Exception(
+                "Number of parameters and subgaits to parameterize do not match"
+            )
+
+    @property
+    def current_gait(self):
+        return self._gait_menu.currentText()

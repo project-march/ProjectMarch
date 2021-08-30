@@ -1,3 +1,5 @@
+from typing import List
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
@@ -20,19 +22,19 @@ class ParametricPopUpWindow(QDialog):
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
         self.firstParameterSlider.valueChanged.connect(
-            self.first_parameter_value_changed
+            lambda: ParametricPopUpWindow.first_parameter_value_changed(self)
         )
         self.secondParameterSlider.valueChanged.connect(
-            self.second_parameter_value_changed
+            lambda: ParametricPopUpWindow.second_parameter_value_changed(self)
         )
         self.fourSubgaitInterpolation.stateChanged.connect(
-            self.four_subgait_interpolation_changed
+            lambda: self.four_subgait_interpolation_changed()
         )
+        self.set_second_parameterize_enabled(False)
 
-        # Initialize the third and fourth combo box and the second parameter slider as blocked
-        self.thirdVersionComboBox.setEnabled(False)
-        self.fourthVersionComboBox.setEnabled(False)
-        self.secondParameterSlider.setEnabled(False)
+        self.uses_four_subgait_interpolation = False
+        self.parameters: List[float] = []
+        self.selected_versions: List[str] = []
 
     def show_pop_up(self, versions):
         """Reset and show pop up."""
@@ -49,7 +51,7 @@ class ParametricPopUpWindow(QDialog):
         self.secondParameterSlider.setValue(50)
         self.secondParameterLabel.setText("second parameter = 0.50")
 
-        self.four_subgait_interpolation = False
+        self.uses_four_subgait_interpolation = False
 
         # For 'normal' parametric gaits between two subgaits
         self.parameter = 0.0
@@ -84,13 +86,14 @@ class ParametricPopUpWindow(QDialog):
     def four_subgait_interpolation_changed(self):
         """Unlocks the buttons for four subgait interpolation when it is enabled"""
         if self.fourSubgaitInterpolation.isChecked():
-            self.thirdVersionComboBox.setEnabled(True)
-            self.fourthVersionComboBox.setEnabled(True)
-            self.secondParameterSlider.setEnabled(True)
+            self.set_second_parameterize_enabled(True)
         else:
-            self.thirdVersionComboBox.setEnabled(False)
-            self.fourthVersionComboBox.setEnabled(False)
-            self.secondParameterSlider.setEnabled(False)
+            self.set_second_parameterize_enabled(False)
+
+    def set_second_parameterize_enabled(self, value: bool):
+        self.thirdVersionComboBox.setEnabled(value)
+        self.fourthVersionComboBox.setEnabled(value)
+        self.secondParameterSlider.setEnabled(value)
 
     def cancel(self):
         """Close without applying the values."""
@@ -98,17 +101,17 @@ class ParametricPopUpWindow(QDialog):
 
     def save(self):
         """Check and save value while closing, close if successful."""
-        self.four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
-        if self.four_subgait_interpolation:
-            self.first_version = self.firstVersionComboBox.currentText()
-            self.second_version = self.secondVersionComboBox.currentText()
-            self.third_version = self.thirdVersionComboBox.currentText()
-            self.fourth_version = self.fourthVersionComboBox.currentText()
-            self.first_parameter = self.firstParameterSlider.value() / 100.0
-            self.second_parameter = self.secondParameterSlider.value() / 100.0
-            self.accept()
-        else:
-            self.base_version = self.firstVersionComboBox.currentText()
-            self.other_version = self.secondVersionComboBox.currentText()
-            self.parameter = self.firstParameterSlider.value() / 100.0
-            self.accept()
+        self.uses_four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
+
+        self.parameters = [self.firstParameterSlider.value() / 100.0]
+        self.selected_versions = [
+            self.firstVersionComboBox.currentText(),
+            self.secondVersionComboBox.currentText(),
+        ]
+
+        if self.uses_four_subgait_interpolation:
+            self.parameters.append(self.secondParameterSlider.value() / 100.0)
+            self.selected_versions.append(self.thirdVersionComboBox.currentText())
+            self.selected_versions.append(self.fourthVersionComboBox.currentText())
+
+        self.accept()
