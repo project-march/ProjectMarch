@@ -35,6 +35,8 @@
          doc="Whether the joints that are fixed in the urdf, but do have motorcontrollers,
          are also not in the ethercat train."/>
     <arg name="enable_safety_controller" default="false" doc="Whether to enable the safety controller"/>
+    <arg name="jointless" default="false"
+         doc="Whether to start up the exoskeleton without joints (only pdb and camera's)"/>
 
 <!-- Data                       -->
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
@@ -87,6 +89,7 @@
                  value="$(arg remove_fixed_joints_from_ethercat_train)"/>
             <arg name="enable_safety_controller"
                  value="$(arg enable_safety_controller)"/>
+            <arg name="jointless" value="$(arg jointless)"/>
         </include>
     </group>
 
@@ -148,7 +151,8 @@
 
     <param name="robot_description"
            command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
-                    ground_gait:=$(arg ground_gait) configuration:=$(arg configuration) realsense_simulation:=$(arg realsense_simulation)"/>
+           ground_gait:=$(arg ground_gait) configuration:=$(arg configuration)
+           realsense_simulation:=$(arg realsense_simulation) jointless:=$(arg jointless)"/>
 
     <param name="balance" value="$(arg balance)"/>
 
@@ -165,6 +169,7 @@
             <arg name="controller_type" value="$(arg controller_type)"/>
             <arg name="realsense_simulation" value="$(arg realsense_simulation)"/>
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+            <arg name="jointless" value="$(arg jointless)"/>
         </include>
     </group>
 

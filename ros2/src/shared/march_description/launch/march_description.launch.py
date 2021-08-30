@@ -15,6 +15,7 @@ def generate_launch_description():
     robot_description = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
+    jointless = LaunchConfiguration("jointless")
 
     xacro_path = PathJoinSubstitution(
         [get_package_share_directory("march_description"), "urdf", robot_description]
@@ -77,6 +78,11 @@ def generate_launch_description():
                 default_value="False",
                 description="Whether balance is being used.",
             ),
+            DeclareLaunchArgument(
+                "jointless",
+                default_value="False",
+                description="If true, no joints will be actuated",
+            ),
             Node(
                 package="march_robot_state_publisher",
                 executable="march_robot_state_publisher_node",
@@ -97,6 +103,8 @@ def generate_launch_description():
                                 realsense_simulation,
                                 " configuration:=",
                                 ("exoskeleton" if not simulation else "simulation"),
+                                " jointless:=",
+                                jointless,
                             ]
                         ),
                         "use_imu_data": use_imu_data,

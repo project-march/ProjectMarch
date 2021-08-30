@@ -23,6 +23,7 @@ def generate_launch_description():
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
+    jointless = LaunchConfiguration("jointless")
 
     # HUD arguments
     use_hud = LaunchConfiguration("use_hud")
@@ -66,7 +67,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="layout",
-                default_value="default",
+                default_value="training",
                 description="Input device layout .json file to use.",
             ),
             DeclareLaunchArgument(
@@ -123,6 +124,11 @@ def generate_launch_description():
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting.",
+            ),
+            DeclareLaunchArgument(
+                "jointless",
+                default_value="False",
+                description="If true, no joints will be actuated",
             ),
             DeclareLaunchArgument(
                 name="imu_topic",
@@ -219,6 +225,7 @@ def generate_launch_description():
                     ("use_imu_data", use_imu_data),
                     ("imu_topic", imu_topic),
                     ("simulation", simulation),
+                    ("jointless", jointless),
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),
