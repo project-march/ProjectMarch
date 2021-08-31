@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "18-create-a-model-file-containing-a-simple-model-for-the-left-and-right-haa-only"
+    GIT_TAG "main"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
