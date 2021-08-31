@@ -76,7 +76,7 @@ generate the docs and automatically open them in your browser.
 
 .. code::
 
-  ./build_locally.sh
+ bash ./build_locally.sh
 
 .. note::
   If you have added new files but not pushed to GitLab yet, html-proofer will probably complain about invalid links.
