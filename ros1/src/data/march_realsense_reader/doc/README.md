@@ -84,7 +84,7 @@ The package publisher several debug pointclouds and markers, if the debug flag i
 
 `/camera/hull_area_cloud (sensor_msgs::PointCloud2`  
   A pointcloud that is purely for debugging. It represents the the plane constructed inside the hulls. The potential foot locations are
-  projected to this plane.
+  elevated to this plane. This debug cloud is created by cropping a large grid on the ground to the hulls.
 
 `/camera/foot_locations_marker_array (visualization_msgs::MarkerArray)`  
   Markers that visualize the steps of the parameter determiner. The optional locations are in blue, the possible locations are in green
@@ -176,11 +176,27 @@ For the ramp gait this is done as follows:
 
   1. Create points in front of the foot to move.
 
-  2. Project these points to plane, and check wether they are inside the hull.
+  2. Elevate these points to plane, and check wether they are inside the hull.
 
-  3. Compute the average slope.
+  3. Compute the average slope:
+  
+  		1. Find the average normal of the points on the ramp
+  		
+  		2. Calculate the ramp from this (assume the x direction is to the front of the robot)
 
   4. Transform this into a parameter.
+  
+For the bench and curb this is done as follows:
+
+  1. Create points in a grid behind the exoskeleton / in front of the foot to move
+  
+  2. Elevate the points to the hulls 
+  
+  3. Sort the points on height
+  
+  4. Get the medain height
+  
+  5. Transform this heightinto a parameter
 
 ![Markers indicating locations](images/params.png "Markers indicating the potential foot locations on the stairs")
 
