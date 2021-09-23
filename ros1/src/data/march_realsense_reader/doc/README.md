@@ -208,7 +208,7 @@ It is recommended to run all commands in separate terminals, to prevent sourcing
 ```bash
 march_run_ros1_sim ground_gait:=true gazebo_ui:=true obstacle:=stairs # T1
 march_run_bridge # T2
-march_run_ros2 ground_gait:=true #T3
+march_run_ros2_sim ground_gait:=true #T3
 ```
 This will start both RViz and Gazebo. We use Gazebo to model the stairs, and RViz to visualise the pointlcouds. In RViz
 add a `pointcloud2`, and set the topic to `/camera/preprocessed_cloud` or `/camera/region_cloud`. Add more debug information from [Published topics](#published-topics). If you cannot see the robot, add a RobotModel to rviz, and set the frame to `world`.  
