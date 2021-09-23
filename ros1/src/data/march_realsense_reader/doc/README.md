@@ -6,7 +6,7 @@ subscribes the the realsense camera topics and processes one of pointclouds publ
 The processing makes heavy use of the [Point Cloud Library (PCL)](https://pointclouds.org/) to do the processing.
 Many of its classes are used even when not directly using methods from PCL.
 
-The processing consists does 4 main phases:
+The processing consists of 4 main phases:
 
 * Preprocess the point cloud
 
