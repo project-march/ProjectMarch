@@ -60,7 +60,7 @@ serial_no_camera_back:=  # The serial number for the new camera in the right hip
 `"/camera_back/depth/color/points" sensor_msgs::PointCloud2`
   The realsense back camera publishes its pointcloud on this topic
 
-`"/test_clouds" senseor_msgs::PointCloud2`  
+`"/test_clouds" sensor_msgs::PointCloud2`  
   The `march_realsense_test_publisher` publishes its saved clouds to this topic.
 
 ![Pointcloud from front camera](images/raw_stairs.png "Pointcloud obtained from a stairs, using the front camera in simualition")
