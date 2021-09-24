@@ -4,7 +4,7 @@
         have all realsense dependencies installed or printed on the camera-->
     <arg name="serial_no_camera_front"    default="109122070820"/>
     <arg name="serial_no_camera_back"     default="048322070237"/>
-    <arg name="use_camera_back" default="false"
+    <arg name="use_camera_back" default="true"
          doc="Whether to start the second (back) camera"/>
     <arg name="use_camera_front" default="true"
          doc="Whether to start the front camera"/>
