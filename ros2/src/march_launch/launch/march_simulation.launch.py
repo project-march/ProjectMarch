@@ -91,7 +91,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="realsense",
-                default_value="True",
+                default_value="False",
                 description="Whether any realsense camera will be used",
             ),
             DeclareLaunchArgument(
