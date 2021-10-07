@@ -55,7 +55,7 @@ Pressure Soles
 The `march_data_collector` interfaces between the Moticon pressure soles and the exoskeleton software.
 It  sends data to and receives data from the desktop software that came with the pressure soles.
 This data is sent over `UDP <https://nl.wikipedia.org/wiki/User_Datagram_Protocol>`_.
-More information on interacting with the Moticon software can be found `here <https://www.moticon.de/doc/science_desktop_software/record/udp/>`_.
+More information on interacting with the Moticon software can be found online.
 The package assumes that the filter used in the Moticon software is ``force pressure cop``.
 More information on using the pressure soles can be found at :ref:`using the pressure soles <using-the-pressure-soles-label>`.
 
