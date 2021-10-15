@@ -31,7 +31,7 @@ All devices should be connected to the same WiFi for optimal functioning.
         - `Port:`                   8888
         - `Filter:`                 force pressure cop
 
-More info on this step can be found `here <https://www.moticon.de/doc/science_desktop_software/record/udp/>`_.
+More info on this step can be found `here <https://www.moticon.de/doc/science_desktop_software/>`_.
 
 3. Set the correct launch arguments. You should set pressure_soles to true and if you are not using the
 standard Switch laptop connected to the project March router, you should set the IP-address on which the Moticon desktop app is running.
