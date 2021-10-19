@@ -3,12 +3,6 @@
 # Exit on the first error
 set -e
 
-cd ~/march/
-
-python3 -m venv .venv_march
-
-source .venv_march/bin/activate
-
 CACHE=true
 
 while (("$#")); do
@@ -17,10 +11,11 @@ while (("$#")); do
   -h | --help)
     echo "This bash script will make a virtual environment in the current folder."
     echo "This will be a folder called '.venv_march'."
+    echo "To use this virtual environment call 'source .venv_march/bin/activate'"
     printf "\n -n | --new \t\t\tThis will delete the current environment."
     printf "\n -c | --clean | --no-cache \tThis will make sure that it freshly downloads all dependencies."
     echo ""
-    shift
+    exit 0;
     ;;
   # The new parameter to delete the previous venv. False by default in case of an accidental call.
   -n | --new=) # unsupported flags
@@ -44,12 +39,18 @@ while (("$#")); do
   esac
 done
 
+cd ~/march/
+
+python3 -m venv .venv_march
+
+source ~/march/.venv_march/bin/activate
+
 if [ $CACHE = true ]; then
   pip install wheel==0.37.0
   pip install -r requirements.txt
   pip install -r requirements_colcon.txt
 else
   pip install --no-cache wheel==0.37.0
-  pip install -r --no-cache requirements.txt
-  pip install -r --no-cache requirements_colcon.txt
+  pip install --no-cache -r requirements.txt
+  pip install --no-cache -r requirements_colcon.txt
 fi
