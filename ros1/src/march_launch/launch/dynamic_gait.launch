@@ -1,0 +1,69 @@
+<launch>
+    <!-- Load universal robot descriptions: -->
+    <group ns="lr">
+        <param name="robot_description" textfile="$(find march7_description_lr)/urdf/march7_description_lr.urdf"/>
+    </group>
+    <group ns="rl">
+        <param name="robot_description" textfile="$(find march7_description_rl)/urdf/march7_description_rl.urdf"/>
+    </group>
+
+    <!-- Load semantic descriptions (SRDF): -->
+    <group ns="lr">
+        <param name="robot_description_semantic" textfile="$(find march7_lr_moveit_config)/config/march7_description_lr.srdf"/>
+    </group>
+    <group ns="rl">
+        <param name="robot_description_semantic" textfile="$(find march7_rl_moveit_config)/config/march7_description_rl.srdf"/>
+    </group>
+
+    <!-- Load default settings for kinematics: -->
+    <group ns="lr/robot_description_kinematics">
+        <rosparam command="load" file="$(find march7_lr_moveit_config)/config/kinematics.yaml"/>
+    </group>
+    <group ns="rl/robot_description_kinematics">
+        <rosparam command="load" file="$(find march7_rl_moveit_config)/config/kinematics.yaml"/>
+    </group>
+
+    <!-- Include planning Pipelines -->
+    <group ns="lr/move_group/planning_pipelines">
+        <include ns="ompl" file="$(find march7_lr_moveit_config)/launch/planning_pipeline.launch.xml">
+            <arg name="pipeline" value="ompl" />
+        </include>
+    </group>
+
+    <group ns="rl/move_group/planning_pipelines">
+        <include ns="ompl" file="$(find march7_rl_moveit_config)/launch/planning_pipeline.launch.xml">
+            <arg name="pipeline" value="ompl" />
+        </include>
+    </group>
+
+    <!-- Trajectory Execution Functionality -->
+    <include ns="lr/move_group" file="$(find march7_lr_moveit_config)/launch/trajectory_execution.launch.xml"/>
+    <include ns="rl/move_group" file="$(find march7_rl_moveit_config)/launch/trajectory_execution.launch.xml"/>
+
+    <!-- Start the actual move_groups -->
+    <node ns="lr" pkg="moveit_ros_move_group" name="move_group" type="move_group" output="screen">
+        <param name="default_planning_pipeline" value="ompl" />
+        <remap from="joint_states" to="/march/joint_states" />
+    </node>
+
+    <node ns="rl" pkg="moveit_ros_move_group" name="move_group" type="move_group" output="screen">
+        <param name="default_planning_pipeline" value="ompl" />
+        <remap from="joint_states" to="/march/joint_states" />
+    </node>
+
+    <!-- Start Rviz: -->
+    <node ns="lr" pkg="rviz" name="rviz" type="rviz">
+        <remap from="robot_description" to="/lr/robot_description" />
+    </node>
+
+    <node ns="rl" pkg="rviz" name="rviz" type="rviz">
+        <remap from="robot_description" to="/rl/robot_description" />
+    </node>
+
+    <!-- Load march simulation: -->
+    <arg name="rviz" default="false"/>
+    <arg name="realsense" default="false"/>
+    <arg name="realsense_simulation" default="false"/>
+    <arg name="sounds" default="false"/>
+    <include file="$(dirname)/march_simulation.launch" pass_all_args="true"/>
+</launch>
