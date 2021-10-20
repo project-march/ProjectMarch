@@ -1,5 +1,5 @@
 How to git
-=================================
+==========
 .. inclusion-introduction-start
 
 This tutorial will describe the current git based workflow we adhere to.
@@ -22,7 +22,7 @@ Before following the following steps make sure you:
 * Have cloned the march repo.
 
 Roadmap for adding something to the repository
-^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. Create an issue on gitlab.
     #. Go to issues on the gitlab page (https://gitlab.com/project-march/march/-/issues)
