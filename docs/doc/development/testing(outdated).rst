@@ -1,4 +1,4 @@
-Testing
+Testing (Outdated)
 ==================
 This page describes the process of running and writing automated tests for
 the march packages.
@@ -12,18 +12,13 @@ See :ref:`setup-your-workspace-label`.
 
 Running the tests locally
 -------------------------
-Before running al test you first need to **build** and **source** your workspace this can be done with:
+Running all the tests within your workspace can be done by the following commands:
 
 .. code::
 
-  march_build_ros1 && sros1
-  # or
-  march_build_ros2 && sros2
-
-Afterwards you can run the following command to run all tests in the current directory:
-
-.. code::
-
+  # colcon must be run from your workspace root
+  cd ~/march_ws
+  colcon build
   colcon test
 
 The ``build`` step also builds the automated tests, so it is important to run
@@ -44,6 +39,21 @@ specified packages.
 .. code::
 
   colcon test --packages-select march_some_package march_some_other_package
+
+Running catkin_lint
+^^^^^^^^^^^^^^^^^^^
+Another tool that is used to lint packages is `catkin_lint <https://github.com/fkie/catkin_lint>`_.
+``catkin_lint`` checks the package manifest and CMake configuration files for
+any common errors. This command can be run anywhere in the workspace and will recurse into directories.
+So in order to check all packages you should run this command in the root of the workspace.
+
+.. code::
+
+  catkin_lint -W2 --explain --strict .
+
+This will output any notes, warnings or errors with an explanation. This
+command is normally run when you have created a new package or made changes to
+a ``package.xml`` or ``CMakeLists.txt`` file.
 
 General guidelines to writing tests
 -----------------------------------
