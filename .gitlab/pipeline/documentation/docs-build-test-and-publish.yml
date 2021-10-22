@@ -1,0 +1,73 @@
+# This is the child pipeline of the parent pipeline defined by "docs.yml"
+# It runs differently based on the var $HTMLPROOFER_ARGS.
+# This defines if it will be published and how the 'htmlproofer' runs.
+# author: Thijs Raymakers, George Vegelien
+stages:
+  - Build documentation
+  - Test documentation
+  - Publish documentation
+
+###############
+# Sphinx build #
+###############
+# Build the documentation and checks it for warnings and errors.
+Sphinx build:
+  stage: Build documentation
+  # The "$TAG" variable is set by parent pipeline (docs.yml)
+  image: $CI_REGISTRY_IMAGE/sphinx:$TAG
+  before_script:
+    - cd docs
+  script:
+    - bash build_locally.sh
+  artifacts:
+    paths:
+      - docs/build/
+  # This rule below should always evaluate to true.
+  # DON'T REMOVE IS NEEDED see: https://coastgit.hzg.de/help/ci/parent_child_pipelines.md
+  rules:
+    - if: $TAG
+
+################
+# HTML proofer #
+################
+Sphinx HTML proofer:
+  stage: Test documentation
+  image:
+    name: "klakegg/html-proofer"
+    entrypoint: [""]
+  needs:
+    - job: "Sphinx build"
+      artifacts: true
+  script:
+    # This runs "htmlproofer", a tool that checks whether the generated HTML has certain properties, such as
+    #   - a valid favicon
+    #   - valid html tags (depending on $HTMLPROOFER_ARGS, so there will be no active link checks on an MR)
+    #   - only https images and links
+    #   - all links in the docs are still available/online
+    - "htmlproofer docs/build/ $HTMLPROOFER_ARGS --check-favicon --check-html --check-img-http --check-sri --enforce-https --only-4xx --file-ignore docs/build/search.html --hydra_config '{\"max_concurrency\": 1}' --url-ignore '#'"
+  # This rule below should always evaluate to true.
+  # DON'T REMOVE IS NEEDED see: https://coastgit.hzg.de/help/ci/parent_child_pipelines.md
+  rules:
+    - if: $TAG
+
+#########
+# Pages #
+#########
+# Upload to GitLab pages
+pages:
+  stage: Publish documentation
+  image: alpine
+  needs:
+    - job: "Sphinx build"
+      artifacts: true
+    - job: "Sphinx HTML proofer"
+  script:
+    - echo 'Publishing pages...'
+    - mv docs/build/ public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    # This should run iff there are no HTMLPROOFER_ARGS.
+    # Meaning that it runs if and only if it is merged onto the main branch (dev).
+    - if: '$HTMLPROOFER_ARGS !~ /\S+/'
