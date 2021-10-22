@@ -1,7 +1,7 @@
 # This is the child pipeline of the parent pipeline defined by "docs.yml"
 # It runs differently based on the var $HTMLPROOFER_ARGS.
 # This defines if it will be published and how the 'htmlproofer' runs.
-# author: George Vegelien, Thijs Raymakers
+# author: Thijs Raymakers, George Vegelien
 stages:
   - Build documentation
   - Test documentation
@@ -13,7 +13,7 @@ stages:
 # Build the documentation and checks it for warnings and errors.
 Sphinx build:
   stage: Build documentation
-  # The "$TAG" variable is set by parent pipeline (documentation-ci.yml)
+  # The "$TAG" variable is set by parent pipeline (docs.yml)
   image: $CI_REGISTRY_IMAGE/sphinx:$TAG
   before_script:
     - cd docs

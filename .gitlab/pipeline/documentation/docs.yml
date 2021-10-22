@@ -6,7 +6,7 @@
 Build, test and publish documentation:
   stage: Documentation
   trigger:
-    include: ".gitlab/pipeline/documentation/build-test-and-publish2.yml"
+    include: ".gitlab/pipeline/documentation/docs-build-test-and-publish.yml"
     strategy: depend
   variables:
     DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
