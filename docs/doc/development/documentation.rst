@@ -72,8 +72,8 @@ We need some additional packages for sphinx that can be installed via pip.
 
 Install Pandoc
 --------------
-We need to pandoc to convert the markdown files to rst files. This is used by the
-:rootdir:`build_locally <build_locally.sh>` script. To turn the README files in the
+We need pandoc to convert the markdown files to rst files. Pandoc is used by the
+:rootdir:`build_locally <build_locally.sh>` script to turn the README files in the
 src of ros1 and ros2 into rst files. To install pandoc run:
 
 .. code::
