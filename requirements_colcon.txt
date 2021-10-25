@@ -6,3 +6,4 @@ rosdep==0.21.0
 rosinstall==0.7.8 
 rosinstall-generator==0.1.22
 wstool==0.1.17
+defusedxml==0.7.1
