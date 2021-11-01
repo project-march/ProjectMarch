@@ -126,7 +126,20 @@ In order to run ROS2, you have to source both ROS2 Foxy and the ROS2 MARCH packa
 
 Convenient aliases
 ^^^^^^^^^^^^^^^^^^
-These aliases provide shortcuts to easily build and run the code, and some other utilities. It is recommended you add them to your ~/.bashrc file.
+These aliases provide shortcuts to easily build and run the code, and some other utilities.
+It is recommended you add these aliases to a separate the a file and link to those.
+First link to the march aliases file by adding the below code to your ~/.bashrc file.
+
+.. code-block:: bash
+
+    if [ -f ~/.march_bash_aliases ]; then
+        . ~/.march_bash_aliases
+    fi
+
+Secondly add a file named ~/.march_bash_aliases, and paste the code below in that file.
+
+.. note:: You can also add the code below directly into your ~/.bashrc file, and skip the step above.
+    However this is not recommended as it is less neat.
 
 .. code:: bash
 
