@@ -17,13 +17,13 @@ while (("$#")); do
     echo ""
     exit 0;
     ;;
-  # The new parameter to delete the previous venv. False by default in case of an accidental call.
+  # The new parameter to delete the previous venv. (default=false).
   -n | --new=) # unsupported flags
     echo "The current virtual environment will be deleted."
     rm -rf .venv_march/
     shift
     ;;
-  # Installs all packages with the no-cache param to ensure a clean install.
+  # Installs all packages with the no-cache param to ensure a clean install. (default=false)
   -c | --no-cache | --clean)
     CACHE=false
     shift
@@ -41,7 +41,9 @@ done
 
 cd ~/march/
 
-python3 -m venv .venv_march
+python3 -m venv .venv_march --system-site-packages --symlinks
+
+touch .venv_march/COLCON_IGNORE
 
 source ~/march/.venv_march/bin/activate
 
