@@ -45,14 +45,71 @@ flake8
 ^^^^^^
 What makes flake8 so useful is that it is able to install plugins, which add checks.
 Flake8 checks by default for `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_ style guide.
-At March, we also use more plugins. To install flake8 with the plugins run:
+At March, we also use more plugins. To ensure everybody uses the same plugins we run it with docker images.
 
-.. code::
+flake8 setup
+~~~~~~~~~~~~
+First make sure that you have docker installed, if not you can do that with the following code:
 
-    pip2 install --user flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order flake8-colors
+.. code-block:: bash
 
-If you are wondering what a plugin checks for you can search for them on `PyPI <https://pypi.org>`_.
+    curl -fsSL https://get.docker.com -o get-docker.sh  # Download docker installer script.
+    sudo sh get-docker.sh  # Install docker by running installer script.
 
-.. caution::
+    # Optional commands for easier use:
+    rm get-docker.sh  # Removes the installer script.
+    usermod -aG docker $USER  # To remove the need for 'sudo' in front of every docker command.
+    newgrp docker  # To activate the previous command, if you still need sudo restart your computer
 
-    It is important to install flake8 for python 2 using ``pip2``, since we use python 2 (for now).
+Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
+
+.. code-block:: bash
+
+    # Flake8 shortcuts (python code style checker)
+    alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:main" && \
+    docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT'
+    alias march_flake8='docker run -v ~/march:/home/march:ro march/flake8'
+    alias march_flake8_here='docker run -v `pwd`:`pwd`:ro -w /. -v ~/march/.flake8:/.flake8:ro march/flake8 `pwd`'
+
+    # Black shortcuts (python code formatter)
+    alias march_black='docker run -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
+    alias march_black_check='docker run -v ~/march:/home/march:ro --entrypoint black march/flake8 \
+    --check --diff --color ros1/src ros2/src utility_scripts/'
+    alias march_black_here='docker run -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
+    alias march_black_check_here='docker run -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
+
+Update your flake8 docker image. You can redo do this step if it doesn't produce the same output as gitlab,
+or if someone from software sends a slack message.
+
+.. code-block:: bash
+
+    # If you added the alias:
+    march_flake8_update
+    # Or, if you want to do it manually:
+    FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:main" && \
+    docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT
+
+Running flake8
+~~~~~~~~~~~~~~
+
+If you have everything setup you can very easily run it with the following commands:
+
+.. code-block:: bash
+
+    # To run flake8 on your whole march folder:
+    march_flake8
+
+    # To run flake8 in you current directory:
+    march_flake8_here
+
+    # To run flake8 without the aliases:
+    docker run -v [local_src]:[dest_in_docker]:[ro for readonly] -w [work_dir_in_docker] [image name (e.g. march/flake8)] [flake 8 arguments]
+
+If there is an violations anywhere in the march_flake8 where it says "black would make changes" run the following commands:
+
+.. code-block:: bash
+
+    march_black # To auto-format all code in the march directory.
+    march_black_here # To auto-format you code according to black in you current directory.
+    march_black_check # To see what should be changes according to black in you ~/march folder.
+    march_black_check_here # To see what should be changes according to black in you current directory.
