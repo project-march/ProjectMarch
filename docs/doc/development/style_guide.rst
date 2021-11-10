@@ -1,10 +1,21 @@
 .. _style-guide:
 
-Style Guide (Outdated)
-======================
+Style Guide
+===========
 All code in the March repositories should adhere to a certain set of style guides.
-Since most of the March packages are ROS packages, these should all adhere to the
-ROS style guide for `C++ <https://wiki.ros.org/CppStyleGuide>`_ and `Python <https://wiki.ros.org/PyStyleGuide>`_.
+
+In our code we adhere to the following style guides:
+
+    C++: https://wiki.ros.org/CppStyleGuide
+        * https://github.com/WHILL/roscpp_code_format
+        * clang-format: https://clang.llvm.org/docs/ClangFormat.html
+    Python: https://wiki.ros.org/PyStyleGuide
+        * PEP8: https://www.python.org/dev/peps/pep-0008/
+
+It is not important to read these specifications, the most important aspects will be summarized below.
+In order to check whether your code is properly formatted and according to the rules defined in the guides above,
+you have to perform static analysis locally. See the next chapter for more information about static analysis,
+and how to run it.
 
 Running style checkers
 ----------------------
@@ -45,7 +56,7 @@ flake8
 ^^^^^^
 What makes flake8 so useful is that it is able to install plugins, which add checks.
 Flake8 checks by default for `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_ style guide.
-At March, we also use more plugins. To ensure everybody uses the same plugins we run it with docker images.
+At March we also use more plugins. To ensure everybody uses the same plugins we run it with docker images.
 
 flake8 setup
 ~~~~~~~~~~~~
@@ -113,3 +124,108 @@ If there is an violations anywhere in the march_flake8 where it says "black woul
     march_black_here # To auto-format you code according to black in you current directory.
     march_black_check # To see what should be changes according to black in you ~/march folder.
     march_black_check_here # To see what should be changes according to black in you current directory.
+
+Naming Conventions
+------------------
+This sections will explain the different namings schemes and which scheme we use for which type of object.
+
+Naming schemes
+^^^^^^^^^^^^^^
+There exists five different kind of naming schemes we use:
+
+* **PascalCase**: The name starts with a capital letter, and has a capital letter for each new word, with no underscores.
+* **camelCase**: Like PascalCase, but with a lower-case first letter.
+* **snake_case**: The name uses only lower-case letters, with words separated by underscores.
+* **UPPER_CASE**: All capital letters, with words separated by underscores.
+* **kebab-case**: The name uses only lower-case letters, with words separated by lines.
+
+A prefix is a common word placed before the rest of the name. For example: the prefix for ROS Packages is 'march'.
+If you want to create a package called 'state_machine', the package should be named 'march_state_machine'.
+
+General naming guidelines
+^^^^^^^^^^^^^^^^^^^^^^^^^
+* Avoid abbreviations: prefer getIMotionCubes() over getIMCs()
+* Be descriptive
+    * The name of a function should make clear what action it performs. Prefer isAlive() over alive()
+    * The name of a variable or class should make clear what is represents. Prefer is_alive over alive
+
+Naming conventions
+^^^^^^^^^^^^^^^^^^
+.. list-table:: Naming conventions
+    :header-rows: 1
+
+    * - Type
+      - Case
+      - Prefix
+      - Postfix
+      - Example
+    * - Repositories
+      - kebab-case
+      -
+      -
+      - gait-generation
+    * - ROS Packages
+      - snake_case
+      - march
+      -
+      - march_state_machine
+    * - Nodes
+      - snake_case
+      -
+      -
+      - march_hardware_interface
+    * - Topics / Services
+      - PascalCase
+      -
+      -
+      - GaitInstruction.msg
+    * - Files
+      - snake_case
+      -
+      -
+      - march_hardware_interface_node.cpp
+    * - Classes
+      - PascalCase
+      -
+      -
+      - HardwareBuilder
+    * - Variables
+      - snake_case
+      -
+      -
+      - cycle_time
+    * - Class fields (C++)
+      - snake_case
+      -
+      - _
+      - \net_number_
+    * - Class fields (Python)
+      - snake_case
+      -
+      -
+      - field_name
+    * - Private fields (Python only)
+      - snake_case
+      - _
+      -
+      - _private_something
+    * - Methods / functions (C++)
+      - camelCase
+      -
+      -
+      - createMarchRobot()
+    * - Methods / functions (Python)
+      - snake_case
+      -
+      -
+      - do_something()
+    * - Constants
+      - UPPER_CASE
+      -
+      -
+      - MAXIMUM_TORQUE
+    * - Namespaces
+      - snake_case
+      -
+      -
+      - march
