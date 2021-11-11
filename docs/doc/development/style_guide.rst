@@ -13,7 +13,7 @@ In our code we adhere to the following style guides:
         * PEP8: https://www.python.org/dev/peps/pep-0008/
 
 It is not important to read these specifications, the most important aspects will be summarized below.
-In order to check whether your code is properly formatted and according to the rules defined in the guides above,
+In order to check whether your code is formatted according to the rules defined in the guides above,
 you have to perform static analysis locally. See the next chapter for more information about static analysis,
 and how to run it.
 
@@ -57,6 +57,8 @@ flake8
 What makes flake8 so useful is that it is able to install plugins, which add checks.
 Flake8 checks by default for `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_ style guide.
 At March we also use more plugins. To ensure everybody uses the same plugins we run it with docker images.
+Docker is a product that ensures that code runs the same on everyone's device by having all needed files and dependencies in
+a closed off container. See `this 100 sec explanation <https://www.youtube.com/watch?v=Gjnup-PuquQ>`_ for more information.
 
 flake8 setup
 ~~~~~~~~~~~~
@@ -64,6 +66,11 @@ First make sure that you have docker installed, if not you can do that with the 
 
 .. code-block:: bash
 
+    # To check if you have docker installed run:
+    docker --version
+    # If it outputs something like "Docker version 20.10.7, build 20.10.7-0ubuntu5~20.04.2", then you have docker installed.
+
+    # To install docker.
     curl -fsSL https://get.docker.com -o get-docker.sh  # Download docker installer script.
     sudo sh get-docker.sh  # Install docker by running installer script.
 
@@ -93,7 +100,7 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_py_auto_format_check_here='docker run -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
 
 Update your flake8 docker image. You can redo do this step if it doesn't produce the same output as gitlab,
-or if someone from software sends a slack message.
+or if someone from the Project MARCH software department announces to you that the docker image should be updated.
 
 .. code-block:: bash
 
@@ -106,7 +113,7 @@ or if someone from software sends a slack message.
 Running flake8
 ~~~~~~~~~~~~~~
 
-If you have everything setup you can very easily run it with the following commands:
+If you have everything set up you can very easily run it with the following commands:
 
 .. code-block:: bash
 
@@ -119,7 +126,8 @@ If you have everything setup you can very easily run it with the following comma
     # To run flake8 without the aliases:
     docker run -v [local_src]:[dest_in_docker]:[ro for readonly] -w [work_dir_in_docker] [image name (e.g. march/flake8)] [flake 8 arguments]
 
-If there is an violations anywhere in the march_flake8 where it says "black would make changes" run the following commands:
+If there are any violations after running the march_flake8 alias where it says "black would make changes",
+run the following commands:
 
 .. code-block:: bash
 
