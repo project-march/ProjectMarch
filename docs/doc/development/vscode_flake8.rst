@@ -18,16 +18,19 @@ Creating a virtual environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To create a virtual environment, we need to install the required python package first using:
 ::
+    
     python3 -m pip install virtualenv
 
 Next we can create a virtual environment. While being in the march workspace (~/march by default), open a terminal and run:
 ::
+    
     python3 -m venv .march_venv --system-site-packages
 
 This will create a directory called .march_venv containing the virtual python environment. The ``--system-site-packages`` argument gives the virtual environment access to the python packages already installed in your main python environment. This is necessary to use the ROS python packages we installed during the ROS installation.
 
 Finally we can go into the virtual environment using:
 ::
+    
     source .march_venv/bin/activate
 
 If everything went well, you see that *(.march_venv)* is now shown in front of your bash prompt (the text shown in a terminal before the $-sign). Seeing this means that you are in the virtual python environment.
@@ -36,6 +39,7 @@ Install flake8 and extensions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 While being in the virtual environment, we can install all the flake8 packages used by the pipeline. All the packages are specified in march/requirements_flake8.txt. Therefore we can simply do:
 ::
+    
     python3 -m pip install -I -r requirements_flake8.txt
 
 Note that we add the -I argument to ignore already installed packages. This ensures to install flake8 in the virtual environment, even if you already installed it in your main environment.
