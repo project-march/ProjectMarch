@@ -74,10 +74,13 @@ First make sure that you have docker installed, if not you can do that with the 
 
 Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
 
+..
+    The 'dev' in the code block below might be changed to 'main' to keep the flake8 more consistent but slower to adapt.
+
 .. code-block:: bash
 
     # Flake8 shortcuts (python code style checker)
-    alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:main" && \
+    alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:dev" && \
     docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT'
     alias march_flake8='docker run -v ~/march:/home/march:ro march/flake8'
     alias march_flake8_here='docker run -v `pwd`:`pwd`:ro -w /. -v ~/march/.flake8:/.flake8:ro march/flake8 `pwd`'
