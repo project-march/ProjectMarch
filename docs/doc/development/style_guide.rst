@@ -83,11 +83,11 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_flake8_here='docker run -v `pwd`:`pwd`:ro -w /. -v ~/march/.flake8:/.flake8:ro march/flake8 `pwd`'
 
     # Black shortcuts (python code formatter)
-    alias march_black='docker run -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
-    alias march_black_check='docker run -v ~/march:/home/march:ro --entrypoint black march/flake8 \
+    alias march_py_auto_format='docker run -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
+    alias march_py_auto_format_check='docker run -v ~/march:/home/march:ro --entrypoint black march/flake8 \
     --check --diff --color ros1/src ros2/src utility_scripts/'
-    alias march_black_here='docker run -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
-    alias march_black_check_here='docker run -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
+    alias march_py_auto_format_here='docker run -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
+    alias march_py_auto_format_check_here='docker run -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
 
 Update your flake8 docker image. You can redo do this step if it doesn't produce the same output as gitlab,
 or if someone from software sends a slack message.
@@ -120,10 +120,10 @@ If there is an violations anywhere in the march_flake8 where it says "black woul
 
 .. code-block:: bash
 
-    march_black # To auto-format all code in the march directory.
-    march_black_here # To auto-format you code according to black in you current directory.
-    march_black_check # To see what should be changes according to black in you ~/march folder.
-    march_black_check_here # To see what should be changes according to black in you current directory.
+    march_py_auto_format # To auto-format all code in the march directory.
+    march_py_auto_format_here # To auto-format you code according to black in you current directory.
+    march_py_auto_format_check # To see what should be changes according to black in you ~/march folder.
+    march_py_auto_format_check_here # To see what should be changes according to black in you current directory.
 
 Naming Conventions
 ------------------
