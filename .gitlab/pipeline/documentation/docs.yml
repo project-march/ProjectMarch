@@ -1,0 +1,44 @@
+##############################
+### Documentation pipeline ###
+##############################
+# Set up the CI for changes to the docs. It starts a child pipeline with variable based on
+# if it is a merge request or push on the main branch (dev).
+Build, test and publish documentation:
+  stage: Documentation
+  trigger:
+    include: ".gitlab/pipeline/documentation/docs-build-test-and-publish.yml"
+    strategy: depend
+  variables:
+    DOCKER_FILE: ".gitlab/dockerfiles/sphinx"
+    TAG: $CI_DEFAULT_BRANCH # This is also needed to trigger the downstream pipeline.
+  rules:
+
+    # Run a separate pipeline if we are merged into the main branch (dev).
+    # This will actually publish the files to docs.projectmarch.nl
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - $DOCKER_FILE
+        - "ros1/src/**/README.md"
+        - "ros2/src/**/README.md"
+        - "docs/**/*" # To check if any file in the docs folder has changed.
+
+    # If there is a merge request, and there are changes we also want to build a new docker image.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - $DOCKER_FILE
+        - "docs/requirements.txt" # To check if any requirements have changed.
+      variables:
+        HTMLPROOFER_ARGS: "--checks-to-ignore LinkCheck"
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+
+    # If there is a merge request, and there are changes to the docs
+    # we want to Build and HTMLPROOF, but not publish.
+    # Note: We do not run the LinkCheck alive until it is actually published because,
+    #       otherwise the server would send out to many GET requests.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "ros1/src/**/README.md"
+        - "ros2/src/**/README.md"
+        - "docs/**/*" # To check if any file in the docs folder has changed.
+      variables:
+        HTMLPROOFER_ARGS: "--checks-to-ignore LinkCheck"

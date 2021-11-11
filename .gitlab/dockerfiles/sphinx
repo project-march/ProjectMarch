@@ -4,5 +4,5 @@ FROM sphinxdoc/sphinx
 RUN apt update && apt install -y pandoc && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /docs
-ADD docs/requirements.pip /docs
-RUN pip3 install -r requirements.pip
+ADD docs/requirements.txt /docs
+RUN pip3 install -r requirements.txt

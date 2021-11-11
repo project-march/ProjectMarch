@@ -65,7 +65,7 @@ stages:
 # are split into different files. Each file specifies the jobs of a stage.
 include:
     - local: /.gitlab/pipeline/build-container.yml
-    - local: /.gitlab/pipeline/documentation/build.yml
+    - local: /.gitlab/pipeline/documentation/docs.yml
     - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
     - local: /.gitlab/pipeline/test-code.yml
