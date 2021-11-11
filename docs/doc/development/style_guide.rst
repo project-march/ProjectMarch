@@ -83,7 +83,7 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:dev" && \
     docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT'
     alias march_flake8='docker run -v ~/march:/home/march:ro march/flake8'
-    alias march_flake8_here='docker run -v `pwd`:`pwd`:ro -w /. -v ~/march/.flake8:/.flake8:ro march/flake8 `pwd`'
+    alias march_flake8_here='docker run -v `pwd`:`pwd`:ro march/flake8 `pwd`'
 
     # Black shortcuts (python code formatter)
     alias march_py_auto_format='docker run -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
@@ -123,6 +123,7 @@ If there is an violations anywhere in the march_flake8 where it says "black woul
 
 .. code-block:: bash
 
+    # Auto-format your python code (with black):
     march_py_auto_format # To auto-format all code in the march directory.
     march_py_auto_format_here # To auto-format you code according to black in you current directory.
     march_py_auto_format_check # To see what should be changes according to black in you ~/march folder.
