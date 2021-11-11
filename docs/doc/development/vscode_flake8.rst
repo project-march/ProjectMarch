@@ -8,7 +8,7 @@ This tutorial will teach you how to add the flake8 style checks used in the pipe
 
 Introduction
 ------------
-The March Gitlab is configured with the so called pipeline. This pipeline performs several checks one the code we commit. One of these checks is on code style, see :ref:`style-guide`. To avoid styling errors in python, it is possible to add the flake8 linter with the checks used by the pipeline to your VS Code editor.
+The MARCH Gitlab is configured with the so called pipeline. This pipeline performs several checks one the code we commit. One of these checks is on code style, see :ref:`style-guide`. To avoid styling errors in Python, it is possible to add the flake8 linter with the checks used by the pipeline to your VS Code editor.
 
 Installation
 ------------
@@ -42,14 +42,14 @@ While being in the virtual environment, we can install all the flake8 packages u
     
     python3 -m pip install -I -r requirements_flake8.txt
 
-Note that we add the -I argument to ignore already installed packages. This ensures to install flake8 in the virtual environment, even if you already installed it in your main environment.
+Note that we add the -I argument to ignore already installed packages. This ensures that  flake8 will be installed in the virtual environment, even if you already installed it in your main environment.
 
 Configure VS code
 ^^^^^^^^^^^^^^^^^
-Now that flake8 is installed, we need to configure VS Code to use it. To do this, open VS Code and go to setting (Ctrl+,).
+Now that flake8 is installed, we need to configure VS Code to use it. To do this, open VS Code and go to settings (Ctrl+,).
 
-1. Search for ``python.linting.enabled`` and enable to enable python linting.
-2. Search for ``python.linting.flake8Enabled`` and enable to enable linting with flake8.
+1. Search for ``python.linting.enabled`` and enable python linting.
+2. Search for ``python.linting.flake8Enabled`` and enable linting with flake8.
 3. Search for ``python.linting.flake8Path`` and set this to the flake8 installation directory of the virtual environment (``~/march/.march_venv/bin/flake8`` by default)
 4. Search for ``python.formatting.provider`` and set this to black to use black formatting (like we do in the pipeline).
 
