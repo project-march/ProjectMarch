@@ -40,9 +40,11 @@ class ToTrajectoryCommandNode(Node):
 
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_msg(time_from_start)
-        self._start_time = self._clock.now().to_msg()
+        # _start_time = self.get_clock().now().to_msg()
+        self._start_time = Time(seconds=30, nanoseconds=0)
+        # self._start_time["goal"]
         # self._end_time = 1
-
+        print(self._start_time, '\n', self._current_subgait_duration)
         self.get_logger().info("Creating TrajectoryCommand")
         command = TrajectoryCommand(
             trajectory,
@@ -53,7 +55,7 @@ class ToTrajectoryCommandNode(Node):
 
         # From TrajectoryCommand to FollowJointTrajectoryGoal.msg
         self.get_logger().info("Publishing FollowJointTrajectoryActionGoal")
-        stamp = self._start_time
+        stamp = self._start_time.to_msg()
         command.trajectory.header.stamp = stamp
         goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
         self.publisher_.publish(

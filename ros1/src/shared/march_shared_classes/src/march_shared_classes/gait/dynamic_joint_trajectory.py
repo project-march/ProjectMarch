@@ -1,6 +1,7 @@
 import rospy
 from trajectory_msgs import msg as trajectory_msg
 from scipy.interpolate import CubicSpline
+import numpy as np
 
 # Needed to get current state
 from sensor_msgs.msg import JointState
@@ -21,7 +22,7 @@ class DynamicJointTrajectory:
 
     def set_middle_state(self):
         """Set middle state (currently fixed)"""
-        self._middle_position = [0.0, 8.0, -2.0, 2.0, 2.0, 35.0, 67.0, 0.0]
+        self._middle_position = np.deg2rad([0.0, 8.0, -2.0, 2.0, 2.0, 35.0, 67.0, 0.0])
 
     def get_desired_state(self):
         """Reads desired foot location as given by CoViD and performs
@@ -29,8 +30,8 @@ class DynamicJointTrajectory:
 
         # Dummy position until covid has a topic. Maybe publish/make a node
         # that publishes fake feasible states
-        self._desired_position = [0.0, 8.0, -9.5, 2.0, 2.0, 18.0, 8.0, 0.0]
-        self._desired_velocity = [0.0, 0.0, 0.0, 0.0, 0.0, -20, 0.0, 0.0]
+        self._desired_position = np.deg2rad([0.0, 8.0, -9.5, 2.0, 2.0, 18.0, 8.0, 0.0])
+        self._desired_velocity = np.deg2rad([0.0, 0.0, 0.0, 0.0, 0.0, -20, 0.0, 0.0])
 
     def interpolate_setpoints(self):
         """Interpolates between the current, middle and desired state
