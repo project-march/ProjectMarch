@@ -99,7 +99,7 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_py_auto_format_here='docker run -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
     alias march_py_auto_format_check_here='docker run -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
 
-Update your flake8 docker image. You can redo do this step if it doesn't produce the same output as gitlab,
+Update your flake8 docker image. You can redo this step if it doesn't produce the same output as gitlab,
 or if someone from the Project MARCH software department announces to you that the docker image should be updated.
 
 .. code-block:: bash
@@ -133,17 +133,17 @@ run the following commands:
 
     # Auto-format your python code (with black):
     march_py_auto_format # To auto-format all code in the march directory.
-    march_py_auto_format_here # To auto-format you code according to black in you current directory.
-    march_py_auto_format_check # To see what should be changes according to black in you ~/march folder.
-    march_py_auto_format_check_here # To see what should be changes according to black in you current directory.
+    march_py_auto_format_here # To auto-format your code according to black in your current directory.
+    march_py_auto_format_check # To see what should be changed according to black in your ~/march folder.
+    march_py_auto_format_check_here # To see what should be changed according to black in your current directory.
 
 Naming Conventions
 ------------------
-This sections will explain the different namings schemes and which scheme we use for which type of object.
+This section will explain the different naming schemes and which scheme we use for which type of object.
 
 Naming schemes
 ^^^^^^^^^^^^^^
-There exists five different kind of naming schemes we use:
+The MARCH code uses the following five naming schemes:
 
 * **PascalCase**: The name starts with a capital letter, and has a capital letter for each new word, with no underscores.
 * **camelCase**: Like PascalCase, but with a lower-case first letter.
