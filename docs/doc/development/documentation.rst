@@ -66,6 +66,7 @@ We need some additional packages for sphinx that can be installed via pip.
 
 .. code::
 
+  cd ~/march/docs
   pip install -r requirements.txt
 
 .. _install-pandoc-label:
@@ -88,6 +89,7 @@ generate the docs and automatically open them in your browser.
 
 .. code::
 
+ cd ~/march/docs
  bash ./build_locally.sh
 
 .. note::
