@@ -1,8 +1,7 @@
 from sensor_msgs.msg import JointState
 import rospy
 import numpy as np
-
-from march_shared_classes.gait.dynamic_joint_trajectory import DynamicJointTrajectory
+from contextlib import suppress
 
 
 def publish_fake_current_joint_states():
@@ -13,7 +12,6 @@ def publish_fake_current_joint_states():
         current_position = np.deg2rad([0.0, 8.0, 18.0, 2.0, 2.0, -9.5, 8.0, 0.0])
         current_velocity = np.deg2rad([0.0, 0.0, -20.2, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-        # joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_state_msg = JointState()
         joint_state_msg.name = [
             "left_ankle",
@@ -33,7 +31,5 @@ def publish_fake_current_joint_states():
 
 
 if __name__ == "__main__":
-    try:
+    with suppress(rospy.ROSInterruptException):
         publish_fake_current_joint_states()
-    except rospy.ROSInterruptException:
-        pass

@@ -105,6 +105,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/continuous_integration/continuous_integration
    doc/development/testing
    doc/development/style_guide
+   doc/development/vscode_flake8
    doc/development/add_a_new_gait
 
 .. toctree::

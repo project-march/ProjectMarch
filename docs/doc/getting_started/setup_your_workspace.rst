@@ -126,7 +126,20 @@ In order to run ROS2, you have to source both ROS2 Foxy and the ROS2 MARCH packa
 
 Convenient aliases
 ^^^^^^^^^^^^^^^^^^
-These aliases provide shortcuts to easily build and run the code, and some other utilities. It is recommended you add them to your ~/.bashrc file.
+These aliases provide shortcuts to easily build and run the code, and some other utilities.
+It is recommended you add these aliases to a separate the a file and link to those.
+First link to the march aliases file by adding the below code to your ~/.bashrc file.
+
+.. code-block:: bash
+
+    if [ -f ~/.march_bash_aliases ]; then
+        . ~/.march_bash_aliases
+    fi
+
+Secondly add a file named ~/.march_bash_aliases, and paste the code below in that file.
+
+.. note:: You can also add the code below directly into your ~/.bashrc file, and skip the step above.
+    However this is not recommended as it is less neat.
 
 .. code:: bash
 
@@ -158,6 +171,12 @@ These aliases provide shortcuts to easily build and run the code, and some other
     # Build and run the bridge
     alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
     alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge parameter_bridge'
+
+    # Clean march builds
+    alias march_clean_ros1='rm -rf ~/march/ros1/build ~/march/ros1/log ~/march/ros1/install'
+    alias march_clean_ros2='rm -rf ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install'
+    alias march_clean_bridge='rm -rf ~/ros1_bridge/build ~/ros1_bridge/log ~/ros1_bridge/install'
+    alias march_clean_all='march_clean_ros1 && march_clean_ros2 && march_clean_bridge'
 
     # Install dependencies
     alias install_dep_ros1='cm1 && snoe && rosdep install --from-paths src --ignore-src -y --rosdistro noetic'
