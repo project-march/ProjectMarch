@@ -6,7 +6,9 @@
 flake8:
   stage: Lint code
   # The "$TAG" variable is set by the rules below
-  image: $CI_REGISTRY_IMAGE/flake8:$TAG
+  image:
+    name: $CI_REGISTRY_IMAGE/flake8:$TAG
+    entrypoint: [""]
   script:
     # Return the return value of the rightmost failed command. It is unlikely that `sed` fails, but
     # the if the flake8 runner fails then everything is propagated through. This means that the
@@ -16,7 +18,10 @@ flake8:
     # The codeclimate format returns violations on new lines, but GitLab expects a json
     # array. This adds the required "[", "]" and ","s for the file to be interpreted as
     # a valid JSON array.
-    - python3 -m flake8 --format=codeclimate --config .flake8 | sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
+    # Note that the following command doesn't use the default entrypoint defined in the dockerfile 'flake8'.
+    - >
+      flake8 --config .flake8 --format=codeclimate ros1/src ros2/src utility_scripts/ |
+      sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
     # If the above statement succeeds, then codeclimate.json will be empty. We add an empty
     # array to ensure that the codeclimate.json file still has a valid json syntax
     - echo "[]" | tee codeclimate.json;

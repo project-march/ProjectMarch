@@ -12,6 +12,7 @@ exclude =
     log,
     libraries,
     venv,
+    .venv_march,
     .scripts,
     test
 enable-extensions =
