@@ -1,12 +1,10 @@
-from re import S
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
+from rosgraph_msgs.msg import Clock
 
-# from march_utility.gait.joint_trajectory import JointTrajectory
-# from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 from trajectory_msgs import msg as trajectory_msg
 from march_shared_msgs.msg import (
     FollowJointTrajectoryGoal,
@@ -14,6 +12,7 @@ from march_shared_msgs.msg import (
 )
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
+
 
 class ToTrajectoryCommandNode(Node):
     def __init__(self):
@@ -27,35 +26,41 @@ class ToTrajectoryCommandNode(Node):
         )
         self.subscription
 
+        self.get_ros_one_time = self.create_subscription(
+            msg_type=Clock,
+            topic="/clock",
+            callback=self.get_sim_time,
+            qos_profile=5,
+        )
+
         self.publisher_ = self.create_publisher(
             msg_type=FollowJointTrajectoryActionGoal,
             topic="/march/controller/trajectory/follow_joint_trajectory/goal",
             qos_profile=5,
         )
 
+    def get_sim_time(self, msg):
+        clock = msg.clock
+        self.ros_one_time = Time(
+            seconds=clock.sec,
+            nanoseconds=clock.nanosec,
+        )
+
     def to_trajectory_command(self, msg):
         """Generate a new trajectory command."""
-        # From joint_trajectory_msg to TrajectoryCommand
         trajectory = msg
 
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_msg(time_from_start)
-        # _start_time = self.get_clock().now().to_msg()
-        self._start_time = Time(seconds=30, nanoseconds=0)
-        # self._start_time["goal"]
-        # self._end_time = 1
-        print(self._start_time, '\n', self._current_subgait_duration)
-        self.get_logger().info("Creating TrajectoryCommand")
+
         command = TrajectoryCommand(
             trajectory,
             self._current_subgait_duration,
             "dynamic_joint_trajectory",
-            self._start_time,
+            self.ros_one_time,
         )
 
-        # From TrajectoryCommand to FollowJointTrajectoryGoal.msg
-        self.get_logger().info("Publishing FollowJointTrajectoryActionGoal")
-        stamp = self._start_time.to_msg()
+        stamp = self.ros_one_time.to_msg()
         command.trajectory.header.stamp = stamp
         goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
         self.publisher_.publish(
@@ -66,6 +71,7 @@ class ToTrajectoryCommandNode(Node):
             )
         )
 
+
 def main(args=None):
     rclpy.init(args=args)
     to_trajectory_command_node = ToTrajectoryCommandNode()
@@ -73,6 +79,7 @@ def main(args=None):
 
     to_trajectory_command_node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

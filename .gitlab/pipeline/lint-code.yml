@@ -6,7 +6,9 @@
 flake8:
   stage: Lint code
   # The "$TAG" variable is set by the rules below
-  image: $CI_REGISTRY_IMAGE/flake8:$TAG
+  image:
+    name: $CI_REGISTRY_IMAGE/flake8:$TAG
+    entrypoint: [""]
   script:
     # Return the return value of the rightmost failed command. It is unlikely that `sed` fails, but
     # the if the flake8 runner fails then everything is propagated through. This means that the
@@ -16,10 +18,23 @@ flake8:
     # The codeclimate format returns violations on new lines, but GitLab expects a json
     # array. This adds the required "[", "]" and ","s for the file to be interpreted as
     # a valid JSON array.
-    - python3 -m flake8 --format=codeclimate --config .flake8 | sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
+    # Note that the following command doesn't use the default entrypoint defined in the dockerfile 'flake8'.
+    - >
+      flake8 --config .flake8 --format=codeclimate ros1/src ros2/src utility_scripts/ |
+      sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
     # If the above statement succeeds, then codeclimate.json will be empty. We add an empty
     # array to ensure that the codeclimate.json file still has a valid json syntax
-    - echo "[]" | tee codeclimate.json
+    - echo "[]" | tee codeclimate.json;
+  after_script:
+    # The next statement will convert the codeclimate.json into a human-readable format.
+    - |
+      echo "---Start Violations---" && \
+      cat codeclimate.json | python3 -c "import sys, json; [print(
+          '{0}:{1}:{2} - {3}:{4}: {5} : {6} {7}'.format(el['location']['path'],
+          el['location']['lines']['begin'], el['location']['positions']['begin']['column'],
+          el['location']['lines']['end'], el['location']['positions']['end']['column'],
+          el['categories'], el['check_name'], el['description'])) for el in json.load(sys.stdin)];" \
+      && echo "---End Violations---"
   artifacts:
     reports:
       codequality: codeclimate.json

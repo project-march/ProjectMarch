@@ -40,7 +40,7 @@
       changes:
         - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
-        - "requirements.pip"
+        - "requirements.txt"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
@@ -49,7 +49,7 @@
       changes:
         - "$DOCKER_FILE"
         - "$ROS_VERSION/**/package.xml"
-        - "requirements.pip"
+        - "requirements.txt"
       variables:
          TAG: $CI_COMMIT_BRANCH
   extends:
@@ -124,7 +124,7 @@ sphinx container build:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - "$DOCKER_FILE"
-        - "docs/requirements.pip"
+        - "docs/requirements.txt"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
@@ -132,7 +132,7 @@ sphinx container build:
     - if: '$CI_COMMIT_BRANCH'
       changes:
         - "$DOCKER_FILE"
-        - "docs/requirements.pip"
+        - "docs/requirements.txt"
       variables:
        TAG: $CI_COMMIT_BRANCH
   extends:
