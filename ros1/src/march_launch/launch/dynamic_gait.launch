@@ -82,6 +82,7 @@
     <arg name="sounds" default="false"/>
     <include file="$(dirname)/march_simulation.launch" pass_all_args="true"/>
 
-    <!-- Start the inverse kinematic solver: -->
-    <node ns="lr" pkg="inverse_kinematic_solver" name="inverse_kinematic_solver_lr" type="inverse_kinematic_solver_lr.py" output="screen"/>
+    <!-- Start the inverse kinematic solvers: -->
+    <node ns="lr" pkg="inverse_kinematic_solver" name="inverse_kinematic_solver" type="inverse_kinematic_solver.py" output="screen" args="right"/>
+    <node ns="rl" pkg="inverse_kinematic_solver" name="inverse_kinematic_solver" type="inverse_kinematic_solver.py" output="screen" args="left"/>
 </launch>
