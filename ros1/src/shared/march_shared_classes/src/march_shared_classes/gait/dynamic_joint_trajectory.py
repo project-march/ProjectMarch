@@ -12,7 +12,7 @@ class DynamicJointTrajectory:
     Based on the JointTrajectoryClass"""
 
     def __init__(self):
-        self.time = [0, 0.5, 1]
+        self.time = [0.5, 1, 1.5]
 
     def get_current_state(self, msg: JointState):
         """Reads current joint angles and velocities of the exo"""
@@ -66,8 +66,9 @@ class DynamicJointTrajectory:
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
 
         joint_trajectory_msg.joint_names = self._joint_names
+        timestamps = np.linspace(self.time[0], self.time[-1], 20)
 
-        for timestamp in self.time:
+        for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
             joint_trajectory_point.time_from_start = rospy.Duration.from_sec(timestamp)
 

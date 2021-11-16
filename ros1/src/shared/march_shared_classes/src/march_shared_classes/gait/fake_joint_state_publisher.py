@@ -15,13 +15,13 @@ def publish_fake_current_joint_states():
         joint_state_msg = JointState()
         joint_state_msg.name = [
             "left_ankle",
-            "left_hip_aa",
-            "left_hip_fe",
             "left_knee",
-            "right_ankle",
+            "left_hip_fe",
+            "left_hip_aa",
             "right_hip_aa",
             "right_hip_fe",
             "right_knee",
+            "right_ankle",
         ]
         joint_state_msg.position = current_position
         joint_state_msg.velocity = current_velocity
