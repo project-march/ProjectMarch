@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import rospy
 from march_shared_msgs.srv import SolveInverseKinematic, SolveInverseKinematicResponse
 import moveit_msgs.srv
@@ -10,8 +11,8 @@ import numpy as np
 def inverse_kinematic_solver(request):
     # Create ik_request and define planning group and frame_id:
     position_ik_request = moveit_msgs.msg.PositionIKRequest()
-    position_ik_request.group_name = "chain_lr"
-    position_ik_request.ik_link_name = "right_foot"
+    position_ik_request.group_name = planning_group
+    position_ik_request.ik_link_name = end_effector
     position_ik_request.robot_state.joint_state.header.frame_id = "base_link"
     position_ik_request.pose_stamped.header.frame_id = "base_link"
 
@@ -56,7 +57,7 @@ def inverse_kinematic_solver(request):
 
     # Make ankle constraint:
     ankle_constraint = moveit_msgs.msg.JointConstraint()
-    ankle_constraint.joint_name = "left_ankle"
+    ankle_constraint.joint_name = constraint_ankle
     ankle_constraint.position = np.deg2rad(5)
     ankle_constraint.tolerance_above = np.deg2rad(5)
     ankle_constraint.tolerance_below = np.deg2rad(5)
@@ -64,7 +65,7 @@ def inverse_kinematic_solver(request):
 
     # Make knee constraint:
     knee_constraint = moveit_msgs.msg.JointConstraint()
-    knee_constraint.joint_name = "left_knee"
+    knee_constraint.joint_name = constraint_knee
     knee_constraint.position = np.deg2rad(0)
     knee_constraint.tolerance_above = np.deg2rad(5)
     knee_constraint.tolerance_below = np.deg2rad(5)
@@ -126,21 +127,45 @@ def inverse_kinematic_solver(request):
 
 def inverse_kinematic_solver_server():
     rospy.Service(
-        "inverse_kinematic_solver_lr", SolveInverseKinematic, inverse_kinematic_solver
+        "inverse_kinematic_solver", SolveInverseKinematic, inverse_kinematic_solver
     )
     rospy.spin()
 
 
 if __name__ == "__main__":
-    # Start node:
-    rospy.init_node("inverse_kinematic_solver_lr")
-
-    compute_ik = rospy.ServiceProxy("compute_ik", moveit_msgs.srv.GetPositionIK())
-
     # Default offset:
-    x_offest = 0.429
+    x_offset = 0.429
     y_offset = -0.258
     z_offset = 0.108
 
-    # Start server:
-    inverse_kinematic_solver_server()
+    # Start node and get argument:
+    rospy.init_node("inverse_kinematic_solver")
+    args = rospy.myargv(argv=sys.argv)
+    if len(args) == 2:
+        side = args[1]
+
+        if side == "right":
+            planning_group = "chain_lr"
+            end_effector = "right_foot"
+            constraint_ankle = "left_ankle"
+            constraint_knee = "left_knee"
+            rospy.loginfo("Starting inverse_kinematic_solver for right foot...")
+            x_offest = x_offset
+        elif side == "left":
+            planning_group = "chain_rl"
+            end_effector = "left_foot"
+            constraint_ankle = "right_ankle"
+            constraint_knee = "right_knee"
+            rospy.loginfo("Starting inverse_kinematic_solver for left foot...")
+            x_offest = -x_offset
+        else:
+            rospy.logerr(
+                "Node inverse_kinematic_solver expects 'left' or 'right' as argument!"
+            )
+
+        # Define compute_ik service and start own server:
+        compute_ik = rospy.ServiceProxy("compute_ik", moveit_msgs.srv.GetPositionIK())
+        inverse_kinematic_solver_server()
+
+    else:
+        rospy.logerr("Node inverse_kinematic_solver expects 1 argument!")
