@@ -38,13 +38,11 @@
 
     <!-- Given the published joint states, publish tf for the robot links -->
     <node ns="lr" pkg="robot_state_publisher" name="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
-        <remap from="robot_description" to="/lr/robot_description" />
         <remap from="joint_states" to="/march/joint_states" />
         <remap from="/tf" to="/lr/tf" />
     </node>
 
     <node ns="rl" pkg="robot_state_publisher" name="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
-        <remap from="robot_description" to="/rl/robot_description" />
         <remap from="joint_states" to="/march/joint_states" />
         <remap from="/tf" to="/rl/tf" />
     </node>
@@ -57,22 +55,26 @@
     <node ns="lr" pkg="moveit_ros_move_group" name="move_group" type="move_group" output="screen">
         <param name="default_planning_pipeline" value="ompl" />
         <remap from="joint_states" to="/march/joint_states" />
+        <remap from="/tf" to="/lr/tf" />
+        <remap from="/tf_static" to="/lr/tf_static" />
     </node>
 
     <node ns="rl" pkg="moveit_ros_move_group" name="move_group" type="move_group" output="screen">
         <param name="default_planning_pipeline" value="ompl" />
         <remap from="joint_states" to="/march/joint_states" />
+        <remap from="/tf" to="/rl/tf" />
+        <remap from="/tf_static" to="/rl/tf_static" />
     </node>
 
     <!-- Start Rviz: -->
     <node ns="lr" pkg="rviz" name="rviz" type="rviz">
-        <remap from="/robot_description" to="/lr/robot_description" />
         <remap from="/tf" to="/lr/tf" />
+        <remap from="/tf_static" to="/lr/tf_static" />
     </node>
 
     <node ns="rl" pkg="rviz" name="rviz" type="rviz">
-        <remap from="/robot_description" to="/rl/robot_description" />
         <remap from="/tf" to="/rl/tf" />
+        <remap from="/tf_static" to="/rl/tf_static" />
     </node>
 
     <!-- Load march simulation: -->
