@@ -8,7 +8,7 @@ import moveit_msgs.msg
 import numpy as np
 
 
-def inverse_kinematic_solver(request):
+def inverse_kinematic_solver(request) -> SolveInverseKinematicResponse:
     # Create ik_request and define planning group and frame_id:
     position_ik_request = moveit_msgs.msg.PositionIKRequest()
     position_ik_request.group_name = planning_group
