@@ -25,6 +25,7 @@ class ToTrajectoryCommandNode(Node):
             qos_profile=5,
         )
         self.subscription
+        self.ros_one_time = None
 
         self.get_ros_one_time = self.create_subscription(
             msg_type=Clock,

@@ -1,9 +1,7 @@
-import rospy
 from trajectory_msgs import msg as trajectory_msg
 from scipy.interpolate import CubicSpline
 import numpy as np
-
-# Needed to get current state
+from march_utility.utilities.duration import Duration
 from sensor_msgs.msg import JointState
 
 
@@ -22,7 +20,7 @@ class DynamicJointTrajectory:
 
     def set_middle_state(self):
         """Set middle state (currently fixed)"""
-        self._middle_position = np.deg2rad([0.0, 8.0, -2.0, 2.0, 2.0, 35.0, 67.0, 0.0])
+        self._middle_position = [0.0, 0.14, -0.03, 0.03, 0.03, 0.61, 1.17, 0.0]
 
     def get_desired_state(self):
         """Reads desired foot location as given by CoViD and performs
@@ -30,8 +28,8 @@ class DynamicJointTrajectory:
 
         # Dummy position until covid has a topic. Maybe publish/make a node
         # that publishes fake feasible states
-        self._desired_position = np.deg2rad([0.0, 8.0, -9.5, 2.0, 2.0, 18.0, 8.0, 0.0])
-        self._desired_velocity = np.deg2rad([0.0, 0.0, 0.0, 0.0, 0.0, -20, 0.0, 0.0])
+        self._desired_position = [0.0, 0.14, -0.17, 0.03, 0.03, 0.31, 0.14, 0.0]
+        self._desired_velocity = [0.0, 0.0, 0.0, 0.0, 0.0, -0.35, 0.0, 0.0]
 
     def interpolate_setpoints(self):
         """Interpolates between the current, middle and desired state
@@ -70,7 +68,9 @@ class DynamicJointTrajectory:
 
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = rospy.Duration.from_sec(timestamp)
+            joint_trajectory_point.time_from_start = Duration(
+                nanoseconds=(timestamp * 1000000000)
+            ).to_msg()
 
             for i in range(len(self._joint_names)):
                 joint_trajectory_point.positions.append(
