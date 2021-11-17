@@ -62,7 +62,8 @@ a closed off container. See `this 100 sec explanation <https://www.youtube.com/w
 
 flake8 setup
 ~~~~~~~~~~~~
-First make sure that you have docker installed, if not you can do that with the following code:
+First make sure that you have docker installed, if not you can do that with the following code,
+or check out `this link <https://docs.docker.com/engine/install/ubuntu/>`_:
 
 .. code-block:: bash
 
@@ -70,13 +71,15 @@ First make sure that you have docker installed, if not you can do that with the 
     docker --version
     # If it outputs something like "Docker version 20.10.7, build 20.10.7-0ubuntu5~20.04.2", then you have docker installed.
 
-    # To install docker.
+    # To install docker, use the following code or check out `https://docs.docker.com/engine/install/ubuntu/` for alternative options.
     curl -fsSL https://get.docker.com -o get-docker.sh  # Download docker installer script.
     sudo sh get-docker.sh  # Install docker by running installer script.
-
-    # Optional commands for easier use:
     rm get-docker.sh  # Removes the installer script.
+
+    # Optional commands for easier docker use:
+    sudo groupadd docker
     usermod -aG docker $USER  # To remove the need for 'sudo' in front of every docker command.
+    sudo gpasswd -a $USER docker # To remove the need for 'sudo' in front of every docker command.
     newgrp docker  # To activate the previous command, if you still need sudo restart your computer
 
 Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
