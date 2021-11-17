@@ -47,6 +47,8 @@
     - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
         - $DOCKER_FILE
+        - "$ROS_VERSION/**/package.xml"
+        - "requirements.txt"
       variables:
         TAG: $CI_COMMIT_BRANCH
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
