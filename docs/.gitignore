@@ -1,5 +1,7 @@
 *~
 *.pyc
+html/
+rst/
 doc/manifest.yaml
 doc/html
 doc/march_packages
