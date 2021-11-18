@@ -130,7 +130,7 @@ class JointPlot(pg.PlotItem):
 
         self.plot_item.setData(time, position)
 
-        indices = np.linspace(0, self.duration, self.duration * 100)
+        indices = np.linspace(0, self.duration, int(self.duration * 100))
         position_data = joint.interpolated_position(indices)
         velocity_data = joint.interpolated_velocity(indices)
         min_effort_data, max_effort_data = self.calculate_min_max_effort(
