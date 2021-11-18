@@ -16,7 +16,9 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - $DOCKER_FILE
+        - "$DOCKER_FILE"
+        - "$ROS_VERSION/**/package.xml"
+        - "requirements.txt"
       variables:
         TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
