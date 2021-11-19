@@ -20,6 +20,8 @@ class ToTrajectoryCommandNode(Node):
         super().__init__("to_trajectory_command_node")
         self.ros_one_time = None
         self.current_state_msg = None
+        self.new_subgait_time = [0.1, 0.6, 1.6]
+        self.id = "right_swing"
 
         self.get_ros_one_time = self.create_subscription(
             msg_type=Clock,
@@ -55,8 +57,22 @@ class ToTrajectoryCommandNode(Node):
 
     def to_trajectory_command(self):
         """Generate a new trajectory command."""
+        print(self.id)
+        if self.id == "right_swing":
+            middle_position = [0.0, 0.14, -0.03, 0.03, 0.03, 0.61, 1.17, 0.0]
+            desired_position = [0.0, 0.14, -0.17, 0.03, 0.03, 0.31, 0.14, 0.0]
+            desired_velocity = [0.0, 0.0, 0.0, 0.0, 0.0, -0.35, 0.0, 0.0]
+        elif self.id == "left_swing":
+            middle_position = [0.0, 1.17, 0.61, 0.03, 0.03, -0.03, 0.14, 0.0]
+            desired_position = [0.0, 0.14, 0.31, 0.03, 0.03, -0.17, 0.14, 0.0]
+            desired_velocity = [0.0, 0.0, -0.35, 0.0, 0.0, 0.0, 0.0, 0.0]
+
         trajectory = DynamicSubgait(
-            [0.5, 1.0, 1.5], self.current_state_msg
+            self.new_subgait_time,
+            self.current_state_msg,
+            middle_position,
+            desired_position,
+            desired_velocity,
         ).to_joint_trajectory_msg()
 
         time_from_start = trajectory.points[-1].time_from_start
@@ -80,8 +96,14 @@ class ToTrajectoryCommandNode(Node):
             )
         )
 
+        # self.update_time_stamps()
+        if self.id == "right_swing":
+            self.id = "left_swing"
+        elif self.id == "left_swing":
+            self.id = "right_swing"
+
     def publish_trajectory_command(self):
-        print("Scheduling subgait")
+        print("Scheduling subgait: " , self.id)
         self.to_trajectory_command()
 
 
