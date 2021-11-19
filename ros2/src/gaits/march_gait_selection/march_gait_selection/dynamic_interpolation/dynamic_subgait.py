@@ -3,6 +3,7 @@ from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from sensor_msgs.msg import JointState
 from trajectory_msgs import msg as trajectory_msg
+import numpy as np
 
 
 class DynamicSubgait:
@@ -79,7 +80,9 @@ class DynamicSubgait:
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joints
 
-        for timestamp in self.time:
+        timestamps = np.linspace(self.time[0], self.time[-1], 20)
+
+        for timestamp in timestamps:
             joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
             joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
 
