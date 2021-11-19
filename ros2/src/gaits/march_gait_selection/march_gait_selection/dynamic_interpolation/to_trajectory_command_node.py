@@ -5,26 +5,20 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_utility.utilities.duration import Duration
 from rosgraph_msgs.msg import Clock
 
-from trajectory_msgs import msg as trajectory_msg
-from march_shared_msgs.msg import (
-    FollowJointTrajectoryGoal,
-    FollowJointTrajectoryActionGoal,
-)
+# from trajectory_msgs import msg as trajectory_msg
+from march_shared_msgs.msg import FollowJointTrajectoryGoal
+from march_shared_msgs.msg import FollowJointTrajectoryActionGoal
+
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
+
+from dynamic_subgait import DynamicSubgait
 
 
 class ToTrajectoryCommandNode(Node):
     def __init__(self):
         print("initializing ToTrajectoryCommandNode")
         super().__init__("to_trajectory_command_node")
-        self.subscription = self.create_subscription(
-            msg_type=trajectory_msg.JointTrajectory,
-            topic="/test/joint_trajectory_msg",
-            callback=self.to_trajectory_command,
-            qos_profile=5,
-        )
-        self.subscription
         self.ros_one_time = None
 
         self.get_ros_one_time = self.create_subscription(
@@ -40,6 +34,8 @@ class ToTrajectoryCommandNode(Node):
             qos_profile=5,
         )
 
+        self.timer = self.create_timer(5, self.publish_trajectory_command)
+
     def get_sim_time(self, msg):
         clock = msg.clock
         self.ros_one_time = Time(
@@ -47,9 +43,9 @@ class ToTrajectoryCommandNode(Node):
             nanoseconds=clock.nanosec,
         )
 
-    def to_trajectory_command(self, msg):
+    def to_trajectory_command(self):
         """Generate a new trajectory command."""
-        trajectory = msg
+        trajectory = DynamicSubgait([0.5, 1.0, 1.5]).to_joint_trajectory_msg()
 
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_msg(time_from_start)
@@ -71,6 +67,10 @@ class ToTrajectoryCommandNode(Node):
                 goal=goal,
             )
         )
+
+    def publish_trajectory_command(self):
+        print("Scheduling subgait")
+        self.to_trajectory_command()
 
 
 def main(args=None):
