@@ -96,14 +96,13 @@ class ToTrajectoryCommandNode(Node):
             )
         )
 
-        # self.update_time_stamps()
         if self.id == "right_swing":
             self.id = "left_swing"
         elif self.id == "left_swing":
             self.id = "right_swing"
 
     def publish_trajectory_command(self):
-        print("Scheduling subgait: " , self.id)
+        print("Scheduling subgait: ", self.id)
         self.to_trajectory_command()
 
 
