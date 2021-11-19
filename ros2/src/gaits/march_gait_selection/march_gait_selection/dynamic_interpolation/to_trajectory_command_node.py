@@ -1,13 +1,13 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
+
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from rosgraph_msgs.msg import Clock
-
 from march_shared_msgs.msg import FollowJointTrajectoryGoal
 from march_shared_msgs.msg import FollowJointTrajectoryActionGoal
-
+from control_msgs.msg import JointTrajectoryControllerState
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 
@@ -19,11 +19,19 @@ class ToTrajectoryCommandNode(Node):
         print("initializing ToTrajectoryCommandNode")
         super().__init__("to_trajectory_command_node")
         self.ros_one_time = None
+        self.current_state_msg = None
 
         self.get_ros_one_time = self.create_subscription(
             msg_type=Clock,
             topic="/clock",
             callback=self.get_sim_time,
+            qos_profile=5,
+        )
+
+        self.read_current_state = self.create_subscription(
+            msg_type=JointTrajectoryControllerState,
+            topic="march/controller/trajectory/state",
+            callback=self.current_state_callback,
             qos_profile=5,
         )
 
@@ -42,9 +50,14 @@ class ToTrajectoryCommandNode(Node):
             nanoseconds=clock.nanosec,
         )
 
+    def current_state_callback(self, msg: JointTrajectoryControllerState):
+        self.current_state_msg = msg
+
     def to_trajectory_command(self):
         """Generate a new trajectory command."""
-        trajectory = DynamicSubgait([0.5, 1.0, 1.5]).to_joint_trajectory_msg()
+        trajectory = DynamicSubgait(
+            [0.5, 1.0, 1.5], self.current_state_msg
+        ).to_joint_trajectory_msg()
 
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_msg(time_from_start)

@@ -9,7 +9,7 @@ import numpy as np
 class DynamicSubgait:
     """class that reads setpoints and returns list of jointtrajectories"""
 
-    def __init__(self, time):
+    def __init__(self, time, current_state):
         self.joints = [
             "left_ankle",
             "left_knee",
@@ -21,16 +21,17 @@ class DynamicSubgait:
             "right_ankle",
         ]
         self.time = time
+        self.current_state = current_state
 
     def current_setpoint(self):
         """Reads current state of the robot"""
-        current_position = [0.0, 0.14, 0.31, 0.03, 0.03, -0.17, 0.14, 0.0]
-        current_velocity = [0.0, 0.0, -0.35, 0.0, 0.0, 0.0, 0.0, 0.0]
+        # current_position = [0.0, 0.14, 0.31, 0.03, 0.03, -0.17, 0.14, 0.0]
+        # current_velocity = [0.0, 0.0, -0.35, 0.0, 0.0, 0.0, 0.0, 0.0]
 
         self.current_setpoint_dict = self.from_list_to_setpoint(
-            self.joints,
-            current_position,
-            current_velocity,
+            self.current_state.joint_names,
+            self.current_state.actual.positions,
+            self.current_state.actual.velocities,
             self.time[0],
         )
 
