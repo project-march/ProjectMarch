@@ -1,13 +1,13 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
+
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from rosgraph_msgs.msg import Clock
-
 from march_shared_msgs.msg import FollowJointTrajectoryGoal
 from march_shared_msgs.msg import FollowJointTrajectoryActionGoal
-
+from control_msgs.msg import JointTrajectoryControllerState
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 
@@ -19,11 +19,21 @@ class ToTrajectoryCommandNode(Node):
         print("initializing ToTrajectoryCommandNode")
         super().__init__("to_trajectory_command_node")
         self.ros_one_time = None
+        self.current_state_msg = None
+        self.new_subgait_time = [0.1, 0.6, 1.6]
+        self.id = "right_swing"
 
         self.get_ros_one_time = self.create_subscription(
             msg_type=Clock,
             topic="/clock",
             callback=self.get_sim_time,
+            qos_profile=5,
+        )
+
+        self.read_current_state = self.create_subscription(
+            msg_type=JointTrajectoryControllerState,
+            topic="march/controller/trajectory/state",
+            callback=self.current_state_callback,
             qos_profile=5,
         )
 
@@ -42,9 +52,28 @@ class ToTrajectoryCommandNode(Node):
             nanoseconds=clock.nanosec,
         )
 
+    def current_state_callback(self, msg: JointTrajectoryControllerState):
+        self.current_state_msg = msg
+
     def to_trajectory_command(self):
         """Generate a new trajectory command."""
-        trajectory = DynamicSubgait([0.5, 1.0, 1.5]).to_joint_trajectory_msg()
+        print(self.id)
+        if self.id == "right_swing":
+            middle_position = [0.0, 0.14, -0.03, 0.03, 0.03, 0.61, 1.17, 0.0]
+            desired_position = [0.0, 0.14, -0.17, 0.03, 0.03, 0.31, 0.14, 0.0]
+            desired_velocity = [0.0, 0.0, 0.0, 0.0, 0.0, -0.35, 0.0, 0.0]
+        elif self.id == "left_swing":
+            middle_position = [0.0, 1.17, 0.61, 0.03, 0.03, -0.03, 0.14, 0.0]
+            desired_position = [0.0, 0.14, 0.31, 0.03, 0.03, -0.17, 0.14, 0.0]
+            desired_velocity = [0.0, 0.0, -0.35, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        trajectory = DynamicSubgait(
+            self.new_subgait_time,
+            self.current_state_msg,
+            middle_position,
+            desired_position,
+            desired_velocity,
+        ).to_joint_trajectory_msg()
 
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_msg(time_from_start)
@@ -67,8 +96,13 @@ class ToTrajectoryCommandNode(Node):
             )
         )
 
+        if self.id == "right_swing":
+            self.id = "left_swing"
+        elif self.id == "left_swing":
+            self.id = "right_swing"
+
     def publish_trajectory_command(self):
-        print("Scheduling subgait")
+        print("Scheduling subgait: ", self.id)
         self.to_trajectory_command()
 
 
