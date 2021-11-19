@@ -106,7 +106,7 @@ class DynamicSubgait:
         """Computes setpoint dictionary from JointState msg"""
         setpoint_dict = {}
 
-        if velocity != None:
+        if velocity is not None:
             for i in range(len(joint_names)):
                 setpoint_dict.update(
                     {

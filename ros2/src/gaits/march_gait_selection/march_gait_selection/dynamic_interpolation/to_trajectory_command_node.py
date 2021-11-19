@@ -5,7 +5,6 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_utility.utilities.duration import Duration
 from rosgraph_msgs.msg import Clock
 
-# from trajectory_msgs import msg as trajectory_msg
 from march_shared_msgs.msg import FollowJointTrajectoryGoal
 from march_shared_msgs.msg import FollowJointTrajectoryActionGoal
 
