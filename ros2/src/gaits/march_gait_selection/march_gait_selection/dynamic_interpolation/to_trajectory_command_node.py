@@ -104,7 +104,7 @@ class ToTrajectoryCommandNode(Node):
         elif self.id == "left_swing":
             self.id = "right_swing"
 
-        print("--- %s seconds ---" % (time.time() - start_time))
+        print(f"--- {(time.time() - start_time)} seconds ---")
 
     def publish_trajectory_command(self):
         print("Scheduling subgait: ", self.id)
