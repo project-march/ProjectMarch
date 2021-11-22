@@ -13,6 +13,8 @@ from actionlib_msgs.msg import GoalID
 
 from dynamic_subgait import DynamicSubgait
 
+import time
+
 
 class ToTrajectoryCommandNode(Node):
     def __init__(self):
@@ -57,6 +59,7 @@ class ToTrajectoryCommandNode(Node):
 
     def to_trajectory_command(self):
         """Generate a new trajectory command."""
+        start_time = time.time()
         print(self.id)
         if self.id == "right_swing":
             middle_position = [0.0, 0.14, -0.03, 0.03, 0.03, 0.61, 1.17, 0.0]
@@ -100,6 +103,8 @@ class ToTrajectoryCommandNode(Node):
             self.id = "left_swing"
         elif self.id == "left_swing":
             self.id = "right_swing"
+
+        print("--- %s seconds ---" % (time.time() - start_time))
 
     def publish_trajectory_command(self):
         print("Scheduling subgait: ", self.id)
