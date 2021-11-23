@@ -36,6 +36,7 @@ flake8:
           el['categories'], el['check_name'], el['description'])) for el in json.load(sys.stdin)];" \
       && echo "---End Violations---"
   artifacts:
+    expire_in: 2 weeks
     reports:
       codequality: codeclimate.json
   variables:
