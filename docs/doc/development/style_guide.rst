@@ -82,6 +82,12 @@ or check out `this link <https://docs.docker.com/engine/install/ubuntu/>`_:
     sudo gpasswd -a $USER docker # To remove the need for 'sudo' in front of every docker command.
     newgrp docker  # To activate the previous command, if you still need sudo restart your computer
 
+.. note::
+
+    If you don't do the "Optional commands for easier use" you will get error messages if you run docker commands
+    without prepending 'sudo'.
+
+
 Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
 
 ..
