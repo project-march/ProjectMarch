@@ -16,6 +16,7 @@ Run ROS1 simulation with RealSense:
 Call upon the service with arguments using the following format:
 
 .. code::
+
   rosservice call /camera/publish_test_cloud "selected_mode: 0"; "pointcloud_file_name: 'stairs1.ply'"; "save_camera_back: false"
 
 Arguments
