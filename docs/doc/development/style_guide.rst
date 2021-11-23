@@ -82,6 +82,12 @@ or check out `this link <https://docs.docker.com/engine/install/ubuntu/>`_:
     sudo gpasswd -a $USER docker # To remove the need for 'sudo' in front of every docker command.
     newgrp docker  # To activate the previous command, if you still need sudo restart your computer
 
+.. note::
+
+    If you don't do the "Optional commands for easier use" you will get error messages if you run docker commands
+    without prepending 'sudo'.
+
+
 Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
 
 ..
@@ -92,15 +98,15 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     # Flake8 shortcuts (python code style checker)
     alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:dev" && \
     docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT'
-    alias march_flake8='docker run -v ~/march:/home/march:ro march/flake8'
-    alias march_flake8_here='docker run -v `pwd`:`pwd`:ro march/flake8 `pwd`'
+    alias march_flake8='docker run --rm -v ~/march:/home/march:ro march/flake8'
+    alias march_flake8_here='docker run --rm -v `pwd`:`pwd`:ro march/flake8 `pwd`'
 
     # Black shortcuts (python code formatter)
-    alias march_py_auto_format='docker run -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
-    alias march_py_auto_format_check='docker run -v ~/march:/home/march:ro --entrypoint black march/flake8 \
+    alias march_py_auto_format='docker run --rm -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
+    alias march_py_auto_format_check='docker run --rm -v ~/march:/home/march:ro --entrypoint black march/flake8 \
     --check --diff --color ros1/src ros2/src utility_scripts/'
-    alias march_py_auto_format_here='docker run -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
-    alias march_py_auto_format_check_here='docker run -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
+    alias march_py_auto_format_here='docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
+    alias march_py_auto_format_check_here='docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
 
 Update your flake8 docker image. You can redo this step if it doesn't produce the same output as gitlab,
 or if someone from the Project MARCH software department announces to you that the docker image should be updated.
@@ -127,7 +133,7 @@ If you have everything set up you can very easily run it with the following comm
     march_flake8_here
 
     # To run flake8 without the aliases:
-    docker run -v [local_src]:[dest_in_docker]:[ro for readonly] -w [work_dir_in_docker] [image name (e.g. march/flake8)] [flake 8 arguments]
+    docker run --rm -v [local_src]:[dest_in_docker]:[ro for readonly] -w [work_dir_in_docker] [image name (e.g. march/flake8)] [flake 8 arguments]
 
 If there are any violations after running the march_flake8 alias where it says "black would make changes",
 run the following commands:
