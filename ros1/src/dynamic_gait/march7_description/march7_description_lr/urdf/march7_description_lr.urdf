@@ -52,7 +52,7 @@
     <parent link="base_link" />
     <child link="left_lower_leg" />
     <axis xyz="-1 0 0" />
-    <limit lower="-1.2217" upper="0.087266" effort="0" velocity="0" />
+    <limit lower="-1.2217" upper="0.174533" effort="0" velocity="0" />
   </joint>
   <link name="left_upper_leg">
     <inertial>
@@ -255,6 +255,6 @@
     <parent link="right_lower_leg" />
     <child link="right_foot" />
     <axis xyz="-1 0 0" />
-    <limit lower="-1.2217" upper="0.087266" effort="0" velocity="0" />
+    <limit lower="-1.2217" upper="0.174533" effort="0" velocity="0" />
   </joint>
 </robot>
