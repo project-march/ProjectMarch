@@ -14,7 +14,7 @@ total_leg = upper_leg + lower_leg
 
 def calculate_joint_positions(pose):
     """
-    Calculates the joint positions for a given pose, were:
+    Calculates the joint positions for a given pose, where:
     - ankle1 is at [0,0]
     - toe1 is at [foot_length, 0], since the foot is flat.
     - knee1 is at ankle1 + lower_leg in direction given by ankle1
