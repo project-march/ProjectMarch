@@ -7,6 +7,7 @@ from scipy.optimize import linprog
 from scipy.spatial import Delaunay
 from scipy.signal import convolve2d
 from numpy.lib.stride_tricks import sliding_window_view
+from matplotlib import pyplot as plt
 
 s0 = timeit.default_timer()
 
@@ -22,13 +23,13 @@ Z1 = 0.5
 Z2 = 0.5
 
 start = timeit.default_timer()
-pcd = o3d.io.read_point_cloud("datasets/stairs2.ply")
+pcd = o3d.io.read_point_cloud("datasets/stairs4.ply")
 orig_pcd = pcd
 print('IO time:\t\t\t ', timeit.default_timer() - start)  
 
 # Downsampling
 start = timeit.default_timer()
-pcd = pcd.voxel_down_sample(voxel_size=0.005)
+# pcd = pcd.voxel_down_sample(voxel_size=0.005)
 print('Down sampling time:\t\t ', timeit.default_timer() - start)   
 
 # hiqp base to hip aa
@@ -54,7 +55,7 @@ print('Normal estimation time:\t\t ', timeit.default_timer() - start)
 
 # Downsampling
 start = timeit.default_timer()
-pcd = pcd.voxel_down_sample(voxel_size=0.04)
+# pcd = pcd.voxel_down_sample(voxel_size=0.005)
 print('Down sampling time:\t\t ', timeit.default_timer() - start)  
 
 
@@ -90,23 +91,92 @@ start = timeit.default_timer()
 pcd_tree = o3d.geometry.KDTreeFlann(pcd)
 print('Tree creation time:\t\t ', timeit.default_timer() - start)  
 
-print(np.asarray(pcd.colors).shape)
-
-
-for point in np.asarray(pcd.colors):
-    print(point)
-
-
-map = np.full((1000, 1000), 1)
-
-x = [-0.5, 0.5]
-y = [-0.5, 0.5]
-
-
-
-
-
-
 mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2, origin=[0, 0, 0])
-
 o3d.visualization.draw_geometries([pcd, mesh_frame], mesh_show_back_face=True)
+
+N = 50
+
+arr = np.full((N, N), 0.0)
+
+start = timeit.default_timer()
+
+for point in np.asarray(pcd.points):
+    x = point[0]
+    y = point[1]
+    z = point[2]
+
+    x_index = int((x + 0.5) * N)
+    y_index = int((y + 0.5) * N)
+
+    if arr[x_index, y_index] == 0.0:
+        arr[x_index, y_index] = z
+    else:
+        arr[x_index, y_index] = (arr[x_index, y_index] + z) / 2
+
+print('Map generation time:\t\t ', timeit.default_timer() - start)
+start = timeit.default_timer()
+
+arr = np.rot90(arr)
+
+laplacian = np.array([[0, -1, 0],
+                      [-1, 4, -1],
+                      [0, -1, 0]])
+
+clip_max = 0.2
+clip_min = 0.05
+
+derivatives = np.abs(convolve2d(arr, laplacian, 'same'))
+
+print('Laplacian time:\t\t ', timeit.default_timer() - start)
+
+derivatives[derivatives > clip_max] = clip_max
+derivatives[derivatives < clip_min] = 0
+        
+
+plt.imshow(arr, interpolation='none', extent=[-0.5, 0.5, -0.5, 0.5])
+plt.colorbar()
+threshold = 0.06
+plt.show()
+
+cellwidth = 1 / N
+
+shift = 0
+
+feasible_positions = []
+
+for t in range(0, 10):
+    if t % 2 == 1:
+        shift += 1
+    shift *= -1
+
+    plt.imshow((derivatives), interpolation='none', extent=[-0.5, 0.5, -0.5, 0.5])
+    plt.colorbar()
+
+    S = 0
+    x_opt = int((0.2 + 0.5) * N)
+    y_opt = int((0.15 + 0.5) * N) - shift
+
+    for x in range(x_opt - 2, x_opt + 3):
+        for y in range(y_opt - 4, y_opt + 5):
+            val = derivatives[y, x]
+            if val < threshold:
+                S += 1
+                plt.scatter((x / N) - 0.5 + cellwidth/2, ((N - y) / N) - 0.5 - cellwidth/2, c='r', s=5, marker='s')
+    
+    if S == 9 * 5:
+        z = arr[y_opt, x_opt]
+        feasible_positions.append([(x_opt / N) - 0.5 + cellwidth/2, ((N - y_opt) / N) - 0.5 - cellwidth/2, z])
+        plt.show()
+
+    plt.clf()
+
+print(feasible_positions)
+
+# plt.imshow(np.rot90(derivatives), interpolation='none', extent=[-0.5, 0.5, -0.5, 0.5])
+
+# for i in range(0, N - 2):
+#     for j in range(0, N - 2):
+#         if derivatives[i, j] < threshold:
+#             plt.scatter(i / (N-2) - 0.5, j / (N-2) - 0.5, c='r')
+
+
