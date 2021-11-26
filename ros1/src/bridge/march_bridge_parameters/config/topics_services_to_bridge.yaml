@@ -66,6 +66,8 @@ services_1_to_2:
       type: 'std_srvs/srv/Trigger' }
   - { service: '/march/gait_selection/set_gait_version',
       type: 'march_shared_msgs/srv/SetGaitVersion' }
+  - { service: 'march_shared_msgs/srv/SolveInverseKinematic',
+      type: '/rl/inverse_kinematic_solver' }
 services_2_to_1:
   - { service: '/gazebo/get_world_properties',
       type: 'gazebo_msgs/GetWorldProperties' }
