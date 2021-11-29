@@ -37,6 +37,9 @@ Or use https:
     cd march/
     git lfs install
 
+.. Note::
+    The following sections are not necessary to run the code. You can run everything inside docker images.
+    To see how to set that up see :ref:`install_docker-label`.
 
 Install ROS1 Noetic
 ^^^^^^^^^^^^^^^^^^^
