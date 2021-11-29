@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-import quadrilateral_angle_solver as qas
-import triangle_angle_solver as tas
-from goniometric_functions_degrees import cos, sin, asin
+import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
+import march_goniometric_ik_solver.triangle_angle_solver as tas
+from march_goniometric_ik_solver.goniometric_functions_degrees import cos, sin, asin
 
 # Constants:
 length_upper_leg = 41  # cm

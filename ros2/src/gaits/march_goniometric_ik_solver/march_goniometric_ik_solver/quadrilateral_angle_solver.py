@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from goniometric_functions_degrees import cos, sin, acos
+from march_goniometric_ik_solver.goniometric_functions_degrees import cos, sin, acos
 
 
 def plot_points(points):

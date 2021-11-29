@@ -1,5 +1,5 @@
 import numpy as np
-from goniometric_functions_degrees import acos
+from march_goniometric_ik_solver.goniometric_functions_degrees import acos
 
 
 def get_angle_from_sides(opposite_side, adjacent_sides):
