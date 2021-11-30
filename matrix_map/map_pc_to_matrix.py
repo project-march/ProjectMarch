@@ -55,9 +55,9 @@ print('Normal estimation time:\t\t ', timeit.default_timer() - start)
 
 # Downsampling
 start = timeit.default_timer()
-# pcd = pcd.voxel_down_sample(voxel_size=0.005)
+pcd = pcd.voxel_down_sample(voxel_size=0.01)
 print('Down sampling time:\t\t ', timeit.default_timer() - start)  
-
+print(len(pcd.points))
 
 # Filter points
 start = timeit.default_timer()
@@ -94,7 +94,7 @@ print('Tree creation time:\t\t ', timeit.default_timer() - start)
 mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2, origin=[0, 0, 0])
 o3d.visualization.draw_geometries([pcd, mesh_frame], mesh_show_back_face=True)
 
-N = 50
+N = 80
 
 arr = np.full((N, N), 0.0)
 
@@ -112,6 +112,12 @@ for point in np.asarray(pcd.points):
         arr[x_index, y_index] = z
     else:
         arr[x_index, y_index] = (arr[x_index, y_index] + z) / 2
+
+
+for i in range(1, N - 1):
+    for j in range(1, N - 1):
+        if arr[i, j] == 0:
+            arr[i, j] = 0.25 * (arr[i - 1, j] + arr[i + 1, j] + arr[i, j - 1] + arr[i, j + 1])
 
 print('Map generation time:\t\t ', timeit.default_timer() - start)
 start = timeit.default_timer()
@@ -148,6 +154,7 @@ for t in range(0, 10):
     if t % 2 == 1:
         shift += 1
     shift *= -1
+    print(shift)
 
     plt.imshow((derivatives), interpolation='none', extent=[-0.5, 0.5, -0.5, 0.5])
     plt.colorbar()
@@ -167,6 +174,7 @@ for t in range(0, 10):
         z = arr[y_opt, x_opt]
         feasible_positions.append([(x_opt / N) - 0.5 + cellwidth/2, ((N - y_opt) / N) - 0.5 - cellwidth/2, z])
         plt.show()
+        exit()
 
     plt.clf()
 
