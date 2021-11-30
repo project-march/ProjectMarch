@@ -37,6 +37,8 @@ services:
       - ROS_MASTER_URI=http://ros1-service:11311
       - ROS_DOCKER_TYPE="ros1"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
+      - ROS_ARGS
+      - ROS1_ARGS
     working_dir: /home/${USER}/march/ros1
     ipc: host # The reason host is chosen (and not shareable) is so that the containers can run in isolation of eachother.
     ports: ["11311"] # Needed for rviz visualization
@@ -52,6 +54,8 @@ services:
       - ROS_MASTER_URI=http://ros1-service:11311
       - ROS_DOCKER_TYPE="ros2"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
+      - ROS_ARGS
+      - ROS2_ARGS
     working_dir: /home/${USER}/march/ros2
     ipc: host # The reason host is chosen (and not container:ros1) is so that the containers can run in isolation of eachother.
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros2.bash"]

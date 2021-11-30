@@ -204,5 +204,24 @@ Now that everything is downloaded you can run the ros code.
     march_ros2_bash
     march_bridge_bash
 
+Giving arguments to march run
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You can also add arguments to ros1 and ros2 startup. This is done by setting the environment variables
+:code:`ROS_ARGS`, :code:`ROS1_ARGS` and :code:`ROS2_ARGS`. See the code block below on how to do this.
+Note however, that because you set an environment variable these will persist within the terminal session.
+This means that if you do :code:`march_run` again from the same window it will use the same startup arguments.
+To unset this also see the code block below:
+
+.. code-block:: bash
+
+    # To add arguments to ros1 and ros2 startup, you need to set environment variable with:
+    export ROS_ARGS='...'  # To set args for ros1 and ros2 (e.g. ground_gait:=true)
+    export ROS1_ARGS='...'  # To set args for ros1 (e.g. gazebo_ui:=true)
+    export ROS2_ARGS='...' # To set args for ros2
+
+    # NOTE: These persist within in the terminal session, if you wish to unset them do:
+    unset ROS_ARGS
+    unset ROS1_ARGS
+    unset ROS2_ARGS
 
 
