@@ -35,7 +35,12 @@
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "$ROS_VERSION/**/*"
+      variables:
+        TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
         - "$ROS_VERSION/**/*"
       variables:

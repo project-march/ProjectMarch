@@ -4,9 +4,11 @@ from rclpy.time import Time
 
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
+
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import FollowJointTrajectoryGoal
 from march_shared_msgs.msg import FollowJointTrajectoryActionGoal
+from march_shared_msgs.msg import CurrentGait
 from control_msgs.msg import JointTrajectoryControllerState
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
@@ -22,8 +24,8 @@ class ToTrajectoryCommandNode(Node):
         super().__init__("to_trajectory_command_node")
         self.ros_one_time = None
         self.current_state_msg = None
-        self.new_subgait_time = [0.1, 0.6, 1.6]
-        self.id = "right_swing"
+        self.new_subgait_time = [0.2, 0.7, 1.7]
+        self.id = "right"
 
         self.get_ros_one_time = self.create_subscription(
             msg_type=Clock,
@@ -45,7 +47,13 @@ class ToTrajectoryCommandNode(Node):
             qos_profile=5,
         )
 
-        self.timer = self.create_timer(5, self.publish_trajectory_command)
+        self.publish_current_gait = self.create_publisher(
+            msg_type=CurrentGait,
+            topic="/march/gait_selection/current_gait",
+            qos_profile=5,
+        )
+
+        self.timer = self.create_timer(3, self.publish_trajectory_command)
 
     def get_sim_time(self, msg):
         clock = msg.clock
@@ -60,24 +68,19 @@ class ToTrajectoryCommandNode(Node):
     def to_trajectory_command(self):
         """Generate a new trajectory command."""
         start_time = time.time()
-        print(self.id)
-        if self.id == "right_swing":
-            middle_position = [0.0, 0.14, -0.03, 0.03, 0.03, 0.61, 1.17, 0.0]
-            desired_position = [0.0, 0.14, -0.17, 0.03, 0.03, 0.31, 0.14, 0.0]
-            desired_velocity = [0.0, 0.0, 0.0, 0.0, 0.0, -0.35, 0.0, 0.0]
-        elif self.id == "left_swing":
-            middle_position = [0.0, 1.17, 0.61, 0.03, 0.03, -0.03, 0.14, 0.0]
-            desired_position = [0.0, 0.14, 0.31, 0.03, 0.03, -0.17, 0.14, 0.0]
-            desired_velocity = [0.0, 0.0, -0.35, 0.0, 0.0, 0.0, 0.0, 0.0]
 
+        ankle_rom = 7
+        desired_ankle_position = [30, 7]
+        # Skip desired velocity for now
         trajectory = DynamicSubgait(
             self.new_subgait_time,
             self.current_state_msg,
-            middle_position,
-            desired_position,
-            desired_velocity,
+            desired_ankle_position,
+            ankle_rom,
+            self.id,
         ).to_joint_trajectory_msg()
 
+        # Send trajectory command to the topic listened to by the simulation
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_msg(time_from_start)
 
@@ -99,15 +102,26 @@ class ToTrajectoryCommandNode(Node):
             )
         )
 
-        if self.id == "right_swing":
-            self.id = "left_swing"
-        elif self.id == "left_swing":
-            self.id = "right_swing"
+        # Publish gait type. This is needed for the CoM plugin to work
+        # and thus to be able to groundgait
+        current_gait_msg = CurrentGait()
+        current_gait_msg.header = Header(stamp=stamp)
+        current_gait_msg.gait = "walk"
+        current_gait_msg.subgait = str(self.id + "_swing")
+        current_gait_msg.version = "dynamic_walk_v1"
+        current_gait_msg.duration = Duration(1.5).to_msg()
+        current_gait_msg.gait_type = "walk_like"
+
+        self.publish_current_gait.publish(current_gait_msg)
+
+        if self.id == "right":
+            self.id = "left"
+        elif self.id == "left":
+            self.id = "right"
 
         print(f"--- {(time.time() - start_time)} seconds ---")
 
     def publish_trajectory_command(self):
-        print("Scheduling subgait: ", self.id)
         self.to_trajectory_command()
 
 
