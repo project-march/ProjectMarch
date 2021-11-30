@@ -106,7 +106,7 @@ Log in to gitlab with docker
 Add aliases
 ^^^^^^^^^^^
 To make everything easier to use for you we have provided some aliases.
-Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/..march_bash_aliases`.
+Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`.
 
 .. code-block:: bash
 
@@ -120,10 +120,10 @@ Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/..marc
     alias march_docker_ros1_pull='ROS1_GIT="registry.gitlab.com/project-march/march/local:ros1" && cd ~/march/ && docker pull $ROS1_GIT && docker tag $ROS1_GIT ros1 && docker rmi $ROS1_GIT'
     alias march_docker_ros1_build='cd ~/march/ && docker build -f .docker_local/dockerfiles/noeticFull.Dockerfile -t ros1 .'
 
-    alias march_docker_ros2_pull='ROS2_GIT="registry.gitlab.com/project-march/march/local:ros2" && cd ~/march/ && docker pull $ROS2_GIT && docker tag $ROS2_GIT ros1 && docker rmi $ROS2_GIT'
+    alias march_docker_ros2_pull='ROS2_GIT="registry.gitlab.com/project-march/march/local:ros2" && cd ~/march/ && docker pull $ROS2_GIT && docker tag $ROS2_GIT ros2 && docker rmi $ROS2_GIT'
     alias march_docker_ros2_build='cd ~/march/ && docker build -f .docker_local/dockerfiles/foxyFull.Dockerfile -t ros2 .'
 
-    alias march_docker_bridge_pull='BRIDGE_GIT="registry.gitlab.com/project-march/march/local:bridge" && cd ~/march/ && docker pull $BRIDGE_GIT && docker tag $BRIDGE_GIT ros1 && docker rmi $BRIDGE_GIT'
+    alias march_docker_bridge_pull='BRIDGE_GIT="registry.gitlab.com/project-march/march/local:bridge" && cd ~/march/ && docker pull $BRIDGE_GIT && docker tag $BRIDGE_GIT bridge && docker rmi $BRIDGE_GIT'
     alias march_docker_bridge_build='cd ~/march/ && docker build -f .docker_local/dockerfiles/bridge.Dockerfile -t bridge .'
 
     alias march_docker_pull='march_docker_ros1_pull && march_docker_ros2_pull && march_docker_bridge_pull'
