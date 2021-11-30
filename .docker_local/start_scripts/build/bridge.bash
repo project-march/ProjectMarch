@@ -5,17 +5,17 @@ DONE_FILE=install/.done
 source /opt/ros/noetic/setup.bash
 source /opt/ros/foxy/setup.bash
 
-if ! [ -f "${HOME}"/march/ros1/"${DONE_FILE}" ]; then
+while ! [ -f "${HOME}"/march/ros1/"${DONE_FILE}" ]; do
   echo "Ros1 is not done yet, sleeping for ${SLEEP_TIME}. (do 'touch ~/march/ros1/${DONE_FILE}' if it should be done)";
   sleep $SLEEP_TIME;
-fi
+done;
 
 source "${HOME}"/march/ros1/install/local_setup.bash
 
-if ! [ -f "${HOME}"/march/ros2/"${DONE_FILE}" ]; then
+while ! [ -f "${HOME}"/march/ros2/"${DONE_FILE}" ]; do
   echo "Ros2 is not done yet, sleeping for ${SLEEP_TIME}. (do 'touch ~/march/ros2/${DONE_FILE}' if it should be done)";
   sleep $SLEEP_TIME;
-fi
+done;
 
 source "${HOME}"/march/ros2/install/local_setup.bash
 
