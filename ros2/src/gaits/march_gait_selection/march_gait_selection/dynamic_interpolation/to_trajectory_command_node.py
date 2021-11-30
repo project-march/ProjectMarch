@@ -122,7 +122,6 @@ class ToTrajectoryCommandNode(Node):
         print(f"--- {(time.time() - start_time)} seconds ---")
 
     def publish_trajectory_command(self):
-        # print("Scheduling subgait: ", self.id)
         self.to_trajectory_command()
 
 

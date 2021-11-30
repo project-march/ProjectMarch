@@ -9,9 +9,7 @@ from ik_solver import solve_ik
 class DynamicSubgait:
     """class that reads setpoints and returns list of jointtrajectories"""
 
-    def __init__(
-        self, time, current_state, position, ankle_rom, swing_leg
-    ):
+    def __init__(self, time, current_state, position, ankle_rom, swing_leg):
         self.joints = [
             "left_ankle",
             "left_knee",
@@ -30,7 +28,7 @@ class DynamicSubgait:
 
     def current_setpoint(self):
         """Reads current state of the robot"""
-        # TODO Current state velocity readings not correct. Sometimes reported high
+        # Current state velocity readings not correct. Sometimes reported high
         # velocities in the ankle joints, which leads to invalid gaits
         self.current_setpoint_dict = self.from_list_to_setpoint(
             self.current_state.joint_names,
@@ -62,8 +60,12 @@ class DynamicSubgait:
             self.desired_position.reverse()
 
         if self.desired_position[0] > 0.1745 or self.desired_position[-1] > 0.1745:
-            dorsiflexion = max([self.desired_position[0], self.desired_position[-1]])/3.14*180
-            print(f"Dorsiflexion bigger than 10 degrees: {round(dorsiflexion, 1)} degrees")
+            dorsiflexion = (
+                max([self.desired_position[0], self.desired_position[-1]]) / 3.14 * 180
+            )
+            print(
+                f"Dorsiflexion bigger than 10 degrees: {round(dorsiflexion, 1)} degrees",
+            )
 
         self.desired_setpoint_dict = self.from_list_to_setpoint(
             self.joints, self.desired_position, None, self.time[2]
@@ -72,10 +74,10 @@ class DynamicSubgait:
     def to_joint_trajectory_class(self):
         """Returns a list of JointTrajectory classes containing
         the setpoints for each joint"""
-        # TODO fix hardcoded haa/false current state readings
+        # fix hardcoded haa/false current state readings
         self.current_setpoint_dict.update(
             {
-                'right_hip_aa': Setpoint(
+                "right_hip_aa": Setpoint(
                     Duration(0.2),
                     0.03,
                     0.0,
@@ -85,7 +87,7 @@ class DynamicSubgait:
 
         self.current_setpoint_dict.update(
             {
-                'left_hip_aa': Setpoint(
+                "left_hip_aa": Setpoint(
                     Duration(0.2),
                     0.03,
                     0.0,
@@ -113,9 +115,11 @@ class DynamicSubgait:
         self.to_joint_trajectory_class()
 
         print(
-            f"Current HAA: {self.current_setpoint_dict['right_hip_aa']}", "\n",
-            f"Middle HAA: {self.middle_setpoint_dict['right_hip_aa']}", "\n"
-            f"Desired HAA: {self.desired_setpoint_dict['right_hip_aa']}", "\n",
+            f"Current HAA: {self.current_setpoint_dict['right_hip_aa']}",
+            "\n",
+            f"Middle HAA: {self.middle_setpoint_dict['right_hip_aa']}",
+            "\n" f"Desired HAA: {self.desired_setpoint_dict['right_hip_aa']}",
+            "\n",
         )
 
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
