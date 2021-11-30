@@ -3,13 +3,14 @@ from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import numpy as np
+from ik_solver import solve_ik
 
 
 class DynamicSubgait:
     """class that reads setpoints and returns list of jointtrajectories"""
 
     def __init__(
-        self, time, current_state, middle_position, desired_position, desired_velocity
+        self, time, current_state, position, ankle_rom, swing_leg
     ):
         self.joints = [
             "left_ankle",
@@ -23,38 +24,75 @@ class DynamicSubgait:
         ]
         self.time = time
         self.current_state = current_state
-        self.middle_state = middle_position
-        self.desired_position = desired_position
-        self.desired_velocity = desired_velocity
+        self.position = position
+        self.ankle_rom = ankle_rom
+        self.swing_leg = swing_leg
 
     def current_setpoint(self):
         """Reads current state of the robot"""
+        # TODO Current state velocity readings not correct. Sometimes reported high
+        # velocities in the ankle joints, which leads to invalid gaits
         self.current_setpoint_dict = self.from_list_to_setpoint(
             self.current_state.joint_names,
             self.current_state.actual.positions,
-            self.current_state.actual.velocities,
+            None,
             self.time[0],
         )
 
     def middle_setpoint(self):
         """Returns the middle setpoint. Fixed for now.
         Should adapt dynamically in the future"""
+        self.middle_position = [0.0, 0.14, 0.1, 0.03, 0.03, 0.61, 1.17, 0.0]
+        if self.swing_leg == "left":
+            self.middle_position.reverse()
+
         self.middle_setpoint_dict = self.from_list_to_setpoint(
             self.joints,
-            self.middle_state,
+            self.middle_position,
             None,
             self.time[1],
         )
 
-    def desired_setpoint(self):
-        """Calls IK solver to compute setpoint from CoViD location"""
+    def desired_setpoint(self, position, ankle_rom):
+        """Calls IK solver to compute setpoint from CoViD location.
+        Position is defined in centimeters and takes two argurments:
+        forward distance and height. Ankle RoM should be given in degrees"""
+        self.desired_position = solve_ik(position, ankle_rom)
+        if self.swing_leg == "left":
+            self.desired_position.reverse()
+
+        if self.desired_position[0] > 0.1745 or self.desired_position[-1] > 0.1745:
+            dorsiflexion = max([self.desired_position[0], self.desired_position[-1]])/3.14*180
+            print(f"Dorsiflexion bigger than 10 degrees: {round(dorsiflexion, 1)} degrees")
+
         self.desired_setpoint_dict = self.from_list_to_setpoint(
-            self.joints, self.desired_position, self.desired_velocity, self.time[2]
+            self.joints, self.desired_position, None, self.time[2]
         )
 
     def to_joint_trajectory_class(self):
         """Returns a list of JointTrajectory classes containing
         the setpoints for each joint"""
+        # TODO fix hardcoded haa/false current state readings
+        self.current_setpoint_dict.update(
+            {
+                'right_hip_aa': Setpoint(
+                    Duration(0.2),
+                    0.03,
+                    0.0,
+                )
+            }
+        )
+
+        self.current_setpoint_dict.update(
+            {
+                'left_hip_aa': Setpoint(
+                    Duration(0.2),
+                    0.03,
+                    0.0,
+                )
+            }
+        )
+
         self.joint_trajectory_list = []
         for name in self.joints:
             self.joint_trajectory_list.append(
@@ -71,8 +109,14 @@ class DynamicSubgait:
         """Returns a joint_trajectory_msg which can be send to the exo"""
         self.current_setpoint()
         self.middle_setpoint()
-        self.desired_setpoint()
+        self.desired_setpoint(self.position, self.ankle_rom)
         self.to_joint_trajectory_class()
+
+        print(
+            f"Current HAA: {self.current_setpoint_dict['right_hip_aa']}", "\n",
+            f"Middle HAA: {self.middle_setpoint_dict['right_hip_aa']}", "\n"
+            f"Desired HAA: {self.desired_setpoint_dict['right_hip_aa']}", "\n",
+        )
 
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joints
@@ -97,7 +141,7 @@ class DynamicSubgait:
         return joint_trajectory_msg
 
     def from_list_to_setpoint(self, joint_names, position, velocity, time):
-        """Computes setpoint dictionary from JointState msg"""
+        """Computes setpoint dictionary from a list"""
         setpoint_dict = {}
 
         if velocity is not None:
