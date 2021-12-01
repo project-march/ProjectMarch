@@ -1,49 +1,55 @@
-FROM ros:foxy-ros1-bridge
+# author: George Vegelien
+# The reason this docker file is made and we did not use the generall one, is to save storage because it can use the
+# same ros1 and ros2 layers. Second reason is that we have smaller intermediate steps. This helps as the normal one is
+# very difficult to upload to gitlab due to its large dependency install steps.
 
-# Because we build this image in a non-interactive environment, we should notify Debian that
-# we cannot respond to required interaction. This will assume the default values in case
-# an interactive window pops up.
-ARG DEBIAN_FRONTEND=noninteractive
+# Uses the local ros2 image (if you don't have this checkout registry.gitlab.com/project-march/march/local:ros2)
+FROM ros2 as ros2_builder
 
-# Build tools
-# We need pip to install certain python dependencies
-# colcon-common-extensions is used for building and testing ROS1
-# clang is used to compile C++ code
-# clang-tidy is used in a different pipeline stage
-# We need git and git-lfs to get repo information from
-# inside the container.
-#
-# The `rosdep`, `rosinstall`, `wstool` and `build-essential` packages
-# are required for building ROS1, see https://wiki.ros.org/noetic/Installation/Ubuntu
-RUN apt update && apt install -y python3-pip python3-colcon-common-extensions clang clang-tidy git git-lfs python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
+# The reason ros1 is done after ros2 is because ros1 is the bigger image, so less packages need to be copied over.
+# Note however the standalone size is smaller in reverse but more actual storage is used because of less cached layers
 
-# Non-ROS Python dependencies
-COPY requirements.txt /march/requirements.txt
-RUN bash -c "python3 -m pip install -r /march/requirements.txt"
-
-# Copy the project into the container to automatically detect all dependencies.
-COPY ros1/src /march/ros1/src
-
-# Copy the project into the container to automatically detect all dependencies.
-COPY ros2/src /march/ros2/src
+# Uses the local ros1 image (if you don't have this checkout registry.gitlab.com/project-march/march/local:ros1)
+FROM ros1 as ros1_builder
 
 
-# Install all ROS1 packages
-# This runs the `rosdep` program, which automatically finds dependencies declared in package.xml files
-# and installs them. See https://docs.ros.org/en/independent/api/rosdep/html/commands.html for
-# command line reference.
-RUN apt update && rosdep update --rosdistro noetic && rosdep install --rosdistro noetic -y --from-paths /march/ros1/src --ignore-src
+# This sections copys all the ros2 relavent installed folders made in the local ros2 image.
+COPY --from=ros2_builder /etc/apt/sources.list.d/ros2-latest.list /etc/apt/sources.list.d/ros2-latest.list
+COPY --from=ros2_builder /opt/ros/foxy /opt/ros/foxy
+COPY --from=ros2_builder /usr/local/sbin /usr/local/sbin
+COPY --from=ros2_builder /usr/local/bin /usr/local/bin
+COPY --from=ros2_builder /usr/sbin /usr/sbin
+COPY --from=ros2_builder /usr/bin /usr/bin
+COPY --from=ros2_builder /bin /bin
+COPY --from=ros2_builder /sbin /sbin
 
+# Set all the bride enviromental variables
+ENV ROS_VERSION 2
+ENV PKG_CONFIG_PATH /opt/ros/noetic/lib/pkgconfig:/opt/ros/noetic/lib/x86_64-linux-gnu/pkgconfig
+ENV ROS_PACKAGE_PATH /opt/ros/noetic/share
+ENV ROS_ETC_DIR /opt/ros/noetic/etc/ros
+ENV CMAKE_PREFIX_PATH /opt/ros/noetic
+ENV ROSLISP_PACKAGE_DIRECTORIES=
+ENV PYTHONPATH /opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages
+ENV ROS_MASTER_URI http://localhost:11311
+ENV LD_LIBRARY_PATH /opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/opt/ros/noetic/lib:/opt/ros/noetic/lib/x86_64-linux-gnu
+ENV PATH /opt/ros/foxy/bin:/opt/ros/noetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV ROS_LOCALHOST_ONLY 0
+ENV ROS1_DISTRO noetic
+ENV ROS_ROOT /opt/ros/noetic/share/ros
+ENV ROS2_DISTRO foxy
+ENV ROS_DISTRO=foxy
 
-# Install all ROS2 packages
-# This runs the `rosdep` program, which automatically finds dependencies declared in package.xml files
-# and installs them. See https://docs.ros.org/en/independent/api/rosdep/html/commands.html for
-# command line reference.
-RUN apt update && rosdep update --rosdistro foxy && rosdep install --rosdistro foxy -y --from-paths /march/ros2/src --ignore-src
+# Install the needed ros1, ros2 packages for the bride, and curl for the script ~/march/start_scripts/run/bridge.bash.
+# See (https://github.com/osrf/docker_images/blob/d1e081089b3f7d8c118561b0f39998e7163a5f0a/ros/foxy/ubuntu/focal/ros1-bridge/Dockerfile)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-noetic-ros-comm=1.15.13-1* \
+    ros-foxy-ros1-bridge=0.9.6-1* \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Remove march files to save space
-RUN rm -rf /march
-
-
+# Installs all the ros2 deps that are new and/or not coppied over by copying all the folder specified above.
+COPY ros2/src /march/src
+RUN apt-get update && rosdep update --rosdistro foxy && rosdep install --rosdistro foxy -y --from-paths /march/src --ignore-src
 # Remove march files to save space
 RUN rm -rf /march
