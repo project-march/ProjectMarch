@@ -9,7 +9,8 @@ or see their docs `here <https://docs.docker.com/get-started/>`_.
 
 Download docker engine
 ^^^^^^^^^^^^^^^^^^^^^^
-First thing we need is the docker engine itself. Check if you have it installed, if not follow the steps below.
+First thing we need is the docker engine itself. Check if you have it installed with :code:`docker --version`.
+If this does not output something like "Docker version 20.10.11, build dea9396", then follow the steps below.
 
 If you are on mac or windows check out the `docker engine install page <https://docs.docker.com/engine/install/>`_
 for an installation guide.
@@ -35,6 +36,8 @@ If you are on ubuntu follow the steps here below:
 
 Download docker compose
 ^^^^^^^^^^^^^^^^^^^^^^^
+We use docker-compose to start-up multiple containers at the same time with the right settings.
+See below on how to install docker-compose.
 
 If you are on mac or windows check out the `docker compose install page <https://docs.docker.com/compose/install/>`_
 for an installation guide.
@@ -84,17 +87,17 @@ follow the step below to setup docker Nvidia support:
 
     # This should show something like:
     #+-----------------------------------------------------------------------------+
-    #| NVIDIA-SMI 384.130            	Driver Version: 384.130               	|
+    #| NVIDIA-SMI 384.130            	Driver Version: 384.130                    |
     #|-------------------------------+----------------------+----------------------+
-    #| GPU  Name 	   Persistence-M| Bus-Id    	Disp.A | Volatile Uncorr. ECC |
+    #| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
     #| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
     #|===============================+======================+======================|
     #|   0  GRID K520       	Off  | 00000000:00:03.0 Off |                  N/A |
-    #| N/A   36C	P0    39W / 125W |  	0MiB /  4036MiB |      0%  	Default |
+    #| N/A   36C    P0    39W / 125W |      0MiB /  4036MiB |       0%     Default |
     #+-------------------------------+----------------------+----------------------+
     #+-----------------------------------------------------------------------------+
     #| Processes:                                                       GPU Memory |
-    #|  GPU   	PID   Type   Process name                         	Usage  	|
+    #|  GPU   	PID   Type   Process name                               Usage      |
     #|=============================================================================|
     #|  No running processes found                                                 |
     #+-----------------------------------------------------------------------------+
