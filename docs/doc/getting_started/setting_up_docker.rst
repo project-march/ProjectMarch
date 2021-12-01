@@ -117,7 +117,10 @@ Log in to gitlab with docker
 
 .. code-block:: bash
 
-    docker login registry.gitlab.com
+    docker login registry.gitlab.com -u <username> -p <token>
+
+    # If you wish you can also input your password instead of token but this is insecure.
+    # You can see your username if you log into gitlab and click on you name in the top right
 
 
 Add aliases
@@ -143,8 +146,8 @@ Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march
     alias march_docker_pull_bridge='BRIDGE_GIT="registry.gitlab.com/project-march/march/local:bridge" && cd ~/march/ && docker pull $BRIDGE_GIT && docker tag $BRIDGE_GIT bridge && docker rmi $BRIDGE_GIT'
     alias march_docker_image_bridge='cd ~/march/ && docker build -f .docker_local/dockerfiles/bridge.Dockerfile -t bridge .'
 
-    alias march_docker_pull='march_docker_ros1_pull && march_docker_ros2_pull && march_docker_bridge_pull'
-    alias march_docker_image='march_docker_ros1_build && march_docker_ros2_build && march_docker_bridge_build'
+    alias march_docker_pull='march_docker_pull_ros1 && march_docker_pull_ros2 && march_docker_pull_bridge'
+    alias march_docker_image='march_docker_image_ros1 && march_docker_image_ros2 && march_docker_image_bridge'
 
     # To build the ros code through docker images individually, it is a bit faster than march_build.
     alias march_docker_ros1_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps ros1-service'
@@ -202,7 +205,7 @@ Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march
 Downloading the docker images
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You are now all ready to go. you only need to get the newest docker image from the gitlab repo.
-You will needed to redo this step everytime there are new dependencies added to the ros code.
+You will need to redo this step everytime there are new dependencies added to the ros code.
 Luckily getting these new images can be done very easily with the following commands:
 
 .. code-block:: bash
