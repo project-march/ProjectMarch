@@ -186,6 +186,9 @@ install/*
 venv/
 .march_venv/
 
+# Ignore the docker-compose file because people want to change the gpu support
+.docker_local/docker-compose.yaml
+
 # End of https://www.gitignore.io/api/ros,cmake
 .idea/*
 */cmake-build-debug/**
