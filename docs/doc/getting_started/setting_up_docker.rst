@@ -124,7 +124,7 @@ Log in to gitlab with docker
     # Then you see @<username>
 
     # To get a token you need to go to https://gitlab.com/-/profile/personal_access_tokens
-    #
+    # There you need to select 'read_registry'.
 
 
 Add aliases
