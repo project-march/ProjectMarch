@@ -76,9 +76,9 @@ follow the step below to setup docker Nvidia support:
         sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
     sudo apt-get update
 
-    apt-get install nvidia-container-runtime
+    sudo apt-get install nvidia-container-runtime
 
-    # Now restart docker daemon, this can be done by rebooting you computer.
+    # Now restart docker daemon. This can be done by rebooting you computer, or calling 'service docker restart'
     # To check if it is correctly installed run the following line:
     docker run -it --rm --gpus all ubuntu nvidia-smi
 
