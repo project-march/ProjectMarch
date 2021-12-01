@@ -257,7 +257,7 @@ def solve_ik(
     ankle_x,
     ankle_y=0,
     max_ankle_flexion=default_max_ankle_flexion,
-    make_plot=False,
+    plot=False,
     timer=False,
 ):
     """
@@ -296,7 +296,10 @@ def solve_ik(
         end = time.time()
         print("Calculation time = ", end - start, " seconds")
 
-    if make_plot:
+    if plot:
         make_plot(pose)
 
-    return pose
+    pose.insert(3, np.rad2deg(0.03))
+    pose.insert(4, np.rad2deg(0.03))
+
+    return [np.deg2rad(angle) for angle in pose]

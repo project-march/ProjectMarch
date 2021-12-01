@@ -69,15 +69,14 @@ class ToTrajectoryCommandNode(Node):
         """Generate a new trajectory command."""
         start_time = time.time()
 
-        ankle_rom = 7
-        desired_ankle_position = [30, 7]
+        desired_ankle_x = 40
         # Skip desired velocity for now
         trajectory = DynamicSubgait(
             self.new_subgait_time,
             self.current_state_msg,
-            desired_ankle_position,
-            ankle_rom,
             self.id,
+            desired_ankle_x,
+            position_y=0,
         ).to_joint_trajectory_msg()
 
         # Send trajectory command to the topic listened to by the simulation
@@ -104,13 +103,16 @@ class ToTrajectoryCommandNode(Node):
 
         # Publish gait type. This is needed for the CoM plugin to work
         # and thus to be able to groundgait
-        current_gait_msg = CurrentGait()
-        current_gait_msg.header = Header(stamp=stamp)
-        current_gait_msg.gait = "walk"
-        current_gait_msg.subgait = str(self.id + "_swing")
-        current_gait_msg.version = "dynamic_walk_v1"
-        current_gait_msg.duration = Duration(1.5).to_msg()
-        current_gait_msg.gait_type = "walk_like"
+        current_gait_msg = CurrentGait(
+            header=Header(stamp=stamp),
+            gait="walk",
+            subgait=str(self.id + "_swing"),
+            version="dynamic_walk_v1",
+            duration=Duration(
+                self.new_subgait_time[-1] - self.new_subgait_time[0]
+            ).to_msg(),
+            gait_type="walk_like",
+        )
 
         self.publish_current_gait.publish(current_gait_msg)
 
