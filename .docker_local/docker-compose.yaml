@@ -8,9 +8,11 @@ x-gui:
   environment:
     - USER=${USER}
     - DISPLAY=${DISPLAY}
-    - ROS_MASTER_URI=http://ros1-service:11311
     - NVIDIA_VISIBLE_DEVICES=all
     - NVIDIA_DRIVER_CAPABILITIES=all
+    - __NV_PRIME_RENDER_OFFLOAD=1
+    - __GLX_VENDOR_LIBRARY_NAME=nvidia
+    - ROS_MASTER_URI=http://ros1-service:11311
   volumes:
     - /home/$USER:/home/$USER:rw
     - /etc/group:/etc/group:ro
@@ -20,11 +22,11 @@ x-gui:
     - /tmp/.X11-unix:/tmp/.X11-unix:rw
   # Uncomment the code below if you have an Nvidia gpu
   # (see https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html for more information)
-  #deploy: # This is needed for gpu acceleration
-    #resources:
-      #reservations:
-        #devices:
-          #- capabilities: [ gpu ]
+  deploy: # This is needed for gpu acceleration
+    resources:
+      reservations:
+        devices:
+          - capabilities: [ gpu ]
 
 services:
   ros1-service: &ros1-service
@@ -36,6 +38,8 @@ services:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
       - ROS_MASTER_URI=http://ros1-service:11311
       - ROS_DOCKER_TYPE="ros1"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
@@ -53,6 +57,10 @@ services:
     environment:
       - USER=${USER}
       - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
       - ROS_MASTER_URI=http://ros1-service:11311
       - ROS_DOCKER_TYPE="ros2"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
@@ -69,6 +77,10 @@ services:
     environment:
       - USER=${USER}
       - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
       - ROS_MASTER_URI=http://ros1-service:11311
       - ROS_DOCKER_TYPE="bridge"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
