@@ -53,13 +53,18 @@ If you are on ubuntu check out the same link as for mac and windows, or follow t
         -L https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose \
         -o /etc/bash_completion.d/docker-compose
 
-    # If you reload your terminal or do `source ~/.bashrc` you can use docker-compose commands.
+    # You need to reload your terminal, or do `source ~/.bashrc` to use docker-compose commands.
 
 Download gpu support
 ^^^^^^^^^^^^^^^^^^^^
 If you have a dedicated NVIDIA gpu in your computer you might need to follow the following steps,
-if not you can skip this part.
-Check out `this link <https://docs.docker.com/config/containers/resource_constraints/#gpu>`_ or follow the step below:
+if not you can skip this part. Before continuing make sure you have setup your video card correctly.
+You can check this with the command :code:`prime-select query` it should return 'on-demand' or 'nvidia'.
+If this does not work checkout
+`use nvidia graphics card <https://www.linuxbabe.com/desktop-linux/switch-intel-nvidia-graphics-card-ubuntu>`_.
+
+Next check out `docker resource constraint <https://docs.docker.com/config/containers/resource_constraints/#gpu>`_ or
+follow the step below to setup docker Nvidia support:
 
 .. code-block:: bash
 
