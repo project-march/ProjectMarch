@@ -120,7 +120,11 @@ Log in to gitlab with docker
     docker login registry.gitlab.com -u <username> -p <token>
 
     # If you wish you can also input your password instead of token but this is insecure.
-    # You can see your username if you log into gitlab and click on you name in the top right
+    # You can see your username if you log into gitlab and click on your name in the top right.
+    # Then you see @<username>
+
+    # To get a token you need to go to https://gitlab.com/-/profile/personal_access_tokens
+    #
 
 
 Add aliases
@@ -214,16 +218,16 @@ Luckily getting these new images can be done very easily with the following comm
     march_docker_pull
 
     # Or to pull them all individually:
-    march_docker_ros1_pull
-    march_docker_ros2_pull
-    march_docker_bridge_pull
+    march_docker_pull_ros1
+    march_docker_pull_ros2
+    march_docker_pull_bridge
 
-    # You can also build them yourself, this is however not advised however.
+    # You can also build them yourself, this is however not advised.
     # You should only do this if you want to add anything to the ros dependencies
-    march_docker_build
-    march_docker_ros1_build
-    march_docker_ros2_build
-    march_docker_bridge_build
+    march_docker_image
+    march_docker_image_ros1
+    march_docker_image_ros2
+    march_docker_image_bridge
 
 Running the march code
 ^^^^^^^^^^^^^^^^^^^^^^
