@@ -115,7 +115,7 @@ Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march
 
     alias march_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
     alias march_run_bash='set_uid_gid && export ROS_DOCKER_START_TYPE=bash && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
-    alias march_build='set_uid_gid && ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
+    alias march_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
 
     alias march_docker_ros1_pull='ROS1_GIT="registry.gitlab.com/project-march/march/local:ros1" && cd ~/march/ && docker pull $ROS1_GIT && docker tag $ROS1_GIT ros1 && docker rmi $ROS1_GIT'
     alias march_docker_ros1_build='cd ~/march/ && docker build -f .docker_local/dockerfiles/noeticFull.Dockerfile -t ros1 .'
