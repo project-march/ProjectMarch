@@ -3,13 +3,13 @@ from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import numpy as np
-from ik_solver import solve_ik
+from march_goniometric_ik_solver.ik_solver import solve_ik
 
 
 class DynamicSubgait:
     """class that reads setpoints and returns list of jointtrajectories"""
 
-    def __init__(self, time, current_state, position, ankle_rom, swing_leg):
+    def __init__(self, time, current_state, swing_leg, position_x, position_y=0):
         self.joints = [
             "left_ankle",
             "left_knee",
@@ -22,8 +22,8 @@ class DynamicSubgait:
         ]
         self.time = time
         self.current_state = current_state
-        self.position = position
-        self.ankle_rom = ankle_rom
+        self.position_x = position_x
+        self.position_y = position_y
         self.swing_leg = swing_leg
 
     def current_setpoint(self):
@@ -51,11 +51,11 @@ class DynamicSubgait:
             self.time[1],
         )
 
-    def desired_setpoint(self, position, ankle_rom):
+    def desired_setpoint(self, position_x, position_y=0):
         """Calls IK solver to compute setpoint from CoViD location.
         Position is defined in centimeters and takes two argurments:
         forward distance and height. Ankle RoM should be given in degrees"""
-        self.desired_position = solve_ik(position, ankle_rom)
+        self.desired_position = solve_ik(position_x, position_y)
         if self.swing_leg == "left":
             self.desired_position.reverse()
 
@@ -111,7 +111,7 @@ class DynamicSubgait:
         """Returns a joint_trajectory_msg which can be send to the exo"""
         self.current_setpoint()
         self.middle_setpoint()
-        self.desired_setpoint(self.position, self.ankle_rom)
+        self.desired_setpoint(self.position_x, position_y=self.position_y)
         self.to_joint_trajectory_class()
 
         print(
