@@ -18,11 +18,13 @@ x-gui:
     - /etc/shadow:/etc/shadow:ro
     - /etc/sudoers.d:/etc/sudoers.d:ro
     - /tmp/.X11-unix:/tmp/.X11-unix:rw
-  deploy: # This is needed for gpu acceleration
-    resources:
-      reservations:
-        devices:
-          - capabilities: [ gpu ]
+  # Uncomment the code below if you have an Nvidia gpu
+  # (see https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html for more information)
+#  deploy: # This is needed for gpu acceleration
+#    resources:
+#      reservations:
+#        devices:
+#          - capabilities: [ gpu ]
 
 services:
   ros1-service: &ros1-service
@@ -63,8 +65,7 @@ services:
   bridge-service:
     << : *gui-standard
     container_name: bridge
-    stdin_open: false
-    image: bridge
+    image: bridge:new2
     environment:
       - USER=${USER}
       - DISPLAY=${DISPLAY}

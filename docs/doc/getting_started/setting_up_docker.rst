@@ -94,6 +94,18 @@ Check out `this link <https://docs.docker.com/config/containers/resource_constra
     #|  No running processes found                                                 |
     #+-----------------------------------------------------------------------------+
 
+Afterward you need to uncomment the following code into your :code:`~/march/.docker_local/docker-compose.yaml`:
+
+.. code-block:: bash
+
+    # Uncomment the code shown below in the group called 'x-gui', it can be found bellow '- /tmp/.X11-unix:/tmp/.X11-unix:rw'.
+    # This is (probably) on line 23 to line 27.
+      deploy: # This is needed for gpu acceleration
+        resources:
+          reservations:
+            devices:
+              - capabilities: [ gpu ]
+
 
 Log in to gitlab with docker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
