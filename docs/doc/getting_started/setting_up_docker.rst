@@ -51,7 +51,7 @@ If you are on ubuntu check out the same link as for mac and windows, or follow t
 
     sudo chmod +x /usr/local/bin/docker-compose
 
-    # For command-line completion:
+    # For command-line completion, this step can be checked by typing 'docker-com' and then pressing 'tab':
     sudo curl \
         -L https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose \
         -o /etc/bash_completion.d/docker-compose
