@@ -1,7 +1,8 @@
-# author: George Vegelien
 # The reason this docker file is made and we did not use the generall one, is to save storage because it can use the
 # same ros1 and ros2 layers. Second reason is that we have smaller intermediate steps. This helps as the normal one is
 # very difficult to upload to gitlab due to its large dependency install steps.
+# date: 12-02-2021
+# author: George Vegelien
 
 # Uses the local ros2 image (if you don't have this checkout registry.gitlab.com/project-march/march/local:ros2)
 FROM ros2 as ros2_builder

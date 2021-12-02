@@ -1,4 +1,7 @@
 # See https://hub.docker.com/_/ros
+# date: 12-02-2021
+# author: George Vegelien
+
 FROM ros:foxy
 
 # Because we build this image in a non-interactive environment, we should notify Debian that

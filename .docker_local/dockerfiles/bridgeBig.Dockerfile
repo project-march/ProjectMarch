@@ -1,3 +1,6 @@
+# This docker file is based on the original foxy bridge docker file.
+# However because this file has a to large intermidate step we have made our own variant.
+# Use this file iff with the current bridge.Dockerfile there are issues with missing dependecies.
 FROM ros:foxy-ros1-bridge
 
 # Because we build this image in a non-interactive environment, we should notify Debian that
