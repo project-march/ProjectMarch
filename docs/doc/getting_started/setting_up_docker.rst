@@ -58,6 +58,103 @@ If you are on ubuntu check out the same link as for mac and windows, or follow t
 
     # You need to reload your terminal, or do `source ~/.bashrc` to use docker-compose commands.
 
+
+Log in to gitlab with docker
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    docker login registry.gitlab.com -u <username> -p <token>
+
+    # If you wish you can also input your password instead of token but this is insecure.
+    # You can see your username if you log into gitlab and click on your name in the top right.
+    # Then you see @<username>
+
+    # To get a token you need to go to https://gitlab.com/-/profile/personal_access_tokens
+    # There you need to select 'read_registry'.
+
+
+Add aliases
+^^^^^^^^^^^
+To make everything easier to use for you we have provided some aliases.
+Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`.
+
+.. code-block:: bash
+
+    export MARCH_COMPOSE_FILE="${HOME}/march/.docker_local/docker-compose.yaml"
+
+    alias set_uid_gid='export M_UID=$(id -u $USER) && export M_GID=$(id -g $USER)'
+    alias march_clean_containers='docker rm ros1 ros2 bridge'
+
+    alias march_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f "${MARCH_COMPOSE_FILE}" up'
+    alias march_run_bash='set_uid_gid && export ROS_DOCKER_START_TYPE=bash && docker-compose -f "${MARCH_COMPOSE_FILE}" up'
+    alias march_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f "${MARCH_COMPOSE_FILE}" up'
+
+    alias march_docker_pull_ros1='ROS1_GIT="registry.gitlab.com/project-march/march/local:ros1" && cd ~/march/ && docker pull $ROS1_GIT && docker tag $ROS1_GIT ros1 && docker rmi $ROS1_GIT'
+    alias march_docker_image_ros1='cd ~/march/ && docker build -f .docker_local/dockerfiles/noeticFull.Dockerfile -t ros1 .'
+
+    alias march_docker_pull_ros2='ROS2_GIT="registry.gitlab.com/project-march/march/local:ros2" && cd ~/march/ && docker pull $ROS2_GIT && docker tag $ROS2_GIT ros2 && docker rmi $ROS2_GIT'
+    alias march_docker_image_ros2='cd ~/march/ && docker build -f .docker_local/dockerfiles/foxyFull.Dockerfile -t ros2 .'
+
+    alias march_docker_pull_bridge='BRIDGE_GIT="registry.gitlab.com/project-march/march/local:bridge" && cd ~/march/ && docker pull $BRIDGE_GIT && docker tag $BRIDGE_GIT bridge && docker rmi $BRIDGE_GIT'
+    alias march_docker_image_bridge='cd ~/march/ && docker build -f .docker_local/dockerfiles/bridge.Dockerfile -t bridge .'
+
+    alias march_docker_pull='march_docker_pull_ros1 && march_docker_pull_ros2 && march_docker_pull_bridge'
+    alias march_docker_image='march_docker_image_ros1 && march_docker_image_ros2 && march_docker_image_bridge'
+
+    # To build the ros code through docker images individually, it is a bit faster than march_build.
+    alias march_docker_ros1_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f "${MARCH_COMPOSE_FILE}" up --no-deps ros1-service'
+    alias march_docker_ros2_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f "${MARCH_COMPOSE_FILE}" up --no-deps ros2-service'
+    alias march_docker_bridge_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f "${MARCH_COMPOSE_FILE}" up --no-deps bridge-service'
+
+    # To run the ros code through docker images individually.
+    alias march_docker_ros1_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f "${MARCH_COMPOSE_FILE}" up --no-deps ros1-service'
+    alias march_docker_ros2_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f "${MARCH_COMPOSE_FILE}" up --no-deps ros2-service'
+    alias march_docker_bridge_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f "${MARCH_COMPOSE_FILE}" up --no-deps bridge-service'
+
+    # To start up the docker images individually.
+    alias march_docker_ros1_bash='set_uid_gid && docker-compose -f "${MARCH_COMPOSE_FILE}" run --no-deps ros1-service bash'
+    alias march_docker_ros2_bash='set_uid_gid && docker-compose -f "${MARCH_COMPOSE_FILE}" run --no-deps ros2-service bash'
+    alias march_docker_bridge_bash='set_uid_gid && docker-compose -f "${MARCH_COMPOSE_FILE}" run --no-deps bridge-service bash'
+
+    alias march_ros1_bash='docker exec -it ros1 bash'
+    alias march_ros2_bash='docker exec -it ros2 bash'
+    alias march_bridge_bash='docker exec -it bridge bash'
+
+    # Below is a script to automatically source the correct files on startup, inside the docker images.
+    if [ -n "$ROS_DOCKER_TYPE" ];then
+        if [ -f /opt/ros/noetic/local_setup.bash ];then
+          source /opt/ros/noetic/local_setup.bash
+        fi
+
+        if [ -f /opt/ros/foxy/local_setup.bash ];then
+          source /opt/ros/foxy/local_setup.bash
+        fi
+
+        if [ "$ROS_DOCKER_TYPE" == "ros1" ] && [ -f "$HOME"/march/ros1/install/local_setup.bash ];then
+          source "$HOME"/march/ros1/install/local_setup.bash
+        fi
+
+        if [ "$ROS_DOCKER_TYPE" == "ros2" ] && [ -f "$HOME"/march/ros2/install/local_setup.bash ];then
+          source "$HOME"/march/ros2/install/local_setup.bash
+        fi
+
+        if [ "$ROS_DOCKER_TYPE" == "bridge" ];then
+          if [ -f "$HOME"/march/ros1/install/local_setup.bash ];then
+            source "$HOME"/march/ros1/install/local_setup.bash
+          fi
+
+          if [ -f "$HOME"/march/ros2/install/local_setup.bash ];then
+            source "$HOME"/march/ros2/install/local_setup.bash
+          fi
+
+          if [ -f "$HOME"/ros1_bridge/install/local_setup.bash ];then
+            source "$HOME"/ros1_bridge/install/local_setup.bash
+          fi
+        fi
+    fi
+
+
 Download gpu support
 ^^^^^^^^^^^^^^^^^^^^
 If you have a dedicated NVIDIA gpu in your computer you might need to follow the following steps,
@@ -102,112 +199,16 @@ follow the step below to setup docker Nvidia support:
     #|  No running processes found                                                 |
     #+-----------------------------------------------------------------------------+
 
-Afterward you need to uncomment the following code into your :code:`~/march/.docker_local/docker-compose.yaml`:
+Afterward you need to change one of the previously added aliases.
+Go to your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`, and look for the :code:`export MARCH_COMPOSE_FILE=`.
 
 .. code-block:: bash
 
-    # Uncomment the code shown below in the group called 'x-gui', it can be found bellow '- /tmp/.X11-unix:/tmp/.X11-unix:rw'.
-    # This is (probably) on line 23 to line 27.
-      deploy: # This is needed for gpu acceleration
-        resources:
-          reservations:
-            devices:
-              - capabilities: [ gpu ]
+    # Change:
+    export MARCH_COMPOSE_FILE="${HOME}/march/.docker_local/docker-compose.yaml"
+    # To:
+    export MARCH_COMPOSE_FILE="${HOME}/march/.docker_local/docker-compose-gpu.yaml"
 
-
-Log in to gitlab with docker
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-    docker login registry.gitlab.com -u <username> -p <token>
-
-    # If you wish you can also input your password instead of token but this is insecure.
-    # You can see your username if you log into gitlab and click on your name in the top right.
-    # Then you see @<username>
-
-    # To get a token you need to go to https://gitlab.com/-/profile/personal_access_tokens
-    # There you need to select 'read_registry'.
-
-
-Add aliases
-^^^^^^^^^^^
-To make everything easier to use for you we have provided some aliases.
-Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`.
-
-.. code-block:: bash
-
-    alias set_uid_gid='export M_UID=$(id -u $USER) && export M_GID=$(id -g $USER)'
-    alias march_clean_containers='docker rm ros1 ros2 bridge'
-
-    alias march_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
-    alias march_run_bash='set_uid_gid && export ROS_DOCKER_START_TYPE=bash && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
-    alias march_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up'
-
-    alias march_docker_pull_ros1='ROS1_GIT="registry.gitlab.com/project-march/march/local:ros1" && cd ~/march/ && docker pull $ROS1_GIT && docker tag $ROS1_GIT ros1 && docker rmi $ROS1_GIT'
-    alias march_docker_image_ros1='cd ~/march/ && docker build -f .docker_local/dockerfiles/noeticFull.Dockerfile -t ros1 .'
-
-    alias march_docker_pull_ros2='ROS2_GIT="registry.gitlab.com/project-march/march/local:ros2" && cd ~/march/ && docker pull $ROS2_GIT && docker tag $ROS2_GIT ros2 && docker rmi $ROS2_GIT'
-    alias march_docker_image_ros2='cd ~/march/ && docker build -f .docker_local/dockerfiles/foxyFull.Dockerfile -t ros2 .'
-
-    alias march_docker_pull_bridge='BRIDGE_GIT="registry.gitlab.com/project-march/march/local:bridge" && cd ~/march/ && docker pull $BRIDGE_GIT && docker tag $BRIDGE_GIT bridge && docker rmi $BRIDGE_GIT'
-    alias march_docker_image_bridge='cd ~/march/ && docker build -f .docker_local/dockerfiles/bridge.Dockerfile -t bridge .'
-
-    alias march_docker_pull='march_docker_pull_ros1 && march_docker_pull_ros2 && march_docker_pull_bridge'
-    alias march_docker_image='march_docker_image_ros1 && march_docker_image_ros2 && march_docker_image_bridge'
-
-    # To build the ros code through docker images individually, it is a bit faster than march_build.
-    alias march_docker_ros1_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps ros1-service'
-    alias march_docker_ros2_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps ros2-service'
-    alias march_docker_bridge_build='set_uid_gid && export ROS_DOCKER_START_TYPE=build && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps bridge-service'
-
-    # To run the ros code through docker images individually.
-    alias march_docker_ros1_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps ros1-service'
-    alias march_docker_ros2_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps ros2-service'
-    alias march_docker_bridge_run='set_uid_gid && export ROS_DOCKER_START_TYPE=run && docker-compose -f ~/march/.docker_local/docker-compose.yaml up --no-deps bridge-service'
-
-    # To start up the docker images individually.
-    alias march_docker_ros1_bash='set_uid_gid && docker-compose -f ~/march/.docker_local/docker-compose.yaml run --no-deps ros1-service bash'
-    alias march_docker_ros2_bash='set_uid_gid && docker-compose -f ~/march/.docker_local/docker-compose.yaml run --no-deps ros2-service bash'
-    alias march_docker_bridge_bash='set_uid_gid && docker-compose -f ~/march/.docker_local/docker-compose.yaml run --no-deps bridge-service bash'
-
-
-    alias march_ros1_bash='docker exec -it ros1 bash'
-    alias march_ros2_bash='docker exec -it ros2 bash'
-    alias march_bridge_bash='docker exec -it bridge bash'
-
-    # Below is a script to automatically source the correct files on startup, inside the docker images.
-    if [ -n "$ROS_DOCKER_TYPE" ];then
-        if [ -f /opt/ros/noetic/local_setup.bash ];then
-          source /opt/ros/noetic/local_setup.bash
-        fi
-
-        if [ -f /opt/ros/foxy/local_setup.bash ];then
-          source /opt/ros/foxy/local_setup.bash
-        fi
-
-        if [ "$ROS_DOCKER_TYPE" == "ros1" ] && [ -f "$HOME"/march/ros1/install/local_setup.bash ];then
-          source "$HOME"/march/ros1/install/local_setup.bash
-        fi
-
-        if [ "$ROS_DOCKER_TYPE" == "ros2" ] && [ -f "$HOME"/march/ros2/install/local_setup.bash ];then
-          source "$HOME"/march/ros2/install/local_setup.bash
-        fi
-
-        if [ "$ROS_DOCKER_TYPE" == "bridge" ];then
-          if [ -f "$HOME"/march/ros1/install/local_setup.bash ];then
-            source "$HOME"/march/ros1/install/local_setup.bash
-          fi
-
-          if [ -f "$HOME"/march/ros2/install/local_setup.bash ];then
-            source "$HOME"/march/ros2/install/local_setup.bash
-          fi
-
-          if [ -f "$HOME"/ros1_bridge/install/local_setup.bash ];then
-            source "$HOME"/ros1_bridge/install/local_setup.bash
-          fi
-        fi
-    fi
 
 Downloading the docker images
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
