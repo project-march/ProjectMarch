@@ -28,7 +28,7 @@ x-gui:
     - __NV_PRIME_RENDER_OFFLOAD=1
     - __GLX_VENDOR_LIBRARY_NAME=nvidia
   volumes:
-    # This makes it use your home directory.
+    # This makes the container mount your home directory.
     - /home/$USER:/home/$USER:rw
     # The volumes mounted here below are added to enable the same user/local account in the container.
     - /etc/group:/etc/group:ro
