@@ -9,9 +9,9 @@ version: "3.9"
 # author: George Vegelien
 
 
-# This is the default service. This is added to the other services with pointers by calling '<< : *gui-standard'
-# Keep in mind that if the service where this pointer is added to also specifies an environment then this
-# environment is overwritten.
+# This is the default service for giving the containers gui and gpu privileges.
+# It is added to the other services with pointers by calling '<< : *gui-standard'. Keep in mind that if
+# the pointer is added to any service that already specifies an environment, then this environment is overwritten.
 x-gui:
   &gui-standard
   tty: true # Enables terminal in & out
@@ -30,14 +30,13 @@ x-gui:
   volumes:
     # This makes it use your home directory.
     - /home/$USER:/home/$USER:rw
-    # These volumes below are to make it use the same user in the docker container.
+    # The volumes mounted here below are added to enable the same user/local account in the container.
     - /etc/group:/etc/group:ro
     - /etc/passwd:/etc/passwd:ro
     - /etc/shadow:/etc/shadow:ro
     - /etc/sudoers.d:/etc/sudoers.d:ro
-    # This gives it the ability to use your gui.
+    # This makes sure that the docker container can use your gui.
     - /tmp/.X11-unix:/tmp/.X11-unix:rw
-  # Uncomment the code below if you have an Nvidia gpu
   # (see https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html for more information)
   deploy:
     resources:
@@ -65,7 +64,7 @@ services:
       - ROS_ARGS
       - ROS1_ARGS
     working_dir: /home/${USER}/march/ros1
-    ipc: host # The reason host is chosen (and not shareable) is so that the containers can run in isolation of eachother.
+    ipc: host  # The reason 'host' is chosen (and not 'shareable') is so that the containers can run in isolation of each other.
     ports: ["11311"] # Needed for rviz visualization
     command: ["bash",  "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros1.bash"]
 
@@ -86,7 +85,7 @@ services:
       - ROS_ARGS
       - ROS2_ARGS
     working_dir: /home/${USER}/march/ros2
-    ipc: host # The reason host is chosen (and not container:ros1) is so that the containers can run in isolation of eachother.
+    ipc: host  # The reason 'host' is chosen (and not 'container:ros1') is so that the containers can run in isolation of each other.
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros2.bash"]
 
   bridge-service:
@@ -104,7 +103,7 @@ services:
       - ROS_DOCKER_TYPE="bridge"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
     working_dir: /home/${USER}/ros1_bridge
-    ipc: host # The reason host is chosen (and not container:ros1) is so that the containers can run in isolation of eachother.
+    ipc: host  # The reason 'host' is chosen (and not 'container:ros1') is so that the containers can run in isolation of each other.
     depends_on:
       - ros1-service
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/bridge.bash"]

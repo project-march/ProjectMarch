@@ -1,6 +1,7 @@
-# The reason this docker file is made and we did not use the general one, is to save storage, as this docker can use the
-# same ros1 and ros2 layers. Second reason is that we have less intermediate steps. This helps, as the normal docker is
-# very difficult to upload to GitLab due to its large amount of dependency install steps.
+# The reason this docker file is made and we did not use the generall one, is to save storage because it can use the
+# same ros1 and ros2 layers. Second reason is that we have smaller intermediate steps. This helps as the normal one is
+# very difficult to upload to gitlab due to its large dependency install steps.
+# This makes use of multistage docker files. (see https://docs.docker.com/develop/develop-images/multistage-build/)
 # date: 12-02-2021
 # author: George Vegelien
 

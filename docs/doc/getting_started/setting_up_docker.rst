@@ -65,11 +65,13 @@ Log in to GitLab with docker
     docker login registry.gitlab.com -u <username> -p <token>
 
     # If you wish you can also input your password instead of token but this is insecure.
-    # You can see your username if you log into gitlab and click on your name in the top right.
-    # Then you see @<username>
+    # To find your GitLab username,
+    #   1. Log in to your GitLab account in a browser
+    #   2. Click on your name in the top right corner
+    #   3. There you can find @<username>
 
     # To get a token you need to go to https://gitlab.com/-/profile/personal_access_tokens
-    # There you need to select 'read_registry'.
+    # and make a key with 'read_registry' access.
 
 
 Add aliases
