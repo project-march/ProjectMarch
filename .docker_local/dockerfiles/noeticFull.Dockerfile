@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # are required for building ROS1, see https://wiki.ros.org/noetic/Installation/Ubuntu
 RUN apt update && apt install -y python3-pip python3-colcon-common-extensions clang clang-tidy git git-lfs python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
 
-# This one is seperated for space caching reasons, if it is left out it wil be installed by rosdep install ...
+# This one is separated for space caching reasons, if it is left out it will be installed by rosdep install ...
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gazebo11 \
     && rm -rf /var/lib/apt/lists/*

@@ -9,21 +9,20 @@ or see their docs `here <https://docs.docker.com/get-started/>`_.
 
 Download docker engine
 ^^^^^^^^^^^^^^^^^^^^^^
-First thing we need is the docker engine itself. Check if you have it installed with :code:`docker --version`.
+The first thing we need is the docker engine itself. Check if you have it installed with :code:`docker --version`.
 If this does not output something like "Docker version 20.10.11, build dea9396", then follow the steps below.
 
-If you are on mac or windows check out the `docker engine install page <https://docs.docker.com/engine/install/>`_
-for an installation guide.
+If you are on Mac or Windows, you can find an installation guide on the `docker engine install page <https://docs.docker.com/engine/install/>`_ website.
 
-If you are on ubuntu follow the steps here below:
+If you are on Ubuntu, follow the steps below:
 
 .. code-block:: bash
 
-    # To check if you have docker installed run:
+    # To check if you have docker installed, run:
     docker --version
     # If it outputs something like "Docker version 20.10.7, build 20.10.7-0ubuntu5~20.04.2", then you have docker installed.
 
-    # To install docker, use the following code or check out `https://docs.docker.com/engine/install/` for alternative options.
+    # To install docker, use the following code or go to `https://docs.docker.com/engine/install/` for alternative options.
     curl -fsSL https://get.docker.com -o get-docker.sh  # Download docker installer script.
     sudo sh get-docker.sh  # Install docker by running installer script.
     rm get-docker.sh  # Removes the installer script.
@@ -32,17 +31,16 @@ If you are on ubuntu follow the steps here below:
     sudo groupadd docker
     usermod -aG docker $USER  # To remove the need for 'sudo' in front of every docker command.
     sudo gpasswd -a $USER docker # To remove the need for 'sudo' in front of every docker command.
-    newgrp docker  # To activate the previous command, if you still need sudo restart your computer
+    newgrp docker  # To activate the previous command. If you still need 'sudo', restart your computer
 
 Download docker compose
 ^^^^^^^^^^^^^^^^^^^^^^^
-We use docker-compose to start-up multiple containers at the same time with the right settings.
+We use docker-compose to start multiple containers at the same time, and with the right settings.
 See below on how to install docker-compose.
 
-If you are on mac or windows check out the `docker compose install page <https://docs.docker.com/compose/install/>`_
-for an installation guide.
+If you are on Mac or Windows, you can find an installation guide on the `docker compose install page <https://docs.docker.com/compose/install/>`_ website.
 
-If you are on ubuntu check out the same link as for mac and windows, or follow the steps below:
+If you are on Ubuntu check out the same link as for Mac and Windows, or follow the steps below:
 
 .. code-block:: bash
 
@@ -59,7 +57,7 @@ If you are on ubuntu check out the same link as for mac and windows, or follow t
     # You need to reload your terminal, or do `source ~/.bashrc` to use docker-compose commands.
 
 
-Log in to gitlab with docker
+Log in to GitLab with docker
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
@@ -76,7 +74,7 @@ Log in to gitlab with docker
 
 Add aliases
 ^^^^^^^^^^^
-To make everything easier to use for you we have provided some aliases.
+To make everything easier to use for you we, have provided some aliases.
 Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`.
 
 You can change the :code:`$MARCH_DOCKER_CPU_CAP` to cap the ros cpu usage. If you have 12 CPU's you can put down any number
@@ -162,14 +160,14 @@ To check how many CPU's you have available, run :code:`nproc --all`.
 
 Download gpu support
 ^^^^^^^^^^^^^^^^^^^^
-If you have a dedicated NVIDIA gpu in your computer you might need to follow the following steps,
-if not you can skip this part. Before continuing make sure you have setup your video card correctly.
-You can check this with the command :code:`prime-select query` it should return 'on-demand' or 'nvidia'.
-If this does not work checkout
+If you have a dedicated NVIDIA gpu in your computer, you might need to follow the following steps,
+if not, you can skip this part. Before continuing, make sure you have setup your video card correctly.
+You can check this with the command :code:`prime-select query`. It should return 'on-demand' or 'nvidia'.
+If this does not work, go to this website to find out how to
 `use nvidia graphics card <https://www.linuxbabe.com/desktop-linux/switch-intel-nvidia-graphics-card-ubuntu>`_.
 
-Next check out `docker resource constraint <https://docs.docker.com/config/containers/resource_constraints/#gpu>`_ or
-follow the step below to setup docker Nvidia support:
+To configure the gpu for usage in docker, go to the `docker resource constraint page <https://docs.docker.com/config/containers/resource_constraints/#gpu>`_ or
+follow the step below to set up docker Nvidia support:
 
 .. code-block:: bash
 
@@ -184,7 +182,7 @@ follow the step below to setup docker Nvidia support:
     sudo apt-get install nvidia-container-runtime
 
     # Now restart docker daemon. This can be done by rebooting you computer, or calling 'service docker restart'
-    # To check if it is correctly installed run the following line:
+    # To check if it is correctly installed, run the following line:
     docker run -it --rm --gpus all ubuntu nvidia-smi
 
     # This should show something like:
@@ -204,7 +202,7 @@ follow the step below to setup docker Nvidia support:
     #|  No running processes found                                                 |
     #+-----------------------------------------------------------------------------+
 
-Afterward you need to change one of the previously added aliases.
+After this step, you need to change one of the previously added aliases.
 Go to your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`, and look for the :code:`export MARCH_COMPOSE_FILE=`.
 
 .. code-block:: bash
@@ -217,7 +215,7 @@ Go to your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`, and look for the 
 
 Downloading the docker images
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You are now all ready to go. you only need to get the newest docker image from the gitlab repo.
+Now, you should be all ready to go. The last step is to get the newest docker image from the GitLab repository.
 You will need to redo this step everytime there are new dependencies added to the ros code.
 Luckily getting these new images can be done very easily with the following commands:
 
@@ -231,7 +229,7 @@ Luckily getting these new images can be done very easily with the following comm
     march_docker_pull_ros2
     march_docker_pull_bridge
 
-    # You can also build them yourself, this is however not advised.
+    # You can also build them yourself, but this is not advised.
     # You should only do this if you want to add anything to the ros dependencies
     march_docker_image
     march_docker_image_ros1
@@ -240,11 +238,11 @@ Luckily getting these new images can be done very easily with the following comm
 
 Running the march code
 ^^^^^^^^^^^^^^^^^^^^^^
-Now that everything is downloaded you can run the ros code.
+Now that everything is downloaded, you can run the ros code.
 
 .. code-block:: bash
 
-    march_run  # To run the entire march code. (ros1, ros2 and the bridge) (This also start up the 3 containers / "environments")
+    march_run  # To run the entire march code. (ros1, ros2 and the bridge) (This also starts up the 3 containers / "environments")
     march_build  # To run build for all of march code (ros1, ros2 and the bridge)
     march_run_bash  # To start up all 3 ros containers / "environments".
 
@@ -255,8 +253,8 @@ Now that everything is downloaded you can run the ros code.
 
 Giving arguments to march run
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can also add arguments to ros1 and ros2 startup. This is done by setting the environment variables
-:code:`ROS_ARGS`, :code:`ROS1_ARGS` and :code:`ROS2_ARGS`. See the code block below on how to do this.
+You can also add arguments to the ros1 and ros2 startup. This is done by setting the environment variables
+:code:`ROS_ARGS`, :code:`ROS1_ARGS` and :code:`ROS2_ARGS`. The code block below shows how to do this.
 Note however, that because you set an environment variable these will persist within the terminal session.
 This means that if you do :code:`march_run` again from the same window it will use the same startup arguments.
 To unset this also see the code block below:
