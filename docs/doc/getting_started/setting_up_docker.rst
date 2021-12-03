@@ -79,9 +79,14 @@ Add aliases
 To make everything easier to use for you we have provided some aliases.
 Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march_bash_aliases`.
 
+You can change the :code:`$MARCH_DOCKER_CPU_CAP` to cap the ros cpu usage. If you have 12 CPU's you can put down any number
+between 0.01 and 12. This specifies how much of the CPU's can be used with 12 being 100% in this case.
+To check how many CPU's you have available, run :code:`nproc --all`.
+
 .. code-block:: bash
 
     export MARCH_COMPOSE_FILE="${HOME}/march/.docker_local/docker-compose.yaml"
+    export MARCH_DOCKER_CPU_CAP=$(nproc --all) # you can adjust this from anywhere from 0.01 - <$(nproc --all)>
 
     alias set_uid_gid='export M_UID=$(id -u $USER) && export M_GID=$(id -g $USER)'
     alias march_clean_containers='docker rm ros1 ros2 bridge'
