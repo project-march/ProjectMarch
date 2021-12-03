@@ -7,7 +7,7 @@ source /opt/ros/noetic/setup.bash
 source /opt/ros/foxy/setup.bash
 
 while ! [ -f "${HOME}"/march/ros1/"${DONE_FILE}" ]; do
-  if [ $SLEEP_COUNTER == $SLEEP_TIME ]; then
+  if [ "$SLEEP_COUNTER" -gt "$SLEEP_TIME" ]; then
     SLEEP_COUNTER=0
     echo "Ros1 is not done yet, you get this message again in ${SLEEP_TIME} seconds. (do 'touch ~/march/ros1/${DONE_FILE}' if it should be done)";
   fi
@@ -18,7 +18,7 @@ done;
 source "${HOME}"/march/ros1/install/local_setup.bash
 
 while ! [ -f "${HOME}"/march/ros2/"${DONE_FILE}" ]; do
-  if [ $SLEEP_COUNTER == $SLEEP_TIME ]; then
+  if [ "$SLEEP_COUNTER" -gt "$SLEEP_TIME" ]; then
     SLEEP_COUNTER=0
     echo "Ros2 is not done yet, you get this message again in ${SLEEP_TIME} seconds. (do 'touch ~/march/ros2/${DONE_FILE}' if it should be done)";
   fi
