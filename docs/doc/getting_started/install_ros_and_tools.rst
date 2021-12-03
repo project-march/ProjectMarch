@@ -94,7 +94,7 @@ Some additional python dependencies have to be installed using pip:
 
 .. code:: bash
 
-    python3 -m pip install -r ~/march/requirements.pip
+    python3 -m pip install -r ~/march/requirements.txt
 
 Install RealSense dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

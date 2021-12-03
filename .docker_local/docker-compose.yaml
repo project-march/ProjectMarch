@@ -1,9 +1,9 @@
 version: "3.9"
 # This docker-compose file is to start up ros1, ros2 and the bridge with gui support.
 # For more information on how:
-#   • to use it checkout https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html
-#   • this file is made checkout https://docs.docker.com/compose/compose-file/compose-file-v3/
-#   • the gui is setup http://wiki.ros.org/docker/Tutorials/GUI
+#   • to use it: checkout https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html
+#   • this file is made: checkout https://docs.docker.com/compose/compose-file/compose-file-v3/
+#   • the gui is setup: http://wiki.ros.org/docker/Tutorials/GUI
 # date: 02-12-2021
 # author: George Vegelien
 
@@ -15,13 +15,13 @@ x-gui:
   &gui-standard
   tty: true # Enables terminal in & out
   stdin_open: true
-  user: "${M_UID}:${M_GID}"  # These two values are set by alias 'set_uid_gid' and there values are usually both 1000
+  user: "${M_UID}:${M_GID}"  # These two values are set by alias 'set_uid_gid' and their values are usually both 1000
   environment:
     - USER=${USER}
     - DISPLAY=${DISPLAY}
     - ROS_MASTER_URI=http://ros1-service:11311
   volumes:
-    # This makes it use your home directory.
+    # This makes sure the service uses your home directory.
     - /home/$USER:/home/$USER:rw
     # These volumes below are to make it use the same user in the docker container.
     - /etc/group:/etc/group:ro

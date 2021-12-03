@@ -1,20 +1,20 @@
-# The reason this docker file is made and we did not use the generall one, is to save storage because it can use the
-# same ros1 and ros2 layers. Second reason is that we have smaller intermediate steps. This helps as the normal one is
-# very difficult to upload to gitlab due to its large dependency install steps.
+# The reason this docker file is made and we did not use the general one, is to save storage, as this docker can use the
+# same ros1 and ros2 layers. Second reason is that we have less intermediate steps. This helps, as the normal docker is
+# very difficult to upload to GitLab due to its large amount of dependency install steps.
 # date: 12-02-2021
 # author: George Vegelien
 
-# Uses the local ros2 image (if you don't have this checkout registry.gitlab.com/project-march/march/local:ros2)
+# Uses the local ros2 image (if you don't have this, checkout registry.gitlab.com/project-march/march/local:ros2)
 FROM ros2 as ros2_builder
 
 # The reason ros1 is done after ros2 is because ros1 is the bigger image, so less packages need to be copied over.
-# Note however the standalone size is smaller in reverse but more actual storage is used because of less cached layers
+# Note however that the standalone size seems smaller, but because there are less cached layers, it will take up more actual storage space.
 
-# Uses the local ros1 image (if you don't have this checkout registry.gitlab.com/project-march/march/local:ros1)
+# Uses the local ros1 image (if you don't have this, checkout registry.gitlab.com/project-march/march/local:ros1)
 FROM ros1 as ros1_builder
 
 
-# This sections copys all the ros2 relavent installed folders made in the local ros2 image.
+# This sections copies all the ros2 relevant installed folders made in the local ros2 image.
 COPY --from=ros2_builder /etc/apt/sources.list.d/ros2-latest.list /etc/apt/sources.list.d/ros2-latest.list
 COPY --from=ros2_builder /opt/ros/foxy /opt/ros/foxy
 COPY --from=ros2_builder /usr/local/sbin /usr/local/sbin
@@ -24,7 +24,7 @@ COPY --from=ros2_builder /usr/bin /usr/bin
 COPY --from=ros2_builder /bin /bin
 COPY --from=ros2_builder /sbin /sbin
 
-# Set all the bride enviromental variables
+# Set all the bridge environmental variables
 ENV ROS_VERSION 2
 ENV PKG_CONFIG_PATH /opt/ros/noetic/lib/pkgconfig:/opt/ros/noetic/lib/x86_64-linux-gnu/pkgconfig
 ENV ROS_PACKAGE_PATH /opt/ros/noetic/share
@@ -41,7 +41,7 @@ ENV ROS_ROOT /opt/ros/noetic/share/ros
 ENV ROS2_DISTRO foxy
 ENV ROS_DISTRO=foxy
 
-# Install the needed ros1, ros2 packages for the bride, and curl for the script ~/march/start_scripts/run/bridge.bash.
+# Install the needed ros1 and ros2 packages for the bridge, and curl for the script ~/march/start_scripts/run/bridge.bash.
 # See (https://github.com/osrf/docker_images/blob/d1e081089b3f7d8c118561b0f39998e7163a5f0a/ros/foxy/ubuntu/focal/ros1-bridge/Dockerfile)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-ros-comm=1.15.13-1* \
@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Installs all the ros2 deps that are new and/or not coppied over by copying all the folder specified above.
+# Installs all the ros2 dependencies that are new and/or not copied over by copying all the folders specified above.
 COPY ros2/src /march/src
 RUN apt-get update && rosdep update --rosdistro foxy && rosdep install --rosdistro foxy -y --from-paths /march/src --ignore-src
 # Remove march files to save space
