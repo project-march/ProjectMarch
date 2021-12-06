@@ -266,7 +266,7 @@ def solve_mid_position(
     """
     Solve inverse kinematics for the middle position. Assumes that the
     stance leg is straight. Takes the ankle_x and ankle_y position of the
-    desired middle position. Calculates the required hfe and kfe angles of 
+    desired middle position. Calculates the required hfe and kfe angles of
     the swing leg by making a triangle between the swing leg ankle, swing leg
     knee and the hip. Returns the calculated pose.
     """
