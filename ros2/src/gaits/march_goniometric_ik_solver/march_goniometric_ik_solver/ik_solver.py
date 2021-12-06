@@ -4,7 +4,13 @@ import time
 
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 import march_goniometric_ik_solver.triangle_angle_solver as tas
-from march_goniometric_ik_solver.goniometric_functions_degrees import cos, sin, asin
+from march_goniometric_ik_solver.goniometric_functions_degrees import (
+    cos,
+    sin,
+    asin,
+    atan,
+)
+
 
 # Constants:
 length_upper_leg = 41  # cm
@@ -253,7 +259,38 @@ def straighten_leg(pose):
     return pose
 
 
-def solve_ik(
+def solve_mid_position(
+    ankle_x,
+    ankle_y,
+):
+    """
+    Solve inverse kinematics for the middle position. Assumes that the
+    stance leg is straight. Takes the ankle_x and ankle_y position of the
+    desired middle position. Returns the calculated pose
+    """
+
+    hip_x = 0
+    hip_y = length_leg
+
+    # Calculate distance from ankle to hip with Pythagoras
+    diff_x = ankle_x - hip_x
+    diff_y = ankle_y - hip_y
+    len_ankle_to_hip = np.sqrt((diff_x ** 2) + (diff_y ** 2))
+
+    swing_leg_angles = tas.get_angles_from_sides(
+        [length_lower_leg, len_ankle_to_hip, length_upper_leg]
+    )
+
+    hfe_offset = atan(diff_x / diff_y)
+    swing_leg_hfe = swing_leg_angles[0] - hfe_offset
+    swing_leg_kfe = knee_zero_angle - swing_leg_angles[1]
+
+    pose = [0.0, 0.0, 0.0, 1.72, 1.72, swing_leg_hfe, swing_leg_kfe, 0.0]
+
+    return [np.deg2rad(angle) for angle in pose]
+
+
+def solve_end_position(
     ankle_x,
     ankle_y=0,
     max_ankle_flexion=default_max_ankle_flexion,

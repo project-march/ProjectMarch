@@ -20,11 +20,11 @@ import time
 
 class ToTrajectoryCommandNode(Node):
     def __init__(self):
-        print("initializing ToTrajectoryCommandNode")
         super().__init__("to_trajectory_command_node")
         self.ros_one_time = None
         self.current_state_msg = None
-        self.new_subgait_time = [0.2, 0.7, 1.7]
+        self.subgait_duration = 1.5
+        self.mid_point_frac = 0.33
         self.id = "right"
 
         self.get_ros_one_time = self.create_subscription(
@@ -69,14 +69,16 @@ class ToTrajectoryCommandNode(Node):
         """Generate a new trajectory command."""
         start_time = time.time()
 
-        desired_ankle_x = 40
+        desired_ankle_x = 29
+        desired_ankle_y = 3
         # Skip desired velocity for now
         trajectory = DynamicSubgait(
-            self.new_subgait_time,
+            self.subgait_duration,
+            self.mid_point_frac,
             self.current_state_msg,
             self.id,
             desired_ankle_x,
-            position_y=0,
+            position_y=desired_ankle_y,
         ).to_joint_trajectory_msg()
 
         # Send trajectory command to the topic listened to by the simulation
@@ -108,9 +110,7 @@ class ToTrajectoryCommandNode(Node):
             gait="walk",
             subgait=str(self.id + "_swing"),
             version="dynamic_walk_v1",
-            duration=Duration(
-                self.new_subgait_time[-1] - self.new_subgait_time[0]
-            ).to_msg(),
+            duration=Duration(self.subgait_duration).to_msg(),
             gait_type="walk_like",
         )
 
