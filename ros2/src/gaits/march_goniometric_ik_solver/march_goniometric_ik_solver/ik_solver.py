@@ -266,7 +266,9 @@ def solve_mid_position(
     """
     Solve inverse kinematics for the middle position. Assumes that the
     stance leg is straight. Takes the ankle_x and ankle_y position of the
-    desired middle position. Returns the calculated pose
+    desired middle position. Calculates the required hfe and kfe angles of 
+    the swing leg by making a triangle between the swing leg ankle, swing leg
+    knee and the hip. Returns the calculated pose.
     """
 
     hip_x = 0
@@ -281,10 +283,15 @@ def solve_mid_position(
         [length_lower_leg, len_ankle_to_hip, length_upper_leg]
     )
 
+    # The angle found with the triangle between the swing ankle/knee and the
+    # hip is not the same as the hfe angle, which is the angle between the
+    # upper leg of the stance leg and the upper leg of the swing leg.
     hfe_offset = atan(diff_x / diff_y)
+
     swing_leg_hfe = swing_leg_angles[0] - hfe_offset
     swing_leg_kfe = knee_zero_angle - swing_leg_angles[1]
 
+    # HAA ankle is fixed at 1.72 deg (0.03 rad) for now
     pose = [0.0, 0.0, 0.0, 1.72, 1.72, swing_leg_hfe, swing_leg_kfe, 0.0]
 
     return [np.deg2rad(angle) for angle in pose]
