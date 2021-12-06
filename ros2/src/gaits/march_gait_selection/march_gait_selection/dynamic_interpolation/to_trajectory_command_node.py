@@ -69,7 +69,7 @@ class ToTrajectoryCommandNode(Node):
         """Generate a new trajectory command."""
         start_time = time.time()
 
-        desired_ankle_x = 29
+        desired_ankle_x = 28
         desired_ankle_y = 3
         # Skip desired velocity for now
         trajectory = DynamicSubgait(
