@@ -60,7 +60,6 @@ class DynamicSubgait:
         """Returns the middle setpoint. Fixed for now.
         Should adapt dynamically in the future"""
         middle_position = solve_mid_position(position_x, position_y)
-        print(f"mid pos: {middle_position}")
         if self.swing_leg == "left":
             middle_position.reverse()
 
@@ -127,32 +126,45 @@ class DynamicSubgait:
 
     def to_joint_trajectory_msg(self):
         """Returns a joint_trajectory_msg which can be send to the exo"""
+        # Read current setpoint
         self.current_setpoint()
-        current_state_without_haa = self.current_state.actual.positions
+
+        # Solve for middle setpoint. solve_ik function cannot handle HAA yet
+        current_state_without_haa = []
+        for joint in self.joints:
+            current_state_without_haa.append(
+                np.rad2deg(self.current_setpoint_dict[joint].position)
+            )
+
+        del current_state_without_haa[4]
         del current_state_without_haa[3]
-        del current_state_without_haa[3]
-        current_stance_ankle_pos = calculate_joint_positions(
-            current_state_without_haa.tolist(), joint="pos_ankle1"
+
+        if self.swing_leg == "left":
+            current_state_without_haa.reverse()
+
+        swing_leg_ankle_pos = calculate_joint_positions(
+            current_state_without_haa, joint="pos_ankle2"
         )
-        current_swing_ankle_pos = calculate_joint_positions(
-            current_state_without_haa.tolist(), joint="pos_ankle2"
+
+        # Swing leg ankle position is relative to stance leg ankle position (0,0)
+        stance_swing_dis = np.sqrt(
+            swing_leg_ankle_pos[0] ** 2 + swing_leg_ankle_pos[1] ** 2
         )
 
         # Middle position x is weighted average of the current and desired setpoint,
         # relative to the stance leg ankle
-        stance_swing_dis = current_stance_ankle_pos[0] - current_swing_ankle_pos[0]
-        print(stance_swing_dis)
-        mid_pos_x = current_swing_ankle_pos[0] + self.mid_point_frac * self.position_x - stance_swing_dis
+        mid_pos_x = self.mid_point_frac * self.position_x - stance_swing_dis
 
         # Middle position y should always be heigher than the desired position y
         mid_pos_y = self.position_y + 10
 
-        print(f"midpos(xy): {mid_pos_x, mid_pos_y}")
-        self.middle_setpoint(-5, mid_pos_y)
+        self.middle_setpoint(mid_pos_x, mid_pos_y)
 
+        # Solve for desired setpoint
         self.desired_setpoint(self.position_x, position_y=self.position_y)
         self.to_joint_trajectory_class()
 
+        # Create joint_trajectory_msg
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joints
 
