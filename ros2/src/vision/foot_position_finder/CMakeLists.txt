@@ -32,7 +32,7 @@ add_library(${PROJECT_NAME}
     src/foot_position_finder.cpp
 )
 
-add_executable(foot_position_finder_node src/main.cpp)
+add_executable(foot_position_finder_node src/foot_position_finder_node.cpp)
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY})
 target_link_libraries(foot_position_finder_node ${PROJECT_NAME})

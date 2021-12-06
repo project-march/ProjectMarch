@@ -29,25 +29,23 @@ public:
 protected:
 
     PointCloud::Ptr pointcloud_;
-
+    std::vector<double> search_dimensions_;
     char left_or_right;
+
     int grid_resolution_ = RES;
     double cell_width = 1.0 / grid_resolution_;
 
     double height_map_[RES][RES];
-    int height_map_temp_[RES][RES];
+    double height_map_temp_[RES][RES];
     double derivatives_[RES][RES];
-
-    std::vector<double> search_dimensions_;
 
     double derivative_threshold_ = 0.03;
 
-    double optimal_foot_x_ = 0.2;
+    double optimal_foot_x_ = 0.0;
     double optimal_foot_y_ = 0.4;
 
     double foot_width_ = 0.10;
     double foot_length_ = 0.20;
-    
     int rect_width = ceil(foot_width_ / cell_width);
     int rect_height = ceil(foot_length_ / cell_width);
 
@@ -56,7 +54,12 @@ protected:
     double y_displacements_front = ceil(0.20 / cell_width);
     double y_displacements_far = ceil(0.05 / cell_width);
 
-    double available_points_ratio = 0.9;
+    double x_offset;
+    double y_offset;
+    double x_width;
+    double y_width;
+
+    double available_points_ratio = 0.85;
 
     bool mapPointCloudToHeightMap();
 
@@ -66,8 +69,8 @@ protected:
 
     bool convolveLaplacianKernel();
 
-    template<int R>
-    bool convolve2D(double kernel[3][3], double (&source)[R][R], double (&destination)[R][R]);
+    template<int K, int R>
+    bool convolve2D(double kernel[K][K], double (&source)[R][R], double (&destination)[R][R]);
 
     bool findFeasibleFootPlacements(std::vector<Point> *position_queue);    
 
