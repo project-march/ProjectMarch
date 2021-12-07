@@ -140,6 +140,9 @@
       "name": "error",
       "callback": "publish_error",
       "always_enabled": true
+    },
+    {
+      "name": "dynamic_walk"
     }
   ]
 ]

@@ -65,6 +65,7 @@ setup(
         package_name,
         "march_gait_selection.state_machine",
         "march_gait_selection.gaits",
+        "march_gait_selection.dynamic_interpolation",
     ],
     data_files=data_files(),
     install_requires=["setuptools"],

@@ -14,6 +14,8 @@ from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 
 from dynamic_subgait import DynamicSubgait
+from march_utility.gait.setpoint import Setpoint
+
 
 import time
 
@@ -26,18 +28,21 @@ class ToTrajectoryCommandNode(Node):
         self.current_state_msg = None
         self.new_subgait_time = [0.2, 0.7, 1.7]
         self.id = "right"
+        self.starting_position = {
+            "left_ankle": Setpoint(Duration(0), 0.0, 0),
+            "left_hip_aa": Setpoint(Duration(0), 0.0349, 0),
+            "left_hip_fe": Setpoint(Duration(0), -0.1745, 0),
+            "left_knee": Setpoint(Duration(0), 0.0, 0),
+            "right_ankle": Setpoint(Duration(0), 0.0, 0),
+            "right_hip_aa": Setpoint(Duration(0), 0.0349, 0),
+            "right_hip_fe": Setpoint(Duration(0), -0.1745, 0),
+            "right_knee": Setpoint(Duration(0), 0.0, 0),
+        }
 
         self.get_ros_one_time = self.create_subscription(
             msg_type=Clock,
             topic="/clock",
             callback=self.get_sim_time,
-            qos_profile=5,
-        )
-
-        self.read_current_state = self.create_subscription(
-            msg_type=JointTrajectoryControllerState,
-            topic="march/controller/trajectory/state",
-            callback=self.current_state_callback,
             qos_profile=5,
         )
 
@@ -62,21 +67,24 @@ class ToTrajectoryCommandNode(Node):
             nanoseconds=clock.nanosec,
         )
 
-    def current_state_callback(self, msg: JointTrajectoryControllerState):
-        self.current_state_msg = msg
+    def update_starting_position(self):
+        self.starting_position = self.dynamic_subgait.get_final_position()
+        print(f"updated starting position: {self.starting_position}")
 
     def to_trajectory_command(self):
         """Generate a new trajectory command."""
         start_time = time.time()
-        desired_ankle_x = 40
+        desired_ankle_x = 27
 
-        trajectory = DynamicSubgait(
+        self.dynamic_subgait = DynamicSubgait(
             self.new_subgait_time,
-            self.current_state_msg,
+            self.starting_position,
             self.id,
             desired_ankle_x,
             position_y=0,
-        ).to_joint_trajectory_msg()
+        )
+
+        trajectory = self.dynamic_subgait.to_joint_trajectory_msg()
 
         # Send trajectory command to the topic listened to by the simulation
         time_from_start = trajectory.points[-1].time_from_start
@@ -119,6 +127,8 @@ class ToTrajectoryCommandNode(Node):
             self.id = "left"
         elif self.id == "left":
             self.id = "right"
+
+        self.update_starting_position()
 
         print(f"--- {(time.time() - start_time)} seconds ---")
 
