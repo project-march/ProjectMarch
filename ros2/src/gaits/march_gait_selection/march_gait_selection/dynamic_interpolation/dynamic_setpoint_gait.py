@@ -99,11 +99,12 @@ class DynamicSetpointGait(GaitInterface):
 
     def start(self, current_time: Time) -> GaitUpdate:
         """Starts the gait"""
-        print("------------------------- Starting dynamic subgait")
         self._current_time = current_time
         self.subgait_id = "right_swing"
         self._start_time = self._current_time
+        print("------------------------- Starting id_to_trajectory_command")
         self._current_command = self.subgait_id_to_trajectory_command()
+        print("------------------------- Starting update_time_stamps")
         self._update_time_stamps(self._current_command)
         return GaitUpdate.should_schedule(self._current_command)
 
@@ -111,6 +112,10 @@ class DynamicSetpointGait(GaitInterface):
         """Give an update on the progress of the gait"""
         self._current_time = current_time
 
+        if self._end_time == None:
+            print("end time is none")
+        if self._current_time == None:
+            print("current time is none")
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
 
@@ -186,8 +191,10 @@ class DynamicSetpointGait(GaitInterface):
         desired_ankle_x = 27
         desired_ankle_y = 3
         mid_point_frac = 0.33
-        subgait_duration = Duration(1.5)
+        print("------------- Defining subgait_duration")
+        subgait_duration = [0.0, 0.5, 1.5]
 
+        print("------------- Defining dynamic_subgait")
         self.dynamic_subgait = DynamicSubgait(
             subgait_duration,
             self.start_position,
@@ -196,14 +203,19 @@ class DynamicSetpointGait(GaitInterface):
             position_y=desired_ankle_y,
         )
 
+        print("------------- Creating trajectory")
         trajectory = self.dynamic_subgait.to_joint_trajectory_msg()
 
+        print("------------- Creating current_subgait_duration")
         time_from_start = trajectory.points[-1].time_from_start
         current_subgait_duration = Duration.from_msg(time_from_start)
 
         # Update the starting position for the next command
+        print("------------- Update start pos")
         self.update_start_pos()
 
+        print("------------- Return")
+        print("------- _start_time type:", type(self._start_time))
         return TrajectoryCommand(
             trajectory,
             current_subgait_duration,
@@ -222,4 +234,4 @@ class DynamicSetpointGait(GaitInterface):
             self._start_time = self._end_time
         self._end_time = self._start_time + next_command.duration
         print(f"start_time: {type(self._start_time)}")
-        print(f"end_time type: {type(self.end_time)}")
+        print(f"end_time type: {type(self._end_time)}")
