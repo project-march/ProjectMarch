@@ -1,4 +1,4 @@
-from typing import Optional
+# from typing import Optional
 from rclpy.time import Time
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
@@ -36,10 +36,11 @@ class DynamicSetpointGait(GaitInterface):
             "right_hip_fe": Setpoint(Duration(0), -0.1745, 0),
             "right_knee": Setpoint(Duration(0), 0.0, 0),
         }
+        self.gait_name = "dynamic_gait_v0"
 
     @property
-    def name():
-        return "dynamic_gait_v0"
+    def name(self):
+        return self.gait_name
 
     @property
     def subgait_name(self):
@@ -48,7 +49,7 @@ class DynamicSetpointGait(GaitInterface):
         return self.subgait_id
 
     @property
-    def version():
+    def version(self):
         return "dynamic_subgait_v0"
 
     @property
@@ -68,10 +69,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
-        print(self.start_position)
-        return StaticEdgePosition(
-            self.setpoint_dict_to_joint_dict(self.start_position)
-        )
+        return StaticEdgePosition(self.setpoint_dict_to_joint_dict(self.start_position))
 
     @property
     def final_postion(self) -> EdgePosition:
@@ -85,7 +83,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
-        return True
+        return False
 
     def _reset(self):
         """Reset all attributes of the gait"""
@@ -101,6 +99,13 @@ class DynamicSetpointGait(GaitInterface):
 
     def start(self, current_time: Time) -> GaitUpdate:
         """Starts the gait"""
+        print("------------------------- Starting dynamic subgait")
+        self._current_time = current_time
+        self.subgait_id = "right_swing"
+        self._start_time = self._current_time
+        self._current_command = self.subgait_id_to_trajectory_command()
+        self._update_time_stamps(self._current_command)
+        return GaitUpdate.should_schedule(self._current_command)
 
     def update(self, current_time: Time) -> GaitUpdate:
         """Give an update on the progress of the gait"""
@@ -153,10 +158,10 @@ class DynamicSetpointGait(GaitInterface):
     def update_start_pos(self):
         self.start_position = self.dynamic_subgait.get_final_position()
 
-    def setpoint_dict_to_joint_dict(setpoint_dict):
+    def setpoint_dict_to_joint_dict(self, setpoint_dict):
         position = []
         for setpoint in setpoint_dict:
-            position.append(setpoint.position)
+            position.append(setpoint_dict[setpoint].position)
         joints = [
             "left_ankle",
             "left_knee",
@@ -167,15 +172,11 @@ class DynamicSetpointGait(GaitInterface):
             "right_knee",
             "right_ankle",
         ]
-        JointDict = {}
+        jointdict = {}
         for i in range(len(position)):
-            JointDict.update(
-                {
-                    joints[i]: position[i]
-                }
-            )
+            jointdict.update({joints[i]: position[i]})
 
-        return JointDict
+        return jointdict
 
     def subgait_id_to_trajectory_command(self) -> TrajectoryCommand:
         """Construct a TrajectoryCommand from the current subgait_id
@@ -189,7 +190,6 @@ class DynamicSetpointGait(GaitInterface):
 
         self.dynamic_subgait = DynamicSubgait(
             subgait_duration,
-            mid_point_frac,
             self.start_position,
             self.subgait_id,
             desired_ankle_x,
@@ -220,4 +220,6 @@ class DynamicSetpointGait(GaitInterface):
             self._start_time = self._current_time
         else:
             self._start_time = self._end_time
-        self.end_time = self._start_time + next_command.duration
+        self._end_time = self._start_time + next_command.duration
+        print(f"start_time: {type(self._start_time)}")
+        print(f"end_time type: {type(self.end_time)}")

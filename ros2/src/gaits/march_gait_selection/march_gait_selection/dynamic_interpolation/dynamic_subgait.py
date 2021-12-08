@@ -1,4 +1,6 @@
-from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory_setpoint import DynamicJointTrajectorySetpoint
+from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory_setpoint import (
+    DynamicJointTrajectorySetpoint,
+)
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from trajectory_msgs import msg as trajectory_msg

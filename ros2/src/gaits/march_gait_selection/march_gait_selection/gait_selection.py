@@ -416,6 +416,7 @@ class GaitSelection(Node):
 
         dynamic_gait = DynamicSetpointGait()
         gaits["dynamic_walk"] = dynamic_gait
+        self.get_logger().info("Added dynamic_walk to gaits")
 
         return gaits
 
