@@ -31,7 +31,10 @@ from urdf_parser_py import urdf
 
 from march_gait_selection.gaits.realsense_gait import RealsenseGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
+    DynamicSetpointGait,
+)
+
 NODE_NAME = "gait_selection"
 
 

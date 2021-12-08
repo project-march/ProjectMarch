@@ -411,7 +411,6 @@ class GaitStateMachine:
         # Schedule a new trajectory if any
         if gait_update.new_trajectory_command is not None:
             self._trajectory_scheduler.schedule(gait_update.new_trajectory_command)
-        
 
         # Process finishing of the gait
         if gait_update.is_finished:
