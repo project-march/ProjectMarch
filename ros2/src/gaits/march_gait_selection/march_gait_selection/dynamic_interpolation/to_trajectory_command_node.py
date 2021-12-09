@@ -9,7 +9,6 @@ from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import FollowJointTrajectoryGoal
 from march_shared_msgs.msg import FollowJointTrajectoryActionGoal
 from march_shared_msgs.msg import CurrentGait
-from control_msgs.msg import JointTrajectoryControllerState
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 
