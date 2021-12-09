@@ -102,7 +102,6 @@ class DynamicSetpointGait(GaitInterface):
         self.subgait_id = "right_swing"
         self._start_time = self._current_time
         self._current_command = self.subgait_id_to_trajectory_command()
-        self._update_time_stamps(self._current_command)
         return GaitUpdate.should_schedule(self._current_command)
 
     def update(self, current_time: Time) -> GaitUpdate:
@@ -123,8 +122,6 @@ class DynamicSetpointGait(GaitInterface):
         :return: optional trajectory_command, is_finished
         """
         next_command = self._get_next_command()
-
-        self._update_time_stamps(next_command)
         self._current_command = next_command
 
         return GaitUpdate.should_schedule(next_command)
@@ -183,7 +180,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         desired_ankle_x = 20
         desired_ankle_y = 3
-        subgait_duration = [0.0, 0.5, 1.5]
+        subgait_duration = [0, 0.5, 1.5]
 
         self.dynamic_subgait = DynamicSubgait(
             subgait_duration,
@@ -199,6 +196,7 @@ class DynamicSetpointGait(GaitInterface):
 
         # Update the starting position for the next command
         self.update_start_pos()
+        self._update_time_stamps(current_subgait_duration)
 
         return TrajectoryCommand(
             trajectory,
@@ -207,7 +205,7 @@ class DynamicSetpointGait(GaitInterface):
             self._start_time,
         )
 
-    def _update_time_stamps(self, next_command):
+    def _update_time_stamps(self, next_command_duration):
         """Update the starting and end time
 
         :param next_command: Next command to be scheduled
@@ -216,4 +214,4 @@ class DynamicSetpointGait(GaitInterface):
             self._start_time = self._current_time
         else:
             self._start_time = self._end_time
-        self._end_time = self._start_time + next_command.duration
+        self._end_time = self._start_time + next_command_duration

@@ -32,7 +32,7 @@ class DynamicSubgait:
         """Returns the middle setpoint. Fixed for now.
         Should adapt dynamically in the future"""
         self.middle_position = [0.0, 0.14, 0.1, 0.03, 0.03, 0.61, 1.17, 0.0]
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             self.middle_position.reverse()
 
         self.middle_setpoint_dict = self.from_list_to_setpoint(
@@ -47,7 +47,7 @@ class DynamicSubgait:
         Position is defined in centimeters and takes two argurments:
         forward distance and height. Ankle RoM should be given in degrees"""
         self.desired_position = solve_ik(position_x, position_y)
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             self.desired_position.reverse()
 
         if self.desired_position[0] > 0.1745 or self.desired_position[-1] > 0.1745:
