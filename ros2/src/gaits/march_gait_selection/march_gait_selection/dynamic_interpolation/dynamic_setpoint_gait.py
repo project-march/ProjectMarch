@@ -107,7 +107,7 @@ class DynamicSetpointGait(GaitInterface):
     def update(self, current_time: Time) -> GaitUpdate:
         """Give an update on the progress of the gait"""
         self._current_time = current_time
-
+        print("Help the pipeline is failing")
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
 
