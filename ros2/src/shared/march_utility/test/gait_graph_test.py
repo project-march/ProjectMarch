@@ -56,7 +56,7 @@ class TestGaitGraph(unittest.TestCase):
             self.stand_position: {"simple_gait"},
             self.gait_selection._gaits["home_stand"].starting_position: {"home_stand"},
         }
-        self.assertTrue(len(self.gait_selection._gaits) == 2)
+        self.assertEqual(len(self.gait_selection._gaits), 2)
         self.assertEqual(expected_idle_transitions, gait_graph._idle_transitions)
 
     def test_validate_transitions_true(self):
