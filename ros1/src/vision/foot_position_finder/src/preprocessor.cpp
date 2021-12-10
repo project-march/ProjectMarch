@@ -7,6 +7,7 @@
 #include <pcl/common/transforms.h> 
 #include <pcl/filters/extract_indices.h> 
 #include <math.h>
+#include <ros/console.h>
 
 
 using Point = pcl::PointXYZ;
@@ -21,13 +22,17 @@ Preprocessor::Preprocessor(PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcl
 
 NormalsPreprocessor::NormalsPreprocessor(PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud)
     : Preprocessor(pointcloud, normalcloud)
-    {}
+    {
+        tfBuffer = std::make_unique<tf2_ros::Buffer>();
+        tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+    }
 
 bool NormalsPreprocessor::preprocess()
 {
     voxelDownSample(0.01);
     // estimateNormals(1);
-    transformPointsToOrigin();
+    transformPointCloudFromUrdf();
+    // transformPointsToOrigin();
     filterOnDistance(-1, 1, -1, 1, -1, 1);
     return true;
 }
@@ -61,7 +66,9 @@ bool NormalsPreprocessor::transformPointsToOrigin()
     // transform.rotate(Eigen::AngleAxisf(-M_PI/2, Eigen::Vector3f::UnitZ()));
     // transform.rotate(Eigen::AngleAxisf(-M_PI/4*3, Eigen::Vector3f::UnitY()));
 
-    transform.rotate(Eigen::AngleAxisf(-M_PI/4*3, Eigen::Vector3f::UnitX()));
+    // transform.rotate(Eigen::AngleAxisf(-M_PI/4*3, Eigen::Vector3f::UnitX()));
+    // transform.rotate(Eigen::AngleAxisf(-61/180 * M_PI, Eigen::Vector3f::UnitY()));
+    
 
 
     // transform.translation() << 0, -0.0725, 0;
@@ -97,5 +104,28 @@ bool NormalsPreprocessor::filterOnDistance(int x_min, int x_max, int y_min, int 
     extract.setIndices(remove_indices);
     extract.setNegative(true);
     extract.filter(*pointcloud_);
+    return true;
+}
+
+
+bool NormalsPreprocessor::transformPointCloudFromUrdf()
+{
+    geometry_msgs::TransformStamped transform_stamped;
+    try {
+        pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
+        if (tfBuffer->canTransform("world", pointcloud_frame_id, ros::Time(), ros::Duration(1.0))) {
+            transform_stamped = tfBuffer->lookupTransform("world", pointcloud_frame_id, ros::Time(0));
+        }
+        std::cout << transform_stamped.transform.translation << std::endl;
+        std::cout << transform_stamped.transform.rotation << std::endl;
+        pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_, transform_stamped.transform);
+    } catch (tf2::TransformException& ex) {
+        ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: " << ex.what());
+        return false;
+    }
+    
+    Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+    transform.rotate(Eigen::AngleAxisf(-M_PI/2, Eigen::Vector3f::UnitZ()));
+    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
     return true;
 }

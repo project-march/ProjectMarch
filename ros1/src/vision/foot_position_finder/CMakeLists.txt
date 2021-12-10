@@ -36,8 +36,6 @@ find_package(catkin REQUIRED COMPONENTS
     dynamic_reconfigure
 )
 
-# find_library(realsense2_LIBRARIES realsense2)
-
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 catkin_package(
@@ -60,6 +58,7 @@ include_directories(
 
 add_library(${PROJECT_NAME}
     src/preprocessor.cpp
+    src/point_finder.cpp
     src/foot_position_finder.cpp
 )
 

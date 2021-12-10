@@ -1,12 +1,14 @@
-#ifndef MARCH_HEIGHT_MAP_GENERATOR_H
-#define MARCH_HEIGHT_MAP_GENERATOR_H
-
-#define RES 70
+#ifndef MARCH_FOOT_POSITION_FINDER_H
+#define MARCH_FOOT_POSITION_FINDER_H
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <cmath>
 #include <vector>
+#include <sensor_msgs/PointCloud2.h>
+#include <ros/ros.h>
+#include <librealsense2/rs.hpp>
+
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -14,66 +16,49 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class FootPositionFinder {
 public:
 
-    explicit FootPositionFinder(PointCloud::Ptr pointcloud,
-                                std::vector<double>& search_dimensions,
-                                char left_or_right);
+    explicit FootPositionFinder(ros::NodeHandle* n, bool realsense, char left_or_right);
 
     ~FootPositionFinder() = default;
 
-    bool findFootPositions(std::vector<Point> *position_queue);
-
-    double (*getDerivatives())[RES];
-
-    double (*getHeights())[RES];
-
 protected:
 
-    PointCloud::Ptr pointcloud_;
-    std::vector<double> search_dimensions_;
-    char left_or_right;
+    bool processRealSenseDepthFrames();
 
-    int grid_resolution_ = RES;
-    double cell_width = 1.0 / grid_resolution_;
+    void processSimulatedDepthFrames(const sensor_msgs::PointCloud2 input_cloud);
 
-    double height_map_[RES][RES];
-    double height_map_temp_[RES][RES];
-    double derivatives_[RES][RES];
+    bool processPointCloud(PointCloud::Ptr pointcloud);
 
-    double derivative_threshold_ = 0.03;
+    bool computeTemporalAveragePoint(Point &new_point);
 
-    double optimal_foot_x_ = 0.0;
-    double optimal_foot_y_ = 0.4;
+    bool publishNextPoint(Point &p);
 
-    double foot_width_ = 0.10;
-    double foot_length_ = 0.20;
-    int rect_width = ceil(foot_width_ / cell_width);
-    int rect_height = ceil(foot_length_ / cell_width);
+    void publishCloud(const ros::Publisher& publisher, PointCloud cloud);
 
-    double x_displacements_left = ceil(0.05 / cell_width);
-    double x_displacements_right = ceil(0.10 / cell_width);
-    double y_displacements_front = ceil(0.20 / cell_width);
-    double y_displacements_far = ceil(0.05 / cell_width);
 
-    double x_offset;
-    double y_offset;
-    double x_width;
-    double y_width;
+    rs2::pipeline pipe;
+    rs2::config cfg;
 
-    double available_points_ratio = 0.85;
+    rs2::decimation_filter dec_filter;
+    rs2::spatial_filter spat_filter;
+    rs2::temporal_filter temp_filter;
 
-    bool mapPointCloudToHeightMap();
+    bool realsense_;
 
-    bool interpolateMap();
+    ros::NodeHandle* n_;
 
-    bool convolveGaussianKernel();
+    ros::Publisher point_publisher_;
+    ros::Subscriber pointcloud_subscriber_;
 
-    bool convolveLaplacianKernel();
+    std::string TOPIC_CAMERA_FRONT_LEFT = "/camera_front_left/depth/color/points";
+    std::string TOPIC_CAMERA_FRONT_RIGHT = "/camera_front_right/depth/color/points";
+    std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 
-    template<int K, int R>
-    bool convolve2D(double kernel[K][K], double (&source)[R][R], double (&destination)[R][R]);
+    std::vector<Point> found_points_;
+    int sample_size_ = 5;
+    char left_or_right_;
 
-    bool findFeasibleFootPlacements(std::vector<Point> *position_queue);    
+    ros::Publisher preprocessed_pointcloud_publisher_;
 
 };
 
-#endif // MARCH_HEIGHT_MAP_GENERATOR_H
+#endif // MARCH_FOOT_POSITION_FINDER_H

@@ -1,166 +1,168 @@
+#include "std_msgs/String.h"
+#include "utilities/realsense_to_pcl.hpp"
+#include "preprocessor.h"
+#include "point_finder.h"
+#include "foot_position_finder.h"
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/point_cloud.h>
+#include <ros/console.h>
+#include <string>
 #include <iostream>
-#include <foot_position_finder.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include <iomanip>
 
-using Point = pcl::PointXYZ;
-using PointCloud = pcl::PointCloud<Point>;
 
-FootPositionFinder::FootPositionFinder(PointCloud::Ptr pointcloud,
-                                       std::vector<double>& search_dimensions,
-                                       char left_or_right)
-    : pointcloud_ { pointcloud },
-      search_dimensions_ { search_dimensions },
-      left_or_right { left_or_right }
+FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense, char left_or_right)
+    : n_(n)
+    , realsense_(realsense)
+    , left_or_right_(left_or_right)
+{
+
+    if (left_or_right_ == 'l')
     {
-        memset(height_map_, -5, sizeof(double) * grid_resolution_ * grid_resolution_);
-        memset(height_map_temp_, -5, sizeof(double) * grid_resolution_ * grid_resolution_);
-        memset(derivatives_, 1, sizeof(double) * grid_resolution_ * grid_resolution_);
+        point_publisher_ = n_->advertise<std_msgs::String>("/foot_position/left", 1);
+        preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera_left/preprocessed_cloud", 1);
+    }
+    else
+    {
+        point_publisher_ = n_->advertise<std_msgs::String>("/foot_position/right", 1);
+        preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera_right/preprocessed_cloud", 1);
+    }
 
-        if (rect_width % 2 == 0) rect_width--;
-        if (rect_height % 2 == 0) rect_height--;
-        if (left_or_right == 'l')
-        {
-            optimal_foot_x_ *= -1;
-            auto temp = x_displacements_left;
-            x_displacements_left = x_displacements_right;
-            x_displacements_right = temp;
+    if (realsense)
+    {
+        cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
+        pipe.start(cfg);
+        processRealSenseDepthFrames();
+    }
+    else
+    {
+        if (left_or_right_ == 'l')
+            pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(TOPIC_CAMERA_FRONT_LEFT, 1, &FootPositionFinder::processSimulatedDepthFrames, this);
+        else
+            pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(TOPIC_CAMERA_FRONT_RIGHT, 1, &FootPositionFinder::processSimulatedDepthFrames, this);
+    }
+}
+
+
+bool FootPositionFinder::processRealSenseDepthFrames()
+{
+    while (ros::ok())
+    {
+        rs2::frameset frames = pipe.wait_for_frames();
+        rs2::depth_frame depth = frames.get_depth_frame();
+
+        depth = dec_filter.process(depth);
+        depth = spat_filter.process(depth);
+        depth = temp_filter.process(depth);
+
+        rs2::pointcloud pc;
+        rs2::points points = pc.calculate(depth);
+
+        PointCloud::Ptr pointcloud = points_to_pcl(points);
+        processPointCloud(pointcloud);
+        ros::spinOnce();
+        return true;
+    }
+    return true;
+}
+
+void FootPositionFinder::processSimulatedDepthFrames(const sensor_msgs::PointCloud2 input_cloud)
+{    
+    PointCloud converted_cloud;
+    pcl::fromROSMsg(input_cloud, converted_cloud);
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
+    processPointCloud(pointcloud);
+}
+
+
+bool FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
+{
+    ROS_INFO("Processing");
+    NormalCloud::Ptr normalcloud(new NormalCloud());
+    NormalsPreprocessor preprocessor(pointcloud, normalcloud);
+    preprocessor.preprocess();
+
+    publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
+
+    std::vector<double> search_region = {-0.5, 0.5, 0, 1, -2, 2};
+    PointFinder pointFinder(pointcloud, search_region, left_or_right_);
+    std::vector<Point> position_queue;
+    pointFinder.findPoints(&position_queue);
+
+    if (position_queue.size() > 0) {
+        ROS_INFO("Found!");
+        Point p = position_queue[0];
+        computeTemporalAveragePoint(p);
+    }
+    return true;
+}
+
+
+bool FootPositionFinder::computeTemporalAveragePoint(Point &new_point)
+{
+    if (found_points_.size() < sample_size_)
+        found_points_.push_back(new_point);
+    else
+    {
+        std::rotate(found_points_.begin(), found_points_.begin() + 1, found_points_.end());
+        found_points_[sample_size_-1] = new_point;
+
+        double x_avg = 0, y_avg = 0, z_avg = 0;
+
+        for (Point &p : found_points_) {
+            x_avg += new_point.x; y_avg += new_point.y; z_avg += new_point.z;
         }
 
-        x_offset = -search_dimensions_[0];
-        y_offset = -search_dimensions_[2];
-        x_width = search_dimensions_[1] - search_dimensions_[0];
-        y_width = search_dimensions_[3] - search_dimensions_[2];
-    }
+        x_avg /= sample_size_; y_avg /= sample_size_; z_avg /= sample_size_;
+        Point avg(x_avg, y_avg, z_avg);
 
-bool FootPositionFinder::findFootPositions(std::vector<Point> *position_queue)
-{
-    mapPointCloudToHeightMap();
-    convolveGaussianKernel();
-    convolveLaplacianKernel();
-    findFeasibleFootPlacements(position_queue);
-    return true;
-}
+        std::vector<Point> non_outliers;
 
-bool FootPositionFinder::mapPointCloudToHeightMap()
-{
-    for (std::size_t i = 0; i < pointcloud_->size(); i++)
-    {
-        auto p = pointcloud_->points[i];
-        
-        int x_index = (int) ((p.x + x_offset) / x_width * grid_resolution_);
-        int y_index = (int) ((p.y + y_offset) / y_width * grid_resolution_);
-
-        auto current_height = height_map_temp_[grid_resolution_ - y_index][x_index];
-        height_map_temp_[grid_resolution_ - y_index][x_index] = std::max(current_height, (double) p.z);
-    }
-    return true;
-}
-
-bool FootPositionFinder::interpolateMap()
-{
-    for (int i = 0; i < grid_resolution_; i++)
-        for (int j = 0; j < grid_resolution_; j++)
-            if (height_map_[i][j] == 0.0)
-                height_map_[i][j] = (height_map_[i + 1][j]
-                                   + height_map_[i - 1][j]
-                                   + height_map_[i][j + 1]
-                                   + height_map_[i][j - 1]) / 4.0;
-    return true;
-}
-
-bool FootPositionFinder::convolveGaussianKernel()
-{
-    double gaussian[3][3] =
-        {{1.0/16, 2.0/16, 1.0/16},
-         {2.0/16, 4.0/16, 2.0/16},
-         {1.0/16, 2.0/16, 1.0/16}};
-
-    convolve2D(gaussian, height_map_temp_, height_map_);
-    return true;
-}
-
-
-bool FootPositionFinder::convolveLaplacianKernel()
-{
-    double laplacian[3][3] =
-        {{1/6.0,   4/6.0, 1/6.0},
-         {4/6.0, -20/6.0, 4/6.0},
-         {1/6.0,   4/6.0, 1/6.0}};
-
-    convolve2D(laplacian, height_map_, derivatives_);
-    return true;
-}
-
-template<int K, int R>
-bool FootPositionFinder::convolve2D(double kernel[K][K], double (&source)[R][R], double (&destination)[R][R])
-{
-    for (int i = K/2; i < R - K/2; i++)
-    {
-        for (int j = K/2; j < R - K/2; j++)
-        {
-            double sum = 0;
-            for (int a = 0; a < K; a++)
-                for (int b = 0; b < K; b++)
-                    sum += kernel[a][b] * source[i+(a-1)][j+(b-1)];
-            destination[i][j] = sum;
+        for (Point &p : found_points_) {
+            if (sqrt(pow(p.x - avg.x, 2) + pow(p.y - avg.y, 2) +  pow(p.z - avg.z, 2)) < 0.05)
+                non_outliers.push_back(p);
         }
-    }
-    return true;
-}
+        if (non_outliers.size() < sample_size_)
+            std::cout << non_outliers.size() << std::endl;
 
-bool FootPositionFinder::findFeasibleFootPlacements(std::vector<Point> *position_queue)
-{
-    std::vector<int> x_displacements;
-    std::vector<int> y_displacements;
-
-    for (int y =  0; y >= -y_displacements_front; y--) y_displacements.push_back(y);
-    for (int y =  1; y <=  y_displacements_far  ; y++) y_displacements.push_back(y);
-
-    if (left_or_right == 'l') {    
-        for (int x = 0; x >= -x_displacements_left ; x--) x_displacements.push_back(x);
-        for (int x = 1; x <=  x_displacements_right; x++) x_displacements.push_back(x);
-    } else if (left_or_right == 'r') {   
-        for (int x =  0; x <=  x_displacements_right; x++) x_displacements.push_back(x);
-        for (int x = -1; x >= -x_displacements_left ; x--) x_displacements.push_back(x);
-    }
-
-    for (auto &x_shift : x_displacements)
-    {
-        for (auto &y_shift : y_displacements)
-        {
-            int num_free_cells = 0;
-            int x_opt = (int) ((optimal_foot_x_ + x_offset) / x_width * grid_resolution_) + x_shift;
-            int y_opt = (int) ((optimal_foot_y_ + y_offset) / y_width * grid_resolution_) - y_shift;
-
-            for (int x = x_opt - rect_width/2; x < x_opt + rect_width/2.0; x++)
-            {
-                for (int y = y_opt - rect_height/2; y < y_opt + rect_height/2.0; y++)
-                {
-                    if (std::abs(derivatives_[y][x]) < derivative_threshold_)
-                        num_free_cells++;
-                }
-            }
-
-            if (num_free_cells >= rect_height * rect_width * available_points_ratio)
-            {
-                double x = ((double) x_opt / grid_resolution_) - x_offset + cell_width/2.0;
-                double y = ((double) (grid_resolution_ - y_opt) / grid_resolution_) - y_offset - cell_width/2.0;
-                double z = height_map_[y_opt][x_opt];
-                position_queue->push_back(Point(x, y, z));
-            }
+        x_avg = 0, y_avg = 0, z_avg = 0;
+        for (Point &p : non_outliers) {
+            x_avg += p.x; y_avg += p.y; z_avg += p.z;
         }
+        x_avg /= sample_size_; y_avg /= sample_size_; z_avg /= sample_size_;
+        Point found_point(x_avg, y_avg, z_avg);
+
+        if (non_outliers.size() == sample_size_)
+            publishNextPoint(found_point);
     }
     return true;
 }
 
-double (*FootPositionFinder::getDerivatives())[RES]
+bool FootPositionFinder::publishNextPoint(Point &p)
 {
-    return derivatives_;
+    if (left_or_right_ == 'l')
+    {
+        ROS_INFO("Left point: (%d, %d, %d)", p.data[0], p.data[1], p.data[2]);
+    }
+    else if (left_or_right_ == 'r')
+    {
+        ROS_INFO("Right point: (%d, %d, %d)", p.data[0], p.data[1], p.data[2]);
+    }
+    return true;
 }
 
-double (*FootPositionFinder::getHeights())[RES]
+
+void FootPositionFinder::publishCloud(const ros::Publisher& publisher, PointCloud cloud)
 {
-    return height_map_;
+    cloud.width = 1;
+    cloud.height = cloud.points.size();
+
+    sensor_msgs::PointCloud2 msg;
+
+    pcl::toROSMsg(cloud, msg);
+
+    msg.header.frame_id = "world";
+    msg.header.stamp = ros::Time::now();
+
+    publisher.publish(msg);
 }
+
