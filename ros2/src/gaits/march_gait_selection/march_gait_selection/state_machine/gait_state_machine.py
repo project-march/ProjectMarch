@@ -321,7 +321,9 @@ class GaitStateMachine:
                 gait is not None
                 and gait_name
                 in self._gait_graph.possible_gaits_from_idle(self._current_state)
+                or gait_name == "dynamic_walk"
             ):
+                self._gait_selection.get_logger().warn(f"gait type: {type(gait)}")
                 if (
                     isinstance(gait.starting_position, DynamicEdgePosition)
                     and gait.starting_position != self._current_state
@@ -361,6 +363,7 @@ class GaitStateMachine:
                     now, self._gait_selection._first_subgait_delay
                 )
             else:
+                self._gait_selection.get_logger().info("Starting gait...")
                 gait_update = self._current_gait.start(now)
 
             if gait_update == GaitUpdate.empty():
@@ -411,6 +414,7 @@ class GaitStateMachine:
 
         # Process finishing of the gait
         if gait_update.is_finished:
+            self._gait_selection.get_logger().info("gait.update.is_finished")
             self._current_state = self._current_gait.final_position
             self._current_gait.end()
             self._input.gait_finished()

@@ -1,4 +1,6 @@
-from dynamic_joint_trajectory_setpoint import DynamicJointTrajectorySetpoint
+from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory_setpoint import (
+    DynamicJointTrajectorySetpoint,
+)
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
@@ -9,7 +11,7 @@ from march_goniometric_ik_solver.ik_solver import solve_ik
 class DynamicSubgait:
     """class that reads setpoints and returns list of jointtrajectories"""
 
-    def __init__(self, time, current_state, swing_leg, position_x, position_y=0):
+    def __init__(self, time, starting_position, swing_leg, position_x, position_y=0):
         self.joints = [
             "left_ankle",
             "left_knee",
@@ -21,27 +23,16 @@ class DynamicSubgait:
             "right_ankle",
         ]
         self.time = time
-        self.current_state = current_state
+        self.starting_position = starting_position
         self.position_x = position_x
         self.position_y = position_y
         self.swing_leg = swing_leg
-
-    def current_setpoint(self):
-        """Reads current state of the robot"""
-        # Current state velocity readings not correct. Sometimes reported high
-        # velocities in the ankle joints, which leads to invalid gaits
-        self.current_setpoint_dict = self.from_list_to_setpoint(
-            self.current_state.joint_names,
-            self.current_state.actual.positions,
-            None,
-            self.time[0],
-        )
 
     def middle_setpoint(self):
         """Returns the middle setpoint. Fixed for now.
         Should adapt dynamically in the future"""
         self.middle_position = [0.0, 0.14, 0.1, 0.03, 0.03, 0.61, 1.17, 0.0]
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             self.middle_position.reverse()
 
         self.middle_setpoint_dict = self.from_list_to_setpoint(
@@ -56,7 +47,7 @@ class DynamicSubgait:
         Position is defined in centimeters and takes two argurments:
         forward distance and height. Ankle RoM should be given in degrees"""
         self.desired_position = solve_ik(position_x, position_y)
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             self.desired_position.reverse()
 
         if self.desired_position[0] > 0.1745 or self.desired_position[-1] > 0.1745:
@@ -71,36 +62,22 @@ class DynamicSubgait:
             self.joints, self.desired_position, None, self.time[2]
         )
 
+    def get_final_position(self):
+        # SHOULD FIX FIXED TIME DELAY OF 0.2 SEC
+        return self.from_list_to_setpoint(
+            self.joints, self.desired_position, None, self.time[0]
+        )
+
     def to_joint_trajectory_class(self):
         """Returns a list of JointTrajectory classes containing
         the setpoints for each joint"""
-        # fix hardcoded haa/false current state readings
-        self.current_setpoint_dict.update(
-            {
-                "right_hip_aa": Setpoint(
-                    Duration(0.2),
-                    0.03,
-                    0.0,
-                )
-            }
-        )
-
-        self.current_setpoint_dict.update(
-            {
-                "left_hip_aa": Setpoint(
-                    Duration(0.2),
-                    0.03,
-                    0.0,
-                )
-            }
-        )
 
         self.joint_trajectory_list = []
         for name in self.joints:
             self.joint_trajectory_list.append(
                 DynamicJointTrajectorySetpoint(
                     [
-                        self.current_setpoint_dict[name],
+                        self.starting_position[name],
                         self.middle_setpoint_dict[name],
                         self.desired_setpoint_dict[name],
                     ]
@@ -109,18 +86,9 @@ class DynamicSubgait:
 
     def to_joint_trajectory_msg(self):
         """Returns a joint_trajectory_msg which can be send to the exo"""
-        self.current_setpoint()
         self.middle_setpoint()
         self.desired_setpoint(self.position_x, position_y=self.position_y)
         self.to_joint_trajectory_class()
-
-        print(
-            f"Current HAA: {self.current_setpoint_dict['right_hip_aa']}",
-            "\n",
-            f"Middle HAA: {self.middle_setpoint_dict['right_hip_aa']}",
-            "\n" f"Desired HAA: {self.desired_setpoint_dict['right_hip_aa']}",
-            "\n",
-        )
 
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joints
