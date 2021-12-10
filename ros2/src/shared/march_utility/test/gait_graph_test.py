@@ -27,6 +27,7 @@ class TestGaitGraph(unittest.TestCase):
             directory="test/resources/gait_graph_gaits",
             robot=self.robot,
             balance=False,
+            dynamic_gait=False,
         )
 
     def test_make_named_position(self):

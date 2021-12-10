@@ -41,11 +41,19 @@ NODE_NAME = "gait_selection"
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
-    def __init__(self, gait_package=None, directory=None, robot=None, balance=None):
+    def __init__(
+        self,
+        gait_package=None,
+        directory=None,
+        robot=None,
+        balance=None,
+        dynamic_gait=None,
+    ):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
         self._balance_used = False
+        self._dynamic_gait = False
         try:
             # Initialize all parameters once, and set up a callback for dynamically
             # reconfiguring
@@ -64,6 +72,11 @@ class GaitSelection(Node):
             if balance is None:
                 self._balance_used = (
                     self.get_parameter("balance").get_parameter_value().bool_value
+                )
+
+            if dynamic_gait is None:
+                self._dynamic_gait = (
+                    self.get_parameter("dynamic_gait").get_parameter_value().bool_value
                 )
 
             self._early_schedule_duration = self._parse_duration_parameter(
@@ -417,9 +430,10 @@ class GaitSelection(Node):
                 self.get_logger().info("Successfully created a balance gait")
                 gaits["balanced_walk"] = balance_gait
 
-        dynamic_gait = DynamicSetpointGait()
-        gaits["dynamic_walk"] = dynamic_gait
-        self.get_logger().info("Added dynamic_walk to gaits")
+        if self._dynamic_gait:
+            dynamic_gait = DynamicSetpointGait()
+            gaits["dynamic_walk"] = dynamic_gait
+            self.get_logger().info("Added dynamic_walk to gaits")
 
         return gaits
 
