@@ -287,7 +287,6 @@ def solve_mid_position(
     # hip is not the same as the hfe angle, which is the angle between the
     # upper leg of the stance leg and the upper leg of the swing leg.
     hfe_offset = atan(diff_x / diff_y)
-
     swing_leg_hfe = swing_leg_angles[0] - hfe_offset
     swing_leg_kfe = knee_zero_angle - swing_leg_angles[1]
 
