@@ -20,7 +20,6 @@
   <exec_depend>urdfdom_py</exec_depend>
   <test_depend>python3-pytest</test_depend>
   <exec_depend>rclpy</exec_depend>
-  <exec_depend>march_goniometric_ik_solver</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
