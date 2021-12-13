@@ -179,10 +179,12 @@ class DynamicSetpointGait(GaitInterface):
         """
         desired_ankle_x = 20
         desired_ankle_y = 3
-        subgait_duration = [0, 0.5, 1.5]
+        subgait_duration = 1.5
+        mid_point_frac = 0.33
 
         self.dynamic_subgait = DynamicSubgait(
             subgait_duration,
+            mid_point_frac,
             self.start_position,
             self.subgait_id,
             desired_ankle_x,

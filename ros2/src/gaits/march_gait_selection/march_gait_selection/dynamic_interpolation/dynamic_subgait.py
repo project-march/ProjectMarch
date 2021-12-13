@@ -1,6 +1,8 @@
 import numpy as np
 
-from dynamic_joint_trajectory_setpoint import DynamicJointTrajectorySetpoint
+from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory_setpoint import (
+    DynamicJointTrajectorySetpoint,
+)
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
@@ -18,7 +20,7 @@ class DynamicSubgait:
         self,
         duration,
         mid_point_frac,
-        current_state,
+        starting_position,
         swing_leg,
         position_x,
         position_y=0,
@@ -40,7 +42,7 @@ class DynamicSubgait:
             self.delay + duration,
         ]
         self.mid_point_frac = mid_point_frac
-        self.current_state = current_state
+        self.starting_position = starting_position
         self.position_x = position_x
         self.position_y = position_y
         self.swing_leg = swing_leg
@@ -63,18 +65,18 @@ class DynamicSubgait:
         """Calls IK solver to compute setpoint from CoViD location.
         Position is defined in centimeters and takes two argurments:
         forward distance and height. Ankle RoM should be given in degrees"""
-        desired_position = solve_end_position(position_x, position_y)
+        self.desired_position = solve_end_position(position_x, position_y)
         if self.swing_leg == "left_swing":
-            desired_position.reverse()
+            self.desired_position.reverse()
 
-        if desired_position[0] > 0.1745 or desired_position[-1] > 0.1745:
-            dorsiflexion = max([desired_position[0], desired_position[-1]]) / 3.14 * 180
+        if self.desired_position[0] > 0.1745 or self.desired_position[-1] > 0.1745:
+            dorsiflexion = max([self.desired_position[0], self.desired_position[-1]]) / 3.14 * 180
             print(
                 f"Dorsiflexion bigger than 10 degrees: {round(dorsiflexion, 1)} degrees",
             )
 
         self.desired_setpoint_dict = self.from_list_to_setpoint(
-            self.joints, desired_position, None, self.time[2]
+            self.joints, self.desired_position, None, self.time[2]
         )
 
     def get_final_position(self):
@@ -101,24 +103,21 @@ class DynamicSubgait:
 
     def to_joint_trajectory_msg(self):
         """Returns a joint_trajectory_msg which can be send to the exo"""
-        # Read current setpoint
-        self.current_setpoint()
-
         # Solve for middle setpoint. solve_ik function cannot handle HAA yet
-        current_state_without_haa = []
+        starting_position_without_haa = []
         for joint in self.joints:
-            current_state_without_haa.append(
-                np.rad2deg(self.current_setpoint_dict[joint].position)
+            starting_position_without_haa.append(
+                np.rad2deg(self.starting_position[joint].position)
             )
 
-        del current_state_without_haa[4]
-        del current_state_without_haa[3]
+        del starting_position_without_haa[4]
+        del starting_position_without_haa[3]
 
         if self.swing_leg == "left_swing":
-            current_state_without_haa.reverse()
+            starting_position_without_haa.reverse()
 
         swing_leg_ankle_pos = calculate_joint_positions(
-            current_state_without_haa, joint="pos_ankle2"
+            starting_position_without_haa, joint="pos_ankle2"
         )
 
         # Swing leg ankle position is relative to stance leg ankle position (0,0)
