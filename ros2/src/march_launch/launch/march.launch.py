@@ -38,6 +38,7 @@ def generate_launch_description():
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
+    dynamic_gait = LaunchConfiguration("dynamic_gait")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -166,6 +167,11 @@ def generate_launch_description():
                 description="Whether balance is being used.",
             ),
             DeclareLaunchArgument(
+                name="dynamic_gait",
+                default_value="False",
+                description="Wether dynamic_setpoint_gait is enabled",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -250,6 +256,7 @@ def generate_launch_description():
                     ("use_sim_time", use_sim_time),
                     ("gait_package", gait_package),
                     ("balance", balance),
+                    ("dynamic_gait", dynamic_gait),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
                     ("timer_period", timer_period),

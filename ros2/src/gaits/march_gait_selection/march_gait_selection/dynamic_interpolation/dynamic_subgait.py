@@ -33,7 +33,7 @@ class DynamicSubgait:
             "right_knee",
             "right_ankle",
         ]
-        self.delay = 0.2
+        self.delay = 0
         self.time = [
             self.delay,
             self.delay + mid_point_frac * duration,
@@ -45,22 +45,11 @@ class DynamicSubgait:
         self.position_y = position_y
         self.swing_leg = swing_leg
 
-    def current_setpoint(self):
-        """Reads current state of the robot"""
-        # Current state velocity readings not correct. Sometimes reported high
-        # velocities in the ankle joints, which leads to invalid gaits
-        self.current_setpoint_dict = self.from_list_to_setpoint(
-            self.current_state.joint_names,
-            self.current_state.actual.positions,
-            None,
-            self.time[0],
-        )
-
     def middle_setpoint(self, position_x, position_y):
         """Returns the middle setpoint. Fixed for now.
         Should adapt dynamically in the future"""
         middle_position = solve_mid_position(position_x, position_y)
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             middle_position.reverse()
 
         self.middle_setpoint_dict = self.from_list_to_setpoint(
@@ -75,7 +64,7 @@ class DynamicSubgait:
         Position is defined in centimeters and takes two argurments:
         forward distance and height. Ankle RoM should be given in degrees"""
         desired_position = solve_end_position(position_x, position_y)
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             desired_position.reverse()
 
         if desired_position[0] > 0.1745 or desired_position[-1] > 0.1745:
@@ -88,36 +77,22 @@ class DynamicSubgait:
             self.joints, desired_position, None, self.time[2]
         )
 
+    def get_final_position(self):
+        # SHOULD FIX FIXED TIME DELAY OF 0.2 SEC
+        return self.from_list_to_setpoint(
+            self.joints, self.desired_position, None, self.time[0]
+        )
+
     def to_joint_trajectory_class(self):
         """Returns a list of JointTrajectory classes containing
         the setpoints for each joint"""
-        # fix hardcoded haa/false current state readings
-        self.current_setpoint_dict.update(
-            {
-                "right_hip_aa": Setpoint(
-                    Duration(0.2),
-                    0.03,
-                    0.0,
-                )
-            }
-        )
-
-        self.current_setpoint_dict.update(
-            {
-                "left_hip_aa": Setpoint(
-                    Duration(0.2),
-                    0.03,
-                    0.0,
-                )
-            }
-        )
 
         self.joint_trajectory_list = []
         for name in self.joints:
             self.joint_trajectory_list.append(
                 DynamicJointTrajectorySetpoint(
                     [
-                        self.current_setpoint_dict[name],
+                        self.starting_position[name],
                         self.middle_setpoint_dict[name],
                         self.desired_setpoint_dict[name],
                     ]
@@ -139,7 +114,7 @@ class DynamicSubgait:
         del current_state_without_haa[4]
         del current_state_without_haa[3]
 
-        if self.swing_leg == "left":
+        if self.swing_leg == "left_swing":
             current_state_without_haa.reverse()
 
         swing_leg_ankle_pos = calculate_joint_positions(

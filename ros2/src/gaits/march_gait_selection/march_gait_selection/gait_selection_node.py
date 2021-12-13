@@ -56,6 +56,8 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
     for param in parameters:
         if param.name == "balance" and param.type_ == Parameter.Type.BOOL:
             gait_selection._balance_used = param.value
+        elif param.name == "dynamic_gait" and param.type == Parameter.Type.BOOL:
+            gait_selection._dynamic_gait = param.value
         elif (
             param.name == "early_schedule_delay"
             and param.type_ == Parameter.Type.DOUBLE

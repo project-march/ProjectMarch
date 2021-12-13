@@ -57,12 +57,13 @@
         - ".clang-tidy"
       variables:
         TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
     - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
         - "$ROS_VERSION/**/*"
         - ".clang-tidy"
       variables:
-        TAG: $CI_DEFAULT_BRANCH
+        TAG: $CI_COMMIT_BRANCH
 
 # Define the values of the ROS1 and ROS2 specific instances of
 # the ".base_builder" job
