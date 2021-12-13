@@ -323,7 +323,6 @@ class GaitStateMachine:
                 in self._gait_graph.possible_gaits_from_idle(self._current_state)
                 or gait_name == "dynamic_walk"
             ):
-                self._gait_selection.get_logger().warn(f"gait type: {type(gait)}")
                 if (
                     isinstance(gait.starting_position, DynamicEdgePosition)
                     and gait.starting_position != self._current_state

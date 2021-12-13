@@ -4,7 +4,12 @@ import time
 
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 import march_goniometric_ik_solver.triangle_angle_solver as tas
-from march_goniometric_ik_solver.goniometric_functions_degrees import cos, sin, asin
+from march_goniometric_ik_solver.goniometric_functions_degrees import (
+    cos,
+    sin,
+    asin,
+)
+
 
 # Constants:
 length_upper_leg = 41  # cm
@@ -253,7 +258,44 @@ def straighten_leg(pose):
     return pose
 
 
-def solve_ik(
+def solve_mid_position(ankle_x, ankle_y, plot=False):
+    """
+    Solve inverse kinematics for the middle position. Assumes that the
+    stance leg is straight. Takes the ankle_x and ankle_y position of the
+    desired middle position. Calculates the required hip and knee angles of
+    the swing leg by making a triangle between the swing leg ankle, swing leg
+    knee and the hip. Returns the calculated pose.
+    """
+
+    ankle2 = np.array([ankle_x, ankle_y])
+    hip = np.array([0, length_leg])
+    dist_ankle_hip = np.linalg.norm(ankle2 - hip)
+
+    # Calculate hip and knee2 angle in triangle with ankle2:
+    angle_hip, angle_knee2 = tas.get_angles_from_sides(
+        [length_lower_leg, dist_ankle_hip, length_upper_leg]
+    )[0:2]
+
+    # The hip angle found with the triangle is not the same as the flex_hip2 angle:
+    hip_angle_ankle1_ankle2 = np.sign(ankle_x) * qas.get_angle_between_points(
+        [np.array([0, 0]), hip, ankle2]
+    )
+    flex_hip2 = angle_hip + hip_angle_ankle1_ankle2
+    flex_knee2 = knee_zero_angle - angle_knee2
+
+    pose = [0.0, 0.0, 0.0, flex_hip2, flex_knee2, 0.0]
+
+    if plot:
+        make_plot(pose)
+
+    # Insert fixed HAA for now:
+    pose.insert(3, 1.72)
+    pose.insert(4, 1.72)
+
+    return [np.deg2rad(angle) for angle in pose]
+
+
+def solve_end_position(
     ankle_x,
     ankle_y=0,
     max_ankle_flexion=default_max_ankle_flexion,
@@ -299,7 +341,8 @@ def solve_ik(
     if plot:
         make_plot(pose)
 
-    pose.insert(3, np.rad2deg(0.03))
-    pose.insert(4, np.rad2deg(0.03))
+    # Insert fixed HAA for now:
+    pose.insert(3, 1.72)
+    pose.insert(4, 1.72)
 
     return [np.deg2rad(angle) for angle in pose]
