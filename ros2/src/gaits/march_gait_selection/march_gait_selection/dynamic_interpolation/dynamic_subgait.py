@@ -70,7 +70,9 @@ class DynamicSubgait:
             self.desired_position.reverse()
 
         if self.desired_position[0] > 0.1745 or self.desired_position[-1] > 0.1745:
-            dorsiflexion = max([self.desired_position[0], self.desired_position[-1]]) / 3.14 * 180
+            dorsiflexion = (
+                max([self.desired_position[0], self.desired_position[-1]]) / 3.14 * 180
+            )
             print(
                 f"Dorsiflexion bigger than 10 degrees: {round(dorsiflexion, 1)} degrees",
             )
