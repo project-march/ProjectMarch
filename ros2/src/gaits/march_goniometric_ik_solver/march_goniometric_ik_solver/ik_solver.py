@@ -8,7 +8,6 @@ from march_goniometric_ik_solver.goniometric_functions_degrees import (
     cos,
     sin,
     asin,
-    atan,
 )
 
 
@@ -259,39 +258,39 @@ def straighten_leg(pose):
     return pose
 
 
-def solve_mid_position(
-    ankle_x,
-    ankle_y,
-):
+def solve_mid_position(ankle_x, ankle_y, plot=False):
     """
     Solve inverse kinematics for the middle position. Assumes that the
     stance leg is straight. Takes the ankle_x and ankle_y position of the
-    desired middle position. Calculates the required hfe and kfe angles of
+    desired middle position. Calculates the required hip and knee angles of
     the swing leg by making a triangle between the swing leg ankle, swing leg
     knee and the hip. Returns the calculated pose.
     """
 
-    hip_x = 0
-    hip_y = length_leg
+    ankle2 = np.array([ankle_x, ankle_y])
+    hip = np.array([0, length_leg])
+    dist_ankle_hip = np.linalg.norm(ankle2 - hip)
 
-    # Calculate distance from ankle to hip with Pythagoras
-    diff_x = ankle_x - hip_x
-    diff_y = ankle_y - hip_y
-    len_ankle_to_hip = np.sqrt((diff_x ** 2) + (diff_y ** 2))
+    # Calculate hip and knee2 angle in triangle with ankle2:
+    angle_hip, angle_knee2 = tas.get_angles_from_sides(
+        [length_lower_leg, dist_ankle_hip, length_upper_leg]
+    )[0:2]
 
-    swing_leg_angles = tas.get_angles_from_sides(
-        [length_lower_leg, len_ankle_to_hip, length_upper_leg]
+    # The hip angle found with the triangle is not the same as the flex_hip2 angle:
+    hip_angle_ankle1_ankle2 = np.sign(ankle_x) * qas.get_angle_between_points(
+        [np.array([0, 0]), hip, ankle2]
     )
+    flex_hip2 = angle_hip + hip_angle_ankle1_ankle2
+    flex_knee2 = knee_zero_angle - angle_knee2
 
-    # The angle found with the triangle between the swing ankle/knee and the
-    # hip is not the same as the hfe angle, which is the angle between the
-    # upper leg of the stance leg and the upper leg of the swing leg.
-    hfe_offset = atan(diff_x / diff_y)
-    swing_leg_hfe = swing_leg_angles[0] - hfe_offset
-    swing_leg_kfe = knee_zero_angle - swing_leg_angles[1]
+    pose = [0.0, 0.0, 0.0, flex_hip2, flex_knee2, 0.0]
 
-    # HAA ankle is fixed at 1.72 deg (0.03 rad) for now
-    pose = [0.0, 0.0, 0.0, 1.72, 1.72, swing_leg_hfe, swing_leg_kfe, 0.0]
+    if plot:
+        make_plot(pose)
+
+    # Insert fixed HAA for now:
+    pose.insert(3, 1.72)
+    pose.insert(4, 1.72)
 
     return [np.deg2rad(angle) for angle in pose]
 
@@ -342,7 +341,8 @@ def solve_end_position(
     if plot:
         make_plot(pose)
 
-    pose.insert(3, np.rad2deg(0.03))
-    pose.insert(4, np.rad2deg(0.03))
+    # Insert fixed HAA for now:
+    pose.insert(3, 1.72)
+    pose.insert(4, 1.72)
 
     return [np.deg2rad(angle) for angle in pose]
