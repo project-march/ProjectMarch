@@ -9,6 +9,3 @@ Flask==1.1.2
 scipy==1.7.1
 parameterized==0.8.1 
 numpy==1.21.2
-
-# Matplotlib is required for making plots in the march_goniometric_ik_solver package
-matplotlib==3.5.0

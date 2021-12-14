@@ -51,7 +51,6 @@ add_service_files(
     SetGaitVersion.srv
     SetObstacleSizeRampLike.srv
     SetObstacleSizeBlockLike.srv
-    SolveInverseKinematic.srv
 )
 
 generate_messages(
