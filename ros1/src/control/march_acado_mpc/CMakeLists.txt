@@ -35,9 +35,9 @@ catkin_package(
     std_msgs
 )
 
-#######################
-# Remove _deps folder #
-#######################
+##################################################
+# Remove _deps folder to prevent building issues #
+##################################################
 
 file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/_deps")
 
