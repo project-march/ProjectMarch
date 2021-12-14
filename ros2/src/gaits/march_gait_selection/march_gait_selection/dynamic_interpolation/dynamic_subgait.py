@@ -132,7 +132,7 @@ class DynamicSubgait:
         mid_pos_x = self.mid_point_frac * self.position_x - stance_swing_dis
 
         # Middle position y should always be heigher than the desired position y
-        mid_pos_y = self.position_y + 10
+        mid_pos_y = self.position_y + 0.1
 
         self.middle_setpoint(mid_pos_x, mid_pos_y)
 
