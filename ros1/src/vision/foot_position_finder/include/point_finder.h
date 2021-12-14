@@ -3,10 +3,12 @@
 
 #define RES 70
 
+#include <string>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <cmath>
 #include <vector>
+#include <pcl_ros/transforms.h>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -15,22 +17,19 @@ class PointFinder {
 public:
 
     explicit PointFinder(PointCloud::Ptr pointcloud,
-                                std::vector<double>& search_dimensions,
-                                char left_or_right);
+                                std::string left_or_right,
+                                Point &step_point);
 
     ~PointFinder() = default;
 
     bool findPoints(std::vector<Point> *position_queue);
 
-    double (*getDerivatives())[RES];
-
-    double (*getHeights())[RES];
 
 protected:
 
     PointCloud::Ptr pointcloud_;
     std::vector<double> search_dimensions_;
-    char left_or_right;
+    std::string left_or_right_;
 
     int grid_resolution_ = RES;
     double cell_width = 1.0 / grid_resolution_;
@@ -41,8 +40,12 @@ protected:
 
     double derivative_threshold_ = 0.03;
 
-    double optimal_foot_x_ = 0.0;
-    double optimal_foot_y_ = 0.4;
+    double optimal_foot_x_;
+    double optimal_foot_y_;
+    double current_foot_z_;
+
+    double world_foot_x_offset_;
+    double world_foot_y_offset_;
 
     double foot_width_ = 0.10;
     double foot_length_ = 0.20;

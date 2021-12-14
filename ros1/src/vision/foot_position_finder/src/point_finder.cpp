@@ -8,21 +8,25 @@ using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<Point>;
 
 PointFinder::PointFinder(PointCloud::Ptr pointcloud,
-                                       std::vector<double>& search_dimensions,
-                                       char left_or_right)
+                         std::string left_or_right,
+                         Point& step_point)
     : pointcloud_ { pointcloud },
-      search_dimensions_ { search_dimensions },
-      left_or_right { left_or_right }
+      left_or_right_ { left_or_right }
     {
         memset(height_map_, -5, sizeof(double) * grid_resolution_ * grid_resolution_);
         memset(height_map_temp_, -5, sizeof(double) * grid_resolution_ * grid_resolution_);
         memset(derivatives_, 1, sizeof(double) * grid_resolution_ * grid_resolution_);
 
+        optimal_foot_x_ = step_point.x;
+        optimal_foot_y_ = step_point.y;
+        current_foot_z_ = step_point.z;
+
+        search_dimensions_ = {optimal_foot_x_-0.5, optimal_foot_x_+0.5, optimal_foot_y_-0.5, optimal_foot_y_+0.5, -1, 1};
+
         if (rect_width % 2 == 0) rect_width--;
         if (rect_height % 2 == 0) rect_height--;
-        if (left_or_right == 'l')
+        if (left_or_right_ == "left")
         {
-            optimal_foot_x_ *= -1;
             auto temp = x_displacements_left;
             x_displacements_left = x_displacements_right;
             x_displacements_right = temp;
@@ -118,10 +122,10 @@ bool PointFinder::findFeasibleFootPlacements(std::vector<Point> *position_queue)
     for (int y =  0; y >= -y_displacements_front; y--) y_displacements.push_back(y);
     for (int y =  1; y <=  y_displacements_far  ; y++) y_displacements.push_back(y);
 
-    if (left_or_right == 'l') {    
+    if (left_or_right_ == "left") {    
         for (int x = 0; x >= -x_displacements_left ; x--) x_displacements.push_back(x);
         for (int x = 1; x <=  x_displacements_right; x++) x_displacements.push_back(x);
-    } else if (left_or_right == 'r') {   
+    } else if (left_or_right_ == "right") {   
         for (int x =  0; x <=  x_displacements_right; x++) x_displacements.push_back(x);
         for (int x = -1; x >= -x_displacements_left ; x--) x_displacements.push_back(x);
     }
@@ -135,32 +139,20 @@ bool PointFinder::findFeasibleFootPlacements(std::vector<Point> *position_queue)
             int y_opt = (int) ((optimal_foot_y_ + y_offset) / y_width * grid_resolution_) - y_shift;
 
             for (int x = x_opt - rect_width/2; x < x_opt + rect_width/2.0; x++)
-            {
                 for (int y = y_opt - rect_height/2; y < y_opt + rect_height/2.0; y++)
-                {
                     if (std::abs(derivatives_[y][x]) < derivative_threshold_)
                         num_free_cells++;
-                }
-            }
 
             if (num_free_cells >= rect_height * rect_width * available_points_ratio)
             {
                 double x = ((double) x_opt / grid_resolution_) - x_offset + cell_width/2.0;
                 double y = ((double) (grid_resolution_ - y_opt) / grid_resolution_) - y_offset - cell_width/2.0;
                 double z = height_map_[y_opt][x_opt];
-                position_queue->push_back(Point(x, y, z));
+                
+                if (std::abs(z - current_foot_z_) <= 0.25 && !std::isnan(x) && !std::isnan(y) && !std::isnan(z))
+                    position_queue->push_back(Point(x, y, z));
             }
         }
     }
     return true;
-}
-
-double (*PointFinder::getDerivatives())[RES]
-{
-    return derivatives_;
-}
-
-double (*PointFinder::getHeights())[RES]
-{
-    return height_map_;
 }

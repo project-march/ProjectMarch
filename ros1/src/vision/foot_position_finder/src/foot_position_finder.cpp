@@ -1,5 +1,6 @@
 #include "std_msgs/String.h"
 #include "utilities/realsense_to_pcl.hpp"
+#include "utilities/publish_utilities.hpp"
 #include "preprocessor.h"
 #include "point_finder.h"
 #include "foot_position_finder.h"
@@ -8,24 +9,21 @@
 #include <ros/console.h>
 #include <string>
 #include <iostream>
+#include <visualization_msgs/MarkerArray.h>
 
 
-FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense, char left_or_right)
+FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense, std::string left_or_right)
     : n_(n)
     , realsense_(realsense)
     , left_or_right_(left_or_right)
 {
 
-    if (left_or_right_ == 'l')
-    {
-        point_publisher_ = n_->advertise<std_msgs::String>("/foot_position/left", 1);
-        preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera_left/preprocessed_cloud", 1);
-    }
-    else
-    {
-        point_publisher_ = n_->advertise<std_msgs::String>("/foot_position/right", 1);
-        preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera_right/preprocessed_cloud", 1);
-    }
+    tfBuffer = std::make_unique<tf2_ros::Buffer>();
+    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+
+    point_publisher_ = n_->advertise<geometry_msgs::Point>("/foot_position/" + left_or_right_, 1);
+    preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera_" + left_or_right_ + "/preprocessed_cloud", 1);
+    found_points_publisher_ = n_->advertise<visualization_msgs::Marker>("/camera_" + left_or_right_ + "/found_points", 1);
 
     if (realsense)
     {
@@ -35,7 +33,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense, char 
     }
     else
     {
-        if (left_or_right_ == 'l')
+        if (left_or_right_ == "left")
             pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(TOPIC_CAMERA_FRONT_LEFT, 1, &FootPositionFinder::processSimulatedDepthFrames, this);
         else
             pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(TOPIC_CAMERA_FRONT_RIGHT, 1, &FootPositionFinder::processSimulatedDepthFrames, this);
@@ -65,6 +63,7 @@ bool FootPositionFinder::processRealSenseDepthFrames()
     return true;
 }
 
+
 void FootPositionFinder::processSimulatedDepthFrames(const sensor_msgs::PointCloud2 input_cloud)
 {    
     PointCloud converted_cloud;
@@ -76,28 +75,77 @@ void FootPositionFinder::processSimulatedDepthFrames(const sensor_msgs::PointClo
 
 bool FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
 {
-    ROS_INFO("Processing");
+    
+    auto pointcloud_frame_id = pointcloud->header.frame_id.c_str();
+
     NormalCloud::Ptr normalcloud(new NormalCloud());
-    NormalsPreprocessor preprocessor(pointcloud, normalcloud);
+    PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
+
+    if (!realsense_)
+    {
+        std::string frame_id;
+        if (left_or_right_ == "left")
+        {
+            desired_point->push_back(Point(-0.5, -0.25, 0));
+            frame_id = "foot_right";
+        }
+        else if (left_or_right_ == "right")
+        {
+            desired_point->push_back(Point(-0.5, 0.25, 0));
+            frame_id = "foot_left";
+        }
+            
+        geometry_msgs::TransformStamped transform_stamped;
+
+        try {
+            if (tfBuffer->canTransform("world", frame_id, ros::Time(), ros::Duration(1.0)))
+                transform_stamped = tfBuffer->lookupTransform("world", frame_id, ros::Time(0));
+        } catch (tf2::TransformException& ex) {
+            ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: "<< ex.what());
+            return false;
+        }
+
+        pcl_ros::transformPointCloud(*desired_point, *desired_point, transform_stamped.transform);
+    } 
+
+    Preprocessor preprocessor(pointcloud, normalcloud);
     preprocessor.preprocess();
 
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
-    std::vector<double> search_region = {-0.5, 0.5, 0, 1, -2, 2};
-    PointFinder pointFinder(pointcloud, search_region, left_or_right_);
+    Point point = desired_point->points[0];
+    Point position(point.y, -point.x, point.z);  // Rotate 90 degrees clockwise
+    PointFinder pointFinder(pointcloud, left_or_right_, position);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
     if (position_queue.size() > 0) {
-        ROS_INFO("Found!");
-        Point p = position_queue[0];
-        computeTemporalAveragePoint(p);
+        publishMarkerPoint(found_points_publisher_, position_queue[0]);
+        computeTemporalAveragePoint(position_queue[0]);
     }
     return true;
 }
 
+Point FootPositionFinder::computeAveragePoint(const std::vector<Point> &points)
+{
+    Point avg(0, 0, 0);
 
-bool FootPositionFinder::computeTemporalAveragePoint(Point &new_point)
+    for (const Point &p : points)
+    {
+        avg.x += p.x;
+        avg.y += p.y;
+        avg.z += p.z;
+    }
+
+    avg.x /= points.size();
+    avg.x /= points.size();
+    avg.x /= points.size();
+
+    return avg;
+}
+
+
+bool FootPositionFinder::computeTemporalAveragePoint(const Point &new_point)
 {
     if (found_points_.size() < sample_size_)
         found_points_.push_back(new_point);
@@ -105,64 +153,29 @@ bool FootPositionFinder::computeTemporalAveragePoint(Point &new_point)
     {
         std::rotate(found_points_.begin(), found_points_.begin() + 1, found_points_.end());
         found_points_[sample_size_-1] = new_point;
-
-        double x_avg = 0, y_avg = 0, z_avg = 0;
-
-        for (Point &p : found_points_) {
-            x_avg += new_point.x; y_avg += new_point.y; z_avg += new_point.z;
-        }
-
-        x_avg /= sample_size_; y_avg /= sample_size_; z_avg /= sample_size_;
-        Point avg(x_avg, y_avg, z_avg);
+        Point avg = computeAveragePoint(found_points_);
 
         std::vector<Point> non_outliers;
-
-        for (Point &p : found_points_) {
-            if (sqrt(pow(p.x - avg.x, 2) + pow(p.y - avg.y, 2) +  pow(p.z - avg.z, 2)) < 0.05)
+        for (Point &p : found_points_)
+            if (pcl::squaredEuclideanDistance(p, avg) < 0.05)
                 non_outliers.push_back(p);
-        }
-        if (non_outliers.size() < sample_size_)
-            std::cout << non_outliers.size() << std::endl;
 
-        x_avg = 0, y_avg = 0, z_avg = 0;
-        for (Point &p : non_outliers) {
-            x_avg += p.x; y_avg += p.y; z_avg += p.z;
-        }
-        x_avg /= sample_size_; y_avg /= sample_size_; z_avg /= sample_size_;
-        Point found_point(x_avg, y_avg, z_avg);
-
+        Point found_point = computeAveragePoint(non_outliers);
         if (non_outliers.size() == sample_size_)
             publishNextPoint(found_point);
     }
     return true;
 }
 
+
 bool FootPositionFinder::publishNextPoint(Point &p)
 {
-    if (left_or_right_ == 'l')
-    {
-        ROS_INFO("Left point: (%d, %d, %d)", p.data[0], p.data[1], p.data[2]);
-    }
-    else if (left_or_right_ == 'r')
-    {
-        ROS_INFO("Right point: (%d, %d, %d)", p.data[0], p.data[1], p.data[2]);
-    }
+    publishMarkerPoint(found_points_publisher_, p);
+
+    geometry_msgs::Point point;
+    point.x = p.x;
+    point.y = p.y;
+    point.z = p.z;
+    point_publisher_.publish(point);
     return true;
 }
-
-
-void FootPositionFinder::publishCloud(const ros::Publisher& publisher, PointCloud cloud)
-{
-    cloud.width = 1;
-    cloud.height = cloud.points.size();
-
-    sensor_msgs::PointCloud2 msg;
-
-    pcl::toROSMsg(cloud, msg);
-
-    msg.header.frame_id = "world";
-    msg.header.stamp = ros::Time::now();
-
-    publisher.publish(msg);
-}
-

@@ -4,31 +4,16 @@
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl_ros/transforms.h>
-#include <tf2_ros/transform_listener.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using NormalCloud = pcl::PointCloud<pcl::Normal>;
+
 
 class Preprocessor {
 public:
     explicit Preprocessor(PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud);
 
-    ~Preprocessor() = default;
-
-    virtual bool preprocess() = 0;
-
-
-protected:
-    PointCloud::Ptr pointcloud_;
-    NormalCloud::Ptr normalcloud_;
-};
-
-
-class NormalsPreprocessor : Preprocessor {
-public:
-    explicit NormalsPreprocessor(PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud);
-
-    bool preprocess() override;
+    bool preprocess();
 
 
 protected:
@@ -43,8 +28,12 @@ protected:
 
     bool transformPointCloudFromUrdf();
 
+    PointCloud::Ptr pointcloud_;
+    NormalCloud::Ptr normalcloud_;
+
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
+    
     std::string pointcloud_frame_id;
 
 };
