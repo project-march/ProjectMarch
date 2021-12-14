@@ -13,6 +13,7 @@ from rclpy.node import Node
 
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.utilities.vector_3d import Vector3d
+from march_utility.gait.limits import Limits
 from .side import Side
 
 import yaml
@@ -166,6 +167,21 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
 
 
 LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
+
+
+def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name):
+    """Get the joint from the urdf robot with the given joint
+    name and return the limits of the joint.
+
+    :param robot: The urdf robot to use.
+    :param joint_name: The name to look for.
+    """
+    march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
+    robot = urdf.Robot.from_xml_file(march_urdf)
+    urdf_joint = next(
+        (joint for joint in robot.joints if joint.name == joint_name), None
+    )
+    return Limits.from_urdf_joint(urdf_joint)
 
 
 def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:

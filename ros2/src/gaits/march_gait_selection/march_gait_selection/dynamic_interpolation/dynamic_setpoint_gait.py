@@ -177,8 +177,8 @@ class DynamicSetpointGait(GaitInterface):
 
         :return: TrajectoryCommand with the current subgait and start time.
         """
-        desired_ankle_x = 20
-        desired_ankle_y = 3
+        desired_ankle_x = 0.20 # m
+        desired_ankle_y = 0.03 # m
         subgait_duration = 1.5
         mid_point_frac = 0.33
 

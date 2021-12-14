@@ -10,15 +10,26 @@ from march_goniometric_ik_solver.goniometric_functions_degrees import (
     asin,
 )
 
+from march_utility.utilities.utility_functions import (
+    get_lengths_robot_from_urdf_for_inverse_kinematics,
+    get_limits_robot_from_urdf_for_inverse_kinematics,
+)
+
+# Get leg lengths form urdf:
+(
+    length_upper_leg,
+    length_lower_leg,
+) = get_lengths_robot_from_urdf_for_inverse_kinematics()[0:2]
+length_leg = length_upper_leg + length_lower_leg
+
+# Get ankle limit from urdf:
+limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
+default_max_ankle_flexion = np.rad2deg(limits.upper)
 
 # Constants:
-length_upper_leg = 41  # cm
-length_lower_leg = 41  # cm
-length_foot = 10  # cm
-length_leg = length_upper_leg + length_lower_leg
+length_foot = 0.10  # m
 ankle_zero_angle = 90  # deg
 knee_zero_angle = 180  # deg
-default_max_ankle_flexion = 10  # deg
 
 
 def calculate_joint_positions(pose, joint="all"):
