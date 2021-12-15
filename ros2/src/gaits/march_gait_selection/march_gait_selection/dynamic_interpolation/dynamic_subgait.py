@@ -86,9 +86,9 @@ class DynamicSubgait:
     def desired_setpoint(self, position_x, position_y=0):
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate
 
-        :param position_x: x-coordinate in cm of the desired foot location.
+        :param position_x: x-coordinate in meters of the desired foot location.
         :type position_x: float
-        :param position_y: Optional y-coordinate in cm of the desired foot location. Default is zero.
+        :param position_y: Optional y-coordinate in meters of the desired foot location. Default is zero.
         :type position_y: float
         """
         self.desired_position = solve_end_position(position_x, position_y)
