@@ -9,7 +9,7 @@ from trajectory_msgs import msg as trajectory_msg
 from march_goniometric_ik_solver.ik_solver import (
     solve_mid_position,
     solve_end_position,
-    calculate_joint_positions,
+    Pose,
 )
 
 # Middle point is always 0.1 meters higher than desired location
@@ -137,13 +137,11 @@ class DynamicSubgait:
                 np.rad2deg(self.starting_position[joint].position)
             )
 
-        del starting_position_without_haa[4]
-        del starting_position_without_haa[3]
-
         if self.subgait_id == "left_swing":
             starting_position_without_haa.reverse()
 
-        subgait_id_ankle_pos = calculate_joint_positions(
+        current_pose = Pose(starting_position_without_haa)
+        subgait_id_ankle_pos = current_pose.calculate_joint_positions(
             starting_position_without_haa, joint="pos_ankle2"
         )
 
