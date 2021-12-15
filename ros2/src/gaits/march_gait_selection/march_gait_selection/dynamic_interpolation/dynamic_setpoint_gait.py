@@ -35,7 +35,7 @@ class DynamicSetpointGait(GaitInterface):
             "right_hip_fe": Setpoint(Duration(0), -0.1745, 0),
             "right_knee": Setpoint(Duration(0), 0.0, 0),
         }
-        self.gait_name = "dynamic_gait_v0"
+        self.gait_name = "dynamic_walk_v0"
 
     @property
     def name(self):
@@ -135,8 +135,6 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id = "left_swing"
         elif self.subgait_id == "left_swing":
             self.subgait_id = "right_swing"
-        else:
-            print(f"Unknown subgait_id of type {self.subgait_id}")
 
         return self.subgait_id_to_trajectory_command()
 
@@ -177,8 +175,8 @@ class DynamicSetpointGait(GaitInterface):
 
         :return: TrajectoryCommand with the current subgait and start time.
         """
-        desired_ankle_x = 0.20 # m
-        desired_ankle_y = 0.03 # m
+        desired_ankle_x = 0.20  # m
+        desired_ankle_y = 0.03  # m
         subgait_duration = 1.5
         mid_point_frac = 0.33
 
@@ -192,16 +190,14 @@ class DynamicSetpointGait(GaitInterface):
         )
 
         trajectory = self.dynamic_subgait.to_joint_trajectory_msg()
-        time_from_start = trajectory.points[-1].time_from_start
-        current_subgait_duration = Duration.from_msg(time_from_start)
 
         # Update the starting position for the next command
         self.update_start_pos()
-        self._update_time_stamps(current_subgait_duration)
+        self._update_time_stamps(Duration(subgait_duration))
 
         return TrajectoryCommand(
             trajectory,
-            current_subgait_duration,
+            Duration(subgait_duration),
             "dynamic_joint_trajectory",
             self._start_time,
         )
