@@ -1,7 +1,7 @@
 import numpy as np
 
-from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory_setpoint import (
-    DynamicJointTrajectorySetpoint,
+from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
+    DynamicJointTrajectory,
 )
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
@@ -17,7 +17,23 @@ MIDDLE_POINT_HEIGHT = 0.1
 
 
 class DynamicSubgait:
-    """class that reads setpoints and returns list of jointtrajectories"""
+    """Creates joint trajectories based on the desired foot location.
+
+    :param duration: Duration of the subgait.
+    :type duration: float
+    :param mid_point_fraction: Fraction of the subgait at which the middle setpoint will be set.
+    :type mid_point_fraction: float
+    :param starting_position: The first setpoint of the subgait, usually the last setpoint of the previous subgait.
+    :type starting_position: dict
+    :param subgait_id: Whether it is a left_swing or right_swing.
+    :type subgait_id: str
+    :param position_x: x-coordinate of the desired foot location in meters.
+    :type position_x: float
+    :param position_y: Optional y-coordinate of the desired foot location in meters. Default is zero.
+    :type position_y: float
+    :param delay: Optional time delay of first setpoint. Default is zero.
+    :type delay: float
+    """
 
     def __init__(
         self,
@@ -27,6 +43,7 @@ class DynamicSubgait:
         subgait_id,
         position_x,
         position_y=0,
+        delay=0,
     ):
         # Should get this list from the urdf in the future
         self.joints = [
@@ -40,7 +57,7 @@ class DynamicSubgait:
             "right_ankle",
         ]
         self.mid_point_fraction = mid_point_fraction
-        self.delay = 0
+        self.delay = delay
         self.time = [
             self.delay,
             self.delay + self.mid_point_fraction * duration,
@@ -52,8 +69,16 @@ class DynamicSubgait:
         self.subgait_id = subgait_id
 
     def middle_setpoint(self, position_x, position_y):
-        """Returns the middle setpoint. Fixed for now.
-        Should adapt dynamically in the future"""
+        """Calls IK solver to compute the joint angles needed for the middle setpoint
+
+        :param position_x: x-coordinate in meters of the foot for the desired middle setpoint.
+        :type position_x: float
+        :param position_y: y-coordinate in meters of the foot for the desired middle setpoint.
+        :type position_y: float
+
+        :returns: A setpoint_dict for the middle position.
+        :rtype: dict
+        """
         middle_position = solve_mid_position(position_x, position_y)
         if self.subgait_id == "left_swing":
             middle_position.reverse()
@@ -66,9 +91,13 @@ class DynamicSubgait:
         )
 
     def desired_setpoint(self, position_x, position_y=0):
-        """Calls IK solver to compute setpoint from CoViD location.
-        Position is defined in centimeters and takes two argurments:
-        forward distance and height."""
+        """Calls IK solver to compute the joint angles needed for the desired x and y coordinate
+
+        :param position_x: x-coordinate in cm of the desired foot location.
+        :type position_x: float
+        :param position_y: Optional y-coordinate in cm of the desired foot location. Default is zero.
+        :type position_y: float
+        """
         self.desired_position = solve_end_position(position_x, position_y)
         if self.subgait_id == "left_swing":
             self.desired_position.reverse()
@@ -78,18 +107,21 @@ class DynamicSubgait:
         )
 
     def get_final_position(self):
-        """Returns the final setpoint of the subgait."""
+        """Get setpoint_dictionary of the final setpoint.
+
+        :return: The final setpoint of the subgait.
+        :rtype: dict
+        """
         return self.from_list_to_setpoint(
             self.joints, self.desired_position, None, self.time[0]
         )
 
     def to_joint_trajectory_class(self):
-        """Returns a list of JointTrajectory classes containing
-        the setpoints for each joint"""
+        """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
         for name in self.joints:
             self.joint_trajectory_list.append(
-                DynamicJointTrajectorySetpoint(
+                DynamicJointTrajectory(
                     [
                         self.starting_position[name],
                         self.middle_setpoint_dict[name],
@@ -99,7 +131,11 @@ class DynamicSubgait:
             )
 
     def to_joint_trajectory_msg(self):
-        """Returns a joint_trajectory_msg which can be send to the exo"""
+        """Create joint_trajectory_msg containing the interpolated trajectories for each joint
+
+        :returns: A joint_trajectory_msg
+        :rtype: joint_trajectory_msg
+        """
         # Solve for middle setpoint.
         # Solve_ik function cannot handle HAA yet, thus has to be removed
         starting_position_without_haa = []
@@ -160,7 +196,20 @@ class DynamicSubgait:
         return joint_trajectory_msg
 
     def from_list_to_setpoint(self, joint_names, position, velocity, time):
-        """Computes setpoint dictionary from a list"""
+        """Computes setpoint_dictionary from a list
+
+        :param joint_names: Names of the joints.
+        :type joint_names: list
+        :param position: Positions for each joint.
+        :type position: list
+        :param velocity: Optional velocities for each joint. If None, velocity will be set to zero.
+        :type velocity: list
+        :param time: Time at which the setpoint should be set.
+        :type time: float
+
+        :returns: A Setpoint_dict containing time, position and velocity for each joint
+        :rtype: dict
+        """
         setpoint_dict = {}
 
         if velocity is not None:

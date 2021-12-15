@@ -43,8 +43,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def subgait_name(self):
-        # Should return left_swing/right_swing for simulation to
-        # Can be retrieved from dynamic_subgait
+        # Should return left_swing/right_swing for simulation to work
         return self.subgait_id
 
     @property
@@ -97,7 +96,14 @@ class DynamicSetpointGait(GaitInterface):
         self._next_command = None
 
     def start(self, current_time: Time) -> GaitUpdate:
-        """Starts the gait"""
+        """Starts the gait.
+
+        :param current_time: Time at which the subgait will start
+        :type current_time: Time
+
+        :return: A GaitUpdate containing a TrajectoryCommand
+        :rtype: GaitUpdate
+        """
         self._current_time = current_time
         self.subgait_id = "right_swing"
         self._start_time = self._current_time
@@ -105,7 +111,17 @@ class DynamicSetpointGait(GaitInterface):
         return GaitUpdate.should_schedule(self._current_command)
 
     def update(self, current_time: Time) -> GaitUpdate:
-        """Give an update on the progress of the gait"""
+        """Give an update on the progress of the gait.
+
+        If the subgaitgait is finished, schedule the next subgait. Else,
+        return an empty GaitUdpate
+
+        :param current_time: Current time.
+        :type current_time: Time
+
+        :return: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
+        :rtype: GaitUpdate
+        """
         self._current_time = current_time
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
@@ -113,12 +129,13 @@ class DynamicSetpointGait(GaitInterface):
         return GaitUpdate.empty()
 
     def _update_next_subgait(self) -> GaitUpdate:
-        """Update the next subgait
+        """Update the next subgait.
 
         If the current subgait is left_swing, the next subgait should be
         right_swing, and vice versa.
 
-        :return: optional trajectory_command, is_finished
+        :return: A GaitUpdate containg a TrajectoryCommand
+        :rtype: GaitUpdate
         """
         next_command = self._get_next_command()
         self._current_command = next_command
@@ -126,7 +143,13 @@ class DynamicSetpointGait(GaitInterface):
         return GaitUpdate.should_schedule(next_command)
 
     def _get_next_command(self):
-        """Check if gait should be stopped. If not, schedule next command"""
+        """Create the next command, based on what the current subgait is.
+        Also checks if the gait has to be stopped. If true, it returns
+        a close gait.
+
+        :returns: A TrajectoryCommand for the next subgait
+        :rtype: TrajectoryCommand
+        """
         if self._should_stop:
             # SHOULD RETURN A STOP GAIT
             return None
@@ -148,9 +171,19 @@ class DynamicSetpointGait(GaitInterface):
         self._current_command = None
 
     def update_start_pos(self):
+        """Update the start position of the next subgait to be
+        the last position of the previous subgait."""
         self.start_position = self.dynamic_subgait.get_final_position()
 
     def setpoint_dict_to_joint_dict(self, setpoint_dict):
+        """Creates a joint_dict from a setpoint_dict.
+
+        :param setpoint_dict: A setpoint_dictionary containing joint names and setpoints.
+        :type setpoint_dict: dict
+
+        :returns: A joint_dict containing joint names and positions.
+        :rtype: dict
+        """
         position = []
         for setpoint in setpoint_dict:
             position.append(setpoint_dict[setpoint].position)
@@ -174,6 +207,7 @@ class DynamicSetpointGait(GaitInterface):
         """Construct a TrajectoryCommand from the current subgait_id
 
         :return: TrajectoryCommand with the current subgait and start time.
+        :rtype: TrajectoryCommand
         """
         desired_ankle_x = 0.20  # m
         desired_ankle_y = 0.03  # m
@@ -205,7 +239,8 @@ class DynamicSetpointGait(GaitInterface):
     def _update_time_stamps(self, next_command_duration):
         """Update the starting and end time
 
-        :param next_command: Next command to be scheduled
+        :param next_command_duration: Duration of the next command to be scheduled.
+        :type next_command_duration: Duration
         """
         if self._end_time is None:
             self._start_time = self._current_time
