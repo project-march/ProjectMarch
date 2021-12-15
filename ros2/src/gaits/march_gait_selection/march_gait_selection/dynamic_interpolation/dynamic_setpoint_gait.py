@@ -2,6 +2,7 @@ from rclpy.time import Time
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 from march_utility.gait.setpoint import Setpoint
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -35,6 +36,7 @@ class DynamicSetpointGait(GaitInterface):
             "right_hip_fe": Setpoint(Duration(0), -0.1745, 0),
             "right_knee": Setpoint(Duration(0), 0.0, 0),
         }
+        self.joint_names = get_joint_names_from_urdf()
         self.gait_name = "dynamic_walk_v0"
 
     @property
@@ -48,7 +50,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def version(self):
-        return "dynamic_subgait_v0"
+        return ""
 
     @property
     def duration(self):
@@ -187,19 +189,10 @@ class DynamicSetpointGait(GaitInterface):
         position = []
         for setpoint in setpoint_dict:
             position.append(setpoint_dict[setpoint].position)
-        joints = [
-            "left_ankle",
-            "left_knee",
-            "left_hip_fe",
-            "left_hip_aa",
-            "right_hip_aa",
-            "right_hip_fe",
-            "right_knee",
-            "right_ankle",
-        ]
+
         jointdict = {}
         for i in range(len(position)):
-            jointdict.update({joints[i]: position[i]})
+            jointdict.update({self.joint_names[i]: position[i]})
 
         return jointdict
 
@@ -219,6 +212,7 @@ class DynamicSetpointGait(GaitInterface):
             mid_point_frac,
             self.start_position,
             self.subgait_id,
+            self.joint_names,
             desired_ankle_x,
             position_y=desired_ankle_y,
         )
