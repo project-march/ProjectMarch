@@ -136,23 +136,25 @@
         <!-- To prevent unnecessary topics and messages, we disable the plugins that
          send a lot of compressed versions of the camera topics. -->
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(arg realsense)">
+                 if="$(eval realsense and robot_description == 'march6_two_cameras')">
             <arg name="camera_name" value="camera_front_left"/>
         </include>
+
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(arg realsense)">
+                 if="$(eval realsense and robot_description == 'march6_two_cameras')">
             <arg name="camera_name" value="camera_front_right"/>
         </include>
-        <!--
+        
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(arg realsense)">
+                 if="$(eval realsense and robot_description == 'march6')">
             <arg name="camera_name" value="camera_front"/>
         </include>
+        
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(arg realsense)">
+                 if="$(eval realsense and robot_description == 'march6')">
             <arg name="camera_name" value="camera_back"/>
         </include>
-        -->
+       
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>
             <arg name="robot" value="$(arg robot)"/>
