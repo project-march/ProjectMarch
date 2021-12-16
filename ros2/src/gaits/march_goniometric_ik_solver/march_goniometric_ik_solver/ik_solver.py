@@ -373,7 +373,7 @@ def solve_end_position(
             pose.reduce_dorsi_flexion(max_ankle_flexion)
 
             # straighten leg:
-            pose.straighten_leg(pose)
+            pose.straighten_leg()
 
     if timer:
         end = time.time()
