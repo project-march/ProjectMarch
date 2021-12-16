@@ -146,6 +146,143 @@ class Pose:
         plt.gca().set_aspect("equal", adjustable="box")
         plt.show()
 
+    def calculate_lifted_pose(self, pos_ankle2):
+        """
+        Calculate the pose after lifting the foot to the desired ankle postion.
+        """
+
+        # calculate angles using triangle between hip, knee2 and ankle2 and side distances:
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        dist_hip_ankle = np.linalg.norm(pos_hip - pos_ankle2)
+        sides = [length_lower_leg, dist_hip_ankle, length_upper_leg]
+        angle_hip, angle_knee2, angle_ankle2 = tas.get_angles_from_sides(sides)
+
+        # define new fe_hip2:
+        point_below_hip = np.array([pos_ankle2[0] / 2, 0])
+        hip_angle_vertical_ankle2 = qas.get_angle_between_points(
+            [point_below_hip, pos_hip, pos_ankle2]
+        )
+        self.fe_hip2 = hip_angle_vertical_ankle2 + angle_hip
+
+        # define new fe_knee2:
+        self.fe_knee2 = knee_zero_angle - angle_knee2
+
+        # define new fe_ankle2:
+        toe2 = pos_ankle2 + np.array([length_foot, 0])
+        ankle2_angle_toe2_hip = qas.get_angle_between_points(
+            [toe2, pos_ankle2, pos_hip]
+        )
+        self.fe_ankle2 = ankle_zero_angle - (ankle2_angle_toe2_hip - angle_ankle2)
+
+    def reduce_dorsi_flexion(self, max_flexion):
+        """
+        Calculate the pose after reducing the dorsiflexion using quadrilateral solver
+        with quadrilateral between ankle2, knee2, hip, knee1
+        """
+
+        # get current state:
+        (
+            pos_ankle1,
+            pos_knee1,
+            pos_hip,
+            pos_knee2,
+            pos_ankle2,
+        ) = self.calculate_joint_positions()[1:-1]
+
+        # determine angle_ankle2 of quadrilateral:
+        reduction = self.fe_ankle2 - max_flexion
+        angle_ankle2 = (
+            qas.get_angle_between_points([pos_knee1, pos_ankle2, pos_knee2]) - reduction
+        )
+
+        # determine other angles using angle_ankle2 and sides:
+        dist_knee1_ankle2 = np.linalg.norm(pos_knee1 - pos_ankle2)
+        sides = [
+            length_upper_leg,
+            dist_knee1_ankle2,
+            length_lower_leg,
+            length_upper_leg,
+        ]
+        angle_knee1, angle_ankle2, angle_knee2, angle_hip = qas.solve_quadritlateral(
+            sides, angle_ankle2
+        )
+
+        # define new fe_knee1:
+        knee1_angle_ankle1_ankle2 = qas.get_angle_between_points(
+            [pos_ankle1, pos_knee1, pos_ankle2]
+        )
+        self.fe_knee1 = angle_knee1 + knee1_angle_ankle1_ankle2 - knee_zero_angle
+
+        # get new hip location and determine point below it:
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        point_below_hip = np.array([pos_hip[0], 0])
+
+        # define new fe_hip1:
+        if pos_hip[0] < pos_knee1[0]:
+            self.fe_hip1 = qas.get_angle_between_points(
+                [pos_knee1, pos_hip, point_below_hip]
+            )
+        else:
+            self.fe_hip1 = -qas.get_angle_between_points(
+                [pos_knee1, pos_hip, point_below_hip]
+            )
+
+        # define new fe_hip2, fe_knee2 and fe_ankle2:
+        self.fe_hip2 = angle_hip + self.fe_hip1
+        self.fe_knee2 = knee_zero_angle - angle_knee2
+        self.fe_ankle2 -= reduction
+
+    def straighten_leg(self):
+        """
+        Straighten stance leg by making a triangle between ankle1, hip and knee2
+        and calculating new angles.
+        """
+
+        # get current state:
+        (
+            pos_toe1,
+            pos_ankle1,
+            pos_knee1,
+            pos_hip,
+            pos_knee2,
+            pos_ankle2,
+            pos_toe2,
+        ) = self.calculate_joint_positions()
+
+        # determine sides of triangle and calculate angles:
+        dist_ankle1_knee2 = np.linalg.norm(pos_ankle1 - pos_knee2)
+        sides = [length_upper_leg, length_leg, dist_ankle1_knee2]
+        angle_ankle1, angle_knee2, angle_hip = tas.get_angles_from_sides(sides)
+
+        # define new fe_ankle1 and fe_knee1:
+        ankle1_angle_toe1_knee2 = qas.get_angle_between_points(
+            [pos_knee2, pos_ankle1, pos_toe1]
+        )
+        self.fe_ankle1 = ankle_zero_angle - (angle_ankle1 + ankle1_angle_toe1_knee2)
+        self.fe_knee1 = 0
+
+        # get new knee1 and hip location and determine point below it:
+        pos_knee1 = self.calculate_joint_positions("pos_knee1")
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        point_below_hip = np.array([pos_hip[0], 0])
+
+        # define new fe_hip1:
+        if pos_hip[0] < pos_knee1[0]:
+            self.fe_hip1 = qas.get_angle_between_points(
+                [pos_knee1, pos_hip, point_below_hip]
+            )
+        else:
+            self.fe_hip1 = -qas.get_angle_between_points(
+                [pos_knee1, pos_hip, point_below_hip]
+            )
+
+        # define new fe_hip2 and fe_knee2:
+        self.fe_hip2 = angle_hip + self.fe_hip1
+        knee2_angle_ankle1_ankle2 = qas.get_angle_between_points(
+            [pos_ankle1, pos_knee2, pos_ankle2]
+        )
+        self.fe_knee2 = knee_zero_angle - (angle_knee2 + knee2_angle_ankle1_ankle2)
+
 
 def calculate_ground_pose_flexion(ankle_x):
     """
@@ -154,166 +291,6 @@ def calculate_ground_pose_flexion(ankle_x):
     """
 
     return asin((ankle_x / 2) / length_leg)
-
-
-def calculate_lifted_pose(pos_ankle2, pose: Pose):
-    """
-    Calculate the pose after lifting the foot to the desired ankle postion.
-    """
-
-    # calculate angles using triangle between hip, knee2 and ankle2 and side distances:
-    pos_hip = pose.calculate_joint_positions("pos_hip")
-    dist_hip_ankle = np.linalg.norm(pos_hip - pos_ankle2)
-    sides = [length_lower_leg, dist_hip_ankle, length_upper_leg]
-    angle_hip, angle_knee2, angle_ankle2 = tas.get_angles_from_sides(sides)
-
-    # define new fe_hip2:
-    point_below_hip = np.array([pos_ankle2[0] / 2, 0])
-    hip_angle_vertical_ankle2 = qas.get_angle_between_points(
-        [point_below_hip, pos_hip, pos_ankle2]
-    )
-    fe_hip2 = hip_angle_vertical_ankle2 + angle_hip
-
-    # define new fe_knee2:
-    fe_knee2 = knee_zero_angle - angle_knee2
-
-    # define new fe_ankle2:
-    toe2 = pos_ankle2 + np.array([length_foot, 0])
-    ankle2_angle_toe2_hip = qas.get_angle_between_points([toe2, pos_ankle2, pos_hip])
-    fe_ankle2 = ankle_zero_angle - (ankle2_angle_toe2_hip - angle_ankle2)
-
-    pose.fe_hip2, pose.fe_knee2, pose.fe_ankle2 = (
-        fe_hip2,
-        fe_knee2,
-        fe_ankle2,
-    )
-    return pose
-
-
-def reduce_dorsi_flexion(max_flexion, pose: Pose):
-    """
-    Calculate the pose after reducing the dorsiflexion using quadrilateral solver
-    with quadrilateral between ankle2, knee2, hip, knee1
-    """
-
-    fe_knee1, fe_hip1, fe_hip2, fe_knee2, fe_ankle2 = (
-        pose.fe_knee1,
-        pose.fe_hip1,
-        pose.fe_hip2,
-        pose.fe_knee2,
-        pose.fe_ankle2,
-    )
-
-    # get current state:
-    (
-        pos_ankle1,
-        pos_knee1,
-        pos_hip,
-        pos_knee2,
-        pos_ankle2,
-    ) = pose.calculate_joint_positions()[1:-1]
-
-    # determine angle_ankle2 of quadrilateral:
-    reduction = fe_ankle2 - max_flexion
-    angle_ankle2 = (
-        qas.get_angle_between_points([pos_knee1, pos_ankle2, pos_knee2]) - reduction
-    )
-
-    # determine other angles using angle_ankle2 and sides:
-    dist_knee1_ankle2 = np.linalg.norm(pos_knee1 - pos_ankle2)
-    sides = [
-        length_upper_leg,
-        dist_knee1_ankle2,
-        length_lower_leg,
-        length_upper_leg,
-    ]
-    angle_knee1, angle_ankle2, angle_knee2, angle_hip = qas.solve_quadritlateral(
-        sides, angle_ankle2
-    )
-
-    # define new fe_knee1:
-    knee1_angle_ankle1_ankle2 = qas.get_angle_between_points(
-        [pos_ankle1, pos_knee1, pos_ankle2]
-    )
-    fe_knee1 = angle_knee1 + knee1_angle_ankle1_ankle2 - knee_zero_angle
-    pose.fe_knee1 = fe_knee1
-
-    # get new hip location and determine point below it:
-    pos_hip = pose.calculate_joint_positions("pos_hip")
-    point_below_hip = np.array([pos_hip[0], 0])
-
-    # define new fe_hip1:
-    if pos_hip[0] < pos_knee1[0]:
-        fe_hip1 = qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
-    else:
-        fe_hip1 = -qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
-
-    # define new fe_hip2, fe_knee2 and fe_ankle2:
-    fe_hip2 = angle_hip + fe_hip1
-    fe_knee2 = knee_zero_angle - angle_knee2
-    fe_ankle2 -= reduction
-
-    pose.fe_hip1 = fe_hip1
-    pose.fe_hip2 = fe_hip2
-    pose.fe_knee2 = fe_knee2
-    pose.fe_ankle2 = fe_ankle2
-
-    return pose
-
-
-def straighten_leg(pose: Pose):
-    """
-    Straighten stance leg by making a triangle between ankle1, hip and knee2
-    and calculating new angles.
-    """
-
-    # get current state:
-    (
-        pos_toe1,
-        pos_ankle1,
-        pos_knee1,
-        pos_hip,
-        pos_knee2,
-        pos_ankle2,
-        pos_toe2,
-    ) = pose.calculate_joint_positions()
-
-    # determine sides of triangle and calculate angles:
-    dist_ankle1_knee2 = np.linalg.norm(pos_ankle1 - pos_knee2)
-    sides = [length_upper_leg, length_leg, dist_ankle1_knee2]
-    angle_ankle1, angle_knee2, angle_hip = tas.get_angles_from_sides(sides)
-
-    # define new fe_ankle1 and fe_knee1:
-    ankle1_angle_toe1_knee2 = qas.get_angle_between_points(
-        [pos_knee2, pos_ankle1, pos_toe1]
-    )
-    fe_ankle1 = ankle_zero_angle - (angle_ankle1 + ankle1_angle_toe1_knee2)
-    fe_knee1 = 0
-    pose.fe_ankle1 = fe_ankle1
-    pose.fe_knee1 = fe_knee1
-
-    # get new knee1 and hip location and determine point below it:
-    pos_knee1 = pose.calculate_joint_positions("pos_knee1")
-    pos_hip = pose.calculate_joint_positions("pos_hip")
-    point_below_hip = np.array([pos_hip[0], 0])
-
-    # define new fe_hip1:
-    if pos_hip[0] < pos_knee1[0]:
-        fe_hip1 = qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
-    else:
-        fe_hip1 = -qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
-
-    # define new fe_hip2 and fe_knee2:
-    fe_hip2 = angle_hip + fe_hip1
-    knee2_angle_ankle1_ankle2 = qas.get_angle_between_points(
-        [pos_ankle1, pos_knee2, pos_ankle2]
-    )
-    fe_knee2 = knee_zero_angle - (angle_knee2 + knee2_angle_ankle1_ankle2)
-
-    pose.fe_hip2 = fe_hip2
-    pose.fe_knee2 = fe_knee2
-
-    return pose
 
 
 def solve_mid_position(ankle_x, ankle_y, subgait_id: str, plot=False):
@@ -387,16 +364,16 @@ def solve_end_position(
     # calculate lifted pose if ankle_y > 0:
     if ankle_y > 0:
         pos_ankle = np.array([ankle_x, ankle_y])
-        pose = calculate_lifted_pose(pos_ankle, pose)
+        pose.calculate_lifted_pose(pos_ankle)
 
         # reduce dorsi flexion and straighten leg if fe_ankle2 > max_flexion:
         if pose.fe_ankle2 > max_ankle_flexion:
 
             # reduce dorsi flexion:
-            pose = reduce_dorsi_flexion(max_ankle_flexion, pose)
+            pose.reduce_dorsi_flexion(max_ankle_flexion)
 
             # straighten leg:
-            pose = straighten_leg(pose)
+            pose.straighten_leg(pose)
 
     if timer:
         end = time.time()
