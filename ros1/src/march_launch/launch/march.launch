@@ -119,7 +119,7 @@
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
                  if="$(arg realsense)"/>
         
-        <include file="$(find foot_position_finder)/launch/foot_position_finder.launch"
+        <include file="$(find march_foot_position_finder)/launch/march_foot_position_finder.launch"
                  if="$(arg realsense)"/>
 
         <include file="$(find march_realsense_test_publisher)/launch/realsense_test_publisher.launch"

@@ -3,7 +3,7 @@
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "foot_position_finder");
+    ros::init(argc, argv, "march_foot_position_finder");
 
     ros::NodeHandle n;
     FootPositionFinder pointFinderLeft(&n, false, "left");
@@ -13,4 +13,5 @@ int main(int argc, char** argv)
     ros::shutdown();
 
     return 0;
+
 }

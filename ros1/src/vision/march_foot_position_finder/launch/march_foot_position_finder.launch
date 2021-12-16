@@ -1,6 +1,6 @@
 <launch>
     <node name="foot_position_finder_node"
-          pkg="foot_position_finder"
+          pkg="march_foot_position_finder"
           type="foot_position_finder_node"
           output="screen"
           respawn="true"

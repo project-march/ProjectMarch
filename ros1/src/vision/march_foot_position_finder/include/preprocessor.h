@@ -20,8 +20,6 @@ protected:
 
     bool voxelDownSample(double voxel_size);
 
-    bool transformPointsToOrigin();
-
     bool estimateNormals(int number_of_neighbours);
 
     bool filterOnDistance(int x_min, int x_max, int y_min, int y_max, int z_min, int z_max);

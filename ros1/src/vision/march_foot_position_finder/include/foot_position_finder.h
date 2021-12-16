@@ -12,8 +12,6 @@
 #include <librealsense2/rs.hpp>
 #include <pcl_ros/transforms.h>
 
-
-
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -36,16 +34,12 @@ protected:
 
     bool publishNextPoint(Point &p);
 
-    Point computeAveragePoint(const std::vector<Point> &points);
-
     rs2::pipeline pipe;
     rs2::config cfg;
 
     rs2::decimation_filter dec_filter;
     rs2::spatial_filter spat_filter;
     rs2::temporal_filter temp_filter;
-
-    bool realsense_;
 
     ros::NodeHandle* n_;
 
@@ -62,6 +56,7 @@ protected:
     std::vector<Point> found_points_;
     int sample_size_ = 3;
     std::string left_or_right_;
+    bool realsense_;
 
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher found_points_publisher_;

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MARCH_REALSENSE_TO_PCL
+#define MARCH_REALSENSE_TO_PCL
 
 #include <librealsense2/rs.hpp>
 #include <pcl/point_types.h>
@@ -10,7 +11,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
  * Transforms pointclouds from the realsense cameras to pointcloud from the PCL library
  * 
  * @param points realsense pointcloud
- * @return pcl pointcloud
+ * @return PointCloud::Ptr pcl pointcloud
  */
 PointCloud::Ptr points_to_pcl(const rs2::points& points)
 {
@@ -22,11 +23,11 @@ PointCloud::Ptr points_to_pcl(const rs2::points& points)
     cloud-> is_dense = false;
     cloud-> points.resize(points.size());
 
-    auto x_min = -1;
-    auto x_max =  1;
+    auto x_min = -0.5;
+    auto x_max =  0.5;
     auto y_min = -1;
     auto y_max =  1;
-    auto z_min =  -2;
+    auto z_min =  -0.10;
     auto z_max =  2;
 
     int point_count = 0;
@@ -50,3 +51,5 @@ PointCloud::Ptr points_to_pcl(const rs2::points& points)
 
     return cloud;
 }
+
+#endif // MARCH_REALSENSE_TO_PCL

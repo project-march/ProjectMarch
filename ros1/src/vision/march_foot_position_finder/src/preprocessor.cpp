@@ -15,25 +15,42 @@ using PointCloud = pcl::PointCloud<Point>;
 using Normal = pcl::Normal;
 using NormalCloud = pcl::PointCloud<Normal>;
 
-
+/**
+ * Constructs a preprocessor object.
+ * 
+ * @param pointcloud realsense pointcloud
+ * @return PointCloud::Ptr pcl pointcloud
+ */
 Preprocessor::Preprocessor(PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud)
     : pointcloud_ { pointcloud }
     , normalcloud_ { normalcloud }
-    {
-        tfBuffer = std::make_unique<tf2_ros::Buffer>();
-        tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
-    }
+{
+    tfBuffer = std::make_unique<tf2_ros::Buffer>();
+    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+}
 
+
+/**
+ * Preprocess the current pointcloud.
+ * 
+ * @return bool whether the function succeeded
+ */
 bool Preprocessor::preprocess()
 {
-    voxelDownSample(0.01);
-    // estimateNormals(1);
-    transformPointCloudFromUrdf();
-    // transformPointsToOrigin();
-    filterOnDistance(-1, 1, -1, 1, -1, 1);
+    bool success = true;
+    success &= voxelDownSample(0.01);
+    success &= filterOnDistance(-1, 1, -1, 1, -1, 1);
+    success &= transformPointCloudFromUrdf();
     return true;
 }
 
+
+/**
+ * Downsample the pointcloud using a voxel grid.
+ * 
+ * @param voxel_size cell size of the voxel grid
+ * @return bool whether the function succeeded
+ */
 bool Preprocessor::voxelDownSample(double voxel_size) 
 {
     pcl::VoxelGrid<Point> voxel_grid;
@@ -43,6 +60,13 @@ bool Preprocessor::voxelDownSample(double voxel_size)
     return true;
 }
 
+
+/**
+ * Compute the normals of each point in a pointcloud.
+ * 
+ * @param number_of_neighbours number of neighbours to use for computing normals
+ * @return bool whether the function succeeded
+ */
 bool Preprocessor::estimateNormals(int number_of_neighbours)
 {
     pcl::NormalEstimation<Point, Normal> normal_estimator;
@@ -54,13 +78,12 @@ bool Preprocessor::estimateNormals(int number_of_neighbours)
     return true;
 }
 
-bool Preprocessor::transformPointsToOrigin()
-{
-    Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-    pcl::transformPointCloud (*pointcloud_, *pointcloud_, transform);
-    return true;
-}
 
+/**
+ * Filter points based on their distance using minimum and maximum allowed coordinates.
+ * 
+ * @return bool whether the function succeeded
+ */
 bool Preprocessor::filterOnDistance(int x_min, int x_max, int y_min, int y_max,  
                                            int z_min, int z_max)
 {
@@ -86,6 +109,11 @@ bool Preprocessor::filterOnDistance(int x_min, int x_max, int y_min, int y_max,
 }
 
 
+/**
+ * Transform the realsense pointclouds to world frame using URDF transformations.
+ * 
+ * @return bool whether the function succeeded
+ */
 bool Preprocessor::transformPointCloudFromUrdf()
 {
     geometry_msgs::TransformStamped transform_stamped;

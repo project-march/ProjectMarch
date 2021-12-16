@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(foot_position_finder)
+project(march_foot_position_finder)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -62,11 +62,11 @@ add_library(${PROJECT_NAME}
     src/foot_position_finder.cpp
 )
 
-add_executable(${PROJECT_NAME}_node src/foot_position_finder_node.cpp)
+add_executable(foot_position_finder_node src/foot_position_finder_node.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY})
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+target_link_libraries(foot_position_finder_node ${PROJECT_NAME})
 
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -76,21 +76,10 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark executables for installation
-install(TARGETS ${PROJECT_NAME}_node
+install(TARGETS foot_position_finder_node
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-# install(DIRECTORY include/${PROJECT_NAME}/ include/pointcloud_processor/
-#         include/utilities/
-#         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#         FILES_MATCHING PATTERN "*.h"
-# )
-
-# if(BUILD_TESTING)
-#   find_package(ament_lint_auto REQUIRED)
-#   ament_lint_auto_find_test_dependencies()
-# endif()

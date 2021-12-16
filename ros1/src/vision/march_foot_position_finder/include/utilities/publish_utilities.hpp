@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MARCH_PUBLISH_UTILITIES
+#define MARCH_PUBLISH_UTILITIES
 
 #include <librealsense2/rs.hpp>
 #include <pcl/point_types.h>
@@ -12,13 +13,17 @@ using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 
+/**
+ * Publishes a point cloud with a given publisher.
+ * 
+ * @param publisher publisher to use
+ * @param cloud cloud to publish
+ */
 void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
 {
-
-    ROS_INFO("Publish cloud");
-
-
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+
+    // rotate point around z axis (counter clockwise)
     transform.rotate(Eigen::AngleAxisf(M_PI/2, Eigen::Vector3f::UnitZ()));
     pcl::transformPointCloud(cloud, cloud, transform);
 
@@ -33,11 +38,14 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
 }
 
 
+/**
+ * Publishes a marker point with a given publisher.
+ * 
+ * @param publisher publisher to use
+ * @param p point to publish
+ */
 void publishMarkerPoint(const ros::Publisher& publisher, Point &p)
 {
-
-    ROS_INFO("Publish marker");
-
     visualization_msgs::Marker marker;
     marker.header.frame_id = "world";
     marker.header.stamp = ros::Time::now();
@@ -70,3 +78,4 @@ void publishMarkerPoint(const ros::Publisher& publisher, Point &p)
     publisher.publish(marker);
 }
   
+#endif // MARCH_PUBLISH_UTILITIES

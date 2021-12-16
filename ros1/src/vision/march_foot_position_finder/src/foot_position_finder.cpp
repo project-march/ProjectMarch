@@ -10,9 +10,12 @@
 #include <string>
 #include <iostream>
 #include <visualization_msgs/MarkerArray.h>
+#include "utilities/math_utilities.hpp"
 
 
-FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense, std::string left_or_right)
+FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
+                                       bool realsense,
+                                       std::string left_or_right)
     : n_(n)
     , realsense_(realsense)
     , left_or_right_(left_or_right)
@@ -126,24 +129,6 @@ bool FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
     return true;
 }
 
-Point FootPositionFinder::computeAveragePoint(const std::vector<Point> &points)
-{
-    Point avg(0, 0, 0);
-
-    for (const Point &p : points)
-    {
-        avg.x += p.x;
-        avg.y += p.y;
-        avg.z += p.z;
-    }
-
-    avg.x /= points.size();
-    avg.x /= points.size();
-    avg.x /= points.size();
-
-    return avg;
-}
-
 
 bool FootPositionFinder::computeTemporalAveragePoint(const Point &new_point)
 {
@@ -176,6 +161,8 @@ bool FootPositionFinder::publishNextPoint(Point &p)
     point.x = p.x;
     point.y = p.y;
     point.z = p.z;
+
     point_publisher_.publish(point);
     return true;
 }
+

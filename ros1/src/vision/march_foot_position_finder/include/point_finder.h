@@ -9,6 +9,7 @@
 #include <cmath>
 #include <vector>
 #include <pcl_ros/transforms.h>
+#include "utilities/math_utilities.hpp"
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -57,6 +58,9 @@ protected:
     double y_displacements_front = ceil(0.20 / cell_width);
     double y_displacements_far = ceil(0.05 / cell_width);
 
+    std::vector<int> x_displacements;
+    std::vector<int> y_displacements;
+
     double x_offset;
     double y_offset;
     double x_width;
@@ -71,9 +75,6 @@ protected:
     bool convolveGaussianKernel();
 
     bool convolveLaplacianKernel();
-
-    template<int K, int R>
-    bool convolve2D(double kernel[K][K], double (&source)[R][R], double (&destination)[R][R]);
 
     bool findFeasibleFootPlacements(std::vector<Point> *position_queue);    
 
