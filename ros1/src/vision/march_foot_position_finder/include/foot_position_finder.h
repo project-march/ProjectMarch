@@ -1,38 +1,38 @@
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
-#include <string>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include <pcl/common/distances.h>
 #include <cmath>
-#include <vector>
-#include <sensor_msgs/PointCloud2.h>
-#include <ros/ros.h>
 #include <librealsense2/rs.hpp>
+#include <pcl/common/distances.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 #include <pcl_ros/transforms.h>
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <string>
+#include <vector>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class FootPositionFinder {
 public:
-
-    explicit FootPositionFinder(ros::NodeHandle* n, bool realsense, std::string left_or_right);
+    explicit FootPositionFinder(
+        ros::NodeHandle* n, bool realsense, std::string left_or_right);
 
     ~FootPositionFinder() = default;
 
 protected:
+    void processRealSenseDepthFrames();
 
-    bool processRealSenseDepthFrames();
+    void processSimulatedDepthFrames(
+        const sensor_msgs::PointCloud2 input_cloud);
 
-    void processSimulatedDepthFrames(const sensor_msgs::PointCloud2 input_cloud);
+    void processPointCloud(PointCloud::Ptr pointcloud);
 
-    bool processPointCloud(PointCloud::Ptr pointcloud);
+    void computeTemporalAveragePoint(const Point& new_point);
 
-    bool computeTemporalAveragePoint(const Point &new_point);
-
-    bool publishNextPoint(Point &p);
+    void publishNextPoint(Point& p);
 
     rs2::pipeline pipe;
     rs2::config cfg;
@@ -49,9 +49,7 @@ protected:
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
 
-    std::string TOPIC_CAMERA_FRONT_LEFT = "/camera_front_left/depth/color/points";
-    std::string TOPIC_CAMERA_FRONT_RIGHT = "/camera_front_right/depth/color/points";
-    std::string TOPIC_TEST_CLOUDS = "/test_clouds";
+    std::string topic_camera_front;
 
     std::vector<Point> found_points_;
     int sample_size_ = 3;
@@ -59,8 +57,7 @@ protected:
     bool realsense_;
 
     ros::Publisher preprocessed_pointcloud_publisher_;
-    ros::Publisher found_points_publisher_;
-
+    ros::Publisher point_marker_publisher_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

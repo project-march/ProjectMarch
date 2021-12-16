@@ -8,10 +8,9 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     FootPositionFinder pointFinderLeft(&n, false, "left");
     FootPositionFinder pointFinderRight(&n, false, "right");
-    
+
     ros::spin();
     ros::shutdown();
 
     return 0;
-
 }

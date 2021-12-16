@@ -3,31 +3,27 @@
 
 #define RES 70
 
-#include <string>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include <cmath>
-#include <vector>
-#include <pcl_ros/transforms.h>
 #include "utilities/math_utilities.hpp"
+#include <cmath>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_ros/transforms.h>
+#include <string>
+#include <vector>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class PointFinder {
 public:
-
-    explicit PointFinder(PointCloud::Ptr pointcloud,
-                                std::string left_or_right,
-                                Point &step_point);
+    explicit PointFinder(PointCloud::Ptr pointcloud, std::string left_or_right,
+        Point& step_point);
 
     ~PointFinder() = default;
 
-    bool findPoints(std::vector<Point> *position_queue);
-
+    void findPoints(std::vector<Point>* position_queue);
 
 protected:
-
     PointCloud::Ptr pointcloud_;
     std::vector<double> search_dimensions_;
     std::string left_or_right_;
@@ -68,16 +64,15 @@ protected:
 
     double available_points_ratio = 0.85;
 
-    bool mapPointCloudToHeightMap();
+    void mapPointCloudToHeightMap();
 
-    bool interpolateMap();
+    void interpolateMap();
 
-    bool convolveGaussianKernel();
+    void convolveGaussianKernel();
 
-    bool convolveLaplacianKernel();
+    void convolveLaplacianKernel();
 
-    bool findFeasibleFootPlacements(std::vector<Point> *position_queue);    
-
+    void findFeasibleFootPlacements(std::vector<Point>* position_queue);
 };
 
 #endif // MARCH_POINT_FINDER_H

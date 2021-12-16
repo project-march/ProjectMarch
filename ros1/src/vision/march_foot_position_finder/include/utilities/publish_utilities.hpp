@@ -2,20 +2,19 @@
 #define MARCH_PUBLISH_UTILITIES
 
 #include <librealsense2/rs.hpp>
-#include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <ros/ros.h>
-#include <pcl_ros/transforms.h>
+#include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
+#include <pcl_ros/transforms.h>
+#include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
-
 /**
  * Publishes a point cloud with a given publisher.
- * 
+ *
  * @param publisher publisher to use
  * @param cloud cloud to publish
  */
@@ -24,7 +23,7 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
     // rotate point around z axis (counter clockwise)
-    transform.rotate(Eigen::AngleAxisf(M_PI/2, Eigen::Vector3f::UnitZ()));
+    transform.rotate(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitZ()));
     pcl::transformPointCloud(cloud, cloud, transform);
 
     cloud.width = 1;
@@ -37,24 +36,23 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
     publisher.publish(msg);
 }
 
-
 /**
  * Publishes a marker point with a given publisher.
- * 
+ *
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishMarkerPoint(const ros::Publisher& publisher, Point &p)
+void publishMarkerPoint(ros::Publisher& publisher, Point& p)
 {
     visualization_msgs::Marker marker;
     marker.header.frame_id = "world";
     marker.header.stamp = ros::Time::now();
-    
+
     marker.ns = "found_points";
     marker.id = 0;
     marker.type = visualization_msgs::Marker::CUBE;
     marker.action = visualization_msgs::Marker::ADD;
-    
+
     // rotate point around z axis (counter clockwise)
     marker.pose.position.x = -p.y;
     marker.pose.position.y = p.x;
@@ -77,5 +75,23 @@ void publishMarkerPoint(const ros::Publisher& publisher, Point &p)
 
     publisher.publish(marker);
 }
-  
+
+/**
+ * Publishes a point to a given publisher.
+ *
+ * @param publisher publisher to use
+ * @param p point to publish
+ */
+void publishPoint(ros::Publisher& publisher, Point& p)
+{
+    publishMarkerPoint(publisher, p);
+
+    geometry_msgs::Point point;
+    point.x = p.x;
+    point.y = p.y;
+    point.z = p.z;
+
+    publisher.publish(point);
+}
+
 #endif // MARCH_PUBLISH_UTILITIES
