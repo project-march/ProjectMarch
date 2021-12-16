@@ -1,6 +1,0 @@
-# Service for solving the inverse kinematic problem for a desired foot location
-
-geometry_msgs/Point desired_location
----
-string success
-sensor_msgs/JointState solution

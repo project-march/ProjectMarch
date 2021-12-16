@@ -22,7 +22,6 @@ endif()
 add_definitions(-w)
 
 # find dependencies
-# find_package(ament_cmake REQUIRED)
 find_package(PCL REQUIRED)
 find_package(realsense2 REQUIRED)
 
