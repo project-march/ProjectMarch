@@ -91,13 +91,12 @@ class Pose:
         )
 
         # toe2 = ankle2 + translation_by_foot:
+        angle_before_ankle2 = self.fe_hip2 - self.fe_knee2
         angle_ankle2 = ankle_zero_angle + self.fe_ankle2
         pos_toe2 = np.array(
             [
-                pos_ankle2[0]
-                + sin(self.fe_hip2 - self.fe_knee2 + angle_ankle2) * length_foot,
-                pos_ankle2[1]
-                - cos(self.fe_hip2 - self.fe_knee2 + angle_ankle2) * length_foot,
+                pos_ankle2[0] + sin(angle_before_ankle2 + angle_ankle2) * length_foot,
+                pos_ankle2[1] - cos(angle_before_ankle2 + angle_ankle2) * length_foot,
             ]
         )
 
@@ -114,6 +113,11 @@ class Pose:
             )
         else:
             return locals()[joint]
+
+    def get_ankle_distance(self):
+        pos_ankle1 = self.calculate_joint_positions("pos_ankle1")
+        pos_ankle2 = self.calculate_joint_positions("pos_ankle2")
+        return np.linalg.norm(pos_ankle1 - pos_ankle2)
 
     def get_pose(self):
         return (
@@ -257,7 +261,7 @@ def reduce_dorsi_flexion(max_flexion, pose: Pose):
     return pose
 
 
-def straighten_leg(pose):
+def straighten_leg(pose: Pose):
     """
     Straighten stance leg by making a triangle between ankle1, hip and knee2
     and calculating new angles.
@@ -312,7 +316,7 @@ def straighten_leg(pose):
     return pose
 
 
-def solve_mid_position(ankle_x, ankle_y, plot=False):
+def solve_mid_position(ankle_x, ankle_y, subgait_id: str, plot=False):
     """
     Solve inverse kinematics for the middle position. Assumes that the
     stance leg is straight. Takes the ankle_x and ankle_y position of the
@@ -343,12 +347,18 @@ def solve_mid_position(ankle_x, ankle_y, plot=False):
         current_pose = Pose(pose)
         current_pose.make_plot()
 
+    if subgait_id == "left_swing":
+        half1 = pose[: len(pose) // 2]
+        half2 = pose[len(pose) // 2 :]
+        pose = half2 + half1
+
     return [np.deg2rad(angle) for angle in pose]
 
 
 def solve_end_position(
     ankle_x,
-    ankle_y=0,
+    ankle_y,
+    subgait_id: str,
     max_ankle_flexion=default_max_ankle_flexion,
     plot=False,
     timer=False,
@@ -396,4 +406,10 @@ def solve_end_position(
         pose.make_plot()
 
     pose = pose.get_pose()
+
+    if subgait_id == "left_swing":
+        half1 = pose[: len(pose) // 2]
+        half2 = pose[len(pose) // 2 :]
+        pose = half2 + half1
+
     return [np.deg2rad(angle) for angle in pose]

@@ -72,9 +72,7 @@ class DynamicSubgait:
         :returns: A setpoint_dict for the middle position.
         :rtype: dict
         """
-        middle_position = solve_mid_position(position_x, position_y)
-        if self.subgait_id == "left_swing":
-            middle_position.reverse()
+        middle_position = solve_mid_position(position_x, position_y, self.subgait_id)
 
         self.middle_setpoint_dict = self.from_list_to_setpoint(
             self.joint_names,
@@ -91,9 +89,9 @@ class DynamicSubgait:
         :param position_y: Optional y-coordinate in meters of the desired foot location. Default is zero.
         :type position_y: float
         """
-        self.desired_position = solve_end_position(position_x, position_y)
-        if self.subgait_id == "left_swing":
-            self.desired_position.reverse()
+        self.desired_position = solve_end_position(
+            position_x, position_y, self.subgait_id
+        )
 
         self.desired_setpoint_dict = self.from_list_to_setpoint(
             self.joint_names, self.desired_position, None, self.time[2]
@@ -131,24 +129,15 @@ class DynamicSubgait:
         """
         # Solve for middle setpoint.
         # Solve_ik function cannot handle HAA yet, thus has to be removed
-        starting_position_without_haa = []
+        starting_position_list = []
         for joint in self.joint_names:
-            starting_position_without_haa.append(
+            starting_position_list.append(
                 np.rad2deg(self.starting_position[joint].position)
             )
 
-        if self.subgait_id == "left_swing":
-            starting_position_without_haa.reverse()
-
-        current_pose = Pose(starting_position_without_haa)
-        subgait_id_ankle_pos = current_pose.calculate_joint_positions(
-            starting_position_without_haa, joint="pos_ankle2"
-        )
-
         # Swing leg ankle position is relative to stance leg ankle position (0,0)
-        stance_swing_dis = np.sqrt(
-            subgait_id_ankle_pos[0] ** 2 + subgait_id_ankle_pos[1] ** 2
-        )
+        current_pose = Pose(starting_position_list)
+        stance_swing_dis = current_pose.get_ankle_distance()
 
         # Middle position x is weighted average of the current and desired setpoint,
         # relative to the stance leg ankle
