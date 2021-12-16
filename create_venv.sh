@@ -1,4 +1,12 @@
 #!/bin/sh
+# This script is designed to automatically create a python virtual environment with all necessary dependencies.
+# Note: This file virtual environment is not meant to run the ros code in, but for your IDE to easily index dependencies.\
+# To run the march code with this venv you need to add the options --system-site-packages --symlinks to building,
+# however this is not advised and you should use the docker images if you want to set the dependencies to
+# a specific version.
+# To run this code call `bash create_venv.sh` in a terminal console.
+# date: 10-2021
+# author: George Vegelien
 
 # Exit on the first error
 set -e
