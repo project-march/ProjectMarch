@@ -52,14 +52,14 @@
     </group>
    
     <group ns="camera_front_left"
-           if="$(eval realsense and not realsense_simulation and ground_gait and robot_description == 'march6_two_cameras')">
+           if="$(eval realsense and not realsense_simulation and ground_gait and robot_description == 'march6_three_cameras')">
         <node name="republish_pointclouds" pkg="march_simulation"
               type="republish_pointclouds.py">
             <param name="name" value="camera_front_left"/>
         </node>
     </group>
     <group ns="camera_front_right"
-           if="$(eval realsense and not realsense_simulation and ground_gait and robot_description == 'march6_two_cameras')">
+           if="$(eval realsense and not realsense_simulation and ground_gait and robot_description == 'march6_three_cameras')">
         <node name="republish_pointclouds" pkg="march_simulation"
               type="republish_pointclouds.py">
             <param name="name" value="camera_front_right"/>

@@ -18,7 +18,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class FootPositionFinder {
 public:
     explicit FootPositionFinder(
-        ros::NodeHandle* n, bool realsense, std::string left_or_right);
+        ros::NodeHandle* n, bool realsense, const std::string& left_or_right);
 
     ~FootPositionFinder() = default;
 
@@ -28,7 +28,7 @@ protected:
     void processSimulatedDepthFrames(
         const sensor_msgs::PointCloud2 input_cloud);
 
-    void processPointCloud(PointCloud::Ptr pointcloud);
+    void processPointCloud(const PointCloud::Ptr& pointcloud);
 
     void computeTemporalAveragePoint(const Point& new_point);
 

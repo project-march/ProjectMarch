@@ -136,12 +136,12 @@
         <!-- To prevent unnecessary topics and messages, we disable the plugins that
          send a lot of compressed versions of the camera topics. -->
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(eval realsense and robot_description == 'march6_two_cameras')">
+                 if="$(eval realsense and robot_description == 'march6_three_cameras')">
             <arg name="camera_name" value="camera_front_left"/>
         </include>
 
         <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(eval realsense and robot_description == 'march6_two_cameras')">
+                 if="$(eval realsense and robot_description == 'march6_three_cameras')">
             <arg name="camera_name" value="camera_front_right"/>
         </include>
         

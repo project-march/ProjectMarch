@@ -67,9 +67,9 @@ void publishMarkerPoint(ros::Publisher& publisher, Point& p)
     marker.scale.y = 0.02;
     marker.scale.z = 0.02;
 
-    marker.color.r = 1.0f;
-    marker.color.g = 0.0f;
-    marker.color.b = 0.0f;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
     marker.color.a = 1.0;
     marker.lifetime = ros::Duration();
 

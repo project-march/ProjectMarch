@@ -21,8 +21,11 @@
  * @param left_or_right whether the FootPositionFinder runs for the left or
  * right foot
  */
-FootPositionFinder::FootPositionFinder(
-    ros::NodeHandle* n, bool realsense, std::string left_or_right)
+// No lint is used to avoid linting in the realsense library, where a potential
+// memory leak error is present
+// NOLINTNEXTLINE
+FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
+    const std::string& left_or_right) // NOLINT
     : n_(n)
     , realsense_(realsense)
     , left_or_right_(left_or_right)
@@ -34,20 +37,21 @@ FootPositionFinder::FootPositionFinder(
         = "/camera_front_" + left_or_right + "/depth/color/points";
 
     point_publisher_ = n_->advertise<geometry_msgs::Point>(
-        "/foot_position/" + left_or_right_, 1);
+        "/foot_position/" + left_or_right_, /*queue_size=*/1);
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>(
-        "/camera_" + left_or_right_ + "/preprocessed_cloud", 1);
+        "/camera_" + left_or_right_ + "/preprocessed_cloud", /*queue_size=*/1);
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
-        "/camera_" + left_or_right_ + "/found_points", 1);
+        "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
     if (realsense) {
-        cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
+        cfg.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
+            RS2_FORMAT_Z16, /*framerate=*/30);
         pipe.start(cfg);
         processRealSenseDepthFrames();
     } else {
-        pointcloud_subscriber_
-            = n_->subscribe<sensor_msgs::PointCloud2>(topic_camera_front, 1,
-                &FootPositionFinder::processSimulatedDepthFrames, this);
+        pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
+            topic_camera_front, /*queue_size=*/1,
+            &FootPositionFinder::processSimulatedDepthFrames, this);
     }
 }
 
@@ -78,7 +82,7 @@ void FootPositionFinder::processRealSenseDepthFrames()
  * Callback function for when a simulated realsense depth frame arrives.
  */
 void FootPositionFinder::processSimulatedDepthFrames(
-    const sensor_msgs::PointCloud2 input_cloud)
+    const sensor_msgs::PointCloud2 input_cloud) // NOLINT
 {
     PointCloud converted_cloud;
     pcl::fromROSMsg(input_cloud, converted_cloud);
@@ -91,10 +95,8 @@ void FootPositionFinder::processSimulatedDepthFrames(
  * Run a complete processing pipeline for a point cloud with as a result a new
  * point.
  */
-void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
+void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
-    auto pointcloud_frame_id = pointcloud->header.frame_id.c_str();
-
     NormalCloud::Ptr normalcloud(new NormalCloud());
     PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
 
@@ -103,10 +105,11 @@ void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
         // Define the desired future foot position
         std::string frame_id;
         if (left_or_right_ == "left") {
-            desired_point->push_back(Point(-0.5, -0.25, 0));
+            desired_point->push_back(
+                Point(/*_x=*/-0.5, /*_y=*/-0.25, /*_z=*/0));
             frame_id = "foot_right";
         } else if (left_or_right_ == "right") {
-            desired_point->push_back(Point(-0.5, 0.25, 0));
+            desired_point->push_back(Point(/*_x=*/-0.5, /*_y=*/0.25, /*_z=*/0));
             frame_id = "foot_left";
         }
 
@@ -116,9 +119,10 @@ void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
 
         try {
             if (tfBuffer->canTransform(
-                    "world", frame_id, ros::Time(), ros::Duration(1.0)))
+                    "world", frame_id, ros::Time(), ros::Duration(/*t=*/1.0))) {
                 transform_stamped = tfBuffer->lookupTransform(
-                    "world", frame_id, ros::Time(0));
+                    "world", frame_id, ros::Time(/*t=*/0));
+            }
         } catch (tf2::TransformException& ex) {
             ROS_WARN_STREAM(
                 "Something went wrong when transforming the pointcloud: "
@@ -151,9 +155,9 @@ void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
  */
 void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 {
-    if (found_points_.size() < sample_size_)
+    if (found_points_.size() < sample_size_) {
         found_points_.push_back(new_point);
-    else {
+    } else {
         std::rotate(found_points_.begin(), found_points_.begin() + 1,
             found_points_.end());
         found_points_[sample_size_ - 1] = new_point;
@@ -161,8 +165,9 @@ void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 
         std::vector<Point> non_outliers;
         for (Point& p : found_points_) {
-            if (pcl::squaredEuclideanDistance(p, avg) < 0.05)
+            if (pcl::squaredEuclideanDistance(p, avg) < 0.05) {
                 non_outliers.push_back(p);
+            }
         }
 
         Point found_point = computeAveragePoint(non_outliers);

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <pcl/point_cloud.h>
@@ -16,17 +17,16 @@ using PointCloud = pcl::PointCloud<Point>;
  * foot
  * @param step_point an initial desired step point
  */
+// NOLINTNEXTLINE
 PointFinder::PointFinder(
     PointCloud::Ptr pointcloud, std::string left_or_right, Point& step_point)
-    : pointcloud_ { pointcloud }
-    , left_or_right_ { left_or_right }
+    : pointcloud_ { std::move(pointcloud) }
+    , left_or_right_ { std::move(left_or_right) }
 {
-    memset(
-        height_map_, -5, sizeof(double) * grid_resolution_ * grid_resolution_);
-    memset(height_map_temp_, -5,
-        sizeof(double) * grid_resolution_ * grid_resolution_);
-    memset(
-        derivatives_, 1, sizeof(double) * grid_resolution_ * grid_resolution_);
+    std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -5);
+    std::fill_n(
+        &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -5);
+    std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 1);
 
     optimal_foot_x_ = step_point.x;
     optimal_foot_y_ = step_point.y;
@@ -35,10 +35,12 @@ PointFinder::PointFinder(
     search_dimensions_ = { optimal_foot_x_ - 0.5, optimal_foot_x_ + 0.5,
         optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5, -1, 1 };
 
-    if (rect_width % 2 == 0)
+    if (rect_width % 2 == 0) {
         rect_width--;
-    if (rect_height % 2 == 0)
+    }
+    if (rect_height % 2 == 0) {
         rect_height--;
+    }
     if (left_or_right_ == "left") {
         auto temp = x_displacements_left;
         x_displacements_left = x_displacements_right;
@@ -50,21 +52,26 @@ PointFinder::PointFinder(
     x_width = search_dimensions_[1] - search_dimensions_[0];
     y_width = search_dimensions_[3] - search_dimensions_[2];
 
-    for (int y = 0; y >= -y_displacements_front; y--)
+    for (int y = 0; y >= -y_displacements_front; y--) {
         y_displacements.push_back(y);
-    for (int y = 1; y <= y_displacements_far; y++)
+    }
+    for (int y = 1; y <= y_displacements_far; y++) {
         y_displacements.push_back(y);
-
+    }
     if (left_or_right_ == "left") {
-        for (int x = 0; x >= -x_displacements_left; x--)
+        for (int x = 0; x >= -x_displacements_left; x--) {
             x_displacements.push_back(x);
-        for (int x = 1; x <= x_displacements_right; x++)
+        }
+        for (int x = 1; x <= x_displacements_right; x++) {
             x_displacements.push_back(x);
+        }
     } else if (left_or_right_ == "right") {
-        for (int x = 0; x <= x_displacements_right; x++)
+        for (int x = 0; x <= x_displacements_right; x++) {
             x_displacements.push_back(x);
-        for (int x = -1; x >= -x_displacements_left; x--)
+        }
+        for (int x = -1; x >= -x_displacements_left; x--) {
             x_displacements.push_back(x);
+        }
     }
 }
 
@@ -105,8 +112,10 @@ void PointFinder::mapPointCloudToHeightMap()
  */
 void PointFinder::convolveGaussianKernel()
 {
-    double gaussian[3][3] = { { 1.0 / 16, 2.0 / 16, 1.0 / 16 },
-        { 2.0 / 16, 4.0 / 16, 2.0 / 16 }, { 1.0 / 16, 2.0 / 16, 1.0 / 16 } };
+    std::array<std::array<double, 3>, 3> gaussian = {
+        { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 },
+            { 1.0 / 16, 2.0 / 16, 1.0 / 16 } }
+    };
 
     convolve2D(gaussian, height_map_temp_, height_map_);
 }
@@ -116,8 +125,10 @@ void PointFinder::convolveGaussianKernel()
  */
 void PointFinder::convolveLaplacianKernel()
 {
-    double laplacian[3][3] = { { 1 / 6.0, 4 / 6.0, 1 / 6.0 },
-        { 4 / 6.0, -20 / 6.0, 4 / 6.0 }, { 1 / 6.0, 4 / 6.0, 1 / 6.0 } };
+
+    std::array<std::array<double, 3>, 3> laplacian
+        = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 },
+            { 1 / 6.0, 4 / 6.0, 1 / 6.0 } } };
 
     convolve2D(laplacian, height_map_, derivatives_);
 }
@@ -139,24 +150,29 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
                 - y_shift;
 
             for (int x = x_opt - rect_width / 2; x < x_opt + rect_width / 2.0;
-                 x++)
+                 x++) {
                 for (int y = y_opt - rect_height / 2;
-                     y < y_opt + rect_height / 2.0; y++)
-                    if (std::abs(derivatives_[y][x]) < derivative_threshold_)
+                     y < y_opt + rect_height / 2.0; y++) {
+                    if (std::abs(derivatives_[y][x]) < derivative_threshold_) {
                         num_free_cells++;
+                    }
+                }
+            }
 
             if (num_free_cells
                 >= rect_height * rect_width * available_points_ratio) {
-                double x = ((double)x_opt / grid_resolution_) - x_offset
+                // NOLINTNEXTLINE
+                float x = ((float)x_opt / grid_resolution_) - x_offset
                     + cell_width / 2.0;
-                double y
-                    = ((double)(grid_resolution_ - y_opt) / grid_resolution_)
+                // NOLINTNEXTLINE
+                float y = ((float)(grid_resolution_ - y_opt) / grid_resolution_)
                     - y_offset - cell_width / 2.0;
-                double z = height_map_[y_opt][x_opt];
+                float z = height_map_[y_opt][x_opt];
 
                 if (std::abs(z - current_foot_z_) <= 0.25 && !std::isnan(x)
-                    && !std::isnan(y) && !std::isnan(z))
+                    && !std::isnan(y) && !std::isnan(z)) {
                     position_queue->push_back(Point(x, y, z));
+                }
             }
         }
     }

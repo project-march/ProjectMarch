@@ -16,12 +16,12 @@ public:
     void preprocess();
 
 protected:
-    void voxelDownSample(double voxel_size);
+    void voxelDownSample(float voxel_size);
 
     void estimateNormals(int number_of_neighbours);
 
-    void filterOnDistance(
-        int x_min, int x_max, int y_min, int y_max, int z_min, int z_max);
+    void filterOnDistance(float x_min, float x_max, float y_min, float y_max,
+        float z_min, float z_max);
 
     void transformPointCloudFromUrdf();
 

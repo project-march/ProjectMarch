@@ -1,7 +1,8 @@
 #ifndef MARCH_MATH_UTILITIES
 #define MARCH_MATH_UTILITIES
 
-#include <math.h>
+#include <array>
+#include <cmath>
 #include <pcl/point_types.h>
 
 using Point = pcl::PointXYZ;
@@ -14,16 +15,19 @@ using Point = pcl::PointXYZ;
  * @param source reference of the matrix to apply the convolution to
  * @param destination reference of array where the result is stored
  */
-template <int K, int R>
-void convolve2D(
-    double kernel[K][K], double (&source)[R][R], double (&destination)[R][R])
+template <std::size_t K, std::size_t R>
+void convolve2D(std::array<std::array<double, K>, K>& kernel,
+    std::array<std::array<double, R>, R>& source,
+    std::array<std::array<double, R>, R>& destination)
 {
     for (int i = K / 2; i < R - K / 2; i++) {
         for (int j = K / 2; j < R - K / 2; j++) {
             double sum = 0;
-            for (int a = 0; a < K; a++)
-                for (int b = 0; b < K; b++)
+            for (int a = 0; a < K; a++) {
+                for (int b = 0; b < K; b++) {
                     sum += kernel[a][b] * source[i + (a - 1)][j + (b - 1)];
+                }
+            }
             destination[i][j] = sum;
         }
     }
@@ -37,7 +41,7 @@ void convolve2D(
  */
 inline Point computeAveragePoint(const std::vector<Point>& points)
 {
-    Point avg(0, 0, 0);
+    Point avg(/*_x=*/0, /*_y=*/0, /*_z=*/0);
 
     for (const Point& p : points) {
         avg.x += p.x;

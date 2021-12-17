@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/extract_indices.h>
@@ -22,8 +22,8 @@ using NormalCloud = pcl::PointCloud<Normal>;
  */
 Preprocessor::Preprocessor(
     PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud)
-    : pointcloud_ { pointcloud }
-    , normalcloud_ { normalcloud }
+    : pointcloud_ { std::move(pointcloud) }
+    , normalcloud_ { std::move(normalcloud) }
 {
     tfBuffer = std::make_unique<tf2_ros::Buffer>();
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
@@ -34,8 +34,9 @@ Preprocessor::Preprocessor(
  */
 void Preprocessor::preprocess()
 {
-    voxelDownSample(0.01);
-    filterOnDistance(-1, 1, -1, 1, -1, 1);
+    voxelDownSample(/*voxel_size=*/0.01);
+    filterOnDistance(/*x_min=*/-1, /*x_max=*/1, /*y_min=*/-1, /*y_max=*/1,
+        /*z_min=*/-1, /*z_max=*/1);
     transformPointCloudFromUrdf();
 }
 
@@ -44,7 +45,7 @@ void Preprocessor::preprocess()
  *
  * @param voxel_size cell size of the voxel grid
  */
-void Preprocessor::voxelDownSample(double voxel_size)
+void Preprocessor::voxelDownSample(float voxel_size)
 {
     pcl::VoxelGrid<Point> voxel_grid;
     voxel_grid.setInputCloud(pointcloud_);
@@ -71,8 +72,8 @@ void Preprocessor::estimateNormals(int number_of_neighbours)
  * Filter points based on their distance using minimum and maximum allowed
  * coordinates.
  */
-void Preprocessor::filterOnDistance(
-    int x_min, int x_max, int y_min, int y_max, int z_min, int z_max)
+void Preprocessor::filterOnDistance(float x_min, float x_max, float y_min,
+    float y_max, float z_min, float z_max)
 {
     pcl::PointIndices::Ptr remove_indices(new pcl::PointIndices());
     pcl::ExtractIndices<Point> extract;
@@ -87,7 +88,7 @@ void Preprocessor::filterOnDistance(
 
     extract.setInputCloud(pointcloud_);
     extract.setIndices(remove_indices);
-    extract.setNegative(true);
+    extract.setNegative(/*negative=*/true);
     extract.filter(*pointcloud_);
 }
 
@@ -101,9 +102,9 @@ void Preprocessor::transformPointCloudFromUrdf()
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         if (tfBuffer->canTransform("world", pointcloud_frame_id, ros::Time(),
-                ros::Duration(1.0))) {
+                ros::Duration(/*t=*/1.0))) {
             transform_stamped = tfBuffer->lookupTransform(
-                "world", pointcloud_frame_id, ros::Time(0));
+                "world", pointcloud_frame_id, ros::Time(/*t=*/0));
         }
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);

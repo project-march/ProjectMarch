@@ -4,6 +4,7 @@
 #define RES 70
 
 #include "utilities/math_utilities.hpp"
+#include <array>
 #include <cmath>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -31,18 +32,15 @@ protected:
     int grid_resolution_ = RES;
     double cell_width = 1.0 / grid_resolution_;
 
-    double height_map_[RES][RES];
-    double height_map_temp_[RES][RES];
-    double derivatives_[RES][RES];
+    std::array<std::array<double, RES>, RES> height_map_;
+    std::array<std::array<double, RES>, RES> height_map_temp_;
+    std::array<std::array<double, RES>, RES> derivatives_;
 
     double derivative_threshold_ = 0.03;
 
     double optimal_foot_x_;
     double optimal_foot_y_;
     double current_foot_z_;
-
-    double world_foot_x_offset_;
-    double world_foot_y_offset_;
 
     double foot_width_ = 0.10;
     double foot_length_ = 0.20;
