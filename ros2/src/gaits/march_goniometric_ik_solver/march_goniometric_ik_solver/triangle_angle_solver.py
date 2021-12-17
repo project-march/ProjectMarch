@@ -1,5 +1,4 @@
 import numpy as np
-from march_goniometric_ik_solver.goniometric_functions_degrees import acos
 
 
 def get_angle_from_sides(opposite_side, adjacent_sides):
@@ -8,7 +7,7 @@ def get_angle_from_sides(opposite_side, adjacent_sides):
     when all sides are given, based on the cosine rule.
     """
 
-    return acos(
+    return np.arccos(
         (adjacent_sides.dot(adjacent_sides) - opposite_side ** 2)
         / (2 * np.prod(adjacent_sides))
     )

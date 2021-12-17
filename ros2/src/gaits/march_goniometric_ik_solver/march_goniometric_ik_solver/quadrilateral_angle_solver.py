@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from march_goniometric_ik_solver.goniometric_functions_degrees import cos, sin, acos
+
+RIGHT_ANGLE = np.pi / 2
 
 
 def plot_points(points):
@@ -24,7 +25,7 @@ def get_angle_between_points(points):
 
     ba = a - b
     bc = c - b
-    return acos(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
+    return np.arccos(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
 
 
 def find_fourth_point(a, b, c, da):
@@ -44,10 +45,10 @@ def find_fourth_point(a, b, c, da):
     height = np.sqrt(da ** 2 - half_ac ** 2)
 
     ground_angle = get_angle_between_points([c, a, b])
-    center_point_angle = 90 - ground_angle
+    center_point_angle = RIGHT_ANGLE - ground_angle
 
     return center_point + np.array(
-        [-cos(center_point_angle) * height, sin(center_point_angle) * height]
+        [-np.cos(center_point_angle) * height, np.sin(center_point_angle) * height]
     )
 
 
@@ -95,7 +96,7 @@ def solve_quadritlateral(lengths, angle_b, debug=False):
 
     a = np.array([0, 0])
     b = a + np.array([ab, 0])
-    c = b + np.array([-cos(angle_b) * bc, sin(angle_b) * bc])
+    c = b + np.array([-np.cos(angle_b) * bc, np.sin(angle_b) * bc])
     d = find_fourth_point(a, b, c, da)
     points = [a, b, c, d]
 

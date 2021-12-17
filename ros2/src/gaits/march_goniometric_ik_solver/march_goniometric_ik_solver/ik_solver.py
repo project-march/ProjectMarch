@@ -4,11 +4,6 @@ import time
 
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 import march_goniometric_ik_solver.triangle_angle_solver as tas
-from march_goniometric_ik_solver.goniometric_functions_degrees import (
-    cos,
-    sin,
-    asin,
-)
 
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
@@ -24,14 +19,14 @@ length_leg = length_upper_leg + length_lower_leg
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-default_max_ankle_flexion = np.rad2deg(limits.upper)
+default_max_ankle_flexion = limits.upper
 
 # Constants:
 length_foot = 0.10  # m
-ankle_zero_angle = 90  # deg
-knee_zero_angle = 180  # deg
+ankle_zero_angle = np.pi / 2  # deg
+knee_zero_angle = np.pi  # deg
 
-default_hip_aa = 1.72  # deg
+default_hip_aa = 0.03  # deg
 
 
 class Pose:
@@ -61,32 +56,34 @@ class Pose:
         # knee1 = ankle1 + translation_by_lower_leg:
         pos_knee1 = np.array(
             [
-                pos_ankle1[0] + sin(self.fe_ankle1) * length_lower_leg,
-                pos_ankle1[1] + cos(self.fe_ankle1) * length_lower_leg,
+                pos_ankle1[0] + np.sin(self.fe_ankle1) * length_lower_leg,
+                pos_ankle1[1] + np.cos(self.fe_ankle1) * length_lower_leg,
             ]
         )
 
         # hip1 = knee1 + translation_by_upper_leg:
         pos_hip = np.array(
             [
-                pos_knee1[0] + sin(self.fe_ankle1 - self.fe_knee1) * length_upper_leg,
-                pos_knee1[1] + cos(self.fe_ankle1 - self.fe_knee1) * length_upper_leg,
+                pos_knee1[0]
+                + np.sin(self.fe_ankle1 - self.fe_knee1) * length_upper_leg,
+                pos_knee1[1]
+                + np.cos(self.fe_ankle1 - self.fe_knee1) * length_upper_leg,
             ]
         )
 
         # knee2 = hip + translation_by_upper_leg:
         pos_knee2 = np.array(
             [
-                pos_hip[0] + sin(self.fe_hip2) * length_upper_leg,
-                pos_hip[1] - cos(self.fe_hip2) * length_upper_leg,
+                pos_hip[0] + np.sin(self.fe_hip2) * length_upper_leg,
+                pos_hip[1] - np.cos(self.fe_hip2) * length_upper_leg,
             ]
         )
 
         # ankle2 = knee2 + translation_by_lower_leg:
         pos_ankle2 = np.array(
             [
-                pos_knee2[0] + sin(self.fe_hip2 - self.fe_knee2) * length_lower_leg,
-                pos_knee2[1] - cos(self.fe_hip2 - self.fe_knee2) * length_lower_leg,
+                pos_knee2[0] + np.sin(self.fe_hip2 - self.fe_knee2) * length_lower_leg,
+                pos_knee2[1] - np.cos(self.fe_hip2 - self.fe_knee2) * length_lower_leg,
             ]
         )
 
@@ -95,8 +92,10 @@ class Pose:
         angle_ankle2 = ankle_zero_angle + self.fe_ankle2
         pos_toe2 = np.array(
             [
-                pos_ankle2[0] + sin(angle_before_ankle2 + angle_ankle2) * length_foot,
-                pos_ankle2[1] - cos(angle_before_ankle2 + angle_ankle2) * length_foot,
+                pos_ankle2[0]
+                + np.sin(angle_before_ankle2 + angle_ankle2) * length_foot,
+                pos_ankle2[1]
+                - np.cos(angle_before_ankle2 + angle_ankle2) * length_foot,
             ]
         )
 
@@ -290,7 +289,7 @@ def calculate_ground_pose_flexion(ankle_x):
     ankle is moved to a certain x position, using pythagoras theorem.
     """
 
-    return asin((ankle_x / 2) / length_leg)
+    return np.arcsin((ankle_x / 2) / length_leg)
 
 
 def solve_mid_position(ankle_x, ankle_y, subgait_id: str, plot=False):
@@ -329,7 +328,7 @@ def solve_mid_position(ankle_x, ankle_y, subgait_id: str, plot=False):
         half2 = pose[len(pose) // 2 :]
         pose = half2 + half1
 
-    return [np.deg2rad(angle) for angle in pose]
+    return list(pose)
 
 
 def solve_end_position(
@@ -389,4 +388,4 @@ def solve_end_position(
         half2 = pose[len(pose) // 2 :]
         pose = half2 + half1
 
-    return [np.deg2rad(angle) for angle in pose]
+    return list(pose)
