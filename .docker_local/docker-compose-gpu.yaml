@@ -64,7 +64,7 @@ services:
       - ROS_ARGS
       - ROS1_ARGS
     working_dir: /home/${USER}/march/ros1
-    ipc: host  # The reason 'host' is chosen (and not 'shareable') is so that the containers can run in isolation of each other.
+    ipc: host # The reason 'host' is chosen instead of 'shareable' is so that the containers can run in isolation of each other.
     ports: ["11311"] # Needed for rviz visualization
     command: ["bash",  "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros1.bash"]
 
@@ -85,7 +85,7 @@ services:
       - ROS_ARGS
       - ROS2_ARGS
     working_dir: /home/${USER}/march/ros2
-    ipc: host  # The reason 'host' is chosen (and not 'container:ros1') is so that the containers can run in isolation of each other.
+    ipc: host # The reason 'host' is chosen instead of the usual 'container:ros1' is so that the containers can run in isolation of each other.
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros2.bash"]
 
   bridge-service:
@@ -103,7 +103,7 @@ services:
       - ROS_DOCKER_TYPE="bridge"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
     working_dir: /home/${USER}/ros1_bridge
-    ipc: host  # The reason 'host' is chosen (and not 'container:ros1') is so that the containers can run in isolation of each other.
+    ipc: host # The reason 'host' is chosen instead of the usual 'container:ros1' is so that the containers can run in isolation of each other.
     depends_on:
       - ros1-service
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/bridge.bash"]

@@ -1,6 +1,7 @@
 # This docker file is based on the original foxy bridge docker file.
-# However, because this file has a too large intermediate step, we have made our own variant see 'bridge.Dockerfile'.
-# Use this file iff there are issues with missing dependencies when you use the current bridge.Dockerfile.
+# However, because one of the intermediate steps in the original file is too large, we have made our own variant
+# see 'bridge.Dockerfile'. Use this file iff there are issues with missing dependencies when you use
+# the current bridge.Dockerfile.
 
 # date: 12-02-2021
 # author: George Vegelien
