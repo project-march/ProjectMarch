@@ -9,6 +9,6 @@ catkin_install_python(PROGRAMS scripts/upload_controller_values.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY launch
+install(DIRECTORY launch rviz
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
