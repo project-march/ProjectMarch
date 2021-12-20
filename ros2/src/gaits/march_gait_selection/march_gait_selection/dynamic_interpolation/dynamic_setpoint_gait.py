@@ -39,7 +39,7 @@ class DynamicSetpointGait(GaitInterface):
             "right_knee": Setpoint(Duration(0), 0.0, 0),
         }
         self.joint_names = get_joint_names_from_urdf()
-        self.gait_name = "dynamic_walk_v0"
+        self.gait_name = "dynamic_walk"
 
         self._start_is_delayed = False
         self._scheduled_early = False
@@ -104,6 +104,7 @@ class DynamicSetpointGait(GaitInterface):
 
         self._start_is_delayed = False
         self._scheduled_early = False
+        roslog.get_logger("gait_selection").info(f"reset {self._scheduled_early}")
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -123,16 +124,17 @@ class DynamicSetpointGait(GaitInterface):
         self._reset()
         self._current_time = current_time
         self.subgait_id = "right_swing"
-        self._start_time = self._current_time
-        self._current_command = self.subgait_id_to_trajectory_command()
+        self._first_subgait_delay = first_subgait_delay
 
         if first_subgait_delay > Duration(0):
             self._start_is_delayed = True
-            self._update_time_stamps(self._current_command, first_subgait_delay)
+            self._current_command = self.subgait_id_to_trajectory_command()
+            self._next_command = self._current_command
             return GaitUpdate.should_schedule_early(self._current_command)
         else:
             self._start_is_delayed = False
-            self._update_time_stamps(self._current_command)
+            self._current_command = self.subgait_id_to_trajectory_command()
+            self._next_command = self._current_command
             return GaitUpdate.should_schedule(self._current_command)
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
@@ -169,9 +171,9 @@ class DynamicSetpointGait(GaitInterface):
 
         if (
             early_schedule_duration > Duration(0)
-            and not self._scheduled_early
             and self._current_time >= self._end_time - early_schedule_duration
         ):
+            roslog.get_logger("gait_selection").info(f"SCHEDULING EARLY")
             return self._update_next_subgait_early()
         return GaitUpdate.empty()
 
@@ -199,18 +201,20 @@ class DynamicSetpointGait(GaitInterface):
         else:
             # Reset early schedule attributes
             self._scheduled_early = False
+            roslog.get_logger("gait_selection").info(f"_update_next_subgait {self._scheduled_early}")
             self._next_command = None
             return GaitUpdate.subgait_updated()
 
     def _update_next_subgait_early(self) -> GaitUpdate:
         self._scheduled_early = True
+        roslog.get_logger("gait_selection").info(f"_update_next_subgait_early {self._scheduled_early}")
         next_command = self._get_next_command()
 
         self._next_command = next_command
         if next_command is None:
             return GaitUpdate.empty()
 
-        return GaitUpdate.should_schedule_early(self.subgait_id_to_trajectory_command())
+        return GaitUpdate.should_schedule_early(next_command)
 
     def _get_next_command(self):
         """Create the next command, based on what the current subgait is.
@@ -289,14 +293,17 @@ class DynamicSetpointGait(GaitInterface):
 
         # Update the starting position for the next command
         self.update_start_pos()
-        self._update_time_stamps(Duration(subgait_duration))
-
-        roslog.get_logger("gait_selection").info(f"Scheduled {self.subgait_id} at time {self._start_time.to_msg()}")
+        if self._start_is_delayed:
+            self._update_time_stamps(
+                Duration(subgait_duration), self._first_subgait_delay
+            )
+        else:
+            self._update_time_stamps(Duration(subgait_duration))
 
         return TrajectoryCommand(
             trajectory,
             Duration(subgait_duration),
-            "dynamic_joint_trajectory",
+            self.subgait_id,
             self._start_time,
         )
 

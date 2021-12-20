@@ -1,4 +1,5 @@
 from typing import Optional
+import rclpy.logging as roslog
 
 from march_gait_selection.gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
@@ -165,7 +166,7 @@ class SetpointsGait(GaitInterface, Gait):
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
-
+        roslog.get_logger("gait_selection").info(f"update {self._scheduled_early}")
         if (
             early_schedule_duration > Duration(0)
             and not self._scheduled_early
@@ -219,6 +220,7 @@ class SetpointsGait(GaitInterface, Gait):
         else:
             # Reset early schedule attributes
             self._scheduled_early = False
+            roslog.get_logger("gait_selection").info(f"_update_next_subgait {self._scheduled_early}")
             self._next_subgait = None
             return GaitUpdate.subgait_updated()
 
@@ -237,6 +239,7 @@ class SetpointsGait(GaitInterface, Gait):
         :return: optional trajectory_command
         """
         self._scheduled_early = True
+        roslog.get_logger("gait_selection").info(f"_update_next_subgait_early {self._scheduled_early}")
         if self._transition_to_subgait is not None and not self._is_transitioning:
             # We should schedule a transition subgait
             next_subgait = self._make_transition_subgait()
@@ -383,3 +386,11 @@ class SetpointsGait(GaitInterface, Gait):
         else:
             self._start_time = self._end_time
         self._end_time = self._start_time + next_subgait.duration
+
+        roslog.get_logger("gait_selection").info(
+            f"Scheduled early: {self._scheduled_early}. "
+            f"Current time: {self._current_time}. "
+            f"Start time: {self._start_time}. "
+            f"End time: {self._end_time}. "
+            f"Next command duration: {next_subgait.duration}. "
+        )
