@@ -1,5 +1,4 @@
 from rclpy.time import Time
-import rclpy.logging as roslog
 from typing import Optional
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
@@ -104,7 +103,6 @@ class DynamicSetpointGait(GaitInterface):
 
         self._start_is_delayed = False
         self._scheduled_early = False
-        roslog.get_logger("gait_selection").info(f"reset {self._scheduled_early}")
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -173,7 +171,6 @@ class DynamicSetpointGait(GaitInterface):
             early_schedule_duration > Duration(0)
             and self._current_time >= self._end_time - early_schedule_duration
         ):
-            roslog.get_logger("gait_selection").info(f"SCHEDULING EARLY")
             return self._update_next_subgait_early()
         return GaitUpdate.empty()
 
@@ -201,13 +198,11 @@ class DynamicSetpointGait(GaitInterface):
         else:
             # Reset early schedule attributes
             self._scheduled_early = False
-            roslog.get_logger("gait_selection").info(f"_update_next_subgait {self._scheduled_early}")
             self._next_command = None
             return GaitUpdate.subgait_updated()
 
     def _update_next_subgait_early(self) -> GaitUpdate:
         self._scheduled_early = True
-        roslog.get_logger("gait_selection").info(f"_update_next_subgait_early {self._scheduled_early}")
         next_command = self._get_next_command()
 
         self._next_command = next_command
