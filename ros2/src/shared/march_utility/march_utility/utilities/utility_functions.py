@@ -13,6 +13,7 @@ from rclpy.node import Node
 
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.utilities.vector_3d import Vector3d
+from march_utility.gait.limits import Limits
 from .side import Side
 
 import yaml
@@ -168,6 +169,21 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
 LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
 
 
+def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name):
+    """Get the joint from the urdf robot with the given joint
+    name and return the limits of the joint.
+
+    :param robot: The urdf robot to use.
+    :param joint_name: The name to look for.
+    """
+    march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
+    robot = urdf.Robot.from_xml_file(march_urdf)
+    urdf_joint = next(
+        (joint for joint in robot.joints if joint.name == joint_name), None
+    )
+    return Limits.from_urdf_joint(urdf_joint)
+
+
 def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
     """Grab lengths which are relevant for the inverse kinematics calculations from a list."""
     return select_lengths_for_inverse_kinematics(LENGTHS_BOTH_SIDES, side)
@@ -205,3 +221,19 @@ def validate_and_get_joint_names_for_inverse_kinematics(
             return None
 
     return sorted(joint_name_list)
+
+
+def get_joint_names_from_urdf():
+    robot = urdf.Robot.from_xml_file(
+        os.path.join(
+            get_package_share_directory("march_description"), "urdf", "march6.urdf"
+        )
+    )
+    robot_joint_names = robot.joint_map.keys()
+    joint_names = []
+
+    # Joints we cannot control are fixed in the urdf. These should be removed.
+    for joint_name in robot_joint_names:
+        if robot.joint_map[joint_name].type != "fixed":
+            joint_names.append(joint_name)
+    return sorted(joint_names)
