@@ -131,9 +131,7 @@ class DynamicSubgait:
         # Solve_ik function cannot handle HAA yet, thus has to be removed
         starting_position_list = []
         for joint in self.joint_names:
-            starting_position_list.append(
-                np.rad2deg(self.starting_position[joint].position)
-            )
+            starting_position_list.append(self.starting_position[joint].position)
 
         # Swing leg ankle position is relative to stance leg ankle position (0,0)
         current_pose = Pose(starting_position_list)

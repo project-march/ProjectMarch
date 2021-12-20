@@ -1,17 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from march_goniometric_ik_solver.goniometric_functions_degrees import cos, sin, acos
+
+RIGHT_ANGLE = np.pi / 2
 
 
-def plot_points(points):
-    plt.figure(1)
-    for i in points:
-        plt.plot(i[0], i[1], marker="o")
-    plt.gca().set_aspect("equal", adjustable="box")
-    plt.show()
-
-
-def get_angle_between_points(points):
+def get_angle_between_points(points: list):
     """
     Calculates the angle between three points,
     where the angle is calculated for the middle point.
@@ -24,10 +16,10 @@ def get_angle_between_points(points):
 
     ba = a - b
     bc = c - b
-    return acos(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
+    return np.arccos(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
 
 
-def find_fourth_point(a, b, c, da):
+def find_fourth_point(a: np.array, b: np.array, c: np.array, da: float):
     """
     Finds the fourth point (d) of a quadrilateral when 3 points (a, b, c) and the
     distance da or cd is given, assuming da = cd, with the following step:
@@ -44,14 +36,14 @@ def find_fourth_point(a, b, c, da):
     height = np.sqrt(da ** 2 - half_ac ** 2)
 
     ground_angle = get_angle_between_points([c, a, b])
-    center_point_angle = 90 - ground_angle
+    center_point_angle = RIGHT_ANGLE - ground_angle
 
     return center_point + np.array(
-        [-cos(center_point_angle) * height, sin(center_point_angle) * height]
+        [-np.cos(center_point_angle) * height, np.sin(center_point_angle) * height]
     )
 
 
-def get_angles(points):
+def get_angles(points: list):
     """
     Calculates the angles of a quadrilateral by giving the four points of it.
     The order of returned angles is equal to the order of points given.
@@ -70,7 +62,7 @@ def get_angles(points):
     return angles
 
 
-def check_lengths(points, real_lengths):
+def check_lengths(points: list, real_lengths: list):
     """
     Checks whether the lengths between points are equal to the real lengths.
     Expects points as [a, b, c, d] and real_lengths as [da, ab, bc, cd]
@@ -83,7 +75,7 @@ def check_lengths(points, real_lengths):
             print("Error difference = ", error)
 
 
-def solve_quadritlateral(lengths, angle_b, debug=False):
+def solve_quadritlateral(lengths: list, angle_b: float, debug: bool = False):
     """
     Calculates the angles of a quadrilateral given all side lengths and the angle of point b.
     Expects lengths to be given as [da, ab, bc, cd]
@@ -95,7 +87,7 @@ def solve_quadritlateral(lengths, angle_b, debug=False):
 
     a = np.array([0, 0])
     b = a + np.array([ab, 0])
-    c = b + np.array([-cos(angle_b) * bc, sin(angle_b) * bc])
+    c = b + np.array([-np.cos(angle_b) * bc, np.sin(angle_b) * bc])
     d = find_fourth_point(a, b, c, da)
     points = [a, b, c, d]
 
