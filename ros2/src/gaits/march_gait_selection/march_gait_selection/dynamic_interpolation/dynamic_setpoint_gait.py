@@ -111,10 +111,13 @@ class DynamicSetpointGait(GaitInterface):
         current_time: Time,
         first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> GaitUpdate:
-        """Starts the gait.
+        """Starts the gait. If first_subgait_delay is not zero, the first subgait will
+        be scheduled with the given delay.
 
         :param current_time: Time at which the subgait will start
         :type current_time: Time
+        :param first_subgait_delay: Delay of first subgait schedule
+        :type first_subgait_delay: Duration
 
         :return: A GaitUpdate containing a TrajectoryCommand
         :rtype: GaitUpdate
@@ -147,10 +150,13 @@ class DynamicSetpointGait(GaitInterface):
         """Give an update on the progress of the gait.
 
         If the subgaitgait is finished, schedule the next subgait. Else,
-        return an empty GaitUdpate
+        return an empty GaitUdpate. If early_schedule_duration is not zero,
+        the next subgait will be planned ahead with the given duration.
 
         :param current_time: Current time.
         :type current_time: Time
+        :param early_schedule_duration: Duration that determines how long ahead the next subgait is planned
+        :type early_schedule_duration: Duration
 
         :return: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         :rtype: GaitUpdate
@@ -178,7 +184,8 @@ class DynamicSetpointGait(GaitInterface):
         """Update the next subgait.
 
         If the current subgait is left_swing, the next subgait should be
-        right_swing, and vice versa.
+        right_swing, and vice versa. Also checks if the next subgait should
+        be scheduled early.
 
         :return: A GaitUpdate containg a TrajectoryCommand
         :rtype: GaitUpdate
@@ -202,6 +209,7 @@ class DynamicSetpointGait(GaitInterface):
             return GaitUpdate.subgait_updated()
 
     def _update_next_subgait_early(self) -> GaitUpdate:
+        """Updates the next subgait early."""
         self._scheduled_early = True
         next_command = self._get_next_command()
 
