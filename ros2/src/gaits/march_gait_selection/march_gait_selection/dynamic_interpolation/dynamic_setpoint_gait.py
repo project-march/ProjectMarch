@@ -18,6 +18,7 @@ class DynamicSetpointGait(GaitInterface):
     def __init__(self):
         super(DynamicSetpointGait, self).__init__()
         self._should_stop = False
+        self._end = False
         self._is_transitioning = False
 
         self._start_time = None
@@ -37,6 +38,8 @@ class DynamicSetpointGait(GaitInterface):
             "right_hip_fe": Setpoint(Duration(0), -0.1745, 0),
             "right_knee": Setpoint(Duration(0), 0.0, 0),
         }
+        self.end_position = self.start_position
+
         self.joint_names = get_joint_names_from_urdf()
         self.gait_name = "dynamic_walk"
 
@@ -76,10 +79,17 @@ class DynamicSetpointGait(GaitInterface):
         return StaticEdgePosition(self.setpoint_dict_to_joint_dict(self.start_position))
 
     @property
-    def final_postion(self) -> EdgePosition:
-        return StaticEdgePosition(
-            self.setpoint_dict_to_joint_dict(self.dynamic_subgait.get_final_position())
-        )
+    def final_position(self) -> EdgePosition:
+        if self._current_command is not None:
+            return StaticEdgePosition(
+                self.setpoint_dict_to_joint_dict(
+                    self.dynamic_subgait.get_final_position()
+                )
+            )
+        else:
+            return StaticEdgePosition(
+                self.setpoint_dict_to_joint_dict(self.end_position)
+            )
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -92,6 +102,7 @@ class DynamicSetpointGait(GaitInterface):
     def _reset(self):
         """Reset all attributes of the gait"""
         self._should_stop = False
+        self._end = False
         self._is_transitioning = False
 
         self._start_time = None
@@ -193,12 +204,11 @@ class DynamicSetpointGait(GaitInterface):
         if self._scheduled_early:
             # We scheduled early and already determined the next subgait
             next_command = self._next_command
+        elif self._next_command is None:
+            return GaitUpdate.finished()
         else:
             next_command = self._get_next_command()
         self._current_command = next_command
-
-        if next_command is None:
-            return GaitUpdate.finished()
 
         if not self._scheduled_early:
             return GaitUpdate.should_schedule(next_command)
@@ -211,13 +221,12 @@ class DynamicSetpointGait(GaitInterface):
     def _update_next_subgait_early(self) -> GaitUpdate:
         """Updates the next subgait early."""
         self._scheduled_early = True
-        next_command = self._get_next_command()
+        self._next_command = self._get_next_command()
 
-        self._next_command = next_command
-        if next_command is None:
+        if self._next_command is None:
             return GaitUpdate.empty()
 
-        return GaitUpdate.should_schedule_early(next_command)
+        return GaitUpdate.should_schedule_early(self._next_command)
 
     def _get_next_command(self):
         """Create the next command, based on what the current subgait is.
@@ -227,16 +236,18 @@ class DynamicSetpointGait(GaitInterface):
         :returns: A TrajectoryCommand for the next subgait
         :rtype: TrajectoryCommand
         """
-        if self._should_stop:
-            # SHOULD RETURN A STOP GAIT
-            return None
 
         if self.subgait_id == "right_swing":
             self.subgait_id = "left_swing"
         elif self.subgait_id == "left_swing":
             self.subgait_id = "right_swing"
 
-        return self.subgait_id_to_trajectory_command()
+        if self._end:
+            return None
+        elif self._should_stop:
+            return self.subgait_id_to_trajectory_command(stop=True)
+        else:
+            return self.subgait_id_to_trajectory_command()
 
     def stop(self) -> bool:
         """Called when the current gait should be stopped"""
@@ -271,15 +282,22 @@ class DynamicSetpointGait(GaitInterface):
 
         return jointdict
 
-    def subgait_id_to_trajectory_command(self) -> TrajectoryCommand:
+    def subgait_id_to_trajectory_command(self, stop=False) -> TrajectoryCommand:
         """Construct a TrajectoryCommand from the current subgait_id
 
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
         """
-        desired_ankle_x = 0.20  # m
-        desired_ankle_y = 0.03  # m
-        subgait_duration = 1.5
+        # Should be replaced by covid topic in the future
+        if stop:
+            desired_ankle_x = 0  # m
+            desired_ankle_y = 0  # m
+            subgait_duration = 1  # s
+            self._end = True
+        else:
+            desired_ankle_x = 0.20  # m
+            desired_ankle_y = 0.03  # m
+            subgait_duration = 1.5  # s
         mid_point_frac = 0.45
 
         self.dynamic_subgait = DynamicSubgait(
