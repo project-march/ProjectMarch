@@ -165,6 +165,7 @@ class SetpointsGait(GaitInterface, Gait):
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
+
         if (
             early_schedule_duration > Duration(0)
             and not self._scheduled_early
