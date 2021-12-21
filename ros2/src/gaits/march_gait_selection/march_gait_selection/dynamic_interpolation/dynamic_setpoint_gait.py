@@ -1,5 +1,4 @@
 from rclpy.time import Time
-import rclpy.logging as roslog
 from typing import Optional
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
