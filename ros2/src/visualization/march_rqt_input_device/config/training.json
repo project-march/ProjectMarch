@@ -142,8 +142,7 @@
       "always_enabled": true
     },
     {
-      "name": "dynamic_walk",
-      "always_enabled": true
+      "name": "dynamic_walk"
     }
   ]
 ]
