@@ -99,7 +99,7 @@ generate the docs and automatically open them in your browser.
 .. note::
   If you get the error:
 
-  .. code-block::
+  .. code::
 
     Warning, treated as error:
     /home/[user]/march/docs/index.rst:109:toctree contains reference to document 'doc/march_packages/doc/README' that doesn't have a title: no link will be generated

@@ -66,6 +66,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
    doc/getting_started/install_ros_and_tools
    doc/getting_started/setup_your_workspace
+   doc/getting_started/setting_up_docker
 
 .. toctree::
    :caption: Useful tools
