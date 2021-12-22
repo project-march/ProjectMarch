@@ -5,7 +5,6 @@ from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 from march_utility.gait.edge_position import (
     EdgePosition,
-    StaticEdgePosition,
     UnknownEdgePosition,
     DynamicEdgePosition,
 )
@@ -201,12 +200,7 @@ class GaitStateMachine:
         :returns List of names, or empty list when a gait is executing.
         """
         if self._is_idle():
-            possible_gaits = self._gait_graph.possible_gaits_from_idle(
-                self._current_state
-            )
-            if isinstance(self._current_state, StaticEdgePosition):
-                possible_gaits.add("dynamic_walk")
-            return possible_gaits
+            return self._gait_graph.possible_gaits_from_idle(self._current_state)
         else:
             return []
 
