@@ -1,6 +1,6 @@
 name: dynamic_gait
 subgaits:
   start:
-    to: main_pose
-  main_pose:
+    to: zero_pose
+  zero_pose:
     to: end
