@@ -201,9 +201,11 @@ class GaitStateMachine:
         :returns List of names, or empty list when a gait is executing.
         """
         if self._is_idle():
-            possible_gaits = self._gait_graph.possible_gaits_from_idle(self._current_state)
+            possible_gaits = self._gait_graph.possible_gaits_from_idle(
+                self._current_state
+            )
             if isinstance(self._current_state, StaticEdgePosition):
-                possible_gaits.add('dynamic_walk')
+                possible_gaits.add("dynamic_walk")
             return possible_gaits
         else:
             return []
