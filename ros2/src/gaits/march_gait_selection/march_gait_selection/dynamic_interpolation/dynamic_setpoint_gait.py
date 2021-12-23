@@ -140,13 +140,16 @@ class DynamicSetpointGait(GaitInterface):
 
         if first_subgait_delay > Duration(0):
             self._start_is_delayed = True
-            self._current_command = self.subgait_id_to_trajectory_command()
-            self._next_command = self._current_command
-            return GaitUpdate.should_schedule_early(self._current_command)
+            self._start_time = self._current_time + first_subgait_delay
         else:
             self._start_is_delayed = False
-            self._current_command = self.subgait_id_to_trajectory_command()
-            self._next_command = self._current_command
+            self._start_time = self._current_time
+
+        self._current_command = self.subgait_id_to_trajectory_command()
+
+        if self._start_is_delayed:
+            return GaitUpdate.should_schedule_early(self._current_command)
+        else:
             return GaitUpdate.should_schedule(self._current_command)
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
@@ -177,18 +180,27 @@ class DynamicSetpointGait(GaitInterface):
         if self._start_is_delayed:
             if self._current_time >= self._start_time:
                 self._start_is_delayed = False
+                # Update start position and time stamps for the next gait after
+                # the start gait has been scheduled
+                self.update_start_pos()
+                self._update_time_stamps(self._next_command.duration)
                 return GaitUpdate.subgait_updated()
             else:
                 return GaitUpdate.empty()
 
         if self._current_time >= self._end_time:
+            # The current subgait has reached its end time, a new subgait should
+            # be scheduled
             return self._update_next_subgait()
 
         if (
             early_schedule_duration > Duration(0)
+            and not self._scheduled_early
             and self._current_time >= self._end_time - early_schedule_duration
         ):
+            # Schedule the next subgait early, if this has not been done yet
             return self._update_next_subgait_early()
+
         return GaitUpdate.empty()
 
     def _update_next_subgait(self) -> GaitUpdate:
@@ -204,11 +216,16 @@ class DynamicSetpointGait(GaitInterface):
         if self._scheduled_early:
             # We scheduled early and already determined the next subgait
             next_command = self._next_command
-        elif self._next_command is None:
-            return GaitUpdate.finished()
         else:
             next_command = self._get_next_command()
-        self._current_command = next_command
+
+        if next_command is None:
+            # The stop gait has completed and the gait is finished
+            return GaitUpdate.finished()
+
+        # Update the starting position and time stamps for the next command
+        self.update_start_pos()
+        self._update_time_stamps(next_command.duration)
 
         if not self._scheduled_early:
             return GaitUpdate.should_schedule(next_command)
@@ -243,6 +260,7 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id = "right_swing"
 
         if self._end:
+            # If the gait is stopped, the next command should be None
             return None
         elif self._should_stop:
             return self.subgait_id_to_trajectory_command(stop=True)
@@ -311,39 +329,23 @@ class DynamicSetpointGait(GaitInterface):
         )
 
         trajectory = self.dynamic_subgait.to_joint_trajectory_msg()
-
-        # Update the starting position for the next command
-        self.update_start_pos()
         if self._start_is_delayed:
-            self._update_time_stamps(
-                Duration(subgait_duration), self._first_subgait_delay
-            )
-        else:
-            self._update_time_stamps(Duration(subgait_duration))
+            self._end_time = self._start_time
 
         return TrajectoryCommand(
             trajectory,
             Duration(subgait_duration),
             self.subgait_id,
-            self._start_time,
+            self._end_time,
         )
 
     DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY = Duration(0)
 
-    def _update_time_stamps(
-        self,
-        next_command_duration,
-        first_subgait_delay: Optional[
-            Duration
-        ] = DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY,
-    ):
+    def _update_time_stamps(self, next_command_duration):
         """Update the starting and end time
 
         :param next_command_duration: Duration of the next command to be scheduled.
         :type next_command_duration: Duration
         """
-        if not self._scheduled_early or self._end_time is None:
-            self._start_time = self._current_time + first_subgait_delay
-        else:
-            self._start_time = self._end_time
+        self._start_time = self._end_time
         self._end_time = self._start_time + next_command_duration
