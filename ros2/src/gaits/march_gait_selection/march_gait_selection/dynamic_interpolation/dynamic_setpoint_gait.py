@@ -197,7 +197,6 @@ class DynamicSetpointGait(GaitInterface):
             self.update_start_pos()
             self._update_time_stamps(self._next_command.duration)
             self._scheduled_early = False
-            self._next_command = None
 
             return GaitUpdate.subgait_updated()
 
