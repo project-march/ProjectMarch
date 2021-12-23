@@ -24,7 +24,6 @@ class DynamicSetpointGait(GaitInterface):
         self._end_time = None
         self._current_time = None
 
-        self._current_command = None
         self._next_command = None
 
         self.start_position = {
@@ -60,15 +59,15 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def duration(self):
-        if self._current_command is not None:
-            return self._current_command.duration
+        if self._next_command is not None:
+            return self._next_command.duration
         else:
             return None
 
     @property
     def gait_type(self):
         # For now only take walk-like gaits
-        if self._current_command is not None:
+        if self._next_command is not None:
             return "walk_like"
         else:
             return None
@@ -79,7 +78,8 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def final_position(self) -> EdgePosition:
-        if self._current_command is not None:
+        # Beunmethod to fix transitions, should be fixed
+        if self._next_command is not None:
             return StaticEdgePosition(
                 self.setpoint_dict_to_joint_dict(
                     self.dynamic_subgait.get_final_position()
@@ -108,7 +108,6 @@ class DynamicSetpointGait(GaitInterface):
         self._end_time = None
         self._current_time = None
 
-        self._current_command = None
         self._next_command = None
 
         self._start_is_delayed = True
@@ -137,9 +136,8 @@ class DynamicSetpointGait(GaitInterface):
         self.subgait_id = "right_swing"
         self._first_subgait_delay = first_subgait_delay
         self._start_time = self._current_time + first_subgait_delay
-        self._current_command = self.subgait_id_to_trajectory_command()
-
-        return GaitUpdate.should_schedule_early(self._current_command)
+        self._next_command = self.subgait_id_to_trajectory_command()
+        return GaitUpdate.should_schedule_early(self._next_command)
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
 
@@ -176,11 +174,12 @@ class DynamicSetpointGait(GaitInterface):
             else:
                 return GaitUpdate.empty()
 
+        # If we are within the early schedule duration AND have not scheduled yet,
+        # already schedule the next subgait
         if (
             self._current_time >= self._end_time - early_schedule_duration
             and not self._scheduled_early
         ):
-            # Schedule the next subgait early, if this has not been done yet
             self._scheduled_early = True
             self._next_command = self._get_next_command()
 
@@ -189,9 +188,9 @@ class DynamicSetpointGait(GaitInterface):
 
             return GaitUpdate.should_schedule_early(self._next_command)
 
+        # If the current gait has reached its end time, update the state
+        # machine and reset the early schedule attributes
         if self._current_time >= self._end_time:
-            # The current subgait has reached its end time, a new subgait should
-            # be scheduled
             if self._next_command is None:
                 return GaitUpdate.finished()
 
@@ -233,7 +232,7 @@ class DynamicSetpointGait(GaitInterface):
 
     def end(self):
         """Called when the gait is finished"""
-        self._current_command = None
+        self._next_command = None
 
     def update_start_pos(self):
         """Update the start position of the next subgait to be
