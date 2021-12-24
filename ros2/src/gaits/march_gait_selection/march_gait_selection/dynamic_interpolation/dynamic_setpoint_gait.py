@@ -234,29 +234,25 @@ class DynamicSetpointGait(GaitInterface):
     def setpoint_dict_to_joint_dict(self, setpoint_dict):
         """Creates a joint_dict from a setpoint_dict.
 
-        :param setpoint_dict: A setpoint_dictionary containing joint names and setpoints.
-        :type setpoint_dict: dict
+        :param setpoint_dict: A dictionary containing joint names and setpoints.
+        :type: dict
 
-        :returns: A joint_dict containing joint names and positions.
+        :returns: A dictionary containing joint names and positions.
         :rtype: dict
         """
-        position = []
-        for setpoint in setpoint_dict:
-            position.append(setpoint_dict[setpoint].position)
+        joint_dict = {}
+        for name, setpoint in setpoint_dict.items():
+            joint_dict[name] = setpoint.position
 
-        jointdict = {}
-        for i in range(len(position)):
-            jointdict.update({self.joint_names[i]: position[i]})
-
-        return jointdict
+        return joint_dict
 
     def joint_dict_to_setpoint_dict(self, joint_dict):
         """Creates a setpoint_dict from a joint_dict.
 
-        :param joint_dict: A setpoint_dictionary containing joint names and positions.
-        :type setpoint_dict: dict
+        :param joint_dict: A dictionary containing joint names and positions.
+        :type: dict
 
-        :returns: A setpoint_dict containing joint names and setpoints.
+        :returns: A dictionary containing joint names and setpoints.
         :rtype: dict
         """
         setpoint_dict = {}
