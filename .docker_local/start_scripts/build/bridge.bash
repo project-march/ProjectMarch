@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SLEEP_TIME=30
+SLEEP_TIME=120
 SLEEP_COUNTER=0
 DONE_FILE=install/.done
 source /opt/ros/noetic/setup.bash

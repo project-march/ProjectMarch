@@ -1,10 +1,10 @@
 #!/bin/bash
 
-SLEEP_TIME=30
+SLEEP_TIME=120
 SLEEP_COUNTER=0
 DONE_FILE=install/.done
 cd "${HOME}"/march/ros2 || exit
-rm "${DONE_FILE}"
+if [ -f "${DONE_FILE}" ]; then rm "${DONE_FILE}"; fi;
 source /opt/ros/foxy/setup.bash
 
 while ! [ -f "${HOME}"/march/ros1/"${DONE_FILE}" ]; do
@@ -17,5 +17,5 @@ while ! [ -f "${HOME}"/march/ros1/"${DONE_FILE}" ]; do
 done;
 
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja
-touch "${DONE_FILE}"
+exec touch ${DONE_FILE}
 
