@@ -4,6 +4,7 @@ from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.utility_functions import get_position_from_yaml
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
@@ -25,16 +26,9 @@ class DynamicSetpointGait(GaitInterface):
 
         self._next_command = None
 
-        self.start_position = {
-            "left_ankle": Setpoint(Duration(0), 0.0, 0),
-            "left_hip_aa": Setpoint(Duration(0), 0.0349, 0),
-            "left_hip_fe": Setpoint(Duration(0), -0.1745, 0),
-            "left_knee": Setpoint(Duration(0), 0.0, 0),
-            "right_ankle": Setpoint(Duration(0), 0.0, 0),
-            "right_hip_aa": Setpoint(Duration(0), 0.0349, 0),
-            "right_hip_fe": Setpoint(Duration(0), -0.1745, 0),
-            "right_knee": Setpoint(Duration(0), 0.0, 0),
-        }
+        self.start_position = self.joint_dict_to_setpoint_dict(
+            get_position_from_yaml("stand")
+        )
         self.end_position = self.start_position
 
         self.joint_names = get_joint_names_from_urdf()
@@ -255,6 +249,20 @@ class DynamicSetpointGait(GaitInterface):
             jointdict.update({self.joint_names[i]: position[i]})
 
         return jointdict
+
+    def joint_dict_to_setpoint_dict(self, joint_dict):
+        """Creates a setpoint_dict from a joint_dict.
+
+        :param joint_dict: A setpoint_dictionary containing joint names and positions.
+        :type setpoint_dict: dict
+
+        :returns: A setpoint_dict containing joint names and setpoints.
+        :rtype: dict
+        """
+        setpoint_dict = {}
+        for name, position in joint_dict.items():
+            setpoint_dict[name] = Setpoint(Duration(0), position, 0)
+        return setpoint_dict
 
     def subgait_id_to_trajectory_command(self, stop=False) -> TrajectoryCommand:
         """Construct a TrajectoryCommand from the current subgait_id

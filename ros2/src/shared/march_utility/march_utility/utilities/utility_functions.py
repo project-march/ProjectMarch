@@ -237,3 +237,21 @@ def get_joint_names_from_urdf():
         if robot.joint_map[joint_name].type != "fixed":
             joint_names.append(joint_name)
     return sorted(joint_names)
+
+
+def get_position_from_yaml(position: str):
+    try:
+        with open(
+            os.path.join(
+                get_package_share_directory("march_gait_files"),
+                "airgait_vi",
+                "default.yaml",
+            ),
+            "r",
+        ) as yaml_file:
+            try:
+                return yaml.safe_load(yaml_file)["positions"][position]["joints"]
+            except KeyError as e:
+                raise KeyError(f"No position found with name {e}")
+    except FileNotFoundError as e:
+        Node("march_utility").get_logger().error(e)
