@@ -18,7 +18,6 @@ class DynamicSetpointGait(GaitInterface):
         super(DynamicSetpointGait, self).__init__()
         self._should_stop = False
         self._end = False
-        self._is_transitioning = False
 
         self._start_time = None
         self._end_time = None
@@ -102,7 +101,6 @@ class DynamicSetpointGait(GaitInterface):
         """Reset all attributes of the gait"""
         self._should_stop = False
         self._end = False
-        self._is_transitioning = False
 
         self._start_time = None
         self._end_time = None
@@ -120,8 +118,8 @@ class DynamicSetpointGait(GaitInterface):
         current_time: Time,
         first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> GaitUpdate:
-        """Starts the gait. If first_subgait_delay is not zero, the first subgait will
-        be scheduled with the given delay.
+        """Starts the gait. The subgait will be scheduled with the delay given
+        by first_subgait_delay.
 
         :param current_time: Time at which the subgait will start
         :type current_time: Time
@@ -146,11 +144,12 @@ class DynamicSetpointGait(GaitInterface):
         current_time: Time,
         early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
     ) -> GaitUpdate:
-        """Give an update on the progress of the gait.
+        """Give an update on the progress of the gait. This function is called
+        every cycle of the gait_state_machine.
 
-        If the subgaitgait is finished, schedule the next subgait. Else,
-        return an empty GaitUdpate. If early_schedule_duration is not zero,
-        the next subgait will be planned ahead with the given duration.
+        Schedules the first subgait when the delay has passed. Starts scheduling
+        subsequent subgaits when the previous subgait is within early scheduling
+        duration and updates the state machine when the next subgait is started.
 
         :param current_time: Current time.
         :type current_time: Time
@@ -217,7 +216,7 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id = "right_swing"
 
         if self._end:
-            # If the gait is stopped, the next command should be None
+            # If the gait has ended, the next command should be None
             return None
         elif self._should_stop:
             return self.subgait_id_to_trajectory_command(stop=True)
