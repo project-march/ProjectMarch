@@ -128,7 +128,6 @@ class DynamicSubgait:
         :rtype: joint_trajectory_msg
         """
         # Solve for middle setpoint.
-        # Solve_ik function cannot handle HAA yet, thus has to be removed
         starting_position_list = []
         for joint in self.joint_names:
             starting_position_list.append(self.starting_position[joint].position)
