@@ -36,7 +36,7 @@ limitations under the License.
       <kd>1</kd>
       <!--<max_vel>0.01</max_vel>
       <min_depth>0</min_depth>-->
-      <sensor name="${camera_name}color" type="camera">
+      <!-- <sensor name="${camera_name}color" type="camera">
         <camera name="${camera_name}">
           <horizontal_fov>${69.4*deg_to_rad}</horizontal_fov>
           <image>
@@ -57,8 +57,8 @@ limitations under the License.
         <always_on>1</always_on>
         <update_rate>30</update_rate>
         <visualize>1</visualize>
-      </sensor>
-      <sensor name="${camera_name}ired1" type="camera">
+      </sensor> -->
+      <!-- <sensor name="${camera_name}ired1" type="camera">
         <camera name="${camera_name}">
           <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
           <image>
@@ -79,8 +79,8 @@ limitations under the License.
         <always_on>1</always_on>
         <update_rate>90</update_rate>
         <visualize>0</visualize>
-      </sensor>
-      <sensor name="${camera_name}ired2" type="camera">
+      </sensor> -->
+      <!-- <sensor name="${camera_name}ired2" type="camera">
         <camera name="${camera_name}">
           <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
           <image>
@@ -101,13 +101,13 @@ limitations under the License.
         <always_on>1</always_on>
         <update_rate>90</update_rate>
         <visualize>0</visualize>
-      </sensor>
+      </sensor> -->
       <sensor name="${camera_name}depth" type="depth">
         <camera name="${camera_name}">
           <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
           <image>
-            <width>1280</width>
-            <height>720</height>
+            <width>320</width> <!-- original: 1280 -->
+            <height>240</height> <!-- original: 720 -->
           </image>
           <clip>
             <near>0.1</near>
