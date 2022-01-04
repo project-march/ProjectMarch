@@ -180,7 +180,7 @@ void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
  * @param frame_to target frame in which point is transformed
  */
 void FootPositionFinder::transformPoint(
-    Point& point, std::string frame_from, std::string frame_to)
+    Point& point, const std::string& frame_from, const std::string& frame_to)
 {
     PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
     desired_point->push_back(point);

@@ -34,8 +34,8 @@ protected:
 
     void publishNextPoint(Point& p);
 
-    void transformPoint(
-        Point& point, std::string frame_from, std::string frame_to);
+    void transformPoint(Point& point, const std::string& frame_from,
+        const std::string& frame_to);
 
     rs2::pipeline pipe;
     rs2::config cfg;
