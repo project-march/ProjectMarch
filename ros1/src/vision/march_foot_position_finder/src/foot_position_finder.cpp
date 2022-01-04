@@ -43,6 +43,12 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
+    if (left_or_right_ == "left") {
+        reference_frame_id = "foot_right";
+    } else if (left_or_right_ == "right") {
+        reference_frame_id = "foot_left";
+    }
+
     if (realsense) {
         cfg.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
             RS2_FORMAT_Z16, /*framerate=*/30);
@@ -98,39 +104,19 @@ void FootPositionFinder::processSimulatedDepthFrames(
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
     NormalCloud::Ptr normalcloud(new NormalCloud());
-    PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
+    Point point;
 
     if (!realsense_) {
 
         // Define the desired future foot position
-        std::string frame_id;
         if (left_or_right_ == "left") {
-            desired_point->push_back(
-                Point(/*_x=*/-0.5, /*_y=*/-0.25, /*_z=*/0));
-            frame_id = "foot_right";
+            point = Point(/*_x=*/-0.5, /*_y=*/-0.25, /*_z=*/0);
         } else if (left_or_right_ == "right") {
-            desired_point->push_back(Point(/*_x=*/-0.5, /*_y=*/0.25, /*_z=*/0));
-            frame_id = "foot_left";
+            point = Point(/*_x=*/-0.5, /*_y=*/0.25, /*_z=*/0);
         }
 
-        // Determine the transformation from the standing leg to the world frame
-        // The standing leg is the opposite leg that will take a step
-        geometry_msgs::TransformStamped transform_stamped;
-
-        try {
-            if (tfBuffer->canTransform(
-                    "world", frame_id, ros::Time(), ros::Duration(/*t=*/1.0))) {
-                transform_stamped = tfBuffer->lookupTransform(
-                    "world", frame_id, ros::Time(/*t=*/0));
-            }
-        } catch (tf2::TransformException& ex) {
-            ROS_WARN_STREAM(
-                "Something went wrong when transforming the pointcloud: "
-                << ex.what());
-        }
-
-        pcl_ros::transformPointCloud(
-            *desired_point, *desired_point, transform_stamped.transform);
+        // Calculate point location relative to positionary leg
+        transformPoint(point, reference_frame_id, "world");
     }
 
     Preprocessor preprocessor(pointcloud, normalcloud);
@@ -138,13 +124,13 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
-    Point point = desired_point->points[0];
     Point position(point.y, -point.x, point.z); // Rotate 90 degrees clockwise
     PointFinder pointFinder(pointcloud, left_or_right_, position);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
     if (position_queue.size() > 0) {
+        Point p = position_queue[0];
         computeTemporalAveragePoint(position_queue[0]);
     }
 }
@@ -170,11 +156,51 @@ void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
             }
         }
 
-        Point found_point = computeAveragePoint(non_outliers);
+        Point final = computeAveragePoint(non_outliers);
 
         if (non_outliers.size() == sample_size_) {
-            publishMarkerPoint(point_marker_publisher_, found_point);
-            publishPoint(point_publisher_, found_point);
+            // Publish for visualization
+            publishMarkerPoint(point_marker_publisher_, final);
+
+            // Publish for gait computation
+            final = Point(
+                -final.y, final.x, final.z); // Rotate 90 counter clockwise
+            transformPoint(final, "world", reference_frame_id);
+            publishPoint(point_publisher_, final);
         }
     }
+}
+
+/**
+ * Transforms a point in place from one frame to another using ROS
+ * transformations
+ *
+ * @param point Point to transform between frames
+ * @param frame_from source frame in which the point is currently
+ * @param frame_to target frame in which point is transformed
+ */
+void FootPositionFinder::transformPoint(
+    Point& point, std::string frame_from, std::string frame_to)
+{
+    PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
+    desired_point->push_back(point);
+
+    geometry_msgs::TransformStamped transform_stamped;
+
+    try {
+        if (tfBuffer->canTransform(
+                frame_to, frame_from, ros::Time(), ros::Duration(/*t=*/1.0))) {
+            transform_stamped = tfBuffer->lookupTransform(
+                frame_to, frame_from, ros::Time(/*t=*/0));
+        }
+    } catch (tf2::TransformException& ex) {
+        ROS_WARN_STREAM(
+            "Something went wrong when transforming the pointcloud: "
+            << ex.what());
+    }
+
+    pcl_ros::transformPointCloud(
+        *desired_point, *desired_point, transform_stamped.transform);
+
+    point = desired_point->points[0];
 }

@@ -34,6 +34,9 @@ protected:
 
     void publishNextPoint(Point& p);
 
+    void transformPoint(
+        Point& point, std::string frame_from, std::string frame_to);
+
     rs2::pipeline pipe;
     rs2::config cfg;
 
@@ -55,6 +58,7 @@ protected:
     int sample_size_ = 3;
     std::string left_or_right_;
     bool realsense_;
+    std::string reference_frame_id;
 
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher point_marker_publisher_;

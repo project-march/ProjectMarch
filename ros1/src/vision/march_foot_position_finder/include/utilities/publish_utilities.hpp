@@ -84,8 +84,6 @@ void publishMarkerPoint(ros::Publisher& publisher, Point& p)
  */
 void publishPoint(ros::Publisher& publisher, Point& p)
 {
-    publishMarkerPoint(publisher, p);
-
     geometry_msgs::Point point;
     point.x = p.x;
     point.y = p.y;
