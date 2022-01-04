@@ -41,33 +41,42 @@ class Pose:
             self.fe_hip2,
             self.fe_knee2,
         ) = pose
+        self.rot_foot1 = 0
 
     def calculate_joint_positions(self, joint: str = "all"):
         """
         Calculates the joint positions for a given pose.
         """
 
-        # ankle1 is defined at [0,0]:
-        pos_ankle1 = np.array([0, 0])
-
-        # assumed flat feet, resulting in toe1 at [LENGTH_FOOT, 0]:
+        # toe1 is defined at [LENGTH_FOOT, 0]:
         pos_toe1 = np.array([LENGTH_FOOT, 0])
+
+        # ankle1 = toe1 + translation_by_foot:
+        pos_ankle1 = np.array(
+            [
+                pos_toe1[0] - np.cos(self.rot_foot1) * LENGTH_FOOT,
+                pos_toe1[1] + np.sin(self.rot_foot1) * LENGTH_FOOT,
+            ]
+        )
 
         # knee1 = ankle1 + translation_by_lower_leg:
         pos_knee1 = np.array(
             [
-                pos_ankle1[0] + np.sin(self.fe_ankle1) * LENGTH_LOWER_LEG,
-                pos_ankle1[1] + np.cos(self.fe_ankle1) * LENGTH_LOWER_LEG,
+                pos_ankle1[0]
+                + np.sin(self.fe_ankle1 + self.rot_foot1) * LENGTH_LOWER_LEG,
+                pos_ankle1[1]
+                + np.cos(self.fe_ankle1 + self.rot_foot1) * LENGTH_LOWER_LEG,
             ]
         )
 
         # hip1 = knee1 + translation_by_upper_leg:
+        angle_before_knee1 = self.fe_ankle1 + self.rot_foot1
         pos_hip = np.array(
             [
                 pos_knee1[0]
-                + np.sin(self.fe_ankle1 - self.fe_knee1) * LENGTH_UPPER_LEG,
+                + np.sin(angle_before_knee1 - self.fe_knee1) * LENGTH_UPPER_LEG,
                 pos_knee1[1]
-                + np.cos(self.fe_ankle1 - self.fe_knee1) * LENGTH_UPPER_LEG,
+                + np.cos(angle_before_knee1 - self.fe_knee1) * LENGTH_UPPER_LEG,
             ]
         )
 
@@ -173,7 +182,7 @@ class Pose:
         )
         self.fe_ankle2 = ANKLE_ZERO_ANGLE - (ankle2_angle_toe2_hip - angle_ankle2)
 
-    def reduce_dorsi_flexion(self, max_flexion: float):
+    def reduce_swing_dorsi_flexion(self, max_flexion: float):
         """
         Calculate the pose after reducing the dorsiflexion using quadrilateral solver
         with quadrilateral between ankle2, knee2, hip, knee1
@@ -282,6 +291,27 @@ class Pose:
         )
         self.fe_knee2 = KNEE_ZERO_ANGLE - (angle_knee2 + knee2_angle_ankle1_ankle2)
 
+    def reduce_stance_dorsi_flexion(self):
+        # Save current angle at toe1 between ankle1 and hip:
+        pos_ankle1 = self.calculate_joint_positions("pos_ankle1")
+        pos_toe1 = self.calculate_joint_positions("pos_toe1")
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        toe1_angle_ankle1_hip = qas.get_angle_between_points(
+            [pos_ankle1, pos_toe1, pos_hip]
+        )
+
+        # Reduce dorsi flexion of stance leg:
+        dis_toe1_hip = np.linalg.norm(pos_toe1 - pos_hip)
+        lengths = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_FOOT, dis_toe1_hip]
+        angle_knee1, angle_ankle1, angle_toe1, angle_hip = qas.solve_quadritlateral(
+            lengths=lengths, angle_b=ANKLE_ZERO_ANGLE - MAX_ANKLE_FLEXION, convex=False
+        )
+
+        # Update pose:
+        self.rot_foot1 = toe1_angle_ankle1_hip - angle_toe1
+        self.fe_ankle1 = ANKLE_ZERO_ANGLE - angle_ankle1
+        self.fe_knee1 = KNEE_ZERO_ANGLE - angle_knee1
+
 
 def calculate_ground_pose_flexion(ankle_x: float):
     """
@@ -367,14 +397,19 @@ def solve_end_position(
         pos_ankle = np.array([ankle_x, ankle_y])
         pose.calculate_lifted_pose(pos_ankle)
 
-        # reduce dorsi flexion and straighten leg if fe_ankle2 > max_flexion:
+        # reduce dorsi flexion of swing leg and straighten stance leg
+        # if fe_ankle2 > max_flexion:
         if pose.fe_ankle2 > max_ankle_flexion:
 
-            # reduce dorsi flexion:
-            pose.reduce_dorsi_flexion(max_ankle_flexion)
+            # reduce dorsi flexion of swing leg:
+            pose.reduce_swing_dorsi_flexion(max_ankle_flexion)
 
-            # straighten leg:
+            # straighten stance leg:
             pose.straighten_leg()
+
+    # reduce dorsi flexion of stance leg if fe_ankle1 > MAX_ANKLE_FLEXION:
+    if pose.fe_ankle1 > MAX_ANKLE_FLEXION:
+        pose.reduce_stance_dorsi_flexion()
 
     if timer:
         end = time.time()
@@ -383,11 +418,11 @@ def solve_end_position(
     if plot:
         pose.make_plot()
 
-    pose = pose.get_pose()
+    pose_list = pose.get_pose()
 
     if subgait_id == "left_swing":
-        half1 = pose[: len(pose) // 2]
-        half2 = pose[len(pose) // 2 :]
-        pose = half2 + half1
+        half1 = pose_list[: len(pose_list) // 2]
+        half2 = pose_list[len(pose_list) // 2 :]
+        pose_list = half2 + half1
 
-    return list(pose)
+    return list(pose_list)
