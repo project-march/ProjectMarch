@@ -11,6 +11,9 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
+# Desired location higher than 15 cm will be considered a stairs-like gait
+MINIMUM_STAIR_HEIGHT = 0.15
+
 
 class DynamicSetpointGait(GaitInterface):
     """Gait built up from dynamic setpoints"""
@@ -59,9 +62,15 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def gait_type(self):
-        # For now only take walk-like gaits
+        # Return gait type based on height of desired foot location
         if self._next_command is not None:
-            return "walk_like"
+            if (
+                self.desired_ankle_y > MINIMUM_STAIR_HEIGHT
+                or self.desired_ankle_y < MINIMUM_STAIR_HEIGHT
+            ):
+                return "stairs_like"
+            else:
+                return "walk_like"
         else:
             return None
 
@@ -271,12 +280,12 @@ class DynamicSetpointGait(GaitInterface):
         # Should be replaced by covid topic in the future
         if stop:
             desired_ankle_x = 0  # m
-            desired_ankle_y = 0  # m
+            self.desired_ankle_y = 0  # m
             subgait_duration = 1  # s
             self._end = True
         else:
             desired_ankle_x = 0.20  # m
-            desired_ankle_y = 0.03  # m
+            self.desired_ankle_y = 0.03  # m
             subgait_duration = 1.5  # s
         mid_point_frac = 0.45
 
@@ -287,7 +296,7 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id,
             self.joint_names,
             desired_ankle_x,
-            position_y=desired_ankle_y,
+            self.desired_ankle_y,
         )
 
         trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
