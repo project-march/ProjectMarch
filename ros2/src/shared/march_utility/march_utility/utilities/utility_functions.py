@@ -18,6 +18,10 @@ from .side import Side
 
 import yaml
 
+MARCH_URDF = march_urdf = (
+    get_package_share_directory("march_description") + "/urdf/march6.urdf"
+)
+
 
 def weighted_average_floats(
     base_value: float, other_value: float, parameter: float
@@ -176,8 +180,7 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name):
     :param robot: The urdf robot to use.
     :param joint_name: The name to look for.
     """
-    march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
-    robot = urdf.Robot.from_xml_file(march_urdf)
+    robot = urdf.Robot.from_xml_file(MARCH_URDF)
     urdf_joint = next(
         (joint for joint in robot.joints if joint.name == joint_name), None
     )
@@ -197,11 +200,7 @@ def validate_and_get_joint_names_for_inverse_kinematics(
     Returns none if the robot description does not contain the required joints.
     :return: A list of joint names.
     """
-    robot = urdf.Robot.from_xml_file(
-        os.path.join(
-            get_package_share_directory("march_description"), "urdf", "march6.urdf"
-        )
-    )
+    robot = urdf.Robot.from_xml_file(MARCH_URDF)
     robot_joint_names = robot.joint_map.keys()
     joint_name_list = [
         "left_hip_aa",
@@ -224,11 +223,7 @@ def validate_and_get_joint_names_for_inverse_kinematics(
 
 
 def get_joint_names_from_urdf():
-    robot = urdf.Robot.from_xml_file(
-        os.path.join(
-            get_package_share_directory("march_description"), "urdf", "march6.urdf"
-        )
-    )
+    robot = urdf.Robot.from_xml_file(MARCH_URDF)
     robot_joint_names = robot.joint_map.keys()
     joint_names = []
 

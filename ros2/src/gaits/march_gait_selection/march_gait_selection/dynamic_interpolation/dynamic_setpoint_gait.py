@@ -26,7 +26,7 @@ class DynamicSetpointGait(GaitInterface):
 
         self._next_command = None
 
-        self.start_position = self.joint_dict_to_setpoint_dict(
+        self.start_position = self._joint_dict_to_setpoint_dict(
             get_position_from_yaml("stand")
         )
         self.end_position = self.start_position
@@ -67,20 +67,22 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
-        return StaticEdgePosition(self.setpoint_dict_to_joint_dict(self.start_position))
+        return StaticEdgePosition(
+            self._setpoint_dict_to_joint_dict(self.start_position)
+        )
 
     @property
     def final_position(self) -> EdgePosition:
         # Beunmethod to fix transitions, should be fixed
         if self._next_command is not None:
             return StaticEdgePosition(
-                self.setpoint_dict_to_joint_dict(
-                    self.dynamic_subgait.get_final_position()
+                self._setpoint_dict_to_joint_dict(
+                    self.dynamic_subgait._get_final_position()
                 )
             )
         else:
             return StaticEdgePosition(
-                self.setpoint_dict_to_joint_dict(self.end_position)
+                self._setpoint_dict_to_joint_dict(self.end_position)
             )
 
     @property
@@ -128,7 +130,7 @@ class DynamicSetpointGait(GaitInterface):
         self.subgait_id = "right_swing"
         self._first_subgait_delay = first_subgait_delay
         self._start_time = self._current_time + first_subgait_delay
-        self._next_command = self.subgait_id_to_trajectory_command()
+        self._next_command = self._get_trajectory_command()
         return GaitUpdate.should_schedule_early(self._next_command)
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
@@ -161,7 +163,7 @@ class DynamicSetpointGait(GaitInterface):
                 self._start_is_delayed = False
                 # Update start position and time stamps for the next gait after
                 # the start gait has been scheduled
-                self.update_start_pos()
+                self._update_start_pos()
                 self._update_time_stamps(self._next_command.duration)
                 return GaitUpdate.subgait_updated()
             else:
@@ -187,13 +189,22 @@ class DynamicSetpointGait(GaitInterface):
             if self._next_command is None:
                 return GaitUpdate.finished()
 
-            self.update_start_pos()
+            self._update_start_pos()
             self._update_time_stamps(self._next_command.duration)
             self._scheduled_early = False
 
             return GaitUpdate.subgait_updated()
 
         return GaitUpdate.empty()
+
+    def stop(self) -> bool:
+        """Called when the current gait should be stopped"""
+        self._should_stop = True
+        return True
+
+    def end(self):
+        """Called when the gait is finished"""
+        self._next_command = None
 
     def _get_next_command(self):
         """Create the next command, based on what the current subgait is.
@@ -213,25 +224,16 @@ class DynamicSetpointGait(GaitInterface):
             # If the gait has ended, the next command should be None
             return None
         elif self._should_stop:
-            return self.subgait_id_to_trajectory_command(stop=True)
+            return self._get_trajectory_command(stop=True)
         else:
-            return self.subgait_id_to_trajectory_command()
+            return self._get_trajectory_command()
 
-    def stop(self) -> bool:
-        """Called when the current gait should be stopped"""
-        self._should_stop = True
-        return True
-
-    def end(self):
-        """Called when the gait is finished"""
-        self._next_command = None
-
-    def update_start_pos(self):
+    def _update_start_pos(self):
         """Update the start position of the next subgait to be
         the last position of the previous subgait."""
-        self.start_position = self.dynamic_subgait.get_final_position()
+        self.start_position = self.dynamic_subgait._get_final_position()
 
-    def setpoint_dict_to_joint_dict(self, setpoint_dict):
+    def _setpoint_dict_to_joint_dict(self, setpoint_dict):
         """Creates a joint_dict from a setpoint_dict.
 
         :param setpoint_dict: A dictionary containing joint names and setpoints.
@@ -246,7 +248,7 @@ class DynamicSetpointGait(GaitInterface):
 
         return joint_dict
 
-    def joint_dict_to_setpoint_dict(self, joint_dict):
+    def _joint_dict_to_setpoint_dict(self, joint_dict):
         """Creates a setpoint_dict from a joint_dict.
 
         :param joint_dict: A dictionary containing joint names and positions.
@@ -260,8 +262,8 @@ class DynamicSetpointGait(GaitInterface):
             setpoint_dict[name] = Setpoint(Duration(0), position, 0)
         return setpoint_dict
 
-    def subgait_id_to_trajectory_command(self, stop=False) -> TrajectoryCommand:
-        """Construct a TrajectoryCommand from the current subgait_id
+    def _get_trajectory_command(self, stop=False) -> TrajectoryCommand:
+        """Return a TrajectoryCommand based on current subgait_id
 
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
@@ -288,7 +290,7 @@ class DynamicSetpointGait(GaitInterface):
             position_y=desired_ankle_y,
         )
 
-        trajectory = self.dynamic_subgait.to_joint_trajectory_msg()
+        trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
         if self._start_is_delayed:
             self._end_time = self._start_time
 
