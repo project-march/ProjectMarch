@@ -151,7 +151,7 @@ class DynamicSubgait:
 
         return joint_trajectory_msg
 
-    def _get_final_position(self):
+    def get_final_position(self):
         """Get setpoint_dictionary of the final setpoint.
 
         :return: The final setpoint of the subgait.

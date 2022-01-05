@@ -86,7 +86,7 @@ class DynamicSetpointGait(GaitInterface):
         if self._next_command is not None:
             return StaticEdgePosition(
                 self._setpoint_dict_to_joint_dict(
-                    self.dynamic_subgait._get_final_position()
+                    self.dynamic_subgait.get_final_position()
                 )
             )
         else:
@@ -240,7 +240,7 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_pos(self):
         """Update the start position of the next subgait to be
         the last position of the previous subgait."""
-        self.start_position = self.dynamic_subgait._get_final_position()
+        self.start_position = self.dynamic_subgait.get_final_position()
 
     def _setpoint_dict_to_joint_dict(self, setpoint_dict):
         """Creates a joint_dict from a setpoint_dict.
