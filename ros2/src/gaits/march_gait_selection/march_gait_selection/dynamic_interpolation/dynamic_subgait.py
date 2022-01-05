@@ -47,7 +47,7 @@ class DynamicSubgait:
         self.subgait_id = subgait_id
         self.pose = Pose()
 
-    def _middle_setpoint(self, position_x, position_y):
+    def _middle_setpoint(self):
         """Calls IK solver to compute the joint angles needed for the middle setpoint
 
         :returns: A setpoint_dict for the middle position.
@@ -64,7 +64,7 @@ class DynamicSubgait:
             self.time[1],
         )
 
-    def _desired_setpoint(self, position_x, position_y=0):
+    def _desired_setpoint(self):
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate
 
         :param position_x: x-coordinate in meters of the desired foot location.
@@ -105,13 +105,13 @@ class DynamicSubgait:
         self.pose = Pose(pose_list)
 
         # Solve for middle setpoint:
-        self.middle_setpoint()
+        self._middle_setpoint()
 
         # Solve for desired setpoint:
-        self.desired_setpoint()
+        self._desired_setpoint()
 
         # Create joint_trajectory_msg
-        self.to_joint_trajectory_class()
+        self._to_joint_trajectory_class()
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 

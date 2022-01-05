@@ -285,7 +285,7 @@ class DynamicSetpointGait(GaitInterface):
             self._end = True
         else:
             desired_ankle_x = 0.4  # m
-            desired_ankle_y = 0.0  # m
+            self.desired_ankle_y = 0.0  # m
             subgait_duration = 1.5  # s
         mid_point_frac = 0.45
 
