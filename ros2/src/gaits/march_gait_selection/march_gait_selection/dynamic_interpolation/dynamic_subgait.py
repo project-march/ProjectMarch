@@ -20,14 +20,12 @@ class DynamicSubgait:
     :type starting_position: dict
     :param subgait_id: Whether it is a left_swing or right_swing.
     :type subgait_id: str
-    :param position_x: x-coordinate of the desired foot location in meters.
-    :type position_x: float
-    :param position_y: Optional y-coordinate of the desired foot location in meters. Default is zero.
-    :type position_y: float
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param delay: Optional time delay of first setpoint. Default is zero.
-    :type delay: float
+    :param position_x: x-coordinate of the desired foot location in meters.
+    :type position_x: float
+    :param position_y: y-coordinate of the desired foot location in meters. Default is zero.
+    :type position_y: float
     """
 
     def __init__(
@@ -38,16 +36,10 @@ class DynamicSubgait:
         subgait_id,
         joint_names,
         position_x,
-        position_y=0,
-        delay=0,
+        position_y,
     ):
         self.mid_point_fraction = mid_point_fraction
-        self.delay = delay
-        self.time = [
-            self.delay,
-            self.delay + self.mid_point_fraction * duration,
-            self.delay + duration,
-        ]
+        self.time = [0, self.mid_point_fraction * duration, duration]
         self.starting_position = starting_position
         self.position_x = position_x
         self.position_y = position_y
@@ -55,7 +47,7 @@ class DynamicSubgait:
         self.subgait_id = subgait_id
         self.pose = Pose()
 
-    def middle_setpoint(self):
+    def _middle_setpoint(self, position_x, position_y):
         """Calls IK solver to compute the joint angles needed for the middle setpoint
 
         :returns: A setpoint_dict for the middle position.
@@ -65,14 +57,14 @@ class DynamicSubgait:
             self.position_x, self.position_y, self.mid_point_fraction, self.subgait_id
         )
 
-        self.middle_setpoint_dict = self.from_list_to_setpoint(
+        self.middle_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             middle_position,
             None,
             self.time[1],
         )
 
-    def desired_setpoint(self):
+    def _desired_setpoint(self, position_x, position_y=0):
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate
 
         :param position_x: x-coordinate in meters of the desired foot location.
@@ -84,21 +76,11 @@ class DynamicSubgait:
             self.position_x, self.position_y, self.subgait_id
         )
 
-        self.desired_setpoint_dict = self.from_list_to_setpoint(
-            self.joint_names, self.desired_position, None, self.time[2]
+        self.desired_setpoint_dict = self._from_list_to_setpoint(
+            self.joint_names, self.desired_position, None, self.time[-1]
         )
 
-    def get_final_position(self):
-        """Get setpoint_dictionary of the final setpoint.
-
-        :return: The final setpoint of the subgait.
-        :rtype: dict
-        """
-        return self.from_list_to_setpoint(
-            self.joint_names, self.desired_position, None, self.time[0]
-        )
-
-    def to_joint_trajectory_class(self):
+    def _to_joint_trajectory_class(self):
         """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
         for name in self.joint_names:
@@ -112,8 +94,8 @@ class DynamicSubgait:
                 )
             )
 
-    def to_joint_trajectory_msg(self):
-        """Create joint_trajectory_msg containing the interpolated trajectories for each joint
+    def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
+        """Return a joint_trajectory_msg containing the interpolated trajectories for each joint
 
         :returns: A joint_trajectory_msg
         :rtype: joint_trajectory_msg
@@ -133,14 +115,11 @@ class DynamicSubgait:
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 
-        timestamps = np.linspace(self.time[0], self.time[-1], 20)
-
-        for timestamp in timestamps:
+        for timestamp in self.time:
             joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
             joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
 
             for joint_trajectory in self.joint_trajectory_list:
-                joint_trajectory.interpolate_setpoints()
                 interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
                     timestamp
                 )
@@ -152,7 +131,17 @@ class DynamicSubgait:
 
         return joint_trajectory_msg
 
-    def from_list_to_setpoint(self, joint_names, position, velocity, time):
+    def get_final_position(self):
+        """Get setpoint_dictionary of the final setpoint.
+
+        :return: The final setpoint of the subgait.
+        :rtype: dict
+        """
+        return self._from_list_to_setpoint(
+            self.joint_names, self.desired_position, None, self.time[0]
+        )
+
+    def _from_list_to_setpoint(self, joint_names, position, velocity, time):
         """Computes setpoint_dictionary from a list
 
         :param joint_names: Names of the joints.
@@ -168,28 +157,17 @@ class DynamicSubgait:
         :rtype: dict
         """
         setpoint_dict = {}
+        velocity = np.zeros_like(position) if (velocity is None) else velocity
 
-        if velocity is not None:
-            for i in range(len(joint_names)):
-                setpoint_dict.update(
-                    {
-                        joint_names[i]: Setpoint(
-                            Duration(time),
-                            position[i],
-                            velocity[i],
-                        )
-                    }
-                )
-        else:
-            for i in range(len(joint_names)):
-                setpoint_dict.update(
-                    {
-                        joint_names[i]: Setpoint(
-                            Duration(time),
-                            position[i],
-                            0.0,
-                        )
-                    }
-                )
+        for i in range(len(joint_names)):
+            setpoint_dict.update(
+                {
+                    joint_names[i]: Setpoint(
+                        Duration(time),
+                        position[i],
+                        velocity[i],
+                    )
+                }
+            )
 
         return setpoint_dict
