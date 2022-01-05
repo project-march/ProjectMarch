@@ -25,8 +25,13 @@ MAX_ANKLE_FLEXION = limits.upper
 LENGTH_FOOT = 0.10  # m
 ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
+HIP_ZERO_ANGLE = np.pi  # rad
 
 HIP_AA = 0.03  # rad
+
+
+def rot(t):
+    return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
 
 
 class Pose:
@@ -45,73 +50,52 @@ class Pose:
 
     def calculate_joint_positions(self, joint: str = "all"):
         """
-        Calculates the joint positions for a given pose.
+        Calculates the joint positions for a given pose as a chain from rear toes (toes1) to front toes (toes2).
+        If a positive angle represents a clockwise rotation, the angle variable is positive in the rot function.
+        If a positive angle represents a non-clockwise rotation, the angle variable is negative in the rot function.
+        The vectors (all np.array's) do always describe the translation when no rotation is applied.
+        The rot_total matrix expands every step, since every joint location depends on all privious joint angles in the chain.
         """
+        # create rotation matrix that we expand after every rotation:
+        rot_total = rot(0)
 
-        # toe1 is defined at [LENGTH_FOOT, 0]:
-        pos_toe1 = np.array([LENGTH_FOOT, 0])
+        # toes1 is defined at [LENGTH_FOOT, 0]:
+        pos_toes1 = np.array([LENGTH_FOOT, 0])
 
-        # ankle1 = toe1 + translation_by_foot:
-        pos_ankle1 = np.array(
-            [
-                pos_toe1[0] - np.cos(self.rot_foot1) * LENGTH_FOOT,
-                pos_toe1[1] + np.sin(self.rot_foot1) * LENGTH_FOOT,
-            ]
-        )
+        # ankle1 = toes1 + translation_by_foot1:
+        rot_foot = rot(-self.rot_foot1)
+        rot_total = rot_total @ rot_foot
+        pos_ankle1 = pos_toes1 + rot_total @ np.array([-LENGTH_FOOT, 0])
 
-        # knee1 = ankle1 + translation_by_lower_leg:
-        pos_knee1 = np.array(
-            [
-                pos_ankle1[0]
-                + np.sin(self.fe_ankle1 + self.rot_foot1) * LENGTH_LOWER_LEG,
-                pos_ankle1[1]
-                + np.cos(self.fe_ankle1 + self.rot_foot1) * LENGTH_LOWER_LEG,
-            ]
-        )
+        # knee1 = ankle1 + translation_by_lower_leg1:
+        rot_ankle1 = rot(-self.fe_ankle1)
+        rot_total = rot_total @ rot_ankle1
+        pos_knee1 = pos_ankle1 + rot_total @ np.array([0, LENGTH_LOWER_LEG])
 
-        # hip1 = knee1 + translation_by_upper_leg:
-        angle_before_knee1 = self.fe_ankle1 + self.rot_foot1
-        pos_hip = np.array(
-            [
-                pos_knee1[0]
-                + np.sin(angle_before_knee1 - self.fe_knee1) * LENGTH_UPPER_LEG,
-                pos_knee1[1]
-                + np.cos(angle_before_knee1 - self.fe_knee1) * LENGTH_UPPER_LEG,
-            ]
-        )
+        # hip = knee1 + translation_by_upper_leg1:
+        rot_knee1 = rot(self.fe_knee1)
+        rot_total = rot_total @ rot_knee1
+        pos_hip = pos_knee1 + rot_total @ np.array([0, LENGTH_UPPER_LEG])
 
-        # knee2 = hip + translation_by_upper_leg:
-        pos_knee2 = np.array(
-            [
-                pos_hip[0] + np.sin(self.fe_hip2) * LENGTH_UPPER_LEG,
-                pos_hip[1] - np.cos(self.fe_hip2) * LENGTH_UPPER_LEG,
-            ]
-        )
+        # knee2 = hip + translation_by_upper_leg2:
+        rot_hip = rot(self.fe_hip2 - self.fe_hip1)
+        rot_total = rot_total @ rot_hip
+        pos_knee2 = pos_hip + rot_total @ np.array([0, -LENGTH_UPPER_LEG])
 
-        # ankle2 = knee2 + translation_by_lower_leg:
-        pos_ankle2 = np.array(
-            [
-                pos_knee2[0] + np.sin(self.fe_hip2 - self.fe_knee2) * LENGTH_LOWER_LEG,
-                pos_knee2[1] - np.cos(self.fe_hip2 - self.fe_knee2) * LENGTH_LOWER_LEG,
-            ]
-        )
+        # ankle2 = knee2 + translation_by_lower_leg2:
+        rot_knee2 = rot(-self.fe_knee2)
+        rot_total = rot_total @ rot_knee2
+        pos_ankle2 = pos_knee2 + rot_total @ np.array([0, -LENGTH_LOWER_LEG])
 
-        # toe2 = ankle2 + translation_by_foot:
-        angle_before_ankle2 = self.fe_hip2 - self.fe_knee2
-        angle_ankle2 = ANKLE_ZERO_ANGLE + self.fe_ankle2
-        pos_toe2 = np.array(
-            [
-                pos_ankle2[0]
-                + np.sin(angle_before_ankle2 + angle_ankle2) * LENGTH_FOOT,
-                pos_ankle2[1]
-                - np.cos(angle_before_ankle2 + angle_ankle2) * LENGTH_FOOT,
-            ]
-        )
+        # toe2 = ankle2 + translation_by_foot2:
+        rot_ankle2 = rot(self.fe_ankle2)
+        rot_total = rot_total @ rot_ankle2
+        pos_toe2 = pos_ankle2 + rot_total @ np.array([LENGTH_FOOT, 0])
 
         # return all positions, or one specific if asked:
         if joint == "all":
             return (
-                pos_toe1,
+                pos_toes1,
                 pos_ankle1,
                 pos_knee1,
                 pos_hip,
@@ -248,7 +232,7 @@ class Pose:
 
         # get current state:
         (
-            pos_toe1,
+            pos_toes1,
             pos_ankle1,
             pos_knee1,
             pos_hip,
@@ -263,10 +247,10 @@ class Pose:
         angle_ankle1, angle_knee2, angle_hip = tas.get_angles_from_sides(sides)
 
         # define new fe_ankle1 and fe_knee1:
-        ankle1_angle_toe1_knee2 = qas.get_angle_between_points(
-            [pos_knee2, pos_ankle1, pos_toe1]
+        ankle1_angle_toes1_knee2 = qas.get_angle_between_points(
+            [pos_knee2, pos_ankle1, pos_toes1]
         )
-        self.fe_ankle1 = ANKLE_ZERO_ANGLE - (angle_ankle1 + ankle1_angle_toe1_knee2)
+        self.fe_ankle1 = ANKLE_ZERO_ANGLE - (angle_ankle1 + ankle1_angle_toes1_knee2)
         self.fe_knee1 = 0
 
         # get new knee1 and hip location and determine point below it:
@@ -292,25 +276,31 @@ class Pose:
         self.fe_knee2 = KNEE_ZERO_ANGLE - (angle_knee2 + knee2_angle_ankle1_ankle2)
 
     def reduce_stance_dorsi_flexion(self):
-        # Save current angle at toe1 between ankle1 and hip:
+        # Save current angle at toes1 between ankle1 and hip:
         pos_ankle1 = self.calculate_joint_positions("pos_ankle1")
-        pos_toe1 = self.calculate_joint_positions("pos_toe1")
+        pos_toes1 = self.calculate_joint_positions("pos_toes1")
         pos_hip = self.calculate_joint_positions("pos_hip")
-        toe1_angle_ankle1_hip = qas.get_angle_between_points(
-            [pos_ankle1, pos_toe1, pos_hip]
+        toes1_angle_ankle1_hip = qas.get_angle_between_points(
+            [pos_ankle1, pos_toes1, pos_hip]
         )
 
         # Reduce dorsi flexion of stance leg:
-        dis_toe1_hip = np.linalg.norm(pos_toe1 - pos_hip)
-        lengths = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_FOOT, dis_toe1_hip]
-        angle_knee1, angle_ankle1, angle_toe1, angle_hip = qas.solve_quadritlateral(
+        dis_toes1_hip = np.linalg.norm(pos_toes1 - pos_hip)
+        lengths = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_FOOT, dis_toes1_hip]
+        angle_knee1, angle_ankle1, angle_toes1, angle_hip = qas.solve_quadritlateral(
             lengths=lengths, angle_b=ANKLE_ZERO_ANGLE - MAX_ANKLE_FLEXION, convex=False
         )
 
         # Update pose:
-        self.rot_foot1 = toe1_angle_ankle1_hip - angle_toe1
+        self.rot_foot1 = toes1_angle_ankle1_hip - angle_toes1
         self.fe_ankle1 = ANKLE_ZERO_ANGLE - angle_ankle1
         self.fe_knee1 = KNEE_ZERO_ANGLE - angle_knee1
+
+        pos_knee1 = self.calculate_joint_positions("pos_knee1")
+        point_below_hip = np.array([pos_hip[0], 0])
+        self.fe_hip1 = np.sign(
+            pos_knee1[0] - pos_hip[0]
+        ) * qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
 
 
 def calculate_ground_pose_flexion(ankle_x: float):
