@@ -12,9 +12,7 @@
       "always_enabled": true
     },
     {
-      "name": "force_unknown",
-      "callback": "publish_sm_to_unknown",
-      "always_enabled": true
+      "name": "dynamic_walk"
     }
   ],
   [
@@ -142,7 +140,9 @@
       "always_enabled": true
     },
     {
-      "name": "dynamic_walk"
+      "name": "force_unknown",
+      "callback": "publish_sm_to_unknown",
+      "always_enabled": true
     }
   ]
 ]
