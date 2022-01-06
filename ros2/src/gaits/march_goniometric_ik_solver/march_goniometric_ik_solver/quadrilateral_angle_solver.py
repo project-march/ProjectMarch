@@ -19,28 +19,31 @@ def get_angle_between_points(points: list):
     return np.arccos(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
 
 
-def find_fourth_point(a: np.array, b: np.array, c: np.array, da: float):
+def find_fourth_point(
+    a: np.array,
+    b: np.array,
+    c: np.array,
+    da: float,
+    cd: float,
+    convex: bool,
+):
     """
     Finds the fourth point (d) of a quadrilateral when 3 points (a, b, c) and the
-    distance da or cd is given, assuming da = cd, with the following step:
-    1. Calculate the center_point between a and c.
-    2. Calculate the distance between a and the center_point, which is half of the diagonal ac.
-    3. Calculate the distance between point d and the diagonal ac, which we call height, using pythagoras theorem.
-    4. Determine the angle between ab and ac, which we call ground_angle.
-    5. Determine the direction of the height calculated in step 3, by knowing it is perpenicular to ac and assuming a convex quadrilateral.
-    6. Calculate point d by adding the height as vector with correct direction to center_point, and return it.
+    distances da and cd are given, based on
+    http://paulbourke.net/geometry/circlesphere/#:~:text=Intersection%20of%20two%20circles
     """
 
-    center_point = np.array([np.mean([a[0], c[0]]), np.mean([a[1], c[1]])])
-    half_ac = np.linalg.norm(a - c) / 2
-    height = np.sqrt(da ** 2 - half_ac ** 2)
+    r0, r1 = da, cd
+    p0, p1 = a, c
+    d = np.linalg.norm(p0 - p1)
 
-    ground_angle = get_angle_between_points([c, a, b])
-    center_point_angle = RIGHT_ANGLE - ground_angle
+    dis_p0_p2 = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
+    h = np.sqrt(r0 ** 2 - dis_p0_p2 ** 2)
+    p2 = p0 + dis_p0_p2 * (p1 - p0) / d
 
-    return center_point + np.array(
-        [-np.cos(center_point_angle) * height, np.sin(center_point_angle) * height]
-    )
+    kernel = np.array([-1, 1]) if convex else np.array([1, -1])
+
+    return p2 + kernel * h / d * np.flip(p1 - p0)  # = p3
 
 
 def get_angles(points: list):
@@ -75,7 +78,9 @@ def check_lengths(points: list, real_lengths: list):
             print("Error difference = ", error)
 
 
-def solve_quadritlateral(lengths: list, angle_b: float, debug: bool = False):
+def solve_quadritlateral(
+    lengths: list, angle_b: float, convex: bool = True, debug: bool = False
+):
     """
     Calculates the angles of a quadrilateral given all side lengths and the angle of point b.
     Expects lengths to be given as [da, ab, bc, cd]
@@ -88,7 +93,7 @@ def solve_quadritlateral(lengths: list, angle_b: float, debug: bool = False):
     a = np.array([0, 0])
     b = a + np.array([ab, 0])
     c = b + np.array([-np.cos(angle_b) * bc, np.sin(angle_b) * bc])
-    d = find_fourth_point(a, b, c, da)
+    d = find_fourth_point(a, b, c, da, cd, convex)
     points = [a, b, c, d]
 
     angles = get_angles(points)

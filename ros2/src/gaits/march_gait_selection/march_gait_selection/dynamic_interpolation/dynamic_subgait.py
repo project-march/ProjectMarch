@@ -6,14 +6,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import 
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
-from march_goniometric_ik_solver.ik_solver import (
-    solve_mid_position,
-    solve_end_position,
-    Pose,
-)
-
-# Middle point is always 0.1 meters higher than desired location
-MIDDLE_POINT_HEIGHT = 0.1
+from march_goniometric_ik_solver.ik_solver import Pose
 
 
 class DynamicSubgait:
@@ -52,19 +45,17 @@ class DynamicSubgait:
         self.position_y = position_y
         self.joint_names = joint_names
         self.subgait_id = subgait_id
+        self.pose = Pose()
 
-    def _middle_setpoint(self, position_x, position_y):
+    def _middle_setpoint(self):
         """Calls IK solver to compute the joint angles needed for the middle setpoint
-
-        :param position_x: x-coordinate in meters of the foot for the desired middle setpoint.
-        :type position_x: float
-        :param position_y: y-coordinate in meters of the foot for the desired middle setpoint.
-        :type position_y: float
 
         :returns: A setpoint_dict for the middle position.
         :rtype: dict
         """
-        middle_position = solve_mid_position(position_x, position_y, self.subgait_id)
+        middle_position = self.pose.solve_mid_position(
+            self.position_x, self.position_y, self.mid_point_fraction, self.subgait_id
+        )
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
@@ -73,7 +64,7 @@ class DynamicSubgait:
             self.time[1],
         )
 
-    def _desired_setpoint(self, position_x, position_y=0):
+    def _desired_setpoint(self):
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate
 
         :param position_x: x-coordinate in meters of the desired foot location.
@@ -81,8 +72,8 @@ class DynamicSubgait:
         :param position_y: Optional y-coordinate in meters of the desired foot location. Default is zero.
         :type position_y: float
         """
-        self.desired_position = solve_end_position(
-            position_x, position_y, self.subgait_id
+        self.desired_position = self.pose.solve_end_position(
+            self.position_x, self.position_y, self.subgait_id
         )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
@@ -109,26 +100,15 @@ class DynamicSubgait:
         :returns: A joint_trajectory_msg
         :rtype: joint_trajectory_msg
         """
-        # Solve for middle setpoint.
-        starting_position_list = []
-        for joint in self.joint_names:
-            starting_position_list.append(self.starting_position[joint].position)
+        # Update pose:
+        pose_list = [joint.position for joint in self.starting_position.values()]
+        self.pose = Pose(pose_list)
 
-        # Swing leg ankle position is relative to stance leg ankle position (0,0)
-        current_pose = Pose(starting_position_list)
-        stance_swing_dis = current_pose.get_ankle_distance()
+        # Solve for middle setpoint:
+        self._middle_setpoint()
 
-        # Middle position x is weighted average of the current and desired setpoint,
-        # relative to the stance leg ankle
-        mid_pos_x = self.mid_point_fraction * self.position_x - stance_swing_dis
-
-        # Middle position y should always be heigher than the desired position y
-        mid_pos_y = self.position_y + MIDDLE_POINT_HEIGHT
-
-        self._middle_setpoint(mid_pos_x, mid_pos_y)
-
-        # Solve for desired setpoint
-        self._desired_setpoint(self.position_x, position_y=self.position_y)
+        # Solve for desired setpoint:
+        self._desired_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
