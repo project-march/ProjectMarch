@@ -23,7 +23,7 @@ MAX_ANKLE_FLEXION = limits.upper
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
-MIDDLE_POINT_HEIGHT = 0.1  # m
+MIDDLE_POINT_HEIGHT = 0.15  # m
 
 ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
