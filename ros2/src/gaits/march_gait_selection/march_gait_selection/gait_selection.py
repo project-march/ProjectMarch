@@ -454,8 +454,8 @@ class GaitSelection(Node):
         if self._dynamic_gait:
             # We pass along the gait_selection_node to be able to listen
             # to the CoViD topic wihtin the DynamicSetpointGait class.
-            dynamic_gait = DynamicSetpointGait(gait_selection_node=self)
-            gaits["dynamic_walk"] = dynamic_gait
+            self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
+            gaits["dynamic_walk"] = self.dynamic_setpoint_gait
             self.get_logger().info("Added dynamic_walk to gaits")
 
         return gaits

@@ -54,6 +54,9 @@ class DynamicSetpointGait(GaitInterface):
             10,
         )
 
+        # Assign reconfigurable parameters
+        self.update_parameters()
+
     @property
     def name(self):
         return self.gait_name
@@ -79,8 +82,8 @@ class DynamicSetpointGait(GaitInterface):
         # Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
-                self.foot_location.y > self.minimun_stair_height
-                or self.foot_location.y < self.minimun_stair_height
+                self.foot_location.y > self.minimum_stair_height
+                or self.foot_location.y < self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
@@ -149,6 +152,7 @@ class DynamicSetpointGait(GaitInterface):
         :rtype: GaitUpdate
         """
         self._reset()
+        self.update_parameters()
         self._current_time = current_time
         self.subgait_id = "right_swing"
         self._first_subgait_delay = first_subgait_delay
@@ -264,10 +268,8 @@ class DynamicSetpointGait(GaitInterface):
 
     def _get_foot_position(self, subgait_id):
         if subgait_id == "left_swing":
-            self._logger("Getting left foot position from covid")
             return self.foot_position_left
         elif subgait_id == "right_swing":
-            self._logger("Getting right foot position from covid")
             return self.foot_position_right
         else:
             return None
@@ -278,19 +280,6 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
         """
-        # Set up reconfigurable parameters
-        self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
-        self.middle_position_fraction = self.gait_selection.middle_point_fraction
-        self.middle_position_height = self.gait_selection.middle_point_height
-        self.minimun_stair_height = self.gait_selection.minimum_stair_height
-
-        self._logger(
-            f"{self.dynamic_subgait_duration}"
-            f"{self.middle_position_fraction}"
-            f"{self.middle_position_height}"
-            f"{self.minimun_stair_height}"
-        )
-
         # Should be replaced by covid topic in the future
         if stop:
             self.foot_location.x = 0  # m
@@ -301,7 +290,7 @@ class DynamicSetpointGait(GaitInterface):
 
         self.dynamic_subgait = DynamicSubgait(
             self.dynamic_subgait_duration,
-            self.middle_position_fraction,
+            self.middle_point_fraction,
             self.start_position,
             self.subgait_id,
             self.joint_names,
@@ -330,6 +319,20 @@ class DynamicSetpointGait(GaitInterface):
         """
         self._start_time = self._end_time
         self._end_time = self._start_time + next_command_duration
+
+    def update_parameters(self):
+        self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
+        self.middle_point_fraction = self.gait_selection.middle_point_fraction
+        self.middle_point_height = self.gait_selection.middle_point_height
+        self.minimum_stair_height = self.gait_selection.minimum_stair_height
+
+        self._logger(
+            "Parameters updated. "
+            f"duration: {self.dynamic_subgait_duration}, "
+            f"fraction: {self.middle_point_fraction}, "
+            f"height: {self.middle_point_height}, "
+            f"stairs: {self.minimum_stair_height}"
+        )
 
     # UTILITY FUNCTIONS
     def _setpoint_dict_to_joint_dict(self, setpoint_dict):
