@@ -290,8 +290,8 @@ class DynamicSetpointGait(GaitInterface):
             self._end_time = self._start_time
 
         if stop:
-            self.foot_location.x = 0  # m
-            self.foot_location.y = 0  # m
+            self.foot_location.x = 0.0  # m
+            self.foot_location.y = 0.0  # m
             self._end = True
         else:
             self.foot_location = self._get_foot_position(self.subgait_id)

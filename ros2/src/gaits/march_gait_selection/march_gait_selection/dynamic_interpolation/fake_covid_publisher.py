@@ -1,3 +1,5 @@
+# Ignore for flake8 because it errors on the RNG
+# flake8: noqa
 import rclpy
 from rclpy.node import Node
 
