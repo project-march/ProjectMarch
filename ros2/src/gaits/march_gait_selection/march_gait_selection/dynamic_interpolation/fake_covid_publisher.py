@@ -29,7 +29,7 @@ class FakeCovidPublisher(Node):
     def publish_locations(self):
         point = Point()
         point.x = random.uniform(0.2, 0.5)
-        point.y = 0.0
+        point.y = random.uniform(0.0, 0.2)
         point.z = 0.0
 
         self.left_foot_publisher.publish(point)
