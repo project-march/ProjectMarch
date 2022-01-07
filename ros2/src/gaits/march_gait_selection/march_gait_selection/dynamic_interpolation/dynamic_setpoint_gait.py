@@ -261,12 +261,18 @@ class DynamicSetpointGait(GaitInterface):
         self.start_position = self.dynamic_subgait.get_final_position()
 
     def _callback_right(self, foot_position: Point):
+        """Update the right foot position with the latest point published
+        on the CoViD-topic.
+        """
         self.foot_position_right = foot_position
 
     def _callback_left(self, foot_position: Point):
+        """Update the left foot position with the latest point published
+        on the CoViD-topic."""
         self.foot_position_left = foot_position
 
     def _get_foot_position(self, subgait_id):
+        """Returns the right or left foot position based upon the subgait_id"""
         if subgait_id == "left_swing":
             return self.foot_position_left
         elif subgait_id == "right_swing":
@@ -280,7 +286,9 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
         """
-        # Should be replaced by covid topic in the future
+        if self._start_is_delayed:
+            self._end_time = self._start_time
+
         if stop:
             self.foot_location.x = 0  # m
             self.foot_location.y = 0  # m
@@ -299,8 +307,6 @@ class DynamicSetpointGait(GaitInterface):
         )
 
         trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
-        if self._start_is_delayed:
-            self._end_time = self._start_time
 
         return TrajectoryCommand(
             trajectory,
@@ -308,8 +314,6 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id,
             self._end_time,
         )
-
-    DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY = Duration(0)
 
     def _update_time_stamps(self, next_command_duration):
         """Update the starting and end time
