@@ -14,8 +14,10 @@ class DynamicSubgait:
 
     :param duration: Duration of the subgait.
     :type duration: float
-    :param mid_point_fraction: Fraction of the subgait at which the middle setpoint will be set.
-    :type mid_point_fraction: float
+    :param middle_point_fraction: Fraction of the subgait at which the middle setpoint will be set.
+    :type middle_point_fraction: float
+    :param middle_point_height: Height of the middle setpoint.
+    :type middle_point_height: float
     :param starting_position: The first setpoint of the subgait, usually the last setpoint of the previous subgait.
     :type starting_position: dict
     :param subgait_id: Whether it is a left_swing or right_swing.
@@ -31,15 +33,17 @@ class DynamicSubgait:
     def __init__(
         self,
         duration,
-        mid_point_fraction,
+        middle_point_fraction,
+        middle_point_height,
         starting_position,
         subgait_id,
         joint_names,
         position_x,
         position_y,
     ):
-        self.mid_point_fraction = mid_point_fraction
-        self.time = [0, self.mid_point_fraction * duration, duration]
+        self.middle_point_fraction = middle_point_fraction
+        self.middle_point_height = middle_point_height
+        self.time = [0, self.middle_point_fraction * duration, duration]
         self.starting_position = starting_position
         self.position_x = position_x
         self.position_y = position_y
@@ -54,7 +58,11 @@ class DynamicSubgait:
         :rtype: dict
         """
         middle_position = self.pose.solve_mid_position(
-            self.position_x, self.position_y, self.mid_point_fraction, self.subgait_id
+            self.position_x,
+            self.position_y,
+            self.middle_point_fraction,
+            self.middle_point_height,
+            self.subgait_id,
         )
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
