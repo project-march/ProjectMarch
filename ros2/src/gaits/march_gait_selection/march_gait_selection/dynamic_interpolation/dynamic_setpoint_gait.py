@@ -13,9 +13,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 
 from geometry_msgs.msg import Point
 
-# Desired location higher than 15 cm will be considered a stairs-like gait
-MINIMUM_STAIR_HEIGHT = 0.15
-
 
 class DynamicSetpointGait(GaitInterface):
     """Gait built up from dynamic setpoints"""
@@ -82,8 +79,8 @@ class DynamicSetpointGait(GaitInterface):
         # Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
-                self.foot_location.y > MINIMUM_STAIR_HEIGHT
-                or self.foot_location.y < MINIMUM_STAIR_HEIGHT
+                self.foot_location.y > self.minimun_stair_height
+                or self.foot_location.y < self.minimun_stair_height
             ):
                 return "stairs_like"
             else:
@@ -281,6 +278,19 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
         """
+        # Set up reconfigurable parameters
+        self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
+        self.middle_position_fraction = self.gait_selection.middle_point_fraction
+        self.middle_position_height = self.gait_selection.middle_point_height
+        self.minimun_stair_height = self.gait_selection.minimum_stair_height
+
+        self._logger(
+            f"{self.dynamic_subgait_duration}"
+            f"{self.middle_position_fraction}"
+            f"{self.middle_position_height}"
+            f"{self.minimun_stair_height}"
+        )
+
         # Should be replaced by covid topic in the future
         if stop:
             self.foot_location.x = 0  # m
@@ -289,12 +299,9 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_position(self.subgait_id)
 
-        subgait_duration = 1.5  # s
-        mid_point_frac = 0.45
-
         self.dynamic_subgait = DynamicSubgait(
-            subgait_duration,
-            mid_point_frac,
+            self.dynamic_subgait_duration,
+            self.middle_position_fraction,
             self.start_position,
             self.subgait_id,
             self.joint_names,
@@ -308,7 +315,7 @@ class DynamicSetpointGait(GaitInterface):
 
         return TrajectoryCommand(
             trajectory,
-            Duration(subgait_duration),
+            Duration(self.dynamic_subgait_duration),
             self.subgait_id,
             self._end_time,
         )

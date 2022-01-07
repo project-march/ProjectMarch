@@ -39,6 +39,10 @@ def generate_launch_description():
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
     dynamic_gait = LaunchConfiguration("dynamic_gait")
+    dynamic_subgait_duration = LaunchConfiguration("dynamic_subgait_duration")
+    middle_point_fraction = LaunchConfiguration("middle_point_fraction")
+    middle_point_height = LaunchConfiguration("middle_point_height")
+    minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -172,6 +176,29 @@ def generate_launch_description():
                 description="Wether dynamic_setpoint_gait is enabled",
             ),
             DeclareLaunchArgument(
+                name="dynamic_subgait_duration",
+                default_value="1.5",
+                description="Duration of a subgait created by the dynamic gait",
+            ),
+            DeclareLaunchArgument(
+                name="middle_point_fraction",
+                default_value="0.45",
+                description="Fraction of the step at which the middle point "
+                "of the dynamic gait will take place.",
+            ),
+            DeclareLaunchArgument(
+                name="middle_point_height",
+                default_value="0.15",
+                description="Height of the middle setpoint of dynamic gait "
+                "relative to the desired position, given in meters.",
+            ),
+            DeclareLaunchArgument(
+                name="minimum_stair_height",
+                default_value="0.15",
+                description="A step lower or higher than the minimum_stair_height"
+                "will change the gait type to stairs_like instead of walk_like.",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -257,6 +284,10 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("balance", balance),
                     ("dynamic_gait", dynamic_gait),
+                    ("dynamic_subgait_duration", dynamic_subgait_duration),
+                    ("middle_point_fraction", middle_point_fraction),
+                    ("middle_point_height", middle_point_height),
+                    ("mininum_stair_height", minimum_stair_height),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
                     ("timer_period", timer_period),

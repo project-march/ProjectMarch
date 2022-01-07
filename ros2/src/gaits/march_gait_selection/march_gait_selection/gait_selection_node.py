@@ -71,6 +71,14 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
             if param.value < 0:
                 return SetParametersResult(successful=False)
             gait_selection._first_subgait_delay = Duration(seconds=param.value)
+        elif param.name == "dynamic_subgait_duration":
+            gait_selection.dynamic_subgait_duration = param.value
+        elif param.name == "middle_point_fraction":
+            gait_selection.middle_point_fraction = param.value
+        elif param.name == "middle_point_height":
+            gait_selection.middle_point_height = param.value
+        elif param.name == "minimum_stair_height":
+            gait_selection.minimum_stair_height = param.value
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
             gaits_updated = True
