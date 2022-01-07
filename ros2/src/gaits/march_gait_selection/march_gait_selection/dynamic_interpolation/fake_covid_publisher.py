@@ -3,6 +3,8 @@ from rclpy.node import Node
 
 from geometry_msgs.msg import Point
 
+import random
+
 NODE_NAME = "fake_covid_publisher"
 
 
@@ -26,7 +28,7 @@ class FakeCovidPublisher(Node):
 
     def publish_locations(self):
         point = Point()
-        point.x = 0.4
+        point.x = random.uniform(0.2, 0.5)
         point.y = 0.0
         point.z = 0.0
 
