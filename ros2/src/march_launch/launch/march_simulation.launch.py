@@ -49,6 +49,10 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
+    # Fake covid
+    location_x = LaunchConfiguration("location_x")
+    location_y = LaunchConfiguration("location_y")
+
     return launch.LaunchDescription(
         [
             # GENERAL ARGUMENTS
@@ -220,6 +224,16 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            DeclareLaunchArgument(
+                name="location_x",
+                default_value="0.4",
+                description="x-location for fake covid topic",
+            ),
+            DeclareLaunchArgument(
+                name="location_y",
+                default_value="0.0",
+                description="y-location for fake covid topic",
+            ),
             # Use normal launch file with different launch_arguments
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -260,6 +274,8 @@ def generate_launch_description():
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
                     ("jointlesss", jointless),
+                    ("location_x", location_x),
+                    ("location_y", location_y),
                 ],
             ),
         ]

@@ -52,6 +52,10 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
+    # Fake covid
+    location_x = LaunchConfiguration("location_x")
+    location_y = LaunchConfiguration("location_y")
+
     return launch.LaunchDescription(
         [
             # GENERAL ARGUMENTS
@@ -230,6 +234,16 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            DeclareLaunchArgument(
+                name="location_x",
+                default_value="0.4",
+                description="x-location for fake covid topic",
+            ),
+            DeclareLaunchArgument(
+                name="location_y",
+                default_value="0.0",
+                description="y-location for fake covid topic",
+            ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -291,6 +305,20 @@ def generate_launch_description():
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
                     ("timer_period", timer_period),
+                ],
+            ),
+            # Fake covid publisher
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_fake_covid"),
+                        "launch",
+                        "march_fake_covid.launch.py",
+                    )
+                ),
+                launch_arguments=[
+                    ("location_x", location_x),
+                    ("location_y", location_y),
                 ],
             ),
             # Safety
