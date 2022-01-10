@@ -49,8 +49,8 @@ protected:
     ros::Publisher point_publisher_;
     ros::Subscriber pointcloud_subscriber_;
 
-    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
-    std::unique_ptr<tf2_ros::TransformListener> tfListener;
+    std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
     std::string topic_camera_front;
 

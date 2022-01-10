@@ -31,8 +31,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
     , left_or_right_(left_or_right)
 {
 
-    tfBuffer = std::make_unique<tf2_ros::Buffer>();
-    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+    tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
+    tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
     topic_camera_front
         = "/camera_front_" + left_or_right + "/depth/color/points";
 
@@ -56,7 +56,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
         processRealSenseDepthFrames();
     } else {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-            topic_camera_front, /*queue_size=*/1,
+            topic_camera_front, /*queue_size=*/3,
             &FootPositionFinder::processSimulatedDepthFrames, this);
     }
 }
@@ -188,9 +188,9 @@ void FootPositionFinder::transformPoint(
     geometry_msgs::TransformStamped transform_stamped;
 
     try {
-        if (tfBuffer->canTransform(
-                frame_to, frame_from, ros::Time(), ros::Duration(/*t=*/1.0))) {
-            transform_stamped = tfBuffer->lookupTransform(
+        if (tfBuffer_->canTransform(frame_to, frame_from, ros::Time(/*t=*/0),
+                ros::Duration(/*t=*/1.0))) {
+            transform_stamped = tfBuffer_->lookupTransform(
                 frame_to, frame_from, ros::Time(/*t=*/0));
         }
     } catch (tf2::TransformException& ex) {

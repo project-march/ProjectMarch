@@ -28,8 +28,8 @@ protected:
     PointCloud::Ptr pointcloud_;
     NormalCloud::Ptr normalcloud_;
 
-    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
-    std::unique_ptr<tf2_ros::TransformListener> tfListener;
+    std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
     std::string pointcloud_frame_id;
 };

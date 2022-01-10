@@ -25,8 +25,8 @@ Preprocessor::Preprocessor(
     : pointcloud_ { std::move(pointcloud) }
     , normalcloud_ { std::move(normalcloud) }
 {
-    tfBuffer = std::make_unique<tf2_ros::Buffer>();
-    tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+    tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
+    tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
 }
 
 /**
@@ -101,13 +101,14 @@ void Preprocessor::transformPointCloudFromUrdf()
     geometry_msgs::TransformStamped transform_stamped;
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-        if (tfBuffer->canTransform("world", pointcloud_frame_id, ros::Time(),
-                ros::Duration(/*t=*/1.0))) {
-            transform_stamped = tfBuffer->lookupTransform(
+        if (tfBuffer_->canTransform("world", pointcloud_frame_id,
+                ros::Time(/*t=*/0), ros::Duration(/*t=*/1.0))) {
+            transform_stamped = tfBuffer_->lookupTransform(
                 "world", pointcloud_frame_id, ros::Time(/*t=*/0));
+            pcl_ros::transformPointCloud(
+                *pointcloud_, *pointcloud_, transform_stamped.transform);
+            pointcloud_->header.frame_id = "world";
         }
-        pcl_ros::transformPointCloud(
-            *pointcloud_, *pointcloud_, transform_stamped.transform);
     } catch (tf2::TransformException& ex) {
         ROS_WARN_STREAM(
             "Something went wrong when transforming the pointcloud: "
