@@ -106,8 +106,8 @@ limitations under the License.
         <camera name="${camera_name}">
           <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
           <image>
-            <width>320</width> <!-- original: 1280 -->
-            <height>240</height> <!-- original: 720 -->
+            <width>1280</width> <!-- original: 1280 -->
+            <height>720</height> <!-- original: 720 -->
           </image>
           <clip>
             <near>0.1</near>
