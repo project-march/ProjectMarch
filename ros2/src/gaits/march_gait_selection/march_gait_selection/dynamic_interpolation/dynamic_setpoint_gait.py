@@ -11,14 +11,13 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
-# Desired location higher than 15 cm will be considered a stairs-like gait
-MINIMUM_STAIR_HEIGHT = 0.15
+from geometry_msgs.msg import Point
 
 
 class DynamicSetpointGait(GaitInterface):
     """Gait built up from dynamic setpoints"""
 
-    def __init__(self):
+    def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
         self._should_stop = False
         self._end = False
@@ -39,6 +38,24 @@ class DynamicSetpointGait(GaitInterface):
 
         self._start_is_delayed = True
         self._scheduled_early = False
+
+        # Create subscribers for CoViD topic
+        self.gait_selection = gait_selection_node
+        self.gait_selection.create_subscription(
+            Point,
+            "/foot_position/right",
+            self._callback_right,
+            10,
+        )
+        self.gait_selection.create_subscription(
+            Point,
+            "/foot_position/left",
+            self._callback_left,
+            10,
+        )
+
+        # Assign reconfigurable parameters
+        self.update_parameters()
 
     @property
     def name(self):
@@ -65,8 +82,8 @@ class DynamicSetpointGait(GaitInterface):
         # Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
-                self.desired_ankle_y > MINIMUM_STAIR_HEIGHT
-                or self.desired_ankle_y < MINIMUM_STAIR_HEIGHT
+                self.foot_location.y > self.minimum_stair_height
+                or self.foot_location.y < self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
@@ -135,6 +152,7 @@ class DynamicSetpointGait(GaitInterface):
         :rtype: GaitUpdate
         """
         self._reset()
+        self.update_parameters()
         self._current_time = current_time
         self.subgait_id = "right_swing"
         self._first_subgait_delay = first_subgait_delay
@@ -242,6 +260,90 @@ class DynamicSetpointGait(GaitInterface):
         the last position of the previous subgait."""
         self.start_position = self.dynamic_subgait.get_final_position()
 
+    def _callback_right(self, foot_position: Point):
+        """Update the right foot position with the latest point published
+        on the CoViD-topic.
+        """
+        self.foot_position_right = foot_position
+
+    def _callback_left(self, foot_position: Point):
+        """Update the left foot position with the latest point published
+        on the CoViD-topic."""
+        self.foot_position_left = foot_position
+
+    def _get_foot_position(self, subgait_id):
+        """Returns the right or left foot position based upon the subgait_id"""
+        if subgait_id == "left_swing":
+            return self.foot_position_left
+        elif subgait_id == "right_swing":
+            return self.foot_position_right
+        else:
+            return None
+
+    def _get_trajectory_command(self, stop=False) -> TrajectoryCommand:
+        """Return a TrajectoryCommand based on current subgait_id
+
+        :return: TrajectoryCommand with the current subgait and start time.
+        :rtype: TrajectoryCommand
+        """
+        if self._start_is_delayed:
+            self._end_time = self._start_time
+
+        if stop:
+            self.foot_location.x = 0.0  # m
+            self.foot_location.y = 0.0  # m
+            self._end = True
+        else:
+            self.foot_location = self._get_foot_position(self.subgait_id)
+
+        self._logger(
+            f"Stepping to location ({self.foot_location.x}, {self.foot_location.y})"
+        )
+
+        self.dynamic_subgait = DynamicSubgait(
+            self.dynamic_subgait_duration,
+            self.middle_point_fraction,
+            self.middle_point_height,
+            self.start_position,
+            self.subgait_id,
+            self.joint_names,
+            self.foot_location.x,
+            self.foot_location.y,
+        )
+
+        trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+
+        return TrajectoryCommand(
+            trajectory,
+            Duration(self.dynamic_subgait_duration),
+            self.subgait_id,
+            self._end_time,
+        )
+
+    def _update_time_stamps(self, next_command_duration):
+        """Update the starting and end time
+
+        :param next_command_duration: Duration of the next command to be scheduled.
+        :type next_command_duration: Duration
+        """
+        self._start_time = self._end_time
+        self._end_time = self._start_time + next_command_duration
+
+    def update_parameters(self):
+        self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
+        self.middle_point_fraction = self.gait_selection.middle_point_fraction
+        self.middle_point_height = self.gait_selection.middle_point_height
+        self.minimum_stair_height = self.gait_selection.minimum_stair_height
+
+        self._logger(
+            "Parameters updated. "
+            f"duration: {self.dynamic_subgait_duration}, "
+            f"fraction: {self.middle_point_fraction}, "
+            f"height: {self.middle_point_height}, "
+            f"stairs: {self.minimum_stair_height}"
+        )
+
+    # UTILITY FUNCTIONS
     def _setpoint_dict_to_joint_dict(self, setpoint_dict):
         """Creates a joint_dict from a setpoint_dict.
 
@@ -271,52 +373,7 @@ class DynamicSetpointGait(GaitInterface):
             setpoint_dict[name] = Setpoint(Duration(0), position, 0)
         return setpoint_dict
 
-    def _get_trajectory_command(self, stop=False) -> TrajectoryCommand:
-        """Return a TrajectoryCommand based on current subgait_id
-
-        :return: TrajectoryCommand with the current subgait and start time.
-        :rtype: TrajectoryCommand
-        """
-        # Should be replaced by covid topic in the future
-        if stop:
-            desired_ankle_x = 0  # m
-            self.desired_ankle_y = 0  # m
-            subgait_duration = 1  # s
-            self._end = True
-        else:
-            desired_ankle_x = 0.4  # m
-            self.desired_ankle_y = 0.0  # m
-            subgait_duration = 1.5  # s
-        mid_point_frac = 0.45
-
-        self.dynamic_subgait = DynamicSubgait(
-            subgait_duration,
-            mid_point_frac,
-            self.start_position,
-            self.subgait_id,
-            self.joint_names,
-            desired_ankle_x,
-            self.desired_ankle_y,
-        )
-
-        trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
-        if self._start_is_delayed:
-            self._end_time = self._start_time
-
-        return TrajectoryCommand(
-            trajectory,
-            Duration(subgait_duration),
-            self.subgait_id,
-            self._end_time,
-        )
-
-    DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY = Duration(0)
-
-    def _update_time_stamps(self, next_command_duration):
-        """Update the starting and end time
-
-        :param next_command_duration: Duration of the next command to be scheduled.
-        :type next_command_duration: Duration
-        """
-        self._start_time = self._end_time
-        self._end_time = self._start_time + next_command_duration
+    def _logger(self, message):
+        """Publish a message on the gait_selection_node logger
+        with DYNAMIC_SETPOINT_GAIT as a prefix"""
+        self.gait_selection.get_logger().info("DYNAMIC_SETPOINT_GAIT: " f"{message}")

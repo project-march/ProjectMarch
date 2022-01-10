@@ -85,6 +85,27 @@ class GaitSelection(Node):
             self._first_subgait_delay = self._parse_duration_parameter(
                 "first_subgait_delay"
             )
+            # Setting dynamic gait parameters
+            self.dynamic_subgait_duration = (
+                self.get_parameter("dynamic_subgait_duration")
+                .get_parameter_value()
+                .double_value
+            )
+            self.middle_point_fraction = (
+                self.get_parameter("middle_point_fraction")
+                .get_parameter_value()
+                .double_value
+            )
+            self.middle_point_height = (
+                self.get_parameter("middle_point_height")
+                .get_parameter_value()
+                .double_value
+            )
+            self.minimum_stair_height = (
+                self.get_parameter("minimum_stair_height")
+                .get_parameter_value()
+                .double_value
+            )
 
         except ParameterNotDeclaredException:
             self.get_logger().error(
@@ -431,8 +452,10 @@ class GaitSelection(Node):
                 gaits["balanced_walk"] = balance_gait
 
         if self._dynamic_gait:
-            dynamic_gait = DynamicSetpointGait()
-            gaits["dynamic_walk"] = dynamic_gait
+            # We pass along the gait_selection_node to be able to listen
+            # to the CoViD topic wihtin the DynamicSetpointGait class.
+            self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
+            gaits["dynamic_walk"] = self.dynamic_setpoint_gait
             self.get_logger().info("Added dynamic_walk to gaits")
 
         return gaits
