@@ -22,7 +22,6 @@ endif()
 add_definitions(-w)
 
 # find dependencies
-find_package(PCL REQUIRED)
 find_package(realsense2 REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -52,7 +51,6 @@ catkin_package(
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
-    ${PCL_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -63,12 +61,9 @@ add_library(${PROJECT_NAME}
 
 add_executable(foot_position_finder_node src/foot_position_finder_node.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY})
 target_link_libraries(foot_position_finder_node ${PROJECT_NAME})
 
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
 
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
