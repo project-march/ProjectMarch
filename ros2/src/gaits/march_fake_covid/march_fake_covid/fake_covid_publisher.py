@@ -8,7 +8,10 @@ import rclpy
 from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 
+import signal
+import sys
 from contextlib import suppress
+
 from geometry_msgs.msg import Point
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -69,7 +72,6 @@ class FakeCovidPublisher(Node):
 
 def sys_exit(*_):
     sys.exit(0)
-
 
 def main():
     rclpy.init()
