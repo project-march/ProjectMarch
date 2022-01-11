@@ -68,7 +68,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def version(self):
-        return ""
+        return "v0"
 
     @property
     def duration(self):
