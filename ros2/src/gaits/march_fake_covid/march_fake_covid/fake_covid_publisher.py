@@ -33,15 +33,15 @@ class FakeCovidPublisher(Node):
         )
 
         self.left_foot_publisher = self.create_publisher(
-            Point,
-            "/foot_position/left",
-            10,
+            msg_type=Point,
+            topic="/foot_position/left",
+            qos_profile=10,
         )
 
         self.right_foot_publisher = self.create_publisher(
-            Point,
-            "/foot_position/right",
-            10,
+            msg_type=Point,
+            topic="/foot_position/right",
+            qos_profile=10,
         )
 
         self.create_timer(0.1, self.publish_locations)
