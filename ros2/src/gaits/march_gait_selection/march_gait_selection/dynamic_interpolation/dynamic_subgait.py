@@ -51,7 +51,7 @@ class DynamicSubgait:
         self.subgait_id = subgait_id
         self.pose = Pose()
 
-    def _middle_setpoint(self):
+    def _solve_middle_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the middle setpoint
 
         :returns: A setpoint_dict for the middle position.
@@ -72,14 +72,9 @@ class DynamicSubgait:
             self.time[1],
         )
 
-    def _desired_setpoint(self):
-        """Calls IK solver to compute the joint angles needed for the desired x and y coordinate
-
-        :param position_x: x-coordinate in meters of the desired foot location.
-        :type position_x: float
-        :param position_y: Optional y-coordinate in meters of the desired foot location. Default is zero.
-        :type position_y: float
-        """
+    def _solve_desired_setpoint(self) -> None:
+        """Calls IK solver to compute the joint angles needed for the
+        desired x and y coordinate"""
         self.desired_position = self.pose.solve_end_position(
             self.position_x, self.position_y, self.subgait_id
         )
@@ -88,7 +83,7 @@ class DynamicSubgait:
             self.joint_names, self.desired_position, None, self.time[-1]
         )
 
-    def _to_joint_trajectory_class(self):
+    def _to_joint_trajectory_class(self) -> None:
         """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
         for name in self.joint_names:
@@ -103,7 +98,8 @@ class DynamicSubgait:
             )
 
     def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
-        """Return a joint_trajectory_msg containing the interpolated trajectories for each joint
+        """Return a joint_trajectory_msg containing the interpolated
+        trajectories for each joint
 
         :returns: A joint_trajectory_msg
         :rtype: joint_trajectory_msg
@@ -112,11 +108,8 @@ class DynamicSubgait:
         pose_list = [joint.position for joint in self.starting_position.values()]
         self.pose = Pose(pose_list)
 
-        # Solve for middle setpoint:
-        self._middle_setpoint()
-
-        # Solve for desired setpoint:
-        self._desired_setpoint()
+        self._solve_middle_setpoint()
+        self._solve_desired_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
@@ -139,7 +132,7 @@ class DynamicSubgait:
 
         return joint_trajectory_msg
 
-    def get_final_position(self):
+    def get_final_position(self) -> dict:
         """Get setpoint_dictionary of the final setpoint.
 
         :return: The final setpoint of the subgait.
@@ -149,7 +142,7 @@ class DynamicSubgait:
             self.joint_names, self.desired_position, None, self.time[0]
         )
 
-    def _from_list_to_setpoint(self, joint_names, position, velocity, time):
+    def _from_list_to_setpoint(self, joint_names, position, velocity, time) -> dict:
         """Computes setpoint_dictionary from a list
 
         :param joint_names: Names of the joints.
