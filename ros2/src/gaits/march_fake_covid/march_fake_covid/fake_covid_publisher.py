@@ -11,6 +11,11 @@ NODE_NAME = "fake_covid_publisher"
 
 
 class FakeCovidPublisher(Node):
+    """Class to spawn the node 'fake_covid_publisher' that will spam fake possible foot location,
+       on topic '/foot_position/['left' or 'right']'.
+
+    Can change distance locations during runtime, see '../launch/march_fake_covid.launch.py'.
+    """
     def __init__(self):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         self.random_x = False
@@ -67,6 +72,7 @@ def main():
     rclpy.spin(fake_covid_publisher)
 
     rclpy.shutdown()
+
 
 def parameter_callback(fake_covid_publisher, parameters):
     for param in parameters:

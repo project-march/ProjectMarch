@@ -5,6 +5,15 @@ from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
+    """Launch file for the fake_covid_publisher node that will spam fake possible foot location.
+    For more information see '../march_fake_covid/fake_covid_publisher.py'.
+    
+    Can change parameters during runtime by calling in a terminal:
+        'ros2 param set fake_covid_publisher [param_name] [value]'
+        with param_name and value possibilities:
+        * location_x: either a double or 'random'
+        * location_y: either a double or 'random'
+    """
     return LaunchDescription(
         [
             DeclareLaunchArgument(
