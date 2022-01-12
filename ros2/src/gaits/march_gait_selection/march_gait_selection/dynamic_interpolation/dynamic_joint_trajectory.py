@@ -3,6 +3,7 @@ from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 
 NANOSECONDS_TO_SECONDS = 1000000000
+CLAMPED_BOUNDARY_CONDITION = 1
 
 
 class DynamicJointTrajectory:
@@ -33,15 +34,15 @@ class DynamicJointTrajectory:
         """Uses a CubicSpline with velocity boundary conditions to create interpolator objects for
         position and velocity."""
         duration, position, velocity = self._get_setpoints_unzipped()
-        boundary_condition = ((1, velocity[0]), (1, velocity[-1]))
-        yi = []
-        time = []
+        boundary_condition = (
+            (CLAMPED_BOUNDARY_CONDITION, velocity[0]),
+            (CLAMPED_BOUNDARY_CONDITION, velocity[-1]),
+        )
+        time = list(map(lambda x: x.nanoseconds / NANOSECONDS_TO_SECONDS, duration))
 
-        for i in range(len(duration)):
-            yi.append(position[i])
-            time.append(duration[i].nanoseconds / NANOSECONDS_TO_SECONDS)
-
-        self.interpolated_position = CubicSpline(time, yi, bc_type=boundary_condition)
+        self.interpolated_position = CubicSpline(
+            time, position, bc_type=boundary_condition
+        )
         self.interpolated_velocity = self.interpolated_position.derivative()
 
     def get_interpolated_setpoint(self, time) -> Setpoint:
