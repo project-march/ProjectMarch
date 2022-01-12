@@ -19,14 +19,7 @@ class DynamicSetpointGait(GaitInterface):
 
     def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
-        self._should_stop = False
-        self._end = False
-
-        self._start_time = None
-        self._end_time = None
-        self._current_time = None
-
-        self._next_command = None
+        self._reset()
 
         self.start_position = self._joint_dict_to_setpoint_dict(
             get_position_from_yaml("stand")
@@ -35,9 +28,6 @@ class DynamicSetpointGait(GaitInterface):
 
         self.joint_names = get_joint_names_from_urdf()
         self.gait_name = "dynamic_walk"
-
-        self._start_is_delayed = True
-        self._scheduled_early = False
 
         # Create subscribers for CoViD topic
         self.gait_selection = gait_selection_node
