@@ -1,11 +1,15 @@
 # Ignore for flake8 because it errors on the RNG
 # flake8: noqa
+import signal
+import sys
+
+import random
 import rclpy
 from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 
+from contextlib import suppress
 from geometry_msgs.msg import Point
-import random
 
 NODE_NAME = "fake_covid_publisher"
 
@@ -61,6 +65,10 @@ class FakeCovidPublisher(Node):
         self.right_foot_publisher.publish(point)
 
 
+def sys_exit(*_):
+    sys.exit(0)
+
+
 def main():
     rclpy.init()
     fake_covid_publisher = FakeCovidPublisher()
@@ -69,7 +77,10 @@ def main():
         lambda params: parameter_callback(fake_covid_publisher, params)
     )
 
-    rclpy.spin(fake_covid_publisher)
+    signal.signal(signal.SIGTERM, sys_exit)
+
+    with suppress(KeyboardInterrupt):
+        rclpy.spin(fake_covid_publisher)
 
     rclpy.shutdown()
 
