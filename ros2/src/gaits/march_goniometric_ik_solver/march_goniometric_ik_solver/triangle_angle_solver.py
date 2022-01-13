@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def get_angle_from_sides(opposite_side: float, adjacent_sides: list):
+def get_angle_from_sides(opposite_side: float, adjacent_sides: list) -> float:
     """
-    Calculates the angle in a triangle opposite to 'opposite_side'
+    Calculates the angle (in rad) in a triangle opposite to the side given as 'opposite_side'
     when all sides are given, based on the cosine rule.
     """
 
@@ -13,7 +13,7 @@ def get_angle_from_sides(opposite_side: float, adjacent_sides: list):
     )
 
 
-def get_angles_from_sides(sides: list):
+def get_angles_from_sides(sides: list) -> float:
     """
     Calculates all the angles in a triangle when all sides are given.
     Angles are returned in the order of opposite sides.

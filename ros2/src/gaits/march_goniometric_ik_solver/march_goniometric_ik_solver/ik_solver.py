@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 import march_goniometric_ik_solver.triangle_angle_solver as tas
@@ -34,6 +33,16 @@ NUMBER_OF_JOINTS = 8
 
 
 class Pose:
+    """
+    Used to solve inverse kinematics for a desired end_postion or mid_position of the foot.
+    The class contains the joint_angles and the foot_rotation of the rear foot (in case of a toe-off).
+    Solving can be done for the left or right foot, therefore this class uses the definition of 1 or 2
+    for the joints, where 1 is the rear leg and 2 the front leg.
+    Positive defined are: ankle dorsi-flexion, hip abduction, hip flexion, knee flexion.
+    More documentation about the inverse kinematic method can be found on confluence:
+    https://confluence.projectmarch.nl/x/vo6AFw
+    """
+
     def __init__(self, pose: list = [0] * NUMBER_OF_JOINTS):
         (
             self.fe_ankle1,
@@ -51,52 +60,84 @@ class Pose:
     def reset_to_zero_pose(self):
         self.__init__()
 
-    def rot(self, t):
-        return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
+    @property
+    def pose_right(self) -> list:
+        """
+        Returns the pose as list with the right leg as front leg (leg2):
+        """
+        return [
+            self.fe_ankle1,
+            self.aa_hip1,
+            self.fe_hip1,
+            self.fe_knee1,
+            self.fe_ankle2,
+            self.aa_hip2,
+            self.fe_hip2,
+            self.fe_knee2,
+        ]
 
-    def calculate_joint_positions(self, joint: str = "all"):
+    @property
+    def pose_left(self) -> list:
+        """
+        Returns the pose as list with the left leg as front leg (leg2):
+        """
+        return [
+            self.fe_ankle2,
+            self.aa_hip2,
+            self.fe_hip2,
+            self.fe_knee2,
+            self.fe_ankle1,
+            self.aa_hip1,
+            self.fe_hip1,
+            self.fe_knee1,
+        ]
+
+    def calculate_joint_positions(self, joint: str = "all") -> tuple:
         """
         Calculates the joint positions for a given pose as a chain from rear toes (toes1) to front toes (toes2).
-        If a positive angle represents a clockwise rotation, the angle variable is positive in the rot function.
-        If a positive angle represents a non-clockwise rotation, the angle variable is negative in the rot function.
+        Can return all joint positions or a specific one, by choosing from:
+        pos_toes1, pos_ankle1, pos_knee1, pos_hip, pos_knee2, pos_ankle2, pos_toes2
+
+        If a positive angle represents a anti-clockwise rotation, the angle variable is positive in the rot function.
+        If a positive angle represents a clockwise rotation, the angle variable is negative in the rot function.
         The vectors (all np.array's) do always describe the translation when no rotation is applied.
-        The rot_total matrix expands every step, since every joint location depends on all privious joint angles in the chain.
+        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the chain.
         """
         # create rotation matrix that we expand after every rotation:
-        rot_total = self.rot(0)
+        rot_total = rot(0)
 
         # toes1 is defined at [LENGTH_FOOT, 0]:
         pos_toes1 = np.array([LENGTH_FOOT, 0])
 
         # ankle1 = toes1 + translation_by_foot1:
-        rot_foot = self.rot(-self.rot_foot1)
+        rot_foot = rot(-self.rot_foot1)
         rot_total = rot_total @ rot_foot
         pos_ankle1 = pos_toes1 + rot_total @ np.array([-LENGTH_FOOT, 0])
 
         # knee1 = ankle1 + translation_by_lower_leg1:
-        rot_ankle1 = self.rot(-self.fe_ankle1)
+        rot_ankle1 = rot(-self.fe_ankle1)
         rot_total = rot_total @ rot_ankle1
         pos_knee1 = pos_ankle1 + rot_total @ np.array([0, LENGTH_LOWER_LEG])
 
         # hip = knee1 + translation_by_upper_leg1:
-        rot_knee1 = self.rot(self.fe_knee1)
+        rot_knee1 = rot(self.fe_knee1)
         rot_total = rot_total @ rot_knee1
         pos_hip = pos_knee1 + rot_total @ np.array([0, LENGTH_UPPER_LEG])
 
         # knee2 = hip + translation_by_upper_leg2:
-        rot_hip = self.rot(self.fe_hip2 - self.fe_hip1)
+        rot_hip = rot(self.fe_hip2 - self.fe_hip1)
         rot_total = rot_total @ rot_hip
         pos_knee2 = pos_hip + rot_total @ np.array([0, -LENGTH_UPPER_LEG])
 
         # ankle2 = knee2 + translation_by_lower_leg2:
-        rot_knee2 = self.rot(-self.fe_knee2)
+        rot_knee2 = rot(-self.fe_knee2)
         rot_total = rot_total @ rot_knee2
         pos_ankle2 = pos_knee2 + rot_total @ np.array([0, -LENGTH_LOWER_LEG])
 
         # toe2 = ankle2 + translation_by_foot2:
-        rot_ankle2 = self.rot(self.fe_ankle2)
+        rot_ankle2 = rot(self.fe_ankle2)
         rot_total = rot_total @ rot_ankle2
-        pos_toe2 = pos_ankle2 + rot_total @ np.array([LENGTH_FOOT, 0])
+        pos_toes2 = pos_ankle2 + rot_total @ np.array([LENGTH_FOOT, 0])
 
         # return all positions, or one specific if asked:
         if joint == "all":
@@ -107,50 +148,18 @@ class Pose:
                 pos_hip,
                 pos_knee2,
                 pos_ankle2,
-                pos_toe2,
+                pos_toes2,
             )
         else:
             return locals()[joint]
 
-    def get_ankle_distance(self):
+    def get_ankle_distance(self) -> float:
+        """
+        Method to get the distance between the two ankles.
+        """
         pos_ankle1 = self.calculate_joint_positions("pos_ankle1")
         pos_ankle2 = self.calculate_joint_positions("pos_ankle2")
         return np.linalg.norm(pos_ankle1 - pos_ankle2)
-
-    def get_pose(self):
-        return (
-            self.fe_ankle1,
-            self.aa_hip1,
-            self.fe_hip1,
-            self.fe_knee1,
-            self.fe_ankle2,
-            self.aa_hip2,
-            self.fe_hip2,
-            self.fe_knee2,
-        )
-
-    def make_plot(self):
-        """
-        Makes a plot of the exo by first calculating the joint positions
-        and then plotting them with lines.
-        """
-
-        positions = self.calculate_joint_positions()
-        positions_x = [pos[0] for pos in positions]
-        positions_y = [pos[1] for pos in positions]
-
-        plt.figure(1)
-        plt.plot(positions_x, positions_y)
-        plt.gca().set_aspect("equal", adjustable="box")
-        plt.show()
-
-    def calculate_ground_pose_flexion(self, ankle_x: float):
-        """
-        Calculates and returns the flexion of the ankles and the hips when the
-        ankle is moved to a certain x position, using pythagoras theorem.
-        """
-
-        return np.arcsin((ankle_x / 2) / LENGTH_LEG)
 
     def calculate_lifted_pose(self, pos_ankle2: np.array):
         """
@@ -224,14 +233,9 @@ class Pose:
         point_below_hip = np.array([pos_hip[0], 0])
 
         # define new fe_hip1:
-        if pos_hip[0] < pos_knee1[0]:
-            self.fe_hip1 = qas.get_angle_between_points(
-                [pos_knee1, pos_hip, point_below_hip]
-            )
-        else:
-            self.fe_hip1 = -qas.get_angle_between_points(
-                [pos_knee1, pos_hip, point_below_hip]
-            )
+        self.fe_hip1 = np.sign(
+            pos_knee1[0] - pos_hip[0]
+        ) * qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
 
         # define new fe_hip2, fe_knee2 and fe_ankle2:
         self.fe_hip2 = angle_hip + self.fe_hip1
@@ -252,7 +256,7 @@ class Pose:
             pos_hip,
             pos_knee2,
             pos_ankle2,
-            pos_toe2,
+            pos_toes2,
         ) = self.calculate_joint_positions()
 
         # determine sides of triangle and calculate angles:
@@ -273,14 +277,9 @@ class Pose:
         point_below_hip = np.array([pos_hip[0], 0])
 
         # define new fe_hip1:
-        if pos_hip[0] < pos_knee1[0]:
-            self.fe_hip1 = qas.get_angle_between_points(
-                [pos_knee1, pos_hip, point_below_hip]
-            )
-        else:
-            self.fe_hip1 = -qas.get_angle_between_points(
-                [pos_knee1, pos_hip, point_below_hip]
-            )
+        self.fe_hip1 = np.sign(
+            pos_knee1[0] - pos_hip[0]
+        ) * qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
 
         # define new fe_hip2 and fe_knee2:
         self.fe_hip2 = angle_hip + self.fe_hip1
@@ -323,13 +322,12 @@ class Pose:
         midpoint_fraction: float,
         midpoint_height: float,
         subgait_id: str,
-        plot: bool = False,
-    ):
+    ) -> list:
         """
         Solve inverse kinematics for the middle position. Assumes that the
         stance leg is straight. Takes the ankle_x and ankle_y position of the
         desired position and the midpoint_fraction at which a midpoint is desired.
-        First calculates the midpoint posituin using current pose and fraction.
+        First calculates the midpoint position using current pose and fraction.
         Next, calculates the required hip and knee angles of
         the swing leg by making a triangle between the swing leg ankle, swing leg
         knee and the hip. Returns the calculated pose.
@@ -364,17 +362,8 @@ class Pose:
         # lift toes as much as possible:
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
-        if plot:
-            self.make_plot()
-
-        pose_list = self.get_pose()
-
-        if subgait_id == "left_swing":
-            half1 = pose_list[: len(pose_list) // 2]
-            half2 = pose_list[len(pose_list) // 2 :]
-            pose_list = half2 + half1
-
-        return list(pose_list)
+        # return pose as list:
+        return self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
     def solve_end_position(
         self,
@@ -382,20 +371,17 @@ class Pose:
         ankle_y: float,
         subgait_id: str,
         max_ankle_flexion: float = MAX_ANKLE_FLEXION,
-        plot: bool = False,
-        timer: bool = False,
-    ):
+    ) -> list:
         """
         Solve inverse kinematics for a desired ankle location, assuming flat feet.
         Expects at least the ankle x-position and returns the calculated pose.
         """
-        start = time.time()
 
         # make sure to start in zero_pose:
         self.reset_to_zero_pose()
 
         # calculate ground pose:
-        ground_pose_flexion = self.calculate_ground_pose_flexion(ankle_x)
+        ground_pose_flexion = calculate_ground_pose_flexion(ankle_x)
         self.fe_ankle1 = self.fe_hip2 = ground_pose_flexion
         self.fe_hip1 = self.fe_ankle2 = -ground_pose_flexion
 
@@ -418,18 +404,41 @@ class Pose:
         if self.fe_ankle1 > MAX_ANKLE_FLEXION:
             self.reduce_stance_dorsi_flexion()
 
-        if timer:
-            end = time.time()
-            print("Calculation time = ", end - start, " seconds")
+        # return pose as list:
+        return self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
-        if plot:
-            self.make_plot()
 
-        pose_list = self.get_pose()
+# Static methods:
+def rot(t: float) -> np.array:
+    """
+    Returns the 2D rotation matrix R to rotate a vector with rotation t (in rad), so that:
+    ⎡x'⎤ ⎽ ⎡cos(t) -sin(t)⎤⎡x⎤
+    ⎣y'⎦ ⎺ ⎣sin(t)  cos(t)⎦⎣y⎦
+    A positive value of t results in a anti-clockwise rotation around the origin.
+    """
+    return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
 
-        if subgait_id == "left_swing":
-            half1 = pose_list[: len(pose_list) // 2]
-            half2 = pose_list[len(pose_list) // 2 :]
-            pose_list = half2 + half1
 
-        return list(pose_list)
+def calculate_ground_pose_flexion(ankle_x: float):
+    """
+    Calculates and returns the flexion of the ankles and the hips when the
+    ankle is moved to a certain x position, using pythagoras theorem.
+    """
+
+    return np.arcsin((ankle_x / 2) / LENGTH_LEG)
+
+
+def make_plot(pose: Pose):
+    """
+    Makes a plot of the exo by first calculating the joint positions and then plotting them.
+    This method is only used for debugging reasons.
+    """
+
+    positions = pose.calculate_joint_positions()
+    positions_x = [pos[0] for pos in positions]
+    positions_y = [pos[1] for pos in positions]
+
+    plt.figure(1)
+    plt.plot(positions_x, positions_y)
+    plt.gca().set_aspect("equal", adjustable="box")
+    plt.show()

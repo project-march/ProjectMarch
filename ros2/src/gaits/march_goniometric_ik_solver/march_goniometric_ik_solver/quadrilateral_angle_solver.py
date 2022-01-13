@@ -3,7 +3,7 @@ import numpy as np
 RIGHT_ANGLE = np.pi / 2
 
 
-def get_angle_between_points(points: list):
+def get_angle_between_points(points: list) -> float:
     """
     Calculates the angle between three points,
     where the angle is calculated for the middle point.
@@ -26,7 +26,7 @@ def find_fourth_point(
     da: float,
     cd: float,
     convex: bool,
-):
+) -> np.array:
     """
     Finds the fourth point (d) of a quadrilateral when 3 points (a, b, c) and the
     distances da and cd are given, based on
@@ -46,7 +46,7 @@ def find_fourth_point(
     return p2 + kernel * h / d * np.flip(p1 - p0)  # = p3
 
 
-def get_angles(points: list):
+def get_angles(points: list) -> list:
     """
     Calculates the angles of a quadrilateral by giving the four points of it.
     The order of returned angles is equal to the order of points given.
@@ -65,22 +65,9 @@ def get_angles(points: list):
     return angles
 
 
-def check_lengths(points: list, real_lengths: list):
-    """
-    Checks whether the lengths between points are equal to the real lengths.
-    Expects points as [a, b, c, d] and real_lengths as [da, ab, bc, cd]
-    """
-
-    for i in range(len(points)):
-        length = np.linalg.norm(points[i - 1] - points[i])
-        error = abs(length - real_lengths[i])
-        if error > 1e-10:
-            print("Error difference = ", error)
-
-
 def solve_quadritlateral(
     lengths: list, angle_b: float, convex: bool = True, debug: bool = False
-):
+) -> list:
     """
     Calculates the angles of a quadrilateral given all side lengths and the angle of point b.
     Expects lengths to be given as [da, ab, bc, cd]
@@ -103,3 +90,17 @@ def solve_quadritlateral(
         check_lengths(points, lengths)
 
     return angles
+
+
+def check_lengths(points: list, real_lengths: list):
+    """
+    Checks whether the lengths between points are equal to the real lengths.
+    Expects points as [a, b, c, d] and real_lengths as [da, ab, bc, cd].
+    This method is only used for debugging.
+    """
+
+    for i in range(len(points)):
+        length = np.linalg.norm(points[i - 1] - points[i])
+        error = abs(length - real_lengths[i])
+        if error > 1e-10:
+            print("Error difference = ", error)
