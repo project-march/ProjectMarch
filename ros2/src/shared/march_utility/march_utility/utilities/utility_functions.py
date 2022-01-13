@@ -21,6 +21,7 @@ import yaml
 MARCH_URDF = march_urdf = (
     get_package_share_directory("march_description") + "/urdf/march6.urdf"
 )
+MODE_READING = "r"
 
 
 def weighted_average_floats(
@@ -134,7 +135,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
                 "properties",
                 "march6.yaml",
             ),
-            "r",
+            MODE_READING,
         ) as yaml_file:
             robot_dimensions = yaml.safe_load(yaml_file)["dimensions"]
 
@@ -242,7 +243,7 @@ def get_position_from_yaml(position: str):
                 "airgait_vi",
                 "default.yaml",
             ),
-            "r",
+            MODE_READING,
         ) as yaml_file:
             try:
                 return yaml.safe_load(yaml_file)["positions"][position]["joints"]
