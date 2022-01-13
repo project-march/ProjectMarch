@@ -18,7 +18,7 @@ class DynamicJointTrajectory:
         self.setpoints = setpoints
         self._interpolate_setpoints()
 
-    def _get_setpoints_unzipped(self) -> List[float]:
+    def _get_setpoints_unzipped(self) -> tuple[List[float], List[float], List[float]]:
         """Returns a list of time, position and velocity."""
         time = []
         position = []
