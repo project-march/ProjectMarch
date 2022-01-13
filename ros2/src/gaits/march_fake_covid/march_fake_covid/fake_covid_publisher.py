@@ -97,7 +97,7 @@ def parameter_callback(
                 fake_covid_publisher.random_x = False
                 fake_covid_publisher.location_x = param.value
                 fake_covid_publisher.get_logger().info(f"x set to {param.value}")
-        if param.name == "location_y":
+        elif param.name == "location_y":
             if param.value == "random":
                 fake_covid_publisher.random_y = True
                 fake_covid_publisher.get_logger().info("y set to random.")
