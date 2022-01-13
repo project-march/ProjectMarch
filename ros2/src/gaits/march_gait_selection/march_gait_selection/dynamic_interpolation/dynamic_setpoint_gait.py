@@ -17,7 +17,11 @@ from geometry_msgs.msg import Point
 
 
 class DynamicSetpointGait(GaitInterface):
-    """Gait built up from dynamic setpoints"""
+    """Gait built up from dynamic setpoints
+
+    :param gait_selection_node: the gait selection node
+    :type gait_selection_node: Node
+    """
 
     def __init__(self, gait_selection_node: Node):
         super(DynamicSetpointGait, self).__init__()
@@ -204,7 +208,10 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_subgait(self) -> GaitUpdate:
         """Update the state machine that the start gait has
         begun. Also updates the start position and the time
-        stamps for the next subgait."""
+        stamps for the next subgait.
+
+        :returns: a GaitUpdate for the state machine
+        :rtype: GaitUpdate"""
         self._start_is_delayed = False
         self._update_start_pos()
         self._update_time_stamps(self._next_command.duration)
@@ -213,7 +220,11 @@ class DynamicSetpointGait(GaitInterface):
 
     def _update_next_subgait_early(self) -> GaitUpdate:
         """Already schedule the next subgait with the end time
-        of the current subgait as the start time."""
+        of the current subgait as the start time.
+
+        :returns: a GaitUpdate that is empty or contains a trajectory command
+        :rtype: GaitUpdate
+        """
         self._scheduled_early = True
         self._next_command = self._get_next_command()
 
@@ -225,7 +236,11 @@ class DynamicSetpointGait(GaitInterface):
     def _update_state_machine(self) -> GaitUpdate:
         """Update the state machine that the new subgait has begun.
         Also updates the starting position and time stamps for the
-        next subgait."""
+        next subgait.
+
+        :returns: a GaitUpdate for the state machine
+        :rtype: GaitUpdate
+        """
         if self._next_command is None:
             return GaitUpdate.finished()
 
@@ -265,16 +280,29 @@ class DynamicSetpointGait(GaitInterface):
     def _callback_right(self, foot_position: Point) -> None:
         """Update the right foot position with the latest point published
         on the CoViD-topic.
+
+        :param foot_position: a Point containing the x, y and z location
+        :type foot_position: Point
         """
         self.foot_position_right = foot_position
 
     def _callback_left(self, foot_position: Point) -> None:
         """Update the left foot position with the latest point published
-        on the CoViD-topic."""
+        on the CoViD-topic.
+
+        :param foot_position: a Point containing the x, y and z location
+        :type foot_position: Point
+        """
         self.foot_position_left = foot_position
 
     def _get_foot_position(self, subgait_id: str) -> Point:
-        """Returns the right or left foot position based upon the subgait_id"""
+        """Returns the right or left foot position based upon the subgait_id
+
+        :param subgait_id: either right_swing or left_swing
+        :type subgait_id: str
+        :return: either the left or right foot position or none
+        :rtype: Point
+        """
         if subgait_id == "left_swing":
             return self.foot_position_left
         elif subgait_id == "right_swing":
@@ -332,6 +360,7 @@ class DynamicSetpointGait(GaitInterface):
         self._end_time = self._start_time + next_command_duration
 
     def update_parameters(self) -> None:
+        """Callback for gait_selection_node when the parameters have been updated."""
         self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
         self.middle_point_fraction = self.gait_selection.middle_point_fraction
         self.middle_point_height = self.gait_selection.middle_point_height

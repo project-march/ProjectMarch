@@ -48,6 +48,7 @@ class FakeCovidPublisher(Node):
         self.create_timer(0.1, self.publish_locations)
 
     def publish_locations(self) -> None:
+        """Publishes the fake foot locations"""
         point = Point()
 
         if self.random_x:
@@ -89,6 +90,17 @@ def main():
 def parameter_callback(
     fake_covid_publisher: FakeCovidPublisher, parameters: list
 ) -> SetParametersResult:
+    """Update parameter of fake_covid_publisher and return if
+    this is done succesfully.
+
+    :param fake_covid_publisher: instance of the fake_covid_publisher class
+    :type fake_covid_publisher: FakeCovidPublisher
+    :param parameters: list containing the changed parameters
+    :type parameters: list
+
+    :returns: whether or not the parameters were set succesfully
+    :rtype: SetParametersResult
+    """
     for param in parameters:
         if param.name == "location_x":
             if param.value == "random":
