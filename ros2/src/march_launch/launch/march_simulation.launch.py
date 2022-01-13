@@ -49,7 +49,7 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
-    # Fake covid
+    # Fake covid (CoViD = Computer Vision Department)
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
 
