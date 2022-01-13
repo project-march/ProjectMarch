@@ -49,7 +49,7 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
-    # Fake covid
+    # Fake covid (CoViD = Computer Vision Department)
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
 
@@ -227,12 +227,12 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
-                description="x-location for fake covid topic",
+                description="x-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
                 name="location_y",
                 default_value="0.0",
-                description="y-location for fake covid topic",
+                description="y-location for fake covid topic, takes double or 'random'",
             ),
             # Use normal launch file with different launch_arguments
             IncludeLaunchDescription(

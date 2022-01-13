@@ -1,6 +1,7 @@
 from scipy.interpolate import CubicSpline
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
+from typing import List
 
 NANOSECONDS_TO_SECONDS = 1000000000
 CLAMPED_BOUNDARY_CONDITION = 1
@@ -13,11 +14,11 @@ class DynamicJointTrajectory:
     :type setpoints: list
     """
 
-    def __init__(self, setpoints):
+    def __init__(self, setpoints: List[Setpoint]):
         self.setpoints = setpoints
         self._interpolate_setpoints()
 
-    def _get_setpoints_unzipped(self) -> list:
+    def _get_setpoints_unzipped(self) -> List[float]:
         """Returns a list of time, position and velocity."""
         time = []
         position = []
