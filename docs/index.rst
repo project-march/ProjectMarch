@@ -108,7 +108,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/development/style_guide
    doc/development/vscode_flake8
    doc/development/add_a_new_gait
-   doc/development/index_ros_for_cpp_in_clion.rst
+   doc/development/index_ros_for_cpp_in_jetbrains.rst
 
 .. toctree::
     :caption: MARCH packages
