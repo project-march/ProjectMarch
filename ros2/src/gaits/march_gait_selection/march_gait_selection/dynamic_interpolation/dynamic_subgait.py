@@ -11,6 +11,8 @@ from march_goniometric_ik_solver.ik_solver import Pose
 from trajectory_msgs import msg as trajectory_msg
 from geometry_msgs.msg import Point
 
+from typing import List
+
 
 class DynamicSubgait:
     """Creates joint trajectories based on the desired foot location.
@@ -40,7 +42,7 @@ class DynamicSubgait:
         middle_point_height: float,
         starting_position: dict,
         subgait_id: str,
-        joint_names: list,
+        joint_names: List[str],
         position: Point,
         stop: bool,
     ):
@@ -151,7 +153,11 @@ class DynamicSubgait:
         )
 
     def _from_list_to_setpoint(
-        self, joint_names: list, position: list, velocity: list, time: float
+        self,
+        joint_names: List[str],
+        position: List[float],
+        velocity: List[float],
+        time: float,
     ) -> dict:
         """Computes setpoint_dictionary from a list
 
@@ -183,5 +189,5 @@ class DynamicSubgait:
 
         return setpoint_dict
 
-    def _from_joint_dict_to_list(self, joint_dict: dict) -> list:
+    def _from_joint_dict_to_list(self, joint_dict: dict) -> List[float]:
         return list(joint_dict.values())
