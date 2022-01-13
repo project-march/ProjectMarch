@@ -5,8 +5,11 @@ from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import 
 )
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
-from trajectory_msgs import msg as trajectory_msg
+from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_goniometric_ik_solver.ik_solver import Pose
+
+from trajectory_msgs import msg as trajectory_msg
+from geometry_msgs.msg import Point
 
 
 class DynamicSubgait:
@@ -38,17 +41,17 @@ class DynamicSubgait:
         starting_position: dict,
         subgait_id: str,
         joint_names: list,
-        position_x: float,
-        position_y: float,
+        position: Point,
+        stop: bool,
     ):
         self.middle_point_fraction = middle_point_fraction
         self.middle_point_height = middle_point_height
         self.time = [0, self.middle_point_fraction * duration, duration]
         self.starting_position = starting_position
-        self.position_x = position_x
-        self.position_y = position_y
+        self.position = position
         self.joint_names = joint_names
         self.subgait_id = subgait_id
+        self.stop = stop
         self.pose = Pose()
 
     def _solve_middle_setpoint(self) -> None:
@@ -58,8 +61,8 @@ class DynamicSubgait:
         :rtype: dict
         """
         middle_position = self.pose.solve_mid_position(
-            self.position_x,
-            self.position_y,
+            self.position.x,
+            self.position.y,
             self.middle_point_fraction,
             self.middle_point_height,
             self.subgait_id,
@@ -75,9 +78,14 @@ class DynamicSubgait:
     def _solve_desired_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the
         desired x and y coordinate"""
-        self.desired_position = self.pose.solve_end_position(
-            self.position_x, self.position_y, self.subgait_id
-        )
+        if self.stop:
+            self.desired_position = self._from_joint_dict_to_list(
+                get_position_from_yaml("stand")
+            )
+        else:
+            self.desired_position = self.pose.solve_end_position(
+                self.position.x, self.position.y, self.subgait_id
+            )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names, self.desired_position, None, self.time[-1]
@@ -174,3 +182,6 @@ class DynamicSubgait:
             )
 
         return setpoint_dict
+
+    def _from_joint_dict_to_list(self, joint_dict: dict) -> list:
+        return list(joint_dict.values())
