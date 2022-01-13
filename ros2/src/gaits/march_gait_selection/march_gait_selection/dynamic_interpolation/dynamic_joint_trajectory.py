@@ -17,7 +17,7 @@ class DynamicJointTrajectory:
         self.setpoints = setpoints
         self._interpolate_setpoints()
 
-    def _get_setpoints_unzipped(self):
+    def _get_setpoints_unzipped(self) -> list:
         """Returns a list of time, position and velocity."""
         time = []
         position = []
@@ -30,7 +30,7 @@ class DynamicJointTrajectory:
 
         return time, position, velocity
 
-    def _interpolate_setpoints(self):
+    def _interpolate_setpoints(self) -> None:
         """Uses a CubicSpline with velocity boundary conditions to create interpolator objects for
         position and velocity."""
         duration, position, velocity = self._get_setpoints_unzipped()
@@ -45,7 +45,7 @@ class DynamicJointTrajectory:
         )
         self.interpolated_velocity = self.interpolated_position.derivative()
 
-    def get_interpolated_setpoint(self, time) -> Setpoint:
+    def get_interpolated_setpoint(self, time: float) -> Setpoint:
         """Computes a Setpoint instance with the given time and the interpolated
         position and velocity at this time.
 

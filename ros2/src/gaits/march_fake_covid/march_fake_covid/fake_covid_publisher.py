@@ -10,6 +10,7 @@ from rcl_interfaces.msg import SetParametersResult
 
 from contextlib import suppress
 from geometry_msgs.msg import Point
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "fake_covid_publisher"
 
@@ -35,18 +36,19 @@ class FakeCovidPublisher(Node):
         self.left_foot_publisher = self.create_publisher(
             msg_type=Point,
             topic="/foot_position/left",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.right_foot_publisher = self.create_publisher(
             msg_type=Point,
             topic="/foot_position/right",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.create_timer(0.1, self.publish_locations)
 
-    def publish_locations(self):
+    def publish_locations(self) -> None:
+        """Publishes the fake foot locations"""
         point = Point()
 
         if self.random_x:
@@ -85,7 +87,20 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(fake_covid_publisher, parameters):
+def parameter_callback(
+    fake_covid_publisher: FakeCovidPublisher, parameters: list
+) -> SetParametersResult:
+    """Update parameter of fake_covid_publisher and return if
+    this is done succesfully.
+
+    :param fake_covid_publisher: instance of the fake_covid_publisher class
+    :type fake_covid_publisher: FakeCovidPublisher
+    :param parameters: list containing the changed parameters
+    :type parameters: list
+
+    :returns: whether or not the parameters were set succesfully
+    :rtype: SetParametersResult
+    """
     for param in parameters:
         if param.name == "location_x":
             if param.value == "random":
@@ -95,7 +110,7 @@ def parameter_callback(fake_covid_publisher, parameters):
                 fake_covid_publisher.random_x = False
                 fake_covid_publisher.location_x = param.value
                 fake_covid_publisher.get_logger().info(f"x set to {param.value}")
-        if param.name == "location_y":
+        elif param.name == "location_y":
             if param.value == "random":
                 fake_covid_publisher.random_y = True
                 fake_covid_publisher.get_logger().info("y set to random.")

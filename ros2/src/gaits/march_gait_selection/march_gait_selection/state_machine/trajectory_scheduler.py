@@ -14,6 +14,8 @@ from march_shared_msgs.msg import (
 )
 from trajectory_msgs.msg import JointTrajectory
 
+TRAJECTORY_SCHEDULER_HISTORY_DEPTH = 5
+
 
 @dataclass
 class TrajectoryCommand:
@@ -60,27 +62,27 @@ class TrajectoryScheduler:
         self._trajectory_goal_pub = self._node.create_publisher(
             msg_type=FollowJointTrajectoryActionGoal,
             topic="/march/controller/trajectory/follow_joint_trajectory/goal",
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
         self._cancel_pub = self._node.create_publisher(
             msg_type=GoalID,
             topic="/march/controller/trajectory/follow_joint_trajectory/cancel",
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
         self._trajectory_goal_result_sub = self._node.create_subscription(
             msg_type=FollowJointTrajectoryActionResult,
             topic="/march/controller/trajectory/follow_joint_trajectory/result",
             callback=self._done_cb,
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
         # Publisher for sending hold position mode
         self._trajectory_command_pub = self._node.create_publisher(
             msg_type=JointTrajectory,
             topic="/march/controller/trajectory/command",
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
     def schedule(self, command: TrajectoryCommand):

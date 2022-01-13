@@ -32,14 +32,14 @@ class DynamicSubgait:
 
     def __init__(
         self,
-        duration,
-        middle_point_fraction,
-        middle_point_height,
-        starting_position,
-        subgait_id,
-        joint_names,
-        position_x,
-        position_y,
+        duration: float,
+        middle_point_fraction: float,
+        middle_point_height: float,
+        starting_position: dict,
+        subgait_id: str,
+        joint_names: list,
+        position_x: float,
+        position_y: float,
     ):
         self.middle_point_fraction = middle_point_fraction
         self.middle_point_height = middle_point_height
@@ -142,7 +142,9 @@ class DynamicSubgait:
             self.joint_names, self.desired_position, None, self.time[0]
         )
 
-    def _from_list_to_setpoint(self, joint_names, position, velocity, time) -> dict:
+    def _from_list_to_setpoint(
+        self, joint_names: list, position: list, velocity: list, time: float
+    ) -> dict:
         """Computes setpoint_dictionary from a list
 
         :param joint_names: Names of the joints.
