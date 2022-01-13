@@ -1,9 +1,10 @@
 import numpy as np
+from typing import List
 
 RIGHT_ANGLE = np.pi / 2
 
 
-def get_angle_between_points(points: list) -> float:
+def get_angle_between_points(points: List[np.array]) -> float:
     """
     Calculates the angle between three points,
     where the angle is calculated for the middle point.
@@ -46,7 +47,7 @@ def find_fourth_point(
     return p2 + kernel * h / d * np.flip(p1 - p0)  # = p3
 
 
-def get_angles(points: list) -> list:
+def get_angles(points: List[np.array]) -> List[float]:
     """
     Calculates the angles of a quadrilateral by giving the four points of it.
     The order of returned angles is equal to the order of points given.
@@ -66,8 +67,8 @@ def get_angles(points: list) -> list:
 
 
 def solve_quadritlateral(
-    lengths: list, angle_b: float, convex: bool = True, debug: bool = False
-) -> list:
+    lengths: List[float], angle_b: float, convex: bool = True, debug: bool = False
+) -> List[float]:
     """
     Calculates the angles of a quadrilateral given all side lengths and the angle of point b.
     Expects lengths to be given as [da, ab, bc, cd]
@@ -92,7 +93,7 @@ def solve_quadritlateral(
     return angles
 
 
-def check_lengths(points: list, real_lengths: list):
+def check_lengths(points: List[float], real_lengths: List[float]):
     """
     Checks whether the lengths between points are equal to the real lengths.
     Expects points as [a, b, c, d] and real_lengths as [da, ab, bc, cd].

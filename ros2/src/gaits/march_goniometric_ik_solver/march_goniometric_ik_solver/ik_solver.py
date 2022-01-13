@@ -1,4 +1,5 @@
 import numpy as np
+from typing import List
 import matplotlib.pyplot as plt
 
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
@@ -43,7 +44,7 @@ class Pose:
     https://confluence.projectmarch.nl/x/vo6AFw
     """
 
-    def __init__(self, pose: list = [0] * NUMBER_OF_JOINTS):
+    def __init__(self, pose: List[float] = [0.0] * NUMBER_OF_JOINTS):
         (
             self.fe_ankle1,
             self.aa_hip1,
@@ -61,7 +62,7 @@ class Pose:
         self.__init__()
 
     @property
-    def pose_right(self) -> list:
+    def pose_right(self) -> List[float]:
         """
         Returns the pose as list with the right leg as front leg (leg2):
         """
@@ -77,7 +78,7 @@ class Pose:
         ]
 
     @property
-    def pose_left(self) -> list:
+    def pose_left(self) -> List[float]:
         """
         Returns the pose as list with the left leg as front leg (leg2):
         """
@@ -322,7 +323,7 @@ class Pose:
         midpoint_fraction: float,
         midpoint_height: float,
         subgait_id: str,
-    ) -> list:
+    ) -> List[float]:
         """
         Solve inverse kinematics for the middle position. Assumes that the
         stance leg is straight. Takes the ankle_x and ankle_y position of the
@@ -371,7 +372,7 @@ class Pose:
         ankle_y: float,
         subgait_id: str,
         max_ankle_flexion: float = MAX_ANKLE_FLEXION,
-    ) -> list:
+    ) -> List[float]:
         """
         Solve inverse kinematics for a desired ankle location, assuming flat feet.
         Expects at least the ankle x-position and returns the calculated pose.
