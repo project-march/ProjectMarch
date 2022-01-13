@@ -1,4 +1,5 @@
 from rclpy.time import Time
+from rclpy.node import Node
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
@@ -17,7 +18,7 @@ from geometry_msgs.msg import Point
 class DynamicSetpointGait(GaitInterface):
     """Gait built up from dynamic setpoints"""
 
-    def __init__(self, gait_selection_node):
+    def __init__(self, gait_selection_node: Node):
         super(DynamicSetpointGait, self).__init__()
         self._reset()
 
@@ -109,7 +110,7 @@ class DynamicSetpointGait(GaitInterface):
     def first_subgait_can_be_scheduled_early(self) -> bool:
         return True
 
-    def _reset(self):
+    def _reset(self) -> None:
         """Reset all attributes of the gait"""
         self._should_stop = False
         self._end = False
@@ -271,7 +272,7 @@ class DynamicSetpointGait(GaitInterface):
         on the CoViD-topic."""
         self.foot_position_left = foot_position
 
-    def _get_foot_position(self, subgait_id) -> Point:
+    def _get_foot_position(self, subgait_id: str) -> Point:
         """Returns the right or left foot position based upon the subgait_id"""
         if subgait_id == "left_swing":
             return self.foot_position_left
@@ -320,7 +321,7 @@ class DynamicSetpointGait(GaitInterface):
             self._end_time,
         )
 
-    def _update_time_stamps(self, next_command_duration) -> None:
+    def _update_time_stamps(self, next_command_duration: Duration) -> None:
         """Update the starting and end time
 
         :param next_command_duration: Duration of the next command to be scheduled.
@@ -345,7 +346,7 @@ class DynamicSetpointGait(GaitInterface):
 
     # UTILITY FUNCTIONS
     @staticmethod
-    def _setpoint_dict_to_joint_dict(setpoint_dict) -> dict:
+    def _setpoint_dict_to_joint_dict(setpoint_dict: dict) -> dict:
         """Creates a joint_dict from a setpoint_dict.
 
         :param setpoint_dict: A dictionary containing joint names and setpoints.
@@ -361,7 +362,7 @@ class DynamicSetpointGait(GaitInterface):
         return joint_dict
 
     @staticmethod
-    def _joint_dict_to_setpoint_dict(joint_dict) -> dict:
+    def _joint_dict_to_setpoint_dict(joint_dict: dict) -> dict:
         """Creates a setpoint_dict from a joint_dict.
 
         :param joint_dict: A dictionary containing joint names and positions.
@@ -375,7 +376,7 @@ class DynamicSetpointGait(GaitInterface):
             setpoint_dict[name] = Setpoint(Duration(0), position, 0)
         return setpoint_dict
 
-    def _logger(self, message) -> None:
+    def _logger(self, message: str) -> None:
         """Publish a message on the gait_selection_node logger
         with DYNAMIC_SETPOINT_GAIT as a prefix"""
         self.gait_selection.get_logger().info("DYNAMIC_SETPOINT_GAIT: " f"{message}")

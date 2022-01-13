@@ -46,7 +46,7 @@ class FakeCovidPublisher(Node):
 
         self.create_timer(0.1, self.publish_locations)
 
-    def publish_locations(self):
+    def publish_locations(self) -> None:
         point = Point()
 
         if self.random_x:
@@ -85,7 +85,9 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(fake_covid_publisher, parameters):
+def parameter_callback(
+    fake_covid_publisher: FakeCovidPublisher, parameters: list
+) -> SetParametersResult:
     for param in parameters:
         if param.name == "location_x":
             if param.value == "random":
