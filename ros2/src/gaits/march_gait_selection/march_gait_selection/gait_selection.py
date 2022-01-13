@@ -18,6 +18,7 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import (
     get_robot_urdf_from_service,
     get_joint_names_from_robot,
+    DEFAULT_HISTORY_DEPTH,
 )
 from march_utility.utilities.utility_functions import (
     validate_and_get_joint_names_for_inverse_kinematics,
@@ -142,7 +143,7 @@ class GaitSelection(Node):
             msg_type=String,
             topic="/march/robot_description",
             callback=self._update_robot_description_cb,
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self._create_services()

@@ -10,6 +10,7 @@ from rcl_interfaces.msg import SetParametersResult
 
 from contextlib import suppress
 from geometry_msgs.msg import Point
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "fake_covid_publisher"
 
@@ -35,13 +36,13 @@ class FakeCovidPublisher(Node):
         self.left_foot_publisher = self.create_publisher(
             msg_type=Point,
             topic="/foot_position/left",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.right_foot_publisher = self.create_publisher(
             msg_type=Point,
             topic="/foot_position/right",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.create_timer(0.1, self.publish_locations)

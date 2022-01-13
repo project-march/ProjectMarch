@@ -6,6 +6,7 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.utility_functions import get_position_from_yaml
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
@@ -36,13 +37,13 @@ class DynamicSetpointGait(GaitInterface):
             Point,
             "/foot_position/right",
             self._callback_right,
-            10,
+            DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
             Point,
             "/foot_position/left",
             self._callback_left,
-            10,
+            DEFAULT_HISTORY_DEPTH,
         )
 
         # Assign reconfigurable parameters
