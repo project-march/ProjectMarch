@@ -12,6 +12,7 @@ from march_utility.gait.gait_graph import GaitGraph
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 from std_msgs.msg import Header
@@ -74,18 +75,18 @@ class GaitStateMachine:
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self.current_gait_pub = self._gait_selection.create_publisher(
             msg_type=CurrentGait,
             topic="/march/gait_selection/current_gait",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self.error_sub = self._gait_selection.create_subscription(
             msg_type=Error,
             topic="/march/error",
             callback=self._error_cb,
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self._right_foot_on_ground = True
@@ -97,14 +98,14 @@ class GaitStateMachine:
             topic="/march/sensor/right_pressure_sole",
             callback=lambda msg: self._update_foot_on_ground_cb(Side.right, msg),
             callback_group=ReentrantCallbackGroup(),
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._left_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState,
             topic="/march/sensor/left_pressure_sole",
             callback=lambda msg: self._update_foot_on_ground_cb(Side.left, msg),
             callback_group=ReentrantCallbackGroup(),
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self._get_possible_gaits_client = self._gait_selection.create_service(
@@ -321,6 +322,7 @@ class GaitStateMachine:
                 gait is not None
                 and gait_name
                 in self._gait_graph.possible_gaits_from_idle(self._current_state)
+                or gait_name == "dynamic_walk"
             ):
                 if (
                     isinstance(gait.starting_position, DynamicEdgePosition)

@@ -35,6 +35,11 @@ def generate_launch_description():
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
+    dynamic_gait = LaunchConfiguration("dynamic_gait")
+    dynamic_subgait_duration = LaunchConfiguration("dynamic_subgait_duration")
+    middle_point_fraction = LaunchConfiguration("middle_point_fraction")
+    middle_point_height = LaunchConfiguration("middle_point_height")
+    minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -43,6 +48,10 @@ def generate_launch_description():
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
+
+    # Fake covid (CoViD = Computer Vision Department)
+    location_x = LaunchConfiguration("location_x")
+    location_y = LaunchConfiguration("location_y")
 
     return launch.LaunchDescription(
         [
@@ -149,6 +158,34 @@ def generate_launch_description():
                 description="Whether balance is being used.",
             ),
             DeclareLaunchArgument(
+                name="dynamic_gait",
+                default_value="False",
+                description="Wether dynamic_setpoint_gait is enabled",
+            ),
+            DeclareLaunchArgument(
+                name="dynamic_subgait_duration",
+                default_value="1.5",
+                description="Duration of a subgait created by the dynamic gait",
+            ),
+            DeclareLaunchArgument(
+                name="middle_point_fraction",
+                default_value="0.45",
+                description="Fraction of the step at which the middle point "
+                "of the dynamic gait will take place.",
+            ),
+            DeclareLaunchArgument(
+                name="middle_point_height",
+                default_value="0.15",
+                description="Height of the middle setpoint of dynamic gait "
+                "relative to the desired position, given in meters.",
+            ),
+            DeclareLaunchArgument(
+                name="minimum_stair_height",
+                default_value="0.15",
+                description="A step lower or higher than the minimum_stair_height"
+                "will change the gait type to stairs_like instead of walk_like.",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -187,6 +224,16 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            DeclareLaunchArgument(
+                name="location_x",
+                default_value="0.4",
+                description="x-location for fake covid topic, takes double or 'random'",
+            ),
+            DeclareLaunchArgument(
+                name="location_y",
+                default_value="0.0",
+                description="y-location for fake covid topic, takes double or 'random'",
+            ),
             # Use normal launch file with different launch_arguments
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -214,6 +261,11 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("gait_directory", gait_directory),
                     ("balance", balance),
+                    ("dynamic_gait", dynamic_gait),
+                    ("dynamic_subgait_duration", dynamic_subgait_duration),
+                    ("middle_point_fraction", middle_point_fraction),
+                    ("middle_point_height", middle_point_height),
+                    ("mininum_stair_height", minimum_stair_height),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
                     ("timer_period", timer_period),
@@ -222,6 +274,8 @@ def generate_launch_description():
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
                     ("jointlesss", jointless),
+                    ("location_x", location_x),
+                    ("location_y", location_y),
                 ],
             ),
         ]
