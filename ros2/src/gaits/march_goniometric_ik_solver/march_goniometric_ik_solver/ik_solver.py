@@ -19,7 +19,8 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-MAX_ANKLE_FLEXION = limits.upper
+SOFT_LIMIT_BUFFER = np.deg2rad(2)  # deg
+MAX_ANKLE_FLEXION = limits.upper - SOFT_LIMIT_BUFFER
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -31,6 +32,8 @@ HIP_ZERO_ANGLE = np.pi  # rad
 HIP_AA = 0.03  # rad
 
 NUMBER_OF_JOINTS = 8
+
+DEFAULT_KNEE_BEND = np.deg2rad(8)
 
 
 class Pose:
@@ -326,10 +329,10 @@ class Pose:
     ) -> List[float]:
         """
         Solve inverse kinematics for the middle position. Assumes that the
-        stance leg is straight. Takes the ankle_x and ankle_y position of the
-        desired position and the midpoint_fraction at which a midpoint is desired.
-        First calculates the midpoint position using current pose and fraction.
-        Next, calculates the required hip and knee angles of
+        stance has a knee flexion of DEFAULT_KNEE_BEND. Takes the ankle_x and
+        ankle_y position of the desired position and the midpoint_fraction at
+        which a midpoint is desired. First calculates the midpoint position using
+        current pose and fraction. Next, calculates the required hip and knee angles of
         the swing leg by making a triangle between the swing leg ankle, swing leg
         knee and the hip. Returns the calculated pose.
         """
@@ -342,6 +345,7 @@ class Pose:
 
         # Reset pose to zero_pose and calculate distance between hip and ankle2 midpoint location:
         self.reset_to_zero_pose()
+        self.fe_knee1 = DEFAULT_KNEE_BEND
         pos_hip = self.calculate_joint_positions("pos_hip")
         dist_ankle2_hip = np.linalg.norm(pos_ankle2 - pos_hip)
 
@@ -362,8 +366,6 @@ class Pose:
 
         # lift toes as much as possible:
         self.fe_ankle2 = MAX_ANKLE_FLEXION
-
-        # return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
     def solve_end_position(

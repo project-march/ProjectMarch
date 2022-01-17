@@ -213,5 +213,7 @@ class DynamicSubgait:
                 or position[i] < self.joint_soft_limits[i].lower
             ):
                 raise Exception(
-                    f"DynamicSubgait: joint[{i}] will be outside of soft limits"
+                    f"DynamicSubgait: joint[{i}] will be outside of soft limits, "
+                    f"position: {position[i]}, soft limits: "
+                    f"[{self.joint_soft_limits[i].lower}, {self.joint_soft_limits[i].upper}]."
                 )
