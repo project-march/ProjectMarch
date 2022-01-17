@@ -37,6 +37,9 @@ Or use https:
     cd march/
     git lfs install
 
+.. Note::
+    It is not necessary to go through the following sections to run the code. You can run everything inside
+    docker images. To see how to set that up see :ref:`install_docker-label`.
 
 Install ROS1 Noetic
 ^^^^^^^^^^^^^^^^^^^
@@ -91,7 +94,7 @@ Some additional python dependencies have to be installed using pip:
 
 .. code:: bash
 
-    python3 -m pip install -r ~/march/requirements.pip
+    python3 -m pip install -r ~/march/requirements.txt
 
 Install RealSense dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

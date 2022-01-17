@@ -27,7 +27,7 @@ Each category has their own list of steps that have to be followed if you want t
 
 ROS specific libraries
 ----------------------
-These libraries are specificly designed to work with ROS. These packages are listed in the
+These libraries are specifically designed to work with ROS. These packages are listed in the
 `ROS distro list`_. However, not all packages are 100% compatible with our version of ROS
 and therefore adding ROS specific libraries requires some care.
 The following steps should be followed, in order, until a step matches the situation:

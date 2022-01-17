@@ -1,10 +1,21 @@
 .. _style-guide:
 
-Style Guide (Outdated)
-======================
+Style Guide
+===========
 All code in the March repositories should adhere to a certain set of style guides.
-Since most of the March packages are ROS packages, these should all adhere to the
-ROS style guide for `C++ <https://wiki.ros.org/CppStyleGuide>`_ and `Python <https://wiki.ros.org/PyStyleGuide>`_.
+
+In our code we adhere to the following style guides:
+
+    C++: https://wiki.ros.org/CppStyleGuide
+        * https://github.com/WHILL/roscpp_code_format
+        * clang-format: https://clang.llvm.org/docs/ClangFormat.html
+    Python: https://wiki.ros.org/PyStyleGuide
+        * PEP8: https://www.python.org/dev/peps/pep-0008/
+
+It is not important to read these specifications, the most important aspects will be summarized below.
+In order to check whether your code is formatted according to the rules defined in the guides above,
+you have to perform static analysis locally. See the next chapter for more information about static analysis,
+and how to run it.
 
 Running style checkers
 ----------------------
@@ -45,14 +56,197 @@ flake8
 ^^^^^^
 What makes flake8 so useful is that it is able to install plugins, which add checks.
 Flake8 checks by default for `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_ style guide.
-At March, we also use more plugins. To install flake8 with the plugins run:
+At March we also use more plugins. To ensure everybody uses the same plugins we run it with docker images.
+Docker is a product that ensures that code runs the same on everyone's device by having all needed files and dependencies in
+a closed off container. See `this 100 sec explanation <https://www.youtube.com/watch?v=Gjnup-PuquQ>`_ for more information.
 
-.. code::
+flake8 setup
+~~~~~~~~~~~~
+First make sure that you have docker installed, if not you can do that with the following code,
+or check out `this link <https://docs.docker.com/engine/install/ubuntu/>`_:
 
-    pip2 install --user flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order flake8-colors
+.. code-block:: bash
 
-If you are wondering what a plugin checks for you can search for them on `PyPI <https://pypi.org>`_.
+    # To check if you have docker installed run:
+    docker --version
+    # If it outputs something like "Docker version 20.10.7, build 20.10.7-0ubuntu5~20.04.2", then you have docker installed.
 
-.. caution::
+    # To install docker, use the following code or check out `https://docs.docker.com/engine/install/ubuntu/` for alternative options.
+    curl -fsSL https://get.docker.com -o get-docker.sh  # Download docker installer script.
+    sudo sh get-docker.sh  # Install docker by running installer script.
+    rm get-docker.sh  # Removes the installer script.
 
-    It is important to install flake8 for python 2 using ``pip2``, since we use python 2 (for now).
+    # Optional commands for easier docker use:
+    sudo groupadd docker
+    usermod -aG docker $USER  # To remove the need for 'sudo' in front of every docker command.
+    sudo gpasswd -a $USER docker # To remove the need for 'sudo' in front of every docker command.
+    newgrp docker  # To activate the previous command, if you still need sudo restart your computer
+
+.. note::
+
+    If you don't do the "Optional commands for easier use" you will get error messages if you run docker commands
+    without prepending 'sudo'.
+
+
+Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
+
+..
+    The 'dev' in the code block below might be changed to 'main' to keep the flake8 more consistent but slower to adapt.
+
+.. code-block:: bash
+
+    # Flake8 shortcuts (python code style checker)
+    alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:dev" && \
+    docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT'
+    alias march_flake8='docker run --rm -v ~/march:/home/march:ro march/flake8'
+    alias march_flake8_here='docker run --rm -v `pwd`:`pwd`:ro march/flake8 `pwd`'
+
+    # Black shortcuts (python code formatter)
+    alias march_py_auto_format='docker run --rm -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
+    alias march_py_auto_format_check='docker run --rm -v ~/march:/home/march:ro --entrypoint black march/flake8 \
+    --check --diff --color ros1/src ros2/src utility_scripts/'
+    alias march_py_auto_format_here='docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
+    alias march_py_auto_format_check_here='docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
+
+Update your flake8 docker image. You can redo this step if it doesn't produce the same output as gitlab,
+or if someone from the Project MARCH software department announces to you that the docker image should be updated.
+
+.. code-block:: bash
+
+    # If you added the alias:
+    march_flake8_update
+    # Or, if you want to do it manually:
+    FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:main" && \
+    docker pull $FLAKE8_GIT && docker tag $FLAKE8_GIT march/flake8 && docker rmi $FLAKE8_GIT
+
+Running flake8
+~~~~~~~~~~~~~~
+
+If you have everything set up you can very easily run it with the following commands:
+
+.. code-block:: bash
+
+    # To run flake8 on your whole march folder:
+    march_flake8
+
+    # To run flake8 in you current directory:
+    march_flake8_here
+
+    # To run flake8 without the aliases:
+    docker run --rm -v [local_src]:[dest_in_docker]:[ro for readonly] -w [work_dir_in_docker] [image name (e.g. march/flake8)] [flake 8 arguments]
+
+If there are any violations after running the march_flake8 alias where it says "black would make changes",
+run the following commands:
+
+.. code-block:: bash
+
+    # Auto-format your python code (with black):
+    march_py_auto_format # To auto-format all code in the march directory.
+    march_py_auto_format_here # To auto-format your code according to black in your current directory.
+    march_py_auto_format_check # To see what should be changed according to black in your ~/march folder.
+    march_py_auto_format_check_here # To see what should be changed according to black in your current directory.
+
+Naming Conventions
+------------------
+This section will explain the different naming schemes and which scheme we use for which type of object.
+
+Naming schemes
+^^^^^^^^^^^^^^
+The MARCH code uses the following five naming schemes:
+
+* **PascalCase**: The name starts with a capital letter, and has a capital letter for each new word, with no underscores.
+* **camelCase**: Like PascalCase, but with a lower-case first letter.
+* **snake_case**: The name uses only lower-case letters, with words separated by underscores.
+* **UPPER_CASE**: All capital letters, with words separated by underscores.
+* **kebab-case**: The name uses only lower-case letters, with words separated by lines.
+
+A prefix is a common word placed before the rest of the name. For example: the prefix for ROS Packages is 'march'.
+If you want to create a package called 'state_machine', the package should be named 'march_state_machine'.
+
+General naming guidelines
+^^^^^^^^^^^^^^^^^^^^^^^^^
+* Avoid abbreviations: prefer getIMotionCubes() over getIMCs()
+* Be descriptive
+    * The name of a function should make clear what action it performs. Prefer isAlive() over alive()
+    * The name of a variable or class should make clear what is represents. Prefer is_alive over alive
+
+Naming conventions
+^^^^^^^^^^^^^^^^^^
+.. list-table:: Naming conventions
+    :header-rows: 1
+
+    * - Type
+      - Case
+      - Prefix
+      - Postfix
+      - Example
+    * - Repositories
+      - kebab-case
+      -
+      -
+      - gait-generation
+    * - ROS Packages
+      - snake_case
+      - march
+      -
+      - march_state_machine
+    * - Nodes
+      - snake_case
+      -
+      -
+      - march_hardware_interface
+    * - Topics / Services
+      - PascalCase
+      -
+      -
+      - GaitInstruction.msg
+    * - Files
+      - snake_case
+      -
+      -
+      - march_hardware_interface_node.cpp
+    * - Classes
+      - PascalCase
+      -
+      -
+      - HardwareBuilder
+    * - Variables
+      - snake_case
+      -
+      -
+      - cycle_time
+    * - Class fields (C++)
+      - snake_case
+      -
+      - _
+      - \net_number_
+    * - Class fields (Python)
+      - snake_case
+      -
+      -
+      - field_name
+    * - Private fields (Python only)
+      - snake_case
+      - _
+      -
+      - _private_something
+    * - Methods / functions (C++)
+      - camelCase
+      -
+      -
+      - createMarchRobot()
+    * - Methods / functions (Python)
+      - snake_case
+      -
+      -
+      - do_something()
+    * - Constants
+      - UPPER_CASE
+      -
+      -
+      - MAXIMUM_TORQUE
+    * - Namespaces
+      - snake_case
+      -
+      -
+      - march

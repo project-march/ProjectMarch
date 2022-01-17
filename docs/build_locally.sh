@@ -6,6 +6,7 @@ set -e
 # Setup Environment
 rm -rf build
 
+# shellcheck disable=SC2112
 function readmes_to_sphinx ()
 {
     echo "Converting READMEs to reStructuredText..."
@@ -15,7 +16,8 @@ function readmes_to_sphinx ()
 
     echo "Find all relevant README.md files in main repository"
     INPUT_FILE=$(mktemp)
-    find $1 -name "README.md" | grep -v "libraries" | grep '^' | xargs readlink -f > $INPUT_FILE
+    # shellcheck disable=SC2086 # Because we want it to be seperated as loose strings.
+    find $1 -name "README.md" | grep -v "libraries" | grep '^' | xargs readlink -f > "$INPUT_FILE"
 
     # Extract the package name by removing the "README.md" part and by removing
     # everything before the latest "/"
@@ -30,7 +32,7 @@ function readmes_to_sphinx ()
     OUTPUT_FILE=$(mktemp)
     cat $INPUT_FILE | sed "s#/README.md##" \
                  | sed "s#.*/##" \
-                 | sed "s#^#$OUTPUT_DIR/#" > $OUTPUT_FILE
+                 | sed "s#^#$OUTPUT_DIR/#" > "$OUTPUT_FILE"
 
     # Read the contents of the files into arrays
     readarray -t INPUT < $INPUT_FILE
@@ -56,7 +58,7 @@ function readmes_to_sphinx ()
     rm $INPUT_FILE
     rm $OUTPUT_FILE
 
-    echo "Succesfully converted READMEs to reStructuredText!"
+    echo "Successfully converted READMEs to reStructuredText!"
 }
 
 readmes_to_sphinx "../ros1/src ../ros2/src" "doc/march_packages/"

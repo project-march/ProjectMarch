@@ -35,7 +35,7 @@ Clone the repository with either ssh or https:
     git clone https://gitlab.com/project-march/march.git
 
 Install Sphinx
-------------------------------
+--------------
 We use the Sphinx to generate the documentation
 
 .. code:: bash
@@ -66,7 +66,20 @@ We need some additional packages for sphinx that can be installed via pip.
 
 .. code::
 
+  cd ~/march/docs
   pip install -r requirements.txt
+
+.. _install-pandoc-label:
+
+Install Pandoc
+--------------
+We need pandoc to convert the markdown files to rst files. Pandoc is used by the
+:rootdir:`build_locally <build_locally.sh>` script to turn the README files in the
+src of ros1 and ros2 into rst files. To install pandoc run:
+
+.. code::
+
+  sudo apt update && sudo apt install -y pandoc
 
 
 Generate the html
@@ -76,14 +89,27 @@ generate the docs and automatically open them in your browser.
 
 .. code::
 
+ cd ~/march/docs
  bash ./build_locally.sh
 
 .. note::
   If you have added new files but not pushed to GitLab yet, html-proofer will probably complain about invalid links.
   Push your files and build locally again to solve this problem.
 
+.. note::
+  If you get the error:
+
+  .. code::
+
+    Warning, treated as error:
+    /home/[user]/march/docs/index.rst:109:toctree contains reference to document 'doc/march_packages/doc/README' that doesn't have a title: no link will be generated
+
+  This is because you don't have pandoc installed. See :ref:`install-pandoc-label`
+
+
+
 sphinx-autobuild
------------------------
+----------------
 `sphinx-autobuild <https://pypi.org/project/sphinx-autobuild/>`_ is a tool that
 watches your doc files and live updates your changes.
 

@@ -66,6 +66,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
    doc/getting_started/install_ros_and_tools
    doc/getting_started/setup_your_workspace
+   doc/getting_started/setting_up_docker
 
 .. toctree::
    :caption: Useful tools
@@ -101,9 +102,11 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
    doc/development/documentation
    doc/development/adding_dependencies
+   doc/development/git
    doc/continuous_integration/continuous_integration
    doc/development/testing
    doc/development/style_guide
+   doc/development/vscode_flake8
    doc/development/add_a_new_gait
 
 .. toctree::

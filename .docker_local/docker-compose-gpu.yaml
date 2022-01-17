@@ -1,0 +1,112 @@
+version: "3.9"
+# This docker-compose file is to start up ros1, ros2 and the bridge with gui and gpu support.
+# For more information on how:
+#   • to use it, checkout https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html
+#   • this file is made, checkout https://docs.docker.com/compose/compose-file/compose-file-v3/
+#   • the gui is setup: http://wiki.ros.org/docker/Tutorials/GUI
+#   • the gpu is setup: https://docs.docker.com/compose/gpu-support/
+# date: 02-12-2021
+# author: George Vegelien
+
+
+# This is the default service for giving the containers gui and gpu privileges.
+# It is added to the other services with pointers by calling '<< : *gui-standard'. Keep in mind that if
+# the pointer is added to any service that already specifies an environment, then this environment is overwritten.
+x-gui:
+  &gui-standard
+  tty: true # Enables terminal in & out
+  stdin_open: true
+  user: "${M_UID}:${M_GID}"  # These two values are set by alias 'set_uid_gid' and their values are usually both 1000
+  environment:
+    - USER=${USER}
+    - DISPLAY=${DISPLAY}
+    - ROS_MASTER_URI=http://ros1-service:11311
+    # These 4 variables are for nvidia gpu support.
+    - NVIDIA_VISIBLE_DEVICES=all
+    - NVIDIA_DRIVER_CAPABILITIES=all
+    # These two variables make sure your gpu is used if you use prime 'on-demand'.
+    - __NV_PRIME_RENDER_OFFLOAD=1
+    - __GLX_VENDOR_LIBRARY_NAME=nvidia
+  volumes:
+    # This makes the container mount your home directory.
+    - /home/$USER:/home/$USER:rw
+    # The volumes mounted here below are added to enable the same user/local account in the container.
+    - /etc/group:/etc/group:ro
+    - /etc/passwd:/etc/passwd:ro
+    - /etc/shadow:/etc/shadow:ro
+    - /etc/sudoers.d:/etc/sudoers.d:ro
+    # This makes sure that the docker container can use your gui.
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+  # (see https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html for more information)
+  deploy:
+    resources:
+      limits:
+        cpus: '${MARCH_DOCKER_CPU_CAP}'  # To cap cpu at 90% usage.
+      reservations:  # This is needed for gpu acceleration
+        devices:
+          - capabilities: [ gpu ]
+
+services:
+  ros1-service: &ros1-service
+    << : *gui-standard
+    container_name: ros1
+    image: ros1
+    environment:
+      - USER=${USER}
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
+      - ROS_MASTER_URI=http://ros1-service:11311
+      - ROS_DOCKER_TYPE="ros1"
+      - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
+      - ROS_ARGS
+      - ROS1_ARGS
+    working_dir: /home/${USER}/march/ros1
+    ipc: host # The reason 'host' is chosen instead of 'shareable' is so that the containers can run in isolation of each other.
+    ports: ["11311"] # Needed for rviz visualization
+    command: ["bash",  "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros1.bash"]
+
+  ros2-service:
+    << : *gui-standard
+    container_name: ros2
+    image: ros2
+    environment:
+      - USER=${USER}
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
+      - ROS_MASTER_URI=http://ros1-service:11311
+      - ROS_DOCKER_TYPE="ros2"
+      - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
+      - ROS_ARGS
+      - ROS2_ARGS
+    working_dir: /home/${USER}/march/ros2
+    ipc: host # The reason 'host' is chosen instead of the usual 'container:ros1' is so that the containers can run in isolation of each other.
+    command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros2.bash"]
+
+  bridge-service:
+    << : *gui-standard
+    container_name: bridge
+    image: bridge
+    environment:
+      - USER=${USER}
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
+      - ROS_MASTER_URI=http://ros1-service:11311
+      - ROS_DOCKER_TYPE="bridge"
+      - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
+    working_dir: /home/${USER}/ros1_bridge
+    ipc: host # The reason 'host' is chosen instead of the usual 'container:ros1' is so that the containers can run in isolation of each other.
+    depends_on:
+      - ros1-service
+    command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/bridge.bash"]
+
+
+
