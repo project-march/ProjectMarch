@@ -14,6 +14,7 @@ def generate_launch_description():
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
+    wireless_ipd = LaunchConfiguration("wireless_ipd")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
     layout = LaunchConfiguration("layout")
 
@@ -64,6 +65,12 @@ def generate_launch_description():
                 name="rqt_input",
                 default_value="True",
                 description="If this argument is false, the rqt input device will"
+                "not be launched.",
+            ),
+            DeclareLaunchArgument(
+                name="wireless_ipd",
+                default_value="True",
+                description="If this argument is false, the wireless input device will"
                 "not be launched.",
             ),
             DeclareLaunchArgument(
@@ -212,6 +219,17 @@ def generate_launch_description():
                     ("layout", layout),
                 ],
                 condition=IfCondition(rqt_input),
+            ),
+            # Launch wireless input device if not wireless_ipd:=false
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_wireless_ipd"),
+                        "launch",
+                        "wireless_ipd.launch.py",
+                    )
+                ),
+                condition=IfCondition(wireless_ipd),
             ),
             # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
             IncludeLaunchDescription(
