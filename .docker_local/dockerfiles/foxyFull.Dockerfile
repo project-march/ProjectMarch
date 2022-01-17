@@ -10,7 +10,7 @@ FROM ros:foxy
 ARG DEBIAN_FRONTEND=noninteractive
 
 # To install graphical tools such as rqt_graph.
-# The ninja-build is to generate a json-database for index packages.
+# The 'ninja-build' package is for generating a json-database needed for static analysis.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-foxy-desktop \
     ninja-build \
