@@ -2,7 +2,7 @@
 
 Index ROS1 & ROS2 in JetBrains (Clion & PyCharm)
 ================================================
-
+When your environment is properly indexed, you will be able to see the type and usage of a certain bit of text in the rest of the code. It makes finding dependencies a lot easier and less confusing. In Visual Studio Code, this is partly done by sourcing, but in CLion and PyCharm, it needs a bit of setting up. Use the following guides for that.
 
 Index ROS1 & ROS2 in Clion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -30,7 +30,7 @@ Now Clion should have correctly indexed your ROS1 or ROS2. Good luck and have fu
 Index ROS1 & ROS2 in PyCharm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To get code completion and static analysis for ROS code to work, you need to open PyCharm a bit differently than usual.
-Sadly, to get it to work well, you need to open either ROS1 or ROS2 in a more complicated way every time.
+Sadly, you can not have this work well for both ROS1 and ROS2, so every time you start up, you need to choose which one should be indexed properly.
 
 First-time setup steps:
 
