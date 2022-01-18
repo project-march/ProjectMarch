@@ -1,3 +1,5 @@
+"""Author: Marten Haitjema, MVII"""
+
 from scipy.interpolate import CubicSpline
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration

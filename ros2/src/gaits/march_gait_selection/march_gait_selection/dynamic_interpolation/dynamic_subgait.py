@@ -1,3 +1,5 @@
+"""Author: Marten Haitjema, MVII"""
+
 import numpy as np
 
 from rclpy.node import Node
@@ -20,22 +22,16 @@ EXTRA_ANKLE_SETPOINT_INDEX = 1
 class DynamicSubgait:
     """Creates joint trajectories based on the desired foot location.
 
-    :param duration: Duration of the subgait.
-    :type duration: float
-    :param middle_point_fraction: Fraction of the subgait at which the middle setpoint will be set.
-    :type middle_point_fraction: float
-    :param middle_point_height: Height of the middle setpoint.
-    :type middle_point_height: float
+    :param gait_selection_node: The gait_selection node
+    :type gait_selection: Node
     :param starting_position: The first setpoint of the subgait, usually the last setpoint of the previous subgait.
     :type starting_position: dict
     :param subgait_id: Whether it is a left_swing or right_swing.
     :type subgait_id: str
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param position_x: x-coordinate of the desired foot location in meters.
-    :type position_x: float
-    :param position_y: y-coordinate of the desired foot location in meters. Default is zero.
-    :type position_y: float
+    :param location: The desired foot location as given by CoViD
+    :type location: Point
     """
 
     def __init__(
@@ -44,7 +40,7 @@ class DynamicSubgait:
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
-        position: Point,
+        location: Point,
         stop: bool,
     ):
         self._get_parameters(gait_selection_node)
@@ -55,7 +51,7 @@ class DynamicSubgait:
             self.duration,
         ]
         self.starting_position = starting_position
-        self.position = position
+        self.location = location
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.stop = stop
@@ -77,8 +73,8 @@ class DynamicSubgait:
         :rtype: dict
         """
         middle_position = self.pose.solve_mid_position(
-            self.position.x,
-            self.position.y,
+            self.location.x,
+            self.location.y,
             self.middle_point_fraction,
             self.middle_point_height,
             self.subgait_id,
@@ -100,7 +96,7 @@ class DynamicSubgait:
             )
         else:
             self.desired_position = self.pose.solve_end_position(
-                self.position.x, self.position.y, self.subgait_id
+                self.location.x, self.location.y, self.subgait_id
             )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(

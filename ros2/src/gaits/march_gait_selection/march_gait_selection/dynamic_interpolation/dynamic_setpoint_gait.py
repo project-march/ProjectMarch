@@ -1,3 +1,5 @@
+"""Author: Marten Haitjema, MVII"""
+
 from rclpy.time import Time
 from rclpy.node import Node
 
