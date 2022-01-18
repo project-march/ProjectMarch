@@ -345,7 +345,7 @@ class Pose:
 
         # Reset pose to zero_pose and calculate distance between hip and ankle2 midpoint location:
         self.reset_to_zero_pose()
-        self.fe_knee1 = DEFAULT_KNEE_BEND
+        self.fe_knee1 = DEFAULT_KNEE_BEND + 2
         pos_hip = self.calculate_joint_positions("pos_hip")
         dist_ankle2_hip = np.linalg.norm(pos_ankle2 - pos_hip)
 
