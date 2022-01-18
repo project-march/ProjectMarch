@@ -1,5 +1,6 @@
 import numpy as np
 
+from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
@@ -39,24 +40,35 @@ class DynamicSubgait:
 
     def __init__(
         self,
-        duration: float,
-        middle_point_fraction: float,
-        middle_point_height: float,
+        gait_selection_node: Node,
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
         position: Point,
         stop: bool,
     ):
-        self.middle_point_fraction = middle_point_fraction
-        self.middle_point_height = middle_point_height
-        self.time = [0, self.middle_point_fraction * duration, duration]
+        self._get_parameters(gait_selection_node)
+        self.time = [
+            0,
+            self.push_off_fraction * self.duration,
+            self.middle_point_fraction * self.duration,
+            self.duration,
+        ]
         self.starting_position = starting_position
         self.position = position
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.stop = stop
         self.pose = Pose()
+
+    def _get_extra_ankle_setpoint(self) -> Setpoint:
+        """Returns an extra setpoint for the swing leg ankle
+        that can be used to create a push off.
+
+        :returns: An extra setpoint for the swing leg ankle
+        :rtype: Setpoint
+        """
+        return Setpoint(Duration(self.time[1]), self.push_off_position, 0.0)
 
     def _solve_middle_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the middle setpoint
@@ -76,18 +88,8 @@ class DynamicSubgait:
             self.joint_names,
             middle_position,
             None,
-            self.time[1],
+            self.time[2],
         )
-
-    def _get_extra_ankle_setpoint(self) -> Setpoint:
-        """Returns an extra setpoint for the swing leg ankle
-        that can be used to create a push off.
-
-        :returns: An extra setpoint for the swing leg ankle
-        :rtype: Setpoint
-        """
-        time = 0.1
-        return Setpoint(Duration(time), -0.6, 0.0)
 
     def _solve_desired_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the
@@ -209,3 +211,15 @@ class DynamicSubgait:
 
     def _from_joint_dict_to_list(self, joint_dict: dict) -> List[float]:
         return list(joint_dict.values())
+
+    def _get_parameters(self, gait_selection_node: Node) -> None:
+        """Gets the dynamic gait parameters from the gait_selection_node
+
+        :param gait_selection_node: the gait selection node
+        :type gait_selection_node: Node
+        """
+        self.duration = gait_selection_node.dynamic_subgait_duration
+        self.middle_point_height = gait_selection_node.middle_point_height
+        self.middle_point_fraction = gait_selection_node.middle_point_fraction
+        self.push_off_fraction = gait_selection_node.push_off_fraction
+        self.push_off_position = gait_selection_node.push_off_position

@@ -107,6 +107,16 @@ class GaitSelection(Node):
                 .get_parameter_value()
                 .double_value
             )
+            self.push_off_fraction = (
+                self.get_parameter("push_off_fraction")
+                .get_parameter_value()
+                .double_value
+            )
+            self.push_off_position = (
+                self.get_parameter("push_off_position")
+                .get_parameter_value()
+                .double_value
+            )
 
         except ParameterNotDeclaredException:
             self.get_logger().error(
