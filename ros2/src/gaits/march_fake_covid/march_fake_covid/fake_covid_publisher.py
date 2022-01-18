@@ -73,6 +73,7 @@ class FakeCovidPublisher(Node):
 def sys_exit(*_):
     sys.exit(0)
 
+
 def main():
     rclpy.init()
     fake_covid_publisher = FakeCovidPublisher()

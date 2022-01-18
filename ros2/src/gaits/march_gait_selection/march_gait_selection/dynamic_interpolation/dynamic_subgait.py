@@ -13,6 +13,8 @@ from geometry_msgs.msg import Point
 
 from typing import List
 
+EXTRA_ANKLE_SETPOINT_INDEX = 1
+
 
 class DynamicSubgait:
     """Creates joint trajectories based on the desired foot location.
@@ -77,6 +79,16 @@ class DynamicSubgait:
             self.time[1],
         )
 
+    def _get_extra_ankle_setpoint(self) -> Setpoint:
+        """Returns an extra setpoint for the swing leg ankle
+        that can be used to create a push off.
+
+        :returns: An extra setpoint for the swing leg ankle
+        :rtype: Setpoint
+        """
+        time = 0.1
+        return Setpoint(Duration(time), -0.6, 0.0)
+
     def _solve_desired_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the
         desired x and y coordinate"""
@@ -97,15 +109,20 @@ class DynamicSubgait:
         """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
         for name in self.joint_names:
-            self.joint_trajectory_list.append(
-                DynamicJointTrajectory(
-                    [
-                        self.starting_position[name],
-                        self.middle_setpoint_dict[name],
-                        self.desired_setpoint_dict[name],
-                    ]
+            setpoint_list = [
+                self.starting_position[name],
+                self.middle_setpoint_dict[name],
+                self.desired_setpoint_dict[name],
+            ]
+
+            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
+                name == "left_ankle" and self.subgait_id == "left_swing"
+            ):
+                setpoint_list.insert(
+                    EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
                 )
-            )
+
+            self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
     def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated
@@ -120,6 +137,7 @@ class DynamicSubgait:
 
         self._solve_middle_setpoint()
         self._solve_desired_setpoint()
+        self._get_extra_ankle_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
