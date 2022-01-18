@@ -4,7 +4,7 @@ import socket
 from rclpy import Future
 from std_msgs.msg import Header, String
 from rosgraph_msgs.msg import Clock
-from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
+from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, CurrentGait
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 
@@ -40,10 +40,10 @@ class InputDeviceController:
             qos_profile=10,
         )
         self._current_gait = self._node.create_subscription(
-            msg_type=String,
-            topic="/march/gait/current",
+            msg_type=CurrentGait,
+            topic="/march/gait_selection/current_gait",
             callback=self._current_gait_callback,
-            qos_profile=1,
+            qos_profile=10,
         )
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
@@ -86,14 +86,14 @@ class InputDeviceController:
         ):
             self.rejected_cb()
 
-    def _current_gait_callback(self, msg: String) -> None:
+    def _current_gait_callback(self, msg: CurrentGait) -> None:
         """
         Callback for when the current gait changes, sends the msg through to public current_gait_callback
         :param msg: The string with the name of the current gait
         :type msg: String
         """
         if callable(self.current_gait_cb):
-            self.current_gait_cb(msg.data)
+            self.current_gait_cb(msg.gait)
 
     def update_possible_gaits(self) -> None:
         """

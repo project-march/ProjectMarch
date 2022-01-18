@@ -17,7 +17,7 @@ def main():
     node = WirelessIPDNode()
     executor = MultiThreadedExecutor()
     controller = InputDeviceController(node)
-    manager = ConnectionManager('10.211.55.7', 4000, controller)
+    manager = ConnectionManager('192.168.157.240', 4000, controller)
     
     thr = threading.Thread(target=manager.establish_connection)
     thr.start()

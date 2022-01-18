@@ -139,7 +139,7 @@ class InputDeviceController:
         Send out an asynchronous request to get the possible gaits and stores response in gait_future
         """
         if self._possible_gait_client.service_is_ready():
-            self.gait_future = self._possible_gait_client.call_async(
+            self.gait_future = self._possiblecall_async_gait_client.(
                 PossibleGaits.Request()
             )
         else:
