@@ -13,6 +13,9 @@ from trajectory_msgs import msg as trajectory_msg
 from geometry_msgs.msg import Point
 
 from typing import List
+import rclpy.logging
+
+LOGGER_NODE_NAME = "gait_selection"
 
 
 class DynamicSubgait:
@@ -212,8 +215,11 @@ class DynamicSubgait:
                 position[i] > self.joint_soft_limits[i].upper
                 or position[i] < self.joint_soft_limits[i].lower
             ):
-                raise Exception(
-                    f"DynamicSubgait: joint[{i}] will be outside of soft limits, "
+                rclpy.logging.get_logger(LOGGER_NODE_NAME).info(
+                    f"DynamicSubgait: {self.joint_names[i]} will be outside of soft limits, "
                     f"position: {position[i]}, soft limits: "
                     f"[{self.joint_soft_limits[i].lower}, {self.joint_soft_limits[i].upper}]."
+                )
+                raise Exception(
+                    f"{self.joint_names[i]} will be outside its soft limits."
                 )
