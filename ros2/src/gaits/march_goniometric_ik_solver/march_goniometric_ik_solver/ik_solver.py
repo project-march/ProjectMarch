@@ -165,6 +165,40 @@ class Pose:
         pos_ankle2 = self.calculate_joint_positions("pos_ankle2")
         return np.linalg.norm(pos_ankle1 - pos_ankle2)
 
+    def calculate_ground_pose(self, ankle_x: float):
+        """
+        Calculate the ground pose to reach the x-location of the desired ankle postion,
+        while keeping the knees bended with the default knee bend value.
+        First it calculates the hip-ankle-length with a bendend knee, next it set the joint values.
+        """
+
+        # Determine length_hip_ankle:
+        self.fe_knee1 = self.fe_knee2 = DEFAULT_KNEE_BEND
+        pos_ankle1 = self.calculate_joint_positions("pos_ankle1")
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        length_ankle_hip = np.linalg.norm(pos_ankle1 - pos_hip)
+
+        angle_ankle1, angle_knee1, angkle_hip = tas.get_angles_from_sides(
+            [LENGTH_UPPER_LEG, length_ankle_hip, LENGTH_LOWER_LEG]
+        )
+
+        # Calculate theta as defined in the README:
+        theta = np.arcsin(ankle_x / (2 * length_ankle_hip))
+
+        # Define new value of ankle:
+        self.fe_ankle1 = theta + angle_ankle1
+
+        # Determine new positions of knee1 and hip and define other joint values:
+        pos_knee1 = self.calculate_joint_positions("pos_knee1")
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        pos_below_hip = np.array([pos_hip[0], 0])
+
+        self.fe_hip1 = np.sign(
+            pos_knee1[0] - pos_hip[0]
+        ) * qas.get_angle_between_points([pos_knee1, pos_hip, pos_below_hip])
+        self.fe_hip2 = theta + angkle_hip
+        self.fe_ankle2 = -theta + angle_ankle1
+
     def calculate_lifted_pose(self, pos_ankle2: np.array):
         """
         Calculate the pose after lifting the foot to the desired ankle postion.
@@ -248,8 +282,8 @@ class Pose:
 
     def straighten_leg(self):
         """
-        Straighten stance leg by making a triangle between ankle1, hip and knee2
-        and calculating new angles.
+        Straighten stance leg until the default knee bend by making a quadtrilateral between
+        ankle1, knee1, hip, knee2 and calculating new angles.
         """
 
         # get current state:
@@ -263,17 +297,26 @@ class Pose:
             pos_toes2,
         ) = self.calculate_joint_positions()
 
-        # determine sides of triangle and calculate angles:
+        # determine sides of quadrilateral and calculate angles:
         dist_ankle1_knee2 = np.linalg.norm(pos_ankle1 - pos_knee2)
-        sides = [LENGTH_UPPER_LEG, LENGTH_LEG, dist_ankle1_knee2]
-        angle_ankle1, angle_knee2, angle_hip = tas.get_angles_from_sides(sides)
+        sides = [
+            LENGTH_UPPER_LEG,
+            LENGTH_UPPER_LEG,
+            LENGTH_LOWER_LEG,
+            dist_ankle1_knee2,
+        ]
+        angle_knee1 = KNEE_ZERO_ANGLE + DEFAULT_KNEE_BEND
+        angle_hip, angle_knee1, angle_ankle1, angle_knee2 = qas.solve_quadritlateral(
+            sides, angle_knee1, convex=True
+        )  # note: this is actually a concave quadrilateral, but qas works strange for angle_b > 180 deg.
+        # this should be improved, see issue: https://gitlab.com/project-march/march/-/issues/1362
 
         # define new fe_ankle1 and fe_knee1:
         ankle1_angle_toes1_knee2 = qas.get_angle_between_points(
             [pos_knee2, pos_ankle1, pos_toes1]
         )
         self.fe_ankle1 = ANKLE_ZERO_ANGLE - (angle_ankle1 + ankle1_angle_toes1_knee2)
-        self.fe_knee1 = 0
+        self.fe_knee1 = KNEE_ZERO_ANGLE - angle_knee1
 
         # get new knee1 and hip location and determine point below it:
         pos_knee1 = self.calculate_joint_positions("pos_knee1")
@@ -384,9 +427,7 @@ class Pose:
         self.reset_to_zero_pose()
 
         # calculate ground pose:
-        ground_pose_flexion = calculate_ground_pose_flexion(ankle_x)
-        self.fe_ankle1 = self.fe_hip2 = ground_pose_flexion
-        self.fe_hip1 = self.fe_ankle2 = -ground_pose_flexion
+        self.calculate_ground_pose(ankle_x)
 
         # calculate lifted pose if ankle_y > 0:
         if ankle_y > 0:
@@ -420,15 +461,6 @@ def rot(t: float) -> np.array:
     A positive value of t results in a anti-clockwise rotation around the origin.
     """
     return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
-
-
-def calculate_ground_pose_flexion(ankle_x: float):
-    """
-    Calculates and returns the flexion of the ankles and the hips when the
-    ankle is moved to a certain x position, using pythagoras theorem.
-    """
-
-    return np.arcsin((ankle_x / 2) / LENGTH_LEG)
 
 
 def make_plot(pose: Pose):
