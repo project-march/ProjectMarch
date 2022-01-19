@@ -113,6 +113,7 @@ class DynamicSubgait:
                 self.desired_setpoint_dict[name],
             ]
 
+            # Add an extra setpoint to the ankle to create a push off:
             if (name == "right_ankle" and self.subgait_id == "right_swing") or (
                 name == "left_ankle" and self.subgait_id == "left_swing"
             ):
