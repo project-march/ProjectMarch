@@ -15,8 +15,16 @@ from trajectory_msgs import msg as trajectory_msg
 from geometry_msgs.msg import Point
 
 from typing import List
+from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
+
+
+class SetpointTime(IntEnum):
+    START_INDEX = 0
+    PUSH_OFF_INDEX = 1
+    MIDDLE_POINT_INDEX = 2
+    END_POINT_INDEX = 3
 
 
 class DynamicSubgait:
@@ -64,7 +72,11 @@ class DynamicSubgait:
         :returns: An extra setpoint for the swing leg ankle
         :rtype: Setpoint
         """
-        return Setpoint(Duration(self.time[1]), self.push_off_position, 0.0)
+        return Setpoint(
+            Duration(self.time[SetpointTime.PUSH_OFF_INDEX]),
+            self.push_off_position,
+            0.0,
+        )
 
     def _solve_middle_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the middle setpoint
@@ -84,7 +96,7 @@ class DynamicSubgait:
             self.joint_names,
             middle_position,
             None,
-            self.time[2],
+            self.time[SetpointTime.MIDDLE_POINT_INDEX],
         )
 
     def _solve_desired_setpoint(self) -> None:
@@ -100,7 +112,10 @@ class DynamicSubgait:
             )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
-            self.joint_names, self.desired_position, None, self.time[-1]
+            self.joint_names,
+            self.desired_position,
+            None,
+            self.time[SetpointTime.END_POINT_INDEX],
         )
 
     def _to_joint_trajectory_class(self) -> None:
@@ -166,7 +181,10 @@ class DynamicSubgait:
         :rtype: dict
         """
         return self._from_list_to_setpoint(
-            self.joint_names, self.desired_position, None, self.time[0]
+            self.joint_names,
+            self.desired_position,
+            None,
+            self.time[SetpointTime.START_INDEX],
         )
 
     def _from_list_to_setpoint(
