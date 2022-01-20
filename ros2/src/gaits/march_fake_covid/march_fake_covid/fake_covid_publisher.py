@@ -9,7 +9,6 @@ from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 
 from contextlib import suppress
-
 from geometry_msgs.msg import Point
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
