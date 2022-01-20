@@ -6,6 +6,8 @@ import json
 import traceback
 import time
 from functools import partial
+from datetime import datetime
+
 
 
 class ConnectionManager():
@@ -24,47 +26,47 @@ class ConnectionManager():
         self.seq = -1
         self.stop_receive = False
         self.current_gait = "unknown"
+        self.last_heartbeat = datetime.now()
 
     def wait_for_request(self):
         while True:
-            if self.connection._closed:
+            try: 
+                counter = 0
+                while(self.stop_receive and counter < 15):
+                    time.sleep(0.20)
+                    counter += 1
+
+                req = self.wait_for_message(1.0)
+
+                if req == "":
+                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD")
+                    self.reset_connection()
+                if "Received" in req:
+                    continue
+                elif "GaitRequest" in req:
+                    req = json.loads(req)
+                    self.seq = max(self.seq, req["seq"])
+                
+                    if req["gait"]["gaitName"] == "stop":
+                        self.stop_receive = True
+                        self.controller.update_possible_gaits()
+                        self.controller.publish_stop()
+                        self.send_message_till_confirm("accept")
+                        self.current_gait = "stop"
+                    else:
+                        self.request_gait(req)
+                else:
+                    self.last_heartbeat = datetime.now()
+
+            except socket.timeout:
+                if (datetime.now() - self.last_heartbeat).total_seconds() > 1.5:
+                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
+                    self.reset_connection()
+
+            except Exception:
                 self.reset_connection()
-            else:
-                try:
-                    
-                    while(self.stop_receive):
-                        time.sleep(0.20)
-
-                    req = self.wait_for_message(30)
-                    # self.controller.get_node().get_logger().info(str(req))
-                    if req == "":
-                        break
-                    elif not isinstance(req, str):
-                        continue
-                    elif "Received" in req:
-                        continue
-                    elif "GaitRequest" in req:
-                        req = json.loads(req)
-                        self.seq = max(self.seq, req["seq"])
-                    
-                        if req["gait"]["gaitName"] == "stop":
-                            self.stop_receive = True
-                            self.controller.update_possible_gaits()
-                            self.controller.publish_stop()
-                            self.send_message_till_confirm("accept")
-                            self.current_gait = "stop"
-                        else:
-                            self.request_gait(req)
-
-                except Exception as e:
-                    self.controller.get_node().get_logger().warning(traceback.format_exc())
-                    break
-
-        self.reset_connection()
-
 
     def update_current_gait(self, gait):        
-        self.controller.get_node().get_logger().info("Current gait: " + str(gait))
         self.current_gait = gait
 
     def gait_finished(self):
@@ -79,15 +81,12 @@ class ConnectionManager():
 
         gait = req["gait"]
 
-        self.controller.get_node().get_logger().info("Possible gaits: " + str(future.result().gaits))
-
         if gait["gaitName"] in future.result().gaits:
             self.stop_receive = True
             self.controller.publish_gait(gait["gaitName"])
             return True
         else:
             self.stop_receive = True
-            self.controller.get_node().get_logger().info("Gait not available")
             self.send_message_till_confirm("fail")
             return False
 
@@ -121,30 +120,32 @@ class ConnectionManager():
             "seq": self.seq
         }
 
-        while (True):
-            while (True):
-                try:
-                    self.send_message(json.dumps(msg))
-                    data = self.wait_for_message(0.20)
-                    # self.controller.get_node().get_logger().info(str(data))
-                    if not isinstance(data, str):
-                        continue
+        while True:
+            try:
+                self.send_message(json.dumps(msg))
+                data = self.wait_for_message(0.20)
+
+                if "Received" in data:
                     data = json.loads(data)
-                    
-                    if data["type"] == "Received" and data["seq"] == self.seq:
+                    if data["seq"] == self.seq:
                         self.stop_receive = False
                         return
-                except socket.timeout:
-                    continue
-                except Exception:
-                    break
-            self.reset_connection()
+                else:
+                    self.last_heartbeat = datetime.now()
+
+            except socket.timeout:
+                if (datetime.now() - self.last_heartbeat).total_seconds() > 1.5:
+                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
+                    self.reset_connection()
+
+            except Exception:
+                self.reset_connection()
 
 
     def establish_connection(self):
         self.connection, self.addr = self.s.accept()
         self.send_message_till_confirm(self.current_gait)
-        self.controller.get_node().get_logger().info("Device connected")
+        self.controller.get_node().get_logger().info("Wireless IPD connected")
         self.wait_for_request()
 
 
