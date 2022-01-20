@@ -1,5 +1,8 @@
+"""Author: Marten Haitjema, MVII"""
+
 import numpy as np
 
+from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
@@ -12,49 +15,68 @@ from trajectory_msgs import msg as trajectory_msg
 from geometry_msgs.msg import Point
 
 from typing import List
+from enum import IntEnum
+
+EXTRA_ANKLE_SETPOINT_INDEX = 1
+
+
+class SetpointTime(IntEnum):
+    START_INDEX = 0
+    PUSH_OFF_INDEX = 1
+    MIDDLE_POINT_INDEX = 2
+    END_POINT_INDEX = 3
 
 
 class DynamicSubgait:
     """Creates joint trajectories based on the desired foot location.
 
-    :param duration: Duration of the subgait.
-    :type duration: float
-    :param middle_point_fraction: Fraction of the subgait at which the middle setpoint will be set.
-    :type middle_point_fraction: float
-    :param middle_point_height: Height of the middle setpoint.
-    :type middle_point_height: float
+    :param gait_selection_node: The gait_selection node
+    :type gait_selection: Node
     :param starting_position: The first setpoint of the subgait, usually the last setpoint of the previous subgait.
     :type starting_position: dict
     :param subgait_id: Whether it is a left_swing or right_swing.
     :type subgait_id: str
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param position_x: x-coordinate of the desired foot location in meters.
-    :type position_x: float
-    :param position_y: y-coordinate of the desired foot location in meters. Default is zero.
-    :type position_y: float
+    :param location: The desired foot location as given by CoViD
+    :type location: Point
     """
 
     def __init__(
         self,
-        duration: float,
-        middle_point_fraction: float,
-        middle_point_height: float,
+        gait_selection_node: Node,
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
-        position: Point,
+        location: Point,
         stop: bool,
     ):
-        self.middle_point_fraction = middle_point_fraction
-        self.middle_point_height = middle_point_height
-        self.time = [0, self.middle_point_fraction * duration, duration]
+        self._get_parameters(gait_selection_node)
+        self.time = [
+            0,
+            self.push_off_fraction * self.duration,
+            self.middle_point_fraction * self.duration,
+            self.duration,
+        ]
         self.starting_position = starting_position
-        self.position = position
+        self.location = location
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.stop = stop
         self.pose = Pose()
+
+    def _get_extra_ankle_setpoint(self) -> Setpoint:
+        """Returns an extra setpoint for the swing leg ankle
+        that can be used to create a push off.
+
+        :returns: An extra setpoint for the swing leg ankle
+        :rtype: Setpoint
+        """
+        return Setpoint(
+            Duration(self.time[SetpointTime.PUSH_OFF_INDEX]),
+            self.push_off_position,
+            0.0,
+        )
 
     def _solve_middle_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the middle setpoint
@@ -63,8 +85,8 @@ class DynamicSubgait:
         :rtype: dict
         """
         middle_position = self.pose.solve_mid_position(
-            self.position.x,
-            self.position.y,
+            self.location.x,
+            self.location.y,
             self.middle_point_fraction,
             self.middle_point_height,
             self.subgait_id,
@@ -74,7 +96,7 @@ class DynamicSubgait:
             self.joint_names,
             middle_position,
             None,
-            self.time[1],
+            self.time[SetpointTime.MIDDLE_POINT_INDEX],
         )
 
     def _solve_desired_setpoint(self) -> None:
@@ -86,26 +108,35 @@ class DynamicSubgait:
             )
         else:
             self.desired_position = self.pose.solve_end_position(
-                self.position.x, self.position.y, self.subgait_id
+                self.location.x, self.location.y, self.subgait_id
             )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
-            self.joint_names, self.desired_position, None, self.time[-1]
+            self.joint_names,
+            self.desired_position,
+            None,
+            self.time[SetpointTime.END_POINT_INDEX],
         )
 
     def _to_joint_trajectory_class(self) -> None:
         """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
         for name in self.joint_names:
-            self.joint_trajectory_list.append(
-                DynamicJointTrajectory(
-                    [
-                        self.starting_position[name],
-                        self.middle_setpoint_dict[name],
-                        self.desired_setpoint_dict[name],
-                    ]
+            setpoint_list = [
+                self.starting_position[name],
+                self.middle_setpoint_dict[name],
+                self.desired_setpoint_dict[name],
+            ]
+
+            # Add an extra setpoint to the ankle to create a push off:
+            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
+                name == "left_ankle" and self.subgait_id == "left_swing"
+            ):
+                setpoint_list.insert(
+                    EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
                 )
-            )
+
+            self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
     def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated
@@ -120,6 +151,7 @@ class DynamicSubgait:
 
         self._solve_middle_setpoint()
         self._solve_desired_setpoint()
+        self._get_extra_ankle_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
@@ -149,7 +181,10 @@ class DynamicSubgait:
         :rtype: dict
         """
         return self._from_list_to_setpoint(
-            self.joint_names, self.desired_position, None, self.time[0]
+            self.joint_names,
+            self.desired_position,
+            None,
+            self.time[SetpointTime.START_INDEX],
         )
 
     def _from_list_to_setpoint(
@@ -191,3 +226,15 @@ class DynamicSubgait:
 
     def _from_joint_dict_to_list(self, joint_dict: dict) -> List[float]:
         return list(joint_dict.values())
+
+    def _get_parameters(self, gait_selection_node: Node) -> None:
+        """Gets the dynamic gait parameters from the gait_selection_node
+
+        :param gait_selection_node: the gait selection node
+        :type gait_selection_node: Node
+        """
+        self.duration = gait_selection_node.dynamic_subgait_duration
+        self.middle_point_height = gait_selection_node.middle_point_height
+        self.middle_point_fraction = gait_selection_node.middle_point_fraction
+        self.push_off_fraction = gait_selection_node.push_off_fraction
+        self.push_off_position = gait_selection_node.push_off_position

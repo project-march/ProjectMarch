@@ -83,6 +83,12 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
         elif param.name == "minimum_stair_height":
             gait_selection.minimum_stair_height = param.value
             dynamic_gait_updated = True
+        elif param.name == "push_off_fraction":
+            gait_selection.push_off_fraction = param.value
+            dynamic_gait_updated = True
+        elif param.name == "push_off_position":
+            gait_selection.push_off_position = param.value
+            dynamic_gait_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
             gaits_updated = True
@@ -95,9 +101,10 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
                 gait_state_machine.update_timer.destroy()
             gait_state_machine.run()
 
-    # Seperate update function to avoid time performance issues
+    # Seperate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
         gait_selection.dynamic_setpoint_gait.update_parameters()
+        gait_selection.get_logger().info("Dynamic gait parameters updated.")
     elif gaits_updated:
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()

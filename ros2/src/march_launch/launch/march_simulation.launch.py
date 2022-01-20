@@ -40,6 +40,8 @@ def generate_launch_description():
     middle_point_fraction = LaunchConfiguration("middle_point_fraction")
     middle_point_height = LaunchConfiguration("middle_point_height")
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
+    push_off_fraction = LaunchConfiguration("push_off_fraction")
+    push_off_position = LaunchConfiguration("push_off_position")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -186,6 +188,17 @@ def generate_launch_description():
                 "will change the gait type to stairs_like instead of walk_like.",
             ),
             DeclareLaunchArgument(
+                name="push_off_fraction",
+                default_value="0.2",
+                description="Fraction of the step at which the push off will"
+                "take place.",
+            ),
+            DeclareLaunchArgument(
+                name="push_off_position",
+                default_value="-0.3",
+                description="Maximum joint position of the ankle during push off.",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -266,6 +279,8 @@ def generate_launch_description():
                     ("middle_point_fraction", middle_point_fraction),
                     ("middle_point_height", middle_point_height),
                     ("mininum_stair_height", minimum_stair_height),
+                    ("push_off_fraction", push_off_fraction),
+                    ("push_off_position", push_off_position),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
                     ("timer_period", timer_period),

@@ -1,3 +1,5 @@
+"""Author: Marten Haitjema, MVII"""
+
 from rclpy.time import Time
 from rclpy.node import Node
 
@@ -329,9 +331,7 @@ class DynamicSetpointGait(GaitInterface):
             )
 
         self.dynamic_subgait = DynamicSubgait(
-            self.dynamic_subgait_duration,
-            self.middle_point_fraction,
-            self.middle_point_height,
+            self.gait_selection,
             self.start_position,
             self.subgait_id,
             self.joint_names,
@@ -360,17 +360,7 @@ class DynamicSetpointGait(GaitInterface):
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
         self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
-        self.middle_point_fraction = self.gait_selection.middle_point_fraction
-        self.middle_point_height = self.gait_selection.middle_point_height
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
-
-        self._logger(
-            "Parameters updated. "
-            f"duration: {self.dynamic_subgait_duration}, "
-            f"fraction: {self.middle_point_fraction}, "
-            f"height: {self.middle_point_height}, "
-            f"stairs: {self.minimum_stair_height}"
-        )
 
     # UTILITY FUNCTIONS
     @staticmethod
