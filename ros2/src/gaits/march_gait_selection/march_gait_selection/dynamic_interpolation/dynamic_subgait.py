@@ -16,6 +16,7 @@ from typing import List
 import rclpy.logging
 
 LOGGER_NODE_NAME = "gait_selection"
+INTERPOLATION_POINTS = 30
 
 
 class DynamicSubgait:
@@ -78,7 +79,6 @@ class DynamicSubgait:
             self.subgait_id,
         )
 
-        self._check_joint_limits(middle_position)
         self.middle_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             middle_position,
@@ -98,7 +98,6 @@ class DynamicSubgait:
                 self.position.x, self.position.y, self.subgait_id
             )
 
-        self._check_joint_limits(self.desired_position)
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names, self.desired_position, None, self.time[-1]
         )
@@ -136,17 +135,19 @@ class DynamicSubgait:
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 
-        for timestamp in self.time:
+        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
+        for timestamp in timestamps:
             joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
             joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
 
-            for joint_trajectory in self.joint_trajectory_list:
+            for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
                 interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
                     timestamp
                 )
 
                 joint_trajecory_point.positions.append(interpolated_setpoint.position)
                 joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
+                self._check_joint_limits(joint_index, joint_trajecory_point)
 
             joint_trajectory_msg.points.append(joint_trajecory_point)
 
@@ -203,23 +204,39 @@ class DynamicSubgait:
         """Return the values in a joint_dict as a list."""
         return list(joint_dict.values())
 
-    def _check_joint_limits(self, position: List[float]) -> None:
-        """Check if values in 'position' are within the soft limits
-        defined in the urdf
+    def _check_joint_limits(
+        self,
+        joint_index: int,
+        joint_trajectory_point: trajectory_msg.JointTrajectoryPoint,
+    ) -> None:
+        """Check if values in the joint_trajectory_point are within the soft and
+        velocity limits defined in the urdf
 
-        :param position: joint positions in alphabetical order
-        :type position: list[float]
+        :param joint_index: Index of the joint in the alphabetical joint_names list
+        :type joint_index: int
+        :param joint_trajectory_point: point in time containing position and velocity
+        :type joint_trajectory_point: trajectory_msg.JointTrajectoryPoint
         """
-        for i in range(len(self.joint_names)):
-            if (
-                position[i] > self.joint_soft_limits[i].upper
-                or position[i] < self.joint_soft_limits[i].lower
-            ):
-                rclpy.logging.get_logger(LOGGER_NODE_NAME).info(
-                    f"DynamicSubgait: {self.joint_names[i]} will be outside of soft limits, "
-                    f"position: {position[i]}, soft limits: "
-                    f"[{self.joint_soft_limits[i].lower}, {self.joint_soft_limits[i].upper}]."
-                )
-                raise Exception(
-                    f"{self.joint_names[i]} will be outside its soft limits."
-                )
+        position = joint_trajectory_point.positions[joint_index]
+        velocity = joint_trajectory_point.velocities[joint_index]
+        if (
+            position > self.joint_soft_limits[joint_index].upper
+            or position < self.joint_soft_limits[joint_index].lower
+        ):
+            rclpy.logging.get_logger(LOGGER_NODE_NAME).info(
+                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of soft limits, "
+                f"position: {position}, soft limits: "
+                f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]."
+            )
+            raise Exception(
+                f"{self.joint_names[joint_index]} will be outside its soft limits."
+            )
+
+        if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
+            rclpy.logging.get_logger(LOGGER_NODE_NAME).info(
+                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of velocity limits, "
+                f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}."
+            )
+            raise Exception(
+                f"{self.joint_names[joint_index]} will be outside its velocity limits."
+            )
