@@ -146,6 +146,7 @@ Secondly add a file named ~/.march_bash_aliases, and paste the code below in tha
     # Source ROS distribution
     alias snoe='source /opt/ros/noetic/local_setup.bash'
     alias sfox='source /opt/ros/foxy/local_setup.bash'
+    alias svenv='source ~/march/.venv_march/bin/activate'
 
     # Source MARCH packages
     alias sros1='source ~/march/ros1/install/local_setup.bash'
