@@ -338,7 +338,7 @@ class DynamicSetpointGait(GaitInterface):
             self._logger("Stopping dynamic gait.")
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
-            self._check_msg_time(self.foot_location)
+            stop = self._check_msg_time(self.foot_location)
             self._publish_foot_location(self.subgait_id, self.foot_location)
             self._logger(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
@@ -437,7 +437,7 @@ class DynamicSetpointGait(GaitInterface):
             self.gait_selection.get_logger().info(msg)
 
     # SAFETY
-    def _check_msg_time(self, foot_location: PointStamped) -> None:
+    def _check_msg_time(self, foot_location: PointStamped) -> bool:
         """Checks if the foot_location given by CoViD is not older than
         FOOT_LOCATION_TIME_OUT."""
         msg_time = Time(
@@ -458,7 +458,10 @@ class DynamicSetpointGait(GaitInterface):
         if time_difference > FOOT_LOCATION_TIME_OUT:
             self._logger(
                 "Foot location is more than 0.5 seconds old, time difference is "
-                f"{time_difference}",
+                f"{time_difference}. Stopping gait.",
                 warning=True,
             )
-            raise Exception("Foot location last updated more than 0.5 seconds ago.")
+            self._end = True
+            return True
+
+        return False
