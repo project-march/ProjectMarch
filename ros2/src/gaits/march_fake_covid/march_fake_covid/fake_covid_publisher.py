@@ -21,8 +21,11 @@ class FakeCovidPublisher(Node):
 
     Can change distance locations during runtime, see '../launch/march_fake_covid.launch.py'.
     """
+
     def __init__(self):
-        super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
+        super().__init__(
+            NODE_NAME, automatically_declare_parameters_from_overrides=True
+        )
         self.random_x = False
         self.random_y = False
 
@@ -31,6 +34,9 @@ class FakeCovidPublisher(Node):
         )
         self.location_y = (
             self.get_parameter("location_y").get_parameter_value().double_value
+        )
+        self.location_z = (
+            self.get_parameter("location_z").get_parameter_value().double_value
         )
 
         self.left_foot_publisher = self.create_publisher(
@@ -61,7 +67,7 @@ class FakeCovidPublisher(Node):
         else:
             point.y = self.location_y
 
-        point.z = 0.0
+        point.z = self.location_z
 
         self.left_foot_publisher.publish(point)
         self.right_foot_publisher.publish(point)
@@ -91,14 +97,14 @@ def parameter_callback(
     fake_covid_publisher: FakeCovidPublisher, parameters: list
 ) -> SetParametersResult:
     """Update parameter of fake_covid_publisher and return if
-    this is done succesfully.
+    this is done successfully.
 
     :param fake_covid_publisher: instance of the fake_covid_publisher class
     :type fake_covid_publisher: FakeCovidPublisher
     :param parameters: list containing the changed parameters
     :type parameters: list
 
-    :returns: whether or not the parameters were set succesfully
+    :returns: whether or not the parameters were set successfully
     :rtype: SetParametersResult
     """
     for param in parameters:
@@ -118,6 +124,9 @@ def parameter_callback(
                 fake_covid_publisher.random_y = False
                 fake_covid_publisher.location_y = param.value
                 fake_covid_publisher.get_logger().info(f"y set to {param.value}")
+        elif param.name == "location_z":
+            fake_covid_publisher.location_z = param.value
+            fake_covid_publisher.get_logger().info(f"z set to {param.value}")
 
     return SetParametersResult(successful=True)
 

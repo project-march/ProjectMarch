@@ -29,8 +29,6 @@ ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
 HIP_ZERO_ANGLE = np.pi  # rad
 
-HIP_AA = 0.03  # rad
-
 NUMBER_OF_JOINTS = 8
 
 
@@ -57,7 +55,6 @@ class Pose:
             self.fe_knee2,
         ) = pose
         self.rot_foot1 = 0
-        self.aa_hip1 = self.aa_hip2 = HIP_AA
 
     def reset_to_zero_pose(self):
         self.__init__()
@@ -399,6 +396,7 @@ class Pose:
         self,
         ankle_x: float,
         ankle_y: float,
+        ankle_z: float,
         midpoint_fraction: float,
         midpoint_height: float,
         subgait_id: str,
@@ -418,6 +416,10 @@ class Pose:
         midpoint_x = midpoint_fraction * (swing_distance + ankle_x) - swing_distance
         midpoint_y = ankle_y + midpoint_height
         pos_ankle2 = np.array([midpoint_x, midpoint_y])
+
+        # Store start pose:
+        start_hip_aa1 = self.aa_hip1
+        start_hip_aa2 = self.aa_hip1
 
         # Reset pose to zero_pose and calculate distance between hip and ankle2 midpoint location:
         self.reset_to_zero_pose()
@@ -442,6 +444,18 @@ class Pose:
         # lift toes as much as possible:
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
+        # Set hip_aa to average of start and end pose:
+        end_pose = Pose()
+        end_pose.solve_end_position(ankle_x, ankle_y, ankle_z, subgait_id)
+        self.aa_hip1 = (
+            start_hip_aa1 * (1 - midpoint_fraction)
+            + end_pose.aa_hip1 * midpoint_fraction
+        )
+        self.aa_hip2 = (
+            start_hip_aa2 * (1 - midpoint_fraction)
+            + end_pose.aa_hip2 * midpoint_fraction
+        )
+
         # return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
@@ -449,6 +463,7 @@ class Pose:
         self,
         ankle_x: float,
         ankle_y: float,
+        ankle_z: float,
         subgait_id: str,
         max_ankle_flexion: float = MAX_ANKLE_FLEXION,
     ) -> List[float]:
@@ -485,7 +500,7 @@ class Pose:
             self.reduce_stance_dorsi_flexion()
 
         # apply side_step, hard_coded to default feet distance for now:
-        self.perform_side_step(ankle_y, LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE)
+        self.perform_side_step(ankle_y, abs(ankle_z))
 
         # return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right

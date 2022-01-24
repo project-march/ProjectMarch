@@ -4,6 +4,14 @@ from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from march_utility.utilities.utility_functions import (
+    get_lengths_robot_from_urdf_for_inverse_kinematics,
+)
+
+# Get lengths from urdf:
+lengths = get_lengths_robot_from_urdf_for_inverse_kinematics()
+LENGTH_HIP_AA, LENGTH_HIP_BASE = lengths[2], lengths[-1]
+DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
 def generate_launch_description():
@@ -54,6 +62,7 @@ def generate_launch_description():
     # Fake covid (CoViD = Computer Vision Department)
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
+    location_z = LaunchConfiguration("location_z")
 
     return launch.LaunchDescription(
         [
@@ -247,6 +256,11 @@ def generate_launch_description():
                 default_value="0.0",
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
+            DeclareLaunchArgument(
+                name="location_z",
+                default_value=str(DEFAULT_FEET_DISTANCE),
+                description="z-location for fake covid topic, takes double or 'random'",
+            ),
             # Use normal launch file with different launch_arguments
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -291,6 +305,7 @@ def generate_launch_description():
                     ("jointlesss", jointless),
                     ("location_x", location_x),
                     ("location_y", location_y),
+                    ("location_z", location_z),
                 ],
             ),
         ]
