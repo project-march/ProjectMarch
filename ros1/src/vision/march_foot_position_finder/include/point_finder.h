@@ -17,8 +17,8 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class PointFinder {
 public:
-    explicit PointFinder(PointCloud::Ptr pointcloud, std::string left_or_right,
-        Point& step_point);
+    explicit PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
+        std::string left_or_right, Point& step_point);
 
     ~PointFinder() = default;
 
@@ -30,7 +30,7 @@ protected:
     std::string left_or_right_;
 
     int grid_resolution_ = RES;
-    double cell_width = 1.0 / grid_resolution_;
+    double cell_width_ = 1.0 / grid_resolution_;
 
     std::array<std::array<double, RES>, RES> height_map_;
     std::array<std::array<double, RES>, RES> height_map_temp_;
@@ -42,25 +42,26 @@ protected:
     double optimal_foot_y_;
     double current_foot_z_;
 
-    double foot_width_ = 0.10;
-    double foot_length_ = 0.20;
-    int rect_width = ceil(foot_width_ / cell_width);
-    int rect_height = ceil(foot_length_ / cell_width);
+    double foot_width_;
+    double foot_length_;
+    int rect_width_;
+    int rect_height_;
 
-    double x_displacements_left = ceil(0.05 / cell_width);
-    double x_displacements_right = ceil(0.10 / cell_width);
-    double y_displacements_front = ceil(0.20 / cell_width);
-    double y_displacements_far = ceil(0.05 / cell_width);
+    double x_displacements_left_;
+    double x_displacements_right_;
+    double y_displacements_front_;
+    double y_displacements_far_;
 
-    std::vector<int> x_displacements;
-    std::vector<int> y_displacements;
+    std::vector<int> x_displacements_;
+    std::vector<int> y_displacements_;
 
-    double x_offset;
-    double y_offset;
-    double x_width;
-    double y_width;
+    double x_offset_;
+    double y_offset_;
+    double x_width_;
+    double y_width_;
 
-    double available_points_ratio = 0.85;
+    double max_z_distance_;
+    double available_points_ratio_;
 
     void mapPointCloudToHeightMap();
 

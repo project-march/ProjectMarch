@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
+
+if (POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif (POLICY CMP0048)
+
 project(march_foot_position_finder)
 
 # Default to C99

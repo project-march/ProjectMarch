@@ -18,11 +18,13 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class FootPositionFinder {
 public:
     explicit FootPositionFinder(
-        ros::NodeHandle* n, bool realsense, const std::string& left_or_right);
+        ros::NodeHandle* n, const std::string& left_or_right);
 
     ~FootPositionFinder() = default;
 
 protected:
+    void chosenPointCallback(const geometry_msgs::Point point);
+
     void processRealSenseDepthFrames();
 
     void processSimulatedDepthFrames(
@@ -37,31 +39,41 @@ protected:
     void transformPoint(Point& point, const std::string& frame_from,
         const std::string& frame_to);
 
-    rs2::pipeline pipe;
-    rs2::config cfg;
+    rs2::pipeline pipe_;
+    rs2::config cfg_;
 
-    rs2::decimation_filter dec_filter;
-    rs2::spatial_filter spat_filter;
-    rs2::temporal_filter temp_filter;
+    rs2::decimation_filter dec_filter_;
+    rs2::spatial_filter spat_filter_;
+    rs2::temporal_filter temp_filter_;
 
     ros::NodeHandle* n_;
 
     ros::Publisher point_publisher_;
     ros::Subscriber pointcloud_subscriber_;
+    ros::Subscriber chosen_point_subscriber_;
+
+    ros::Publisher preprocessed_pointcloud_publisher_;
+    ros::Publisher point_marker_publisher_;
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
-    std::string topic_camera_front;
+    std::string topic_camera_front_;
+    std::string topic_chosen_points_;
 
-    std::vector<Point> found_points_;
-    int sample_size_ = 3;
     std::string left_or_right_;
     bool realsense_;
-    std::string reference_frame_id;
 
-    ros::Publisher preprocessed_pointcloud_publisher_;
-    ros::Publisher point_marker_publisher_;
+    double foot_gap_;
+    double step_distance_;
+    double outlier_distance_;
+    int sample_size_;
+
+    std::string base_frame_;
+    std::string reference_frame_id_;
+
+    std::vector<Point> found_points_;
+    Point last_chosen_point_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

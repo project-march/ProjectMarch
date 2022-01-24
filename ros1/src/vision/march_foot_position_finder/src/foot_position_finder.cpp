@@ -24,17 +24,17 @@
 // No lint is used to avoid linting in the realsense library, where a potential
 // memory leak error is present
 // NOLINTNEXTLINE
-FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
+FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     const std::string& left_or_right) // NOLINT
     : n_(n)
-    , realsense_(realsense)
     , left_or_right_(left_or_right)
 {
 
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
-    topic_camera_front
+    topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
+    topic_chosen_points_ = "/chosen_foot_position/" + left_or_right_;
 
     point_publisher_ = n_->advertise<geometry_msgs::Point>(
         "/foot_position/" + left_or_right_, /*queue_size=*/1);
@@ -43,20 +43,36 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
+    chosen_point_subscriber_
+        = n_->subscribe<geometry_msgs::Point>(topic_chosen_points_,
+            /*queue_size=*/1, &FootPositionFinder::chosenPointCallback, this);
+    pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
+        topic_camera_front_, /*queue_size=*/3,
+        &FootPositionFinder::processSimulatedDepthFrames, this);
+
+    n->getParam("realsense", realsense_);
+    n->getParam("base_frame", base_frame_);
+    n->getParam("foot_gap", foot_gap_);
+    n->getParam("step_distance", step_distance_);
+    n->getParam("average_sample_size", sample_size_);
+    n->getParam("outlier_distance", outlier_distance_);
+
     if (left_or_right_ == "left") {
-        reference_frame_id = "foot_right";
+        reference_frame_id_ = "foot_right";
+        last_chosen_point_ = Point(/*_x=*/0, /*_y=*/foot_gap_, /*_z=*/0);
     } else if (left_or_right_ == "right") {
-        reference_frame_id = "foot_left";
+        reference_frame_id_ = "foot_left";
+        last_chosen_point_ = Point(/*_x=*/0, /*_y=*/-foot_gap_, /*_z=*/0);
     }
 
-    if (realsense) {
-        cfg.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
+    if (realsense_) {
+        cfg_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
             RS2_FORMAT_Z16, /*framerate=*/30);
-        pipe.start(cfg);
+        pipe_.start(cfg_);
         processRealSenseDepthFrames();
     } else {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-            topic_camera_front, /*queue_size=*/3,
+            topic_camera_front_, /*queue_size=*/3,
             &FootPositionFinder::processSimulatedDepthFrames, this);
     }
 }
@@ -68,12 +84,12 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n, bool realsense,
 void FootPositionFinder::processRealSenseDepthFrames()
 {
     while (ros::ok()) {
-        rs2::frameset frames = pipe.wait_for_frames();
+        rs2::frameset frames = pipe_.wait_for_frames();
         rs2::depth_frame depth = frames.get_depth_frame();
 
-        depth = dec_filter.process(depth);
-        depth = spat_filter.process(depth);
-        depth = temp_filter.process(depth);
+        depth = dec_filter_.process(depth);
+        depth = spat_filter_.process(depth);
+        depth = temp_filter_.process(depth);
 
         rs2::pointcloud pc;
         rs2::points points = pc.calculate(depth);
@@ -82,6 +98,15 @@ void FootPositionFinder::processRealSenseDepthFrames()
         processPointCloud(pointcloud);
         ros::spinOnce();
     }
+}
+
+/**
+ * Callback function for when a point is chosen for a dynamic gait.
+ */
+void FootPositionFinder::chosenPointCallback(
+    const geometry_msgs::Point point) // NOLINT
+{
+    last_chosen_point_ = Point(point.x, point.y, point.z);
 }
 
 /**
@@ -107,25 +132,28 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     Point point;
 
     if (!realsense_) {
-
         // Define the desired future foot position
+        Point p = last_chosen_point_;
+        transformPoint(p, "foot_" + left_or_right_, reference_frame_id_);
         if (left_or_right_ == "left") {
-            point = Point(/*_x=*/-0.5, /*_y=*/-0.25, /*_z=*/0);
+            point = Point(/*_x=*/p.x - step_distance_, /*_y=*/p.y - foot_gap_,
+                /*_z=*/p.z);
         } else if (left_or_right_ == "right") {
-            point = Point(/*_x=*/-0.5, /*_y=*/0.25, /*_z=*/0);
+            point = Point(/*_x=*/p.x - step_distance_, /*_y=*/p.y + foot_gap_,
+                /*_z=*/p.z);
         }
 
         // Calculate point location relative to positionary leg
-        transformPoint(point, reference_frame_id, "world");
+        transformPoint(point, reference_frame_id_, base_frame_);
     }
 
-    Preprocessor preprocessor(pointcloud, normalcloud);
+    Preprocessor preprocessor(n_, pointcloud, normalcloud);
     preprocessor.preprocess();
 
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
     Point position(point.y, -point.x, point.z); // Rotate 90 degrees clockwise
-    PointFinder pointFinder(pointcloud, left_or_right_, position);
+    PointFinder pointFinder(n_, pointcloud, left_or_right_, position);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
@@ -151,7 +179,7 @@ void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 
         std::vector<Point> non_outliers;
         for (Point& p : found_points_) {
-            if (pcl::squaredEuclideanDistance(p, avg) < 0.05) {
+            if (pcl::squaredEuclideanDistance(p, avg) < outlier_distance_) {
                 non_outliers.push_back(p);
             }
         }
@@ -165,7 +193,7 @@ void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
             // Publish for gait computation
             final = Point(
                 -final.y, final.x, final.z); // Rotate 90 counter clockwise
-            transformPoint(final, "world", reference_frame_id);
+            transformPoint(final, base_frame_, reference_frame_id_);
             publishPoint(point_publisher_, final);
         }
     }

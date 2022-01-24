@@ -5,4 +5,39 @@
           output="screen"
           respawn="true"
     />
+
+    <!-- Preprocessor arguments -->
+    <param name="voxel_size" type="float" value="0.01" />
+    <param name="x_min" type="float" value="-1" />
+    <param name="x_max" type="float" value="1" />
+    <param name="y_min" type="float" value="-1" />
+    <param name="y_max" type="float" value="1" />
+    <param name="z_min" type="float" value="-1" />
+    <param name="z_max" type="float" value="1" />
+
+    <!-- Foot position finder arguments -->
+    <param name="realsense" type="bool" value="false" />
+    <param name="base_frame" type="str" value="world" />
+
+    <param name="foot_gap" type="double" value="0.25" />
+    <param name="step_distance" type="double" value="0.50" />
+
+    <param name="outlier_distance" type="double" value="0.05" />
+    <param name="average_sample_size" type="int" value="3" />
+
+    <!-- Point finder arguments -->
+    <param name="foot_width" type="double" value="0.10" />
+    <param name="foot_length" type="double" value="0.20" />
+
+    <param name="grid_resolution" type="int" value="70" />
+    <param name="derivative_threshold" type="int" value="0.03" />
+    <param name="available_points_ratio" type="double" value="0.85" />
+    <param name="max_z_distance" type="double" value="0.25" />
+
+    <param name="x_displacements_left" type="double" value="0.05" />
+    <param name="x_displacements_right" type="double" value="0.10" />
+    <param name="y_displacements_front" type="double" value="0.20" />
+    <param name="y_displacements_far" type="double" value="0.05" />
+    
+
 </launch>

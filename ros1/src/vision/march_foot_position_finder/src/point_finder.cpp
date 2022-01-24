@@ -18,8 +18,8 @@ using PointCloud = pcl::PointCloud<Point>;
  * @param step_point an initial desired step point
  */
 // NOLINTNEXTLINE
-PointFinder::PointFinder(
-    PointCloud::Ptr pointcloud, std::string left_or_right, Point& step_point)
+PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
+    std::string left_or_right, Point& step_point)
     : pointcloud_ { std::move(pointcloud) }
     , left_or_right_ { std::move(left_or_right) }
 {
@@ -28,6 +28,26 @@ PointFinder::PointFinder(
         &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -5);
     std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 1);
 
+    n->getParam("foot_width", foot_width_);
+    n->getParam("foot_length", foot_length_);
+
+    n->getParam("x_displacements_left", x_displacements_left_);
+    n->getParam("x_displacements_right", x_displacements_right_);
+    n->getParam("y_displacements_front", y_displacements_front_);
+    n->getParam("x_displacements_left", y_displacements_far_);
+
+    x_displacements_left_ = ceil(x_displacements_left_ / cell_width_);
+    x_displacements_right_ = ceil(x_displacements_right_ / cell_width_);
+    y_displacements_front_ = ceil(y_displacements_front_ / cell_width_);
+    y_displacements_far_ = ceil(y_displacements_far_ / cell_width_);
+
+    n->getParam("available_points_ratio", available_points_ratio_);
+    n->getParam("derivative_threshold", derivative_threshold_);
+    n->getParam("max_z_distance", max_z_distance_);
+
+    rect_width_ = ceil(foot_width_ / cell_width_);
+    rect_height_ = ceil(foot_length_ / cell_width_);
+
     optimal_foot_x_ = step_point.x;
     optimal_foot_y_ = step_point.y;
     current_foot_z_ = step_point.z;
@@ -35,42 +55,42 @@ PointFinder::PointFinder(
     search_dimensions_ = { optimal_foot_x_ - 0.5, optimal_foot_x_ + 0.5,
         optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5, -1, 1 };
 
-    if (rect_width % 2 == 0) {
-        rect_width--;
+    if (rect_width_ % 2 == 0) {
+        rect_width_--;
     }
-    if (rect_height % 2 == 0) {
-        rect_height--;
-    }
-    if (left_or_right_ == "left") {
-        auto temp = x_displacements_left;
-        x_displacements_left = x_displacements_right;
-        x_displacements_right = temp;
-    }
-
-    x_offset = -search_dimensions_[0];
-    y_offset = -search_dimensions_[2];
-    x_width = search_dimensions_[1] - search_dimensions_[0];
-    y_width = search_dimensions_[3] - search_dimensions_[2];
-
-    for (int y = 0; y >= -y_displacements_front; y--) {
-        y_displacements.push_back(y);
-    }
-    for (int y = 1; y <= y_displacements_far; y++) {
-        y_displacements.push_back(y);
+    if (rect_height_ % 2 == 0) {
+        rect_height_--;
     }
     if (left_or_right_ == "left") {
-        for (int x = 0; x >= -x_displacements_left; x--) {
-            x_displacements.push_back(x);
+        auto temp = x_displacements_left_;
+        x_displacements_left_ = x_displacements_right_;
+        x_displacements_right_ = temp;
+    }
+
+    x_offset_ = -search_dimensions_[0];
+    y_offset_ = -search_dimensions_[2];
+    x_width_ = search_dimensions_[1] - search_dimensions_[0];
+    y_width_ = search_dimensions_[3] - search_dimensions_[2];
+
+    for (int y = 0; y >= -y_displacements_front_; y--) {
+        y_displacements_.push_back(y);
+    }
+    for (int y = 1; y <= y_displacements_far_; y++) {
+        y_displacements_.push_back(y);
+    }
+    if (left_or_right_ == "left") {
+        for (int x = 0; x >= -x_displacements_left_; x--) {
+            x_displacements_.push_back(x);
         }
-        for (int x = 1; x <= x_displacements_right; x++) {
-            x_displacements.push_back(x);
+        for (int x = 1; x <= x_displacements_right_; x++) {
+            x_displacements_.push_back(x);
         }
     } else if (left_or_right_ == "right") {
-        for (int x = 0; x <= x_displacements_right; x++) {
-            x_displacements.push_back(x);
+        for (int x = 0; x <= x_displacements_right_; x++) {
+            x_displacements_.push_back(x);
         }
-        for (int x = -1; x >= -x_displacements_left; x--) {
-            x_displacements.push_back(x);
+        for (int x = -1; x >= -x_displacements_left_; x--) {
+            x_displacements_.push_back(x);
         }
     }
 }
@@ -97,8 +117,8 @@ void PointFinder::mapPointCloudToHeightMap()
     for (std::size_t i = 0; i < pointcloud_->size(); i++) {
         auto p = pointcloud_->points[i];
 
-        int x_index = (int)((p.x + x_offset) / x_width * grid_resolution_);
-        int y_index = (int)((p.y + y_offset) / y_width * grid_resolution_);
+        int x_index = (int)((p.x + x_offset_) / x_width_ * grid_resolution_);
+        int y_index = (int)((p.y + y_offset_) / y_width_ * grid_resolution_);
 
         auto current_height
             = height_map_temp_[grid_resolution_ - y_index][x_index];
@@ -139,20 +159,20 @@ void PointFinder::convolveLaplacianKernel()
  */
 void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 {
-    for (auto& x_shift : x_displacements) {
-        for (auto& y_shift : y_displacements) {
+    for (auto& x_shift : x_displacements_) {
+        for (auto& y_shift : y_displacements_) {
             int num_free_cells = 0;
-            int x_opt = (int)((optimal_foot_x_ + x_offset) / x_width
+            int x_opt = (int)((optimal_foot_x_ + x_offset_) / x_width_
                             * grid_resolution_)
                 + x_shift;
-            int y_opt = (int)((optimal_foot_y_ + y_offset) / y_width
+            int y_opt = (int)((optimal_foot_y_ + y_offset_) / y_width_
                             * grid_resolution_)
                 - y_shift;
 
-            for (int x = x_opt - rect_width / 2; x < x_opt + rect_width / 2.0;
+            for (int x = x_opt - rect_width_ / 2; x < x_opt + rect_width_ / 2.0;
                  x++) {
-                for (int y = y_opt - rect_height / 2;
-                     y < y_opt + rect_height / 2.0; y++) {
+                for (int y = y_opt - rect_height_ / 2;
+                     y < y_opt + rect_height_ / 2.0; y++) {
                     if (std::abs(derivatives_[y][x]) < derivative_threshold_) {
                         num_free_cells++;
                     }
@@ -160,17 +180,17 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
             }
 
             if (num_free_cells
-                >= rect_height * rect_width * available_points_ratio) {
+                >= rect_height_ * rect_width_ * available_points_ratio_) {
                 // NOLINTNEXTLINE
-                float x = ((float)x_opt / grid_resolution_) - x_offset
-                    + cell_width / 2.0;
+                float x = ((float)x_opt / grid_resolution_) - x_offset_
+                    + cell_width_ / 2.0;
                 // NOLINTNEXTLINE
                 float y = ((float)(grid_resolution_ - y_opt) / grid_resolution_)
-                    - y_offset - cell_width / 2.0;
+                    - y_offset_ - cell_width_ / 2.0;
                 float z = height_map_[y_opt][x_opt];
 
-                if (std::abs(z - current_foot_z_) <= 0.25 && !std::isnan(x)
-                    && !std::isnan(y) && !std::isnan(z)) {
+                if (std::abs(z - current_foot_z_) <= max_z_distance_
+                    && !std::isnan(x) && !std::isnan(y) && !std::isnan(z)) {
                     position_queue->push_back(Point(x, y, z));
                 }
             }

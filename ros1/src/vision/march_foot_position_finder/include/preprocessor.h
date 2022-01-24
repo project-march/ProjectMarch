@@ -10,8 +10,8 @@ using NormalCloud = pcl::PointCloud<pcl::Normal>;
 
 class Preprocessor {
 public:
-    explicit Preprocessor(
-        PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud);
+    explicit Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
+        NormalCloud::Ptr normalcloud);
 
     void preprocess();
 
@@ -28,10 +28,19 @@ protected:
     PointCloud::Ptr pointcloud_;
     NormalCloud::Ptr normalcloud_;
 
+    float voxel_size_;
+    float x_min_;
+    float x_max_;
+    float y_min_;
+    float y_max_;
+    float z_min_;
+    float z_max_;
+
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
-    std::string pointcloud_frame_id;
+    std::string base_frame_;
+    std::string pointcloud_frame_id_;
 };
 
 #endif // MARCH_PREPROCESSOR_H

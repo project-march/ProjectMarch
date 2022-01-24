@@ -6,8 +6,8 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "march_foot_position_finder");
 
     ros::NodeHandle n;
-    FootPositionFinder pointFinderLeft(&n, /*realsense=*/false, "left");
-    FootPositionFinder pointFinderRight(&n, /*realsense=*/false, "right");
+    FootPositionFinder pointFinderLeft(&n, "left");
+    FootPositionFinder pointFinderRight(&n, "right");
 
     ros::spin();
     ros::shutdown();

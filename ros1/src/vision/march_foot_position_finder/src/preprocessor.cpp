@@ -20,13 +20,22 @@ using NormalCloud = pcl::PointCloud<Normal>;
  * @param pointcloud realsense pointcloud
  * @return PointCloud::Ptr pcl pointcloud
  */
-Preprocessor::Preprocessor(
-    PointCloud::Ptr pointcloud, NormalCloud::Ptr normalcloud)
+Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
+    NormalCloud::Ptr normalcloud)
     : pointcloud_ { std::move(pointcloud) }
     , normalcloud_ { std::move(normalcloud) }
 {
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
+
+    n->getParam("base_frame", base_frame_);
+    n->getParam("voxel_size", voxel_size_);
+    n->getParam("x_min", x_min_);
+    n->getParam("x_max", x_max_);
+    n->getParam("y_min", y_min_);
+    n->getParam("y_max", y_max_);
+    n->getParam("z_min", z_min_);
+    n->getParam("z_max", z_max_);
 }
 
 /**
@@ -34,9 +43,10 @@ Preprocessor::Preprocessor(
  */
 void Preprocessor::preprocess()
 {
-    voxelDownSample(/*voxel_size=*/0.01);
-    filterOnDistance(/*x_min=*/-1, /*x_max=*/1, /*y_min=*/-1, /*y_max=*/1,
-        /*z_min=*/-1, /*z_max=*/1);
+    voxelDownSample(/*voxel_size=*/voxel_size_);
+    filterOnDistance(/*x_min=*/x_min_, /*x_max=*/x_max_, /*y_min=*/y_min_,
+        /*y_max=*/y_max_,
+        /*z_min=*/z_min_, /*z_max=*/z_max_);
     transformPointCloudFromUrdf();
 }
 
@@ -100,14 +110,14 @@ void Preprocessor::transformPointCloudFromUrdf()
 {
     geometry_msgs::TransformStamped transform_stamped;
     try {
-        pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-        if (tfBuffer_->canTransform("world", pointcloud_frame_id,
+        pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
+        if (tfBuffer_->canTransform(base_frame_, pointcloud_frame_id_,
                 ros::Time(/*t=*/0), ros::Duration(/*t=*/1.0))) {
             transform_stamped = tfBuffer_->lookupTransform(
-                "world", pointcloud_frame_id, ros::Time(/*t=*/0));
+                base_frame_, pointcloud_frame_id_, ros::Time(/*t=*/0));
             pcl_ros::transformPointCloud(
                 *pointcloud_, *pointcloud_, transform_stamped.transform);
-            pointcloud_->header.frame_id = "world";
+            pointcloud_->header.frame_id = base_frame_;
         }
     } catch (tf2::TransformException& ex) {
         ROS_WARN_STREAM(
