@@ -10,11 +10,12 @@ from march_utility.utilities.utility_functions import (
     get_limits_robot_from_urdf_for_inverse_kinematics,
 )
 
-# Get leg lengths form urdf:
-(
-    LENGTH_UPPER_LEG,
-    LENGTH_LOWER_LEG,
-) = get_lengths_robot_from_urdf_for_inverse_kinematics()[0:2]
+# Get lengths from urdf:
+lengths = get_lengths_robot_from_urdf_for_inverse_kinematics()
+(LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_HIP_AA, LENGTH_HIP_BASE) = (
+    *lengths[0:3],
+    lengths[-1],
+)
 LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 
 # Get ankle limit from urdf:
@@ -316,6 +317,84 @@ class Pose:
             pos_knee1[0] - pos_hip[0]
         ) * qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
 
+    def perform_side_step(self, y: float, z: float):
+        """
+        A method that calculates the required hip adduction/abduction for a given feet distance z,
+        without changing the vertical feet distance y. Requires very complex equations.
+        See the README.MD of this package for more information.
+        """
+
+        # get y position of hip and toes:
+        y_hip = self.calculate_joint_positions("pos_hip")[1]
+        y_toes1 = self.calculate_joint_positions("pos_toes1")[1]
+        y_toes2 = self.calculate_joint_positions("pos_toes2")[1]
+
+        # Determine lengths:
+        length_leg_short, length_leg_long = sorted([y_hip - y_toes1, y_hip - y_toes2])
+        length_short, length_long = (
+            np.sqrt(length_leg_short ** 2 + LENGTH_HIP_AA ** 2),
+            np.sqrt(length_leg_long ** 2 + LENGTH_HIP_AA ** 2),
+        )
+
+        # Calculate theta_long and theta_short:
+        theta_long = 2 * np.arctan(  # noqa: ECE001
+            (
+                -2 * length_long * LENGTH_HIP_BASE
+                + 2 * length_long * z
+                - np.sqrt(
+                    -(length_long ** 4)
+                    + 2 * length_long ** 2 * length_short ** 2
+                    + 2 * length_long ** 2 * LENGTH_HIP_BASE ** 2
+                    - 4 * length_long ** 2 * LENGTH_HIP_BASE * z
+                    + 2 * length_long ** 2 * y ** 2
+                    + 2 * length_long ** 2 * z ** 2
+                    - length_short ** 4
+                    + 2 * length_short ** 2 * LENGTH_HIP_BASE ** 2
+                    - 4 * length_short ** 2 * LENGTH_HIP_BASE * z
+                    + 2 * length_short ** 2 * y ** 2
+                    + 2 * length_short ** 2 * z ** 2
+                    - LENGTH_HIP_BASE ** 4
+                    + 4 * LENGTH_HIP_BASE ** 3 * z
+                    - 2 * LENGTH_HIP_BASE ** 2 * y ** 2
+                    - 6 * LENGTH_HIP_BASE ** 2 * z ** 2
+                    + 4 * LENGTH_HIP_BASE * y ** 2 * z
+                    + 4 * LENGTH_HIP_BASE * z ** 3
+                    - y ** 4
+                    - 2 * y ** 2 * z ** 2
+                    - z ** 4
+                )
+            )
+            / (
+                length_long ** 2
+                + 2 * length_long * y
+                - length_short ** 2
+                + LENGTH_HIP_BASE ** 2
+                - 2 * LENGTH_HIP_BASE * z
+                + y ** 2
+                + z ** 2
+            )
+        )
+
+        theta_short = np.arccos((length_long * np.cos(theta_long) - y) / length_short)
+
+        # Determine hip_aa for both hips:
+        angle_hip_long = tas.get_angle_from_sides(
+            length_leg_long, np.array([length_long, LENGTH_HIP_AA])
+        )
+        angle_hip_short = tas.get_angle_from_sides(
+            length_leg_short, np.array([length_short, LENGTH_HIP_AA])
+        )
+
+        hip_aa_long = theta_long + angle_hip_long - HIP_ZERO_ANGLE / 2
+        hip_aa_short = theta_short + angle_hip_short - HIP_ZERO_ANGLE / 2
+
+        if y_toes1 > y_toes2:
+            self.aa_hip1 = hip_aa_short
+            self.aa_hip2 = hip_aa_long
+        else:
+            self.aa_hip1 = hip_aa_long
+            self.aa_hip2 = hip_aa_short
+
     def solve_mid_position(
         self,
         ankle_x: float,
@@ -404,6 +483,9 @@ class Pose:
         # reduce dorsi flexion of stance leg if fe_ankle1 > MAX_ANKLE_FLEXION:
         if self.fe_ankle1 > MAX_ANKLE_FLEXION:
             self.reduce_stance_dorsi_flexion()
+
+        # apply side_step, hard_coded to default feet distance for now:
+        self.perform_side_step(ankle_y, LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE)
 
         # return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right
