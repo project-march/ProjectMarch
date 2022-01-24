@@ -372,7 +372,7 @@ class Pose:
     ) -> List[float]:
         """
         Solve inverse kinematics for the middle position. Assumes that the
-        stance has a knee flexion of DEFAULT_KNEE_BEND. Takes the ankle_x and
+        stance leg has a knee flexion of DEFAULT_KNEE_BEND. Takes the ankle_x and
         ankle_y position of the desired position and the midpoint_fraction at
         which a midpoint is desired. First calculates the midpoint position using
         current pose and fraction. Next, calculates the required hip and knee angles of
