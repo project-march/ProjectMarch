@@ -37,7 +37,7 @@ class DynamicSetpointGait(GaitInterface):
         self.joint_names = get_joint_names_from_urdf()
         self.gait_name = "dynamic_walk"
 
-        # Create subscribers for CoViD topic
+        # Create subscribers and publishers for CoViD
         self.gait_selection = gait_selection_node
         self.gait_selection.create_subscription(
             Point,
@@ -49,6 +49,16 @@ class DynamicSetpointGait(GaitInterface):
             Point,
             "/foot_position/left",
             self._callback_left,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.publisher_position_right = self.gait_selection.create_publisher(
+            Point,
+            "/chosen_foot_position/right",
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.publisher_position_left = self.gait_selection.create_publisher(
+            Point,
+            "/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -326,6 +336,7 @@ class DynamicSetpointGait(GaitInterface):
             self._logger("Stopping dynamic gait.")
         else:
             self.foot_location = self._get_foot_position(self.subgait_id)
+            self._publish_foot_location(self.subgait_id, self.foot_location)
             self._logger(
                 f"Stepping to location ({self.foot_location.x}, {self.foot_location.y})"
             )
@@ -361,6 +372,13 @@ class DynamicSetpointGait(GaitInterface):
         """Callback for gait_selection_node when the parameters have been updated."""
         self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
+
+    def _publish_foot_location(self, subgait_id: str, foot_location: Point) -> None:
+        """Publish the foot location to which we are stepping for confirmation towards CoViD"""
+        if subgait_id == "left_swing":
+            self.publisher_position_left.publish(foot_location)
+        elif subgait_id == "right_swing":
+            self.publisher_position_right.publish(foot_location)
 
     # UTILITY FUNCTIONS
     @staticmethod
