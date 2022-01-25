@@ -5,7 +5,10 @@ from rclpy.node import Node
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.utility_functions import get_joint_names_from_urdf
+from march_utility.utilities.utility_functions import (
+    get_joint_names_from_urdf,
+    get_limits_robot_from_urdf_for_inverse_kinematics,
+)
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -30,14 +33,16 @@ class DynamicSetpointGait(GaitInterface):
 
     def __init__(self, gait_selection_node: Node):
         super(DynamicSetpointGait, self).__init__()
+        self.gait_selection = gait_selection_node
         self._reset()
+        self.joint_names = get_joint_names_from_urdf()
+        self._get_soft_limits()
 
         self.start_position = self._joint_dict_to_setpoint_dict(
             get_position_from_yaml("stand")
         )
         self.end_position = self.start_position
 
-        self.joint_names = get_joint_names_from_urdf()
         self.gait_name = "dynamic_walk"
 
         # Create subscribers and publishers for CoViD
@@ -353,6 +358,7 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id,
             self.joint_names,
             self.foot_location.point,
+            self.joint_soft_limits,
             stop,
         )
 
@@ -419,6 +425,14 @@ class DynamicSetpointGait(GaitInterface):
         for name, position in joint_dict.items():
             setpoint_dict[name] = Setpoint(Duration(0), position, 0)
         return setpoint_dict
+
+    def _get_soft_limits(self):
+        """Get the limits of all joints in the urdf"""
+        self.joint_soft_limits = []
+        for joint_name in self.joint_names:
+            self.joint_soft_limits.append(
+                get_limits_robot_from_urdf_for_inverse_kinematics(joint_name)
+            )
 
     # SAFETY
     def _check_msg_time(self, foot_location: PointStamped) -> bool:
