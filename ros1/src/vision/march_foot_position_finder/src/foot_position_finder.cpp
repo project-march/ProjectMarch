@@ -40,8 +40,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         other_ = "left";
     }
 
-    last_chosen_point_
-        = Point(/*_x=*/0, /*_y=*/switch_factor_ * foot_gap_, /*_z=*/0);
+    last_chosen_point_ = Point(
+        /*_x=*/0, /*_y=*/(float)switch_factor_ * (float)foot_gap_, /*_z=*/0);
 
     reference_frame_id_ = "foot_" + other_;
 
@@ -121,6 +121,7 @@ void FootPositionFinder::processRealSenseDepthFrames()
 /**
  * Callback function for when a point is chosen for a dynamic gait.
  */
+// Suppress lint error: make reference of argument (breaks callback)
 void FootPositionFinder::chosenPointCallback(
     const geometry_msgs::PointStamped msg)
 {
@@ -130,8 +131,9 @@ void FootPositionFinder::chosenPointCallback(
 /**
  * Callback function for when a simulated realsense depth frame arrives.
  */
+// Suppress lint error: make reference of argument (breaks callback)
 void FootPositionFinder::processSimulatedDepthFrames(
-    const sensor_msgs::PointCloud2 input_cloud)
+    const sensor_msgs::PointCloud2 input_cloud) // NOLINT
 {
     PointCloud converted_cloud;
     pcl::fromROSMsg(input_cloud, converted_cloud);
@@ -153,8 +155,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Define the desired future foot position
         Point p = last_chosen_point_;
         transformPoint(p, "foot_" + left_or_right_, reference_frame_id_);
-        point = Point(/*_x=*/p.x - step_distance_,
-            /*_y=*/p.y - switch_factor_ * foot_gap_,
+        point = Point(/*_x=*/p.x - (float)step_distance_,
+            /*_y=*/p.y - (float)switch_factor_ * (float)foot_gap_,
             /*_z=*/p.z);
 
         // Calculate point location relative to positionary leg

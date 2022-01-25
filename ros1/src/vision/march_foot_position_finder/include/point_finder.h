@@ -40,7 +40,7 @@ protected:
     std::array<std::array<double, RES>, RES> height_map_temp_;
     std::array<std::array<double, RES>, RES> derivatives_;
 
-    double derivative_threshold_ = 0.03;
+    double derivative_threshold_;
 
     double optimal_foot_x_;
     double optimal_foot_y_;

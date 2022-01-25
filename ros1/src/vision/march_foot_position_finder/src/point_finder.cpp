@@ -183,12 +183,14 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
                 }
             }
 
+            // Suppress lint errors: narrowing conversions (they are safe)
             if (num_free_cells
                 >= rect_height_ * rect_width_ * available_points_ratio_) {
-                float x = ((float)x_opt / grid_resolution_) - x_offset_
-                    + cell_width_ / 2.0;
-                float y = ((float)(grid_resolution_ - y_opt) / grid_resolution_)
-                    - y_offset_ - cell_width_ / 2.0;
+                float x = ((float)x_opt / (float)grid_resolution_)
+                    - (float)x_offset_ + (float)cell_width_ / 2.0;
+                float y = (((float)grid_resolution_ - (float)y_opt)
+                              / (float)grid_resolution_)
+                    - (float)y_offset_ - (float)cell_width_ / 2.0;
                 float z = height_map_[y_opt][x_opt];
 
                 if (std::abs(z - current_foot_z_) <= max_z_distance_
