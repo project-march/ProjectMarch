@@ -9,6 +9,7 @@ from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_utility.utilities.logger import Logger
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
@@ -66,6 +67,8 @@ class DynamicSetpointGait(GaitInterface):
 
         # Assign reconfigurable parameters
         self.update_parameters()
+
+        self.logger = Logger(self.gait_selection, "DYNAMIC_SETPOINT_GAIT")
 
     @property
     def name(self) -> str:
@@ -335,12 +338,12 @@ class DynamicSetpointGait(GaitInterface):
 
         if stop:
             self._end = True
-            self._logger("Stopping dynamic gait.")
+            self.logger.info("Stopping dynamic gait.")
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
             self._publish_foot_location(self.subgait_id, self.foot_location)
-            self._logger(
+            self.logger.info(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
             )
 
@@ -417,25 +420,6 @@ class DynamicSetpointGait(GaitInterface):
             setpoint_dict[name] = Setpoint(Duration(0), position, 0)
         return setpoint_dict
 
-    def _logger(
-        self,
-        message: str,
-        warning: bool = False,
-        error: bool = False,
-        debug: bool = False,
-    ) -> None:
-        """Publish a message on the gait_selection_node logger with
-        DYNAMIC_SETPOINT_GAIT as a prefix"""
-        msg = f"DYNAMIC_SETPOINT_GAIT: " f"{message}"
-        if warning:
-            self.gait_selection.get_logger().warning(msg)
-        elif error:
-            self.gait_selection.get_logger().error(msg)
-        elif debug:
-            self.gait_selection.get_logger().debug(msg)
-        else:
-            self.gait_selection.get_logger().info(msg)
-
     # SAFETY
     def _check_msg_time(self, foot_location: PointStamped) -> bool:
         """Checks if the foot_location given by CoViD is not older than
@@ -449,17 +433,15 @@ class DynamicSetpointGait(GaitInterface):
             nanoseconds=self.gait_selection.get_clock().now().seconds_nanoseconds()[1],
         )
         time_difference = current_time - msg_time
-        self._logger(
+        self.logger.debug(
             "Time difference between CoViD foot location and current time: "
             f"{time_difference}.",
-            debug=True,
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
-            self._logger(
+            self.logger.info(
                 "Foot location is more than 0.5 seconds old, time difference is "
                 f"{time_difference}. Stopping gait.",
-                warning=True,
             )
             self._end = True
             return True
