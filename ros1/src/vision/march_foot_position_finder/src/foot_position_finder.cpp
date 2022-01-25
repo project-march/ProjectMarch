@@ -93,6 +93,7 @@ void FootPositionFinder::readParameters(
     step_distance_ = config.step_distance;
     sample_size_ = config.sample_size;
     outlier_distance_ = config.outlier_distance;
+    found_points_.resize(sample_size_);
     ROS_INFO("Parameters updated in foot position finder");
 }
 
