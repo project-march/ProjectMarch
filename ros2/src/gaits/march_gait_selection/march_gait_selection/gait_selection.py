@@ -15,6 +15,7 @@ from march_utility.exceptions.gait_exceptions import (
 )
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import (
     get_robot_urdf_from_service,
     get_joint_names_from_robot,
@@ -53,6 +54,7 @@ class GaitSelection(Node):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
+        self.logger = Logger(self, __class__.__name__)
         self._balance_used = False
         self._dynamic_gait = False
         try:
@@ -119,7 +121,7 @@ class GaitSelection(Node):
             )
 
         except ParameterNotDeclaredException:
-            self.get_logger().error(
+            self.logger.error(
                 "Gait selection node started without required parameters "
                 "gait_package, gait_directory and balance"
             )
@@ -128,10 +130,10 @@ class GaitSelection(Node):
         self._gait_package = gait_package
         self._gait_directory, self._default_yaml = self._initialize_gaits()
         if not os.path.isdir(self._gait_directory):
-            self.get_logger().error(f"Gait directory does not exist: {directory}")
+            self.logger.error(f"Gait directory does not exist: {directory}")
             raise FileNotFoundError(directory)
         if not os.path.isfile(self._default_yaml):
-            self.get_logger().error(
+            self.logger.error(
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
 
@@ -167,14 +169,14 @@ class GaitSelection(Node):
         )
 
         if not self._validate_inverse_kinematics_is_possible():
-            self.get_logger().warn(
+            self.logger.warning(
                 "The currently available joints are unsuitable for "
                 "using inverse kinematics.\n"
                 "Any interpolation on foot_location will return "
                 "the base subgait instead. Realsense gaits will "
                 "not be loaded."
             )
-        self.get_logger().info("Successfully initialized gait selection node.")
+        self.logger.info("Successfully initialized gait selection node.")
 
     @property
     def joint_names(self):
@@ -186,8 +188,7 @@ class GaitSelection(Node):
 
     def _validate_inverse_kinematics_is_possible(self):
         return (
-            validate_and_get_joint_names_for_inverse_kinematics(self.get_logger())
-            is not None
+            validate_and_get_joint_names_for_inverse_kinematics(self.logger) is not None
         )
 
     def _initialize_gaits(self):
@@ -196,11 +197,9 @@ class GaitSelection(Node):
         default_yaml = os.path.join(gait_directory, "default.yaml")
 
         if not os.path.isdir(gait_directory):
-            self.get_logger().error(
-                f"Gait directory does not exist: " f"{gait_directory}"
-            )
+            self.logger.error(f"Gait directory does not exist: " f"{gait_directory}")
         if not os.path.isfile(default_yaml):
-            self.get_logger().error(
+            self.logger.error(
                 f"Gait default yaml file does not exist: "
                 f"{gait_directory}/default.yaml"
             )
@@ -334,9 +333,7 @@ class GaitSelection(Node):
             self._robot, self._gait_directory, version_map
         )
         self._gait_version_map[gait_name].update(version_map)
-        self.get_logger().info(
-            f"Setting gait versions successful: {self._gaits[gait_name]}"
-        )
+        self.logger.info(f"Setting gait versions successful: {self._gaits[gait_name]}")
 
     def set_gait_versions_cb(self, request, response):
         """Sets a new gait version to the gait selection instance.
@@ -351,7 +348,7 @@ class GaitSelection(Node):
 
         version_map = dict(zip(request.subgaits, request.versions))
         try:
-            self.get_logger().info(f"Setting gait versions from {request}")
+            self.logger.info(f"Setting gait versions from {request}")
             self.set_gait_versions(request.gait, version_map)
             response.success = True
             response.message = ""
@@ -420,7 +417,7 @@ class GaitSelection(Node):
         The to be added gait should implement `GaitInterface`.
         """
         if gait.name in self._gaits:
-            self.get_logger().warn(
+            self.logger.warning(
                 "Gait `{gait}` already exists in gait selection".format(gait=gait.name)
             )
         else:
@@ -439,7 +436,7 @@ class GaitSelection(Node):
             )
 
         for gait in self._dynamic_edge_version_map:
-            self.get_logger().debug(f"Adding dynamic gait {gait}")
+            self.logger.debug(f"Adding dynamic gait {gait}")
             start_is_dynamic = self._dynamic_edge_version_map[gait].pop(
                 "start_is_dynamic", True
             )
@@ -459,7 +456,7 @@ class GaitSelection(Node):
         if self._balance_used and "balance_walk" in gaits:
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
             if balance_gait is not None:
-                self.get_logger().info("Successfully created a balance gait")
+                self.logger.info("Successfully created a balance gait")
                 gaits["balanced_walk"] = balance_gait
 
         if self._dynamic_gait:
@@ -467,7 +464,7 @@ class GaitSelection(Node):
             # to the CoViD topic wihtin the DynamicSetpointGait class.
             self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
             gaits["dynamic_walk"] = self.dynamic_setpoint_gait
-            self.get_logger().info("Added dynamic_walk to gaits")
+            self.logger.info("Added dynamic_walk to gaits")
 
         return gaits
 
@@ -507,7 +504,7 @@ class GaitSelection(Node):
 
     def _load_realsense_configuration(self):
         if not os.path.isfile(self._realsense_yaml):
-            self.get_logger().info(
+            self.logger.info(
                 "No realsense_yaml present, no realsense gaits will be created."
             )
             return {}
@@ -561,13 +558,13 @@ class GaitSelection(Node):
         for gait_name in version_map:
             gait_path = os.path.join(self._gait_directory, gait_name)
             if not os.path.isfile(os.path.join(gait_path, gait_name + ".gait")):
-                self.get_logger().warn("gait {gn} does not exist".format(gn=gait_name))
+                self.logger.warning("gait {gn} does not exist".format(gn=gait_name))
                 return False
 
             for subgait_name in version_map[gait_name]:
                 version = version_map[gait_name][subgait_name]
                 if not Subgait.validate_version(gait_path, subgait_name, version):
-                    self.get_logger().warn(
+                    self.logger.warning(
                         "{0}, {1} does not exist".format(subgait_name, version)
                     )
                     return False

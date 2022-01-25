@@ -1,6 +1,5 @@
 """Author: Marten Haitjema, MVII"""
 
-import rclpy.logging
 import numpy as np
 
 from rclpy.node import Node
@@ -11,6 +10,7 @@ from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_position_from_yaml
+from march_utility.utilities.logger import Logger
 from march_goniometric_ik_solver.ik_solver import Pose
 
 from trajectory_msgs import msg as trajectory_msg
@@ -21,7 +21,6 @@ from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
 INTERPOLATION_POINTS = 30
-LOGGER_NODE_NAME = "gait_selection"
 
 
 class SetpointTime(IntEnum):
@@ -60,6 +59,7 @@ class DynamicSubgait:
         joint_soft_limits: List[Limits],
         stop: bool,
     ):
+        self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
         self.time = [
             0,
@@ -271,7 +271,7 @@ class DynamicSubgait:
             position > self.joint_soft_limits[joint_index].upper
             or position < self.joint_soft_limits[joint_index].lower
         ):
-            rclpy.logging.get_logger(LOGGER_NODE_NAME).info(
+            self.logger.info(
                 f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of soft limits, "
                 f"position: {position}, soft limits: "
                 f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]."
@@ -281,7 +281,7 @@ class DynamicSubgait:
             )
 
         if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
-            rclpy.logging.get_logger(LOGGER_NODE_NAME).info(
+            self.logger.info(
                 f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of velocity limits, "
                 f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}."
             )
