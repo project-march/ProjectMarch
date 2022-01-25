@@ -12,13 +12,16 @@ from march_utility.utilities.utility_functions import (
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_utility.utilities.logger import Logger
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import PointStamped
+
+FOOT_LOCATION_TIME_OUT = Duration(0.5)
 
 
 class DynamicSetpointGait(GaitInterface):
@@ -42,22 +45,35 @@ class DynamicSetpointGait(GaitInterface):
 
         self.gait_name = "dynamic_walk"
 
-        # Create subscribers for CoViD topic
+        # Create subscribers and publishers for CoViD
+        self.gait_selection = gait_selection_node
         self.gait_selection.create_subscription(
-            Point,
+            PointStamped,
             "/foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
-            Point,
+            PointStamped,
             "/foot_position/left",
             self._callback_left,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.publisher_position_right = self.gait_selection.create_publisher(
+            PointStamped,
+            "/chosen_foot_position/right",
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.publisher_position_left = self.gait_selection.create_publisher(
+            PointStamped,
+            "/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
         # Assign reconfigurable parameters
         self.update_parameters()
+
+        self.logger = Logger(self.gait_selection, "DYNAMIC_SETPOINT_GAIT")
 
     @property
     def name(self) -> str:
@@ -84,8 +100,8 @@ class DynamicSetpointGait(GaitInterface):
         # Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
-                self.foot_location.y > self.minimum_stair_height
-                or self.foot_location.y < self.minimum_stair_height
+                self.foot_location.point.y > self.minimum_stair_height
+                or self.foot_location.point.y < self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
@@ -283,36 +299,36 @@ class DynamicSetpointGait(GaitInterface):
         the last position of the previous subgait."""
         self.start_position = self.dynamic_subgait.get_final_position()
 
-    def _callback_right(self, foot_position: Point) -> None:
+    def _callback_right(self, foot_location: PointStamped) -> None:
         """Update the right foot position with the latest point published
         on the CoViD-topic.
 
-        :param foot_position: a Point containing the x, y and z location
-        :type foot_position: Point
+        :param foot_location: a Point containing the x, y and z location
+        :type foot_location: PointStamped
         """
-        self.foot_position_right = foot_position
+        self.foot_location_right = foot_location
 
-    def _callback_left(self, foot_position: Point) -> None:
+    def _callback_left(self, foot_location: PointStamped) -> None:
         """Update the left foot position with the latest point published
         on the CoViD-topic.
 
-        :param foot_position: a Point containing the x, y and z location
-        :type foot_position: Point
+        :param foot_location: a Point containing the x, y and z location
+        :type foot_location: PointStamped
         """
-        self.foot_position_left = foot_position
+        self.foot_location_left = foot_location
 
-    def _get_foot_position(self, subgait_id: str) -> Point:
+    def _get_foot_location(self, subgait_id: str) -> PointStamped:
         """Returns the right or left foot position based upon the subgait_id
 
         :param subgait_id: either right_swing or left_swing
         :type subgait_id: str
         :return: either the left or right foot position or none
-        :rtype: Point
+        :rtype: PointStamped
         """
         if subgait_id == "left_swing":
-            return self.foot_position_left
+            return self.foot_location_left
         elif subgait_id == "right_swing":
-            return self.foot_position_right
+            return self.foot_location_right
         else:
             return None
 
@@ -327,11 +343,13 @@ class DynamicSetpointGait(GaitInterface):
 
         if stop:
             self._end = True
-            self._logger("Stopping dynamic gait.")
+            self.logger.info("Stopping dynamic gait.")
         else:
-            self.foot_location = self._get_foot_position(self.subgait_id)
-            self._logger(
-                f"Stepping to location ({self.foot_location.x}, {self.foot_location.y})"
+            self.foot_location = self._get_foot_location(self.subgait_id)
+            stop = self._check_msg_time(self.foot_location)
+            self._publish_foot_location(self.subgait_id, self.foot_location)
+            self.logger.info(
+                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
             )
 
         self.dynamic_subgait = DynamicSubgait(
@@ -339,7 +357,7 @@ class DynamicSetpointGait(GaitInterface):
             self.start_position,
             self.subgait_id,
             self.joint_names,
-            self.foot_location,
+            self.foot_location.point,
             self.joint_soft_limits,
             stop,
         )
@@ -366,6 +384,15 @@ class DynamicSetpointGait(GaitInterface):
         """Callback for gait_selection_node when the parameters have been updated."""
         self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
+
+    def _publish_foot_location(
+        self, subgait_id: str, foot_location: PointStamped
+    ) -> None:
+        """Publish the foot location to which we are stepping for confirmation towards CoViD"""
+        if subgait_id == "left_swing":
+            self.publisher_position_left.publish(foot_location)
+        elif subgait_id == "right_swing":
+            self.publisher_position_right.publish(foot_location)
 
     # UTILITY FUNCTIONS
     @staticmethod
@@ -399,11 +426,6 @@ class DynamicSetpointGait(GaitInterface):
             setpoint_dict[name] = Setpoint(Duration(0), position, 0)
         return setpoint_dict
 
-    def _logger(self, message: str) -> None:
-        """Publish a message on the gait_selection_node logger
-        with DYNAMIC_SETPOINT_GAIT as a prefix"""
-        self.gait_selection.get_logger().info("DYNAMIC_SETPOINT_GAIT: " f"{message}")
-
     def _get_soft_limits(self):
         """Get the limits of all joints in the urdf"""
         self.joint_soft_limits = []
@@ -411,3 +433,31 @@ class DynamicSetpointGait(GaitInterface):
             self.joint_soft_limits.append(
                 get_limits_robot_from_urdf_for_inverse_kinematics(joint_name)
             )
+
+    # SAFETY
+    def _check_msg_time(self, foot_location: PointStamped) -> bool:
+        """Checks if the foot_location given by CoViD is not older than
+        FOOT_LOCATION_TIME_OUT."""
+        msg_time = Time(
+            seconds=foot_location.header.stamp.sec,
+            nanoseconds=foot_location.header.stamp.nanosec,
+        )
+        current_time = Time(
+            seconds=self.gait_selection.get_clock().now().seconds_nanoseconds()[0],
+            nanoseconds=self.gait_selection.get_clock().now().seconds_nanoseconds()[1],
+        )
+        time_difference = current_time - msg_time
+        self.logger.debug(
+            "Time difference between CoViD foot location and current time: "
+            f"{time_difference}.",
+        )
+
+        if time_difference > FOOT_LOCATION_TIME_OUT:
+            self.logger.info(
+                "Foot location is more than 0.5 seconds old, time difference is "
+                f"{time_difference}. Stopping gait.",
+            )
+            self._end = True
+            return True
+
+        return False

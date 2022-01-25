@@ -19,7 +19,7 @@ std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID_FRONT = "camera_front_depth_optical_frame";
 std::string CAMERA_FRAME_ID_BACK = "camera_back_depth_optical_frame";
 std::string PROCESS_POINTCLOUD_SERVICE_NAME = "/camera/process_pointcloud";
-std::string PUBLISH_POINTCLOUD_SERVICE_NAME = "/camera/publish_pointcloud";
+std::string PUBLISH_POINTCLOUD_SERVICE_NAME = "/camera/publish_test_cloud";
 std::string DATASET_CONFIGURATION_NAME = "pointcloud_information.yaml";
 std::string POINTCLOUD_EXTENSION = ".ply";
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
