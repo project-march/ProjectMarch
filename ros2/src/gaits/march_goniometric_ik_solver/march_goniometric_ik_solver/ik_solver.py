@@ -168,7 +168,7 @@ class Pose:
     def calculate_ground_pose(self, ankle_x: float):
         """
         Calculate the ground pose to reach the x-location of the desired ankle postion,
-        while keeping the knees bended with the default knee bend value.
+        while keeping the knees bent with the default knee bend value.
         First it calculates the hip-ankle-length with a bendend knee, next it set the joint values.
         """
 
