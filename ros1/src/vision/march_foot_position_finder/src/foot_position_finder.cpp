@@ -121,9 +121,9 @@ void FootPositionFinder::processRealSenseDepthFrames()
 /**
  * Callback function for when a point is chosen for a dynamic gait.
  */
-// Suppress lint error: make reference of argument (breaks callback)
+// Suppress lint error "make reference of argument" (breaks callback)
 void FootPositionFinder::chosenPointCallback(
-    const geometry_msgs::PointStamped msg)
+    const geometry_msgs::PointStamped msg) // NOLINT
 {
     last_chosen_point_ = Point(msg.point.x, msg.point.y, msg.point.z);
 }
@@ -131,7 +131,7 @@ void FootPositionFinder::chosenPointCallback(
 /**
  * Callback function for when a simulated realsense depth frame arrives.
  */
-// Suppress lint error: make reference of argument (breaks callback)
+// Suppress lint error "make reference of argument" (breaks callback)
 void FootPositionFinder::processSimulatedDepthFrames(
     const sensor_msgs::PointCloud2 input_cloud) // NOLINT
 {
