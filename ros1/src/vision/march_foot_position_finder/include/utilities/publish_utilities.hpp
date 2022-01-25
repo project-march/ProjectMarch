@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #ifndef MARCH_PUBLISH_UTILITIES
 #define MARCH_PUBLISH_UTILITIES
 
@@ -13,7 +17,9 @@ using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 /**
- * Publishes a point cloud with a given publisher.
+ * Transforms a pointcloud to world frame and publishes it for visualization. A
+ * rotation around the z-axis is necessary to align the pointcloud with the
+ * world coordinate system.
  *
  * @param publisher publisher to use
  * @param cloud cloud to publish
@@ -37,7 +43,8 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
 }
 
 /**
- * Publishes a marker point with a given publisher.
+ * Publishes a marker point with a given publisher.  A rotation around the z
+ * axis is needed to correctly align the realsense and world coordinate systems.
  *
  * @param publisher publisher to use
  * @param p point to publish
@@ -71,7 +78,7 @@ void publishMarkerPoint(ros::Publisher& publisher, Point& p)
     marker.color.g = 0.0;
     marker.color.b = 0.0;
     marker.color.a = 1.0;
-    marker.lifetime = ros::Duration(0.3);
+    marker.lifetime = ros::Duration(/*t=*/0.3);
 
     publisher.publish(marker);
 }

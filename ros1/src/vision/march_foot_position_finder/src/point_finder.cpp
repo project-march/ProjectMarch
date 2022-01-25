@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
@@ -181,10 +185,8 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 
             if (num_free_cells
                 >= rect_height_ * rect_width_ * available_points_ratio_) {
-                // NOLINTNEXTLINE
                 float x = ((float)x_opt / grid_resolution_) - x_offset_
                     + cell_width_ / 2.0;
-                // NOLINTNEXTLINE
                 float y = ((float)(grid_resolution_ - y_opt) / grid_resolution_)
                     - y_offset_ - cell_width_ / 2.0;
                 float z = height_map_[y_opt][x_opt];

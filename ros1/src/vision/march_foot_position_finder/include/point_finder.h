@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #ifndef MARCH_POINT_FINDER_H
 #define MARCH_POINT_FINDER_H
 

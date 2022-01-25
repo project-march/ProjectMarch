@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
@@ -36,9 +40,7 @@ protected:
 
     void processPointCloud(const PointCloud::Ptr& pointcloud);
 
-    void computeTemporalAveragePoint(const Point& new_point);
-
-    void publishNextPoint(Point& p);
+    Point computeTemporalAveragePoint(const Point& new_point);
 
     void transformPoint(Point& point, const std::string& frame_from,
         const std::string& frame_to);

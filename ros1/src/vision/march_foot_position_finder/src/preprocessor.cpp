@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #include <cmath>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
@@ -20,6 +24,8 @@ using NormalCloud = pcl::PointCloud<Normal>;
  * @param pointcloud realsense pointcloud
  * @return PointCloud::Ptr pcl pointcloud
  */
+// Suppress lint error: "fields are not initialized by constructor"
+// NOLINTNEXTLINE
 Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     NormalCloud::Ptr normalcloud)
     : pointcloud_ { std::move(pointcloud) }
@@ -41,7 +47,6 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 /**
  * Preprocess the current pointcloud.
  */
-// NOLINTNEXTLINE
 void Preprocessor::preprocess()
 {
     voxelDownSample(/*voxel_size=*/voxel_size_);

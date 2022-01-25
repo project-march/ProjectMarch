@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #include "foot_position_finder.h"
 #include <dynamic_reconfigure/server.h>
 #include <march_foot_position_finder/parametersConfig.h>

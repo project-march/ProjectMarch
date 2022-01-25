@@ -1,14 +1,15 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #include "foot_position_finder.h"
 #include "point_finder.h"
 #include "preprocessor.h"
-#include "std_msgs/String.h"
 #include "utilities/math_utilities.hpp"
 #include "utilities/publish_utilities.hpp"
 #include "utilities/realsense_to_pcl.hpp"
 #include <iostream>
 #include <march_foot_position_finder/parametersConfig.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl_ros/point_cloud.h>
 #include <ros/console.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
@@ -68,7 +69,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         = n_->subscribe<geometry_msgs::PointStamped>(topic_chosen_points_,
             /*queue_size=*/1, &FootPositionFinder::chosenPointCallback, this);
     pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-        topic_camera_front_, /*queue_size=*/3,
+        topic_camera_front_, /*queue_size=*/1,
         &FootPositionFinder::processSimulatedDepthFrames, this);
 
     if (realsense_) {
@@ -78,7 +79,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         processRealSenseDepthFrames();
     } else {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-            topic_camera_front_, /*queue_size=*/3,
+            topic_camera_front_, /*queue_size=*/1,
             &FootPositionFinder::processSimulatedDepthFrames, this);
     }
 }
@@ -114,7 +115,6 @@ void FootPositionFinder::processRealSenseDepthFrames()
 
         PointCloud::Ptr pointcloud = points_to_pcl(points);
         processPointCloud(pointcloud);
-        ros::spinOnce();
     }
 }
 
@@ -122,7 +122,7 @@ void FootPositionFinder::processRealSenseDepthFrames()
  * Callback function for when a point is chosen for a dynamic gait.
  */
 void FootPositionFinder::chosenPointCallback(
-    const geometry_msgs::PointStamped msg) // NOLINT
+    const geometry_msgs::PointStamped msg)
 {
     last_chosen_point_ = Point(msg.point.x, msg.point.y, msg.point.z);
 }
@@ -131,7 +131,7 @@ void FootPositionFinder::chosenPointCallback(
  * Callback function for when a simulated realsense depth frame arrives.
  */
 void FootPositionFinder::processSimulatedDepthFrames(
-    const sensor_msgs::PointCloud2 input_cloud) // NOLINT
+    const sensor_msgs::PointCloud2 input_cloud)
 {
     PointCloud converted_cloud;
     pcl::fromROSMsg(input_cloud, converted_cloud);
@@ -172,8 +172,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     pointFinder.findPoints(&position_queue);
 
     if (position_queue.size() > 0) {
-        Point p = position_queue[0];
-        computeTemporalAveragePoint(position_queue[0]);
+        Point avg = computeTemporalAveragePoint(position_queue[0]);
+        publishPoint(point_publisher_, avg);
     }
 }
 
@@ -181,7 +181,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
  * Computes a temporal average of the last X points and removes any outliers,
  * then publishes the average of the points without the outliers.
  */
-void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
+Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 {
     if (found_points_.size() < sample_size_) {
         found_points_.push_back(new_point);
@@ -208,7 +208,7 @@ void FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
             final = Point(
                 -final.y, final.x, final.z); // Rotate 90 counter clockwise
             transformPoint(final, base_frame_, reference_frame_id_);
-            publishPoint(point_publisher_, final);
+            return final;
         }
     }
 }

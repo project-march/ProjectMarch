@@ -1,3 +1,7 @@
+/**
+ * @author Tuhin Das - MARCH 7
+ */
+
 #ifndef MARCH_MATH_UTILITIES
 #define MARCH_MATH_UTILITIES
 

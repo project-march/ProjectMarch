@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Package to find future foot positions using Realsense depth cameras</description>
 
-  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <maintainer email="software@projectmarch.nl">Project MARCH 7</maintainer>
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>
