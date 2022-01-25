@@ -1,0 +1,5 @@
+<library path="lib/libmarch_controller_template">
+    <class name="template_trajectory_controller/JointTrajectoryController"
+           type="template_trajectory_controller::JointTrajectoryController"
+           base_class_type="controller_interface::ControllerBase" />
+</library>

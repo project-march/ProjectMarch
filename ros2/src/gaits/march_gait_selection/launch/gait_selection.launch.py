@@ -59,6 +59,17 @@ def generate_launch_description():
                 description="A step lower or higher than the minimum_stair_height"
                 "will change the gait type to stairs_like instead of walk_like.",
             ),
+            DeclareLaunchArgument(
+                name="push_off_fraction",
+                default_value="0.2",
+                description="Fraction of the step at which the push off will"
+                "take place.",
+            ),
+            DeclareLaunchArgument(
+                name="push_off_position",
+                default_value="-0.3",
+                description="Maximum joint position of the ankle during push off.",
+            ),
             # State machine parameters:
             DeclareLaunchArgument(
                 name="first_subgait_delay",
@@ -104,6 +115,8 @@ def generate_launch_description():
                             "minimum_stair_height"
                         )
                     },
+                    {"push_off_fraction": LaunchConfiguration("push_off_fraction")},
+                    {"push_off_position": LaunchConfiguration("push_off_position")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {
                         "early_schedule_duration": LaunchConfiguration(
