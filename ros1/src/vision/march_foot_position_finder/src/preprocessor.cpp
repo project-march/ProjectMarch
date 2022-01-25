@@ -28,25 +28,29 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
 
-    n->getParam("base_frame", base_frame_);
-    n->getParam("voxel_size", voxel_size_);
-    n->getParam("x_min", x_min_);
-    n->getParam("x_max", x_max_);
-    n->getParam("y_min", y_min_);
-    n->getParam("y_max", y_max_);
-    n->getParam("z_min", z_min_);
-    n->getParam("z_max", z_max_);
+    ros::param::get("~base_frame", base_frame_);
+    ros::param::get("~voxel_size", voxel_size_);
+    ros::param::get("~x_min", x_min_);
+    ros::param::get("~x_max", x_max_);
+    ros::param::get("~y_min", y_min_);
+    ros::param::get("~y_max", y_max_);
+    ros::param::get("~z_min", z_min_);
+    ros::param::get("~z_max", z_max_);
 }
 
 /**
  * Preprocess the current pointcloud.
  */
+// NOLINTNEXTLINE
 void Preprocessor::preprocess()
 {
     voxelDownSample(/*voxel_size=*/voxel_size_);
-    filterOnDistance(/*x_min=*/x_min_, /*x_max=*/x_max_, /*y_min=*/y_min_,
-        /*y_max=*/y_max_,
-        /*z_min=*/z_min_, /*z_max=*/z_max_);
+    filterOnDistance(/*x_min=*/static_cast<float>(x_min_),
+        /*x_max=*/static_cast<float>(x_max_),
+        /*y_min=*/static_cast<float>(y_min_),
+        /*y_max=*/static_cast<float>(y_max_),
+        /*z_min=*/static_cast<float>(z_min_),
+        /*z_max=*/static_cast<float>(z_max_));
     transformPointCloudFromUrdf();
 }
 

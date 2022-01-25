@@ -6,6 +6,7 @@
 #include "utilities/publish_utilities.hpp"
 #include "utilities/realsense_to_pcl.hpp"
 #include <iostream>
+#include <march_foot_position_finder/parametersConfig.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/console.h>
@@ -30,13 +31,33 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     , left_or_right_(left_or_right)
 {
 
+    if (left_or_right_ == "left") {
+        other_ = "right";
+        switch_factor_ = -1;
+    } else {
+        switch_factor_ = 1;
+        other_ = "left";
+    }
+
+    last_chosen_point_
+        = Point(/*_x=*/0, /*_y=*/switch_factor_ * foot_gap_, /*_z=*/0);
+
+    reference_frame_id_ = "foot_" + other_;
+
+    ros::param::get("~realsense", realsense_);
+    ros::param::get("~base_frame", base_frame_);
+    ros::param::get("~foot_gap", foot_gap_);
+    ros::param::get("~step_distance", step_distance_);
+    ros::param::get("~average_sample_size", sample_size_);
+    ros::param::get("~outlier_distance", outlier_distance_);
+
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
-    topic_chosen_points_ = "/chosen_foot_position/" + left_or_right_;
+    topic_chosen_points_ = "/chosen_foot_position/" + other_;
 
-    point_publisher_ = n_->advertise<geometry_msgs::Point>(
+    point_publisher_ = n_->advertise<geometry_msgs::PointStamped>(
         "/foot_position/" + left_or_right_, /*queue_size=*/1);
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>(
         "/camera_" + left_or_right_ + "/preprocessed_cloud", /*queue_size=*/1);
@@ -44,26 +65,11 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
     chosen_point_subscriber_
-        = n_->subscribe<geometry_msgs::Point>(topic_chosen_points_,
+        = n_->subscribe<geometry_msgs::PointStamped>(topic_chosen_points_,
             /*queue_size=*/1, &FootPositionFinder::chosenPointCallback, this);
     pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
         topic_camera_front_, /*queue_size=*/3,
         &FootPositionFinder::processSimulatedDepthFrames, this);
-
-    n->getParam("realsense", realsense_);
-    n->getParam("base_frame", base_frame_);
-    n->getParam("foot_gap", foot_gap_);
-    n->getParam("step_distance", step_distance_);
-    n->getParam("average_sample_size", sample_size_);
-    n->getParam("outlier_distance", outlier_distance_);
-
-    if (left_or_right_ == "left") {
-        reference_frame_id_ = "foot_right";
-        last_chosen_point_ = Point(/*_x=*/0, /*_y=*/foot_gap_, /*_z=*/0);
-    } else if (left_or_right_ == "right") {
-        reference_frame_id_ = "foot_left";
-        last_chosen_point_ = Point(/*_x=*/0, /*_y=*/-foot_gap_, /*_z=*/0);
-    }
 
     if (realsense_) {
         cfg_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
@@ -75,6 +81,18 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
             topic_camera_front_, /*queue_size=*/3,
             &FootPositionFinder::processSimulatedDepthFrames, this);
     }
+}
+
+void FootPositionFinder::readParameters(
+    march_foot_position_finder::parametersConfig& config, uint32_t level)
+{
+    realsense_ = config.realsense;
+    base_frame_ = config.base_frame;
+    foot_gap_ = config.foot_gap;
+    step_distance_ = config.step_distance;
+    sample_size_ = config.sample_size;
+    outlier_distance_ = config.outlier_distance;
+    ROS_INFO("Parameters updated in foot position finder");
 }
 
 /**
@@ -104,9 +122,9 @@ void FootPositionFinder::processRealSenseDepthFrames()
  * Callback function for when a point is chosen for a dynamic gait.
  */
 void FootPositionFinder::chosenPointCallback(
-    const geometry_msgs::Point point) // NOLINT
+    const geometry_msgs::PointStamped msg) // NOLINT
 {
-    last_chosen_point_ = Point(point.x, point.y, point.z);
+    last_chosen_point_ = Point(msg.point.x, msg.point.y, msg.point.z);
 }
 
 /**
@@ -135,13 +153,9 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Define the desired future foot position
         Point p = last_chosen_point_;
         transformPoint(p, "foot_" + left_or_right_, reference_frame_id_);
-        if (left_or_right_ == "left") {
-            point = Point(/*_x=*/p.x - step_distance_, /*_y=*/p.y - foot_gap_,
-                /*_z=*/p.z);
-        } else if (left_or_right_ == "right") {
-            point = Point(/*_x=*/p.x - step_distance_, /*_y=*/p.y + foot_gap_,
-                /*_z=*/p.z);
-        }
+        point = Point(/*_x=*/p.x - step_distance_,
+            /*_y=*/p.y - switch_factor_ * foot_gap_,
+            /*_z=*/p.z);
 
         // Calculate point location relative to positionary leg
         transformPoint(point, reference_frame_id_, base_frame_);

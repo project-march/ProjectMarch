@@ -28,22 +28,22 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
         &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -5);
     std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 1);
 
-    n->getParam("foot_width", foot_width_);
-    n->getParam("foot_length", foot_length_);
+    ros::param::get("~foot_width", foot_width_);
+    ros::param::get("~foot_length", foot_length_);
 
-    n->getParam("x_displacements_left", x_displacements_left_);
-    n->getParam("x_displacements_right", x_displacements_right_);
-    n->getParam("y_displacements_front", y_displacements_front_);
-    n->getParam("x_displacements_left", y_displacements_far_);
+    ros::param::get("~x_displacements_left", x_displacements_left_);
+    ros::param::get("~x_displacements_right", x_displacements_right_);
+    ros::param::get("~y_displacements_front", y_displacements_front_);
+    ros::param::get("~x_displacements_left", y_displacements_far_);
 
     x_displacements_left_ = ceil(x_displacements_left_ / cell_width_);
     x_displacements_right_ = ceil(x_displacements_right_ / cell_width_);
     y_displacements_front_ = ceil(y_displacements_front_ / cell_width_);
     y_displacements_far_ = ceil(y_displacements_far_ / cell_width_);
 
-    n->getParam("available_points_ratio", available_points_ratio_);
-    n->getParam("derivative_threshold", derivative_threshold_);
-    n->getParam("max_z_distance", max_z_distance_);
+    ros::param::get("~available_points_ratio", available_points_ratio_);
+    ros::param::get("~derivative_threshold", derivative_threshold_);
+    ros::param::get("~max_z_distance", max_z_distance_);
 
     rect_width_ = ceil(foot_width_ / cell_width_);
     rect_height_ = ceil(foot_length_ / cell_width_);

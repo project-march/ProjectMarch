@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <librealsense2/rs.hpp>
+#include <march_foot_position_finder/parametersConfig.h>
 #include <pcl/common/distances.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -20,10 +21,13 @@ public:
     explicit FootPositionFinder(
         ros::NodeHandle* n, const std::string& left_or_right);
 
+    void readParameters(
+        march_foot_position_finder::parametersConfig& config, uint32_t level);
+
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenPointCallback(const geometry_msgs::Point point);
+    void chosenPointCallback(const geometry_msgs::PointStamped point);
 
     void processRealSenseDepthFrames();
 
@@ -62,6 +66,8 @@ protected:
     std::string topic_chosen_points_;
 
     std::string left_or_right_;
+    std::string other_;
+    int switch_factor_;
     bool realsense_;
 
     double foot_gap_;

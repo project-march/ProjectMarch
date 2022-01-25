@@ -39,6 +39,10 @@ find_package(catkin REQUIRED COMPONENTS
     dynamic_reconfigure
 )
 
+generate_dynamic_reconfigure_options(
+    config/parameters.cfg
+)
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 catkin_package(
@@ -57,6 +61,7 @@ include_directories(
     include
     ${catkin_INCLUDE_DIRS}
 )
+include_directories(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake) 
 
 add_library(${PROJECT_NAME}
     src/preprocessor.cpp
@@ -64,19 +69,28 @@ add_library(${PROJECT_NAME}
     src/foot_position_finder.cpp
 )
 
-add_executable(foot_position_finder_node src/foot_position_finder_node.cpp)
+add_executable(${PROJECT_NAME}_node src/foot_position_finder_node.cpp)
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY})
-target_link_libraries(foot_position_finder_node ${PROJECT_NAME})
-
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 # Mark executables for installation
-install(TARGETS foot_position_finder_node
+install(TARGETS ${PROJECT_NAME}_node
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/ include/
+        include/utilities/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
 )
 
 install(DIRECTORY launch

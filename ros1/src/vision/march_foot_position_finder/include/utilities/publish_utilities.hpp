@@ -71,7 +71,7 @@ void publishMarkerPoint(ros::Publisher& publisher, Point& p)
     marker.color.g = 0.0;
     marker.color.b = 0.0;
     marker.color.a = 1.0;
-    marker.lifetime = ros::Duration();
+    marker.lifetime = ros::Duration(0.3);
 
     publisher.publish(marker);
 }
@@ -84,12 +84,13 @@ void publishMarkerPoint(ros::Publisher& publisher, Point& p)
  */
 void publishPoint(ros::Publisher& publisher, Point& p)
 {
-    geometry_msgs::Point point;
-    point.x = p.x;
-    point.y = p.y;
-    point.z = p.z;
+    geometry_msgs::PointStamped msg;
+    msg.point.x = p.x;
+    msg.point.y = p.y;
+    msg.point.z = p.z;
+    msg.header.stamp = ros::Time::now();
 
-    publisher.publish(point);
+    publisher.publish(msg);
 }
 
 #endif // MARCH_PUBLISH_UTILITIES
