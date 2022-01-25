@@ -60,8 +60,9 @@ endif()
 #           haa_airgait
 #           haa_koengait
 #           march6_simulation_uncoupled
-#           test_joint_rotational,
+#           test_joint_rotational
 #           test_joint_linear
+#           test_joint_rotational_MPC
 set(MODEL_NAME haa_airgait)
 
 
