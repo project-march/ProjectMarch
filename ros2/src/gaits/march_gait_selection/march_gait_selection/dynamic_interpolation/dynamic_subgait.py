@@ -1,5 +1,6 @@
 """Author: Marten Haitjema, MVII"""
 
+import rclpy.logging
 import numpy as np
 
 from rclpy.node import Node
@@ -19,6 +20,8 @@ from typing import List
 from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
+INTERPOLATION_POINTS = 30
+LOGGER_NODE_NAME = "gait_selection"
 
 
 class SetpointTime(IntEnum):
@@ -53,7 +56,7 @@ class DynamicSubgait:
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
-        position: Point,
+        location: Point,
         joint_soft_limits: List[Limits],
         stop: bool,
     ):
@@ -236,6 +239,18 @@ class DynamicSubgait:
     def _from_joint_dict_to_list(self, joint_dict: dict) -> List[float]:
         """Return the values in a joint_dict as a list."""
         return list(joint_dict.values())
+
+    def _get_parameters(self, gait_selection_node: Node) -> None:
+        """Gets the dynamic gait parameters from the gait_selection_node
+
+        :param gait_selection_node: the gait selection node
+        :type gait_selection_node: Node
+        """
+        self.duration = gait_selection_node.dynamic_subgait_duration
+        self.middle_point_height = gait_selection_node.middle_point_height
+        self.middle_point_fraction = gait_selection_node.middle_point_fraction
+        self.push_off_fraction = gait_selection_node.push_off_fraction
+        self.push_off_position = gait_selection_node.push_off_position
 
     def _check_joint_limits(
         self,
