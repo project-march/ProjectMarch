@@ -9,6 +9,9 @@ class Logger:
         self.node = node
         self.msg_prefix = prefix
 
+    def debug(self, msg: str) -> None:
+        self.node.get_logger().debug(f"[{self.msg_prefix}] {msg}")
+
     def info(self, msg: str) -> None:
         self.node.get_logger().info(f"[{self.msg_prefix}] {msg}")
 
@@ -18,5 +21,5 @@ class Logger:
     def error(self, msg: str) -> None:
         self.node.get_logger().error(f"[{self.msg_prefix}] {msg}")
 
-    def debug(self, msg: str) -> None:
-        self.node.get_logger().debug(f"[{self.msg_prefix}] {msg}")
+    def fatal(self, msg: str) -> None:
+        self.node.get_logger().fatal(f"[{self.msg_prefix}] {msg}")
