@@ -46,7 +46,6 @@ class DynamicSetpointGait(GaitInterface):
         self.gait_name = "dynamic_walk"
 
         # Create subscribers and publishers for CoViD
-        self.gait_selection = gait_selection_node
         self.gait_selection.create_subscription(
             PointStamped,
             "/foot_position/right",
@@ -73,7 +72,7 @@ class DynamicSetpointGait(GaitInterface):
         # Assign reconfigurable parameters
         self.update_parameters()
 
-        self.logger = Logger(self.gait_selection, "DYNAMIC_SETPOINT_GAIT")
+        self.logger = Logger(self.gait_selection, __class__.__name__)
 
     @property
     def name(self) -> str:

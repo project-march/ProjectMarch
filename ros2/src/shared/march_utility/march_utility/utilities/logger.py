@@ -1,3 +1,5 @@
+"""Author: Marten Haitjema, MVII"""
+
 from rclpy.node import Node
 
 
@@ -15,7 +17,11 @@ class Logger:
     def info(self, msg: str) -> None:
         self.node.get_logger().info(f"[{self.msg_prefix}] {msg}")
 
+    # support both warn and warning
     def warning(self, msg: str) -> None:
+        self.node.get_logger().warning(f"[{self.msg_prefix}] {msg}")
+
+    def warn(self, msg: str) -> None:
         self.node.get_logger().warning(f"[{self.msg_prefix}] {msg}")
 
     def error(self, msg: str) -> None:
