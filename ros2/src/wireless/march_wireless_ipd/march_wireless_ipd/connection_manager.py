@@ -1,5 +1,6 @@
 from numpy import isin
 from march_rqt_input_device.input_device_controller import InputDeviceController
+from march_shared_msgs.msg import CurrentGait
 
 import socket
 import json
@@ -12,7 +13,7 @@ from datetime import datetime
 
 class ConnectionManager():
     
-    def __init__(self, host, port, controller):
+    def __init__(self, host, port, controller, node):
         server_address = (host, port)
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -21,12 +22,23 @@ class ConnectionManager():
         self.controller = controller
         self.controller.accepted_cb = partial(self.send_message_till_confirm, "accept")
         self.controller.rejected_cb = partial(self.send_message_till_confirm, "reject")
-        self.controller.current_gait_cb = self.update_current_gait
+        self.controller.current_gait_cb = self._current_gait_cb
         self.controller.finished_cb = self.gait_finished
-        self.seq = -1
+        self.seq = 0
         self.stop_receive = False
         self.current_gait = "unknown"
         self.last_heartbeat = datetime.now()
+        self.node = node
+        self.stopped = False
+
+    def _current_gait_cb(self, msg):
+        if self.stopped:
+            self.controller.get_node().get_logger().info("UPDATE stop")
+            self.current_gait = "stop"
+            self.stopped = False
+        else:
+            self.controller.get_node().get_logger().info("UPDATE " + msg)
+            self.current_gait = msg
 
     def wait_for_request(self):
         while True:
@@ -40,19 +52,21 @@ class ConnectionManager():
 
                 if req == "":
                     self.controller.get_node().get_logger().warning("Connection lost with wireless IPD")
-                    self.reset_connection()
+                    raise Exception("Connection lost")
+                    # self.reset_connection()
+
                 if "Received" in req:
                     continue
                 elif "GaitRequest" in req:
                     req = json.loads(req)
-                    self.seq = max(self.seq, req["seq"])
-                
+                    self.seq = req["seq"]
+
                     if req["gait"]["gaitName"] == "stop":
                         self.stop_receive = True
                         self.controller.update_possible_gaits()
                         self.controller.publish_stop()
+                        self.stopped = True
                         self.send_message_till_confirm("accept")
-                        self.current_gait = "stop"
                     else:
                         self.request_gait(req)
                 else:
@@ -61,13 +75,14 @@ class ConnectionManager():
             except socket.timeout:
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 1.5:
                     self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
-                    self.reset_connection()
+                    raise Exception("Connection lost")
 
-            except Exception:
-                self.reset_connection()
+            except Exception as e:
+                raise e
 
-    def update_current_gait(self, gait):        
-        self.current_gait = gait
+            # except Exception:
+            #     traceback.print_exc()
+            #     self.reset_connection()
 
     def gait_finished(self):
         pass
@@ -76,8 +91,10 @@ class ConnectionManager():
         self.controller.update_possible_gaits()
         future = self.controller.get_possible_gaits()
 
-        while(not future.done()):
+        counter = 0
+        while(not future.done() and counter < 50):
             time.sleep(0.010)
+            counter += 1
 
         gait = req["gait"]
 
@@ -115,6 +132,7 @@ class ConnectionManager():
         if self.connection is None:
             return
 
+        self.controller.get_node().get_logger().warning(str(self.seq))    
         msg = {
             "msg": msg,
             "seq": self.seq
@@ -130,25 +148,37 @@ class ConnectionManager():
                     if data["seq"] == self.seq:
                         self.stop_receive = False
                         return
+                    else:
+                        self.controller.get_node().get_logger().warning("Different seq")    
                 else:
                     self.last_heartbeat = datetime.now()
-
+        
             except socket.timeout:
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 1.5:
-                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
-                    self.reset_connection()
+                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat 2)")
+                    raise Exception("Connection lost")
+            
+            except Exception as e:
+                raise e
 
-            except Exception:
-                self.reset_connection()
+            # except Exception:
+            #     traceback.print_exc()
+            #     self.reset_connection()
 
 
     def establish_connection(self):
-        self.connection, self.addr = self.s.accept()
-        self.send_message_till_confirm(self.current_gait)
-        self.controller.get_node().get_logger().info("Wireless IPD connected")
-        self.wait_for_request()
+        while True:
+            try:
+                self.connection, self.addr = self.s.accept()
+                self.send_message_till_confirm(self.current_gait)
+                self.controller.get_node().get_logger().info("Wireless IPD connected")
+                self.wait_for_request()
+
+            except Exception:
+                traceback.print_exc()
+                self.connection.close()
 
 
-    def reset_connection(self):
-        self.connection.close()
-        self.establish_connection()
+    # def reset_connection(self):
+    #     self.connection.close()
+    #     self.establish_connection()
