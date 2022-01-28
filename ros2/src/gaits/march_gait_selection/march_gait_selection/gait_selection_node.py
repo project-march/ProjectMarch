@@ -56,6 +56,8 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
     for param in parameters:
         if param.name == "balance" and param.type_ == Parameter.Type.BOOL:
             gait_selection._balance_used = param.value
+        elif param.name == "dynamic_gait" and param.type == Parameter.Type.BOOL:
+            gait_selection._dynamic_gait = param.value
         elif (
             param.name == "early_schedule_delay"
             and param.type_ == Parameter.Type.DOUBLE
@@ -69,6 +71,24 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
             if param.value < 0:
                 return SetParametersResult(successful=False)
             gait_selection._first_subgait_delay = Duration(seconds=param.value)
+        elif param.name == "dynamic_subgait_duration":
+            gait_selection.dynamic_subgait_duration = param.value
+            dynamic_gait_updated = True
+        elif param.name == "middle_point_fraction":
+            gait_selection.middle_point_fraction = param.value
+            dynamic_gait_updated = True
+        elif param.name == "middle_point_height":
+            gait_selection.middle_point_height = param.value
+            dynamic_gait_updated = True
+        elif param.name == "minimum_stair_height":
+            gait_selection.minimum_stair_height = param.value
+            dynamic_gait_updated = True
+        elif param.name == "push_off_fraction":
+            gait_selection.push_off_fraction = param.value
+            dynamic_gait_updated = True
+        elif param.name == "push_off_position":
+            gait_selection.push_off_position = param.value
+            dynamic_gait_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
             gaits_updated = True
@@ -81,7 +101,11 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
                 gait_state_machine.update_timer.destroy()
             gait_state_machine.run()
 
-    if gaits_updated:
+    # Seperate update function for dynamic gait to avoid time performance issues
+    if dynamic_gait_updated:
+        gait_selection.dynamic_setpoint_gait.update_parameters()
+        gait_selection.get_logger().info("Dynamic gait parameters updated.")
+    elif gaits_updated:
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()
         gait_selection.get_logger().info("Gaits were updated")

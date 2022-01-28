@@ -7,6 +7,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectory
 from march_utility.gait.gait import Gait
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.logger import Logger
 from rclpy import Future
 from rclpy.node import Node
 from rclpy.time import Time
@@ -28,6 +29,7 @@ class BalanceGait(GaitInterface):
         self._node = node
         self._default_walk = default_walk
         self._constructing = False
+        self.logger = Logger(self._node, __class__.__name__)
 
         self._current_subgait = None
         self._current_subgait_duration = Duration(0)
@@ -75,7 +77,7 @@ class BalanceGait(GaitInterface):
         """
         subgait_duration = self.default_walk[subgait_name].duration
         if not self._capture_point_service[leg_name].wait_for_service(timeout_sec=3):
-            self._node.get_logger().warn(
+            self.logger.warn(
                 f"Capture point service not found: "
                 f"{self._capture_point_service[leg_name]}"
             )
@@ -132,7 +134,7 @@ class BalanceGait(GaitInterface):
         :return: the balance trajectory
         """
         if swing_leg not in ["right_leg", "left_leg"]:
-            self._node.get_logger().warn(
+            self.logger.warn(
                 f"Swing leg was not one of the possible legs "
                 f"(left_leg or right_leg), but {swing_leg}, "
                 f"using default walk instead"
@@ -141,9 +143,7 @@ class BalanceGait(GaitInterface):
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
         capture_point_success = self.compute_swing_leg_target(swing_leg, subgait_name)
         if not capture_point_success:
-            self._node.get_logger().warn(
-                "Capture point call took too long, using default gait."
-            )
+            self.logger.warn("Capture point call took too long, using default gait.")
             return self.default_walk[subgait_name].to_joint_trajectory_msg()
         stance_leg_target = self.compute_stance_leg_target(stance_leg, subgait_name)
 
@@ -160,9 +160,7 @@ class BalanceGait(GaitInterface):
         if self.moveit_event.wait(self.MOVEIT_INTERFACE_SERVICE_TIMEOUT):
             return self.moveit_trajectory_result.trajectory
         else:
-            self._node.get_logger().warn(
-                "Moveit interface call took too long, using default gait."
-            )
+            self.logger.warn("Moveit interface call took too long, using default gait.")
             return self.default_walk[subgait_name].to_joint_trajectory_msg()
 
     def moveit_event_cb(self, future: Future):

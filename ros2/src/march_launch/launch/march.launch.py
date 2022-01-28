@@ -38,6 +38,13 @@ def generate_launch_description():
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
+    dynamic_gait = LaunchConfiguration("dynamic_gait")
+    dynamic_subgait_duration = LaunchConfiguration("dynamic_subgait_duration")
+    middle_point_fraction = LaunchConfiguration("middle_point_fraction")
+    middle_point_height = LaunchConfiguration("middle_point_height")
+    minimum_stair_height = LaunchConfiguration("minimum_stair_height")
+    push_off_fraction = LaunchConfiguration("push_off_fraction")
+    push_off_position = LaunchConfiguration("push_off_position")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -46,6 +53,10 @@ def generate_launch_description():
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
+
+    # Fake covid (CoViD = Computer Vision Department)
+    location_x = LaunchConfiguration("location_x")
+    location_y = LaunchConfiguration("location_y")
 
     return launch.LaunchDescription(
         [
@@ -166,6 +177,45 @@ def generate_launch_description():
                 description="Whether balance is being used.",
             ),
             DeclareLaunchArgument(
+                name="dynamic_gait",
+                default_value="False",
+                description="Wether dynamic_setpoint_gait is enabled",
+            ),
+            DeclareLaunchArgument(
+                name="dynamic_subgait_duration",
+                default_value="1.5",
+                description="Duration of a subgait created by the dynamic gait",
+            ),
+            DeclareLaunchArgument(
+                name="middle_point_fraction",
+                default_value="0.45",
+                description="Fraction of the step at which the middle point "
+                "of the dynamic gait will take place.",
+            ),
+            DeclareLaunchArgument(
+                name="middle_point_height",
+                default_value="0.15",
+                description="Height of the middle setpoint of dynamic gait "
+                "relative to the desired position, given in meters.",
+            ),
+            DeclareLaunchArgument(
+                name="minimum_stair_height",
+                default_value="0.15",
+                description="A step lower or higher than the minimum_stair_height"
+                "will change the gait type to stairs_like instead of walk_like.",
+            ),
+            DeclareLaunchArgument(
+                name="push_off_fraction",
+                default_value="0.15",
+                description="Fraction of the step at which the push off will"
+                "take place.",
+            ),
+            DeclareLaunchArgument(
+                name="push_off_position",
+                default_value="-0.15",
+                description="Maximum joint position of the ankle during push off.",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -196,6 +246,16 @@ def generate_launch_description():
                 "maximum_fake_temperature",
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
+            ),
+            DeclareLaunchArgument(
+                name="location_x",
+                default_value="0.4",
+                description="x-location for fake covid topic, takes double or 'random'",
+            ),
+            DeclareLaunchArgument(
+                name="location_y",
+                default_value="0.0",
+                description="y-location for fake covid topic, takes double or 'random'",
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
@@ -250,9 +310,31 @@ def generate_launch_description():
                     ("use_sim_time", use_sim_time),
                     ("gait_package", gait_package),
                     ("balance", balance),
+                    ("dynamic_gait", dynamic_gait),
+                    ("dynamic_subgait_duration", dynamic_subgait_duration),
+                    ("middle_point_fraction", middle_point_fraction),
+                    ("middle_point_height", middle_point_height),
+                    ("mininum_stair_height", minimum_stair_height),
+                    ("push_off_fraction", push_off_fraction),
+                    ("push_off_position", push_off_position),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
                     ("timer_period", timer_period),
+                ],
+            ),
+            # Fake covid publisher
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_fake_covid"),
+                        "launch",
+                        "march_fake_covid.launch.py",
+                    )
+                ),
+                launch_arguments=[
+                    ("use_sim_time", use_sim_time),
+                    ("location_x", location_x),
+                    ("location_y", location_y),
                 ],
             ),
             # Safety

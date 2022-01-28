@@ -28,7 +28,7 @@
       "name": "walk_single_step"
     },
     {
-      "name": "walk_single_step_large"
+      "name": "dynamic_walk"
     }
   ],
   [
@@ -140,6 +140,9 @@
       "name": "error",
       "callback": "publish_error",
       "always_enabled": true
+    },
+    {
+      "name": "walk_single_step_large"
     }
   ]
 ]

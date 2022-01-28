@@ -59,9 +59,13 @@ flake8:
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       variables:
-        TAG: $CI_DEFAULT_BRANCH
+        TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      variables:
+        TAG: $CI_COMMIT_BRANCH
 
 #######################
 # clang-format linter #
@@ -104,11 +108,20 @@ clang-format:
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - "ros1/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - "ros2/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - ".clang-format"
         - ".clang-format-ignore"
       variables:
-        TAG: $CI_DEFAULT_BRANCH
+        TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "ros1/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+        - "ros2/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+        - ".clang-format"
+        - ".clang-format-ignore"
+      variables:
+        TAG: $CI_COMMIT_BRANCH

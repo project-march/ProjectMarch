@@ -12,6 +12,8 @@ from march_utility.gait.gait_graph import GaitGraph
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.side import Side
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_utility.utilities.logger import Logger
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 from std_msgs.msg import Header
@@ -42,6 +44,7 @@ class GaitStateMachine:
         """
         self._gait_selection = gait_selection
         self._trajectory_scheduler = trajectory_scheduler
+        self.logger = Logger(self._gait_selection, __class__.__name__)
 
         self._input = StateMachineInput(gait_selection)
 
@@ -74,18 +77,18 @@ class GaitStateMachine:
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self.current_gait_pub = self._gait_selection.create_publisher(
             msg_type=CurrentGait,
             topic="/march/gait_selection/current_gait",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self.error_sub = self._gait_selection.create_subscription(
             msg_type=Error,
             topic="/march/error",
             callback=self._error_cb,
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self._right_foot_on_ground = True
@@ -97,14 +100,14 @@ class GaitStateMachine:
             topic="/march/sensor/right_pressure_sole",
             callback=lambda msg: self._update_foot_on_ground_cb(Side.right, msg),
             callback_group=ReentrantCallbackGroup(),
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._left_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState,
             topic="/march/sensor/left_pressure_sole",
             callback=lambda msg: self._update_foot_on_ground_cb(Side.left, msg),
             callback_group=ReentrantCallbackGroup(),
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self._get_possible_gaits_client = self._gait_selection.create_service(
@@ -116,7 +119,7 @@ class GaitStateMachine:
 
         self.add_transition_callback(self._current_state_cb)
         self.add_gait_callback(self._current_gait_cb)
-        self._gait_selection.get_logger().debug("Initialized state machine")
+        self.logger.debug("Initialized state machine")
 
     def _is_idle(self):
         return isinstance(self._current_state, EdgePosition)
@@ -171,9 +174,7 @@ class GaitStateMachine:
     ):
         """Standard callback when gait changes, publishes the current gait
         More callbacke can be added using add_gait_callback"""
-        self._gait_selection.get_logger().debug(
-            f"Current subgait updated to {subgait_name}"
-        )
+        self.logger.debug(f"Current subgait updated to {subgait_name}")
         self.current_gait_pub.publish(
             CurrentGait(
                 header=Header(stamp=self._gait_selection.get_clock().now().to_msg()),
@@ -274,7 +275,7 @@ class GaitStateMachine:
         base_msg = "Shutdown requested"
         if msg is not None:
             base_msg += ": " + msg
-        self._gait_selection.get_logger().fatal(base_msg)
+        self.logger.fatal(base_msg)
         self._shutdown_requested = True
         shutdown_system()
 
@@ -295,7 +296,7 @@ class GaitStateMachine:
                 "right" in self._current_gait.subgait_name
                 and self._force_right_foot > self._force_left_foot
             ):
-                self._gait_selection.get_logger().warn(
+                self.logger.warn(
                     "Incorrect pressure placement, place pressure on left foot"
                 )
                 return False
@@ -303,7 +304,7 @@ class GaitStateMachine:
                 "left" in self._current_gait.subgait_name
                 and self._force_left_foot > self._force_right_foot
             ):
-                self._gait_selection.get_logger().warn(
+                self.logger.warn(
                     "Incorrect pressure placement, place pressure on right foot"
                 )
                 return False
@@ -315,18 +316,19 @@ class GaitStateMachine:
         what to do next."""
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
-            self._gait_selection.get_logger().info(f"Requested gait `{gait_name}`")
+            self.logger.info(f"Requested gait `{gait_name}`")
             gait = self._gait_selection._gaits.get(gait_name)
             if (
                 gait is not None
                 and gait_name
                 in self._gait_graph.possible_gaits_from_idle(self._current_state)
+                or gait_name == "dynamic_walk"
             ):
                 if (
                     isinstance(gait.starting_position, DynamicEdgePosition)
                     and gait.starting_position != self._current_state
                 ):
-                    self._gait_selection.get_logger().warn(
+                    self.logger.warn(
                         f"The gait {gait_name} does not have the correct dynamic "
                         f"starting position, should be {self._current_state}, but was "
                         f"{gait.starting_position}"
@@ -337,10 +339,10 @@ class GaitStateMachine:
                 self._should_stop = False
                 self._input.gait_accepted()
                 self._call_transition_callbacks()
-                self._gait_selection.get_logger().info(f"Accepted gait `{gait_name}`")
+                self.logger.info(f"Accepted gait `{gait_name}`")
             else:
                 self._input.gait_rejected()
-                self._gait_selection.get_logger().info(
+                self.logger.info(
                     f"Cannot execute gait `{gait_name}` from idle state `"
                     f"{self._current_state}`"
                 )
@@ -353,9 +355,7 @@ class GaitStateMachine:
         if self._current_gait is None:
             self._current_gait = self._gait_selection._gaits[self._current_state]
 
-            self._gait_selection.get_logger().info(
-                f"Executing gait `{self._current_gait.name}`"
-            )
+            self.logger.info(f"Executing gait `{self._current_gait.name}`")
             if self._current_gait.first_subgait_can_be_scheduled_early:
                 gait_update = self._current_gait.start(
                     now, self._gait_selection._first_subgait_delay
@@ -368,7 +368,7 @@ class GaitStateMachine:
                 # Find the start position of the current gait, to go back to idle.
                 self._current_state = self._current_gait.starting_position
                 self._current_gait = None
-                self._gait_selection.get_logger().info(
+                self.logger.info(
                     f"Starting the gait returned "
                     f"no trajectory, going back to idle state "
                     f"{self._gait_graph.get_name_of_position(self._current_state)}"
@@ -376,7 +376,7 @@ class GaitStateMachine:
                 return
 
             if not self.check_correct_foot_pressure():
-                self._gait_selection.get_logger().debug(
+                self.logger.debug(
                     f"Foot forces when incorrect pressure warning was issued: "
                     f"left={self._force_left_foot}, right={self._force_right_foot}"
                 )
@@ -418,9 +418,7 @@ class GaitStateMachine:
             self._current_gait = None
             self._is_stopping = False
             self._trajectory_scheduler.reset()
-            self._gait_selection.get_logger().info(
-                f"Finished gait `{self._current_gait.name}`"
-            )
+            self.logger.info(f"Finished gait `{self._current_gait.name}`")
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
@@ -429,13 +427,11 @@ class GaitStateMachine:
             self._should_stop = False
             self._is_stopping = True
             if self._current_gait.stop():
-                self._gait_selection.get_logger().info(
-                    f"Gait {self._current_gait.name} responded to stop"
-                )
+                self.logger.info(f"Gait {self._current_gait.name} responded to stop")
                 self._input.stop_accepted()
                 self._call_callbacks(self._stop_accepted_callbacks)
             else:
-                self._gait_selection.get_logger().info(
+                self.logger.info(
                     f"Gait {self._current_gait.name} does not respond to stop"
                 )
                 self._input.stop_rejected()
@@ -444,12 +440,12 @@ class GaitStateMachine:
             request = self._input.get_transition_request()
             self._input.reset()
             if self._current_gait.transition(request):
-                self._gait_selection.get_logger().info(
+                self.logger.info(
                     f"Gait {self._current_gait.name} responded to transition request "
                     f"{request.name}"
                 )
             else:
-                self._gait_selection.get_logger().info(
+                self.logger.info(
                     f"Gait {self._current_gait.name} does not respond to transition "
                     f"request {request.name}"
                 )
@@ -482,7 +478,7 @@ class GaitStateMachine:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
         self._current_state = UnknownEdgePosition()
-        self._gait_selection.get_logger().info("Transitioned to unknown")
+        self.logger.info("Transitioned to unknown")
 
     @staticmethod
     def _add_callback(callbacks, cb):

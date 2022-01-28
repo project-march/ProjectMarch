@@ -163,7 +163,7 @@
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
         <include if="$(arg balance)"
                  file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
-        <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find march_launch)/rviz/default.rviz" if="$(eval not headless and rviz)"/>
     </group>
 
     <param name="robot_description"

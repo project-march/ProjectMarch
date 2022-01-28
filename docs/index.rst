@@ -66,6 +66,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
    doc/getting_started/install_ros_and_tools
    doc/getting_started/setup_your_workspace
+   doc/getting_started/setting_up_docker
 
 .. toctree::
    :caption: Useful tools
@@ -107,6 +108,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/development/style_guide
    doc/development/vscode_flake8
    doc/development/add_a_new_gait
+   doc/development/index_ros_for_cpp_in_jetbrains.rst
 
 .. toctree::
     :caption: MARCH packages
@@ -134,6 +136,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages_old/march_launch
   doc/march_packages_old/march_moveit
   doc/march_packages_old/march_realsense_reader
+  doc/march_packages_old/march_realsense_test_publisher
   doc/march_packages_old/march_rqt_input_device
   doc/march_packages_old/march_safety
   doc/march_packages_old/march_shared_classes
