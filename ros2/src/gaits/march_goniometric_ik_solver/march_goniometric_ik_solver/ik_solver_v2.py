@@ -3,6 +3,7 @@ from typing import List
 import matplotlib.pyplot as plt
 
 import march_goniometric_ik_solver.triangle_angle_solver as tas
+import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
@@ -170,9 +171,12 @@ class Pose:
         return np.linalg.norm(pos_hip - pos_ankle1)
 
     def bended_angles(self, leg_length: float):
-        sides = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, leg_length]
-        bend_ankle, bend_hip, bend_knee = tas.get_angles_from_sides(sides)
-        return bend_ankle, bend_hip, bend_knee
+        if leg_length < LENGTH_LEG:
+            sides = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, leg_length]
+            bend_ankle, bend_hip, bend_knee = tas.get_angles_from_sides(sides)
+            return bend_ankle, bend_hip, bend_knee
+        else:
+            return 0.0, 0.0, np.pi
 
     def solve_rear_leg(self, pos_hip, pos_ankle1):
         dist_ankle1_hip = np.linalg.norm(pos_hip - pos_ankle1)
@@ -192,8 +196,40 @@ class Pose:
         self.fe_knee2 = KNEE_ZERO_ANGLE - bend_knee2
         self.fe_ankle2 = -angle_front + bend_ankle2
 
+    def reduce_stance_dorsi_flexion(self):
+        # Save current angle at toes1 between ankle1 and hip:
+        pos_ankle1 = self.calculate_joint_positions("pos_ankle1")
+        pos_toes1 = self.calculate_joint_positions("pos_toes1")
+        pos_hip = self.calculate_joint_positions("pos_hip")
+        toes1_angle_ankle1_hip = qas.get_angle_between_points(
+            [pos_ankle1, pos_toes1, pos_hip]
+        )
+
+        # Reduce dorsi flexion of stance leg:
+        dis_toes1_hip = np.linalg.norm(pos_toes1 - pos_hip)
+        lengths = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_FOOT, dis_toes1_hip]
+        angle_knee1, angle_ankle1, angle_toes1, angle_hip = qas.solve_quadritlateral(
+            lengths=lengths, angle_b=ANKLE_ZERO_ANGLE - MAX_ANKLE_FLEXION, convex=False
+        )
+
+        # Update pose:
+        self.rot_foot1 = toes1_angle_ankle1_hip - angle_toes1
+        self.fe_ankle1 = ANKLE_ZERO_ANGLE - angle_ankle1
+        self.fe_knee1 = KNEE_ZERO_ANGLE - angle_knee1
+
+        pos_knee1 = self.calculate_joint_positions("pos_knee1")
+        point_below_hip = np.array([pos_hip[0], 0])
+        self.fe_hip1 = np.sign(
+            pos_knee1[0] - pos_hip[0]
+        ) * qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
+
     def solve_all(
-        self, ankle_x, ankle_y, hip_x_fraction, default_knee_bend=DEFAULT_KNEE_BEND
+        self,
+        ankle_x,
+        ankle_y,
+        hip_x_fraction,
+        default_knee_bend,
+        reduce_df_rear,
     ):
         # set parameters:
         self.ankle_x = ankle_x
@@ -201,12 +237,17 @@ class Pose:
         self.hip_x_fraction = hip_x_fraction
         self.default_knee_bend = default_knee_bend
 
-        # determine hip location:
-        if ankle_y >= 0:
-            hip_y = np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2)
+        # determine hip y-location:
+        if ankle_y > 0:
+            if hip_x_fraction >= 0.5:
+                hip_y = np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2)
+            else:
+                hip_y = np.sqrt(self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2)
         else:
-            hip_y = ankle_y + np.sqrt(
-                self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2
+            hip_y = min(
+                ankle_y
+                + np.sqrt(self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2),
+                np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2),
             )
 
         # define locations:
@@ -219,6 +260,10 @@ class Pose:
 
         # front leg:
         self.solve_front_leg(pos_hip, pos_ankle2)
+
+        # reduce stance dorsi flexion:
+        if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION:
+            self.reduce_stance_dorsi_flexion()
 
 
 # Static methods:
