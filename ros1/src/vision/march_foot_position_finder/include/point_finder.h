@@ -28,6 +28,8 @@ public:
 
     void findPoints(std::vector<Point>* position_queue);
 
+    std::vector<double> getDisplacements();
+
 protected:
     PointCloud::Ptr pointcloud_;
     std::vector<double> search_dimensions_;
@@ -51,9 +53,9 @@ protected:
     int rect_width_;
     int rect_height_;
 
-    double x_displacements_left_;
-    double x_displacements_right_;
-    double y_displacements_front_;
+    double x_displacements_outside_;
+    double x_displacements_inside_;
+    double y_displacements_near_;
     double y_displacements_far_;
 
     std::vector<int> x_displacements_;

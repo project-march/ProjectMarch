@@ -56,7 +56,6 @@ protected:
 
     ros::Publisher point_publisher_;
     ros::Subscriber pointcloud_subscriber_;
-    ros::Subscriber chosen_point_subscriber_;
 
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher point_marker_publisher_;
@@ -81,7 +80,7 @@ protected:
     std::string reference_frame_id_;
 
     std::vector<Point> found_points_;
-    Point last_chosen_point_;
+    double last_height_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

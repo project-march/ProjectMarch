@@ -40,10 +40,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         other_ = "left";
     }
 
-    last_chosen_point_ = Point(
-        /*_x=*/0, /*_y=*/(float)switch_factor_ * (float)foot_gap_, /*_z=*/0);
-
     reference_frame_id_ = "foot_" + other_;
+    last_height_ = 0;
 
     ros::param::get("~realsense", realsense_);
     ros::param::get("~base_frame", base_frame_);
@@ -56,7 +54,6 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
-    topic_chosen_points_ = "/chosen_foot_position/" + other_;
 
     point_publisher_ = n_->advertise<geometry_msgs::PointStamped>(
         "/foot_position/" + left_or_right_, /*queue_size=*/1);
@@ -65,18 +62,15 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
-    chosen_point_subscriber_
-        = n_->subscribe<geometry_msgs::PointStamped>(topic_chosen_points_,
-            /*queue_size=*/1, &FootPositionFinder::chosenPointCallback, this);
     pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
         topic_camera_front_, /*queue_size=*/1,
         &FootPositionFinder::processSimulatedDepthFrames, this);
 
     if (realsense_) {
-        cfg_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
-            RS2_FORMAT_Z16, /*framerate=*/30);
-        pipe_.start(cfg_);
-        processRealSenseDepthFrames();
+        // cfg_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
+        //     RS2_FORMAT_Z16, /*framerate=*/30);
+        // pipe_.start(cfg_);
+        // processRealSenseDepthFrames();
     } else {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
             topic_camera_front_, /*queue_size=*/1,
@@ -120,16 +114,6 @@ void FootPositionFinder::processRealSenseDepthFrames()
 }
 
 /**
- * Callback function for when a point is chosen for a dynamic gait.
- */
-// Suppress lint error "make reference of argument" (breaks callback)
-void FootPositionFinder::chosenPointCallback(
-    const geometry_msgs::PointStamped msg) // NOLINT
-{
-    last_chosen_point_ = Point(msg.point.x, msg.point.y, msg.point.z);
-}
-
-/**
  * Callback function for when a simulated realsense depth frame arrives.
  */
 // Suppress lint error "make reference of argument" (breaks callback)
@@ -154,11 +138,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     if (!realsense_) {
         // Define the desired future foot position
-        Point p = last_chosen_point_;
-        transformPoint(p, "foot_" + left_or_right_, reference_frame_id_);
-        point = Point(/*_x=*/p.x - (float)step_distance_,
-            /*_y=*/p.y - (float)switch_factor_ * (float)foot_gap_,
-            /*_z=*/p.z);
+        point = Point(-(float)step_distance_,
+            (float)switch_factor_ * (float)foot_gap_, last_height_);
 
         // Calculate point location relative to positionary leg
         transformPoint(point, reference_frame_id_, base_frame_);
@@ -174,9 +155,14 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
+    publishSearchRectangle(point_marker_publisher_, position,
+        pointFinder.getDisplacements(), left_or_right_);
+
     if (position_queue.size() > 0) {
         Point avg = computeTemporalAveragePoint(position_queue[0]);
+        last_height_ = avg.z;
         publishPoint(point_publisher_, avg);
+        publishPossiblePoints(point_marker_publisher_, position_queue);
     }
 }
 

@@ -332,8 +332,10 @@ class DynamicSetpointGait(GaitInterface):
             return None
 
     def _covid_to_gait_magic(self) -> None:
+        temp = self.foot_location.point.y
         self.foot_location.point.x = -self.foot_location.point.x
         self.foot_location.point.y = self.foot_location.point.z
+        self.foot_location.point.z = temp
 
     def _get_trajectory_command(self, stop=False) -> TrajectoryCommand:
         """Return a TrajectoryCommand based on current subgait_id
