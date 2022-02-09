@@ -53,16 +53,6 @@ class DynamicSetpointGait(GaitInterface):
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.publisher_position_right = self.gait_selection.create_publisher(
-            PointStamped,
-            "/chosen_foot_position/right",
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.publisher_position_left = self.gait_selection.create_publisher(
-            PointStamped,
-            "/chosen_foot_position/left",
-            DEFAULT_HISTORY_DEPTH,
-        )
 
         # Assign reconfigurable parameters
         self.update_parameters()
@@ -351,7 +341,6 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
-            self._publish_foot_location(self.subgait_id, self.foot_location)
             self.logger.info(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
             )
@@ -389,15 +378,6 @@ class DynamicSetpointGait(GaitInterface):
         """Callback for gait_selection_node when the parameters have been updated."""
         self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
-
-    def _publish_foot_location(
-        self, subgait_id: str, foot_location: PointStamped
-    ) -> None:
-        """Publish the foot location to which we are stepping for confirmation towards CoViD"""
-        if subgait_id == "left_swing":
-            self.publisher_position_left.publish(foot_location)
-        elif subgait_id == "right_swing":
-            self.publisher_position_right.publish(foot_location)
 
     # UTILITY FUNCTIONS
     @staticmethod
