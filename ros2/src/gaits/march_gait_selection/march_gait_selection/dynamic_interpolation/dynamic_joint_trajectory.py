@@ -42,7 +42,6 @@ class DynamicJointTrajectory:
             (CLAMPED_BOUNDARY_CONDITION, velocity[-1]),
         )
         time = list(map(lambda x: x.nanoseconds / NANOSECONDS_TO_SECONDS, duration))
-
         self.interpolated_position = CubicSpline(
             time, position, bc_type=boundary_condition
         )

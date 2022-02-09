@@ -19,6 +19,8 @@ from geometry_msgs.msg import Point
 from typing import List
 from enum import IntEnum
 
+import matplotlib.pyplot as plt
+
 EXTRA_ANKLE_SETPOINT_INDEX = 1
 INTERPOLATION_POINTS = 30
 
@@ -148,6 +150,19 @@ class DynamicSubgait:
 
             self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
+    def test_plot(self):
+        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
+        for joint_trajectory in self.joint_trajectory_list:
+            pos = []
+            vel = []
+            for timestamp in timestamps:
+                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(timestamp)
+                pos.append(interpolated_setpoint.position)
+                vel.append(interpolated_setpoint.velocity)
+            plt.plot(timestamps, pos, label="pos")
+            plt.plot(timestamps, vel, label="vel")
+            plt.show()
+
     def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated
         trajectories for each joint
@@ -165,6 +180,7 @@ class DynamicSubgait:
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
+        # self.test_plot()
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 
@@ -223,7 +239,12 @@ class DynamicSubgait:
         setpoint_dict = {}
         velocity = np.zeros_like(position) if (velocity is None) else velocity
 
-        for i in range(len(joint_names)):
+        for i, name in enumerate(joint_names):
+            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
+                name == "left_ankle" and self.subgait_id == "left_swing"
+            ):
+                velocity[i] = 0.0
+
             setpoint_dict.update(
                 {
                     joint_names[i]: Setpoint(
