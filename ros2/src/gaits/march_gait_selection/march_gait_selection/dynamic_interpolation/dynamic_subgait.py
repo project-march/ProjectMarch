@@ -19,8 +19,6 @@ from geometry_msgs.msg import Point
 from typing import List
 from enum import IntEnum
 
-import matplotlib.pyplot as plt
-
 EXTRA_ANKLE_SETPOINT_INDEX = 1
 INTERPOLATION_POINTS = 30
 
@@ -122,11 +120,15 @@ class DynamicSubgait:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.subgait_id
             )
-
+        desired_velocity = np.zeros_like(self.desired_position)
+        # if self.subgait_id == "right_swing":
+        #     desired_velocity[6] = -0.28
+        # else:
+        #     desired_velocity[2] = -0.28
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             self.desired_position,
-            None,
+            desired_velocity,
             self.time[SetpointTime.END_POINT_INDEX],
         )
 
@@ -147,21 +149,11 @@ class DynamicSubgait:
                 setpoint_list.insert(
                     EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
                 )
-
-            self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
-
-    def test_plot(self):
-        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
-        for joint_trajectory in self.joint_trajectory_list:
-            pos = []
-            vel = []
-            for timestamp in timestamps:
-                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(timestamp)
-                pos.append(interpolated_setpoint.position)
-                vel.append(interpolated_setpoint.velocity)
-            plt.plot(timestamps, pos, label="pos")
-            plt.plot(timestamps, vel, label="vel")
-            plt.show()
+                self.joint_trajectory_list.append(
+                    DynamicJointTrajectory(setpoint_list, ankle=True)
+                )
+            else:
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
     def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated
@@ -180,7 +172,6 @@ class DynamicSubgait:
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
-        # self.test_plot()
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 

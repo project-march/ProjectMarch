@@ -19,8 +19,7 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-SOFT_LIMIT_BUFFER = np.deg2rad(5)
-MAX_ANKLE_FLEXION = limits.upper - SOFT_LIMIT_BUFFER
+MAX_ANKLE_FLEXION = limits.upper
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
