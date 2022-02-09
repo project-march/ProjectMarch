@@ -69,6 +69,14 @@ class ConnectionManager():
                         self.send_message_till_confirm("accept")
                     else:
                         self.request_gait(req)
+                elif "Heartbeat" in req:
+                    req = json.loads(req)
+                    self.req = req["seq"]
+
+                    self.send_message_till_confirm(self.current_gait)
+                    # Wait untill response comes back from android IPD
+
+                    
                 else:
                     self.last_heartbeat = datetime.now()
 
