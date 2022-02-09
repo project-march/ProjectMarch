@@ -38,11 +38,6 @@ class DynamicSetpointGait(GaitInterface):
         self.joint_names = get_joint_names_from_urdf()
         self._get_soft_limits()
 
-        self.start_position = self._joint_dict_to_setpoint_dict(
-            get_position_from_yaml("stand")
-        )
-        self.end_position = self.start_position
-
         self.gait_name = "dynamic_walk"
 
         # Create subscribers and publishers for CoViD
@@ -150,6 +145,11 @@ class DynamicSetpointGait(GaitInterface):
 
         self._start_is_delayed = True
         self._scheduled_early = False
+
+        self.start_position = self._joint_dict_to_setpoint_dict(
+            get_position_from_yaml("stand")
+        )
+        self.end_position = self.start_position
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
