@@ -97,9 +97,6 @@ gaits:
     right_open: MVI_walksinglestepsmall_rightopen_v5
     left_close: MVI_walksinglestepsmall_leftclose_v5
 
-  dynamic_gait:
-    zero_pose: zero_pose
-
 dynamic_edge_gaits:
   ramp_down:
     start_is_dynamic: false
