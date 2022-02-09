@@ -173,7 +173,7 @@ class DynamicSetpointGait(GaitInterface):
         self.update_parameters()
         self._current_time = current_time
         self._start_time = self._current_time + first_subgait_delay
-        self._next_command = self._get_trajectory_command()
+        self._next_command = self._get_trajectory_command(start=True)
         return GaitUpdate.should_schedule_early(self._next_command)
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
@@ -331,8 +331,13 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
-    def _get_trajectory_command(self, stop=False) -> TrajectoryCommand:
+    def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:
         """Return a TrajectoryCommand based on current subgait_id
+
+        :param start: whether it is a start gait or not
+        :type start: bool
+        :param stop: whether it is a stop gait or not
+        :type stop: bool
 
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
@@ -358,6 +363,7 @@ class DynamicSetpointGait(GaitInterface):
             self.joint_names,
             self.foot_location.point,
             self.joint_soft_limits,
+            start,
             stop,
         )
 

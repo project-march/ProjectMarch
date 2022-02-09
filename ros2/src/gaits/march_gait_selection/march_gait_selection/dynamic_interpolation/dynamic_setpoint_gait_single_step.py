@@ -1,9 +1,9 @@
-from rclpy.node import Node
+"""Author: Marten Haitjema, MVII"""
 
+from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
-from march_utility.utilities.duration import Duration
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
 

@@ -45,6 +45,8 @@ class DynamicSubgait:
     :type position: Point
     :param joint_soft_limits: list containing soft limits in alphabetical order
     :type joint_soft_limits: List[Limits]
+    :param start: whether it is an open gait or not
+    :type start: bool
     :param stop: whether it is a close gait or not
     :type stop: bool
     """
@@ -57,6 +59,7 @@ class DynamicSubgait:
         joint_names: List[str],
         location: Point,
         joint_soft_limits: List[Limits],
+        start: bool,
         stop: bool,
     ):
         self.logger = Logger(gait_selection_node, __class__.__name__)
@@ -72,6 +75,8 @@ class DynamicSubgait:
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
+
+        self.start = start
         self.stop = stop
         self.pose = Pose()
 
@@ -138,9 +143,11 @@ class DynamicSubgait:
                 self.desired_setpoint_dict[name],
             ]
 
-            # Add an extra setpoint to the ankle to create a push off:
-            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
-                name == "left_ankle" and self.subgait_id == "left_swing"
+            # Add an extra setpoint to the ankle to create a push off, except for
+            # a start gait:
+            if not self.start and (
+                (name == "right_ankle" and self.subgait_id == "right_swing")
+                or (name == "left_ankle" and self.subgait_id == "left_swing")
             ):
                 setpoint_list.insert(
                     EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
