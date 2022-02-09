@@ -19,7 +19,7 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-SOFT_LIMIT_BUFFER = np.deg2rad(5)
+SOFT_LIMIT_BUFFER = np.deg2rad(1)
 MAX_ANKLE_FLEXION = limits.upper - SOFT_LIMIT_BUFFER
 
 # Constants:
@@ -64,6 +64,10 @@ class Pose:
 
     def reset_to_zero_pose(self):
         self.__init__()
+        bend_ankle, bend_hip, bend_knee = self.bended_angles(self.max_leg_length)
+        self.fe_ankle1 = self.fe_ankle2 = bend_ankle
+        self.fe_hip1 = self.fe_hip2 = bend_hip
+        self.fe_knee1 = self.fe_knee2 = KNEE_ZERO_ANGLE - bend_knee
 
     @property
     def pose_right(self) -> List[float]:
@@ -170,6 +174,14 @@ class Pose:
         pos_ankle1 = pose.calculate_joint_positions("pos_ankle1")
         return np.linalg.norm(pos_hip - pos_ankle1)
 
+    @property
+    def ankle_limit_toes_knee_distance(self) -> float:
+        pose = Pose()
+        pose.fe_ankle1 = MAX_ANKLE_FLEXION
+        pos_toes1 = pose.calculate_joint_positions("pos_toes1")
+        pos_knee1 = pose.calculate_joint_positions("pos_knee1")
+        return np.linalg.norm(pos_toes1 - pos_knee1)
+
     def bended_angles(self, leg_length: float):
         if leg_length < LENGTH_LEG:
             sides = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, leg_length]
@@ -195,6 +207,89 @@ class Pose:
         self.fe_hip2 = angle_front + bend_hip2
         self.fe_knee2 = KNEE_ZERO_ANGLE - bend_knee2
         self.fe_ankle2 = -angle_front + bend_ankle2
+
+    def reduce_swing_dorsi_flexion(self):
+        """
+        Calculate the pose after reducing the dorsiflexion using quadrilateral solver
+        with quadrilateral between ankle2, knee2, hip, knee1
+        """
+
+        # get current state:
+        (
+            pos_ankle1,
+            pos_knee1,
+            pos_hip,
+            pos_knee2,
+            pos_ankle2,
+        ) = self.calculate_joint_positions()[1:-1]
+
+        # determine reduction:
+        reduction = self.fe_ankle2 - MAX_ANKLE_FLEXION
+        angle_ankle2 = (
+            qas.get_angle_between_points([pos_ankle1, pos_ankle2, pos_knee2])
+            - reduction
+        )
+
+        # store current angle of ankle1 between ankle2 and hip:
+        angle_ankle1_before = qas.get_angle_between_points(
+            [pos_ankle2, pos_ankle1, pos_hip]
+        )
+
+        # determine other angles using angle_ankle2 and sides:
+        dist_ankle1_ankle2 = np.linalg.norm(pos_ankle1 - pos_ankle2)
+        sides = [
+            self.max_leg_length,
+            dist_ankle1_ankle2,
+            LENGTH_LOWER_LEG,
+            LENGTH_UPPER_LEG,
+        ]
+        angle_ankle1, angle_ankle2, angle_knee2, angle_hip = qas.solve_quadritlateral(
+            sides, angle_ankle2
+        )
+
+        # define new fe_ankle1:
+        self.fe_ankle1 -= angle_ankle1 - angle_ankle1_before
+
+        # get new locations of knee1 and hip:
+        pos_knee1 = self.calculate_joint_positions("pos_knee1")
+        pos_hip = self.calculate_joint_positions("pos_hip")
+
+        # define other joint angles:
+        point_below_hip = np.array([pos_hip[0], 0])
+        self.fe_hip1 = np.sign(
+            pos_knee1[0] - pos_hip[0]
+        ) * qas.get_angle_between_points([pos_knee1, pos_hip, point_below_hip])
+        self.fe_hip2 = (
+            angle_hip
+            - qas.get_angle_between_points([pos_ankle1, pos_hip, pos_knee1])
+            + self.fe_hip1
+        )
+        self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee2
+        self.fe_ankle2 -= reduction
+
+    def keep_hip_between_ankles(self):
+        pos_toes2 = np.array([self.ankle_x + LENGTH_FOOT, self.ankle_y])
+
+        self.reset_to_zero_pose()
+        pos_hip = self.calculate_joint_positions("pos_hip")
+
+        dist_hip_toes2 = np.linalg.norm(pos_hip - pos_toes2)
+        dist_toes2_knee2 = self.ankle_limit_toes_knee_distance
+        angle_hip, angle_toes2, angle_knee2 = tas.get_angles_from_sides(
+            [dist_toes2_knee2, LENGTH_UPPER_LEG, dist_hip_toes2]
+        )
+
+        point_below_hip = np.array([pos_hip[0], 0])
+        angle_hip_out = qas.get_angle_between_points(
+            [point_below_hip, pos_hip, pos_toes2]
+        )
+        self.fe_hip2 = angle_hip + angle_hip_out
+
+        angle_knee2_out = tas.get_angle_from_sides(
+            LENGTH_FOOT, np.array([LENGTH_LOWER_LEG, dist_toes2_knee2])
+        )
+        self.fe_knee2 = KNEE_ZERO_ANGLE - (angle_knee2 - angle_knee2_out)
+        self.fe_ankle2 = MAX_ANKLE_FLEXION
 
     def reduce_stance_dorsi_flexion(self):
         # Save current angle at toes1 between ankle1 and hip:
@@ -229,6 +324,7 @@ class Pose:
         ankle_y,
         hip_x_fraction,
         default_knee_bend,
+        reduce_df_front,
         reduce_df_rear,
     ):
         # set parameters:
@@ -261,7 +357,15 @@ class Pose:
         # front leg:
         self.solve_front_leg(pos_hip, pos_ankle2)
 
-        # reduce stance dorsi flexion:
+        # reduce dorsi flexion:
+        if reduce_df_front and self.fe_ankle2 > MAX_ANKLE_FLEXION:
+            self.reduce_swing_dorsi_flexion()
+            if (
+                self.calculate_joint_positions("pos_hip")[0]
+                < self.calculate_joint_positions("pos_ankle1")[0]
+            ):
+                self.keep_hip_between_ankles()
+
         if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION:
             self.reduce_stance_dorsi_flexion()
 

@@ -1,8 +1,7 @@
-from turtle import width
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, Button
-from march_goniometric_ik_solver.ik_solver_v2 import Pose
+from march_goniometric_ik_solver.ik_solver_v2 import Pose, LENGTH_FOOT
 
 
 class LiveWidget:
@@ -10,6 +9,7 @@ class LiveWidget:
         self.default_hip_fraction = 0.5
         self.default_knee_bend = np.deg2rad(8)
         self.reduce_df_rear = False
+        self.reduce_df_front = False
 
         # Create default pose:
         pose = Pose()
@@ -18,6 +18,7 @@ class LiveWidget:
             0.0,
             self.default_hip_fraction,
             self.default_knee_bend,
+            self.reduce_df_front,
             self.reduce_df_rear,
         )
         positions = pose.calculate_joint_positions()
@@ -27,6 +28,10 @@ class LiveWidget:
         # Plot the default pose:
         self.fig, self.ax = plt.subplots()
         (self.exo,) = plt.plot(positions_x, positions_y, ".-")
+
+        # Plot ankle goal and toes:
+        (self.goal,) = plt.plot(0.0, 0.0, "x")
+        (self.toes,) = plt.plot(LENGTH_FOOT, 0.0, "x")
 
         # Print the default pose:
         joints = [
@@ -113,25 +118,29 @@ class LiveWidget:
         self.toggle_df_rear = Button(
             ax_toggle, "df_rear", color="red", hovercolor="green"
         )
-        self.toggle_df_rear.on_clicked(self.toggle)
+        self.toggle_df_rear.on_clicked(self.toggle_rear)
 
         # create a toggle for swing dorsi flexion:
         ax_toggle = plt.axes([0.85, 0.25, 0.1, 0.04])
         self.toggle_df_front = Button(
             ax_toggle, "df_front", color="red", hovercolor="green"
         )
+        self.toggle_df_front.on_clicked(self.toggle_front)
 
         # Show all:
         plt.show()
 
     # The function to be called anytime a slider's value changes
     def update(self, update_value):
+
+        # Get new exo pose:
         pose = Pose()
         pose.solve_all(
             self.x_slider.val,
             self.y_slider.val,
             self.hip_slider.val,
             np.deg2rad(self.knee_slider.val),
+            self.reduce_df_front,
             self.reduce_df_rear,
         )
         positions = pose.calculate_joint_positions()
@@ -140,6 +149,14 @@ class LiveWidget:
 
         self.exo.set_xdata(positions_x)
         self.exo.set_ydata(positions_y)
+
+        # Plot new ankle goal location:
+        self.goal.set_xdata(self.x_slider.val)
+        self.goal.set_ydata(self.y_slider.val)
+
+        # Plot new toes goal location:
+        self.toes.set_xdata(self.x_slider.val + LENGTH_FOOT)
+        self.toes.set_ydata(self.y_slider.val)
 
         pose_rad = pose.pose_left
         for i in np.arange(len(pose_rad)):
@@ -160,7 +177,7 @@ class LiveWidget:
         self.knee_slider.reset()
 
     # toggle function:
-    def toggle(self, event):
+    def toggle_rear(self, event):
         if self.reduce_df_rear:
             self.reduce_df_rear = False
             self.toggle_df_rear.color = "red"
@@ -169,6 +186,17 @@ class LiveWidget:
             self.reduce_df_rear = True
             self.toggle_df_rear.color = "green"
             self.toggle_df_rear.hovercolor = "red"
+        self.update(0)
+
+    def toggle_front(self, event):
+        if self.reduce_df_front:
+            self.reduce_df_front = False
+            self.toggle_df_front.color = "red"
+            self.toggle_df_front.hovercolor = "green"
+        else:
+            self.reduce_df_front = True
+            self.toggle_df_front.color = "green"
+            self.toggle_df_front.hovercolor = "red"
         self.update(0)
 
 
