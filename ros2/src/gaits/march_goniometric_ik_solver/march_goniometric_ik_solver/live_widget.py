@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, Button
-from march_goniometric_ik_solver.ik_solver_v2 import Pose, LENGTH_FOOT
+from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT
 
 
 class LiveWidget:
@@ -18,9 +18,10 @@ class LiveWidget:
 
         # Get default pose:
         pose = Pose()
-        pose.solve_all(
+        pose.solve_end_position(
             0.0,
             0.0,
+            "",
             self.default_hip_fraction,
             self.default_knee_bend,
             self.reduce_df_front,
@@ -34,7 +35,7 @@ class LiveWidget:
         self.fig, self.ax = plt.subplots()
         (self.exo,) = plt.plot(positions_x, positions_y, ".-")
 
-        # Plot ankle goal and toes locations:
+        # Plot ankle and toes goal locations:
         (self.goal,) = plt.plot(0.0, 0.0, "x")
         (self.toes,) = plt.plot(LENGTH_FOOT, 0.0, "x")
 
@@ -107,7 +108,7 @@ class LiveWidget:
             valinit=8,
         )
 
-        # Register the update function with each slider
+        # Create update callback for every slider's change:
         self.x_slider.on_changed(self.update)
         self.y_slider.on_changed(self.update)
         self.hip_slider.on_changed(self.update)
@@ -140,9 +141,10 @@ class LiveWidget:
 
         # Get new exo pose and update joint positions:
         pose = Pose()
-        pose.solve_all(
+        pose.solve_end_position(
             self.x_slider.val,
             self.y_slider.val,
+            "",
             self.hip_slider.val,
             np.deg2rad(self.knee_slider.val),
             self.reduce_df_front,
