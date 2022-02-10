@@ -15,6 +15,9 @@
       "name": "force_unknown",
       "callback": "publish_sm_to_unknown",
       "always_enabled": true
+    },
+    {
+      "name": "dynamic_walk"
     }
   ],
   [
@@ -28,7 +31,10 @@
       "name": "walk_single_step"
     },
     {
-      "name": "dynamic_walk"
+      "name": "walk_single_step_large"
+    },
+    {
+      "name": "dynamic_walk_single_step"
     }
   ],
   [
@@ -140,9 +146,6 @@
       "name": "error",
       "callback": "publish_error",
       "always_enabled": true
-    },
-    {
-      "name": "walk_single_step_large"
     }
   ]
 ]

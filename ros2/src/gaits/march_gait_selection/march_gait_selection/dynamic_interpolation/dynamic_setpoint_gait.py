@@ -38,11 +38,6 @@ class DynamicSetpointGait(GaitInterface):
         self.joint_names = get_joint_names_from_urdf()
         self._get_soft_limits()
 
-        self.start_position = self._joint_dict_to_setpoint_dict(
-            get_position_from_yaml("stand")
-        )
-        self.end_position = self.start_position
-
         self.gait_name = "dynamic_walk"
 
         # Create subscribers and publishers for CoViD
@@ -56,16 +51,6 @@ class DynamicSetpointGait(GaitInterface):
             PointStamped,
             "/foot_position/left",
             self._callback_left,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.publisher_position_right = self.gait_selection.create_publisher(
-            PointStamped,
-            "/chosen_foot_position/right",
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.publisher_position_left = self.gait_selection.create_publisher(
-            PointStamped,
-            "/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -151,6 +136,11 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
+        self.start_position = self._joint_dict_to_setpoint_dict(
+            get_position_from_yaml("stand")
+        )
+        self.end_position = self.start_position
+
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
     def start(
@@ -173,7 +163,7 @@ class DynamicSetpointGait(GaitInterface):
         self.update_parameters()
         self._current_time = current_time
         self._start_time = self._current_time + first_subgait_delay
-        self._next_command = self._get_trajectory_command()
+        self._next_command = self._get_trajectory_command(start=True)
         return GaitUpdate.should_schedule_early(self._next_command)
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
@@ -331,8 +321,13 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
-    def _get_trajectory_command(self, stop=False) -> TrajectoryCommand:
+    def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:
         """Return a TrajectoryCommand based on current subgait_id
+
+        :param start: whether it is a start gait or not
+        :type start: bool
+        :param stop: whether it is a stop gait or not
+        :type stop: bool
 
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
@@ -346,7 +341,6 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
-            self._publish_foot_location(self.subgait_id, self.foot_location)
             self.logger.info(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
             )
@@ -358,6 +352,7 @@ class DynamicSetpointGait(GaitInterface):
             self.joint_names,
             self.foot_location.point,
             self.joint_soft_limits,
+            start,
             stop,
         )
 
@@ -383,15 +378,6 @@ class DynamicSetpointGait(GaitInterface):
         """Callback for gait_selection_node when the parameters have been updated."""
         self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
-
-    def _publish_foot_location(
-        self, subgait_id: str, foot_location: PointStamped
-    ) -> None:
-        """Publish the foot location to which we are stepping for confirmation towards CoViD"""
-        if subgait_id == "left_swing":
-            self.publisher_position_left.publish(foot_location)
-        elif subgait_id == "right_swing":
-            self.publisher_position_right.publish(foot_location)
 
     # UTILITY FUNCTIONS
     @staticmethod
