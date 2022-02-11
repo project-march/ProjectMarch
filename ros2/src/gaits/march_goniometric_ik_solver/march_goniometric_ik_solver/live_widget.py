@@ -1,3 +1,5 @@
+"""Author: Jelmer de Wolde, MVII"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, Button
@@ -7,6 +9,9 @@ from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT
 class LiveWidget:
     """
     A widget to easily check the solutions of the IK solver for a given x,y location of the ankle.
+    This widget has been made for debugging purposes, to evaluate poses the IK solver provides as
+    solution for a given goal location. This widget can be executed by sourcing ROS2, March ROS2
+    and running this script with python: sfox && sros2 && python3 live_widget.py
     """
 
     def __init__(self) -> None:
@@ -209,4 +214,5 @@ class LiveWidget:
         self.update(0)
 
 
-widget = LiveWidget()
+if __name__ == "__main__":
+    widget = LiveWidget()

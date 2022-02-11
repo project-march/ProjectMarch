@@ -1,3 +1,5 @@
+"""Author: Jelmer de Wolde, MVII"""
+
 import numpy as np
 from typing import List, Tuple
 import matplotlib.pyplot as plt
@@ -45,7 +47,7 @@ class Pose:
     Positive defined are: ankle dorsi-flexion, hip abduction, hip flexion, knee flexion.
     """
 
-    def __init__(self, pose: List[float] = None):
+    def __init__(self, pose: List[float] = None) -> None:
         if pose is None:
             angle_ankle, angle_hip, angle_knee = self.leg_length_angles(
                 self.max_leg_length
@@ -67,7 +69,7 @@ class Pose:
             ) = pose
         self.rot_foot1 = 0
 
-    def reset_to_zero_pose(self):
+    def reset_to_zero_pose(self) -> None:
         self.__init__()
 
     @property
@@ -236,9 +238,11 @@ class Pose:
         else:
             return 0.0, 0.0, np.pi
 
-    def solve_leg(self, pos_hip: np.array, pos_ankle: np.array, leg: str):
+    def solve_leg(self, pos_hip: np.array, pos_ankle: np.array, leg: str) -> None:
         """
-        Set the required joint angles for the given leg
+        Set the required joint angles for the given leg to reach given pos_ankle location 
+        with hip at given pos_hip location. Expects a 2D numpy array for both pos_hip and
+        pos_ankle containing the x and y location. The given leg can be 'rear' or 'front'.
         """
         dist_ankle_hip = np.linalg.norm(pos_hip - pos_ankle)
         angle_ankle, angle_hip, angle_knee = self.leg_length_angles(dist_ankle_hip)
@@ -258,7 +262,7 @@ class Pose:
         else:
             raise ValueError("Expected leg to be 'rear' or 'front'.")
 
-    def reduce_swing_dorsi_flexion(self):
+    def reduce_swing_dorsi_flexion(self) -> None:
         """
         Calculates the pose after reducing the dorsiflexion using quadrilateral solver
         with quadrilateral between ankle2, knee2, hip, knee1.
@@ -309,7 +313,7 @@ class Pose:
         self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee2
         self.fe_ankle2 -= reduction
 
-    def keep_hip_above_rear_ankle(self):
+    def keep_hip_above_rear_ankle(self) -> None:
         """
         Calculates the pose required to keep the hip above the rear ankle
         while reaching at least the goal location for the toes.
@@ -339,7 +343,7 @@ class Pose:
         self.fe_knee2 = KNEE_ZERO_ANGLE - (angle_knee2 - angle_knee2_out)
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
-    def reduce_stance_dorsi_flexion(self):
+    def reduce_stance_dorsi_flexion(self) -> None:
         """
         Calculates the pose after reducing the dorsiflexion using quadrilateral solver
         with quadrilateral between toes1, ankle1, knee1, and hip.
