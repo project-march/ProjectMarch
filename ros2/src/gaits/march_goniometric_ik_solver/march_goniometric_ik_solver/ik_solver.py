@@ -240,7 +240,7 @@ class Pose:
 
     def solve_leg(self, pos_hip: np.array, pos_ankle: np.array, leg: str) -> None:
         """
-        Set the required joint angles for the given leg to reach given pos_ankle location 
+        Set the required joint angles for the given leg to reach given pos_ankle location
         with hip at given pos_hip location. Expects a 2D numpy array for both pos_hip and
         pos_ankle containing the x and y location. The given leg can be 'rear' or 'front'.
         """
