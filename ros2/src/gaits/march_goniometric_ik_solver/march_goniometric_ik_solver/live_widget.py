@@ -1,9 +1,15 @@
 """Author: Jelmer de Wolde, MVII"""
 
+import pkg_resources
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, Button
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT
+
+# Layout problems occurred with older versions of matplotlib (for example 3.1.2).
+# Tested and working on 3.5.1 (latest version at the moment this tool was made).
+# If newer versions release, test the layout and adjust requirement if successfull:
+pkg_resources.require("matplotlib==3.5.1")
 
 
 class LiveWidget:
