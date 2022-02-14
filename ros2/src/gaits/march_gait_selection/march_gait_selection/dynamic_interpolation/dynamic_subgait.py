@@ -6,6 +6,9 @@ from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
+    DynamicSetpointGait,
+)
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
@@ -64,21 +67,62 @@ class DynamicSubgait:
     ):
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
-        self.time = [
-            0,
-            self.push_off_fraction * self.duration,
-            self.middle_point_fraction * self.duration,
-            self.duration,
-        ]
+
         self.starting_position = starting_position
         self.location = location
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
 
+        duration = DynamicSetpointGait.get_duration_scaled_to_height(self.duration, self.location.y)
+        self.time = [
+            0,
+            self.push_off_fraction * duration,
+            self.middle_point_fraction * duration,
+            duration,
+        ]
+
         self.start = start
         self.stop = stop
         self.pose = Pose()
+
+    def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
+        """Return a joint_trajectory_msg containing the interpolated
+        trajectories for each joint
+
+        :returns: A joint_trajectory_msg
+        :rtype: joint_trajectory_msg
+        """
+        # Update pose:
+        pose_list = [joint.position for joint in self.starting_position.values()]
+        self.pose = Pose(pose_list)
+
+        self._solve_middle_setpoint()
+        self._solve_desired_setpoint()
+        self._get_extra_ankle_setpoint()
+
+        # Create joint_trajectory_msg
+        self._to_joint_trajectory_class()
+        joint_trajectory_msg = trajectory_msg.JointTrajectory()
+        joint_trajectory_msg.joint_names = self.joint_names
+
+        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
+        for timestamp in timestamps:
+            joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
+            joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
+
+            for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
+                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
+                    timestamp
+                )
+
+                joint_trajecory_point.positions.append(interpolated_setpoint.position)
+                joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
+                self._check_joint_limits(joint_index, joint_trajecory_point)
+
+            joint_trajectory_msg.points.append(joint_trajecory_point)
+
+        return joint_trajectory_msg
 
     def _get_extra_ankle_setpoint(self) -> Setpoint:
         """Returns an extra setpoint for the swing leg ankle
@@ -154,44 +198,6 @@ class DynamicSubgait:
                 )
 
             self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
-
-    def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
-        """Return a joint_trajectory_msg containing the interpolated
-        trajectories for each joint
-
-        :returns: A joint_trajectory_msg
-        :rtype: joint_trajectory_msg
-        """
-        # Update pose:
-        pose_list = [joint.position for joint in self.starting_position.values()]
-        self.pose = Pose(pose_list)
-
-        self._solve_middle_setpoint()
-        self._solve_desired_setpoint()
-        self._get_extra_ankle_setpoint()
-
-        # Create joint_trajectory_msg
-        self._to_joint_trajectory_class()
-        joint_trajectory_msg = trajectory_msg.JointTrajectory()
-        joint_trajectory_msg.joint_names = self.joint_names
-
-        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
-        for timestamp in timestamps:
-            joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
-
-            for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
-                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
-                    timestamp
-                )
-
-                joint_trajecory_point.positions.append(interpolated_setpoint.position)
-                joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
-                self._check_joint_limits(joint_index, joint_trajecory_point)
-
-            joint_trajectory_msg.points.append(joint_trajecory_point)
-
-        return joint_trajectory_msg
 
     def get_final_position(self) -> dict:
         """Get setpoint_dictionary of the final setpoint.

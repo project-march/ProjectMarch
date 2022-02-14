@@ -364,10 +364,13 @@ class DynamicSetpointGait(GaitInterface):
         )
 
         trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+        duration = self.get_duration_scaled_to_height(
+            self.dynamic_subgait_duration, self.foot_location.point.y
+        )
 
         return TrajectoryCommand(
             trajectory,
-            Duration(self.dynamic_subgait_duration),
+            duration,
             self.subgait_id,
             self._end_time,
         )
@@ -387,6 +390,10 @@ class DynamicSetpointGait(GaitInterface):
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
 
     # UTILITY FUNCTIONS
+    @staticmethod
+    def get_duration_scaled_to_height(duration: float, step_height: float) -> Duration:
+        return Duration(duration + 5 * abs(step_height))
+
     @staticmethod
     def _setpoint_dict_to_joint_dict(setpoint_dict: dict) -> dict:
         """Creates a joint_dict from a setpoint_dict.
