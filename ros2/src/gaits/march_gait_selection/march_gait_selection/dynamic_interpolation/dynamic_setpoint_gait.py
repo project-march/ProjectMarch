@@ -321,6 +321,12 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
+    def _covid_to_gait_magic(self) -> None:
+        temp = self.foot_location.point.y
+        self.foot_location.point.x = -self.foot_location.point.x
+        self.foot_location.point.y = self.foot_location.point.z
+        self.foot_location.point.z = temp
+
     def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:
         """Return a TrajectoryCommand based on current subgait_id
 
@@ -341,6 +347,7 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
+            self._covid_to_gait_magic()
             self.logger.info(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
             )

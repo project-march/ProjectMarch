@@ -196,3 +196,4 @@ venv/
 codequality.json
 
 .vscode/*
+.DS_Store

@@ -323,20 +323,20 @@ def generate_launch_description():
                 ],
             ),
             # Fake covid publisher
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(
-                        get_package_share_directory("march_fake_covid"),
-                        "launch",
-                        "march_fake_covid.launch.py",
-                    )
-                ),
-                launch_arguments=[
-                    ("use_sim_time", use_sim_time),
-                    ("location_x", location_x),
-                    ("location_y", location_y),
-                ],
-            ),
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource(
+            #         os.path.join(
+            #             get_package_share_directory("march_fake_covid"),
+            #             "launch",
+            #             "march_fake_covid.launch.py",
+            #         )
+            #     ),
+            #     launch_arguments=[
+            #         ("use_sim_time", use_sim_time),
+            #         ("location_x", location_x),
+            #         ("location_y", location_y),
+            #     ],
+            # ),
             # Safety
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
