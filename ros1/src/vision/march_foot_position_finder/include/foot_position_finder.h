@@ -31,8 +31,6 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenPointCallback(const geometry_msgs::PointStamped point);
-
     void processRealSenseDepthFrames();
 
     void processSimulatedDepthFrames(
@@ -42,7 +40,7 @@ protected:
 
     Point computeTemporalAveragePoint(const Point& new_point);
 
-    void transformPoint(Point& point, const std::string& frame_from,
+    Point transformPoint(Point& point, const std::string& frame_from,
         const std::string& frame_to);
 
     rs2::pipeline pipe_;
@@ -78,6 +76,7 @@ protected:
 
     std::string base_frame_;
     std::string reference_frame_id_;
+    std::string current_frame_id_;
 
     std::vector<Point> found_points_;
     double last_height_;

@@ -60,4 +60,19 @@ inline Point computeAveragePoint(const std::vector<Point>& points)
     return avg;
 }
 
+inline std::vector<Point> linearDomain(Point a, Point b, int n)
+{
+    n--;
+    std::vector<Point> points;
+    for (int i = 0 ; i <= n ; i++)
+    {
+        double x = (b.x - a.x) / (double)n * i + a.x;
+        double y = (b.y - a.y) / (double)n * i + a.y;
+        double z = (b.z - a.z) / (double)n * i + a.z;
+
+        points.push_back(Point(x, y, z));
+    }
+    return points;
+}
+
 #endif // MARCH_MATH_UTILITIES

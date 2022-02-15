@@ -41,6 +41,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     }
 
     reference_frame_id_ = "foot_" + other_;
+    current_frame_id_ = "foot_" + left_or_right;
     last_height_ = 0;
 
     ros::param::get("~realsense", realsense_);
@@ -55,7 +56,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
 
-    point_publisher_ = n_->advertise<geometry_msgs::PointStamped>(
+    point_publisher_ = n_->advertise<march_shared_msgs::FootPosition>(
         "/foot_position/" + left_or_right_, /*queue_size=*/1);
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>(
         "/camera_" + left_or_right_ + "/preprocessed_cloud", /*queue_size=*/1);
@@ -139,10 +140,10 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     if (!realsense_) {
         // Define the desired future foot position
         point = Point(-(float)step_distance_,
-            (float)switch_factor_ * (float)foot_gap_, last_height_);
+            (float)switch_factor_ * (float)foot_gap_, (float)last_height_);
 
         // Calculate point location relative to positionary leg
-        transformPoint(point, reference_frame_id_, base_frame_);
+        point = transformPoint(point, reference_frame_id_, base_frame_);
     }
 
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
@@ -159,10 +160,28 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         pointFinder.getDisplacements(), left_or_right_);
 
     if (position_queue.size() > 0) {
-        Point avg = computeTemporalAveragePoint(position_queue[0]);
+        Point avg = computeTemporalAveragePoint(position_queue[0]); // base frame
+
         last_height_ = avg.z;
-        publishPoint(point_publisher_, avg);
+
+        Point start(0, 0, 0);
+        start = transformPoint(start, current_frame_id_, base_frame_);
+        start = Point(start.y, -start.x, start.z); // Rotate 90 degrees clockwise
+        std::vector<Point> track_points = pointFinder.retrieveTrackPoints(start, avg);
+
+        publishTrackMarkerPoints(point_marker_publisher_, track_points);
+        publishMarkerPoint(point_marker_publisher_, avg);
         publishPossiblePoints(point_marker_publisher_, position_queue);
+
+        Point relative_avg = Point(-avg.y, avg.x, avg.z);
+        relative_avg = transformPoint(relative_avg, base_frame_, reference_frame_id_);
+
+        for (Point& p : track_points) {
+            p = Point(-p.y, p.x, p.z);
+            p = transformPoint(p, base_frame_, reference_frame_id_);
+        }
+
+        publishPoint(point_publisher_, relative_avg, track_points);
     }
 }
 
@@ -190,13 +209,6 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
         Point final = computeAveragePoint(non_outliers);
 
         if (non_outliers.size() == sample_size_) {
-            // Publish for visualization
-            publishMarkerPoint(point_marker_publisher_, final);
-
-            // Publish for gait computation
-            final = Point(
-                -final.y, final.x, final.z); // Rotate 90 counter clockwise
-            transformPoint(final, base_frame_, reference_frame_id_);
             return final;
         }
     }
@@ -210,7 +222,7 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
  * @param frame_from source frame in which the point is currently
  * @param frame_to target frame in which point is transformed
  */
-void FootPositionFinder::transformPoint(
+Point FootPositionFinder::transformPoint(
     Point& point, const std::string& frame_from, const std::string& frame_to)
 {
     PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
@@ -233,5 +245,5 @@ void FootPositionFinder::transformPoint(
     pcl_ros::transformPointCloud(
         *desired_point, *desired_point, transform_stamped.transform);
 
-    point = desired_point->points[0];
+    return desired_point->points[0];
 }
