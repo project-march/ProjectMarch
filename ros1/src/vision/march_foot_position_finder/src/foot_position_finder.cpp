@@ -160,21 +160,25 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         pointFinder.getDisplacements(), left_or_right_);
 
     if (position_queue.size() > 0) {
-        Point avg = computeTemporalAveragePoint(position_queue[0]); // base frame
+        Point avg
+            = computeTemporalAveragePoint(position_queue[0]); // base frame
 
         last_height_ = avg.z;
 
-        Point start(0, 0, 0);
+        Point start(/*_x=*/0, /*_y=*/0, /*_z=*/0);
         start = transformPoint(start, current_frame_id_, base_frame_);
-        start = Point(start.y, -start.x, start.z); // Rotate 90 degrees clockwise
-        std::vector<Point> track_points = pointFinder.retrieveTrackPoints(start, avg);
+        start
+            = Point(start.y, -start.x, start.z); // Rotate 90 degrees clockwise
+        std::vector<Point> track_points
+            = pointFinder.retrieveTrackPoints(start, avg);
 
         publishTrackMarkerPoints(point_marker_publisher_, track_points);
         publishMarkerPoint(point_marker_publisher_, avg);
         publishPossiblePoints(point_marker_publisher_, position_queue);
 
         Point relative_avg = Point(-avg.y, avg.x, avg.z);
-        relative_avg = transformPoint(relative_avg, base_frame_, reference_frame_id_);
+        relative_avg
+            = transformPoint(relative_avg, base_frame_, reference_frame_id_);
 
         for (Point& p : track_points) {
             p = Point(-p.y, p.x, p.z);

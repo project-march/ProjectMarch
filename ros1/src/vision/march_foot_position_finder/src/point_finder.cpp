@@ -104,7 +104,8 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
-    convolveGaussianKernel();
+    // convolveGaussianKernel();
+    height_map_ = height_map_temp_;
     convolveLaplacianKernel();
     findFeasibleFootPlacements(position_queue);
 }
@@ -124,9 +125,8 @@ void PointFinder::mapPointCloudToHeightMap()
             continue;
         }
 
-        auto current_height
-            = height_map_temp_[grid_resolution_ - y_index][x_index];
-        height_map_temp_[grid_resolution_ - y_index][x_index]
+        auto current_height = height_map_temp_[y_index][x_index];
+        height_map_temp_[y_index][x_index]
             = std::max(current_height, (double)p.z);
     }
 }
@@ -188,76 +188,36 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 
                 if (std::abs(z - current_foot_z_) <= 1.0 && !std::isnan(x)
                     && !std::isnan(y) && !std::isnan(z)) {
-                    position_queue->push_back(Point((float)x, (float)y, (float)z));
+                    position_queue->push_back(
+                        Point((float)x, (float)y, (float)z));
                 }
             }
         }
     }
 }
 
-std::vector<Point> PointFinder::retrieveTrackPoints(const Point& start, const Point& end)
+std::vector<Point> PointFinder::retrieveTrackPoints(
+    const Point& start, const Point& end)
 {
-    // std::vector<Point> points = linearDomain(start, end, num_track_points_);
-    std::vector<Point> points = linearDomain(Point(0, 0, 0), Point(-0.5, 0, 0), num_track_points_);
+    std::vector<Point> points = linearDomain(start, end, num_track_points_);
     std::vector<Point> track_points;
 
     for (Point& p : points) {
-        int x_index = (p.y + 0.5) / 1.0 * grid_resolution_;
-        int y_index = (p.x + 0.5) / 1.0 * grid_resolution_;
+        int x_index = xCoordinateToIndex(p.x);
+        int y_index = yCoordinateToIndex(p.y);
 
-        double z;
+        float z;
 
-        if (x_index < 0 || y_index < 0 || x_index >= RES || y_index >= RES) {
-            z = -0.25;
+        if (x_index < 0 || y_index < 0) {
+            z = 0;
         } else {
             z = height_map_[y_index][x_index];
         }
 
-        // double x = xIndexToCoordinate(x_index);
-        // double y = yIndexToCoordinate(y_index);
-
-        track_points.push_back(Point(p.x, p.y, z));
+        track_points.emplace_back(Point(/*_x=*/p.x, /*_y=*/p.y, /*_z=*/z));
     }
 
-    // for (Point& p : points) {
-    //     int x_index = xCoordinateToIndex(p.x);
-    //     int y_index = yCoordinateToIndex(p.y);
-        
-    //     double x = xIndexToCoordinate(x_index);
-    //     double y = yIndexToCoordinate(y_index);
-    //     double z;
-
-    //     if (x_index < 0 || y_index < 0) {
-    //         z = -0.25;
-    //     } else {
-    //         z = height_map_[y_index][x_index];
-    //     }
-
-    //     track_points.push_back(Point(p.x, p.y, z));
-    // }
-
-    // for (int i = 0 ; i < 30 ; i++) {
-
-    //     double xx = xIndexToCoordinate(i);
-    //     double yy = yIndexToCoordinate(5);
-    //     double zz = height_map_[5][i];
-    //     track_points.push_back(Point(xx, yy, zz));
-    // }
-
-    for (int i = 0 ; i < RES ; i++) {
-        for (int j = 0; j < RES ; j++) {
-            
-            double xx = xIndexToCoordinate(i);
-            double yy = yIndexToCoordinate(j);
-            double zz = height_map_[j][i];
-
-            track_points.push_back(Point(xx, yy, zz));
-        }
-    }
-
-    // for (int )
-
-    return track_points; 
+    return track_points;
 }
 
 /**
@@ -283,7 +243,8 @@ int PointFinder::xCoordinateToIndex(double x)
  */
 int PointFinder::yCoordinateToIndex(double y)
 {
-    int index = (int)((y + y_offset_) / y_width_ * grid_resolution_);
+    int index = grid_resolution_
+        - (int)((y + y_offset_) / y_width_ * grid_resolution_);
     if (index >= RES || index < 0) {
         index = -1;
     }
@@ -309,12 +270,13 @@ double PointFinder::xIndexToCoordinate(int x)
  */
 double PointFinder::yIndexToCoordinate(int y)
 {
-    return ((double)(grid_resolution_ - y) / grid_resolution_) - y_offset_ - cell_width_ / 2.0;
+    return ((double)(grid_resolution_ - y) / grid_resolution_) - y_offset_
+        - cell_width_ / 2.0;
 }
 
 /**
  * Retrieve the displacements used to search for a foot-shaped rectangle.
- * 
+ *
  * @return the rectangle displacements
  */
 std::vector<double> PointFinder::getDisplacements()

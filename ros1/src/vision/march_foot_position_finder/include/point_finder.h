@@ -28,7 +28,8 @@ public:
 
     void findPoints(std::vector<Point>* position_queue);
 
-    std::vector<Point> retrieveTrackPoints(const Point& start, const Point& end);
+    std::vector<Point> retrieveTrackPoints(
+        const Point& start, const Point& end);
 
     std::vector<double> getDisplacements();
 

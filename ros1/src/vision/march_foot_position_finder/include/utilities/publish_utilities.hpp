@@ -6,19 +6,20 @@
 #define MARCH_PUBLISH_UTILITIES
 
 #include <librealsense2/rs.hpp>
+#include <march_shared_msgs/FootPosition.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/transforms.h>
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <march_shared_msgs/FootPosition.h>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 /**
- * Rotates a PCL point counter clockwise, and converts it to a ROS Point message.
+ * Rotates a PCL point counter clockwise, and converts it to a ROS Point
+ * message.
  *
  * @param p point to rotate
  * @return rotated point as a geometry_msgs::Point message
@@ -218,7 +219,7 @@ void publishTrackMarkerPoints(
     marker.action = visualization_msgs::Marker::ADD;
 
     for (auto& point : points) {
-        marker.points.push_back(toGeometry(point));
+        marker.points.push_back(rotate_left(point));
     }
 
     marker.pose.orientation.w = 1.0;
@@ -239,9 +240,11 @@ void publishTrackMarkerPoints(
  *
  * @param publisher publisher to use
  * @param p point to publish
- * @param track_points vector of points between start and end position of this step
+ * @param track_points vector of points between start and end position of this
+ * step
  */
-void publishPoint(ros::Publisher& publisher, Point& p, std::vector<Point> track_points)
+void publishPoint(
+    ros::Publisher& publisher, Point& p, const std::vector<Point>& track_points)
 {
     march_shared_msgs::FootPosition msg;
     msg.point.x = p.x;
@@ -250,7 +253,7 @@ void publishPoint(ros::Publisher& publisher, Point& p, std::vector<Point> track_
     msg.header.stamp = ros::Time::now();
 
     // rotate the track points
-    for (Point& p : track_points) {
+    for (const Point& p : track_points) {
         msg.track_points.push_back(rotate_left(p));
     }
 
