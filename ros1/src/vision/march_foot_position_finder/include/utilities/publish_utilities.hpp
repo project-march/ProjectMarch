@@ -33,15 +33,6 @@ inline geometry_msgs::Point rotate_left(Point p)
     return msg;
 }
 
-inline geometry_msgs::Point toGeometry(Point p)
-{
-    geometry_msgs::Point msg;
-    msg.x = p.x;
-    msg.y = p.y;
-    msg.z = p.z;
-    return msg;
-}
-
 /**
  * Transforms a pointcloud to world frame and publishes it for visualization. A
  * rotation around the z-axis is necessary to align the pointcloud with the
@@ -192,8 +183,8 @@ void publishPossiblePoints(
     marker.scale.x = 0.0055;
     marker.scale.y = 0.0055;
 
-    marker.color.g = 1.0;
-    marker.color.b = 0.1;
+    marker.color.g = 0.75;
+    marker.color.b = 0.25;
     marker.color.a = 1.0;
     marker.lifetime = ros::Duration(/*t=*/0.2);
 
@@ -227,8 +218,8 @@ void publishTrackMarkerPoints(
     marker.scale.x = 0.0055;
     marker.scale.y = 0.0055;
 
-    marker.color.g = 0.1;
-    marker.color.b = 1.0;
+    marker.color.r = 1.0;
+    marker.color.g = 0.5;
     marker.color.a = 1.0;
     marker.lifetime = ros::Duration(/*t=*/0.2);
 

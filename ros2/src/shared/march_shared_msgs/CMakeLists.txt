@@ -45,6 +45,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FollowJointTrajectoryActionResult.msg"
   "msg/FollowJointTrajectoryFeedback.msg"
   "msg/FollowJointTrajectoryActionFeedback.msg"
+  "msg/FootPosition.msg"
   "msg/GaitInstruction.msg"
   "msg/GaitInstructionResponse.msg"
   "msg/GaitParameters.msg"

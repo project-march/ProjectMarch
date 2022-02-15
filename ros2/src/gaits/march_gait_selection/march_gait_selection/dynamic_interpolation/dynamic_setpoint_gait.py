@@ -19,7 +19,7 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
-from geometry_msgs.msg import PointStamped
+from march_shared_msgs.msg import FootPosition
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 
@@ -42,13 +42,13 @@ class DynamicSetpointGait(GaitInterface):
 
         # Create subscribers and publishers for CoViD
         self.gait_selection.create_subscription(
-            PointStamped,
+            FootPosition,
             "/foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
-            PointStamped,
+            FootPosition,
             "/foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
@@ -288,31 +288,31 @@ class DynamicSetpointGait(GaitInterface):
         the last position of the previous subgait."""
         self.start_position = self.dynamic_subgait.get_final_position()
 
-    def _callback_right(self, foot_location: PointStamped) -> None:
+    def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published
         on the CoViD-topic.
 
         :param foot_location: a Point containing the x, y and z location
-        :type foot_location: PointStamped
+        :type foot_location: FootPosition
         """
         self.foot_location_right = foot_location
 
-    def _callback_left(self, foot_location: PointStamped) -> None:
+    def _callback_left(self, foot_location: FootPosition) -> None:
         """Update the left foot position with the latest point published
         on the CoViD-topic.
 
         :param foot_location: a Point containing the x, y and z location
-        :type foot_location: PointStamped
+        :type foot_location: FootPosition
         """
         self.foot_location_left = foot_location
 
-    def _get_foot_location(self, subgait_id: str) -> PointStamped:
+    def _get_foot_location(self, subgait_id: str) -> FootPosition:
         """Returns the right or left foot position based upon the subgait_id
 
         :param subgait_id: either right_swing or left_swing
         :type subgait_id: str
         :return: either the left or right foot position or none
-        :rtype: PointStamped
+        :rtype: FootPosition
         """
         if subgait_id == "left_swing":
             return self.foot_location_left
@@ -427,7 +427,7 @@ class DynamicSetpointGait(GaitInterface):
             )
 
     # SAFETY
-    def _check_msg_time(self, foot_location: PointStamped) -> bool:
+    def _check_msg_time(self, foot_location: FootPosition) -> bool:
         """Checks if the foot_location given by CoViD is not older than
         FOOT_LOCATION_TIME_OUT."""
         msg_time = Time(

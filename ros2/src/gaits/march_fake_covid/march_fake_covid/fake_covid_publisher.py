@@ -9,7 +9,7 @@ from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 
 from contextlib import suppress
-from geometry_msgs.msg import PointStamped
+from march_shared_msgs.msg import FootPosition
 
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -35,13 +35,13 @@ class FakeCovidPublisher(Node):
         )
 
         self.left_foot_publisher = self.create_publisher(
-            msg_type=PointStamped,
+            msg_type=FootPosition,
             topic="/foot_position/left",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.right_foot_publisher = self.create_publisher(
-            msg_type=PointStamped,
+            msg_type=FootPosition,
             topic="/foot_position/right",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
@@ -50,7 +50,7 @@ class FakeCovidPublisher(Node):
 
     def publish_locations(self) -> None:
         """Publishes the fake foot locations"""
-        point_msg = PointStamped()
+        point_msg = FootPosition()
         point_msg.header.stamp = self.get_clock().now().to_msg()
 
         if self.random_x:
