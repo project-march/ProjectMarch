@@ -44,7 +44,8 @@ protected:
         const std::string& frame_to);
 
     rs2::pipeline pipe_;
-    rs2::config cfg_;
+    rs2::config config_;
+    rs2::context context_;
 
     rs2::decimation_filter dec_filter_;
     rs2::spatial_filter spat_filter_;

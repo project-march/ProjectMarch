@@ -33,8 +33,9 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 {
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
+    base_frame_ = "world";
 
-    ros::param::get("~base_frame", base_frame_);
+    // ros::param::get("~base_frame", base_frame_);
     ros::param::get("~voxel_size", voxel_size_);
     ros::param::get("~x_min", x_min_);
     ros::param::get("~x_max", x_max_);

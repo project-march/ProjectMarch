@@ -13,6 +13,7 @@
 #include <ros/console.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
+#include <thread>
 
 /**
  * Constructs an object that listens to simulated or real realsense depth frames
@@ -44,8 +45,9 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     current_frame_id_ = "foot_" + left_or_right;
     last_height_ = 0;
 
+    base_frame_ = "world";
+
     ros::param::get("~realsense", realsense_);
-    ros::param::get("~base_frame", base_frame_);
     ros::param::get("~foot_gap", foot_gap_);
     ros::param::get("~step_distance", step_distance_);
     ros::param::get("~average_sample_size", sample_size_);
@@ -68,10 +70,32 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         &FootPositionFinder::processSimulatedDepthFrames, this);
 
     if (realsense_) {
-        // cfg_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
-        //     RS2_FORMAT_Z16, /*framerate=*/30);
-        // pipe_.start(cfg_);
-        // processRealSenseDepthFrames();
+        std::vector<std::string> serials;
+        for (auto&& dev : context_.query_devices()) {
+            serials.emplace_back(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)); 
+        }
+
+        pipe_ = rs2::pipeline(context_);
+
+        bool enabled = false;
+
+        if (left_or_right_ == "left" && serials.size() >= 1) {
+            config_.enable_device(serials[0]);
+            enabled = true;
+        } else if (left_or_right == "right" && serials.size() >= 2) {
+            config_.enable_device(serials[1]);
+            enabled = true;
+        }
+
+        if (enabled) {
+            ROS_INFO("Realsense (" + left_or_right_ + ") connected");
+            config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
+            RS2_FORMAT_Z16, /*framerate=*/30);
+            pipe_.start(config_);
+            std::thread t(&FootPositionFinder::processRealSenseDepthFrames, this);
+            t.detach();
+        }
+
     } else {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
             topic_camera_front_, /*queue_size=*/1,
@@ -110,6 +134,7 @@ void FootPositionFinder::processRealSenseDepthFrames()
         rs2::points points = pc.calculate(depth);
 
         PointCloud::Ptr pointcloud = points_to_pcl(points);
+        pointcloud->header.frame_id = "camera_front_" + left_or_right_ + "_depth_optical_frame";
         processPointCloud(pointcloud);
     }
 }

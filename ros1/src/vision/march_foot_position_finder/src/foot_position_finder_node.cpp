@@ -23,8 +23,10 @@ int main(int argc, char** argv)
 
     ros::NodeHandle n;
     positionFinderLeft = new FootPositionFinder(&n, "left");
+    std::cout << "Finder left created" << std::endl;
     positionFinderRight = new FootPositionFinder(&n, "right");
-
+    std::cout << "Finder right created" << std::endl;
+    
     dynamic_reconfigure::Server<march_foot_position_finder::parametersConfig>
         server;
     dynamic_reconfigure::Server<
