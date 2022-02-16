@@ -67,7 +67,7 @@ class DynamicSubgait:
         self._get_parameters(gait_selection_node)
 
         self.starting_position = starting_position
-        self.location = location
+        self.location = self.get_foot_location_offset_scaled_to_height(location)
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
@@ -268,6 +268,18 @@ class DynamicSubgait:
     ) -> float:
         """Scales the duration based on the absolute step height"""
         return duration + DURATION_SCALING_FACTOR * abs(step_height)
+
+    def get_foot_location_offset_scaled_to_height(self, foot_location: Point) -> Point:
+        scaling_factor = 0.1
+        offset = 0.1
+        default_scaling = foot_location.x - offset
+        if foot_location.y >= 0.05:
+            foot_location.x = default_scaling - scaling_factor * foot_location.y
+            foot_location.y += 0
+            return foot_location
+        else:
+            foot_location.x = default_scaling
+            return foot_location
 
     def _check_joint_limits(
         self,
