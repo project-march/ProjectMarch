@@ -167,11 +167,15 @@ class DynamicSubgait:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.subgait_id
             )
-
+        desired_velocity = np.zeros_like(self.desired_position)
+        # if self.subgait_id == "right_swing":
+        #     desired_velocity[6] = -0.28
+        # else:
+        #     desired_velocity[2] = -0.28
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             self.desired_position,
-            None,
+            desired_velocity,
             self.time[SetpointTime.END_POINT_INDEX],
         )
 
@@ -194,8 +198,11 @@ class DynamicSubgait:
                 setpoint_list.insert(
                     EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
                 )
-
-            self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
+                self.joint_trajectory_list.append(
+                    DynamicJointTrajectory(setpoint_list, ankle=True)
+                )
+            else:
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
     def get_final_position(self) -> dict:
         """Get setpoint_dictionary of the final setpoint.
@@ -234,7 +241,12 @@ class DynamicSubgait:
         setpoint_dict = {}
         velocity = np.zeros_like(position) if (velocity is None) else velocity
 
-        for i in range(len(joint_names)):
+        for i, name in enumerate(joint_names):
+            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
+                name == "left_ankle" and self.subgait_id == "left_swing"
+            ):
+                velocity[i] = 0.0
+
             setpoint_dict.update(
                 {
                     joint_names[i]: Setpoint(
