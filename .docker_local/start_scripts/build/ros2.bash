@@ -16,6 +16,5 @@ while ! [ -f "${HOME}"/march/ros1/"${DONE_FILE}" ]; do
   sleep 1;
 done;
 
-colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja
+colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 exec touch ${DONE_FILE}
-
