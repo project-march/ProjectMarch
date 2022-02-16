@@ -6,9 +6,6 @@ from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
-    DynamicSetpointGait,
-)
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
@@ -24,6 +21,7 @@ from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
 INTERPOLATION_POINTS = 30
+DURATION_SCALING_FACTOR = 5
 
 
 class SetpointTime(IntEnum):
@@ -74,7 +72,7 @@ class DynamicSubgait:
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
 
-        duration = DynamicSetpointGait.get_duration_scaled_to_height(self.duration, self.location.y)
+        duration = self.get_duration_scaled_to_height(self.duration, self.location.y)
         self.time = [
             0,
             self.push_off_fraction * duration,
@@ -264,6 +262,12 @@ class DynamicSubgait:
         self.middle_point_fraction = gait_selection_node.middle_point_fraction
         self.push_off_fraction = gait_selection_node.push_off_fraction
         self.push_off_position = gait_selection_node.push_off_position
+
+    def get_duration_scaled_to_height(
+        self, duration: float, step_height: float
+    ) -> float:
+        """Scales the duration based on the absolute step height"""
+        return duration + DURATION_SCALING_FACTOR * abs(step_height)
 
     def _check_joint_limits(
         self,
