@@ -324,7 +324,8 @@ class DynamicSetpointGait(GaitInterface):
     def _covid_to_gait_magic(self) -> None:
         temp = self.foot_location.point.y
         self.foot_location.point.x = -self.foot_location.point.x
-        self.foot_location.point.x -= 0.1
+        gait_covid_offset = 0.1
+        self.foot_location.point.x -= gait_covid_offset
         self.foot_location.point.y = self.foot_location.point.z + 0.05
         self.foot_location.point.z = temp
 
