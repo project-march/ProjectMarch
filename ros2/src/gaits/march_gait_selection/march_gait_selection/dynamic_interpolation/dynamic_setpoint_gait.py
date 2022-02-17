@@ -324,7 +324,8 @@ class DynamicSetpointGait(GaitInterface):
     def _covid_to_gait_magic(self) -> None:
         temp = self.foot_location.point.y
         self.foot_location.point.x = -self.foot_location.point.x
-        self.foot_location.point.y = self.foot_location.point.z
+        self.foot_location.point.x -= 0.1
+        self.foot_location.point.y = self.foot_location.point.z + 0.05
         self.foot_location.point.z = temp
 
     def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:

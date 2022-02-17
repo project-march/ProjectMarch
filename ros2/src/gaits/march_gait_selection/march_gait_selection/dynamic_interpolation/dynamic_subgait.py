@@ -67,7 +67,7 @@ class DynamicSubgait:
         self._get_parameters(gait_selection_node)
 
         self.starting_position = starting_position
-        self.location = self.get_foot_location_offset_scaled_to_height(location)
+        self.location = location
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
@@ -148,11 +148,12 @@ class DynamicSubgait:
             self.middle_point_height,
             self.subgait_id,
         )
+        middle_velocity = np.zeros_like(middle_position)
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             middle_position,
-            None,
+            middle_velocity,
             self.time[SetpointTime.MIDDLE_POINT_INDEX],
         )
 
@@ -168,10 +169,7 @@ class DynamicSubgait:
                 self.location.x, self.location.y, self.subgait_id
             )
         desired_velocity = np.zeros_like(self.desired_position)
-        # if self.subgait_id == "right_swing":
-        #     desired_velocity[6] = -0.28
-        # else:
-        #     desired_velocity[2] = -0.28
+
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             self.desired_position,
@@ -198,6 +196,8 @@ class DynamicSubgait:
                 setpoint_list.insert(
                     EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
                 )
+
+            if name in ["right_ankle", "left_ankle"]:
                 self.joint_trajectory_list.append(
                     DynamicJointTrajectory(setpoint_list, ankle=True)
                 )
@@ -213,7 +213,7 @@ class DynamicSubgait:
         return self._from_list_to_setpoint(
             self.joint_names,
             self.desired_position,
-            None,
+            np.zeros_like(self.desired_position),
             self.time[SetpointTime.START_INDEX],
         )
 
@@ -280,18 +280,6 @@ class DynamicSubgait:
     ) -> float:
         """Scales the duration based on the absolute step height"""
         return duration + DURATION_SCALING_FACTOR * abs(step_height)
-
-    def get_foot_location_offset_scaled_to_height(self, foot_location: Point) -> Point:
-        scaling_factor = 0.1
-        offset = 0.1
-        default_scaling = foot_location.x - offset
-        if foot_location.y >= 0.05:
-            foot_location.x = default_scaling - scaling_factor * foot_location.y
-            foot_location.y += 0
-            return foot_location
-        else:
-            foot_location.x = default_scaling
-            return foot_location
 
     def _check_joint_limits(
         self,

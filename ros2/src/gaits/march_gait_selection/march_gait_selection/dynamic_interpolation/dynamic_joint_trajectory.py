@@ -37,7 +37,7 @@ class DynamicJointTrajectory:
     def _interpolate_setpoints(self) -> None:
         """Uses a CubicSpline with velocity boundary conditions to create interpolator objects for
         position and velocity. Uses a different interpolation method for the swing leg ankle. This is
-        because this joint will otherwise be in the soft limits to often."""
+        because this joint will otherwise be in the soft limits too often."""
         duration, position, velocity = self._get_setpoints_unzipped()
         time = list(map(lambda x: x.nanoseconds / NANOSECONDS_TO_SECONDS, duration))
 
