@@ -112,6 +112,7 @@ def select_lengths_for_inverse_kinematics(
 
 
 def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
+    length_names: List[str] = None,
     side: Side = Side.both,
 ) -> List[float]:
     """Grab lengths which are relevant for the inverse kinematics calculation from the urdf file.
@@ -155,20 +156,26 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
             f"Expected robot.link_map to contain {e.args[0]}, but it was missing."
         )
 
-    return select_lengths_for_inverse_kinematics(
-        [
-            upper_leg_length,
-            lower_leg_length,
-            hip_front_length,
-            hip_aa_arm_length,
-            upper_leg_length,
-            lower_leg_length,
-            hip_front_length,
-            hip_aa_arm_length,
-            base_length,
-        ],
-        side,
-    )
+    if length_names is None:
+        return select_lengths_for_inverse_kinematics(
+            [
+                upper_leg_length,
+                lower_leg_length,
+                hip_front_length,
+                hip_aa_arm_length,
+                upper_leg_length,
+                lower_leg_length,
+                hip_front_length,
+                hip_aa_arm_length,
+                base_length,
+            ],
+            side,
+        )
+    else:
+        lengths = []
+        for name in length_names:
+            lengths.append(robot_dimensions[name]["length"])
+        return lengths
 
 
 LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()

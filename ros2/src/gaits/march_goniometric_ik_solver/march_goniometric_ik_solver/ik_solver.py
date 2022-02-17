@@ -13,10 +13,13 @@ from march_utility.utilities.utility_functions import (
 )
 
 # Get lengths from urdf:
-lengths = get_lengths_robot_from_urdf_for_inverse_kinematics()
-(LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_HIP_AA, LENGTH_HIP_BASE) = (
-    *lengths[0:3],
-    lengths[-1],
+(
+    LENGTH_UPPER_LEG,
+    LENGTH_LOWER_LEG,
+    LENGTH_HIP_AA,
+    LENGTH_HIP_BASE,
+) = get_lengths_robot_from_urdf_for_inverse_kinematics(
+    length_names=["upper_leg", "lower_leg", "hip_aa_front", "hip_base"]
 )
 LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 
@@ -377,10 +380,10 @@ class Pose:
         See the README.MD of this package for more information.
         """
 
-        # get y position of hip and toes:
-        y_hip = self.calculate_joint_positions("pos_hip")[1]
-        y_toes1 = self.calculate_joint_positions("pos_toes1")[1]
-        y_toes2 = self.calculate_joint_positions("pos_toes2")[1]
+        # Get y position of hip and toes:
+        y_hip = self.pos_hip[1]
+        y_toes1 = self.pos_toes1[1]
+        y_toes2 = self.pos_toes2[1]
 
         # Determine lengths:
         length_leg_short, length_leg_long = sorted([y_hip - y_toes1, y_hip - y_toes2])
@@ -565,7 +568,7 @@ class Pose:
         if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION:
             self.reduce_stance_dorsi_flexion()
 
-        # apply side_step, hard_coded to default feet distance for now:
+        # Apply side_step, hard_coded to default feet distance for now:
         self.perform_side_step(ankle_y, abs(ankle_z))
 
         # return pose as list:
