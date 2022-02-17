@@ -25,6 +25,12 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
+                name="use_sim_time",
+                default_value="True",
+                description="Whether to use simulation time as published on the "
+                "/clock topic by gazebo instead of system time.",
+            ),
+            DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
                 description="x-location for fake covid topic, takes double or 'random'",
@@ -46,6 +52,7 @@ def generate_launch_description():
                 name="fake_covid_publisher",
                 namespace="march",
                 parameters=[
+                    {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"location_x": LaunchConfiguration("location_x")},
                     {"location_y": LaunchConfiguration("location_y")},
                     {"location_z": LaunchConfiguration("location_z")},

@@ -19,6 +19,7 @@ from march_utility.gait.edge_position import (
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.logger import Logger
 from march_utility.utilities.dimensions import (
     InterpolationDimensions,
     amount_of_subgaits,
@@ -79,6 +80,7 @@ class RealsenseGait(SetpointsGait):
     ):
         super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
         self._gait_selection = gait_selection
+        self.logger = Logger(self._gait_selection, __class__.__name__)
         self.parameters = parameters
         self.dimensions = dimensions
         self.dimensions = dimensions
@@ -329,14 +331,12 @@ class RealsenseGait(SetpointsGait):
         """
         service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
-            self._gait_selection.get_logger().warn(
-                "No service response received within timeout"
-            )
+            self.logger.warn("No service response received within timeout")
             return False
 
         gait_parameters_response = self.realsense_service_result
         if gait_parameters_response is None or not gait_parameters_response.success:
-            self._gait_selection.get_logger().warn(
+            self.logger.warn(
                 "No gait parameters were found, gait will not be started, "
                 f"{gait_parameters_response}"
             )
@@ -394,7 +394,7 @@ class RealsenseGait(SetpointsGait):
                 self._realsense_response_cb
             )
         else:
-            self._gait_selection.get_logger().error(
+            self.logger.error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
                 f"available, is the realsense reader running?"
             )
@@ -409,7 +409,7 @@ class RealsenseGait(SetpointsGait):
 
     def interpolate_subgaits_from_parameters(self) -> bool:
         """Change all subgaits to one interpolated from the current parameters."""
-        self._gait_selection.get_logger().info(
+        self.logger.info(
             f"Interpolating gait {self.gait_name} with parameters:"
             f" {self.parameters}"
         )

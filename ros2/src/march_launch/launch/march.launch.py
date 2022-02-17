@@ -215,13 +215,13 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="push_off_fraction",
-                default_value="0.2",
+                default_value="0.15",
                 description="Fraction of the step at which the push off will"
                 "take place.",
             ),
             DeclareLaunchArgument(
                 name="push_off_position",
-                default_value="-0.3",
+                default_value="-0.15",
                 description="Maximum joint position of the ankle during push off.",
             ),
             DeclareLaunchArgument(
@@ -346,6 +346,7 @@ def generate_launch_description():
                     )
                 ),
                 launch_arguments=[
+                    ("use_sim_time", use_sim_time),
                     ("location_x", location_x),
                     ("location_y", location_y),
                     ("location_z", location_z),

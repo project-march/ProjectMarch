@@ -2,14 +2,15 @@
 # flake8: noqa
 import signal
 import sys
-
 import random
 import rclpy
+
 from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 
 from contextlib import suppress
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import PointStamped
+
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "fake_covid_publisher"
@@ -40,13 +41,13 @@ class FakeCovidPublisher(Node):
         )
 
         self.left_foot_publisher = self.create_publisher(
-            msg_type=Point,
+            msg_type=PointStamped,
             topic="/foot_position/left",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.right_foot_publisher = self.create_publisher(
-            msg_type=Point,
+            msg_type=PointStamped,
             topic="/foot_position/right",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
@@ -55,22 +56,23 @@ class FakeCovidPublisher(Node):
 
     def publish_locations(self) -> None:
         """Publishes the fake foot locations"""
-        point = Point()
+        point_msg = PointStamped()
+        point_msg.header.stamp = self.get_clock().now().to_msg()
 
         if self.random_x:
-            point.x = random.uniform(0.2, 0.5)
+            point_msg.point.x = random.uniform(0.2, 0.5)
         else:
-            point.x = self.location_x
+            point_msg.point.x = self.location_x
 
         if self.random_y:
-            point.y = random.uniform(0.0, 0.2)
+            point_msg.point.y = random.uniform(0.0, 0.2)
         else:
-            point.y = self.location_y
+            point_msg.point.y = self.location_y
 
-        point.z = self.location_z
+        point_msg.point.z = self.location_z
 
-        self.left_foot_publisher.publish(point)
-        self.right_foot_publisher.publish(point)
+        self.left_foot_publisher.publish(point_msg)
+        self.right_foot_publisher.publish(point_msg)
 
 
 def sys_exit(*_):

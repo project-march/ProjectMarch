@@ -6,9 +6,11 @@ from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
+from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_position_from_yaml
+from march_utility.utilities.logger import Logger
 from march_goniometric_ik_solver.ik_solver import Pose
 
 from trajectory_msgs import msg as trajectory_msg
@@ -18,6 +20,7 @@ from typing import List
 from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
+INTERPOLATION_POINTS = 30
 
 
 class SetpointTime(IntEnum):
@@ -38,8 +41,14 @@ class DynamicSubgait:
     :type subgait_id: str
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param location: The desired foot location as given by CoViD
-    :type location: Point
+    :param position: Desired foot position
+    :type position: Point
+    :param joint_soft_limits: list containing soft limits in alphabetical order
+    :type joint_soft_limits: List[Limits]
+    :param start: whether it is an open gait or not
+    :type start: bool
+    :param stop: whether it is a close gait or not
+    :type stop: bool
     """
 
     def __init__(
@@ -49,8 +58,11 @@ class DynamicSubgait:
         subgait_id: str,
         joint_names: List[str],
         location: Point,
+        joint_soft_limits: List[Limits],
+        start: bool,
         stop: bool,
     ):
+        self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
         self.time = [
             0,
@@ -62,6 +74,9 @@ class DynamicSubgait:
         self.location = location
         self.joint_names = joint_names
         self.subgait_id = subgait_id
+        self.joint_soft_limits = joint_soft_limits
+
+        self.start = start
         self.stop = stop
         self.pose = Pose()
 
@@ -129,9 +144,11 @@ class DynamicSubgait:
                 self.desired_setpoint_dict[name],
             ]
 
-            # Add an extra setpoint to the ankle to create a push off:
-            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
-                name == "left_ankle" and self.subgait_id == "left_swing"
+            # Add an extra setpoint to the ankle to create a push off, except for
+            # a start gait:
+            if not self.start and (
+                (name == "right_ankle" and self.subgait_id == "right_swing")
+                or (name == "left_ankle" and self.subgait_id == "left_swing")
             ):
                 setpoint_list.insert(
                     EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
@@ -159,17 +176,19 @@ class DynamicSubgait:
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 
-        for timestamp in self.time:
+        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
+        for timestamp in timestamps:
             joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
             joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
 
-            for joint_trajectory in self.joint_trajectory_list:
+            for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
                 interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
                     timestamp
                 )
 
                 joint_trajecory_point.positions.append(interpolated_setpoint.position)
                 joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
+                self._check_joint_limits(joint_index, joint_trajecory_point)
 
             joint_trajectory_msg.points.append(joint_trajecory_point)
 
@@ -226,6 +245,7 @@ class DynamicSubgait:
         return setpoint_dict
 
     def _from_joint_dict_to_list(self, joint_dict: dict) -> List[float]:
+        """Return the values in a joint_dict as a list."""
         return list(joint_dict.values())
 
     def _get_parameters(self, gait_selection_node: Node) -> None:
@@ -239,3 +259,40 @@ class DynamicSubgait:
         self.middle_point_fraction = gait_selection_node.middle_point_fraction
         self.push_off_fraction = gait_selection_node.push_off_fraction
         self.push_off_position = gait_selection_node.push_off_position
+
+    def _check_joint_limits(
+        self,
+        joint_index: int,
+        joint_trajectory_point: trajectory_msg.JointTrajectoryPoint,
+    ) -> None:
+        """Check if values in the joint_trajectory_point are within the soft and
+        velocity limits defined in the urdf
+
+        :param joint_index: Index of the joint in the alphabetical joint_names list
+        :type joint_index: int
+        :param joint_trajectory_point: point in time containing position and velocity
+        :type joint_trajectory_point: trajectory_msg.JointTrajectoryPoint
+        """
+        position = joint_trajectory_point.positions[joint_index]
+        velocity = joint_trajectory_point.velocities[joint_index]
+        if (
+            position > self.joint_soft_limits[joint_index].upper
+            or position < self.joint_soft_limits[joint_index].lower
+        ):
+            self.logger.info(
+                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of soft limits, "
+                f"position: {position}, soft limits: "
+                f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]."
+            )
+            raise Exception(
+                f"{self.joint_names[joint_index]} will be outside its soft limits."
+            )
+
+        if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
+            self.logger.info(
+                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of velocity limits, "
+                f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}."
+            )
+            raise Exception(
+                f"{self.joint_names[joint_index]} will be outside its velocity limits."
+            )
