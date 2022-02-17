@@ -4,20 +4,29 @@ import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 import threading
-import socket
-
+from netifaces import interfaces, ifaddresses, AF_INET
+import signal
+import sys
+from contextlib import suppress
 
 class WirelessIPDNode(Node):
 
     def __init__(self):
         super().__init__('wireless_ipd_node')
 
+def sys_exit(*_):
+    sys.exit(0)
+
 def main():
     
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    ip = s.getsockname()[0]
-    s.close()
+    for iface in interfaces():
+        iface_details = ifaddresses(iface)
+        if AF_INET in iface_details:
+            interface_info = iface_details[AF_INET][0]
+            if 'addr' in interface_info:
+                address = interface_info['addr']
+                if address[0:3] == '192':
+                    ip = address
 
     rclpy.init()
 
@@ -28,6 +37,10 @@ def main():
     thr = threading.Thread(target=manager.establish_connection)
     thr.start()
 
-    rclpy.spin(node, executor)
+    signal.signal(signal.SIGTERM, sys_exit)
+
+    with suppress(KeyboardInterrupt):
+        rclpy.spin(node, executor)
+
     rclpy.shutdown()
 
