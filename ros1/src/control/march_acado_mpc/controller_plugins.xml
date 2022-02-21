@@ -1,3 +1,4 @@
+<!-- This will reference to libmarch_acado_mpc.so file in the install directory that is created during build -->
 <library path="lib/libmarch_acado_mpc">
     <class name="model_predictive_trajectory_controller/JointTrajectoryController"
            type="model_predictive_trajectory_controller::JointTrajectoryController"
