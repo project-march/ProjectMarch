@@ -8,12 +8,13 @@
 #include "utilities/math_utilities.hpp"
 #include "utilities/publish_utilities.hpp"
 #include "utilities/realsense_to_pcl.hpp"
+#include <chrono>
 #include <iostream>
 #include <march_foot_position_finder/parametersConfig.h>
 #include <ros/console.h>
 #include <string>
-#include <visualization_msgs/MarkerArray.h>
 #include <thread>
+#include <visualization_msgs/MarkerArray.h>
 
 /**
  * Constructs an object that listens to simulated or real realsense depth frames
@@ -24,9 +25,6 @@
  * @param left_or_right whether the FootPositionFinder runs for the left or
  * right foot
  */
-// No lint is used to avoid linting in the realsense library, where a potential
-// memory leak error is present
-// NOLINTNEXTLINE
 FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     const std::string& left_or_right) // NOLINT
     : n_(n)
@@ -45,14 +43,6 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     current_frame_id_ = "foot_" + left_or_right;
     last_height_ = 0;
 
-    base_frame_ = "world";
-
-    ros::param::get("~realsense", realsense_);
-    ros::param::get("~foot_gap", foot_gap_);
-    ros::param::get("~step_distance", step_distance_);
-    ros::param::get("~average_sample_size", sample_size_);
-    ros::param::get("~outlier_distance", outlier_distance_);
-
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
     topic_camera_front_
@@ -65,44 +55,15 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
-    pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-        topic_camera_front_, /*queue_size=*/1,
-        &FootPositionFinder::processSimulatedDepthFrames, this);
-
-    if (realsense_) {
-        std::vector<std::string> serials;
-        for (auto&& dev : context_.query_devices()) {
-            serials.emplace_back(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)); 
-        }
-
-        pipe_ = rs2::pipeline(context_);
-
-        bool enabled = false;
-
-        if (left_or_right_ == "left" && serials.size() >= 1) {
-            config_.enable_device(serials[0]);
-            enabled = true;
-        } else if (left_or_right == "right" && serials.size() >= 2) {
-            config_.enable_device(serials[1]);
-            enabled = true;
-        }
-
-        if (enabled) {
-            ROS_INFO("Realsense (" + left_or_right_ + ") connected");
-            config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
-            RS2_FORMAT_Z16, /*framerate=*/30);
-            pipe_.start(config_);
-            std::thread t(&FootPositionFinder::processRealSenseDepthFrames, this);
-            t.detach();
-        }
-
-    } else {
-        pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-            topic_camera_front_, /*queue_size=*/1,
-            &FootPositionFinder::processSimulatedDepthFrames, this);
-    }
+    running_ = false;
 }
 
+/**
+ * Callback for when parameters are updated with ros reconfigure.
+ */
+// No lint is used to avoid linting in the realsense library, where a potential
+// memory leak error is present
+// NOLINTNEXTLINE
 void FootPositionFinder::readParameters(
     march_foot_position_finder::parametersConfig& config, uint32_t level)
 {
@@ -113,30 +74,56 @@ void FootPositionFinder::readParameters(
     sample_size_ = config.sample_size;
     outlier_distance_ = config.outlier_distance;
     found_points_.resize(sample_size_);
-    ROS_INFO("Parameters updated in foot position finder");
+
+    // Initialize the depth frame callbacks the first time parameters are read
+    if (!running_ && realsense_) {
+        config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
+            RS2_FORMAT_Z16, /*framerate=*/30);
+
+        if (left_or_right_ == "left") {
+            config_.enable_device("944622074337");
+        } else {
+            config_.enable_device("944622071535");
+        }
+
+        pipe_.start(config_);
+        ROS_INFO("Realsense camera (%s) connected", left_or_right_.c_str());
+
+        realsenseTimer = n_->createTimer(ros::Duration(/*t=*/0.005),
+            &FootPositionFinder::processRealSenseDepthFrames, this);
+
+    } else if (!running_ && !realsense_) {
+        pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
+            topic_camera_front_, /*queue_size=*/1,
+            &FootPositionFinder::processSimulatedDepthFrames, this);
+    }
+
+    ROS_INFO("Parameters updated in %s foot position finder",
+        left_or_right_.c_str());
+
+    running_ = true;
 }
 
 /**
  * Listen for realsense frames from a camera, apply filters to them and process
  * the eventual pointcloud.
  */
-void FootPositionFinder::processRealSenseDepthFrames()
+void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
 {
-    while (ros::ok()) {
-        rs2::frameset frames = pipe_.wait_for_frames();
-        rs2::depth_frame depth = frames.get_depth_frame();
+    rs2::frameset frames = pipe_.wait_for_frames();
+    rs2::depth_frame depth = frames.get_depth_frame();
 
-        depth = dec_filter_.process(depth);
-        depth = spat_filter_.process(depth);
-        depth = temp_filter_.process(depth);
+    depth = dec_filter_.process(depth);
+    depth = spat_filter_.process(depth);
+    depth = temp_filter_.process(depth);
 
-        rs2::pointcloud pc;
-        rs2::points points = pc.calculate(depth);
+    rs2::pointcloud pc;
+    rs2::points points = pc.calculate(depth);
 
-        PointCloud::Ptr pointcloud = points_to_pcl(points);
-        pointcloud->header.frame_id = "camera_front_" + left_or_right_ + "_depth_optical_frame";
-        processPointCloud(pointcloud);
-    }
+    PointCloud::Ptr pointcloud = points_to_pcl(points);
+    pointcloud->header.frame_id
+        = "camera_front_" + left_or_right_ + "_depth_optical_frame";
+    processPointCloud(pointcloud);
 }
 
 /**
@@ -162,14 +149,13 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     NormalCloud::Ptr normalcloud(new NormalCloud());
     Point point;
 
-    if (!realsense_) {
-        // Define the desired future foot position
-        point = Point(-(float)step_distance_,
-            (float)switch_factor_ * (float)foot_gap_, (float)last_height_);
+    // Define the desired future foot position
+    point = Point(-(float)step_distance_,
+        (float)switch_factor_ * (float)foot_gap_, (float)last_height_);
 
-        // Calculate point location relative to positionary leg
-        point = transformPoint(point, reference_frame_id_, base_frame_);
-    }
+    // Calculate point location relative to positionary leg
+    point = transformPoint(point, reference_frame_id_, base_frame_);
+    // }
 
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
     preprocessor.preprocess();
@@ -240,10 +226,8 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
             }
         }
 
-        Point final = computeAveragePoint(non_outliers);
-
         if (non_outliers.size() == sample_size_) {
-            return final;
+            return computeAveragePoint(non_outliers);
         }
     }
 }

@@ -31,7 +31,7 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void processRealSenseDepthFrames();
+    void processRealSenseDepthFrames(const ros::TimerEvent&);
 
     void processSimulatedDepthFrames(
         const sensor_msgs::PointCloud2 input_cloud);
@@ -43,14 +43,6 @@ protected:
     Point transformPoint(Point& point, const std::string& frame_from,
         const std::string& frame_to);
 
-    rs2::pipeline pipe_;
-    rs2::config config_;
-    rs2::context context_;
-
-    rs2::decimation_filter dec_filter_;
-    rs2::spatial_filter spat_filter_;
-    rs2::temporal_filter temp_filter_;
-
     ros::NodeHandle* n_;
 
     ros::Publisher point_publisher_;
@@ -61,6 +53,17 @@ protected:
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
+
+    bool running_;
+
+    ros::Timer realsenseTimer;
+    rs2::pipeline pipe_;
+    rs2::config config_;
+    rs2::context context_;
+
+    rs2::decimation_filter dec_filter_;
+    rs2::spatial_filter spat_filter_;
+    rs2::temporal_filter temp_filter_;
 
     std::string topic_camera_front_;
     std::string topic_chosen_points_;

@@ -38,7 +38,8 @@ PointCloud::Ptr points_to_pcl(const rs2::points& points)
     int point_count = 0;
     auto ptr = points.get_vertices();
     for (std::size_t i = 0; i < points.size(); i++) {
-        // if (ptr->y < y_min || ptr->y > y_max || ptr->x < x_min || ptr->x > x_max
+        // if (ptr->y < y_min || ptr->y > y_max || ptr->x < x_min || ptr->x >
+        // x_max
         //     || ptr->z < z_min || ptr->z > z_max) {
         // } else {
         (*cloud)[point_count].x = ptr->x;
