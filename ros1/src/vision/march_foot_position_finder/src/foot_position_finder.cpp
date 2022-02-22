@@ -155,7 +155,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Calculate point location relative to positionary leg
     point = transformPoint(point, reference_frame_id_, base_frame_);
-    // }
 
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
     preprocessor.preprocess();
@@ -172,6 +171,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishSearchRectangle(point_marker_publisher_, position,
         pointFinder.getDisplacements(), left_or_right_);
 
+    std::cout << position_queue.size() << std::endl; 
     if (position_queue.size() > 0) {
         Point avg = computeTemporalAveragePoint(position_queue[0]);
 
