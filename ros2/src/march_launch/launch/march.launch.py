@@ -55,6 +55,7 @@ def generate_launch_description():
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
     # Fake covid (CoViD = Computer Vision Department)
+    simulate_points = LaunchConfiguration("simulate_points")
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
 
@@ -248,6 +249,11 @@ def generate_launch_description():
                 description="Upper bound to generate fake temperatures from",
             ),
             DeclareLaunchArgument(
+                name="simulate_points",
+                default_value="False",
+                description="Whether to simulate fake foot positions for gait generation",
+            ),
+            DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
                 description="x-location for fake covid topic, takes double or 'random'",
@@ -322,21 +328,22 @@ def generate_launch_description():
                     ("timer_period", timer_period),
                 ],
             ),
-            # Fake covid publisher
-            # IncludeLaunchDescription(
-            #     PythonLaunchDescriptionSource(
-            #         os.path.join(
-            #             get_package_share_directory("march_fake_covid"),
-            #             "launch",
-            #             "march_fake_covid.launch.py",
-            #         )
-            #     ),
-            #     launch_arguments=[
-            #         ("use_sim_time", use_sim_time),
-            #         ("location_x", location_x),
-            #         ("location_y", location_y),
-            #     ],
-            # ),
+            # Gait preprocessor
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_gait_preprocessor"),
+                        "launch",
+                        "march_gait_preprocessor.launch.py",
+                    )
+                ),
+                launch_arguments=[
+                    ("use_sim_time", use_sim_time),
+                    ("simulate_points", simulate_points),
+                    ("location_x", location_x),
+                    ("location_y", location_y),
+                ],
+            ),
             # Safety
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(

@@ -31,9 +31,7 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenPointCallback(const geometry_msgs::PointStamped point);
-
-    void processRealSenseDepthFrames();
+    void processRealSenseDepthFrames(const ros::TimerEvent&);
 
     void processSimulatedDepthFrames(
         const sensor_msgs::PointCloud2 input_cloud);
@@ -42,15 +40,8 @@ protected:
 
     Point computeTemporalAveragePoint(const Point& new_point);
 
-    void transformPoint(Point& point, const std::string& frame_from,
+    Point transformPoint(Point& point, const std::string& frame_from,
         const std::string& frame_to);
-
-    rs2::pipeline pipe_;
-    rs2::config cfg_;
-
-    rs2::decimation_filter dec_filter_;
-    rs2::spatial_filter spat_filter_;
-    rs2::temporal_filter temp_filter_;
 
     ros::NodeHandle* n_;
 
@@ -63,13 +54,24 @@ protected:
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
+    bool running_;
+
+    ros::Timer realsenseTimer;
+    rs2::pipeline pipe_;
+    rs2::config config_;
+    rs2::context context_;
+
+    rs2::decimation_filter dec_filter_;
+    rs2::spatial_filter spat_filter_;
+    rs2::temporal_filter temp_filter_;
+
     std::string topic_camera_front_;
     std::string topic_chosen_points_;
 
     std::string left_or_right_;
     std::string other_;
     int switch_factor_;
-    bool realsense_;
+    bool physical_cameras_;
 
     double foot_gap_;
     double step_distance_;
@@ -78,6 +80,7 @@ protected:
 
     std::string base_frame_;
     std::string reference_frame_id_;
+    std::string current_frame_id_;
 
     std::vector<Point> found_points_;
     double last_height_;

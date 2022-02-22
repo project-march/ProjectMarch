@@ -6,6 +6,7 @@
 #define MARCH_PUBLISH_UTILITIES
 
 #include <librealsense2/rs.hpp>
+#include <march_shared_msgs/FootPosition.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -17,18 +18,19 @@ using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 /**
- * Rotates a point counter clockwise.
+ * Rotates a PCL point counter clockwise, and converts it to a ROS Point
+ * message.
  *
  * @param p point to rotate
  * @return rotated point as a geometry_msgs::Point message
  */
 inline geometry_msgs::Point rotate_left(Point p)
 {
-    geometry_msgs::Point point;
-    point.x = -p.y;
-    point.y = p.x;
-    point.z = p.z;
-    return point;
+    geometry_msgs::Point msg;
+    msg.x = -p.y;
+    msg.y = p.x;
+    msg.z = p.z;
+    return msg;
 }
 
 /**
@@ -64,7 +66,7 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishMarkerPoint(ros::Publisher& publisher, Point& p)
+void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
 {
     visualization_msgs::Marker marker;
     marker.header.frame_id = "world";
@@ -109,7 +111,7 @@ void publishMarkerPoint(ros::Publisher& publisher, Point& p)
  * @param p4 vertex of rectangle
  */
 void publishSearchRectangle(ros::Publisher& publisher, Point& p,
-    std::vector<double> dis, std::string left_or_right)
+    std::vector<double> dis, const std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
     marker.header.frame_id = "world";
@@ -120,8 +122,8 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
     marker.type = visualization_msgs::Marker::LINE_STRIP;
     marker.action = visualization_msgs::Marker::ADD;
 
-    double outside;
-    double inside;
+    float outside;
+    float inside;
 
     if (left_or_right == "right") {
         outside = dis[0];
@@ -131,10 +133,10 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
         inside = dis[0];
     }
 
-    Point p1(p.x - inside, p.y + dis[3], 0);
-    Point p2(p.x + outside, p.y + dis[3], 0);
-    Point p3(p.x + outside, p.y - dis[2], 0);
-    Point p4(p.x - inside, p.y - dis[2], 0);
+    Point p1((float)p.x - inside, (float)(p.y + dis[3]), /*_z=*/0);
+    Point p2((float)p.x + outside, (float)(p.y + dis[3]), /*_z=*/0);
+    Point p3((float)p.x + outside, (float)(p.y - dis[2]), /*_z=*/0);
+    Point p4((float)p.x - inside, (float)(p.y - dis[2]), /*_z=*/0);
 
     marker.points.push_back(rotate_left(p1));
     marker.points.push_back(rotate_left(p2));
@@ -181,8 +183,43 @@ void publishPossiblePoints(
     marker.scale.x = 0.0055;
     marker.scale.y = 0.0055;
 
-    marker.color.g = 1.0;
-    marker.color.b = 0.1;
+    marker.color.g = 0.75;
+    marker.color.b = 0.25;
+    marker.color.a = 1.0;
+    marker.lifetime = ros::Duration(/*t=*/0.2);
+
+    publisher.publish(marker);
+}
+
+/**
+ * Publishes a list of track points to visualize.
+ *
+ * @param publisher publisher to use
+ * @param points points to visualize
+ */
+void publishTrackMarkerPoints(
+    ros::Publisher& publisher, std::vector<Point>& points)
+{
+    visualization_msgs::Marker marker;
+    marker.header.frame_id = "world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = "track_points";
+    marker.id = 2;
+    marker.type = visualization_msgs::Marker::POINTS;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    for (auto& point : points) {
+        marker.points.push_back(rotate_left(point));
+    }
+
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.0055;
+    marker.scale.y = 0.0055;
+
+    marker.color.r = 1.0;
+    marker.color.g = 0.5;
     marker.color.a = 1.0;
     marker.lifetime = ros::Duration(/*t=*/0.2);
 
@@ -194,14 +231,22 @@ void publishPossiblePoints(
  *
  * @param publisher publisher to use
  * @param p point to publish
+ * @param track_points vector of points between start and end position of this
+ * step
  */
-void publishPoint(ros::Publisher& publisher, Point& p)
+void publishPoint(
+    ros::Publisher& publisher, Point& p, const std::vector<Point>& track_points)
 {
-    geometry_msgs::PointStamped msg;
+    march_shared_msgs::FootPosition msg;
     msg.point.x = p.x;
     msg.point.y = p.y;
     msg.point.z = p.z;
     msg.header.stamp = ros::Time::now();
+
+    // rotate the track points
+    for (const Point& p : track_points) {
+        msg.track_points.push_back(rotate_left(p));
+    }
 
     publisher.publish(msg);
 }

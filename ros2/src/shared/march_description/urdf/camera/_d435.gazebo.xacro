@@ -103,11 +103,12 @@ limitations under the License.
         <visualize>0</visualize>
       </sensor> -->
       <sensor name="${camera_name}depth" type="depth">
-        <camera name="${camera_name}">
+        <camera name="${camera_name}">    ros::param::get("~x_max", x_max_);
+
           <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
           <image>
-            <width>240</width> <!-- original: 1280 -->
-            <height>130</height> <!-- original: 720 -->
+            <width>240</width>
+            <height>130</height>
           </image>
           <clip>
             <near>0.1</near>

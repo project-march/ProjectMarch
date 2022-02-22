@@ -52,6 +52,7 @@ def generate_launch_description():
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
     # Fake covid (CoViD = Computer Vision Department)
+    simulate_points = LaunchConfiguration("simulate_points")
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
 
@@ -238,6 +239,11 @@ def generate_launch_description():
                 description="Upper bound to generate fake temperatures from",
             ),
             DeclareLaunchArgument(
+                name="simulate_points",
+                default_value="False",
+                description="Whether to simulate fake foot positions for gait generation",
+            ),
+            DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
                 description="x-location for fake covid topic, takes double or 'random'",
@@ -289,6 +295,7 @@ def generate_launch_description():
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
                     ("jointlesss", jointless),
+                    ("simulate_points", simulate_points),
                     ("location_x", location_x),
                     ("location_y", location_y),
                 ],

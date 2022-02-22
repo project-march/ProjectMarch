@@ -28,6 +28,9 @@ public:
 
     void findPoints(std::vector<Point>* position_queue);
 
+    std::vector<Point> retrieveTrackPoints(
+        const Point& start, const Point& end);
+
     std::vector<double> getDisplacements();
 
 protected:
@@ -68,6 +71,7 @@ protected:
 
     double max_z_distance_;
     double available_points_ratio_;
+    int num_track_points_;
 
     void mapPointCloudToHeightMap();
 
@@ -78,6 +82,14 @@ protected:
     void convolveLaplacianKernel();
 
     void findFeasibleFootPlacements(std::vector<Point>* position_queue);
+
+    int xCoordinateToIndex(double x);
+
+    int yCoordinateToIndex(double y);
+
+    double xIndexToCoordinate(int x);
+
+    double yIndexToCoordinate(int y);
 };
 
 #endif // MARCH_POINT_FINDER_H
