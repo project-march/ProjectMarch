@@ -71,7 +71,7 @@ protected:
     std::string left_or_right_;
     std::string other_;
     int switch_factor_;
-    bool realsense_;
+    bool physical_cameras_;
 
     double foot_gap_;
     double step_distance_;
