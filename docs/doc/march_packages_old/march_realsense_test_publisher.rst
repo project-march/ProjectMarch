@@ -5,6 +5,7 @@ march_realsense_test_publisher
 
 The march_realsense_test_publisher publishes fake realsense pointclouds to simulate the RealSense camera when running a simulation of the exoskeleton.
 This is a service (:code:`service_name = /camera/publish_test_cloud`) so it will only be executed when called upon.
+
 How to use
 ==============================
 
