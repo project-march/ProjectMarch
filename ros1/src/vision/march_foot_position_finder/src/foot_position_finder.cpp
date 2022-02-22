@@ -67,7 +67,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 void FootPositionFinder::readParameters(
     march_foot_position_finder::parametersConfig& config, uint32_t level)
 {
-    physical_cameras_ = config.physical_cameras;
+    realsense_ = config.realsense;
     base_frame_ = config.base_frame;
     foot_gap_ = config.foot_gap;
     step_distance_ = config.step_distance;
@@ -76,7 +76,7 @@ void FootPositionFinder::readParameters(
     found_points_.resize(sample_size_);
 
     // Initialize the depth frame callbacks the first time parameters are read
-    if (!running_ && physical_cameras_) {
+    if (!running_ && realsense_) {
         config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
             RS2_FORMAT_Z16, /*framerate=*/30);
 
@@ -92,7 +92,7 @@ void FootPositionFinder::readParameters(
         realsenseTimer = n_->createTimer(ros::Duration(/*t=*/0.005),
             &FootPositionFinder::processRealSenseDepthFrames, this);
 
-    } else if (!running_ && !physical_cameras_) {
+    } else if (!running_ && !realsense_) {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
             topic_camera_front_, /*queue_size=*/1,
             &FootPositionFinder::processSimulatedDepthFrames, this);
@@ -171,7 +171,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishSearchRectangle(point_marker_publisher_, position,
         pointFinder.getDisplacements(), left_or_right_);
 
-    std::cout << position_queue.size() << std::endl; 
     if (position_queue.size() > 0) {
         Point avg = computeTemporalAveragePoint(position_queue[0]);
 

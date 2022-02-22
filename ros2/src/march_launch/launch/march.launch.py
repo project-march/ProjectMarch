@@ -339,7 +339,6 @@ def generate_launch_description():
                 ),
                 launch_arguments=[
                     ("use_sim_time", use_sim_time),
-                    ("realsense", realsense),
                     ("simulate_points", simulate_points),
                     ("location_x", location_x),
                     ("location_y", location_y),
