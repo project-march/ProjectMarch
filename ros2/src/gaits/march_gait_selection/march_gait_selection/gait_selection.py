@@ -92,11 +92,6 @@ class GaitSelection(Node):
                 "first_subgait_delay"
             )
             # Setting dynamic gait parameters
-            self.dynamic_subgait_duration = (
-                self.get_parameter("dynamic_subgait_duration")
-                .get_parameter_value()
-                .double_value
-            )
             self.middle_point_fraction = (
                 self.get_parameter("middle_point_fraction")
                 .get_parameter_value()

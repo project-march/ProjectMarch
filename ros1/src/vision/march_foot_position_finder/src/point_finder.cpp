@@ -104,8 +104,8 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
-    convolveGaussianKernel();
-    // height_map_ = height_map_temp_;
+    // convolveGaussianKernel();
+    height_map_ = height_map_temp_;
     convolveLaplacianKernel();
     findFeasibleFootPlacements(position_queue);
 }

@@ -14,14 +14,13 @@ from march_utility.utilities.logger import Logger
 from march_goniometric_ik_solver.ik_solver import Pose
 
 from trajectory_msgs import msg as trajectory_msg
-from geometry_msgs.msg import Point
+from march_shared_msgs.msg import FootPositionDuration
 
 from typing import List
 from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
 INTERPOLATION_POINTS = 30
-DURATION_SCALING_FACTOR = 5
 
 
 class SetpointTime(IntEnum):
@@ -58,7 +57,7 @@ class DynamicSubgait:
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
-        location: Point,
+        location: FootPositionDuration,
         joint_soft_limits: List[Limits],
         start: bool,
         stop: bool,
@@ -67,17 +66,16 @@ class DynamicSubgait:
         self._get_parameters(gait_selection_node)
 
         self.starting_position = starting_position
-        self.location = location
+        self.location = location.point
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
 
-        duration = self.get_duration_scaled_to_height(self.duration, self.location.y)
         self.time = [
             0,
-            self.push_off_fraction * duration,
-            self.middle_point_fraction * duration,
-            duration,
+            self.push_off_fraction * location.duration,
+            self.middle_point_fraction * location.duration,
+            location.duration,
         ]
 
         self.start = start
@@ -269,17 +267,10 @@ class DynamicSubgait:
         :param gait_selection_node: the gait selection node
         :type gait_selection_node: Node
         """
-        self.duration = gait_selection_node.dynamic_subgait_duration
         self.middle_point_height = gait_selection_node.middle_point_height
         self.middle_point_fraction = gait_selection_node.middle_point_fraction
         self.push_off_fraction = gait_selection_node.push_off_fraction
         self.push_off_position = gait_selection_node.push_off_position
-
-    def get_duration_scaled_to_height(
-        self, duration: float, step_height: float
-    ) -> float:
-        """Scales the duration based on the absolute step height"""
-        return duration + DURATION_SCALING_FACTOR * abs(step_height)
 
     def _check_joint_limits(
         self,

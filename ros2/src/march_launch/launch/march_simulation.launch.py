@@ -36,7 +36,6 @@ def generate_launch_description():
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
     dynamic_gait = LaunchConfiguration("dynamic_gait")
-    dynamic_subgait_duration = LaunchConfiguration("dynamic_subgait_duration")
     middle_point_fraction = LaunchConfiguration("middle_point_fraction")
     middle_point_height = LaunchConfiguration("middle_point_height")
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
@@ -55,6 +54,7 @@ def generate_launch_description():
     simulate_points = LaunchConfiguration("simulate_points")
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
+    duration = LaunchConfiguration("duration")
 
     return launch.LaunchDescription(
         [
@@ -166,11 +166,6 @@ def generate_launch_description():
                 description="Wether dynamic_setpoint_gait is enabled",
             ),
             DeclareLaunchArgument(
-                name="dynamic_subgait_duration",
-                default_value="1.5",
-                description="Duration of a subgait created by the dynamic gait",
-            ),
-            DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
                 description="Fraction of the step at which the middle point "
@@ -238,6 +233,7 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            # GAIT PREPROCESSOR ARGUMENTS
             DeclareLaunchArgument(
                 name="simulate_points",
                 default_value="False",
@@ -252,6 +248,11 @@ def generate_launch_description():
                 name="location_y",
                 default_value="0.0",
                 description="y-location for fake covid topic, takes double or 'random'",
+            ),
+            DeclareLaunchArgument(
+                name="duration",
+                default_value="1.5",
+                description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             # Use normal launch file with different launch_arguments
             IncludeLaunchDescription(
@@ -281,7 +282,7 @@ def generate_launch_description():
                     ("gait_directory", gait_directory),
                     ("balance", balance),
                     ("dynamic_gait", dynamic_gait),
-                    ("dynamic_subgait_duration", dynamic_subgait_duration),
+                    ("duration", duration),
                     ("middle_point_fraction", middle_point_fraction),
                     ("middle_point_height", middle_point_height),
                     ("mininum_stair_height", minimum_stair_height),

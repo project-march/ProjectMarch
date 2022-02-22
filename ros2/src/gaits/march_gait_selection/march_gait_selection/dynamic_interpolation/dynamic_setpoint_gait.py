@@ -19,7 +19,7 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPositionDuration
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 
@@ -42,14 +42,14 @@ class DynamicSetpointGait(GaitInterface):
 
         # Create subscribers and publishers for CoViD
         self.gait_selection.create_subscription(
-            FootPosition,
-            "/foot_position/right",
+            FootPositionDuration,
+            "/processed_foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
-            FootPosition,
-            "/foot_position/left",
+            FootPositionDuration,
+            "/processed_foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
@@ -85,7 +85,7 @@ class DynamicSetpointGait(GaitInterface):
         if self._next_command is not None:
             if (
                 self.foot_location.point.y > self.minimum_stair_height
-                or self.foot_location.point.y < self.minimum_stair_height
+                or self.foot_location.point.y < -self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
@@ -288,7 +288,7 @@ class DynamicSetpointGait(GaitInterface):
         the last position of the previous subgait."""
         self.start_position = self.dynamic_subgait.get_final_position()
 
-    def _callback_right(self, foot_location: FootPosition) -> None:
+    def _callback_right(self, foot_location: FootPositionDuration) -> None:
         """Update the right foot position with the latest point published
         on the CoViD-topic.
 
@@ -297,7 +297,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         self.foot_location_right = foot_location
 
-    def _callback_left(self, foot_location: FootPosition) -> None:
+    def _callback_left(self, foot_location: FootPositionDuration) -> None:
         """Update the left foot position with the latest point published
         on the CoViD-topic.
 
@@ -306,7 +306,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         self.foot_location_left = foot_location
 
-    def _get_foot_location(self, subgait_id: str) -> FootPosition:
+    def _get_foot_location(self, subgait_id: str) -> FootPositionDuration:
         """Returns the right or left foot position based upon the subgait_id
 
         :param subgait_id: either right_swing or left_swing
@@ -320,14 +320,6 @@ class DynamicSetpointGait(GaitInterface):
             return self.foot_location_right
         else:
             return None
-
-    def _covid_to_gait_magic(self) -> None:
-        temp = self.foot_location.point.y
-        self.foot_location.point.x = -self.foot_location.point.x
-        gait_covid_offset = 0.1
-        self.foot_location.point.x -= gait_covid_offset
-        self.foot_location.point.y = self.foot_location.point.z + 0.05
-        self.foot_location.point.z = temp
 
     def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:
         """Return a TrajectoryCommand based on current subgait_id
@@ -349,30 +341,27 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
-            self._covid_to_gait_magic()
-            self.logger.info(
+            self.logger.debug(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
             )
 
+        duration = Duration(self.foot_location.duration)
         self.dynamic_subgait = DynamicSubgait(
             self.gait_selection,
             self.start_position,
             self.subgait_id,
             self.joint_names,
-            self.foot_location.point,
+            self.foot_location,
             self.joint_soft_limits,
             start,
             stop,
         )
 
         trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
-        duration = self.dynamic_subgait.get_duration_scaled_to_height(
-            self.dynamic_subgait_duration, self.foot_location.point.y
-        )
 
         return TrajectoryCommand(
             trajectory,
-            Duration(duration),
+            duration,
             self.subgait_id,
             self._end_time,
         )
@@ -388,7 +377,6 @@ class DynamicSetpointGait(GaitInterface):
 
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
-        self.dynamic_subgait_duration = self.gait_selection.dynamic_subgait_duration
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
 
     # UTILITY FUNCTIONS
@@ -432,7 +420,7 @@ class DynamicSetpointGait(GaitInterface):
             )
 
     # SAFETY
-    def _check_msg_time(self, foot_location: FootPosition) -> bool:
+    def _check_msg_time(self, foot_location: FootPositionDuration) -> bool:
         """Checks if the foot_location given by CoViD is not older than
         FOOT_LOCATION_TIME_OUT."""
         msg_time = Time(

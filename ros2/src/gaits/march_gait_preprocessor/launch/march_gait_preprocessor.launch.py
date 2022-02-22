@@ -30,12 +30,17 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
-                description="x-location for fake covid topic, takes double or 'random'",
+                description="x-location for fake covid topic, takes double'",
             ),
             DeclareLaunchArgument(
                 name="location_y",
                 default_value="0.0",
-                description="y-location for fake covid topic, takes double or 'random'",
+                description="y-location for fake covid topic, takes double",
+            ),
+            DeclareLaunchArgument(
+                name="duration",
+                default_value="1.5",
+                description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             Node(
                 package="march_gait_preprocessor",
@@ -48,6 +53,7 @@ def generate_launch_description():
                     {"simulate_points": LaunchConfiguration("simulate_points")},
                     {"location_x": LaunchConfiguration("location_x")},
                     {"location_y": LaunchConfiguration("location_y")},
+                    {"duration": LaunchConfiguration("duration")},
                 ],
                 on_exit=Shutdown(),
             ),
