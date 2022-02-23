@@ -342,7 +342,7 @@ class DynamicSetpointGait(GaitInterface):
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
             self.logger.info(
-                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y})"
+                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, {self.foot_location.point.z})"
             )
 
         self.dynamic_subgait = DynamicSubgait(

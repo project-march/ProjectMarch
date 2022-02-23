@@ -102,6 +102,7 @@ class DynamicSubgait:
         middle_position = self.pose.solve_mid_position(
             self.location.x,
             self.location.y,
+            self.location.z,
             self.middle_point_fraction,
             self.middle_point_height,
             self.subgait_id,
@@ -123,7 +124,7 @@ class DynamicSubgait:
             )
         else:
             self.desired_position = self.pose.solve_end_position(
-                self.location.x, self.location.y, self.subgait_id
+                self.location.x, self.location.y, self.location.z, self.subgait_id
             )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
