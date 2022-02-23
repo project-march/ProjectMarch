@@ -393,6 +393,7 @@ class Pose:
         )
 
         # Calculate theta_long and theta_short:
+        # Note that flake8-expression-complexity check is disabled since this is a very complex calculation.
         theta_long = 2 * np.arctan(  # noqa: ECE001
             (
                 -2 * length_long * LENGTH_HIP_BASE
