@@ -226,7 +226,8 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
         }
 
         if (non_outliers.size() == sample_size_) {
-            return computeAveragePoint(non_outliers);
+            Point final = computeAveragePoint(non_outliers);
+            return final;
         }
     }
 }
