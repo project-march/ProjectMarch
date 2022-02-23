@@ -8,12 +8,10 @@
 #include "utilities/math_utilities.hpp"
 #include "utilities/publish_utilities.hpp"
 #include "utilities/realsense_to_pcl.hpp"
-#include <chrono>
 #include <iostream>
 #include <march_foot_position_finder/parametersConfig.h>
 #include <ros/console.h>
 #include <string>
-#include <thread>
 #include <visualization_msgs/MarkerArray.h>
 
 /**
@@ -25,6 +23,8 @@
  * @param left_or_right whether the FootPositionFinder runs for the left or
  * right foot
  */
+// No lint is used to allow uninitialized variables (ros parameters)
+// NOLINTNEXTLINE
 FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     const std::string& left_or_right) // NOLINT
     : n_(n)
@@ -117,6 +117,8 @@ void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
     depth = spat_filter_.process(depth);
     depth = temp_filter_.process(depth);
 
+    // Allow default constructor for pc
+    // NOLINTNEXTLINE
     rs2::pointcloud pc;
     rs2::points points = pc.calculate(depth);
 
