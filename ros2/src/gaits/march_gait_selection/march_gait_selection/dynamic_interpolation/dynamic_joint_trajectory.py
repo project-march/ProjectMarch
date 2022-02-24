@@ -16,7 +16,7 @@ class DynamicJointTrajectory:
     :type setpoints: list
     """
 
-    def __init__(self, setpoints: List[Setpoint], ankle=False):
+    def __init__(self, setpoints: List[Setpoint], ankle: bool = False):
         self.setpoints = setpoints
         self.ankle = ankle
         self._interpolate_setpoints()

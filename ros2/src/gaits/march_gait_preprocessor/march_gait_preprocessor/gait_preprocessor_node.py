@@ -10,6 +10,7 @@ from contextlib import suppress
 
 
 def sys_exit(*_):
+    rclpy.shutdown()
     sys.exit(0)
 
 
