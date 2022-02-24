@@ -4,6 +4,8 @@ import signal
 import sys
 import rclpy
 
+from typing import List
+from rclpy.parameter import Parameter
 from .gait_preprocessor import GaitPreprocessor
 from rcl_interfaces.msg import SetParametersResult
 from contextlib import suppress
@@ -30,7 +32,9 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(gait_preprocessor, parameters: list) -> SetParametersResult:
+def parameter_callback(
+    gait_preprocessor, parameters: List[Parameter]
+) -> SetParametersResult:
     """Update parameter of gait_preprocessor and return if
     this is done succesfully.
 
@@ -44,14 +48,14 @@ def parameter_callback(gait_preprocessor, parameters: list) -> SetParametersResu
     """
     for param in parameters:
         if param.name == "location_x":
-            gait_preprocessor._location_x = param.value
+            gait_preprocessor._location_x = param.get_parameter_value().double_value
         elif param.name == "location_y":
-            gait_preprocessor._location_y = param.value
+            gait_preprocessor._location_y = param.get_parameter_value().double_value
         if param.name == "simulate_points":
-            gait_preprocessor._simulate_points = param.value
+            gait_preprocessor._simulate_points = param.get_parameter_value().bool_value
             gait_preprocessor.set_simulate_points_parameter()
         if param.name == "duration":
-            gait_preprocessor._duration = param.value
+            gait_preprocessor._duration = param.get_parameter_value().double_value
 
         parameter_updated_logger(gait_preprocessor, param)
 
