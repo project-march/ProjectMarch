@@ -1,7 +1,6 @@
 """Author: Marten Haitjema, MVII"""
 
 from rclpy.node import Node
-
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.logger import Logger
@@ -81,34 +80,28 @@ class GaitPreprocessor(Node):
     def _callback_left(self, foot_location: FootPosition) -> None:
         """Callback for new left point from covid. Makes the point
         usable for the gait."""
-        transformed_foot_location = self._get_foot_location_in_gait_axes(foot_location)
-        scaled_duration = self._get_duration_scaled_to_height(
-            self._duration, transformed_foot_location.y
-        )
-
-        foot_location_msg = FootPosition()
-        foot_location_msg.header = foot_location.header
-        foot_location_msg.point = transformed_foot_location
-        foot_location_msg.track_points = foot_location.track_points
-        foot_location_msg.duration = scaled_duration
-
+        foot_location_msg = self._process_foot_location(foot_location)
         self.publisher_left.publish(foot_location_msg)
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Callback for new right point from covid. Makes the point
         usable for the gait."""
+        foot_location_msg = self._process_foot_location(foot_location)
+        self.publisher_right.publish(foot_location_msg)
+
+    def _process_foot_location(self, foot_location: FootPosition) -> FootPosition:
+        """Reformat the foot location so that gait can use it."""
         transformed_foot_location = self._get_foot_location_in_gait_axes(foot_location)
         scaled_duration = self._get_duration_scaled_to_height(
             self._duration, transformed_foot_location.y
         )
 
-        foot_location_msg = FootPosition()
-        foot_location_msg.header = foot_location.header
-        foot_location_msg.point = transformed_foot_location
-        foot_location_msg.track_points = foot_location.track_points
-        foot_location_msg.duration = scaled_duration
-
-        self.publisher_right.publish(foot_location_msg)
+        return FootPosition(
+            header=foot_location.header,
+            point=transformed_foot_location,
+            track_points=foot_location.track_points,
+            duration=scaled_duration,
+        )
 
     def _get_foot_location_in_gait_axes(self, foot_location: FootPosition) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes."""
@@ -126,8 +119,6 @@ class GaitPreprocessor(Node):
     ) -> float:
         """Scales the duration based on the absolute step height"""
         return duration + DURATION_SCALING_FACTOR * abs(step_height)
-
-    def _get_transforma
 
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations"""

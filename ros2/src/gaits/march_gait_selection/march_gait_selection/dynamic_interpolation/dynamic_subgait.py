@@ -14,7 +14,7 @@ from march_utility.utilities.logger import Logger
 from march_goniometric_ik_solver.ik_solver import Pose
 
 from trajectory_msgs import msg as trajectory_msg
-from march_shared_msgs.msg import FootPositionDuration
+from march_shared_msgs.msg import FootPosition
 
 from typing import List
 from enum import IntEnum
@@ -57,7 +57,7 @@ class DynamicSubgait:
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
-        location: FootPositionDuration,
+        location: FootPosition,
         joint_soft_limits: List[Limits],
         start: bool,
         stop: bool,
