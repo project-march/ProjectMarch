@@ -197,7 +197,7 @@ class DynamicSubgait:
 
             if name in ["right_ankle", "left_ankle"]:
                 self.joint_trajectory_list.append(
-                    DynamicJointTrajectory(setpoint_list, ankle=True)
+                    DynamicJointTrajectory(setpoint_list, interpolate_ankle=True)
                 )
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
