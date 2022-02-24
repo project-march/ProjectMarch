@@ -3,7 +3,7 @@
 from rclpy.node import Node
 
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition, FootPositionDuration
+from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -68,12 +68,12 @@ class GaitPreprocessor(Node):
     def _create_publishers(self) -> None:
         """Create publishers for the topics gait listens to."""
         self.publisher_right = self.create_publisher(
-            FootPositionDuration,
+            FootPosition,
             "/processed_foot_position/right",
             DEFAULT_HISTORY_DEPTH,
         )
         self.publisher_left = self.create_publisher(
-            FootPositionDuration,
+            FootPosition,
             "/processed_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
@@ -86,7 +86,7 @@ class GaitPreprocessor(Node):
             self._duration, transformed_foot_location.y
         )
 
-        foot_location_msg = FootPositionDuration()
+        foot_location_msg = FootPosition()
         foot_location_msg.header = foot_location.header
         foot_location_msg.point = transformed_foot_location
         foot_location_msg.track_points = foot_location.track_points
@@ -102,7 +102,7 @@ class GaitPreprocessor(Node):
             self._duration, transformed_foot_location.y
         )
 
-        foot_location_msg = FootPositionDuration()
+        foot_location_msg = FootPosition()
         foot_location_msg.header = foot_location.header
         foot_location_msg.point = transformed_foot_location
         foot_location_msg.track_points = foot_location.track_points
@@ -127,9 +127,11 @@ class GaitPreprocessor(Node):
         """Scales the duration based on the absolute step height"""
         return duration + DURATION_SCALING_FACTOR * abs(step_height)
 
+    def _get_transforma
+
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations"""
-        point_msg = FootPositionDuration()
+        point_msg = FootPosition()
         point_msg.header.stamp = self.get_clock().now().to_msg()
 
         point_msg.point.x = self._location_x
