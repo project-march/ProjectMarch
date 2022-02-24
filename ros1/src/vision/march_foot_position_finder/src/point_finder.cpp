@@ -16,6 +16,9 @@ using PointCloud = pcl::PointCloud<Point>;
  * Constructs a PointFinder object to find a possible foot location in a single
  * depth frame. The parameterised variables are also initialised here.
  *
+ * Heights/derivatives are initialized with the values ±10, so that no
+ * nonexisting points can be found by default.
+ *
  * @param pointcloud a pointer to a PCL pointcloud
  * @param left_or_right whether a position should be found for the left or right
  * foot
@@ -28,10 +31,10 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     : pointcloud_ { std::move(pointcloud) }
     , left_or_right_ { std::move(left_or_right) }
 {
-    std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -5);
+    std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
     std::fill_n(
-        &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -5);
-    std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 1);
+        &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -10);
+    std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 10);
 
     ros::param::get("~foot_width", foot_width_);
     ros::param::get("~foot_length", foot_length_);
@@ -104,7 +107,6 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
-    // convolveGaussianKernel();
     height_map_ = height_map_temp_;
     convolveLaplacianKernel();
     findFeasibleFootPlacements(position_queue);

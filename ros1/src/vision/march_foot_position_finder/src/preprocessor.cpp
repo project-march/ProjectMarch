@@ -50,13 +50,6 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
  */
 void Preprocessor::preprocess()
 {
-    // voxelDownSample(/*voxel_size=*/voxel_size_);
-    // filterOnDistance(/*x_min=*/static_cast<float>(x_min_),
-    //     /*x_max=*/static_cast<float>(x_max_),
-    //     /*y_min=*/static_cast<float>(y_min_),
-    //     /*y_max=*/static_cast<float>(y_max_),
-    //     /*z_min=*/static_cast<float>(z_min_),
-    //     /*z_max=*/static_cast<float>(z_max_));
     transformPointCloudFromUrdf();
 }
 

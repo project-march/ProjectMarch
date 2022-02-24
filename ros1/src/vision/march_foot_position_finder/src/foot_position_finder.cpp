@@ -164,7 +164,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     // Publish cloud for visualization
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
-    Point position(point.y, -point.x, point.z);
+    Point position(point.y, -point.x, point.z); // Rotate right
     PointFinder pointFinder(n_, pointcloud, left_or_right_, position);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
@@ -181,7 +181,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Retrieve 3D points between current and new foot position
         Point start(/*_x=*/0, /*_y=*/0, /*_z=*/0);
         start = transformPoint(start, current_frame_id_, base_frame_);
-        start = Point(start.y, -start.x, start.z);
+        start = Point(start.y, -start.x, start.z); // Rotate right
         std::vector<Point> track_points
             = pointFinder.retrieveTrackPoints(start, avg);
 
@@ -191,13 +191,13 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPossiblePoints(point_marker_publisher_, position_queue);
 
         // Publish new point and points on the track for gait computation
-        Point relative_avg = Point(-avg.y, avg.x, avg.z);
+        Point relative_avg = Point(-avg.y, avg.x, avg.z); // Rotate left
         relative_avg
             = transformPoint(relative_avg, base_frame_, reference_frame_id_);
         std::vector<Point> relative_track_points;
 
         for (Point& p : track_points) {
-            Point point(-p.y, p.x, p.z);
+            Point point(-p.y, p.x, p.z); // Rotate left
             point = transformPoint(point, base_frame_, current_frame_id_);
             relative_track_points.emplace_back(point);
         }
