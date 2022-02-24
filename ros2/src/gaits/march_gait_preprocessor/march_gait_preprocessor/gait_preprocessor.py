@@ -3,7 +3,6 @@
 from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "gait_preprocessor_node"
@@ -25,11 +24,7 @@ class GaitPreprocessor(Node):
         )
 
         self._set_parameters()
-        self.logger = Logger(self, __class__.__name__)
 
-        self.timer = None
-        self.subcription_left = None
-        self.subcription_right = None
         self.set_simulate_points_parameter()
         self._create_publishers()
 
