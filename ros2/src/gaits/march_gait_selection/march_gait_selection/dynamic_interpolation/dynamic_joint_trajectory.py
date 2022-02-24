@@ -39,15 +39,12 @@ class DynamicJointTrajectory:
         position and velocity. Uses a different interpolation method for the swing leg ankle. This is
         because this joint will otherwise be in the soft limits too often."""
         duration, position, velocity = self._get_setpoints_unzipped()
-        time = list(map(lambda x: x.nanoseconds / NANOSECONDS_TO_SECONDS, duration))
+        time = [d.nanoseconds / NANOSECONDS_TO_SECONDS for d in duration]
 
         if self.ankle:
-            yi = []
-            for i in range(len(duration)):
-                yi.append([position[i], velocity[i]])
+            yi = [[position[i], velocity[i]] for i in range(len(duration))]
 
             self.interpolated_position = BPoly.from_derivatives(time, yi)
-            self.interpolated_velocity = self.interpolated_position.derivative()
         else:
             boundary_condition = (
                 (CLAMPED_BOUNDARY_CONDITION, velocity[0]),
@@ -56,7 +53,7 @@ class DynamicJointTrajectory:
             self.interpolated_position = CubicSpline(
                 time, position, bc_type=boundary_condition
             )
-            self.interpolated_velocity = self.interpolated_position.derivative()
+        self.interpolated_velocity = self.interpolated_position.derivative()
 
     def get_interpolated_setpoint(self, time: float) -> Setpoint:
         """Computes a Setpoint instance with the given time and the interpolated

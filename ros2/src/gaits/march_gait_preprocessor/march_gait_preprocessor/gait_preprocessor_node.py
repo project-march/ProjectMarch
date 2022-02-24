@@ -30,9 +30,11 @@ def main():
 
 
 def parameter_callback(gait_preprocessor, parameters: list) -> SetParametersResult:
-    """Update parameter of fake_covid_publisher and return if
+    """Update parameter of gait_preprocessor and return if
     this is done succesfully.
 
+    :param gait_preprocessor: gait_preprocessor class
+    :type gait_preprocessor: GaitPreprocessor
     :param parameters: list containing the changed parameters
     :type parameters: list
 
@@ -50,7 +52,7 @@ def parameter_callback(gait_preprocessor, parameters: list) -> SetParametersResu
         if param.name == "duration":
             gait_preprocessor._duration = param.value
 
-        gait_preprocessor.logger.info(f"Simulate points set to {param.value}")
+        parameter_updated_logger(gait_preprocessor, param)
 
     return SetParametersResult(successful=True)
 

@@ -8,9 +8,11 @@ from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "gait_preprocessor_node"
+DURATION_SCALING_FACTOR = 5
+# Offsets are used to account for the difference in points between
+# covid (middle of foot) and gait (at the heel)
 X_OFFSET = 0.1
 Y_OFFSET = 0.05
-DURATION_SCALING_FACTOR = 5
 
 
 class GaitPreprocessor(Node):
@@ -144,12 +146,9 @@ class GaitPreprocessor(Node):
         """Creates either a publisher that publishes simulated points or a
         subsctiption on the covid points topics."""
         if self._simulate_points:
-            if self.subcription_right is not None:
-                self.destroy_subscription(self.subcription_right)
-            if self.subcription_left is not None:
-                self.destroy_subscription(self.subcription_left)
+            self.destroy_subscription(self.subcription_right)
+            self.destroy_subscription(self.subcription_left)
             self.timer = self.create_timer(0.1, self._publish_simulated_locations)
         else:
-            if self.timer is not None:
-                self.destroy_timer(self.timer)
+            self.destroy_timer(self.timer)
             self._create_covid_subscribers()
