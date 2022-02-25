@@ -61,7 +61,8 @@ inline Point computeAveragePoint(const std::vector<Point>& points)
 }
 
 /**
- * Create a domain with n 3D points linearly spaced between a start and end point.
+ * Create a domain with n 3D points linearly spaced between a start and end
+ * point.
  *
  * @param Point a first point of the domain
  * @param Point b last point of the domain
