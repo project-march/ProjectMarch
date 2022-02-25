@@ -33,7 +33,7 @@ def main():
 
 
 def parameter_callback(
-    gait_preprocessor, parameters: List[Parameter]
+    gait_preprocessor: GaitPreprocessor, parameters: List[Parameter]
 ) -> SetParametersResult:
     """Update parameter of gait_preprocessor and return if
     this is done succesfully.
@@ -62,5 +62,6 @@ def parameter_callback(
     return SetParametersResult(successful=True)
 
 
-def parameter_updated_logger(gait_preprocessor, param):
+def parameter_updated_logger(gait_preprocessor: GaitPreprocessor, param: Parameter):
+    """Log which param has been updated to which value"""
     gait_preprocessor.logger.info(f"{param.name} set to {param.value}")

@@ -27,12 +27,11 @@ class GaitPreprocessor(Node):
         self.subscription_left = None
         self.subscription_right = None
 
-        self._set_parameters()
-
+        self._init_parameters()
         self.set_simulate_points_parameter()
         self._create_publishers()
 
-    def _set_parameters(self) -> None:
+    def _init_parameters(self) -> None:
         """Read node parameters from parameter server."""
         self._simulate_points = (
             self.get_parameter("simulate_points").get_parameter_value().bool_value
@@ -78,18 +77,32 @@ class GaitPreprocessor(Node):
 
     def _callback_left(self, foot_location: FootPosition) -> None:
         """Callback for new left point from covid. Makes the point
-        usable for the gait."""
+        usable for the gait.
+
+        :param foot_location: location given by covid
+        :type foot_location: FootPosition
+        """
         foot_location_msg = self._process_foot_location(foot_location)
         self.publisher_left.publish(foot_location_msg)
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Callback for new right point from covid. Makes the point
-        usable for the gait."""
+        usable for the gait.
+
+        :param foot_location: location given by covid
+        :type foot_location: FootPosition
+        """
         foot_location_msg = self._process_foot_location(foot_location)
         self.publisher_right.publish(foot_location_msg)
 
     def _process_foot_location(self, foot_location: FootPosition) -> FootPosition:
-        """Reformat the foot location so that gait can use it."""
+        """Reformat the foot location so that gait can use it.
+
+        :param foot_location: location given by covid
+        :type foot_location: FootPosition
+        :returns: location with transformed axes and scaled duration
+        :rtype: Point
+        """
         transformed_foot_location = self._get_foot_location_in_gait_axes(foot_location)
         scaled_duration = self._get_duration_scaled_to_height(
             self._duration, transformed_foot_location.y
@@ -103,7 +116,13 @@ class GaitPreprocessor(Node):
         )
 
     def _get_foot_location_in_gait_axes(self, foot_location: FootPosition) -> Point:
-        """Transforms the point found by covid from the covid axes to the gait axes."""
+        """Transforms the point found by covid from the covid axes to the gait axes.
+
+        :param foot_location: location given by covid
+        :type foot_location: FootPosition
+        :returns: foot location transformed to ik solver axes
+        :rtype: Point
+        """
         temp_y = foot_location.point.y
         point = Point()
 
@@ -116,7 +135,15 @@ class GaitPreprocessor(Node):
     def _get_duration_scaled_to_height(
         self, duration: float, step_height: float
     ) -> float:
-        """Scales the duration based on the absolute step height"""
+        """Scales the duration based on the absolute step height
+
+        :param duration: Duration of the step in seconds
+        :type duration: float
+        :param step_height: y-coordinate of the covid point
+        :type step_height: float
+        :returns: scaled duration in seconds
+        :rtype: float
+        """
         return duration + DURATION_SCALING_FACTOR * abs(step_height)
 
     def _publish_simulated_locations(self) -> None:
