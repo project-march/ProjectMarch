@@ -30,8 +30,7 @@ JOINT_NAMES = [
 
 class LiveWidget:
     def __init__(self) -> None:
-        self.slider_x = 0
-        self.slider_y = 0
+        self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}}
 
         self.create_window()
         self.create_plot()
@@ -53,19 +52,40 @@ class LiveWidget:
         plot.setAspectLocked()
         plot.showGrid(x=True, y=True)
 
-        self.exo = plot.plot(pen="k", symbol="o", symbolSize=6)
-        self.pose = Pose()
-        self.update_pose()
+        self.poses = {"last": Pose(), "next": Pose()}
+        self.plots = {
+            "last": plot.plot(pen="b", symbol="o", symbolSize=6),
+            "next": plot.plot(pen="k", symbol="o", symbolSize=6),
+        }
+        self.update_poses()
 
     def create_sliders(self):
-        self.slider_horizontal = QSlider()
-        self.slider_horizontal.setOrientation(Qt.Horizontal)
-        self.slider_horizontal.valueChanged.connect(self.update_x_slider)
+        self.slider_last_x = QSlider()
+        self.slider_last_x.setOrientation(Qt.Horizontal)
+        self.slider_last_x.setValue(99)
+        self.slider_last_x.valueChanged.connect(self.update_last_x)
 
-        self.slider_vertical = QSlider()
-        self.slider_vertical.setValue(50)
-        self.slider_vertical.setOrientation(Qt.Vertical)
-        self.slider_vertical.valueChanged.connect(self.update_y_slider)
+        self.slider_next_x = QSlider()
+        self.slider_next_x.setOrientation(Qt.Horizontal)
+        self.slider_next_x.valueChanged.connect(self.update_next_x)
+
+        self.horizontal_sliders = QGridLayout()
+        self.horizontal_sliders.addWidget(self.slider_last_x, 0, 0)
+        self.horizontal_sliders.addWidget(self.slider_next_x, 0, 1)
+
+        self.slider_last_y = QSlider()
+        self.slider_last_y.setValue(50)
+        self.slider_last_y.setOrientation(Qt.Vertical)
+        self.slider_last_y.valueChanged.connect(self.update_last_y)
+
+        self.slider_next_y = QSlider()
+        self.slider_next_y.setValue(50)
+        self.slider_next_y.setOrientation(Qt.Vertical)
+        self.slider_next_y.valueChanged.connect(self.update_next_y)
+
+        self.vertical_sliders = QGridLayout()
+        self.vertical_sliders.addWidget(self.slider_last_y, 0, 0)
+        self.vertical_sliders.addWidget(self.slider_next_y, 0, 1)
 
     def create_buttons(self):
         self.reset_button = QPushButton("Reset")
@@ -79,34 +99,47 @@ class LiveWidget:
         self.tables.addWidget(self.table, 0, 0)
 
     def fill_layout(self):
-        self.layout.addWidget(self.slider_vertical, 0, 0)
+        self.layout.addLayout(self.vertical_sliders, 0, 0)
         self.layout.addWidget(self.plot_window, 0, 1)
-        self.layout.addWidget(self.slider_horizontal, 1, 1)
+        self.layout.addLayout(self.horizontal_sliders, 1, 1)
         self.layout.addLayout(self.tables, 0, 2)
         self.layout.addWidget(self.reset_button, 1, 2)
 
-    def update_x_slider(self, value):
-        self.slider_x = (value / 99) * (X_MAX - X_MIN) + X_MIN
-        self.update_pose()
+    def update_last_x(self, value):
+        self.sliders["last"]["x"] = (1 - (value / 99)) * (X_MAX - X_MIN) + X_MIN
+        self.update_pose("last")
         self.update_table()
 
-    def update_y_slider(self, value):
-        self.slider_y = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
-        self.update_pose()
+    def update_next_x(self, value):
+        self.sliders["next"]["x"] = (value / 99) * (X_MAX - X_MIN) + X_MIN
+        self.update_pose("next")
+        self.update_table()
+
+    def update_last_y(self, value):
+        self.sliders["last"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
+        self.update_pose("last")
+        self.update_table()
+
+    def update_next_y(self, value):
+        self.sliders["next"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
+        self.update_pose("next")
         self.update_table()
 
     def reset(self):
-        self.slider_horizontal.setValue(0)
-        self.slider_vertical.setValue(50)
-        self.slider_x = 0
-        self.slider_y = 0
-        self.update_pose()
+        self.slider_last_x.setValue(99)
+        self.slider_next_x.setValue(0)
+        self.slider_last_y.setValue(50)
+        self.slider_next_y.setValue(50)
+        for pose in ["last", "next"]:
+            for axis in ["x", "y"]:
+                self.sliders[pose][axis] = 0
+        self.update_poses()
         self.update_table()
 
-    def update_pose(self):
-        self.pose.solve_end_position(
-            self.slider_x,
-            self.slider_y,
+    def update_pose(self, pose):
+        self.poses[pose].solve_end_position(
+            self.sliders[pose]["x"],
+            self.sliders[pose]["y"],
             0.0,
             "",
             DEFAULT_HIP_FRACTION,
@@ -114,13 +147,17 @@ class LiveWidget:
             REDUCE_DF_FRONT,
             REDUCE_DF_REAR,
         )
-        positions = self.pose.calculate_joint_positions()
+        positions = self.poses[pose].calculate_joint_positions()
         positions_x = [pos[0] for pos in positions]
         positions_y = [pos[1] for pos in positions]
-        self.exo.setData(x=positions_x, y=positions_y)
+        self.plots[pose].setData(x=positions_x, y=positions_y)
+
+    def update_poses(self):
+        for pose in ["last", "next"]:
+            self.update_pose(pose)
 
     def update_table(self):
-        joint_angles = self.pose.pose_left
+        joint_angles = self.poses["last"].pose_left
         joint_angles_degrees = [np.rad2deg(angle) for angle in joint_angles]
 
         data = {}
