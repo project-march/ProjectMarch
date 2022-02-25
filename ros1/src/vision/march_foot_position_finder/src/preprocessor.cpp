@@ -45,7 +45,8 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 }
 
 /**
- * Preprocess the current pointcloud by transforming the coordinates to world frame.
+ * Preprocess the current pointcloud by transforming the coordinates to world
+ * frame.
  */
 void Preprocessor::preprocess()
 {
