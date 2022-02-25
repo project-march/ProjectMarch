@@ -64,4 +64,4 @@ def parameter_callback(
 
 def parameter_updated_logger(gait_preprocessor: GaitPreprocessor, param: Parameter):
     """Log which param has been updated to which value"""
-    gait_preprocessor.logger.info(f"{param.name} set to {param.value}")
+    gait_preprocessor.get_logger().info(f"{param.name} set to {param.value}")
