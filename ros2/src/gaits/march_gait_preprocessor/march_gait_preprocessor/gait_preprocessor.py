@@ -45,6 +45,9 @@ class GaitPreprocessor(Node):
         self._location_y = (
             self.get_parameter("location_y").get_parameter_value().double_value
         )
+        self._location_z = (
+            self.get_parameter("location_z").get_parameter_value().double_value
+        )
 
     def _create_covid_subscribers(self) -> None:
         """Create subscribers to the topics on which covid
@@ -153,7 +156,7 @@ class GaitPreprocessor(Node):
 
         point_msg.point.x = self._location_x
         point_msg.point.y = self._location_y
-        point_msg.point.z = 0.0
+        point_msg.point.z = self._location_z
         point_msg.duration = self._get_duration_scaled_to_height(
             self._duration, self._location_y
         )

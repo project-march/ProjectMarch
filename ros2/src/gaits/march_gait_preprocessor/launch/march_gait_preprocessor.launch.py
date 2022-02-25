@@ -2,6 +2,14 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import Shutdown, DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from march_utility.utilities.utility_functions import (
+    get_lengths_robot_from_urdf_for_inverse_kinematics,
+)
+
+# Get lengths from urdf:
+lengths = get_lengths_robot_from_urdf_for_inverse_kinematics()
+LENGTH_HIP_AA, LENGTH_HIP_BASE = lengths[2], lengths[-1]
+DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
 def generate_launch_description():
@@ -42,6 +50,11 @@ def generate_launch_description():
                 default_value="1.5",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
+            DeclareLaunchArgument(
+                name="location_z",
+                default_value=str(DEFAULT_FEET_DISTANCE),
+                description="z-location for fake covid topic, takes double or 'random'",
+            ),
             Node(
                 package="march_gait_preprocessor",
                 executable="march_gait_preprocessor",
@@ -54,6 +67,7 @@ def generate_launch_description():
                     {"location_x": LaunchConfiguration("location_x")},
                     {"location_y": LaunchConfiguration("location_y")},
                     {"duration": LaunchConfiguration("duration")},
+                    {"location_z": LaunchConfiguration("location_z")},
                 ],
                 on_exit=Shutdown(),
             ),

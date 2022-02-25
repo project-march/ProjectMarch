@@ -5,6 +5,15 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from march_utility.utilities.utility_functions import (
+    get_lengths_robot_from_urdf_for_inverse_kinematics,
+)
+
+# Get lengths from urdf:
+LENGTH_HIP_AA, LENGTH_HIP_BASE = get_lengths_robot_from_urdf_for_inverse_kinematics(
+    length_names=["hip_aa_front", "hip_base"]
+)
+DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
 def generate_launch_description():
@@ -58,6 +67,7 @@ def generate_launch_description():
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
     duration = LaunchConfiguration("duration")
+    location_z = LaunchConfiguration("location_z")
 
     return launch.LaunchDescription(
         [
@@ -260,6 +270,11 @@ def generate_launch_description():
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
+                name="location_z",
+                default_value=str(DEFAULT_FEET_DISTANCE),
+                description="z-location for fake covid topic, takes double or 'random'",
+            ),
+            DeclareLaunchArgument(
                 name="duration",
                 default_value="1.5",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
@@ -342,6 +357,7 @@ def generate_launch_description():
                     ("simulate_points", simulate_points),
                     ("location_x", location_x),
                     ("location_y", location_y),
+                    ("location_z", location_z),
                     ("duration", duration),
                 ],
             ),
