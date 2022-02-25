@@ -17,6 +17,8 @@
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
+std::string world_frame = "world";
+
 /**
  * Rotates a PCL point counter clockwise, and converts it to a ROS Point
  * message.
@@ -54,7 +56,7 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
 
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg(cloud, msg);
-    msg.header.frame_id = "world";
+    msg.header.frame_id = world_frame;
     msg.header.stamp = ros::Time::now();
     publisher.publish(msg);
 }
@@ -69,7 +71,7 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
 void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = "world";
+    marker.header.frame_id = world_frame;
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "found_points";
@@ -114,7 +116,7 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
     std::vector<double> dis, const std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = "world";
+    marker.header.frame_id = world_frame;
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "search_region";
@@ -166,7 +168,7 @@ void publishPossiblePoints(
     ros::Publisher& publisher, std::vector<Point>& points)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = "world";
+    marker.header.frame_id = world_frame;
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "possible_points";
@@ -174,7 +176,7 @@ void publishPossiblePoints(
     marker.type = visualization_msgs::Marker::POINTS;
     marker.action = visualization_msgs::Marker::ADD;
 
-    for (auto& point : points) {
+    for (Point& point : points) {
         marker.points.push_back(rotate_left(point));
     }
 
@@ -201,7 +203,7 @@ void publishTrackMarkerPoints(
     ros::Publisher& publisher, std::vector<Point>& points)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = "world";
+    marker.header.frame_id = world_frame;
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "track_points";

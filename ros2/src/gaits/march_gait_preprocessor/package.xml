@@ -3,7 +3,7 @@
 <package format="3">
   <name>march_gait_preprocessor</name>
   <version>0.0.0</version>
-  <description>Publishes fake foot locations</description>
+  <description>A node that preprocesses the found points by the cameras for creating dynamic gaits.</description>
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 

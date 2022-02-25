@@ -119,7 +119,7 @@ void PointFinder::findPoints(std::vector<Point>* position_queue)
 void PointFinder::mapPointCloudToHeightMap()
 {
     for (std::size_t i = 0; i < pointcloud_->size(); i++) {
-        auto p = pointcloud_->points[i];
+        Point p = pointcloud_->points[i];
 
         int x_index = xCoordinateToIndex(p.x);
         int y_index = yCoordinateToIndex(p.y);

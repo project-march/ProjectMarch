@@ -23,6 +23,10 @@ class GaitPreprocessor(Node):
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
 
+        self.timer = None
+        self.subscription_left = None
+        self.subscription_right = None
+
         self._set_parameters()
 
         self.set_simulate_points_parameter()
@@ -46,13 +50,13 @@ class GaitPreprocessor(Node):
     def _create_covid_subscribers(self) -> None:
         """Create subscribers to the topics on which covid
         publishes found points"""
-        self.subcription_left = self.create_subscription(
+        self.subscription_left = self.create_subscription(
             FootPosition,
             "/foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.subcription_right = self.create_subscription(
+        self.subscription_right = self.create_subscription(
             FootPosition,
             "/foot_position/right",
             self._callback_right,
@@ -134,8 +138,8 @@ class GaitPreprocessor(Node):
         """Creates either a publisher that publishes simulated points or a
         subsctiption on the covid points topics."""
         if self._simulate_points:
-            self.destroy_subscription(self.subcription_right)
-            self.destroy_subscription(self.subcription_left)
+            self.destroy_subscription(self.subscription_right)
+            self.destroy_subscription(self.subscription_left)
             self.timer = self.create_timer(0.1, self._publish_simulated_locations)
         else:
             self.destroy_timer(self.timer)
