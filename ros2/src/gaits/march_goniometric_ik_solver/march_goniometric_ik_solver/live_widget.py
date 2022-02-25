@@ -32,6 +32,7 @@ class LiveWidget:
         pose.solve_end_position(
             0.0,
             0.0,
+            0.0,
             "",
             self.default_hip_fraction,
             self.default_knee_bend,
@@ -155,6 +156,7 @@ class LiveWidget:
         pose.solve_end_position(
             self.x_slider.val,
             self.y_slider.val,
+            0.0,
             "",
             self.hip_slider.val,
             np.deg2rad(self.knee_slider.val),
