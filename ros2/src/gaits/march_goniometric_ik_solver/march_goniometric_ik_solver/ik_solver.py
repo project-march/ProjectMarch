@@ -22,6 +22,7 @@ from march_utility.utilities.utility_functions import (
     length_names=["upper_leg", "lower_leg", "hip_aa_front", "hip_base"]
 )
 LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
+LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")

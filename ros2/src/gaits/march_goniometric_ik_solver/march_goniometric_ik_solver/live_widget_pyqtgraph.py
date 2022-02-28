@@ -3,8 +3,7 @@ import numpy as np
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton
-from march_goniometric_ik_solver.ik_solver import Pose
-import copy
+from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP
 
 DEFAULT_HIP_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
@@ -41,7 +40,7 @@ class LiveWidget:
 
     def create_window(self):
         self.window = QWidget()
-        self.window.setWindowTitle("Test")
+        self.window.setWindowTitle("IK Solver - Widget")
         self.layout = QGridLayout(self.window)
         pg.setConfigOptions(antialias=True)
 
@@ -92,38 +91,38 @@ class LiveWidget:
         self.reset_button.clicked.connect(self.reset)
 
     def create_table(self):
-        self.tables = QGridLayout()
-        self.table = pg.TableWidget()
-        self.table.horizontalHeader().hide()
-        self.update_table()
-        self.tables.addWidget(self.table, 0, 0)
+        self.table = QGridLayout()
+        self.tables = {"last": pg.TableWidget(), "next": pg.TableWidget()}
+        self.update_tables()
+        for pose in ["last", "next"]:
+            self.table.addWidget(self.tables[pose], list(self.tables.keys()).index(pose), 0)
 
     def fill_layout(self):
         self.layout.addLayout(self.vertical_sliders, 0, 0)
         self.layout.addWidget(self.plot_window, 0, 1)
         self.layout.addLayout(self.horizontal_sliders, 1, 1)
-        self.layout.addLayout(self.tables, 0, 2)
+        self.layout.addLayout(self.table, 0, 2)
         self.layout.addWidget(self.reset_button, 1, 2)
 
     def update_last_x(self, value):
         self.sliders["last"]["x"] = (1 - (value / 99)) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("last")
-        self.update_table()
+        self.update_tables()
 
     def update_next_x(self, value):
         self.sliders["next"]["x"] = (value / 99) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("next")
-        self.update_table()
+        self.update_tables()
 
     def update_last_y(self, value):
-        self.sliders["last"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
+        self.sliders["last"]["y"] = (1 - (value / 99)) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("last")
-        self.update_table()
+        self.update_tables()
 
     def update_next_y(self, value):
         self.sliders["next"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("next")
-        self.update_table()
+        self.update_tables()
 
     def reset(self):
         self.slider_last_x.setValue(99)
@@ -134,13 +133,13 @@ class LiveWidget:
             for axis in ["x", "y"]:
                 self.sliders[pose][axis] = 0
         self.update_poses()
-        self.update_table()
+        self.update_tables()
 
     def update_pose(self, pose):
         self.poses[pose].solve_end_position(
             self.sliders[pose]["x"],
             self.sliders[pose]["y"],
-            0.0,
+            LENGTH_HIP,
             "",
             DEFAULT_HIP_FRACTION,
             DEFAULT_KNEE_BEND,
@@ -148,6 +147,13 @@ class LiveWidget:
             REDUCE_DF_REAR,
         )
         positions = self.poses[pose].calculate_joint_positions()
+
+        # shift positions to have toes of stand legs at (0,0):
+        if pose == "last":
+            positions = [pos - positions[-1] for pos in positions]
+        elif pose == "next":
+            positions = [pos - positions[0] for pos in positions]
+
         positions_x = [pos[0] for pos in positions]
         positions_y = [pos[1] for pos in positions]
         self.plots[pose].setData(x=positions_x, y=positions_y)
@@ -156,17 +162,20 @@ class LiveWidget:
         for pose in ["last", "next"]:
             self.update_pose(pose)
 
-    def update_table(self):
-        joint_angles = self.poses["last"].pose_left
-        joint_angles_degrees = [np.rad2deg(angle) for angle in joint_angles]
+    def update_tables(self):
+        for pose in ["last", "next"]:
+            joint_angles = self.poses[pose].pose_left
+            joint_angles_degrees = [np.rad2deg(angle) for angle in joint_angles]
 
-        data = {}
-        for joint, angle_rad, angle_deg in zip(
-            JOINT_NAMES, np.round(joint_angles, 3), np.round(joint_angles_degrees, 3)
-        ):
-            data[joint] = [angle_rad, angle_deg]
+            data = []
+            for joint, angle_rad, angle_deg in zip(
+                JOINT_NAMES, np.round(joint_angles, 3), np.round(joint_angles_degrees, 3)
+            ):
+                data.append([joint, angle_rad, angle_deg])
 
-        self.table.setData(data)
+            self.tables[pose].setData(data)
+            self.tables[pose].setHorizontalHeaderLabels(["", "rad", "deg"])
+            self.tables[pose].verticalHeader().hide()
 
     def show(self):
         self.window.show()
