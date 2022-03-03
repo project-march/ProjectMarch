@@ -41,8 +41,8 @@ class DynamicSubgait:
     :type subgait_id: str
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param position: Desired foot position
-    :type position: Point
+    :param location: Desired foot position
+    :type location: Point
     :param joint_soft_limits: list containing soft limits in alphabetical order
     :type joint_soft_limits: List[Limits]
     :param start: whether it is an open gait or not
@@ -104,19 +104,19 @@ class DynamicSubgait:
 
         timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
         for timestamp in timestamps:
-            joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
+            joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
+            joint_trajectory_point.time_from_start = Duration(timestamp).to_msg()
 
             for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
                 interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
                     timestamp
                 )
 
-                joint_trajecory_point.positions.append(interpolated_setpoint.position)
-                joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
-                self._check_joint_limits(joint_index, joint_trajecory_point)
+                joint_trajectory_point.positions.append(interpolated_setpoint.position)
+                joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
+                self._check_joint_limits(joint_index, joint_trajectory_point)
 
-            joint_trajectory_msg.points.append(joint_trajecory_point)
+            joint_trajectory_msg.points.append(joint_trajectory_point)
 
         return joint_trajectory_msg
 

@@ -19,6 +19,7 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
+from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
@@ -51,6 +52,16 @@ class DynamicSetpointGait(GaitInterface):
             FootPosition,
             "/processed_foot_position/left",
             self._callback_left,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.pub_right = self.gait_selection.create_publisher(
+            Point,
+            "/chosen_foot_position/right",
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.pub_left = self.gait_selection.create_publisher(
+            Point,
+            "/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -286,7 +297,11 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_pos(self) -> None:
         """Update the start position of the next subgait to be
         the last position of the previous subgait."""
-        self.start_position = self.dynamic_subgait.get_final_position()
+        try:
+            self.start_position = self.dynamic_subgait.get_final_position()
+        except AttributeError:
+            self.start_position = None
+
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published
@@ -321,6 +336,19 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
+    def _publish_chosen_foot_position(self, subgait_id: str, foot_position_point: Point) -> None:
+        """Publish the point to which the step is planned
+
+        :param subgait_id: whether it is a right or left swing
+        :type subgait_id: str
+        :param foot_position_point: point to which step is planned
+        :type foot_position_point: Point
+        """
+        if subgait_id == "left_swing":
+            self.pub_left.publish(foot_position_point)
+        elif subgait_id == "right_swing":
+            self.pub_right.publish(foot_position_point)
+
     def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:
         """Return a TrajectoryCommand based on current subgait_id
 
@@ -341,6 +369,7 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
+            self._publish_chosen_foot_position(self.subgait_id, self.foot_location.point)
             self.logger.debug(
                 f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, {self.foot_location.point.z})"
             )
@@ -357,7 +386,10 @@ class DynamicSetpointGait(GaitInterface):
             stop,
         )
 
-        trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+        try:
+            trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+        except ValueError:
+            trajectory = None
 
         return TrajectoryCommand(
             trajectory,
