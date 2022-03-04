@@ -13,6 +13,9 @@ from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.logger import Logger
+from march_utility.exceptions.gait_exceptions import (
+    PositionSoftLimitError, VelocitySoftLimitError,
+)
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
@@ -357,14 +360,17 @@ class DynamicSetpointGait(GaitInterface):
             stop,
         )
 
-        trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
-
-        return TrajectoryCommand(
-            trajectory,
-            duration,
-            self.subgait_id,
-            self._end_time,
-        )
+        try:
+            trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+            return TrajectoryCommand(
+                trajectory,
+                duration,
+                self.subgait_id,
+                self._end_time,
+            )
+        except (PositionSoftLimitError, VelocitySoftLimitError):
+            self._end = True
+            self._get_next_command()
 
     def _update_time_stamps(self, next_command_duration: Duration) -> None:
         """Update the starting and end time
@@ -438,7 +444,7 @@ class DynamicSetpointGait(GaitInterface):
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
-            self.logger.info(
+            self.logger.warn(
                 "Foot location is more than 0.5 seconds old, time difference is "
                 f"{time_difference}. Stopping gait.",
             )

@@ -11,6 +11,9 @@ from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.logger import Logger
+from march_utility.exceptions.gait_exceptions import (
+    PositionSoftLimitError, VelocitySoftLimitError,
+)
 from march_goniometric_ik_solver.ik_solver import Pose
 
 from trajectory_msgs import msg as trajectory_msg
@@ -292,20 +295,27 @@ class DynamicSubgait:
             position > self.joint_soft_limits[joint_index].upper
             or position < self.joint_soft_limits[joint_index].lower
         ):
-            self.logger.info(
+            self.logger.warn(
                 f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of soft limits, "
                 f"position: {position}, soft limits: "
-                f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]."
+                f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]. "
+                "Gait will not be executed."
             )
-            raise Exception(
-                f"{self.joint_names[joint_index]} will be outside its soft limits."
+            raise PositionSoftLimitError(
+                self.joint_names[joint_index],
+                position,
+                self.joint_soft_limits[joint_index].lower,
+                self.joint_soft_limits[joint_index].upper,
             )
 
         if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
-            self.logger.info(
+            self.logger.warn(
                 f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of velocity limits, "
-                f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}."
+                f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}. "
+                "Gait will not be executed."
             )
-            raise Exception(
-                f"{self.joint_names[joint_index]} will be outside its velocity limits."
+            raise VelocitySoftLimitError(
+                self.joint_names[joint_index],
+                velocity,
+                self.joint_soft_limits[joint_index].velocity,
             )
