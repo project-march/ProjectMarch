@@ -12,7 +12,8 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
-    PositionSoftLimitError, VelocitySoftLimitError,
+    PositionSoftLimitError,
+    VelocitySoftLimitError,
 )
 from march_goniometric_ik_solver.ik_solver import Pose
 

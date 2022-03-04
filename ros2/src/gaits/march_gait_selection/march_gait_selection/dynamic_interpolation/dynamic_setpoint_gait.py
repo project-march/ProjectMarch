@@ -1,4 +1,5 @@
 """Author: Marten Haitjema, MVII"""
+from typing import Optional
 
 from rclpy.time import Time
 from rclpy.node import Node
@@ -14,7 +15,8 @@ from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
-    PositionSoftLimitError, VelocitySoftLimitError,
+    PositionSoftLimitError,
+    VelocitySoftLimitError,
 )
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -25,6 +27,8 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 from march_shared_msgs.msg import FootPosition
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
+DURATION_INCREASE_FACTOR = 2
+DURATION_INCREASE_SIZE = 0.25
 
 
 class DynamicSetpointGait(GaitInterface):
@@ -76,15 +80,15 @@ class DynamicSetpointGait(GaitInterface):
         return "v0"
 
     @property
-    def duration(self) -> Duration:
+    def duration(self) -> Optional[Duration]:
         if self._next_command is not None:
             return self._next_command.duration
         else:
             return None
 
     @property
-    def gait_type(self) -> str:
-        # Return gait type based on height of desired foot location
+    def gait_type(self) -> Optional[str]:
+        # TODO: Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
                 self.foot_location.point.y > self.minimum_stair_height
@@ -264,7 +268,7 @@ class DynamicSetpointGait(GaitInterface):
 
         return GaitUpdate.subgait_updated()
 
-    def _get_next_command(self) -> TrajectoryCommand:
+    def _get_next_command(self) -> Optional[TrajectoryCommand]:
         """Create the next command, based on what the current subgait is.
         Also checks if the gait has to be stopped. If true, it returns
         a close gait.
@@ -309,7 +313,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         self.foot_location_left = foot_location
 
-    def _get_foot_location(self, subgait_id: str) -> FootPosition:
+    def _get_foot_location(self, subgait_id: str) -> Optional[FootPosition]:
         """Returns the right or left foot position based upon the subgait_id
 
         :param subgait_id: either right_swing or left_swing
@@ -325,7 +329,7 @@ class DynamicSetpointGait(GaitInterface):
             return None
 
     def _get_trajectory_command(self, start=False, stop=False) -> TrajectoryCommand:
-        """Return a TrajectoryCommand based on current subgait_id
+        """Return a TrajectoryCommand based on current subgait_id.
 
         :param start: whether it is a start gait or not
         :type start: bool
@@ -345,10 +349,74 @@ class DynamicSetpointGait(GaitInterface):
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
             self.logger.debug(
-                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, {self.foot_location.point.z})"
+                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, "
+                f"{self.foot_location.point.z})"
             )
 
-        duration = Duration(self.foot_location.duration)
+        return self._get_first_feasible_trajectory(start, stop)
+
+    def _get_first_feasible_trajectory(
+        self, start: bool, stop: bool
+    ) -> Optional[TrajectoryCommand]:
+        """If a subgait is not feasible, it will first try to increase the duration. If it is
+        still not feasible, execution of the gait will be stopped.
+
+        :param start: whether it is a start gait or not
+        :type start: bool
+        :param stop: whether it is a stop gait or not
+        :type stop: bool
+
+        :return: TrajectoryCommand with the current subgait and start time.
+        :rtype: TrajectoryCommand
+        """
+        original_duration = self.foot_location.duration
+        while (
+            self.foot_location.duration <= original_duration * DURATION_INCREASE_FACTOR
+        ):
+            trajectory_command = self._try_to_get_trajectory_command(start, stop)
+            if trajectory_command is not None:
+                return trajectory_command
+            else:
+                self.foot_location.duration += DURATION_INCREASE_SIZE
+
+        # If no feasible subgait can be found, stop execution.
+        self._end = True
+        self._get_next_command()
+        return None
+
+    def _try_to_get_trajectory_command(
+        self, start: bool, stop: bool
+    ) -> Optional[TrajectoryCommand]:
+        """Try to get a joint_trajectory_msg from the dynamic subgait instance.
+
+        :param start: whether it is a start gait or not
+        :type start: bool
+        :param stop: whether it is a stop gait or not
+        :type stop: bool
+
+        :return: TrajectoryCommand if successful, otherwise None
+        :rtype: TrajectoryCommand
+        """
+        try:
+            self._create_subgait_instance(start, stop)
+            trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+            return TrajectoryCommand(
+                trajectory,
+                Duration(self.foot_location.duration),
+                self.subgait_id,
+                self._end_time,
+            )
+        except (PositionSoftLimitError, VelocitySoftLimitError):
+            return None
+
+    def _create_subgait_instance(self, start: bool, stop: bool) -> None:
+        """Create a DynamicSubgait instance
+
+        :param start: whether it is a start gait or not
+        :type start: bool
+        :param stop: whether it is a stop gait or not
+        :type stop: bool
+        """
         self.dynamic_subgait = DynamicSubgait(
             self.gait_selection,
             self.start_position,
@@ -359,18 +427,6 @@ class DynamicSetpointGait(GaitInterface):
             start,
             stop,
         )
-
-        try:
-            trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
-            return TrajectoryCommand(
-                trajectory,
-                duration,
-                self.subgait_id,
-                self._end_time,
-            )
-        except (PositionSoftLimitError, VelocitySoftLimitError):
-            self._end = True
-            self._get_next_command()
 
     def _update_time_stamps(self, next_command_duration: Duration) -> None:
         """Update the starting and end time
