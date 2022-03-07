@@ -25,7 +25,7 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPosition, GaitInstruction
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 DURATION_INCREASE_FACTOR = 2
@@ -59,6 +59,12 @@ class DynamicSetpointGait(GaitInterface):
             FootPosition,
             "/processed_foot_position/left",
             self._callback_left,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.gait_selection.create_subscription(
+            GaitInstruction,
+            "/march/input_device/instruction",
+            self._callback_force_unknown,
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -474,6 +480,13 @@ class DynamicSetpointGait(GaitInterface):
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
+
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        if msg.type == GaitInstruction.UNKNOWN:
+            self.start_position = self._joint_dict_to_setpoint_dict(
+                get_position_from_yaml("stand")
+            )
+            self.subgait_id = "right_swing"
 
     # UTILITY FUNCTIONS
     @staticmethod
