@@ -1,6 +1,7 @@
 """Author: Marten Haitjema, MVII"""
-from typing import Optional
 
+from typing import Optional
+from math import floor
 from rclpy.time import Time
 from rclpy.node import Node
 
@@ -373,7 +374,7 @@ class DynamicSetpointGait(GaitInterface):
         while (
             self.foot_location.duration <= original_duration * DURATION_INCREASE_FACTOR
         ):
-            trajectory_command = self._try_to_get_trajectory_command(start, stop)
+            trajectory_command = self._try_to_get_trajectory_command(start, stop, original_duration)
             if trajectory_command is not None:
                 return trajectory_command
             else:
@@ -385,7 +386,7 @@ class DynamicSetpointGait(GaitInterface):
         return None
 
     def _try_to_get_trajectory_command(
-        self, start: bool, stop: bool
+        self, start: bool, stop: bool, original_duration: float,
     ) -> Optional[TrajectoryCommand]:
         """Try to get a joint_trajectory_msg from the dynamic subgait instance.
 
@@ -397,16 +398,35 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand if successful, otherwise None
         :rtype: TrajectoryCommand
         """
+        iteration = floor((self.foot_location.duration - original_duration) / DURATION_INCREASE_SIZE)
         try:
             self._create_subgait_instance(start, stop)
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+            self.logger.debug(
+                f"Found trajectory after {iteration} iterations at duration of {self.foot_location.duration}. "
+                f"Original duration {original_duration}."
+            )
             return TrajectoryCommand(
                 trajectory,
                 Duration(self.foot_location.duration),
                 self.subgait_id,
                 self._end_time,
             )
-        except (PositionSoftLimitError, VelocitySoftLimitError):
+        except PositionSoftLimitError as e:
+            if self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR:
+                self.logger.warn(
+                    f"Joint {e.joint_name} will still be outside of soft limits after "
+                    f"{iteration} iterations. Position: {e.position}, soft limits: "
+                    f"[{e.lower_limit}, {e.upper_limit}]. Gait will not be executed."
+                )
+            return None
+        except VelocitySoftLimitError as e:
+            if self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR:
+                self.logger.warn(
+                    f"Joint {e.joint_name} will still be outside of velocity limits, after "
+                    f"{iteration} iterations. Velocity: {e.velocity}, velocity limit: {e.velocity}. "
+                    "Gait will not be executed."
+                )
             return None
 
     def _create_subgait_instance(self, start: bool, stop: bool) -> None:

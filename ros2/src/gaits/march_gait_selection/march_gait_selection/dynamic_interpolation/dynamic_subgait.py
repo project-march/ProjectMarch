@@ -296,12 +296,6 @@ class DynamicSubgait:
             position > self.joint_soft_limits[joint_index].upper
             or position < self.joint_soft_limits[joint_index].lower
         ):
-            self.logger.warn(
-                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of soft limits, "
-                f"position: {position}, soft limits: "
-                f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]. "
-                "Gait will not be executed."
-            )
             raise PositionSoftLimitError(
                 self.joint_names[joint_index],
                 position,
@@ -310,11 +304,6 @@ class DynamicSubgait:
             )
 
         if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
-            self.logger.warn(
-                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of velocity limits, "
-                f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}. "
-                "Gait will not be executed."
-            )
             raise VelocitySoftLimitError(
                 self.joint_names[joint_index],
                 velocity,

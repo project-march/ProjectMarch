@@ -102,6 +102,11 @@ class PositionSoftLimitError(Exception):
     ):
         """Class to raise an error when joint trajectory will be outside of
         position soft limits"""
+        self.joint_name = joint_name
+        self.position = position
+        self.lower_limit = lower_limit
+        self.upper_limit = upper_limit
+
         msg = (
             f"{joint_name} will be outside its soft limits. "
             f"position: {position}, soft limits: "
@@ -115,6 +120,10 @@ class VelocitySoftLimitError(Exception):
     def __init__(self, joint_name: str, velocity: float, limit: float):
         """Class to raise an error when joint trajectory will be outside of
         velocity soft limits"""
+        self.joint_name = joint_name
+        self.velocity = velocity
+        self.limit = limit
+
         msg = (
             f"{joint_name} will be outside of velocity limits, "
             f"velocity: {velocity}, velocity limit: {limit}."
