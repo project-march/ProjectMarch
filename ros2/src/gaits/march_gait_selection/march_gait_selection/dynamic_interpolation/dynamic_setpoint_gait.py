@@ -374,7 +374,9 @@ class DynamicSetpointGait(GaitInterface):
         while (
             self.foot_location.duration <= original_duration * DURATION_INCREASE_FACTOR
         ):
-            trajectory_command = self._try_to_get_trajectory_command(start, stop, original_duration)
+            trajectory_command = self._try_to_get_trajectory_command(
+                start, stop, original_duration
+            )
             if trajectory_command is not None:
                 return trajectory_command
             else:
@@ -386,7 +388,10 @@ class DynamicSetpointGait(GaitInterface):
         return None
 
     def _try_to_get_trajectory_command(
-        self, start: bool, stop: bool, original_duration: float,
+        self,
+        start: bool,
+        stop: bool,
+        original_duration: float,
     ) -> Optional[TrajectoryCommand]:
         """Try to get a joint_trajectory_msg from the dynamic subgait instance.
 
@@ -398,7 +403,9 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand if successful, otherwise None
         :rtype: TrajectoryCommand
         """
-        iteration = floor((self.foot_location.duration - original_duration) / DURATION_INCREASE_SIZE)
+        iteration = floor(
+            (self.foot_location.duration - original_duration) / DURATION_INCREASE_SIZE
+        )
         try:
             self._create_subgait_instance(start, stop)
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
@@ -413,7 +420,10 @@ class DynamicSetpointGait(GaitInterface):
                 self._end_time,
             )
         except PositionSoftLimitError as e:
-            if self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR:
+            if (
+                self.foot_location.duration
+                >= original_duration * DURATION_INCREASE_FACTOR
+            ):
                 self.logger.warn(
                     f"Joint {e.joint_name} will still be outside of soft limits after "
                     f"{iteration} iterations. Position: {e.position}, soft limits: "
@@ -421,7 +431,10 @@ class DynamicSetpointGait(GaitInterface):
                 )
             return None
         except VelocitySoftLimitError as e:
-            if self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR:
+            if (
+                self.foot_location.duration
+                >= original_duration * DURATION_INCREASE_FACTOR
+            ):
                 self.logger.warn(
                     f"Joint {e.joint_name} will still be outside of velocity limits, after "
                     f"{iteration} iterations. Velocity: {e.velocity}, velocity limit: {e.velocity}. "
