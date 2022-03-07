@@ -62,6 +62,12 @@ class DynamicSetpointGait(GaitInterface):
             DEFAULT_HISTORY_DEPTH,
         )
 
+        self.start_position = self._joint_dict_to_setpoint_dict(
+            get_position_from_yaml("stand")
+        )
+        self.end_position = self.start_position
+        self.subgait_id = "right_swing"
+
         # Assign reconfigurable parameters
         self.update_parameters()
 
@@ -138,16 +144,12 @@ class DynamicSetpointGait(GaitInterface):
         self._end_time = None
         self._current_time = None
 
-        self.subgait_id = "right_swing"
         self._next_command = None
 
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position = self._joint_dict_to_setpoint_dict(
-            get_position_from_yaml("stand")
-        )
-        self.end_position = self.start_position
+        self._trajectory_failed = False
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -226,13 +228,11 @@ class DynamicSetpointGait(GaitInterface):
 
     def _update_start_subgait(self) -> GaitUpdate:
         """Update the state machine that the start gait has
-        begun. Also updates the start position and the time
-        stamps for the next subgait.
+        begun. Updates the time stamps for the next subgait.
 
         :returns: a GaitUpdate for the state machine
         :rtype: GaitUpdate"""
         self._start_is_delayed = False
-        self._update_start_pos()
         self._update_time_stamps(self._next_command.duration)
 
         return GaitUpdate.subgait_updated()
@@ -254,8 +254,7 @@ class DynamicSetpointGait(GaitInterface):
 
     def _update_state_machine(self) -> GaitUpdate:
         """Update the state machine that the new subgait has begun.
-        Also updates the starting position and time stamps for the
-        next subgait.
+        Also updates time stamps for the next subgait.
 
         :returns: a GaitUpdate for the state machine
         :rtype: GaitUpdate
@@ -263,7 +262,6 @@ class DynamicSetpointGait(GaitInterface):
         if self._next_command is None:
             return GaitUpdate.finished()
 
-        self._update_start_pos()
         self._update_time_stamps(self._next_command.duration)
         self._scheduled_early = False
 
@@ -277,11 +275,11 @@ class DynamicSetpointGait(GaitInterface):
         :returns: A TrajectoryCommand for the next subgait
         :rtype: TrajectoryCommand
         """
-
-        if self.subgait_id == "right_swing":
-            self.subgait_id = "left_swing"
-        elif self.subgait_id == "left_swing":
-            self.subgait_id = "right_swing"
+        if not self._trajectory_failed:
+            if self.subgait_id == "right_swing":
+                self.subgait_id = "left_swing"
+            elif self.subgait_id == "left_swing":
+                self.subgait_id = "right_swing"
 
         if self._end:
             # If the gait has ended, the next command should be None
@@ -378,8 +376,10 @@ class DynamicSetpointGait(GaitInterface):
                 start, stop, original_duration
             )
             if trajectory_command is not None:
+                self._trajectory_failed = False
                 return trajectory_command
             else:
+                self._trajectory_failed = True
                 self.foot_location.duration += DURATION_INCREASE_SIZE
 
         # If no feasible subgait can be found, stop execution.
@@ -413,6 +413,7 @@ class DynamicSetpointGait(GaitInterface):
                 f"Found trajectory after {iteration} iterations at duration of {self.foot_location.duration}. "
                 f"Original duration {original_duration}."
             )
+            self._update_start_pos()
             return TrajectoryCommand(
                 trajectory,
                 Duration(self.foot_location.duration),
