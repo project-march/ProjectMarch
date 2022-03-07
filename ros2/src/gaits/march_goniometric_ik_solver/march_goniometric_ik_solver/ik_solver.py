@@ -26,7 +26,7 @@ LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-SOFT_LIMIT_BUFFER = np.deg2rad(5)
+SOFT_LIMIT_BUFFER = np.deg2rad(1)
 MAX_ANKLE_FLEXION = limits.upper - SOFT_LIMIT_BUFFER
 
 # Constants:
@@ -39,6 +39,7 @@ HIP_ZERO_ANGLE = np.pi  # rad
 NUMBER_OF_JOINTS = 8
 DEFAULT_HIP_X_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
+MIDPOINT_HEIGHT = 0.1
 
 
 class Pose:
@@ -453,6 +454,34 @@ class Pose:
             self.aa_hip1 = hip_aa_long
             self.aa_hip2 = hip_aa_short
 
+    def create_ankle_trajectory(self, ankle_x: float, ankle_y: float):
+        # Get ankle positions via the static toes:
+        ankle_start = self.pos_ankle1
+        toes_static = self.pos_toes2
+        next_pose = Pose()
+        next_pose.solve_end_position(ankle_x, ankle_y, LENGTH_HIP, "")
+        ankle_end = toes_static + (next_pose.pos_ankle2 - next_pose.pos_toes1)
+
+        # Calculate step size and height:
+        N = 1000
+        step_size = ankle_end[0] - ankle_start[0]
+        step_height = ankle_end[1] - ankle_start[1]
+
+        # Determine the parabola function:
+        if step_size != 0:
+            c = MIDPOINT_HEIGHT
+            a = -4 * (c / step_size ** 2)
+            x = np.linspace(0, 1, N) * step_size - step_size / 2
+            y_parabola = a * x ** 2 + c
+        else:
+            y_parabola = 0
+
+        # Define trajectory:
+        x = ankle_start[0] + np.linspace(0, 1, N) * step_size
+        y = ankle_start[1] + np.linspace(0, 1, N) * step_height + y_parabola
+
+        return x, y
+
     def solve_mid_position(
         self,
         ankle_x: float,
@@ -533,6 +562,9 @@ class Pose:
         Solve inverse kinematics for a desired ankle location.
         Returns the calculated pose as a list.
         """
+        # Reset to zero pose:
+        self.reset_to_zero_pose()
+
         # Set parameters:
         self.ankle_x = ankle_x
         self.ankle_y = ankle_y

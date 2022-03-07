@@ -7,8 +7,8 @@ from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP
 
 DEFAULT_HIP_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
-REDUCE_DF_REAR = False
-REDUCE_DF_FRONT = False
+REDUCE_DF_REAR = True
+REDUCE_DF_FRONT = True
 
 X_MIN = 0.0
 X_MAX = 0.6
@@ -55,6 +55,7 @@ class LiveWidget:
         self.plots = {
             "last": plot.plot(pen="b", symbol="o", symbolSize=6),
             "next": plot.plot(pen="k", symbol="o", symbolSize=6),
+            "trajectory": plot.plot(pen="r"),
         }
         self.update_poses()
 
@@ -95,7 +96,9 @@ class LiveWidget:
         self.tables = {"last": pg.TableWidget(), "next": pg.TableWidget()}
         self.update_tables()
         for pose in ["last", "next"]:
-            self.table.addWidget(self.tables[pose], list(self.tables.keys()).index(pose), 0)
+            self.table.addWidget(
+                self.tables[pose], list(self.tables.keys()).index(pose), 0
+            )
 
     def fill_layout(self):
         self.layout.addLayout(self.vertical_sliders, 0, 0)
@@ -157,10 +160,22 @@ class LiveWidget:
         positions_x = [pos[0] for pos in positions]
         positions_y = [pos[1] for pos in positions]
         self.plots[pose].setData(x=positions_x, y=positions_y)
+        self.update_trajectory()
 
     def update_poses(self):
         for pose in ["last", "next"]:
             self.update_pose(pose)
+
+    def update_trajectory(self):
+        x, y = self.poses["last"].create_ankle_trajectory(
+            self.sliders["next"]["x"], self.sliders["next"]["y"]
+        )
+
+        # shift positions to have toes of stand legs at (0,0):
+        x -= self.poses["last"].pos_toes2[0]
+        y -= self.poses["last"].pos_toes2[1]
+
+        self.plots["trajectory"].setData(x=x, y=y)
 
     def update_tables(self):
         for pose in ["last", "next"]:
@@ -169,7 +184,9 @@ class LiveWidget:
 
             data = []
             for joint, angle_rad, angle_deg in zip(
-                JOINT_NAMES, np.round(joint_angles, 3), np.round(joint_angles_degrees, 3)
+                JOINT_NAMES,
+                np.round(joint_angles, 3),
+                np.round(joint_angles_degrees, 3),
             ):
                 data.append([joint, angle_rad, angle_deg])
 
