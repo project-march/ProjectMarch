@@ -391,17 +391,22 @@ class DynamicSetpointGait(GaitInterface):
             trajectory_command = self._try_to_get_trajectory_command(
                 start, stop, original_duration
             )
-            if trajectory_command is not None:
+            # Return command if current and next step can be made at same duration
+            if trajectory_command is not None and self._try_to_get_second_step():
                 self._trajectory_failed = False
                 return trajectory_command
             else:
                 self._trajectory_failed = True
                 self.foot_location.duration += DURATION_INCREASE_SIZE
 
-        # If no feasible subgait can be found, stop execution.
-        self._end = True
-        self._get_next_command()
-        return None
+        # If no feasible subgait can be found, try to execute close gait
+        try:
+            return self._get_close_gait()
+        except (PositionSoftLimitError, VelocitySoftLimitError):
+            # If close gait is not feasible, stop gait completely
+            self._end = True
+            self._get_next_command()
+            return None
 
     def _try_to_get_trajectory_command(
         self,
@@ -460,6 +465,39 @@ class DynamicSetpointGait(GaitInterface):
                     "Gait will not be executed."
                 )
             return None
+
+    def _try_to_get_second_step(self) -> bool:
+        start_position = self.dynamic_subgait.get_final_position()
+        subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
+        subgait = self._create_subgait_instance(
+            start_position,
+            subgait_id,
+            start=False,
+            stop=False,
+        )
+        try:
+            subgait.get_joint_trajectory_msg()
+        except (PositionSoftLimitError, VelocitySoftLimitError):
+            return False
+        return True
+
+    def _get_close_gait(self) -> TrajectoryCommand:
+        start_position = self.dynamic_subgait.get_final_position()
+        subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
+        subgait = self._create_subgait_instance(
+            start_position,
+            subgait_id,
+            start=False,
+            stop=True,
+        )
+        trajectory = subgait.get_joint_trajectory_msg()
+        return TrajectoryCommand(
+            trajectory,
+            Duration(self.foot_location.duration),
+            self.subgait_id,
+            self._end_time,
+        )
+
 
     def _create_subgait_instance(
             self,
