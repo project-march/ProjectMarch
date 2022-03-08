@@ -18,6 +18,7 @@ from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
     VelocitySoftLimitError,
+    ShouldStartFromHomestandError,
 )
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -42,6 +43,7 @@ class DynamicSetpointGait(GaitInterface):
     def __init__(self, gait_selection_node: Node):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
+        self._trajectory_failed = False
         self._reset()
         self.joint_names = get_joint_names_from_urdf()
         self._get_soft_limits()
@@ -72,7 +74,6 @@ class DynamicSetpointGait(GaitInterface):
             get_position_from_yaml("stand")
         )
         self.end_position = self.start_position
-        self.subgait_id = "right_swing"
 
         # Assign reconfigurable parameters
         self.update_parameters()
@@ -143,6 +144,9 @@ class DynamicSetpointGait(GaitInterface):
 
     def _reset(self) -> None:
         """Reset all attributes of the gait"""
+        if self._trajectory_failed:
+            raise ShouldStartFromHomestandError
+
         self._should_stop = False
         self._end = False
 
@@ -151,6 +155,7 @@ class DynamicSetpointGait(GaitInterface):
         self._current_time = None
 
         self._next_command = None
+        self.subgait_id = "right_swing"
 
         self._start_is_delayed = True
         self._scheduled_early = False
@@ -163,7 +168,7 @@ class DynamicSetpointGait(GaitInterface):
         self,
         current_time: Time,
         first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
-    ) -> GaitUpdate:
+    ) -> Optional[GaitUpdate]:
         """Starts the gait. The subgait will be scheduled with the delay given
         by first_subgait_delay.
 
@@ -175,7 +180,13 @@ class DynamicSetpointGait(GaitInterface):
         :return: A GaitUpdate containing a TrajectoryCommand
         :rtype: GaitUpdate
         """
-        self._reset()
+        try:
+            self._reset()
+        except ShouldStartFromHomestandError:
+            self.logger.error(
+                f"Cannot start the gait from a position that is not homestand."
+            )
+            return None
         self.update_parameters()
         self._current_time = current_time
         self._start_time = self._current_time + first_subgait_delay
@@ -281,11 +292,10 @@ class DynamicSetpointGait(GaitInterface):
         :returns: A TrajectoryCommand for the next subgait
         :rtype: TrajectoryCommand
         """
-        if not self._trajectory_failed:
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
+        if self.subgait_id == "right_swing":
+            self.subgait_id = "left_swing"
+        elif self.subgait_id == "left_swing":
+            self.subgait_id = "right_swing"
 
         if self._end:
             # If the gait has ended, the next command should be None
@@ -413,7 +423,9 @@ class DynamicSetpointGait(GaitInterface):
             (self.foot_location.duration - original_duration) / DURATION_INCREASE_SIZE
         )
         try:
-            self._create_subgait_instance(start, stop)
+            self.dynamic_subgait = self._create_subgait_instance(
+                self.start_position, self.subgait_id, start, stop
+            )
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
             self.logger.debug(
                 f"Found trajectory after {iteration} iterations at duration of {self.foot_location.duration}. "
@@ -449,7 +461,13 @@ class DynamicSetpointGait(GaitInterface):
                 )
             return None
 
-    def _create_subgait_instance(self, start: bool, stop: bool) -> None:
+    def _create_subgait_instance(
+            self,
+            start_position: dict,
+            subgait_id: str,
+            start: bool,
+            stop: bool,
+    ) -> DynamicSubgait:
         """Create a DynamicSubgait instance
 
         :param start: whether it is a start gait or not
@@ -457,10 +475,10 @@ class DynamicSetpointGait(GaitInterface):
         :param stop: whether it is a stop gait or not
         :type stop: bool
         """
-        self.dynamic_subgait = DynamicSubgait(
+        return DynamicSubgait(
             self.gait_selection,
-            self.start_position,
-            self.subgait_id,
+            start_position,
+            subgait_id,
             self.joint_names,
             self.foot_location,
             self.joint_soft_limits,
@@ -487,6 +505,7 @@ class DynamicSetpointGait(GaitInterface):
                 get_position_from_yaml("stand")
             )
             self.subgait_id = "right_swing"
+            self._trajectory_failed = False
 
     # UTILITY FUNCTIONS
     @staticmethod
