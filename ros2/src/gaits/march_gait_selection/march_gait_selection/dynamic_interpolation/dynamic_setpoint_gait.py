@@ -95,8 +95,8 @@ class DynamicSetpointGait(GaitInterface):
         # Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
-                self.foot_location.point.y > self.minimum_stair_height
-                or self.foot_location.point.y < -self.minimum_stair_height
+                self.foot_location.preprocessed_point.y > self.minimum_stair_height
+                or self.foot_location.preprocessed_point.y < -self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
@@ -297,11 +297,7 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_pos(self) -> None:
         """Update the start position of the next subgait to be
         the last position of the previous subgait."""
-        try:
-            self.start_position = self.dynamic_subgait.get_final_position()
-        except AttributeError:
-            self.start_position = None
-
+        self.start_position = self.dynamic_subgait.get_final_position()
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published
@@ -370,8 +366,8 @@ class DynamicSetpointGait(GaitInterface):
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
             self._publish_chosen_foot_position(self.subgait_id, self.foot_location.point)
-            self.logger.debug(
-                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, {self.foot_location.point.z})"
+            self.logger.info(
+                f"Stepping to location ({self.foot_location.processed_point.x}, {self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
 
         duration = Duration(self.foot_location.duration)
@@ -386,10 +382,7 @@ class DynamicSetpointGait(GaitInterface):
             stop,
         )
 
-        try:
-            trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
-        except ValueError:
-            trajectory = None
+        trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
 
         return TrajectoryCommand(
             trajectory,

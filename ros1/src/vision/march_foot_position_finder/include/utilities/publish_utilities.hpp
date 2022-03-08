@@ -237,12 +237,15 @@ void publishTrackMarkerPoints(
  * step
  */
 void publishPoint(
-    ros::Publisher& publisher, Point& p, const std::vector<Point>& track_points)
+    ros::Publisher& publisher, Point& p, Point& displacement, const std::vector<Point>& track_points)
 {
     march_shared_msgs::FootPosition msg;
     msg.point.x = p.x;
     msg.point.y = p.y;
     msg.point.z = p.z;
+    msg.displacement.x = displacement.x;
+    msg.displacement.y = displacement.y;
+    msg.displacement.z = displacement.z;
     msg.header.stamp = ros::Time::now();
 
     // rotate the track points

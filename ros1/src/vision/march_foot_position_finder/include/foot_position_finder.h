@@ -31,6 +31,8 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
+    void chosenPointCallback(const geometry_msgs::Point msg);
+
     void processRealSenseDepthFrames(const ros::TimerEvent&);
 
     void processSimulatedDepthFrames(
@@ -50,6 +52,7 @@ protected:
 
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher point_marker_publisher_;
+    ros::Subscriber chosen_point_subscriber_;
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
@@ -66,7 +69,7 @@ protected:
     rs2::temporal_filter temp_filter_;
 
     std::string topic_camera_front_;
-    std::string topic_chosen_points_;
+    std::string topic_chosen_point_;
 
     std::string left_or_right_;
     std::string other_;
@@ -83,7 +86,7 @@ protected:
     std::string current_frame_id_;
 
     std::vector<Point> found_points_;
-    double last_height_;
+    Point last_chosen_point_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

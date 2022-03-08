@@ -33,20 +33,23 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 
     if (left_or_right_ == "left") {
         other_ = "right";
-        switch_factor_ = -1;
-    } else {
         switch_factor_ = 1;
+    } else {
+        switch_factor_ = -1;
         other_ = "left";
     }
 
     reference_frame_id_ = "foot_" + other_;
     current_frame_id_ = "foot_" + left_or_right;
-    last_height_ = 0;
+
+    // last_chosen_point_ = Point(/*_x=*/0, /*_y=*/(float)switch_factor_ * (float) foot_gap_, /*_z=*/0);
+    last_chosen_point_ = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0); // point is in reference frame id 
 
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
+    topic_chosen_point_ = "/chosen_foot_position/" + other_; // in current_frame_id
 
     point_publisher_ = n_->advertise<march_shared_msgs::FootPosition>(
         "/foot_position/" + left_or_right_, /*queue_size=*/1);
@@ -54,6 +57,9 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         "/camera_" + left_or_right_ + "/preprocessed_cloud", /*queue_size=*/1);
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
+
+    chosen_point_subscriber_ = n_->subscribe<geometry_msgs::Point>(
+            topic_chosen_point_, /*queue_size=*/1, &FootPositionFinder::chosenPointCallback, this);
 
     running_ = false;
 }
@@ -105,6 +111,16 @@ void FootPositionFinder::readParameters(
 }
 
 /**
+ * Callback function for when the gait selection node selects a point.
+ */
+// Suppress lint error "make reference of argument" (breaks callback)
+void FootPositionFinder::chosenPointCallback(
+    const geometry_msgs::Point point) // NOLINT
+{
+    last_chosen_point_ = Point(point.x, point.y, point.z);
+}
+
+/**
  * Listen for realsense frames from a camera, apply filters to them and process
  * the eventual pointcloud.
  */
@@ -149,14 +165,22 @@ void FootPositionFinder::processSimulatedDepthFrames(
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
     NormalCloud::Ptr normalcloud(new NormalCloud());
+
+    // last chosen point is in current frame
+    
+    Point start_point = transformPoint(last_chosen_point_, reference_frame_id_, current_frame_id_);
+
     Point point;
 
     // Define the desired future foot position
-    point = Point(-(float)step_distance_,
-        (float)switch_factor_ * (float)foot_gap_, (float)last_height_);
+    // last chosen point is in current_foot_frame_
+
+    point = Point(start_point.x-(float)step_distance_, start_point.y - (float)switch_factor_ * (float)foot_gap_, start_point.z);
+    // point = Point(-(float)step_distance_,
+    //     (float)switch_factor_ * (float)foot_gap_, (float)last_height_);
 
     // Calculate point location relative to positionary leg
-    point = transformPoint(point, reference_frame_id_, base_frame_);
+    point = transformPoint(point, current_frame_id_, base_frame_);
 
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
     preprocessor.preprocess();
@@ -176,8 +200,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     if (position_queue.size() > 0) {
         Point avg = computeTemporalAveragePoint(position_queue[0]);
 
-        last_height_ = avg.z;
-
         // Retrieve 3D points between current and new foot position
         Point start(/*_x=*/0, /*_y=*/0, /*_z=*/0);
         start = transformPoint(start, current_frame_id_, base_frame_);
@@ -191,18 +213,21 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPossiblePoints(point_marker_publisher_, position_queue);
 
         // Publish new point and points on the track for gait computation
-        Point relative_avg = Point(-avg.y, avg.x, avg.z); // Rotate left
-        relative_avg
-            = transformPoint(relative_avg, base_frame_, reference_frame_id_);
+        Point current_frame_avg = Point(-avg.y, avg.x, avg.z); // Rotate left
+        current_frame_avg
+            = transformPoint(current_frame_avg, base_frame_, current_frame_id_);
         std::vector<Point> relative_track_points;
 
-        for (Point& p : track_points) {
-            Point point(-p.y, p.x, p.z); // Rotate left
-            point = transformPoint(point, base_frame_, current_frame_id_);
-            relative_track_points.emplace_back(point);
-        }
+        // for (Point& p : track_points) {
+        //     Point point(-p.y, p.x, p.z); // Rotate left
+        //     point = transformPoint(point, base_frame_, current_frame_id_);
+        //     relative_track_points.emplace_back(point);
+        // }
 
-        publishPoint(point_publisher_, relative_avg, relative_track_points);
+        Point displacement(current_frame_avg.x - start_point.x,
+                           current_frame_avg.y - start_point.y,
+                           current_frame_avg.z - start_point.z);
+        publishPoint(point_publisher_, current_frame_avg, displacement, relative_track_points);
     }
 }
 
