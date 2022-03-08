@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 import numpy as np
+import math
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton
@@ -29,7 +30,7 @@ JOINT_NAMES = [
 
 class LiveWidget:
     def __init__(self) -> None:
-        self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}}
+        self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}, "mid": 0}
 
         self.create_window()
         self.create_plot()
@@ -51,10 +52,12 @@ class LiveWidget:
         plot.setAspectLocked()
         plot.showGrid(x=True, y=True)
 
-        self.poses = {"last": Pose(), "next": Pose()}
+        self.poses = {"last": Pose(), "next": Pose(), "mid": Pose()}
         self.plots = {
             "last": plot.plot(pen="b", symbol="o", symbolSize=6),
             "next": plot.plot(pen="k", symbol="o", symbolSize=6),
+            "mid": plot.plot(pen="g", symbol="o", symbolSize=6),
+            "mid_point": plot.plot(pen="k", symbol="o", symbolSize=6),
             "trajectory": plot.plot(pen="r"),
         }
         self.update_poses()
@@ -71,6 +74,7 @@ class LiveWidget:
 
         self.midpoint_slider = QSlider()
         self.midpoint_slider.setOrientation(Qt.Horizontal)
+        self.midpoint_slider.valueChanged.connect(self.update_midpoint)
 
         self.horizontal_sliders = QGridLayout()
         self.horizontal_sliders_top = QGridLayout()
@@ -135,6 +139,11 @@ class LiveWidget:
         self.update_pose("next")
         self.update_tables()
 
+    def update_midpoint(self, value):
+        self.sliders["mid"] = value / 99
+        self.update_trajectory()
+        self.update_pose("mid")
+
     def reset(self):
         self.slider_last_x.setValue(99)
         self.slider_next_x.setValue(0)
@@ -147,22 +156,26 @@ class LiveWidget:
         self.update_tables()
 
     def update_pose(self, pose):
-        self.poses[pose].solve_end_position(
-            self.sliders[pose]["x"],
-            self.sliders[pose]["y"],
-            LENGTH_HIP,
-            "",
-            DEFAULT_HIP_FRACTION,
-            DEFAULT_KNEE_BEND,
-            REDUCE_DF_FRONT,
-            REDUCE_DF_REAR,
-        )
+        if pose == "mid":
+            pass
+        else:
+            self.poses[pose].solve_end_position(
+                self.sliders[pose]["x"],
+                self.sliders[pose]["y"],
+                LENGTH_HIP,
+                "",
+                DEFAULT_HIP_FRACTION,
+                DEFAULT_KNEE_BEND,
+                REDUCE_DF_FRONT,
+                REDUCE_DF_REAR,
+            )
+
         positions = self.poses[pose].calculate_joint_positions()
 
         # shift positions to have toes of stand legs at (0,0):
         if pose == "last":
             positions = [pos - positions[-1] for pos in positions]
-        elif pose == "next":
+        else:
             positions = [pos - positions[0] for pos in positions]
 
         positions_x = [pos[0] for pos in positions]
@@ -183,7 +196,14 @@ class LiveWidget:
         x -= self.poses["last"].pos_toes2[0]
         y -= self.poses["last"].pos_toes2[1]
 
+        # plot trajectory:
         self.plots["trajectory"].setData(x=x, y=y)
+
+        # plot current mid_point:
+        if len(x) > 0 and len(y) > 0:
+            point_x = x[math.floor(len(x) * self.sliders["mid"]) - 1]
+            point_y = y[math.floor(len(y) * self.sliders["mid"]) - 1]
+            self.plots["mid_point"].setData(x=[point_x], y=[point_y])
 
     def update_tables(self):
         for pose in ["last", "next"]:
