@@ -69,9 +69,17 @@ class LiveWidget:
         self.slider_next_x.setOrientation(Qt.Horizontal)
         self.slider_next_x.valueChanged.connect(self.update_next_x)
 
+        self.midpoint_slider = QSlider()
+        self.midpoint_slider.setOrientation(Qt.Horizontal)
+
         self.horizontal_sliders = QGridLayout()
-        self.horizontal_sliders.addWidget(self.slider_last_x, 0, 0)
-        self.horizontal_sliders.addWidget(self.slider_next_x, 0, 1)
+        self.horizontal_sliders_top = QGridLayout()
+
+        self.horizontal_sliders_top.addWidget(self.slider_last_x, 0, 0)
+        self.horizontal_sliders_top.addWidget(self.slider_next_x, 0, 1)
+
+        self.horizontal_sliders.addLayout(self.horizontal_sliders_top, 0, 0)
+        self.horizontal_sliders.addWidget(self.midpoint_slider, 1, 0)
 
         self.slider_last_y = QSlider()
         self.slider_last_y.setValue(50)
