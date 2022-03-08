@@ -1,6 +1,6 @@
 import pyqtgraph as pg
 import numpy as np
-import math
+import copy
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton
@@ -140,7 +140,7 @@ class LiveWidget:
         self.update_tables()
 
     def update_midpoint(self, value):
-        self.sliders["mid"] = value / 99
+        self.sliders["mid"] = value / 100
         self.update_trajectory()
         self.update_pose("mid")
 
@@ -157,7 +157,14 @@ class LiveWidget:
 
     def update_pose(self, pose):
         if pose == "mid":
-            pass
+            self.poses["mid"] = copy.deepcopy(self.poses["last"])
+            self.poses[pose].solve_mid_position(
+                self.sliders["next"]["x"],
+                self.sliders["next"]["y"],
+                LENGTH_HIP,
+                self.sliders[pose],
+                "",
+            )
         else:
             self.poses[pose].solve_end_position(
                 self.sliders[pose]["x"],
@@ -192,17 +199,17 @@ class LiveWidget:
             self.sliders["next"]["x"], self.sliders["next"]["y"]
         )
 
-        # shift positions to have toes of stand legs at (0,0):
-        x -= self.poses["last"].pos_toes2[0]
-        y -= self.poses["last"].pos_toes2[1]
+        # shift positions to let trajectory start in ankle:
+        x -= (self.poses["last"].pos_toes2[0] - self.poses["last"].pos_ankle1[0])
+        y -= (self.poses["last"].pos_toes2[1] - self.poses["last"].pos_ankle1[1])
 
         # plot trajectory:
         self.plots["trajectory"].setData(x=x, y=y)
 
         # plot current mid_point:
         if len(x) > 0 and len(y) > 0:
-            point_x = x[math.floor(len(x) * self.sliders["mid"]) - 1]
-            point_y = y[math.floor(len(y) * self.sliders["mid"]) - 1]
+            point_x = x[round(len(x) * self.sliders["mid"])]
+            point_y = y[round(len(y) * self.sliders["mid"])]
             self.plots["mid_point"].setData(x=[point_x], y=[point_y])
 
     def update_tables(self):
