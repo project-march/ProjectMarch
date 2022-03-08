@@ -4,6 +4,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+import numpy as np
 
 NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
@@ -134,7 +135,7 @@ class GaitPreprocessor(Node):
 
         point.x = -foot_location.displacement.x + X_OFFSET
         point.y = foot_location.displacement.z + Y_OFFSET
-        point.z = temp_y + Z_OFFSET
+        point.z = temp_y + np.sign(temp_y) * Z_OFFSET
 
         return point
 

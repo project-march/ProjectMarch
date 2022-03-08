@@ -95,8 +95,8 @@ class DynamicSetpointGait(GaitInterface):
         # Return gait type based on height of desired foot location
         if self._next_command is not None:
             if (
-                self.foot_location.preprocessed_point.y > self.minimum_stair_height
-                or self.foot_location.preprocessed_point.y < -self.minimum_stair_height
+                self.foot_location.processed_point.y > self.minimum_stair_height
+                or self.foot_location.processed_point.y < -self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
