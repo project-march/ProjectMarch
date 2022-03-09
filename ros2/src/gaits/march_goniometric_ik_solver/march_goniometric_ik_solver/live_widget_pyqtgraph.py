@@ -29,6 +29,13 @@ JOINT_NAMES = [
 
 
 class LiveWidget:
+    """
+    A widget created in Qt to easily check the solutions of the IK solver for a given x,y location of the ankle.
+    This widget has been made for debugging purposes, to evaluate poses the IK solver provides as
+    solution for a given goal location. This widget can be executed by sourcing ROS2, March ROS2
+    and running this script with python: sfox && sros2 && python3 live_widget_pyqtgraph.py
+    """
+
     def __init__(self) -> None:
         self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}, "mid": 0}
 
@@ -157,11 +164,9 @@ class LiveWidget:
 
     def update_pose(self, pose):
         if pose == "mid":
-            self.poses["mid"] = copy.deepcopy(self.poses["last"])
+            self.poses[pose] = copy.deepcopy(self.poses["last"])
             self.poses[pose].solve_mid_position(
-                self.sliders["next"]["x"],
-                self.sliders["next"]["y"],
-                LENGTH_HIP,
+                self.poses["next"],
                 self.sliders[pose],
                 "",
             )
@@ -179,7 +184,7 @@ class LiveWidget:
 
         positions = self.poses[pose].calculate_joint_positions()
 
-        # shift positions to have toes of stand legs at (0,0):
+        # shift positions to have toes of stand leg at (0,0):
         if pose == "last":
             positions = [pos - positions[-1] for pos in positions]
         else:
@@ -195,13 +200,11 @@ class LiveWidget:
             self.update_pose(pose)
 
     def update_trajectory(self):
-        x, y = self.poses["last"].create_ankle_trajectory(
-            self.sliders["next"]["x"], self.sliders["next"]["y"]
-        )
+        x, y = self.poses["last"].create_ankle_trajectory(self.poses["next"])
 
         # shift positions to let trajectory start in ankle:
-        x -= (self.poses["last"].pos_toes2[0] - self.poses["last"].pos_ankle1[0])
-        y -= (self.poses["last"].pos_toes2[1] - self.poses["last"].pos_ankle1[1])
+        x -= self.poses["last"].pos_toes2[0] - self.poses["last"].pos_ankle1[0]
+        y -= self.poses["last"].pos_toes2[1] - self.poses["last"].pos_ankle1[1]
 
         # plot trajectory:
         self.plots["trajectory"].setData(x=x, y=y)

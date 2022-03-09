@@ -40,6 +40,7 @@ NUMBER_OF_JOINTS = 8
 DEFAULT_HIP_X_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
 MIDPOINT_HEIGHT = 0.1
+ANKLE_TRAJECTORY_SAMPLES = 99
 
 
 class Pose:
@@ -460,16 +461,16 @@ class Pose:
             self.aa_hip1 = hip_aa_long
             self.aa_hip2 = hip_aa_short
 
-    def create_ankle_trajectory(self, ankle_x: float, ankle_y: float):
+    def create_ankle_trajectory(self, next_pose: "Pose"):
+        """
+        Create a ankle trajectory from current pose (self) to given next_pose.
+        """
         # Get ankle positions via the static toes:
         ankle_start = self.pos_ankle1
         toes_static = self.pos_toes2
-        next_pose = Pose()
-        next_pose.solve_end_position(ankle_x, ankle_y, LENGTH_HIP, "")
         ankle_end = toes_static + (next_pose.pos_ankle2 - next_pose.pos_toes1)
 
         # Calculate step size and height:
-        N = 1000
         step_size = ankle_end[0] - ankle_start[0]
         step_height = ankle_end[1] - ankle_start[1]
 
@@ -477,96 +478,66 @@ class Pose:
         if step_size != 0:
             c = MIDPOINT_HEIGHT
             a = -4 * (c / step_size ** 2)
-            x = np.linspace(0, 1, N) * step_size - step_size / 2
+            x = np.linspace(0, 1, ANKLE_TRAJECTORY_SAMPLES) * step_size - step_size / 2
             y_parabola = a * x ** 2 + c
         else:
             y_parabola = 0
 
         # Define trajectory:
-        x = np.linspace(0, 1, N) * step_size
-        y = np.linspace(0, 1, N) * step_height + y_parabola
+        x = np.linspace(0, 1, ANKLE_TRAJECTORY_SAMPLES) * step_size
+        y = np.linspace(0, 1, ANKLE_TRAJECTORY_SAMPLES) * step_height + y_parabola
 
         return x, y
 
     def solve_mid_position(
         self,
-        ankle_x: float,
-        ankle_y: float,
-        ankle_z: float,
-        midpoint_fraction: float,
+        next_pose: "Pose",
+        frac: float,
         subgait_id: str,
     ) -> List[float]:
         """
-        Solve inverse kinematics for the middle position. Assumes that the
-        stance leg has a knee flexion of DEFAULT_KNEE_BEND. Takes the ankle_x and
-        ankle_y position of the desired position and the midpoint_fraction at
-        which a midpoint is desired. First calculates the midpoint position using
-        current pose and fraction. Next, calculates the required hip and knee angles of
-        the swing leg by making a triangle between the swing leg ankle, swing leg
-        knee and the hip. Returns the calculated pose.
+        Solve inverse kinematics for a middle position at a given frac between current pose (self) and given next_pose.
+        Returns the calculated pose as a list.
         """
+        # Store current hip_aa to calculate hip_aa of midpoint later:
+        current_hip_aa_1, current_hip_aa_2 = self.aa_hip1, self.aa_hip2
 
-        # Save hip distance to next origin:
+        # Translate current hip and ankle location to new reference frame:
         hip_current = self.pos_hip - self.pos_ankle2
         ankle_current = self.pos_ankle1 - self.pos_ankle2
 
-        # Store start pose:
-        start_hip_aa1 = self.aa_hip1
-        start_hip_aa2 = self.aa_hip1
+        # Create ankle_trajectory and get ankle_mid location of given frac:
+        ankle_trajectory = np.array(self.create_ankle_trajectory(next_pose))
+        index = round(np.shape(ankle_trajectory)[1] * frac)
+        ankle_mid = ankle_current + ankle_trajectory[:, index]
 
-        # Calculate hip position in next pose:
-        pose_next = Pose()
-        pose_next.solve_end_position(ankle_x, ankle_y, ankle_z, subgait_id)
-        hip_next = pose_next.pos_hip
+        # Define hip_mid_x as the given fraction between current hip location and the hip location in next pose:
+        hip_mid_x = (1 - frac) * hip_current[0] + frac * next_pose.pos_hip[0]
 
-        # Calculate mid pose based on midpoint_fraction:
-        ankle_trajectory_x, ankle_trajectory_y = self.create_ankle_trajectory(
-            ankle_x, ankle_y
+        # Define hip_mid_y as the minimum of the heights both legs can reach:
+        max_height_swing_leg = ankle_mid[1] + np.sqrt(
+            self.max_leg_length ** 2 - (ankle_mid[0] - hip_mid_x) ** 2
         )
-        ankle_mid_x = (
-            ankle_current[0]
-            + ankle_trajectory_x[round(len(ankle_trajectory_y) * midpoint_fraction)]
-        )
-        ankle_mid_y = (
-            ankle_current[1]
-            + ankle_trajectory_y[round(len(ankle_trajectory_y) * midpoint_fraction)]
-        )
-
-        hip_mid_x = (1 - midpoint_fraction) * hip_current[
-            0
-        ] + midpoint_fraction * hip_next[0]
-        hip_mid_y = min(
-            ankle_mid_y
-            + np.sqrt(self.max_leg_length ** 2 - (ankle_mid_x - hip_mid_x) ** 2),
-            np.sqrt(self.max_leg_length ** 2 - (hip_mid_x) ** 2),
-        )
+        max_height_stance_leg = np.sqrt(self.max_leg_length ** 2 - (hip_mid_x) ** 2)
+        hip_mid_y = min(max_height_swing_leg, max_height_stance_leg)
 
         hip_mid = np.array([hip_mid_x, hip_mid_y])
-        ankle_mid = np.array([ankle_mid_x, ankle_mid_y])
 
-        # Solve mid_pose:
+        # Solve the mid pose with the define hip and ankle positions:
         self.reset_to_zero_pose()
-        self.solve_leg(hip_mid, np.array([0, 0]), "rear")
+        self.solve_leg(hip_mid, self.pos_ankle1, "rear")
         self.solve_leg(hip_mid, ankle_mid, "front")
         if self.fe_ankle1 > MAX_ANKLE_FLEXION:
             self.reduce_stance_dorsi_flexion()
 
-        # lift toes as much as possible:
+        # Lift toes of swing leg as much as possible:
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
         # Set hip_aa to average of start and end pose:
-        end_pose = Pose()
-        end_pose.solve_end_position(ankle_x, ankle_y, ankle_z, subgait_id)
-        self.aa_hip1 = (
-            start_hip_aa1 * (1 - midpoint_fraction)
-            + end_pose.aa_hip1 * midpoint_fraction
-        )
-        self.aa_hip2 = (
-            start_hip_aa2 * (1 - midpoint_fraction)
-            + end_pose.aa_hip2 * midpoint_fraction
-        )
+        self.aa_hip1 = current_hip_aa_1 * (1 - frac) + next_pose.aa_hip1 * frac
+        self.aa_hip2 = current_hip_aa_2 * (1 - frac) + next_pose.aa_hip2 * frac
 
-        # return pose as list:
+        # Return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
     def solve_end_position(
