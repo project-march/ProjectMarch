@@ -469,7 +469,9 @@ class GaitSelection(Node):
                 gait_selection_node=self
             )
             gaits["dynamic_walk_single_step"] = self.dynamic_setpoint_gait_single_step
-            self.dynamic_setpoint_gait_close = DynamicSetpointGaitClose(gait_selection_node=self)
+            self.dynamic_setpoint_gait_close = DynamicSetpointGaitClose(
+                gait_selection_node=self
+            )
             gaits["dynamic_walk_close"] = self.dynamic_setpoint_gait_close
             self.logger.info("Added dynamic_walk to gaits")
 

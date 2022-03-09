@@ -137,8 +137,6 @@ class ShouldStartFromHomestandError(Exception):
         """Class to raise an error when the previous subgait failed
         and dynamic gait is selected again without the exo being
         in home stand."""
-        msg = (
-            f"Gait can only be executed from homestand."
-        )
+        msg = "Gait can only be executed from homestand."
 
         super(ShouldStartFromHomestandError, self).__init__(msg)

@@ -184,7 +184,7 @@ class DynamicSetpointGait(GaitInterface):
             self._reset()
         except ShouldStartFromHomestandError:
             self.logger.error(
-                f"Cannot start the gait from a position that is not homestand."
+                "Cannot start the gait from a position that is not homestand."
             )
             return None
         self.update_parameters()
@@ -512,11 +512,11 @@ class DynamicSetpointGait(GaitInterface):
         )
 
     def _create_subgait_instance(
-            self,
-            start_position: dict,
-            subgait_id: str,
-            start: bool,
-            stop: bool,
+        self,
+        start_position: dict,
+        subgait_id: str,
+        start: bool,
+        stop: bool,
     ) -> DynamicSubgait:
         """Create a DynamicSubgait instance
 
