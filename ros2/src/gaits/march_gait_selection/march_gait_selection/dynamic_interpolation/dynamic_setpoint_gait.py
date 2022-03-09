@@ -404,6 +404,7 @@ class DynamicSetpointGait(GaitInterface):
             return self._get_close_gait()
         except (PositionSoftLimitError, VelocitySoftLimitError):
             # If close gait is not feasible, stop gait completely
+            self.logger.warn("Not possible to perform close gait.")
             self._end = True
             self._get_next_command()
             return None
@@ -434,7 +435,7 @@ class DynamicSetpointGait(GaitInterface):
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
             self.logger.debug(
                 f"Found trajectory after {iteration} iterations at duration of {self.foot_location.duration}. "
-                f"Original duration {original_duration}."
+                f"Original duration was {original_duration}."
             )
             self._update_start_pos()
             return TrajectoryCommand(
@@ -467,6 +468,12 @@ class DynamicSetpointGait(GaitInterface):
             return None
 
     def _try_to_get_second_step(self) -> bool:
+        """Tries to create the subgait that is one step ahead. If this is not possible,
+        the first subgait should not be executed.
+
+        :returns: If the second step can be made
+        :rtype: bool
+        """
         start_position = self.dynamic_subgait.get_final_position()
         subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
         subgait = self._create_subgait_instance(
@@ -478,10 +485,16 @@ class DynamicSetpointGait(GaitInterface):
         try:
             subgait.get_joint_trajectory_msg()
         except (PositionSoftLimitError, VelocitySoftLimitError):
+            self.logger.warn("Not possible to perform second step")
             return False
         return True
 
     def _get_close_gait(self) -> TrajectoryCommand:
+        """Tries to create a close subgait that is one step ahead.
+
+        :returns: TrajectoryCommand containing the close gait
+        :rtype: TrajectoryCommand
+        """
         start_position = self.dynamic_subgait.get_final_position()
         subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
         subgait = self._create_subgait_instance(
@@ -497,7 +510,6 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id,
             self._end_time,
         )
-
 
     def _create_subgait_instance(
             self,
