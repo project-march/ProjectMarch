@@ -26,7 +26,7 @@ LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # Get ankle limit from urdf:
 limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-SOFT_LIMIT_BUFFER = np.deg2rad(1)
+SOFT_LIMIT_BUFFER = np.deg2rad(3)
 MAX_ANKLE_FLEXION = limits.upper - SOFT_LIMIT_BUFFER
 
 # Constants:
@@ -76,6 +76,12 @@ class Pose:
 
     def reset_to_zero_pose(self) -> None:
         self.__init__()
+
+    def swap_sides(self) -> None:
+        self.fe_ankle1, self.fe_ankle2 = self.fe_ankle2, self.fe_ankle1
+        self.aa_hip1, self.aa_hip2 = self.aa_hip2, self.aa_hip1
+        self.fe_hip1, self.fe_hip2 = self.fe_hip2, self.fe_hip1
+        self.fe_knee1, self.fe_knee2 = self.fe_knee2, self.fe_knee1
 
     @property
     def pose_right(self) -> List[float]:
