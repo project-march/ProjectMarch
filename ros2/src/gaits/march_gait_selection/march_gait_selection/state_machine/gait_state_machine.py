@@ -323,7 +323,7 @@ class GaitStateMachine:
                 and gait_name
                 in self._gait_graph.possible_gaits_from_idle(self._current_state)
                 or gait_name
-                == ["dynamic_walk", "dynamic_walk_single_step", "dynamic_walk_close"]
+                == ["dynamic_walk", "dynamic_walk_single_step"]
             ):
                 if (
                     isinstance(gait.starting_position, DynamicEdgePosition)

@@ -404,14 +404,16 @@ class DynamicSetpointGait(GaitInterface):
             self.logger.warn("Not possible to perform second step.")
 
         # If no feasible subgait can be found, try to execute close gait
-        try:
-            return self._get_close_gait()
-        except (PositionSoftLimitError, VelocitySoftLimitError):
-            # If close gait is not feasible, stop gait completely
-            self.logger.warn("Not possible to perform close gait.")
-            self._end = True
-            self._get_next_command()
-            return None
+        if not start:
+            try:
+                return self._get_trajectory_command(stop=True)
+            except (PositionSoftLimitError, VelocitySoftLimitError):
+                # If close gait is not feasible, stop gait completely
+                self.logger.warn("Not possible to perform close gait.")
+
+        self._end = True
+        self._get_next_command()
+        return None
 
     def _try_to_get_trajectory_command(
         self,
@@ -490,28 +492,6 @@ class DynamicSetpointGait(GaitInterface):
         except (PositionSoftLimitError, VelocitySoftLimitError):
             return False
         return True
-
-    def _get_close_gait(self) -> TrajectoryCommand:
-        """Tries to create a close subgait that is one step ahead.
-
-        :returns: TrajectoryCommand containing the close gait
-        :rtype: TrajectoryCommand
-        """
-        start_position = self.dynamic_subgait.get_final_position()
-        subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
-        subgait = self._create_subgait_instance(
-            start_position,
-            subgait_id,
-            start=False,
-            stop=True,
-        )
-        trajectory = subgait.get_joint_trajectory_msg()
-        return TrajectoryCommand(
-            trajectory,
-            Duration(self.foot_location.duration),
-            self.subgait_id,
-            self._end_time,
-        )
 
     def _create_subgait_instance(
         self,

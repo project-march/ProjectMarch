@@ -39,9 +39,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_single_step import (
     DynamicSetpointGaitSingleStep,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import (
-    DynamicSetpointGaitClose,
-)
 
 NODE_NAME = "gait_selection"
 
@@ -462,17 +459,13 @@ class GaitSelection(Node):
 
         if self._dynamic_gait:
             # We pass along the gait_selection_node to be able to listen
-            # to the CoViD topic wihtin the DynamicSetpointGait class.
+            # to the CoViD topic within the DynamicSetpointGait class.
             self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
             gaits["dynamic_walk"] = self.dynamic_setpoint_gait
             self.dynamic_setpoint_gait_single_step = DynamicSetpointGaitSingleStep(
                 gait_selection_node=self
             )
             gaits["dynamic_walk_single_step"] = self.dynamic_setpoint_gait_single_step
-            self.dynamic_setpoint_gait_close = DynamicSetpointGaitClose(
-                gait_selection_node=self
-            )
-            gaits["dynamic_walk_close"] = self.dynamic_setpoint_gait_close
             self.logger.info("Added dynamic_walk to gaits")
 
         return gaits
