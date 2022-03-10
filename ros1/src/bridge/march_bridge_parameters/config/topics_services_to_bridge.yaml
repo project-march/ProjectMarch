@@ -53,8 +53,8 @@ topics:
   - { topic: 'march/pdb_data', type: 'march_shared_msgs/msg/PowerDistributionBoardData'}
   - { topic: '/foot_position/right', type: 'march_shared_msgs/msg/FootPosition'}
   - { topic: '/foot_position/left', type: 'march_shared_msgs/msg/FootPosition'}
-  - { topic: '/chosen_foot_position/right', type: 'geometry_msgs/msg/Point'}
-  - { topic: '/chosen_foot_position/left', type: 'geometry_msgs/msg/Point'}
+  - { topic: '/chosen_foot_position/right', type: 'march_shared_msgs/msg/FootPosition'}
+  - { topic: '/chosen_foot_position/left', type: 'march_shared_msgs/msg/FootPosition'}
 services_1_to_2:
   - { service: '/freeze',
       type: 'std_srvs/srv/Trigger' }

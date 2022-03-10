@@ -5,6 +5,7 @@
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
+#include "march_shared_msgs/FootPosition.h"
 #include <cmath>
 #include <librealsense2/rs.hpp>
 #include <march_foot_position_finder/parametersConfig.h>
@@ -31,7 +32,7 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenPointCallback(const geometry_msgs::Point msg);
+    void chosenPointCallback(const march_shared_msgs::FootPosition msg);
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);
 
@@ -87,6 +88,9 @@ protected:
 
     std::vector<Point> found_points_;
     Point last_chosen_point_;
+    Point last_chosen_point_world_;
+    Point last_displacement_;
+    double last_height_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

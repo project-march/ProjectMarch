@@ -103,6 +103,88 @@ void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
 }
 
 /**
+ * Publishes a marker point with a given publisher. A rotation around the z
+ * axis is needed to correctly align the realsense and world coordinate systems.
+ *
+ * @param publisher publisher to use
+ * @param p point to publish
+ */
+void publishRelativeSearchPoint(ros::Publisher& publisher, const Point& p)
+{
+    visualization_msgs::Marker marker;
+    marker.header.frame_id = world_frame;
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = "relative_points";
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    // rotate point around z axis (counter clockwise)
+    marker.pose.position.x = -p.y;
+    marker.pose.position.y = p.x;
+    marker.pose.position.z = p.z;
+
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.02;
+    marker.scale.y = 0.02;
+    marker.scale.z = 0.02;
+
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 1.0;
+    marker.color.a = 1.0;
+    marker.lifetime = ros::Duration(/*t=*/0.3);
+
+    publisher.publish(marker);
+}
+
+/**
+ * Publishes a marker point with a given publisher. A rotation around the z
+ * axis is needed to correctly align the realsense and world coordinate systems.
+ *
+ * @param publisher publisher to use
+ * @param p point to publish
+ */
+void publishDesiredPosition(ros::Publisher& publisher, const Point& p)
+{
+    visualization_msgs::Marker marker;
+    marker.header.frame_id = world_frame;
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = "desired_position";
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    // rotate point around z axis (counter clockwise)
+    marker.pose.position.x = -p.y;
+    marker.pose.position.y = p.x;
+    marker.pose.position.z = p.z;
+
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.02;
+    marker.scale.y = 0.02;
+    marker.scale.z = 0.02;
+
+    marker.color.r = 0.0;
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+    marker.lifetime = ros::Duration(/*t=*/0.3);
+
+    publisher.publish(marker);
+}
+
+/**
  * Publishes a rectangle with a given publisher. A rotation around the z
  * axis is needed to correctly align the realsense and world coordinate systems.
  *
@@ -236,16 +318,23 @@ void publishTrackMarkerPoints(
  * @param track_points vector of points between start and end position of this
  * step
  */
-void publishPoint(
-    ros::Publisher& publisher, Point& p, Point& displacement, const std::vector<Point>& track_points)
+void publishPoint(ros::Publisher& publisher, Point& p, Point& p_world,
+    Point& displacement, const std::vector<Point>& track_points)
 {
     march_shared_msgs::FootPosition msg;
+
     msg.point.x = p.x;
     msg.point.y = p.y;
     msg.point.z = p.z;
+
+    msg.point_world.x = p_world.x;
+    msg.point_world.y = p_world.y;
+    msg.point_world.z = p_world.z;
+
     msg.displacement.x = displacement.x;
     msg.displacement.y = displacement.y;
     msg.displacement.z = displacement.z;
+
     msg.header.stamp = ros::Time::now();
 
     // rotate the track points
