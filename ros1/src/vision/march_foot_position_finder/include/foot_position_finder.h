@@ -90,6 +90,7 @@ protected:
     Point last_chosen_point_;
     Point last_chosen_point_world_;
     Point last_displacement_;
+    Point last_chosen_point_visualize_;
     double last_height_;
 };
 
