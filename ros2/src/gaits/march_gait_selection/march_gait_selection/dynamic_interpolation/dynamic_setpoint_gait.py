@@ -341,7 +341,9 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
-    def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
+    def _get_trajectory_command(
+        self, start=False, stop=False
+    ) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id.
 
         :param start: whether it is a start gait or not
