@@ -188,13 +188,13 @@ class DynamicSubgait:
 
             # Add an extra setpoint to the ankle to create a push off, except for
             # a start gait:
-            if not self.start and (
-                (name == "right_ankle" and self.subgait_id == "right_swing")
-                or (name == "left_ankle" and self.subgait_id == "left_swing")
-            ):
-                setpoint_list.insert(
-                    EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
-                )
+            # if not self.start and (
+            #     (name == "right_ankle" and self.subgait_id == "right_swing")
+            #     or (name == "left_ankle" and self.subgait_id == "left_swing")
+            # ):
+            #     setpoint_list.insert(
+            #         EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
+            #     )
 
             if name in ["right_ankle", "left_ankle"]:
                 self.joint_trajectory_list.append(

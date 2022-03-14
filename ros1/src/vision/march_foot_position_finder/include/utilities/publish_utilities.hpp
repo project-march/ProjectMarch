@@ -428,6 +428,9 @@ void publishPoint(ros::Publisher& publisher, Point& p, Point& p_world,
     msg.displacement.y = displacement.y;
     msg.displacement.z = displacement.z;
 
+    // start_point_world_ = last_chosen_point_;
+    // world_frame_avg_ = last_chosen_point_world_;
+
     msg.header.stamp = ros::Time::now();
 
     // rotate the track points

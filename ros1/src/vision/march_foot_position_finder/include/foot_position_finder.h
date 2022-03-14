@@ -92,6 +92,9 @@ protected:
     Point last_displacement_;
     Point last_chosen_point_visualize_;
     double last_height_;
+
+    Point start_point_world_;
+    Point world_frame_avg_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H
