@@ -386,9 +386,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         original_duration = self.foot_location.duration
         second_step = False
-        while (
-            self.foot_location.duration <= original_duration * DURATION_INCREASE_FACTOR
-        ):
+        while not self._is_duration_bigger_than_max_duration(original_duration):
             trajectory_command = self._try_to_get_trajectory_command(
                 start, stop, original_duration
             )
@@ -408,7 +406,7 @@ class DynamicSetpointGait(GaitInterface):
         # If no feasible subgait can be found, try to execute close gait
         if not start:
             try:
-                return self._get_trajectory_command(stop=True)
+                return self._get_stop_gait()
             except (PositionSoftLimitError, VelocitySoftLimitError):
                 # If close gait is not feasible, stop gait completely
                 self.logger.warn("Not possible to perform close gait.")
@@ -452,10 +450,7 @@ class DynamicSetpointGait(GaitInterface):
                 self._end_time,
             )
         except PositionSoftLimitError as e:
-            if (
-                self.foot_location.duration
-                >= original_duration * DURATION_INCREASE_FACTOR
-            ):
+            if self._is_duration_bigger_than_max_duration(original_duration):
                 self.logger.warn(
                     f"Joint {e.joint_name} will still be outside of soft limits after "
                     f"{iteration} iterations. Position: {e.position}, soft limits: "
@@ -463,10 +458,7 @@ class DynamicSetpointGait(GaitInterface):
                 )
             return None
         except VelocitySoftLimitError as e:
-            if (
-                self.foot_location.duration
-                >= original_duration * DURATION_INCREASE_FACTOR
-            ):
+            if self._is_duration_bigger_than_max_duration(original_duration):
                 self.logger.warn(
                     f"Joint {e.joint_name} will still be outside of velocity limits, after "
                     f"{iteration} iterations. Velocity: {e.velocity}, velocity limit: {e.velocity}. "
@@ -494,6 +486,32 @@ class DynamicSetpointGait(GaitInterface):
         except (PositionSoftLimitError, VelocitySoftLimitError):
             return False
         return True
+
+    def _get_stop_gait(self) -> Optional[TrajectoryCommand]:
+        self._end = True
+        subgait = self._create_subgait_instance(
+            self.start_position,
+            self.subgait_id,
+            start=False,
+            stop=True,
+        )
+        trajectory = subgait.get_joint_trajectory_msg()
+        return TrajectoryCommand(
+            trajectory,
+            Duration(self.foot_location.duration),
+            self.subgait_id,
+            self._end_time,
+        )
+
+    def _is_duration_bigger_than_max_duration(self, original_duration: float) -> bool:
+        """Returns true if duration is bigger than maximum duration, else false.
+
+        :param original_duration: duration before iterations
+        :type original_duration: float
+        """
+        return (
+            self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR
+        )
 
     def _create_subgait_instance(
         self,
