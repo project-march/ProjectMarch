@@ -131,6 +131,7 @@
             <arg name="simulation" value="$(eval configuration == 'simulation')"/>
         </include>
 
+    <include file="$(find march_gravity_aligned_frame_publisher)/launch/march_gravity_aligned_frame_publisher.launch"/>
 
 <!-- Bridge -->
         <!-- To prevent unnecessary topics and messages, we disable the plugins that

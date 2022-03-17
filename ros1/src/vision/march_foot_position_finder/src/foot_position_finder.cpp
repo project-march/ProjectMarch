@@ -41,9 +41,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 
     reference_frame_id_ = "foot_" + other_;
     current_frame_id_ = "foot_" + left_or_right;
-
-
-    last_chosen_point_world_ = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
+    current_aligned_frame_id_ = "toes_" + left_or_right_ + "_aligned";
+    other_aligned_frame_id_ = "toes_" + other_ + "_aligned";
 
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
@@ -108,35 +107,34 @@ void FootPositionFinder::readParameters(
     }
 
     Point start(/*_x=*/0, /*_y=*/0, /*_z=*/0);
-    // last_chosen_point_ = transformPoint(start, reference_frame_id_, base_frame_);
-    last_chosen_point_ = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
-    last_chosen_point_ = transformPoint(last_chosen_point_, reference_frame_id_, current_frame_id_);
-    last_chosen_point_visualize_ = transformPoint(last_chosen_point_, current_frame_id_, "world");
-
     last_chosen_point_world_ = transformPoint(start, reference_frame_id_, base_frame_);
-
-    start_point_world_ = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
-    start_point_world_ = transformPoint(start_point_world_, current_frame_id_, "hip_base");
 
     // world_frame_avg_ = last_chosen_point_world_;
     world_frame_avg_ = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
     world_frame_avg_ = transformPoint(world_frame_avg_, reference_frame_id_, "hip_base");
 
-        
     if (left_or_right_ == "left") {
         last_displacement_ = Point(/*_x=*/0, /*_y=*/(float)foot_gap_, /*_z=*/0);
-        
     } else {
         last_displacement_
             = Point(/*_x=*/0, /*_y=*/-(float)foot_gap_, /*_z=*/0);
-        // start_point_world_ = last_chosen_point_;
-        // world_frame_avg_ = last_chosen_point_world_;
     }
+
+    last_displacement_ = Point(0, 0, 0);
+    last_displacement_ = transformPoint(last_displacement_, other_aligned_frame_id_, current_aligned_frame_id_);
+
+    // last_displacement_ = transformPoint(last_displacement_, current_frame_id_, current_aligned_frame_id_);
 
     last_chosen_point_ = last_displacement_;
 
+    expected_other_point_ = transformPoint(last_chosen_point_, current_aligned_frame_id_, "world");
+
     ROS_INFO("Parameters updated in %s foot position finder",
         left_or_right_.c_str());
+
+    displacement_world_ = transformPoint(last_displacement_, current_aligned_frame_id_, "world");
+    start_displacement_world_ = Point(0, 0, 0);
+    start_displacement_world_ = transformPoint(start_displacement_world_, current_aligned_frame_id_, "world");
 
     running_ = true;
 }
@@ -155,12 +153,14 @@ void FootPositionFinder::chosenPointCallback(
         = Point(msg.displacement.x, msg.displacement.y, msg.displacement.z);
 
     // last_chosen_point_ = ;
-    std::cout << last_displacement_ << std::endl;
+    // std::cout << last_displacement_ << std::endl;
     // last_chosen_point_ = transformPoint(last_chosen_point_, reference_frame_id_, current_frame_id_);
-    last_chosen_point_visualize_ = transformPoint(last_chosen_point_, current_frame_id_, "world");
+    expected_other_point_ = transformPoint(last_chosen_point_, other_aligned_frame_id_, "world");
 
-    start_point_world_ = Point(msg.point.x, msg.point.y, msg.point.z);
-    world_frame_avg_ = Point(msg.point_world.x, msg.point_world.y, msg.point_world.z);
+    displacement_world_ = transformPoint(last_displacement_, current_aligned_frame_id_, "world");
+    start_displacement_world_ = Point(0, 0, 0);
+    start_displacement_world_ = transformPoint(start_displacement_world_, current_aligned_frame_id_, "world");
+
 }
 
 /**
@@ -206,6 +206,15 @@ void FootPositionFinder::processSimulatedDepthFrames(
  * point.
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
+
+
+//  BLUE ARROW -> from desired (purple) to covid estimate (red)
+//  GREEN ARROW -> origin current aligned frame -> last displacement / eventual position other leg (green)
+
+// GREEN POINT: where are we looking for new points with covid, relative to where the other leg will stand in 0.20 s
+// GREEN ARROW: where the other foot currently moving to, in the frame of the current leg
+
+
 {
     NormalCloud::Ptr normalcloud(new NormalCloud());
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
@@ -214,85 +223,68 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
 
-    // start_point_world_ = last_chosen_point_;
-    // world_frame_avg_ = last_chosen_point_world_;
+    Point start_point = last_displacement_;
 
-    Point start_2 = transformPoint(start_point_world_, "hip_base", current_frame_id_);
-    Point covid_2 = transformPoint(world_frame_avg_, "hip_base", current_frame_id_);
-
-
-    // Point start_point = last_displacement_;
-
-    Point start_point(covid_2.x - start_2.x,
-            covid_2.y - start_2.y,
-            covid_2.z - start_2.z);
-
-
-    // Point start_point = transformPoint(last_chosen_point_, reference_frame_id_, current_frame_id_);
-    Point point;
+    Point desired_point;
 
     if (left_or_right_ == "left") {
-        point = Point(start_point.x - (float)step_distance_,
+        desired_point = Point(start_point.x - (float)step_distance_,
             start_point.y - (float)foot_gap_, start_point.z);
     } else {
-        point = Point(start_point.x - (float)step_distance_,
+        desired_point = Point(start_point.x - (float)step_distance_,
             start_point.y + (float)foot_gap_, start_point.z);
     }
+
+    desired_point = transformPoint(desired_point, current_aligned_frame_id_, base_frame_);
+    desired_point = Point(desired_point.y, -desired_point.x, desired_point.z);  // Rotate right
+    publishDesiredPosition(point_marker_publisher_, desired_point);  // Green
+    // Green = Purple + usual foot displacement
 
     // Visualize
     // Point p2 = transformPoint(start_point, current_frame_id_, "world");
     // p2 = Point(start_point.y, -start_point.x, start_point.z); // Rotate right
-    Point p2 = Point(last_chosen_point_visualize_.y, -last_chosen_point_visualize_.x, last_chosen_point_visualize_.z); // Rotate right
-    publishRelativeSearchPoint(point_marker_publisher_, p2);
 
-    point = transformPoint(point, current_frame_id_, "world");
-    Point position(point.y, -point.x, point.z); // Rotate right
-    publishDesiredPosition(point_marker_publisher_, position);
 
+    Point expected_other_point_marker_ = Point(expected_other_point_.y, -expected_other_point_.x, expected_other_point_.z); // Rotate right
+    publishRelativeSearchPoint(point_marker_publisher_, expected_other_point_marker_);  // Purple
+  
     
-    PointFinder pointFinder(n_, pointcloud, left_or_right_, position);
+    PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
     // Publish search region for visualization
-    publishSearchRectangle(point_marker_publisher_, position,
+    publishSearchRectangle(point_marker_publisher_, desired_point,
         pointFinder.getDisplacements(), left_or_right_);
 
     if (position_queue.size() > 0) {
-        Point avg = computeTemporalAveragePoint(position_queue[0]);
+        Point found_covid_point_world = computeTemporalAveragePoint(position_queue[0]);  // red
 
         // Retrieve 3D points between current and new foot position
         Point start(/*_x=*/0, /*_y=*/0, /*_z=*/0);
         start = transformPoint(start, current_frame_id_, base_frame_);
         start = Point(start.y, -start.x, start.z); // Rotate right
         std::vector<Point> track_points
-            = pointFinder.retrieveTrackPoints(start, avg);
+            = pointFinder.retrieveTrackPoints(start, found_covid_point_world);
 
         // Publish for visualization
         publishTrackMarkerPoints(point_marker_publisher_, track_points);
-        publishMarkerPoint(point_marker_publisher_, avg);
+        publishMarkerPoint(point_marker_publisher_, found_covid_point_world);
         publishPossiblePoints(point_marker_publisher_, position_queue);
 
-        Point world_frame_avg = Point(-avg.y, avg.x, avg.z); // Rotate left
+        found_covid_point_world = Point(-found_covid_point_world.y, found_covid_point_world.x, found_covid_point_world.z); // Rotate left
         // the desired displacement? -> blue
-        publishArrow(point_marker_publisher_, last_chosen_point_visualize_, world_frame_avg);
+        // publishArrow(point_marker_publisher_, expected_other_point_, found_covid_point_world);
 
-        Point pp1 = Point(0, 0, 0); 
-        Point pp2 = last_displacement_;
-        pp1 = transformPoint(pp1, current_frame_id_, "world");
-        pp2 = transformPoint(pp2, current_frame_id_, "world");
-        // the displacement given by the gait callback -> green
-        publishArrow2(point_marker_publisher_, pp1, pp2);
+        // Point pp1 = Point(0, 0, 0);
+        // Point pp2 = last_displacement_;
+        // pp1 = transformPoint(pp1, current_aligned_frame_id_, "world");
+        // pp2 = transformPoint(pp2, current_aligned_frame_id_, "world");
+        // the displacement given by the gait callback -> green arrow
+        publishArrow(point_marker_publisher_, start_displacement_world_, displacement_world_); // blue
 
-
-        if (left_or_right_ == "left") {
-            std::cout << "start" << std::endl;
-            std::cout << world_frame_avg << std::endl;
-        }
-
-
-        Point current_frame_avg
-            = transformPoint(world_frame_avg, "world", current_frame_id_);
+        Point found_covid_point_current_aligned
+            = transformPoint(found_covid_point_world, base_frame_, current_aligned_frame_id_);
 
         std::vector<Point> relative_track_points;
         // for (Point& p : track_points) {
@@ -303,24 +295,21 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // std::cout << left_or_right_ << std::endl;
 
-        if (left_or_right_ == "left") {
-            std::cout << current_frame_avg << std::endl;
-            // std::cout << start_point << std::endl;
-        }
+        std::cout << left_or_right_ << std::endl;
+        std::cout << "Covid" << std::endl;
+        std::cout << found_covid_point_current_aligned.z << std::endl;
+        std::cout << "Previous point" << std::endl;
+        std::cout << start_point.z << std::endl;
         
-// send current frame avg in world frame
-// send start_point in world frame
-// transform them after callback to current frame, for the newest updated position (which is rotated)'
-// 
 
-        Point displacement(current_frame_avg.x - start_point.x,
-            current_frame_avg.y - start_point.y,
-            current_frame_avg.z - start_point.z);
+        Point displacement(found_covid_point_current_aligned.x - start_point.x,
+            found_covid_point_current_aligned.y - start_point.y,
+            found_covid_point_current_aligned.z - start_point.z);
 
-        world_frame_avg =  transformPoint(world_frame_avg, "world", "hip_base");
-        Point start_point_world = transformPoint(start_point, current_frame_id_, "hip_base");
+        Point start_point_world = transformPoint(start_point, current_aligned_frame_id_, "world");
+        publishArrow2(point_marker_publisher_, start_point_world, found_covid_point_world);
 
-        publishPoint(point_publisher_, start_point_world, world_frame_avg,
+        publishPoint(point_publisher_, found_covid_point_current_aligned, found_covid_point_world,
             displacement, relative_track_points);
     }
 }

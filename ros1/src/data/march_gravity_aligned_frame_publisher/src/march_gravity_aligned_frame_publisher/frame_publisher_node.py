@@ -3,7 +3,7 @@ import tf
 
 # Define the distance from frame 'foot_left' or 'foot_right' at which the foot rotates:
 FOOT_LENGTH = 0.2
-Z_ROTATION = [0.0, 0.0, 1.0, 0.0]
+Z_ROTATION = [0.0, 0.0, 0.0, 1.0]
 RATE = 10.0
 
 
@@ -22,10 +22,10 @@ def main():
     while not rospy.is_shutdown():
         try:
             (trans_left, rot_left) = listener.lookupTransform(
-                "/world", "/foot_left", rospy.Time(0)
+                "/foot_left", "/world", rospy.Time(0)
             )
             (trans_right, rot_right) = listener.lookupTransform(
-                "/world", "/foot_right", rospy.Time(0)
+                "/foot_right", "/world", rospy.Time(0)
             )
         except (
             tf.LookupException,
@@ -35,7 +35,7 @@ def main():
             continue
 
         broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, 0.0),
+            (-FOOT_LENGTH, 0.0, -0.03),
             Z_ROTATION,
             rospy.Time.now(),
             "toes_left",
@@ -51,7 +51,7 @@ def main():
         )
 
         broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, 0.0),
+            (-FOOT_LENGTH, 0.0, -0.03),
             Z_ROTATION,
             rospy.Time.now(),
             "toes_right",

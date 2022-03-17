@@ -9,3 +9,7 @@ catkin_package(CATKIN_DEPENDS)
 
 catkin_install_python(PROGRAMS scripts/march_gravity_aligned_frame_publisher
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(DIRECTORY launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

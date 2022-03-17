@@ -85,16 +85,21 @@ protected:
     std::string base_frame_;
     std::string reference_frame_id_;
     std::string current_frame_id_;
+    std::string current_aligned_frame_id_;
+    std::string other_aligned_frame_id_;
 
     std::vector<Point> found_points_;
     Point last_chosen_point_;
     Point last_chosen_point_world_;
     Point last_displacement_;
-    Point last_chosen_point_visualize_;
+    Point expected_other_point_;
     double last_height_;
 
     Point start_point_world_;
     Point world_frame_avg_;
+
+    Point start_displacement_world_;
+    Point displacement_world_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H
