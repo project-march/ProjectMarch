@@ -60,7 +60,7 @@ class IncorrectCoordinateError(Exception):
         :param msg: Optional, a custom error message to return.
         """
         if msg is None:
-            msg = "The keys of a position or velocity dictionary should be " "['x', 'y', 'z'], but were different."
+            msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."
 
         super(IncorrectCoordinateError, self).__init__(msg)
 

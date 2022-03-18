@@ -165,7 +165,7 @@ class Gait:
         if isinstance(old_edge_position, StaticEdgePosition):
             if old_edge_position != StaticEdgePosition(new_edge_position_values):
                 raise NonValidGaitContentError(
-                    msg="The edge position of new version does not match to the " "static old version"
+                    msg="The edge position of new version does not match to the static old version"
                 )
             else:
                 return StaticEdgePosition(new_edge_position_values)

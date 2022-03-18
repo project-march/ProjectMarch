@@ -85,7 +85,7 @@ class GaitSelection(Node):
 
         except ParameterNotDeclaredException:
             self.logger.error(
-                "Gait selection node started without required parameters " "gait_package, gait_directory and balance"
+                "Gait selection node started without required parameters gait_package, gait_directory and balance"
             )
 
         self._directory_name = directory

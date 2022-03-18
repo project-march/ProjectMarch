@@ -79,7 +79,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="rqt_input",
                 default_value="True",
-                description="If this argument is false, the rqt input device will" "not be launched.",
+                description="If this argument is false, the rqt input device will not be launched.",
             ),
             DeclareLaunchArgument(
                 name="layout",
@@ -120,7 +120,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value=realsense,
-                description="Whether the simulation should be simulating " "ground_gaiting instead of airgaiting.",
+                description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
@@ -132,7 +132,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="use_imu_data",
                 default_value=realsense,
-                description="Whether to use the camera imu to know the real " "orientation of the exoskeleton",
+                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(name="imu_to_use", default_value="back", description="Which imu to use"),
             DeclareLaunchArgument(
@@ -175,7 +175,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
-                description="Fraction of the step at which the middle point " "of the dynamic gait will take place.",
+                description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
                 name="middle_point_height",
@@ -192,7 +192,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="push_off_fraction",
                 default_value="0.15",
-                description="Fraction of the step at which the push off will" "take place.",
+                description="Fraction of the step at which the push off will take place.",
             ),
             DeclareLaunchArgument(
                 name="push_off_position",

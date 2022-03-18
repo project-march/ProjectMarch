@@ -44,7 +44,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
-                description="Fraction of the step at which the middle point " "of the dynamic gait will take place.",
+                description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
                 name="middle_point_height",
@@ -61,7 +61,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="push_off_fraction",
                 default_value="0.15",
-                description="Fraction of the step at which the push off will" "take place.",
+                description="Fraction of the step at which the push off will take place.",
             ),
             DeclareLaunchArgument(
                 name="push_off_position",

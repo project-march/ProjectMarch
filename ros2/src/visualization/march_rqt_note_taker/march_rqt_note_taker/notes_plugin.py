@@ -84,7 +84,7 @@ class NotesPlugin(Plugin):
         config_client = self._node.create_client(Trigger, "/march/gain_scheduling/get_configuration")
         if not config_client.service_is_ready():
             while config_client.wait_for_service(timeout_sec=1):
-                self._node.get_logger().warn("Failed to contact gain scheduling config " "service")
+                self._node.get_logger().warn("Failed to contact gain scheduling config service")
         future = config_client.call_async(Trigger.Request())
         future.add_done_callback(
             lambda res: self._model.insert_row(Entry(f"Configuration is {future.result().message}"))

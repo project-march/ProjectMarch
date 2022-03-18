@@ -57,7 +57,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="simulation",
                 default_value="False",
-                description="Whether the exoskeleton is ran physically or in " "simulation.",
+                description="Whether the exoskeleton is ran physically or in simulation.",
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
@@ -67,7 +67,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value="False",
-                description="Whether the simulation should be simulating " "ground_gaiting instead of airgaiting.",
+                description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 "balance",

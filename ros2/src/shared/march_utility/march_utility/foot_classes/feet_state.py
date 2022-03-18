@@ -48,7 +48,7 @@ class FeetState:
         """
         if JOINT_NAMES_IK is None:
             raise SubgaitInterpolationError(
-                "Robot joints do not allow IK, " "so FeetState object can not be created " "from setpoints."
+                "Robot joints do not allow IK, so FeetState object can not be created from setpoints."
             )
         for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
@@ -108,7 +108,7 @@ class FeetState:
             the feet are the weighted average of those of the base and other states.
         """
         if base_state.time is None or other_state.time is None:
-            raise SubgaitInterpolationError("Feet state requires a time to compute " "the weighted average.")
+            raise SubgaitInterpolationError("Feet state requires a time to compute the weighted average.")
 
         if parameter == 0:
             return base_state
@@ -132,7 +132,7 @@ class FeetState:
         """
         if feet_state.time is None:
             raise SubgaitInterpolationError(
-                msg="Feet state needs a time to " "interpolate to setpoint, but time " "was None."
+                msg="Feet state needs a time to interpolate to setpoint, but time was None."
             )
 
         left_joint_states = Foot.get_joint_states_from_foot_state(feet_state.left_foot, feet_state.time)

@@ -367,7 +367,7 @@ class Subgait:
             raise SubgaitInterpolationError("The length of the subgait list does not match the given dimensions")
         if len(parameters) != amount_of_parameters(dimensions):
             raise SubgaitInterpolationError(
-                f"The amount of parameters does not match {len(parameters)}" "the given dimensions {dimensions}"
+                f"The amount of parameters does not match {len(parameters)} the given dimensions {dimensions}"
             )
         if dimensions == InterpolationDimensions.ONE_DIM:
             return cls.interpolate_subgaits(subgaits[0], subgaits[1], parameters[0], use_foot_position)

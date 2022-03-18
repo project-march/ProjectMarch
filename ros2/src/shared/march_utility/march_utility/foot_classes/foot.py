@@ -126,7 +126,7 @@ class Foot:
 
         if JOINT_NAMES_IK is None:
             raise SubgaitInterpolationError(
-                "Robot joints do not allow calculating the " "joint angles from foot position."
+                "Robot joints do not allow calculating the joint angles from foot position."
             )
         # Get relevant lengths from robot model, ul = upper leg etc.
         # see get_lengths_robot_for_inverse_kinematics() and unpack desired position
