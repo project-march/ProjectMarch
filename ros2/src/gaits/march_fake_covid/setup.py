@@ -20,9 +20,5 @@ setup(
     description="Publishes fake foot locations",
     license="TODO: License declaration",
     tests_require=["pytest", "unittest"],
-    entry_points={
-        "console_scripts": [
-            "march_fake_covid = march_fake_covid.fake_covid_publisher:main"
-        ]
-    },
+    entry_points={"console_scripts": ["march_fake_covid = march_fake_covid.fake_covid_publisher:main"]},
 )

@@ -39,8 +39,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": [
-            "input_device = march_rqt_input_device.input_device_plugin:main"
-        ],
+        "console_scripts": ["input_device = march_rqt_input_device.input_device_plugin:main"],
     },
 )

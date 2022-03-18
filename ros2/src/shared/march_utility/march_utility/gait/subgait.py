@@ -106,18 +106,12 @@ class Subgait:
         """
         subgait_path = os.path.join(gait_dir, gait_name, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
-            base_version, other_version, parameter = Subgait.unpack_parametric_version(
-                version
-            )
-            base_version_path = os.path.join(
-                subgait_path, base_version + SUBGAIT_SUFFIX
-            )
+            base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
+            base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
             if base_version == other_version:
                 return cls.from_file(robot, base_version_path)
             else:
-                other_version_path = os.path.join(
-                    subgait_path, other_version + SUBGAIT_SUFFIX
-                )
+                other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
                 return cls.from_two_files_interpolated(
                     robot,
                     base_version_path,
@@ -207,9 +201,7 @@ class Subgait:
         """
         base_subgait = cls.from_file(robot, first_file_name)
         other_subgait = cls.from_file(robot, second_file_name)
-        return cls.interpolate_subgaits(
-            base_subgait, other_subgait, first_parameter, use_foot_position
-        )
+        return cls.interpolate_subgaits(base_subgait, other_subgait, first_parameter, use_foot_position)
 
     @classmethod
     def from_dict(
@@ -242,22 +234,14 @@ class Subgait:
 
         duration = Duration(nanoseconds=subgait_dict["duration"])
         joint_list = []
-        for name, points in sorted(
-            subgait_dict["joints"].items(), key=lambda item: item[0]
-        ):
+        for name, points in sorted(subgait_dict["joints"].items(), key=lambda item: item[0]):
             urdf_joint = cls.joint_class.get_joint_from_urdf(robot, name)
             if urdf_joint is None or urdf_joint.type == "fixed":
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
-            joint_list.append(
-                cls.joint_class.from_setpoint_dict(name, limits, points, duration)
-            )
-        subgait_type = (
-            subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
-        )
-        subgait_description = (
-            subgait_dict["description"] if subgait_dict.get("description") else ""
-        )
+            joint_list.append(cls.joint_class.from_setpoint_dict(name, limits, points, duration))
+        subgait_type = subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
+        subgait_description = subgait_dict["description"] if subgait_dict.get("description") else ""
 
         return cls(
             joint_list,
@@ -336,9 +320,7 @@ class Subgait:
     # endregion
 
     # region Manipulate subgait
-    def scale_timestamps_subgait(
-        self, new_duration: Duration, rescale: bool = True
-    ) -> None:
+    def scale_timestamps_subgait(self, new_duration: Duration, rescale: bool = True) -> None:
         """Scale or cut off all the setpoint to match the duration in both subgaits.
 
         :param new_duration: the new duration to scale the setpoints with.
@@ -382,22 +364,15 @@ class Subgait:
         use_foot_position: bool,
     ):
         if len(subgaits) != amount_of_subgaits(dimensions):
-            raise SubgaitInterpolationError(
-                "The length of the subgait list does not match the given dimensions"
-            )
+            raise SubgaitInterpolationError("The length of the subgait list does not match the given dimensions")
         if len(parameters) != amount_of_parameters(dimensions):
             raise SubgaitInterpolationError(
-                f"The amount of parameters does not match {len(parameters)}"
-                "the given dimensions {dimensions}"
+                f"The amount of parameters does not match {len(parameters)}" "the given dimensions {dimensions}"
             )
         if dimensions == InterpolationDimensions.ONE_DIM:
-            return cls.interpolate_subgaits(
-                subgaits[0], subgaits[1], parameters[0], use_foot_position
-            )
+            return cls.interpolate_subgaits(subgaits[0], subgaits[1], parameters[0], use_foot_position)
         elif dimensions == InterpolationDimensions.TWO_DIM:
-            return cls.interpolate_four_subgaits(
-                subgaits, parameters, use_foot_position
-            )
+            return cls.interpolate_four_subgaits(subgaits, parameters, use_foot_position)
         else:
             raise UnknownDimensionsError(dimensions)
 
@@ -467,19 +442,12 @@ class Subgait:
         if parameter == 0:
             return base_subgait
         if not (0 < parameter < 1):
-            raise ValueError(
-                f"Parameter for interpolation should be in the interval [0, 1], "
-                f"but is {parameter}"
-            )
+            raise ValueError(f"Parameter for interpolation should be in the interval [0, 1], but is {parameter}")
 
         if use_foot_position:
-            joints = Subgait.get_foot_position_interpolated_joint_trajectories(
-                base_subgait, other_subgait, parameter
-            )
+            joints = Subgait.get_foot_position_interpolated_joint_trajectories(base_subgait, other_subgait, parameter)
         else:
-            joints = Subgait.get_joint_angle_interpolated_joint_trajectories(
-                base_subgait, other_subgait, parameter
-            )
+            joints = Subgait.get_joint_angle_interpolated_joint_trajectories(base_subgait, other_subgait, parameter)
 
         description = (
             f"Interpolation between base version {base_subgait.version}, "
@@ -487,13 +455,9 @@ class Subgait:
             f"Based on foot position: {use_foot_position}"
         )
 
-        duration = base_subgait.duration.weighted_average(
-            other_subgait.duration, parameter
-        )
+        duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
 
-        gait_type = (
-            base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
-        )
+        gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         # What to do with the version of the new gait
         version = "{0}{1}_({2})_({3})".format(
             PARAMETRIC_GAITS_PREFIX,
@@ -514,9 +478,7 @@ class Subgait:
     # endregion
 
     # region Get functions
-    def get_unique_timestamps(
-        self, sorted_timestamps: bool = True
-    ) -> Collection[Duration]:
+    def get_unique_timestamps(self, sorted_timestamps: bool = True) -> Collection[Duration]:
         """Get the timestamps that are unique to a setpoint."""
         timestamps = []
         for joint in self.joints:
@@ -620,9 +582,7 @@ class Subgait:
             version_path_list[version_index] = os.path.join(
                 subgait_path, gait_version_list[version_index] + SUBGAIT_SUFFIX
             )
-        return all(
-            not os.path.isfile(version_path) for version_path in version_path_list
-        )
+        return all(not os.path.isfile(version_path) for version_path in version_path_list)
 
     @staticmethod
     def validate_parametric_version(subgait_path: str, version: str) -> bool:
@@ -635,17 +595,12 @@ class Subgait:
         base_version, other_version, _ = Subgait.unpack_parametric_version(version)
         base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
         other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
-        return all(
-            not os.path.isfile(version_path)
-            for version_path in [base_version_path, other_version_path]
-        )
+        return all(not os.path.isfile(version_path) for version_path in [base_version_path, other_version_path])
 
     @staticmethod
     def unpack_parametric_version(version: str) -> Tuple[str, str, float]:
         """Unpack a version to base version, other version and parameter."""
-        parameter_search = re.search(
-            r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version
-        )
+        parameter_search = re.search(r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version)
         if parameter_search is None:
             raise SubgaitInterpolationError(
                 f"Parametric version string was stored in wrong format. "
@@ -678,9 +633,7 @@ class Subgait:
         return (version_list, parameter_list)
 
     @staticmethod
-    def check_foot_position_interpolation_is_safe(
-        base_subgait: Subgait, other_subgait: Subgait
-    ) -> None:
+    def check_foot_position_interpolation_is_safe(base_subgait: Subgait, other_subgait: Subgait) -> None:
         """Check whether two subgaits are safe to be interpolated on foot location."""
         for base_joint, other_joint in zip(
             sorted(base_subgait.joints, key=lambda joint: joint.name),
@@ -719,50 +672,31 @@ class Subgait:
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
         for setpoint_index in range(number_of_setpoints):
-            if (
-                base_setpoints_to_interpolate[setpoint_index]
-                == other_setpoints_to_interpolate[setpoint_index]
-            ):
+            if base_setpoints_to_interpolate[setpoint_index] == other_setpoints_to_interpolate[setpoint_index]:
                 setpoints_to_add = base_setpoints_to_interpolate[setpoint_index]
             else:
-                base_feet_state = FeetState.from_setpoint_dict(
-                    base_setpoints_to_interpolate[setpoint_index]
-                )
-                other_feet_state = FeetState.from_setpoint_dict(
-                    other_setpoints_to_interpolate[setpoint_index]
-                )
-                new_feet_state = FeetState.weighted_average_states(
-                    base_feet_state, other_feet_state, parameter
-                )
+                base_feet_state = FeetState.from_setpoint_dict(base_setpoints_to_interpolate[setpoint_index])
+                other_feet_state = FeetState.from_setpoint_dict(other_setpoints_to_interpolate[setpoint_index])
+                new_feet_state = FeetState.weighted_average_states(base_feet_state, other_feet_state, parameter)
                 setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
 
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
             # fill the ankle joint using the angle based linear interpolation
             for ankle_joint in ["left_ankle", "right_ankle"]:
-                base_setpoint = base_setpoints_to_interpolate[setpoint_index][
-                    ankle_joint
-                ]
-                other_setpoint = other_setpoints_to_interpolate[setpoint_index][
-                    ankle_joint
-                ]
-                new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(
-                    base_setpoint, other_setpoint, parameter
-                )
+                base_setpoint = base_setpoints_to_interpolate[setpoint_index][ankle_joint]
+                other_setpoint = other_setpoints_to_interpolate[setpoint_index][ankle_joint]
+                new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(base_setpoint, other_setpoint, parameter)
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
-        duration = base_subgait.duration.weighted_average(
-            other_subgait.duration, parameter
-        )
+        duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
 
         interpolated_joint_trajectories = [None] * len(base_subgait.joints)
         for index, joint in enumerate(base_subgait.joints):
             interpolated_joint_trajectory_to_add = JointTrajectory(
                 joint.name, joint.limits, new_setpoints[joint.name], duration
             )
-            interpolated_joint_trajectories[
-                index
-            ] = interpolated_joint_trajectory_to_add
+            interpolated_joint_trajectories[index] = interpolated_joint_trajectory_to_add
 
         return interpolated_joint_trajectories
 
@@ -773,29 +707,20 @@ class Subgait:
         """Create two lists of setpoints with equal time stamps."""
         base_to_other_duration_ratio = other_subgait.duration / base_subgait.duration
 
-        original_base_time_stamps = set(
-            base_subgait.get_unique_timestamps(sorted_timestamps=False)
-        )
-        other_time_stamps = set(
-            other_subgait.get_unique_timestamps(sorted_timestamps=False)
-        )
+        original_base_time_stamps = set(base_subgait.get_unique_timestamps(sorted_timestamps=False))
+        other_time_stamps = set(other_subgait.get_unique_timestamps(sorted_timestamps=False))
 
         for base_time in original_base_time_stamps:
-            other_time_stamps.add(
-                round((base_time * base_to_other_duration_ratio), Setpoint.digits)
-            )
+            other_time_stamps.add(round((base_time * base_to_other_duration_ratio), Setpoint.digits))
 
         base_time_stamps = [
-            round(other_time / base_to_other_duration_ratio, Setpoint.digits)
-            for other_time in other_time_stamps
+            round(other_time / base_to_other_duration_ratio, Setpoint.digits) for other_time in other_time_stamps
         ]
 
         base_time_stamps = sorted(base_time_stamps)
         other_time_stamps = sorted(other_time_stamps)
 
-        base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
-            base_subgait, base_time_stamps
-        )
+        base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(base_subgait, base_time_stamps)
         other_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
             other_subgait, other_time_stamps
         )
@@ -803,9 +728,7 @@ class Subgait:
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate
 
     @staticmethod
-    def prepare_subgait_for_inverse_kinematics(
-        subgait: Subgait, time_stamps: List[Duration]
-    ) -> List[dict]:
+    def prepare_subgait_for_inverse_kinematics(subgait: Subgait, time_stamps: List[Duration]) -> List[dict]:
         """Create a list of setpoints from a subgait with timestamps given by time_stamps."""
         setpoints_to_interpolate: List[dict] = [{} for _ in time_stamps]
 
@@ -835,14 +758,10 @@ class Subgait:
             if base_joint.name != other_joint.name:
                 raise SubgaitInterpolationError(
                     "The subgaits to interpolate do not have the same joints, base"
-                    " subgait has {0}, while other subgait has {1}".format(
-                        base_joint.name, other_joint.name
-                    )
+                    " subgait has {0}, while other subgait has {1}".format(base_joint.name, other_joint.name)
                 )
-            interpolated_joint_trajectory_to_add = (
-                JointTrajectory.interpolate_joint_trajectories(
-                    base_joint, other_joint, parameter
-                )
+            interpolated_joint_trajectory_to_add = JointTrajectory.interpolate_joint_trajectories(
+                base_joint, other_joint, parameter
             )
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 

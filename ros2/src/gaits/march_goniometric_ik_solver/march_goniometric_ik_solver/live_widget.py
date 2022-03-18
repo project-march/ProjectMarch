@@ -63,9 +63,7 @@ class LiveWidget:
         ]
         pose_rad = pose.pose_left
         pose_deg = [np.rad2deg(angle) for angle in pose_rad]
-        celltext = np.column_stack(
-            (joints, np.round(pose_rad, 2), np.round(pose_deg, 2))
-        )
+        celltext = np.column_stack((joints, np.round(pose_rad, 2), np.round(pose_deg, 2)))
         collabels = ("joint", "radians", "degrees")
         self.table = plt.table(cellText=celltext, colLabels=collabels, loc="right")
         self.table.auto_set_column_width((0, 1, 2))
@@ -132,16 +130,12 @@ class LiveWidget:
 
         # Create a toggle for rear ankle dorsi flexion reduction:
         ax_toggle = plt.axes([0.7, 0.25, 0.1, 0.04])
-        self.toggle_df_rear = Button(
-            ax_toggle, "df_rear", color="green", hovercolor="red"
-        )
+        self.toggle_df_rear = Button(ax_toggle, "df_rear", color="green", hovercolor="red")
         self.toggle_df_rear.on_clicked(self.toggle_rear)
 
         # Create a toggle for front ankle dorsi flexion reduction:
         ax_toggle = plt.axes([0.85, 0.25, 0.1, 0.04])
-        self.toggle_df_front = Button(
-            ax_toggle, "df_front", color="green", hovercolor="red"
-        )
+        self.toggle_df_front = Button(ax_toggle, "df_front", color="green", hovercolor="red")
         self.toggle_df_front.on_clicked(self.toggle_front)
 
         # Show the widget:
@@ -179,12 +173,8 @@ class LiveWidget:
         # Update table with joint angles:
         pose_rad = pose.pose_right
         for i in np.arange(len(pose_rad)):
-            self.table.get_celld()[(i + 1, 1)].get_text().set_text(
-                np.round(pose_rad[i], 2)
-            )
-            self.table.get_celld()[(i + 1, 2)].get_text().set_text(
-                np.round(np.rad2deg(pose_rad[i]), 2)
-            )
+            self.table.get_celld()[(i + 1, 1)].get_text().set_text(np.round(pose_rad[i], 2))
+            self.table.get_celld()[(i + 1, 2)].get_text().set_text(np.round(np.rad2deg(pose_rad[i]), 2))
 
         # Redraw plot:
         self.fig.canvas.draw_idle()

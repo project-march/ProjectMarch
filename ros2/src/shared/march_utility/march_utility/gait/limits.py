@@ -1,7 +1,5 @@
 class Limits:
-    def __init__(
-        self, lower, upper, velocity, effort=None, k_position=None, k_velocity=None
-    ):
+    def __init__(self, lower, upper, velocity, effort=None, k_position=None, k_velocity=None):
         self.lower = lower
         self.upper = upper
         self.velocity = velocity

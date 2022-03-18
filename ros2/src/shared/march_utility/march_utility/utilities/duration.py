@@ -49,14 +49,8 @@ class Duration(ROSDuration):
         :return: Returns the weighted duration
         """
         if not isinstance(other, Duration):
-            raise TypeError(
-                f"Weighted average expectes other to be a Duration, but got a {type(other)}"
-            )
-        return Duration(
-            nanoseconds=weighted_average_floats(
-                self.nanoseconds, other.nanoseconds, parameter
-            )
-        )
+            raise TypeError(f"Weighted average expectes other to be a Duration, but got a {type(other)}")
+        return Duration(nanoseconds=weighted_average_floats(self.nanoseconds, other.nanoseconds, parameter))
 
     @classmethod
     def from_ros_duration(cls, duration: ROSDuration) -> Duration:
@@ -95,9 +89,7 @@ class Duration(ROSDuration):
             return Duration(nanoseconds=self.nanoseconds * other)
         raise TypeError(f"Expected numerical value, bot got type: {type(other)}")
 
-    def __truediv__(
-        self, other: Union[Duration, int, float]
-    ) -> Union[Duration, int, float]:
+    def __truediv__(self, other: Union[Duration, int, float]) -> Union[Duration, int, float]:
         """Divide the duration by some other value.
 
         If this value is numeric, a Duration is returned.
@@ -111,9 +103,7 @@ class Duration(ROSDuration):
             return Duration(nanoseconds=self.nanoseconds / other)
         if isinstance(other, Duration):
             return self.nanoseconds / other.nanoseconds
-        raise TypeError(
-            f"Expected numerical value or Duration, bot got type: {type(other)}"
-        )
+        raise TypeError(f"Expected numerical value or Duration, bot got type: {type(other)}")
 
     def __hash__(self):
         """Return a hash based on the nanoseconds attribute."""

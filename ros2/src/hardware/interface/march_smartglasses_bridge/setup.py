@@ -22,8 +22,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": [
-            "march_smartglasses_bridge = march_smartglasses_bridge.bridge:main"
-        ],
+        "console_scripts": ["march_smartglasses_bridge = march_smartglasses_bridge.bridge:main"],
     },
 )

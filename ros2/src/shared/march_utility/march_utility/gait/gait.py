@@ -36,12 +36,8 @@ class Gait:
         self.gait_name = gait_name
         self.subgaits = subgaits
         self.graph = graph
-        self._starting_position = StaticEdgePosition(
-            self.subgaits[self.graph.start_subgaits()[0]].starting_position
-        )
-        self._final_position = StaticEdgePosition(
-            self.subgaits[self.graph.end_subgaits()[0]].final_position
-        )
+        self._starting_position = StaticEdgePosition(self.subgaits[self.graph.start_subgaits()[0]].starting_position)
+        self._final_position = StaticEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
         self._validate_trajectory_transition()
 
     @classmethod
@@ -97,9 +93,7 @@ class Gait:
 
         graph = SubgaitGraph(subgaits)
         subgaits = {
-            name: cls.load_subgait(
-                robot, gait_directory, gait_name, name, gait_version_map
-            )
+            name: cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map)
             for name in subgaits
             if name not in ("start", "end")
         }
@@ -136,20 +130,12 @@ class Gait:
             raise SubgaitNameNotFoundError(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
-        return Subgait.from_name_and_version(
-            robot, gait_directory, gait_name, subgait_name, version
-        )
+        return Subgait.from_name_and_version(robot, gait_directory, gait_name, subgait_name, version)
 
     def _validate_trajectory_transition(self):
         """Compares and validates the trajectory end and start points."""
         for from_subgait_name, to_subgait_name in self.graph:
-            if (
-                len(
-                    {from_subgait_name, to_subgait_name}
-                    & {self.graph.START, self.graph.END}
-                )
-                > 0
-            ):
+            if len({from_subgait_name, to_subgait_name} & {self.graph.START, self.graph.END}) > 0:
                 continue
 
             from_subgait = self.subgaits[from_subgait_name]
@@ -179,17 +165,14 @@ class Gait:
         if isinstance(old_edge_position, StaticEdgePosition):
             if old_edge_position != StaticEdgePosition(new_edge_position_values):
                 raise NonValidGaitContentError(
-                    msg="The edge position of new version does not match to the "
-                    "static old version"
+                    msg="The edge position of new version does not match to the " "static old version"
                 )
             else:
                 return StaticEdgePosition(new_edge_position_values)
         elif isinstance(old_edge_position, DynamicEdgePosition):
             return DynamicEdgePosition(new_edge_position_values)
         else:
-            raise NonValidGaitContentError(
-                msg="Gaits with unknown edge positions should not be updated"
-            )
+            raise NonValidGaitContentError(msg="Gaits with unknown edge positions should not be updated")
 
     def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait]):
         """
@@ -224,9 +207,7 @@ class Gait:
         self.set_edge_positions(new_starting_position, new_final_position)
         return True
 
-    def set_edge_positions(
-        self, starting_position: EdgePosition, final_position: EdgePosition
-    ):
+    def set_edge_positions(self, starting_position: EdgePosition, final_position: EdgePosition):
         """
         Set the new edge positions. Overrides from the setpoints gait, which does not
         store the starting or final position
@@ -236,9 +217,7 @@ class Gait:
         self._starting_position = starting_position
         self._final_position = final_position
 
-    def set_subgaits(
-        self, new_subgaits: Dict[str, Subgait], node: Optional[Node] = None
-    ):
+    def set_subgaits(self, new_subgaits: Dict[str, Subgait], node: Optional[Node] = None):
         """
         Update the subgaits of the gaits, and validate that the edges changes
         acceptably. Also make sure that all transitions between the subgaits match.
@@ -255,9 +234,7 @@ class Gait:
                 node.get_logger().warn(f"New subgaits were invalid: {e}")
             raise e
 
-    def set_subgait_versions(
-        self, robot: urdf.Robot, gait_directory: str, version_map: dict
-    ):
+    def set_subgait_versions(self, robot: urdf.Robot, gait_directory: str, version_map: dict):
         """Updates the given subgait versions and verifies transitions.
 
         :param robot: URDF matching subgaits

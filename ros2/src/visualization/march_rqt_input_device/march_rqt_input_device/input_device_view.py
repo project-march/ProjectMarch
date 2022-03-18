@@ -15,9 +15,7 @@ from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
 
-DEFAULT_LAYOUT_FILE = os.path.join(
-    get_package_share_directory("march_rqt_input_device"), "config", "training.json"
-)
+DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
 
@@ -26,9 +24,7 @@ class InputDeviceView(QWidget):
     The View of the input device, inialized based on a ui file and a controller.
     """
 
-    def __init__(
-        self, ui_file: str, layout_file: str, controller: InputDeviceController, logger
-    ):
+    def __init__(self, ui_file: str, layout_file: str, controller: InputDeviceController, logger):
         """
         Initializes the view with a UI file and controller.
 
@@ -56,9 +52,7 @@ class InputDeviceView(QWidget):
         self._layout_file = layout_file if layout_file != "" else DEFAULT_LAYOUT_FILE
         self._image_names = [
             file.name
-            for file in Path(
-                get_package_share_directory("march_rqt_input_device"), "resource", "img"
-            ).glob("*.png")
+            for file in Path(get_package_share_directory("march_rqt_input_device"), "resource", "img").glob("*.png")
         ]
         self._create_buttons()
         self._update_possible_gaits()
@@ -70,10 +64,7 @@ class InputDeviceView(QWidget):
         with open(self._layout_file) as file:
             json_content = json.loads(file.read())
 
-        button_layout = [
-            [self.create_button(**button_dict) for button_dict in row]
-            for row in json_content
-        ]
+        button_layout = [[self.create_button(**button_dict) for button_dict in row] for row in json_content]
 
         # Create the qt_layout from the button layout.
         qt_layout = self.create_layout(button_layout)
@@ -182,9 +173,7 @@ class InputDeviceView(QWidget):
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         qt_button.setStyleSheet(
-            "QToolButton {background-color: lightgrey; "
-            "font-size: 13px;"
-            "font: 'Times New Roman'}"
+            "QToolButton {background-color: lightgrey; " "font-size: 13px;" "font: 'Times New Roman'}"
         )
         qt_button.setIconSize(QSize(90, 90))
         qt_button.setText(check_string(name))

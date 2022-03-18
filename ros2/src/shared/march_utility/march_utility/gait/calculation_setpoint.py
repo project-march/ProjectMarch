@@ -9,9 +9,7 @@ VELOCITY_SCALE_FACTOR = 0.001
 class CalculationSetpoint(Setpoint):
     """Base class to define setpoints used in calculations which do not round."""
 
-    def __init__(
-        self, time: Duration, position: float, velocity: Optional[float] = None
-    ) -> None:
+    def __init__(self, time: Duration, position: float, velocity: Optional[float] = None) -> None:
         """
         Initialize a setpoint.
 
@@ -68,8 +66,7 @@ class CalculationSetpoint(Setpoint):
         for joint in setpoint_dic.keys():
             next_positions[joint] = cls(
                 setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
-                setpoint_dic[joint].position
-                + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
+                setpoint_dic[joint].position + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
             )
 
         return next_positions
@@ -87,6 +84,4 @@ class CalculationSetpoint(Setpoint):
         :param self: A Setpoint object to which the velocity has to be added
         :param next_state: A Setpoint with the position a moment later
         """
-        self.velocity = (next_state.position - self.position) / (
-            next_state.time - self.time
-        ).seconds
+        self.velocity = (next_state.position - self.position) / (next_state.time - self.time).seconds

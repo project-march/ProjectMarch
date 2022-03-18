@@ -17,9 +17,7 @@ ZERO_DURATION = Duration(seconds=0)
 class HomeGait(GaitInterface):
     """A standard gait that goes from the unknown state to an idle position."""
 
-    def __init__(
-        self, name, position, gait_type, duration: Duration = DEFAULT_HOMEGAIT_DURATION
-    ):
+    def __init__(self, name, position, gait_type, duration: Duration = DEFAULT_HOMEGAIT_DURATION):
         """Initializes an executable home gait with given positions.
 
         :param str name: Name of the idle position this gait homes to.
