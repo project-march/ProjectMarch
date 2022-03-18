@@ -51,21 +51,15 @@ class GaitVersionToolView(QWidget):
         self._subgait_menus = []
 
         for index in range(DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS):
-            self._subgait_labels.append(
-                getattr(self, "SubgaitLabel_{nr}".format(nr=index))
-            )
-            self._subgait_menus.append(
-                getattr(self, "SubgaitMenu_{nr}".format(nr=index))
-            )
+            self._subgait_labels.append(getattr(self, "SubgaitLabel_{nr}".format(nr=index)))
+            self._subgait_menus.append(getattr(self, "SubgaitMenu_{nr}".format(nr=index)))
 
         # bind functions to callbacks of buttons and menus
         self.Refresh.pressed.connect(lambda: self._refresh())
         self.Apply.pressed.connect(lambda: [self._apply(), self._refresh()])
         self.SelectSameVersions.pressed.connect(self._select_same_versions)
         self.ParametricSameVersions.pressed.connect(self._parameterize_same_versions)
-        self.SaveDefault.pressed.connect(
-            lambda: [self._apply(), self._save_default(), self._refresh()]
-        )
+        self.SaveDefault.pressed.connect(lambda: [self._apply(), self._save_default(), self._refresh()])
 
         self.ClearLogger.clicked.connect(lambda: self._logger.clear())
         self.SeeAllVersions.clicked.connect(lambda: self._show_version_map_pop_up())
@@ -127,9 +121,7 @@ class GaitVersionToolView(QWidget):
             """
             try:
                 length = len(version)
-                version_number = "".join(
-                    char for char in version[length - 2 : length] if char.isdigit()
-                )
+                version_number = "".join(char for char in version[length - 2 : length] if char.isdigit())
                 if version_number != "":
                     return int(version_number)
                 else:
@@ -187,9 +179,7 @@ class GaitVersionToolView(QWidget):
                     )
             except KeyError:
                 self._log(
-                    "{gn} has no default version for {sgn}.".format(
-                        gn=gait_name, sgn=subgait_name
-                    ),
+                    "{gn} has no default version for {sgn}.".format(gn=gait_name, sgn=subgait_name),
                     LogLevel.ERROR,
                 )
 
@@ -207,9 +197,7 @@ class GaitVersionToolView(QWidget):
             return
 
         gait_name = self.current_gait
-        for subgait_label, subgait_menu in zip(
-            self._subgait_labels, self._subgait_menus
-        ):
+        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
             subgait_name = subgait_label.text()
             if subgait_name != "Unused":
                 try:
@@ -220,22 +208,14 @@ class GaitVersionToolView(QWidget):
                                 self._parametric_pop_up.parameters,
                                 self._parametric_pop_up.selected_versions,
                             )
-                            subgait_label.setStyleSheet(
-                                f"color:{LogLevel.WARNING.value}"
-                            )
+                            subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
                             subgait_menu.addItem(new_version)
                             subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
                         else:
                             # parametric pop up window unsuccessful stopped, reset version to default
-                            current_version_index = versions.index(
-                                self.version_map[gait_name][subgait_name]
-                            )
-                            subgait_menu.setCurrentIndex(
-                                max(current_version_index - 1, 0)
-                            )
-                    if str(self.version_map[gait_name][subgait_name]) != str(
-                        subgait_menu.currentText()
-                    ):
+                            current_version_index = versions.index(self.version_map[gait_name][subgait_name])
+                            subgait_menu.setCurrentIndex(max(current_version_index - 1, 0))
+                    if str(self.version_map[gait_name][subgait_name]) != str(subgait_menu.currentText()):
                         subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
                     else:
                         subgait_label.setStyleSheet(f"color:{LogLevel.INFO.value}")
@@ -279,9 +259,7 @@ class GaitVersionToolView(QWidget):
                 f"Unknown log level specified for message: {msg}",
             )
             return
-        self._logger.appendHtml(
-            f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>'
-        )
+        self._logger.appendHtml(f'<p style="color:{level.value}; white-space: pre-wrap;">{msg}</p>')
         scrollbar = self.Log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
@@ -309,9 +287,7 @@ class GaitVersionToolView(QWidget):
             if success:
                 self._log(msg if msg else "Set new default versions", LogLevel.SUCCESS)
             else:
-                self._log(
-                    msg if msg else "Failed to set default versions", LogLevel.ERROR
-                )
+                self._log(msg if msg else "Failed to set default versions", LogLevel.ERROR)
         except GaitVersionToolError as e:
             self._log(str(e), LogLevel.ERRROR)
 
@@ -321,17 +297,13 @@ class GaitVersionToolView(QWidget):
         subgait_names = []
         versions = []
 
-        for subgait_label, subgait_menu in zip(
-            self._subgait_labels, self._subgait_menus
-        ):
+        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
             if subgait_label.text() != "Unused":
                 subgait_names.append(subgait_label.text())
                 versions.append(subgait_menu.currentText())
 
         try:
-            success, msg = self._controller.set_gait_version(
-                gait_name, subgait_names, versions
-            )
+            success, msg = self._controller.set_gait_version(gait_name, subgait_names, versions)
             if success:
                 if not msg:
                     msg = f"Version change applied for {gait_name}: "
@@ -340,9 +312,7 @@ class GaitVersionToolView(QWidget):
                         msg += f"\n    - {subgait}:    {versions[index]}"
                 self._log(msg, LogLevel.SUCCESS)
             else:
-                self._log(
-                    msg if msg else "Version change applied failed", LogLevel.ERROR
-                )
+                self._log(msg if msg else "Version change applied failed", LogLevel.ERROR)
         except GaitVersionToolError as e:
             self._log(str(e), LogLevel.ERROR)
 
@@ -361,9 +331,7 @@ class GaitVersionToolView(QWidget):
         postfix = self._same_versions_pop_up.postfix
         subgaits = self.available_gaits[gait_name]
 
-        selected_versions = select_same_subgait_versions(
-            gait_name, subgaits, prefix, postfix
-        )
+        selected_versions = select_same_subgait_versions(gait_name, subgaits, prefix, postfix)
 
         self._update_selected_subgaits(selected_versions)
 
@@ -372,14 +340,12 @@ class GaitVersionToolView(QWidget):
 
         :param selected_versions Dictionary mapping subgait to selected version
         """
-        for subgait_label, subgait_menu in zip(
-            self._subgait_labels, self._subgait_menus
-        ):
+        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
             subgait = subgait_label.text()
             if subgait in selected_versions:
-                version_index = self.sort_versions(
-                    self.available_gaits[self.current_gait][subgait]
-                ).index(selected_versions[subgait])
+                version_index = self.sort_versions(self.available_gaits[self.current_gait][subgait]).index(
+                    selected_versions[subgait]
+                )
                 subgait_menu.setCurrentIndex(version_index)
 
     def _parameterize_same_versions(self):
@@ -394,28 +360,19 @@ class GaitVersionToolView(QWidget):
             return
 
         parameters = self._parametric_same_versions_pop_up.parameters
-        all_selected_versions = (
-            self._parametric_same_versions_pop_up.all_selected_versions
-        )
+        all_selected_versions = self._parametric_same_versions_pop_up.all_selected_versions
 
         # Convert list of subgait dictionaries to dictionary with a list for each subgait
         subgait_versions = {
-            subgait: [
-                selected_subgaits[subgait]
-                for selected_subgaits in all_selected_versions
-            ]
+            subgait: [selected_subgaits[subgait] for selected_subgaits in all_selected_versions]
             for subgait in self.available_gaits[self.current_gait]
         }
 
-        for subgait_label, subgait_menu in zip(
-            self._subgait_labels, self._subgait_menus
-        ):
+        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
             subgait = subgait_label.text()
 
             if subgait != "Unused":
-                new_version = self.get_parametric_version(
-                    parameters, subgait_versions[subgait]
-                )
+                new_version = self.get_parametric_version(parameters, subgait_versions[subgait])
 
                 subgait_label.setStyleSheet(f"color:{LogLevel.WARNING.value}")
                 subgait_menu.addItem(new_version)
@@ -433,9 +390,7 @@ class GaitVersionToolView(QWidget):
         for gait_name in sorted(version_map.keys()):
             version_map_string += "{gait} \n".format(gait=gait_name)
             for subgait_name, version in version_map[gait_name].items():
-                version_map_string += "\t{sb:<30} \t {vs} \n".format(
-                    sb=subgait_name, vs=version
-                )
+                version_map_string += "\t{sb:<30} \t {vs} \n".format(sb=subgait_name, vs=version)
             version_map_string += "\n"
 
         self._version_map_pop_up.show_message(version_map_string)
@@ -471,9 +426,7 @@ class GaitVersionToolView(QWidget):
                 subgait_versions[3],
             )
         else:
-            raise Exception(
-                "Number of parameters and subgaits to parameterize do not match"
-            )
+            raise Exception("Number of parameters and subgaits to parameterize do not match")
 
     @property
     def current_gait(self):

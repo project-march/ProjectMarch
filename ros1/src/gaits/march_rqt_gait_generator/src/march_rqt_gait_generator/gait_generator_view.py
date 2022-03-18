@@ -38,9 +38,7 @@ class GaitGeneratorView(QWidget):
     def __init__(self):
         super(GaitGeneratorView, self).__init__()
 
-        self.joint_state_pub = rospy.Publisher(
-            "joint_states", JointState, queue_size=10
-        )
+        self.joint_state_pub = rospy.Publisher("joint_states", JointState, queue_size=10)
 
         current_file_path = __file__.split("/")
         path = "/"
@@ -65,12 +63,8 @@ class GaitGeneratorView(QWidget):
 
         self.gait_type_combo_box.addItems(["walk_like", "sit_like", "stairs_like"])
 
-        previous_subgait_view = SideSubgaitView(
-            widget=self.previous_subgait_container, side="previous"
-        )
-        next_subgait_view = SideSubgaitView(
-            widget=self.next_subgait_container, side="next"
-        )
+        previous_subgait_view = SideSubgaitView(widget=self.previous_subgait_container, side="previous")
+        next_subgait_view = SideSubgaitView(widget=self.next_subgait_container, side="next")
         self.side_subgait_view = {
             "previous": previous_subgait_view,
             "next": next_subgait_view,
@@ -128,9 +122,7 @@ class GaitGeneratorView(QWidget):
 
     # Methods below are called by load_gait_into_ui.
     def update_time_sliders(self, time):
-        graphics_layouts = self.JointSettingContainer.findChildren(
-            pg.GraphicsLayoutWidget
-        )
+        graphics_layouts = self.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
             joint_settings_plot.update_time_slider(time)
@@ -152,9 +144,7 @@ class GaitGeneratorView(QWidget):
                     joint.name,
                 )
                 continue
-            self.JointSettingContainer.layout().addWidget(
-                self.joint_widgets[joint.name], row, column
-            )
+            self.JointSettingContainer.layout().addWidget(self.joint_widgets[joint.name], row, column)
 
     def create_joint_plot_widget(self, joint):
         joint_setting_file = os.path.join(
@@ -173,12 +163,8 @@ class GaitGeneratorView(QWidget):
 
         # Disable scrolling horizontally
         joint_plot_widget.Table.horizontalScrollBar().setDisabled(True)
-        joint_plot_widget.Table.horizontalHeader().setSectionResizeMode(
-            QHeaderView.Stretch
-        )
-        joint_plot_widget.Table.controller = JointTableController(
-            joint_plot_widget.Table, joint
-        )
+        joint_plot_widget.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        joint_plot_widget.Table.controller = JointTableController(joint_plot_widget.Table, joint)
 
         return joint_plot_widget
 
@@ -197,35 +183,25 @@ class GaitGeneratorView(QWidget):
         try:
             # The translation from the right foot to the left foot is the position of the
             # left foot from the right foot's frame of reference.
-            (trans_left, rot_right) = self.tf_listener.lookupTransform(
-                "/foot_right", "/foot_left", rospy.Time(0)
-            )
-            (trans_right, rot_left) = self.tf_listener.lookupTransform(
-                "/foot_left", "/foot_right", rospy.Time(0)
-            )
+            (trans_left, rot_right) = self.tf_listener.lookupTransform("/foot_right", "/foot_left", rospy.Time(0))
+            (trans_right, rot_left) = self.tf_listener.lookupTransform("/foot_left", "/foot_right", rospy.Time(0))
         except (LookupException, ConnectivityException, ExtrapolationException):
             return
 
         self.height_left_line_edit.setText(f"{trans_left[2]:.3f}")
         self.height_right_line_edit.setText(f"{trans_right[2]:.3f}")
-        self.heel_distance_line_edit.setText(
-            f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2):.3f}"
-        )
+        self.heel_distance_line_edit.setText(f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2):.3f}")
 
     def message(self, title: str = None, msg: str = None) -> None:
         QMessageBox.question(self, title, msg, QMessageBox.Ok)
 
     def yes_no_question(self, title: str = None, msg: str = None) -> bool:
-        answer = QMessageBox.question(
-            self, title, msg, QMessageBox.Yes | QMessageBox.No
-        )
+        answer = QMessageBox.question(self, title, msg, QMessageBox.Yes | QMessageBox.No)
         return answer == QMessageBox.Yes
 
     def open_file_dialogue(self, path_to_open: os.path = None):
         if path_to_open is None:
-            path_to_open = os.path.join(
-                self.march_path, "ros2", "src", "gaits", "march_gait_files"
-            )
+            path_to_open = os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files")
         return QFileDialog.getOpenFileName(
             self,
             "Select a subgait to import.",

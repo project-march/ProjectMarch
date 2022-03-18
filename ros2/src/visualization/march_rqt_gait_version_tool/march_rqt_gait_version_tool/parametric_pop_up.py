@@ -27,9 +27,7 @@ class ParametricPopUpWindow(QDialog):
         self.secondParameterSlider.valueChanged.connect(
             lambda: ParametricPopUpWindow.second_parameter_value_changed(self)
         )
-        self.fourSubgaitInterpolation.stateChanged.connect(
-            lambda: self.four_subgait_interpolation_changed()
-        )
+        self.fourSubgaitInterpolation.stateChanged.connect(lambda: self.four_subgait_interpolation_changed())
         self.set_second_parameterize_enabled(False)
 
         self.uses_four_subgait_interpolation = False
@@ -70,17 +68,13 @@ class ParametricPopUpWindow(QDialog):
     def first_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
         self.firstParameterLabel.setText(
-            "first parameter = {val:.2f}".format(
-                val=self.firstParameterSlider.value() / 100.0
-            )
+            "first parameter = {val:.2f}".format(val=self.firstParameterSlider.value() / 100.0)
         )
 
     def second_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
         self.secondParameterLabel.setText(
-            "second parameter = {val:.2f}".format(
-                val=self.secondParameterSlider.value() / 100.0
-            )
+            "second parameter = {val:.2f}".format(val=self.secondParameterSlider.value() / 100.0)
         )
 
     def four_subgait_interpolation_changed(self):

@@ -30,9 +30,7 @@ class GaitStateMachine:
 
     UNKNOWN = "unknown"
 
-    def __init__(
-        self, gait_selection: GaitSelection, trajectory_scheduler: TrajectoryScheduler
-    ):
+    def __init__(self, gait_selection: GaitSelection, trajectory_scheduler: TrajectoryScheduler):
         """Generates a state machine from given gaits and resets it to
         UNKNOWN state.
 
@@ -68,11 +66,7 @@ class GaitStateMachine:
 
         self.update_timer = None
 
-        self.timer_period = (
-            self._gait_selection.get_parameter("timer_period")
-            .get_parameter_value()
-            .double_value
-        )
+        self.timer_period = self._gait_selection.get_parameter("timer_period").get_parameter_value().double_value
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
@@ -169,9 +163,7 @@ class GaitStateMachine:
             )
         )
 
-    def _current_gait_cb(
-        self, gait_name, subgait_name, version, duration: Duration, gait_type
-    ):
+    def _current_gait_cb(self, gait_name, subgait_name, version, duration: Duration, gait_type):
         """Standard callback when gait changes, publishes the current gait
         More callbacke can be added using add_gait_callback"""
         self.logger.debug(f"Current subgait updated to {subgait_name}")
@@ -292,21 +284,11 @@ class GaitStateMachine:
         If not, issue a warning. This will only be checked when transitioning from idle to gait state
         """
         if self._current_gait is not None:
-            if (
-                "right" in self._current_gait.subgait_name
-                and self._force_right_foot > self._force_left_foot
-            ):
-                self.logger.warn(
-                    "Incorrect pressure placement, place pressure on left foot"
-                )
+            if "right" in self._current_gait.subgait_name and self._force_right_foot > self._force_left_foot:
+                self.logger.warn("Incorrect pressure placement, place pressure on left foot")
                 return False
-            if (
-                "left" in self._current_gait.subgait_name
-                and self._force_left_foot > self._force_right_foot
-            ):
-                self.logger.warn(
-                    "Incorrect pressure placement, place pressure on right foot"
-                )
+            if "left" in self._current_gait.subgait_name and self._force_left_foot > self._force_right_foot:
+                self.logger.warn("Incorrect pressure placement, place pressure on right foot")
                 return False
 
         return True
@@ -320,8 +302,7 @@ class GaitStateMachine:
             gait = self._gait_selection._gaits.get(gait_name)
             if (
                 gait is not None
-                and gait_name
-                in self._gait_graph.possible_gaits_from_idle(self._current_state)
+                and gait_name in self._gait_graph.possible_gaits_from_idle(self._current_state)
                 or gait_name == ["dynamic_walk", "dynamic_walk_single_step"]
             ):
                 if (
@@ -342,10 +323,7 @@ class GaitStateMachine:
                 self.logger.info(f"Accepted gait `{gait_name}`")
             else:
                 self._input.gait_rejected()
-                self.logger.info(
-                    f"Cannot execute gait `{gait_name}` from idle state `"
-                    f"{self._current_state}`"
-                )
+                self.logger.info(f"Cannot execute gait `{gait_name}` from idle state `{self._current_state}`")
 
     def _process_gait_state(self):
         """Processes the current state when there is a gait happening.
@@ -357,9 +335,7 @@ class GaitStateMachine:
 
             self.logger.info(f"Executing gait `{self._current_gait.name}`")
             if self._current_gait.first_subgait_can_be_scheduled_early:
-                gait_update = self._current_gait.start(
-                    now, self._gait_selection._first_subgait_delay
-                )
+                gait_update = self._current_gait.start(now, self._gait_selection._first_subgait_delay)
             else:
                 gait_update = self._current_gait.start(now)
 
@@ -393,9 +369,7 @@ class GaitStateMachine:
         self._handle_input()
 
         if self._current_gait.subsequent_subgaits_can_be_scheduled_early:
-            gait_update = self._current_gait.update(
-                now, self._gait_selection._early_schedule_duration
-            )
+            gait_update = self._current_gait.update(now, self._gait_selection._early_schedule_duration)
         else:
             gait_update = self._current_gait.update(now)
         self._process_gait_update(gait_update)
@@ -431,23 +405,17 @@ class GaitStateMachine:
                 self._input.stop_accepted()
                 self._call_callbacks(self._stop_accepted_callbacks)
             else:
-                self.logger.info(
-                    f"Gait {self._current_gait.name} does not respond to stop"
-                )
+                self.logger.info(f"Gait {self._current_gait.name} does not respond to stop")
                 self._input.stop_rejected()
 
         if self._input.transition_requested():
             request = self._input.get_transition_request()
             self._input.reset()
             if self._current_gait.transition(request):
-                self.logger.info(
-                    f"Gait {self._current_gait.name} responded to transition request "
-                    f"{request.name}"
-                )
+                self.logger.info(f"Gait {self._current_gait.name} responded to transition request {request.name}")
             else:
                 self.logger.info(
-                    f"Gait {self._current_gait.name} does not respond to transition "
-                    f"request {request.name}"
+                    f"Gait {self._current_gait.name} does not respond to transition request {request.name}"
                 )
 
     def _call_transition_callbacks(self):

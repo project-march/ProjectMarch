@@ -8,9 +8,7 @@ class FilterMap:
     """Filter class that can add filters and mappings for accepting logs"""
 
     def __init__(self):
-        self._filter_maps: List[  # noqa: TAE002
-            Tuple[Callable[[Log], bool], Callable[[str], Any]]
-        ] = []
+        self._filter_maps: List[Tuple[Callable[[Log], bool], Callable[[str], Any]]] = []  # noqa: TAE002
 
     def add_filter(
         self,
@@ -45,9 +43,7 @@ class FilterMap:
         :param msg_map: Optional map method that accepts a string
         """
         self.add_filter(
-            lambda l: msg_filter(l)
-            if l.level == self.log_level_to_int(level)
-            else False,
+            lambda l: msg_filter(l) if l.level == self.log_level_to_int(level) else False,
             msg_map,
         )
 
@@ -71,9 +67,7 @@ class FilterMap:
         :param msg_map: Optional map method that accepts a string
         """
         self.add_filter(
-            lambda l: msg_filter(l)
-            if l.level >= self.log_level_to_int(level)
-            else False,
+            lambda l: msg_filter(l) if l.level >= self.log_level_to_int(level) else False,
             msg_map,
         )
 

@@ -16,12 +16,8 @@ class EntryModelTest(unittest.TestCase):
         self.assertEqual(self.model.columnCount(), 2)
 
     def test_horizontal_model_header(self):
-        self.assertEqual(
-            self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole), "Time"
-        )
-        self.assertEqual(
-            self.model.headerData(1, Qt.Horizontal, Qt.DisplayRole), "Entry"
-        )
+        self.assertEqual(self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole), "Time")
+        self.assertEqual(self.model.headerData(1, Qt.Horizontal, Qt.DisplayRole), "Entry")
 
     def test_insert_single_row_count(self):
         entry = Entry("test", QDateTime.fromSecsSinceEpoch(5))
@@ -74,9 +70,7 @@ class EntryModelTest(unittest.TestCase):
         self.assertIsNone(self.model.data(self.model.createIndex(0, 1)))
 
     def test_get_column_out_of_bounds(self):
-        self.assertIsNone(
-            self.model.data(self.model.createIndex(0, len(self.model.columns)))
-        )
+        self.assertIsNone(self.model.data(self.model.createIndex(0, len(self.model.columns))))
 
     def test_empty_model_to_string(self):
         self.assertEqual(str(self.model), "")

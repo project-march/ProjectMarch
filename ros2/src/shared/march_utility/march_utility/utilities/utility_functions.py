@@ -18,15 +18,11 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = (
-    get_package_share_directory("march_description") + "/urdf/march6.urdf"
-)
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
 MODE_READING = "r"
 
 
-def weighted_average_floats(
-    base_value: float, other_value: float, parameter: float
-) -> float:
+def weighted_average_floats(base_value: float, other_value: float, parameter: float) -> float:
     """
     Compute the weighted average of two element with normalised weight parameter.
 
@@ -42,9 +38,7 @@ def weighted_average_floats(
     return base_value * (1 - parameter) + other_value * parameter
 
 
-def weighted_average_vectors(
-    base_vector: Vector3d, other_vector: Vector3d, parameter: float
-) -> Vector3d:
+def weighted_average_vectors(base_vector: Vector3d, other_vector: Vector3d, parameter: float) -> Vector3d:
     """
     Compute the weighted average of two element with normalised weight parameter.
 
@@ -87,21 +81,14 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
         return True
     else:
         if dic_one[key] != dic_two[key]:
-            raise KeyError(
-                f"Dictionaries to be merged both contain key {key} with differing "
-                f"values"
-            )
+            raise KeyError(f"Dictionaries to be merged both contain key {key} with differing values")
         return True
 
 
-def select_lengths_for_inverse_kinematics(
-    lengths: List[float], side: Side = Side.both
-) -> List[float]:
+def select_lengths_for_inverse_kinematics(lengths: List[float], side: Side = Side.both) -> List[float]:
     """Return only the lengths in the list on the requested side."""
     if len(lengths) != 9:
-        Node("march_utility").get_logger().error(
-            "The lengths given did not have size 9. Cannot unpack the lengths."
-        )
+        Node("march_utility").get_logger().error("The lengths given did not have size 9. Cannot unpack the lengths.")
 
     l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = lengths
     if side == Side.left:
@@ -125,9 +112,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
         the (inverse) kinematics calculations
     """
     if not isinstance(side, Side):
-        raise SideSpecificationError(
-            side, f"Side should be either 'left', 'right' or 'both', but was {side}"
-        )
+        raise SideSpecificationError(side, f"Side should be either 'left', 'right' or 'both', but was {side}")
     try:
         with open(
             os.path.join(
@@ -145,16 +130,11 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
         hip_front_length = robot_dimensions["hip_aa_front"]["length"]
         upper_leg_length = robot_dimensions["upper_leg"]["length"]
         lower_leg_length = robot_dimensions["lower_leg"]["length"]
-        ankle_offset = (
-            robot_dimensions["upper_leg"]["offset"]
-            + robot_dimensions["ankle_plate"]["offset"]
-        )
+        ankle_offset = robot_dimensions["upper_leg"]["offset"] + robot_dimensions["ankle_plate"]["offset"]
         hip_aa_arm_length = hip_side_length - ankle_offset
 
     except KeyError as e:
-        raise KeyError(
-            f"Expected robot.link_map to contain {e.args[0]}, but it was missing."
-        )
+        raise KeyError(f"Expected robot.link_map to contain {e.args[0]}, but it was missing.")
 
     if length_names is None:
         return select_lengths_for_inverse_kinematics(
@@ -189,9 +169,7 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name):
     :param joint_name: The name to look for.
     """
     robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    urdf_joint = next(
-        (joint for joint in robot.joints if joint.name == joint_name), None
-    )
+    urdf_joint = next((joint for joint in robot.joints if joint.name == joint_name), None)
     return Limits.from_urdf_joint(urdf_joint)
 
 
@@ -219,10 +197,7 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         "right_knee",
     ]
     for joint_name in joint_name_list:
-        if (
-            joint_name not in robot_joint_names
-            or robot.joint_map[joint_name].type == "fixed"
-        ):
+        if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == "fixed":
             if logger is not None:
                 logger.warn(f"{joint_name} is fixed, but required for IK")
             return None

@@ -15,14 +15,10 @@ class TestGaitSelection(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rclpy.init()
-        cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march6.urdf"
-        )
+        cls.robot = urdf.Robot.from_xml_file(get_package_share_directory("march_description") + "/urdf/march6.urdf")
 
     def setUp(self):
-        self.gait_selection = GaitSelection(
-            gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=self.robot
-        )
+        self.gait_selection = GaitSelection(gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=self.robot)
 
     # __init__ tests
     def test_init_with_wrong_package(self):
@@ -79,9 +75,7 @@ class TestGaitSelection(unittest.TestCase):
         self.assertFalse(response.contains)
 
     def test_contains_gait_wrong_gait(self):
-        request = ContainsGait.Request(
-            gait="non_existing_gait", subgaits=["right_open"]
-        )
+        request = ContainsGait.Request(gait="non_existing_gait", subgaits=["right_open"])
         response = ContainsGait.Response(contains=True)
         response = self.gait_selection.contains_gait_cb(request, response)
         self.assertFalse(response.contains)
