@@ -1,4 +1,5 @@
 flake8==4.0.1
+black==21.11.b1
 flake8-2020==1.6.0
 flake8-annotations-complexity==0.0.6
 flake8-annotations-coverage==0.0.5
