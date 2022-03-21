@@ -35,14 +35,14 @@ class Gait:
     def from_file(cls, gait_name, gait_directory, robot, gait_version_map):
         """Extract the data from the .gait file.
 
-        :param gait_name:
-            name of the gait to unpack
-        :param gait_directory:
-            path of the directory where the .gait file is located
-        :param robot:
-            the robot corresponding to the given .gait file
-        :param gait_version_map:
-            The parsed yaml file which states the version of the subgaits
+        Args:
+          gait_name: name of the gait to unpack
+          gait_directory: path of the directory where the .gait file is located
+          robot: the robot corresponding to the given .gait file
+          gait_version_map: The parsed yaml file which states the version of the subgaits
+
+        Returns:
+
         """
         gait_folder = gait_name
         gait_path = os.path.join(gait_directory, gait_folder, gait_name + ".gait")
@@ -58,17 +58,15 @@ class Gait:
     def from_dict(cls, robot, gait_dictionary, gait_directory, gait_version_map):
         """Create a new gait object using the .gait and .subgait files.
 
-        :param robot:
-            the robot corresponding to the given .gait file
-        :param gait_dictionary:
-            the information of the .gait file as a dictionary
-        :param gait_directory:
-            path of the directory where the .gait file is located
-        :param gait_version_map:
-            The parsed yaml file which states the version of the subgaits
+        Args:
+          robot: the robot corresponding to the given .gait file
+          gait_dictionary: the information of the .gait file as a dictionary
+          gait_directory: path of the directory where the .gait file is located
+          gait_version_map: The parsed yaml file which states the version of the subgaits
 
-        :return:
-            If the data in the files is validated a gait object is returned
+        Returns:
+          : If the data in the files is validated a gait object is returned
+
         """
         gait_name = gait_dictionary["name"]
         subgaits = gait_dictionary["subgaits"]
@@ -86,8 +84,16 @@ class Gait:
     def load_subgait(robot, gait_directory, gait_name, subgait_name, gait_version_map):
         """Read the .subgait file and extract the data.
 
-        :returns
-            if gait and subgait names are valid return populated Gait object
+        Args:
+          robot:
+          gait_directory:
+          gait_name:
+          subgait_name:
+          gait_version_map:
+
+        Returns:
+          : if gait and subgait names are valid return populated Gait object
+
         """
         if gait_name not in gait_version_map:
             raise GaitNameNotFoundError(gait_name)
@@ -119,9 +125,15 @@ class Gait:
     def set_subgait_versions(self, robot, gait_directory, version_map):
         """Updates the given subgait versions and verifies transitions.
 
-        :param robot: URDF matching subgaits
-        :param str gait_directory: path to the gait directory
-        :param dict version_map: Mapping subgait names to versions
+        Args:
+          robot: URDF matching subgaits
+          str: gait_directory: path to the gait directory
+          dict: version_map: Mapping subgait names to versions
+          gait_directory:
+          version_map:
+
+        Returns:
+
         """
         new_subgaits = {}
         for subgait_name, version in version_map.items():

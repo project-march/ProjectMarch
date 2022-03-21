@@ -1,3 +1,4 @@
+# flake8: noqa:  This file will soon be deleted.
 import os
 import traceback
 
@@ -21,6 +22,8 @@ from .side_subgait_controller import SideSubgaitController
 
 
 class GaitGeneratorController:
+    """Todo: Add docstring."""
+
     def __init__(self, view, robot):
         self.view = view
 
@@ -61,6 +64,7 @@ class GaitGeneratorController:
 
     # Called by __init__
     def connect_buttons(self):
+        """Todo: Add docstring."""
         self.view.change_gait_directory_button.clicked.connect(self.change_gait_directory)
         self.view.add_inverse_kinematic_setpoints_button.clicked.connect(self.add_inverse_kinematics_setpoints)
         self.view.import_gait_button.clicked.connect(self.import_gait)
@@ -137,11 +141,24 @@ class GaitGeneratorController:
         )
 
     # Called by __init__
-    def connect_plot(self, joint):
+    def connect_plot(self, joint) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          joint:
+        """
         joint_widget = self.view.joint_widgets[joint.name]
         joint_plot = joint_widget.Plot.getItem(0, 0)
 
-        def add_setpoint(joint, time, position, button):
+        def add_setpoint(joint, time, position, button) -> None:
+            """Todo: Add docstring.
+
+            Args:
+              joint:
+              time:
+              position:
+              button:
+            """
             if button == self.view.control_button:
                 joint.add_interpolated_setpoint(time)
             else:
@@ -183,7 +200,12 @@ class GaitGeneratorController:
         )
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
-    def set_playback_speed(self, playback_speed):
+    def set_playback_speed(self, playback_speed) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          playback_speed:
+        """
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
@@ -193,10 +215,16 @@ class GaitGeneratorController:
         if was_playing:
             self.start_time_slider_thread()
 
-    def set_current_time(self, current_time):
+    def set_current_time(self, current_time) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          current_time:
+        """
         self.current_time = current_time
 
-    def start_time_slider_thread(self):
+    def start_time_slider_thread(self) -> None:
+        """Todo: Add docstring."""
         if self.time_slider_thread is not None:
             rospy.logdebug("Cannot start another time slider thread as one is already active")
             return
@@ -208,12 +236,18 @@ class GaitGeneratorController:
         self.time_slider_thread.update_signal.connect(self.view.update_main_time_slider)
         self.time_slider_thread.start()
 
-    def stop_time_slider_thread(self):
+    def stop_time_slider_thread(self) -> None:
+        """Todo: Add docstring."""
         if self.time_slider_thread is not None:
             self.time_slider_thread.stop()
             self.time_slider_thread = None
 
-    def update_gait_duration(self, duration):
+    def update_gait_duration(self, duration) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          duration:
+        """
         rescale_setpoints = self.view.scale_setpoints_check_box.isChecked()
 
         if self.subgait.has_setpoints_after_duration(duration) and not rescale_setpoints:
@@ -247,7 +281,8 @@ class GaitGeneratorController:
         if was_playing:
             self.start_time_slider_thread()
 
-    def import_gait(self):
+    def import_gait(self) -> None:
+        """Todo: Add docstring."""
         file_name, f = self.view.open_file_dialogue(self.current_gait_path)
 
         if file_name != "":
@@ -289,7 +324,12 @@ class GaitGeneratorController:
         self.settings_changed_history = RingBuffer(capacity=100, dtype=list)
         self.settings_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
-    def import_side_subgait(self, side="previous"):
+    def import_side_subgait(self, side="previous") -> None:
+        """Todo: Add docstring.
+
+        Args:
+          side: (Default value = "previous")
+        """
         file_name, f = self.view.open_file_dialogue()
 
         if file_name != "":
@@ -306,7 +346,8 @@ class GaitGeneratorController:
         elif side == "next":
             self.next_subgait = subgait
 
-    def export_gait(self):
+    def export_gait(self) -> None:
+        """Todo: Add docstring."""
         if self.view.mirror_check_box.isChecked():
             key_1 = self.view.mirror_key1_line_edit.text()
             key_2 = self.view.mirror_key2_line_edit.text()
@@ -320,7 +361,13 @@ class GaitGeneratorController:
 
         self.export_to_file(self.subgait, self.get_gait_directory())
 
-    def export_to_file(self, subgait, gait_directory):
+    def export_to_file(self, subgait, gait_directory) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          subgait:
+          gait_directory:
+        """
         if gait_directory is None or gait_directory == "":
             return
 
@@ -357,13 +404,19 @@ class GaitGeneratorController:
         self.view.notify("Gait Saved", output_file_path)
 
     # Called by export_gait
-    def get_gait_directory(self):
+    def get_gait_directory(self) -> str:
+        """Todo: Add docstring.
+
+        Returns:
+            str: The gait directory string.
+        """
         if self.gait_directory is None:
             self.change_gait_directory()
         rospy.loginfo("Selected output directory " + str(self.gait_directory))
         return self.gait_directory
 
-    def change_gait_directory(self):
+    def change_gait_directory(self) -> None:
+        """Todo: Add docstring."""
         previous_gait_directory = self.gait_directory
         self.gait_directory = str(self.view.open_directory_dialogue())
         # If directory dialogue is canceled, or an invalid directory is selected, leave gait_directory unchanged
@@ -445,7 +498,12 @@ class GaitGeneratorController:
         self.transform_inverse_kinematics_setpoints_z_coordinate(upper_leg_length, lower_leg_length)
 
     def transform_inverse_kinematics_setpoints_x_coordinate(self, haa_to_leg_length: float) -> None:
-        """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
+        """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system.
+
+        Args:
+          haa_to_leg_length: float:
+          haa_to_leg_length: float:
+        """
         default_x_position = haa_to_leg_length
 
         self.view.inverse_kinematics_pop_up.position_input.x += default_x_position
@@ -453,7 +511,16 @@ class GaitGeneratorController:
     def transform_inverse_kinematics_setpoints_y_coordinate(
         self, haa_arm: float, base: float, foot_side: float
     ) -> None:
-        """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system."""
+        """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system.
+
+        Args:
+          haa_arm: float:
+          base: float:
+          foot_side: float:
+          haa_arm: float:
+          base: float:
+          foot_side: float:
+        """
         hip_to_foot_length_cm = base / 2 + haa_arm
         if foot_side == Side.right:
             default_y_position = hip_to_foot_length_cm
@@ -464,7 +531,14 @@ class GaitGeneratorController:
     def transform_inverse_kinematics_setpoints_z_coordinate(
         self, upper_leg_length: float, lower_leg_length: float
     ) -> None:
-        """Transform the z coordinate of the input to the coordinate system of the exoskeleton."""
+        """Transform the z coordinate of the input to the coordinate system of the exoskeleton.
+
+        Args:
+          upper_leg_length: float:
+          lower_leg_length: float:
+          upper_leg_length: float:
+          lower_leg_length: float:
+        """
         if self.view.inverse_kinematics_pop_up.z_axis == "From ground upwards":
             ground_z_coordinate_cm = upper_leg_length + lower_leg_length
             self.view.inverse_kinematics_pop_up.position_input.z = (
@@ -482,7 +556,13 @@ class GaitGeneratorController:
         return Foot.get_joint_states_from_foot_state(desired_foot_state, self.view.inverse_kinematics_pop_up.time)
 
     def add_setpoints_from_dictionary(self, setpoint_dictionary: Dict[str, any]) -> None:
-        """Add setpoints from a dictionary with joints as keys to the current subgait."""
+        """Add setpoints from a dictionary with joints as keys to the current subgait.
+
+        Args:
+          setpoint_dictionary: Dict[str:
+          any]:
+          setpoint_dictionary: Dict[str:
+        """
         for joint_name in setpoint_dictionary:
             time = setpoint_dictionary[joint_name].time
             position = setpoint_dictionary[joint_name].position
@@ -504,6 +584,7 @@ class GaitGeneratorController:
             self.view.publish_preview(self.subgait, self.current_time)
 
     def invert_gait(self) -> None:
+        """Todo: Add docstring."""
         for side, controller in self.side_subgait_controller.items():
             controller.lock_checked = False
             self.handle_sidepoint_lock(side)
@@ -519,7 +600,8 @@ class GaitGeneratorController:
         )
         self.view.publish_preview(self.subgait, self.current_time)
 
-    def undo(self):
+    def undo(self) -> None:
+        """Todo: Add docstring."""
         if not self.settings_changed_history:
             return
 
@@ -540,7 +622,8 @@ class GaitGeneratorController:
         self.view.publish_preview(self.subgait, self.current_time)
         self.settings_changed_redo_list.append(changed_dict)
 
-    def redo(self):
+    def redo(self) -> None:
+        """Todo: Add docstring."""
         if not self.settings_changed_redo_list:
             return
 
@@ -564,11 +647,23 @@ class GaitGeneratorController:
 
     # Needed for undo and redo.
     def save_changed_settings(self, settings):
+        """Todo: Add docstring.
+
+        Args:
+          settings:
+        """
         self.settings_changed_history.append(settings)
         self.settings_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     # Functions related to previous/next subgait
-    def toggle_side_subgait_checkbox(self, value, side, box_type):
+    def toggle_side_subgait_checkbox(self, value, side, box_type) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          value:
+          side:
+          box_type:
+        """
         self.save_changed_settings(
             {
                 "joints": self.subgait.joints,
@@ -583,7 +678,11 @@ class GaitGeneratorController:
             self.side_subgait_controller[side].default_checked = value
         self.handle_sidepoint_lock(side)
 
-    def handle_sidepoint_lock(self, side):
+    def handle_sidepoint_lock(self, side) -> None:
+        """Todo: Add docstring.
+        Args:
+          side:
+        """
         if self.side_subgait_controller[side].lock_checked:
             if self.side_subgait_controller[side].subgait is not None:
                 for joint in self.subgait.joints:
@@ -613,7 +712,12 @@ class GaitGeneratorController:
         return self.side_subgait_controller["previous"].subgait
 
     @previous_subgait.setter
-    def previous_subgait(self, new_subgait):
+    def previous_subgait(self, new_subgait) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          new_subgait:
+        """
         self.save_changed_settings(
             {
                 "joints": self.subgait.joints,
@@ -630,7 +734,12 @@ class GaitGeneratorController:
         return self.side_subgait_controller["next"].subgait
 
     @next_subgait.setter
-    def next_subgait(self, new_subgait):
+    def next_subgait(self, new_subgait) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          new_subgait:
+        """
         self.save_changed_settings(
             {
                 "joints": self.subgait.joints,
