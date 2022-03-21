@@ -3,6 +3,7 @@
 max-line-length = 120
 show-source = false
 min-coverage-percents = 0
+docstring-convention=google
 exclude =
     .git,
     __init__.py,
@@ -33,3 +34,5 @@ ignore =
     RST206,
     SIM106,     # Gives a lot of false positives
     VNE001,     # Not really necessary
+    D107,       # Requires docstring to be init, but we document it at class level.
+

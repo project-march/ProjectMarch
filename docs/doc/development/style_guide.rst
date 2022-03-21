@@ -11,6 +11,7 @@ In our code we adhere to the following style guides:
         * clang-format: https://clang.llvm.org/docs/ClangFormat.html
     Python: https://wiki.ros.org/PyStyleGuide
         * PEP8: https://www.python.org/dev/peps/pep-0008/
+        * Google Style Python Docstrings: https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html
 
 It is not important to read these specifications, the most important aspects will be summarized below.
 In order to check whether your code is formatted according to the rules defined in the guides above,
