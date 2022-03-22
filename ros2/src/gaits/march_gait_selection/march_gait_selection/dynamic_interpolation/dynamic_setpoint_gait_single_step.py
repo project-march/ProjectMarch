@@ -11,8 +11,8 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
     """Single step gait based on dynamic setpoint gait
 
-    :param gait_selection_node: the gait selection node
-    :type gait_selection_node: Node
+    Args:
+        gait_selection_node (GaitSelection): the gait selection node
     """
 
     def __init__(self, gait_selection_node: Node):
@@ -23,8 +23,8 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
         """Create the next command. Because it is a single step, this will
         always be a left_swing and a close gait.
 
-        :returns: A TrajectoryCommand for the next subgait
-        :rtype: TrajectoryCommand
+        Returns:
+            TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
         if not self._trajectory_failed:
             if self.subgait_id == "right_swing":
