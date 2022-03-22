@@ -129,7 +129,7 @@ void PointFinder::mapPointCloudToHeightMap()
 
         auto current_height = height_map_temp_[y_index][x_index];
         height_map_temp_[y_index][x_index]
-            = std::max(current_height, (double)p.z);
+            = std::max(current_height, (double)p.z + 0.25);
     }
 }
 

@@ -100,6 +100,8 @@ protected:
 
     Point start_displacement_world_;
     Point displacement_world_;
+    Point start_point_;
+    Point desired_point_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

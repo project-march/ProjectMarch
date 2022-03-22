@@ -137,6 +137,19 @@ void FootPositionFinder::readParameters(
     start_displacement_world_ = transformPoint(start_displacement_world_, current_aligned_frame_id_, "world");
 
     running_ = true;
+
+    start_point_ = last_displacement_;
+
+    if (left_or_right_ == "left") {
+        desired_point_ = Point(start_point_.x - (float)step_distance_,
+            start_point_.y - (float)foot_gap_, start_point_.z);
+    } else {
+        desired_point_ = Point(start_point_.x - (float)step_distance_,
+            start_point_.y + (float)foot_gap_, start_point_.z);
+    }
+
+    desired_point_ = transformPoint(desired_point_, current_aligned_frame_id_, base_frame_);
+    desired_point_ = rotateRight(desired_point_);
 }
 
 /**
@@ -161,6 +174,20 @@ void FootPositionFinder::chosenPointCallback(
     start_displacement_world_ = Point(0, 0, 0);
     start_displacement_world_ = transformPoint(start_displacement_world_, current_aligned_frame_id_, "world");
 
+
+
+    start_point_ = last_displacement_;
+
+    if (left_or_right_ == "left") {
+        desired_point_ = Point(start_point_.x - (float)step_distance_,
+            start_point_.y - (float)foot_gap_, start_point_.z);
+    } else {
+        desired_point_ = Point(start_point_.x - (float)step_distance_,
+            start_point_.y + (float)foot_gap_, start_point_.z);
+    }
+
+    desired_point_ = transformPoint(desired_point_, current_aligned_frame_id_, base_frame_);
+    desired_point_ = rotateRight(desired_point_);
 }
 
 /**
@@ -223,38 +250,22 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
 
-    Point start_point = last_displacement_;
-
-    Point desired_point;
-
-    if (left_or_right_ == "left") {
-        desired_point = Point(start_point.x - (float)step_distance_,
-            start_point.y - (float)foot_gap_, start_point.z);
-    } else {
-        desired_point = Point(start_point.x - (float)step_distance_,
-            start_point.y + (float)foot_gap_, start_point.z);
-    }
-
-    desired_point = transformPoint(desired_point, current_aligned_frame_id_, base_frame_);
-    desired_point = Point(desired_point.y, -desired_point.x, desired_point.z);  // Rotate right
-    publishDesiredPosition(point_marker_publisher_, desired_point);  // Green
+    publishDesiredPosition(point_marker_publisher_, desired_point_);  // Green
     // Green = Purple + usual foot displacement
 
     // Visualize
-    // Point p2 = transformPoint(start_point, current_frame_id_, "world");
-    // p2 = Point(start_point.y, -start_point.x, start_point.z); // Rotate right
+    // Point p2 = transformPoint(start_point_, current_frame_id_, "world");
+    // p2 = Point(start_point_.y, -start_point_.x, start_point_.z); // Rotate right
 
-
-    Point expected_other_point_marker_ = Point(expected_other_point_.y, -expected_other_point_.x, expected_other_point_.z); // Rotate right
+    Point expected_other_point_marker_ = rotateRight(expected_other_point_);
     publishRelativeSearchPoint(point_marker_publisher_, expected_other_point_marker_);  // Purple
   
-    
-    PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point);
+    PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point_);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
     // Publish search region for visualization
-    publishSearchRectangle(point_marker_publisher_, desired_point,
+    publishSearchRectangle(point_marker_publisher_, desired_point_,
         pointFinder.getDisplacements(), left_or_right_);
 
     if (position_queue.size() > 0) {
@@ -263,7 +274,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Retrieve 3D points between current and new foot position
         Point start(/*_x=*/0, /*_y=*/0, /*_z=*/0);
         start = transformPoint(start, current_frame_id_, base_frame_);
-        start = Point(start.y, -start.x, start.z); // Rotate right
+        start = rotateRight(start);
         std::vector<Point> track_points
             = pointFinder.retrieveTrackPoints(start, found_covid_point_world);
 
@@ -272,7 +283,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishMarkerPoint(point_marker_publisher_, found_covid_point_world);
         publishPossiblePoints(point_marker_publisher_, position_queue);
 
-        found_covid_point_world = Point(-found_covid_point_world.y, found_covid_point_world.x, found_covid_point_world.z); // Rotate left
+        found_covid_point_world = rotateLeft(found_covid_point_world);
         // the desired displacement? -> blue
         // publishArrow(point_marker_publisher_, expected_other_point_, found_covid_point_world);
 
@@ -288,25 +299,22 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         std::vector<Point> relative_track_points;
         // for (Point& p : track_points) {
-        //     Point point(-p.y, p.x, p.z); // Rotate left
+        //     Point point = rotateLeft(p);
         //     point = transformPoint(point, base_frame_, current_frame_id_);
         //     relative_track_points.emplace_back(point);
         // }
 
         // std::cout << left_or_right_ << std::endl;
 
-        std::cout << left_or_right_ << std::endl;
-        std::cout << "Covid" << std::endl;
-        std::cout << found_covid_point_current_aligned.z << std::endl;
-        std::cout << "Previous point" << std::endl;
-        std::cout << start_point.z << std::endl;
+        // std::cout << left_or_right_ << std::endl;
+        // std::cout << "Covid (world) " << left_or_right_ << std::endl;
+        // std::cout << found_covid_point_world.z << std::endl;
+        // std::cout << "Previous point" << std::endl;
+        // std::cout << start_point_.z << std::endl;
         
+        Point displacement = subtractPoints(found_covid_point_current_aligned, start_point_);
 
-        Point displacement(found_covid_point_current_aligned.x - start_point.x,
-            found_covid_point_current_aligned.y - start_point.y,
-            found_covid_point_current_aligned.z - start_point.z);
-
-        Point start_point_world = transformPoint(start_point, current_aligned_frame_id_, "world");
+        Point start_point_world = transformPoint(start_point_, current_aligned_frame_id_, "world");
         publishArrow2(point_marker_publisher_, start_point_world, found_covid_point_world);
 
         publishPoint(point_publisher_, found_covid_point_current_aligned, found_covid_point_world,

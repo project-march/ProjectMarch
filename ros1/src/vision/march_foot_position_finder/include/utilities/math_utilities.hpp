@@ -82,4 +82,28 @@ inline std::vector<Point> linearDomain(Point a, Point b, int n)
     return points;
 }
 
+inline Point rotateRight(const Point& p)
+{
+    Point p_rotated(p.y, -p.x, p.z);
+    return p_rotated;
+}
+
+inline Point rotateLeft(const Point& p)
+{
+    Point p_rotated(-p.y, p.x, p.z);
+    return p_rotated;
+}
+
+inline Point addPoints(const Point& p1, const Point& p2)
+{
+    Point sum(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
+    return sum;
+}
+
+inline Point subtractPoints(const Point& p1, const Point& p2)
+{
+    Point difference(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+    return difference;
+}
+
 #endif // MARCH_MATH_UTILITIES
