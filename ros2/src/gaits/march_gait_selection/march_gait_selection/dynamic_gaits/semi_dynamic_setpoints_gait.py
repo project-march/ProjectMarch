@@ -4,6 +4,7 @@ from typing import Optional
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_utility.gait.subgait import Subgait
+from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
@@ -12,9 +13,24 @@ DEFAULT_SEDY_FREEZE_DURATION = Duration(seconds=3)
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
-    """A semi-dynamic version of the setpoints gait, implements a freeze functionality"""
+    """A semi-dynamic version of the setpoints gait, implements a freeze functionality.
 
-    def __init__(self, gait_name, subgaits, graph):
+    Args:
+        gait_name (str): Name of the gait
+        subgaits (dict): Mapping of names to subgait instances
+        graph (SubgaitGraph): Mapping of subgait names transitions
+
+    Attributes:
+        _should_freeze (bool): True if the gait should freeze
+        _is_frozen (bool): True if the gait is currently frozen
+        _freeze_duration (Duration): how long the gait should be frozen
+        _freeze_position (Dict[str, float]): dict containing joint names and positions
+    """
+
+    _current_time: Time
+    _current_subgait: Subgait
+
+    def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
         super(SemiDynamicSetpointsGait, self).__init__(
             f"dynamic_{gait_name}", subgaits, graph
         )
@@ -48,7 +64,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
         after the short freeze
-        :param duration: How long to freeze in the current position
+
+        Args:
+            duration (Duration): How long to freeze in the current position
         """
         if self.can_freeze:
             self._should_freeze = True
@@ -59,9 +77,12 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         If the current subgait is still running, this does nothing.
         If the gait should be stopped, this will be done
         If the current subgait is done, it will start the next subgait
-        :param current_time: Current time
-        :returns: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
-        flags set to true, depending on the state of the Gait.
+
+        Args:
+            current_time (Time): Current time
+        Returns:
+            GaitUpdate: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+                flags set to true, depending on the state of the Gait.
         """
         self._current_time = current_time
         if self._should_freeze:
@@ -71,7 +92,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         if current_time < self._end_time:
             return GaitUpdate.empty()
 
-        # If the subgait is finished and it was frozen, execute the subgait after freeze
+        # If the subgait is finished, and it was frozen, execute the subgait after freeze
         if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
             self._is_frozen = False
@@ -86,7 +107,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         started of the given freeze duration which ends at the current position.
         If this happens in the middle of a subgait, it plans the rest of the
         original subgait after the freeze.
-        :return: Returns a GaitUpdate
+
+        Returns:
+            GaitUpdate: Returns a GaitUpdate
         """
         self._freeze_position = self._position_after_time()
         self._previous_subgait = self._current_subgait.subgait_name
@@ -97,10 +120,12 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         self._update_time_stamps(self._current_subgait)
         return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
-    def subgait_after_freeze(self):
+    def subgait_after_freeze(self) -> Subgait:
         """
         Generates the subgait that should be executed after the freezing.
-        :return: The subgait to execute after the freeze
+
+        Returns:
+            Subgait: The subgait to execute after the freeze
         """
         if self._current_time < self._end_time:
             # The subgait after freeze is a copy of the current gait from
@@ -122,10 +147,12 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             # go to the next subgait after freeze
             return self.subgaits[self.graph[(self._previous_subgait, self.graph.TO)]]
 
-    def _freeze_subgait(self):
+    def _freeze_subgait(self) -> Subgait:
         """
         Generates a subgait of the freeze duration based on the current position.
-        :return: A subgait to freeze in current position
+
+        Returns:
+            Subgait: A subgait to freeze in current position
         """
         new_dict = {
             "description": "A subgait that stays in the same position",
@@ -152,13 +179,16 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             version="Only version, generated from code",
         )
 
-    def _position_after_time(self, elapsed_time: Optional[Duration] = None):
+    def _position_after_time(self, elapsed_time: Optional[Duration] = None) -> dict:
         """
         The position that the exoskeleton should be in after the elapsed
         time.
-        :param: elapsed_time Optional Time that has elapsed, if None uses the elapsed time of
-        the current subgait
-        :return: dict with joints and joint positions
+
+        Args:
+            elapsed_time (:obj: Time, optional): Time that has elapsed, if None uses the elapsed time of
+                the current subgait
+        Returns:
+            dict: dict with joints and joint positions
         """
         if elapsed_time is None:
             elapsed_time = self.elapsed_time
