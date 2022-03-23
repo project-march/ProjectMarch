@@ -27,6 +27,9 @@ def main():
             (trans_right, rot_right) = listener.lookupTransform(
                 "/foot_right", "/world", rospy.Time(0)
             )
+            (trans_hip, rot_hip) = listener.lookupTransform(
+                "/hip_base", "/world", rospy.Time(0)
+            )
         except (
             tf.LookupException,
             tf.ConnectivityException,
@@ -35,7 +38,7 @@ def main():
             continue
 
         broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, -0.03),
+            (-FOOT_LENGTH, 0.0, -0.01),
             Z_ROTATION,
             rospy.Time.now(),
             "toes_left",
@@ -51,7 +54,7 @@ def main():
         )
 
         broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, -0.03),
+            (-FOOT_LENGTH, 0.0, -0.01),
             Z_ROTATION,
             rospy.Time.now(),
             "toes_right",
@@ -64,6 +67,14 @@ def main():
             rospy.Time.now(),
             "toes_right_aligned",
             "toes_right",
+        )
+
+        broadcaster.sendTransform(
+            (0.0, 0.0, 0.0),
+            rot_hip,
+            rospy.Time.now(),
+            "hip_base_aligned",
+            "hip_base",
         )
 
         rate.sleep()

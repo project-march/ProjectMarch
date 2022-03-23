@@ -32,6 +32,8 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
+    void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
+
     void chosenPointCallback(const march_shared_msgs::FootPosition msg);
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);
@@ -43,7 +45,7 @@ protected:
 
     Point computeTemporalAveragePoint(const Point& new_point);
 
-    Point transformPoint(Point& point, const std::string& frame_from,
+    Point transformPoint(Point point, const std::string& frame_from,
         const std::string& frame_to);
 
     ros::NodeHandle* n_;
@@ -53,12 +55,11 @@ protected:
 
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher point_marker_publisher_;
-    ros::Subscriber chosen_point_subscriber_;
+    ros::Subscriber current_chosen_point_subscriber_;
+    ros::Subscriber other_chosen_point_subscriber_;
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
-
-    bool running_;
 
     ros::Timer realsenseTimer;
     rs2::pipeline pipe_;
@@ -70,38 +71,38 @@ protected:
     rs2::temporal_filter temp_filter_;
 
     std::string topic_camera_front_;
-    std::string topic_chosen_point_;
+    std::string topic_current_chosen_point_;
+    std::string topic_other_chosen_point_;
 
     std::string left_or_right_;
     std::string other_;
-    int switch_factor_;
+
+    std::string base_frame_;
+    std::string other_frame_id_;
+    std::string current_frame_id_;
+
+    bool running_;
     bool physical_cameras_;
 
     double foot_gap_;
     double step_distance_;
     double outlier_distance_;
+    double height_zero_threshold_;
+    float last_height_;
+    int switch_factor_;
     int sample_size_;
-
-    std::string base_frame_;
-    std::string reference_frame_id_;
-    std::string current_frame_id_;
-    std::string current_aligned_frame_id_;
-    std::string other_aligned_frame_id_;
+    int refresh_last_height_;
 
     std::vector<Point> found_points_;
-    Point last_chosen_point_;
+
+    Point ORIGIN;
+    Point last_chosen_point_current_;
     Point last_chosen_point_world_;
-    Point last_displacement_;
-    Point expected_other_point_;
-    double last_height_;
-
+    Point start_point_current_;
     Point start_point_world_;
-    Point world_frame_avg_;
-
-    Point start_displacement_world_;
-    Point displacement_world_;
-    Point start_point_;
     Point desired_point_;
+    Point previous_start_point_world_;
+    Point last_displacement_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

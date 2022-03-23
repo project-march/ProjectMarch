@@ -35,7 +35,6 @@ inline geometry_msgs::Point rotate_left(Point p)
     return msg;
 }
 
-
 inline geometry_msgs::Point to_geometry(Point p)
 {
     geometry_msgs::Point msg;
@@ -44,7 +43,6 @@ inline geometry_msgs::Point to_geometry(Point p)
     msg.z = p.z;
     return msg;
 }
-
 
 /**
  * Transforms a pointcloud to world frame and publishes it for visualization. A
@@ -113,7 +111,6 @@ void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
     publisher.publish(marker);
 }
 
-
 void publishArrow(ros::Publisher& publisher, const Point& p1, Point& p2)
 {
     visualization_msgs::Marker marker;
@@ -176,24 +173,20 @@ void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2)
     publisher.publish(marker);
 }
 
-
-    // m = Marker()
-    // m.action = Marker.ADD
-    // m.header.frame_id = '/base_link'
-    // m.header.stamp = rospy.Time.now()
-    // m.ns = 'points_arrows'
-    // m.id = idnum
-    // m.type = Marker.ARROW
-    // m.pose.orientation.y = 0
-    // m.pose.orientation.w = 1
-    // m.scale = scale
-    // m.color.r = 0.2
-    // m.color.g = 0.5
-    // m.color.b = 1.0
-    // m.color.a = 0.3
-
-
-
+// m = Marker()
+// m.action = Marker.ADD
+// m.header.frame_id = '/base_link'
+// m.header.stamp = rospy.Time.now()
+// m.ns = 'points_arrows'
+// m.id = idnum
+// m.type = Marker.ARROW
+// m.pose.orientation.y = 0
+// m.pose.orientation.w = 1
+// m.scale = scale
+// m.color.r = 0.2
+// m.color.g = 0.5
+// m.color.b = 1.0
+// m.color.a = 0.3
 
 /**
  * Publishes a marker point with a given publisher. A rotation around the z
