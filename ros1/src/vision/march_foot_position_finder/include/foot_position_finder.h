@@ -32,9 +32,9 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
+    void chosenCurrentPointCallback(const march_shared_msgs::FootPosition msg);
 
-    void chosenPointCallback(const march_shared_msgs::FootPosition msg);
+    void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);
 

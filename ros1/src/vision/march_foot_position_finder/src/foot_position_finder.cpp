@@ -60,13 +60,14 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
     other_chosen_point_subscriber_
-        = n_->subscribe<march_shared_msgs::FootPosition>(topic_other_chosen_point_,
-            /*queue_size=*/1, &FootPositionFinder::chosenPointCallback, this);
+        = n_->subscribe<march_shared_msgs::FootPosition>(
+            topic_other_chosen_point_,
+            /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback, this);
 
     current_chosen_point_subscriber_
         = n_->subscribe<march_shared_msgs::FootPosition>(
             topic_current_chosen_point_,
-            /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback,
+            /*queue_size=*/1, &FootPositionFinder::chosenCurrentPointCallback,
             this);
 
     running_ = false;
@@ -143,7 +144,7 @@ void FootPositionFinder::readParameters(
  * Callback function for when the gait selection node selects a point.
  */
 // Suppress lint error "make reference of argument" (breaks callback)
-void FootPositionFinder::chosenOtherPointCallback(
+void FootPositionFinder::chosenCurrentPointCallback(
     const march_shared_msgs::FootPosition msg) // NOLINT
 {
     last_height_ = FLT_MAX;
@@ -154,7 +155,7 @@ void FootPositionFinder::chosenOtherPointCallback(
  * Callback function for when the gait selection node selects a point.
  */
 // Suppress lint error "make reference of argument" (breaks callback)
-void FootPositionFinder::chosenPointCallback(
+void FootPositionFinder::chosenOtherPointCallback(
     const march_shared_msgs::FootPosition msg) // NOLINT
 {
     last_displacement_ = start_point_current_
