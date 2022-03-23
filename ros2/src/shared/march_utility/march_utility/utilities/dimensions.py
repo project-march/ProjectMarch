@@ -20,9 +20,7 @@ class InterpolationDimensions(Enum):
         elif dimensions == 2:
             return cls.TWO_DIM
         else:
-            raise WrongRealSenseConfigurationError(
-                f"The dimensions value is not `1` " f"or `2`, but {dimensions}"
-            )
+            raise WrongRealSenseConfigurationError(f"The dimensions value is not `1` or `2`, but {dimensions}")
 
 
 def amount_of_subgaits(dim: InterpolationDimensions):

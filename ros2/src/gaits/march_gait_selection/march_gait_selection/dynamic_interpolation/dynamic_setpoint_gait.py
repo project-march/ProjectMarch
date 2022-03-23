@@ -106,23 +106,15 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
-        return StaticEdgePosition(
-            self._setpoint_dict_to_joint_dict(self.start_position)
-        )
+        return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.start_position))
 
     @property
     def final_position(self) -> EdgePosition:
         # Beunmethod to fix transitions, should be fixed
         if self._next_command is not None:
-            return StaticEdgePosition(
-                self._setpoint_dict_to_joint_dict(
-                    self.dynamic_subgait.get_final_position()
-                )
-            )
+            return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.dynamic_subgait.get_final_position()))
         else:
-            return StaticEdgePosition(
-                self._setpoint_dict_to_joint_dict(self.end_position)
-            )
+            return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.end_position))
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -147,9 +139,7 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position = self._joint_dict_to_setpoint_dict(
-            get_position_from_yaml("stand")
-        )
+        self.start_position = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
         self.end_position = self.start_position
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
@@ -207,10 +197,7 @@ class DynamicSetpointGait(GaitInterface):
             else:
                 return GaitUpdate.empty()
 
-        if (
-            self._current_time >= self._end_time - early_schedule_duration
-            and not self._scheduled_early
-        ):
+        if self._current_time >= self._end_time - early_schedule_duration and not self._scheduled_early:
             return self._update_next_subgait_early()
 
         if self._current_time >= self._end_time:
@@ -440,9 +427,7 @@ class DynamicSetpointGait(GaitInterface):
         """Get the limits of all joints in the urdf"""
         self.joint_soft_limits = []
         for joint_name in self.joint_names:
-            self.joint_soft_limits.append(
-                get_limits_robot_from_urdf_for_inverse_kinematics(joint_name)
-            )
+            self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
     # SAFETY
     def _check_msg_time(self, foot_location: FootPosition) -> bool:
@@ -458,14 +443,12 @@ class DynamicSetpointGait(GaitInterface):
         )
         time_difference = current_time - msg_time
         self.logger.debug(
-            "Time difference between CoViD foot location and current time: "
-            f"{time_difference}.",
+            f"Time difference between CoViD foot location and current time: {time_difference}.",
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
             self.logger.info(
-                "Foot location is more than 0.5 seconds old, time difference is "
-                f"{time_difference}. Stopping gait.",
+                f"Foot location is more than 0.5 seconds old, time difference is {time_difference}. Stopping gait.",
             )
             self._end = True
             return True

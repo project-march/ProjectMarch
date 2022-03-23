@@ -66,9 +66,7 @@ def get_angles(points: List[np.array]) -> List[float]:
     return angles
 
 
-def solve_quadritlateral(
-    lengths: List[float], angle_b: float, convex: bool = True, debug: bool = False
-) -> List[float]:
+def solve_quadritlateral(lengths: List[float], angle_b: float, convex: bool = True, debug: bool = False) -> List[float]:
     """
     Calculates the angles of a quadrilateral given all side lengths and the angle of point b.
     Expects lengths to be given as [da, ab, bc, cd]

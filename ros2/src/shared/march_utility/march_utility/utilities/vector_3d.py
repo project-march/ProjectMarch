@@ -121,9 +121,7 @@ class Vector3d:
         return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     @staticmethod
-    def is_close_enough(
-        vector1: Vector3d, vector2: Vector3d, tolerance: float = 0.0001
-    ) -> bool:
+    def is_close_enough(vector1: Vector3d, vector2: Vector3d, tolerance: float = 0.0001) -> bool:
         """Check whether the normalized vectors are within a given tolerance."""
         return (vector1 - vector2).norm() <= tolerance
 

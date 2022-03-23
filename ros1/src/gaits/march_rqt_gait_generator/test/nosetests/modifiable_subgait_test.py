@@ -15,63 +15,35 @@ class ModifiableSubgaitTest(unittest.TestCase):
         self.gait_name = "walk"
         self.subgait_name = "left_swing"
         self.version = "MV_walk_leftswing_v2"
-        self.resources_folder = (
-            rospkg.RosPack().get_path("march_rqt_gait_generator") + "/test/resources"
-        )
-        self.robot = urdf.Robot.from_xml_file(
-            rospkg.RosPack().get_path("march_description") + "/urdf/march4.urdf"
-        )
+        self.resources_folder = rospkg.RosPack().get_path("march_rqt_gait_generator") + "/test/resources"
+        self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path("march_description") + "/urdf/march4.urdf")
         self.subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
             rsc=self.resources_folder,
             gait=self.gait_name,
             subgait=self.subgait_name,
             version=self.version,
         )
-        self.subgait = ModifiableSubgait.from_file(
-            self.robot, self.subgait_path, self.gait_generator
-        )
+        self.subgait = ModifiableSubgait.from_file(self.robot, self.subgait_path, self.gait_generator)
 
     # has_multiple_setpoints_before_duration tests
     def test_has_multiple_setpoints_before_duration_true(self):
-        self.assertTrue(
-            self.subgait.has_multiple_setpoints_before_duration(
-                duration=self.subgait.duration + 1
-            )
-        )
+        self.assertTrue(self.subgait.has_multiple_setpoints_before_duration(duration=self.subgait.duration + 1))
 
     def test_has_multiple_setpoints_before_duration_border(self):
-        self.assertTrue(
-            self.subgait.has_multiple_setpoints_before_duration(
-                duration=self.subgait.duration
-            )
-        )
+        self.assertTrue(self.subgait.has_multiple_setpoints_before_duration(duration=self.subgait.duration))
 
     def test_has_multiple_setpoints_before_duration_false(self):
-        self.assertFalse(
-            self.subgait.has_multiple_setpoints_before_duration(
-                duration=self.subgait.duration - 1
-            )
-        )
+        self.assertFalse(self.subgait.has_multiple_setpoints_before_duration(duration=self.subgait.duration - 1))
 
     # has_setpoints_after_duration tests
     def test_has_setpoints_after_duration_true(self):
-        self.assertTrue(
-            self.subgait.has_setpoints_after_duration(
-                duration=self.subgait.duration - 1
-            )
-        )
+        self.assertTrue(self.subgait.has_setpoints_after_duration(duration=self.subgait.duration - 1))
 
     def test_has_setpoints_after_duration_border(self):
-        self.assertFalse(
-            self.subgait.has_setpoints_after_duration(duration=self.subgait.duration)
-        )
+        self.assertFalse(self.subgait.has_setpoints_after_duration(duration=self.subgait.duration))
 
     def test_has_setpoints_after_duration_false(self):
-        self.assertFalse(
-            self.subgait.has_setpoints_after_duration(
-                duration=self.subgait.duration + 1
-            )
-        )
+        self.assertFalse(self.subgait.has_setpoints_after_duration(duration=self.subgait.duration + 1))
 
     # setters tests
     def test_set_gait_type(self):
@@ -120,26 +92,18 @@ class ModifiableSubgaitTest(unittest.TestCase):
         test_setpoint.time = test_setpoint.time * 2
         new_duration = self.subgait.duration * 2
         self.subgait.scale_timestamps_subgait(new_duration, True)
-        self.assertEqual(
-            self.subgait.get_joint("left_knee").setpoints[2], test_setpoint
-        )
+        self.assertEqual(self.subgait.get_joint("left_knee").setpoints[2], test_setpoint)
         self.assertEqual(self.subgait.duration, new_duration)
-        self.assertEqual(
-            [joint.duration for joint in self.subgait.joints], [new_duration] * 8
-        )
+        self.assertEqual([joint.duration for joint in self.subgait.joints], [new_duration] * 8)
 
     def test_set_duration_rescale_longer(self):
         test_setpoint = copy.deepcopy(self.subgait.get_joint("left_knee").setpoints[2])
         test_setpoint.time = test_setpoint.time * 2
         new_duration = self.subgait.duration * 2
         self.subgait.scale_timestamps_subgait(new_duration, True)
-        self.assertEqual(
-            self.subgait.get_joint("left_knee").setpoints[2], test_setpoint
-        )
+        self.assertEqual(self.subgait.get_joint("left_knee").setpoints[2], test_setpoint)
         self.assertEqual(self.subgait.duration, new_duration)
-        self.assertEqual(
-            [joint.duration for joint in self.subgait.joints], [new_duration] * 8
-        )
+        self.assertEqual([joint.duration for joint in self.subgait.joints], [new_duration] * 8)
 
     # can_mirror test
     def test_can_mirror(self):
@@ -148,9 +112,7 @@ class ModifiableSubgaitTest(unittest.TestCase):
     # get_mirror tests
     def test_get_mirror_subgait_name(self):
         mirrored_subgait = self.subgait.get_mirror("left", "right")
-        self.assertEqual(
-            mirrored_subgait.subgait_name, self.subgait_name.replace("left", "right")
-        )
+        self.assertEqual(mirrored_subgait.subgait_name, self.subgait_name.replace("left", "right"))
 
     def test_get_mirror_joint_trajectories(self):
         mirrored_subgait = self.subgait.get_mirror("left", "right")

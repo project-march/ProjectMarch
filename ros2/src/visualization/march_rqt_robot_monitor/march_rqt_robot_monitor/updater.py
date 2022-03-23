@@ -38,12 +38,8 @@ class DiagnosticUpdater(Node):
 
         # Control checks
         check_joint_states = CheckJointValues(self, "/march/joint_states", JointState)
-        self.updater.add(
-            "Control position values", check_joint_states.position_diagnostics
-        )
-        self.updater.add(
-            "Control velocity values", check_joint_states.velocity_diagnostics
-        )
+        self.updater.add("Control position values", check_joint_states.position_diagnostics)
+        self.updater.add("Control velocity values", check_joint_states.velocity_diagnostics)
         self.updater.add("Control effort values", check_joint_states.effort_diagnostics)
 
         # MotorController state check

@@ -36,26 +36,18 @@ class InputDevicePlugin(Plugin):
 
         self.setObjectName("InputDevicePlugin")
 
-        ui_file = os.path.join(
-            get_package_share_directory("march_rqt_input_device"), "input_device.ui"
-        )
+        ui_file = os.path.join(get_package_share_directory("march_rqt_input_device"), "input_device.ui")
 
         self._node: Node = context.node
         # Declare with default = True, so that if ping_safety_node is not given (when
         # using march_monitor), the ipd always sends alive pings to the safety node
         self._node.declare_parameter("ping_safety_node", True)
         self._node.declare_parameter("layout_file")
-        layout_file = (
-            self._node.get_parameter("layout_file").get_parameter_value().string_value
-        )
+        layout_file = self._node.get_parameter("layout_file").get_parameter_value().string_value
         self._controller = InputDeviceController(self._node)
-        self._widget = InputDeviceView(
-            ui_file, layout_file, self._controller, self._node.get_logger()
-        )
+        self._widget = InputDeviceView(ui_file, layout_file, self._controller, self._node.get_logger())
         context.add_widget(self._widget)
 
         # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). (useful for multiple windows)
         if context.serial_number() > 1:
-            self._widget.setWindowTitle(
-                "{0} ({1})".format(self._widget.windowTitle(), context.serial_number())
-            )
+            self._widget.setWindowTitle("{0} ({1})".format(self._widget.windowTitle(), context.serial_number()))

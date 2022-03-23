@@ -22,9 +22,7 @@ class BalanceGait(GaitInterface):
     CAPTURE_POINT_SERVICE_TIMEOUT = 1.0
     MOVEIT_INTERFACE_SERVICE_TIMEOUT = 1.0
 
-    def __init__(
-        self, node: Node, gait_name: str = "balanced_walk", default_walk: Gait = None
-    ):
+    def __init__(self, node: Node, gait_name: str = "balanced_walk", default_walk: Gait = None):
         self.gait_name = gait_name
         self._node = node
         self._default_walk = default_walk
@@ -41,12 +39,8 @@ class BalanceGait(GaitInterface):
         self.capture_point_event = Event()
         self.capture_point_result = None
         self._capture_point_service = {
-            "left_leg": node.create_client(
-                srv_name="/march/capture_point/foot_left", srv_type=CapturePointPose
-            ),
-            "right_leg": node.create_client(
-                srv_name="/march/capture_point/foot_right", srv_type=CapturePointPose
-            ),
+            "left_leg": node.create_client(srv_name="/march/capture_point/foot_left", srv_type=CapturePointPose),
+            "right_leg": node.create_client(srv_name="/march/capture_point/foot_right", srv_type=CapturePointPose),
         }
 
         self.moveit_event = Event()
@@ -77,10 +71,7 @@ class BalanceGait(GaitInterface):
         """
         subgait_duration = self.default_walk[subgait_name].duration
         if not self._capture_point_service[leg_name].wait_for_service(timeout_sec=3):
-            self.logger.warn(
-                f"Capture point service not found: "
-                f"{self._capture_point_service[leg_name]}"
-            )
+            self.logger.warn(f"Capture point service not found: {self._capture_point_service[leg_name]}")
 
         self.capture_point_event.clear()
 
@@ -116,12 +107,8 @@ class BalanceGait(GaitInterface):
         joint_state.header = Header()
         joint_state.header.stamp = self._node.get_clock().now().to_msg()
         joint_state.name = [joint.name for joint in non_capture_point_joints]
-        joint_state.position = [
-            joint.setpoints[-1].position for joint in non_capture_point_joints
-        ]
-        joint_state.velocity = [
-            joint.setpoints[-1].velocity for joint in non_capture_point_joints
-        ]
+        joint_state.position = [joint.setpoints[-1].position for joint in non_capture_point_joints]
+        joint_state.velocity = [joint.setpoints[-1].velocity for joint in non_capture_point_joints]
 
         return joint_state
 
@@ -215,9 +202,7 @@ class BalanceGait(GaitInterface):
         if self._current_time < self._end_time or self._constructing:
             return GaitUpdate.empty()
         else:
-            next_subgait = self._default_walk.graph[
-                (self._current_subgait, self._default_walk.graph.TO)
-            ]
+            next_subgait = self._default_walk.graph[(self._current_subgait, self._default_walk.graph.TO)]
 
             if next_subgait == self._default_walk.graph.END:
                 return GaitUpdate.finished()

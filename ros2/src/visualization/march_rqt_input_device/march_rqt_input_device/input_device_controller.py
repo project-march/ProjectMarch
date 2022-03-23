@@ -28,11 +28,7 @@ class InputDeviceController:
     def __init__(self, node):
         self._node = node
 
-        self._ping = (
-            self._node.get_parameter("ping_safety_node")
-            .get_parameter_value()
-            .bool_value
-        )
+        self._ping = self._node.get_parameter("ping_safety_node").get_parameter_value().bool_value
 
         self._instruction_gait_pub = self._node.create_publisher(
             msg_type=GaitInstruction,
@@ -51,9 +47,7 @@ class InputDeviceController:
             callback=self._current_gait_callback,
             qos_profile=1,
         )
-        self._error_pub = self._node.create_publisher(
-            msg_type=Error, topic="/march/error", qos_profile=10
-        )
+        self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
         )
@@ -64,9 +58,7 @@ class InputDeviceController:
         self.current_gait_cb = None
         self._possible_gaits = []
 
-        self._id = self.ID_FORMAT.format(
-            machine=socket.gethostname(), user=getpass.getuser()
-        )
+        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
         if self._node.get_parameter("use_sim_time").get_parameter_value():
             self._timesource = self._node.create_subscription(
@@ -77,9 +69,7 @@ class InputDeviceController:
             )
 
         if self._ping:
-            self._alive_pub = self._node.create_publisher(
-                Alive, "/march/input_device/alive", 10
-            )
+            self._alive_pub = self._node.create_publisher(Alive, "/march/input_device/alive", 10)
             self._alive_timer = self._node.create_timer(
                 timer_period_sec=0.1,
                 callback=self._timer_callback,
@@ -105,17 +95,11 @@ class InputDeviceController:
 
         :type msg: GaitInstructionResponse
         """
-        if msg.result == GaitInstructionResponse.GAIT_ACCEPTED and callable(
-            self.accepted_cb
-        ):
+        if msg.result == GaitInstructionResponse.GAIT_ACCEPTED and callable(self.accepted_cb):
             self.accepted_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_FINISHED and callable(
-            self.finished_cb
-        ):
+        elif msg.result == GaitInstructionResponse.GAIT_FINISHED and callable(self.finished_cb):
             self.finished_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_REJECTED and callable(
-            self.rejected_cb
-        ):
+        elif msg.result == GaitInstructionResponse.GAIT_REJECTED and callable(self.rejected_cb):
             self.rejected_cb()
 
     def _current_gait_callback(self, msg: String) -> None:
@@ -139,9 +123,7 @@ class InputDeviceController:
         Send out an asynchronous request to get the possible gaits and stores response in gait_future
         """
         if self._possible_gait_client.service_is_ready():
-            self.gait_future = self._possible_gait_client.call_async(
-                PossibleGaits.Request()
-            )
+            self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
@@ -236,9 +218,7 @@ class InputDeviceController:
         )
 
     def publish_sm_to_unknown(self) -> None:
-        self._node.get_logger().debug(
-            "Mock Input Device published state machine to unknown"
-        )
+        self._node.get_logger().debug("Mock Input Device published state machine to unknown")
         self._instruction_gait_pub.publish(
             GaitInstruction(
                 header=Header(stamp=self._node.get_clock().now().to_msg()),
