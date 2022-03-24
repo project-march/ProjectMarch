@@ -110,7 +110,7 @@ class Pose:
         Can return all joint positions or a specific one, by choosing from:
         pos_toes1, pos_ankle1, pos_knee1, pos_hip, pos_knee2, pos_ankle2, pos_toes2
 
-        If a positive angle represents a anti-clockwise rotation, the angle variable is positive in the rot function.
+        If a positive angle represents an anti-clockwise rotation, the angle variable is positive in the rot function.
         If a positive angle represents a clockwise rotation, the angle variable is negative in the rot function.
         The vectors (all np.array's) do always describe the translation when no rotation is applied.
         The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the chain.
