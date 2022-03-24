@@ -33,7 +33,28 @@ JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 
 
 class Subgait:
-    """Base class for usage of the defined subgaits."""
+    """Base class for usage of the defined subgaits.
+
+    Args:
+        joints (List[JointTrajectory]): list containing joint trajectories for each joint
+        duration (Duration): duration of the subgait
+        gait_type (:obj: str, optional): Type of the gait, defaults to 'walk_like'
+        gait_name (:obj: str, optional): Name of the gait, defaults to 'Walk'
+        subgait_name (:obj: str, optional): Name of the subgait, defaults to 'right_open'
+        version (:obj: str, optional): Version of the subgait, defaults to 'First try'
+        description (:obj: str, optional): Description of the subgait, defaults to 'Just a simple gait'
+        robot (:obj: urdf.Robot, optional): robot model to use, default is None
+    Attributes:
+        joints (List[JointTrajectory]): list containing joint trajectories for each joint
+        duration (Duration): duration of the subgait
+        gait_type (:obj: str, optional): Type of the gait, defaults to 'walk_like'
+        gait_name (:obj: str, optional): Name of the gait, defaults to 'Walk'
+        subgait_name (:obj: str, optional): Name of the subgait, defaults to 'right_open'
+        version (:obj: str, optional): Version of the subgait, defaults to 'First try'
+        description (:obj: str, optional): Description of the subgait, defaults to 'Just a simple gait'
+        robot (:obj: urdf.Robot, optional): robot model to use, default is None
+
+    """
 
     joint_class = JointTrajectory
 

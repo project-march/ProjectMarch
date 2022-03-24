@@ -49,15 +49,9 @@ class DynamicSetpointGait(GaitInterface):
         gait_name (str): name of the gait
         subgait_id (str): either left_swing or right_swing
 
-        _trajectory_failed (bool): True if step is not feasible (e.g. due to soft limits), else False
-        _should_stop (bool): whether the gait should stop
         _end (bool): whether the gait has ended
-        _start_time (Optional[Duration]): time at which the gait should start
-        _end_time (Optional[Duration]): time at which the gait ends
-        _current_time (Optional[Time]): current time
         _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
-        _start_is_delayed (bool): whether the start is delayed (early schedule for start gait)
-        _scheduled_early (bool): whether the next step is already scheduled early or not
+        _trajectory_failed (bool): True if step is not feasible (e.g. due to soft limits), else False
     """
 
     _start_time: Optional[Duration]

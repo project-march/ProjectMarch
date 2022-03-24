@@ -17,7 +17,28 @@ from trajectory_msgs.msg import JointTrajectory
 
 
 class BalanceGait(GaitInterface):
-    """Base class to create a gait using the moveit motion planning."""
+    """Base class to create a gait using the moveit motion planning.
+
+    Args:
+        node (Node): node that subscribers will be made on
+        gait_name (:obj: str, optional): name of the gait, default is 'balanced_walk'
+        default_walk (:obj: Gait, optional): default is None
+
+    Attributes:
+        gait_name (str): name of the gait
+        logger (Logger): used to log to the terminal
+        capture_point_event (Event): ???
+        capture_point_result (???): ???
+
+        _node (Node): node used to create subscribers
+        _default_walk (:obj: Gait, optional): default is None
+        _constructing (bool): ???
+        _current_subgait (Subgait): current subgait
+        _current_subgait_duration (Duration): duration of current subgait
+        _start_time (rclpy.Time): time at which subgait should start
+        _end_time (rclpy.Time): time at which subgait should end
+        _current_time (rclpy.Time): current time
+    """
 
     CAPTURE_POINT_SERVICE_TIMEOUT = 1.0
     MOVEIT_INTERFACE_SERVICE_TIMEOUT = 1.0
@@ -64,16 +85,17 @@ class BalanceGait(GaitInterface):
     def default_walk(self, new_default_walk: Gait):
         """Set a new default walk subgait to the balance subgait.
 
-        :param new_default_walk:
-            A new subgait which is the default balance walking pattern
+        Args:
+            new_default_walk (Gait): A new subgait which is the default balance walking pattern
         """
         self._default_walk = new_default_walk
 
     def compute_swing_leg_target(self, leg_name: str, subgait_name: str) -> bool:
         """Set the swing leg target to capture point.
 
-        :param leg_name: The name of the used move group
-        :param subgait_name: the normal subgait name
+        Args:
+            leg_name (str): name of the used move group
+            subgait_name (str): the normal subgait name
         """
         subgait_duration = self.default_walk[subgait_name].duration
         if not self._capture_point_service[leg_name].wait_for_service(timeout_sec=3):
@@ -90,7 +112,7 @@ class BalanceGait(GaitInterface):
         future.add_done_callback(self.capture_point_cb)
         return self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
 
-    def capture_point_cb(self, future: Future):
+    def capture_point_cb(self, future: Future) -> None:
         """Set capture point result when the capture point service returns."""
         self.capture_point_result = future.result()
         self.capture_point_event.set()
@@ -98,10 +120,11 @@ class BalanceGait(GaitInterface):
     def compute_stance_leg_target(self, leg_name: str, subgait_name: str) -> JointState:
         """Set the target of the stance leg to the end of the gait file.
 
-        :param leg_name: The name of the move group which does not use capture point
-        :param subgait_name: the normal subgait name
-
-        :return the duration of the default subgait
+        Args:
+            leg_name (str): name of the used move group
+            subgait_name (str): the normal subgait name
+        Returns:
+            JointState: message containing name, position and velocity
         """
         side_prefix = "right" if "right" in leg_name else "left"
 
@@ -125,13 +148,14 @@ class BalanceGait(GaitInterface):
 
         return joint_state
 
-    def construct_trajectory(self, swing_leg: str, subgait_name: str):
+    def construct_trajectory(self, swing_leg: str, subgait_name: str) -> JointTrajectory:
         """Constructs a balance trajectory for all joints.
 
-        :param swing_leg: The name of the swing leg ('left_leg' or 'right_leg')
-        :param subgait_name: the normal subgait name
-
-        :return: the balance trajectory
+        Args:
+            swing_leg (str): name of the used move group
+            subgait_name (str): the normal subgait name
+        Returns:
+            JointTrajectory: the balance trajectory
         """
         if swing_leg not in ["right_leg", "left_leg"]:
             self.logger.warn(
@@ -171,7 +195,10 @@ class BalanceGait(GaitInterface):
     def get_joint_trajectory_msg(self, name: str) -> JointTrajectory:
         """Returns the trajectory of a subgait name that could use moveit.
 
-        :param name: the name of the subgait
+        Args:
+            name (str): name of the subgait
+        Returns
+            JointTrajectory: message containing trajectory
         """
         if name in ["right_open_2", "right_swing_2"]:  # noqa: SIM116
             return self.construct_trajectory("right_leg", name)
@@ -230,7 +257,8 @@ class BalanceGait(GaitInterface):
     def _new_trajectory_command(self) -> TrajectoryCommand:
         """Update the trajectory values and generate a new trajectory command.
 
-        :return Return a TrajectoryCommand for the next subgait.
+        Returns:
+            TrajectoryCommand: a TrajectoryCommand for the next subgait.
         """
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
         time_from_start = trajectory.points[-1].time_from_start
@@ -244,6 +272,6 @@ class BalanceGait(GaitInterface):
             self._start_time,
         )
 
-    def end(self):
+    def end(self) -> None:
         self._current_subgait = None
         self._current_subgait_duration = Duration(0)

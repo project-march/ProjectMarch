@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict
 
 from march_utility.gait.edge_position import StaticEdgePosition, UnknownEdgePosition
 from march_utility.utilities.duration import Duration
@@ -15,19 +15,25 @@ ZERO_DURATION = Duration(seconds=0)
 
 
 class HomeGait(GaitInterface):
-    """A standard gait that goes from the unknown state to an idle position."""
+    """A standard gait that goes from the unknown state to an idle position.
+
+    Args:
+        name (str): Name of the idle position this gait homes to. Will be prefixed with `home_`
+        position (Dict[str, float]): Mapping of joint names to positions
+        gait_type (str): Gait type to use for home gait
+        duration (:obj: Duration, optional): Duration of the gait in seconds, defaults to 3 seconds
+
+    Attributes:
+        _name (str): Name of the idle position this gait homes to. Will be prefixed with `home_`
+        _position (Dict[str, float]): Mapping of joint names to positions
+        _gait_type (str): Gait type to use for home gait
+        _duration (Duration): Duration of the gait in seconds, defaults to 3 seconds
+    """
 
     def __init__(
-        self, name, position, gait_type, duration: Duration = DEFAULT_HOMEGAIT_DURATION
+        self, name: str, position: Dict[str, float], gait_type: str, duration: Duration = DEFAULT_HOMEGAIT_DURATION
     ):
-        """Initializes an executable home gait with given positions.
-
-        :param str name: Name of the idle position this gait homes to.
-                         Will be prefixed with `home_`
-        :param dict position: Mapping of joint names to positions
-        :param str gait_type: Gait type to use for home gait
-        :param Duration duration: Duration of the gait in seconds. Defaults to 3 seconds.
-        """
+        """Initializes an executable home gait with given positions."""
         self._name = "home_{name}".format(name=name)
         self._position = position
         self._gait_type = gait_type
@@ -81,7 +87,12 @@ class HomeGait(GaitInterface):
     ) -> GaitUpdate:
         """Start the gait.
         Creates a trajectory command to go towards the idle position in the given duration.
-        :returns Returns a GaitUpdate that usually contains a TrajectoryCommand.
+
+        Args:
+            current_time (rclpy.Time): current time
+            first_subgait_delay (:obj: Duration, optional): delay of the first subgait, defaults to zero
+        Returns:
+            GaitUpdate: a GaitUpdate that usually contains a TrajectoryCommand.
         """
         if first_subgait_delay is not None and first_subgait_delay > Duration(0):
             self._start_time = current_time + first_subgait_delay
@@ -113,9 +124,13 @@ class HomeGait(GaitInterface):
         early_schedule_duration: Optional[Duration] = ZERO_DURATION,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
-        :param current_time: Current time.
-        :param early_schedule_duration: The duration to schedule the gait early.
-        :returns Returns a GaitUpdate with only the is_finished set to either true or false.
+
+         Args:
+            current_time (Time): current_time
+            early_schedule_duration (:obj: Duration, optional): Optional duration to schedule early
+        Returns:
+            GaitUpdate: GaitUpdate that may contain a TrajectoryCommand, and any of the
+                flags set to true, depending on the state of the Gait.
         """
         if current_time >= self._end_time:
             return GaitUpdate.finished()
@@ -124,11 +139,13 @@ class HomeGait(GaitInterface):
         else:
             return GaitUpdate.empty()
 
-    def _get_trajectory_msg(self):
+    def _get_trajectory_msg(self) -> JointTrajectory:
         """
         Constructs a trajectory message that has only one set point to be
         standing still in the idle position after the specified duration.
-        :return:
+
+        Returns:
+            JointTrajectory: message containing joint trajectories
         """
         msg = JointTrajectory()
         msg.joint_names = sorted(self._position.keys())
