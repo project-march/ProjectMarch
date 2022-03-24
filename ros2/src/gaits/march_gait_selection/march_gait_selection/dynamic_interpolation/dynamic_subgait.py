@@ -108,9 +108,7 @@ class DynamicSubgait:
             joint_trajectory_point.time_from_start = Duration(timestamp).to_msg()
 
             for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
-                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
-                    timestamp
-                )
+                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(timestamp)
 
                 joint_trajectory_point.positions.append(interpolated_setpoint.position)
                 joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
@@ -190,14 +188,10 @@ class DynamicSubgait:
                 (name == "right_ankle" and self.subgait_id == "right_swing")
                 or (name == "left_ankle" and self.subgait_id == "left_swing")
             ):
-                setpoint_list.insert(
-                    EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
-                )
+                setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
             if name in ["right_ankle", "left_ankle"]:
-                self.joint_trajectory_list.append(
-                    DynamicJointTrajectory(setpoint_list, interpolate_ankle=True)
-                )
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, interpolate_ankle=True))
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 

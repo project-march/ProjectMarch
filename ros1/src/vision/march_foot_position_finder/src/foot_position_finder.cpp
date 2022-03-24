@@ -62,7 +62,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     other_chosen_point_subscriber_
         = n_->subscribe<march_shared_msgs::FootPosition>(
             topic_other_chosen_point_,
-            /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback, this);
+            /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback,
+            this);
 
     current_chosen_point_subscriber_
         = n_->subscribe<march_shared_msgs::FootPosition>(

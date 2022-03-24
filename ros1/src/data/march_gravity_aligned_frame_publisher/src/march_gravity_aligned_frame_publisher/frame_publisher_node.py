@@ -21,15 +21,9 @@ def main():
 
     while not rospy.is_shutdown():
         try:
-            (trans_left, rot_left) = listener.lookupTransform(
-                "/foot_left", "/world", rospy.Time(0)
-            )
-            (trans_right, rot_right) = listener.lookupTransform(
-                "/foot_right", "/world", rospy.Time(0)
-            )
-            (trans_hip, rot_hip) = listener.lookupTransform(
-                "/hip_base", "/world", rospy.Time(0)
-            )
+            (trans_left, rot_left) = listener.lookupTransform("/foot_left", "/world", rospy.Time(0))
+            (trans_right, rot_right) = listener.lookupTransform("/foot_right", "/world", rospy.Time(0))
+            (trans_hip, rot_hip) = listener.lookupTransform("/hip_base", "/world", rospy.Time(0))
         except (
             tf.LookupException,
             tf.ConnectivityException,

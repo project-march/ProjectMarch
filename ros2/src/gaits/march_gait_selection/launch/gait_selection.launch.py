@@ -90,11 +90,7 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"dynamic_gait": LaunchConfiguration("dynamic_gait")},
-                    {
-                        "middle_point_fraction": LaunchConfiguration(
-                            "middle_point_fraction"
-                        )
-                    },
+                    {"middle_point_fraction": LaunchConfiguration("middle_point_fraction")},
                     {"middle_point_height": LaunchConfiguration("middle_point_height")},
                     {"minimum_stair_height": LaunchConfiguration("minimum_stair_height")},
                     {"push_off_fraction": LaunchConfiguration("push_off_fraction")},
