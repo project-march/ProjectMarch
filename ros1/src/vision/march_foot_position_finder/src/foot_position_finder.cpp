@@ -163,7 +163,7 @@ void FootPositionFinder::chosenCurrentPointCallback(
     // Allow last height of other foot to be updated at most 10 times
     // This simulates that the pressure soles have confirmed that the other foot
     // has touched the ground, so that the height can be reset
-    last_height_ = FLT_MAX;
+    last_height_ = FLT_MAX;  // maximum float value
     refresh_last_height_ = 10;
 }
 
@@ -272,7 +272,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         rotateRight(last_chosen_point_world_)); // Purple
 
     if (position_queue.size() > 0) {
-
         // Take the first point of the point queue returned by the point finder
         Point found_covid_point_world
             = computeTemporalAveragePoint(position_queue[0]); // Red

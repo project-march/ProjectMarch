@@ -1,3 +1,5 @@
+"""Author: Jelmer de Wolde, MVII"""
+
 import rospy
 import tf
 
