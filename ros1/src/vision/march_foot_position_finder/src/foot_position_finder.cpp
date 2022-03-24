@@ -163,7 +163,7 @@ void FootPositionFinder::chosenCurrentPointCallback(
     // Allow last height of other foot to be updated at most 10 times
     // This simulates that the pressure soles have confirmed that the other foot
     // has touched the ground, so that the height can be reset
-    last_height_ = FLT_MAX;  // maximum float value
+    last_height_ = FLT_MAX; // maximum float value
     refresh_last_height_ = 10;
 }
 
