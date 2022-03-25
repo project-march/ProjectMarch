@@ -49,7 +49,7 @@ class RealsenseGait(SetpointsGait):
         subgaits (dict): Mapping of names to subgait instances
         graph (SubgaitGraph): Mapping of subgait names to transitions
         gait_selection (GaitSelection): the gait selection node
-        realsense_category (str): ???
+        realsense_category (str): ??? TODO: Add docs
         camera_to_use (str): which camera to use
         subgaits_to_interpolate (dict): dict containing subgaits
         dimensions (InterpolationDimensions): dimensions of interpolation
@@ -57,23 +57,23 @@ class RealsenseGait(SetpointsGait):
         starting_position (EdgePosition): starting position of the gait
         final_position (EdgePosition): final position of the gait
         parameters (List[float]): parameters
-        dependent_on (List[str]): ???
-        responsible for (List[str]): ???
+        dependent_on (List[str]): ??? TODO: Add docs
+        responsible_for (List[str]): ??? TODO: Add docs
 
     Attributes:
         logger (Logger): used to log to the terminal
-        parameters (List[float): ???
-        dimensions (InterpolationDimensions): ???
-        realsense_category (str): ???
+        parameters (List[float): ??? TODO: Add docs
+        dimensions (InterpolationDimensions): ??? TODO: Add docs
+        realsense_category (str): ??? TODO: Add docs
         camera_to_use (str): which camera to use
         subgaits_to_interpolate (dict): subgaits that are used for interpolation, amount should be equal to the
             dimensions of interpolation
-        realsense_service_event (Event): ???
-        realsense_service_result (???): ???
+        realsense_service_event (Event): ??? TODO: Add docs
+        realsense_service_result (???): ??? TODO: Add docs
         _gait_selection (GaitSelection): the gait selection node
         _get_gait_parameters_service (Client): The service from which to get the gait parameters
-        _dependent_on (List[str]): ???
-        _responsible_for (List[str]): ???
+        _dependent_on (List[str]): ??? TODO: Add docs
+        _responsible_for (List[str]): ??? TODO: Add docs
 
     """
 
@@ -462,7 +462,7 @@ class RealsenseGait(SetpointsGait):
         """Set capture point result when the capture point service returns.
 
         Args:
-            future (Future): ???
+            future (Future): ??? TODO: Add docs
         """
         self.realsense_service_result = future.result()
         self.realsense_service_event.set()
