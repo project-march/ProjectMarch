@@ -412,7 +412,6 @@ class DynamicSetpointGait(GaitInterface):
                 self.logger.warn("Not possible to perform close gait.")
 
         self._end = True
-        self._get_next_command()
         return None
 
     def _try_to_get_trajectory_command(
