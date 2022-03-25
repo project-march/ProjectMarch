@@ -93,7 +93,7 @@ class InputDeviceController:
         :type msg: String
         """
         if callable(self.current_gait_cb):
-            self.current_gait_cb(msg.gait)
+            self.current_gait_cb(msg)
 
     def update_possible_gaits(self) -> None:
         """

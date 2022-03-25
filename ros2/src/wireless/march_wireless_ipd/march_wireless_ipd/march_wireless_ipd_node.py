@@ -9,23 +9,25 @@ import signal
 import sys
 from contextlib import suppress
 
-class WirelessIPDNode(Node):
 
+class WirelessIPDNode(Node):
     def __init__(self):
-        super().__init__('wireless_ipd_node')
+        super().__init__("wireless_ipd_node")
+
 
 def sys_exit(*_):
     sys.exit(0)
 
+
 def main():
-    
+
     for iface in interfaces():
         iface_details = ifaddresses(iface)
         if AF_INET in iface_details:
             interface_info = iface_details[AF_INET][0]
-            if 'addr' in interface_info:
-                address = interface_info['addr']
-                if address[0:3] == '192':
+            if "addr" in interface_info:
+                address = interface_info["addr"]
+                if address[0:3] == "192":
                     ip = address
 
     rclpy.init()
@@ -43,4 +45,3 @@ def main():
         rclpy.spin(node, executor)
 
     rclpy.shutdown()
-

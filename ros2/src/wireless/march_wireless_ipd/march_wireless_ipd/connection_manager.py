@@ -11,9 +11,7 @@ from functools import partial
 from datetime import datetime
 
 
-
-class ConnectionManager():
-    
+class ConnectionManager:
     def __init__(self, host, port, controller, node):
         server_address = (host, port)
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,49 +26,45 @@ class ConnectionManager():
         self.last_heartbeat = datetime.now()
         self.node = node
         self.stopped = False
-        self.controller.accepted_cb = partial(self.send_message_till_confirm, "Accepted", True)
+        self.controller.accepted_cb = partial(
+            self.send_message_till_confirm, "Accepted", True
+        )
         self.controller.rejected_cb = partial(self.send_message_till_confirm, "Reject")
         self.controller.current_gait_cb = self._current_gait_cb
         self.controller.finished_cb = self.gait_finished
 
     def _current_gait_cb(self, msg):
-        if self.stopped:
-            self.controller.get_node().get_logger().info("UPDATE stop")
+
+        if self.stopped or "close" in msg.subgait:
             self.current_gait = self.requested_gait = "stop"
             self.stopped = False
         else:
-            self.controller.get_node().get_logger().info("UPDATE " + msg)
-            self.current_gait = msg
+            self.current_gait = msg.gait
 
     def wait_for_request(self):
         while True:
-            try: 
-                self.controller.get_node().get_logger().warning("Wait for request")
-                
+            try:
                 self.empty_socket()
-                
 
                 counter = 0
-                while(self.stop_receive and counter < 15):
+                while self.stop_receive and counter < 15:
                     time.sleep(0.20)
                     counter += 1
 
                 req = self.wait_for_message(1.0)
 
-                self.controller.get_node().get_logger().warning("DATA RECEIVED: " + str(req))
-
                 if req == "":
-                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD")
+                    self.controller.get_node().get_logger().warning(
+                        "Connection lost with wireless IPD"
+                    )
                     raise Exception("Connection lost")
                     # self.reset_connection()
                 else:
                     self.last_heartbeat = datetime.now()
 
                 if "Received" in req:
-                    self.controller.get_node().get_logger().info("Received")
                     continue
                 elif "GaitRequest" in req:
-                    self.controller.get_node().get_logger().info("Gait request")
                     req = json.loads(req)
                     self.seq = req["seq"]
 
@@ -84,7 +78,6 @@ class ConnectionManager():
                     else:
                         self.request_gait(req)
                 elif "Heartbeat" in req:
-                    self.controller.get_node().get_logger().info("Heartbeat")
                     req = json.loads(req)
                     self.seq = req["seq"]
 
@@ -92,96 +85,80 @@ class ConnectionManager():
                     # Wait untill response comes back from android IPD
 
             except socket.timeout:
-                self.controller.get_node().get_logger().info("Socket timeout 1")
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 5.0:
-                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
+                    self.controller.get_node().get_logger().warning(
+                        "Connection lost with wireless IPD (no heartbeat)"
+                    )
                     raise Exception("Connection lost")
 
             except Exception as e:
                 print(e)
                 raise e
 
-            # self.controller.get_node().get_logger().info("End while (wait for request)")
-
-
     def gait_finished(self):
         pass
 
     def request_gait(self, req):
+        self.stop_receive = True
+
         self.controller.update_possible_gaits()
         future = self.controller.get_possible_gaits()
 
         counter = 0
-        while(not future.done() and counter < 50):
+        while not future.done() and counter < 50:
             time.sleep(0.010)
             counter += 1
 
         self.requested_gait = req["gait"]["gaitName"]
 
-        self.controller.get_node().get_logger().info("Request gait")
-
         if self.requested_gait in future.result().gaits:
             self.controller.get_node().get_logger().info("Succesful gait")
-            self.stop_receive = True
             self.controller.publish_gait(self.requested_gait)
             return True
         else:
-            self.stop_receive = True
             self.controller.get_node().get_logger().info("Failed gait")
             self.send_message_till_confirm("Fail")
             return False
 
-
     def wait_for_message(self, timeout=5.0):
-        self.controller.get_node().get_logger().info("Wait for message")
         try:
             self.connection.settimeout(timeout)
-            data = self.connection.recv(1024).decode('utf-8')
+            data = self.connection.recv(1024).decode("utf-8")
             self.connection.settimeout(None)
         except Exception:
             raise
         return data
 
-
     def send_message(self, msg):
-
-        self.controller.get_node().get_logger().info("Send message")
         try:
-            msg = msg + '\r\n'
+            msg = msg + "\r\n"
             self.connection.sendall(msg.encode())
         except BrokenPipeError:
             raise
         except Exception:
             self.controller.get_node().get_logger().warning(traceback.format_exc())
 
-
     def send_message_till_confirm(self, type, requested_gait=False):
-
-        self.controller.get_node().get_logger().info("Send till confirm")
 
         if requested_gait:
             sendGait = self.requested_gait
         else:
             sendGait = self.current_gait
-        
+
         if self.connection is None:
             return
 
-        msg = {
-            "type": type,
-            "currentGait": sendGait,
-            "seq": self.seq
-        }
+        msg = {"type": type, "currentGait": sendGait, "seq": self.seq}
 
         while True:
             try:
                 self.send_message(json.dumps(msg))
                 data = self.wait_for_message(0.40)
 
-                self.controller.get_node().get_logger().warning("DATA RECEIVED (Wait for received message): " + str(data))
-
                 if data == "":
-                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD")
+                    self.controller.get_node().get_logger().warning(
+                        "Connection lost with wireless IPD"
+                    )
                     self.empty_socket()
                     raise Exception("Connection lost")
                 else:
@@ -194,22 +171,20 @@ class ConnectionManager():
                         self.empty_socket()
                         return
                     else:
-                        self.controller.get_node().get_logger().warning("Different seq")    
-                # else:
-                #     self.controller.get_node().get_logger().info("Ignoring other messages: " + str(data))
-                #     self.last_heartbeat = datetime.now()
-        
+                        self.controller.get_node().get_logger().warning("Different seq")
+
             except socket.timeout:
                 self.controller.get_node().get_logger().info("Socket timeout")
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 5.0:
-                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat 2)")
+                    self.controller.get_node().get_logger().warning(
+                        "Connection lost with wireless IPD (no heartbeat 2)"
+                    )
                     self.empty_socket()
                     raise Exception("Connection lost")
-            
+
             except Exception as e:
                 self.empty_socket()
                 raise e
-
 
     def establish_connection(self):
         while True:
@@ -223,12 +198,11 @@ class ConnectionManager():
 
             self.connection.close()
 
-
     def empty_socket(self):
         input = [self.s]
         while 1:
             input_ready, _, _ = select.select(input, [], [], 0.0)
-            if len(input_ready) == 0: break
-            for s in input_ready: s.recv(1)
-
-        self.controller.get_node().get_logger().info("Emptied buffer")
+            if len(input_ready) == 0:
+                break
+            for s in input_ready:
+                s.recv(1)
