@@ -261,14 +261,16 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
 
     // Find possible points around the desired point determined earlier
-    PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point_world_);
+    PointFinder pointFinder(
+        n_, pointcloud, left_or_right_, desired_point_world_);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
     // Visualization
     publishSearchRectangle(point_marker_publisher_, desired_point_world_,
         pointFinder.getDisplacements(), left_or_right_);
-    publishDesiredPosition(point_marker_publisher_, desired_point_world_); // Green
+    publishDesiredPosition(
+        point_marker_publisher_, desired_point_world_); // Green
     publishRelativeSearchPoint(point_marker_publisher_,
         rotateRight(start_point_world_)); // Purple
 
@@ -278,9 +280,9 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             = computeTemporalAveragePoint(position_queue[0]); // Red
 
         // Retrieve 3D points between current and new determined foot position
-        // previous_start_point_ is where the current leg is right now 
-        std::vector<Point> track_points
-            = pointFinder.retrieveTrackPoints(rotateRight(previous_start_point_world_), found_covid_point_world);
+        // previous_start_point_ is where the current leg is right now
+        std::vector<Point> track_points = pointFinder.retrieveTrackPoints(
+            rotateRight(previous_start_point_world_), found_covid_point_world);
 
         // Visualization
         publishTrackMarkerPoints(point_marker_publisher_, track_points);
