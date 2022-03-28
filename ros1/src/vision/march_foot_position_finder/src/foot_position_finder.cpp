@@ -31,15 +31,15 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     , left_or_right_(left_or_right)
 {
     if (left_or_right_ == "left") {
-        other_ = "right";
+        other_side_ = "right";
         switch_factor_ = -1;
     } else {
-        other_ = "left";
+        other_side_ = "left";
         switch_factor_ = 1;
     }
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
-    other_frame_id_ = "toes_" + other_ + "_aligned";
+    other_frame_id_ = "toes_" + other_side_ + "_aligned";
     base_frame_ = "world";
     ORIGIN = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
     last_height_ = 0;
@@ -50,7 +50,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
     topic_other_chosen_point_
-        = "/chosen_foot_position/" + other_; // in current_frame_id
+        = "/chosen_foot_position/" + other_side_; // in current_frame_id
     topic_current_chosen_point_ = "/chosen_foot_position/" + left_or_right_;
 
     point_publisher_ = n_->advertise<march_shared_msgs::FootPosition>(
@@ -77,6 +77,9 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 
 /**
  * Callback for when parameters are updated with ros reconfigure.
+ * 
+ * @param parametersConfig container that contains all (updated) parameters
+ * @param uint32_t level is not used but is required for correct callback
  */
 // No lint is used to avoid linting in the realsense library, where a potential
 // memory leak error is present
@@ -163,9 +166,10 @@ void FootPositionFinder::chosenCurrentPointCallback(
 {
     // Schedule when last_height_ is updated with the height of the other leg.
     // This timer is used to simulate the moment when pressure soles indicate a
-    // touch of the ground.
+    // touch of the ground. Currently the duration is equal to the early
+    // schedule duration, but this should be loaded dynamically eventually.
     height_reset_timer_ = n_->createTimer(ros::Duration(/*t=*/0.250),
-        &FootPositionFinder::resetHeight, this, true);
+        &FootPositionFinder::resetHeight, this, /*oneshot=*/true);
 }
 
 /**
@@ -296,14 +300,12 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         Point found_covid_point_hip_ = transformPoint(
             found_covid_point_world, base_frame_, "hip_base_aligned");
 
-        // Reset the heights of points in current frame with z-values in the
-        // gravity aligned hip frame
-        found_covid_point_current_.z = found_covid_point_hip_.z;
-        start_point_current_.z = last_height_;
-
         // Compute new foot displacement for gait computation
         Point new_displacement
             = subtractPoints(found_covid_point_current_, start_point_current_);
+        // Compute the z displacement with the z-values in hip frame.
+        float displacement_z = found_covid_point_hip_.z - last_height_;
+        new_displacement.z = displacement_z;
 
         // Apply a threshold for the height of points to be different from 0
         if (std::abs(new_displacement.z) < height_zero_threshold_) {

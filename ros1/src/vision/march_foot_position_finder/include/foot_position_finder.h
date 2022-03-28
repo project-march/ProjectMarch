@@ -67,7 +67,6 @@ protected:
     ros::Timer height_reset_timer_;
     rs2::pipeline pipe_;
     rs2::config config_;
-    rs2::context context_;
 
     rs2::decimation_filter dec_filter_;
     rs2::spatial_filter spat_filter_;
@@ -78,7 +77,7 @@ protected:
     std::string topic_other_chosen_point_;
 
     std::string left_or_right_;
-    std::string other_;
+    std::string other_side_;
 
     std::string base_frame_;
     std::string other_frame_id_;
@@ -99,7 +98,6 @@ protected:
     std::vector<Point> found_points_;
 
     Point ORIGIN;
-    Point last_chosen_point_current_;
     Point last_chosen_point_world_;
     Point start_point_current_;
     Point start_point_world_;
