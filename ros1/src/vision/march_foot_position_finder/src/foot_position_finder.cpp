@@ -77,7 +77,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 
 /**
  * Callback for when parameters are updated with ros reconfigure.
- * 
+ *
  * @param parametersConfig container that contains all (updated) parameters
  * @param uint32_t level is not used but is required for correct callback
  */
