@@ -40,19 +40,25 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(gait_selection, gait_state_machine, parameters):
+def parameter_callback(
+    gait_selection: GaitSelection, gait_state_machine: GaitStateMachine, parameters
+) -> SetParametersResult:
     """
     A callback function that is used to update the parameters that are a part of the
     gait selection node. Since some of these parameters are from the
     gait_state_machine, some from gait_selection and some from both, this is
     implemented here.
-    :param gait_selection: The current GaitSelection object
-    :param gait_state_machine: The current GaitStateMachine
-    :param parameters: the parameters to update
-    :return: Whether the callback was successful
+
+    Args:
+        gait_selection (GaitSelection): The current GaitSelection object
+        gait_state_machine (GaitStateMachine): The current GaitStateMachine object
+        parameters (???): The parameters to update
+    Returns:
+        SetParametersResult: Whether the callback was successful
     """
     gait_selection.get_logger().info("Parameters are updated")
     gaits_updated = False
+    dynamic_gait_updated = False
     for param in parameters:
         if param.name == "balance" and param.type_ == Parameter.Type.BOOL:
             gait_selection._balance_used = param.value
@@ -98,11 +104,12 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
                 gait_state_machine.update_timer.destroy()
             gait_state_machine.run()
 
-    # Seperate update function for dynamic gait to avoid time performance issues
+    # Separate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
         gait_selection.dynamic_setpoint_gait.update_parameters()
         gait_selection.get_logger().info("Dynamic gait parameters updated.")
     elif gaits_updated:
+        # TODO: Updating the parameters in gait_selection does not work
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()
         gait_selection.get_logger().info("Gaits were updated")

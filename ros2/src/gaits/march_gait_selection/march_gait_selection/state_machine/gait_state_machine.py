@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, List
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
@@ -26,7 +26,39 @@ State = Union[EdgePosition, str]
 
 class GaitStateMachine:
     """The state machine used to make sure that only valid transitions will
-    be made."""
+    be made.
+
+    Args:
+        gait_selection (GaitSelection): the gait selection node, loaded gaits to build graph from
+        trajectory_scheduler (TrajectoryScheduler): scheduler interface for scheduling trajectories
+    Attributes:
+        logger (Logger): used to log to the terminal
+        update_timer (???): ??? TODO: Add docs
+        timer_period (float): state machine runs at intervals of timer_period
+        current_state_pub (Publisher): publishes CurrentState message
+        current_gait_pub (Publisher): publishes CurrentGait message
+        error_sub (Subscriber): subscribes to the /march/error topic
+
+        _gait_selection (GaitSelection): the gait selection node, loaded gaits to build graph from
+        _trajectory_scheduler (TrajectoryScheduler): scheduler interface for scheduling trajectories
+        _input (StateMachineInput): ??? TODO: Add docs
+        _transition_callbacks (List[???]): ??? TODO: Add docs
+        _gait_callbacks (List[???]): ??? TODO: Add docs
+        _stop_accepted_callbacks (List[???]): ??? TODO: Add docs
+        _gait_graph (GaitGraph): ??? TODO: Add docs
+        _current_state (State): Either an EdgePosition or a string representing the active gait
+        _current_gait (???): The current gait
+        _shutdown_requested (bool): whether the state machine should shut down
+        _should_stop (bool): whether the gait should be stopped
+        _is_stopping (bool): whether the gait is currently stopping
+        _right_foot_on_ground (bool): whether the right foot is on the ground or not
+        _left_foot_on_ground (bool): whether the left foot is on the ground or not
+        _force_right_foot (float): amount of force on right foot
+        _force_left_foot (float): amount of force on left foot
+        _right_pressure_sub (Subscriber): subscribes to /march/sensor/right_pressure_sole
+        _left_pressure_sub (Subscriber): subscribes to /march/sensor/left_pressure_sole
+        _get_possible_gaits_client (Service): service to get possible gaits from gait_selection
+    """
 
     UNKNOWN = "unknown"
 
@@ -37,10 +69,6 @@ class GaitStateMachine:
         UNKNOWN state.
 
         In order to start the state machine see `run`.
-
-        :param GaitSelection gait_selection: Loaded gaits to build graph from
-        :param TrajectoryScheduler trajectory_scheduler: Scheduler interface for
-                                                         scheduling trajectories
         """
         self._gait_selection = gait_selection
         self._trajectory_scheduler = trajectory_scheduler
@@ -55,7 +83,7 @@ class GaitStateMachine:
         self._gait_graph = GaitGraph(self._gait_selection)
         self._gait_graph.generate_graph()
 
-        # Current state is eiter an EdgePositions or a string representing the active gait
+        # Current state is either an EdgePositions or a string representing the active gait
         self._current_state: State = UnknownEdgePosition()
         self._current_gait = None
         self._shutdown_requested = False
@@ -124,10 +152,15 @@ class GaitStateMachine:
     def _is_idle(self):
         return isinstance(self._current_state, EdgePosition)
 
-    def _update_foot_on_ground_cb(self, side, msg):
+    def _update_foot_on_ground_cb(self, side: Side, msg: ContactsState) -> None:
         """Update the status of the feet on ground based on pressure sole data,
         this is currently decided based on the force in simulation, but the numbers
-        for this will be updated when range of real pressure soles is known."""
+        for this will be updated when range of real pressure soles is known.
+
+        Args:
+            side (Side): Enum for right or left side
+            msg (ContactsState): message published on /march/sensor/[left/right]_pressure_sole
+        """
         if len(msg.states) > 0:
             force = sum(state.total_wrench.force.z for state in msg.states)
 
@@ -144,15 +177,24 @@ class GaitStateMachine:
             else:
                 self._force_left_foot = 0
 
-    def _possible_gaits_cb(self, request, response):
-        """Standard callback for the get possible gaits service"""
+    def _possible_gaits_cb(self, request, response: PossibleGaits) -> PossibleGaits:
+        """Standard callback for the get possible gaits service
+
+        Args:
+            request: Necessary for service
+            response (PossibleGaits): PossibleGaits message to return at service request
+        """
         response.gaits = self.get_possible_gaits()
         return response
 
-    def _current_state_cb(self, state: State):
+    def _current_state_cb(self, state: State) -> None:
         """Standard transition callback for when current state changes,
         publishes the current state. More callbacks can be added using
-        add_transition_callback."""
+        add_transition_callback.
+
+        Args:
+            state (State): message passed on through callback
+        """
         if self._is_idle():
             state_type = CurrentState.IDLE
             state_name = self._gait_graph.get_name_of_position(self._current_state)
@@ -170,10 +212,23 @@ class GaitStateMachine:
         )
 
     def _current_gait_cb(
-        self, gait_name, subgait_name, version, duration: Duration, gait_type
-    ):
+        self,
+        gait_name: str,
+        subgait_name: str,
+        version: str,
+        duration: Duration,
+        gait_type: str,
+    ) -> None:
         """Standard callback when gait changes, publishes the current gait
-        More callbacke can be added using add_gait_callback"""
+        More callback can be added using add_gait_callback
+
+        Args:
+            gait_name (str): name of the gait
+            subgait_name (str): name of the subgait
+            version (str): version of the subgait
+            duration (Duration): duration of the subgait
+            gait_type (str): type of gait, for example walk_like or sit_like
+        """
         self.logger.debug(f"Current subgait updated to {subgait_name}")
         self.current_gait_pub.publish(
             CurrentGait(
@@ -186,69 +241,77 @@ class GaitStateMachine:
             )
         )
 
-    def _error_cb(self, msg):
+    def _error_cb(self, msg: Error) -> None:
         """Standard callback for state machine errors, completely stops
-        updating if the error is fatal. If non fatal, it stops the current
-        gait."""
+        updating if the error is fatal. If non-fatal, it stops the current
+        gait.
+
+        Args:
+            msg (Error): message containing the error type (fatal or non-fatal)
+        """
         if msg.type == Error.NON_FATAL:
             self.stop_gait()
         elif msg.type == Error.FATAL:
             self.request_shutdown("A fatal error was posted to /march/error")
 
-    def get_possible_gaits(self):
+    def get_possible_gaits(self) -> Union[List, set]:
         """Returns possible names of gaits that can be executed.
 
-        :returns List of names, or empty list when a gait is executing.
+        Returns:
+            Union[List, set]: Set of names, or empty list when a gait is executing.
         """
         if self._is_idle():
             return self._gait_graph.possible_gaits_from_idle(self._current_state)
         else:
             return []
 
-    def add_transition_callback(self, cb):
-
+    def add_transition_callback(self, cb) -> None:
         """Adds a callback function that will be called when a transition to
         a state happens.
 
         The given method should be running as shortly as possible, since they
         will be called from within the main loop.
 
-        :param cb: method that accepts a name of the state and a boolean if it
-                   is an idle state.
+        TODO: Add cb type
+        Args:
+            cb: method that accepts a name of the state and a boolean if it is an idle state.
 
         """
         self._add_callback(self._transition_callbacks, cb)
 
-    def add_gait_callback(self, cb):
+    def add_gait_callback(self, cb) -> None:
         """Adds a callback function that will be called when a trajectory of a gait is being scheduled.
 
         The given method should be running as shortly as possible, since they
         will be called from within the main loop.
 
-        :param cb: Callable method that accepts 5 args: gait name, subgait name,
-                   version, duration and gait type.
+        TODO: Add cb type
+        Args:
+             cb: Callable method that accepts 5 args: gait name, subgait name, version, duration and gait type.
         """
         self._add_callback(self._gait_callbacks, cb)
 
-    def add_stop_accepted_callback(self, cb):
+    def add_stop_accepted_callback(self, cb) -> None:
         """Adds a callback function that will be called when a gait accepts the stop command.
 
 
         The given method should be running as shortly as possible, since they
         will be called from within the main loop.
 
-        :param cb: Callable method that accepts no arguments and returns None.
+        TODO: Add cb type
+        Args:
+            cb: Callable method that accepts no arguments and returns None.
         """
         self._add_callback(self._stop_accepted_callbacks, cb)
 
-    def run(self):
+    def run(self) -> None:
         """Runs the state machine until shutdown is requested."""
         self.update_timer = self._gait_selection.create_timer(
             timer_period_sec=self.timer_period,
             callback=self.update,
         )
 
-    def update(self):
+    def update(self) -> None:
         """
         Updates the current state based on the elapsed time, after the state
         machine is started, this function is called every timer period.
@@ -269,9 +332,14 @@ class GaitStateMachine:
         else:
             self.update_timer.cancel()
 
-    def request_shutdown(self, msg: Optional[str] = None):
+    def request_shutdown(self, msg: Optional[str] = None) -> None:
         """Requests shutdown, which will terminate the state machine as soon as
-        possible."""
+        possible.
+
+        Args:
+            msg (:obj: str, optional): message to log with shutdown request, if not specified will be
+                "Shutdown requested"
+        """
         base_msg = "Shutdown requested"
         if msg is not None:
             base_msg += ": " + msg
@@ -279,17 +347,18 @@ class GaitStateMachine:
         self._shutdown_requested = True
         shutdown_system()
 
-    def stop_gait(self):
+    def stop_gait(self) -> None:
         """Requests a stop from the current executing gait, but keeps the state
         machine running."""
         if not self._is_idle() and not self._is_stopping:
             self._should_stop = True
 
     def check_correct_foot_pressure(self) -> bool:
-        """
-        Check if the pressure is placed on the foot opposite to the subgait starting foot.
+        """Check if the pressure is placed on the foot opposite to the subgait starting foot. If not, issue a warning.
+        This will only be checked when transitioning from idle to gait state
 
-        If not, issue a warning. This will only be checked when transitioning from idle to gait state
+        Returns:
+            bool: True if pressure is on the correct foot, else False
         """
         if self._current_gait is not None:
             if (
@@ -311,7 +380,7 @@ class GaitStateMachine:
 
         return True
 
-    def _process_idle_state(self):
+    def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for
         what to do next."""
         if self._input.gait_requested():
@@ -352,7 +421,7 @@ class GaitStateMachine:
                     f"{self._current_state}`"
                 )
 
-    def _process_gait_state(self):
+    def _process_gait_state(self) -> None:
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
@@ -405,7 +474,14 @@ class GaitStateMachine:
             gait_update = self._current_gait.update(now)
         self._process_gait_update(gait_update)
 
-    def _process_gait_update(self, gait_update: GaitUpdate):
+    def _process_gait_update(self, gait_update: GaitUpdate) -> None:
+        """Process an incoming GaitUpdate.
+
+        Will call gait callbacks for each new subgait, schedule new trajectories and process finishing of gait
+
+        Args:
+            gait_update (GaitUpdate): GaitUpdate returned by the gait that is currently executing
+        """
         # Call gait callback if there is a new subgait
         if gait_update.is_new_subgait:
             self._call_gait_callbacks()
@@ -433,7 +509,7 @@ class GaitStateMachine:
             self._current_gait = None
             self._is_stopping = False
 
-    def _handle_input(self):
+    def _handle_input(self) -> None:
         """Handles stop and transition input from the input device. This input
         is passed on to the current gait to execute the request"""
         if self._is_stop_requested() and not self._is_stopping:
@@ -463,16 +539,20 @@ class GaitStateMachine:
                     f"request {request.name}"
                 )
 
-    def _call_transition_callbacks(self):
+    def _call_transition_callbacks(self) -> None:
         """Calls all transition callbacks when the current state changes."""
         self._call_callbacks(self._transition_callbacks, self._current_state)
 
-    def _is_stop_requested(self):
+    def _is_stop_requested(self) -> bool:
         """Returns true if either the input device requested a stop or some other
-        external source requested a stop."""
+        external source requested a stop.
+
+        Returns:
+            bool: True if stop is requested, else False
+        """
         return self._input.stop_requested() or self._should_stop
 
-    def _call_gait_callbacks(self):
+    def _call_gait_callbacks(self) -> None:
         """Calls all added gait callbacks when the current gait changes."""
         if self._current_gait is not None:
             self._call_callbacks(
@@ -484,7 +564,7 @@ class GaitStateMachine:
                 self._current_gait.gait_type,
             )
 
-    def _transition_to_unknown(self):
+    def _transition_to_unknown(self) -> None:
         """When the unknown button is pressed, this function resets the
         state machine to unknown state."""
         if self._current_gait is not None:
@@ -494,13 +574,13 @@ class GaitStateMachine:
         self.logger.info("Transitioned to unknown")
 
     @staticmethod
-    def _add_callback(callbacks, cb):
-        """Adds a method to a list if it is callable."""
+    def _add_callback(callbacks, cb) -> None:
+        """Adds a method to a list if it is callable. TODO: Add docs"""
         if callable(cb):
             callbacks.append(cb)
 
     @staticmethod
-    def _call_callbacks(callbacks, *args):
-        """Calls multiple methods with same set of arguments."""
+    def _call_callbacks(callbacks, *args) -> None:
+        """Calls multiple methods with same set of arguments. TODO: Add docs"""
         for cb in callbacks:
             cb(*args)

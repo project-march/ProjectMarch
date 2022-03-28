@@ -10,7 +10,6 @@ from ament_index_python.packages import get_package_share_path
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
-from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
@@ -37,19 +36,19 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
 
     _current_time: Optional[Time]
 
-    def __init__(self, gait_selection_node: GaitSelection):
+    def __init__(self, gait_selection_node):
         super().__init__(gait_selection_node)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_walk_half_step"
 
         queue_path = get_package_share_path("march_gait_selection")
         queue_directory = os.path.join(
-            queue_path, "_position_queue", "_position_queue.yaml"
+            queue_path, "position_queue", "position_queue.yaml"
         )
         with open(queue_directory, "r") as queue_file:
             _position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
 
-        self._use_position_queue = _position_queue_yaml["use__position_queue"]
+        self._use_position_queue = _position_queue_yaml["use_position_queue"]
         if self._use_position_queue:
             self._position_queue = _position_queue_yaml["points"]
         else:

@@ -23,11 +23,12 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
     """
 
     def __init__(
-            self,
-            gait_name: str, subgaits: Dict[str, Subgait],
-            graph: SubgaitGraph,
-            start_is_dynamic: bool,
-            final_is_dynamic: bool
+        self,
+        gait_name: str,
+        subgaits: Dict[str, Subgait],
+        graph: SubgaitGraph,
+        start_is_dynamic: bool,
+        final_is_dynamic: bool,
     ):
         super(DynamicEdgeSetpointsGait, self).__init__(gait_name, subgaits, graph)
         if start_is_dynamic:

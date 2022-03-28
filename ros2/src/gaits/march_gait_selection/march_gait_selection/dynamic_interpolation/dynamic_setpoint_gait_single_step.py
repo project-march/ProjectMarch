@@ -1,7 +1,6 @@
 """Author: Marten Haitjema, MVII"""
 
 from typing import Optional
-from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
@@ -15,7 +14,7 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
         gait_selection_node (GaitSelection): the gait selection node
     """
 
-    def __init__(self, gait_selection_node: Node):
+    def __init__(self, gait_selection_node):
         super().__init__(gait_selection_node)
         self.gait_name = "dynamic_walk_single_step"
 

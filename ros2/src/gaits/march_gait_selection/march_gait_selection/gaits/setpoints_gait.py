@@ -35,7 +35,9 @@ class SetpointsGait(GaitInterface, Gait):
         _scheduled_early (bool): whether the next step is already scheduled early or not
     """
 
-    def __init__(self, gait_name: str, subgaits: Dict[str, Subgait], graph: SubgaitGraph):
+    def __init__(
+        self, gait_name: str, subgaits: Dict[str, Subgait], graph: SubgaitGraph
+    ):
         super(SetpointsGait, self).__init__(gait_name, subgaits, graph)
         self._current_subgait = None
         self._should_stop = False
@@ -358,7 +360,9 @@ class SetpointsGait(GaitInterface, Gait):
         """Called when the gait has finished."""
         self._current_subgait = None
 
-    def set_subgait_versions(self, robot: Robot, gait_directory: str, version_map: Dict[str, str]) -> None:
+    def set_subgait_versions(
+        self, robot: Robot, gait_directory: str, version_map: Dict[str, str]
+    ) -> None:
         """
         Change the versions of the subgaits.
 

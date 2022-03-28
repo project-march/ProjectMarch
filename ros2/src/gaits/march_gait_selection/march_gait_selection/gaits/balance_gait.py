@@ -148,7 +148,9 @@ class BalanceGait(GaitInterface):
 
         return joint_state
 
-    def construct_trajectory(self, swing_leg: str, subgait_name: str) -> JointTrajectory:
+    def construct_trajectory(
+        self, swing_leg: str, subgait_name: str
+    ) -> JointTrajectory:
         """Constructs a balance trajectory for all joints.
 
         Args:

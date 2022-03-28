@@ -229,7 +229,7 @@ class Subgait:
     def from_dict(
         cls,
         robot: urdf.Robot,
-        subgait_dict: Dict[str, Union[str, int, Dict[str, Dict[str, float]]]],
+        subgait_dict: dict,
         gait_name: str,
         subgait_name: str,
         version: str,
@@ -587,7 +587,7 @@ class Subgait:
 
     # endregion
 
-    def to_dict(self) -> Dict[str, Union[str, float, Dict[str, float]]]:
+    def to_dict(self) -> dict:
         """Get the subgait represented as a dictionary.
 
         Returns:

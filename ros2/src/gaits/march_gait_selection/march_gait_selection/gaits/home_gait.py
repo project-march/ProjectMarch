@@ -31,7 +31,11 @@ class HomeGait(GaitInterface):
     """
 
     def __init__(
-        self, name: str, position: Dict[str, float], gait_type: str, duration: Duration = DEFAULT_HOMEGAIT_DURATION
+        self,
+        name: str,
+        position: Dict[str, float],
+        gait_type: str,
+        duration: Duration = DEFAULT_HOMEGAIT_DURATION,
     ):
         """Initializes an executable home gait with given positions."""
         self._name = "home_{name}".format(name=name)

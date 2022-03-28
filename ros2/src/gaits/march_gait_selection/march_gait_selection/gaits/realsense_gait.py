@@ -267,7 +267,7 @@ class RealsenseGait(SetpointsGait):
 
     @classmethod
     def parse_edge_position(
-            cls, config_value: str, position_values: Dict[str, float]
+        cls, config_value: str, position_values: Dict[str, float]
     ) -> Union[StaticEdgePosition, DynamicEdgePosition]:
         """
         Parse the edge position based on the string in the realsense_gaits.yaml.

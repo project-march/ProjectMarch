@@ -81,7 +81,7 @@ class Gait:
     def from_dict(
         cls,
         robot: urdf.Robot,
-        gait_dictionary: Dict[str, Union[str, Dict[str, str]]],
+        gait_dictionary: Dict[str, Union[str, Dict[str, str]]], # noqa TAE002 too complex annotation
         gait_directory: str,
         gait_version_map: dict,
     ):
@@ -92,6 +92,7 @@ class Gait:
             gait_dictionary (dict): the information of the .gait file as dictionary
             gait_directory (str): path of the directory where the .gait file is located
             gait_version_map (dict): the parsed yaml file which states the version of the subgaits
+                al;skdjasd;lkfj
         Returns:
             If the data in the files is validated a gait object is returned
         """
@@ -199,7 +200,9 @@ class Gait:
                 msg="Gaits with unknown edge positions should not be updated"
             )
 
-    def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait]) -> bool:
+    def _validate_and_set_new_edge_positions(
+        self, new_subgaits: Dict[str, Subgait]
+    ) -> bool:
         """
         Validate that both the starting position and the final position changed in a
         valid way.
@@ -276,7 +279,10 @@ class Gait:
             raise e
 
     def set_subgait_versions(
-        self, robot: urdf.Robot, gait_directory: str, version_map: Dict[str,str],
+        self,
+        robot: urdf.Robot,
+        gait_directory: str,
+        version_map: Dict[str, str],
     ):
         """Updates the given subgait versions and verifies transitions.
 

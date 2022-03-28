@@ -20,7 +20,6 @@ from march_utility.exceptions.gait_exceptions import (
     ShouldStartFromHomestandError,
 )
 
-from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
@@ -60,7 +59,7 @@ class DynamicSetpointGait(GaitInterface):
     _should_stop: bool
     _minimum_stair_height: float
 
-    def __init__(self, gait_selection_node: GaitSelection):
+    def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
         self.home_stand_position = self._joint_dict_to_setpoint_dict(

@@ -5,7 +5,6 @@ import numpy as np
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
-from march_gait_selection.gait_selection import GaitSelection
 
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
@@ -65,7 +64,7 @@ class DynamicSubgait:
 
     def __init__(
         self,
-        gait_selection_node: GaitSelection,
+        gait_selection_node,
         starting_position: Dict[str, Setpoint],
         subgait_id: str,
         joint_names: List[str],
@@ -265,7 +264,7 @@ class DynamicSubgait:
         """Return the values in a joint_dict as a list."""
         return list(joint_dict.values())
 
-    def _get_parameters(self, gait_selection_node: GaitSelection) -> None:
+    def _get_parameters(self, gait_selection_node) -> None:
         """Gets the dynamic gait parameters from the gait_selection_node
 
         Args:

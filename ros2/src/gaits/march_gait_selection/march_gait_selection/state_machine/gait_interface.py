@@ -60,14 +60,17 @@ class GaitInterface:
     def start(self, current_time: Time) -> GaitUpdate:
         """Start the gait.
 
-        :returns Returns a GaitUpdate that usually contains a TrajectoryCommand."""
+        Returns:
+             GaitUpdate: a GaitUpdate that usually contains a TrajectoryCommand."""
         return GaitUpdate.empty()
 
     def update(self, current_time: Time) -> GaitUpdate:
         """Give an update on the progress of the gait.
 
-        :param current_time: Current time
-        :returns Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+        Args:
+           current_time (Time): Current time
+        Returns:
+             GaitUpdate: a GaitUpdate that may contain a TrajectoryCommand, and any of the
                 flags set to true, depending on the state of the Gait.
         """
         return GaitUpdate.finished()
@@ -75,17 +78,18 @@ class GaitInterface:
     def transition(self, transition_request: TransitionRequest) -> bool:
         """Requests a special transition.
 
-        :param TransitionRequest transition_request: request on what special
-               transition to perform
-
-        :returns True when the request has been accepted, False otherwise.
+        Args:
+             transition_request: (TransitionRequest): request on what special transition to perform
+        Returns:
+            bool: True when the request has been accepted, False otherwise.
         """
         return False
 
     def stop(self) -> bool:
         """Called when the gait has been instructed to stop.
 
-        :returns True when the stop action has been accepted, False otherwise.
+        Returns:
+            bool: True when the stop action has been accepted, False otherwise.
         """
         return False
 
