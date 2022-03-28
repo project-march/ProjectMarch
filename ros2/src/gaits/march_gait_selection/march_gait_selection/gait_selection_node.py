@@ -64,16 +64,11 @@ def parameter_callback(
             gait_selection._balance_used = param.value
         elif param.name == "dynamic_gait" and param.type == Parameter.Type.BOOL:
             gait_selection._dynamic_gait = param.value
-        elif (
-            param.name == "early_schedule_delay"
-            and param.type_ == Parameter.Type.DOUBLE
-        ):
+        elif param.name == "early_schedule_delay" and param.type_ == Parameter.Type.DOUBLE:
             if param.value < 0:
                 return SetParametersResult(successful=False)
             gait_selection._early_schedule_duration = Duration(seconds=param.value)
-        elif (
-            param.name == "first_subgait_delay" and param.type_ == Parameter.Type.DOUBLE
-        ):
+        elif param.name == "first_subgait_delay" and param.type_ == Parameter.Type.DOUBLE:
             if param.value < 0:
                 return SetParametersResult(successful=False)
             gait_selection._first_subgait_delay = Duration(seconds=param.value)

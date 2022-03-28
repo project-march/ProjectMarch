@@ -19,15 +19,9 @@ VALID_DIRECTORY = "test/resources"
 class TestSetpointsGait(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march6.urdf"
-        )
-        cls.gait_directory = os.path.join(
-            get_package_share_directory(VALID_PACKAGE), VALID_DIRECTORY
-        )
-        cls.gait_selection = GaitSelection(
-            gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=cls.robot
-        )
+        cls.robot = urdf.Robot.from_xml_file(get_package_share_directory("march_description") + "/urdf/march6.urdf")
+        cls.gait_directory = os.path.join(get_package_share_directory(VALID_PACKAGE), VALID_DIRECTORY)
+        cls.gait_selection = GaitSelection(gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=cls.robot)
 
     def setUp(self):
         self.gait = SetpointsGait.from_file(
@@ -69,9 +63,7 @@ class TestSetpointsGait(unittest.TestCase):
 
     def test_next_graph_subgait(self):
         self.gait.start(Time(seconds=0))
-        self.assertEqual(
-            self.gait._next_graph_subgait(), self.gait.subgaits["left_swing"]
-        )
+        self.assertEqual(self.gait._next_graph_subgait(), self.gait.subgaits["left_swing"])
 
     def test_next_graph_subgait_end(self):
         self.gait._current_subgait = self.gait.subgaits["left_close"]
@@ -80,16 +72,12 @@ class TestSetpointsGait(unittest.TestCase):
     def test_next_graph_subgait_stop_valid(self):
         self.gait._current_subgait = self.gait.subgaits["left_swing"]
         self.gait._should_stop = True
-        self.assertEqual(
-            self.gait._next_graph_subgait(), self.gait.subgaits["right_close"]
-        )
+        self.assertEqual(self.gait._next_graph_subgait(), self.gait.subgaits["right_close"])
 
     def test_next_graph_subgait_stop_invalid(self):
         self.gait._current_subgait = self.gait.subgaits["right_open"]
         self.gait._should_stop = True
-        self.assertEqual(
-            self.gait._next_graph_subgait(), self.gait.subgaits["left_swing"]
-        )
+        self.assertEqual(self.gait._next_graph_subgait(), self.gait.subgaits["left_swing"])
 
     def test_stop_true(self):
         self.gait._current_subgait = self.gait.subgaits["left_swing"]
@@ -111,9 +99,7 @@ class TestSetpointsGait(unittest.TestCase):
 
     def test_update_time_stamps_with_delay(self):
         self.gait._current_time = Time(seconds=3)
-        self.gait._update_time_stamps(
-            self.gait.subgaits["left_swing"], Duration(seconds=2)
-        )
+        self.gait._update_time_stamps(self.gait.subgaits["left_swing"], Duration(seconds=2))
         self.assertEqual(self.gait._start_time, Time(seconds=5))
         self.assertEqual(self.gait._end_time, Time(seconds=6.1))
 
@@ -183,9 +169,7 @@ class TestSetpointsGait(unittest.TestCase):
         self.assertEqual(
             gait_update,
             GaitUpdate.should_schedule_early(
-                TrajectoryCommand.from_subgait(
-                    self.gait.subgaits["left_swing"], Time(seconds=1.5)
-                )
+                TrajectoryCommand.from_subgait(self.gait.subgaits["left_swing"], Time(seconds=1.5))
             ),
         )
 

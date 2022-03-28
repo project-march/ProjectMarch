@@ -133,9 +133,7 @@ class TrajectoryScheduler:
         info_log_message = f"Scheduling {command.name}"
         debug_log_message = f"Subgait {command.name} starts "
         if self._node.get_clock().now() < command.start_time:
-            time_difference = Duration.from_ros_duration(
-                command.start_time - self._node.get_clock().now()
-            )
+            time_difference = Duration.from_ros_duration(command.start_time - self._node.get_clock().now())
             debug_log_message += f"in {round(time_difference.seconds, 3)}s"
         else:
             debug_log_message += "now"
@@ -149,9 +147,7 @@ class TrajectoryScheduler:
         now = self._node.get_clock().now()
         for goal in self._goals:
             if goal.start_time + goal.duration > now:
-                self._cancel_pub.publish(
-                    GoalID(stamp=goal.start_time.to_msg(), id=str(goal))
-                )
+                self._cancel_pub.publish(GoalID(stamp=goal.start_time.to_msg(), id=str(goal)))
 
     def send_position_hold(self) -> None:
         """Schedule empty JointTrajectory message to hold position. Used during force unknown"""

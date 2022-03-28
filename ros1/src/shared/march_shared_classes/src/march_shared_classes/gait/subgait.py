@@ -77,19 +77,13 @@ class Subgait:
                 subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
 
         except Exception as e:  # noqa: PIE786
-            rospy.logerr(
-                "Error occurred in subgait: {te}, {er} ".format(te=type(e), er=e)
-            )
+            rospy.logerr("Error occurred in subgait: {te}, {er} ".format(te=type(e), er=e))
             return None
 
-        return cls.from_dict(
-            robot, subgait_dict, gait_name, subgait_name, version, *args
-        )
+        return cls.from_dict(robot, subgait_dict, gait_name, subgait_name, version, *args)
 
     @classmethod
-    def from_name_and_version(
-        cls, robot, gait_dir, gait_name, subgait_name, version, *args
-    ):
+    def from_name_and_version(cls, robot, gait_dir, gait_name, subgait_name, version, *args):
         """Load subgait based from file(s) based on name and version.
 
         :param robot: The robot corresponding to the given subgait file
@@ -102,21 +96,13 @@ class Subgait:
         """
         subgait_path = os.path.join(gait_dir, gait_name, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
-            base_version, other_version, parameter = Subgait.unpack_parametric_version(
-                version
-            )
+            base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
             if base_version == other_version:
-                subgait_version_path = os.path.join(
-                    subgait_path, base_version + SUBGAIT_SUFFIX
-                )
+                subgait_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
                 return cls.from_file(robot, subgait_version_path, *args)
             else:
-                base_version_path = os.path.join(
-                    subgait_path, base_version + SUBGAIT_SUFFIX
-                )
-                other_version_path = os.path.join(
-                    subgait_path, other_version + SUBGAIT_SUFFIX
-                )
+                base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
+                other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
                 return cls.from_files_interpolated(
                     robot,
                     base_version_path,
@@ -129,15 +115,7 @@ class Subgait:
             return cls.from_file(robot, subgait_version_path, *args)
 
     @classmethod
-    def from_files_interpolated(
-        cls,
-        robot,
-        file_name_base,
-        file_name_other,
-        parameter,
-        use_foot_position=False,
-        *args
-    ):
+    def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, use_foot_position=False, *args):
         """Extract two subgaits from files and interpolate.
 
         :param robot:
@@ -156,9 +134,7 @@ class Subgait:
         """
         base_subgait = cls.from_file(robot, file_name_base, *args)
         other_subgait = cls.from_file(robot, file_name_other, *args)
-        return cls.interpolate_subgaits(
-            base_subgait, other_subgait, parameter, use_foot_position
-        )
+        return cls.interpolate_subgaits(base_subgait, other_subgait, parameter, use_foot_position)
 
     @classmethod
     def from_dict(cls, robot, subgait_dict, gait_name, subgait_name, version, *args):
@@ -185,27 +161,17 @@ class Subgait:
         duration = cls.nsec_to_sec(subgait_dict["duration"])
 
         joint_list = []
-        for name, points in sorted(
-            subgait_dict["joints"].items(), key=lambda item: item[0]
-        ):
+        for name, points in sorted(subgait_dict["joints"].items(), key=lambda item: item[0]):
             urdf_joint = cls.joint_class.get_joint_from_urdf(robot, name)
             if urdf_joint is None or urdf_joint.type == "fixed":
-                rospy.logwarn(
-                    "Joint {0} is not in the robot description. Skipping joint."
-                )
+                rospy.logwarn("Joint {0} is not in the robot description. Skipping joint.")
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
             # Make compatible with new subgait time structure
             cls.convert_points_dict(points)
-            joint_list.append(
-                cls.joint_class.from_setpoints(name, limits, points, duration, *args)
-            )
-        subgait_type = (
-            subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
-        )
-        subgait_description = (
-            subgait_dict["description"] if subgait_dict.get("description") else ""
-        )
+            joint_list.append(cls.joint_class.from_setpoints(name, limits, points, duration, *args))
+        subgait_type = subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
+        subgait_description = subgait_dict["description"] if subgait_dict.get("description") else ""
 
         return cls(
             joint_list,
@@ -240,9 +206,7 @@ class Subgait:
                 if interpolated_setpoint.time != timestamp:
                     rospy.logwarn(
                         "Time mismatch in joint {jn} at timestamp {ts}, "
-                        "got time {ti}".format(
-                            jn=joint.name, ts=timestamp, ti=interpolated_setpoint.time
-                        )
+                        "got time {ti}".format(jn=joint.name, ts=timestamp, ti=interpolated_setpoint.time)
                     )
 
                 joint_trajectory_point.positions.append(interpolated_setpoint.position)
@@ -313,9 +277,7 @@ class Subgait:
                 if timestamp > self.duration:
                     raise IndexError(
                         "Gait {gait}, subgait {subgait} could not extrapolate timestamp outside max "
-                        "duration".format(
-                            gait=self.gait_name, subgait=self.subgait_name
-                        )
+                        "duration".format(gait=self.gait_name, subgait=self.subgait_name)
                     )
 
                 new_joint_setpoints.append(joint.get_interpolated_setpoint(timestamp))
@@ -323,9 +285,7 @@ class Subgait:
             joint.setpoints = new_joint_setpoints
 
     @classmethod
-    def interpolate_subgaits(
-        cls, base_subgait, other_subgait, parameter, use_foot_position=False
-    ):
+    def interpolate_subgaits(cls, base_subgait, other_subgait, parameter, use_foot_position=False):
         """Linearly interpolate two subgaits with the parameter to get a new subgait. based on foot_pos, or on angles.
 
         :param base_subgait:
@@ -346,30 +306,20 @@ class Subgait:
             return base_subgait
         if not (0 < parameter < 1):
             raise ValueError(
-                "Parameter for interpolation should be in the interval [0, 1], but is {0}".format(
-                    parameter
-                )
+                "Parameter for interpolation should be in the interval [0, 1], but is {0}".format(parameter)
             )
 
         if use_foot_position:
-            joints = Subgait.get_foot_position_interpolated_joint_trajectories(
-                base_subgait, other_subgait, parameter
-            )
+            joints = Subgait.get_foot_position_interpolated_joint_trajectories(base_subgait, other_subgait, parameter)
         else:
-            joints = Subgait.get_joint_angle_interpolated_joint_trajectories(
-                base_subgait, other_subgait, parameter
-            )
+            joints = Subgait.get_joint_angle_interpolated_joint_trajectories(base_subgait, other_subgait, parameter)
 
         description = "Interpolation between base version {0}, and other version {1} with parameter{2}. Based on foot position: {3}".format(
             base_subgait.version, other_subgait.version, parameter, use_foot_position
         )
 
-        duration = weighted_average(
-            base_subgait.duration, other_subgait.duration, parameter
-        )
-        gait_type = (
-            base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
-        )
+        duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
+        gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         version = "{0}{1}_({2})_({3})".format(
             PARAMETRIC_GAITS_PREFIX,
             parameter,
@@ -458,12 +408,8 @@ class Subgait:
         subgait_path = os.path.join(gait_path, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, _ = Subgait.unpack_parametric_version(version)
-            base_version_path = os.path.join(
-                subgait_path, base_version + SUBGAIT_SUFFIX
-            )
-            other_version_path = os.path.join(
-                subgait_path, other_version + SUBGAIT_SUFFIX
-            )
+            base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
+            other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
             for version_path in [base_version_path, other_version_path]:
                 if not os.path.isfile(version_path):
                     rospy.logwarn("{sp} does not exist".format(sp=version_path))
@@ -478,9 +424,7 @@ class Subgait:
     @staticmethod
     def unpack_parametric_version(version):
         """Unpack a version to base version, other version and parameter."""
-        parameter_str = re.search(
-            r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version
-        ).group(1)
+        parameter_str = re.search(r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version).group(1)
         parameter = float(parameter_str)
         versions = re.findall(r"\([^\)]*\)", version)
         base_version = versions[0][1:-1]
@@ -499,9 +443,7 @@ class Subgait:
             if base_joint.name != other_joint.name:
                 raise SubgaitInterpolationError(
                     "The subgaits to interpolate do not have the same joints, base"
-                    " subgait has {0}, while other subgait has {1}".format(
-                        base_joint.name, other_joint.name
-                    )
+                    " subgait has {0}, while other subgait has {1}".format(base_joint.name, other_joint.name)
                 )
 
             # check whether each joint has the same number of setpoints for the interpolation using foot position
@@ -532,9 +474,7 @@ class Subgait:
                 )
 
     @staticmethod
-    def get_foot_position_interpolated_joint_trajectories(
-        base_subgait, other_subgait, parameter
-    ):
+    def get_foot_position_interpolated_joint_trajectories(base_subgait, other_subgait, parameter):
         """Creates a list of joint trajectories with linearly interpolated corresponding foot location.
 
         The foot location corresponding to the resulting trajectories is equal to the weighted average (with the
@@ -554,21 +494,13 @@ class Subgait:
         (
             base_setpoints_to_interpolate,
             other_setpoints_to_interpolate,
-        ) = JointTrajectory.change_order_of_joints_and_setpoints(
-            base_subgait, other_subgait
-        )
+        ) = JointTrajectory.change_order_of_joints_and_setpoints(base_subgait, other_subgait)
         new_setpoints = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using the inverse kinematics
         for setpoint_index in range(number_of_setpoints):
-            base_feet_state = FeetState.from_setpoints(
-                base_setpoints_to_interpolate[setpoint_index]
-            )
-            other_feet_state = FeetState.from_setpoints(
-                other_setpoints_to_interpolate[setpoint_index]
-            )
-            new_feet_state = FeetState.weighted_average_states(
-                base_feet_state, other_feet_state, parameter
-            )
+            base_feet_state = FeetState.from_setpoints(base_setpoints_to_interpolate[setpoint_index])
+            other_feet_state = FeetState.from_setpoints(other_setpoints_to_interpolate[setpoint_index])
+            new_feet_state = FeetState.weighted_average_states(base_feet_state, other_feet_state, parameter)
             setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
@@ -579,14 +511,10 @@ class Subgait:
                 base_subgait.get_joint(ankle_joint).setpoints,
                 other_subgait.get_joint(ankle_joint).setpoints,
             ):
-                new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(
-                    base_setpoint, other_setpoint, parameter
-                )
+                new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(base_setpoint, other_setpoint, parameter)
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
-        duration = weighted_average(
-            base_subgait.duration, other_subgait.duration, parameter
-        )
+        duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
 
         for joint in base_subgait.joints:
             interpolated_joint_trajectory_to_add = JointTrajectory(
@@ -597,9 +525,7 @@ class Subgait:
         return interpolated_joint_trajectories
 
     @staticmethod
-    def get_joint_angle_interpolated_joint_trajectories(
-        base_subgait, other_subgait, parameter
-    ):
+    def get_joint_angle_interpolated_joint_trajectories(base_subgait, other_subgait, parameter):
         """Calls the interpolate_joint_trajectories method for each joint trajectory in two subgaits.
 
         :param base_subgait: base subgait, return value if parameter is equal to zero
@@ -615,14 +541,10 @@ class Subgait:
             if base_joint.name != other_joint.name:
                 raise SubgaitInterpolationError(
                     "The subgaits to interpolate do not have the same joints, base"
-                    " subgait has {0}, while other subgait has {1}".format(
-                        base_joint.name, other_joint.name
-                    )
+                    " subgait has {0}, while other subgait has {1}".format(base_joint.name, other_joint.name)
                 )
-            interpolated_joint_trajectory_to_add = (
-                JointTrajectory.interpolate_joint_trajectories(
-                    base_joint, other_joint, parameter
-                )
+            interpolated_joint_trajectory_to_add = JointTrajectory.interpolate_joint_trajectories(
+                base_joint, other_joint, parameter
             )
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 

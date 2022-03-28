@@ -40,13 +40,9 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
                 self.subgaits[self.graph.start_subgaits()[0]].starting_position
             )
         if final_is_dynamic:
-            self._final_position = DynamicEdgePosition(
-                self.subgaits[self.graph.end_subgaits()[0]].final_position
-            )
+            self._final_position = DynamicEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
         else:
-            self._final_position = StaticEdgePosition(
-                self.subgaits[self.graph.end_subgaits()[0]].final_position
-            )
+            self._final_position = StaticEdgePosition(self.subgaits[self.graph.end_subgaits()[0]].final_position)
 
     @classmethod
     def dynamic_from_file(
@@ -109,9 +105,7 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
 
         graph = SubgaitGraph(subgaits)
         subgaits = {
-            name: cls.load_subgait(
-                robot, gait_directory, gait_name, name, gait_version_map
-            )
+            name: cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map)
             for name in subgaits
             if name not in ("start", "end")
         }

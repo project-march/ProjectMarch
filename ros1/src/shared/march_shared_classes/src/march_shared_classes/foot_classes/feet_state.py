@@ -101,12 +101,8 @@ class FeetState:
         elif parameter == 1:
             return other_state
 
-        resulting_right_foot = Foot.weighted_average_foot(
-            base_state.right_foot, other_state.right_foot, parameter
-        )
-        resulting_left_foot = Foot.weighted_average_foot(
-            base_state.left_foot, other_state.left_foot, parameter
-        )
+        resulting_right_foot = Foot.weighted_average_foot(base_state.right_foot, other_state.right_foot, parameter)
+        resulting_left_foot = Foot.weighted_average_foot(base_state.left_foot, other_state.left_foot, parameter)
         resulting_time = weighted_average(base_state.time, other_state.time, parameter)
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
@@ -119,12 +115,8 @@ class FeetState:
 
         :return: A dictionary of setpoints, the foot location and velocity of which corresponds with the feet_state
         """
-        left_joint_states = Foot.get_joint_states_from_foot_state(
-            feet_state.left_foot, feet_state.time
-        )
-        right_joint_states = Foot.get_joint_states_from_foot_state(
-            feet_state.right_foot, feet_state.time
-        )
+        left_joint_states = Foot.get_joint_states_from_foot_state(feet_state.left_foot, feet_state.time)
+        right_joint_states = Foot.get_joint_states_from_foot_state(feet_state.right_foot, feet_state.time)
 
         # setpoints
         return merge_dictionaries(left_joint_states, right_joint_states)

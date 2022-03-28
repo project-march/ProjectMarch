@@ -40,6 +40,4 @@ class GaitVersionToolPlugin(Plugin):
         context.add_widget(self._widget)
 
         if context.serial_number() > 1:
-            self._widget.setWindowTitle(
-                "{0} ({1})".format(self._widget.windowTitle(), context.serial_number())
-            )
+            self._widget.setWindowTitle("{0} ({1})".format(self._widget.windowTitle(), context.serial_number()))

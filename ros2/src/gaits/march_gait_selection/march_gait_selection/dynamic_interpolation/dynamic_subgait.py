@@ -166,9 +166,7 @@ class DynamicSubgait:
         """Calls IK solver to compute the joint angles needed for the
         desired x and y coordinate"""
         if self.stop:
-            self.desired_position = self._from_joint_dict_to_list(
-                get_position_from_yaml("stand")
-            )
+            self.desired_position = self._from_joint_dict_to_list(get_position_from_yaml("stand"))
         else:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
@@ -197,9 +195,7 @@ class DynamicSubgait:
                 (name == "right_ankle" and self.subgait_id == "right_swing")
                 or (name == "left_ankle" and self.subgait_id == "left_swing")
             ):
-                setpoint_list.insert(
-                    EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
-                )
+                setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
             if name in ["right_ankle", "left_ankle"]:
                 self.joint_trajectory_list.append(

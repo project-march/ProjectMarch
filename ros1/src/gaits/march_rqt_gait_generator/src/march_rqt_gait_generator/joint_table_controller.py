@@ -19,13 +19,9 @@ class JointTableController:
         for i, setpoint in enumerate(joint.setpoints):
             time_item = QTableWidgetItem(str(round(setpoint.time, self.TABLE_DIGITS)))
 
-            position_item = QTableWidgetItem(
-                str(round(math.degrees(setpoint.position), self.TABLE_DIGITS))
-            )
+            position_item = QTableWidgetItem(str(round(math.degrees(setpoint.position), self.TABLE_DIGITS)))
 
-            velocity_item = QTableWidgetItem(
-                str(round(math.degrees(setpoint.velocity), self.TABLE_DIGITS))
-            )
+            velocity_item = QTableWidgetItem(str(round(math.degrees(setpoint.velocity), self.TABLE_DIGITS)))
 
             self.table_widget.setItem(i, 0, time_item)
             self.table_widget.setItem(i, 1, position_item)

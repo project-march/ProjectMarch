@@ -19,9 +19,7 @@ class Setpoint:
 
     digits = 4
 
-    def __init__(
-        self, time: Duration, position: float, velocity: Optional[float] = None
-    ) -> None:
+    def __init__(self, time: Duration, position: float, velocity: Optional[float] = None) -> None:
         """
         Initialize a setpoint.
 
@@ -29,9 +27,7 @@ class Setpoint:
         :param position: The position (angle) of the joint.
         :param velocity: The velocity of the joint.
         """
-        self._time = round(
-            time, self.digits
-        )  # https://github.com/python/mypy/issues/8213
+        self._time = round(time, self.digits)  # https://github.com/python/mypy/issues/8213
         self._position = round(position, self.digits)
         if velocity is not None:
             self._velocity: Optional[float] = round(velocity, self.digits)
@@ -64,23 +60,13 @@ class Setpoint:
 
     def __repr__(self):
         if self.velocity is not None:
-            return (
-                f"Time: {self.time.nanoseconds!s}, Position: {self.position!s}, Velocity:"
-                f" {self.velocity!s}"
-            )
+            return f"Time: {self.time.nanoseconds!s}, Position: {self.position!s}, Velocity: {self.velocity!s}"
         else:
-            return (
-                f"Time: {self.time!s}, Position: {self.position!s}, Velocity: Not "
-                f"specified"
-            )
+            return f"Time: {self.time!s}, Position: {self.position!s}, Velocity: Not specified"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (
-                self.time == other.time
-                and self.position == other.position
-                and self.velocity == other.velocity
-            )
+            return self.time == other.time and self.position == other.position and self.velocity == other.velocity
         else:
             return False
 
@@ -88,9 +74,7 @@ class Setpoint:
         return not self.__eq__(other)
 
     @staticmethod
-    def interpolate_setpoints(
-        base_setpoint: Setpoint, other_setpoint: Setpoint, parameter: float
-    ) -> Setpoint:
+    def interpolate_setpoints(base_setpoint: Setpoint, other_setpoint: Setpoint, parameter: float) -> Setpoint:
         """Linearly interpolate two setpoints.
 
         :param base_setpoint:
@@ -103,10 +87,6 @@ class Setpoint:
             The interpolated setpoint
         """
         time = base_setpoint.time.weighted_average(other_setpoint.time, parameter)
-        position = weighted_average_floats(
-            base_setpoint.position, other_setpoint.position, parameter
-        )
-        velocity = weighted_average_floats(
-            base_setpoint.velocity, other_setpoint.velocity, parameter
-        )
+        position = weighted_average_floats(base_setpoint.position, other_setpoint.position, parameter)
+        velocity = weighted_average_floats(base_setpoint.velocity, other_setpoint.velocity, parameter)
         return Setpoint(time, position, velocity)

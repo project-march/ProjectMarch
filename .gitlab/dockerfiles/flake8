@@ -8,6 +8,9 @@ COPY requirements_flake8.txt march_tmp/requirements_flake8.txt
 RUN pip3 install -r march_tmp/requirements_flake8.txt
 RUN rm -rf march_tmp/
 
+COPY pyproject.toml .march_config/black/pyproject.toml
+ENV XDG_CONFIG_HOME .march_config
+
 # Remove the dependencies that were required for building plugins.
 RUN apk del gcc musl-dev
 

@@ -64,6 +64,7 @@ class DynamicJointTrajectory:
             self.interpolated_position = CubicSpline(
                 time, position, bc_type=boundary_condition
             )
+
         self.interpolated_velocity = self.interpolated_position.derivative()
 
     def get_interpolated_setpoint(self, time: float) -> Setpoint:

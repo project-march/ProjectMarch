@@ -134,9 +134,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
-        return StaticEdgePosition(
-            self._setpoint_dict_to_joint_dict(self.start_position)
-        )
+        return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.start_position))
 
     @property
     def final_position(self) -> EdgePosition:
@@ -236,10 +234,7 @@ class DynamicSetpointGait(GaitInterface):
             else:
                 return GaitUpdate.empty()
 
-        if (
-            self._current_time >= self._end_time - early_schedule_duration
-            and not self._scheduled_early
-        ):
+        if self._current_time >= self._end_time - early_schedule_duration and not self._scheduled_early:
             return self._update_next_subgait_early()
 
         if self._current_time >= self._end_time:
@@ -619,9 +614,7 @@ class DynamicSetpointGait(GaitInterface):
         """Get the limits of all joints in the urdf"""
         self.joint_soft_limits = []
         for joint_name in self.joint_names:
-            self.joint_soft_limits.append(
-                get_limits_robot_from_urdf_for_inverse_kinematics(joint_name)
-            )
+            self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
     # SAFETY
     def _check_msg_time(self, foot_location: FootPosition) -> bool:
@@ -643,8 +636,7 @@ class DynamicSetpointGait(GaitInterface):
         )
         time_difference = current_time - msg_time
         self.logger.debug(
-            "Time difference between CoViD foot location and current time: "
-            f"{time_difference}.",
+            f"Time difference between CoViD foot location and current time: {time_difference}.",
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
