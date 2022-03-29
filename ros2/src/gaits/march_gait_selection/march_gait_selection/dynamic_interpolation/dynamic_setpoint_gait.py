@@ -569,8 +569,6 @@ class DynamicSetpointGait(GaitInterface):
             setpoint_dict (dict): A dictionary containing joint names and setpoints
         Returns:
             dict: A dictionary containing joint names and positions
-        :param setpoint_dict: A dictionary containing joint names and setpoints.
-        :type: dict
         """
         joint_dict = {}
         for name, setpoint in setpoint_dict.items():
