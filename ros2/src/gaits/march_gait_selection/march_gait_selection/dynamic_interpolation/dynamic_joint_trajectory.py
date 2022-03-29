@@ -1,4 +1,4 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 from scipy.interpolate import CubicSpline, BPoly
 from march_utility.gait.setpoint import Setpoint
@@ -46,9 +46,12 @@ class DynamicJointTrajectory:
         return time, position, velocity
 
     def _interpolate_setpoints(self) -> None:
-        """Uses a CubicSpline with velocity boundary conditions to create interpolator objects for
+        """Interpolates between the given setpoints.
+
+        Uses a CubicSpline with velocity boundary conditions to create interpolator objects for
         position and velocity. Uses a different interpolation method for the swing leg ankle. This is
-        because this joint will otherwise be in the soft limits too often."""
+        because this joint will otherwise be in the soft limits too often.
+        """
         duration, position, velocity = self._get_setpoints_unzipped()
         time = [d.nanoseconds / NANOSECONDS_TO_SECONDS for d in duration]
 
@@ -66,8 +69,7 @@ class DynamicJointTrajectory:
         self.interpolated_velocity = self.interpolated_position.derivative()
 
     def get_interpolated_setpoint(self, time: float) -> Setpoint:
-        """Computes a Setpoint instance with the given time and the interpolated
-        position and velocity at this time.
+        """Computes a Setpoint instance with the given time and the interpolated position and velocity at this time.
 
         Args:
             time (float): Time at which the setpoint will be set

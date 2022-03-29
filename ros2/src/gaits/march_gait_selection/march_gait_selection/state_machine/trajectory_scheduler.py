@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 from __future__ import annotations
 from typing import List
 
@@ -52,12 +54,12 @@ class TrajectoryCommand:
         )
 
     def __str__(self) -> str:
+        """Returns a string with the name, start time and duration."""
         return f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
 
 
 class TrajectoryScheduler:
-    """Scheduler that sends the wanted trajectories to the topic listened
-    to by the exoskeleton/simulation.
+    """Scheduler that sends the wanted trajectories to the topic listened to by the exoskeleton/simulation.
 
     Args:
         node (Node): node that is used to create subscribers/publishers
@@ -141,22 +143,22 @@ class TrajectoryScheduler:
         self.logger.debug(debug_log_message)
 
     def cancel_active_goals(self) -> None:
-        """Cancels the active goal"""
+        """Cancels the active goal."""
         now = self._node.get_clock().now()
         for goal in self._goals:
             if goal.start_time + goal.duration > now:
                 self._cancel_pub.publish(GoalID(stamp=goal.start_time.to_msg(), id=str(goal)))
 
     def send_position_hold(self) -> None:
-        """Schedule empty JointTrajectory message to hold position. Used during force unknown"""
+        """Schedule empty JointTrajectory message to hold position. Used during force unknown."""
         self._trajectory_command_pub.publish(JointTrajectory())
 
     def failed(self) -> bool:
-        """Returns true if the trajectory failed"""
+        """Returns true if the trajectory failed."""
         return self._failed
 
     def reset(self) -> None:
-        """Reset attributes of class"""
+        """Reset attributes of class."""
         self._failed = False
         self._goals = []
 

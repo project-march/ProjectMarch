@@ -1,3 +1,5 @@
+"""Author: MVI."""
+
 from __future__ import annotations
 
 from threading import Event
@@ -37,11 +39,10 @@ from urdf_parser_py import urdf
 
 
 class RealsenseGait(SetpointsGait):
-    """
-    The RealsenseGait class is used for creating gaits based on the parameters given
-    by the realsense reader. From these parameters the subgaits to interpolate are
-    interpolated after a realsense call during the start of the gait. It is based on the
-    setpoints gait, and it uses the interpolation over 1 or 2 dimensions with 2 or 4
+    """The RealsenseGait class is used for creating gaits based on the parameters given by the realsense reader.
+
+    From these parameters the subgaits to interpolate are interpolated after a realsense call during the start
+    of the gait. It is based on the setpoints gait, and it uses the interpolation over 1 or 2 dimensions with 2 or 4
     subgaits respectively.
 
     Args:
@@ -129,34 +130,36 @@ class RealsenseGait(SetpointsGait):
 
     @property
     def dependent_on(self):
+        """Return of what it is dependent TODO: what does this mean?"""
         return self._dependent_on
 
     @property
     def responsible_for(self):
+        """Return for what it is responsible TODO: what does this mean?"""
         return self._responsible_for
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
-        """
-        Whether a subgait can be scheduled early, this is not possible for the realsense
-        gait, since this will later have a service call to determine the next subgait.
+        """Whether a subgait can be scheduled early.
+
+        This is not possible for the realsense gait, since this will later have a service call to
+        determine the next subgait.
         """
         return True
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
-        """
-        Whether the first subgait can be started with a delay, this is possible for
-        the realsense gait.
-        """
+        """Whether the first subgait can be started with a delay, this is possible for the realsense gait."""
         return True
 
     @property
     def starting_position(self) -> EdgePosition:
+        """Returns the starting position of the subgait."""
         return self._starting_position
 
     @property
     def final_position(self) -> EdgePosition:
+        """Returns the final position of the subgait."""
         return self._final_position
 
     @classmethod
@@ -170,8 +173,7 @@ class RealsenseGait(SetpointsGait):
         gait_directory: str,
         process_service: Client,
     ) -> RealsenseGait:
-        """
-        Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
+        """Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
 
         Args:
             gait_selection (GaitSelection): The GaitSelection node that will be used for making the service calls to the
@@ -261,8 +263,7 @@ class RealsenseGait(SetpointsGait):
     def parse_edge_position(
         cls, config_value: str, position_values: Dict[str, float]
     ) -> Union[StaticEdgePosition, DynamicEdgePosition]:
-        """
-        Parse the edge position based on the string in the realsense_gaits.yaml.
+        """Parse the edge position based on the string in the realsense_gaits.yaml.
 
         Args:
             config_value (str): the value in yaml file
@@ -286,8 +287,7 @@ class RealsenseGait(SetpointsGait):
 
     @classmethod
     def realsense_category_from_string(cls, gait_name: str) -> int:
-        """
-        Construct the realsense gait from the string in the realsense_gaits.yaml.
+        """Construct the realsense gait from the string in the realsense_gaits.yaml.
 
         Args:
             gait_name (str): the string from the config
@@ -303,8 +303,7 @@ class RealsenseGait(SetpointsGait):
 
     @classmethod
     def camera_msg_from_string(cls, camera_name: str) -> int:
-        """
-        Construct the camera name msg from the string in the realsense_gaits.yaml.
+        """Construct the camera name msg from the string in the realsense_gaits.yaml.
 
         Args:
             camera_name (str): The string from the config.
@@ -325,11 +324,12 @@ class RealsenseGait(SetpointsGait):
         current_time: Time,
         first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION,
     ) -> GaitUpdate:
-        """
-        This function is called to start the realsense gait, it does the following.
+        """This function is called to start the realsense gait.
+
+        It does the following:
         1) Make a service call to march_realsense_reader.
         2) Update all subgaits to interpolated subgaits with the given parameters
-        (this will later become only some of the subgaits when the update function is
+        (this will later become only some subgaits when the update function is
         also used).
         3) Update the gait parameters to prepare for start
         4) Return the first subgait, if correct parameters were found.
@@ -365,8 +365,7 @@ class RealsenseGait(SetpointsGait):
         return GaitUpdate.should_schedule_early(self._command_from_current_subgait())
 
     def get_realsense_update(self) -> bool:
-        """
-        Makes a realsense service call and handles the result
+        """Makes a realsense service call and handles the result.
 
         Returns:
             bool: Whether the call was successful
@@ -384,9 +383,7 @@ class RealsenseGait(SetpointsGait):
         return self.update_gaits_from_realsense_call(gait_parameters_response.gait_parameters)
 
     def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> bool:
-        """
-        Update the gait parameters based on the message of the current gaits and its
-        responsibilities.
+        """Update the gait parameters based on the message of the current gaits and its responsibilities.
 
         Args:
             gait_parameters (GaitParameters): The parameters to update to
@@ -406,9 +403,7 @@ class RealsenseGait(SetpointsGait):
         return success
 
     def make_realsense_service_call(self) -> bool:
-        """
-        Make a call to the realsense service, if it is available
-        and returns the response.
+        """Make a call to the realsense service, if it is available and returns the response.
 
         Returns:
             bool: Whether the call was successful
@@ -473,8 +468,7 @@ class RealsenseGait(SetpointsGait):
         return True
 
     def set_parameters(self, gait_parameters: GaitParameters) -> None:
-        """
-        Set the gait parameters based on the message.
+        """Set the gait parameters based on the message.
 
         Args:
             gait_parameters (GaitParameters): The parameters to set
@@ -490,10 +484,9 @@ class RealsenseGait(SetpointsGait):
             raise UnknownDimensionsError(self.dimensions)
 
     def set_edge_positions(self, starting_position: EdgePosition, final_position: EdgePosition) -> None:
+        """Set the new edge positions.
 
-        """
-        Set the new edge positions. Overrides from the setpoints gait, which does not
-        store the starting or final position
+        Overrides from the setpoints gait, which does not store the starting or final position.
 
         Args:
             starting_position (EdgePosition): starting position of the gait

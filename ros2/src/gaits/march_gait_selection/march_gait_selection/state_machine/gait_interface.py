@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_utility.utilities.duration import Duration
 from march_utility.gait.edge_position import EdgePosition
@@ -7,8 +9,7 @@ from .gait_update import GaitUpdate
 
 
 class GaitInterface:
-    """The interface that defines the properties and functions that every gait
-    should have."""
+    """The interface that defines the properties and functions that every gait should have."""
 
     @property
     def name(self) -> str:
@@ -27,8 +28,7 @@ class GaitInterface:
 
     @property
     def duration(self) -> Duration:
-        """Returns the duration in seconds of the currently executing trajectory
-        from the start of the gait."""
+        """Returns the duration in seconds of the currently executing trajectory from the start of the gait."""
         return Duration(0)
 
     @property
@@ -53,15 +53,20 @@ class GaitInterface:
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
-        """Return whether this gait can be started early, this means that the first
-        subgait will be delayed, with the first_subgait_delay, default is False."""
+        """Return whether this gait can be started early.
+
+        This means that the first subgait will be delayed, with the first_subgait_delay, default is False.
+        """
         return False
 
     def start(self, current_time: Time) -> GaitUpdate:
         """Start the gait.
 
+        Args:
+            current_time (Time): the current time
         Returns:
-             GaitUpdate: a GaitUpdate that usually contains a TrajectoryCommand."""
+             GaitUpdate: a GaitUpdate that usually contains a TrajectoryCommand.
+        """
         return GaitUpdate.empty()
 
     def update(self, current_time: Time) -> GaitUpdate:

@@ -1,5 +1,8 @@
+"""Author: ???."""
+
+
 class GaitStateMachineError(Exception):
-    """A base class for any errors in the state machine
+    """A base class for any errors in the state machine.
 
     Args:
         msg (:obj: str, optional): message to return with error. Gets appended to "An error occurred in the gait

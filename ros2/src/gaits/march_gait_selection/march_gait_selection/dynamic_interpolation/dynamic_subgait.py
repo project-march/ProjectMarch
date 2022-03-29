@@ -1,4 +1,4 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 import numpy as np
 
@@ -28,6 +28,7 @@ INTERPOLATION_POINTS = 30
 
 
 class SetpointTime(IntEnum):
+    """Enum for the index of time list."""
     START_INDEX = 0
     PUSH_OFF_INDEX = 1
     MIDDLE_POINT_INDEX = 2
@@ -94,8 +95,7 @@ class DynamicSubgait:
         self.pose = Pose()
 
     def get_joint_trajectory_msg(self) -> JointTrajectory:
-        """Return a joint_trajectory_msg containing the interpolated
-        trajectories for each joint
+        """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
@@ -130,8 +130,7 @@ class DynamicSubgait:
         return joint_trajectory_msg
 
     def _get_extra_ankle_setpoint(self) -> Setpoint:
-        """Returns an extra setpoint for the swing leg ankle
-        that can be used to create a push off.
+        """Returns an extra setpoint for the swing leg ankle that can be used to create a push off.
 
         Returns:
             Setpoint: extra setpoint for the swing leg ankle
@@ -143,7 +142,7 @@ class DynamicSubgait:
         )
 
     def _solve_middle_setpoint(self) -> None:
-        """Calls IK solver to compute the joint angles needed for the middle setpoint"""
+        """Calls IK solver to compute the joint angles needed for the middle setpoint."""
         middle_position = self.pose.solve_mid_position(
             self.location.x,
             self.location.y,
@@ -161,8 +160,7 @@ class DynamicSubgait:
         )
 
     def _solve_desired_setpoint(self) -> None:
-        """Calls IK solver to compute the joint angles needed for the
-        desired x and y coordinate"""
+        """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
         if self.stop:
             self.desired_position = self._from_joint_dict_to_list(get_position_from_yaml("stand"))
         else:
@@ -178,7 +176,7 @@ class DynamicSubgait:
         )
 
     def _to_joint_trajectory_class(self) -> None:
-        """Creates a list of DynamicJointTrajectories for each joint"""
+        """Creates a list of DynamicJointTrajectories for each joint."""
         self.joint_trajectory_list = []
         for name in self.joint_names:
             setpoint_list = [
@@ -220,7 +218,7 @@ class DynamicSubgait:
         velocity: Optional[List[float]],
         time: float,
     ) -> Dict[str, Setpoint]:
-        """Computes setpoint_dictionary from a list
+        """Computes setpoint_dictionary from a list.
 
         Args:
             joint_names (:obj: list of :obj: str): Names of the joints
@@ -257,7 +255,7 @@ class DynamicSubgait:
         return list(joint_dict.values())
 
     def _get_parameters(self, gait_selection_node) -> None:
-        """Gets the dynamic gait parameters from the gait_selection_node
+        """Gets the dynamic gait parameters from the gait_selection_node.
 
         Args:
             gait_selection_node (GaitSelection): the gait selection node
@@ -272,8 +270,7 @@ class DynamicSubgait:
         joint_index: int,
         joint_trajectory_point: JointTrajectoryPoint,
     ) -> None:
-        """Check if values in the joint_trajectory_point are within the soft and
-        velocity limits defined in the urdf
+        """Check if values in the joint_trajectory_point are within the soft and velocity limits defined in the urdf.
 
         Args:
             joint_index (int): Index of the joint in the alphabetical joint_names list

@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 from typing import Optional, Dict
 
 from march_utility.gait.edge_position import StaticEdgePosition, UnknownEdgePosition
@@ -50,38 +52,47 @@ class HomeGait(GaitInterface):
 
     @property
     def name(self):
+        """Returns the name of the gait."""
         return self._name
 
     @property
     def subgait_name(self):
+        """Returns the name of the subgait."""
         return self._name
 
     @property
     def duration(self):
+        """Returns the duration of the subgait."""
         return self._duration
 
     @property
     def gait_type(self):
+        """Returns the type of the gait."""
         return self._gait_type
 
     @property
     def starting_position(self):
+        """Returns the starting position of the gait."""
         return self._starting_position
 
     @property
     def final_position(self):
+        """Returns the final position of the gait."""
         return self._final_position
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
+        """If the first subgait can be scheduled early."""
         return True
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
+        """If subsequent subgait can be scheduled early."""
         return True
 
     @property
     def version(self):
+        """Returns the version of the subgait."""
         return "home_gait_version"
 
     def start(
@@ -90,6 +101,7 @@ class HomeGait(GaitInterface):
         first_subgait_delay: Optional[Duration] = ZERO_DURATION,
     ) -> GaitUpdate:
         """Start the gait.
+
         Creates a trajectory command to go towards the idle position in the given duration.
 
         Args:
@@ -144,9 +156,7 @@ class HomeGait(GaitInterface):
             return GaitUpdate.empty()
 
     def _get_trajectory_msg(self) -> JointTrajectory:
-        """
-        Constructs a trajectory message that has only one set point to be
-        standing still in the idle position after the specified duration.
+        """Constructs a trajectory msg that has a set point standing still in the idle position after the duration.
 
         Returns:
             JointTrajectory: message containing joint trajectories

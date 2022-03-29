@@ -1,16 +1,20 @@
+"""Author: ???."""
+
 from enum import Enum
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse
 from march_utility.utilities.logger import Logger
 
 
 class TransitionRequest(Enum):
+    """Enum for transition requests."""
     NONE = 0
     DECREASE_SIZE = -1
     INCREASE_SIZE = 1
 
 
 class StateMachineInput:
-    """
+    """Handles input to the state machine.
+
     Args:
         node (Node): node used to create subscribers/publishers on
     Attributes:
@@ -93,9 +97,11 @@ class StateMachineInput:
         self._gait = None
 
     def stop_accepted(self) -> None:
+        """If stop is accepted."""
         self._stopped = False
 
     def stop_rejected(self) -> None:
+        """If stop is requested."""
         self._stopped = False
 
     def gait_accepted(self) -> None:
@@ -117,7 +123,7 @@ class StateMachineInput:
         self.reset()
 
     def _callback_input_device_instruction(self, msg: GaitInstruction) -> None:
-        """Callback for each new GaitInstruction message
+        """Callback for each new GaitInstruction message.
 
         Args:
             msg (GaitInstruction): message containing the instruction for the state machine

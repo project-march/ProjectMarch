@@ -1,3 +1,5 @@
+"""Author: MV."""
+
 from copy import deepcopy
 from threading import Event
 
@@ -197,34 +199,54 @@ class BalanceGait(GaitInterface):
     # GaitInterface
     @property
     def name(self):
+        """Returns the name of the gait."""
         return self.gait_name
 
     @property
     def subgait_name(self):
+        """Returns the name of the subgait."""
         return self._current_subgait
 
     @property
     def duration(self):
+        """Returns the duration of the subgait."""
         return self._current_subgait_duration
 
     @property
     def gait_type(self):
+        """Returns the gait type as 'walk_like'."""
         return "walk_like"
 
     @property
     def starting_position(self):
+        """Returns the starting position of the gait."""
         return self._default_walk.starting_position
 
     @property
     def final_position(self):
+        """Returns the final position of the gait."""
         return self._default_walk.final_position
 
     def start(self, current_time: Time) -> GaitUpdate:
+        """Starts the gait.
+
+        Args:
+            current_time (Time): The current time
+        Returns:
+            GaitUpdate: GaitUpdate containing the command for the state machine or that is empty
+        """
         self._current_time = current_time
         self._current_subgait = self._default_walk.graph.start_subgaits()[0]
         return GaitUpdate.should_schedule(self._new_trajectory_command())
 
     def update(self, current_time: Time) -> GaitUpdate:
+        """Updates the gait and state machine, is run every state machine cycle.
+
+        Args:
+            current_time (Time): The current time
+        Returns:
+            GaitUpdate: GaitUpdate containing the command for the state machine or that is empty
+        """
         self._current_time = current_time
         if self._current_time < self._end_time or self._constructing:
             return GaitUpdate.empty()
@@ -258,5 +280,6 @@ class BalanceGait(GaitInterface):
         )
 
     def end(self) -> None:
+        """Called when the gait should end."""
         self._current_subgait = None
         self._current_subgait_duration = Duration(0)

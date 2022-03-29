@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 from copy import deepcopy
 from typing import Optional
 
@@ -39,25 +41,27 @@ class SemiDynamicSetpointsGait(SetpointsGait):
 
     @property
     def can_freeze(self) -> bool:
-        """Returns whether the gait has the ability to freeze. This is meant
-        for noticing the step height and ending the subgait earlier. This is
-        therefore not possible during the first second of the subgait, to
-        prevent accidental freezing."""
+        """Returns whether the gait has the ability to freeze.
+
+        This is meant for noticing the step height and ending the subgait earlier. This is therefore not possible
+        during the first second of the subgait, to prevent accidental freezing.
+        """
         return not (self.elapsed_time < SHOULD_NOT_FREEZE_FIRST_SECS or self._should_freeze or self._is_frozen)
 
     @property
     def can_be_scheduled_early(self) -> bool:
+        """Returns if the gait can be scheduled early."""
         return False
 
     @property
     def elapsed_time(self) -> Duration:
+        """Returns the elapsed duration."""
         return Duration.from_ros_duration(self._current_time - self._start_time)
 
     def freeze(self, duration: Duration = DEFAULT_SEDY_FREEZE_DURATION):
-        """
-        If the subgait can freeze it will freeze for the given duration, this
-        will later be changed to start the next subgait more dynamically
-        after the short freeze
+        """If the subgait can freeze it will freeze for the given duration.
+
+        This will later be changed to start the next subgait more dynamically after the short freeze.
 
         Args:
             duration (Duration): How long to freeze in the current position
@@ -68,9 +72,10 @@ class SemiDynamicSetpointsGait(SetpointsGait):
 
     def update(self, current_time: Time, *_) -> GaitUpdate:
         """Give an update on the progress of the gait.
+
         If the current subgait is still running, this does nothing.
-        If the gait should be stopped, this will be done
-        If the current subgait is done, it will start the next subgait
+        If the gait should be stopped, this will be done.
+        If the current subgait is done, it will start the next subgait.
 
         Args:
             current_time (Time): Current time
@@ -96,11 +101,11 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         return self._update_next_subgait()
 
     def _execute_freeze(self) -> GaitUpdate:
-        """
-        Freezes the subgait, currently this means that there is a new subgait
-        started of the given freeze duration which ends at the current position.
-        If this happens in the middle of a subgait, it plans the rest of the
-        original subgait after the freeze.
+        """Freezes the subgait.
+
+        Currently, this means that there is a new subgait started of the given freeze duration which ends at the current
+        position. If this happens in the middle of a subgait, it plans the rest of the original subgait after
+        the freeze.
 
         Returns:
             GaitUpdate: Returns a GaitUpdate
@@ -115,8 +120,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
     def subgait_after_freeze(self) -> Subgait:
-        """
-        Generates the subgait that should be executed after the freezing.
+        """Generates the subgait that should be executed after the freezing.
 
         Returns:
             Subgait: The subgait to execute after the freeze
@@ -140,8 +144,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             return self.subgaits[self.graph[(self._previous_subgait, self.graph.TO)]]
 
     def _freeze_subgait(self) -> Subgait:
-        """
-        Generates a subgait of the freeze duration based on the current position.
+        """Generates a subgait of the freeze duration based on the current position.
 
         Returns:
             Subgait: A subgait to freeze in current position
@@ -172,9 +175,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         )
 
     def _position_after_time(self, elapsed_time: Optional[Duration] = None) -> dict:
-        """
-        The position that the exoskeleton should be in after the elapsed
-        time.
+        """The position that the exoskeleton should be in after the elapsed time.
 
         Args:
             elapsed_time (:obj: Time, optional): Time that has elapsed, if None uses the elapsed time of

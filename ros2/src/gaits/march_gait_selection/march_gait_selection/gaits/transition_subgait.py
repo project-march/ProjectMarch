@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 from copy import deepcopy
 from typing import List
 
@@ -9,8 +11,7 @@ from march_utility.utilities.duration import Duration
 
 
 class TransitionSubgait(Subgait):
-    """Class that defines the subgait used for transitioning between
-    subgaits with not matching begin and end points
+    """Class that defines the subgait used for transitioning between subgaits with not matching begin and end points.
 
     Args:
         joints (List[JointTrajectory]): list containing joint trajectories for each joint
@@ -63,8 +64,7 @@ class TransitionSubgait(Subgait):
 
     @staticmethod
     def _transition_joints(old_subgait: Subgait, new_subgait: Subgait) -> List[JointTrajectory]:
-        """Calculate a transition trajectory which starts at the old gait and
-            ends with the endpoints of the new gait.
+        """Calculate a transition trajectory which starts at the old gait and ends with the endpoints of the new gait.
 
         Args:
             old_subgait (Subgait): the old subgait to transition from
@@ -107,8 +107,7 @@ class TransitionSubgait(Subgait):
 
     @staticmethod
     def _transition_setpoint(old_setpoint: Setpoint, new_setpoint: Setpoint, new_factor: float) -> Setpoint:
-        """Create a transition setpoint with the use of the old setpoint,
-        new setpoint and transition factor.
+        """Create a transition setpoint with the use of the old setpoint, new setpoint and transition factor.
 
         Args:
             old_setpoint (Setpoint): old setpoint to transition from
@@ -130,7 +129,7 @@ class TransitionSubgait(Subgait):
 
         Args:
             old_subgait (Subgait): old subgait to validate transition
-            transition_subgait (Subgait: transitions to validate
+            transition_subgait (Subgait): transitions to validate
             new_subgait (Subgait): new subgait to validate transition
         Raises:
             TransitionError: raised when transition is not valid
@@ -151,7 +150,7 @@ class TransitionSubgait(Subgait):
 
         Args:
             old_subgait (Subgait): old subgait to validate transition
-            transition_subgait (Subgait: transitions to validate
+            transition_subgait (Subgait): transitions to validate
             new_subgait (Subgait): new subgait to validate transition
         Raises:
             TransitionError: raised when transition is not valid

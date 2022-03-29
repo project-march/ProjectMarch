@@ -1,4 +1,4 @@
-""""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 import os
 import yaml
@@ -20,7 +20,7 @@ from march_shared_msgs.msg import FootPosition
 
 
 class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
-    """*Single single* step gait based on dynamic setpoint gait
+    """*Single single* step gait based on dynamic setpoint gait.
 
     Args:
         gait_selection_node (GaitSelection): the gait selection node
@@ -56,7 +56,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         self._duration_from_yaml = _position_queue_yaml["duration"]
 
     def _reset(self) -> None:
-        """Reset all attributes of the gait"""
+        """Reset all attributes of the gait."""
         self._should_stop = False
         self._end = False
 
@@ -76,11 +76,9 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         current_time: Time,
         early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
     ) -> GaitUpdate:
-        """Give an update on the progress of the gait. This function is called
-        every cycle of the gait_state_machine.
+        """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Stops after the
-        single single step is finished.
+        Schedules the first subgait when the delay has passed. Stops after the single single step is finished.
 
         Args:
             current_time (Time): Current time
@@ -102,8 +100,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         return GaitUpdate.empty()
 
     def _update_state_machine(self) -> GaitUpdate:
-        """Update the state machine that the single single
-        step has finished. Also switches the subgait_id.
+        """Update the state machine that the single single step has finished. Also switches the subgait_id.
 
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
@@ -116,8 +113,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         return GaitUpdate.finished()
 
     def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
-        """Return a TrajectoryCommand based on current subgait_id, or
-        based on the _position_queue if enabled.
+        """Return a TrajectoryCommand based on current subgait_id, or based on the _position_queue if enabled.
 
         Args:
             start (:obj: bool, optional): whether it is a start gait or not, default False

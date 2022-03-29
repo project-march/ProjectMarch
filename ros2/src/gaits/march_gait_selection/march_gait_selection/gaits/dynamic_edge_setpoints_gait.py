@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 import os
 from typing import Dict, Union
 
@@ -11,8 +13,8 @@ from urdf_parser_py import urdf
 
 class DynamicEdgeSetpointsGait(SetpointsGait):
     """The standard gait built up from setpoints, but with dynamic edge positions.
-    This is mostly useful for debugging realsense gaits and testing this without
-    restarting the state machine.
+
+    This is mostly useful for debugging realsense gaits and testing this without restarting the state machine.
 
     Args:
         gait_name (str): name of the gait
@@ -82,7 +84,7 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
     def dynamic_from_dict(
         cls,
         robot: urdf.Robot,
-        gait_dictionary: Dict[str, Union[str, Dict[str, str]]],
+        gait_dictionary: Dict[str, Union[str, Dict[str, str]]], # noqa TAE002 suppress to complex expression
         gait_directory: str,
         gait_version_map: dict,
         start_is_dynamic: bool,
@@ -113,8 +115,10 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
 
     @property
     def starting_position(self):
+        """Returns the starting position of the gait."""
         return self._starting_position
 
     @property
     def final_position(self):
+        """Returns the final position of the gait."""
         return self._final_position

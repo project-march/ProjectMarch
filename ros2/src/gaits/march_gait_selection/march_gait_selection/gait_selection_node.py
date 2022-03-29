@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 import signal
 import sys
 
@@ -15,6 +17,7 @@ from contextlib import suppress
 
 
 def sys_exit(*_):
+    """Cleanly exit."""
     sys.exit(0)
 
 
@@ -43,10 +46,9 @@ def main():
 def parameter_callback(
     gait_selection: GaitSelection, gait_state_machine: GaitStateMachine, parameters
 ) -> SetParametersResult:
-    """
-    A callback function that is used to update the parameters that are a part of the
-    gait selection node. Since some of these parameters are from the
-    gait_state_machine, some from gait_selection and some from both, this is
+    """A callback function that is used to update the parameters that are a part of the gait selection node.
+
+    Since some of these parameters are from the gait_state_machine, some from gait_selection and some from both, this is
     implemented here.
 
     Args:

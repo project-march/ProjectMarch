@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 import os
 from typing import Optional, List, Tuple, Dict, Union
 
@@ -177,16 +179,20 @@ class GaitSelection(Node):
 
     @property
     def joint_names(self) -> List[str]:
+        """Return a list containing joint names."""
         return self._joint_names
 
     @property
     def gaits(self) -> dict:
+        """Return a dictionary containing the loaded gaits."""
         return self._gaits
 
     def _validate_inverse_kinematics_is_possible(self) -> bool:
+        """Whether inverse kinematics is possible."""
         return validate_and_get_joint_names_for_inverse_kinematics(self.logger) is not None
 
     def _initialize_gaits(self) -> Tuple[str, str]:
+        """Initialize the gait packages."""
         package_path = get_package_share_directory(self._gait_package)
         gait_directory = os.path.join(package_path, self._directory_name)
         default_yaml = os.path.join(gait_directory, "default.yaml")
@@ -212,7 +218,7 @@ class GaitSelection(Node):
         self._loaded_gaits = self._load_gaits()
 
     def _create_services(self) -> None:
-        """Create services for gait_selection"""
+        """Create services for gait_selection."""
         self.create_service(
             srv_type=Trigger,
             srv_name="/march/gait_selection/get_version_map",
@@ -292,10 +298,7 @@ class GaitSelection(Node):
         return self._positions
 
     def _update_robot_description_cb(self, msg: String) -> None:
-        """
-        Callback that is used to update the robot description when
-        robot_state_publisher sends out an update.
-        """
+        """Callback that is used to update the robot description when robot_state_publisher sends out an update."""
         self._robot = urdf.Robot.from_xml_string(msg.data)
 
     def set_gait_versions(self, gait_name: str, version_map: Dict[str, str]):
@@ -327,7 +330,6 @@ class GaitSelection(Node):
         Raises:
             Exception: raised when gait version cannot be set
         """
-
         if len(request.subgaits) != len(request.versions):
             return [False, "`subgaits` and `versions` array are not of equal length"]
 
@@ -363,9 +365,8 @@ class GaitSelection(Node):
                 response.contains = False
         return response
 
-    def scan_directory(self) -> Dict[str, Dict[str, List[str]]]:
-        """Scans the gait_directory recursively and create a dictionary of all
-        subgait files.
+    def scan_directory(self) -> Dict[str, Dict[str, List[str]]]: # noqa TAE002 suppress to complex expression
+        """Scans the gait_directory recursively and create a dictionary of all subgait files.
 
         Returns:
             Dict[str, Dict[str, List[str]]]: dictionary of the maps and files within the directory
@@ -394,7 +395,8 @@ class GaitSelection(Node):
         return gaits
 
     def get_default_dict_cb(self, request, response):
-        """
+        """Service that returns the default gaits and positions.
+
         Args:
             request (TriggerRequest): service request
             response (TriggerResponse): response to service request
@@ -556,7 +558,7 @@ class GaitSelection(Node):
         """Validates if the current versions exist.
 
         Args:
-            version map (dict): version map to verify
+            version_map (dict): version map to verify
         Returns:
             bool: True if version map is valid, else False
         """
