@@ -33,7 +33,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "dynamic_gait",
                 default_value="False",
-                description="Wether dynamic_setpoint_gait is enabled",
+                description="Whether dynamic_setpoint_gait is enabled",
             ),
             # Dynamic gait parameters:
             DeclareLaunchArgument(

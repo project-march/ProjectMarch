@@ -37,9 +37,7 @@ class TransitionSubgait(Subgait):
         )
 
     @classmethod
-    def from_subgaits(
-        cls, old_subgait: Subgait, new_subgait: Subgait, transition_subgait_name: str
-    ):
+    def from_subgaits(cls, old_subgait: Subgait, new_subgait: Subgait, transition_subgait_name: str):
         """Create a new transition subgait object between two given subgaits.
 
         Args:
@@ -64,9 +62,7 @@ class TransitionSubgait(Subgait):
         return transition_subgait
 
     @staticmethod
-    def _transition_joints(
-        old_subgait: Subgait, new_subgait: Subgait
-    ) -> List[JointTrajectory]:
+    def _transition_joints(old_subgait: Subgait, new_subgait: Subgait) -> List[JointTrajectory]:
         """Calculate a transition trajectory which starts at the old gait and
             ends with the endpoints of the new gait.
 
@@ -110,9 +106,7 @@ class TransitionSubgait(Subgait):
         return joints
 
     @staticmethod
-    def _transition_setpoint(
-        old_setpoint: Setpoint, new_setpoint: Setpoint, new_factor: float
-    ) -> Setpoint:
+    def _transition_setpoint(old_setpoint: Setpoint, new_setpoint: Setpoint, new_factor: float) -> Setpoint:
         """Create a transition setpoint with the use of the old setpoint,
         new setpoint and transition factor.
 
@@ -131,9 +125,7 @@ class TransitionSubgait(Subgait):
         return Setpoint(new_setpoint.time, position, velocity)
 
     @staticmethod
-    def _validate_transition_gait(
-        old_subgait: Subgait, transition_subgait: Subgait, new_subgait: Subgait
-    ) -> None:
+    def _validate_transition_gait(old_subgait: Subgait, transition_subgait: Subgait, new_subgait: Subgait) -> None:
         """Validates the transition point.
 
         Args:

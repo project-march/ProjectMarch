@@ -61,9 +61,7 @@ class DynamicJointTrajectory:
                 (CLAMPED_BOUNDARY_CONDITION, velocity[0]),
                 (CLAMPED_BOUNDARY_CONDITION, velocity[-1]),
             )
-            self.interpolated_position = CubicSpline(
-                time, position, bc_type=boundary_condition
-            )
+            self.interpolated_position = CubicSpline(time, position, bc_type=boundary_condition)
 
         self.interpolated_velocity = self.interpolated_position.derivative()
 

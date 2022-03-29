@@ -31,9 +31,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
     _current_subgait: Subgait
 
     def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
-        super(SemiDynamicSetpointsGait, self).__init__(
-            f"dynamic_{gait_name}", subgaits, graph
-        )
+        super(SemiDynamicSetpointsGait, self).__init__(f"dynamic_{gait_name}", subgaits, graph)
         self._should_freeze = False
         self._is_frozen = False
         self._freeze_duration = Duration(0)

@@ -42,9 +42,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         self.gait_name = "dynamic_walk_half_step"
 
         queue_path = get_package_share_path("march_gait_selection")
-        queue_directory = os.path.join(
-            queue_path, "position_queue", "position_queue.yaml"
-        )
+        queue_directory = os.path.join(queue_path, "position_queue", "position_queue.yaml")
         with open(queue_directory, "r") as queue_file:
             _position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
 
@@ -117,9 +115,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
                 self.subgait_id = "right_swing"
         return GaitUpdate.finished()
 
-    def _get_trajectory_command(
-        self, start=False, stop=False
-    ) -> Optional[TrajectoryCommand]:
+    def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id, or
         based on the _position_queue if enabled.
 
@@ -173,6 +169,4 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         )
         self._queue_index += 1
 
-        return FootPosition(
-            header=header, point=point, duration=self._duration_from_yaml
-        )
+        return FootPosition(header=header, point=point, duration=self._duration_from_yaml)

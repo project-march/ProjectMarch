@@ -52,9 +52,7 @@ class TrajectoryCommand:
         )
 
     def __str__(self) -> str:
-        return (
-            f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
-        )
+        return f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
 
 
 class TrajectoryScheduler:

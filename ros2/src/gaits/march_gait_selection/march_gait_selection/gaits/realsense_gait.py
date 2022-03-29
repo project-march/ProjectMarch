@@ -115,9 +115,7 @@ class RealsenseGait(SetpointsGait):
         self.logger = Logger(self._gait_selection, __class__.__name__)
         self.parameters = parameters
         self.dimensions = dimensions
-        self.realsense_category = self.realsense_category_from_string(
-            realsense_category
-        )
+        self.realsense_category = self.realsense_category_from_string(realsense_category)
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
         self.subgaits_to_interpolate = subgaits_to_interpolate
         # Set up service and event for asynchronous
@@ -456,9 +454,7 @@ class RealsenseGait(SetpointsGait):
         Raises:
             NonValidGaitContentError: if subgaits cannot be set
         """
-        self.logger.info(
-            f"Interpolating gait {self.gait_name} with parameters: {self.parameters}"
-        )
+        self.logger.info(f"Interpolating gait {self.gait_name} with parameters: {self.parameters}")
 
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
