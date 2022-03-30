@@ -29,7 +29,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 from march_shared_msgs.msg import FootPosition, GaitInstruction
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
-DURATION_INCREASE_FACTOR = 2
+DURATION_INCREASE_FACTOR = 1.5
 DURATION_INCREASE_SIZE = 0.25
 
 
