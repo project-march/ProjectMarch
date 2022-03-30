@@ -7,6 +7,7 @@ from march_utility.utilities.logger import Logger
 
 class TransitionRequest(Enum):
     """Enum for transition requests."""
+
     NONE = 0
     DECREASE_SIZE = -1
     INCREASE_SIZE = 1

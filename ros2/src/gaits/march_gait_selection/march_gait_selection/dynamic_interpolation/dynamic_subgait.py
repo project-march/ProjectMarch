@@ -29,6 +29,7 @@ INTERPOLATION_POINTS = 30
 
 class SetpointTime(IntEnum):
     """Enum for the index of time list."""
+
     START_INDEX = 0
     PUSH_OFF_INDEX = 1
     MIDDLE_POINT_INDEX = 2

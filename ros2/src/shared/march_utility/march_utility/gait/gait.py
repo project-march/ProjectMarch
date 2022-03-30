@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 import os
 from typing import Dict, Optional, Union
 
@@ -158,8 +160,9 @@ class Gait:
         old_edge_position: EdgePosition,
         new_edge_position_values: Dict[str, float],
     ) -> EdgePosition:
-        """
-        Validate that the edge position has made an acceptable change, this means:
+        """Validate that the edge position has made an acceptable change.
+
+        This means:
         StaticEdgePosition -> Should remain the same, values and type.
         UnknownEdgePosition -> Should never be updated.
         DynamicEdgePosition -> Values can change.
@@ -185,9 +188,7 @@ class Gait:
     def _validate_and_set_new_edge_positions(
         self, new_subgaits: Dict[str, Subgait]
     ) -> bool:
-        """
-        Validate that both the starting position and the final position changed in a
-        valid way.
+        """Validate that both the starting position and the final position changed in a valid way.
 
         Args:
             new_subgaits (Dict[str, Subgait]): the new subgaits that will be used
@@ -224,9 +225,9 @@ class Gait:
         return True
 
     def set_edge_positions(self, starting_position: EdgePosition, final_position: EdgePosition):
-        """
-        Set the new edge positions. Overrides from the setpoints gait, which does not
-        store the starting or final position
+        """Set the new edge positions.
+
+        Overrides from the setpoints gait, which does not store the starting or final position.
 
         Args:
             starting_position (EdgePosition): the new starting position
@@ -236,9 +237,9 @@ class Gait:
         self._final_position = final_position
 
     def set_subgaits(self, new_subgaits: Dict[str, Subgait], node: Optional[Node] = None):
-        """
-        Update the subgaits of the gaits, and validate that the edges changes
-        acceptably. Also make sure that all transitions between the subgaits match.
+        """Update the subgaits of the gaits, and validate that the edges changes acceptably.
+
+        Also make sure that all transitions between the subgaits match.
 
         Args:
             new_subgaits (Dict[str, Subgait]): the dictionary with the new subgaits to use

@@ -168,11 +168,11 @@ class SetpointsGait(GaitInterface, Gait):
         """Give an update on the progress of the gait.
 
         - If the start was delayed, and we have passed the start time,
-        we are now actually starting the gait.
-        Hence, the is_new_subgait flag should be set to true.
+            we are now actually starting the gait.
+            Hence, the is_new_subgait flag should be set to true.
         - If the previous subgait ended, schedule a new one.
         - If we haven't scheduled early yet, and we are within early_schedule_duration of
-        the end time, then schedule a new subgait early.
+            the end time, then schedule a new subgait early.
         - Else return nothing.
 
         Args:

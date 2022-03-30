@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import List, Tuple, Collection, Dict, Union
+from typing import List, Tuple, Collection, Dict
 
 import yaml
 from march_utility.exceptions.gait_exceptions import (
@@ -80,8 +80,7 @@ class Subgait:
     # region Create subgait
     @classmethod
     def from_file(cls, robot: urdf.Robot, file_name: str) -> Subgait:
-        """
-        Extract sub gait data of the given yaml.
+        """Extract sub gait data of the given yaml.
 
         Args:
             robot (urdf.Robot): robot model to use
@@ -114,8 +113,7 @@ class Subgait:
         subgait_name: str,
         version: str,
     ) -> Subgait:
-        """
-        Load subgait based from file(s) based on name and version.
+        """Load subgait based from file(s) based on name and version.
 
         Args:
             robot (urdf.Robot): The robot corresponding to the given subgait file
@@ -170,8 +168,7 @@ class Subgait:
         parameter_list: List[float, float],
         use_foot_position: bool = False,
     ) -> Subgait:
-        """
-        Extract two subgaits from files and interpolate.
+        """Extract two subgaits from files and interpolate.
 
         Args:
             robot (urdf.robot): The robot corresponding to the given subgait file
@@ -200,8 +197,7 @@ class Subgait:
         first_parameter: float,
         use_foot_position: bool = False,
     ) -> Subgait:
-        """
-        Extract two subgaits from files and interpolate.
+        """Extract two subgaits from files and interpolate.
 
          Args:
             robot (urdf.robot): The robot corresponding to the given subgait file
@@ -226,8 +222,7 @@ class Subgait:
         subgait_name: str,
         version: str,
     ) -> Subgait:
-        """
-        List parameters from the yaml file in organized lists.
+        """List parameters from the yaml file in organized lists.
 
         Args:
             robot (urdf.Robot): The robot corresponding to the given subgait file
@@ -267,8 +262,7 @@ class Subgait:
 
     # region Create messages
     def to_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
-        """
-        Create trajectory msg for the publisher.
+        """Create trajectory msg for the publisher.
 
         Returns:
             JointTrajectory: a ROS msg for the joint trajectory
@@ -296,8 +290,7 @@ class Subgait:
 
     # region Validate subgait
     def validate_subgait_transition(self, next_subgait: Subgait) -> bool:
-        """
-        Validate the trajectory transition of this gait to a given gait.
+        """Validate the trajectory transition of this gait to a given gait.
 
         Args:
             next_subgait (Subgait): The subgait subsequently to this gait (not the previous one!)
@@ -405,8 +398,7 @@ class Subgait:
         parameters: List[float],
         use_foot_position: bool = False,
     ) -> Subgait:
-        """
-        Interpolate two subgaits with the parameter to get a new subgait.
+        """Interpolate two subgaits with the parameter to get a new subgait.
 
         Args:
             subgaits (List[Subgait]): list of subgaits with which to perform interpolation, length should be four
@@ -439,8 +431,7 @@ class Subgait:
         parameter: float,
         use_foot_position: bool = False,
     ) -> Subgait:
-        """
-        Interpolate two subgaits with the parameter to get a new subgait.
+        """Interpolate two subgaits with the parameter to get a new subgait.
 
         Args:
             base_subgait (Subgait): base subgait, return value if parameter is equal to zero
@@ -588,9 +579,11 @@ class Subgait:
 
     # region Class methods
     def __getitem__(self, index):
+        """Return joint corresponding to given index."""
         return self.joints[index]
 
     def __len__(self):
+        """Return the length of the list containing joint names."""
         return len(self.joints)
 
     # endregion
@@ -655,7 +648,6 @@ class Subgait:
 
     @staticmethod
     def unpack_parametric_version(version: str) -> Tuple[str, str, float]:
-
         """Unpack a version to base version, other version and parameter.
 
         Args:

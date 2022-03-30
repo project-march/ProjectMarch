@@ -365,7 +365,7 @@ class GaitSelection(Node):
                 response.contains = False
         return response
 
-    def scan_directory(self) -> Dict[str, Dict[str, List[str]]]: # noqa TAE002 suppress to complex expression
+    def scan_directory(self) -> Dict[str, Dict[str, List[str]]]:  # noqa TAE002 suppress to complex expression
         """Scans the gait_directory recursively and create a dictionary of all subgait files.
 
         Returns:

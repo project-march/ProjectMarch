@@ -84,7 +84,7 @@ class DynamicEdgeSetpointsGait(SetpointsGait):
     def dynamic_from_dict(
         cls,
         robot: urdf.Robot,
-        gait_dictionary: Dict[str, Union[str, Dict[str, str]]], # noqa TAE002 suppress to complex expression
+        gait_dictionary: Dict[str, Union[str, Dict[str, str]]],  # noqa TAE002 suppress to complex expression
         gait_directory: str,
         gait_version_map: dict,
         start_is_dynamic: bool,
