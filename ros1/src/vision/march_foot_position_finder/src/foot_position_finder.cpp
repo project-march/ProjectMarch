@@ -87,7 +87,6 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 void FootPositionFinder::readParameters(
     march_foot_position_finder::parametersConfig& config, uint32_t level)
 {
-    physical_cameras_ = config.physical_cameras;
     base_frame_ = config.base_frame;
     foot_gap_ = config.foot_gap;
     step_distance_ = config.step_distance;
@@ -95,9 +94,10 @@ void FootPositionFinder::readParameters(
     outlier_distance_ = config.outlier_distance;
     height_zero_threshold_ = config.height_zero_threshold;
     found_points_.resize(sample_size_);
+    ros::param::get("/realsense_simulation", realsense_simulation_);
 
     // Initialize the depth frame callbacks the first time parameters are read
-    if (!running_ && physical_cameras_) {
+    if (!running_ && !realsense_simulation_) {
         config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
             RS2_FORMAT_Z16, /*framerate=*/30);
 
@@ -113,7 +113,7 @@ void FootPositionFinder::readParameters(
         realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
             &FootPositionFinder::processRealSenseDepthFrames, this);
 
-    } else if (!running_ && !physical_cameras_) {
+    } else if (!running_ && realsense_simulation_) {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
             topic_camera_front_, /*queue_size=*/1,
             &FootPositionFinder::processSimulatedDepthFrames, this);

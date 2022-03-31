@@ -84,7 +84,7 @@ protected:
     std::string current_frame_id_;
 
     bool running_;
-    bool physical_cameras_;
+    bool realsense_simulation_;
 
     double foot_gap_;
     double step_distance_;
