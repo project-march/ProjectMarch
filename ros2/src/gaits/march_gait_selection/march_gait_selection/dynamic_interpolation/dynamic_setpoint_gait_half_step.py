@@ -14,6 +14,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from std_msgs.msg import Header
 from geometry_msgs.msg import Point
@@ -47,6 +48,10 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
 
         self.queue_index = 0
         self.duration_from_yaml = position_queue_yaml["duration"]
+
+        gait_selection_node.create_subscription(
+            Point, "/march/add_point_to_queue", self._add_point_to_queue, DEFAULT_HISTORY_DEPTH,
+        )
 
     def _reset(self) -> None:
         """Reset all attributes of the gait"""
@@ -171,3 +176,13 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         return FootPosition(
             header=header, point=point, duration=self.duration_from_yaml
         )
+
+    def _add_point_to_queue(self, point: Point) -> None:
+        """Adds a point to the end of the queue.
+
+        Args:
+            point (Point): point message to add to the queue.
+        """
+        point_dict = {"x": point.x, "y": point.y, "z": point.z}
+        self.position_queue.append(point_dict)
+        self.logger.info(f"Point added to position queue. Current queue is: {self.position_queue}")
