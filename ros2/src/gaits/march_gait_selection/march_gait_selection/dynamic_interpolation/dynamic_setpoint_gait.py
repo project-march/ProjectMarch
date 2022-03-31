@@ -72,6 +72,8 @@ class DynamicSetpointGait(GaitInterface):
             GaitInstruction,
             "/march/input_device/instruction",
             self._callback_force_unknown,
+            DEFAULT_HISTORY_DEPTH,
+        )
 
         # Assign reconfigurable parameters
         self.update_parameters()
@@ -611,7 +613,8 @@ class DynamicSetpointGait(GaitInterface):
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
             self.logger.warn(
-                "Foot location is more than 0.5 seconds old, time difference is {time_difference}. Stopping gait.",
+                "Foot location is more than 0.5 seconds old, time difference is {time_difference}. Stopping gait."
+            )
             self._end = True
             return True
 
