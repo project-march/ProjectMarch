@@ -37,11 +37,6 @@ def generate_launch_description():
             ),
             # Dynamic gait parameters:
             DeclareLaunchArgument(
-                name="dynamic_subgait_duration",
-                default_value="1.5",
-                description="Duration of a subgait created by the dynamic gait",
-            ),
-            DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
                 description="Fraction of the step at which the middle point of the dynamic gait will take place.",
@@ -95,7 +90,6 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"dynamic_gait": LaunchConfiguration("dynamic_gait")},
-                    {"dynamic_subgait_duration": LaunchConfiguration("dynamic_subgait_duration")},
                     {"middle_point_fraction": LaunchConfiguration("middle_point_fraction")},
                     {"middle_point_height": LaunchConfiguration("middle_point_height")},
                     {"minimum_stair_height": LaunchConfiguration("minimum_stair_height")},

@@ -74,9 +74,11 @@ class GaitSelection(Node):
             self._early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
             self._first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
             # Setting dynamic gait parameters
-            self.dynamic_subgait_duration = (
-                self.get_parameter("dynamic_subgait_duration").get_parameter_value().double_value
-            )
+            self.middle_point_fraction = self.get_parameter("middle_point_fraction").get_parameter_value().double_value
+            self.middle_point_height = self.get_parameter("middle_point_height").get_parameter_value().double_value
+            self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
+            self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
+            self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
             self.middle_point_fraction = self.get_parameter("middle_point_fraction").get_parameter_value().double_value
             self.middle_point_height = self.get_parameter("middle_point_height").get_parameter_value().double_value
             self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value

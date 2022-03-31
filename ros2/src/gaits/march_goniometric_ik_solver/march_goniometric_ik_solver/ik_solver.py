@@ -22,11 +22,29 @@ from march_utility.utilities.utility_functions import (
     length_names=["upper_leg", "lower_leg", "hip_aa_front", "hip_base"]
 )
 LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
+LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
-# Get ankle limit from urdf:
-limits = get_limits_robot_from_urdf_for_inverse_kinematics("right_ankle")
-SOFT_LIMIT_BUFFER = np.deg2rad(5)
-MAX_ANKLE_FLEXION = limits.upper - SOFT_LIMIT_BUFFER
+# List the joints we have:
+JOINT_NAMES = [
+    "left_ankle",
+    "left_hip_aa",
+    "left_hip_fe",
+    "left_knee",
+    "right_ankle",
+    "right_hip_aa",
+    "right_hip_fe",
+    "right_knee",
+]
+
+# Create a dictionary of joint limits:
+JOINT_LIMITS = {}
+
+for name in JOINT_NAMES:
+    JOINT_LIMITS[name] = get_limits_robot_from_urdf_for_inverse_kinematics(name)
+
+# Create a constant for frequently used limits:
+ANKLE_BUFFER = np.deg2rad(1)
+MAX_ANKLE_FLEXION = JOINT_LIMITS["left_ankle"].upper - ANKLE_BUFFER
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -532,10 +550,19 @@ class Pose:
             self.reduce_stance_dorsi_flexion()
 
         # Apply side_step, hard_coded to default feet distance for now:
-        self.perform_side_step(ankle_y, abs(ankle_z))
+        self.perform_side_step(abs(ankle_y), abs(ankle_z))
+
+        # Create a list of the pose:
+        pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
+
+        # Perform a limit check and raise error if limit is exceeded:
+        errors = check_on_limits(pose_list)
+        if errors:
+            for error in errors:
+                raise ValueError(error)
 
         # return pose as list:
-        return self.pose_left if (subgait_id == "left_swing") else self.pose_right
+        return pose_list
 
 
 # Static methods:
@@ -547,6 +574,35 @@ def rot(t: float) -> np.array:
     A positive value of t results in a anti-clockwise rotation around the origin.
     """
     return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
+
+
+def check_on_limits(pose_list: List[float]) -> List:
+    """
+    Checks all joints limits of the current pose and create error messages for exceeding limits.
+    Expects a list of joints poses in alphabetic order.
+    """
+
+    errors = []
+
+    for name, angle in zip(JOINT_NAMES, pose_list):
+        if angle < JOINT_LIMITS[name].lower:
+            errors.append(
+                "IK solver found a solution with joint "
+                + name
+                + " "
+                + str(round(JOINT_LIMITS[name].lower - angle, 3))
+                + " rad below lower limit"
+            )
+        elif angle > JOINT_LIMITS[name].upper:
+            errors.append(
+                "IK solver found a solution with joint "
+                + name
+                + " "
+                + str(round(angle - JOINT_LIMITS[name].upper, 3))
+                + " rad above upper limit"
+            )
+
+    return errors
 
 
 def make_plot(pose: Pose):

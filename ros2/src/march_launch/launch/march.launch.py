@@ -48,7 +48,6 @@ def generate_launch_description():
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
     dynamic_gait = LaunchConfiguration("dynamic_gait")
-    dynamic_subgait_duration = LaunchConfiguration("dynamic_subgait_duration")
     middle_point_fraction = LaunchConfiguration("middle_point_fraction")
     middle_point_height = LaunchConfiguration("middle_point_height")
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
@@ -64,8 +63,10 @@ def generate_launch_description():
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
     # Fake covid (CoViD = Computer Vision Department)
+    simulate_points = LaunchConfiguration("simulate_points")
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
+    duration = LaunchConfiguration("duration")
     location_z = LaunchConfiguration("location_z")
 
     return launch.LaunchDescription(
@@ -185,11 +186,6 @@ def generate_launch_description():
                 description="Wether dynamic_setpoint_gait is enabled",
             ),
             DeclareLaunchArgument(
-                name="dynamic_subgait_duration",
-                default_value="1.5",
-                description="Duration of a subgait created by the dynamic gait",
-            ),
-            DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
                 description="Fraction of the step at which the middle point of the dynamic gait will take place.",
@@ -246,6 +242,12 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            # GAIT PREPROCESSOR ARGUMENTS
+            DeclareLaunchArgument(
+                name="simulate_points",
+                default_value="False",
+                description="Whether to simulate fake foot positions for gait generation",
+            ),
             DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
@@ -260,6 +262,11 @@ def generate_launch_description():
                 name="location_z",
                 default_value=str(DEFAULT_FEET_DISTANCE),
                 description="z-location for fake covid topic, takes double or 'random'",
+            ),
+            DeclareLaunchArgument(
+                name="duration",
+                default_value="1.5",
+                description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
@@ -315,7 +322,6 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("balance", balance),
                     ("dynamic_gait", dynamic_gait),
-                    ("dynamic_subgait_duration", dynamic_subgait_duration),
                     ("middle_point_fraction", middle_point_fraction),
                     ("middle_point_height", middle_point_height),
                     ("mininum_stair_height", minimum_stair_height),
@@ -326,20 +332,22 @@ def generate_launch_description():
                     ("timer_period", timer_period),
                 ],
             ),
-            # Fake covid publisher
+            # Gait preprocessor
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(
-                        get_package_share_directory("march_fake_covid"),
+                        get_package_share_directory("march_gait_preprocessor"),
                         "launch",
-                        "march_fake_covid.launch.py",
+                        "march_gait_preprocessor.launch.py",
                     )
                 ),
                 launch_arguments=[
                     ("use_sim_time", use_sim_time),
+                    ("simulate_points", simulate_points),
                     ("location_x", location_x),
                     ("location_y", location_y),
                     ("location_z", location_z),
+                    ("duration", duration),
                 ],
             ),
             # Safety

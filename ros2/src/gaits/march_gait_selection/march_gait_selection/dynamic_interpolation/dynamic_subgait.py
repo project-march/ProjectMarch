@@ -14,7 +14,7 @@ from march_utility.utilities.logger import Logger
 from march_goniometric_ik_solver.ik_solver import Pose
 
 from trajectory_msgs import msg as trajectory_msg
-from geometry_msgs.msg import Point
+from march_shared_msgs.msg import FootPosition
 
 from typing import List
 from enum import IntEnum
@@ -41,8 +41,8 @@ class DynamicSubgait:
     :type subgait_id: str
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param position: Desired foot position
-    :type position: Point
+    :param location: Desired foot position
+    :type location: Point
     :param joint_soft_limits: list containing soft limits in alphabetical order
     :type joint_soft_limits: List[Limits]
     :param start: whether it is an open gait or not
@@ -57,28 +57,66 @@ class DynamicSubgait:
         starting_position: dict,
         subgait_id: str,
         joint_names: List[str],
-        location: Point,
+        location: FootPosition,
         joint_soft_limits: List[Limits],
         start: bool,
         stop: bool,
     ):
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
-        self.time = [
-            0,
-            self.push_off_fraction * self.duration,
-            self.middle_point_fraction * self.duration,
-            self.duration,
-        ]
+
         self.starting_position = starting_position
-        self.location = location
+        self.location = location.processed_point
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
 
+        self.time = [
+            0,
+            self.push_off_fraction * location.duration,
+            self.middle_point_fraction * location.duration,
+            location.duration,
+        ]
+
         self.start = start
         self.stop = stop
         self.pose = Pose()
+
+    def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
+        """Return a joint_trajectory_msg containing the interpolated
+        trajectories for each joint
+
+        :returns: A joint_trajectory_msg
+        :rtype: joint_trajectory_msg
+        """
+        # Update pose:
+        pose_list = [joint.position for joint in self.starting_position.values()]
+        self.pose = Pose(pose_list)
+
+        self._solve_middle_setpoint()
+        self._solve_desired_setpoint()
+        self._get_extra_ankle_setpoint()
+
+        # Create joint_trajectory_msg
+        self._to_joint_trajectory_class()
+        joint_trajectory_msg = trajectory_msg.JointTrajectory()
+        joint_trajectory_msg.joint_names = self.joint_names
+
+        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
+        for timestamp in timestamps:
+            joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
+            joint_trajectory_point.time_from_start = Duration(timestamp).to_msg()
+
+            for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
+                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(timestamp)
+
+                joint_trajectory_point.positions.append(interpolated_setpoint.position)
+                joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
+                self._check_joint_limits(joint_index, joint_trajectory_point)
+
+            joint_trajectory_msg.points.append(joint_trajectory_point)
+
+        return joint_trajectory_msg
 
     def _get_extra_ankle_setpoint(self) -> Setpoint:
         """Returns an extra setpoint for the swing leg ankle
@@ -107,11 +145,12 @@ class DynamicSubgait:
             self.middle_point_height,
             self.subgait_id,
         )
+        middle_velocity = np.zeros_like(middle_position)
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             middle_position,
-            None,
+            middle_velocity,
             self.time[SetpointTime.MIDDLE_POINT_INDEX],
         )
 
@@ -124,11 +163,12 @@ class DynamicSubgait:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
             )
+        desired_velocity = np.zeros_like(self.desired_position)
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.joint_names,
             self.desired_position,
-            None,
+            desired_velocity,
             self.time[SetpointTime.END_POINT_INDEX],
         )
 
@@ -150,43 +190,10 @@ class DynamicSubgait:
             ):
                 setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
-            self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
-
-    def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
-        """Return a joint_trajectory_msg containing the interpolated
-        trajectories for each joint
-
-        :returns: A joint_trajectory_msg
-        :rtype: joint_trajectory_msg
-        """
-        # Update pose:
-        pose_list = [joint.position for joint in self.starting_position.values()]
-        self.pose = Pose(pose_list)
-
-        self._solve_middle_setpoint()
-        self._solve_desired_setpoint()
-        self._get_extra_ankle_setpoint()
-
-        # Create joint_trajectory_msg
-        self._to_joint_trajectory_class()
-        joint_trajectory_msg = trajectory_msg.JointTrajectory()
-        joint_trajectory_msg.joint_names = self.joint_names
-
-        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
-        for timestamp in timestamps:
-            joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
-
-            for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
-                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(timestamp)
-
-                joint_trajecory_point.positions.append(interpolated_setpoint.position)
-                joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
-                self._check_joint_limits(joint_index, joint_trajecory_point)
-
-            joint_trajectory_msg.points.append(joint_trajecory_point)
-
-        return joint_trajectory_msg
+            if name in ["right_ankle", "left_ankle"]:
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, interpolate_ankle=True))
+            else:
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
     def get_final_position(self) -> dict:
         """Get setpoint_dictionary of the final setpoint.
@@ -197,7 +204,7 @@ class DynamicSubgait:
         return self._from_list_to_setpoint(
             self.joint_names,
             self.desired_position,
-            None,
+            np.zeros_like(self.desired_position),
             self.time[SetpointTime.START_INDEX],
         )
 
@@ -225,7 +232,12 @@ class DynamicSubgait:
         setpoint_dict = {}
         velocity = np.zeros_like(position) if (velocity is None) else velocity
 
-        for i in range(len(joint_names)):
+        for i, name in enumerate(joint_names):
+            if (name == "right_ankle" and self.subgait_id == "right_swing") or (
+                name == "left_ankle" and self.subgait_id == "left_swing"
+            ):
+                velocity[i] = 0.0
+
             setpoint_dict.update(
                 {
                     joint_names[i]: Setpoint(
@@ -248,7 +260,6 @@ class DynamicSubgait:
         :param gait_selection_node: the gait selection node
         :type gait_selection_node: Node
         """
-        self.duration = gait_selection_node.dynamic_subgait_duration
         self.middle_point_height = gait_selection_node.middle_point_height
         self.middle_point_fraction = gait_selection_node.middle_point_fraction
         self.push_off_fraction = gait_selection_node.push_off_fraction

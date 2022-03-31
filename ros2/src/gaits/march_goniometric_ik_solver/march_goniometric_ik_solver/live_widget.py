@@ -4,7 +4,7 @@ import pkg_resources
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, Button
-from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT
+from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT, LENGTH_HIP
 
 # Layout problems occurred with older versions of matplotlib (for example 3.1.2).
 # Tested and working on 3.5.1 (latest version at the moment this tool was made).
@@ -32,6 +32,7 @@ class LiveWidget:
         pose.solve_end_position(
             0.0,
             0.0,
+            LENGTH_HIP,
             "",
             self.default_hip_fraction,
             self.default_knee_bend,
@@ -149,6 +150,7 @@ class LiveWidget:
         pose.solve_end_position(
             self.x_slider.val,
             self.y_slider.val,
+            LENGTH_HIP,
             "",
             self.hip_slider.val,
             np.deg2rad(self.knee_slider.val),
