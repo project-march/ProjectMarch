@@ -43,9 +43,7 @@ class DynamicSetpointGait(GaitInterface):
     def __init__(self, gait_selection_node: Node):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
-        self.home_stand_position = self._joint_dict_to_setpoint_dict(
-            get_position_from_yaml("stand")
-        )
+        self.home_stand_position = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
         self.start_position = self.home_stand_position
         self.end_position = self.home_stand_position
         self._trajectory_failed = False
@@ -120,15 +118,9 @@ class DynamicSetpointGait(GaitInterface):
     @property
     def final_position(self) -> EdgePosition:
         try:
-            return StaticEdgePosition(
-                self._setpoint_dict_to_joint_dict(
-                    self.dynamic_subgait.get_final_position()
-                )
-            )
+            return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.dynamic_subgait.get_final_position()))
         except AttributeError:
-            return StaticEdgePosition(
-                self._setpoint_dict_to_joint_dict(self.end_position)
-            )
+            return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.end_position))
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -182,9 +174,7 @@ class DynamicSetpointGait(GaitInterface):
         try:
             self._reset()
         except ShouldStartFromHomestandError:
-            self.logger.error(
-                "Cannot start the gait from a position that is not homestand."
-            )
+            self.logger.error("Cannot start the gait from a position that is not homestand.")
             return None
         self.update_parameters()
         self._current_time = current_time
@@ -339,9 +329,7 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
-    def _get_trajectory_command(
-        self, start=False, stop=False
-    ) -> Optional[TrajectoryCommand]:
+    def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id.
 
         :param start: whether it is a start gait or not
@@ -368,9 +356,7 @@ class DynamicSetpointGait(GaitInterface):
 
         return self._get_first_feasible_trajectory(start, stop)
 
-    def _get_first_feasible_trajectory(
-        self, start: bool, stop: bool
-    ) -> Optional[TrajectoryCommand]:
+    def _get_first_feasible_trajectory(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
         """If a subgait is not feasible, it will first try to increase the duration. If it is
         still not feasible, execution of the gait will be stopped.
 
@@ -385,9 +371,7 @@ class DynamicSetpointGait(GaitInterface):
         original_duration = self.foot_location.duration
         second_step = False
         while not self._is_duration_bigger_than_max_duration(original_duration):
-            trajectory_command = self._try_to_get_trajectory_command(
-                start, stop, original_duration
-            )
+            trajectory_command = self._try_to_get_trajectory_command(start, stop, original_duration)
             # Return command if current and next step can be made at same duration
             second_step = self._try_to_get_second_step()
             if trajectory_command is not None and second_step:
@@ -428,13 +412,9 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand if successful, otherwise None
         :rtype: TrajectoryCommand
         """
-        iteration = floor(
-            (self.foot_location.duration - original_duration) / DURATION_INCREASE_SIZE
-        )
+        iteration = floor((self.foot_location.duration - original_duration) / DURATION_INCREASE_SIZE)
         try:
-            self.dynamic_subgait = self._create_subgait_instance(
-                self.start_position, self.subgait_id, start, stop
-            )
+            self.dynamic_subgait = self._create_subgait_instance(self.start_position, self.subgait_id, start, stop)
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
             self.logger.debug(
                 f"Found trajectory after {iteration} iterations at duration of {self.foot_location.duration}. "
@@ -506,9 +486,7 @@ class DynamicSetpointGait(GaitInterface):
         :param original_duration: duration before iterations
         :type original_duration: float
         """
-        return (
-            self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR
-        )
+        return self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR
 
     def _create_subgait_instance(
         self,
@@ -550,9 +528,7 @@ class DynamicSetpointGait(GaitInterface):
 
     def _callback_force_unknown(self, msg: GaitInstruction) -> None:
         if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position = self._joint_dict_to_setpoint_dict(
-                get_position_from_yaml("stand")
-            )
+            self.start_position = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
 

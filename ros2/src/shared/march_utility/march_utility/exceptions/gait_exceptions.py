@@ -74,7 +74,7 @@ class SubgaitInterpolationError(Exception):
         if msg is None:
             msg = "An error occurred while trying to merge two subgaits."
 
-        super(SubgaitInterpolationError, self).__init__(msg)
+            super(SubgaitInterpolationError, self).__init__(msg)
 
 
 class UnknownDimensionsError(Exception):
@@ -94,9 +94,7 @@ class WrongRealSenseConfigurationError(Exception):
 
 
 class PositionSoftLimitError(Exception):
-    def __init__(
-        self, joint_name: str, position: float, lower_limit: float, upper_limit: float
-    ):
+    def __init__(self, joint_name: str, position: float, lower_limit: float, upper_limit: float):
         """Class to raise an error when joint trajectory will be outside of
         position soft limits"""
         self.joint_name = joint_name
@@ -121,10 +119,7 @@ class VelocitySoftLimitError(Exception):
         self.velocity = velocity
         self.limit = limit
 
-        msg = (
-            f"{joint_name} will be outside of velocity limits, "
-            f"velocity: {velocity}, velocity limit: {limit}."
-        )
+        msg = f"{joint_name} will be outside of velocity limits, " f"velocity: {velocity}, velocity limit: {limit}."
 
         super(VelocitySoftLimitError, self).__init__(msg)
 

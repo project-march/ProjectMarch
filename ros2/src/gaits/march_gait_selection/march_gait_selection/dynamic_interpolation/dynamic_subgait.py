@@ -284,10 +284,7 @@ class DynamicSubgait:
         """
         position = joint_trajectory_point.positions[joint_index]
         velocity = joint_trajectory_point.velocities[joint_index]
-        if (
-            position > self.joint_soft_limits[joint_index].upper
-            or position < self.joint_soft_limits[joint_index].lower
-        ):
+        if position > self.joint_soft_limits[joint_index].upper or position < self.joint_soft_limits[joint_index].lower:
             raise PositionSoftLimitError(
                 self.joint_names[joint_index],
                 position,
