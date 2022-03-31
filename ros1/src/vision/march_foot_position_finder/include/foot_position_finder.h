@@ -5,6 +5,7 @@
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
+#include "march_shared_msgs/FootPosition.h"
 #include <cmath>
 #include <librealsense2/rs.hpp>
 #include <march_foot_position_finder/parametersConfig.h>
@@ -31,7 +32,13 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
+    void chosenCurrentPointCallback(const march_shared_msgs::FootPosition msg);
+
+    void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
+
     void processRealSenseDepthFrames(const ros::TimerEvent&);
+
+    void resetHeight(const ros::TimerEvent&);
 
     void processSimulatedDepthFrames(
         const sensor_msgs::PointCloud2 input_cloud);
@@ -40,7 +47,7 @@ protected:
 
     Point computeTemporalAveragePoint(const Point& new_point);
 
-    Point transformPoint(Point& point, const std::string& frame_from,
+    Point transformPoint(Point point, const std::string& frame_from,
         const std::string& frame_to);
 
     ros::NodeHandle* n_;
@@ -50,40 +57,53 @@ protected:
 
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher point_marker_publisher_;
+    ros::Subscriber current_chosen_point_subscriber_;
+    ros::Subscriber other_chosen_point_subscriber_;
 
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
-    bool running_;
-
-    ros::Timer realsenseTimer;
+    ros::Timer realsense_timer_;
+    ros::Timer height_reset_timer_;
     rs2::pipeline pipe_;
     rs2::config config_;
-    rs2::context context_;
 
     rs2::decimation_filter dec_filter_;
     rs2::spatial_filter spat_filter_;
     rs2::temporal_filter temp_filter_;
 
     std::string topic_camera_front_;
-    std::string topic_chosen_points_;
+    std::string topic_current_chosen_point_;
+    std::string topic_other_chosen_point_;
 
     std::string left_or_right_;
-    std::string other_;
-    int switch_factor_;
+    std::string other_side_;
+
+    std::string base_frame_;
+    std::string other_frame_id_;
+    std::string current_frame_id_;
+
+    bool running_;
     bool physical_cameras_;
 
     double foot_gap_;
     double step_distance_;
     double outlier_distance_;
+    double height_zero_threshold_;
+    float last_height_;
+    int switch_factor_;
     int sample_size_;
-
-    std::string base_frame_;
-    std::string reference_frame_id_;
-    std::string current_frame_id_;
+    int refresh_last_height_;
 
     std::vector<Point> found_points_;
-    double last_height_;
+
+    Point ORIGIN;
+    Point last_chosen_point_world_;
+    Point start_point_current_;
+    Point start_point_world_;
+    Point desired_point_world_;
+    Point previous_start_point_world_;
+    Point last_displacement_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

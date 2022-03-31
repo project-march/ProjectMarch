@@ -13,8 +13,7 @@ class DynamicPIDReconfigurer:
         self._joint_list = joint_list
         self._last_update_times = []
         self._clients = [
-            Client("/march/controller/trajectory/gains/" + joint, timeout=90)
-            for joint in self._joint_list
+            Client("/march/controller/trajectory/gains/" + joint, timeout=90) for joint in self._joint_list
         ]
         self.current_gains = []
         rospy.Subscriber(
@@ -30,18 +29,14 @@ class DynamicPIDReconfigurer:
         self._linearize = rospy.get_param("~linearize_gain_scheduling")
         self._gradient = rospy.get_param("~linear_slope")
         self._configuration = rospy.get_param("~configuration")
-        rospy.loginfo(
-            f"Exoskeleton was started with gain tuning for " f"{self._configuration}"
-        )
+        rospy.loginfo(f"Exoskeleton was started with gain tuning for {self._configuration}")
 
     def gait_selection_callback(self, msg):
         new_gait_type = msg.gait_type
         if (
             new_gait_type is None
             or new_gait_type == ""
-            or not rospy.has_param(
-                "~gait_types/{gait_type}".format(gait_type=new_gait_type)
-            )
+            or not rospy.has_param("~gait_types/{gait_type}".format(gait_type=new_gait_type))
         ):
             rospy.logwarn_once(
                 "The gait has unknown gait type of `{gait_type}`, default is set to walk_like".format(
@@ -57,19 +52,13 @@ class DynamicPIDReconfigurer:
         if not self.done_interpolation_test(needed_gains):
             rate = rospy.Rate(10)
 
-            rospy.loginfo(
-                "Beginning PID interpolation for gait type: {0}".format(self._gait_type)
-            )
+            rospy.loginfo("Beginning PID interpolation for gait type: {0}".format(self._gait_type))
             begin_time = rospy.get_time()
             self._last_update_times = len(self._joint_list) * [begin_time]
             while not self.done_interpolation_test(needed_gains):
                 self.client_update(needed_gains)
                 rate.sleep()
-            rospy.loginfo(
-                "PID interpolation finished in {0}s".format(
-                    rospy.get_time() - begin_time
-                )
-            )
+            rospy.loginfo("PID interpolation finished in {0}s".format(rospy.get_time() - begin_time))
 
     def client_update(self, needed_gains):
         for i in range(len(self._joint_list)):
@@ -111,10 +100,7 @@ class DynamicPIDReconfigurer:
         return [gains["p"], gains["i"], gains["d"]]
 
     def done_interpolation_test(self, needed_gains):
-        return all(
-            self.current_gains[i] == needed_gains[i]
-            for i in range(len(self._joint_list))
-        )
+        return all(self.current_gains[i] == needed_gains[i] for i in range(len(self._joint_list)))
 
     def configuration_cb(self, req: TriggerRequest):
         return TriggerResponse(success=True, message=self._configuration)

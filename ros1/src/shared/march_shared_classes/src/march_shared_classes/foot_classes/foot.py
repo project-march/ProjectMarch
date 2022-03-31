@@ -49,9 +49,7 @@ class Foot:
 
         :return: A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR second later
         """
-        next_position = (
-            current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
-        )
+        next_position = current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
         return cls(current_state.foot_side, next_position)
 
     @staticmethod
@@ -63,9 +61,7 @@ class Foot:
 
         :return: A dictionary of setpoints, the foot location and velocity of which corresponds with the feet_state.
         """
-        joint_states = Foot.calculate_joint_angles_from_foot_position(
-            foot_state.position, foot_state.foot_side, time
-        )
+        joint_states = Foot.calculate_joint_angles_from_foot_position(foot_state.position, foot_state.foot_side, time)
 
         # find the joint angles a moment later using the foot position a moment later
         # use this together with the current joint angles to calculate the joint velocity
@@ -78,9 +74,7 @@ class Foot:
 
         for joint in JOINT_NAMES_IK:
             if joint in joint_states and joint in next_joint_positions:
-                joint_states[joint].add_joint_velocity_from_next_angle(
-                    next_joint_positions[joint]
-                )
+                joint_states[joint].add_joint_velocity_from_next_angle(next_joint_positions[joint])
 
         return joint_states
 
@@ -133,9 +127,7 @@ class Foot:
             MID_CALCULATION_PRECISION_DIGITS,
         )
 
-        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (
-            ll + ul
-        ):
+        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (ll + ul):
             raise SubgaitInterpolationError(
                 "The desired {foot} foot position, ({x}, {y}, {z}), is out of reach".format(
                     foot=foot_side, x=x_position, y=y_position, z=z_position
@@ -169,9 +161,7 @@ class Foot:
                 "desired z position of the foot is not positive, "
                 "current haa calculation is not capable to deal with this"
             )
-        haa_arm_to_z_y_distance_ration = pelvis_hip_length / sqrt(
-            z_position * z_position + y_position * y_position
-        )
+        haa_arm_to_z_y_distance_ration = pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)
 
         if y_position != 0:
             slope_foot_to_origin = z_position / y_position
@@ -205,11 +195,7 @@ class Foot:
                 + transformed_z * transformed_z
                 - lower_leg * lower_leg
             )
-            / (
-                2
-                * upper_leg
-                * sqrt(transformed_x * transformed_x + transformed_z * transformed_z)
-            )
+            / (2 * upper_leg * sqrt(transformed_x * transformed_x + transformed_z * transformed_z))
         )
         normal_to_foot_line = atan(transformed_x / transformed_z)
         hfe = foot_line_to_leg + normal_to_foot_line
@@ -258,13 +244,9 @@ class Foot:
                 "expected sides of both base and other foot to be equal but were {base} and "
                 "{other}.".format(base=base_foot.foot_side, other=other_foot.foot_side)
             )
-        resulting_position = weighted_average(
-            base_foot.position, other_foot.position, parameter
-        )
+        resulting_position = weighted_average(base_foot.position, other_foot.position, parameter)
         if base_foot.velocity is not None and other_foot.velocity is not None:
-            resulting_velocity = weighted_average(
-                base_foot.velocity, other_foot.velocity, parameter
-            )
+            resulting_velocity = weighted_average(base_foot.velocity, other_foot.velocity, parameter)
         else:
             rospy.logwarn(
                 "one or both of the provided feet does not have a velocity specified, "

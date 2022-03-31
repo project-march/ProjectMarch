@@ -20,9 +20,7 @@ rospy.init_node("republish_pointclouds", anonymous=True)
 name = rospy.get_param("~name", "...")
 
 CAMERA_TOPIC = f"/{name}/depth/color/points"
-publisher = rospy.Publisher(
-    CAMERA_TOPIC + REPUBLISH_POSTFIX, PointCloud2, queue_size=100
-)
+publisher = rospy.Publisher(CAMERA_TOPIC + REPUBLISH_POSTFIX, PointCloud2, queue_size=100)
 subscription = rospy.Subscriber(
     CAMERA_TOPIC,
     PointCloud2,

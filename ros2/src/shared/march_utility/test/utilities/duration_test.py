@@ -47,9 +47,7 @@ class TestTransitionTrajectory(unittest.TestCase):
     def test_weighted_average(self):
         duration_1 = Duration(seconds=4)
         duration_2 = Duration(seconds=8)
-        self.assertEqual(
-            duration_1.weighted_average(duration_2, 0.75).nanoseconds, 7000000000
-        )
+        self.assertEqual(duration_1.weighted_average(duration_2, 0.75).nanoseconds, 7000000000)
 
     def test_round(self):
         duration = Duration(seconds=4.56)

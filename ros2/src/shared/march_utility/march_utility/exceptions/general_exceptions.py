@@ -45,10 +45,7 @@ class SideSpecificationError(Exception):
         :param msg: Optional, a custom error message to return.
         """
         if msg is None:
-            msg = (
-                f"An incorrect side was supplied. Must be a either Side.left or "
-                f"Side.right, but was {foot}."
-            )
+            msg = f"An incorrect side was supplied. Must be a either Side.left or Side.right, but was {foot}."
 
         super(SideSpecificationError, self).__init__(msg)
 
@@ -63,10 +60,7 @@ class IncorrectCoordinateError(Exception):
         :param msg: Optional, a custom error message to return.
         """
         if msg is None:
-            msg = (
-                "The keys of a position or velocity dictionary should be "
-                "['x', 'y', 'z'], but were different."
-            )
+            msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."
 
         super(IncorrectCoordinateError, self).__init__(msg)
 
@@ -87,9 +81,7 @@ class WeightedAverageError(Exception):
 
 
 class InconsistentDigitsError(Exception):
-    def __init__(
-        self, msg: str = None, number1: float = None, number2: float = None
-    ) -> None:
+    def __init__(self, msg: str = None, number1: float = None, number2: float = None) -> None:
         """
         Class to raise an error when precision or digits are not consistent where they should be.
 

@@ -77,9 +77,7 @@ class TestMarchSafetyConnection(unittest.TestCase):
         )
 
         self.input_alive_topic = "/march/input_device/alive"
-        self.alive_publisher = self.node.create_publisher(
-            msg_type=Alive, topic=self.input_alive_topic, qos_profile=0
-        )
+        self.alive_publisher = self.node.create_publisher(msg_type=Alive, topic=self.input_alive_topic, qos_profile=0)
 
     def tearDown(self):
         """Destroy the ROS node."""
@@ -90,9 +88,7 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.publish_alive()
 
         # Wait for some time to let error counter increment
-        rclpy.spin_once(
-            self.node, timeout_sec=(self.input_device_connection_timeout * 3) / 1000
-        )
+        rclpy.spin_once(self.node, timeout_sec=(self.input_device_connection_timeout * 3) / 1000)
 
         self.assertEqual(self.error_counter.count, 1)
 
@@ -101,9 +97,7 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.publish_alive()
 
         # Wait for some time but not enough time to be timed out
-        rclpy.spin_once(
-            self.node, timeout_sec=(self.input_device_connection_timeout / 2) / 1000
-        )
+        rclpy.spin_once(self.node, timeout_sec=(self.input_device_connection_timeout / 2) / 1000)
 
         self.assertEqual(self.error_counter.count, 0)
 
@@ -111,9 +105,7 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.wait_for_node_startup()
 
         # Wait some time to let input device connection timeout pass
-        rclpy.spin_once(
-            self.node, timeout_sec=(self.input_device_connection_timeout * 3) / 1000
-        )
+        rclpy.spin_once(self.node, timeout_sec=(self.input_device_connection_timeout * 3) / 1000)
 
         self.assertEqual(self.error_counter.count, 0)
 
@@ -128,6 +120,4 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.assertEqual(self.node.count_publishers(self.error_topic), 1)
 
     def publish_alive(self):
-        self.alive_publisher.publish(
-            Alive(id="test", stamp=self.node.get_clock().now().to_msg())
-        )
+        self.alive_publisher.publish(Alive(id="test", stamp=self.node.get_clock().now().to_msg()))

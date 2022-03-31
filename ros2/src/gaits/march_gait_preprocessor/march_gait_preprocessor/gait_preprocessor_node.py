@@ -20,9 +20,7 @@ def main():
     rclpy.init()
     gait_preprocessor = GaitPreprocessor()
 
-    gait_preprocessor.add_on_set_parameters_callback(
-        lambda params: parameter_callback(gait_preprocessor, params)
-    )
+    gait_preprocessor.add_on_set_parameters_callback(lambda params: parameter_callback(gait_preprocessor, params))
 
     signal.signal(signal.SIGTERM, sys_exit)
 
@@ -32,9 +30,7 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(
-    gait_preprocessor: GaitPreprocessor, parameters: List[Parameter]
-) -> SetParametersResult:
+def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Parameter]) -> SetParametersResult:
     """Update parameter of gait_preprocessor and return if
     this is done succesfully.
 
