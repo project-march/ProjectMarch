@@ -432,7 +432,8 @@ class DynamicSetpointGait(GaitInterface):
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if self._is_duration_bigger_than_max_duration(original_duration):
                 self.logger.warn(
-                    f"Can not get trajectory after {iteration} iterations. {e.msg} Gait will not be executed.")
+                    f"Can not get trajectory after {iteration} iterations. {e.msg} Gait will not be executed."
+                )
             return None
 
     def _try_to_get_second_step(self) -> bool:
