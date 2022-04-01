@@ -133,7 +133,7 @@ class DynamicSetpointGait(GaitInterface):
     def _reset(self) -> None:
         """Reset all attributes of the gait"""
         if self.start_position != self.home_stand_position:
-            raise ShouldStartFromHomestandError
+            raise ShouldStartFromHomestandError(self.start_position)
 
         self._should_stop = False
         self._end = False
