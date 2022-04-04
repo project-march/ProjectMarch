@@ -173,11 +173,8 @@ class DynamicSetpointGait(GaitInterface):
         """
         try:
             self._reset()
-        except ShouldStartFromHomestandError:
-            self.logger.error(
-                f"Cannot start the gait from a position that is not homestand. "
-                f"Current position is {self.start_position}, home stand is {self.home_stand_position}."
-            )
+        except ShouldStartFromHomestandError as e:
+            self.logger.error(e.msg)
             return None
         self.update_parameters()
         self._current_time = current_time
