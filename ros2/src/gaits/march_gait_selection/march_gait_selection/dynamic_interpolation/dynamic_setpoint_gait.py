@@ -373,6 +373,8 @@ class DynamicSetpointGait(GaitInterface):
         """
         original_duration = self.foot_location.duration
         second_step = False
+        trajectory_command = None
+
         while not self._is_duration_bigger_than_max_duration(original_duration):
             trajectory_command = self._try_to_get_trajectory_command(start, stop, original_duration)
             # Return command if current and next step can be made at same duration
@@ -385,8 +387,17 @@ class DynamicSetpointGait(GaitInterface):
                 self._trajectory_failed = True
                 self.foot_location.duration += DURATION_INCREASE_SIZE
 
-        if second_step is False:
-            self.logger.warn("Not possible to perform second step, trying to close the gait.")
+        msg = ""
+        if trajectory_command is None:
+            msg = "Not possible to perform first step, trying to close the gait."
+        elif trajectory_command is None and not second_step:
+            msg = "Not possible to perform first and second step, trying to close the gait."
+        elif second_step is False:
+            if start:
+                msg = "Not possible to perform second step, gait will not be executed."
+            else:
+                msg = "Not possible to perform second step, trying to close the gait."
+        self.logger.warn(msg)
 
         # If no feasible subgait can be found, try to execute close gait
         if not start:
