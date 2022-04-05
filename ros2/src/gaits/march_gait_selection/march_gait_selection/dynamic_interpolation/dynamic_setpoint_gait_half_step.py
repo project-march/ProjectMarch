@@ -188,4 +188,6 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         """
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.append(point_dict)
-        self.logger.info(f"Point added to position queue. Current queue is: {self.position_queue}")
+        self.logger.info(
+            f"Point added to position queue. Current queue is: {self.position_queue}"
+        )
