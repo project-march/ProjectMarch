@@ -177,7 +177,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         self.queue_index += 1
 
         return FootPosition(
-            header=header, point=point, duration=self.duration_from_yaml
+            header=header, processed_point=point, duration=self.duration_from_yaml
         )
 
     def _add_point_to_queue(self, point: Point) -> None:
