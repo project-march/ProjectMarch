@@ -38,6 +38,7 @@ ignore =
 # The following are ignored due to missing docstring in old code.
 per-file-ignores =
     ros1/*/setup.py:D100,
+    ros2/*/setup.py:D100,
     ros1/src/gaits/march_rqt_gait_generator/src/march_rqt_gait_generator/joint_setting_spin_box_delegate.py:D417,
     ros1/src/gaits/march_rqt_gait_generator/src/march_rqt_gait_generator/side_subgait_view.py:D,
     ros1/src/gaits/march_rqt_gait_generator/src/march_rqt_gait_generator/time_slider_thread.py:D,
@@ -72,3 +73,14 @@ per-file-ignores =
     ros1/src/data/march_data_collector/src/march_data_collector/cp_calculator.py:D,
     ros1/src/data/march_data_collector/src/march_data_collector/com_calculator.py:D,
     ros1/src/data/march_data_collector/src/march_data_collector/data_collector_node.py:D,
+
+    ros2/src/visualization/march_rqt_gait_version_tool/march_rqt_gait_version_tool/gait_version_tool_errors.py:D,
+    ros2/src/visualization/march_rqt_gait_version_tool/march_rqt_gait_version_tool/parametric_same_versions_pop_up.py:D,
+    ;   Todo: @martenhaitjema
+    ros2/src/gaits/march_gait_selection/*:D,
+    ;   Todo: @martenhaitjema
+    ros2/src/gaits/march_fake_covid/*:D,
+    ;   Todo: @martenhaitjema
+    ros2/src/gaits/march_goniometric_ik_solver/*:D,
+
+

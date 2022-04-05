@@ -1,5 +1,8 @@
+"""Author: MV; MVI."""
 import ast
 import os
+from typing import List
+
 import yaml
 from std_srvs.srv import Trigger
 from march_shared_msgs.srv import SetGaitVersion
@@ -22,8 +25,9 @@ GAIT_SOURCE_DIR = os.path.join(
 
 
 class GaitVersionToolController:
+    """Base class to communicate with the gait selection node."""
+
     def __init__(self, node):
-        """Base class to communicate with the gait selection node."""
         self._node = node
         self._source_dir = GAIT_SOURCE_DIR
         self._get_version_map = node.create_client(srv_type=Trigger, srv_name="/march/gait_selection/get_version_map")
@@ -38,14 +42,18 @@ class GaitVersionToolController:
         self._gait_directory = self.get_current_gait_directory()
 
     def wait_for_service(self, service):
+        """Waits for a service to come online, retries after 2 seconds if not available.
+
+        Args:
+            service: The service that should be available to be called.
+        """
         while not service.wait_for_service(timeout_sec=2):
             self._node.get_logger().warn(
                 f"Waiting for {service.srv_name} service to be available, is gait selection running?"
             )
 
     def get_current_gait_directory(self):
-        """Get the gait directory used by the gait selection node,
-        to allow updating the default version."""
+        """Get the gait directory used by the gait selection node to allow updating the default version."""
         gait_dir_client = self._node.create_client(
             srv_type=Trigger, srv_name="/march/gait_selection/get_gait_directory"
         )
@@ -70,12 +78,13 @@ class GaitVersionToolController:
         except ValueError:
             raise InvalidResponseError
 
-    def set_gait_version(self, gait_name, subgait_names, versions):
+    def set_gait_version(self, gait_name: str, subgait_names: List[str], versions: List[str]):
         """Set a new gait version map to use in the gait selection node.
 
-        :param str gait_name: The name of the gait
-        :param list(str) subgait_names: Names of subgaits of which to change the version
-        :param list(str) versions: Names of the versions
+        Args:
+            gait_name (str): The name of the gait.
+            subgait_names (list[str]): Names of subgaits of which to change the version.
+            versions (list[str]): Names of the versions.
         """
         self.wait_for_service(self._set_gait_version)
         result = self._set_gait_version.call(
