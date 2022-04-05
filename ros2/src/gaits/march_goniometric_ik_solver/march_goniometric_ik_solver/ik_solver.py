@@ -10,6 +10,7 @@ import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
     get_limits_robot_from_urdf_for_inverse_kinematics,
+    get_joint_names_from_urdf,
 )
 
 # Get lengths from urdf:
@@ -25,16 +26,7 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # List the joints we have:
-JOINT_NAMES = [
-    "left_ankle",
-    "left_hip_aa",
-    "left_hip_fe",
-    "left_knee",
-    "right_ankle",
-    "right_hip_aa",
-    "right_hip_fe",
-    "right_knee",
-]
+JOINT_NAMES = get_joint_names_from_urdf()
 
 # Create a dictionary of joint limits:
 JOINT_LIMITS = {}
@@ -44,7 +36,10 @@ for name in JOINT_NAMES:
 
 # Create a constant for frequently used limits:
 ANKLE_BUFFER = np.deg2rad(1)
-MAX_ANKLE_FLEXION = JOINT_LIMITS["left_ankle"].upper - ANKLE_BUFFER
+if "left_ankle" in JOINT_NAMES:
+    MAX_ANKLE_FLEXION = JOINT_LIMITS["left_ankle"].upper - ANKLE_BUFFER
+else:
+    MAX_ANKLE_FLEXION = 0.144 - ANKLE_BUFFER  # Take march6 limit if joint is not in urdf
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -53,7 +48,6 @@ ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
 HIP_ZERO_ANGLE = np.pi  # rad
 
-NUMBER_OF_JOINTS = 8
 DEFAULT_HIP_X_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
 
@@ -556,10 +550,10 @@ class Pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
         # Perform a limit check and raise error if limit is exceeded:
-        errors = check_on_limits(pose_list)
-        if errors:
-            for error in errors:
-                raise ValueError(error)
+        # errors = check_on_limits(pose_list)
+        # if errors:
+        #     for error in errors:
+        #         raise ValueError(error)
 
         # return pose as list:
         return pose_list

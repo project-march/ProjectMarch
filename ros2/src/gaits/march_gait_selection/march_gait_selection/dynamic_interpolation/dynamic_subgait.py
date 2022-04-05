@@ -112,7 +112,7 @@ class DynamicSubgait:
 
                 joint_trajectory_point.positions.append(interpolated_setpoint.position)
                 joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
-                self._check_joint_limits(joint_index, joint_trajectory_point)
+                # self._check_joint_limits(joint_index, joint_trajectory_point)
 
             joint_trajectory_msg.points.append(joint_trajectory_point)
 
@@ -148,7 +148,7 @@ class DynamicSubgait:
         middle_velocity = np.zeros_like(middle_position)
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
-            self.joint_names,
+            list(self.starting_position.keys()),
             middle_position,
             middle_velocity,
             self.time[SetpointTime.MIDDLE_POINT_INDEX],
@@ -163,10 +163,10 @@ class DynamicSubgait:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
             )
-        desired_velocity = np.zeros_like(self.desired_position)
 
+        desired_velocity = np.zeros_like(self.desired_position)
         self.desired_setpoint_dict = self._from_list_to_setpoint(
-            self.joint_names,
+            list(self.starting_position.keys()),
             self.desired_position,
             desired_velocity,
             self.time[SetpointTime.END_POINT_INDEX],
@@ -202,7 +202,7 @@ class DynamicSubgait:
         :rtype: dict
         """
         return self._from_list_to_setpoint(
-            self.joint_names,
+            list(self.starting_position.keys()),
             self.desired_position,
             np.zeros_like(self.desired_position),
             self.time[SetpointTime.START_INDEX],

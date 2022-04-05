@@ -34,6 +34,7 @@ class DynamicSetpointGait(GaitInterface):
     def __init__(self, gait_selection_node: Node):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
+        self.logger = Logger(self.gait_selection, __class__.__name__)
         self._reset()
         self.joint_names = get_joint_names_from_urdf()
         self._get_soft_limits()
@@ -66,8 +67,6 @@ class DynamicSetpointGait(GaitInterface):
 
         # Assign reconfigurable parameters
         self.update_parameters()
-
-        self.logger = Logger(self.gait_selection, __class__.__name__)
 
     @property
     def name(self) -> str:
@@ -105,7 +104,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
-        return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.start_position))
+        return StaticEdgePosition(self.start_position)
 
     @property
     def final_position(self) -> EdgePosition:
@@ -113,7 +112,7 @@ class DynamicSetpointGait(GaitInterface):
         if self._next_command is not None:
             return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.dynamic_subgait.get_final_position()))
         else:
-            return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.end_position))
+            return StaticEdgePosition(self.end_position)
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
@@ -138,7 +137,9 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
+        self.start_position = self.gait_selection.positions["stand"]["joints"]
+        self.start_position_ik = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
+
         self.end_position = self.start_position
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
@@ -283,7 +284,9 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_pos(self) -> None:
         """Update the start position of the next subgait to be
         the last position of the previous subgait."""
-        self.start_position = self.dynamic_subgait.get_final_position()
+        self.start_position_ik = self.dynamic_subgait.get_final_position()
+        for name in self.joint_names:
+            self.start_position[name] = self.start_position_ik[name]
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published
@@ -359,7 +362,7 @@ class DynamicSetpointGait(GaitInterface):
         duration = Duration(self.foot_location.duration)
         self.dynamic_subgait = DynamicSubgait(
             self.gait_selection,
-            self.start_position,
+            self.start_position_ik,
             self.subgait_id,
             self.joint_names,
             self.foot_location,
