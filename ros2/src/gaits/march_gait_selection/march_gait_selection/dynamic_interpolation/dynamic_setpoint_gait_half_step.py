@@ -50,7 +50,10 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         self.duration_from_yaml = position_queue_yaml["duration"]
 
         gait_selection_node.create_subscription(
-            Point, "/march/add_point_to_queue", self._add_point_to_queue, DEFAULT_HISTORY_DEPTH,
+            Point,
+            "/march/add_point_to_queue",
+            self._add_point_to_queue,
+            DEFAULT_HISTORY_DEPTH,
         )
 
     def _reset(self) -> None:
