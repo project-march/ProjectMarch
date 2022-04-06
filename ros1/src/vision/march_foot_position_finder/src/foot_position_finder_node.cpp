@@ -29,12 +29,16 @@ void parameterCallback(
 
 int main(int argc, char** argv)
 {
-    // Perform realsense hardware reset on all devices
-    rs2::context ctx;
-    for (auto&& dev : ctx.query_devices()) {
-        dev.hardware_reset();
+    try {
+        // Perform realsense hardware reset on all devices
+        rs2::context ctx;
+        for (auto&& dev : ctx.query_devices()) {
+            dev.hardware_reset();
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    } catch (...) {
+        ROS_WARN("Hardware reset of Realsense cameras failed");
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
     ros::init(argc, argv, "march_foot_position_finder");
     ros::NodeHandle n;

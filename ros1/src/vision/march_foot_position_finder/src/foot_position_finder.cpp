@@ -219,9 +219,9 @@ void FootPositionFinder::chosenOtherPointCallback(
 void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
 {
     float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
-    if (floor(difference / 5) > frame_wait_counter_) {
+    if ((int)(difference / 5) > frame_wait_counter_) {
         frame_wait_counter_++;
-        ROS_WARN("Realsense (%s) did not receive frames last %d s",
+        ROS_WARN("Realsense (%s) did not receive frames last %d seconds",
             left_or_right_.c_str(), frame_wait_counter_ * 5);
     }
 
