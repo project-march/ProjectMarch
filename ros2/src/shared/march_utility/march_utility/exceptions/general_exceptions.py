@@ -1,14 +1,13 @@
 """This module contains some errors that are specific to the Project March code."""
 from __future__ import annotations
-from march_utility.utilities.side import Side
 
 
 class PackageNotFoundError(Exception):
     """Class to raise an error when a ros1 package cannot be found.
 
     Args:
-        package_name: The package name which is not found by rospkg.RosPack().get_path()
-        msg (,optional) a custom error message to return.
+        package_name (str): The package name which is not found by rospkg.RosPack().get_path().
+        msg (str, optional) a custom error message to return. Default is `None`.
     """
 
     def __init__(self, package_name, msg=None):
@@ -22,7 +21,7 @@ class MsgTypeError(Exception):
     """Class to raise an error when an non msg type is added to a message.
 
     Args:
-        msg (str, optional): The error message to display.
+        msg (str, optional): The error message to display. Default is `None`.
     """
 
     def __init__(self, msg=None):
@@ -36,7 +35,7 @@ class SideSpecificationError(Exception):
     """Class to raise an error when a foot ('right' or 'left') has to be specified but this did not happen.
 
     Args:
-        msg (str, optional): The error message to display.
+        msg (str, optional): The error message to display. Default is `None`.
     """
 
     def __init__(self, foot, msg=None):
@@ -52,7 +51,7 @@ class IncorrectCoordinateError(Exception):
     """Class to raise an error when the coordinates of a position are incorrect.
 
     Args:
-        msg (str, optional): The error message to display.
+        msg (str, optional): The error message to display. Default is `None`.
     """
 
     def __init__(self, msg=None):
@@ -66,7 +65,7 @@ class WeightedAverageError(Exception):
     """Class to raise an error when a weighted average cannot be computed.
 
     Args:
-        msg (str, optional): The error message to display.
+        msg (str, optional): The error message to display. Default is `None`.
     """
 
     def __init__(self, msg=None):
@@ -77,16 +76,17 @@ class WeightedAverageError(Exception):
 
 
 class InconsistentDigitsError(Exception):
-    def __init__(self, msg: str = None, number1: float = None, number2: float = None) -> None:
-        """
-        Class to raise an error when precision or digits are not consistent where they should be.
+    """Class to raise an error when precision or digits are not consistent where they should be.
 
-        :param msg: Optional, a custom error message to return
-        :param number1: Optional, if both number1 and number2 are specified
-        they are included in the default error message
-        :param number2: Optional, if both number1 and number2 are specified
-        they are included in the default error message
-        """
+    Args:
+        msg (str, Optional): The custom error message to return.
+        number1 (float, Optional): If `number1` and `number2` are specified, then
+            they are included in the default error message.
+        number2 (float, Optional): If `number1` and `number2` are specified, then
+            they are included in the default error message.
+    """
+
+    def __init__(self, msg: str = None, number1: float = None, number2: float = None) -> None:
         if msg is None:
             msg = "Two numbers which which should have the same number of digits but do not were supplied."
             if number1 is not None and number2 is not None:

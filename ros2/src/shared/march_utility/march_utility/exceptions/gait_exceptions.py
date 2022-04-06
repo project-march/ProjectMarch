@@ -1,3 +1,6 @@
+"""This module contains some errors that are specific to the gaits in the Project March code."""
+
+
 class GaitError(Exception):
     """Base class for exceptions in gait modules.
 
@@ -95,15 +98,25 @@ class SubgaitInterpolationError(GaitError):
 
 
 class UnknownDimensionsError(Exception):
+    """Class to raise an error when the dimension is not within the InterpolationDimensions enum, and therefore unknown.
+
+    Args:
+        dimensions: The actual value or object that should have been a value of the InterpolationDimensions enum..
+    """
+
     def __init__(self, dimensions):
         msg = f"Unknown amount of dimensions, should be from InterpolationDimensions enum, but was: {dimensions}"
         super(UnknownDimensionsError, self).__init__(msg)
 
 
 class WrongRealSenseConfigurationError(Exception):
+    """Class to raise an error when there was a mistake in the realsense_gaits.yaml.
+
+    Args:
+        msg (str, optional): The error message to display.
+    """
+
     def __init__(self, msg: str = None):
-        """Class to raise an error when there was a mistake in the
-        realsense_gaits.yaml."""
         if msg is None:
             msg = "An error occurred while trying to read out the realsense config."
 
