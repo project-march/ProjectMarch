@@ -76,36 +76,12 @@ class GaitSelection(Node):
             self._early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
             self._first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
             # Setting dynamic gait parameters
-            self.middle_point_fraction = (
-                self.get_parameter("middle_point_fraction")
-                .get_parameter_value()
-                .double_value
-            )
-            self.middle_point_height = (
-                self.get_parameter("middle_point_height")
-                .get_parameter_value()
-                .double_value
-            )
-            self.minimum_stair_height = (
-                self.get_parameter("minimum_stair_height")
-                .get_parameter_value()
-                .double_value
-            )
-            self.push_off_fraction = (
-                self.get_parameter("push_off_fraction")
-                .get_parameter_value()
-                .double_value
-            )
-            self.push_off_position = (
-                self.get_parameter("push_off_position")
-                .get_parameter_value()
-                .double_value
-            )
-            self.use_position_queue = (
-                self.get_parameter("use_position_queue")
-                .get_parameter_value()
-                .bool_value
-            )
+            self.middle_point_fraction = self.get_parameter("middle_point_fraction").get_parameter_value().double_value
+            self.middle_point_height = self.get_parameter("middle_point_height").get_parameter_value().double_value
+            self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
+            self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
+            self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
+            self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
 
         except ParameterNotDeclaredException:
             self.logger.error(
@@ -417,9 +393,7 @@ class GaitSelection(Node):
             self.dynamic_setpoint_gait_single_step = DynamicSetpointGaitSingleStep(gait_selection_node=self)
             gaits["dynamic_walk_single_step"] = self.dynamic_setpoint_gait_single_step
             self.logger.info("Added dynamic_walk to gaits")
-            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(
-                gait_selection_node=self
-            )
+            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(gait_selection_node=self)
             gaits["dynamic_walk_half_step"] = self.dynamic_setpoint_gait_half_step
 
         return gaits

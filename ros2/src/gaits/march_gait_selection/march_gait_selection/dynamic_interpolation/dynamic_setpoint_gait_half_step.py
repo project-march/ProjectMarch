@@ -111,9 +111,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
 
         return GaitUpdate.finished()
 
-    def _get_trajectory_command(
-        self, start=False, stop=False
-    ) -> Optional[TrajectoryCommand]:
+    def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id, or
         based on the position_queue if enabled.
 
@@ -153,17 +151,13 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         """
         header = Header(stamp=self.gait_selection.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
-        point = Point(
-            x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"]
-        )
+        point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
         if self.position_queue.empty():
             msg = "Next step will be a close gait."
             self.logger.warn(msg)
 
-        return FootPosition(
-            header=header, processed_point=point, duration=self.duration_from_yaml
-        )
+        return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
     def update_parameter(self) -> None:
         """Updates '_use_position_queue' to the newest value in gait_selection."""
@@ -174,9 +168,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
     def _create_position_queue(self) -> None:
         """Creates and fills the queue with values from position_queue.yaml."""
         queue_path = get_package_share_path("march_gait_selection")
-        queue_directory = os.path.join(
-            queue_path, "position_queue", "position_queue.yaml"
-        )
+        queue_directory = os.path.join(queue_path, "position_queue", "position_queue.yaml")
         with open(queue_directory, "r") as queue_file:
             position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
 
@@ -199,9 +191,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
         """
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.put(point_dict)
-        self.logger.info(
-            f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}"
-        )
+        self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
 
     def _callback_force_unknown(self, msg: GaitInstruction) -> None:
         """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown.
@@ -210,9 +200,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
         """
         if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position = self._joint_dict_to_setpoint_dict(
-                get_position_from_yaml("stand")
-            )
+            self.start_position = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
             self.position_queue = Queue()

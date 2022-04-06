@@ -302,8 +302,7 @@ class GaitStateMachine:
             gait = self._gait_selection._gaits.get(gait_name)
             if (
                 gait is not None
-                and gait_name
-                in self._gait_graph.possible_gaits_from_idle(self._current_state)
+                and gait_name in self._gait_graph.possible_gaits_from_idle(self._current_state)
                 or gait_name
                 == [
                     "dynamic_walk",
@@ -400,9 +399,7 @@ class GaitStateMachine:
                 self._current_gait.name == "dynamic_walk_half_step"
                 and self._current_state not in self._gait_graph._idle_transitions
             ):
-                self._gait_graph._idle_transitions[self._current_state] = {
-                    "dynamic_walk_half_step"
-                }
+                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_walk_half_step"}
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()

@@ -206,10 +206,7 @@ class DynamicSetpointGait(GaitInterface):
             else:
                 return GaitUpdate.empty()
 
-        if (
-            current_time >= self._start_time_next_command - early_schedule_duration
-            and not self._scheduled_early
-        ):
+        if current_time >= self._start_time_next_command - early_schedule_duration and not self._scheduled_early:
             return self._update_next_subgait_early()
 
         if current_time >= self._start_time_next_command:
@@ -516,9 +513,7 @@ class DynamicSetpointGait(GaitInterface):
         :type next_command_duration: Duration
         """
         start_time_previous_command = self._start_time_next_command
-        self._start_time_next_command = (
-            start_time_previous_command + next_command_duration
-        )
+        self._start_time_next_command = start_time_previous_command + next_command_duration
 
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
