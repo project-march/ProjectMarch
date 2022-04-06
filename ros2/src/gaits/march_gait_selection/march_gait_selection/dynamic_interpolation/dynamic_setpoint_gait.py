@@ -104,7 +104,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
-        return StaticEdgePosition(self.start_position)
+        return StaticEdgePosition(self.start_position_actuating_joints)
 
     @property
     def final_position(self) -> EdgePosition:
@@ -137,10 +137,10 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position = self.gait_selection.positions["stand"]["joints"]
-        self.start_position_ik = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
+        self.start_position_actuating_joints = self.gait_selection.positions["stand"]["joints"]
+        self.start_position_all_joints = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
 
-        self.end_position = self.start_position
+        self.end_position = self.start_position_actuating_joints
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -284,9 +284,9 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_pos(self) -> None:
         """Update the start position of the next subgait to be
         the last position of the previous subgait."""
-        self.start_position_ik = self.dynamic_subgait.get_final_position()
+        self.start_position_all_joints = self.dynamic_subgait.get_final_position()
         for name in self.joint_names:
-            self.start_position[name] = self.start_position_ik[name]
+            self.start_position_actuating_joints[name] = self.start_position_all_joints[name]
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published
@@ -362,7 +362,7 @@ class DynamicSetpointGait(GaitInterface):
         duration = Duration(self.foot_location.duration)
         self.dynamic_subgait = DynamicSubgait(
             self.gait_selection,
-            self.start_position_ik,
+            self.start_position_all_joints,
             self.subgait_id,
             self.joint_names,
             self.foot_location,

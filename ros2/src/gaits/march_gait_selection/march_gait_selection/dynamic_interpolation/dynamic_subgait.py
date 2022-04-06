@@ -67,7 +67,8 @@ class DynamicSubgait:
 
         self.starting_position = starting_position
         self.location = location.processed_point
-        self.joint_names = joint_names
+        self.actuating_joint_names = joint_names
+        self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
 
@@ -80,7 +81,6 @@ class DynamicSubgait:
 
         self.start = start
         self.stop = stop
-        self.pose = Pose()
 
     def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated
@@ -91,7 +91,7 @@ class DynamicSubgait:
         """
         # Update pose:
         pose_list = [joint.position for joint in self.starting_position.values()]
-        self.pose = Pose(pose_list)
+        self.pose = Pose(self.all_joint_names, pose_list)
 
         self._solve_middle_setpoint()
         self._solve_desired_setpoint()
@@ -100,7 +100,7 @@ class DynamicSubgait:
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
-        joint_trajectory_msg.joint_names = self.joint_names
+        joint_trajectory_msg.joint_names = self.actuating_joint_names
 
         timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
         for timestamp in timestamps:
@@ -112,7 +112,7 @@ class DynamicSubgait:
 
                 joint_trajectory_point.positions.append(interpolated_setpoint.position)
                 joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
-                # self._check_joint_limits(joint_index, joint_trajectory_point)
+                self._check_joint_limits(joint_index, joint_trajectory_point)
 
             joint_trajectory_msg.points.append(joint_trajectory_point)
 
@@ -148,7 +148,7 @@ class DynamicSubgait:
         middle_velocity = np.zeros_like(middle_position)
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
-            list(self.starting_position.keys()),
+            self.all_joint_names,
             middle_position,
             middle_velocity,
             self.time[SetpointTime.MIDDLE_POINT_INDEX],
@@ -166,7 +166,7 @@ class DynamicSubgait:
 
         desired_velocity = np.zeros_like(self.desired_position)
         self.desired_setpoint_dict = self._from_list_to_setpoint(
-            list(self.starting_position.keys()),
+            self.all_joint_names,
             self.desired_position,
             desired_velocity,
             self.time[SetpointTime.END_POINT_INDEX],
@@ -175,7 +175,7 @@ class DynamicSubgait:
     def _to_joint_trajectory_class(self) -> None:
         """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
-        for name in self.joint_names:
+        for name in self.actuating_joint_names:
             setpoint_list = [
                 self.starting_position[name],
                 self.middle_setpoint_dict[name],
@@ -202,7 +202,7 @@ class DynamicSubgait:
         :rtype: dict
         """
         return self._from_list_to_setpoint(
-            list(self.starting_position.keys()),
+            self.all_joint_names,
             self.desired_position,
             np.zeros_like(self.desired_position),
             self.time[SetpointTime.START_INDEX],
@@ -282,15 +282,15 @@ class DynamicSubgait:
         velocity = joint_trajectory_point.velocities[joint_index]
         if position > self.joint_soft_limits[joint_index].upper or position < self.joint_soft_limits[joint_index].lower:
             self.logger.info(
-                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of soft limits, "
+                f"DynamicSubgait: {self.actuating_joint_names[joint_index]} will be outside of soft limits, "
                 f"position: {position}, soft limits: "
                 f"[{self.joint_soft_limits[joint_index].lower}, {self.joint_soft_limits[joint_index].upper}]."
             )
-            raise Exception(f"{self.joint_names[joint_index]} will be outside its soft limits.")
+            raise Exception(f"{self.actuating_joint_names[joint_index]} will be outside its soft limits.")
 
         if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
             self.logger.info(
-                f"DynamicSubgait: {self.joint_names[joint_index]} will be outside of velocity limits, "
+                f"DynamicSubgait: {self.actuating_joint_names[joint_index]} will be outside of velocity limits, "
                 f"velocity: {velocity}, velocity limit: {self.joint_soft_limits[joint_index].velocity}."
             )
-            raise Exception(f"{self.joint_names[joint_index]} will be outside its velocity limits.")
+            raise Exception(f"{self.actuating_joint_names[joint_index]} will be outside its velocity limits.")
