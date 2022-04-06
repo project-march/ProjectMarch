@@ -105,7 +105,26 @@ ROS2 container build:
 flake8 container build:
   variables:
     TOOL_NAME: "flake8"
-    DOCKER_FILE: [".gitlab/dockerfiles/flake8", "requirements_flake8.txt", ".flake8", "pyproject.toml"]
+    DOCKER_FILE: ".gitlab/dockerfiles/flake8"
+  rules:
+    - !reference [.ci_tool_container_builder, rules]
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "$DOCKER_FILE"
+        - ".flake8"
+        - "requirements_flake8.txt"
+        - "pyproject.toml"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "$DOCKER_FILE"
+        - ".flake8"
+        - "requirements_flake8.txt"
+        - "pyproject.toml"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
   extends:
     - .ci_tool_container_builder
 
