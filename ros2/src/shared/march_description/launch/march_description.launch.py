@@ -17,9 +17,7 @@ def generate_launch_description():
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     jointless = LaunchConfiguration("jointless")
 
-    xacro_path = PathJoinSubstitution(
-        [get_package_share_directory("march_description"), "urdf", robot_description]
-    )
+    xacro_path = PathJoinSubstitution([get_package_share_directory("march_description"), "urdf", robot_description])
     use_imu_data = LaunchConfiguration("use_imu_data")
     imu_topic = LaunchConfiguration("imu_topic")
     to_world_transform = LaunchConfiguration("to_world_transform")
@@ -59,8 +57,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="simulation",
                 default_value="False",
-                description="Whether the exoskeleton is ran physically or in "
-                "simulation.",
+                description="Whether the exoskeleton is ran physically or in simulation.",
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
@@ -70,8 +67,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value="False",
-                description="Whether the simulation should be simulating "
-                "ground_gaiting instead of airgaiting.",
+                description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 "balance",

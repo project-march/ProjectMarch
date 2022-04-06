@@ -61,12 +61,8 @@ class GaitGeneratorController:
 
     # Called by __init__
     def connect_buttons(self):
-        self.view.change_gait_directory_button.clicked.connect(
-            self.change_gait_directory
-        )
-        self.view.add_inverse_kinematic_setpoints_button.clicked.connect(
-            self.add_inverse_kinematics_setpoints
-        )
+        self.view.change_gait_directory_button.clicked.connect(self.change_gait_directory)
+        self.view.add_inverse_kinematic_setpoints_button.clicked.connect(self.add_inverse_kinematics_setpoints)
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
 
@@ -74,17 +70,13 @@ class GaitGeneratorController:
             lambda: self.import_side_subgait("previous")
         )
         self.view.side_subgait_view["previous"].default_checkbox.stateChanged.connect(
-            lambda value: self.toggle_side_subgait_checkbox(
-                value, "previous", "standing"
-            )
+            lambda value: self.toggle_side_subgait_checkbox(value, "previous", "standing")
         )
         self.view.side_subgait_view["previous"].lock_checkbox.stateChanged.connect(
             lambda value: self.toggle_side_subgait_checkbox(value, "previous", "lock")
         )
 
-        self.view.side_subgait_view["next"].import_button.clicked.connect(
-            lambda: self.import_side_subgait("next")
-        )
+        self.view.side_subgait_view["next"].import_button.clicked.connect(lambda: self.import_side_subgait("next"))
         self.view.side_subgait_view["next"].default_checkbox.stateChanged.connect(
             lambda value: self.toggle_side_subgait_checkbox(value, "next", "standing")
         )
@@ -206,17 +198,13 @@ class GaitGeneratorController:
 
     def start_time_slider_thread(self):
         if self.time_slider_thread is not None:
-            rospy.logdebug(
-                "Cannot start another time slider thread as one is already active"
-            )
+            rospy.logdebug("Cannot start another time slider thread as one is already active")
             return
 
         current = self.view.time_slider.value()
         playback_speed = self.playback_speed
         max_time = self.view.time_slider.maximum()
-        self.time_slider_thread = self.view.create_time_slider_thread(
-            current, playback_speed, max_time
-        )
+        self.time_slider_thread = self.view.create_time_slider_thread(current, playback_speed, max_time)
         self.time_slider_thread.update_signal.connect(self.view.update_main_time_slider)
         self.time_slider_thread.start()
 
@@ -228,22 +216,17 @@ class GaitGeneratorController:
     def update_gait_duration(self, duration):
         rescale_setpoints = self.view.scale_setpoints_check_box.isChecked()
 
-        if (
-            self.subgait.has_setpoints_after_duration(duration)
-            and not rescale_setpoints
-        ):
+        if self.subgait.has_setpoints_after_duration(duration) and not rescale_setpoints:
             if not self.subgait.has_multiple_setpoints_before_duration(duration):
                 self.view.message(
                     title="Could not update gait duration",
-                    msg="Not all joints have multiple setpoints before duration "
-                    + str(duration),
+                    msg="Not all joints have multiple setpoints before duration " + str(duration),
                 )
                 self.view.set_duration_spinbox(self.subgait.duration)
                 return
             discard_setpoints = self.view.yes_no_question(
                 title="Gait duration lower than highest time setpoint",
-                msg="Do you want to discard any setpoints higher than the "
-                "given duration?",
+                msg="Do you want to discard any setpoints higher than the given duration?",
             )
             if not discard_setpoints:
                 self.view.set_duration_spinbox(self.subgait.duration)
@@ -332,9 +315,7 @@ class GaitGeneratorController:
             if mirror:
                 self.export_to_file(mirror, self.get_gait_directory())
             else:
-                self.view.notify(
-                    "Could not mirror gait", "Check the logs for more information."
-                )
+                self.view.notify("Could not mirror gait", "Check the logs for more information.")
                 return
 
         self.export_to_file(self.subgait, self.get_gait_directory())
@@ -348,9 +329,7 @@ class GaitGeneratorController:
             subgait.gait_name.replace(" ", "_"),
             subgait.subgait_name.replace(" ", "_"),
         )
-        output_file_path = os.path.join(
-            output_file_directory, subgait.version.replace(" ", "_") + ".subgait"
-        )
+        output_file_path = os.path.join(output_file_directory, subgait.version.replace(" ", "_") + ".subgait")
 
         file_exists = os.path.isfile(output_file_path)
         if file_exists:
@@ -407,9 +386,7 @@ class GaitGeneratorController:
         if self.gait_directory is not None:
             rospy.loginfo("Setting gait directory to %s", str(self.gait_directory))
             # Display only the actual directory under which gaits will be saved for readability
-            gait_directory_text = "gait directory: " + os.path.basename(
-                self.gait_directory
-            )
+            gait_directory_text = "gait directory: " + os.path.basename(self.gait_directory)
             self.view.change_gait_directory_button.setText(gait_directory_text)
 
     def add_inverse_kinematics_setpoints(self) -> None:
@@ -428,9 +405,7 @@ class GaitGeneratorController:
                 f"{self.view.inverse_kinematics_pop_up.time} was given."
             )
             rospy.loginfo(warning_message)
-            self.view.message(
-                "The inverse kinematics setpoints feature has failed.", warning_message
-            )
+            self.view.message("The inverse kinematics setpoints feature has failed.", warning_message)
             return
 
         # Transform the input from relative to the default position to relative to the exoskeleton
@@ -466,16 +441,10 @@ class GaitGeneratorController:
         ] = get_lengths_robot_for_inverse_kinematics(foot_side)
 
         self.transform_inverse_kinematics_setpoints_x_coordinate(haa_to_leg_length)
-        self.transform_inverse_kinematics_setpoints_y_coordinate(
-            haa_arm, base, foot_side
-        )
-        self.transform_inverse_kinematics_setpoints_z_coordinate(
-            upper_leg_length, lower_leg_length
-        )
+        self.transform_inverse_kinematics_setpoints_y_coordinate(haa_arm, base, foot_side)
+        self.transform_inverse_kinematics_setpoints_z_coordinate(upper_leg_length, lower_leg_length)
 
-    def transform_inverse_kinematics_setpoints_x_coordinate(
-        self, haa_to_leg_length: float
-    ) -> None:
+    def transform_inverse_kinematics_setpoints_x_coordinate(self, haa_to_leg_length: float) -> None:
         """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
         default_x_position = haa_to_leg_length
 
@@ -499,8 +468,7 @@ class GaitGeneratorController:
         if self.view.inverse_kinematics_pop_up.z_axis == "From ground upwards":
             ground_z_coordinate_cm = upper_leg_length + lower_leg_length
             self.view.inverse_kinematics_pop_up.position_input.z = (
-                ground_z_coordinate_cm
-                - self.view.inverse_kinematics_pop_up.position_input.z
+                ground_z_coordinate_cm - self.view.inverse_kinematics_pop_up.position_input.z
             )
 
     def get_setpoints_from_inverse_kinematics_input(self) -> None:
@@ -511,13 +479,9 @@ class GaitGeneratorController:
             self.view.inverse_kinematics_pop_up.velocity_input,
         )
 
-        return Foot.get_joint_states_from_foot_state(
-            desired_foot_state, self.view.inverse_kinematics_pop_up.time
-        )
+        return Foot.get_joint_states_from_foot_state(desired_foot_state, self.view.inverse_kinematics_pop_up.time)
 
-    def add_setpoints_from_dictionary(
-        self, setpoint_dictionary: Dict[str, any]
-    ) -> None:
+    def add_setpoints_from_dictionary(self, setpoint_dictionary: Dict[str, any]) -> None:
         """Add setpoints from a dictionary with joints as keys to the current subgait."""
         for joint_name in setpoint_dictionary:
             time = setpoint_dictionary[joint_name].time
@@ -564,9 +528,7 @@ class GaitGeneratorController:
             joints = changed_dict["joints"]
             for joint in joints:
                 joint.undo()
-            self.subgait.scale_timestamps_subgait(
-                joints[0].setpoints[-1].time, rescale=False
-            )
+            self.subgait.scale_timestamps_subgait(joints[0].setpoints[-1].time, rescale=False)
             self.view.set_duration_spinbox(self.subgait.duration)
 
         if "side_subgaits" in changed_dict:
@@ -588,9 +550,7 @@ class GaitGeneratorController:
             joints = changed_dict["joints"]
             for joint in joints:
                 joint.redo()
-            self.subgait.scale_timestamps_subgait(
-                joints[0].setpoints[-1].time, rescale=False
-            )
+            self.subgait.scale_timestamps_subgait(joints[0].setpoints[-1].time, rescale=False)
             self.view.set_duration_spinbox(self.subgait.duration)
 
         if "side_subgaits" in changed_dict:
@@ -627,9 +587,7 @@ class GaitGeneratorController:
         if self.side_subgait_controller[side].lock_checked:
             if self.side_subgait_controller[side].subgait is not None:
                 for joint in self.subgait.joints:
-                    side_subgait_joint = self.side_subgait_controller[
-                        side
-                    ].subgait.get_joint(joint.name)
+                    side_subgait_joint = self.side_subgait_controller[side].subgait.get_joint(joint.name)
                     if side == "previous":
                         joint.start_point = side_subgait_joint.setpoints[-1]
                     elif side == "next":

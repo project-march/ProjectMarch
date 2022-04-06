@@ -4,13 +4,15 @@ from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+import numpy as np
 
 NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
 # Offsets are used to account for the difference in points between
 # covid (middle of foot) and gait (at the heel)
-X_OFFSET = 0.1
-Y_OFFSET = 0.05
+X_OFFSET = 0
+Y_OFFSET = -0.01
+Z_OFFSET = 0.22
 
 
 class GaitPreprocessor(Node):
@@ -19,9 +21,7 @@ class GaitPreprocessor(Node):
     used to simulate fake points."""
 
     def __init__(self):
-        super().__init__(
-            NODE_NAME, automatically_declare_parameters_from_overrides=True
-        )
+        super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
 
         self.timer = None
         self.subscription_left = None
@@ -33,21 +33,11 @@ class GaitPreprocessor(Node):
 
     def _init_parameters(self) -> None:
         """Read node parameters from parameter server."""
-        self._simulate_points = (
-            self.get_parameter("simulate_points").get_parameter_value().bool_value
-        )
-        self._duration = (
-            self.get_parameter("duration").get_parameter_value().double_value
-        )
-        self._location_x = (
-            self.get_parameter("location_x").get_parameter_value().double_value
-        )
-        self._location_y = (
-            self.get_parameter("location_y").get_parameter_value().double_value
-        )
-        self._location_z = (
-            self.get_parameter("location_z").get_parameter_value().double_value
-        )
+        self._simulate_points = self.get_parameter("simulate_points").get_parameter_value().bool_value
+        self._duration = self.get_parameter("duration").get_parameter_value().double_value
+        self._location_x = self.get_parameter("location_x").get_parameter_value().double_value
+        self._location_y = self.get_parameter("location_y").get_parameter_value().double_value
+        self._location_z = self.get_parameter("location_z").get_parameter_value().double_value
 
     def _create_covid_subscribers(self) -> None:
         """Create subscribers to the topics on which covid
@@ -107,13 +97,14 @@ class GaitPreprocessor(Node):
         :rtype: Point
         """
         transformed_foot_location = self._get_foot_location_in_gait_axes(foot_location)
-        scaled_duration = self._get_duration_scaled_to_height(
-            self._duration, transformed_foot_location.y
-        )
+        scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_location.y)
 
         return FootPosition(
             header=foot_location.header,
-            point=transformed_foot_location,
+            processed_point=transformed_foot_location,
+            point=foot_location.point,
+            point_world=foot_location.point_world,
+            displacement=foot_location.displacement,
             track_points=foot_location.track_points,
             duration=scaled_duration,
         )
@@ -126,18 +117,16 @@ class GaitPreprocessor(Node):
         :returns: foot location transformed to ik solver axes
         :rtype: Point
         """
-        temp_y = foot_location.point.y
+        temp_y = foot_location.displacement.y
         point = Point()
 
-        point.x = -foot_location.point.x + X_OFFSET
-        point.y = foot_location.point.z + Y_OFFSET
-        point.z = temp_y
+        point.x = -foot_location.displacement.x + X_OFFSET
+        point.y = foot_location.displacement.z + Y_OFFSET
+        point.z = temp_y + np.sign(temp_y) * Z_OFFSET
 
         return point
 
-    def _get_duration_scaled_to_height(
-        self, duration: float, step_height: float
-    ) -> float:
+    def _get_duration_scaled_to_height(self, duration: float, step_height: float) -> float:
         """Scales the duration based on the absolute step height
 
         :param duration: Duration of the step in seconds
@@ -154,12 +143,10 @@ class GaitPreprocessor(Node):
         point_msg = FootPosition()
         point_msg.header.stamp = self.get_clock().now().to_msg()
 
-        point_msg.point.x = self._location_x
-        point_msg.point.y = self._location_y
-        point_msg.point.z = self._location_z
-        point_msg.duration = self._get_duration_scaled_to_height(
-            self._duration, self._location_y
-        )
+        point_msg.processed_point.x = self._location_x
+        point_msg.processed_point.y = self._location_y
+        point_msg.processed_point.z = self._location_z
+        point_msg.duration = self._get_duration_scaled_to_height(self._duration, self._location_y)
 
         self.publisher_right.publish(point_msg)
         self.publisher_left.publish(point_msg)

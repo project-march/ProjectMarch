@@ -84,15 +84,11 @@ class JointPlot(pg.PlotItem):
             x_start = setpoint.time - dx
             x_end = setpoint.time + dx
 
-            dy = math.degrees(
-                0.5 * marker_length * math.sin(math.atan(setpoint.velocity))
-            )
+            dy = math.degrees(0.5 * marker_length * math.sin(math.atan(setpoint.velocity)))
             y_start = math.degrees(setpoint.position) - dy
             y_end = math.degrees(setpoint.position) + dy
 
-            self.velocity_markers.append(
-                self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen)
-            )
+            self.velocity_markers.append(self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen))
             self.velocities.append(setpoint.velocity)
 
     def update_time_slider(self, time):
@@ -133,20 +129,12 @@ class JointPlot(pg.PlotItem):
         indices = np.linspace(0, self.duration, int(self.duration * 100))
         position_data = joint.interpolated_position(indices)
         velocity_data = joint.interpolated_velocity(indices)
-        min_effort_data, max_effort_data = self.calculate_min_max_effort(
-            position_data, velocity_data
-        )
+        min_effort_data, max_effort_data = self.calculate_min_max_effort(position_data, velocity_data)
         for i in range(len(position_data)):
             position_data[i] = math.degrees(position_data[i])
-            velocity_data[i] = self.scale_parameter(
-                velocity_data[i], self.limits.velocity
-            )
-            min_effort_data[i] = self.scale_parameter(
-                min_effort_data[i], self.limits.effort
-            )
-            max_effort_data[i] = self.scale_parameter(
-                max_effort_data[i], self.limits.effort
-            )
+            velocity_data[i] = self.scale_parameter(velocity_data[i], self.limits.velocity)
+            min_effort_data[i] = self.scale_parameter(min_effort_data[i], self.limits.effort)
+            max_effort_data[i] = self.scale_parameter(max_effort_data[i], self.limits.effort)
 
         self.plot_position_interpolation.setData(indices, position_data)
         self.zero_line.setPen(None)
@@ -192,10 +180,7 @@ class JointPlot(pg.PlotItem):
             min_parameter = -max_paramter
         plot_range = self.upper_limit - self.lower_limit
         parameter_range = max_paramter - min_parameter
-        return (
-            self.lower_limit
-            + plot_range * (parameter - min_parameter) / parameter_range
-        )
+        return self.lower_limit + plot_range * (parameter - min_parameter) / parameter_range
 
     def mouseClickEvent(self, event):  # noqa: N802
 
@@ -291,9 +276,7 @@ class JointPlot(pg.PlotItem):
                     x_min = x[self.dragIndex - 1] + 0.01
                 if self.dragIndex < len(x) - 1:
                     x_max = x[self.dragIndex + 1] - 0.01
-                x[self.dragIndex] = min(
-                    max(local_pos.x() + self.dragOffset.x(), x_min), x_max
-                )
+                x[self.dragIndex] = min(max(local_pos.x() + self.dragOffset.x(), x_min), x_max)
                 y[self.dragIndex] = min(
                     max(local_pos.y() + self.dragOffset.y(), self.lower_limit),
                     self.upper_limit,

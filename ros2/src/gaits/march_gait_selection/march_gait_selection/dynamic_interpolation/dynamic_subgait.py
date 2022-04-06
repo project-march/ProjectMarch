@@ -45,8 +45,8 @@ class DynamicSubgait:
     :type subgait_id: str
     :param joint_names: Names of the joints
     :type joint_names: list
-    :param position: Desired foot position
-    :type position: Point
+    :param location: Desired foot position
+    :type location: Point
     :param joint_soft_limits: list containing soft limits in alphabetical order
     :type joint_soft_limits: List[Limits]
     :param start: whether it is an open gait or not
@@ -70,7 +70,7 @@ class DynamicSubgait:
         self._get_parameters(gait_selection_node)
 
         self.starting_position = starting_position
-        self.location = location.point
+        self.location = location.processed_point
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
@@ -108,19 +108,17 @@ class DynamicSubgait:
 
         timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
         for timestamp in timestamps:
-            joint_trajecory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajecory_point.time_from_start = Duration(timestamp).to_msg()
+            joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
+            joint_trajectory_point.time_from_start = Duration(timestamp).to_msg()
 
             for joint_index, joint_trajectory in enumerate(self.joint_trajectory_list):
-                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(
-                    timestamp
-                )
+                interpolated_setpoint = joint_trajectory.get_interpolated_setpoint(timestamp)
 
-                joint_trajecory_point.positions.append(interpolated_setpoint.position)
-                joint_trajecory_point.velocities.append(interpolated_setpoint.velocity)
-                self._check_joint_limits(joint_index, joint_trajecory_point)
+                joint_trajectory_point.positions.append(interpolated_setpoint.position)
+                joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
+                self._check_joint_limits(joint_index, joint_trajectory_point)
 
-            joint_trajectory_msg.points.append(joint_trajecory_point)
+            joint_trajectory_msg.points.append(joint_trajectory_point)
 
         return joint_trajectory_msg
 
@@ -164,9 +162,7 @@ class DynamicSubgait:
         """Calls IK solver to compute the joint angles needed for the
         desired x and y coordinate"""
         if self.stop:
-            self.desired_position = self._from_joint_dict_to_list(
-                get_position_from_yaml("stand")
-            )
+            self.desired_position = self._from_joint_dict_to_list(get_position_from_yaml("stand"))
         else:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
@@ -196,14 +192,10 @@ class DynamicSubgait:
                 (name == "right_ankle" and self.subgait_id == "right_swing")
                 or (name == "left_ankle" and self.subgait_id == "left_swing")
             ):
-                setpoint_list.insert(
-                    EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint()
-                )
+                setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
             if name in ["right_ankle", "left_ankle"]:
-                self.joint_trajectory_list.append(
-                    DynamicJointTrajectory(setpoint_list, interpolate_ankle=True)
-                )
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, interpolate_ankle=True))
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
@@ -292,10 +284,7 @@ class DynamicSubgait:
         """
         position = joint_trajectory_point.positions[joint_index]
         velocity = joint_trajectory_point.velocities[joint_index]
-        if (
-            position > self.joint_soft_limits[joint_index].upper
-            or position < self.joint_soft_limits[joint_index].lower
-        ):
+        if position > self.joint_soft_limits[joint_index].upper or position < self.joint_soft_limits[joint_index].lower:
             raise PositionSoftLimitError(
                 self.joint_names[joint_index],
                 position,

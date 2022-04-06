@@ -106,9 +106,7 @@ class ModifiableSubgait(Subgait):
             else:
                 continue
 
-            mirrored_joint = ModifiableJointTrajectory(
-                mirrored_name, joint.limits, joint.setpoints, joint.duration
-            )
+            mirrored_joint = ModifiableJointTrajectory(mirrored_name, joint.limits, joint.setpoints, joint.duration)
             mirrored_joints.append(mirrored_joint)
 
         return ModifiableSubgait(

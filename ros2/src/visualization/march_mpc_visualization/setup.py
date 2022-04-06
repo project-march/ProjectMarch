@@ -28,8 +28,6 @@ setup(
     license="GPLv3",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": [
-            "march_mpc_visualization= march_mpc_visualization.mpc_visualization_node:main"
-        ],
+        "console_scripts": ["march_mpc_visualization= march_mpc_visualization.mpc_visualization_node:main"],
     },
 )

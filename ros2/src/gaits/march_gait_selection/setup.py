@@ -29,9 +29,7 @@ def data_files():
             glob("march_gait_selection/config/position_queue.yaml"),
         ),
     ]
-    for filename in iglob(
-        os.path.join(test_gait_files_source, "**", "*.subgait"), recursive=True
-    ):
+    for filename in iglob(os.path.join(test_gait_files_source, "**", "*.subgait"), recursive=True):
         data.append(
             (
                 os.path.join(
@@ -44,9 +42,7 @@ def data_files():
                 [filename],
             )
         )
-    for filename in iglob(
-        os.path.join(test_gait_files_source, "**", "*.gait"), recursive=True
-    ):
+    for filename in iglob(os.path.join(test_gait_files_source, "**", "*.gait"), recursive=True):
         data.append(
             (
                 os.path.join(
@@ -81,8 +77,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest", "unittest"],
     entry_points={
-        "console_scripts": [
-            "march_gait_selection = march_gait_selection.gait_selection_node:main"
-        ],
+        "console_scripts": ["march_gait_selection = march_gait_selection.gait_selection_node:main"],
     },
 )

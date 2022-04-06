@@ -37,21 +37,11 @@ class CheckPDBStatus:
             "PowerDistributionBoard stop state",
             self._pdb_diagnostic(self._stop_diagnostic),
         )
-        updater.add(
-            "PowerDistributionBoard lv", self._pdb_diagnostic(self._lv_diagnostic)
-        )
-        updater.add(
-            "PowerDistributionBoard hv", self._pdb_diagnostic(self._hv_diagnostic)
-        )
-        updater.add(
-            "Battery percentage", self._pdb_diagnostic(self._battery_percentage_check)
-        )
-        updater.add(
-            "Battery voltage", self._pdb_diagnostic(self._battery_voltage_check)
-        )
-        updater.add(
-            "Battery temperature", self._pdb_diagnostic(self._battery_temperature_check)
-        )
+        updater.add("PowerDistributionBoard lv", self._pdb_diagnostic(self._lv_diagnostic))
+        updater.add("PowerDistributionBoard hv", self._pdb_diagnostic(self._hv_diagnostic))
+        updater.add("Battery percentage", self._pdb_diagnostic(self._battery_percentage_check))
+        updater.add("Battery voltage", self._pdb_diagnostic(self._battery_voltage_check))
+        updater.add("Battery temperature", self._pdb_diagnostic(self._battery_temperature_check))
 
     def _cb(self, msg: PowerDistributionBoardData):
         """Set the pdb state.
@@ -73,16 +63,12 @@ class CheckPDBStatus:
             stat.summary(DiagnosticStatus.STALE, "No PDB data")
             return stat
 
-        if (is_upper_limit and value >= warning_threshold) or (
-            not is_upper_limit and value <= warning_threshold
-        ):
+        if (is_upper_limit and value >= warning_threshold) or (not is_upper_limit and value <= warning_threshold):
             stat.summary(
                 DiagnosticStatus.WARN,
                 f"{value_name} {'high' if is_upper_limit else 'low'}: {value}",
             )
-        elif (is_upper_limit and value >= error_threshold) or (
-            not is_upper_limit and value <= error_threshold
-        ):
+        elif (is_upper_limit and value >= error_threshold) or (not is_upper_limit and value <= error_threshold):
             stat.summary(
                 DiagnosticStatus.WARN,
                 f"{value_name} too {'high' if is_upper_limit else 'low'}: {value}",
@@ -104,9 +90,7 @@ class CheckPDBStatus:
 
         return d
 
-    def _battery_temperature_check(
-        self, stat: DiagnosticStatusWrapper
-    ) -> DiagnosticStatusWrapper:
+    def _battery_temperature_check(self, stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
         battery_temperature = self._pdb_data.battery_state.temperature
 
         return CheckPDBStatus._threshold_check(
@@ -118,9 +102,7 @@ class CheckPDBStatus:
             value_name="Battery temperature",
         )
 
-    def _battery_percentage_check(
-        self, stat: DiagnosticStatusWrapper
-    ) -> DiagnosticStatusWrapper:
+    def _battery_percentage_check(self, stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
         battery_percentage = self._pdb_data.battery_state.percentage
 
         return CheckPDBStatus._threshold_check(
@@ -132,9 +114,7 @@ class CheckPDBStatus:
             value_name="Battery percentage",
         )
 
-    def _battery_voltage_check(
-        self, stat: DiagnosticStatusWrapper
-    ) -> DiagnosticStatusWrapper:
+    def _battery_voltage_check(self, stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
         battery_voltage = self._pdb_data.battery_state.voltage
 
         return CheckPDBStatus._threshold_check(
@@ -176,9 +156,7 @@ class CheckPDBStatus:
         )
         return stat
 
-    def _stop_diagnostic(
-        self, stat: DiagnosticStatusWrapper
-    ) -> DiagnosticStatusWrapper:
+    def _stop_diagnostic(self, stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
         emergency_button_status = self._pdb_data.emergency_button_state
         stop_button_state = self._pdb_data.stop_button_state
 

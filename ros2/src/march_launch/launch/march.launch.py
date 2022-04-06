@@ -79,15 +79,12 @@ def generate_launch_description():
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
-            DeclareLaunchArgument(
-                name="robot", default_value="march6", description="Robot to use."
-            ),
+            DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
                 name="rqt_input",
                 default_value="True",
-                description="If this argument is false, the rqt input device will"
-                "not be launched.",
+                description="If this argument is false, the rqt input device will not be launched.",
             ),
             DeclareLaunchArgument(
                 name="layout",
@@ -118,8 +115,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="realsense",
                 default_value="True",
-                description="Whether to start up everything for working with the "
-                "realsense",
+                description="Whether to start up everything for working with the realsense",
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
@@ -134,8 +130,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="use_imu_data",
                 default_value=realsense,
-                description="Whether to use the camera imu to know the real "
-                "orientation of the exoskeleton",
+                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
                 name="imu_to_use",
@@ -145,8 +140,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value=use_imu_data,
-                description="Whether the simulation should be simulating "
-                "ground_gaiting instead of airgaiting.",
+                description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
@@ -168,8 +162,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="simulation",
                 default_value="False",
-                description="Whether the exoskeleton is ran physically or in "
-                "simulation.",
+                description="Whether the exoskeleton is ran physically or in simulation.",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -196,8 +189,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
-                description="Fraction of the step at which the middle point "
-                "of the dynamic gait will take place.",
+                description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
                 name="middle_point_height",
@@ -214,8 +206,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="push_off_fraction",
                 default_value="0.15",
-                description="Fraction of the step at which the push off will"
-                "take place.",
+                description="Fraction of the step at which the push off will take place.",
             ),
             DeclareLaunchArgument(
                 name="push_off_position",
@@ -237,13 +228,11 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.15",
+                default_value="0.4",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
-            DeclareLaunchArgument(
-                name="timer_period", default_value="0.004", description=""
-            ),
+            DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",

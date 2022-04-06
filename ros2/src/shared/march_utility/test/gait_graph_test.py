@@ -14,12 +14,8 @@ class TestGaitGraph(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rclpy.init()
-        cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
-        )
-        cls.stand_position = StaticEdgePosition(
-            (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8)
-        )
+        cls.robot = urdf.Robot.from_xml_file(get_package_share_directory("march_description") + "/urdf/march4.urdf")
+        cls.stand_position = StaticEdgePosition((0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8))
 
     def setUp(self):
         self.gait_selection = GaitSelection(

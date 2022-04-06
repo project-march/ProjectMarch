@@ -34,9 +34,7 @@ class NotesWidget(QWidget):
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        self._last_save_file = (
-            f"{save_path}/note-taker" f"-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
-        )
+        self._last_save_file = f"{save_path}/note-taker-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
 
         self._node = node
 
@@ -58,9 +56,7 @@ class NotesWidget(QWidget):
         )
 
         self.table_view.setModel(self._model)
-        self.table_view.verticalScrollBar().rangeChanged.connect(
-            self._handle_change_scroll
-        )
+        self.table_view.verticalScrollBar().rangeChanged.connect(self._handle_change_scroll)
         self._last_scroll_max = self.table_view.verticalScrollBar().maximum()
 
         self.input_field.returnPressed.connect(self._handle_insert_entry)
@@ -117,11 +113,7 @@ class NotesWidget(QWidget):
         """
         selection_model = self.table_view.selectionModel()
         if self.table_view.hasFocus() and selection_model.hasSelection():
-            indices = [
-                index
-                for index in selection_model.selectedIndexes()
-                if not index.column()
-            ]
+            indices = [index for index in selection_model.selectedIndexes() if not index.column()]
             if indices and all(index.isValid() for index in indices):
                 self._model.remove_rows([index.row() for index in indices])
 
@@ -138,9 +130,7 @@ class NotesWidget(QWidget):
 
     def _handle_save(self):
         """Callback for when the save button is pressed."""
-        result = QFileDialog.getSaveFileName(
-            self, "Save File", ".", "Minute files (*.txt)"
-        )
+        result = QFileDialog.getSaveFileName(self, "Save File", ".", "Minute files (*.txt)")
         file_name = result[0]
         if file_name:
             self._save(file_name)
@@ -164,23 +154,16 @@ class NotesWidget(QWidget):
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
                 try:
-                    self._autosave_file = open(  # noqa: SIM115
-                        self._last_save_file, "r+"
-                    )
+                    self._autosave_file = open(self._last_save_file, "r+")  # noqa: SIM115
                     self._autosave_file.seek(0, os.SEEK_END)
                 except IOError as err:
-                    self._node.get_logger().error(
-                        f"Failed to open file {self._last_save_fil} "
-                        f"for autosaving: {err}"
-                    )
+                    self._node.get_logger().error(f"Failed to open file {self._last_save_fil} for autosaving: {err}")
                     return
             try:
                 if action == self.INSERT:
                     if first != 0:
                         self._autosave_file.write("\n")
-                    self._autosave_file.write(
-                        "\n".join(str(entry) for entry in self._model[first : last + 1])
-                    )
+                    self._autosave_file.write("\n".join(str(entry) for entry in self._model[first : last + 1]))
                 elif action == self.REMOVE:
                     self._autosave_file.seek(0, os.SEEK_SET)
                     self._autosave_file.write(str(self._model))
@@ -190,10 +173,7 @@ class NotesWidget(QWidget):
                     return
                 self._autosave_file.flush()
             except IOError as err:
-                self._node.get_logger().error(
-                    f"Failed to write to file {self._last_save_fil} "
-                    f"for autosaving: {err}"
-                )
+                self._node.get_logger().error(f"Failed to write to file {self._last_save_fil} for autosaving: {err}")
             else:
                 self._set_saved(True)
 

@@ -117,7 +117,7 @@ limitations under the License.
           <noise>
             <type>gaussian</type>
             <mean>0.0</mean>
-            <stddev>0.100</stddev>
+            <stddev>0.0</stddev>
           </noise>
         </camera>
         <always_on>1</always_on>

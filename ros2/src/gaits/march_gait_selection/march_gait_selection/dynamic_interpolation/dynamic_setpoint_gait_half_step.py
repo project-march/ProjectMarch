@@ -139,8 +139,8 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
                 stop = self._check_msg_time(self.foot_location)
 
             self.logger.warn(
-                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, "
-                f"{self.foot_location.point.z})"
+                f"Stepping to location ({self.foot_location.processed_point.x}, "
+                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
 
         return self._get_first_feasible_trajectory(start, stop)
@@ -162,7 +162,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             self.logger.warn(msg)
 
         return FootPosition(
-            header=header, point=point, duration=self.duration_from_yaml
+            header=header, processed_point=point, duration=self.duration_from_yaml
         )
 
     def update_parameter(self) -> None:

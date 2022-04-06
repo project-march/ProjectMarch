@@ -54,11 +54,7 @@ class Setpoint:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (
-                self.time == other.time
-                and self.position == other.position
-                and self.velocity == other.velocity
-            )
+            return self.time == other.time and self.position == other.position and self.velocity == other.velocity
         else:
             return False
 
@@ -79,13 +75,10 @@ class Setpoint:
             if joint in setpoint_dic:
                 next_positions[joint] = cls(
                     setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
-                    setpoint_dic[joint].position
-                    + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
+                    setpoint_dic[joint].position + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
                 )
             else:
-                raise KeyError(
-                    "Setpoint_dic is missing joint {joint}".format(joint=joint)
-                )
+                raise KeyError("Setpoint_dic is missing joint {joint}".format(joint=joint))
 
         return next_positions
 
@@ -99,9 +92,7 @@ class Setpoint:
 
         :return: The joint velocities of the joints on the specified side
         """
-        self.velocity = (next_state.position - self.position) / (
-            next_state.time - self.time
-        )
+        self.velocity = (next_state.position - self.position) / (next_state.time - self.time)
 
     @staticmethod
     def interpolate_setpoints(base_setpoint, other_setpoint, parameter):
@@ -117,10 +108,6 @@ class Setpoint:
             The interpolated setpoint
         """
         time = weighted_average(base_setpoint.time, other_setpoint.time, parameter)
-        position = weighted_average(
-            base_setpoint.position, other_setpoint.position, parameter
-        )
-        velocity = weighted_average(
-            base_setpoint.velocity, other_setpoint.velocity, parameter
-        )
+        position = weighted_average(base_setpoint.position, other_setpoint.position, parameter)
+        velocity = weighted_average(base_setpoint.velocity, other_setpoint.velocity, parameter)
         return Setpoint(time, position, velocity)

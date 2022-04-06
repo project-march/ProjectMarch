@@ -41,21 +41,15 @@ class DataCollectorNode:
         self.time_memory = []
         self.joint_values = JointValues()
 
-        self.joint_values_publisher = rospy.Publisher(
-            "/march/joint_values", JointValues, queue_size=1
-        )
+        self.joint_values_publisher = rospy.Publisher("/march/joint_values", JointValues, queue_size=1)
 
-        self._com_marker_publisher = rospy.Publisher(
-            "/march/com_marker", Marker, queue_size=1
-        )
+        self._com_marker_publisher = rospy.Publisher("/march/com_marker", Marker, queue_size=1)
 
         self._simulation = rospy.get_param("~simulation")
         if not self._simulation:
             self._imu_broadcaster = tf2_ros.TransformBroadcaster()
 
-            self._imu_subscriber = rospy.Subscriber(
-                "/march/imu", Imu, self.imu_callback
-            )
+            self._imu_subscriber = rospy.Subscriber("/march/imu", Imu, self.imu_callback)
 
             self.transform_imu = TransformStamped()
 
@@ -86,15 +80,11 @@ class DataCollectorNode:
             try:
                 self.input_sock.bind((self.input_host, 9999))
             except socket.error:
-                rospy.logwarn(
-                    "Cannot connect to host, is the adress correct? \nrunning without pressure soles"
-                )
+                rospy.logwarn("Cannot connect to host, is the adress correct? \nrunning without pressure soles")
                 self.pressure_soles_on = False
                 self.close_sockets()
 
-            self._pressure_sole_publisher = rospy.Publisher(
-                "/march/pressure_soles", PressureSole, queue_size=1
-            )
+            self._pressure_sole_publisher = rospy.Publisher("/march/pressure_soles", PressureSole, queue_size=1)
         else:
             rospy.logdebug("running without pressure soles")
 
@@ -107,9 +97,7 @@ class DataCollectorNode:
             self.send_udp(data.actual.positions)
 
         self.position_memory.append(data.actual.positions)
-        self.time_memory.append(
-            data.header.stamp.secs + data.header.stamp.nsecs * 10 ** (-9)
-        )
+        self.time_memory.append(data.header.stamp.secs + data.header.stamp.nsecs * 10 ** (-9))
         if len(self.position_memory) > self.differentiation_order + 1:
             self.position_memory.pop(0)
             self.time_memory.pop(0)
@@ -145,9 +133,7 @@ class DataCollectorNode:
 
             z_diff = float("-inf")
             try:
-                old_z = self.tf_buffer.lookup_transform(
-                    "world", "imu_link", rospy.Time()
-                ).transform.translation.z
+                old_z = self.tf_buffer.lookup_transform("world", "imu_link", rospy.Time()).transform.translation.z
                 for foot in self.feet:
                     trans = self.tf_buffer.lookup_transform("world", foot, rospy.Time())
                     z_diff = max(z_diff, old_z - trans.transform.translation.z)
@@ -171,17 +157,11 @@ class DataCollectorNode:
 
                 self._imu_broadcaster.sendTransform(self.transform_imu)
             except tf2_ros.TransformException as e:
-                rospy.logdebug(
-                    "Cannot calculate imu transform, because tf frames are not available, {0}".format(
-                        e
-                    )
-                )
+                rospy.logdebug("Cannot calculate imu transform, because tf frames are not available, {0}".format(e))
 
     def send_udp(self, data):
         message = " ".join([str(180 * val / pi) for val in data])
-        self.output_sock.sendto(
-            message.encode("utf-8"), (self.output_host, self.output_port)
-        )
+        self.output_sock.sendto(message.encode("utf-8"), (self.output_host, self.output_port))
 
     def receive_udp(self):
         try:
@@ -199,9 +179,7 @@ class DataCollectorNode:
             pressure_sole_msg.total_force_right = values[38]
             self._pressure_sole_publisher.publish(pressure_sole_msg)
         except socket.timeout:
-            rospy.loginfo(
-                "Has not received pressure sole data in a while, are they on?"
-            )
+            rospy.loginfo("Has not received pressure sole data in a while, are they on?")
         except socket.error as error:
             if error.errno == errno.EINTR:
                 self.close_sockets()
@@ -233,12 +211,7 @@ def main():
     center_of_mass_calculator = CoMCalculator(robot, tf_buffer)
     # key is the swing foot and item is the static foot
     feet = {"foot_left": "foot_right", "foot_right": "foot_left"}
-    cp_calculators = [
-        CPCalculator(tf_buffer, swing_foot, static_foot)
-        for swing_foot, static_foot in feet.items()
-    ]
+    cp_calculators = [CPCalculator(tf_buffer, swing_foot, static_foot) for swing_foot, static_foot in feet.items()]
 
-    data_collector_node = DataCollectorNode(
-        center_of_mass_calculator, cp_calculators, tf_buffer, feet.keys()
-    )
+    data_collector_node = DataCollectorNode(center_of_mass_calculator, cp_calculators, tf_buffer, feet.keys())
     data_collector_node.run()
