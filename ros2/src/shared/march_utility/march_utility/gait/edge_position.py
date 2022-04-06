@@ -66,6 +66,10 @@ class StaticEdgePosition(EdgePosition):
         """str. Returns a dictionary string representation of the values, with 'Static' added in front."""
         return f"Static: {self.values}"
 
+    def __hash__(self):
+        """Returns the hash value of the value dictionary."""
+        return super().__hash__()
+
 
 class DynamicEdgePosition(EdgePosition):
     """EdgePosition for gaits that allow changing at runtime.
@@ -83,6 +87,10 @@ class DynamicEdgePosition(EdgePosition):
         """str. Returns a dictionary string representation of the values, with 'Dynamic' added in front."""
         return f"Dynamic: {self.values}"
 
+    def __hash__(self):
+        """Returns the hash value of the value dictionary."""
+        return super().__hash__()
+
 
 class UnknownEdgePosition(EdgePosition):
     """EdgePosition for gaits that can start from an unknown idle position."""
@@ -93,3 +101,7 @@ class UnknownEdgePosition(EdgePosition):
     def __eq__(self, other):
         """bool. Checks if the `other` is also an UnknownEdgePosition."""
         return isinstance(other, UnknownEdgePosition)
+
+    def __hash__(self):
+        """Returns the hash value of the value dictionary."""
+        return super().__hash__()

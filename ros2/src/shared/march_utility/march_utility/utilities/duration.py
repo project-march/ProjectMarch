@@ -1,14 +1,13 @@
 """This module contains the duration class, which is an extension of the rclpy Duration class."""
 from __future__ import annotations
 
-import math
 from typing import Union, Any
 
 from march_utility.utilities.utility_functions import weighted_average_floats
 from rclpy.duration import Duration as ROSDuration
 
 NSEC_DIGITS = 9
-NSEC_IN_SEC = 1000000000
+NSEC_IN_SEC = 10 ** NSEC_DIGITS
 
 
 class Duration(ROSDuration):
@@ -30,21 +29,21 @@ class Duration(ROSDuration):
         """Round the nanoseconds as if it were seconds.
 
         Example:
-            Say self.seconds = 1.25 and you want to round to 1 digit (n=1)
-            Then self.nanoseconds = 1250000000
-            Since n=1, n_pow becomes 10^8.
-            Then self.nanoseconds / n_pow becomes 12.5 and (12.5) = 13.
-            After multiplying again by n_pow we get 1.3 * 10^9 nanoseconds, which is equal
-            to 1,3 seconds.
+            Say self.seconds = 1.251 and you want to round to 1 digit (n=1)
+            Then self.nanoseconds = 1251000000
+            Since n=1, (n - NSEC_DIGITS) = -8.
+            Then round(self.nanoseconds, n - NSEC_DIGITS) round(1251000000, -8) = 1250000000.
 
         Args:
              n (int): Number of decimals to round to.
+                Default is `None`, meaning that it will round to 0 decimals in seconds.
 
         Returns:
              Duration. A new duration, with the rounded amount of seconds.
         """
-        n_pow = math.pow(10, NSEC_DIGITS - n)
-        rounded_nanoseconds = round(self.nanoseconds / n_pow) * n_pow
+        if n is None:
+            n = 0
+        rounded_nanoseconds = round(self.nanoseconds, n - NSEC_DIGITS)
         return Duration(nanoseconds=rounded_nanoseconds)
 
     def weighted_average(self, other: Duration, parameter: float) -> Duration:
