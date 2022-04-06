@@ -26,7 +26,7 @@ def data_files():
         (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
         (
             os.path.join("share", package_name, "position_queue"),
-            glob("march_gait_selection/dynamic_interpolation/position_queue.yaml"),
+            glob("march_gait_selection/config/position_queue.yaml"),
         ),
     ]
     for filename in iglob(

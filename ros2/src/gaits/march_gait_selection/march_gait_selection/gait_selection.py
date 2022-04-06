@@ -120,6 +120,11 @@ class GaitSelection(Node):
                 .get_parameter_value()
                 .double_value
             )
+            self.use_position_queue = (
+                self.get_parameter("use_position_queue")
+                .get_parameter_value()
+                .bool_value
+            )
 
         except ParameterNotDeclaredException:
             self.logger.error(

@@ -52,6 +52,8 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
     :return: Whether the callback was successful
     """
     gait_selection.get_logger().info("Parameters are updated")
+    dynamic_gait_updated = False
+    position_queue_updated = False
     gaits_updated = False
     for param in parameters:
         if param.name == "balance" and param.type_ == Parameter.Type.BOOL:
@@ -86,6 +88,9 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
         elif param.name == "push_off_position":
             gait_selection.push_off_position = param.value
             dynamic_gait_updated = True
+        elif param.name == "use_position_queue" and param.type_ == Parameter.Type.BOOL:
+            gait_selection.use_position_queue = param.value
+            position_queue_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
             gaits_updated = True
@@ -98,11 +103,15 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
                 gait_state_machine.update_timer.destroy()
             gait_state_machine.run()
 
-    # Seperate update function for dynamic gait to avoid time performance issues
+    # Separate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
         gait_selection.dynamic_setpoint_gait.update_parameters()
         gait_selection.get_logger().info("Dynamic gait parameters updated.")
+    elif position_queue_updated:
+        gait_selection.dynamic_setpoint_gait_half_step.update_parameter()
+        gait_selection.get_logger().info(f"use_position_queue set to {param.value}")
     elif gaits_updated:
+        # TODO: these update methods do not work
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()
         gait_selection.get_logger().info("Gaits were updated")

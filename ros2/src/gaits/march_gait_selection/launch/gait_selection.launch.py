@@ -65,6 +65,12 @@ def generate_launch_description():
                 default_value="-0.15",
                 description="Maximum joint position of the ankle during push off.",
             ),
+            DeclareLaunchArgument(
+                name="use_position_queue",
+                default_value="False",
+                description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
+                "points given by (simulated) covid.",
+            ),
             # State machine parameters:
             DeclareLaunchArgument(
                 name="first_subgait_delay",
@@ -107,6 +113,7 @@ def generate_launch_description():
                     },
                     {"push_off_fraction": LaunchConfiguration("push_off_fraction")},
                     {"push_off_position": LaunchConfiguration("push_off_position")},
+                    {"use_position_queue": LaunchConfiguration("use_position_queue")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {
                         "early_schedule_duration": LaunchConfiguration(
