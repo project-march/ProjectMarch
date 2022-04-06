@@ -79,8 +79,11 @@ per-file-ignores =
     ;   Todo: @martenhaitjema
     ros2/src/gaits/march_gait_selection/*:D,
     ;   Todo: @martenhaitjema
-    ros2/src/gaits/march_fake_covid/*:D,
+    ros2/src/shared/march_utility/march_utility/gait/gait.py:D,
+    ros2/src/shared/march_utility/march_utility/gait/subgait.py:D,
     ;   Todo: @martenhaitjema
+    ros2/src/gaits/march_fake_covid/*:D,
+    ;   Todo: @jsdewolde
     ros2/src/gaits/march_goniometric_ik_solver/*:D,
 
 
