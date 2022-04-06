@@ -105,11 +105,7 @@ ROS2 container build:
 flake8 container build:
   variables:
     TOOL_NAME: "flake8"
-    DOCKER_FILE:
-      - ".gitlab/dockerfiles/flake8"
-      - "requirements_flake8.txt"
-      - ".flake8"
-      - "pyproject.toml"
+    DOCKER_FILE: [".gitlab/dockerfiles/flake8", "requirements_flake8.txt", ".flake8", "pyproject.toml"]
   extends:
     - .ci_tool_container_builder
 
