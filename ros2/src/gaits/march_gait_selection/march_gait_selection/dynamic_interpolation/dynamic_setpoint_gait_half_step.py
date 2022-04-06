@@ -134,7 +134,6 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
                 else:
                     stop = True
                     self._end = True
-                    # self.start_position = self.gait_selection.positions["stand"]["joints"]
             else:
                 self.foot_location = self._get_foot_location(self.subgait_id)
                 stop = self._check_msg_time(self.foot_location)

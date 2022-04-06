@@ -111,7 +111,6 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
         gait_selection.dynamic_setpoint_gait_half_step.update_parameter()
         gait_selection.get_logger().info(f"use_position_queue set to {param.value}")
     elif gaits_updated:
-        # TODO: these update methods do not work
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()
         gait_selection.get_logger().info("Gaits were updated")
