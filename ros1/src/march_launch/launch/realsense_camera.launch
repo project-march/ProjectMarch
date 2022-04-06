@@ -9,23 +9,14 @@
 
 <!--    Although the M6 contains a front camera, it is turned of by default as we
         do not use this camera anymore due to the new 2 front cameras.-->
-    <arg name="use_camera_back" default="true"
+    <arg name="use_camera_back" default="$(eval hull_finder or point_finder)"
          doc="Whether to start the second (back) camera"/>
     <arg name="use_camera_front" default="false"
          doc="Whether to start the front camera"/>
-
-    <group if="$(eval hull_finder)">
-        <arg name="use_camera_left" default="false"
+    <arg name="use_camera_left" default="$(eval point_finder)"
              doc="Whether to start the left camera"/>
-        <arg name="use_camera_right" default="false"
+    <arg name="use_camera_right" default="$(eval point_finder)"
              doc="Whether to start the right camera"/>
-    </group>
-    <group if="$(eval point_finder)">
-        <arg name="use_camera_left" default="true"
-             doc="Whether to start the left camera"/>
-        <arg name="use_camera_right" default="true"
-             doc="Whether to start the right camera"/>
-    </group>
 
     <arg name="initial_reset" default="true" doc="Do a hardware reset at start up to reduce errors"/>
     <arg name="camera_fps" default="15"
