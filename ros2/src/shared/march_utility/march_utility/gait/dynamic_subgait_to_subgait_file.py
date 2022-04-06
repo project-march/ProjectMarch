@@ -17,11 +17,10 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import INTERPOLA
 def main():
     """Script that writes a dynamic joint trajectory to a .subgait file to be used with the test setup."""
     # Create -h option
-    help_text = (
-        """
+    help_text = """
         Script that writes a dynamic joint trajectory to a .subgait file to be used with the test setup. Files
         are written to the install folder: ros2/install/march_gait_files/share/march_gait_files/... Always creates
-        a 'right_swing' subgait. 
+        a 'right_swing' subgait.
 
         Asks for multiple inputs by the user:
             file_name: name given to the .subgait file, for example 'perform_test_dynamic_v0'
@@ -33,11 +32,7 @@ def main():
             y: y-position of the desired foot location, step height. Usually between -0.2 and 0.2
             z: z-position of the desired foot location, side step. Use 0.45 for no sidestep
         """
-    )
-    parser = argparse.ArgumentParser(
-        description=help_text,
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+    parser = argparse.ArgumentParser(description=help_text, formatter_class=argparse.RawTextHelpFormatter)
     parser.parse_args()
 
     pose = Pose()
@@ -70,7 +65,7 @@ def main():
     # Get setpoint
     index = joint_names_from_urdf.index(joint_name)
     start_position_setpoint = Setpoint(Duration(0), start_position[joint_name], 0)
-    middle_position_setpoint = Setpoint(Duration(middle_point_fraction*duration), middle_position[index], 0)
+    middle_position_setpoint = Setpoint(Duration(middle_point_fraction * duration), middle_position[index], 0)
     end_position_setpoint = Setpoint(Duration(duration), end_position[index], 0)
 
     setpoint_list = [start_position_setpoint, middle_position_setpoint, end_position_setpoint]
@@ -106,12 +101,20 @@ def main():
     if joint_name in ["left_knee", "left_hip_fe", "right_knee", "right_hip_fe"]:
         dictionary["joints"] = {"rotational_joint": list_dict_of_setpoints}
         directory = os.path.join(
-            path, "test_joint_rotational_gaits", "test_joint_gait", "perform_test", file_name,
+            path,
+            "test_joint_rotational_gaits",
+            "test_joint_gait",
+            "perform_test",
+            file_name,
         )
     else:
         dictionary["joints"] = {"linear_joint": list_dict_of_setpoints}
         directory = os.path.join(
-            path, "test_joint_linear_gaits", "test_joint_gait", "perform_test", file_name,
+            path,
+            "test_joint_linear_gaits",
+            "test_joint_gait",
+            "perform_test",
+            file_name,
         )
 
     with open(directory, "w") as subgait_file:
