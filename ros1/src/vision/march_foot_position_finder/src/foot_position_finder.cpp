@@ -33,9 +33,11 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     if (left_or_right_ == "left") {
         other_side_ = "right";
         switch_factor_ = -1;
+        serial_number_ = "944622074337";
     } else {
         other_side_ = "left";
         switch_factor_ = 1;
+        serial_number_ = "944622071535";
     }
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
@@ -44,6 +46,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     ORIGIN = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
     last_height_ = 0;
     refresh_last_height_ = 0;
+    last_frame_time_ = std::clock();
+    frame_wait_counter_ = 0;
 
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
@@ -96,24 +100,31 @@ void FootPositionFinder::readParameters(
     found_points_.resize(sample_size_);
     ros::param::get("/realsense_simulation", realsense_simulation_);
 
-    // Initialize the depth frame callbacks the first time parameters are read
-    if (!running_ && !realsense_simulation_) {
-        config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
-            RS2_FORMAT_Z16, /*framerate=*/30);
-
-        if (left_or_right_ == "left") {
-            config_.enable_device("944622074337");
-        } else {
-            config_.enable_device("944622071535");
+    while (true) {
+        try {
+            // Initialize the depth frame callbacks the first time ros
+            // parameters are read
+            if (!running_ && !realsense_simulation_) {
+                config_.enable_device(serial_number_);
+                config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
+                    /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
+                pipe_.start(config_);
+                realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
+                    &FootPositionFinder::processRealSenseDepthFrames, this);
+            }
+        } catch (const rs2::error& e) {
+            ROS_WARN("Error while initializing %s Realsense",
+                left_or_right_.c_str());
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            continue;
         }
 
-        pipe_.start(config_);
-        ROS_INFO("Realsense camera (%s) connected", left_or_right_.c_str());
+        ROS_INFO("\033[1;36m%s Realsense connected (%s) \033[0m",
+            left_or_right_.c_str(), serial_number_.c_str());
+        break;
+    }
 
-        realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
-            &FootPositionFinder::processRealSenseDepthFrames, this);
-
-    } else if (!running_ && realsense_simulation_) {
+    if (!running_ && realsense_simulation_) {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
             topic_camera_front_, /*queue_size=*/1,
             &FootPositionFinder::processSimulatedDepthFrames, this);
@@ -207,6 +218,13 @@ void FootPositionFinder::chosenOtherPointCallback(
  */
 void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
 {
+    float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
+    if (floor(difference / 5) > frame_wait_counter_) {
+        frame_wait_counter_++;
+        ROS_WARN("Realsense (%s) did not receive frames last %d s",
+            left_or_right_.c_str(), frame_wait_counter_ * 5);
+    }
+
     rs2::frameset frames = pipe_.wait_for_frames();
     rs2::depth_frame depth = frames.get_depth_frame();
 
@@ -256,6 +274,9 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
+    last_frame_time_ = std::clock();
+    frame_wait_counter_ = 0;
+
     // Preprocess point cloud
     NormalCloud::Ptr normalcloud(new NormalCloud());
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
