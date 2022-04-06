@@ -37,7 +37,7 @@
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
-    <arg name="hull_finder" default="true"
+    <arg name="hull_finder" default="false"
          doc="Launches the realsense hull finder node when true."/>
     <arg name="point_finder" default="false"
          doc="Launches the realsense point finder node when true."/>
