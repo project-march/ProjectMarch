@@ -36,8 +36,12 @@ int main(int argc, char** argv)
             dev.hardware_reset();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-    } catch (...) {
-        ROS_WARN("Hardware reset of Realsense cameras failed");
+    } catch (const rs2::error& e) {
+        std::string error_message = e.what();
+        ROS_WARN("Hardware reset of Realsense cameras failed: %s",
+            error_message.c_str());
+        // Return error from node so it is restarted
+        return -1;
     }
 
     ros::init(argc, argv, "march_foot_position_finder");

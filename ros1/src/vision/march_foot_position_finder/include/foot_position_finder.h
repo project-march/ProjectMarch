@@ -70,6 +70,7 @@ protected:
 
     clock_t last_frame_time_;
     int frame_wait_counter_;
+    float frame_timeout_;
 
     rs2::pipeline pipe_;
     rs2::config config_;

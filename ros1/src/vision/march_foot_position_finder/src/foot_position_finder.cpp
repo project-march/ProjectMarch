@@ -48,6 +48,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     refresh_last_height_ = 0;
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
+    frame_timeout_ = 5.0;
 
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
@@ -108,16 +109,19 @@ void FootPositionFinder::readParameters(
                 config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
                     /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
                 pipe_.start(config_);
-                realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
-                    &FootPositionFinder::processRealSenseDepthFrames, this);
             } catch (const rs2::error& e) {
-                ROS_WARN("Error while initializing %s RealSense",
-                    left_or_right_.c_str());
+                std::string error_message = e.what();
+                ROS_WARN("Error while initializing %s RealSense camera: %s",
+                    left_or_right_.c_str(), error_message.c_str());
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 continue;
             }
+
+            realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
+                &FootPositionFinder::processRealSenseDepthFrames, this);
             ROS_INFO("\033[1;36m%s RealSense connected (%s) \033[0m",
                 left_or_right_.c_str(), serial_number_.c_str());
+
             break;
         }
     }
@@ -221,10 +225,10 @@ void FootPositionFinder::chosenOtherPointCallback(
 void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
 {
     float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
-    if ((int)(difference / 5) > frame_wait_counter_) {
+    if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
         frame_wait_counter_++;
         ROS_WARN("RealSense (%s) did not receive frames last %d seconds",
-            left_or_right_.c_str(), frame_wait_counter_ * 5);
+            left_or_right_.c_str(), frame_wait_counter_ * frame_timeout_);
     }
 
     rs2::frameset frames = pipe_.wait_for_frames();
