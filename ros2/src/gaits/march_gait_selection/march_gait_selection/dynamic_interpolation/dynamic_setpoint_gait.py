@@ -8,9 +8,9 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_from_urdf,
     get_limits_robot_from_urdf_for_inverse_kinematics,
+    get_position_from_gait_selection,
+    get_position_from_yaml,
 )
-from march_utility.gait.setpoint import Setpoint
-from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.logger import Logger
 
@@ -137,7 +137,7 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position_actuating_joints = self.gait_selection.positions["stand"]["joints"]
+        self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
         self.start_position_all_joints = get_position_from_yaml("stand")
 
         self.end_position = self.start_position_actuating_joints
