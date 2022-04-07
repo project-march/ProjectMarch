@@ -16,7 +16,7 @@ from march_goniometric_ik_solver.ik_solver import Pose
 from trajectory_msgs import msg as trajectory_msg
 from march_shared_msgs.msg import FootPosition
 
-from typing import List
+from typing import List, Optional
 from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
@@ -79,6 +79,10 @@ class DynamicSubgait:
             location.duration,
         ]
 
+        self.starting_position_dict = self._from_list_to_setpoint(
+            self.actuating_joint_names, list(self.starting_position.values()), None, self.time[SetpointTime.START_INDEX]
+        )
+
         self.start = start
         self.stop = stop
 
@@ -89,9 +93,7 @@ class DynamicSubgait:
         :returns: A joint_trajectory_msg
         :rtype: joint_trajectory_msg
         """
-        # Update pose:
-        pose_list = [joint.position for joint in self.starting_position.values()]
-        self.pose = Pose(self.all_joint_names, pose_list)
+        self.pose = Pose(self.all_joint_names, list(self.starting_position.values()))
 
         self._solve_middle_setpoint()
         self._solve_desired_setpoint()
@@ -145,12 +147,11 @@ class DynamicSubgait:
             self.middle_point_height,
             self.subgait_id,
         )
-        middle_velocity = np.zeros_like(middle_position)
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
             self.all_joint_names,
             middle_position,
-            middle_velocity,
+            None,
             self.time[SetpointTime.MIDDLE_POINT_INDEX],
         )
 
@@ -158,17 +159,16 @@ class DynamicSubgait:
         """Calls IK solver to compute the joint angles needed for the
         desired x and y coordinate"""
         if self.stop:
-            self.desired_position = self._from_joint_dict_to_list(get_position_from_yaml("stand"))
+            self.desired_position = list(get_position_from_yaml("stand").values())
         else:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
             )
 
-        desired_velocity = np.zeros_like(self.desired_position)
         self.desired_setpoint_dict = self._from_list_to_setpoint(
             self.all_joint_names,
             self.desired_position,
-            desired_velocity,
+            None,
             self.time[SetpointTime.END_POINT_INDEX],
         )
 
@@ -177,7 +177,7 @@ class DynamicSubgait:
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
             setpoint_list = [
-                self.starting_position[name],
+                self.starting_position_dict[name],
                 self.middle_setpoint_dict[name],
                 self.desired_setpoint_dict[name],
             ]
@@ -201,18 +201,16 @@ class DynamicSubgait:
         :return: The final setpoint of the subgait.
         :rtype: dict
         """
-        return self._from_list_to_setpoint(
-            self.all_joint_names,
-            self.desired_position,
-            np.zeros_like(self.desired_position),
-            self.time[SetpointTime.START_INDEX],
-        )
+        final_position = {}
+        for i, name in enumerate(self.all_joint_names):
+            final_position[name] = self.desired_position[i]
+        return final_position
 
     def _from_list_to_setpoint(
         self,
         joint_names: List[str],
         position: List[float],
-        velocity: List[float],
+        velocity: Optional[List[float]],
         time: float,
     ) -> dict:
         """Computes setpoint_dictionary from a list
@@ -249,10 +247,6 @@ class DynamicSubgait:
             )
 
         return setpoint_dict
-
-    def _from_joint_dict_to_list(self, joint_dict: dict) -> List[float]:
-        """Return the values in a joint_dict as a list."""
-        return list(joint_dict.values())
 
     def _get_parameters(self, gait_selection_node: Node) -> None:
         """Gets the dynamic gait parameters from the gait_selection_node

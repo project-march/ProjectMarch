@@ -110,7 +110,7 @@ class DynamicSetpointGait(GaitInterface):
     def final_position(self) -> EdgePosition:
         # Beunmethod to fix transitions, should be fixed
         if self._next_command is not None:
-            return StaticEdgePosition(self._setpoint_dict_to_joint_dict(self.dynamic_subgait.get_final_position()))
+            return StaticEdgePosition(self.dynamic_subgait.get_final_position())
         else:
             return StaticEdgePosition(self.end_position)
 
@@ -138,7 +138,7 @@ class DynamicSetpointGait(GaitInterface):
         self._scheduled_early = False
 
         self.start_position_actuating_joints = self.gait_selection.positions["stand"]["joints"]
-        self.start_position_all_joints = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
+        self.start_position_all_joints = get_position_from_yaml("stand")
 
         self.end_position = self.start_position_actuating_joints
 
@@ -392,38 +392,6 @@ class DynamicSetpointGait(GaitInterface):
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
-
-    # UTILITY FUNCTIONS
-    @staticmethod
-    def _setpoint_dict_to_joint_dict(setpoint_dict: dict) -> dict:
-        """Creates a joint_dict from a setpoint_dict.
-
-        :param setpoint_dict: A dictionary containing joint names and setpoints.
-        :type: dict
-
-        :returns: A dictionary containing joint names and positions.
-        :rtype: dict
-        """
-        joint_dict = {}
-        for name, setpoint in setpoint_dict.items():
-            joint_dict[name] = setpoint.position
-
-        return joint_dict
-
-    @staticmethod
-    def _joint_dict_to_setpoint_dict(joint_dict: dict) -> dict:
-        """Creates a setpoint_dict from a joint_dict.
-
-        :param joint_dict: A dictionary containing joint names and positions.
-        :type: dict
-
-        :returns: A dictionary containing joint names and setpoints.
-        :rtype: dict
-        """
-        setpoint_dict = {}
-        for name, position in joint_dict.items():
-            setpoint_dict[name] = Setpoint(Duration(0), position, 0)
-        return setpoint_dict
 
     def _get_soft_limits(self):
         """Get the limits of all joints in the urdf"""
