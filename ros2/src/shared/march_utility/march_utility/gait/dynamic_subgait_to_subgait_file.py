@@ -53,9 +53,9 @@ def main():
     z = float(input("Sidestep (meters, 0.45 for no sidestep): "))
 
     joint_names_from_urdf = get_joint_names_from_urdf()
-    if joint_name not in joint_names_from_urdf:
-        print(f"Joint name '{joint_name} does not exist. Valid joint names are {joint_names_from_urdf}.")
-        quit()
+    while joint_name not in joint_names_from_urdf:
+        print(f"Joint name '{joint_name} does not exist. Valid joint names are {joint_names_from_urdf}. Please try again.")
+        joint_name = input("Joint to use: ")
 
     # Get positions in lists
     start_position = get_position_from_yaml("stand")
@@ -105,18 +105,13 @@ def main():
         dictionary["joints"] = {"linear_joint": list_dict_of_setpoints}
         joint_type_path = "test_joint_linear_gaits"
 
-    directory = os.path.join(
-        path,
-        joint_type_path,
-        "test_joint_gait",
-        "perform_test",
-        file_name,
-    )
+    file_path = os.path.join(path, joint_type_path, "test_joint_gait", "perform_test", file_name)
 
-    with open(directory, "w") as subgait_file:
+    with open(file_path, "w") as subgait_file:
+        yaml.dump(dictionary, subgait_file)
         yaml.dump(dictionary, subgait_file)
 
-    print("Successfully created .subgait file.")
+    print(f"Successfully created {file_name} file.")
 
 
 if __name__ == "__main__":
