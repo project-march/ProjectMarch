@@ -23,10 +23,10 @@ def data_files():
             os.path.join("share", package_name, "test", "resources"),
             [os.path.join(test_gait_files_source, "realsense_gaits.yaml")],
         ),
-        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
+        (os.path.join("share", package_name, "launch"), glob(os.path.join("launch", "*.launch.py"))),
         (
             os.path.join("share", package_name, "position_queue"),
-            glob("march_gait_selection/config/position_queue.yaml"),
+            glob(os.path.join("march_gait_selection", "config", "position_queue.yaml")),
         ),
     ]
     for filename in iglob(os.path.join(test_gait_files_source, "**", "*.subgait"), recursive=True):
