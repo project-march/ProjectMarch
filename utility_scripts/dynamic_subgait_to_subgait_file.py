@@ -20,7 +20,7 @@ def main():
     pose = Pose()
 
     help_text = """
-Script that writes a dynamic joint trajectory to a .subgait file to be used with the test setup. 
+Script that writes a dynamic joint trajectory to a .subgait file to be used with the test setup.
 Files are written to the install folder: ros2/install/march_gait_files/share/march_gait_files/... Always creates
 a 'right_swing' subgait.
     """
