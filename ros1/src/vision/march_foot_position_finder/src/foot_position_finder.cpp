@@ -228,7 +228,7 @@ void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
     if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
         frame_wait_counter_++;
         ROS_WARN("RealSense (%s) did not receive frames last %d seconds",
-            left_or_right_.c_str(), frame_wait_counter_ * frame_timeout_);
+            left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
     }
 
     rs2::frameset frames = pipe_.wait_for_frames();
