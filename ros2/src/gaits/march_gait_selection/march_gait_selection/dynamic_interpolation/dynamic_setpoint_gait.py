@@ -138,10 +138,7 @@ class DynamicSetpointGait(GaitInterface):
         self._should_stop = False
         self._end = False
 
-        self._start_time = None
-        self._end_time = None
-        self._current_time = None
-
+        self._start_time_next_command = None
         self._next_command = None
         self.subgait_id = "right_swing"
 
@@ -177,8 +174,7 @@ class DynamicSetpointGait(GaitInterface):
             self.logger.error(e.msg)
             return None
         self.update_parameters()
-        self._current_time = current_time
-        self._start_time = self._current_time + first_subgait_delay
+        self._start_time_next_command = current_time + first_subgait_delay
         self._next_command = self._get_trajectory_command(start=True)
         return GaitUpdate.should_schedule_early(self._next_command)
 
@@ -204,18 +200,16 @@ class DynamicSetpointGait(GaitInterface):
         :return: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         :rtype: GaitUpdate
         """
-        self._current_time = current_time
-
         if self._start_is_delayed:
-            if self._current_time >= self._start_time:
+            if current_time >= self._start_time_next_command:
                 return self._update_start_subgait()
             else:
                 return GaitUpdate.empty()
 
-        if self._current_time >= self._end_time - early_schedule_duration and not self._scheduled_early:
+        if current_time >= self._start_time_next_command - early_schedule_duration and not self._scheduled_early:
             return self._update_next_subgait_early()
 
-        if self._current_time >= self._end_time:
+        if current_time >= self._start_time_next_command:
             return self._update_state_machine()
 
         return GaitUpdate.empty()
@@ -278,10 +272,11 @@ class DynamicSetpointGait(GaitInterface):
         :returns: A TrajectoryCommand for the next subgait
         :rtype: TrajectoryCommand
         """
-        if self.subgait_id == "right_swing":
-            self.subgait_id = "left_swing"
-        elif self.subgait_id == "left_swing":
-            self.subgait_id = "right_swing"
+        if not self._trajectory_failed:
+            if self.subgait_id == "right_swing":
+                self.subgait_id = "left_swing"
+            elif self.subgait_id == "left_swing":
+                self.subgait_id = "right_swing"
 
         if self._end:
             # If the gait has ended, the next command should be None
@@ -340,9 +335,6 @@ class DynamicSetpointGait(GaitInterface):
         :return: TrajectoryCommand with the current subgait and start time.
         :rtype: TrajectoryCommand
         """
-        if self._start_is_delayed:
-            self._end_time = self._start_time
-
         if stop:
             self._end = True
             self.logger.info("Stopping dynamic gait.")
@@ -350,8 +342,8 @@ class DynamicSetpointGait(GaitInterface):
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
             self.logger.debug(
-                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, "
-                f"{self.foot_location.point.z})"
+                f"Stepping to location ({self.foot_location.processed_point.x}, "
+                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
 
         return self._get_first_feasible_trajectory(start, stop)
@@ -435,7 +427,7 @@ class DynamicSetpointGait(GaitInterface):
                 trajectory,
                 Duration(self.foot_location.duration),
                 self.subgait_id,
-                self._end_time,
+                self._start_time_next_command,
             )
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if self._is_duration_bigger_than_max_duration(original_duration):
@@ -478,7 +470,7 @@ class DynamicSetpointGait(GaitInterface):
             trajectory,
             Duration(self.foot_location.duration),
             self.subgait_id,
-            self._end_time,
+            self._start_time_next_command,
         )
 
     def _is_duration_bigger_than_max_duration(self, original_duration: float) -> bool:
@@ -520,8 +512,8 @@ class DynamicSetpointGait(GaitInterface):
         :param next_command_duration: Duration of the next command to be scheduled.
         :type next_command_duration: Duration
         """
-        self._start_time = self._end_time
-        self._end_time = self._start_time + next_command_duration
+        start_time_previous_command = self._start_time_next_command
+        self._start_time_next_command = start_time_previous_command + next_command_duration
 
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""

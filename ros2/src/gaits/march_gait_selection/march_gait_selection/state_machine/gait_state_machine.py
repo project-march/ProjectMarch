@@ -303,7 +303,12 @@ class GaitStateMachine:
             if (
                 gait is not None
                 and gait_name in self._gait_graph.possible_gaits_from_idle(self._current_state)
-                or gait_name == ["dynamic_walk", "dynamic_walk_single_step"]
+                or gait_name
+                == [
+                    "dynamic_walk",
+                    "dynamic_walk_single_step",
+                    "dynamic_walk_half_step",
+                ]
             ):
                 if (
                     isinstance(gait.starting_position, DynamicEdgePosition)
@@ -386,13 +391,22 @@ class GaitStateMachine:
         # Process finishing of the gait
         if gait_update.is_finished:
             self._current_state = self._current_gait.final_position
+            # To make the half step dynamic gait work, the current state (that is final
+            # position) needs to be a position from which the next half step can be started.
+            # Therefore, it needs to be added to the idle_transitions dictionary of the
+            # gait_graph.
+            if (
+                self._current_gait.name == "dynamic_walk_half_step"
+                and self._current_state not in self._gait_graph._idle_transitions
+            ):
+                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_walk_half_step"}
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
-            self._current_gait = None
-            self._is_stopping = False
             self._trajectory_scheduler.reset()
             self.logger.info(f"Finished gait `{self._current_gait.name}`")
+            self._current_gait = None
+            self._is_stopping = False
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input

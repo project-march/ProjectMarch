@@ -50,6 +50,7 @@ def generate_launch_description():
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     push_off_fraction = LaunchConfiguration("push_off_fraction")
     push_off_position = LaunchConfiguration("push_off_position")
+    use_position_queue = LaunchConfiguration("use_position_queue")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -196,6 +197,12 @@ def generate_launch_description():
                 description="Maximum joint position of the ankle during push off.",
             ),
             DeclareLaunchArgument(
+                name="use_position_queue",
+                default_value="False",
+                description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
+                "points given by (simulated) covid.",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -294,6 +301,7 @@ def generate_launch_description():
                     ("mininum_stair_height", minimum_stair_height),
                     ("push_off_fraction", push_off_fraction),
                     ("push_off_position", push_off_position),
+                    ("use_position_queue", use_position_queue),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
                     ("timer_period", timer_period),
