@@ -4,8 +4,6 @@
         have all realsense dependencies installed or printed on the camera-->
     <arg name="serial_no_camera_front"    default="109122070820"/>
     <arg name="serial_no_camera_back"     default="048322070237"/>
-    <arg name="serial_no_camera_left"     default="944622074337"/>
-    <arg name="serial_no_camera_right"    default="944622071535"/>
 
 <!--    Although the M6 contains a front camera, it is turned of by default as we
         do not use this camera anymore due to the new 2 front cameras.-->
@@ -69,12 +67,8 @@
     <arg name="allow_no_texture_points"   default="true"/>
     <arg name="camera_front_name"         default="camera_front"/>
     <arg name="camera_back_name"          default="camera_back"/>
-    <arg name="camera_left_name"          default="camera_front_left"/>
-    <arg name="camera_right_name"         default="camera_front_right"/>
     <arg name="tf_prefix_camera_front"    default="$(arg camera_front_name)"/>
     <arg name="tf_prefix_camera_back"     default="$(arg camera_back_name)"/>
-    <arg name="tf_prefix_camera_left"     default="$(arg camera_left_name)"/>
-    <arg name="tf_prefix_camera_right"    default="$(arg camera_right_name)"/>
 
     <group ns="$(arg camera_front_name)" if="$(eval use_camera_front)">
         <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
