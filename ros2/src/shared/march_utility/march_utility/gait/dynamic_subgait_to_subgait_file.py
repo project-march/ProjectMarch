@@ -100,22 +100,18 @@ def main():
     file_name += ".subgait"
     if joint_name in ["left_knee", "left_hip_fe", "right_knee", "right_hip_fe"]:
         dictionary["joints"] = {"rotational_joint": list_dict_of_setpoints}
-        directory = os.path.join(
-            path,
-            "test_joint_rotational_gaits",
-            "test_joint_gait",
-            "perform_test",
-            file_name,
-        )
+        joint_type_path = "test_joint_rotational_gaits"
     else:
         dictionary["joints"] = {"linear_joint": list_dict_of_setpoints}
-        directory = os.path.join(
-            path,
-            "test_joint_linear_gaits",
-            "test_joint_gait",
-            "perform_test",
-            file_name,
-        )
+        joint_type_path = "test_joint_linear_gaits"
+
+    directory = os.path.join(
+        path,
+        joint_type_path,
+        "test_joint_gait",
+        "perform_test",
+        file_name,
+    )
 
     with open(directory, "w") as subgait_file:
         yaml.dump(dictionary, subgait_file)
