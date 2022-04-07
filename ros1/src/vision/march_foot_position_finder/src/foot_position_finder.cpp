@@ -15,11 +15,11 @@
 #include <visualization_msgs/MarkerArray.h>
 
 /**
- * Constructs an object that listens to simulated or real realsense depth frames
+ * Constructs an object that listens to simulated or real RealSense depth frames
  * and processes these frames with a PointFinder.
  *
  * @param n NodeHandle for running ROS commands
- * @param realsense whether realsense cameras are connected
+ * @param realsense whether RealSense cameras are connected
  * @param left_or_right whether the FootPositionFinder runs for the left or
  * right foot
  */
@@ -33,9 +33,11 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     if (left_or_right_ == "left") {
         other_side_ = "right";
         switch_factor_ = -1;
+        serial_number_ = "944622074337";
     } else {
         other_side_ = "left";
         switch_factor_ = 1;
+        serial_number_ = "944622071535";
     }
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
@@ -44,6 +46,9 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     ORIGIN = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
     last_height_ = 0;
     refresh_last_height_ = 0;
+    last_frame_time_ = std::clock();
+    frame_wait_counter_ = 0;
+    frame_timeout_ = 5.0;
 
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
@@ -81,13 +86,12 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
  * @param parametersConfig container that contains all (updated) parameters
  * @param uint32_t level is not used but is required for correct callback
  */
-// No lint is used to avoid linting in the realsense library, where a potential
+// No lint is used to avoid linting in the RealSense library, where a potential
 // memory leak error is present
 // NOLINTNEXTLINE
 void FootPositionFinder::readParameters(
     march_foot_position_finder::parametersConfig& config, uint32_t level)
 {
-    physical_cameras_ = config.physical_cameras;
     base_frame_ = config.base_frame;
     foot_gap_ = config.foot_gap;
     step_distance_ = config.step_distance;
@@ -95,28 +99,41 @@ void FootPositionFinder::readParameters(
     outlier_distance_ = config.outlier_distance;
     height_zero_threshold_ = config.height_zero_threshold;
     found_points_.resize(sample_size_);
+    ros::param::get("/realsense_simulation", realsense_simulation_);
 
-    // Initialize the depth frame callbacks the first time parameters are read
-    if (!running_ && physical_cameras_) {
-        config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640, /*height=*/480,
-            RS2_FORMAT_Z16, /*framerate=*/30);
+    // Connect the physical RealSense cameras
+    if (!running_ && !realsense_simulation_) {
+        while (true) {
+            try {
+                config_.enable_device(serial_number_);
+                config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
+                    /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
+                pipe_.start(config_);
+            } catch (const rs2::error& e) {
+                std::string error_message = e.what();
+                ROS_WARN("Error while initializing %s RealSense camera: %s",
+                    left_or_right_.c_str(), error_message.c_str());
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                continue;
+            }
 
-        if (left_or_right_ == "left") {
-            config_.enable_device("944622074337");
-        } else {
-            config_.enable_device("944622071535");
+            realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
+                &FootPositionFinder::processRealSenseDepthFrames, this);
+            ROS_INFO("\033[1;36m%s RealSense connected (%s) \033[0m",
+                left_or_right_.c_str(), serial_number_.c_str());
+
+            break;
         }
+    }
 
-        pipe_.start(config_);
-        ROS_INFO("Realsense camera (%s) connected", left_or_right_.c_str());
-
-        realsense_timer_ = n_->createTimer(ros::Duration(/*t=*/0.005),
-            &FootPositionFinder::processRealSenseDepthFrames, this);
-
-    } else if (!running_ && !physical_cameras_) {
+    // Initialize the callback for the RealSense simulation plugin
+    if (!running_ && realsense_simulation_) {
         pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
             topic_camera_front_, /*queue_size=*/1,
             &FootPositionFinder::processSimulatedDepthFrames, this);
+        ROS_INFO(
+            "\033[1;36mSimulated RealSense callback initialized (%s) \033[0m",
+            left_or_right_.c_str());
     }
 
     // Initialize position of other foot in current frame
@@ -202,11 +219,18 @@ void FootPositionFinder::chosenOtherPointCallback(
 }
 
 /**
- * Listen for realsense frames from a camera, apply filters to them and process
+ * Listen for RealSense frames from a camera, apply filters to them and process
  * the eventual pointcloud.
  */
 void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
 {
+    float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
+    if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
+        frame_wait_counter_++;
+        ROS_WARN("RealSense (%s) did not receive frames last %d seconds",
+            left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
+    }
+
     rs2::frameset frames = pipe_.wait_for_frames();
     rs2::depth_frame depth = frames.get_depth_frame();
 
@@ -237,7 +261,7 @@ void FootPositionFinder::resetHeight(const ros::TimerEvent&)
 }
 
 /**
- * Callback function for when a simulated realsense depth frame arrives.
+ * Callback function for when a simulated RealSense depth frame arrives.
  */
 // Suppress lint error "make reference of argument" (breaks callback)
 void FootPositionFinder::processSimulatedDepthFrames(
@@ -256,6 +280,9 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
+    last_frame_time_ = std::clock();
+    frame_wait_counter_ = 0;
+
     // Preprocess point cloud
     NormalCloud::Ptr normalcloud(new NormalCloud());
     Preprocessor preprocessor(n_, pointcloud, normalcloud);
