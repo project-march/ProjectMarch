@@ -25,12 +25,13 @@ class TestIkSolver(unittest.TestCase):
         )
         hip_y = self.pose.calculate_joint_positions("pos_hip")[1]
         self.assertEqual(
-            hip_y,
             leg_length,
+            hip_y,
             "Hip_y is not equal to total leg length in zero pose.",
         )
 
     def test_calculate_joint_position_nonzero_pose(self) -> None:
+        leg_length = self.pose.max_leg_length
         try:
             knee_bend = self.pose.knee_bend
         except AttributeError:
@@ -38,17 +39,16 @@ class TestIkSolver(unittest.TestCase):
         self.pose.fe_hip2 = np.pi / 2 + knee_bend / 2
         ankle2 = self.pose.calculate_joint_positions("pos_ankle2")
         ankle2_x = ankle2[0]
-        leg_length = self.pose.max_leg_length
         self.assertAlmostEqual(
-            ankle2_x,
             leg_length,
+            ankle2_x,
             2,
-            "At fe_hip2 angle of 90 deg, ankle2_x is not equal to total leg length",
+            "At fe_hip2 angle of 90 deg, ankle2_x should be equal to total leg length.",
         )
         ankle2_y = ankle2[1]
         self.assertAlmostEqual(
-            ankle2_y,
             leg_length,
+            ankle2_y,
             2,
-            "At fe_hip2 angle of 90 deg, ankle2_y is not equal to total leg length",
+            "At fe_hip2 angle of 90 deg, ankle2_y should be equal to total leg length.",
         )
