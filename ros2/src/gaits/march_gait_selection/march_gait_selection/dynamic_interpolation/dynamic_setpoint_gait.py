@@ -242,7 +242,7 @@ class DynamicSetpointGait(GaitInterface):
         :rtype: GaitUpdate
         """
         self._scheduled_early = True
-        self._next_command = self._set_and_get_get_next_command()
+        self._next_command = self._set_and_get_next_command()
 
         if self._next_command is None:
             return GaitUpdate.empty()
@@ -264,7 +264,7 @@ class DynamicSetpointGait(GaitInterface):
 
         return GaitUpdate.subgait_updated()
 
-    def _set_and_get_get_next_command(self) -> Optional[TrajectoryCommand]:
+    def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Create the next command, based on what the current subgait is.
         Also checks if the gait has to be stopped. If true, it returns
         a close gait.
