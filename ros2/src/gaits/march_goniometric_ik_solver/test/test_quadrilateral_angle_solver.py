@@ -22,7 +22,7 @@ class TestQuadrilateralAngleSolver(unittest.TestCase):
         self.assertEqual(
             angle,
             get_angle_between_points(points),
-            "Angle between points is not correct for a right_anlged triangle",
+            "Angle should be 1/2 rad for a right-angled triangle",
         )
 
     def test_get_angle_between_points_negative_right_angled_triangle(self) -> None:
@@ -35,7 +35,7 @@ class TestQuadrilateralAngleSolver(unittest.TestCase):
         self.assertEqual(
             angle,
             get_angle_between_points(points),
-            "Angle between points is not correct for a right_anlged triangle",
+            "Angle should be 1/2 rad for a right-angled triangle",
         )
 
     def test_get_angle_between_point_sharp_angle(self) -> None:
@@ -66,13 +66,13 @@ class TestQuadrilateralAngleSolver(unittest.TestCase):
             d_expected[0],
             d_actual[0],
             4,
-            "Fourth point x-coordinate not correct based on unit square",
+            "Fourth point x-coordinate should be zero for an unit square",
         )
         self.assertAlmostEqual(
             d_expected[1],
             d_actual[1],
             4,
-            "Fourth point y-coordinate not correct based on unit square",
+            "Fourth point y-coordinate should be one for an unit square",
         )
 
     def test_get_angles_unit_square(self) -> None:
@@ -89,5 +89,5 @@ class TestQuadrilateralAngleSolver(unittest.TestCase):
         self.assertListEqual(
             angles_expected,
             angles_actual,
-            "Angles not equal to 90 degrees for square",
+            "Angles should equal 90 degrees for square",
         )
