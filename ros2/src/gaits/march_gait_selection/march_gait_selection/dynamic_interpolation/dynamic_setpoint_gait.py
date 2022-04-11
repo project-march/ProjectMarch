@@ -513,6 +513,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         return DynamicSubgait(
             self.gait_selection,
+            self.home_stand_position_all_joints,
             start_position,
             subgait_id,
             self.joint_names,

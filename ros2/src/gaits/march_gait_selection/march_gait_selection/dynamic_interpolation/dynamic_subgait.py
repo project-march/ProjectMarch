@@ -20,7 +20,7 @@ from march_goniometric_ik_solver.ik_solver import Pose
 from trajectory_msgs import msg as trajectory_msg
 from march_shared_msgs.msg import FootPosition
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
@@ -58,7 +58,8 @@ class DynamicSubgait:
     def __init__(
         self,
         gait_selection_node: Node,
-        starting_position: dict,
+        home_stand_position: Dict[str, float],
+        starting_position: Dict[str, float],
         subgait_id: str,
         joint_names: List[str],
         location: FootPosition,
@@ -69,6 +70,8 @@ class DynamicSubgait:
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
 
+        self.home_stand_position = home_stand_position
+        self.logger.warn(f"{home_stand_position}")
         self.starting_position = starting_position
         self.location = location.processed_point
         self.actuating_joint_names = joint_names
@@ -163,7 +166,7 @@ class DynamicSubgait:
         """Calls IK solver to compute the joint angles needed for the
         desired x and y coordinate"""
         if self.stop:
-            self.desired_position = list(get_position_from_yaml("stand").values())
+            self.desired_position = list(self.home_stand_position.values())
         else:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
