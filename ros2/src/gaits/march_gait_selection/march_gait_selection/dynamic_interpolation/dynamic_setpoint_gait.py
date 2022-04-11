@@ -569,9 +569,7 @@ class DynamicSetpointGait(GaitInterface):
             nanoseconds=self.gait_selection.get_clock().now().seconds_nanoseconds()[1],
         )
         time_difference = current_time - msg_time
-        readable_time_difference = (
-                f"{time_difference.nanoseconds / NANOSECONDS_TO_SECONDS}"
-        )
+        readable_time_difference = f"{time_difference.nanoseconds / NANOSECONDS_TO_SECONDS}"
         self.logger.debug(
             f"Time difference between CoViD foot location and current time: {readable_time_difference}.",
         )
