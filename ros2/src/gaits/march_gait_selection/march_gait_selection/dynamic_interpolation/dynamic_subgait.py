@@ -197,8 +197,8 @@ class DynamicSubgait:
                 setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
             if name in ["right_ankle", "left_ankle"] or (
-                (setpoint_list[0].position < setpoint_list[1].position < setpoint_list[-1].position)
-                or (setpoint_list[0].position > setpoint_list[1].position > setpoint_list[-1].position)
+                (name == "right_knee" and self.subgait_id == "left_swing")
+                or (name == "left_knee" and self.subgait_id == "right_swing")
             ):
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
