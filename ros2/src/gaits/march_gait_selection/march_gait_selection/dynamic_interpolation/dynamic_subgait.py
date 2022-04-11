@@ -71,7 +71,6 @@ class DynamicSubgait:
         self._get_parameters(gait_selection_node)
 
         self.home_stand_position = home_stand_position
-        self.logger.warn(f"{home_stand_position}")
         self.starting_position = starting_position
         self.location = location.processed_point
         self.actuating_joint_names = joint_names
@@ -197,8 +196,11 @@ class DynamicSubgait:
             ):
                 setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
-            if name in ["right_ankle", "left_ankle"]:
-                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, interpolate_ankle=True))
+            if name in ["right_ankle", "left_ankle"] or (
+                (setpoint_list[0].position < setpoint_list[1].position < setpoint_list[-1].position)
+                or (setpoint_list[0].position > setpoint_list[1].position > setpoint_list[-1].position)
+            ):
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
