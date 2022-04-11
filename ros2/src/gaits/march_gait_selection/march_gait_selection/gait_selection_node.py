@@ -83,7 +83,7 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
         elif param.name == "push_off_position":
             gait_selection.push_off_position = param.value
             dynamic_gait_updated = True
-        elif param.name == "use_position_queue" and param.type_ == Parameter.Type.BOOL:
+        elif param.name == "use_position_queue":
             gait_selection.use_position_queue = param.value
             position_queue_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:

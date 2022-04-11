@@ -424,7 +424,6 @@ class DynamicSetpointGait(GaitInterface):
             self.dynamic_subgait = self._create_subgait_instance(
                 self.start_position_all_joints, self.subgait_id, start, stop
             )
-            # log = self.logger.warn(f"subgait cannot be created") if self.dynamic_subgait is None else None
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
             self.logger.debug(
                 f"Found trajectory after {iteration + 1} iterations at duration of {self.foot_location.duration}. "
@@ -437,10 +436,10 @@ class DynamicSetpointGait(GaitInterface):
                 self._start_time_next_command,
             )
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
-            # if self._is_duration_bigger_than_max_duration(original_duration):
-            self.logger.warn(
-                f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
-            )
+            if self._is_duration_bigger_than_max_duration(original_duration):
+                self.logger.warn(
+                    f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
+                )
             return None
 
     def _try_to_get_second_step(self) -> bool:

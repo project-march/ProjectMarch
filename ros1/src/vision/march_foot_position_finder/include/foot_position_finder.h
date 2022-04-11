@@ -6,6 +6,7 @@
 #define MARCH_FOOT_POSITION_FINDER_H
 
 #include "march_shared_msgs/FootPosition.h"
+#include <chrono>
 #include <cmath>
 #include <librealsense2/rs.hpp>
 #include <march_foot_position_finder/parametersConfig.h>
@@ -16,6 +17,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <string>
+#include <thread>
 #include <vector>
 
 using Point = pcl::PointXYZ;
@@ -65,8 +67,14 @@ protected:
 
     ros::Timer realsense_timer_;
     ros::Timer height_reset_timer_;
+
+    clock_t last_frame_time_;
+    int frame_wait_counter_;
+    float frame_timeout_;
+
     rs2::pipeline pipe_;
     rs2::config config_;
+    std::string serial_number_;
 
     rs2::decimation_filter dec_filter_;
     rs2::spatial_filter spat_filter_;
@@ -84,7 +92,7 @@ protected:
     std::string current_frame_id_;
 
     bool running_;
-    bool physical_cameras_;
+    bool realsense_simulation_;
 
     double foot_gap_;
     double step_distance_;
