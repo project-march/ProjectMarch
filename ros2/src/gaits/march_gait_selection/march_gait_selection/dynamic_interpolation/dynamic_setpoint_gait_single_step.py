@@ -6,6 +6,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
 
 
 class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
@@ -38,3 +39,26 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
         else:
             self._end = True
             return self._get_trajectory_command(stop=True)
+
+    def _try_to_get_second_step(self) -> bool:
+        """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
+
+        If this is not possible, the first subgait should not be executed.
+
+        Returns:
+            bool: true if second step close gait can be made.
+        """
+        start_position = self.dynamic_subgait.get_final_position()
+        subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
+        subgait = self._create_subgait_instance(
+            start_position,
+            subgait_id,
+            start=False,
+            stop=True,
+        )
+        try:
+            subgait.get_joint_trajectory_msg()
+        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+            self.logger.warn(f"Second step is not feasible. {e.msg}")
+            return False
+        return True

@@ -382,24 +382,19 @@ class DynamicSetpointGait(GaitInterface):
 
         msg = ""
         if trajectory_command is None:
-            msg = "Not possible to perform first step, trying to close the gait."
-        elif trajectory_command is None and not second_step:
-            msg = "Not possible to perform first and second step, trying to close the gait."
-        elif second_step is False:
-            if start:
-                msg = "Not possible to perform second step, gait will not be executed."
-            else:
-                msg = "Not possible to perform second step, trying to close the gait."
-        self.logger.warn(msg)
+            msg = "Not possible to perform step. "
 
         # If no feasible subgait can be found, try to execute close gait
         if not start:
             try:
+                close_gait_msg = "Trying to close the gait. "
                 return self._get_stop_gait()
             except (PositionSoftLimitError, VelocitySoftLimitError):
-                # If close gait is not feasible, stop gait completely
-                self.logger.warn("Not possible to perform close gait.")
+                close_gait_msg = "Not possible to perform close gait. "
+            msg += close_gait_msg
 
+        self.logger.warn(msg)
+        # If close gait is not feasible, stop gait completely
         self._end = True
         return None
 
@@ -459,7 +454,8 @@ class DynamicSetpointGait(GaitInterface):
         )
         try:
             subgait.get_joint_trajectory_msg()
-        except (PositionSoftLimitError, VelocitySoftLimitError):
+        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+            self.logger.warn(f"Second step is not feasible. {e.msg}")
             return False
         return True
 

@@ -205,3 +205,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             self._trajectory_failed = False
             self.position_queue = Queue()
             self._fill_queue()
+
+    def _try_to_get_second_step(self) -> bool:
+        """Returns true if second step is possible, always true for single step."""
+        return True
