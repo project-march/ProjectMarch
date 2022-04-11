@@ -40,7 +40,7 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
             self._end = True
             return self._get_trajectory_command(stop=True)
 
-    def _try_to_get_second_step(self) -> bool:
+    def _try_to_get_second_step(self, final_iteration: bool) -> bool:
         """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
 
         If this is not possible, the first subgait should not be executed.
@@ -59,6 +59,7 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
         try:
             subgait.get_joint_trajectory_msg()
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
-            self.logger.warn(f"Second step is not feasible. {e.msg}")
+            if final_iteration:
+                self.logger.warn(f"Close gait is not feasible. {e.msg}")
             return False
         return True

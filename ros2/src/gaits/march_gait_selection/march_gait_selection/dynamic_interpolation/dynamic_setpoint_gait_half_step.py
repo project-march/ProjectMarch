@@ -133,13 +133,21 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
                     stop = True
                     self._end = True
             else:
-                self.foot_location = self._get_foot_location(self.subgait_id)
+                try:
+                    self.foot_location = self._get_foot_location(self.subgait_id)
+                except AttributeError:
+                    self.logger.warn("No FootLocation found. Connect the camera or use simulated points.")
+                    self._end = True
+                    return None
                 stop = self._check_msg_time(self.foot_location)
 
             self.logger.warn(
                 f"Stepping to location ({self.foot_location.processed_point.x}, "
                 f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
+
+        if start and stop:
+            return None
 
         return self._get_first_feasible_trajectory(start, stop)
 
@@ -206,6 +214,6 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             self.position_queue = Queue()
             self._fill_queue()
 
-    def _try_to_get_second_step(self) -> bool:
+    def _try_to_get_second_step(self, final_iteration: bool) -> bool:
         """Returns true if second step is possible, always true for single step."""
         return True
