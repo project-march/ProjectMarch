@@ -4,7 +4,7 @@ import socket
 from rclpy import Future
 from std_msgs.msg import Header, String
 from rosgraph_msgs.msg import Clock
-from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, CurrentGait
+from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 
@@ -45,6 +45,12 @@ class InputDeviceController:
             callback=self._current_gait_callback,
             qos_profile=10,
         )
+        self._current_state = self._node.create_subscription(
+            msg_type=CurrentState,
+            topic="/march/gait_selection/current_state",
+            callback=self._current_state_callback,
+            qos_profile=10,
+        )
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
         )
@@ -53,6 +59,7 @@ class InputDeviceController:
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
+        self.current_state_cb = None
         self._possible_gaits = []
 
         self._id = self.ID_FORMAT.format(
@@ -94,6 +101,15 @@ class InputDeviceController:
         """
         if callable(self.current_gait_cb):
             self.current_gait_cb(msg)
+
+    def _current_state_callback(self, msg: CurrentState) -> None:
+        """
+        Callback for when the current state changes, sends the msg through to public current_state_callback
+        :param msg: The string with the name of the current state
+        :type msg: String
+        """
+        if callable(self.current_state_cb):
+            self.current_state_cb(msg)
 
     def update_possible_gaits(self) -> None:
         """

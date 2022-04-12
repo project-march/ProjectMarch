@@ -1,4 +1,3 @@
-from numpy import isin
 import select
 from march_rqt_input_device.input_device_controller import InputDeviceController
 from march_shared_msgs.msg import CurrentGait
@@ -31,15 +30,19 @@ class ConnectionManager:
         )
         self.controller.rejected_cb = partial(self.send_message_till_confirm, "Reject")
         self.controller.current_gait_cb = self._current_gait_cb
+        self.controller.current_state_cb = self._current_state_cb
         self.controller.finished_cb = self.gait_finished
 
     def _current_gait_cb(self, msg):
-
         if self.stopped or "close" in msg.subgait:
             self.current_gait = self.requested_gait = "stop"
             self.stopped = False
         else:
             self.current_gait = msg.gait
+
+    def _current_state_cb(self, msg):
+        if msg.state == "unknown":
+            self.current_gait = "unknown"
 
     def wait_for_request(self):
         while True:
