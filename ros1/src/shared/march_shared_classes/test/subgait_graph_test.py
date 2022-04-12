@@ -83,9 +83,7 @@ class SubgaitGraphTest(unittest.TestCase):
             SubgaitGraph(graph)
 
     def test_stoppable_graph(self):
-        graph = SubgaitGraph(
-            {"start": {"to": "1"}, "1": {"to": "2"}, "2": {"to": "1", "stop": "end"}}
-        )
+        graph = SubgaitGraph({"start": {"to": "1"}, "1": {"to": "2"}, "2": {"to": "1", "stop": "end"}})
         self.assertTrue(graph.is_stoppable())
 
     def test_not_stoppable_graph(self):
@@ -101,9 +99,7 @@ class SubgaitGraphTest(unittest.TestCase):
         self.assertListEqual(graph.end_subgaits(), ["1"])
 
     def test_subgait_transitions_to_end(self):
-        graph = SubgaitGraph(
-            {"start": {"to": "1"}, "1": {"to": "end", "stop": "2"}, "2": {"to": "end"}}
-        )
+        graph = SubgaitGraph({"start": {"to": "1"}, "1": {"to": "end", "stop": "2"}, "2": {"to": "end"}})
         self.assertListEqual(graph.end_subgaits(), ["1", "2"])
 
     def test_contained_subgait(self):
@@ -142,12 +138,8 @@ class SubgaitGraphTest(unittest.TestCase):
         self.assertIsNone(graph[("1", "stop")])
 
     def test_iter_transitions(self):
-        graph = SubgaitGraph(
-            {"start": {"to": "1"}, "1": {"to": "2"}, "2": {"to": "1", "stop": "end"}}
-        )
-        self.assertCountEqual(
-            list(iter(graph)), [("1", "2"), ("start", "1"), ("2", "1"), ("2", "end")]
-        )
+        graph = SubgaitGraph({"start": {"to": "1"}, "1": {"to": "2"}, "2": {"to": "1", "stop": "end"}})
+        self.assertCountEqual(list(iter(graph)), [("1", "2"), ("start", "1"), ("2", "1"), ("2", "end")])
 
     def test_iter_transitions_without_subgaits(self):
         graph = SubgaitGraph({"start": {"to": "end"}})

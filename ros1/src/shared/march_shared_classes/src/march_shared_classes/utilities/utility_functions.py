@@ -35,20 +35,12 @@ def merge_dictionaries(dic_one, dic_two):
         if key_one not in dic_two or dic_one[key_one] == dic_two[key_one]:
             merged_dic[key_one] = dic_one[key_one]
         else:
-            raise KeyError(
-                "Dictionaries to be merged both contain key {key} with differing values".format(
-                    key=key_one
-                )
-            )
+            raise KeyError("Dictionaries to be merged both contain key {key} with differing values".format(key=key_one))
     for key_two in dic_two:
         if key_two not in dic_one or dic_one[key_two] == dic_two[key_two]:
             merged_dic[key_two] = dic_two[key_two]
         else:
-            raise KeyError(
-                "Dictionaries to be merged both contain key {key} with differing values".format(
-                    key=key_two
-                )
-            )
+            raise KeyError("Dictionaries to be merged both contain key {key} with differing values".format(key=key_two))
     return merged_dic
 
 
@@ -63,16 +55,12 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
     """
     try:
         robot = urdf.Robot.from_xml_file(
-            os.path.join(
-                rospkg.RosPack().get_path("march_description"), "urdf", "march4.urdf"
-            )
+            os.path.join(rospkg.RosPack().get_path("march_description"), "urdf", "march4.urdf")
         )
         # size[0], size[1] and size[2] are used to grab relevant length of the link, e.g. the relevant length of the
         # hip base is in the y direction, that of the upper leg in the z direction.
         base_map = robot.link_map["hip_base"]
-        base = base_map.collisions[0].geometry.size[
-            1
-        ]  # length of the hip base structure
+        base = base_map.collisions[0].geometry.size[1]  # length of the hip base structure
         l_ul_map = robot.link_map["upper_leg_left"]
         l_ul = l_ul_map.collisions[0].geometry.size[2]  # left upper leg length
         l_ll_map = robot.link_map["lower_leg_left"]
@@ -99,11 +87,7 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
         l_ph = l_ph - off_set
 
     except KeyError as e:
-        raise KeyError(
-            'Expected robot.link_map to contain "{key}", but "{key}" was missing.'.format(
-                key=e.args[0]
-            )
-        )
+        raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.format(key=e.args[0]))
 
     if side == Side.left:
         return [l_ul, l_ll, l_hl, l_ph, base]
@@ -114,17 +98,13 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
     else:
         raise SideSpecificationError(
             side,
-            "Side should be either 'left', 'right' or 'both', but was {side}".format(
-                side=side
-            ),
+            "Side should be either 'left', 'right' or 'both', but was {side}".format(side=side),
         )
 
 
 def get_joint_names_for_inverse_kinematics():
     robot = urdf.Robot.from_xml_file(
-        os.path.join(
-            rospkg.RosPack().get_path("march_description"), "urdf", "march4.urdf"
-        )
+        os.path.join(rospkg.RosPack().get_path("march_description"), "urdf", "march4.urdf")
     )
     robot_joint_names = robot.joint_map.keys()
     joint_name_list = [
@@ -139,9 +119,7 @@ def get_joint_names_for_inverse_kinematics():
         if joint_name not in robot_joint_names:
             raise KeyError(
                 "Inverse kinematics calculation expected the robot to have joint "
-                "{joint_name}, but {joint_name} was not found.".format(
-                    joint_name=joint_name
-                )
+                "{joint_name}, but {joint_name} was not found.".format(joint_name=joint_name)
             )
 
     return joint_name_list

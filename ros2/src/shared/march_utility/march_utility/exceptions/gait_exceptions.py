@@ -1,3 +1,8 @@
+from typing import Dict
+
+from march_utility.gait.setpoint import Setpoint
+
+
 class GaitError(Exception):
     def __init__(self, msg: str = None):
         """
@@ -79,10 +84,7 @@ class SubgaitInterpolationError(Exception):
 
 class UnknownDimensionsError(Exception):
     def __init__(self, dimensions):
-        msg = (
-            f"Unknown amount of dimensions, should be from InterpolationDimensions "
-            f"enum, but was: {dimensions}"
-        )
+        msg = f"Unknown amount of dimensions, should be from InterpolationDimensions enum, but was: {dimensions}"
         super(UnknownDimensionsError, self).__init__(msg)
 
 
@@ -94,3 +96,43 @@ class WrongRealSenseConfigurationError(Exception):
             msg = "An error occurred while trying to read out the realsense config."
 
         super(WrongRealSenseConfigurationError, self).__init__(msg)
+
+
+class PositionSoftLimitError(Exception):
+    def __init__(self, joint_name: str, position: float, lower_limit: float, upper_limit: float):
+        """Class to raise an error when joint trajectory will be outside of
+        position soft limits"""
+        self.joint_name = joint_name
+        self.position = position
+        self.lower_limit = lower_limit
+        self.upper_limit = upper_limit
+
+        msg = (
+            f"{joint_name} will be outside its soft limits. Position: {position}, soft limits: "
+            f"[{lower_limit}, {upper_limit}]."
+        )
+
+        super(PositionSoftLimitError, self).__init__(msg)
+
+
+class VelocitySoftLimitError(Exception):
+    def __init__(self, joint_name: str, velocity: float, limit: float):
+        """Class to raise an error when joint trajectory will be outside of
+        velocity soft limits"""
+        self.joint_name = joint_name
+        self.velocity = velocity
+        self.limit = limit
+
+        msg = f"{joint_name} will be outside of velocity limits, velocity: {velocity}, velocity limit: {limit}."
+
+        super(VelocitySoftLimitError, self).__init__(msg)
+
+
+class ShouldStartFromHomestandError(Exception):
+    def __init__(self, position: Dict[str, Setpoint]):
+        """Class to raise an error when the previous subgait failed
+        and dynamic gait is selected again without the exo being
+        in home stand."""
+        msg = f"Gait can only be executed from homestand, current position is {position}."
+
+        super(ShouldStartFromHomestandError, self).__init__(msg)

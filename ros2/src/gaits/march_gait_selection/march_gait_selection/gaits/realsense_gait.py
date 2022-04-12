@@ -19,6 +19,7 @@ from march_utility.gait.edge_position import (
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.logger import Logger
 from march_utility.utilities.dimensions import (
     InterpolationDimensions,
     amount_of_subgaits,
@@ -79,12 +80,11 @@ class RealsenseGait(SetpointsGait):
     ):
         super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
         self._gait_selection = gait_selection
+        self.logger = Logger(self._gait_selection, __class__.__name__)
         self.parameters = parameters
         self.dimensions = dimensions
         self.dimensions = dimensions
-        self.realsense_category = self.realsense_category_from_string(
-            realsense_category
-        )
+        self.realsense_category = self.realsense_category_from_string(realsense_category)
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
         self.subgaits_to_interpolate = subgaits_to_interpolate
         # Set up service and event for asynchronous
@@ -169,14 +169,10 @@ class RealsenseGait(SetpointsGait):
             # Create subgaits to interpolate with
             for subgait_name in subgait_version_map:
                 subgaits_to_interpolate[subgait_name] = [
-                    Subgait.from_name_and_version(
-                        robot, gait_directory, gait_name, subgait_name, version
-                    )
+                    Subgait.from_name_and_version(robot, gait_directory, gait_name, subgait_name, version)
                     for version in subgait_version_map[subgait_name]
                 ]
-                if len(subgaits_to_interpolate[subgait_name]) != amount_of_subgaits(
-                    dimensions
-                ):
+                if len(subgaits_to_interpolate[subgait_name]) != amount_of_subgaits(dimensions):
                     raise WrongRealSenseConfigurationError(
                         f"The amount of subgaits in the realsense version map "
                         f"({len(subgaits_to_interpolate[subgait_name])}) doesn't match "
@@ -204,13 +200,11 @@ class RealsenseGait(SetpointsGait):
 
         except KeyError as e:
             raise WrongRealSenseConfigurationError(
-                f"There was a missing key to create realsense gait in gait {gait_name}:"
-                f" {e}"
+                f"There was a missing key to create realsense gait in gait {gait_name}: {e}"
             )
         except ValueError as e:
             raise WrongRealSenseConfigurationError(
-                f"There was a wrong value in the config for the realsense gait"
-                f" {gait_name}: {e}"
+                f"There was a wrong value in the config for the realsense gait {gait_name}: {e}"
             )
         return cls(
             gait_name=gait_name,
@@ -283,9 +277,7 @@ class RealsenseGait(SetpointsGait):
     def start(
         self,
         current_time: Time,
-        first_subgait_delay: Optional[
-            Duration
-        ] = DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION,
+        first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_DELAY_START_RS_DURATION,
     ) -> GaitUpdate:
         """
         This function is called to start the realsense gait, it does the following.
@@ -329,22 +321,15 @@ class RealsenseGait(SetpointsGait):
         """
         service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
-            self._gait_selection.get_logger().warn(
-                "No service response received within timeout"
-            )
+            self.logger.warn("No service response received within timeout")
             return False
 
         gait_parameters_response = self.realsense_service_result
         if gait_parameters_response is None or not gait_parameters_response.success:
-            self._gait_selection.get_logger().warn(
-                "No gait parameters were found, gait will not be started, "
-                f"{gait_parameters_response}"
-            )
+            self.logger.warn(f"No gait parameters were found, gait will not be started, {gait_parameters_response}")
             return False
 
-        return self.update_gaits_from_realsense_call(
-            gait_parameters_response.gait_parameters
-        )
+        return self.update_gaits_from_realsense_call(gait_parameters_response.gait_parameters)
 
     def update_gaits_from_realsense_call(self, gait_parameters: GaitParameters) -> bool:
         """
@@ -384,17 +369,11 @@ class RealsenseGait(SetpointsGait):
             subgait_name=subgait_name,
         )
         self.realsense_service_event.clear()
-        if self._get_gait_parameters_service.wait_for_service(
-            timeout_sec=self.SERVICE_TIMEOUT.seconds
-        ):
-            gait_parameters_response_future = (
-                self._get_gait_parameters_service.call_async(request)
-            )
-            gait_parameters_response_future.add_done_callback(
-                self._realsense_response_cb
-            )
+        if self._get_gait_parameters_service.wait_for_service(timeout_sec=self.SERVICE_TIMEOUT.seconds):
+            gait_parameters_response_future = self._get_gait_parameters_service.call_async(request)
+            gait_parameters_response_future.add_done_callback(self._realsense_response_cb)
         else:
-            self._gait_selection.get_logger().error(
+            self.logger.error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
                 f"available, is the realsense reader running?"
             )
@@ -409,10 +388,7 @@ class RealsenseGait(SetpointsGait):
 
     def interpolate_subgaits_from_parameters(self) -> bool:
         """Change all subgaits to one interpolated from the current parameters."""
-        self._gait_selection.get_logger().info(
-            f"Interpolating gait {self.gait_name} with parameters:"
-            f" {self.parameters}"
-        )
+        self.logger.info(f"Interpolating gait {self.gait_name} with parameters: {self.parameters}")
 
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
@@ -446,9 +422,7 @@ class RealsenseGait(SetpointsGait):
         else:
             raise UnknownDimensionsError(self.dimensions)
 
-    def set_edge_positions(
-        self, starting_position: EdgePosition, final_position: EdgePosition
-    ):
+    def set_edge_positions(self, starting_position: EdgePosition, final_position: EdgePosition):
         """
         Set the new edge positions. Overrides from the setpoints gait, which does not
         store the starting or final position

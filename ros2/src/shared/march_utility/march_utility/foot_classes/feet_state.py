@@ -24,9 +24,7 @@ JOINT_NAMES_IK = validate_and_get_joint_names_for_inverse_kinematics()
 class FeetState:
     """Class for encapturing the state of both feet."""
 
-    def __init__(
-        self, right_foot: Foot, left_foot: Foot, time: Duration = None
-    ) -> None:
+    def __init__(self, right_foot: Foot, left_foot: Foot, time: Duration = None) -> None:
         """Create a FeetState object.
 
         :param right_foot: The state of the right foot.
@@ -50,16 +48,11 @@ class FeetState:
         """
         if JOINT_NAMES_IK is None:
             raise SubgaitInterpolationError(
-                "Robot joints do not allow IK, "
-                "so FeetState object can not be created "
-                "from setpoints."
+                "Robot joints do not allow IK, so FeetState object can not be created from setpoints."
             )
         for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
-                raise KeyError(
-                    f"expected setpoint dictionary to contain joint {joint}, "
-                    f"but {joint} was missing."
-                )
+                raise KeyError(f"expected setpoint dictionary to contain joint {joint}, but {joint} was missing.")
 
         foot_state_left = Foot.calculate_foot_position(
             setpoint_dic["left_hip_aa"].position,
@@ -74,9 +67,7 @@ class FeetState:
             Side.right,
         )
 
-        next_joint_positions = CalculationSetpoint.calculate_next_positions_joint(
-            setpoint_dic
-        )
+        next_joint_positions = CalculationSetpoint.calculate_next_positions_joint(setpoint_dic)
 
         next_foot_state_left = Foot.calculate_foot_position(
             next_joint_positions["left_hip_aa"].position,
@@ -104,9 +95,7 @@ class FeetState:
         return cls(foot_state_right, foot_state_left, feet_state_time)
 
     @classmethod
-    def weighted_average_states(
-        cls, base_state: FeetState, other_state: FeetState, parameter: float
-    ) -> FeetState:
+    def weighted_average_states(cls, base_state: FeetState, other_state: FeetState, parameter: float) -> FeetState:
         """Compute the weighted average of two feet states.
 
         :param base_state: One of the states for the weighted average, return
@@ -119,21 +108,15 @@ class FeetState:
             the feet are the weighted average of those of the base and other states.
         """
         if base_state.time is None or other_state.time is None:
-            raise SubgaitInterpolationError(
-                "Feet state requires a time to compute " "the weighted average."
-            )
+            raise SubgaitInterpolationError("Feet state requires a time to compute the weighted average.")
 
         if parameter == 0:
             return base_state
         if parameter == 1:
             return other_state
 
-        resulting_right_foot = Foot.weighted_average_foot(
-            base_state.right_foot, other_state.right_foot, parameter
-        )
-        resulting_left_foot = Foot.weighted_average_foot(
-            base_state.left_foot, other_state.left_foot, parameter
-        )
+        resulting_right_foot = Foot.weighted_average_foot(base_state.right_foot, other_state.right_foot, parameter)
+        resulting_left_foot = Foot.weighted_average_foot(base_state.left_foot, other_state.left_foot, parameter)
         resulting_time = base_state.time.weighted_average(other_state.time, parameter)
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
@@ -149,23 +132,15 @@ class FeetState:
         """
         if feet_state.time is None:
             raise SubgaitInterpolationError(
-                msg="Feet state needs a time to "
-                "interpolate to setpoint, but time "
-                "was None."
+                msg="Feet state needs a time to interpolate to setpoint, but time was None."
             )
 
-        left_joint_states = Foot.get_joint_states_from_foot_state(
-            feet_state.left_foot, feet_state.time
-        )
-        right_joint_states = Foot.get_joint_states_from_foot_state(
-            feet_state.right_foot, feet_state.time
-        )
+        left_joint_states = Foot.get_joint_states_from_foot_state(feet_state.left_foot, feet_state.time)
+        right_joint_states = Foot.get_joint_states_from_foot_state(feet_state.right_foot, feet_state.time)
 
         setpoint_dictionary = merge_dictionaries(left_joint_states, right_joint_states)
 
         for joint_name in setpoint_dictionary.keys():
-            setpoint_dictionary[joint_name] = setpoint_dictionary[
-                joint_name
-            ].to_normal_setpoint()
+            setpoint_dictionary[joint_name] = setpoint_dictionary[joint_name].to_normal_setpoint()
 
         return setpoint_dictionary

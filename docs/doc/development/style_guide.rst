@@ -52,6 +52,46 @@ This will recursively search for header and source files and format them using c
 See the official `clang-format documentation <https://clang.llvm.org/docs/ClangFormat.html>`_
 for more ways of running clang-format.
 
+clang-tidy
+^^^^^^^^^^
+clang-tidy is a tool for performing static analysis on your code. It will warn about potential bugs or memory leaks.
+You can install it using:
+
+.. code::
+
+    sudo apt-get install -y clang-tidy
+
+clang-tidy needs your code to be built and to contain a :code:`compile_commands.json` file.
+This happens automatically if you have built using the docker images.
+If you have not built using docker, make sure you pass :code:`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` to your build command.
+Important note: Before running the static analysis, make sure your build is up to date.
+
+Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
+
+.. code::
+
+    # static analysis shortcuts
+    alias march_static_analysis_ros1='echo "Running analysis, this can take 77 seconds" && find ~/march/ros1/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros1/build {} 2> /dev/null; true && echo -e "\n----done---"'
+    alias march_static_analysis_ros1_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros1/build {} 2> /dev/null; true && echo -e "\n----done---"'
+
+    alias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+    alias march_static_analysis_ros2_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+
+Now you can run the analysis with a couple of very simple commands.
+Keep in mind that, when using the '..._here' commands, you choose to use the ros1 command for ros1 code and the ros2 command for ros2 code. The clang-tidy code checks for some violations, but can't thoroughly check your code if can't find your build folder.
+
+.. code::
+
+    march_static_analysis_ros1  # To run static analysis for the entire ros1/src folder.
+    march_static_analysis_ros1_here  # To run static analysis on the current directory (must be located in ros1).
+
+    march_static_analysis_ros2 # To run static analysis for the entire ros2/src folder.
+    march_static_analysis_ros2_here # To run static analysis on the current directory (must be located in ros2).
+
+.. note::
+
+    Make sure your build is up to date and contains a :code:`compile_commands.json` file.
+
 flake8
 ^^^^^^
 What makes flake8 so useful is that it is able to install plugins, which add checks.
@@ -105,8 +145,8 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_py_auto_format='docker run --rm -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
     alias march_py_auto_format_check='docker run --rm -v ~/march:/home/march:ro --entrypoint black march/flake8 \
     --check --diff --color ros1/src ros2/src utility_scripts/'
-    alias march_py_auto_format_here='docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
-    alias march_py_auto_format_check_here='docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
+    alias march_py_auto_format_here="docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd` -l 120 --extend-exclude '^/.*/libraries/'"
+    alias march_py_auto_format_check_here="docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 -l 120 --extend-exclude '^/.*/libraries/' --check --diff --color `pwd`"
 
 Update your flake8 docker image. You can redo this step if it doesn't produce the same output as gitlab,
 or if someone from the Project MARCH software department announces to you that the docker image should be updated.

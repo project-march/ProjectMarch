@@ -14,12 +14,8 @@ class TestGaitGraph(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rclpy.init()
-        cls.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march4.urdf"
-        )
-        cls.stand_position = StaticEdgePosition(
-            (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8)
-        )
+        cls.robot = urdf.Robot.from_xml_file(get_package_share_directory("march_description") + "/urdf/march4.urdf")
+        cls.stand_position = StaticEdgePosition((0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8))
 
     def setUp(self):
         self.gait_selection = GaitSelection(
@@ -27,6 +23,7 @@ class TestGaitGraph(unittest.TestCase):
             directory="test/resources/gait_graph_gaits",
             robot=self.robot,
             balance=False,
+            dynamic_gait=False,
         )
 
     def test_make_named_position(self):
@@ -56,7 +53,7 @@ class TestGaitGraph(unittest.TestCase):
             self.stand_position: {"simple_gait"},
             self.gait_selection._gaits["home_stand"].starting_position: {"home_stand"},
         }
-        self.assertTrue(len(self.gait_selection._gaits) == 2)
+        self.assertEqual(len(self.gait_selection._gaits), 2)
         self.assertEqual(expected_idle_transitions, gait_graph._idle_transitions)
 
     def test_validate_transitions_true(self):

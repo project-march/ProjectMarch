@@ -26,12 +26,8 @@ class SubgaitTest(unittest.TestCase):
         self.version = "MV_walk_leftswing_v2"
         self.base_version = "forward_swing"
         self.other_version = "backward_swing"
-        self.resources_folder = (
-            get_package_share_directory("march_utility") + "/test/resources"
-        )
-        self.robot = urdf.Robot.from_xml_file(
-            get_package_share_directory("march_description") + "/urdf/march6.urdf"
-        )
+        self.resources_folder = get_package_share_directory("march_utility") + "/test/resources"
+        self.robot = urdf.Robot.from_xml_file(get_package_share_directory("march_description") + "/urdf/march6.urdf")
         self.subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
             rsc=self.resources_folder,
             gait=self.gait_name,
@@ -46,9 +42,7 @@ class SubgaitTest(unittest.TestCase):
 
     def test_from_file_invalid_path(self):
         with self.assertRaises(FileNotFoundError):
-            Subgait.from_file(
-                self.robot, self.resources_folder + "/MV_walk_leftswing_v2.subgait"
-            )
+            Subgait.from_file(self.robot, self.resources_folder + "/MV_walk_leftswing_v2.subgait")
 
     def test_from_file_none_path(self):
         with self.assertRaises(TypeError):
@@ -203,15 +197,8 @@ class SubgaitTest(unittest.TestCase):
     def test_equalize_amount_of_setpoints_with_higher_duration_new_gait(self):
         self.subgait.scale_timestamps_subgait(Duration(seconds=1.5))
 
-        timestamps = sorted(
-            set(
-                self.subgait.get_unique_timestamps()
-                + [Duration(t) for t in [1.1, 1.2, 1.3]]
-            )
-        )
-        self.subgait.create_interpolated_setpoints(
-            [Duration(t) for t in [1.1, 1.2, 1.3]]
-        )
+        timestamps = sorted(set(self.subgait.get_unique_timestamps() + [Duration(t) for t in [1.1, 1.2, 1.3]]))
+        self.subgait.create_interpolated_setpoints([Duration(t) for t in [1.1, 1.2, 1.3]])
 
         self.assertEqual(
             timestamps,
@@ -225,15 +212,8 @@ class SubgaitTest(unittest.TestCase):
     def test_equalize_amount_of_setpoints_with_lower_duration_new_gait(self):
         self.subgait.scale_timestamps_subgait(Duration(0.8))
 
-        timestamps = sorted(
-            set(
-                self.subgait.get_unique_timestamps()
-                + [Duration(t) for t in [0.6, 0.7, 0.75]]
-            )
-        )
-        self.subgait.create_interpolated_setpoints(
-            [Duration(t) for t in [0.6, 0.7, 0.75]]
-        )
+        timestamps = sorted(set(self.subgait.get_unique_timestamps() + [Duration(t) for t in [0.6, 0.7, 0.75]]))
+        self.subgait.create_interpolated_setpoints([Duration(t) for t in [0.6, 0.7, 0.75]])
 
         self.assertEqual(
             timestamps,
@@ -271,31 +251,23 @@ class SubgaitTest(unittest.TestCase):
         # should be 0 <= parameter <= 1
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
         with self.assertRaises(ValueError):
-            Subgait.interpolate_subgaits(
-                base_subgait, other_subgait, 2, use_foot_position=True
-            )
+            Subgait.interpolate_subgaits(base_subgait, other_subgait, 2, use_foot_position=True)
 
     def test_interpolate_subgaits_parameter_zero(self):
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
-        new_subgait = Subgait.interpolate_subgaits(
-            base_subgait, other_subgait, 0, use_foot_position=True
-        )
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, 0, use_foot_position=True)
         self.assertEqual(base_subgait, new_subgait)
 
     def test_interpolate_subgaits_parameter_one(self):
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
-        new_subgait = Subgait.interpolate_subgaits(
-            base_subgait, other_subgait, 1, use_foot_position=True
-        )
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, 1, use_foot_position=True)
         self.assertEqual(other_subgait, new_subgait)
 
     def test_interpolate_subgaits_interpolated(self):
         # test whether each setpoint is correctly interpolated
         parameter = 0.4
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
-        new_subgait = Subgait.interpolate_subgaits(
-            base_subgait, other_subgait, parameter, use_foot_position=False
-        )
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter, use_foot_position=False)
         for i, joint in enumerate(new_subgait.joints):
             for j, setpoint in enumerate(joint.setpoints):
                 base_setpoint = base_subgait.joints[i].setpoints[j]
@@ -306,14 +278,12 @@ class SubgaitTest(unittest.TestCase):
                     places=4,
                 )
                 self.assertAlmostEqual(
-                    base_setpoint.position * (1 - parameter)
-                    + parameter * other_setpoint.position,
+                    base_setpoint.position * (1 - parameter) + parameter * other_setpoint.position,
                     setpoint.position,
                     places=4,
                 )
                 self.assertAlmostEqual(
-                    base_setpoint.velocity * (1 - parameter)
-                    + parameter * other_setpoint.velocity,
+                    base_setpoint.velocity * (1 - parameter) + parameter * other_setpoint.velocity,
                     setpoint.velocity,
                     places=4,
                 )
@@ -323,9 +293,7 @@ class SubgaitTest(unittest.TestCase):
             "right_close", "MV_walk_rightclose_v2", "MV_walk_rightclose_v2_seven_joints"
         )
         with self.assertRaises(ValueError):
-            Subgait.interpolate_subgaits(
-                base_subgait, other_subgait, 2, use_foot_position=True
-            )
+            Subgait.interpolate_subgaits(base_subgait, other_subgait, 2, use_foot_position=True)
 
     def test_interpolate_subgaits_wrong_joint_names(self):
         base_subgait, other_subgait = self.load_interpolatable_subgaits(
@@ -337,23 +305,15 @@ class SubgaitTest(unittest.TestCase):
     def test_interpolate_subgaits_duration(self):
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
         parameter = 0.2
-        new_subgait = Subgait.interpolate_subgaits(
-            base_subgait, other_subgait, parameter
-        )
-        new_duration = base_subgait.duration.weighted_average(
-            other_subgait.duration, parameter
-        )
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter)
+        new_duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
         self.assertEqual(new_duration, new_subgait.duration)
 
     def test_interpolate_subgaits_duration_ik(self):
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
         parameter = 0.2
-        new_subgait = Subgait.interpolate_subgaits(
-            base_subgait, other_subgait, parameter, use_foot_position=True
-        )
-        new_duration = base_subgait.duration.weighted_average(
-            other_subgait.duration, parameter
-        )
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter, use_foot_position=True)
+        new_duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
         self.assertEqual(new_duration, new_subgait.duration)
 
     def test_prepare_subgaits_number_of_setpoints(self):
@@ -382,7 +342,5 @@ class SubgaitTest(unittest.TestCase):
             f"({first_version})_({second_version})_({third_version})_({fourth_version})"
         )
 
-        subgait = Subgait.from_name_and_version(
-            self.robot, self.resources_folder, "walk", "left_close", version
-        )
+        subgait = Subgait.from_name_and_version(self.robot, self.resources_folder, "walk", "left_close", version)
         self.assertIsInstance(subgait, Subgait)

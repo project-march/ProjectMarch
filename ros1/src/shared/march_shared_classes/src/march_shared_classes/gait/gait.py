@@ -75,9 +75,7 @@ class Gait:
 
         graph = SubgaitGraph(subgaits)
         subgaits = {
-            name: cls.load_subgait(
-                robot, gait_directory, gait_name, name, gait_version_map
-            )
+            name: cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map)
             for name in subgaits
             if name not in ("start", "end")
         }
@@ -97,20 +95,12 @@ class Gait:
             raise SubgaitNameNotFoundError(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
-        return Subgait.from_name_and_version(
-            robot, gait_directory, gait_name, subgait_name, version
-        )
+        return Subgait.from_name_and_version(robot, gait_directory, gait_name, subgait_name, version)
 
     def _validate_trajectory_transition(self):
         """Compares and validates the trajectory end and start points."""
         for from_subgait_name, to_subgait_name in self.graph:
-            if (
-                len(
-                    {from_subgait_name, to_subgait_name}
-                    & {self.graph.START, self.graph.END}
-                )
-                > 0
-            ):
+            if len({from_subgait_name, to_subgait_name} & {self.graph.START, self.graph.END}) > 0:
                 continue
 
             from_subgait = self.subgaits[from_subgait_name]
@@ -151,10 +141,7 @@ class Gait:
                     new_starting_positions = new_subgait.starting_position
                     for joint in old_subgait.joints:
                         if (
-                            abs(
-                                old_starting_positions[joint.name]
-                                - new_starting_positions[joint.name]
-                            )
+                            abs(old_starting_positions[joint.name] - new_starting_positions[joint.name])
                             >= ALLOWED_ERROR_ENDPOINTS
                         ):
                             raise NonValidGaitContentError(
@@ -170,10 +157,7 @@ class Gait:
                     new_final_positions = new_subgait.final_position
                     for joint in old_subgait.joints:
                         if (
-                            abs(
-                                old_final_positions[joint.name]
-                                - new_final_positions[joint.name]
-                            )
+                            abs(old_final_positions[joint.name] - new_final_positions[joint.name])
                             >= ALLOWED_ERROR_ENDPOINTS
                         ):
                             raise NonValidGaitContentError(
@@ -182,12 +166,8 @@ class Gait:
                                 )
                             )
                 else:
-                    from_subgait = new_subgaits.get(
-                        from_subgait_name, self.subgaits[from_subgait_name]
-                    )
-                    to_subgait = new_subgaits.get(
-                        to_subgait_name, self.subgaits[to_subgait_name]
-                    )
+                    from_subgait = new_subgaits.get(from_subgait_name, self.subgaits[from_subgait_name])
+                    to_subgait = new_subgaits.get(to_subgait_name, self.subgaits[to_subgait_name])
 
                     if not from_subgait.validate_subgait_transition(to_subgait):
                         raise NonValidGaitContentError(

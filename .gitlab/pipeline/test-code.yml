@@ -35,11 +35,17 @@
         - $DOCKER_FILE
       variables:
         TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - "$ROS_VERSION/**/*"
       variables:
-        TAG: $CI_DEFAULT_BRANCH
+        TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "$ROS_VERSION/**/*"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
 
 noetic:test:
   variables:

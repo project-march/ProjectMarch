@@ -1,7 +1,6 @@
 [flake8]
-# Recommend matching the black line length (default 88),
-# rather than using the flake8 default of 79:
-max-line-length = 88
+# We use a longer line length of 120, rather than using the flake8 default of 79:
+max-line-length = 120
 show-source = false
 min-coverage-percents = 0
 exclude =
@@ -11,7 +10,6 @@ exclude =
     install,
     log,
     libraries,
-    venv,
     .venv_march,
     .scripts,
     test

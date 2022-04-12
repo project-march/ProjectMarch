@@ -15,9 +15,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
     """A semi-dynamic version of the setpoints gait, implements a freeze functionality"""
 
     def __init__(self, gait_name, subgaits, graph):
-        super(SemiDynamicSetpointsGait, self).__init__(
-            f"dynamic_{gait_name}", subgaits, graph
-        )
+        super(SemiDynamicSetpointsGait, self).__init__(f"dynamic_{gait_name}", subgaits, graph)
         self._should_freeze = False
         self._is_frozen = False
         self._freeze_duration = Duration(0)
@@ -29,11 +27,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         for noticing the step height and ending the subgait earlier. This is
         therefore not possible during the first second of the subgait, to
         prevent accidental freezing."""
-        return not (
-            self.elapsed_time < SHOULD_NOT_FREEZE_FIRST_SECS
-            or self._should_freeze
-            or self._is_frozen
-        )
+        return not (self.elapsed_time < SHOULD_NOT_FREEZE_FIRST_SECS or self._should_freeze or self._is_frozen)
 
     @property
     def can_be_scheduled_early(self) -> bool:
@@ -107,9 +101,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             # the current time point
             subgait_after_freeze = deepcopy(self._current_subgait)
             for joint in subgait_after_freeze:
-                joint.from_begin_point(
-                    self.elapsed_time, self._freeze_position[joint.name]
-                )
+                joint.from_begin_point(self.elapsed_time, self._freeze_position[joint.name])
             subgait_after_freeze.duration -= self.elapsed_time
             subgait_after_freeze.subgait_name = "freeze_subgait_after"
             # Add the subgait after the freeze to the subgait graph
@@ -162,7 +154,4 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         """
         if elapsed_time is None:
             elapsed_time = self.elapsed_time
-        return {
-            joint.name: joint.get_interpolated_setpoint(elapsed_time).position
-            for joint in self._current_subgait
-        }
+        return {joint.name: joint.get_interpolated_setpoint(elapsed_time).position for joint in self._current_subgait}

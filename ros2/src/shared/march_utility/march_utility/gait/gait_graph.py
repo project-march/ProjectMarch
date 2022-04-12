@@ -6,6 +6,7 @@ from march_gait_selection.state_machine.gait_state_machine_error import (
 )
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_utility.gait.edge_position import DynamicEdgePosition
+from march_utility.utilities.logger import Logger
 
 from .edge_position import EdgePosition, StaticEdgePosition, UnknownEdgePosition
 
@@ -26,6 +27,7 @@ class GaitGraph:
 
     def __init__(self, gait_selection: GaitSelection):
         self._gait_selection = gait_selection
+        self.logger = Logger(self._gait_selection, __class__.__name__)
 
         self._named_positions: GaitGraph.NamedPositions = {}
         self._idle_transitions: GaitGraph.IdleTransitions = {}
@@ -59,8 +61,7 @@ class GaitGraph:
         Create a StaticEdgePosition for every named position and a default UnknownEdgePosition.
         """
         self._named_positions = {
-            StaticEdgePosition(position["joints"]): name
-            for name, position in self._gait_selection.positions.items()
+            StaticEdgePosition(position["joints"]): name for name, position in self._gait_selection.positions.items()
         }
         self._named_positions[UnknownEdgePosition()] = GaitGraph.UNKNOWN
 
@@ -90,7 +91,7 @@ class GaitGraph:
                 gait.starting_position, StaticEdgePosition
             ):
                 position_name = self._new_unnamed()
-                self._gait_selection.get_logger().warn(
+                self.logger.warn(
                     f"No named position given for starting position of gait `"
                     f"{gait.name}, creating {position_name}. The starting position "
                     f"is {gait.starting_position}"
@@ -102,7 +103,7 @@ class GaitGraph:
                 gait.final_position, StaticEdgePosition
             ):
                 position_name = self._new_unnamed()
-                self._gait_selection.get_logger().warn(
+                self.logger.warn(
                     f"No named position given for final position of gait `"
                     f"{gait.name}, creating {position_name}. The final position is "
                     f"{gait.final_position}"
@@ -124,9 +125,7 @@ class GaitGraph:
             home_gait_name = home_gait.name
 
             if home_gait_name in self._gait_transitions:
-                raise GaitStateMachineError(
-                    f"Gaits cannot have the same name as home gait `{home_gait_name}`"
-                )
+                raise GaitStateMachineError(f"Gaits cannot have the same name as home gait `{home_gait_name}`")
 
             self._gait_selection._gaits[home_gait_name] = home_gait
             self._add_idle_transition(home_gait.starting_position, home_gait_name)
@@ -154,9 +153,7 @@ class GaitGraph:
             if position not in self._idle_transitions:
                 no_from_transitions.append(name)
         if len(no_from_transitions) > 0:
-            self._gait_selection.get_logger().warn(
-                f'There are no transitions from named positions: [{", ".join(no_from_transitions)}]'
-            )
+            self.logger.warn(f'There are no transitions from named positions: [{", ".join(no_from_transitions)}]')
             return False
         return True
 
@@ -167,16 +164,11 @@ class GaitGraph:
         """
         no_to_transitions = []
         for position, name in self._named_positions.items():
-            if (
-                not isinstance(position, UnknownEdgePosition)
-                and position not in self._gait_transitions.values()
-            ):
+            if not isinstance(position, UnknownEdgePosition) and position not in self._gait_transitions.values():
                 no_to_transitions.append(name)
 
         if len(no_to_transitions) > 0:
-            self._gait_selection.get_logger().warn(
-                f'There are no transitions to named positions: [{", ".join(no_to_transitions)}]'
-            )
+            self.logger.warn(f'There are no transitions to named positions: [{", ".join(no_to_transitions)}]')
             return False
         return True
 

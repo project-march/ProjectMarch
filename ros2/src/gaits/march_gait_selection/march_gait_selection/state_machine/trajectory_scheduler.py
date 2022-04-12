@@ -12,7 +12,10 @@ from march_shared_msgs.msg import (
     FollowJointTrajectoryActionResult,
     FollowJointTrajectoryResult,
 )
+from march_utility.utilities.logger import Logger
 from trajectory_msgs.msg import JointTrajectory
+
+TRAJECTORY_SCHEDULER_HISTORY_DEPTH = 5
 
 
 @dataclass
@@ -40,9 +43,7 @@ class TrajectoryCommand:
         )
 
     def __str__(self):
-        return (
-            f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
-        )
+        return f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
 
 
 class TrajectoryScheduler:
@@ -53,6 +54,7 @@ class TrajectoryScheduler:
         self._failed = False
         self._node = node
         self._goals: List[TrajectoryCommand] = []
+        self.logger = Logger(self._node, __class__.__name__)
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -60,27 +62,27 @@ class TrajectoryScheduler:
         self._trajectory_goal_pub = self._node.create_publisher(
             msg_type=FollowJointTrajectoryActionGoal,
             topic="/march/controller/trajectory/follow_joint_trajectory/goal",
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
         self._cancel_pub = self._node.create_publisher(
             msg_type=GoalID,
             topic="/march/controller/trajectory/follow_joint_trajectory/cancel",
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
         self._trajectory_goal_result_sub = self._node.create_subscription(
             msg_type=FollowJointTrajectoryActionResult,
             topic="/march/controller/trajectory/follow_joint_trajectory/result",
             callback=self._done_cb,
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
         # Publisher for sending hold position mode
         self._trajectory_command_pub = self._node.create_publisher(
             msg_type=JointTrajectory,
             topic="/march/controller/trajectory/command",
-            qos_profile=5,
+            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
     def schedule(self, command: TrajectoryCommand):
@@ -101,24 +103,20 @@ class TrajectoryScheduler:
         info_log_message = f"Scheduling {command.name}"
         debug_log_message = f"Subgait {command.name} starts "
         if self._node.get_clock().now() < command.start_time:
-            time_difference = Duration.from_ros_duration(
-                command.start_time - self._node.get_clock().now()
-            )
+            time_difference = Duration.from_ros_duration(command.start_time - self._node.get_clock().now())
             debug_log_message += f"in {round(time_difference.seconds, 3)}s"
         else:
             debug_log_message += "now"
 
         self._goals.append(command)
-        self._node.get_logger().info(info_log_message)
-        self._node.get_logger().debug(debug_log_message)
+        self.logger.info(info_log_message)
+        self.logger.debug(debug_log_message)
 
     def cancel_active_goals(self):
         now = self._node.get_clock().now()
         for goal in self._goals:
             if goal.start_time + goal.duration > now:
-                self._cancel_pub.publish(
-                    GoalID(stamp=goal.start_time.to_msg(), id=str(goal))
-                )
+                self._cancel_pub.publish(GoalID(stamp=goal.start_time.to_msg(), id=str(goal)))
 
     def send_position_hold(self):
         self._trajectory_command_pub.publish(JointTrajectory())
@@ -132,7 +130,7 @@ class TrajectoryScheduler:
 
     def _done_cb(self, result):
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            self._node.get_logger().error(
+            self.logger.error(
                 f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
             )
             self._failed = True

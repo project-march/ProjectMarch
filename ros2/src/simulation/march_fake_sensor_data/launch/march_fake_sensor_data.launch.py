@@ -24,16 +24,8 @@ def generate_launch_description():
                 namespace="march",
                 output="screen",
                 parameters=[
-                    {
-                        "minimum_temperature": LaunchConfiguration(
-                            "minimum_fake_temperature"
-                        )
-                    },
-                    {
-                        "maximum_temperature": LaunchConfiguration(
-                            "maximum_fake_temperature"
-                        )
-                    },
+                    {"minimum_temperature": LaunchConfiguration("minimum_fake_temperature")},
+                    {"maximum_temperature": LaunchConfiguration("maximum_fake_temperature")},
                 ],
             ),
         ]

@@ -11,6 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
 
 SERVICE_TIMEOUT = 1
+DEFAULT_HISTORY_DEPTH = 10
 
 
 def get_robot_urdf_from_service(node: Node) -> urdf.Robot:
@@ -24,17 +25,13 @@ def get_robot_urdf_from_service(node: Node) -> urdf.Robot:
     )
     wait_for_service(node, robot_description_client, 2)
 
-    robot_future = robot_description_client.call_async(
-        request=GetParameters.Request(names=["robot_description"])
-    )
+    robot_future = robot_description_client.call_async(request=GetParameters.Request(names=["robot_description"]))
     rclpy.spin_until_future_complete(node, robot_future)
 
     return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
 
 
-def wait_for_service(
-    node: Node, client: Client, timeout: Optional[float] = SERVICE_TIMEOUT
-):
+def wait_for_service(node: Node, client: Client, timeout: Optional[float] = SERVICE_TIMEOUT):
     """
     Wait for a service to become available.
 

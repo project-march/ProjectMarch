@@ -12,7 +12,10 @@ workflow:
       when: always
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: always
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    # To run a pipeline after a merge for all the protected branches e.g. gait.
+    # To add a protected branch go to https://gitlab.com/project-march/march/-/settings/repository -> Protected branches.
+    # Note: Don't remove ' == "true"', it is needed. The statements otherwise checks for the existence of the boolean.
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
       when: always
     - when: never
 

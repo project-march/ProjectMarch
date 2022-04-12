@@ -30,9 +30,7 @@ class RobotInformation(Node):
     about the march robot in its parameters."""
 
     def __init__(self, joint_names: Optional[List[str]] = None):
-        super().__init__(
-            NODE_NAME, automatically_declare_parameters_from_overrides=True
-        )
+        super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         self.get_parameter_clients = {}
 
         # If the given joint names are not None, use that value for the node
@@ -42,11 +40,7 @@ class RobotInformation(Node):
         if joint_names is not None:
             self.joint_names = joint_names
         else:
-            joint_names = (
-                self.get_parameter("joint_names")
-                .get_parameter_value()
-                .string_array_value
-            )
+            joint_names = self.get_parameter("joint_names").get_parameter_value().string_array_value
             if len(joint_names) > 0:
                 self.joint_names = sorted(joint_names)
             else:
@@ -57,9 +51,7 @@ class RobotInformation(Node):
             self.declare_parameter("joint_names")
         self.set_parameters([Parameter(name="joint_names", value=joint_names)])
 
-        self.create_service(
-            GetJointNames, "robot_information/get_joint_names", self.get_joint_names_cb
-        )
+        self.create_service(GetJointNames, "robot_information/get_joint_names", self.get_joint_names_cb)
 
     def query_joint_names(self) -> List[str]:
         """Query the joint names from the robot_state_publisher."""
@@ -70,9 +62,7 @@ class RobotInformation(Node):
 
         return get_joint_names_from_robot(robot)
 
-    def make_get_parameters_request(
-        self, node: str, names: List[str]
-    ) -> List[ParameterValue]:
+    def make_get_parameters_request(self, node: str, names: List[str]) -> List[ParameterValue]:
         """
         Make a request to a GetParameters service of a node.
         :param node: Node to make the request to.

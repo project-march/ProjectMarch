@@ -23,9 +23,7 @@ subgaits = [
 ]
 versions_to_speed_up = {}
 for subgait_name in subgaits:
-    versions_to_speed_up[subgait_name] = (
-        common_prefix + subgait_name.replace("_", "") + common_suffix
-    )
+    versions_to_speed_up[subgait_name] = common_prefix + subgait_name.replace("_", "") + common_suffix
 # versions_to_speed_up = {  # noqa: E800
 #     "left_close": "MVI_walk_leftclose_v9",  # noqa: E800
 #     "left_swing": "MVI_walk_leftswing_v9",  # noqa: E800
@@ -62,9 +60,7 @@ for subgait_name, version in versions_to_speed_up.items():
                         4,
                     )
         if new_version_extension != "":
-            new_version_name = (
-                version[: version.rfind("_") + 1] + new_version_extension
-            )  # noqa: E501
+            new_version_name = version[: version.rfind("_") + 1] + new_version_extension  # noqa: E501
         else:
             new_version_name = version
         if new_description != "":

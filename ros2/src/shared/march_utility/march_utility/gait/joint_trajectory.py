@@ -119,9 +119,7 @@ class JointTrajectory:
                 self.setpoints.remove(setpoint)
             else:
                 setpoint.time -= begin_time
-        self.setpoints = [
-            Setpoint(time=Duration(), position=position, velocity=0)
-        ] + self.setpoints
+        self.setpoints = [Setpoint(time=Duration(), position=position, velocity=0)] + self.setpoints
         self._duration = self._duration - begin_time
 
     @property
@@ -191,9 +189,7 @@ class JointTrajectory:
             False if the starting/ending point is (not at 0/duration) and
             (has nonzero speed), True otherwise
         """
-        return (
-            self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
-        ) and (
+        return (self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0) and (
             isclose(
                 self.setpoints[-1].time.seconds,
                 self.duration.seconds,
@@ -269,28 +265,18 @@ class JointTrajectory:
 
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
             raise SubgaitInterpolationError(
-                "The amount of setpoints do not match for joint {0}".format(
-                    base_trajectory.name
-                )
+                "The amount of setpoints do not match for joint {0}".format(base_trajectory.name)
             )
         setpoints = []
 
-        for base_setpoint, other_setpoint in zip(
-            base_trajectory.setpoints, other_trajectory.setpoints
-        ):
-            interpolated_setpoint_to_add = (
-                JointTrajectory.setpoint_class.interpolate_setpoints(
-                    base_setpoint, other_setpoint, parameter
-                )
+        for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
+            interpolated_setpoint_to_add = JointTrajectory.setpoint_class.interpolate_setpoints(
+                base_setpoint, other_setpoint, parameter
             )
             setpoints.append(interpolated_setpoint_to_add)
 
-        duration = base_trajectory.duration.weighted_average(
-            other_trajectory.duration, parameter
-        )
-        return JointTrajectory(
-            base_trajectory.name, base_trajectory.limits, setpoints, duration
-        )
+        duration = base_trajectory.duration.weighted_average(other_trajectory.duration, parameter)
+        return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
 
     @staticmethod
     def check_joint_interpolation_is_safe(
