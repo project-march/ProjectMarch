@@ -37,12 +37,12 @@ class ConnectionManager:
         if self.stopped or "close" in msg.subgait:
             self.current_gait = self.requested_gait = "stop"
             self.stopped = False
-        else:
+        elif not ("home_stand" in msg.subgait or "stand" in msg.subgait):
             self.current_gait = msg.gait
 
     def _current_state_cb(self, msg):
-        if msg.state == "unknown":
-            self.current_gait = "unknown"
+        if msg.state == "unknown" or msg.state == "stand" or msg.state == "home_stand":
+            self.current_gait = msg.state
 
     def wait_for_request(self):
         while True:

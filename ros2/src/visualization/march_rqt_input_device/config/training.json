@@ -31,7 +31,7 @@
       "name": "walk_single_step"
     },
     {
-      "name": "dynamic_walk"
+      "name": "walk_single_step_large"
     },
     {
       "name": "dynamic_walk_single_step"
