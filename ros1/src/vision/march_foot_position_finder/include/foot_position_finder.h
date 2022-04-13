@@ -34,7 +34,6 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenCurrentPointCallback(const march_shared_msgs::FootPosition msg);
 
     void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
 
@@ -108,12 +107,13 @@ protected:
     std::vector<Point> found_points_;
 
     Point ORIGIN;
-    Point last_chosen_point_world_;
-    Point start_point_current_;
-    Point start_point_world_;
-    Point desired_point_world_;
-    Point previous_start_point_world_;
+    Point last_chosen_point_;
+    Point start_point_;
+    Point desired_point_;
+    Point previous_start_point_;
     Point last_displacement_;
+    Point new_displacement_;
+    Point found_covid_point_;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

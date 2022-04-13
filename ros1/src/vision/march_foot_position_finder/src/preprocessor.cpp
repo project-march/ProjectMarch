@@ -27,13 +27,19 @@ using NormalCloud = pcl::PointCloud<Normal>;
 // Suppress lint error: "fields are not initialized by constructor"
 // NOLINTNEXTLINE
 Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-    NormalCloud::Ptr normalcloud)
+    NormalCloud::Ptr normalcloud, std::string& left_or_right)
     : pointcloud_ { std::move(pointcloud) }
     , normalcloud_ { std::move(normalcloud) }
 {
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
-    base_frame_ = "world";
+
+    if (left_or_right == "right") {
+        base_frame_ = "toes_right_aligned";
+    }
+    else{
+        base_frame_ = "toes_left_aligned";
+    }
 
     ros::param::get("~voxel_size", voxel_size_);
     ros::param::get("~x_min", x_min_);
@@ -106,7 +112,7 @@ void Preprocessor::filterOnDistance(float x_min, float x_max, float y_min,
 }
 
 /**
- * Transform the realsense pointclouds to world frame using URDF
+ * Transform the realsense pointclouds to given base frame using URDF
  * transformations.
  */
 void Preprocessor::transformPointCloudFromUrdf()
