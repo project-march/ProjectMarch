@@ -75,6 +75,16 @@ class DynamicSetpointGait(GaitInterface):
             self._callback_force_unknown,
             DEFAULT_HISTORY_DEPTH,
         )
+        self.pub_right = self.gait_selection.create_publisher(
+            FootPosition,
+            "/chosen_foot_position/right",
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.pub_left = self.gait_selection.create_publisher(
+            FootPosition,
+            "/chosen_foot_position/left",
+            DEFAULT_HISTORY_DEPTH,
+        )
 
         # Assign reconfigurable parameters
         self.update_parameters()
@@ -328,6 +338,19 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return None
 
+    def _publish_chosen_foot_position(self, subgait_id: str, foot_position: FootPosition) -> None:
+        """Publish the point to which the step is planned
+
+        :param subgait_id: whether it is a right or left swing
+        :type subgait_id: str
+        :param foot_position: point message to which step is planned
+        :type foot_position: FootPosition
+        """
+        if subgait_id == "left_swing":
+            self.pub_left.publish(foot_position)
+        elif subgait_id == "right_swing":
+            self.pub_right.publish(foot_position)
+
     def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id.
 
@@ -345,10 +368,12 @@ class DynamicSetpointGait(GaitInterface):
         else:
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
-            self.logger.info(
-                f"Stepping to location ({self.foot_location.processed_point.x}, "
-                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-            )
+            if not stop:
+                self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self.logger.info(
+                    f"Stepping to location ({self.foot_location.processed_point.x}, "
+                    f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+                )
 
         return self._get_first_feasible_trajectory(start, stop)
 
