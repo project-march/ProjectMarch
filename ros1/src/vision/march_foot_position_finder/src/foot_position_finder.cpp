@@ -5,6 +5,7 @@
 #include "foot_position_finder.h"
 #include "point_finder.h"
 #include "preprocessor.h"
+#include "std_msgs/Float64MultiArray.h"
 #include "utilities/math_utilities.hpp"
 #include "utilities/publish_utilities.hpp"
 #include "utilities/realsense_to_pcl.hpp"
@@ -76,6 +77,9 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
             topic_current_chosen_point_,
             /*queue_size=*/1, &FootPositionFinder::chosenCurrentPointCallback,
             this);
+
+    height_map_publisher = n->advertise<std_msgs::Float64MultiArray>(
+        "/debug/height_map", /*queue_size=*/1);
 
     running_ = false;
 }
@@ -293,7 +297,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Find possible points around the desired point determined earlier
     PointFinder pointFinder(
-        n_, pointcloud, left_or_right_, desired_point_world_);
+        n_, pointcloud, left_or_right_, desired_point_world_, height_map_publisher);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 

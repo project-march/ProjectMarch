@@ -9,6 +9,11 @@
 #include <pcl/point_types.h>
 #include <point_finder.h>
 
+#include "ros/ros.h"
+#include "std_msgs/Float64MultiArray.h"
+#include "std_msgs/MultiArrayLayout.h"
+#include <vector>
+
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<Point>;
 
@@ -27,7 +32,7 @@ using PointCloud = pcl::PointCloud<Point>;
 // Suppress lint error "variables are not initialized" (ros parameters)
 // NOLINTNEXTLINE
 PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-    std::string left_or_right, Point& step_point)
+    std::string left_or_right, Point& step_point, ros::Publisher& height_map_publisher)
     : pointcloud_ { std::move(pointcloud) }
     , left_or_right_ { std::move(left_or_right) }
 {
@@ -60,6 +65,7 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     optimal_foot_x_ = step_point.x;
     optimal_foot_y_ = step_point.y;
     current_foot_z_ = step_point.z;
+    height_map_publisher_ = height_map_publisher;
 
     search_dimensions_ = { optimal_foot_x_ - 0.5, optimal_foot_x_ + 0.5,
         optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5, -1, 1 };
@@ -108,8 +114,34 @@ void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
     height_map_ = height_map_temp_;
+    publishHeightMap();
     convolveLaplacianKernel();
     findFeasibleFootPlacements(position_queue);
+}
+
+void PointFinder::publishHeightMap(){
+
+
+    std::vector<double> height_map_as_vector;
+
+    for (int row = 0; row < RES; row++) {
+        for (int col = 0; col < RES; col++) {
+            height_map_as_vector.push_back(height_map_[row][col]);
+        }
+    }
+    
+    std_msgs::Float64MultiArray msg;
+    std_msgs::MultiArrayLayout layout;
+    if (left_or_right_ == "right"){
+        layout.data_offset = 1;
+    }
+    else{
+        layout.data_offset = 0;
+    }
+    msg.layout = layout;
+    msg.data = height_map_as_vector;
+
+    height_map_publisher_.publish(msg);
 }
 
 /**

@@ -5,7 +5,7 @@
 #ifndef MARCH_POINT_FINDER_H
 #define MARCH_POINT_FINDER_H
 
-#define RES 70
+#define RES 80
 
 #include "utilities/math_utilities.hpp"
 #include <array>
@@ -16,13 +16,15 @@
 #include <string>
 #include <vector>
 
+#include "ros/ros.h"
+
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class PointFinder {
 public:
     explicit PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-        std::string left_or_right, Point& step_point);
+        std::string left_or_right, Point& step_point, ros::Publisher &height_map_publisher);
 
     ~PointFinder() = default;
 
@@ -37,6 +39,8 @@ protected:
     PointCloud::Ptr pointcloud_;
     std::vector<double> search_dimensions_;
     std::string left_or_right_;
+
+    ros::Publisher height_map_publisher_;
 
     int grid_resolution_ = RES;
     double cell_width_ = 1.0 / grid_resolution_;
@@ -74,6 +78,8 @@ protected:
     int num_track_points_;
 
     void mapPointCloudToHeightMap();
+
+    void publishHeightMap();
 
     void interpolateMap();
 
