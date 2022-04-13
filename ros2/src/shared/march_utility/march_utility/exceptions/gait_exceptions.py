@@ -1,5 +1,8 @@
 """This module contains some errors that are specific to the gaits in the Project March code."""
 
+from typing import Dict
+from march_utility.gait.setpoint import Setpoint
+
 
 class GaitError(Exception):
     """Base class for exceptions in gait modules.
@@ -133,8 +136,7 @@ class PositionSoftLimitError(Exception):
         self.upper_limit = upper_limit
 
         msg = (
-            f"{joint_name} will be outside its soft limits. "
-            f"position: {position}, soft limits: "
+            f"{joint_name} will be outside its soft limits. Position: {position}, soft limits: "
             f"[{lower_limit}, {upper_limit}]."
         )
 
@@ -149,7 +151,7 @@ class VelocitySoftLimitError(Exception):
         self.velocity = velocity
         self.limit = limit
 
-        msg = f"{joint_name} will be outside of velocity limits, " f"velocity: {velocity}, velocity limit: {limit}."
+        msg = f"{joint_name} will be outside of velocity limits, velocity: {velocity}, velocity limit: {limit}."
 
         super(VelocitySoftLimitError, self).__init__(msg)
 

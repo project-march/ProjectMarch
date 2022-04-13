@@ -82,4 +82,54 @@ inline std::vector<Point> linearDomain(Point a, Point b, int n)
     return points;
 }
 
+/**
+ * Rotate a point clockwise.
+ *
+ * @param Point point to rotate
+ * @return Point new point rotated clockwise
+ */
+inline Point rotateRight(const Point& p)
+{
+    Point p_rotated(p.y, -p.x, p.z);
+    return p_rotated;
+}
+
+/**
+ * Rotate a point counter-clockwise.
+ *
+ * @param Point point to rotate
+ * @return Point new point rotated counter-clockwise
+ */
+inline Point rotateLeft(const Point& p)
+{
+    Point p_rotated(-p.y, p.x, p.z);
+    return p_rotated;
+}
+
+/**
+ * Add two points together.
+ *
+ * @param Point p1 first point
+ * @param Point p2 second point
+ * @return Point new point that is equivalent to p1 + p2
+ */
+inline Point addPoints(const Point p1, const Point p2)
+{
+    Point sum(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
+    return sum;
+}
+
+/**
+ * Take the difference between two points.
+ *
+ * @param Point p1 first point
+ * @param Point p2 second point
+ * @return Point new point that is equivalent to p1 - p2
+ */
+inline Point subtractPoints(const Point p1, const Point p2)
+{
+    Point difference(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+    return difference;
+}
+
 #endif // MARCH_MATH_UTILITIES

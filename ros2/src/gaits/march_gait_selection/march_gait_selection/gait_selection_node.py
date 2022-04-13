@@ -59,6 +59,8 @@ def parameter_callback(
         SetParametersResult: Whether the callback was successful
     """
     gait_selection.get_logger().info("Parameters are updated")
+    dynamic_gait_updated = False
+    position_queue_updated = False
     gaits_updated = False
     dynamic_gait_updated = False
     for param in parameters:
@@ -89,6 +91,9 @@ def parameter_callback(
         elif param.name == "push_off_position":
             gait_selection.push_off_position = param.value
             dynamic_gait_updated = True
+        elif param.name == "use_position_queue" and param.type_ == Parameter.Type.BOOL:
+            gait_selection.use_position_queue = param.value
+            position_queue_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
             gaits_updated = True
@@ -105,6 +110,9 @@ def parameter_callback(
     if dynamic_gait_updated:
         gait_selection.dynamic_setpoint_gait.update_parameters()
         gait_selection.get_logger().info("Dynamic gait parameters updated.")
+    elif position_queue_updated:
+        gait_selection.dynamic_setpoint_gait_half_step.update_parameter()
+        gait_selection.get_logger().info(f"use_position_queue set to {param.value}")
     elif gaits_updated:
         # TODO: Updating the parameters in gait_selection does not work
         gait_selection.update_gaits()

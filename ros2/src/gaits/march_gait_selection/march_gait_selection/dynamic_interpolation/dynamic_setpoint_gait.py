@@ -28,7 +28,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 from march_shared_msgs.msg import FootPosition, GaitInstruction
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
-DURATION_INCREASE_FACTOR = 2
+DURATION_INCREASE_FACTOR = 1.5
 DURATION_INCREASE_SIZE = 0.25
 
 
@@ -125,8 +125,8 @@ class DynamicSetpointGait(GaitInterface):
         """Returns the type of gait, for example 'walk_like' or 'sit_like'."""
         if self._next_command is not None:
             if (
-                self.foot_location.point.y > self._minimum_stair_height
-                or self.foot_location.point.y < -self._minimum_stair_height
+                self.foot_location.processed_point.y > self.minimum_stair_height
+                or self.foot_location.processed_point.y < -self.minimum_stair_height
             ):
                 return "stairs_like"
             else:
@@ -160,15 +160,12 @@ class DynamicSetpointGait(GaitInterface):
     def _reset(self) -> None:
         """Reset all attributes of the gait."""
         if self.start_position != self.home_stand_position:
-            raise ShouldStartFromHomestandError
+            raise ShouldStartFromHomestandError(self.start_position)
 
         self._should_stop = False
         self._end = False
 
-        self._start_time = None
-        self._end_time = None
-        self._current_time = None
-
+        self._start_time_next_command = None
         self._next_command = None
         self.subgait_id = "right_swing"
 
@@ -176,6 +173,9 @@ class DynamicSetpointGait(GaitInterface):
         self._scheduled_early = False
 
         self._trajectory_failed = False
+
+        self.start_position = self.joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
+        self.end_position = self.start_position
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -194,12 +194,11 @@ class DynamicSetpointGait(GaitInterface):
         """
         try:
             self._reset()
-        except ShouldStartFromHomestandError:
-            self.logger.error("Cannot start the gait from a position that is not homestand.")
+        except ShouldStartFromHomestandError as e:
+            self.logger.error(e.msg)
             return None
         self.update_parameters()
-        self._current_time = current_time
-        self._start_time = self._current_time + first_subgait_delay
+        self._start_time_next_command = current_time + first_subgait_delay
         self._next_command = self._get_trajectory_command(start=True)
         return GaitUpdate.should_schedule_early(self._next_command)
 
@@ -222,18 +221,16 @@ class DynamicSetpointGait(GaitInterface):
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        self._current_time = current_time
-
         if self._start_is_delayed:
-            if self._current_time >= self._start_time:
+            if current_time >= self._start_time_next_command:
                 return self._update_start_subgait()
             else:
                 return GaitUpdate.empty()
 
-        if self._current_time >= self._end_time - early_schedule_duration and not self._scheduled_early:
+        if current_time >= self._start_time_next_command - early_schedule_duration and not self._scheduled_early:
             return self._update_next_subgait_early()
 
-        if self._current_time >= self._end_time:
+        if current_time >= self._start_time_next_command:
             return self._update_state_machine()
 
         return GaitUpdate.empty()
@@ -265,7 +262,7 @@ class DynamicSetpointGait(GaitInterface):
             GaitUpdate: a GaitUpdate that is empty or contains a trajectory command
         """
         self._scheduled_early = True
-        self._next_command = self._get_next_command()
+        self._next_command = self._set_and_get_next_command()
 
         if self._next_command is None:
             return GaitUpdate.empty()
@@ -286,7 +283,7 @@ class DynamicSetpointGait(GaitInterface):
 
         return GaitUpdate.subgait_updated()
 
-    def _get_next_command(self) -> Optional[TrajectoryCommand]:
+    def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Create the next command, based on what the current subgait is.
 
         Also checks if the gait has to be stopped. If true, it returns a close gait.
@@ -352,9 +349,6 @@ class DynamicSetpointGait(GaitInterface):
         Returns:
             TrajectoryCommand: command with the current subgait and start time
         """
-        if self._start_is_delayed:
-            self._end_time = self._start_time
-
         if stop:
             self._end = True
             self.logger.info("Stopping dynamic gait.")
@@ -362,8 +356,8 @@ class DynamicSetpointGait(GaitInterface):
             self.foot_location = self._get_foot_location(self.subgait_id)
             stop = self._check_msg_time(self.foot_location)
             self.logger.debug(
-                f"Stepping to location ({self.foot_location.point.x}, {self.foot_location.point.y}, "
-                f"{self.foot_location.point.z})"
+                f"Stepping to location ({self.foot_location.processed_point.x}, "
+                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
 
         return self._get_first_feasible_trajectory(start, stop)
@@ -382,6 +376,8 @@ class DynamicSetpointGait(GaitInterface):
         """
         original_duration = self.foot_location.duration
         second_step = False
+        trajectory_command = None
+
         while not self._is_duration_bigger_than_max_duration(original_duration):
             trajectory_command = self._try_to_get_trajectory_command(start, stop, original_duration)
             # Return command if current and next step can be made at same duration
@@ -394,8 +390,17 @@ class DynamicSetpointGait(GaitInterface):
                 self._trajectory_failed = True
                 self.foot_location.duration += DURATION_INCREASE_SIZE
 
-        if second_step is False:
-            self.logger.warn("Not possible to perform second step.")
+        msg = ""
+        if trajectory_command is None:
+            msg = "Not possible to perform first step, trying to close the gait."
+        elif trajectory_command is None and not second_step:
+            msg = "Not possible to perform first and second step, trying to close the gait."
+        elif second_step is False:
+            if start:
+                msg = "Not possible to perform second step, gait will not be executed."
+            else:
+                msg = "Not possible to perform second step, trying to close the gait."
+        self.logger.warn(msg)
 
         # If no feasible subgait can be found, try to execute close gait
         if not start:
@@ -406,7 +411,6 @@ class DynamicSetpointGait(GaitInterface):
                 self.logger.warn("Not possible to perform close gait.")
 
         self._end = True
-        self._get_next_command()
         return None
 
     def _try_to_get_trajectory_command(
@@ -436,22 +440,12 @@ class DynamicSetpointGait(GaitInterface):
                 trajectory,
                 Duration(self.foot_location.duration),
                 self.subgait_id,
-                self._end_time,
+                self._start_time_next_command,
             )
-        except PositionSoftLimitError as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if self._is_duration_bigger_than_max_duration(original_duration):
                 self.logger.warn(
-                    f"Joint {e.joint_name} will still be outside of soft limits after "
-                    f"{iteration} iterations. Position: {e.position}, soft limits: "
-                    f"[{e.lower_limit}, {e.upper_limit}]. Gait will not be executed."
-                )
-            return None
-        except VelocitySoftLimitError as e:
-            if self._is_duration_bigger_than_max_duration(original_duration):
-                self.logger.warn(
-                    f"Joint {e.joint_name} will still be outside of velocity limits, after "
-                    f"{iteration} iterations. Velocity: {e.velocity}, velocity limit: {e.velocity}. "
-                    "Gait will not be executed."
+                    f"Can not get trajectory after {iteration} iterations. {e.msg} Gait will not be executed."
                 )
             return None
 
@@ -495,7 +489,7 @@ class DynamicSetpointGait(GaitInterface):
             trajectory,
             Duration(self.foot_location.duration),
             self.subgait_id,
-            self._end_time,
+            self._start_time_next_command,
         )
 
     def _is_duration_bigger_than_max_duration(self, original_duration: float) -> bool:
@@ -542,8 +536,8 @@ class DynamicSetpointGait(GaitInterface):
         Args:
             next_command_duration (Duration): duration of the next command to be scheduled
         """
-        self._start_time = self._end_time
-        self._end_time = self._start_time + next_command_duration
+        start_time_previous_command = self._start_time_next_command
+        self._start_time_next_command = start_time_previous_command + next_command_duration
 
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
@@ -620,7 +614,7 @@ class DynamicSetpointGait(GaitInterface):
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
             self.logger.warn(
-                "Foot location is more than 0.5 seconds old, time difference is " f"{time_difference}. Stopping gait.",
+                f"Foot location is more than 0.5 seconds old, time difference is {time_difference}. Stopping gait."
             )
             self._end = True
             return True

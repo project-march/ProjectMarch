@@ -79,7 +79,7 @@ class DynamicSubgait:
         self._get_parameters(gait_selection_node)
 
         self.starting_position = starting_position
-        self.location = location.point
+        self.location = location.processed_point
         self.joint_names = joint_names
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits

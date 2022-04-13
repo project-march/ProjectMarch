@@ -18,8 +18,9 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
         super().__init__(gait_selection_node)
         self.gait_name = "dynamic_walk_single_step"
 
-    def _get_next_command(self) -> Optional[TrajectoryCommand]:
-        """Create the next command. Because it is a single step, this will always be a left_swing and a close gait.
+    def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
+        """Create the next command. Because it is a single step, this will
+        always be a left_swing and a close gait.
 
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait

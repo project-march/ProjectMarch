@@ -113,7 +113,6 @@ class GaitSelection(Node):
                 directory = self.get_parameter("gait_directory").get_parameter_value().string_value
             if balance is None:
                 self._balance_used = self.get_parameter("balance").get_parameter_value().bool_value
-
             if dynamic_gait is None:
                 self._dynamic_gait = self.get_parameter("dynamic_gait").get_parameter_value().bool_value
 
@@ -126,6 +125,7 @@ class GaitSelection(Node):
             self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
             self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
+            self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
 
         except ParameterNotDeclaredException:
             self.logger.error(
@@ -464,6 +464,8 @@ class GaitSelection(Node):
             for dynamic_gait in dynamic_gaits:
                 self.add_gait(dynamic_gait)
             self.logger.info("Added dynamic_walk to gaits")
+            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(gait_selection_node=self)
+            gaits["dynamic_walk_half_step"] = self.dynamic_setpoint_gait_half_step
 
         return gaits
 

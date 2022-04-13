@@ -4,13 +4,15 @@ from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+import numpy as np
 
 NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
 # Offsets are used to account for the difference in points between
 # covid (middle of foot) and gait (at the heel)
-X_OFFSET = 0.1
-Y_OFFSET = 0.05
+X_OFFSET = 0
+Y_OFFSET = -0.01
+Z_OFFSET = 0.22
 
 
 class GaitPreprocessor(Node):
@@ -98,7 +100,10 @@ class GaitPreprocessor(Node):
 
         return FootPosition(
             header=foot_location.header,
-            point=transformed_foot_location,
+            processed_point=transformed_foot_location,
+            point=foot_location.point,
+            point_world=foot_location.point_world,
+            displacement=foot_location.displacement,
             track_points=foot_location.track_points,
             duration=scaled_duration,
         )
@@ -112,12 +117,12 @@ class GaitPreprocessor(Node):
         Returns:
             Point: Foot location transformed to ik solver axes.
         """
-        temp_y = foot_location.point.y
+        temp_y = foot_location.displacement.y
         point = Point()
 
-        point.x = -foot_location.point.x + X_OFFSET
-        point.y = foot_location.point.z + Y_OFFSET
-        point.z = temp_y
+        point.x = -foot_location.displacement.x + X_OFFSET
+        point.y = foot_location.displacement.z + Y_OFFSET
+        point.z = temp_y + np.sign(temp_y) * Z_OFFSET
 
         return point
 
@@ -138,9 +143,9 @@ class GaitPreprocessor(Node):
         point_msg = FootPosition()
         point_msg.header.stamp = self.get_clock().now().to_msg()
 
-        point_msg.point.x = self._location_x
-        point_msg.point.y = self._location_y
-        point_msg.point.z = self._location_z
+        point_msg.processed_point.x = self._location_x
+        point_msg.processed_point.y = self._location_y
+        point_msg.processed_point.z = self._location_z
         point_msg.duration = self._get_duration_scaled_to_height(self._duration, self._location_y)
 
         self.publisher_right.publish(point_msg)

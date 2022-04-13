@@ -1,0 +1,7 @@
+<launch>
+    <node name="march_gravity_aligned_frame_publisher"
+          pkg="march_gravity_aligned_frame_publisher"
+          type="march_gravity_aligned_frame_publisher"
+          output="screen">
+    </node>
+</launch>
