@@ -16,7 +16,7 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.utility_functions import get_position_from_yaml
+from march_utility.utilities.utility_functions import get_position_from_yaml, get_position_from_gait_selection
 
 from std_msgs.msg import Header
 from geometry_msgs.msg import Point
@@ -208,7 +208,8 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
         """
         if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position = get_position_from_yaml("stand")
+            self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
+            self.start_position_all_joints = get_position_from_yaml("stand")
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
             self.position_queue = Queue()
