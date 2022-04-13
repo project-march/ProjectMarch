@@ -9,7 +9,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
 
 
-class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
+class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
     """Single step gait based on dynamic setpoint gait
 
     :param gait_selection_node: the gait selection node
@@ -18,7 +18,7 @@ class DynamicSetpointGaitSingleStep(DynamicSetpointGait):
 
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
-        self.gait_name = "dynamic_walk_single_step"
+        self.gait_name = "dynamic_step_and_close"
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Create the next command. Because it is a single step, this will

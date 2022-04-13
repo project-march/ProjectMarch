@@ -36,11 +36,11 @@ from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_single_step import (
-    DynamicSetpointGaitSingleStep,
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
+    DynamicSetpointGaitStepAndClose,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_half_step import (
-    DynamicSetpointGaitHalfStep,
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import (
+    DynamicSetpointGaitStep,
 )
 
 NODE_NAME = "gait_selection"
@@ -390,11 +390,11 @@ class GaitSelection(Node):
             # to the CoViD topic within the DynamicSetpointGait class.
             self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
             gaits["dynamic_walk"] = self.dynamic_setpoint_gait
-            self.dynamic_setpoint_gait_single_step = DynamicSetpointGaitSingleStep(gait_selection_node=self)
-            gaits["dynamic_walk_single_step"] = self.dynamic_setpoint_gait_single_step
+            self.dynamic_setpoint_gait_step_and_close = DynamicSetpointGaitStepAndClose(gait_selection_node=self)
+            gaits["dynamic_step_and_close"] = self.dynamic_setpoint_gait_step_and_close
+            self.dynamic_setpoint_gait_step = DynamicSetpointGaitStep(gait_selection_node=self)
+            gaits["dynamic_step"] = self.dynamic_setpoint_gait_step
             self.logger.info("Added dynamic_walk to gaits")
-            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(gait_selection_node=self)
-            gaits["dynamic_walk_half_step"] = self.dynamic_setpoint_gait_half_step
 
         return gaits
 

@@ -23,8 +23,8 @@ from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition, GaitInstruction
 
 
-class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
-    """*Single single* step gait based on dynamic setpoint gait
+class DynamicSetpointGaitStep(DynamicSetpointGait):
+    """Step gait based on dynamic setpoint gait.
 
     :param gait_selection_node: the gait selection node
     :type gait_selection_node: Node
@@ -33,7 +33,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self.subgait_id = "right_swing"
-        self.gait_name = "dynamic_walk_half_step"
+        self.gait_name = "dynamic_step"
         self.gait_selection = gait_selection_node
         self.update_parameter()
 
@@ -208,6 +208,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
         """
         if msg.type == GaitInstruction.UNKNOWN:
+            # TODO: Refactor such that _reset method can be used
             self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
             self.start_position_all_joints = get_position_from_yaml("stand")
             self.subgait_id = "right_swing"
