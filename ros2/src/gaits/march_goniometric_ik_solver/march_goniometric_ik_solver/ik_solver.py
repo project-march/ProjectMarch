@@ -638,11 +638,11 @@ def rot(t: float) -> np.array:
 
 
 def check_on_limits(pose_list: List[float]) -> List:
-    """
-    Checks all joints limits of the current pose and create error messages for exceeding limits.
-    Expects a list of joints poses in alphabetic order.
-    """
+    """Checks all joints limits of the current pose and create error messages for exceeding limits.
 
+    Args:
+         pose_list (List): A list of joints poses in alphabetic order.
+    """
     errors = []
 
     for name, angle in zip(JOINT_NAMES, pose_list):

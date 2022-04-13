@@ -35,6 +35,8 @@ ignore =
     SIM106,     # Gives a lot of false positives
     VNE001,     # Not really necessary
     D107,       # Requires docstring to be init, but we document it at class level.
+    T002,       # We don't need an author after TODO tags.
+    T003,       # We don't need a link to an issue after TODO tags.
 # The following are ignored due to missing docstring in old code.
 per-file-ignores =
     ros1/*/setup.py:D100,
@@ -76,13 +78,6 @@ per-file-ignores =
 
     ros2/src/visualization/march_rqt_gait_version_tool/march_rqt_gait_version_tool/gait_version_tool_errors.py:D,
     ros2/src/visualization/march_rqt_gait_version_tool/march_rqt_gait_version_tool/parametric_same_versions_pop_up.py:D,
-    ;   Todo: @martenhaitjema
-    ros2/src/gaits/march_gait_selection/*:D,
-    ;   Todo: @martenhaitjema
-    ros2/src/shared/march_utility/march_utility/gait/gait.py:D,
-    ros2/src/shared/march_utility/march_utility/gait/subgait.py:D,
-    ;   Todo: @martenhaitjema
-    ros2/src/gaits/march_fake_covid/*:D,
 
 
 

@@ -307,6 +307,7 @@ class RealsenseGait(SetpointsGait):
 
         Args:
             camera_name (str): The string from the config.
+
         Returns:
             int: The integer to send to the realsense reader to define the camera.
         """

@@ -142,8 +142,9 @@ class HomeGait(GaitInterface):
         """Give an update on the progress of the gait.
 
          Args:
-            current_time (Time): current_time
-            early_schedule_duration (:obj: Duration, optional): Optional duration to schedule early
+            current_time (Time): The current time.
+            early_schedule_duration (:obj: Duration, optional): Optional duration to schedule early.
+
         Returns:
             GaitUpdate: GaitUpdate that may contain a TrajectoryCommand, and any of the
                 flags set to true, depending on the state of the Gait.

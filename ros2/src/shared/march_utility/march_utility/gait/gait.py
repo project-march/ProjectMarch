@@ -106,10 +106,12 @@ class Gait:
 
     @property
     def starting_position(self):
+        """StaticEdgePosition. The starting position of the Gait."""
         return self._starting_position
 
     @property
     def final_position(self):
+        """StaticEdgePosition. The end position of the Gait."""
         return self._final_position
 
     @staticmethod
@@ -161,14 +163,16 @@ class Gait:
         old_edge_position: EdgePosition,
         new_edge_position_values: Dict[str, float],
     ) -> EdgePosition:
-        """Validate that the edge position has made an acceptable change, this means:
-        StaticEdgePosition -> Should remain the same, values and type.
-        UnknownEdgePosition -> Should never be updated.
-        DynamicEdgePosition -> Values can change.
+        """Validate that the edge position has made an acceptable change.
+
+        Note:
+            StaticEdgePosition -> Should remain the same, values and type.
+            UnknownEdgePosition -> Should never be updated.
+            DynamicEdgePosition -> Values can change.
 
         Args:
-          old_edge_position: The position the gait has now
-          new_edge_position: The new edge position that should be validated
+          old_edge_position: The position the gait has now.
+          new_edge_position: The new edge position that should be validated.
           old_edge_position (EdgePosition):
           new_edge_position_values (Dict[str, float]):
 

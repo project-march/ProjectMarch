@@ -124,9 +124,9 @@ class WrongRealSenseConfigurationError(Exception):
 
 
 class PositionSoftLimitError(Exception):
+    """Class to raise an error when joint trajectory will be outside of position soft limits."""
+
     def __init__(self, joint_name: str, position: float, lower_limit: float, upper_limit: float):
-        """Class to raise an error when joint trajectory will be outside of
-        position soft limits"""
         self.joint_name = joint_name
         self.position = position
         self.lower_limit = lower_limit
@@ -142,9 +142,9 @@ class PositionSoftLimitError(Exception):
 
 
 class VelocitySoftLimitError(Exception):
+    """Class to raise an error when joint trajectory will be outside of velocity soft limits."""
+
     def __init__(self, joint_name: str, velocity: float, limit: float):
-        """Class to raise an error when joint trajectory will be outside of
-        velocity soft limits"""
         self.joint_name = joint_name
         self.velocity = velocity
         self.limit = limit
@@ -155,10 +155,13 @@ class VelocitySoftLimitError(Exception):
 
 
 class ShouldStartFromHomestandError(Exception):
+    """Exception for if the exo is not start from "Home Stand".
+
+    Mainly raised if an error when the previous subgait failed and dynamic gait is selected again
+    without the exo being in home stand.
+    """
+
     def __init__(self):
-        """Class to raise an error when the previous subgait failed
-        and dynamic gait is selected again without the exo being
-        in home stand."""
         msg = "Gait can only be executed from homestand."
 
         super(ShouldStartFromHomestandError, self).__init__(msg)

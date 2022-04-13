@@ -1,3 +1,4 @@
+"""Author: Marten  Haitjema, MVII."""
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import Shutdown, DeclareLaunchArgument
@@ -14,6 +15,7 @@ DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 def generate_launch_description():
     """Launch file for the gait_preprocessor node that will spam fake possible foot location.
+
     For more information see '../march_gait_preprocessor/gait_preprocessor_publisher.py'.
 
     Can change parameters during runtime by calling in a terminal:

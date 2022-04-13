@@ -200,14 +200,15 @@ class Subgait:
         """Extract two subgaits from files and interpolate.
 
          Args:
-            robot (urdf.robot): The robot corresponding to the given subgait file
-            first_file_name (str): The .yaml file name of the base subgait
-            second_file_name (str): The .yaml file name of the subgait
-            first_parameter (float): The parameter to use for interpolation. Should be 0 <= parameter <= 1
+            robot (urdf.robot): The robot corresponding to the given subgait file.
+            first_file_name (str): The .yaml file name of the base subgait.
+            second_file_name (str): The .yaml file name of the subgait.
+            first_parameter (float): The parameter to use for interpolation. Should be 0 <= parameter <= 1.
             use_foot_position (:obj: bool, optional): Determine whether the interpolation should be done on the
-                foot location or on the joint angles
+                foot location or on the joint angles.
+
         Returns:
-            Subgait: A populated Subgait object
+            Subgait: A populated Subgait object.
         """
         base_subgait = cls.from_file(robot, first_file_name)
         other_subgait = cls.from_file(robot, second_file_name)
@@ -293,9 +294,10 @@ class Subgait:
         """Validate the trajectory transition of this gait to a given gait.
 
         Args:
-            next_subgait (Subgait): The subgait subsequently to this gait (not the previous one!)
+            next_subgait (Subgait): The subgait subsequently to this gait (not the previous one!).
+
         Returns:
-            bool: True if trajectory transition correct else False
+            bool: `True` if trajectory transition correct else `False`.
         """
         from_subgait_joint_names = set(self.get_joint_names())
         to_subgait_joint_names = set(next_subgait.get_joint_names())
@@ -807,12 +809,12 @@ class Subgait:
         """Create a list of setpoints from a subgait with timestamps given by time_stamps.
 
         Args:
-            subgait (Subgait): subgait to prepare for inverse kinematics
-            time_stamps (List[Duration]): time stamps at which setpoints in the list are set
-        Returns:
-            List[dict]: list of setpoints with timestamps given by time_stamps
-        """
+            subgait (Subgait): Subgait to prepare for inverse kinematics.
+            time_stamps (List[Duration]): Time stamps at which setpoints in the list are set.
 
+        Returns:
+            List[dict]: List of setpoints with timestamps given by time_stamps.
+        """
         setpoints_to_interpolate: List[dict] = [{} for _ in time_stamps]
 
         for setpoint_index, time_stamp in enumerate(time_stamps):
