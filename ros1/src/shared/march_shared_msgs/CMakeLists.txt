@@ -19,6 +19,7 @@ add_message_files(
     CurrentIPDState.msg
     CurrentState.msg
     Error.msg
+    FootPosition.msg
     GaitInstruction.msg
     GaitInstructionResponse.msg
     GaitParameters.msg

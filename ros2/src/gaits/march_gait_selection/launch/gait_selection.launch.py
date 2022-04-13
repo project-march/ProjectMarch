@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
@@ -5,7 +7,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Basic launch file to launch the gait selection node"""
+    """Basic launch file to launch the gait selection node."""
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -33,14 +35,9 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "dynamic_gait",
                 default_value="False",
-                description="Wether dynamic_setpoint_gait is enabled",
+                description="Whether dynamic_setpoint_gait is enabled",
             ),
             # Dynamic gait parameters:
-            DeclareLaunchArgument(
-                name="dynamic_subgait_duration",
-                default_value="1.5",
-                description="Duration of a subgait created by the dynamic gait",
-            ),
             DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
@@ -78,7 +75,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.2",
+                default_value="0.15",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
@@ -95,7 +92,6 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"dynamic_gait": LaunchConfiguration("dynamic_gait")},
-                    {"dynamic_subgait_duration": LaunchConfiguration("dynamic_subgait_duration")},
                     {"middle_point_fraction": LaunchConfiguration("middle_point_fraction")},
                     {"middle_point_height": LaunchConfiguration("middle_point_height")},
                     {"minimum_stair_height": LaunchConfiguration("minimum_stair_height")},

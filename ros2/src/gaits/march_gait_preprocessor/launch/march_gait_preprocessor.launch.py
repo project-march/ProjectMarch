@@ -13,11 +13,11 @@ DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
 def generate_launch_description():
-    """Launch file for the fake_covid_publisher node that will spam fake possible foot location.
-    For more information see '../march_fake_covid/fake_covid_publisher.py'.
+    """Launch file for the gait_preprocessor node that will spam fake possible foot location.
+    For more information see '../march_gait_preprocessor/gait_preprocessor_publisher.py'.
 
     Can change parameters during runtime by calling in a terminal:
-        'ros2 param set fake_covid_publisher [param_name] [value]'
+        'ros2 param set gait_preprocessor_node [param_name] [value]'
         with param_name and value possibilities:
         * location_x: either a double or 'random'
         * location_y: either a double or 'random'
@@ -31,14 +31,24 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
+                name="simulate_points",
+                default_value="False",
+                description="Whether to simulate fake foot positions for gait generation",
+            ),
+            DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.4",
-                description="x-location for fake covid topic, takes double or 'random'",
+                description="x-location for fake covid topic, takes double'",
             ),
             DeclareLaunchArgument(
                 name="location_y",
                 default_value="0.0",
-                description="y-location for fake covid topic, takes double or 'random'",
+                description="y-location for fake covid topic, takes double",
+            ),
+            DeclareLaunchArgument(
+                name="duration",
+                default_value="1.5",
+                description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             DeclareLaunchArgument(
                 name="location_z",
@@ -46,15 +56,17 @@ def generate_launch_description():
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
             Node(
-                package="march_fake_covid",
-                executable="march_fake_covid",
+                package="march_gait_preprocessor",
+                executable="march_gait_preprocessor",
                 output="screen",
-                name="fake_covid_publisher",
+                name="gait_preprocessor",
                 namespace="march",
                 parameters=[
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
+                    {"simulate_points": LaunchConfiguration("simulate_points")},
                     {"location_x": LaunchConfiguration("location_x")},
                     {"location_y": LaunchConfiguration("location_y")},
+                    {"duration": LaunchConfiguration("duration")},
                     {"location_z": LaunchConfiguration("location_z")},
                 ],
                 on_exit=Shutdown(),
