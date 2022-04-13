@@ -40,7 +40,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
 
     _current_time: Optional[Time]
 
-    def __init__(self, gait_selection_node):
+    def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_walk_half_step"

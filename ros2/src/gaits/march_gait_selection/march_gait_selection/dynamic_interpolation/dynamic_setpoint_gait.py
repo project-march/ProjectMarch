@@ -211,9 +211,8 @@ class DynamicSetpointGait(GaitInterface):
     ) -> GaitUpdate:
         """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Starts scheduling
-        subsequent subgaits when the previous subgait is within early scheduling
-        duration and updates the state machine when the next subgait is started.
+        Schedules the first subgait when the delay has passed. Starts scheduling subsequent subgaits when the previous
+        subgait is within early scheduling duration and updates the state machine when the next subgait is started.
 
         Args:
             current_time (Time): Current time

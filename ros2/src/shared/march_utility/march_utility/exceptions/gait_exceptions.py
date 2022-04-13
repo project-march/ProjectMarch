@@ -1,8 +1,5 @@
 """This module contains some errors that are specific to the gaits in the Project March code."""
 
-from typing import Dict
-from march_utility.gait.setpoint import Setpoint
-
 
 class GaitError(Exception):
     """Base class for exceptions in gait modules.
