@@ -50,6 +50,7 @@ def generate_launch_description():
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     push_off_fraction = LaunchConfiguration("push_off_fraction")
     push_off_position = LaunchConfiguration("push_off_position")
+    add_push_off = LaunchConfiguration("add_push_off")
     use_position_queue = LaunchConfiguration("use_position_queue")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
@@ -166,8 +167,8 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="dynamic_gait",
-                default_value="False",
-                description="Wether dynamic_setpoint_gait is enabled",
+                default_value="True",
+                description="Whether dynamic_setpoint_gait is enabled",
             ),
             DeclareLaunchArgument(
                 name="middle_point_fraction",
@@ -195,6 +196,11 @@ def generate_launch_description():
                 name="push_off_position",
                 default_value="-0.15",
                 description="Maximum joint position of the ankle during push off.",
+            ),
+            DeclareLaunchArgument(
+                name="add_push_off",
+                default_value="False",
+                description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
                 name="use_position_queue",
@@ -298,9 +304,10 @@ def generate_launch_description():
                     ("duration", duration),
                     ("middle_point_fraction", middle_point_fraction),
                     ("middle_point_height", middle_point_height),
-                    ("mininum_stair_height", minimum_stair_height),
+                    ("minimum_stair_height", minimum_stair_height),
                     ("push_off_fraction", push_off_fraction),
                     ("push_off_position", push_off_position),
+                    ("add_push_off", add_push_off),
                     ("use_position_queue", use_position_queue),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
@@ -309,7 +316,7 @@ def generate_launch_description():
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
-                    ("jointlesss", jointless),
+                    ("jointless", jointless),
                     ("simulate_points", simulate_points),
                     ("location_x", location_x),
                     ("location_y", location_y),

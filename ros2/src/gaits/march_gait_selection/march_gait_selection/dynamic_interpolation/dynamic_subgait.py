@@ -92,7 +92,7 @@ class DynamicSubgait:
         self.start = start
         self.stop = stop
 
-    def get_joint_trajectory_msg(self) -> trajectory_msg.JointTrajectory:
+    def get_joint_trajectory_msg(self, push_off: bool) -> trajectory_msg.JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated
         trajectories for each joint
 
@@ -103,10 +103,9 @@ class DynamicSubgait:
 
         self._solve_middle_setpoint()
         self._solve_desired_setpoint()
-        self._get_extra_ankle_setpoint()
 
         # Create joint_trajectory_msg
-        self._to_joint_trajectory_class()
+        self._to_joint_trajectory_class(push_off)
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
         joint_trajectory_msg.joint_names = self.actuating_joint_names
 
@@ -178,7 +177,7 @@ class DynamicSubgait:
             self.time[SetpointTime.END_POINT_INDEX],
         )
 
-    def _to_joint_trajectory_class(self) -> None:
+    def _to_joint_trajectory_class(self, push_off: bool) -> None:
         """Creates a list of DynamicJointTrajectories for each joint"""
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
@@ -190,11 +189,12 @@ class DynamicSubgait:
 
             # Add an extra setpoint to the ankle to create a push off, except for
             # a start gait:
-            if not self.start and (
-                (name == "right_ankle" and self.subgait_id == "right_swing")
-                or (name == "left_ankle" and self.subgait_id == "left_swing")
-            ):
-                setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
+            if push_off:
+                if not self.start and (
+                    (name == "right_ankle" and self.subgait_id == "right_swing")
+                    or (name == "left_ankle" and self.subgait_id == "left_swing")
+                ):
+                    setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
             if name in ["right_ankle", "left_ankle"] or (
                 (name == "right_knee" and self.subgait_id == "left_swing")

@@ -81,6 +81,7 @@ class GaitSelection(Node):
             self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
             self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
+            self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
 
         except ParameterNotDeclaredException:

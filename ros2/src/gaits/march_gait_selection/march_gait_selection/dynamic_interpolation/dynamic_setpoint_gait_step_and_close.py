@@ -57,7 +57,7 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
             stop=True,
         )
         try:
-            subgait.get_joint_trajectory_msg()
+            subgait.get_joint_trajectory_msg(self.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if final_iteration:
                 self.logger.warn(f"Close gait is not feasible. {e.msg}")

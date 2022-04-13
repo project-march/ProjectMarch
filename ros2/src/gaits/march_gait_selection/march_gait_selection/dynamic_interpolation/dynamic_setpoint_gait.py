@@ -432,7 +432,7 @@ class DynamicSetpointGait(GaitInterface):
             self.dynamic_subgait = self._create_subgait_instance(
                 self.start_position_all_joints, self.subgait_id, start, stop
             )
-            trajectory = self.dynamic_subgait.get_joint_trajectory_msg()
+            trajectory = self.dynamic_subgait.get_joint_trajectory_msg(self.add_push_off)
             self.logger.debug(
                 f"Found trajectory after {iteration + 1} iterations at duration of {self.foot_location.duration}. "
                 f"Original duration was {original_duration}."
@@ -466,7 +466,7 @@ class DynamicSetpointGait(GaitInterface):
             stop=False,
         )
         try:
-            subgait.get_joint_trajectory_msg()
+            subgait.get_joint_trajectory_msg(self.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if is_final_iteration:
                 self.logger.warn(f"Second step is not feasible. {e.msg}")
@@ -481,7 +481,7 @@ class DynamicSetpointGait(GaitInterface):
             start=False,
             stop=True,
         )
-        trajectory = subgait.get_joint_trajectory_msg()
+        trajectory = subgait.get_joint_trajectory_msg(self.add_push_off)
         return TrajectoryCommand(
             trajectory,
             Duration(self.foot_location.duration),
@@ -535,6 +535,7 @@ class DynamicSetpointGait(GaitInterface):
     def update_parameters(self) -> None:
         """Callback for gait_selection_node when the parameters have been updated."""
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
+        self.add_push_off = self.gait_selection.add_push_off
 
     def _callback_force_unknown(self, msg: GaitInstruction) -> None:
         if msg.type == GaitInstruction.UNKNOWN:
