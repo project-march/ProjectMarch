@@ -1,4 +1,4 @@
-"""Author: Jelmer de Wolde, MVII"""
+"""Author: Jelmer de Wolde, MVII."""
 
 import pkg_resources
 import matplotlib.pyplot as plt
@@ -149,8 +149,7 @@ class LiveWidget:
         plt.show()
 
     def update(self, update_value):
-        """The function to be called anytime a slider's value changes"""
-
+        """The function to be called anytime a slider's value changes."""
         # Get new exo pose and update joint positions:
         pose = Pose()
         pose.solve_end_position(
@@ -188,14 +187,14 @@ class LiveWidget:
         self.fig.canvas.draw_idle()
 
     def reset(self, event):
-        """Reset function"""
+        """Reset function."""
         self.x_slider.reset()
         self.y_slider.reset()
         self.hip_slider.reset()
         self.knee_slider.reset()
 
     def toggle_rear(self, event):
-        """Toggle dorsiflexion reduction for stance leg"""
+        """Toggle dorsiflexion reduction for stance leg."""
         if self.reduce_df_rear:
             self.reduce_df_rear = False
             self.toggle_df_rear.color = "red"
@@ -207,7 +206,7 @@ class LiveWidget:
         self.update(0)
 
     def toggle_front(self, event):
-        """Toggle dorsiflexion reduction for swing leg"""
+        """Toggle dorsiflexion reduction for swing leg."""
         if self.reduce_df_front:
             self.reduce_df_front = False
             self.toggle_df_front.color = "red"

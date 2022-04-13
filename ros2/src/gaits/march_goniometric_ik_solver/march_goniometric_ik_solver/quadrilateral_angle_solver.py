@@ -1,3 +1,4 @@
+"""Author: Jelmer de Wolde, MVII."""
 import numpy as np
 from typing import List
 
@@ -16,7 +17,6 @@ def get_angle_between_points(points: List[np.array]) -> float:
     Returns:
         float: the angle between the three points.
     """
-
     a = points[0]
     b = points[1]
     c = points[2]
@@ -49,7 +49,6 @@ def find_fourth_point(
     Returns:
         np.array: the location of the fourth point of the quadrilateral.
     """
-
     r0, r1 = da, cd
     p0, p1 = a, c
     d = np.linalg.norm(p0 - p1)
@@ -72,7 +71,6 @@ def get_angles(points: List[np.array]) -> List[float]:
     Returns:
         List[float]: the four angles of the quadrilateral in the same order as the four points are given.
     """
-
     angles = []
 
     for i in range(len(points)):
@@ -101,7 +99,6 @@ def solve_quadritlateral(lengths: List[float], angle_b: float, convex: bool = Tr
     Returns:
         List[float]: the four angles of the quadrilateral.
     """
-
     da, ab, bc, cd = lengths
 
     a = np.array([0, 0])
@@ -129,7 +126,6 @@ def check_lengths(points: List[float], real_lengths: List[float]):
         points (List[np.array]): A list containing the positions (2D numpy arrays) of the four points [a, b, c, d] of a quadrilateral.
         real_lengths (List[float]): A list containing the real lengths [da, ab, bc, cd] of a quadrilateral.
     """
-
     for i in range(len(points)):
         length = np.linalg.norm(points[i - 1] - points[i])
         error = abs(length - real_lengths[i])

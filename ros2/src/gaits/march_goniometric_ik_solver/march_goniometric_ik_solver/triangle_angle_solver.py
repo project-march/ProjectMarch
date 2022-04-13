@@ -1,3 +1,4 @@
+"""Author: Jelmer de Wolde, MVII."""
 import numpy as np
 from typing import List
 
@@ -14,7 +15,6 @@ def get_angle_from_sides(opposite_side: float, adjacent_sides: List[float]) -> f
     Returns:
         float: the angle calculated in rad.
     """
-
     return np.arccos((adjacent_sides.dot(adjacent_sides) - opposite_side ** 2) / (2 * np.prod(adjacent_sides)))
 
 
@@ -27,7 +27,6 @@ def get_angles_from_sides(sides: List[float]) -> List[float]:
     Returns:
         List[float]: the angles of the triangle in order of opposite to sides given.
     """
-
     angles = []
 
     for i in range(len(sides)):

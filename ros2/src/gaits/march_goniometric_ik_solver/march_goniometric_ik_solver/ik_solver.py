@@ -1,4 +1,4 @@
-"""Author: Jelmer de Wolde, MVII"""
+"""Author: Jelmer de Wolde, MVII."""
 
 import numpy as np
 from typing import List, Tuple, Union
@@ -90,7 +90,7 @@ class Pose:
 
     @property
     def pose_right(self) -> List[float]:
-        """Returns the pose as list with the right leg as the swing leg (leg2):"""
+        """Returns the pose as list with the right leg as the swing leg (leg2)."""
         return [
             self.fe_ankle1,
             self.aa_hip1,
@@ -104,7 +104,7 @@ class Pose:
 
     @property
     def pose_left(self) -> List[float]:
-        """Returns the pose as list with the left leg as swing leg (leg2):"""
+        """Returns the pose as list with the left leg as swing leg (leg2)."""
         return [
             self.fe_ankle2,
             self.aa_hip2,
@@ -184,38 +184,47 @@ class Pose:
 
     @property
     def pos_toes1(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the stance leg toes."""
         return self.calculate_joint_positions("pos_toes1")
 
     @property
     def pos_ankle1(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the stance leg ankle."""
         return self.calculate_joint_positions("pos_ankle1")
 
     @property
     def pos_knee1(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the stance leg knee."""
         return self.calculate_joint_positions("pos_knee1")
 
     @property
     def pos_hip(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the hip."""
         return self.calculate_joint_positions("pos_hip")
 
     @property
     def pos_knee2(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the swing leg knee."""
         return self.calculate_joint_positions("pos_knee2")
 
     @property
     def pos_ankle2(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the swing leg ankle."""
         return self.calculate_joint_positions("pos_ankle2")
 
     @property
     def pos_toes2(self) -> np.array:
+        """np.Array[x,y]. Calculates position of the swing leg toes."""
         return self.calculate_joint_positions("pos_toes2")
 
     @property
     def point_below_hip(self) -> np.array:
+        """np.Array[x,y]. Returns a ground point below the hip."""
         return np.array([self.pos_hip[0], 0])
 
     @property
     def hip_x(self) -> float:
+        """float. Returns hip x position, based on how far forward the hip is placed."""
         return self.ankle_x * self.hip_x_fraction
 
     @property
@@ -289,7 +298,6 @@ class Pose:
         Next it defines the other angles in the quadrilateral with this new ankle angle.
         Finally it updates the pose with the reduced dorsiflexion.
         """
-
         # Determine required reduction:
         reduction = self.fe_ankle2 - MAX_ANKLE_FLEXION
 
@@ -320,7 +328,6 @@ class Pose:
 
     def keep_hip_above_rear_ankle(self) -> None:
         """Calculates the pose required to keep the hip above the rear ankle while reaching the goal location for the toes."""
-
         # Store desired toes location and reset pose:
         pos_toes2 = np.array([self.ankle_x + LENGTH_FOOT, self.ankle_y])
         self.reset_to_zero_pose()
@@ -349,7 +356,6 @@ class Pose:
         Next it defines the other angles in the quadrilateral with this new ankle angle.
         Finally it updates the pose with the reduced dorsiflexion.
         """
-
         # Save current angle at toes1 between ankle1 and hip:
         toes1_angle_ankle1_hip = qas.get_angle_between_points([self.pos_ankle1, self.pos_toes1, self.pos_hip])
 
@@ -378,7 +384,6 @@ class Pose:
             y (float): the distance between the two feet in upward direction.
             z (float): the distance between the two feet in sideward direction.
         """
-
         # Get y position of hip and toes:
         y_hip = self.pos_hip[1]
         y_toes1 = self.pos_toes1[1]
@@ -474,7 +479,6 @@ class Pose:
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
-
         # Get swing distance in current pose and calculate ankle2 midpoint location:
         swing_distance = np.linalg.norm(self.pos_ankle1 - self.pos_ankle2)
         midpoint_x = midpoint_fraction * (swing_distance + ankle_x) - swing_distance
@@ -614,7 +618,6 @@ def make_plot(pose: Pose):
     Args:
         pose (Pose): The pose to plot.
     """
-
     positions = pose.calculate_joint_positions()
     positions_x = [pos[0] for pos in positions]
     positions_y = [pos[1] for pos in positions]
