@@ -56,13 +56,13 @@ protected:
     int rect_width_;
     int rect_height_;
 
-    double x_displacements_outside_;
-    double x_displacements_inside_;
-    double y_displacements_near_;
-    double y_displacements_far_;
+    double displacements_outside_;
+    double displacements_inside_;
+    double displacements_near_;
+    double displacements_far_;
 
-    std::vector<int> x_displacements_;
-    std::vector<int> y_displacements_;
+    std::vector<int> horizontal_displacements_;
+    std::vector<int> vertical_displacements_;
 
     double x_offset_;
     double y_offset_;

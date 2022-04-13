@@ -164,8 +164,8 @@ void FootPositionFinder::readParameters(
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
     // Rotation necessary for base_frame computation
-    desired_point_world_ = rotateRight(
-        transformPoint(desired_point_world_, current_frame_id_, base_frame_));
+    desired_point_world_
+        = transformPoint(desired_point_world_, current_frame_id_, base_frame_);
 
     ROS_INFO("Parameters updated in %s foot position finder",
         left_or_right_.c_str());
@@ -214,8 +214,8 @@ void FootPositionFinder::chosenOtherPointCallback(
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
     // Rotation is necessary for visualization and computation in base frame
-    desired_point_world_ = rotateRight(
-        transformPoint(desired_point_world_, current_frame_id_, base_frame_));
+    desired_point_world_
+        = transformPoint(desired_point_world_, current_frame_id_, base_frame_);
 }
 
 /**
@@ -303,7 +303,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishDesiredPosition(
         point_marker_publisher_, desired_point_world_); // Green
     publishRelativeSearchPoint(point_marker_publisher_,
-        rotateRight(start_point_world_)); // Purple
+        start_point_world_); // Purple
 
     if (position_queue.size() > 0) {
         // Take the first point of the point queue returned by the point finder
@@ -313,7 +313,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
         std::vector<Point> track_points = pointFinder.retrieveTrackPoints(
-            rotateRight(previous_start_point_world_), found_covid_point_world);
+            previous_start_point_world_, found_covid_point_world);
 
         // Visualization
         publishTrackMarkerPoints(point_marker_publisher_, track_points);
@@ -321,7 +321,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPossiblePoints(point_marker_publisher_, position_queue);
 
         // Transform point found with cameras to current frame and to hip frame
-        found_covid_point_world = rotateLeft(found_covid_point_world);
         Point found_covid_point_current_ = transformPoint(
             found_covid_point_world, base_frame_, current_frame_id_);
         Point found_covid_point_hip_ = transformPoint(
@@ -343,9 +342,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // frame
         std::vector<Point> relative_track_points;
         for (Point& p : track_points) {
-            Point point = rotateLeft(p);
-            point = transformPoint(point, base_frame_, current_frame_id_);
-            relative_track_points.emplace_back(point);
+            p = transformPoint(p, base_frame_, current_frame_id_);
+            relative_track_points.emplace_back(p);
         }
 
         // Visualization

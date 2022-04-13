@@ -127,8 +127,4 @@ void Preprocessor::transformPointCloudFromUrdf()
             "Something went wrong when transforming the pointcloud: "
             << ex.what());
     }
-
-    Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-    transform.rotate(Eigen::AngleAxisf(-M_PI / 2, Eigen::Vector3f::UnitZ()));
-    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
 }
