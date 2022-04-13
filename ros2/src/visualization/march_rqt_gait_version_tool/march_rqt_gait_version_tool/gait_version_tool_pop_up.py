@@ -1,3 +1,4 @@
+"""Author: Joris Weeda, MV."""
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QDialog,
@@ -10,16 +11,15 @@ from PyQt5.QtWidgets import (
 
 
 class PopUpWindow(QDialog):
-    def __init__(self, parent, width=500, height=600):
-        """Base class for creating a pop up window over an existing widget.
+    """Base class for creating a pop-up window over an existing widget.
 
-        :param parent:
-            The parent widget to connect to the pop up
-        :param width:
-            Starting width of the the pop up widget
-        :param height:
-            Starting height of the the pop up widget
-        """
+    Args:
+        parent: The parent widget to connect to the pop-up.
+        width (int): Starting width of the pop-up widget.
+        height (int): Starting height of the pop-up widget.
+    """
+
+    def __init__(self, parent, width=500, height=600):
         super(PopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         self.resize(width, height)
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -43,7 +43,7 @@ class PopUpWindow(QDialog):
         self._layout.addWidget(self._scroll_area)
 
     def show_message(self, message):
-        """Add message to the pop up and show the window."""
+        """Add message to the pop-up and show the window."""
         self.msg_label.clear()
         self.msg_label.setText(message)
         return super(PopUpWindow, self).show()

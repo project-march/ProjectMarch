@@ -20,9 +20,5 @@ setup(
     description="Publishes fake foot locations",
     license="TODO: License declaration",
     tests_require=["pytest", "unittest"],
-    entry_points={
-        "console_scripts": [
-            "march_gait_preprocessor = march_gait_preprocessor.gait_preprocessor_node:main"
-        ]
-    },
+    entry_points={"console_scripts": ["march_gait_preprocessor = march_gait_preprocessor.gait_preprocessor_node:main"]},
 )

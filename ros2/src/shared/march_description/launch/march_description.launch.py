@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Script to load in the xacro and make it usable by ros."""
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -10,7 +11,19 @@ from launch.substitutions import (
 from launch_ros.actions import Node
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
+    """The launch file for the exo description.
+
+    This makes sure the urdf is loaded in and published by the node `march_robot_state_publisher`.
+
+    Todo:
+        - Fill in the settable ros parameters.
+
+    The settable ros parameters are:
+        use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
+            Default is false.
+        ...
+    """
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot_description = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")

@@ -23,6 +23,11 @@ class CPCalculator:
 
     The capture point calculator is coupled to a static foot and swing foot. The static foot is used as the base of
     the inverted pendulum.
+
+    Args:
+
+    Returns:
+
     """
 
     def __init__(self, tf_buffer: tf2_ros.Buffer, static_foot_link: str, swing_foot_link: str):
@@ -65,7 +70,15 @@ class CPCalculator:
 
     @center_of_mass.setter
     def center_of_mass(self, updated_center_of_mass: Marker):
-        """Center of mass property setter."""
+        """Center of mass property setter.
+
+        Args:
+          updated_center_of_mass: Marker:
+          updated_center_of_mass: Marker:
+
+        Returns:
+
+        """
         if not isinstance(updated_center_of_mass, Marker):
             raise TypeError("Given center of mass is not of type: Marker")
 
@@ -84,8 +97,13 @@ class CPCalculator:
     def _calculate_capture_point(self, duration: float) -> Tuple[float, Pose]:
         """Calculate a future capture point pose using the inverted pendulum and center of mass.
 
-        :param duration:
-            the amount of seconds away from the current time the capture point should be calculated
+        Args:
+          duration: the amount of seconds away from the current time the capture point should be calculated
+          duration: float:
+          duration: float:
+
+        Returns:
+
         """
         try:
             static_foot_transform = self._tf_buffer.lookup_transform("world", self._static_foot_link, rospy.Time())
@@ -131,7 +149,15 @@ class CPCalculator:
         return capture_point_duration, self._capture_point_marker.pose
 
     def get_capture_point(self, capture_point_request_msg: CapturePointPoseRequest) -> CapturePointPoseResponse:
-        """Service call function to return the capture point pose positions."""
+        """Service call function to return the capture point pose positions.
+
+        Args:
+          capture_point_request_msg: CapturePointPoseRequest:
+          capture_point_request_msg: CapturePointPoseRequest:
+
+        Returns:
+
+        """
         duration = capture_point_request_msg.duration
         capture_point_duration, capture_point = self._calculate_capture_point(duration)
         if capture_point_duration < 0:

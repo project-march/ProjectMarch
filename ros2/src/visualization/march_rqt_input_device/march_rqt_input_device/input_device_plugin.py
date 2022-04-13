@@ -1,3 +1,4 @@
+"""Author: Olav de Haas MIV."""
 import os
 from qt_gui.plugin import Plugin
 from ament_index_python.packages import get_package_share_directory
@@ -10,9 +11,7 @@ from .input_device_view import InputDeviceView
 
 
 def main(args=None):
-    """
-    The main function used to start up the rqt input device.
-    """
+    """The main function used to start up the rqt input device."""
     rclpy.init(args=args)
 
     try:
@@ -27,9 +26,7 @@ def main(args=None):
 
 
 class InputDevicePlugin(Plugin):
-    """
-    The plugin used by RQT to start the input device. This gives a context with the node to use.
-    """
+    """The plugin used by RQT to start the input device. This gives a context with the node to use."""
 
     def __init__(self, context):
         super(InputDevicePlugin, self).__init__(context)

@@ -1,3 +1,4 @@
+"""Author: MARCH."""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
@@ -5,7 +6,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Basic launch file to launch the robot information node"""
+    """Basic launch file to launch the robot information node."""
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -18,8 +19,7 @@ def generate_launch_description():
                 name="joint_names",
                 default_value="None",
                 description="Names of the joints. If an empty list (None) is given"
-                "as argument the robot_information node uses the "
-                "robot_description parameter of the "
+                "as argument the robot_information node uses the robot_description parameter of the "
                 "robot_state_publisher to determine the joint names.",
             ),
             Node(

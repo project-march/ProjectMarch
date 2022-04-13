@@ -26,20 +26,19 @@ ALLOWED_ERROR_ENDPOINTS = 0.001
 
 
 class Gait:
-    """Base class for a generated gait.
+    """It verifies the gait at initialization.
 
     Args:
-        gait_name (str): Name of the gait
-        subgaits (dict[str, Subgait]): Mapping of names to subgait instances
-        graph (SubgaitGraph): Mapping of subgait names transitions
+        gait_name (str): Name of the gait.
+        subgaits (dict): Mapping of names to subgait instances.
+        graph (SubgaitGraph): Mapping of subgait names transitions.
 
     Attributes:
-        gait_name (str): name of the gait
-        subgaits (dict[str, Subgait]): mapping of names to subgait instances
-        graph (SubgaitGraph): mapping of subgait names transitions
-        _starting_position (StaticEdgePosition): start position of the gait
-        _final_position (StaticEdgePosition): final position of the gait
-
+        gait_name (str): Name of the gait.
+        subgaits (dict): Mapping of names to subgait instances.
+        graph (SubgaitGraph): Mapping of subgait names transitions.
+        _starting_position (StaticEdgePosition): The starting position of the gait.
+        _final_position (StaticEdgePosition): The end position of the gait.
     """
 
     def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
@@ -61,12 +60,12 @@ class Gait:
         """Extract the data from the .gait file.
 
         Args:
-            gait_name (str): name of the gait to unpack
-            gait_directory (str): path of the directory where the .gait file is located
-            robot (urdf.Robot): the robot corresponding to the given .gait file
-            gait_version_map (dict): the parsed yaml file which states the version of the subgaits
+          gait_name: name of the gait to unpack
+          gait_directory: path of the directory where the .gait file is located
+          robot: the robot corresponding to the given .gait file
+          gait_version_map: The parsed yaml file which states the version of the subgaits
         Returns:
-            Gait: instance of gait class
+            Gait: If the data in the files is validated a gait object is returned
         """
         gait_folder = gait_name
         gait_path = os.path.join(gait_directory, gait_folder, gait_name + ".gait")
@@ -79,19 +78,20 @@ class Gait:
     def from_dict(
         cls,
         robot: urdf.Robot,
-        gait_dictionary: Dict[str, Union[str, Dict[str, str]]], # noqa TAE002 too complex annotation
+        gait_dictionary: Dict[str, Union[str, Dict[str, str]]],  # noqa TAE002 too complex annotation
         gait_directory: str,
         gait_version_map: dict,
     ):
         """Create a new gait object using the .gait and .subgait files.
 
         Args:
-            robot (urdf.Robot): the robot corresponding to the given .gait file
-            gait_dictionary (dict): the information of the .gait file as dictionary
-            gait_directory (str): path of the directory where the .gait file is located
-            gait_version_map (dict): the parsed yaml file which states the version of the subgaits
+          robot: the robot corresponding to the given .gait file
+          gait_dictionary: the information of the .gait file as a dictionary
+          gait_directory: path of the directory where the .gait file is located
+          gait_version_map: The parsed yaml file which states the version of the subgaits
+
         Returns:
-            If the data in the files is validated a gait object is returned
+            Gait: If the data in the files is validated a gait object is returned
         """
         gait_name = gait_dictionary["name"]
         subgaits = gait_dictionary["subgaits"]
@@ -123,13 +123,14 @@ class Gait:
         """Read the .subgait file and extract the data.
 
         Args:
-            robot (urdf.Robot): the robot corresponding to the given .gait file
-            gait_directory (str): path of the directory where the .gait file is located
-            gait_name (str): name of the gait
-            subgait_name (str): name of the subgait
-            gait_version_map (dict): the parsed yaml file which states the version of the subgaits
+          robot: the robot corresponding to the given .gait file
+          gait_directory: path of the directory where the .gait file is located
+          gait_name: the name of the gait where the subgait belongs to
+          subgait_name: the name of the subgait to load
+          gait_version_map: the parsed yaml file which states the version of the subgaits
+
         Returns:
-            Subgait: if gait and subgait names are valid return populated Gait object
+          Gait if gait and subgait names are valid return populated Gait object
         """
         if gait_name not in gait_version_map:
             raise GaitNameNotFoundError(gait_name)
@@ -160,18 +161,19 @@ class Gait:
         old_edge_position: EdgePosition,
         new_edge_position_values: Dict[str, float],
     ) -> EdgePosition:
-        """Validate that the edge position has made an acceptable change.
-
-        This means:
+        """Validate that the edge position has made an acceptable change, this means:
         StaticEdgePosition -> Should remain the same, values and type.
         UnknownEdgePosition -> Should never be updated.
         DynamicEdgePosition -> Values can change.
 
         Args:
-            old_edge_position (EdgePosition): the position the gait has now
-            new_edge_position_values (Dict[str, float]): the new edge position that should be validated
-        Raises:
-            NonValidGaitContentError: if the transition is not valid.
+          old_edge_position: The position the gait has now
+          new_edge_position: The new edge position that should be validated
+          old_edge_position (EdgePosition):
+          new_edge_position_values (Dict[str, float]):
+
+        Returns:
+            EdgePosition
         """
         if isinstance(old_edge_position, StaticEdgePosition):
             if old_edge_position != StaticEdgePosition(new_edge_position_values):
@@ -185,9 +187,7 @@ class Gait:
         else:
             raise NonValidGaitContentError(msg="Gaits with unknown edge positions should not be updated")
 
-    def _validate_and_set_new_edge_positions(
-        self, new_subgaits: Dict[str, Subgait]
-    ) -> bool:
+    def _validate_and_set_new_edge_positions(self, new_subgaits: Dict[str, Subgait]) -> bool:
         """Validate that both the starting position and the final position changed in a valid way.
 
         Args:

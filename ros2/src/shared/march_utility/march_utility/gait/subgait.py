@@ -485,9 +485,7 @@ class Subgait:
     # endregion
 
     # region Get functions
-    def get_unique_timestamps(
-        self, sorted_timestamps: bool = True
-    ) -> Collection[Duration]:
+    def get_unique_timestamps(self, sorted_timestamps: bool = True) -> Collection[Duration]:
         """Get the timestamps that are unique to a setpoint.
 
         Args:

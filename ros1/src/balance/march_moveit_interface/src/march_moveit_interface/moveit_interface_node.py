@@ -7,6 +7,7 @@ from march_moveit_interface.moveit_interface import MoveItInterface
 
 
 def main():
+    """ """
     rospy.init_node("balance_gaits")
 
     moveit_interface = MoveItInterface()

@@ -1,9 +1,11 @@
+# flake8: noqa  This file will soon be deleted.
 import rospy
 
 from .dynamic_pid_reconfigurer import DynamicPIDReconfigurer
 
 
 def main():
+    """ """
     rospy.init_node("march_gain_scheduling_node")
 
     while not rospy.is_shutdown() and not rospy.has_param("/march/joint_names"):
