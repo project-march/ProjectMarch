@@ -62,6 +62,8 @@ protected:
     ros::Subscriber current_chosen_point_subscriber_;
     ros::Subscriber other_chosen_point_subscriber_;
 
+    ros::Publisher height_map_publisher;
+
     std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
     std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 
