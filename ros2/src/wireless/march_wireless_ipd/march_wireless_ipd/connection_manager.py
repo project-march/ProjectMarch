@@ -37,11 +37,11 @@ class ConnectionManager:
         if self.stopped or "close" in msg.subgait:
             self.current_gait = self.requested_gait = "stop"
             self.stopped = False
-        elif not ("home_stand" in msg.subgait or "stand" in msg.subgait):
+        elif "home_stand" not in msg.subgait and self.current_gait != msg.gait:
             self.current_gait = msg.gait
 
     def _current_state_cb(self, msg):
-        if msg.state == "unknown" or msg.state == "stand" or msg.state == "home_stand":
+        if msg.state == "unknown" or msg.state == "home_stand":
             self.current_gait = msg.state
 
     def wait_for_request(self):
@@ -119,7 +119,7 @@ class ConnectionManager:
             self.controller.publish_gait(self.requested_gait)
             return True
         else:
-            self.controller.get_node().get_logger().info("Failed gait")
+            self.controller.get_node().get_logger().info("Failed gait: " + self.requested_gait)
             self.send_message_till_confirm("Fail")
             return False
 
