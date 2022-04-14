@@ -34,7 +34,7 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
     tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
 
-    if (left_or_right == "right") {
+    if (left_or_right == "left") {
         base_frame_ = "toes_right_aligned";
     }
     else{

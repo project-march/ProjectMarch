@@ -47,7 +47,7 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud,
     cloud.height = cloud.points.size();
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg(cloud, msg);
-    if (left_or_right == "right") {
+    if (left_or_right == "left") {
         msg.header.frame_id = "toes_right_aligned";
     } else {
         msg.header.frame_id = "toes_left_aligned";
@@ -140,7 +140,7 @@ void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2,
     std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
+    if (left_or_right == "left") {
         marker.header.frame_id = "toes_right_aligned";
     } else {
         marker.header.frame_id = "toes_left_aligned";
