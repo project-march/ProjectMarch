@@ -12,7 +12,10 @@ from march_shared_classes.utilities.vector_3d import Vector3d
 
 
 class SetpointTest(unittest.TestCase):
+    """ """
+
     def setUp(self):
+        """ """
         self.setpoint = Setpoint(1.123412541, 0.034341255, 123.162084549)  # 0.0343412512 123.16208454
         self.setpoint_dict = {
             "left_hip_aa": self.setpoint,
@@ -24,41 +27,51 @@ class SetpointTest(unittest.TestCase):
         }
 
     def test_time_rounding(self):
+        """ """
         self.assertEqual(self.setpoint.time, 1.1234)
 
     def test_position_rounding(self):
+        """ """
         self.assertEqual(self.setpoint.position, 0.0343)
 
     def test_velocity_rounding(self):
+        """ """
         self.assertEqual(self.setpoint.velocity, 123.1621)
 
     def test_string_output(self):
+        """ """
         self.assertEqual(
             str(self.setpoint),
             "Time: {t}, Position: {p}, Velocity: {v}".format(t=1.1234, p=0.0343, v=123.1621),
         )
 
     def test_equal(self):
+        """ """
         other_setpoint = Setpoint(1.1234125445313287, 0.034341264534, 123.16208455453)
         self.assertEqual(self.setpoint, other_setpoint)
 
     def test_different_classes(self):
+        """ """
         other_setpoint = object()
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_time(self):
+        """ """
         other_setpoint = Setpoint(1.123491381, 0.03434126, 123.16208455)
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_position(self):
+        """ """
         other_setpoint = Setpoint(1.12341254, -0.03434126, 123.16208455)
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_velocity(self):
+        """ """
         other_setpoint = Setpoint(1.12341254, 0.03434126, 0)
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_interpolation_correct(self):
+        """ """
         parameter = 0.3
         other_setpoint = Setpoint(1, 1, 1)
         expected_result = Setpoint(
@@ -72,12 +85,14 @@ class SetpointTest(unittest.TestCase):
         )
 
     def test_inverse_kinematics_position(self):
+        """ """
         feet_state = FeetState.from_setpoints(self.setpoint_dict)
         new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(new_setpoints[key].position, self.setpoint_dict[key].position, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
+        """ """
         right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
         left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
         desired_state = FeetState(right_foot, left_foot, 0.1)
@@ -90,6 +105,7 @@ class SetpointTest(unittest.TestCase):
         self.assertLess(dif_right.norm(), 1 / 0.0001)
 
     def test_weighted_average_states(self):
+        """ """
         parameter = 0.8
 
         base_right_foot = Foot(Side.right, Vector3d(0, 0, 0), Vector3d(0, 0, 0))
@@ -108,6 +124,7 @@ class SetpointTest(unittest.TestCase):
         self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.right_foot.velocity)
 
     def test_find_known_position_forward(self):
+        """ """
         setpoint_dict = {
             "left_hip_aa": Setpoint(0, 0, 0),
             "left_hip_fe": Setpoint(0, pi / 2, 0),
@@ -137,6 +154,7 @@ class SetpointTest(unittest.TestCase):
         )
 
     def test_find_known_position_down(self):
+        """ """
         setpoint_dict = {
             "left_hip_aa": Setpoint(0, 0, 0),
             "left_hip_fe": Setpoint(0, 0, 0),
@@ -166,6 +184,7 @@ class SetpointTest(unittest.TestCase):
         )
 
     def test_find_known_position_sit(self):
+        """ """
         setpoint_dict = {
             "left_hip_aa": Setpoint(0, 0, 0),
             "left_hip_fe": Setpoint(0, pi / 2, 0),
@@ -195,6 +214,7 @@ class SetpointTest(unittest.TestCase):
         )
 
     def test_set_forward_backward_swing_inverse_kinematics(self):
+        """ """
         [
             l_ul,
             l_ll,

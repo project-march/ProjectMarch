@@ -11,11 +11,14 @@ from .side import Side
 def weighted_average(base_value, other_value, parameter):
     """Compute the weighted average of two values with normalised weight parameter.
 
-    :param base_value: The first value for the weighted average, return this if parameter is 0
-    :param other_value: The second value for the weighted average, return this if parameter is 1
-    :param: parameter: The normalised weight parameter, the parameter that deterines the weight of the second value
+    Args:
+      base_value: The first value for the weighted average, return this if parameter is 0
+      other_value: The second value for the weighted average, return this if parameter is 1
+      parameter:
 
-    :return: A value which is the weighted average of the given values
+    Returns:
+      : A value which is the weighted average of the given values
+
     """
     return base_value * (1 - parameter) + other_value * parameter
 
@@ -25,10 +28,13 @@ def merge_dictionaries(dic_one, dic_two):
 
     Throws an error when both dictionaries contain the same key and the corresponding values are not equal.
 
-    :param dic_one: One of the dictionaries which is to be merged
-    :param dic_two: One of the dictionaries which is to be merged
+    Args:
+      dic_one: One of the dictionaries which is to be merged
+      dic_two: One of the dictionaries which is to be merged
 
-    :return: The merged dictionary, has the same key value pairs as the pairs in the given dictionaries combined
+    Returns:
+      : The merged dictionary, has the same key value pairs as the pairs in the given dictionaries combined
+
     """
     merged_dic = {}
     for key_one in dic_one:
@@ -50,8 +56,12 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
     this function returns the lengths relevant for the specified foot, if no side is specified,
     it returns all relevant lengths for both feet.
 
-    :param side: The side of the exoskeleton of which the relevant would like to be known
-    :return: The lengths of the specified side which are relevant for the (inverse) kinematics calculations
+    Args:
+      side: The side of the exoskeleton of which the relevant would like to be known (Default value = None)
+
+    Returns:
+      : The lengths of the specified side which are relevant for the (inverse) kinematics calculations
+
     """
     try:
         robot = urdf.Robot.from_xml_file(
@@ -103,6 +113,7 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
 
 
 def get_joint_names_for_inverse_kinematics():
+    """ """
     robot = urdf.Robot.from_xml_file(
         os.path.join(rospkg.RosPack().get_path("march_description"), "urdf", "march4.urdf")
     )

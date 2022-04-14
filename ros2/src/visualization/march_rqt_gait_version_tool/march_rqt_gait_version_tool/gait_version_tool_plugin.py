@@ -1,3 +1,4 @@
+"""Author: MV; MVI."""
 import os
 import sys
 from qt_gui.plugin import Plugin
@@ -25,8 +26,9 @@ def main(args=None):
 
 
 class GaitVersionToolPlugin(Plugin):
+    """Initiating the viewer and controller for the gait selection interface."""
+
     def __init__(self, context):
-        """Initiating the viewer and controller for the gait selection interface."""
         super(GaitVersionToolPlugin, self).__init__(context)
         self._node: Node = context.node
         self.setObjectName("GaitVersionToolPlugin")

@@ -1,3 +1,4 @@
+"""Author: MV; MVI."""
 from enum import Enum
 from typing import List, Dict
 
@@ -18,6 +19,8 @@ FOUR_PARAMETRIC_GAIT_PREFIX = "_fpg_"
 
 
 class LogLevel(Enum):
+    """Enum for log level color codes."""
+
     INFO = "#000000"
     SUCCESS = "#009100"
     ERROR = "#FF0000"
@@ -25,14 +28,14 @@ class LogLevel(Enum):
 
 
 class GaitVersionToolView(QWidget):
-    def __init__(self, ui_file, controller):
-        """Base class to load and use the gait_selection.ui.
+    """Base class to load and use the `gait_selection.ui`.
 
-        :param ui_file:
-            Path to the .ui file to load with the widget
-        :param controller:
-            A reference to the controller corresponding to the rqt gait selection functionality
-        """
+    Args:
+        ui_file: Path to the .ui file to load with the widget.
+        controller: A reference to the controller corresponding to the rqt gait selection functionality.
+    """
+
+    def __init__(self, ui_file, controller):
         super(GaitVersionToolView, self).__init__(flags=Qt.Window)
 
         self._controller = controller
@@ -93,7 +96,8 @@ class GaitVersionToolView(QWidget):
     def add_subgait_menus(self, amount_of_new_subgait_menus):
         """Add subgait labels and dropdown menu's in case a gait has more subgaits then available menu's.
 
-        :param amount_of_new_subgait_menus: the amount of new subgait labels and menu's
+        Args:
+             amount_of_new_subgait_menus: the amount of new subgait labels and menu's
         """
         for _ in range(amount_of_new_subgait_menus):
 
@@ -111,13 +115,29 @@ class GaitVersionToolView(QWidget):
             self._subgaits.layout().addRow(new_subgait_label, new_subgait_menu)
 
     @staticmethod
-    def sort_versions(versions):
-        def version_sorter(version):
-            """Used in the sort function to sort based on the last 2 digits of the
-            version name. If there is no version number, 0 is returned to have
-            it at the top of the list.
+    def sort_versions(versions: List[str]) -> List[str]:
+        """Sorts the versions on the last 2 digits of the version name.
 
-            :param version: str of the version
+        Args:
+            versions (List[str]): A list of versions to sort, where each version should end with 2 digits in the name,
+                or it is bumped to the beginning of the sorted list.
+
+        Returns:
+            List[str]: A sorted list of the versions.
+        """
+
+        def version_sorter(version):
+            """Comparator function used to evaluate the sorted position of a version string.
+
+            This method is passed as an evaluate function for the default python `sorted` method.
+            This function sorts based on the last 2 digits of the version name, if there is no version number,
+            0 is returned to have it at the top of the list.
+
+            Args:
+                 version: str of the version.
+
+            Returns:
+                int: Position value for sort functions.
             """
             try:
                 length = len(version)
@@ -133,7 +153,6 @@ class GaitVersionToolView(QWidget):
 
     def update_version_menus(self):
         """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
-
         self._is_update_active = True
         if self._is_refresh_active:
             return
@@ -243,10 +262,9 @@ class GaitVersionToolView(QWidget):
     def _log(self, msg, level=LogLevel.INFO):
         """Use the logger window in the GUI to display data.
 
-        :param msg:
-            The message to display in the widget
-        :param color_tag:
-            The tag which represents the color of the text in the screen (info, warning, error)
+        Args:
+            msg (str): The message to display in the widget.
+            level (LogLevel) : The tag which represents the color of the text in the screen (info, warning, error).
         """
         if level in [LogLevel.SUCCESS, LogLevel.INFO]:
             self._controller._node.get_logger().info(msg)
@@ -267,8 +285,8 @@ class GaitVersionToolView(QWidget):
     def _clear_gui(self, clear_gait_menu=False):
         """Clear the subgait menus and subgait labels and optionally the gait menu.
 
-        :param clear_gait_menu:
-            Set this to true if the gait menu should also be cleared
+        Args:
+            clear_gait_menu: Set this to true if the gait menu should also be cleared.
         """
         for subgait_menu in self._subgait_menus:
             subgait_menu.clear()
@@ -336,9 +354,10 @@ class GaitVersionToolView(QWidget):
         self._update_selected_subgaits(selected_versions)
 
     def _update_selected_subgaits(self, selected_versions: Dict[str, str]):
-        """Set the subgait dropdown menus to the subgaits of the selected versions
+        """Set the subgait dropdown menus to the subgaits of the selected versions.
 
-        :param selected_versions Dictionary mapping subgait to selected version
+        Args:
+             selected_versions (Dict[str, str]): Dictionary mapping subgait to selected version.
         """
         for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
             subgait = subgait_label.text()
@@ -349,10 +368,9 @@ class GaitVersionToolView(QWidget):
                 subgait_menu.setCurrentIndex(version_index)
 
     def _parameterize_same_versions(self):
-        """Parameterize subgait that share a common pre- and postfix
+        """Parameterize subgait that share a common pre- and postfix.
 
-        This can be seen as a combination of the 'select_same_versions' pop up and the
-        'parametric' pop up.
+        This can be seen as a combination of the 'select_same_versions' pop-up and the 'parametric' pop-up.
         """
         if not self._parametric_same_versions_pop_up.show_pop_up(
             self.current_gait, self.available_gaits[self.current_gait]
@@ -379,7 +397,7 @@ class GaitVersionToolView(QWidget):
                 subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
 
     def _show_version_map_pop_up(self):
-        """Use a pop up window to display all the gait, subgaits and currently used versions."""
+        """Use a pop-up window to display all the gait, subgaits and currently used versions."""
         try:
             version_map = self._controller.get_version_map()
         except GaitVersionToolError as e:
@@ -396,17 +414,16 @@ class GaitVersionToolView(QWidget):
         self._version_map_pop_up.show_message(version_map_string)
 
     def _show_parametric_pop_up(self, versions):
-        """Use a pop up window to get the base version, other version and
-        parameter for a parametric subgait."""
+        """Use a pop-up window to get the base version, other version and parameter for a parametric subgait."""
         return self._parametric_pop_up.show_pop_up(versions)
 
     @staticmethod
     def get_parametric_version(parameters: List[float], subgait_versions: List[str]):
-        """Create a parametric version name based on a list of subgait versions and a
-        list of parameters.
+        """Create a parametric version name based on a list of subgait versions and a list of parameters.
 
-        :param parameters List of parameters, either one or two parameters.
-        :param subgait_versions Subgait base, other, third, fourth versions.
+        Args:
+            parameters (List[float]): List of parameters, either one or two parameters.
+            subgait_versions (List[str]): Subgait base, other, third, fourth versions.
         """
         if len(parameters) == 1 and len(subgait_versions) == 2:
             return "{0}{1}_({2})_({3})".format(
@@ -430,4 +447,5 @@ class GaitVersionToolView(QWidget):
 
     @property
     def current_gait(self):
+        """Returns the name of the current gait."""
         return self._gait_menu.currentText()

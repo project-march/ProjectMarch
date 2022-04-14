@@ -1,3 +1,4 @@
+"""Author: Bas Volkers, MVI."""
 from typing import List, Optional
 
 import rclpy
@@ -26,8 +27,7 @@ def main():
 
 
 class RobotInformation(Node):
-    """The RobotInformation is a simple node that holds additional information
-    about the march robot in its parameters."""
+    """RobotInformation is a simple node that holds additional information about the march robot in its parameters."""
 
     def __init__(self, joint_names: Optional[List[str]] = None):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
@@ -63,11 +63,14 @@ class RobotInformation(Node):
         return get_joint_names_from_robot(robot)
 
     def make_get_parameters_request(self, node: str, names: List[str]) -> List[ParameterValue]:
-        """
-        Make a request to a GetParameters service of a node.
-        :param node: Node to make the request to.
-        :param names: Parameter names to request from the node.
-        :return: Returns the values that are retrieved from the service call.
+        """Make a request to a GetParameters service of a node.
+
+        Args:
+            node (Node): The node to make the request to.
+            names (List[str]): Parameter names to request from the node.
+
+        Returns:
+            List[ParameterValue]. The values that are retrieved from the service call.
         """
         srv_name = f"{node}/get_parameters"
         if srv_name not in self.get_parameter_clients:

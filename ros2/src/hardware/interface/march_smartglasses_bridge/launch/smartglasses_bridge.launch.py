@@ -1,3 +1,4 @@
+"""Author: Thijs Raymakers, MVI."""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
@@ -5,6 +6,14 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
+    """Generates the launch file configuration for the smart glasses.
+
+    It starts the smart_glasses node under the name 'march_smartglasses_bridge'.
+
+    The settable ros parameters are:
+        hud_host (str): The Wi-Fi address where the smart glasses are on (excluding the port). Default is "local_host".
+        hud_port (int): The port where the smart glasses are located. Default is `53003`.
+    """
     return LaunchDescription(
         [
             DeclareLaunchArgument(

@@ -41,7 +41,7 @@ class SetpointTest(unittest.TestCase):
     def test_string_output(self):
         self.assertEqual(
             str(self.setpoint),
-            f"Time: {round_setpoint(Duration(nanoseconds=1123412540)).nanoseconds}, "
+            f"Time: {round_setpoint(Duration(nanoseconds=1123412540))}, "
             f"Position: {round_setpoint(0.03434126)}, Velocity: "
             f"{round_setpoint(123.16208455)}",
         )

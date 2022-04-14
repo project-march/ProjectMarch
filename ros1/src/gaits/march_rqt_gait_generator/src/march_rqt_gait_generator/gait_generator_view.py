@@ -35,6 +35,8 @@ from .time_slider_thread import TimeSliderThread
 
 
 class GaitGeneratorView(QWidget):
+    """ """
+
     def __init__(self):
         super(GaitGeneratorView, self).__init__()
 
@@ -77,11 +79,13 @@ class GaitGeneratorView(QWidget):
         )
 
     def initialize_shortcuts(self):
+        """ """
         self.ctrl_z = QShortcut(QKeySequence(self.tr("Ctrl+Z")), self)
         self.ctrl_shift_z = QShortcut(QKeySequence(self.tr("Ctrl+Shift+Z")), self)
 
     # Called by build_ui
     def create_rviz_frame(self):
+        """ """
         frame = rviz.VisualizationFrame()
         frame.initialize()
         reader = rviz.YamlConfigReader()
@@ -104,6 +108,14 @@ class GaitGeneratorView(QWidget):
 
     # Called by __init__ and import_gait.
     def load_gait_into_ui(self, gait):
+        """
+
+        Args:
+          gait:
+
+        Returns:
+
+        """
         self.time_slider.setRange(0, 100 * gait.duration)
 
         self.gait_type_combo_box.setCurrentText(gait.gait_type)
@@ -122,12 +134,28 @@ class GaitGeneratorView(QWidget):
 
     # Methods below are called by load_gait_into_ui.
     def update_time_sliders(self, time):
+        """
+
+        Args:
+          time:
+
+        Returns:
+
+        """
         graphics_layouts = self.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
             joint_settings_plot.update_time_slider(time)
 
     def load_joint_plots(self, joints):
+        """
+
+        Args:
+          joints:
+
+        Returns:
+
+        """
         layout = self.JointSettingContainer.layout()
         for i in reversed(range(layout.count())):
             widget = layout.itemAt(i).widget()
@@ -147,6 +175,14 @@ class GaitGeneratorView(QWidget):
             self.JointSettingContainer.layout().addWidget(self.joint_widgets[joint.name], row, column)
 
     def create_joint_plot_widget(self, joint):
+        """
+
+        Args:
+          joint:
+
+        Returns:
+
+        """
         joint_setting_file = os.path.join(
             rospkg.RosPack().get_path("march_rqt_gait_generator"),
             "resource",
@@ -170,6 +206,15 @@ class GaitGeneratorView(QWidget):
 
     # Methods below are called during runtime
     def publish_preview(self, subgait, time):
+        """
+
+        Args:
+          subgait:
+          time:
+
+        Returns:
+
+        """
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
 
@@ -180,6 +225,7 @@ class GaitGeneratorView(QWidget):
         self.set_feet_distances()
 
     def set_feet_distances(self):
+        """ """
         try:
             # The translation from the right foot to the left foot is the position of the
             # left foot from the right foot's frame of reference.
@@ -193,13 +239,44 @@ class GaitGeneratorView(QWidget):
         self.heel_distance_line_edit.setText(f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2):.3f}")
 
     def message(self, title: str = None, msg: str = None) -> None:
+        """
+
+        Args:
+          title: str:  (Default value = None)
+          msg: str:  (Default value = None)
+          title: str:  (Default value = None)
+          msg: str:  (Default value = None)
+
+        Returns:
+
+        """
         QMessageBox.question(self, title, msg, QMessageBox.Ok)
 
     def yes_no_question(self, title: str = None, msg: str = None) -> bool:
+        """
+
+        Args:
+          title: str:  (Default value = None)
+          msg: str:  (Default value = None)
+          title: str:  (Default value = None)
+          msg: str:  (Default value = None)
+
+        Returns:
+
+        """
         answer = QMessageBox.question(self, title, msg, QMessageBox.Yes | QMessageBox.No)
         return answer == QMessageBox.Yes
 
     def open_file_dialogue(self, path_to_open: os.path = None):
+        """
+
+        Args:
+          path_to_open: os.path:  (Default value = None)
+          path_to_open: os.path:  (Default value = None)
+
+        Returns:
+
+        """
         if path_to_open is None:
             path_to_open = os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files")
         return QFileDialog.getOpenFileName(
@@ -210,6 +287,7 @@ class GaitGeneratorView(QWidget):
         )
 
     def open_directory_dialogue(self):
+        """ """
         return QFileDialog.getExistingDirectory(
             None,
             "Select a directory to save gaits. Directory must be "
@@ -218,17 +296,44 @@ class GaitGeneratorView(QWidget):
         )
 
     def get_inverse_kinematics_setpoints_input(self) -> None:
+        """ """
         self.inverse_kinematics_pop_up.show_pop_up()
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time: float) -> None:
+        """
+
+        Args:
+          time: float:
+          time: float:
+
+        Returns:
+
+        """
         self.time_slider.setValue(time)
 
     def update_joint_widgets(self, joints):
+        """
+
+        Args:
+          joints:
+
+        Returns:
+
+        """
         for joint in joints:
             self.update_joint_widget(joint)
 
     def update_joint_widget(self, joint, update_table=True):
+        """
+
+        Args:
+          joint:
+          update_table: (Default value = True)
+
+        Returns:
+
+        """
         plot = self.joint_widgets[joint.name].Plot.getItem(0, 0)
         plot.plot_item.blockSignals(True)
         plot.update_setpoints(
@@ -245,12 +350,29 @@ class GaitGeneratorView(QWidget):
             table.blockSignals(False)
 
     def set_duration_spinbox(self, duration):
+        """
+
+        Args:
+          duration:
+
+        Returns:
+
+        """
         self.duration_spin_box.blockSignals(True)
         self.duration_spin_box.setValue(duration)
         self.duration_spin_box.blockSignals(False)
 
     @staticmethod
     def notify(title, message):
+        """
+
+        Args:
+          title:
+          message:
+
+        Returns:
+
+        """
         subprocess.Popen(  # noqa: S603
             [
                 "/usr/bin/notify-send",
@@ -261,8 +383,19 @@ class GaitGeneratorView(QWidget):
 
     @property
     def control_button(self):
+        """ """
         return QtCore.Qt.ControlModifier
 
     @staticmethod
     def create_time_slider_thread(current, playback_speed, max_time):
+        """
+
+        Args:
+          current:
+          playback_speed:
+          max_time:
+
+        Returns:
+
+        """
         return TimeSliderThread(current, playback_speed, max_time)

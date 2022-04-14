@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-# Author: Wolf Nederpel
-# Date: 25 - 08 - 2021  # noqa: E800
-# Description: Updates the starting postions of the specified gaits
-# Usage: set the right old and new stand positions,
-# fix the path from which to change and run ./fix_start_positions_gait.py
+"""Updates the starting positions of the specified gaits.
+
+Author: Wolf Nederpel, MVI.
+Date: 25 - 08 - 2021
+Usage: Set the right old and new stand positions, fix the path from which to change
+    and run `./fix_start_positions_gait.py`.
+"""
 from pathlib import Path
 import yaml
 import copy
@@ -99,6 +101,7 @@ new_stand_position_end = copy.deepcopy(new_stand_position_start)
 
 # actually for dicts in dicts
 def almost_equal_nested_dict(dict1: dict, dict2: dict) -> bool:
+    """Todo: Add docstrings."""
     result = True
     for key_outer, value in dict1.items():
         for key_inner, true_value in value.items():
