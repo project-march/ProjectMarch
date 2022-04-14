@@ -7,7 +7,7 @@ All code in the March repositories should adhere to a certain set of style guide
 In our code we adhere to the following style guides:
 
     C++: https://wiki.ros.org/CppStyleGuide
-        * https://github.com/WHILL/roscpp_code_format
+        * https://github.com/PickNikRobotics/roscpp_code_format
         * clang-format: https://clang.llvm.org/docs/ClangFormat.html
     Python: https://wiki.ros.org/PyStyleGuide
         * PEP8: https://www.python.org/dev/peps/pep-0008/
