@@ -9,7 +9,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import 
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
@@ -189,12 +188,15 @@ class DynamicSubgait:
 
             # Add an extra setpoint to the ankle to create a push off, except for
             # a start gait:
-            if push_off:
-                if not self.start and (
+            if (
+                push_off
+                and not self.start
+                and (
                     (name == "right_ankle" and self.subgait_id == "right_swing")
                     or (name == "left_ankle" and self.subgait_id == "left_swing")
-                ):
-                    setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
+                )
+            ):
+                setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
             if name in ["right_ankle", "left_ankle"] or (
                 (name == "right_knee" and self.subgait_id == "left_swing")
