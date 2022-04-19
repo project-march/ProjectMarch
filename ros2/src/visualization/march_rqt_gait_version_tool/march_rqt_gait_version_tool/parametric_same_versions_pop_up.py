@@ -1,3 +1,4 @@
+"""Author: Bas Volkers, MVI."""
 import ast
 from typing import Dict, List
 
@@ -19,16 +20,22 @@ NUM_SECTIONS = 4
 
 
 class ParseError(Exception):
+    """Exception for if something went wrong while parsing the input."""
+
     def __init__(self, msg: str):
         super().__init__(f"Something went wrong while parsing input: {msg}")
 
 
 class ParseSubgaitError(ParseError):
+    """Exception for if something went wrong while parsing the subgait."""
+
     def __init__(self, index: int):
         super().__init__(f"Unable to parse selected subgaits of box {index}")
 
 
 class ParametricSameVersionsPopUpWindow(QDialog):
+    """Todo: Add docstring."""
+
     def __init__(self, parent, ui_file):
         super(ParametricSameVersionsPopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         loadUi(ui_file, self)
@@ -116,7 +123,7 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         )
 
     def _four_subgait_interpolation_changed(self):
-        """Unlocks the buttons for four subgait interpolation when it is enabled"""
+        """Unlocks the buttons for four subgait interpolation when it is enabled."""
         self.uses_four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
         if self.uses_four_subgait_interpolation:
             self.set_second_parameterize_enabled(True)

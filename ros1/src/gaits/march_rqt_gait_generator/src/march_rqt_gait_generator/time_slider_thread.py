@@ -1,8 +1,10 @@
+"""Author: Isha Dijcks, MV"""
 from pyqtgraph.Qt import QtCore
 import rospy
 
 
 class TimeSliderThread(QtCore.QThread):
+    """ """
 
     update_signal = QtCore.pyqtSignal(int)
 
@@ -14,6 +16,7 @@ class TimeSliderThread(QtCore.QThread):
         self.allowed_to_run = True
 
     def run(self):
+        """ """
         index = 0
         calculations_per_second = 30
         r = rospy.Rate(calculations_per_second)
@@ -24,4 +27,5 @@ class TimeSliderThread(QtCore.QThread):
             r.sleep()
 
     def stop(self):
+        """ """
         self.allowed_to_run = False

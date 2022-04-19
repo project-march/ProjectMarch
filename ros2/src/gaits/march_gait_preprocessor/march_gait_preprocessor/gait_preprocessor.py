@@ -1,4 +1,4 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 from rclpy.node import Node
 from geometry_msgs.msg import Point
@@ -16,9 +16,10 @@ Z_OFFSET = 0.22
 
 
 class GaitPreprocessor(Node):
-    """Node for processing the points coming from the vision package,
-    before sending them to the gait generation. This node can also be
-    used to simulate fake points."""
+    """Node for processing the points coming from the vision package, before sending them to the gait generation.
+
+    This node can also be used to simulate fake points.
+    """
 
     def __init__(self):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
@@ -40,8 +41,7 @@ class GaitPreprocessor(Node):
         self._location_z = self.get_parameter("location_z").get_parameter_value().double_value
 
     def _create_covid_subscribers(self) -> None:
-        """Create subscribers to the topics on which covid
-        publishes found points"""
+        """Create subscribers to the topics on which covid publishes found points."""
         self.subscription_left = self.create_subscription(
             FootPosition,
             "/foot_position/left",
@@ -69,21 +69,19 @@ class GaitPreprocessor(Node):
         )
 
     def _callback_left(self, foot_location: FootPosition) -> None:
-        """Callback for new left point from covid. Makes the point
-        usable for the gait.
+        """Callback for new left point from covid. Makes the point usable for the gait.
 
-        :param foot_location: location given by covid
-        :type foot_location: FootPosition
+        Args:
+            foot_location (FootPosition): Location given by CoViD (Computer Vision).
         """
         foot_location_msg = self._process_foot_location(foot_location)
         self.publisher_left.publish(foot_location_msg)
 
     def _callback_right(self, foot_location: FootPosition) -> None:
-        """Callback for new right point from covid. Makes the point
-        usable for the gait.
+        """Callback for new right point from covid. Makes the point usable for the gait.
 
-        :param foot_location: location given by covid
-        :type foot_location: FootPosition
+        Args:
+            foot_location (FootPosition): Location given by CoViD (Computer Vision).
         """
         foot_location_msg = self._process_foot_location(foot_location)
         self.publisher_right.publish(foot_location_msg)
@@ -91,10 +89,11 @@ class GaitPreprocessor(Node):
     def _process_foot_location(self, foot_location: FootPosition) -> FootPosition:
         """Reformat the foot location so that gait can use it.
 
-        :param foot_location: location given by covid
-        :type foot_location: FootPosition
-        :returns: location with transformed axes and scaled duration
-        :rtype: Point
+        Args:
+            foot_location (FootPosition): Location given by CoViD (Computer Vision).
+
+        Returns:
+            Point: Location with transformed axes and scaled duration.
         """
         transformed_foot_location = self._get_foot_location_in_gait_axes(foot_location)
         scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_location.y)
@@ -112,10 +111,11 @@ class GaitPreprocessor(Node):
     def _get_foot_location_in_gait_axes(self, foot_location: FootPosition) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
 
-        :param foot_location: location given by covid
-        :type foot_location: FootPosition
-        :returns: foot location transformed to ik solver axes
-        :rtype: Point
+        Args:
+            foot_location (FootPosition): Location given by covid.
+
+        Returns:
+            Point: Foot location transformed to ik solver axes.
         """
         temp_y = foot_location.displacement.y
         point = Point()
@@ -127,19 +127,19 @@ class GaitPreprocessor(Node):
         return point
 
     def _get_duration_scaled_to_height(self, duration: float, step_height: float) -> float:
-        """Scales the duration based on the absolute step height
+        """Scales the duration based on the absolute step height.
 
-        :param duration: Duration of the step in seconds
-        :type duration: float
-        :param step_height: y-coordinate of the covid point
-        :type step_height: float
-        :returns: scaled duration in seconds
-        :rtype: float
+        Args:
+            duration (float): Duration of the step in seconds.
+            step_height (float): Y-coordinate of the covid point.
+
+        Returns:
+            float: Scaled duration in seconds.
         """
         return duration + DURATION_SCALING_FACTOR * abs(step_height)
 
     def _publish_simulated_locations(self) -> None:
-        """Publishes simulated foot locations"""
+        """Publishes simulated foot locations."""
         point_msg = FootPosition()
         point_msg.header.stamp = self.get_clock().now().to_msg()
 
@@ -152,8 +152,7 @@ class GaitPreprocessor(Node):
         self.publisher_left.publish(point_msg)
 
     def set_simulate_points_parameter(self) -> None:
-        """Creates either a publisher that publishes simulated points or a
-        subsctiption on the covid points topics."""
+        """Creates either a publisher that publishes simulated points or a subscription on the covid points topics."""
         if self._simulate_points:
             self.destroy_subscription(self.subscription_right)
             self.destroy_subscription(self.subscription_left)
