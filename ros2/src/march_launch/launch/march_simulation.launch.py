@@ -1,3 +1,4 @@
+"""Author: MARCH."""
 import os
 import launch
 from ament_index_python import get_package_share_directory
@@ -15,7 +16,22 @@ LENGTH_HIP_AA, LENGTH_HIP_BASE = get_lengths_robot_from_urdf_for_inverse_kinemat
 DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
-def generate_launch_description():
+def generate_launch_description() -> launch.LaunchDescription:
+    """Generates the launch file for the simulation launch.
+
+    This file extends the default march.launch file and overwrites the following default values:
+        - [name] ([type]): from [old_val] -> to [new_val]
+        - ...
+
+    Todo:
+        - Fill in the extended configuration values.
+        - Fill in the settable ros parameters.
+
+    The settable ros parameters are:
+        use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
+            Default is True.
+        ...
+    """
     # General arguments
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")

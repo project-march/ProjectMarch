@@ -1,4 +1,7 @@
+"""Author: ???."""
+
 import os
+from typing import Optional, List, Tuple, Dict, Union
 
 import yaml
 from ament_index_python.packages import get_package_share_directory
@@ -47,15 +50,55 @@ NODE_NAME = "gait_selection"
 
 
 class GaitSelection(Node):
-    """Base class for the gait selection module."""
+    """Base class for the gait selection module.
+
+    Args:
+        gait_package (Optional[str]): path to the package that contains the gait files, defaults to launch argument
+        directory (Optional[str]): name of the directory that contains the gait files, defaults to launch argument
+        robot (Optional[urdf.Robot]): robot to use, defaults to launch argument
+        balance (Optional[bool]): whether to create the balance gait, defaults to launch argument
+        dynamic_gait (Optional[bool]): whether to create the dynamic setpoint gaits, defaults to launch argument
+    Attributes:
+        logger (Logger): used to log to the terminal
+        middle_point_fraction (float): fraction of the step at which the middle setpoint will be set
+        middle_point_height (float): height in meters that the middle point will be above the end point
+        minimum_stair_height (float): steps higher or lower will have the gait_type 'stairs_like' instead of 'walk-like'
+        push_off_fraction (float): fraction of the step at which the push off setpoint will be set
+        push_off_position (float): position (in rad) of the ankle joint that will be set during push off
+
+        _balance_used (bool): whether balance gait will be created
+        _dynamic_gait (bool): whether dynamic setpoint gaits will be created
+        _early_schedule_duration (Duration): duration to use for early scheduling
+        _first_subgait_delay (Duration): delay with which first subgait will be early scheduled
+        _directory_name (str): name of the directory that contains the gait files
+        _gait_package (str): path to the package that contains the gait files
+        _gait_directory (str): ??? TODO: Add docs
+        _default_yaml (str): ??? TODO: Add  docs
+        _robot (urdf.Robot): robot model to use
+        _joint_names (List[str]): alphabetical list of joint names of _robot
+        _realsense_yaml (str): path to the yaml file containing realsense parameters
+        _realsense_gait_version_map (str): ??? TODO: Add docs
+        _gait_version_map (Dict): ??? TODO: Add docs
+        _positions (Dict): ??? TODO: Add docs
+        _dynamic_edge_version_map (Dict[Any, Dict[str, dict]], dict]): ??? TODO: Add docs
+        _robot_description_sub (Subscriber): subscribes to /march/robot_description
+        _gaits (Dict): dictionary containing all possible gaits
+        _loaded_gaits (dict): dictionary containing all possible gaits TODO: difference between _gaits and _loaded_gaits
+
+    Raises:
+        ParameterNotDeclaredException: raised when gait_selection_node is not initialized with all required params
+        FileNotFoundError: raised when gait_directory path does not exist
+    """
+
+    _loaded_gaits: dict
 
     def __init__(
         self,
-        gait_package=None,
-        directory=None,
-        robot=None,
-        balance=None,
-        dynamic_gait=None,
+        gait_package: Optional[str] = None,
+        directory: Optional[str] = None,
+        robot: Optional[urdf.Robot] = None,
+        balance: Optional[bool] = None,
+        dynamic_gait: Optional[bool] = None,
     ):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         self.logger = Logger(self, __class__.__name__)
@@ -75,6 +118,7 @@ class GaitSelection(Node):
 
             self._early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
             self._first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
+
             # Setting dynamic gait parameters
             self.middle_point_fraction = self.get_parameter("middle_point_fraction").get_parameter_value().double_value
             self.middle_point_height = self.get_parameter("middle_point_height").get_parameter_value().double_value
@@ -118,6 +162,7 @@ class GaitSelection(Node):
         )
 
         self._create_services()
+        self._gaits = {}
         self._gaits = self._load_gaits()
 
         self._early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
@@ -134,17 +179,21 @@ class GaitSelection(Node):
         self.logger.info("Successfully initialized gait selection node.")
 
     @property
-    def joint_names(self):
+    def joint_names(self) -> List[str]:
+        """Return a list containing joint names."""
         return self._joint_names
 
     @property
-    def gaits(self):
+    def gaits(self) -> dict:
+        """Return a dictionary containing the loaded gaits."""
         return self._gaits
 
-    def _validate_inverse_kinematics_is_possible(self):
+    def _validate_inverse_kinematics_is_possible(self) -> bool:
+        """Whether inverse kinematics is possible."""
         return validate_and_get_joint_names_for_inverse_kinematics(self.logger) is not None
 
-    def _initialize_gaits(self):
+    def _initialize_gaits(self) -> Tuple[str, str]:
+        """Initialize the gait packages."""
         package_path = get_package_share_directory(self._gait_package)
         gait_directory = os.path.join(package_path, self._directory_name)
         default_yaml = os.path.join(gait_directory, "default.yaml")
@@ -155,10 +204,8 @@ class GaitSelection(Node):
             self.logger.error(f"Gait default yaml file does not exist: {gait_directory}/default.yaml")
         return gait_directory, default_yaml
 
-    def update_gaits(self):
-        """
-        Update the gaits after one of the gait attributes has been changed.
-        """
+    def update_gaits(self) -> None:
+        """Update the gaits after one of the gait attributes has been changed."""
         self._gait_directory, self._default_yaml = self._initialize_gaits()
         self._realsense_yaml = os.path.join(self._gait_directory, "realsense_gaits.yaml")
 
@@ -172,6 +219,7 @@ class GaitSelection(Node):
         self._loaded_gaits = self._load_gaits()
 
     def _create_services(self) -> None:
+        """Create services for gait_selection."""
         self.create_service(
             srv_type=Trigger,
             srv_name="/march/gait_selection/get_version_map",
@@ -211,8 +259,8 @@ class GaitSelection(Node):
     def _parse_duration_parameter(self, name: str) -> Duration:
         """Get a duration parameter from the parameter server.
 
-        Returns 0 if the parameter does not exist.
-        Clamps the duration to 0 if it is negative.
+        Returns:
+            Duration: duration of the parameter given by name. If param does not exist or is negative, returns zero
         """
         if self.has_parameter(name):
             value = self.get_parameter(name).value
@@ -223,7 +271,11 @@ class GaitSelection(Node):
             return Duration(0)
 
     def shortest_subgait(self) -> Subgait:
-        """Get the subgait with the smallest duration of all subgaits in the loaded gaits."""
+        """Get the subgait with the smallest duration of all subgaits in the loaded gaits.
+
+        Returns:
+            Subgait: subgait with the shortest duration
+        """
         shortest_subgait = None
         for gait in self._gaits.values():
             for subgait in gait.subgaits.values():
@@ -232,32 +284,30 @@ class GaitSelection(Node):
         return shortest_subgait
 
     @property
-    def robot(self):
+    def robot(self) -> urdf.Robot:
         """Return the robot obtained from the robot state publisher."""
         return self._robot
 
     @property
-    def gait_version_map(self):
+    def gait_version_map(self) -> dict:
         """Returns the mapping from gaits and subgaits to versions."""
         return self._gait_version_map
 
     @property
-    def positions(self):
+    def positions(self) -> dict:
         """Returns the named idle positions."""
         return self._positions
 
-    def _update_robot_description_cb(self, msg):
-        """
-        Callback that is used to update the robot description when
-        robot_state_publisher sends out an update.
-        """
+    def _update_robot_description_cb(self, msg: String) -> None:
+        """Callback that is used to update the robot description when robot_state_publisher sends out an update."""
         self._robot = urdf.Robot.from_xml_string(msg.data)
 
-    def set_gait_versions(self, gait_name, version_map):
+    def set_gait_versions(self, gait_name: str, version_map: Dict[str, str]):
         """Sets the subgait versions of given gait.
 
-        :param str gait_name: Name of the gait to change versions
-        :param dict version_map: Mapping subgait names to versions
+        Args:
+            gait_name (str): Name of the gait to change versions
+            version_map (Dict[str, str]): Mapping subgait names to versions
         """
         if gait_name not in self._gaits:
             raise GaitNameNotFoundError(gait_name)
@@ -270,14 +320,17 @@ class GaitSelection(Node):
         self._gait_version_map[gait_name].update(version_map)
         self.logger.info(f"Setting gait versions successful: {self._gaits[gait_name]}")
 
-    def set_gait_versions_cb(self, request, response):
+    def set_gait_versions_cb(self, request, response) -> List[Union[bool, str]]:
         """Sets a new gait version to the gait selection instance.
 
-        :type msg: march_shared_resources.srv.SetGaitVersionRequest
-
-        :rtype march_shared_resources.srv.SetGaitVersionResponse
+        Args:
+            request (SetGaitVersionRequest): service request
+            response (SetGaitVersionResponse): response to service request
+        Returns:
+            List[Union[bool, str]]: march_shared_resources.srv.SetGaitVersionResponse
+        Raises:
+            Exception: raised when gait version cannot be set
         """
-
         if len(request.subgaits) != len(request.versions):
             return [False, "`subgaits` and `versions` array are not of equal length"]
 
@@ -288,18 +341,19 @@ class GaitSelection(Node):
             response.success = True
             response.message = ""
             return response
-        except Exception as e:  # noqa: PIE786
+        except Exception as e:  # noqa: PIE786 TODO: create specific exception for this
             response.success = False
             response.message = str(e)
             return response
 
-    def contains_gait_cb(self, request, response):
-        """
-        Checks whether a gait and subgait are loaded.
+    def contains_gait_cb(self, request, response) -> bool:
+        """Checks whether a gait and subgait are loaded.
 
-        :type request: ContainsGaitRequest
-        :param request: service request
-        :return: True when the gait and subgait are loaded
+        Args:
+            request (ContainsGaitRequest): service request
+            response (ContainsGaitResponse): response to service request
+        Returns:
+             bool: True when the gait and subgait are loaded
         """
         gait = self._gaits.get(request.gait)
         if gait is None:
@@ -312,12 +366,11 @@ class GaitSelection(Node):
                 response.contains = False
         return response
 
-    def scan_directory(self):
-        """Scans the gait_directory recursively and create a dictionary of all
-        subgait files.
+    def scan_directory(self) -> Dict[str, Dict[str, List[str]]]:  # noqa TAE002 suppress to complex expression
+        """Scans the gait_directory recursively and create a dictionary of all subgait files.
 
-        :returns:
-            dictionary of the maps and files within the directory
+        Returns:
+            Dict[str, Dict[str, List[str]]]: dictionary of the maps and files within the directory
         """
         gaits = {}
         for gait in os.listdir(self._gait_directory):
@@ -342,24 +395,35 @@ class GaitSelection(Node):
                 gaits[gait] = subgaits
         return gaits
 
-    def get_default_dict_cb(self, req, res):
+    def get_default_dict_cb(self, request, response):
+        """Service that returns the default gaits and positions.
+
+        Args:
+            request (TriggerRequest): service request
+            response (TriggerResponse): response to service request
+        Returns:
+             Trigger.Response
+        """
         defaults = {"gaits": self._gait_version_map, "positions": self._positions}
         return Trigger.Response(success=True, message=str(defaults))
 
     def add_gait(self, gait):
         """Adds a gait to the loaded gaits if it does not already exist.
 
-        The to be added gait should implement `GaitInterface`.
+        Args:
+            gait: gait class that should be added to the loaded gaits. The to be added gait should implement
+                `GaitInterface`
         """
         if gait.name in self._gaits:
             self.logger.warning("Gait `{gait}` already exists in gait selection".format(gait=gait.name))
         else:
             self._gaits[gait.name] = gait
 
-    def _load_gaits(self):
+    def _load_gaits(self) -> dict:
         """Loads the gaits in the specified gait directory.
 
-        :returns dict: A dictionary mapping gait name to gait instance
+        Returns:
+            dict: A dictionary mapping gait name to gait instance
         """
         gaits = {}
 
@@ -387,26 +451,33 @@ class GaitSelection(Node):
                 gaits["balanced_walk"] = balance_gait
 
         if self._dynamic_gait:
-            # We pass along the gait_selection_node to be able to listen
-            # to the CoViD topic within the DynamicSetpointGait class.
+            # We pass along the gait_selection_node to be able to listen to the CoViD topic within the
+            # DynamicSetpointGait class. Dynamic setpoint gait needs to be an attribute for updating parameters.
             self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
-            gaits["dynamic_walk"] = self.dynamic_setpoint_gait
-            self.dynamic_setpoint_gait_step_and_close = DynamicSetpointGaitStepAndClose(gait_selection_node=self)
-            gaits["dynamic_step_and_close"] = self.dynamic_setpoint_gait_step_and_close
             self.dynamic_setpoint_gait_step = DynamicSetpointGaitStep(gait_selection_node=self)
-            gaits["dynamic_step"] = self.dynamic_setpoint_gait_step
+
+            dynamic_gaits = [
+                self.dynamic_setpoint_gait,
+                self.dynamic_setpoint_gait_step,
+                DynamicSetpointGaitStepAndClose(gait_selection_node=self),
+            ]
+
+            for dynamic_gait in dynamic_gaits:
+                gaits[dynamic_gait.name] = dynamic_gait
+
             self.logger.info("Added dynamic_walk to gaits")
 
         return gaits
 
-    def _load_realsense_gaits(self, gaits):
-        """
-        Load all gaits from the realsense gait version map.
+    def _load_realsense_gaits(self, gaits) -> None:
+        """Load all gaits from the realsense gait version map.
+
         Also create a service with a separate callback group that can be used by the
         realsense gaits to get parameters from the realsense_reader. A new callback
         group is necessary to prevent a deadlock.
 
-        :param gaits: The dictionary where the loaded gaits will be added to.
+        Args:
+            gaits (dict): The dictionary where the loaded gaits will be added to.
         """
         if not self._validate_inverse_kinematics_is_possible():
             return
@@ -431,15 +502,26 @@ class GaitSelection(Node):
             )
             gaits[gait_name] = gait
 
-    def _load_realsense_configuration(self):
+    def _load_realsense_configuration(self) -> dict:
+        """Load the realsense configuration from the yaml file.
+
+        Returns:
+            dict: dictionary containing the information in the yaml file
+        """
         if not os.path.isfile(self._realsense_yaml):
             self.logger.info("No realsense_yaml present, no realsense gaits will be created.")
             return {}
         with open(self._realsense_yaml, "r") as realsense_config_file:
             return yaml.load(realsense_config_file, Loader=yaml.SafeLoader)
 
-    def _load_configuration(self):
-        """Loads and verifies the gaits configuration."""
+    def _load_configuration(self) -> Tuple[dict, dict, dict]:
+        """Loads and verifies the gaits configuration.
+
+        Raises:
+            TypeError: raised when gait version map is not a dictionary
+            GaitError: raised when gait version map is not valid
+            NonValidGaitContentError: raised when the position dictionary does not contain positions for each joint
+        """
         with open(self._default_yaml, "r") as default_yaml_file:
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
@@ -474,11 +556,13 @@ class GaitSelection(Node):
                 )
         return version_map, positions, dynamic_edge_version_map
 
-    def _validate_version_map(self, version_map):
+    def _validate_version_map(self, version_map) -> bool:
         """Validates if the current versions exist.
 
-        :param dict version_map: Version map to verify
-        :returns bool: True when all versions exist, False otherwise
+        Args:
+            version_map (dict): version map to verify
+        Returns:
+            bool: True if version map is valid, else False
         """
         for gait_name in version_map:
             gait_path = os.path.join(self._gait_directory, gait_name)
@@ -493,8 +577,22 @@ class GaitSelection(Node):
                     return False
         return True
 
-    def __getitem__(self, name):
-        """Returns a gait from the loaded gaits."""
+    def get_named_position(self, position: str) -> Dict[str, float]:
+        """Returns a joint dict of a named position from the gait_selection node.
+
+        Args:
+            position (str): name of the position
+        Returns:
+            Dict[str, float]: a dict containing joint names and positions for the actuating joints.
+        """
+        return self.positions[position]["joints"]
+
+    def __getitem__(self, name: str):
+        """Returns a gait from the loaded gaits.
+
+        Returns:
+            The gait class corresponding to the name
+        """
         return self._gaits.get(name)
 
     def __iter__(self):

@@ -2,6 +2,8 @@ from numpy_ringbuffer import RingBuffer
 
 
 class SideSubgaitController:
+    """ """
+
     def __init__(
         self,
         default,
@@ -20,6 +22,7 @@ class SideSubgaitController:
         self.settings_redo_list = RingBuffer(capacity=100, dtype=list)
 
     def undo(self):
+        """ """
         self.settings_redo_list.append(
             {
                 "lock_checked": self._lock_checked,
@@ -34,6 +37,7 @@ class SideSubgaitController:
         self.view.update_widget(self)
 
     def redo(self):
+        """ """
         self.save_changed_settings()
         settings = self.settings_redo_list.pop()
         self._lock_checked = settings["lock_checked"]
@@ -42,6 +46,7 @@ class SideSubgaitController:
         self.view.update_widget(self)
 
     def save_changed_settings(self):
+        """ """
         self.settings_history.append(
             {
                 "lock_checked": self._lock_checked,
@@ -52,26 +57,45 @@ class SideSubgaitController:
 
     @property
     def lock_checked(self):
+        """ """
         return self._lock_checked
 
     @lock_checked.setter
     def lock_checked(self, lock_checked):
+        """
+
+        Args:
+          lock_checked:
+
+        Returns:
+
+        """
         self.save_changed_settings()
         self._lock_checked = lock_checked
         self.view.update_widget(self)
 
     @property
     def default_checked(self):
+        """ """
         return self._default_checked
 
     @default_checked.setter
     def default_checked(self, default_checked):
+        """
+
+        Args:
+          default_checked:
+
+        Returns:
+
+        """
         self.save_changed_settings()
         self._default_checked = default_checked
         self.view.update_widget(self)
 
     @property
     def subgait(self):
+        """ """
         if self.default_checked:
             return self._default
         else:
@@ -79,12 +103,21 @@ class SideSubgaitController:
 
     @subgait.setter
     def subgait(self, subgait):
+        """
+
+        Args:
+          subgait:
+
+        Returns:
+
+        """
         self.save_changed_settings()
         self._subgait = subgait
         self.view.update_widget(self)
 
     @property
     def subgait_text(self):
+        """ """
         if self._subgait:
             return self._subgait.version
         else:

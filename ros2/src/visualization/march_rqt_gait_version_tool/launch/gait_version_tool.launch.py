@@ -1,3 +1,4 @@
+"""Author: MVI."""
 import launch
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
@@ -5,10 +6,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description() -> launch.LaunchDescription:
-    """
-    Launch file to launch rqt note taker.
-    """
-
+    """Launch file to launch rqt note taker."""
     return launch.LaunchDescription(
         [
             DeclareLaunchArgument(

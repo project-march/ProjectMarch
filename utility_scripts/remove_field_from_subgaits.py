@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-# Author: Wolf Nederpel
-# Date: 25 - 08 - 2021  # noqa: E800
-# Description: Removes a selected field from the subgait files under the specified path
-# Usage: set the right field to remove, fix the path from which to remove and run ./remove_field_from_subgait.py
+"""Removes a selected field from the subgait files under the specified path.
+
+Author: Wolf Nederpel, MVI.
+Date: 25 - 08 - 2021
+Usage: set the right field to remove, fix the path from which to remove and run ./remove_field_from_subgait.py
+"""
 from pathlib import Path
 import yaml
 

@@ -21,14 +21,13 @@ class CheckInputDevice:
         self._updater = updater
         self._diagnostics = {}
 
-        node.create_subscription(message_type, topic, self._cb, qos_profile=10)
+        node.create_subscription(message_type, topic, self.alive_callback, qos_profile=10)
 
-    def _cb(self, msg: Alive):
-        """
-        Update the frequency diagnostics for given input device.
+    def alive_callback(self, msg: Alive) -> None:
+        """Callback function that updates the frequency diagnostics for given input device.
 
-        :type msg: march_shared_msgs.msg.Alive
-        :param msg: Alive message
+        Args:
+            msg (march_shared_msgs.msg.Alive): Alive message.
         """
         if msg.id in self._diagnostics:
             self._diagnostics[msg.id].tick()

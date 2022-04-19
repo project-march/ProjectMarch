@@ -1,7 +1,6 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 from typing import Optional
-from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
@@ -10,22 +9,21 @@ from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, Vel
 
 
 class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
-    """Single step gait based on dynamic setpoint gait
+    """Single step gait based on dynamic setpoint gait.
 
-    :param gait_selection_node: the gait selection node
-    :type gait_selection_node: Node
+    Args:
+        gait_selection_node (GaitSelection): the gait selection node
     """
 
-    def __init__(self, gait_selection_node: Node):
+    def __init__(self, gait_selection_node):
         super().__init__(gait_selection_node)
         self.gait_name = "dynamic_step_and_close"
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
-        """Create the next command. Because it is a single step, this will
-        always be a left_swing and a close gait.
+        """Create the next command. Because it is a single step, this will always be a left_swing and a close gait.
 
-        :returns: A TrajectoryCommand for the next subgait
-        :rtype: TrajectoryCommand
+        Returns:
+            TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
         if not self._trajectory_failed:
             if self.subgait_id == "right_swing":

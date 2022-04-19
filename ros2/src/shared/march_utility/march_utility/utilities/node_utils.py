@@ -12,12 +12,14 @@ from urdf_parser_py import urdf
 
 SERVICE_TIMEOUT = 1
 DEFAULT_HISTORY_DEPTH = 10
+TOPIC_PREFIX = "/march"
 
 
 def get_robot_urdf_from_service(node: Node) -> urdf.Robot:
     """Get the robot description from the robot state publisher.
 
-    :param node Node to use for making the request.
+    Args:
+        node (Node): The node to use for making the request.
     """
     robot_description_client = node.create_client(
         srv_type=GetParameters,
@@ -32,12 +34,12 @@ def get_robot_urdf_from_service(node: Node) -> urdf.Robot:
 
 
 def wait_for_service(node: Node, client: Client, timeout: Optional[float] = SERVICE_TIMEOUT):
-    """
-    Wait for a service to become available.
+    """Wait for a service to become available.
 
-    :param node: Node to use for logging
-    :param client: Client of the service.
-    :param timeout: Optional timeout to wait before logging again
+    Args:
+        node (Node): The node to use for logging.
+        client (Client): Client of the service.
+        timeout (float, Optional): Timeout in seconds to wait before logging again. Default is `SERVICE_TIMEOUT`.
     """
     while not client.wait_for_service(timeout_sec=timeout):
         node.get_logger().info(f"Waiting for {client.srv_name} to become available")
@@ -58,6 +60,7 @@ def get_joint_names_from_service(node: Node) -> List[str]:
 
 
 def get_joint_names_from_robot_name(robot_name: str) -> List[str]:
+    """Gets a list of all the joint names from the '{robot_name}.urdf' that are not fixed."""
     robot = urdf.Robot.from_xml_file(
         os.path.join(
             get_package_share_directory("march_description"),
@@ -69,6 +72,7 @@ def get_joint_names_from_robot_name(robot_name: str) -> List[str]:
 
 
 def get_joint_names_from_robot(robot: urdf.Robot) -> List[str]:
+    """Gets a list of all the joint names from the urdf that are not fixed."""
     joint_names = []
     for joint in robot.joints:
         if joint.type != "fixed":

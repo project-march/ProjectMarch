@@ -1,3 +1,4 @@
+"""Author: MIV; MV; MVI."""
 import json
 import os
 from typing import List, Callable, Tuple, Optional, Union
@@ -20,19 +21,16 @@ MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
 
 class InputDeviceView(QWidget):
-    """
-    The View of the input device, inialized based on a ui file and a controller.
+    """The View of the input device, initialized based on an ui file and a controller.
+
+    Args:
+        ui_file (str): Path to a Qt UI file.
+        layout_file (str): The path to the layout.json file. If the file does not exist is uses the DEFAULT_LAYOUT_FILE.
+            See "package[`march_rqt_input_device`]/config/training.json" file for an example layout file.
+        controller (InputDeviceController): Input device controller for sending ROS messages.
     """
 
     def __init__(self, ui_file: str, layout_file: str, controller: InputDeviceController, logger):
-        """
-        Initializes the view with a UI file and controller.
-
-        :type ui_file: str
-        :param ui_file: path to a Qt UI file
-        :type controller: InputDeviceController
-        :param controller: input device controller for sending ROS messages
-        """
         super(InputDeviceView, self).__init__()
         self._controller = controller
         self._controller.accepted_cb = self._accepted_cb
@@ -58,9 +56,7 @@ class InputDeviceView(QWidget):
         self._update_possible_gaits()
 
     def _create_buttons(self) -> None:
-        """
-        Creates all the buttons, new buttons should be added here.
-        """
+        """Creates all the buttons, new buttons should be added here."""
         with open(self._layout_file) as file:
             json_content = json.loads(file.read())
 
@@ -77,37 +73,30 @@ class InputDeviceView(QWidget):
         self.content.adjustSize()
 
     def _accepted_cb(self) -> None:
-        """
-        Show the GaitInstructionResponse and update possible gaits
-        """
+        """Show the GaitInstructionResponse and update possible gaits."""
         self.status_label.setText("Gait accepted")
         self._update_possible_gaits()
 
     def _finished_cb(self) -> None:
-        """
-        Show the GaitInstructionResponse and update possible gaits
-        """
+        """Show the GaitInstructionResponse and update possible gaits."""
         self.status_label.setText("Gait finished")
         self.gait_label.setText("")
         self._update_possible_gaits()
 
     def _rejected_cb(self) -> None:
-        """
-        Show the GaitInstructionResponse and update possible gaits
-        """
+        """Show the GaitInstructionResponse and update possible gaits."""
         self.status_label.setText("Gait rejected")
         self.gait_label.setText("")
         self._update_possible_gaits()
 
     def _current_gait_cb(self, gait_name: str) -> None:
-        """
-        Show the current gait and update possible gaits
-        """
+        """Show the current gait and update possible gaits."""
         self.gait_label.setText(gait_name)
 
     def _update_possible_gaits(self) -> None:
-        """
-        First requests the controller to update the possible, then create a timer to update the view if the possible
+        """Updates the gaits based on the possible gaits according to the controller.
+
+        First requests the controller to update the possible, then creates a timer to update the view if the possible
         gaits changed.
         """
         self._controller.update_possible_gaits()
@@ -116,17 +105,16 @@ class InputDeviceView(QWidget):
         self._controller.gait_future.add_done_callback(self._update_possible_gaits_view)
 
     def _update_possible_gaits_view(self, future) -> None:
-        """
-        Update the buttons if the possible gaits have changed.
-        """
+        """Update the buttons if the possible gaits have changed."""
         new_possible_gaits = future.result().gaits
         if set(self.possible_gaits) != set(new_possible_gaits):
             self._update_gait_buttons(new_possible_gaits)
 
     def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
-        """
-        Update which buttons are available to the given possible gaits list
-        @param possible_gaits: The gaits that can be executed
+        """Update which buttons are available to the given possible gaits list.
+
+        Args:
+            possible_gaits (List[str]): List of gaits names that can be executed.
         """
         self.frame.setEnabled(False)
         self.frame.verticalScrollBar().setEnabled(False)
@@ -156,19 +144,17 @@ class InputDeviceView(QWidget):
     ):
         """Create a push button which can be pressed to execute a gait instruction.
 
-        :param name:
-            Name of the button
-        :param callback:
-            The callback to attach to the button when pressed
-        :param image_path:
-            The name of the image file
-        :param size:
-            Default size of the button
-        :param always_enabled:
-            Never disable the button if it's not in possible gaits
+        Args:
+            name (str): Name of the button.
+            callback (Union[str, Callable], Optional): The callback to attach to the button when pressed.
+            image_path (str, Optional): The name of the image file. Default is `None`.
+            size ((int,int)): Size of the button in pixels in format (width, height). Default is (w=125px, h=140px).
+            always_enabled (bool): Whether the button can be disabled. Default is False.
+                `True` if the button should never be disabled
+                `False` if the button should be disabled if it's not in possible gaits.
 
-        :return:
-            A QPushButton object which contains the passed arguments
+        Returns:
+            QPushButton. The QPushButton contains the passed arguments and the same style.
         """
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
@@ -202,11 +188,11 @@ class InputDeviceView(QWidget):
     def create_layout(layout_list):
         """Create a button layout with a given list of buttons.
 
-        :param layout_list:
-            A list which contains multiple list which represent a row with given items
+        Args:
+            layout_list: A list which contains multiple list which represent a row with given items.
 
-        :return:
-            A populated QGridLayout object which contains the passed input buttons
+        Returns:
+            QGridLayout. A populated QGridLayout object which contains the passed input buttons.
         """
         qt_button_layout = QGridLayout()
 
@@ -219,9 +205,11 @@ class InputDeviceView(QWidget):
 
 
 def get_image_path(image_path: str) -> str:
-    """Create an absolute image path to an image.
+    """Returns an absolute image path to an image.
 
-    If the image_path is already absolute, just return it.
+    Returns:
+        str. The image_path if it is already absolute,
+            otherwise it makes an absolute image path.
     """
     if os.path.isabs(image_path):
         return image_path
@@ -237,10 +225,11 @@ def get_image_path(image_path: str) -> str:
 def check_string(text: str) -> str:
     """Split text into new lines on every third word.
 
-    :type text: str
-    :param text: The text to split
+    Args:
+        text (str): The text to split.
 
-    :return New string which contains newlines
+    Returns:
+         str. The string that has a new word on every third word.
     """
     words = text.replace("_", " ").split(" ")
     new_string = words[0]

@@ -1,16 +1,15 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
-from rclpy.node import Node
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
+from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_from_urdf,
     get_limits_robot_from_urdf_for_inverse_kinematics,
-    get_position_from_gait_selection,
     get_position_from_yaml,
 )
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -34,19 +33,48 @@ DURATION_INCREASE_SIZE = 0.25
 
 
 class DynamicSetpointGait(GaitInterface):
-    """Gait built up from dynamic setpoints
+    """Gait built up from dynamic setpoints.
 
-    :param gait_selection_node: the gait selection node
-    :type gait_selection_node: Node
+    Args:
+        gait_selection_node (GaitSelection): the gait selection node
+
+    Attributes:
+        gait_selection (GaitSelection): the gait selection node
+        home_stand_position_actuating_joints (Dict[str, float]): joint dict of home stand position for only the
+            actuating joints
+        home_stand_position_all_joints (Dict[str, float]): joint dict of home stand position for all eight joints
+        start_position_actuating_joints (Dict[str, float]): start_position of the actuating joints. Home stand if the
+            gait has not  started yet, last setpoint of previous step if gait is running
+        start_position_all_joints (Dict[str, float): start_position of all eight joints. Home stand if the gait has not
+            started yet, last setpoint of previous step if gait is running.
+        joint_names (List[str]): names of the joints
+        gait_name (str): name of the gait
+        subgait_id (str): either left_swing or right_swing
+        logger (Logger): used to log messages to the terminal with the class name as a prefix
+        pub_left (Publisher): used to publish the chosen foot position of the left leg
+        pub_right (Publisher): used to publish the chosen foot position of the right leg
+        minimum_stair_height (float): steps higher or lower than this height will be classified as 'stairs-like'
+
+        _end (bool): whether the gait has ended
+        _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
+        _trajectory_failed (bool): True if step is not feasible (e.g. due to soft limits), else False
+        _start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
+        _should_stop (bool): Set to true if the next subgait should be a close gait
     """
 
-    def __init__(self, gait_selection_node: Node):
+    _start_time_next_command: Optional[Union[Duration, Time]]
+    _next_command: Optional[TrajectoryCommand]
+    _should_stop: bool
+    minimum_stair_height: float
+    add_push_off: bool
+
+    def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
         self.logger = Logger(self.gait_selection, __class__.__name__)
         self._trajectory_failed = False
 
-        self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
+        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.start_position_all_joints = get_position_from_yaml("stand")
         self.home_stand_position_actuating_joints = self.start_position_actuating_joints
         self.home_stand_position_all_joints = self.start_position_all_joints
@@ -60,13 +88,13 @@ class DynamicSetpointGait(GaitInterface):
         # Create subscribers and publishers for CoViD
         self.gait_selection.create_subscription(
             FootPosition,
-            "/processed_foot_position/right",
+            "/march/processed_foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
             FootPosition,
-            "/processed_foot_position/left",
+            "/march/processed_foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
@@ -78,12 +106,12 @@ class DynamicSetpointGait(GaitInterface):
         )
         self.pub_right = self.gait_selection.create_publisher(
             FootPosition,
-            "/chosen_foot_position/right",
+            "/march/chosen_foot_position/right",
             DEFAULT_HISTORY_DEPTH,
         )
         self.pub_left = self.gait_selection.create_publisher(
             FootPosition,
-            "/chosen_foot_position/left",
+            "/march/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -92,19 +120,22 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def name(self) -> str:
+        """Returns the name of the gait."""
         return self.gait_name
 
     @property
     def subgait_name(self) -> str:
-        # Should return left_swing/right_swing for simulation to work
+        """Returns the name of the subgait. Should return left_swing/right_swing for simulation to work."""
         return self.subgait_id
 
     @property
     def version(self) -> str:
+        """Returns the version of the subgait."""
         return "v0"
 
     @property
     def duration(self) -> Optional[Duration]:
+        """Returns the duration of the subgait."""
         if self._next_command is not None:
             return self._next_command.duration
         else:
@@ -112,6 +143,7 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def gait_type(self) -> Optional[str]:
+        """Returns the type of gait, for example 'walk_like' or 'sit_like'."""
         if self._next_command is not None:
             if (
                 self.foot_location.processed_point.y > self.minimum_stair_height
@@ -125,10 +157,12 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def starting_position(self) -> EdgePosition:
+        """Returns the starting position of the subgait as an EdgePosition."""
         return StaticEdgePosition(self.start_position_actuating_joints)
 
     @property
     def final_position(self) -> EdgePosition:
+        """Returns the final position of the subgait as an EdgePosition."""
         try:
             return StaticEdgePosition(
                 self._dict_all_joints_to_actuating_joints(self.dynamic_subgait.get_final_position())
@@ -138,14 +172,16 @@ class DynamicSetpointGait(GaitInterface):
 
     @property
     def subsequent_subgaits_can_be_scheduled_early(self) -> bool:
+        """Returns if the subgait can be scheduled early."""
         return True
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
+        """Returns if the first open subgait can be scheduled early."""
         return True
 
     def _reset(self) -> None:
-        """Reset all attributes of the gait"""
+        """Reset all attributes of the gait."""
         if self.start_position_actuating_joints != self.home_stand_position_actuating_joints:
             raise ShouldStartFromHomestandError(self.start_position_actuating_joints)
 
@@ -159,7 +195,7 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
+        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.start_position_all_joints = get_position_from_yaml("stand")
 
         self._trajectory_failed = False
@@ -171,16 +207,13 @@ class DynamicSetpointGait(GaitInterface):
         current_time: Time,
         first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> Optional[GaitUpdate]:
-        """Starts the gait. The subgait will be scheduled with the delay given
-        by first_subgait_delay.
+        """Starts the gait. The subgait will be scheduled with the delay given by first_subgait_delay.
 
-        :param current_time: Time at which the subgait will start
-        :type current_time: Time
-        :param first_subgait_delay: Delay of first subgait schedule
-        :type first_subgait_delay: Duration
-
-        :return: A GaitUpdate containing a TrajectoryCommand
-        :rtype: GaitUpdate
+        Args:
+            current_time (Time): Time at which the subgait will start
+            first_subgait_delay (Duration): Delay of first subgait schedule
+        Returns:
+            GaitUpdate: An optional GaitUpdate containing a TrajectoryCommand if step is feasible
         """
         try:
             self._reset()
@@ -199,20 +232,16 @@ class DynamicSetpointGait(GaitInterface):
         current_time: Time,
         early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
     ) -> GaitUpdate:
-        """Give an update on the progress of the gait. This function is called
-        every cycle of the gait_state_machine.
+        """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Starts scheduling
-        subsequent subgaits when the previous subgait is within early scheduling
-        duration and updates the state machine when the next subgait is started.
+        Schedules the first subgait when the delay has passed. Starts scheduling subsequent subgaits when the previous
+        subgait is within early scheduling duration and updates the state machine when the next subgait is started.
 
-        :param current_time: Current time.
-        :type current_time: Time
-        :param early_schedule_duration: Duration that determines how long ahead the next subgait is planned
-        :type early_schedule_duration: Duration
-
-        :return: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
-        :rtype: GaitUpdate
+        Args:
+            current_time (Time): Current time
+            early_schedule_duration (Duration): Duration that determines how long ahead the next subgait is planned
+        Returns:
+            GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
         if self._start_is_delayed:
             if current_time >= self._start_time_next_command:
@@ -229,31 +258,30 @@ class DynamicSetpointGait(GaitInterface):
         return GaitUpdate.empty()
 
     def stop(self) -> bool:
-        """Called when the current gait should be stopped"""
+        """Called when the current gait should be stopped."""
         self._should_stop = True
         return True
 
     def end(self) -> None:
-        """Called when the gait is finished"""
+        """Called when the gait is finished."""
         self._next_command = None
 
     def _update_start_subgait(self) -> GaitUpdate:
-        """Update the state machine that the start gait has
-        begun. Updates the time stamps for the next subgait.
+        """Update the state machine that the start gait has begun. Updates the time stamps for the next subgait.
 
-        :returns: a GaitUpdate for the state machine
-        :rtype: GaitUpdate"""
+        Returns:
+            GaitUpdate: a GaitUpdate for the state machine
+        """
         self._start_is_delayed = False
         self._update_time_stamps(self._next_command.duration)
 
         return GaitUpdate.subgait_updated()
 
     def _update_next_subgait_early(self) -> GaitUpdate:
-        """Already schedule the next subgait with the end time
-        of the current subgait as the start time.
+        """Already schedule the next subgait with the end time of the current subgait as the start time.
 
-        :returns: a GaitUpdate that is empty or contains a trajectory command
-        :rtype: GaitUpdate
+        Returns:
+            GaitUpdate: a GaitUpdate that is empty or contains a trajectory command
         """
         self._scheduled_early = True
         self._next_command = self._set_and_get_next_command()
@@ -264,11 +292,10 @@ class DynamicSetpointGait(GaitInterface):
         return GaitUpdate.should_schedule_early(self._next_command)
 
     def _update_state_machine(self) -> GaitUpdate:
-        """Update the state machine that the new subgait has begun.
-        Also updates time stamps for the next subgait.
+        """Update the state machine that the new subgait has begun. Also updates time stamps for the next subgait.
 
-        :returns: a GaitUpdate for the state machine
-        :rtype: GaitUpdate
+        Returns:
+            GaitUpdate: a GaitUpdate for the state machine
         """
         if self._next_command is None:
             return GaitUpdate.finished()
@@ -280,11 +307,11 @@ class DynamicSetpointGait(GaitInterface):
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Create the next command, based on what the current subgait is.
-        Also checks if the gait has to be stopped. If true, it returns
-        a close gait.
 
-        :returns: A TrajectoryCommand for the next subgait
-        :rtype: TrajectoryCommand
+        Also checks if the gait has to be stopped. If true, it returns a close gait.
+
+        Returns:
+            TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
         if not self._trajectory_failed:
             if self.subgait_id == "right_swing":
@@ -301,36 +328,33 @@ class DynamicSetpointGait(GaitInterface):
             return self._get_trajectory_command()
 
     def _update_start_pos(self) -> None:
-        """Update the start position of the next subgait to be
-        the last position of the previous subgait."""
+        """Update the start position of the next subgait to be the last position of the previous subgait."""
         self.start_position_all_joints = self.dynamic_subgait.get_final_position()
         self.start_position_actuating_joints = self._dict_all_joints_to_actuating_joints(self.start_position_all_joints)
 
     def _callback_right(self, foot_location: FootPosition) -> None:
-        """Update the right foot position with the latest point published
-        on the CoViD-topic.
+        """Update the right foot position with the latest point published on the CoViD-topic.
 
-        :param foot_location: a Point containing the x, y and z location
-        :type foot_location: FootPosition
+        Args:
+            foot_location (FootPosition): a Point containing the x, y, and z location
         """
         self.foot_location_right = foot_location
 
     def _callback_left(self, foot_location: FootPosition) -> None:
-        """Update the left foot position with the latest point published
-        on the CoViD-topic.
+        """Update the left foot position with the latest point published on the CoViD-topic.
 
-        :param foot_location: a Point containing the x, y and z location
-        :type foot_location: FootPosition
+        Args:
+            foot_location (FootPosition): a Point containing the x, y, and z location
         """
         self.foot_location_left = foot_location
 
     def _get_foot_location(self, subgait_id: str) -> Optional[FootPosition]:
-        """Returns the right or left foot position based upon the subgait_id
+        """Returns the right or left foot position based upon the subgait_id.
 
-        :param subgait_id: either right_swing or left_swing
-        :type subgait_id: str
-        :return: either the left or right foot position or none
-        :rtype: FootPosition
+        Args:
+            subgait_id (str): Either right_swing or left_swing
+        Returns:
+            FootPosition: either the left or right foot position or none
         """
         if subgait_id == "left_swing":
             return self.foot_location_left
@@ -340,12 +364,11 @@ class DynamicSetpointGait(GaitInterface):
             return None
 
     def _publish_chosen_foot_position(self, subgait_id: str, foot_position: FootPosition) -> None:
-        """Publish the point to which the step is planned
+        """Publish the point to which the step is planned.
 
-        :param subgait_id: whether it is a right or left swing
-        :type subgait_id: str
-        :param foot_position: point message to which step is planned
-        :type foot_position: FootPosition
+        Args:
+            subgait_id (str): whether it is a right or left swing
+            foot_position (FootPosition): point message to which step is planned
         """
         if subgait_id == "left_swing":
             self.pub_left.publish(foot_position)
@@ -355,13 +378,11 @@ class DynamicSetpointGait(GaitInterface):
     def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id.
 
-        :param start: whether it is a start gait or not
-        :type start: bool
-        :param stop: whether it is a stop gait or not
-        :type stop: bool
-
-        :return: TrajectoryCommand with the current subgait and start time.
-        :rtype: TrajectoryCommand
+        Args:
+            start (:obj: bool, optional): whether` it is a start gait or not, default False
+            stop (:obj: bool, optional): whether it is a stop gait or not, default False
+        Returns:
+            TrajectoryCommand: command with the current subgait and start time
         """
         if stop:
             self._end = True
@@ -387,16 +408,16 @@ class DynamicSetpointGait(GaitInterface):
         return self._get_first_feasible_trajectory(start, stop)
 
     def _get_first_feasible_trajectory(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
-        """If a subgait is not feasible, it will first try to increase the duration. If it is
+        """Returns the first trajectory than can be executed.
+
+        If a subgait is not feasible, it will first try to increase the duration. If it is
         still not feasible, execution of the gait will be stopped.
 
-        :param start: whether it is a start gait or not
-        :type start: bool
-        :param stop: whether it is a stop gait or not
-        :type stop: bool
-
-        :return: TrajectoryCommand with the current subgait and start time.
-        :rtype: TrajectoryCommand
+        Args:
+            start (:obj: bool, optional): whether` it is a start gait or not, default False
+            stop (:obj: bool, optional): whether it is a stop gait or not, default False
+        Returns:
+            TrajectoryCommand: command with the current subgait and start time
         """
         original_duration = self.foot_location.duration
         max_iteration = (
@@ -445,13 +466,12 @@ class DynamicSetpointGait(GaitInterface):
     ) -> Optional[TrajectoryCommand]:
         """Try to get a joint_trajectory_msg from the dynamic subgait instance.
 
-        :param start: whether it is a start gait or not
-        :type start: bool
-        :param stop: whether it is a stop gait or not
-        :type stop: bool
-
-        :return: TrajectoryCommand if successful, otherwise None
-        :rtype: TrajectoryCommand
+        Args:
+            start (bool): whether` it is a start gait or not
+            stop (bool): whether it is a stop gait or not
+            original_duration (float): original duration of the gait as set in the GaitPreprocessor
+        Returns:
+            TrajectoryCommand: optional command if successful, otherwise None
         """
         try:
             self.dynamic_subgait = self._create_subgait_instance(
@@ -476,11 +496,12 @@ class DynamicSetpointGait(GaitInterface):
             return None
 
     def _try_to_get_second_step(self, is_final_iteration: bool) -> bool:
-        """Tries to create the subgait that is one step ahead. If this is not possible,
-        the first subgait should not be executed.
+        """Tries to create the subgait that is one step ahead.
 
-        :returns: If the second step can be made
-        :rtype: bool
+        If this is not possible, the first subgait should not be executed.
+
+        Returns:
+            bool: True if second step can be made, otherwise false
         """
         start_position = self.dynamic_subgait.get_final_position()
         subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
@@ -499,6 +520,11 @@ class DynamicSetpointGait(GaitInterface):
         return True
 
     def _get_stop_gait(self) -> Optional[TrajectoryCommand]:
+        """Returns a TrajectoryCommand containing a stop gait.
+
+        Returns:
+            TrajectoryCommand: command containing a stop gait
+        """
         self._end = True
         subgait = self._create_subgait_instance(
             self.start_position_all_joints,
@@ -517,24 +543,29 @@ class DynamicSetpointGait(GaitInterface):
     def _is_duration_bigger_than_max_duration(self, original_duration: float) -> bool:
         """Returns true if duration is bigger than maximum duration, else false.
 
-        :param original_duration: duration before iterations
-        :type original_duration: float
+        Args:
+            original_duration (float): duration before iterations
+        Returns:
+            bool: True if current duration is bigger than max allowed duration, else False
         """
         return self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR
 
     def _create_subgait_instance(
         self,
-        start_position: dict,
+        start_position: Dict[str, float],
         subgait_id: str,
         start: bool,
         stop: bool,
     ) -> DynamicSubgait:
-        """Create a DynamicSubgait instance
+        """Create a DynamicSubgait instance.
 
-        :param start: whether it is a start gait or not
-        :type start: bool
-        :param stop: whether it is a stop gait or not
-        :type stop: bool
+        Args:
+            start_position (Dict[str, Setpoint]): dict containing joint_names and positions of the joint as setpoints
+            subgait_id (str): either 'left_swing' or 'right_swing'
+            start (bool): whether it is a start gait or not
+            stop (bool): whether it is a stop gait or not
+        Returns:
+            DynamicSubgait: DynamicSubgait instance for the desired step
         """
         return DynamicSubgait(
             self.gait_selection,
@@ -549,10 +580,10 @@ class DynamicSetpointGait(GaitInterface):
         )
 
     def _update_time_stamps(self, next_command_duration: Duration) -> None:
-        """Update the starting and end time
+        """Update the starting and end time.
 
-        :param next_command_duration: Duration of the next command to be scheduled.
-        :type next_command_duration: Duration
+        Args:
+            next_command_duration (Duration): duration of the next command to be scheduled
         """
         start_time_previous_command = self._start_time_next_command
         self._start_time_next_command = start_time_previous_command + next_command_duration
@@ -563,6 +594,11 @@ class DynamicSetpointGait(GaitInterface):
         self.add_push_off = self.gait_selection.add_push_off
 
     def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Reset start position to home stand after force unknown.
+
+        Args:
+            msg (GaitInstruction): message containing a gait_instruction from the IPD
+        """
         if msg.type == GaitInstruction.UNKNOWN:
             self.start_position_all_joints = get_position_from_yaml("stand")
             self.start_position_actuating_joints = self._dict_all_joints_to_actuating_joints(
@@ -572,7 +608,7 @@ class DynamicSetpointGait(GaitInterface):
             self._trajectory_failed = False
 
     def _get_soft_limits(self):
-        """Get the limits of all joints in the urdf"""
+        """Get the limits of all joints in the urdf."""
         self.joint_soft_limits = []
         for joint_name in self.joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
@@ -584,8 +620,13 @@ class DynamicSetpointGait(GaitInterface):
         return dict_actuating_joints
 
     def _check_msg_time(self, foot_location: FootPosition) -> bool:
-        """Checks if the foot_location given by CoViD is not older than
-        FOOT_LOCATION_TIME_OUT."""
+        """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.
+
+        Args:
+            foot_location (FootPosition): FootPosition message that should be checked
+        Returns:
+            bool: True if message is not more than 0.5 seconds old, else False
+        """
         msg_time = Time(
             seconds=foot_location.header.stamp.sec,
             nanoseconds=foot_location.header.stamp.nanosec,
