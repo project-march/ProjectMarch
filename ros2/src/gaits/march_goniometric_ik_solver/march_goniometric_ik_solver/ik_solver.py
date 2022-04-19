@@ -256,9 +256,7 @@ class Pose:
 
     @property
     def ankle_limit_toes_knee_distance(self) -> float:
-        """
-        Returns the distance between knee and toes when the ankle is in max dorsi flexion.
-        """
+        """Returns the distance between knee and toes when the ankle is in max dorsi flexion."""
         pose = Pose(self.all_joint_names)
         pose.fe_ankle1 = MAX_ANKLE_FLEXION
         return np.linalg.norm(pose.pos_toes1 - pose.pos_knee1)
