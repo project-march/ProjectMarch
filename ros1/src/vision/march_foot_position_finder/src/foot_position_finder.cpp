@@ -135,8 +135,8 @@ void FootPositionFinder::readParameters(
     }
 
     // Initialize all variables as zero:
-    start_point_ = last_displacement_ = previous_start_point_ = desired_point_
-        = ORIGIN;
+    start_point_ = last_displacement_ = previous_start_point_
+        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
 
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
@@ -263,8 +263,9 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
-        std::vector<Point> track_points = pointFinder.retrieveTrackPoints(
-            previous_start_point_, found_covid_point_);
+        std::vector<Point>
+            track_points; //= pointFinder.retrieveTrackPoints(
+                          // previous_start_point_, found_covid_point_);
 
         // Visualization
         publishTrackMarkerPoints(
@@ -279,7 +280,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Apply a threshold for the height of points to be different from 0
         if (std::abs(new_displacement_.z) < height_zero_threshold_) {
-            new_displacement_.z = 0;
+            new_displacement_.z = 0.0;
         }
 
         // Visualization
@@ -289,8 +290,10 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             left_or_right_); // Green
 
         // Publish final point for gait computation
-        publishPoint(point_publisher_, found_covid_point_, found_covid_point_,
-            new_displacement_, track_points);
+        Point found_coved_point_other_ = FootPositionFinder::transformPoint(
+            found_covid_point_, current_frame_id_, other_frame_id_);
+        publishPoint(point_publisher_, found_covid_point_,
+            found_coved_point_other_, new_displacement_, track_points);
     }
 }
 

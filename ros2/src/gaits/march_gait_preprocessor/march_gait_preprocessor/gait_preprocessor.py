@@ -10,8 +10,8 @@ NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
 # Offsets are used to account for the difference in points between
 # covid (middle of foot) and gait (at the heel)
-X_OFFSET = 0
-Y_OFFSET = -0.01
+X_OFFSET = 0.0
+Y_OFFSET = 0.0
 Z_OFFSET = 0.22
 
 
@@ -123,6 +123,8 @@ class GaitPreprocessor(Node):
         point.x = -foot_location.displacement.x + X_OFFSET
         point.y = foot_location.displacement.z + Y_OFFSET
         point.z = temp_y + np.sign(temp_y) * Z_OFFSET
+
+        self.get_logger().info(f"{point.x}, {point.y}, {point.z}")
 
         return point
 

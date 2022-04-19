@@ -66,7 +66,7 @@ void publishMarkerPoint(
     ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "left") {
+    if (left_or_right == "right") {
         marker.header.frame_id = "toes_right_aligned";
     } else {
         marker.header.frame_id = "toes_left_aligned";
@@ -140,7 +140,7 @@ void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2,
     std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "left") {
+    if (left_or_right == "right") {
         marker.header.frame_id = "toes_right_aligned";
     } else {
         marker.header.frame_id = "toes_left_aligned";
@@ -226,7 +226,7 @@ void publishDesiredPosition(
     ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "left") {
+    if (left_or_right == "right") {
         marker.header.frame_id = "toes_right_aligned";
     } else {
         marker.header.frame_id = "toes_left_aligned";
@@ -273,7 +273,7 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
     std::vector<double> dis, const std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "left") {
+    if (left_or_right == "right") {
         marker.header.frame_id = "toes_right_aligned";
     } else {
         marker.header.frame_id = "toes_left_aligned";
@@ -329,7 +329,7 @@ void publishPossiblePoints(ros::Publisher& publisher,
     std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "left") {
+    if (left_or_right == "right") {
         marker.header.frame_id = "toes_right_aligned";
     } else {
         marker.header.frame_id = "toes_left_aligned";
