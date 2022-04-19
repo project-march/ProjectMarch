@@ -36,10 +36,7 @@ for name in JOINT_NAMES:
 
 # Create a constant for frequently used limits:
 ANKLE_BUFFER = np.deg2rad(1)
-if "left_ankle" in JOINT_NAMES:
-    MAX_ANKLE_FLEXION = JOINT_LIMITS["left_ankle"].upper - ANKLE_BUFFER
-else:
-    MAX_ANKLE_FLEXION = 0.144 - ANKLE_BUFFER  # Take march6 limit if joint is not in urdf
+MAX_ANKLE_FLEXION = get_limits_robot_from_urdf_for_inverse_kinematics("left_ankle").upper - ANKLE_BUFFER
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -636,11 +633,12 @@ def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> List:
     """Checks all joints limits of the current pose and create error messages for exceeding limits.
 
     Args:
-        all_joint_names (List[str]): list containing all joint names in alpabetical order.
-         pose_list (List[float]): A list of joints poses in alphabetic order.
+        all_joint_names (List[str]): list containing all joint names in alphabetical order.
+        pose_list (List[float]): A list of joints poses in alphabetical order.
     """
     errors = []
     joint_pose_dict = {}
+    # TODO: add global enum for all joint names
     for i, joint_name in enumerate(all_joint_names):
         joint_pose_dict[joint_name] = pose_list[i]
 

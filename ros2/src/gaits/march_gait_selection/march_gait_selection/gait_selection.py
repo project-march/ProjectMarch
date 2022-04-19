@@ -576,6 +576,16 @@ class GaitSelection(Node):
                     return False
         return True
 
+    def get_named_position(self, position: str) -> Dict[str, float]:
+        """Returns a joint dict of a named position from the gait_selection node.
+
+        Args:
+            position (str): name of the position
+        Returns:
+            Dict[str, float]: a dict containing joint names and positions for the actuating joints.
+        """
+        return self.positions[position]["joints"]
+
     def __getitem__(self, name: str):
         """Returns a gait from the loaded gaits.
 

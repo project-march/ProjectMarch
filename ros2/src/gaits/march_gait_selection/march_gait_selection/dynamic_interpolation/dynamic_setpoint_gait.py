@@ -1,6 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
 
@@ -10,7 +10,6 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_from_urdf,
     get_limits_robot_from_urdf_for_inverse_kinematics,
-    get_position_from_gait_selection,
     get_position_from_yaml,
 )
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -40,21 +39,29 @@ class DynamicSetpointGait(GaitInterface):
 
     Attributes:
         gait_selection (GaitSelection): the gait selection node
-        home_stand_position (Dict[str, Setpoint]): setpoint_dict of home stand position
-        start_position (Dict[str, Setpoint]): start_position of gait. Home stand if the gait has not started yet,
-            last setpoint of previous step if gait is running
-        end_position (Dict[str, Setpoint]): setpoint_dict of end position
+        home_stand_position_actuating_joints (Dict[str, float]): joint dict of home stand position for only the
+            actuating joints
+        home_stand_position_all_joints (Dict[str, float]): joint dict of home stand position for all eight joints
+        start_position_actuating_joints (Dict[str, float]): start_position of the actuating joints. Home stand if the
+            gait has not  started yet, last setpoint of previous step if gait is running
+        start_position_all_joints (Dict[str, float): start_position of all eight joints. Home stand if the gait has not
+            started yet, last setpoint of previous step if gait is running.
         joint_names (List[str]): names of the joints
         gait_name (str): name of the gait
         subgait_id (str): either left_swing or right_swing
+        logger (Logger): used to log messages to the terminal with the class name as a prefix
+        pub_left (Publisher): used to publish the chosen foot position of the left leg
+        pub_right (Publisher): used to publish the chosen foot position of the right leg
 
         _end (bool): whether the gait has ended
         _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
         _trajectory_failed (bool): True if step is not feasible (e.g. due to soft limits), else False
+        _start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
+        _should_stop (bool): Set to true if the next subgait should be a close gait
+        _minimum_stair_height (float): steps higher or lower than this height will be classified as 'stairs-like'
     """
 
-    _start_time: Optional[Duration]
-    _current_time: Optional[Time]
+    _start_time_next_command: Optional[Union[Duration, Time]]
     _next_command: Optional[TrajectoryCommand]
     _should_stop: bool
     _minimum_stair_height: float
@@ -65,7 +72,7 @@ class DynamicSetpointGait(GaitInterface):
         self.logger = Logger(self.gait_selection, __class__.__name__)
         self._trajectory_failed = False
 
-        self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
+        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.start_position_all_joints = get_position_from_yaml("stand")
         self.home_stand_position_actuating_joints = self.start_position_actuating_joints
         self.home_stand_position_all_joints = self.start_position_all_joints
@@ -79,13 +86,13 @@ class DynamicSetpointGait(GaitInterface):
         # Create subscribers and publishers for CoViD
         self.gait_selection.create_subscription(
             FootPosition,
-            "/processed_foot_position/right",
+            "/march/processed_foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
             FootPosition,
-            "/processed_foot_position/left",
+            "/march/processed_foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
@@ -97,12 +104,12 @@ class DynamicSetpointGait(GaitInterface):
         )
         self.pub_right = self.gait_selection.create_publisher(
             FootPosition,
-            "/chosen_foot_position/right",
+            "/march/chosen_foot_position/right",
             DEFAULT_HISTORY_DEPTH,
         )
         self.pub_left = self.gait_selection.create_publisher(
             FootPosition,
-            "/chosen_foot_position/left",
+            "/march/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -186,7 +193,7 @@ class DynamicSetpointGait(GaitInterface):
         self._start_is_delayed = True
         self._scheduled_early = False
 
-        self.start_position_actuating_joints = get_position_from_gait_selection(self.gait_selection, "stand")
+        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.start_position_all_joints = get_position_from_yaml("stand")
 
         self._trajectory_failed = False

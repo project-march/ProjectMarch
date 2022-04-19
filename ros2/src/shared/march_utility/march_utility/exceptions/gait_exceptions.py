@@ -1,7 +1,6 @@
 """This module contains some errors that are specific to the gaits in the Project March code."""
-from typing import Dict
 
-from march_utility.gait.setpoint import Setpoint
+from typing import Dict
 
 
 class GaitError(Exception):
@@ -18,7 +17,7 @@ class GaitError(Exception):
 
 
 class GaitNameNotFoundError(GaitError):
-    """Class to raise an error when given gait name does not exists .
+    """Class to raise an error when given gait name does not exist.
 
     Args:
         gait_name (str): The name of the gait that could not be found.
@@ -33,7 +32,7 @@ class GaitNameNotFoundError(GaitError):
 
 
 class SubgaitNameNotFoundError(GaitError):
-    """Class to raise an error when given subgait name does not exists .
+    """Class to raise an error when given subgait name does not exist.
 
     Args:
         subgait_name (str): The name of the subgait that is not recognized within the gait.
@@ -133,7 +132,7 @@ class PositionSoftLimitError(Exception):
         joint_name (str): name of the joint
         position (float): position of the joint
         lower_limit (float): lower limit of position soft limits
-        upper_limmit (float): upper limit of position soft limits
+        upper_limit (float): upper limit of position soft limits
     """
 
     def __init__(self, joint_name: str, position: float, lower_limit: float, upper_limit: float):
@@ -176,10 +175,10 @@ class ShouldStartFromHomestandError(Exception):
     without the exo being in home stand.
 
     Args:
-        position (Dict[str, Setpoint]): current position of the exo.
+        position (Dict[str, float]): current position of the exo.
     """
 
-    def __init__(self, position: Dict[str, Setpoint]):
+    def __init__(self, position: Dict[str, float]):
         self.msg = f"Gait can only be executed from homestand, current position is {position}."
 
         super(ShouldStartFromHomestandError, self).__init__(self.msg)

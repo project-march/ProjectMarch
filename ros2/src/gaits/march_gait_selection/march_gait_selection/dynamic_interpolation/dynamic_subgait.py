@@ -41,12 +41,12 @@ class DynamicSubgait:
 
     Args:
         gait_selection_node (GaitSelection): The gait selection node
-        starting_position (dict of str: Setpoint): The first setpoint of the subgait, usually the last setpoint
+        starting_position (Dict[str, float]): The first setpoint of the subgait, usually the last setpoint
             of the previous subgait.
         subgait_id (str): Whether it is a left_swing or right_swing
-        joint_names (:obj: list of :obj: str): Names of the joints
+        joint_names (List[str]): Names of the joints
         location (Point): Desired location of the foot, given by covid
-        joint_soft_limits (:obj: list of :obj: Limits): List containing soft limits of joints in alphabetical order
+        joint_soft_limits (List[Limits]): List containing soft limits of joints in alphabetical order
         start (bool): whether it is an open gait or not
         stop (bool): whether it is a close gait or not
 
@@ -67,7 +67,7 @@ class DynamicSubgait:
     def __init__(
         self,
         gait_selection_node,
-        starting_position: Dict[str, Setpoint],
+        starting_position: Dict[str, float],
         subgait_id: str,
         joint_names: List[str],
         location: FootPosition,

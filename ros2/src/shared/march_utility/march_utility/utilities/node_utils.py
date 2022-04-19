@@ -12,6 +12,7 @@ from urdf_parser_py import urdf
 
 SERVICE_TIMEOUT = 1
 DEFAULT_HISTORY_DEPTH = 10
+TOPIC_PREFIX = "/march"
 
 
 def get_robot_urdf_from_service(node: Node) -> urdf.Robot:
