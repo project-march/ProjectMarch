@@ -4,7 +4,7 @@ These functions are not a part of any specific part of the code, but will be use
 for general use cases.
 """
 import os
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
@@ -261,15 +261,3 @@ def get_position_from_yaml(position: str):
                 raise KeyError(f"No position found with name {e}")
     except FileNotFoundError as e:
         Node("march_utility").get_logger().error(e)
-
-
-def get_position_from_gait_selection(gait_selection, position: str) -> Dict[str, float]:
-    """Returns a joint dict of a named position from the gait_selection node.
-
-    Args:
-        gait_selection (GaitSelection): the gait selection
-        position (str): name of the position
-    Returns:
-        Dict[str, float]: a dict containing joint names and positions for the actuating joints.
-    """
-    return gait_selection.positions[position]["joints"]
