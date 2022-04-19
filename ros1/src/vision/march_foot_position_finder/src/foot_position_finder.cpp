@@ -56,7 +56,8 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
         = "/camera_front_" + left_or_right + "/depth/color/points";
     topic_other_chosen_point_
         = "/march/chosen_foot_position/" + other_side_; // in current_frame_id
-    topic_current_chosen_point_ = "/march/chosen_foot_position/" + left_or_right_;
+    topic_current_chosen_point_
+        = "/march/chosen_foot_position/" + left_or_right_;
 
     point_publisher_ = n_->advertise<march_shared_msgs::FootPosition>(
         "/march/foot_position/" + left_or_right_, /*queue_size=*/1);
