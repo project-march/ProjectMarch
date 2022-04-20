@@ -402,6 +402,7 @@ class DynamicSetpointGait(GaitInterface):
                 )
 
         if start and stop:
+            # If it is a start gait and stop is set to true because of the message time, do not return a trajectory.
             return None
 
         return self._get_first_feasible_trajectory(start, stop)
@@ -425,7 +426,7 @@ class DynamicSetpointGait(GaitInterface):
         iteration = 0
 
         while not self._is_duration_bigger_than_max_duration(original_duration):
-            is_final_iteration = iteration == max_iteration
+            is_final_iteration = (iteration == max_iteration)
             trajectory_command = self._try_to_get_trajectory_command(
                 start,
                 stop,
@@ -460,7 +461,7 @@ class DynamicSetpointGait(GaitInterface):
         start: bool,
         stop: bool,
         original_duration: float,
-        iteration: float,
+        iteration: int,
         is_final_iteration: bool,
     ) -> Optional[TrajectoryCommand]:
         """Try to get a joint_trajectory_msg from the dynamic subgait instance.
@@ -469,7 +470,7 @@ class DynamicSetpointGait(GaitInterface):
             start (bool): whether it is a start gait
             stop (bool): whether it is a stop gait
             original_duration (float): original duration of the gait as set in the GaitPreprocessor
-            iteration (float): current iteration over the velocity
+            iteration (int): current iteration over the velocity
             is_final_iteration (bool): True if current iteration equals the maximum amount of iterations
         Returns:
             TrajectoryCommand: optional command if successful, otherwise None
