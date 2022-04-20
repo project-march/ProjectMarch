@@ -236,7 +236,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Preprocess point cloud and place pointcloud in aligned toes frame:
     NormalCloud::Ptr normalcloud(new NormalCloud());
-    Preprocessor preprocessor(n_, pointcloud, normalcloud, left_or_right_);
+    Preprocessor preprocessor(n_, pointcloud, normalcloud, left_or_right_, listener);
     preprocessor.preprocess();
 
     // Publish cloud for visualization:

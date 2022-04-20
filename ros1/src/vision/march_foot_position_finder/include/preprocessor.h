@@ -8,6 +8,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/transforms.h>
+#include <tf/transform_listener.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using NormalCloud = pcl::PointCloud<pcl::Normal>;
@@ -15,7 +16,7 @@ using NormalCloud = pcl::PointCloud<pcl::Normal>;
 class Preprocessor {
 public:
     explicit Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-        NormalCloud::Ptr normalcloud, std::string& left_or_right);
+        NormalCloud::Ptr normalcloud, std::string& left_or_right, tf::TransformListener& listener);
 
     void preprocess();
 
@@ -45,6 +46,9 @@ protected:
 
     std::string base_frame_;
     std::string pointcloud_frame_id_;
+
+    tf::StampedTransform transform;
+    tf::Vector3 translation;
 };
 
 #endif // MARCH_PREPROCESSOR_H

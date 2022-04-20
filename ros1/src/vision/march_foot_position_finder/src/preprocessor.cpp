@@ -2,6 +2,7 @@
  * @author Tuhin Das - MARCH 7
  */
 
+#include <chrono>
 #include <cmath>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
@@ -27,7 +28,8 @@ using NormalCloud = pcl::PointCloud<Normal>;
 // Suppress lint error: "fields are not initialized by constructor"
 // NOLINTNEXTLINE
 Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-    NormalCloud::Ptr normalcloud, std::string& left_or_right)
+    NormalCloud::Ptr normalcloud, std::string& left_or_right,
+    tf::TransformListener& listener)
     : pointcloud_ { std::move(pointcloud) }
     , normalcloud_ { std::move(normalcloud) }
 {
@@ -36,10 +38,26 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 
     if (left_or_right == "left") {
         base_frame_ = "toes_right_aligned";
-    }
-    else{
+    } else {
         base_frame_ = "toes_left_aligned";
     }
+    base_frame_ = "world";
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::cout << "all frames: " << listener.allFramesAsString() << std::endl;
+    pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
+    listener.lookupTransform(
+        base_frame_, pointcloud_frame_id_, ros::Time(0), transform);
+
+    translation = transform.getOrigin();
+    translation.setX(0);
+    translation.setY(0);
+    transform.setOrigin(translation);
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration
+        = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "total time is " << duration.count() << std::endl;
 
     ros::param::get("~voxel_size", voxel_size_);
     ros::param::get("~x_min", x_min_);
@@ -117,20 +135,65 @@ void Preprocessor::filterOnDistance(float x_min, float x_max, float y_min,
  */
 void Preprocessor::transformPointCloudFromUrdf()
 {
-    geometry_msgs::TransformStamped transform_stamped;
-    try {
-        pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
-        if (tfBuffer_->canTransform(base_frame_, pointcloud_frame_id_,
-                ros::Time(/*t=*/0), ros::Duration(/*t=*/1.0))) {
-            transform_stamped = tfBuffer_->lookupTransform(
-                base_frame_, pointcloud_frame_id_, ros::Time(/*t=*/0));
-            pcl_ros::transformPointCloud(
-                *pointcloud_, *pointcloud_, transform_stamped.transform);
-            pointcloud_->header.frame_id = base_frame_;
-        }
-    } catch (tf2::TransformException& ex) {
-        ROS_WARN_STREAM(
-            "Something went wrong when transforming the pointcloud: "
-            << ex.what());
-    }
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // tf::StampedTransform transform;
+    // pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
+    // listener.lookupTransform(
+    //     "world", pointcloud_frame_id_, ros::Time(0), transform);
+
+    // listener.waitForTransform(
+    //     "world", pointcloud_frame_id_, ros::Time::now(), ros::Duration(3.0));
+
+    pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_, transform);
+    pointcloud_->header.frame_id = base_frame_;
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration
+        = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "total time is " << duration.count() << std::endl;
 }
+
+// void Preprocessor::transformPointCloudFromUrdf()
+// {
+//     auto start = std::chrono::high_resolution_clock::now();
+
+//     geometry_msgs::TransformStamped transform_stamped;
+//     try {
+//         pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
+//         if (tfBuffer_->canTransform(base_frame_, pointcloud_frame_id_,
+//                 ros::Time(/*t=*/0), ros::Duration(/*t=*/1.0))) {
+
+//             auto start = std::chrono::high_resolution_clock::now();
+//             transform_stamped = tfBuffer_->lookupTransform(
+//                 base_frame_, pointcloud_frame_id_, ros::Time(/*t=*/0));
+//             auto stop = std::chrono::high_resolution_clock::now();
+//             auto duration
+//                 = std::chrono::duration_cast<std::chrono::microseconds>(
+//                     stop - start);
+//             std::cout << "look up transform takes " << duration.count()
+//                       << std::endl;
+
+//             start = std::chrono::high_resolution_clock::now();
+//             pcl_ros::transformPointCloud(
+//                 *pointcloud_, *pointcloud_, transform_stamped.transform);
+//             stop = std::chrono::high_resolution_clock::now();
+//             duration = std::chrono::duration_cast<std::chrono::microseconds>(
+//                 stop - start);
+//             std::cout << "transformation itself takes " << duration.count()
+//                       << std::endl;
+
+//             pointcloud_->header.frame_id = base_frame_;
+//         }
+//     } catch (tf2::TransformException& ex) {
+//         ROS_WARN_STREAM(
+//             "Something went wrong when transforming the pointcloud: "
+//             << ex.what());
+//     }
+
+//     auto stop = std::chrono::high_resolution_clock::now();
+//     auto duration
+//         = std::chrono::duration_cast<std::chrono::microseconds>(stop -
+//         start);
+//     std::cout << "total time is " << duration.count() << std::endl;
+// }

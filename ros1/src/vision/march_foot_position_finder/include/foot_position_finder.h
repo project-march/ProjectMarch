@@ -19,6 +19,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <tf/transform_listener.h>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -114,6 +115,8 @@ protected:
     Point last_displacement_;
     Point new_displacement_;
     Point found_covid_point_;
+
+    tf::TransformListener listener;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H
