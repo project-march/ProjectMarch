@@ -1,5 +1,7 @@
 """This module contains some errors that are specific to the gaits in the Project March code."""
 
+from typing import Dict
+
 
 class GaitError(Exception):
     """Base class for exceptions in gait modules.
@@ -15,7 +17,7 @@ class GaitError(Exception):
 
 
 class GaitNameNotFoundError(GaitError):
-    """Class to raise an error when given gait name does not exists .
+    """Class to raise an error when given gait name does not exist.
 
     Args:
         gait_name (str): The name of the gait that could not be found.
@@ -30,7 +32,7 @@ class GaitNameNotFoundError(GaitError):
 
 
 class SubgaitNameNotFoundError(GaitError):
-    """Class to raise an error when given subgait name does not exists .
+    """Class to raise an error when given subgait name does not exist.
 
     Args:
         subgait_name (str): The name of the subgait that is not recognized within the gait.
@@ -124,7 +126,14 @@ class WrongRealSenseConfigurationError(Exception):
 
 
 class PositionSoftLimitError(Exception):
-    """Class to raise an error when joint trajectory will be outside of position soft limits."""
+    """Class to raise an error when joint trajectory will be outside of position soft limits.
+
+    Args:
+        joint_name (str): name of the joint
+        position (float): position of the joint
+        lower_limit (float): lower limit of position soft limits
+        upper_limit (float): upper limit of position soft limits
+    """
 
     def __init__(self, joint_name: str, position: float, lower_limit: float, upper_limit: float):
         self.joint_name = joint_name
@@ -132,35 +141,44 @@ class PositionSoftLimitError(Exception):
         self.lower_limit = lower_limit
         self.upper_limit = upper_limit
 
-        msg = (
+        self.msg = (
             f"{joint_name} will be outside its soft limits. Position: {position}, soft limits: "
             f"[{lower_limit}, {upper_limit}]."
         )
 
-        super(PositionSoftLimitError, self).__init__(msg)
+        super(PositionSoftLimitError, self).__init__(self.msg)
 
 
 class VelocitySoftLimitError(Exception):
-    """Class to raise an error when joint trajectory will be outside of velocity soft limits."""
+    """Class to raise an error when joint trajectory will be outside of velocity soft limits.
+
+    Args:
+        joint_name (str): name of the joint that is outside of velocity limit
+        velocity (float): velocity of the joint
+        limit (float): velocity limit of the joint
+    """
 
     def __init__(self, joint_name: str, velocity: float, limit: float):
         self.joint_name = joint_name
         self.velocity = velocity
         self.limit = limit
 
-        msg = f"{joint_name} will be outside of velocity limits, velocity: {velocity}, velocity limit: {limit}."
+        self.msg = f"{joint_name} will be outside of velocity limits, velocity: {velocity}, velocity limit: {limit}."
 
-        super(VelocitySoftLimitError, self).__init__(msg)
+        super(VelocitySoftLimitError, self).__init__(self.msg)
 
 
 class ShouldStartFromHomestandError(Exception):
-    """Exception for if the exo is not start from "Home Stand".
+    """Exception for when the exo is not starting from "Home Stand".
 
     Mainly raised if an error when the previous subgait failed and dynamic gait is selected again
     without the exo being in home stand.
+
+    Args:
+        position (Dict[str, float]): current position of the exo.
     """
 
-    def __init__(self):
-        msg = "Gait can only be executed from homestand."
+    def __init__(self, position: Dict[str, float]):
+        self.msg = f"Gait can only be executed from homestand, current position is {position}."
 
-        super(ShouldStartFromHomestandError, self).__init__(msg)
+        super(ShouldStartFromHomestandError, self).__init__(self.msg)

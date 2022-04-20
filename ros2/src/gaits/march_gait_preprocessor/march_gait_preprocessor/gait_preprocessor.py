@@ -44,13 +44,13 @@ class GaitPreprocessor(Node):
         """Create subscribers to the topics on which covid publishes found points."""
         self.subscription_left = self.create_subscription(
             FootPosition,
-            "/foot_position/left",
+            "/march/foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
         self.subscription_right = self.create_subscription(
             FootPosition,
-            "/foot_position/right",
+            "/march/foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
@@ -59,12 +59,12 @@ class GaitPreprocessor(Node):
         """Create publishers for the topics gait listens to."""
         self.publisher_right = self.create_publisher(
             FootPosition,
-            "/processed_foot_position/right",
+            "/march/processed_foot_position/right",
             DEFAULT_HISTORY_DEPTH,
         )
         self.publisher_left = self.create_publisher(
             FootPosition,
-            "/processed_foot_position/left",
+            "/march/processed_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -108,7 +108,8 @@ class GaitPreprocessor(Node):
             duration=scaled_duration,
         )
 
-    def _get_foot_location_in_gait_axes(self, foot_location: FootPosition) -> Point:
+    @staticmethod
+    def _get_foot_location_in_gait_axes(foot_location: FootPosition) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
 
         Args:
@@ -126,7 +127,8 @@ class GaitPreprocessor(Node):
 
         return point
 
-    def _get_duration_scaled_to_height(self, duration: float, step_height: float) -> float:
+    @staticmethod
+    def _get_duration_scaled_to_height(duration: float, step_height: float) -> float:
         """Scales the duration based on the absolute step height.
 
         Args:

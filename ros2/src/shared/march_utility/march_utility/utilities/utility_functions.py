@@ -3,7 +3,6 @@
 These functions are not a part of any specific part of the code, but will be useful
 for general use cases.
 """
-
 import os
 from typing import List, Optional
 

@@ -59,15 +59,14 @@ def parameter_callback(
         SetParametersResult: Whether the callback was successful
     """
     gait_selection.get_logger().info("Parameters are updated")
-    dynamic_gait_updated = False
     position_queue_updated = False
     gaits_updated = False
     dynamic_gait_updated = False
     for param in parameters:
         if param.name == "balance" and param.type_ == Parameter.Type.BOOL:
-            gait_selection._balance_used = param.value
+            gait_selection._balance_used = param.get_parameter_value().bool_value
         elif param.name == "dynamic_gait" and param.type == Parameter.Type.BOOL:
-            gait_selection._dynamic_gait = param.value
+            gait_selection._dynamic_gait = param.get_parameter_value().bool_value
         elif param.name == "early_schedule_delay" and param.type_ == Parameter.Type.DOUBLE:
             if param.value < 0:
                 return SetParametersResult(successful=False)
@@ -77,22 +76,22 @@ def parameter_callback(
                 return SetParametersResult(successful=False)
             gait_selection._first_subgait_delay = Duration(seconds=param.value)
         elif param.name == "middle_point_fraction":
-            gait_selection.middle_point_fraction = param.value
+            gait_selection.middle_point_fraction = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "middle_point_height":
-            gait_selection.middle_point_height = param.value
+            gait_selection.middle_point_height = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "minimum_stair_height":
-            gait_selection.minimum_stair_height = param.value
+            gait_selection.minimum_stair_height = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "push_off_fraction":
-            gait_selection.push_off_fraction = param.value
+            gait_selection.push_off_fraction = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "push_off_position":
-            gait_selection.push_off_position = param.value
+            gait_selection.push_off_position = param.get_parameter_value().double_value
             dynamic_gait_updated = True
-        elif param.name == "use_position_queue" and param.type_ == Parameter.Type.BOOL:
-            gait_selection.use_position_queue = param.value
+        elif param.name == "use_position_queue":
+            gait_selection.use_position_queue = param.get_parameter_value().bool_value
             position_queue_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value

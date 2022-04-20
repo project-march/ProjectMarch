@@ -2,10 +2,10 @@
 
 import numpy as np
 
+from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
-
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
@@ -41,12 +41,12 @@ class DynamicSubgait:
 
     Args:
         gait_selection_node (GaitSelection): The gait selection node
-        starting_position (dict of str: Setpoint): The first setpoint of the subgait, usually the last setpoint
+        starting_position (Dict[str, float]): The first setpoint of the subgait, usually the last setpoint
             of the previous subgait.
         subgait_id (str): Whether it is a left_swing or right_swing
-        joint_names (:obj: list of :obj: str): Names of the joints
+        joint_names (List[str]): Names of the joints
         location (Point): Desired location of the foot, given by covid
-        joint_soft_limits (:obj: list of :obj: Limits): List containing soft limits of joints in alphabetical order
+        joint_soft_limits (List[Limits]): List containing soft limits of joints in alphabetical order
         start (bool): whether it is an open gait or not
         stop (bool): whether it is a close gait or not
 
@@ -67,7 +67,7 @@ class DynamicSubgait:
     def __init__(
         self,
         gait_selection_node,
-        starting_position: Dict[str, Setpoint],
+        starting_position: Dict[str, float],
         subgait_id: str,
         joint_names: List[str],
         location: FootPosition,
@@ -80,9 +80,11 @@ class DynamicSubgait:
 
         self.starting_position = starting_position
         self.location = location.processed_point
-        self.joint_names = joint_names
+        self.actuating_joint_names = joint_names
+        self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
+        self.pose = Pose(self.all_joint_names, list(self.starting_position.values()))
 
         self.time = [
             0,
@@ -91,9 +93,12 @@ class DynamicSubgait:
             location.duration,
         ]
 
+        self.starting_position_dict = self._from_list_to_setpoint(
+            self.all_joint_names, list(self.starting_position.values()), None, self.time[SetpointTime.START_INDEX]
+        )
+
         self.start = start
         self.stop = stop
-        self.pose = Pose()
 
     def get_joint_trajectory_msg(self) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
@@ -101,18 +106,13 @@ class DynamicSubgait:
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
-        # Update pose:
-        pose_list = [joint.position for joint in self.starting_position.values()]
-        self.pose = Pose(pose_list)
-
         self._solve_middle_setpoint()
         self._solve_desired_setpoint()
-        self._get_extra_ankle_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class()
         joint_trajectory_msg = JointTrajectory()
-        joint_trajectory_msg.joint_names = self.joint_names
+        joint_trajectory_msg.joint_names = self.actuating_joint_names
 
         timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
         for timestamp in timestamps:
@@ -154,7 +154,7 @@ class DynamicSubgait:
         )
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
-            self.joint_names,
+            self.all_joint_names,
             middle_position,
             None,
             self.time[SetpointTime.MIDDLE_POINT_INDEX],
@@ -163,14 +163,14 @@ class DynamicSubgait:
     def _solve_desired_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
         if self.stop:
-            self.desired_position = self._from_joint_dict_to_list(get_position_from_yaml("stand"))
+            self.desired_position = list(get_position_from_yaml("stand").values())
         else:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
             )
 
         self.desired_setpoint_dict = self._from_list_to_setpoint(
-            self.joint_names,
+            self.all_joint_names,
             self.desired_position,
             None,
             self.time[SetpointTime.END_POINT_INDEX],
@@ -179,9 +179,9 @@ class DynamicSubgait:
     def _to_joint_trajectory_class(self) -> None:
         """Creates a list of DynamicJointTrajectories for each joint."""
         self.joint_trajectory_list = []
-        for name in self.joint_names:
+        for name in self.actuating_joint_names:
             setpoint_list = [
-                self.starting_position[name],
+                self.starting_position_dict[name],
                 self.middle_setpoint_dict[name],
                 self.desired_setpoint_dict[name],
             ]
@@ -199,18 +199,16 @@ class DynamicSubgait:
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
-    def get_final_position(self) -> Dict[str, Setpoint]:
+    def get_final_position(self) -> Dict[str, float]:
         """Get setpoint_dictionary of the final setpoint.
 
         Returns:
             dict: The final setpoint of the subgait
         """
-        return self._from_list_to_setpoint(
-            self.joint_names,
-            self.desired_position,
-            None,
-            self.time[SetpointTime.START_INDEX],
-        )
+        final_position = {}
+        for i, name in enumerate(self.all_joint_names):
+            final_position[name] = self.desired_position[i]
+        return final_position
 
     def _from_list_to_setpoint(
         self,
@@ -250,12 +248,7 @@ class DynamicSubgait:
 
         return setpoint_dict
 
-    @staticmethod
-    def _from_joint_dict_to_list(joint_dict: dict) -> List[float]:
-        """Return the values in a joint_dict as a list."""
-        return list(joint_dict.values())
-
-    def _get_parameters(self, gait_selection_node) -> None:
+    def _get_parameters(self, gait_selection_node: Node) -> None:
         """Gets the dynamic gait parameters from the gait_selection_node.
 
         Args:
@@ -281,7 +274,7 @@ class DynamicSubgait:
         velocity = joint_trajectory_point.velocities[joint_index]
         if position > self.joint_soft_limits[joint_index].upper or position < self.joint_soft_limits[joint_index].lower:
             raise PositionSoftLimitError(
-                self.joint_names[joint_index],
+                self.actuating_joint_names[joint_index],
                 position,
                 self.joint_soft_limits[joint_index].lower,
                 self.joint_soft_limits[joint_index].upper,
@@ -289,7 +282,7 @@ class DynamicSubgait:
 
         if abs(velocity) > self.joint_soft_limits[joint_index].velocity:
             raise VelocitySoftLimitError(
-                self.joint_names[joint_index],
+                self.actuating_joint_names[joint_index],
                 velocity,
                 self.joint_soft_limits[joint_index].velocity,
             )

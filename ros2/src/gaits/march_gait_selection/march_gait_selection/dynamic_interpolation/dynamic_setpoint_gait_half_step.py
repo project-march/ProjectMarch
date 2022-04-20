@@ -202,7 +202,7 @@ class DynamicSetpointGaitHalfStep(DynamicSetpointGait):
             msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
         """
         if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position = self._joint_dict_to_setpoint_dict(get_position_from_yaml("stand"))
+            self.start_position = get_position_from_yaml("stand")
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
             self.position_queue = Queue()

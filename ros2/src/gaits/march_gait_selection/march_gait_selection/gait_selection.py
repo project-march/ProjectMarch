@@ -450,22 +450,21 @@ class GaitSelection(Node):
                 gaits["balanced_walk"] = balance_gait
 
         if self._dynamic_gait:
-            # We pass along the gait_selection_node to be able to listen
-            # to the CoViD topic within the DynamicSetpointGait class.
-
-            # Dynamic setpoint gait needs to be an attribute for updating parameters
+            # We pass along the gait_selection_node to be able to listen to the CoViD topic within the
+            # DynamicSetpointGait class. Dynamic setpoint gait needs to be an attribute for updating parameters.
             self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
+            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(gait_selection_node=self)
+
             dynamic_gaits = [
                 self.dynamic_setpoint_gait,
+                self.dynamic_setpoint_gait_half_step,
                 DynamicSetpointGaitSingleStep(gait_selection_node=self),
-                DynamicSetpointGaitHalfStep(gait_selection_node=self),
             ]
 
             for dynamic_gait in dynamic_gaits:
-                self.add_gait(dynamic_gait)
+                gaits[dynamic_gait.name] = dynamic_gait
+
             self.logger.info("Added dynamic_walk to gaits")
-            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(gait_selection_node=self)
-            gaits["dynamic_walk_half_step"] = self.dynamic_setpoint_gait_half_step
 
         return gaits
 
@@ -576,6 +575,16 @@ class GaitSelection(Node):
                     self.logger.warning("{0}, {1} does not exist".format(subgait_name, version))
                     return False
         return True
+
+    def get_named_position(self, position: str) -> Dict[str, float]:
+        """Returns a joint dict of a named position from the gait_selection node.
+
+        Args:
+            position (str): name of the position
+        Returns:
+            Dict[str, float]: a dict containing joint names and positions for the actuating joints.
+        """
+        return self.positions[position]["joints"]
 
     def __getitem__(self, name: str):
         """Returns a gait from the loaded gaits.

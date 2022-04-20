@@ -10,6 +10,7 @@ import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
     get_limits_robot_from_urdf_for_inverse_kinematics,
+    get_joint_names_from_urdf,
 )
 
 # Get lengths from urdf:
@@ -25,16 +26,7 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # List the joints we have:
-JOINT_NAMES = [
-    "left_ankle",
-    "left_hip_aa",
-    "left_hip_fe",
-    "left_knee",
-    "right_ankle",
-    "right_hip_aa",
-    "right_hip_fe",
-    "right_knee",
-]
+JOINT_NAMES = get_joint_names_from_urdf()
 
 # Create a dictionary of joint limits:
 JOINT_LIMITS = {}
@@ -44,7 +36,7 @@ for name in JOINT_NAMES:
 
 # Create a constant for frequently used limits:
 ANKLE_BUFFER = np.deg2rad(1)
-MAX_ANKLE_FLEXION = JOINT_LIMITS["left_ankle"].upper - ANKLE_BUFFER
+MAX_ANKLE_FLEXION = get_limits_robot_from_urdf_for_inverse_kinematics("left_ankle").upper - ANKLE_BUFFER
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -53,7 +45,6 @@ ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
 HIP_ZERO_ANGLE = np.pi  # rad
 
-NUMBER_OF_JOINTS = 8
 DEFAULT_HIP_X_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
 
@@ -82,7 +73,8 @@ class Pose:
         rot_foot1 (float): angle between flat ground and the foot on the stance leg.
     """
 
-    def __init__(self, pose: List[float] = None) -> None:
+    def __init__(self, all_joint_names: List[str], pose: List[float] = None) -> None:
+        self.all_joint_names = all_joint_names
         if pose is None:
             angle_ankle, angle_hip, angle_knee = self.leg_length_angles(self.max_leg_length)
             self.fe_ankle1 = self.fe_ankle2 = angle_ankle
@@ -104,7 +96,7 @@ class Pose:
 
     def reset_to_zero_pose(self) -> None:
         """Reset the post to the default zero pose."""
-        self.__init__()
+        self.__init__(self.all_joint_names)
 
     @property
     def pose_right(self) -> List[float]:
@@ -262,7 +254,7 @@ class Pose:
     @property
     def ankle_limit_toes_knee_distance(self) -> float:
         """Returns the distance between knee and toes when the ankle is in max dorsi flexion."""
-        pose = Pose()
+        pose = Pose(self.all_joint_names)
         pose.fe_ankle1 = MAX_ANKLE_FLEXION
         return np.linalg.norm(pose.pos_toes1 - pose.pos_knee1)
 
@@ -527,7 +519,7 @@ class Pose:
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
         # Set hip_aa to average of start and end pose:
-        end_pose = Pose()
+        end_pose = Pose(self.all_joint_names)
         end_pose.solve_end_position(ankle_x, ankle_y, ankle_z, subgait_id)
         self.aa_hip1 = start_hip_aa1 * (1 - midpoint_fraction) + end_pose.aa_hip1 * midpoint_fraction
         self.aa_hip2 = start_hip_aa2 * (1 - midpoint_fraction) + end_pose.aa_hip2 * midpoint_fraction
@@ -608,7 +600,7 @@ class Pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
         # Perform a limit check and raise error if limit is exceeded:
-        errors = check_on_limits(pose_list)
+        errors = check_on_limits(self.all_joint_names, pose_list)
         if errors:
             for error in errors:
                 raise ValueError(error)
@@ -637,29 +629,34 @@ def rot(t: float) -> np.array:
     return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
 
 
-def check_on_limits(pose_list: List[float]) -> List:
+def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> List:
     """Checks all joints limits of the current pose and create error messages for exceeding limits.
 
     Args:
-         pose_list (List): A list of joints poses in alphabetic order.
+        all_joint_names (List[str]): list containing all joint names in alphabetical order.
+        pose_list (List[float]): A list of joints poses in alphabetical order.
     """
     errors = []
+    joint_pose_dict = {}
+    # TODO: add global enum for all joint names
+    for i, joint_name in enumerate(all_joint_names):
+        joint_pose_dict[joint_name] = pose_list[i]
 
-    for name, angle in zip(JOINT_NAMES, pose_list):
-        if angle < JOINT_LIMITS[name].lower:
+    for joint_name in JOINT_NAMES:
+        if joint_pose_dict[joint_name] < JOINT_LIMITS[joint_name].lower:
             errors.append(
                 "IK solver found a solution with joint "
-                + name
+                + joint_name
                 + " "
-                + str(round(JOINT_LIMITS[name].lower - angle, 3))
+                + str(round(JOINT_LIMITS[joint_name].lower - joint_pose_dict[joint_name], 3))
                 + " rad below lower limit"
             )
-        elif angle > JOINT_LIMITS[name].upper:
+        elif joint_pose_dict[joint_name] > JOINT_LIMITS[joint_name].upper:
             errors.append(
                 "IK solver found a solution with joint "
-                + name
+                + joint_name
                 + " "
-                + str(round(angle - JOINT_LIMITS[name].upper, 3))
+                + str(round(joint_pose_dict[joint_name] - JOINT_LIMITS[joint_name].upper, 3))
                 + " rad above upper limit"
             )
 
