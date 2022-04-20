@@ -426,7 +426,7 @@ class DynamicSetpointGait(GaitInterface):
         iteration = 0
 
         while not self._is_duration_bigger_than_max_duration(original_duration):
-            is_final_iteration = (iteration == max_iteration)
+            is_final_iteration = iteration == max_iteration
             trajectory_command = self._try_to_get_trajectory_command(
                 start,
                 stop,
