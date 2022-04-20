@@ -5,7 +5,6 @@ from math import floor
 from rclpy.time import Time
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
-from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_from_urdf,
@@ -163,7 +162,7 @@ class DynamicSetpointGait(GaitInterface):
         """Returns the final position of the subgait as an EdgePosition."""
         try:
             return StaticEdgePosition(
-                self._dict_all_joints_to_actuating_joints(self.dynamic_subgait.get_final_position())
+                {name: self.dynamic_subgait.get_final_position()[name] for name in self.joint_names}
             )
         except AttributeError:
             return StaticEdgePosition(self.home_stand_position_actuating_joints)
@@ -328,7 +327,7 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_pos(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
         self.start_position_all_joints = self.dynamic_subgait.get_final_position()
-        self.start_position_actuating_joints = self._dict_all_joints_to_actuating_joints(self.start_position_all_joints)
+        self.start_position_actuating_joints = {name: self.start_position_all_joints[name] for name in self.joint_names}
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published on the CoViD-topic.
@@ -541,7 +540,7 @@ class DynamicSetpointGait(GaitInterface):
 
     def _create_subgait_instance(
         self,
-        start_position: Dict[str, Setpoint],
+        start_position: Dict[str, float],
         subgait_id: str,
         start: bool,
         stop: bool,
@@ -549,7 +548,7 @@ class DynamicSetpointGait(GaitInterface):
         """Create a DynamicSubgait instance.
 
         Args:
-            start_position (Dict[str, Setpoint]): dict containing joint_names and positions of the joint as setpoints
+            start_position (Dict[str, float]): dict containing joint_names and positions of the joint as floats
             subgait_id (str): either 'left_swing' or 'right_swing'
             start (bool): whether it is a start gait or not
             stop (bool): whether it is a stop gait or not
@@ -588,9 +587,9 @@ class DynamicSetpointGait(GaitInterface):
         """
         if msg.type == GaitInstruction.UNKNOWN:
             self.start_position_all_joints = get_position_from_yaml("stand")
-            self.start_position_actuating_joints = self._dict_all_joints_to_actuating_joints(
-                self.start_position_all_joints
-            )
+            self.start_position_actuating_joints = {
+                name: self.start_position_all_joints[name] for name in self.joint_names
+            }
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
 
@@ -599,12 +598,6 @@ class DynamicSetpointGait(GaitInterface):
         self.joint_soft_limits = []
         for joint_name in self.joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
-
-    def _dict_all_joints_to_actuating_joints(self, dict_all_joints: Dict[str, float]) -> Dict[str, float]:
-        dict_actuating_joints = {}
-        for name in self.joint_names:
-            dict_actuating_joints[name] = dict_all_joints[name]
-        return dict_actuating_joints
 
     def _check_msg_time(self, foot_location: FootPosition) -> bool:
         """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.
