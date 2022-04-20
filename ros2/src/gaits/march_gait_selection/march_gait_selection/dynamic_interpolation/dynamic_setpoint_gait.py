@@ -5,7 +5,6 @@ from math import floor
 from rclpy.time import Time
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
-from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_from_urdf,
@@ -467,9 +466,11 @@ class DynamicSetpointGait(GaitInterface):
         """Try to get a joint_trajectory_msg from the dynamic subgait instance.
 
         Args:
-            start (bool): whether` it is a start gait or not
-            stop (bool): whether it is a stop gait or not
+            start (bool): whether it is a start gait
+            stop (bool): whether it is a stop gait
             original_duration (float): original duration of the gait as set in the GaitPreprocessor
+            iteration (float): current iteration over the velocity
+            is_final_iteration (bool): True if current iteration equals the maximum amount of iterations
         Returns:
             TrajectoryCommand: optional command if successful, otherwise None
         """
@@ -500,6 +501,8 @@ class DynamicSetpointGait(GaitInterface):
 
         If this is not possible, the first subgait should not be executed.
 
+        Args:
+            is_final_iteration (bool): True if current iteration equals the maximum amount of iterations
         Returns:
             bool: True if second step can be made, otherwise false
         """
@@ -560,7 +563,7 @@ class DynamicSetpointGait(GaitInterface):
         """Create a DynamicSubgait instance.
 
         Args:
-            start_position (Dict[str, Setpoint]): dict containing joint_names and positions of the joint as setpoints
+            start_position (Dict[str, float]): dict containing joint_names and positions of the joint as setpoints
             subgait_id (str): either 'left_swing' or 'right_swing'
             start (bool): whether it is a start gait or not
             stop (bool): whether it is a stop gait or not

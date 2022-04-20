@@ -104,6 +104,8 @@ class DynamicSubgait:
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
+        Args:
+            push_off (bool): True if push off should be present in the gait
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
@@ -178,7 +180,11 @@ class DynamicSubgait:
         )
 
     def _to_joint_trajectory_class(self, push_off: bool) -> None:
-        """Creates a list of DynamicJointTrajectories for each joint."""
+        """Creates a list of DynamicJointTrajectories for each joint.
+
+        Args:
+            push_off (bool): True if push off should be present in the gait
+        """
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
             setpoint_list = [
