@@ -60,17 +60,12 @@ def nothing(x):
     pass
 
 
-cv2.createTrackbar('HMin', 'image', 0, 179, nothing)
+cv2.createTrackbar('HMin', 'image', 0, 255, nothing)
 cv2.createTrackbar('SMin', 'image', 0, 255, nothing)
 cv2.createTrackbar('VMin', 'image', 0, 255, nothing)
-cv2.createTrackbar('HMax', 'image', 0, 179, nothing)
+cv2.createTrackbar('HMax', 'image', 0, 255, nothing)
 cv2.createTrackbar('SMax', 'image', 0, 255, nothing)
 cv2.createTrackbar('VMax', 'image', 0, 255, nothing)
-
-# Set default value for Max HSV trackbars
-cv2.setTrackbarPos('HMax', 'image', 179)
-cv2.setTrackbarPos('SMax', 'image', 255)
-cv2.setTrackbarPos('VMax', 'image', 255)
 
 # Create a pipeline
 pipeline = rs.pipeline()
@@ -108,7 +103,7 @@ print("Depth Scale is: " , depth_scale)
 
 # We will be removing the background of objects more than
 #  clipping_distance_in_meters meters away
-clipping_distance_in_meters = 100 
+clipping_distance_in_meters = 2
 clipping_distance = clipping_distance_in_meters / depth_scale
 
 # Create an align object
@@ -120,17 +115,38 @@ align = rs.align(align_to)
 # lower_red = np.array([217, 0, 93])
 # upper_red = np.array([0, 0, 59])
 
-lower_gray = np.array([59,0,166])
-upper_gray = np.array([126,40,226])
-
-blue_lower=np.array([100,150,0],np.uint8)
-blue_upper=np.array([140,255,255],np.uint8)
+blue_lower = np.array([100, 150, 0], np.uint8)
+blue_upper = np.array([140, 255, 255], np.uint8)
 
 lower_brown = np.array([1, 7, 110])
 upper_brown = np.array([55, 76, 206])
 
-hMin = sMin = vMin = hMax = sMax = vMax = 0
-phMin = psMin = pvMin = phMax = psMax = pvMax = 0
+hMin = 59
+sMin = 0
+vMin = 166
+
+hMax = 126
+sMax = 40
+vMax = 226
+
+# hMin = 0
+# sMin = 0
+# vMin = 97
+
+# hMax = 159
+# sMax = 51
+# vMax = 162
+
+# Set default value for Max HSV trackbars
+cv2.setTrackbarPos('HMin', 'image', hMin)
+cv2.setTrackbarPos('SMin', 'image', sMin)
+cv2.setTrackbarPos('VMin', 'image', vMin)
+cv2.setTrackbarPos('HMax', 'image', hMax)
+cv2.setTrackbarPos('SMax', 'image', sMax)
+cv2.setTrackbarPos('VMax', 'image', vMax)
+
+lower_gray = np.array([hMin, sMin, vMin])
+upper_gray = np.array([hMax, sMax, vMax])
 
 
 # Streaming loop
@@ -159,64 +175,98 @@ try:
         vMax = cv2.getTrackbarPos('VMax', 'image')
 
         # Set minimum and maximum HSV values to display
-        lower = np.array([hMin, sMin, vMin])
-        upper = np.array([hMax, sMax, vMax])
+        lower_gray = np.array([hMin, sMin, vMin])
+        upper_gray = np.array([hMax, sMax, vMax])
+
+        lower_gray = np.array([0, 0, 168])
+        upper_gray = np.array([172, 111, 255])
 
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
+
+        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
+        color_image = np.where((depth_image_3d > clipping_distance), 0, color_image)
+
+        color_image = cv2.GaussianBlur(color_image, (5,5), 0)
+
         color_HSV_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2HSV)
         mask_gray = cv2.inRange(color_HSV_image, lower_gray, upper_gray)
         mask_wood = cv2.inRange(color_HSV_image, lower_brown, upper_brown)
 
         pc = convert_depth_frame_to_pointcloud(depth_image, aligned_depth_frame.profile.as_video_stream_profile().intrinsics)
-        # print(pc.shape)
 
-        # Remove background - Set pixels further than clipping_distance to grey
-        # grey_color = 153
-        # depth_image_3d = np.dstack((depth_image, depth_image, depth_image)) #depth image is 1 channel, color is 3 channels
-        # bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
-        # bg_removed = color_image
 
         white = np.full(color_image.shape, (255, 255, 255), np.uint8)
-
-        # img = np.full((100, 100, 3), color, np.uint8)
-
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         filtered = cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
         filtered = cv2.cvtColor(filtered, cv2.COLOR_RGB2GRAY)
-        # filtered = cv2.bitwise_not(filtered, color_image, mask=mask_wood)
-        # bg_removed = red_red
 
-        connectivity = 4 # or whatever you prefer
+        connectivity = 8 # or whatever you prefer
         n_components, output, stats, centroids = cv2.connectedComponentsWithStats(filtered, connectivity, cv2.CV_32S)
-        sizes = stats[:, -1]
 
         stored_components = []
 
         for i in range(1, n_components+1):
             pts = np.where(output == i)
-            if len(pts[0]) < 3000:
+            if len(pts[0]) < 1000:
                 output[pts] = 0
             else:
                 stored_components.append(i)
 
-
         result = np.full(color_image.shape, (0, 0, 0), np.uint8)
-
-        result[output == 0] = [0, 0, 0]
-
         for i in stored_components:
             result[output == i] = [255, 255, 255]
-            result = cv2.circle(result, (int(centroids[i][0]), int(centroids[i][1])), radius=7, color=(0, 0, 255), thickness=-1)
 
-            # print(centroids[i])
-            print(pc[int(centroids[i][1])][int(centroids[i][0])])
+        result = cv2.morphologyEx(result, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+        result = cv2.morphologyEx(result, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
+
+        result_thres = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+        contours, hierarchy = cv2.findContours(result_thres, 1, 2)
+
+        for cnt in contours:
+            if len(cnt) < 5:
+                continue
+
+            convexHull = cv2.convexHull(cnt)
+            ellipse = cv2.fitEllipse(cnt)
+
+            # result = cv2.ellipse(result, ellipse, (0,255,0), 2)
+
+            contour_mask = np.zeros((color_image.shape[0], color_image.shape[1]), np.uint8)
+            contour_mask = cv2.drawContours(contour_mask, convexHull, -1, (255, 255, 255), 2)
+
+            ellipse_mask = np.zeros((color_image.shape[0], color_image.shape[1]), np.uint8)
+            ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, (255, 255, 255), 2)
+
+            intersection = cv2.bitwise_and(contour_mask, ellipse_mask)
+
+            num_intersection = cv2.countNonZero(intersection)
+            num_contour = cv2.countNonZero(contour_mask)
+            measure = num_intersection / num_contour
+
+            centroid = ellipse[0]
+            bounds = ellipse[1]
+
+            if measure > 0.90 and bounds[0] > 20 and bounds[1] > 20:
+                result = cv2.circle(result, (int(centroid[0]), int(centroid[1])), radius=7, color=(0, 0, 255), thickness=-1)
+                result = cv2.ellipse(result, ellipse, (0, measure*255, 255 - measure*255), 2)
+
+                if centroid[1] < pc.shape[0] and centroid[0] < pc.shape[1]:
+                    depthpoint = pc[int(centroid[1])][int(centroid[0])]
+                    text = np.array2string(depthpoint, precision=2, separator=',', suppress_small=True)
+
+                    result = cv2.putText(
+                        img = result,
+                        text = text,
+                        org = (int(centroid[0]) + 15, int(centroid[1]) + 5),
+                        fontFace = cv2.FONT_HERSHEY_DUPLEX,
+                        fontScale = 0.6,
+                        color = (125, 246, 55),
+                        thickness = 2
+                    )
 
 
 
-        # Render images:
-        #   depth align to color on left
-        #   depth on right
         depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
         images = np.hstack((result, depth_colormap))
 
