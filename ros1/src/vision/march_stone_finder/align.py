@@ -31,22 +31,22 @@ cv2.createTrackbar('h_max', 'image', 0, 255, lambda _: None)
 cv2.createTrackbar('s_max', 'image', 0, 255, lambda _: None)
 cv2.createTrackbar('v_max', 'image', 0, 255, lambda _: None)
 
-# Create a pipeline
+width = 640
+height = 480
+dimensions = (height, width)
+ellipse_similarity_threshold = 0.90
+min_ellipse_size = 20
+
 pipeline = rs.pipeline()
-
-# Create a config and configure the pipeline to stream
-#  different resolutions of color and depth streams
 config = rs.config()
-
-# Get device product line for setting a supporting resolution
 pipeline_wrapper = rs.pipeline_wrapper(pipeline)
 pipeline_profile = config.resolve(pipeline_wrapper)
 device = pipeline_profile.get_device()
 device.hardware_reset()
 device_product_line = str(device.get_info(rs.camera_info.product_line))
 
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.depth, width, height, rs.format.z16, 30)
+config.enable_stream(rs.stream.color, width, height, rs.format.bgr8, 30)
 
 profile = pipeline.start(config)
 
@@ -87,7 +87,6 @@ try:
         aligned_depth_frame = aligned_frames.get_depth_frame()
         color_frame = aligned_frames.get_color_frame()
 
-        # Validate that both frames are valid
         if not aligned_depth_frame or not color_frame:
             continue
 
@@ -104,18 +103,17 @@ try:
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
 
+        pc = convert_depth_frame_to_pointcloud(depth_image, aligned_depth_frame.profile.as_video_stream_profile().intrinsics)
+
         depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
         color_image = np.where((depth_image_3d > clipping_distance), 0, color_image)
 
         color_image = cv2.GaussianBlur(color_image, (5, 5), 0)
-
         color_hsv_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2HSV)
+
         mask_gray = cv2.inRange(color_hsv_image, lower_gray, upper_gray)
         mask_wood = cv2.inRange(color_hsv_image, lower_brown, upper_brown)
-
-        pc = convert_depth_frame_to_pointcloud(depth_image, aligned_depth_frame.profile.as_video_stream_profile().intrinsics)
-
-        white = np.full((color_image.shape[0], color_image.shape[1]), 255, np.uint8)
+        white = np.full(dimensions, 255, np.uint8)
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         filtered = cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
 
@@ -143,10 +141,10 @@ try:
             convex_hull = cv2.convexHull(contour)
             ellipse = cv2.fitEllipse(contour)
 
-            contour_mask = np.zeros((color_image.shape[0], color_image.shape[1]), np.uint8)
+            contour_mask = np.zeros(dimensions, np.uint8)
             contour_mask = cv2.drawContours(contour_mask, convex_hull, -1, (255, 255, 255), 2)
 
-            ellipse_mask = np.zeros((color_image.shape[0], color_image.shape[1]), np.uint8)
+            ellipse_mask = np.zeros(dimensions, np.uint8)
             ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, (255, 255, 255), 2)
 
             intersection = cv2.bitwise_and(contour_mask, ellipse_mask)
@@ -156,20 +154,22 @@ try:
             measure = num_intersection / num_contour
 
             centroid = ellipse[0]
+            x_pixel = int(centroid[0])
+            y_pixel = int(centroid[1])
             bounds = ellipse[1]
 
-            if measure > 0.90 and bounds[0] > 20 and bounds[1] > 20:
-                result = cv2.circle(result, (int(centroid[0]), int(centroid[1])), radius=7, color=(0, 0, 255), thickness=-1)
+            if measure > ellipse_similarity_threshold and bounds[0] > min_ellipse_size and bounds[1] > min_ellipse_size:
+                result = cv2.circle(result, (x_pixel, y_pixel), radius=7, color=(0, 0, 255), thickness=-1)
                 result = cv2.ellipse(result, ellipse, (0, measure * 255, 255 - measure * 255), 2)
 
                 if centroid[1] < pc.shape[0] and centroid[0] < pc.shape[1]:
-                    depthpoint = pc[int(centroid[1])][int(centroid[0])]
+                    depthpoint = pc[y_pixel][x_pixel]
                     text = np.array2string(depthpoint, precision=2, separator=',', suppress_small=True)
 
                     result = cv2.putText(
                         img=result,
                         text=text,
-                        org=(int(centroid[0]) + 15, int(centroid[1]) + 5),
+                        org=(x_pixel + 15, y_pixel + 7),
                         fontFace=cv2.FONT_HERSHEY_DUPLEX,
                         fontScale=0.6,
                         color=(125, 246, 55),
