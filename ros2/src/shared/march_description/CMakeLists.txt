@@ -23,10 +23,14 @@ set(XACRO_FILES
     urdf/march3.xacro
     urdf/march4.xacro
     urdf/march6.xacro
+    urdf/march6_ros2.xacro
     urdf/march4_with_koen_lengths.xacro
     urdf/test_joint_linear.xacro
     urdf/test_joint_rotational.xacro
 )
+
+# Without this the package link of stl files in gazebo doesn't work
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/env-hooks/${PROJECT_NAME}.dsv.in")
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 
