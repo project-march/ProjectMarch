@@ -58,7 +58,7 @@ class ConnectionManager:
 
                 if req == "":
                     self.controller.get_node().get_logger().warning(
-                        "Connection lost with wireless IPD"
+                        "Connection lost with wireless IPD (empty message)"
                     )
                     raise Exception("Connection lost")
                     # self.reset_connection()
@@ -160,7 +160,7 @@ class ConnectionManager:
 
                 if data == "":
                     self.controller.get_node().get_logger().warning(
-                        "Connection lost with wireless IPD"
+                        "Connection lost with wireless IPD (empty message)"
                     )
                     self.empty_socket()
                     raise Exception("Connection lost")
