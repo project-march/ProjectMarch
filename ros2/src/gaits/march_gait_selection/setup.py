@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 import os
 from glob import glob, iglob
 from setuptools import setup
@@ -6,8 +8,10 @@ package_name = "march_gait_selection"
 
 
 def data_files():
-    """Generates the list of data files necessary for gait selection, the gait and subgait files
-    required for testing are taken from the ros1 directory to decrease duplication."""
+    """Generates the list of data files necessary for gait selection.
+
+    The gait and subgait files required for testing are taken from the ros1 directory to decrease duplication.
+    """
     test_gait_files_source = "test/testing_gait_files"
     data = [
         (
@@ -26,7 +30,7 @@ def data_files():
         (os.path.join("share", package_name, "launch"), glob(os.path.join("launch", "*.launch.py"))),
         (
             os.path.join("share", package_name, "position_queue"),
-            glob(os.path.join("march_gait_selection", "config", "position_queue.yaml")),
+            glob(os.path.join("config", "position_queue.yaml")),
         ),
     ]
     for filename in iglob(os.path.join(test_gait_files_source, "**", "*.subgait"), recursive=True):

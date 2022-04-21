@@ -45,7 +45,7 @@ ENV ROS_DISTRO=foxy
 # Install the needed ros1 and ros2 packages for the bridge, and curl for the script ~/march/start_scripts/run/bridge.bash.
 # See (https://github.com/osrf/docker_images/blob/d1e081089b3f7d8c118561b0f39998e7163a5f0a/ros/foxy/ubuntu/focal/ros1-bridge/Dockerfile)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-noetic-ros-comm=1.15.13-1* \
+    ros-noetic-ros-comm=1.15.14-1* \
     ros-foxy-ros1-bridge=0.9.6-1* \
     curl \
     && rm -rf /var/lib/apt/lists/*

@@ -25,6 +25,8 @@ from visualization_msgs.msg import Marker
 
 
 class CoMCalculator:
+    """ """
+
     def __init__(self, robot, tf_buffer):
         self.tf_buffer = tf_buffer
 
@@ -43,6 +45,7 @@ class CoMCalculator:
         self.marker.scale.z = 0.03
 
     def calculate_com(self):
+        """ """
         x = 0
         y = 0
         z = 0

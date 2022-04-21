@@ -1,3 +1,4 @@
+"""Launch description for safety Node."""
 import os
 
 from ament_index_python import get_package_share_directory
@@ -7,7 +8,17 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
+    """The launch file for safety node.
+
+    Todo:
+        - Fill in the settable ros parameters.
+
+    The settable ros parameters are:
+        use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
+            Default is true.
+        ...
+    """
     return LaunchDescription(
         [
             DeclareLaunchArgument(

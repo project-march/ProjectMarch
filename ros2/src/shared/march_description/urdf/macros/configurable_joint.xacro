@@ -20,6 +20,9 @@
                 <parent link="${parent}"/>
                 <child link="${child}"/>
                 <origin xyz="${origin}" rpy="0 0 0"/>
+                <xacro:if value="${safety}">
+                    <xacro:safety_limits safety="${safety}" limits="${limits}"/>
+                </xacro:if>
             </joint>
             <gazebo reference="${name}">
                 <preserveFixedJoint>true</preserveFixedJoint>

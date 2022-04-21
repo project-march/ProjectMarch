@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 import signal
 import sys
 
@@ -15,6 +17,7 @@ from contextlib import suppress
 
 
 def sys_exit(*_):
+    """Cleanly exit."""
     sys.exit(0)
 
 
@@ -40,26 +43,29 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(gait_selection, gait_state_machine, parameters):
-    """
-    A callback function that is used to update the parameters that are a part of the
-    gait selection node. Since some of these parameters are from the
-    gait_state_machine, some from gait_selection and some from both, this is
+def parameter_callback(
+    gait_selection: GaitSelection, gait_state_machine: GaitStateMachine, parameters
+) -> SetParametersResult:
+    """A callback function that is used to update the parameters that are a part of the gait selection node.
+
+    Since some of these parameters are from the gait_state_machine, some from gait_selection and some from both, this is
     implemented here.
-    :param gait_selection: The current GaitSelection object
-    :param gait_state_machine: The current GaitStateMachine
-    :param parameters: the parameters to update
-    :return: Whether the callback was successful
+
+    Args:
+        gait_selection (GaitSelection): The current GaitSelection object
+        gait_state_machine (GaitStateMachine): The current GaitStateMachine object
+        parameters (???): The parameters to update
+    Returns:
+        SetParametersResult: Whether the callback was successful
     """
-    gait_selection.get_logger().info("Parameters are updated")
-    dynamic_gait_updated = False
     position_queue_updated = False
     gaits_updated = False
+    dynamic_gait_updated = False
     for param in parameters:
         if param.name == "balance" and param.type_ == Parameter.Type.BOOL:
-            gait_selection._balance_used = param.value
+            gait_selection._balance_used = param.get_parameter_value().bool_value
         elif param.name == "dynamic_gait" and param.type == Parameter.Type.BOOL:
-            gait_selection._dynamic_gait = param.value
+            gait_selection._dynamic_gait = param.get_parameter_value().bool_value
         elif param.name == "early_schedule_delay" and param.type_ == Parameter.Type.DOUBLE:
             if param.value < 0:
                 return SetParametersResult(successful=False)
@@ -69,22 +75,25 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
                 return SetParametersResult(successful=False)
             gait_selection._first_subgait_delay = Duration(seconds=param.value)
         elif param.name == "middle_point_fraction":
-            gait_selection.middle_point_fraction = param.value
+            gait_selection.middle_point_fraction = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "middle_point_height":
-            gait_selection.middle_point_height = param.value
+            gait_selection.middle_point_height = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "minimum_stair_height":
-            gait_selection.minimum_stair_height = param.value
+            gait_selection.minimum_stair_height = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "push_off_fraction":
-            gait_selection.push_off_fraction = param.value
+            gait_selection.push_off_fraction = param.get_parameter_value().double_value
             dynamic_gait_updated = True
         elif param.name == "push_off_position":
-            gait_selection.push_off_position = param.value
+            gait_selection.push_off_position = param.get_parameter_value().double_value
             dynamic_gait_updated = True
-        elif param.name == "use_position_queue" and param.type_ == Parameter.Type.BOOL:
-            gait_selection.use_position_queue = param.value
+        elif param.name == "add_push_off":
+            gait_selection.add_push_off = param.value
+            dynamic_gait_updated = True
+        elif param.name == "use_position_queue":
+            gait_selection.use_position_queue = param.get_parameter_value().bool_value
             position_queue_updated = True
         elif param.name == "gait_package" and param.type_ == Parameter.Type.STRING:
             gait_selection._gait_package = param.value
@@ -101,13 +110,14 @@ def parameter_callback(gait_selection, gait_state_machine, parameters):
     # Separate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
         gait_selection.dynamic_setpoint_gait.update_parameters()
-        gait_selection.get_logger().info("Dynamic gait parameters updated.")
     elif position_queue_updated:
-        gait_selection.dynamic_setpoint_gait_half_step.update_parameter()
-        gait_selection.get_logger().info(f"use_position_queue set to {param.value}")
+        gait_selection.dynamic_setpoint_gait_step.update_parameter()
     elif gaits_updated:
+        # TODO: Updating the parameters in gait_selection does not work
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()
         gait_selection.get_logger().info("Gaits were updated")
+
+    gait_selection.get_logger().info(f"{param.name} set to {param.value}.")
 
     return SetParametersResult(successful=True)
