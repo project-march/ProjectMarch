@@ -3,6 +3,7 @@
 from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
+from sensor_msgs.msg import JointState
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
@@ -46,7 +47,8 @@ class DynamicSetpointGait(GaitInterface):
             gait has not  started yet, last setpoint of previous step if gait is running
         start_position_all_joints (Dict[str, float): start_position of all eight joints. Home stand if the gait has not
             started yet, last setpoint of previous step if gait is running.
-        joint_names (List[str]): names of the joints
+        actuating_joint_names (List[str]): names of the actuating joints in alphabetical order
+        all_joint_names (List[srt]): names of all eight joints in alphabetical order
         gait_name (str): name of the gait
         subgait_id (str): either left_swing or right_swing
         logger (Logger): used to log messages to the terminal with the class name as a prefix
@@ -79,7 +81,8 @@ class DynamicSetpointGait(GaitInterface):
         self.home_stand_position_all_joints = self.start_position_all_joints
 
         self._reset()
-        self.joint_names = get_joint_names_from_urdf()
+        self.all_joint_names = self.home_stand_position_all_joints.keys()
+        self.actuating_joint_names = get_joint_names_from_urdf()
         self._get_soft_limits()
 
         self.gait_name = "dynamic_walk"
@@ -98,9 +101,9 @@ class DynamicSetpointGait(GaitInterface):
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
-            GaitInstruction,
-            "/march/input_device/instruction",
-            self._callback_force_unknown,
+            JointState,
+            "/march/gait_selection/final_position",
+            self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
         self.pub_right = self.gait_selection.create_publisher(
@@ -164,7 +167,7 @@ class DynamicSetpointGait(GaitInterface):
         """Returns the final position of the subgait as an EdgePosition."""
         try:
             return StaticEdgePosition(
-                {name: self.dynamic_subgait.get_final_position()[name] for name in self.joint_names}
+                {name: self.dynamic_subgait.get_final_position()[name] for name in self.actuating_joint_names}
             )
         except AttributeError:
             return StaticEdgePosition(self.home_stand_position_actuating_joints)
@@ -326,10 +329,20 @@ class DynamicSetpointGait(GaitInterface):
         else:
             return self._get_trajectory_command()
 
-    def _update_start_pos(self) -> None:
+    def _update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
         self.start_position_all_joints = self.dynamic_subgait.get_final_position()
-        self.start_position_actuating_joints = {name: self.start_position_all_joints[name] for name in self.joint_names}
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
 
     def _callback_right(self, foot_location: FootPosition) -> None:
         """Update the right foot position with the latest point published on the CoViD-topic.
@@ -438,7 +451,7 @@ class DynamicSetpointGait(GaitInterface):
             second_step = self._try_to_get_second_step(is_final_iteration)
             if trajectory_command is not None and second_step:
                 self._trajectory_failed = False
-                self._update_start_pos()
+                self._update_start_position_gait_state()
                 return trajectory_command
             else:
                 self._trajectory_failed = True
@@ -576,7 +589,7 @@ class DynamicSetpointGait(GaitInterface):
             self.home_stand_position_all_joints,
             start_position,
             subgait_id,
-            self.joint_names,
+            self.actuating_joint_names,
             self.foot_location,
             self.joint_soft_limits,
             start,
@@ -597,24 +610,10 @@ class DynamicSetpointGait(GaitInterface):
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
         self.add_push_off = self.gait_selection.add_push_off
 
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Reset start position to home stand after force unknown.
-
-        Args:
-            msg (GaitInstruction): message containing a gait_instruction from the IPD
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position_all_joints = get_position_from_yaml("stand")
-            self.start_position_actuating_joints = {
-                name: self.start_position_all_joints[name] for name in self.joint_names
-            }
-            self.subgait_id = "right_swing"
-            self._trajectory_failed = False
-
     def _get_soft_limits(self):
         """Get the limits of all joints in the urdf."""
         self.joint_soft_limits = []
-        for joint_name in self.joint_names:
+        for joint_name in self.actuating_joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
     def _check_msg_time(self, foot_location: FootPosition) -> bool:

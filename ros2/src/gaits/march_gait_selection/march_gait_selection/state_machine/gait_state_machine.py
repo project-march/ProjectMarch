@@ -2,6 +2,8 @@
 
 from typing import Optional, Union, List
 from gazebo_msgs.msg import ContactsState
+from sensor_msgs.msg import JointState
+
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
@@ -104,6 +106,11 @@ class GaitStateMachine:
         self.current_gait_pub = self._gait_selection.create_publisher(
             msg_type=CurrentGait,
             topic="/march/gait_selection/current_gait",
+            qos_profile=DEFAULT_HISTORY_DEPTH,
+        )
+        self.final_position_pub = self._gait_selection.create_publisher(
+            msg_type=JointState,
+            topic="/march/gait_selection/final_position",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self.error_sub = self._gait_selection.create_subscription(
@@ -377,6 +384,7 @@ class GaitStateMachine:
                     "dynamic_walk",
                     "dynamic_step_and_close",
                     "dynamic_step",
+                    "dynamic_close",
                 ]
             ):
                 if (
@@ -469,15 +477,16 @@ class GaitStateMachine:
         # Process finishing of the gait
         if gait_update.is_finished:
             self._current_state = self._current_gait.final_position
+            self.final_position_pub.publish(JointState(position=self._current_state.values))
             # To make the half step dynamic gait work, the current state (that is final
             # position) needs to be a position from which the next half step can be started.
             # Therefore, it needs to be added to the idle_transitions dictionary of the
             # gait_graph.
             if (
-                self._current_gait.name == "dynamic_step"
+                self._current_gait.name in ["dynamic_step", "dynamic_close"]
                 and self._current_state not in self._gait_graph._idle_transitions
             ):
-                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step"}
+                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step", "dynamic_close"}
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
