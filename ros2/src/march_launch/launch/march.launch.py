@@ -74,6 +74,7 @@ def generate_launch_description() -> LaunchDescription:
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     push_off_fraction = LaunchConfiguration("push_off_fraction")
     push_off_position = LaunchConfiguration("push_off_position")
+    add_push_off = LaunchConfiguration("add_push_off")
     use_position_queue = LaunchConfiguration("use_position_queue")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
@@ -204,8 +205,8 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="dynamic_gait",
-                default_value="False",
-                description="Wether dynamic_setpoint_gait is enabled",
+                default_value="True",
+                description="Whether dynamic_setpoint_gait is enabled",
             ),
             DeclareLaunchArgument(
                 name="middle_point_fraction",
@@ -235,6 +236,11 @@ def generate_launch_description() -> LaunchDescription:
                 description="Maximum joint position of the ankle during push off.",
             ),
             DeclareLaunchArgument(
+                name="add_push_off",
+                default_value="True",
+                description="Whether to add a push off setpoint for the ankle.",
+            ),
+            DeclareLaunchArgument(
                 name="use_position_queue",
                 default_value="False",
                 description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
@@ -249,7 +255,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.4",
+                default_value="0.3",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
@@ -352,9 +358,10 @@ def generate_launch_description() -> LaunchDescription:
                     ("dynamic_gait", dynamic_gait),
                     ("middle_point_fraction", middle_point_fraction),
                     ("middle_point_height", middle_point_height),
-                    ("mininum_stair_height", minimum_stair_height),
+                    ("minimum_stair_height", minimum_stair_height),
                     ("push_off_fraction", push_off_fraction),
                     ("push_off_position", push_off_position),
+                    ("add_push_off", add_push_off),
                     ("use_position_queue", use_position_queue),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),

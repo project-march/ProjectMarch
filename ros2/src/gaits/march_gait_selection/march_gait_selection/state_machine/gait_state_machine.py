@@ -375,8 +375,8 @@ class GaitStateMachine:
                 or gait_name
                 == [
                     "dynamic_walk",
-                    "dynamic_walk_single_step",
-                    "dynamic_walk_half_step",
+                    "dynamic_step_and_close",
+                    "dynamic_step",
                 ]
             ):
                 if (
@@ -474,10 +474,10 @@ class GaitStateMachine:
             # Therefore, it needs to be added to the idle_transitions dictionary of the
             # gait_graph.
             if (
-                self._current_gait.name == "dynamic_walk_half_step"
+                self._current_gait.name == "dynamic_step"
                 and self._current_state not in self._gait_graph._idle_transitions
             ):
-                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_walk_half_step"}
+                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step"}
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
