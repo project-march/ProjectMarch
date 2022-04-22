@@ -41,18 +41,22 @@ Preprocessor::Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     } else {
         base_frame_ = "toes_left_aligned";
     }
-    base_frame_ = "world";
+    // base_frame_ = "world";
 
     auto start = std::chrono::high_resolution_clock::now();
-    std::cout << "all frames: " << listener.allFramesAsString() << std::endl;
+    // std::cout << "all frames: " << listener.allFramesAsString() << std::endl;
+    ros::Time now = ros::Time::now();
     pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
-    listener.lookupTransform(
-        base_frame_, pointcloud_frame_id_, ros::Time(0), transform);
+    listener.waitForTransform(
+        base_frame_, pointcloud_frame_id_, now, ros::Duration(1.0));
+    listener.lookupTransform(base_frame_, pointcloud_frame_id_, now, transform);
 
-    translation = transform.getOrigin();
-    translation.setX(0);
-    translation.setY(0);
-    transform.setOrigin(translation);
+    if (base_frame_ == "world") {
+        translation = transform.getOrigin();
+        translation.setX(0);
+        translation.setY(0);
+        transform.setOrigin(translation);
+    }
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration

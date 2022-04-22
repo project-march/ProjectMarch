@@ -291,7 +291,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Publish final point for gait computation
         Point found_coved_point_other_ = FootPositionFinder::transformPoint(
-            found_covid_point_, current_frame_id_, other_frame_id_);
+            ORIGIN, current_frame_id_, "world");
         publishPoint(point_publisher_, found_covid_point_,
             found_coved_point_other_, new_displacement_, track_points);
     }

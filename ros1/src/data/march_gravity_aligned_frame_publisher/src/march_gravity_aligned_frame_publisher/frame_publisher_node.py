@@ -4,9 +4,9 @@ import rospy
 import tf
 
 # Define the distance from frame 'foot_left' or 'foot_right' at which the foot rotates:
-FOOT_LENGTH = 0.2
+FOOT_LENGTH = 0.1825
 Z_ROTATION = [0.0, 0.0, 0.0, 1.0]
-RATE = 10.0
+RATE = 100.0
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
             continue
 
         broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, -0.01),
+            (-FOOT_LENGTH, 0.0, -0.025),
             Z_ROTATION,
             rospy.Time.now(),
             "toes_left",
@@ -50,7 +50,7 @@ def main():
         )
 
         broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, -0.01),
+            (-FOOT_LENGTH, 0.0, -0.025),
             Z_ROTATION,
             rospy.Time.now(),
             "toes_right",
