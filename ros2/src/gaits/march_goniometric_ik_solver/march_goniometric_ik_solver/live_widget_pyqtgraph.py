@@ -1,14 +1,13 @@
+from multiprocessing.sharedctypes import Value
 import pyqtgraph as pg
 import numpy as np
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton
+from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP
 
 DEFAULT_HIP_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
-REDUCE_DF_REAR = False
-REDUCE_DF_FRONT = False
 
 X_MIN = 0.0
 X_MAX = 0.6
@@ -30,6 +29,8 @@ JOINT_NAMES = [
 class LiveWidget:
     def __init__(self) -> None:
         self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}}
+        self.reduce_df_rear = False
+        self.reduce_df_front = False
 
         self.create_window()
         self.create_plot()
@@ -90,6 +91,18 @@ class LiveWidget:
         self.reset_button = QPushButton("Reset")
         self.reset_button.clicked.connect(self.reset)
 
+        self.df_rear_button = QCheckBox("DF rear")
+        self.df_rear_button.clicked.connect(self.toggle_df_rear)
+
+
+        self.df_front_button = QCheckBox("DF front")
+        self.df_front_button.clicked.connect(self.toggle_df_front)
+
+        self.buttons = QGridLayout()
+        self.buttons.addWidget(self.reset_button, 0, 0)
+        self.buttons.addWidget(self.df_rear_button, 0, 1)
+        self.buttons.addWidget(self.df_front_button, 0, 2)
+
     def create_table(self):
         self.table = QGridLayout()
         self.tables = {"last": pg.TableWidget(), "next": pg.TableWidget()}
@@ -102,7 +115,7 @@ class LiveWidget:
         self.layout.addWidget(self.plot_window, 0, 1)
         self.layout.addLayout(self.horizontal_sliders, 1, 1)
         self.layout.addLayout(self.table, 0, 2)
-        self.layout.addWidget(self.reset_button, 1, 2)
+        self.layout.addLayout(self.buttons, 1, 2)
 
     def update_last_x(self, value):
         self.sliders["last"]["x"] = (1 - (value / 99)) * (X_MAX - X_MIN) + X_MIN
@@ -135,17 +148,31 @@ class LiveWidget:
         self.update_poses()
         self.update_tables()
 
+    def toggle_df_rear(self):
+        self.reduce_df_rear = not self.reduce_df_rear
+        self.update_poses()
+        self.update_tables()
+
+    def toggle_df_front(self):
+        self.reduce_df_front = not self.reduce_df_front
+        self.update_poses()
+        self.update_tables()
+
     def update_pose(self, pose):
-        self.poses[pose].solve_end_position(
-            self.sliders[pose]["x"],
-            self.sliders[pose]["y"],
-            LENGTH_HIP,
-            "",
-            DEFAULT_HIP_FRACTION,
-            DEFAULT_KNEE_BEND,
-            REDUCE_DF_FRONT,
-            REDUCE_DF_REAR,
-        )
+        try:
+            self.poses[pose].solve_end_position(
+                self.sliders[pose]["x"],
+                self.sliders[pose]["y"],
+                LENGTH_HIP,
+                "",
+                DEFAULT_HIP_FRACTION,
+                DEFAULT_KNEE_BEND,
+                self.reduce_df_front,
+                self.reduce_df_rear,
+            )
+        except (ValueError) as value_error:
+            print(value_error)
+
         positions = self.poses[pose].calculate_joint_positions()
 
         # shift positions to have toes of stand legs at (0,0):
