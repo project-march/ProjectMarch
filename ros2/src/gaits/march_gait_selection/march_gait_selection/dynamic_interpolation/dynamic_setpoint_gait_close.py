@@ -1,4 +1,4 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 from typing import Optional
 
@@ -10,7 +10,6 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
 
 from march_shared_msgs.msg import FootPosition, CurrentGait
-from geometry_msgs.msg import Point
 
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -24,23 +23,22 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self.gait_name = "dynamic_close"
 
-        # Fake foot location because stop gait needs it TODO: fix this in a prettier way
         gait_selection_node.create_subscription(
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._set_subgait_id,
-            DEFAULT_HISTORY_DEPTH
+            DEFAULT_HISTORY_DEPTH,
         )
         gait_selection_node.create_subscription(
             FootPosition,
             "/march/chosen_foot_position/right",
-            self._set_last_position_right,
+            self._set_last_foot_position,
             DEFAULT_HISTORY_DEPTH,
         )
         gait_selection_node.create_subscription(
             FootPosition,
             "/march/chosen_foot_position/left",
-            self._set_last_position_left,
+            self._set_last_foot_position,
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -55,7 +53,10 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         previous_subgait_id = current_gait.subgait
         self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
 
-    def _set_last_position_right(self, foot_position: FootPosition) -> None:
+    def _set_last_foot_position(self, foot_position: FootPosition) -> None:
+        """Set the foot position to use for the close gait to the last used foot position."""
+        # TODO: refactor such that foot location is not needed for close gait
+        self.foot_location = foot_position
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 

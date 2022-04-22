@@ -16,11 +16,10 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.utility_functions import get_position_from_yaml
 
 from std_msgs.msg import Header
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition, GaitInstruction
+from march_shared_msgs.msg import FootPosition
 
 
 class DynamicSetpointGaitStep(DynamicSetpointGait):
@@ -127,28 +126,26 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             TrajectoryCommand: command with the current subgait and start time
         """
-        if stop:
-            self.logger.info("Stopping dynamic gait.")
-        else:
-            if self._use_position_queue:
-                if not self.position_queue.empty():
-                    self.foot_location = self._get_foot_location_from_queue()
-                else:
-                    stop = True
-                    self._end = True
+        if self._use_position_queue:
+            if not self.position_queue.empty():
+                self.foot_location = self._get_foot_location_from_queue()
             else:
-                try:
-                    self.foot_location = self._get_foot_location(self.subgait_id)
-                except AttributeError:
-                    self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
-                    self._end = True
-                    return None
-                stop = self._check_msg_time(self.foot_location)
+                stop = True
+                self._end = True
+        else:
+            try:
+                self.foot_location = self._get_foot_location(self.subgait_id)
+            except AttributeError:
+                self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                self._end = True
+                return None
+            stop = self._check_msg_time(self.foot_location)
+            self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
 
-            self.logger.warn(
-                f"Stepping to location ({self.foot_location.processed_point.x}, "
-                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-            )
+        self.logger.warn(
+            f"Stepping to location ({self.foot_location.processed_point.x}, "
+            f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+        )
 
         if start and stop:
             return None
