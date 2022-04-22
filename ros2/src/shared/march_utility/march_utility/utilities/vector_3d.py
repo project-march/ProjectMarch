@@ -1,8 +1,4 @@
-"""
-This module contains a basic Vector3d class.
-
-This class is used for specifying positions and directional velocities.
-"""
+"""This module contains a basic Vector3d class."""
 from __future__ import annotations
 from math import sqrt
 from typing import Iterator
@@ -11,26 +7,27 @@ from march_utility.exceptions.general_exceptions import IncorrectCoordinateError
 
 
 class Vector3d:
-    """A 3d vector class."""
+    """A 3d vector class, used for specifying positions and directional velocities.
+
+    Args:
+        x (float): x_coordinate.
+        y (float): y_coordinate.
+        z (float): z_coordinate.
+    """
 
     def __init__(self, x: float, y: float, z: float) -> None:
-        """
-        Initialize the vector based on the coordinates.
-
-        :param x: x_coordinate.
-        :param y: y_coordinate.
-        :param z: z_coordinate.
-        """
         self.x = x
         self.y = y
         self.z = z
 
     def __add__(self, other: Vector3d) -> Vector3d:
-        """
-        Add two vectors together.
+        """Add two vectors together.
 
-        :param other: The vector to add.
-        :return: The new vector.
+        Args:
+            other (Vector3d): The vector to add.
+
+        Returns:
+            Vector3d. The new vector.
         """
         x = self.x + other.x
         y = self.y + other.y
@@ -38,11 +35,13 @@ class Vector3d:
         return Vector3d(x, y, z)
 
     def __sub__(self, other: Vector3d) -> Vector3d:
-        """
-        Subtract two vectors.
+        """Subtract two vectors.
 
-        :param other: The vector to subtract.
-        :return: The new vector.
+        Args:
+            other (Vector3d): The vector to subtract.
+
+        Returns:
+            Vector3d. The new vector.
         """
         x = self.x - other.x
         y = self.y - other.y
@@ -50,11 +49,13 @@ class Vector3d:
         return Vector3d(x, y, z)
 
     def __truediv__(self, factor: float) -> Vector3d:
-        """
-        Divide vector with a certain factor.
+        """Divide vector with a certain factor.
 
-        :param factor: The factor to use.
-        :return: The new vector.
+        Args:
+            factor (float): The factor to use.
+
+        Returns:
+            Vector3d. The new vector.
         """
         x = self.x / factor
         y = self.y / factor
@@ -62,11 +63,13 @@ class Vector3d:
         return Vector3d(x, y, z)
 
     def __mul__(self, factor: float) -> Vector3d:
-        """
-        Multiply vector with a certain factor.
+        """Multiply vector with a certain factor.
 
-        :param factor: The factor to use.
-        :return: The new vector.
+        Args:
+            factor (float): The factor to use.
+
+        Returns:
+            Vector3d. The new vector.
         """
         x = self.x * factor
         y = self.y * factor
@@ -74,11 +77,13 @@ class Vector3d:
         return Vector3d(x, y, z)
 
     def __getitem__(self, direction: str) -> float:
-        """
-        Get one direction of the vector.
+        """Get one direction of the vector.
 
-        :param direction: The direction to get.
-        :return: The new vector.
+        Args:
+            direction (str): The direction to get, either 'x', 'y', or 'z'.
+
+        Returns:
+            float. The coordinate value of the given direction.
         """
         return self.as_dictionary()[direction]
 
@@ -87,21 +92,25 @@ class Vector3d:
         yield from [self.x, self.y, self.z]
 
     def __eq__(self, other: object) -> bool:
-        """
-        Check if two vectors are equal.
+        """Check if two vectors are equal.
 
-        :param other: The vector to compare to.
-        :return: Whether the vectors are equal.
+        Args:
+            other (object): The vector to compare to.
+
+        Returns:
+            bool. Whether the vectors are equal.
+                `True` if it is an instance of Vector3d with same values for x, y and z.
+                `False`, otherwise.
         """
         if not isinstance(other, Vector3d):
             return False
         return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __repr__(self) -> str:
-        """
-        Represent the vector in a string.
+        """Represent the vector in a string.
 
-        :return: A string with the vector coordinates.
+        ReturnsL
+            str. A string with the vector coordinates.
         """
         return f"x: {self.x}, y: {self.y}, z: {self.z}"
 
@@ -121,9 +130,7 @@ class Vector3d:
         return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     @staticmethod
-    def is_close_enough(
-        vector1: Vector3d, vector2: Vector3d, tolerance: float = 0.0001
-    ) -> bool:
+    def is_close_enough(vector1: Vector3d, vector2: Vector3d, tolerance: float = 0.0001) -> bool:
         """Check whether the normalized vectors are within a given tolerance."""
         return (vector1 - vector2).norm() <= tolerance
 

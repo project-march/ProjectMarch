@@ -44,9 +44,7 @@ class CheckJointTemperature:
             f"march/safety_node/temperature_thresholds_{threshold_type}/{self.joint_name}"
             for threshold_type in THRESHOLD_TYPES
         ]
-        client = self.node.create_client(
-            srv_type=GetParameters, srv_name="/march/safety_node/get_parameters"
-        )
+        client = self.node.create_client(srv_type=GetParameters, srv_name="/march/safety_node/get_parameters")
         wait_for_service(self.node, client)
         future = client.call_async(GetParameters.Request(names=names))
         rclpy.spin_until_future_complete(self.node, future)
@@ -65,11 +63,7 @@ class CheckJointTemperature:
             stat.summary(DiagnosticStatus.STALE, "No temperature recorded")
             return stat
 
-        if (
-            not LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE
-            < self._temperature
-            < UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE
-        ):
+        if not LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE < self._temperature < UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE:
             stat.add("Current temperature", self._temperature)
             stat.summary(
                 DiagnosticStatus.WARN,

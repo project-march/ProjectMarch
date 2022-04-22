@@ -34,7 +34,7 @@
       "name": "walk_single_step_large"
     },
     {
-      "name": "dynamic_walk_single_step"
+      "name": "dynamic_step_and_close"
     }
   ],
   [
@@ -49,6 +49,9 @@
     },
     {
       "name": "realsense_ramp_up_single_step"
+    },
+    {
+      "name": "dynamic_step"
     }
   ],
   [

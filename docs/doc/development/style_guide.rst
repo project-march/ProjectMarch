@@ -7,10 +7,11 @@ All code in the March repositories should adhere to a certain set of style guide
 In our code we adhere to the following style guides:
 
     C++: https://wiki.ros.org/CppStyleGuide
-        * https://github.com/WHILL/roscpp_code_format
+        * https://github.com/PickNikRobotics/roscpp_code_format
         * clang-format: https://clang.llvm.org/docs/ClangFormat.html
     Python: https://wiki.ros.org/PyStyleGuide
         * PEP8: https://www.python.org/dev/peps/pep-0008/
+        * Google Style Python Docstrings: https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html
 
 It is not important to read these specifications, the most important aspects will be summarized below.
 In order to check whether your code is formatted according to the rules defined in the guides above,
@@ -145,8 +146,8 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_py_auto_format='docker run --rm -v ~/march:/home/march --entrypoint black march/flake8 ros1/src ros2/src utility_scripts/'
     alias march_py_auto_format_check='docker run --rm -v ~/march:/home/march:ro --entrypoint black march/flake8 \
     --check --diff --color ros1/src ros2/src utility_scripts/'
-    alias march_py_auto_format_here='docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd`'
-    alias march_py_auto_format_check_here='docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 --check --diff --color `pwd`'
+    alias march_py_auto_format_here="docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd` -l 120 --extend-exclude '^/.*/libraries/'"
+    alias march_py_auto_format_check_here="docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 -l 120 --extend-exclude '^/.*/libraries/' --check --diff --color `pwd`"
 
 Update your flake8 docker image. You can redo this step if it doesn't produce the same output as gitlab,
 or if someone from the Project MARCH software department announces to you that the docker image should be updated.

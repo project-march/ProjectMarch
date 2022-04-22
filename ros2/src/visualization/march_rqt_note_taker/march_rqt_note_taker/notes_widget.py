@@ -1,3 +1,4 @@
+"""Author: Olav de Haas, MIV."""
 import os
 from datetime import datetime
 from pathlib import Path
@@ -13,17 +14,19 @@ from .entry import Entry
 
 
 class NotesWidget(QWidget):
+    """Initialize the NotesWidget.
+
+    Args:
+        model (QAbstractTableModel): The table with data.
+        ui_file (str): Path to ui file.
+        node (Node): Handle to a node, used for logging.
+    """
+
     INSERT = 0
     REMOVE = 1
     SAVE_DIRECTORY_FROM_HOME = "/.ros/note-taker-notes"
 
     def __init__(self, model: QAbstractTableModel, ui_file: str, node: Node):
-        """Initialize the NotesWidget.
-
-        :param model
-        :param ui_file Path to ui file.
-        :param node Handle to a node, used for logging
-        """
         super(NotesWidget, self).__init__()
 
         self._model = model
@@ -34,9 +37,7 @@ class NotesWidget(QWidget):
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        self._last_save_file = (
-            f"{save_path}/note-taker" f"-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
-        )
+        self._last_save_file = f"{save_path}/note-taker-{datetime.now().strftime('%Y-%m-%d-%H:%M')}"
 
         self._node = node
 
@@ -58,9 +59,7 @@ class NotesWidget(QWidget):
         )
 
         self.table_view.setModel(self._model)
-        self.table_view.verticalScrollBar().rangeChanged.connect(
-            self._handle_change_scroll
-        )
+        self.table_view.verticalScrollBar().rangeChanged.connect(self._handle_change_scroll)
         self._last_scroll_max = self.table_view.verticalScrollBar().maximum()
 
         self.input_field.returnPressed.connect(self._handle_insert_entry)
@@ -117,11 +116,7 @@ class NotesWidget(QWidget):
         """
         selection_model = self.table_view.selectionModel()
         if self.table_view.hasFocus() and selection_model.hasSelection():
-            indices = [
-                index
-                for index in selection_model.selectedIndexes()
-                if not index.column()
-            ]
+            indices = [index for index in selection_model.selectedIndexes() if not index.column()]
             if indices and all(index.isValid() for index in indices):
                 self._model.remove_rows([index.row() for index in indices])
 
@@ -132,22 +127,22 @@ class NotesWidget(QWidget):
     def _handle_load(self):
         """Callback for when the load button is pressed.
 
+        Todo:
+            * implement this method.
+
         Not yet implemented.
         """
         self._node.get_logger().warn("Loading notes from a file is not yet implemented")
 
     def _handle_save(self):
         """Callback for when the save button is pressed."""
-        result = QFileDialog.getSaveFileName(
-            self, "Save File", ".", "Minute files (*.txt)"
-        )
+        result = QFileDialog.getSaveFileName(self, "Save File", ".", "Minute files (*.txt)")
         file_name = result[0]
         if file_name:
             self._save(file_name)
 
     def _handle_autosave(self, state):
-        """If the autosave checkbox is marked, any new entries are
-        automatically added to the saved file"""
+        """If the autosave checkbox is marked, any new entries are automatically added to the saved file."""
         self._has_autosave = state == QtCore.Qt.Checked
         if not self._has_autosave and self._autosave_file is not None:
             self._autosave_file.close()
@@ -157,30 +152,24 @@ class NotesWidget(QWidget):
     def _autosave(self, first: int, last: int, action: int):
         """Write the last changes incrementally to the autosave file.
 
-        :param first: The first index of affected entries in the model
-        :param last: the last index of affected entries in the model(inclusive)
-        :param action: Either INSERT or REMOVE
+        Args:
+            first (int): The first index of affected entries in the model.
+            last (int): The last index of affected entries in the model(inclusive).
+            action (int): Either NotesWidget.INSERT or NotesWidget.REMOVE.
         """
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
                 try:
-                    self._autosave_file = open(  # noqa: SIM115
-                        self._last_save_file, "r+"
-                    )
+                    self._autosave_file = open(self._last_save_file, "r+")  # noqa: SIM115
                     self._autosave_file.seek(0, os.SEEK_END)
                 except IOError as err:
-                    self._node.get_logger().error(
-                        f"Failed to open file {self._last_save_fil} "
-                        f"for autosaving: {err}"
-                    )
+                    self._node.get_logger().error(f"Failed to open file {self._last_save_fil} for autosaving: {err}")
                     return
             try:
                 if action == self.INSERT:
                     if first != 0:
                         self._autosave_file.write("\n")
-                    self._autosave_file.write(
-                        "\n".join(str(entry) for entry in self._model[first : last + 1])
-                    )
+                    self._autosave_file.write("\n".join(str(entry) for entry in self._model[first : last + 1]))
                 elif action == self.REMOVE:
                     self._autosave_file.seek(0, os.SEEK_SET)
                     self._autosave_file.write(str(self._model))
@@ -190,17 +179,15 @@ class NotesWidget(QWidget):
                     return
                 self._autosave_file.flush()
             except IOError as err:
-                self._node.get_logger().error(
-                    f"Failed to write to file {self._last_save_fil} "
-                    f"for autosaving: {err}"
-                )
+                self._node.get_logger().error(f"Failed to write to file {self._last_save_fil} for autosaving: {err}")
             else:
                 self._set_saved(True)
 
     def _save(self, file_name: str):
         """Save the model contents to a file.
 
-        :param file_name Name of the file
+        Args:
+            file_name (str): Name of the file.
         """
         if file_name[-4:] != ".txt":
             file_name += ".txt"

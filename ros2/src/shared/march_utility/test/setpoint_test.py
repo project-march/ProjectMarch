@@ -19,9 +19,7 @@ def round_setpoint(n):
 
 class SetpointTest(unittest.TestCase):
     def setUp(self):
-        self.setpoint = Setpoint(
-            Duration(seconds=1.123412541), 0.034341255, 123.162084549
-        )  # 0.0343412512 123.162084
+        self.setpoint = Setpoint(Duration(seconds=1.123412541), 0.034341255, 123.162084549)  # 0.0343412512 123.162084
         self.setpoint_dict = {
             "left_hip_aa": self.setpoint,
             "left_hip_fe": self.setpoint,
@@ -32,9 +30,7 @@ class SetpointTest(unittest.TestCase):
         }
 
     def test_time_rounding(self):
-        self.assertEqual(
-            self.setpoint.time, Duration(seconds=round_setpoint(1.12341254))
-        )
+        self.assertEqual(self.setpoint.time, Duration(seconds=round_setpoint(1.12341254)))
 
     def test_position_rounding(self):
         self.assertEqual(self.setpoint.position, round_setpoint(0.03434126))
@@ -45,15 +41,13 @@ class SetpointTest(unittest.TestCase):
     def test_string_output(self):
         self.assertEqual(
             str(self.setpoint),
-            f"Time: {round_setpoint(Duration(nanoseconds=1123412540)).nanoseconds}, "
+            f"Time: {round_setpoint(Duration(nanoseconds=1123412540))}, "
             f"Position: {round_setpoint(0.03434126)}, Velocity: "
             f"{round_setpoint(123.16208455)}",
         )
 
     def test_equal(self):
-        other_setpoint = Setpoint(
-            Duration(seconds=1.1234125445313287), 0.034341264534, 123.16208455453
-        )
+        other_setpoint = Setpoint(Duration(seconds=1.1234125445313287), 0.034341264534, 123.16208455453)
         self.assertEqual(self.setpoint, other_setpoint)
 
     def test_different_classes(self):
@@ -61,15 +55,11 @@ class SetpointTest(unittest.TestCase):
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_time(self):
-        other_setpoint = Setpoint(
-            Duration(seconds=1.123491381), 0.03434126, 123.16208455
-        )
+        other_setpoint = Setpoint(Duration(seconds=1.123491381), 0.03434126, 123.16208455)
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_position(self):
-        other_setpoint = Setpoint(
-            Duration(seconds=1.12341254), -0.03434126, 123.16208455
-        )
+        other_setpoint = Setpoint(Duration(seconds=1.12341254), -0.03434126, 123.16208455)
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_velocity(self):
@@ -81,9 +71,7 @@ class SetpointTest(unittest.TestCase):
         parameter = 0.3
         other_setpoint = Setpoint(Duration(seconds=time), position, velocity)
         expected_result = Setpoint(
-            Duration(
-                seconds=self.setpoint.time.seconds * (1 - parameter) + parameter * time
-            ),
+            Duration(seconds=self.setpoint.time.seconds * (1 - parameter) + parameter * time),
             self.setpoint.position * (1 - parameter) + parameter * position,
             self.setpoint.velocity * (1 - parameter) + parameter * velocity,
         )
@@ -96,9 +84,7 @@ class SetpointTest(unittest.TestCase):
         feet_state = FeetState.from_setpoint_dict(self.setpoint_dict)
         new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
-            self.assertAlmostEqual(
-                new_setpoints[key].position, self.setpoint_dict[key].position, places=4
-            )
+            self.assertAlmostEqual(new_setpoints[key].position, self.setpoint_dict[key].position, places=4)
 
     def test_inverse_kinematics_velocity(self):
         feet_state = FeetState.from_setpoint_dict(self.setpoint_dict)
@@ -117,12 +103,8 @@ class SetpointTest(unittest.TestCase):
         new_setpoints = FeetState.feet_state_to_setpoints(desired_state)
         resulting_position = FeetState.from_setpoint_dict(new_setpoints)
 
-        dif_left = (
-            desired_state.left_foot.position - resulting_position.left_foot.position
-        )
-        dif_right = (
-            desired_state.right_foot.position - resulting_position.right_foot.position
-        )
+        dif_left = desired_state.left_foot.position - resulting_position.left_foot.position
+        dif_right = desired_state.right_foot.position - resulting_position.right_foot.position
         self.assertLess(dif_left.norm(), 0.0001)
         self.assertLess(dif_right.norm(), 1 / 0.0001)
 
@@ -135,13 +117,9 @@ class SetpointTest(unittest.TestCase):
 
         other_right_foot = Foot(Side.right, Vector3d(1, 1, 1), Vector3d(1, 1, 1))
         other_left_foot = Foot(Side.left, Vector3d(1, 1, 1), Vector3d(1, 1, 1))
-        other_state = FeetState(
-            other_right_foot, other_left_foot, Duration(seconds=0.1)
-        )
+        other_state = FeetState(other_right_foot, other_left_foot, Duration(seconds=0.1))
 
-        resulting_state = FeetState.weighted_average_states(
-            base_state, other_state, parameter
-        )
+        resulting_state = FeetState.weighted_average_states(base_state, other_state, parameter)
 
         self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.left_foot.position)
         self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.left_foot.velocity)
@@ -182,15 +160,9 @@ class SetpointTest(unittest.TestCase):
             Vector3d(0, 0, 0),
         )
         expected_state = FeetState(expected_right_foot, expected_left_foot, Duration())
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position, resulting_state.left_foot.position))
         self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.left_foot.position, resulting_state.left_foot.position
-            )
-        )
-        self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.right_foot.position, resulting_state.right_foot.position
-            )
+            Vector3d.is_close_enough(expected_state.right_foot.position, resulting_state.right_foot.position)
         )
 
     def test_find_known_position_down(self):
@@ -225,15 +197,9 @@ class SetpointTest(unittest.TestCase):
             Vector3d(0, 0, 0),
         )
         expected_state = FeetState(expected_right_foot, expected_left_foot, Duration())
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position, resulting_state.left_foot.position))
         self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.left_foot.position, resulting_state.left_foot.position
-            )
-        )
-        self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.right_foot.position, resulting_state.right_foot.position
-            )
+            Vector3d.is_close_enough(expected_state.right_foot.position, resulting_state.right_foot.position)
         )
 
     def test_find_known_position_sit(self):
@@ -268,15 +234,9 @@ class SetpointTest(unittest.TestCase):
             Vector3d(0, 0, 0),
         )
         expected_state = FeetState(expected_right_foot, expected_left_foot, Duration())
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position, resulting_state.left_foot.position))
         self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.left_foot.position, resulting_state.left_foot.position
-            )
-        )
-        self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.right_foot.position, resulting_state.right_foot.position
-            )
+            Vector3d.is_close_enough(expected_state.right_foot.position, resulting_state.right_foot.position)
         )
 
     def test_set_forward_backward_swing_inverse_kinematics(self):
@@ -311,9 +271,7 @@ class SetpointTest(unittest.TestCase):
 
         base_state = FeetState.from_setpoint_dict(base_setpoint_dict)
         other_state = FeetState.from_setpoint_dict(other_setpoint_dict)
-        resulting_state = FeetState.weighted_average_states(
-            base_state, other_state, parameter
-        )
+        resulting_state = FeetState.weighted_average_states(base_state, other_state, parameter)
 
         base_expected_right_foot = Foot(
             Side.right,
@@ -325,9 +283,7 @@ class SetpointTest(unittest.TestCase):
             Vector3d(l_hl, -base / 2.0 - l_ph, l_ul + l_ll),
             Vector3d(0, 0, 0),
         )
-        base_expected_state = FeetState(
-            base_expected_right_foot, base_expected_left_foot, Duration()
-        )
+        base_expected_state = FeetState(base_expected_right_foot, base_expected_left_foot, Duration())
 
         other_expected_right_foot = Foot(
             Side.right,
@@ -339,20 +295,10 @@ class SetpointTest(unittest.TestCase):
             Vector3d(l_ul + l_ll + l_hl, -base / 2.0 - l_ph, 0),
             Vector3d(0, 0, 0),
         )
-        other_expected_state = FeetState(
-            other_expected_right_foot, other_expected_left_foot, Duration()
-        )
+        other_expected_state = FeetState(other_expected_right_foot, other_expected_left_foot, Duration())
 
-        expected_state = FeetState.weighted_average_states(
-            base_expected_state, other_expected_state, parameter
-        )
+        expected_state = FeetState.weighted_average_states(base_expected_state, other_expected_state, parameter)
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position, resulting_state.left_foot.position))
         self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.left_foot.position, resulting_state.left_foot.position
-            )
-        )
-        self.assertTrue(
-            Vector3d.is_close_enough(
-                expected_state.right_foot.position, resulting_state.right_foot.position
-            )
+            Vector3d.is_close_enough(expected_state.right_foot.position, resulting_state.right_foot.position)
         )

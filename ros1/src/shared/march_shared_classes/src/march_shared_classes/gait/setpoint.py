@@ -24,26 +24,53 @@ class Setpoint:
 
     @property
     def time(self):
+        """ """
         return self._time
 
     @time.setter
     def time(self, time):
+        """
+
+        Args:
+          time:
+
+        Returns:
+
+        """
         self._time = round(time, self.digits)
 
     @property
     def position(self):
+        """ """
         return self._position
 
     @position.setter
     def position(self, position):
+        """
+
+        Args:
+          position:
+
+        Returns:
+
+        """
         self._position = round(position, self.digits)
 
     @property
     def velocity(self):
+        """ """
         return self._velocity
 
     @velocity.setter
     def velocity(self, velocity):
+        """
+
+        Args:
+          velocity:
+
+        Returns:
+
+        """
         self._velocity = round(velocity, self.digits)
 
     def __repr__(self):
@@ -54,11 +81,7 @@ class Setpoint:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (
-                self.time == other.time
-                and self.position == other.position
-                and self.velocity == other.velocity
-            )
+            return self.time == other.time and self.position == other.position and self.velocity == other.velocity
         else:
             return False
 
@@ -71,21 +94,22 @@ class Setpoint:
 
         Calculates using the approximation next_position = position + current_velocity * time_difference
 
-        :param setpoint_dic: A dictionary of setpoints with positions and velocities
-        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
+        Args:
+          setpoint_dic: A dictionary of setpoints with positions and velocities
+
+        Returns:
+          : A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
+
         """
         next_positions = {}
         for joint in JOINT_NAMES_IK:
             if joint in setpoint_dic:
                 next_positions[joint] = cls(
                     setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
-                    setpoint_dic[joint].position
-                    + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
+                    setpoint_dic[joint].position + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
                 )
             else:
-                raise KeyError(
-                    "Setpoint_dic is missing joint {joint}".format(joint=joint)
-                )
+                raise KeyError("Setpoint_dic is missing joint {joint}".format(joint=joint))
 
         return next_positions
 
@@ -94,33 +118,30 @@ class Setpoint:
 
         Calculates using the approximation next_position = position + current_velocity * time_difference
 
-        :param self: A Setpoint object with no velocity
-        :param next_state: A Setpoint with the positions a moment later
+        Args:
+          self: A Setpoint object with no velocity
+          next_state: A Setpoint with the positions a moment later
 
-        :return: The joint velocities of the joints on the specified side
+        Returns:
+          : The joint velocities of the joints on the specified side
+
         """
-        self.velocity = (next_state.position - self.position) / (
-            next_state.time - self.time
-        )
+        self.velocity = (next_state.position - self.position) / (next_state.time - self.time)
 
     @staticmethod
     def interpolate_setpoints(base_setpoint, other_setpoint, parameter):
         """Linearly interpolate two setpoints.
 
-        :param base_setpoint:
-            base setpoint, return value if parameter is zero
-        :param other_setpoint:
-            other setpoint, return value if parameter is one
-        :param parameter:
-            parameter for linear interpolation, 0 <= parameter <= 1
-        :return:
-            The interpolated setpoint
+        Args:
+          base_setpoint: base setpoint, return value if parameter is zero
+          other_setpoint: other setpoint, return value if parameter is one
+          parameter: parameter for linear interpolation, 0 <= parameter <= 1
+
+        Returns:
+          : The interpolated setpoint
+
         """
         time = weighted_average(base_setpoint.time, other_setpoint.time, parameter)
-        position = weighted_average(
-            base_setpoint.position, other_setpoint.position, parameter
-        )
-        velocity = weighted_average(
-            base_setpoint.velocity, other_setpoint.velocity, parameter
-        )
+        position = weighted_average(base_setpoint.position, other_setpoint.position, parameter)
+        velocity = weighted_average(base_setpoint.velocity, other_setpoint.velocity, parameter)
         return Setpoint(time, position, velocity)

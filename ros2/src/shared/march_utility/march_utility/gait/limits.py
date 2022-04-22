@@ -1,7 +1,10 @@
+"""Authot: MV, MVI."""
+
+
 class Limits:
-    def __init__(
-        self, lower, upper, velocity, effort=None, k_position=None, k_velocity=None
-    ):
+    """Limits object to contain al the limit information loaded in form an urdf."""
+
+    def __init__(self, lower, upper, velocity, effort=None, k_position=None, k_velocity=None):
         self.lower = lower
         self.upper = upper
         self.velocity = velocity
@@ -21,7 +24,8 @@ class Limits:
             urdf_joint.safety_controller.k_velocity,
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """bool. Checks if the two limits have the same values."""
         return (
             self.lower == other.lower
             and self.upper == other.upper
@@ -30,6 +34,3 @@ class Limits:
             and self.k_position == other.k_position
             and self.k_velocity == other.k_velocity
         )
-
-    def __ne__(self, other):
-        return not self == other  # noqa: SIM201

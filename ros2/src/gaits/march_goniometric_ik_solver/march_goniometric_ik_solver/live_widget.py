@@ -1,10 +1,11 @@
-"""Author: Jelmer de Wolde, MVII"""
+"""Author: Jelmer de Wolde, MVII."""
 
 import pkg_resources
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, Button
-from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT
+from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_FOOT, LENGTH_HIP
+
 
 # Layout problems occurred with older versions of matplotlib (for example 3.1.2).
 # Tested and working on 3.5.1 (latest version at the moment this tool was made).
@@ -13,11 +14,17 @@ pkg_resources.require("matplotlib==3.5.1")
 
 
 class LiveWidget:
-    """
-    A widget to easily check the solutions of the IK solver for a given x,y location of the ankle.
+    """A widget to easily check the solutions of the IK solver for a given x,y location of the ankle.
+
     This widget has been made for debugging purposes, to evaluate poses the IK solver provides as
     solution for a given goal location. This widget can be executed by sourcing ROS2, March ROS2
     and running this script with python: sfox && sros2 && python3 live_widget.py
+
+    Attributes:
+        default_hip_fraction (float): the default fraction between the two feet (forward) at which the hip is desired.
+        default_knee_bend (float): the default bending of the knee for a straight leg.
+        reduce_df_front (bool): whether to reduce dorsiflexion for swing leg.
+        reduce_df_rear (bool): whether to reduce dorsiflexion for stance leg.
     """
 
     def __init__(self) -> None:
@@ -32,7 +39,7 @@ class LiveWidget:
         pose.solve_end_position(
             0.0,
             0.0,
-            0.0,
+            LENGTH_HIP,
             "",
             self.default_hip_fraction,
             self.default_knee_bend,
@@ -64,9 +71,7 @@ class LiveWidget:
         ]
         pose_rad = pose.pose_left
         pose_deg = [np.rad2deg(angle) for angle in pose_rad]
-        celltext = np.column_stack(
-            (joints, np.round(pose_rad, 2), np.round(pose_deg, 2))
-        )
+        celltext = np.column_stack((joints, np.round(pose_rad, 2), np.round(pose_deg, 2)))
         collabels = ("joint", "radians", "degrees")
         self.table = plt.table(cellText=celltext, colLabels=collabels, loc="right")
         self.table.auto_set_column_width((0, 1, 2))
@@ -133,30 +138,25 @@ class LiveWidget:
 
         # Create a toggle for rear ankle dorsi flexion reduction:
         ax_toggle = plt.axes([0.7, 0.25, 0.1, 0.04])
-        self.toggle_df_rear = Button(
-            ax_toggle, "df_rear", color="green", hovercolor="red"
-        )
+        self.toggle_df_rear = Button(ax_toggle, "df_rear", color="green", hovercolor="red")
         self.toggle_df_rear.on_clicked(self.toggle_rear)
 
         # Create a toggle for front ankle dorsi flexion reduction:
         ax_toggle = plt.axes([0.85, 0.25, 0.1, 0.04])
-        self.toggle_df_front = Button(
-            ax_toggle, "df_front", color="green", hovercolor="red"
-        )
+        self.toggle_df_front = Button(ax_toggle, "df_front", color="green", hovercolor="red")
         self.toggle_df_front.on_clicked(self.toggle_front)
 
         # Show the widget:
         plt.show()
 
-    # The function to be called anytime a slider's value changes:
     def update(self, update_value):
-
+        """The function to be called anytime a slider's value changes."""
         # Get new exo pose and update joint positions:
         pose = Pose()
         pose.solve_end_position(
             self.x_slider.val,
             self.y_slider.val,
-            0.0,
+            LENGTH_HIP,
             "",
             self.hip_slider.val,
             np.deg2rad(self.knee_slider.val),
@@ -181,25 +181,21 @@ class LiveWidget:
         # Update table with joint angles:
         pose_rad = pose.pose_right
         for i in np.arange(len(pose_rad)):
-            self.table.get_celld()[(i + 1, 1)].get_text().set_text(
-                np.round(pose_rad[i], 2)
-            )
-            self.table.get_celld()[(i + 1, 2)].get_text().set_text(
-                np.round(np.rad2deg(pose_rad[i]), 2)
-            )
+            self.table.get_celld()[(i + 1, 1)].get_text().set_text(np.round(pose_rad[i], 2))
+            self.table.get_celld()[(i + 1, 2)].get_text().set_text(np.round(np.rad2deg(pose_rad[i]), 2))
 
         # Redraw plot:
         self.fig.canvas.draw_idle()
 
-    # Reset function:
     def reset(self, event):
+        """Reset function."""
         self.x_slider.reset()
         self.y_slider.reset()
         self.hip_slider.reset()
         self.knee_slider.reset()
 
-    # Toggle functions:
     def toggle_rear(self, event):
+        """Toggle dorsiflexion reduction for stance leg."""
         if self.reduce_df_rear:
             self.reduce_df_rear = False
             self.toggle_df_rear.color = "red"
@@ -211,6 +207,7 @@ class LiveWidget:
         self.update(0)
 
     def toggle_front(self, event):
+        """Toggle dorsiflexion reduction for swing leg."""
         if self.reduce_df_front:
             self.reduce_df_front = False
             self.toggle_df_front.color = "red"

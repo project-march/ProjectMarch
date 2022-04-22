@@ -24,21 +24,13 @@ class FakeCovidPublisher(Node):
     """
 
     def __init__(self):
-        super().__init__(
-            NODE_NAME, automatically_declare_parameters_from_overrides=True
-        )
+        super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         self.random_x = False
         self.random_y = False
 
-        self.location_x = (
-            self.get_parameter("location_x").get_parameter_value().double_value
-        )
-        self.location_y = (
-            self.get_parameter("location_y").get_parameter_value().double_value
-        )
-        self.location_z = (
-            self.get_parameter("location_z").get_parameter_value().double_value
-        )
+        self.location_x = self.get_parameter("location_x").get_parameter_value().double_value
+        self.location_y = self.get_parameter("location_y").get_parameter_value().double_value
+        self.location_z = self.get_parameter("location_z").get_parameter_value().double_value
 
         self.left_foot_publisher = self.create_publisher(
             msg_type=PointStamped,
@@ -83,9 +75,7 @@ def main():
     rclpy.init()
     fake_covid_publisher = FakeCovidPublisher()
 
-    fake_covid_publisher.add_on_set_parameters_callback(
-        lambda params: parameter_callback(fake_covid_publisher, params)
-    )
+    fake_covid_publisher.add_on_set_parameters_callback(lambda params: parameter_callback(fake_covid_publisher, params))
 
     signal.signal(signal.SIGTERM, sys_exit)
 
@@ -95,9 +85,7 @@ def main():
     rclpy.shutdown()
 
 
-def parameter_callback(
-    fake_covid_publisher: FakeCovidPublisher, parameters: list
-) -> SetParametersResult:
+def parameter_callback(fake_covid_publisher: FakeCovidPublisher, parameters: list) -> SetParametersResult:
     """Update parameter of fake_covid_publisher and return if
     this is done successfully.
 

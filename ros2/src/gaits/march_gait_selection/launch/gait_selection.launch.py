@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
@@ -5,7 +7,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Basic launch file to launch the gait selection node"""
+    """Basic launch file to launch the gait selection node."""
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -33,19 +35,13 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "dynamic_gait",
                 default_value="False",
-                description="Wether dynamic_setpoint_gait is enabled",
+                description="Whether dynamic_setpoint_gait is enabled",
             ),
             # Dynamic gait parameters:
             DeclareLaunchArgument(
-                name="dynamic_subgait_duration",
-                default_value="1.5",
-                description="Duration of a subgait created by the dynamic gait",
-            ),
-            DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
-                description="Fraction of the step at which the middle point "
-                "of the dynamic gait will take place.",
+                description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
                 name="middle_point_height",
@@ -62,13 +58,23 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="push_off_fraction",
                 default_value="0.15",
-                description="Fraction of the step at which the push off will"
-                "take place.",
+                description="Fraction of the step at which the push off will take place.",
             ),
             DeclareLaunchArgument(
                 name="push_off_position",
                 default_value="-0.15",
                 description="Maximum joint position of the ankle during push off.",
+            ),
+            DeclareLaunchArgument(
+                name="add_push_off",
+                default_value="True",
+                description="Whether to add a push off setpoint for the ankle.",
+            ),
+            DeclareLaunchArgument(
+                name="use_position_queue",
+                default_value="False",
+                description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
+                "points given by (simulated) covid.",
             ),
             # State machine parameters:
             DeclareLaunchArgument(
@@ -80,13 +86,11 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.2",
+                default_value="0.3",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
-            DeclareLaunchArgument(
-                name="timer_period", default_value="0.004", description=""
-            ),
+            DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -99,30 +103,15 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"dynamic_gait": LaunchConfiguration("dynamic_gait")},
-                    {
-                        "dynamic_subgait_duration": LaunchConfiguration(
-                            "dynamic_subgait_duration"
-                        )
-                    },
-                    {
-                        "middle_point_fraction": LaunchConfiguration(
-                            "middle_point_fraction"
-                        )
-                    },
+                    {"middle_point_fraction": LaunchConfiguration("middle_point_fraction")},
                     {"middle_point_height": LaunchConfiguration("middle_point_height")},
-                    {
-                        "minimum_stair_height": LaunchConfiguration(
-                            "minimum_stair_height"
-                        )
-                    },
+                    {"minimum_stair_height": LaunchConfiguration("minimum_stair_height")},
                     {"push_off_fraction": LaunchConfiguration("push_off_fraction")},
                     {"push_off_position": LaunchConfiguration("push_off_position")},
+                    {"add_push_off": LaunchConfiguration("add_push_off")},
+                    {"use_position_queue": LaunchConfiguration("use_position_queue")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
-                    {
-                        "early_schedule_duration": LaunchConfiguration(
-                            "early_schedule_duration"
-                        )
-                    },
+                    {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
                     {"timer_period": LaunchConfiguration("timer_period")},
                 ],
                 on_exit=Shutdown(),

@@ -3,7 +3,6 @@
 These functions are not a part of any specific part of the code, but will be useful
 for general use cases.
 """
-
 import os
 from typing import List, Optional
 
@@ -18,57 +17,56 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = (
-    get_package_share_directory("march_description") + "/urdf/march6.urdf"
-)
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
 MODE_READING = "r"
 
 
-def weighted_average_floats(
-    base_value: float, other_value: float, parameter: float
-) -> float:
-    """
-    Compute the weighted average of two element with normalised weight parameter.
+def weighted_average_floats(base_value: float, other_value: float, parameter: float) -> float:
+    """Compute the weighted average of two element with normalised weight parameter.
 
-    :param base_value: The first value for the weighted average,
-        return this if parameter is 0
-    :param other_value: The second value for the weighted average,
-        return this if parameter is 1
-    :param parameter: The normalised weight parameter, the parameter that
-        determines the weight of the second value
+    Args:
+        base_value (float): The first value for the weighted average,
+        other_value (float): The second value for the weighted average,
+        parameter (float): The normalised weight parameter,
+            the parameter that determines the weight of the second value.
 
-    :return: A vector which is the weighted average of the given values
+    Returns:
+        float. The value for the weighted average of the given values.
+            - `other_value`: If `parameter` is 0.
+            - `base_value`: If `parameter` is 1.
     """
     return base_value * (1 - parameter) + other_value * parameter
 
 
-def weighted_average_vectors(
-    base_vector: Vector3d, other_vector: Vector3d, parameter: float
-) -> Vector3d:
-    """
-    Compute the weighted average of two element with normalised weight parameter.
+def weighted_average_vectors(base_vector: Vector3d, other_vector: Vector3d, parameter: float) -> Vector3d:
+    """Compute the weighted average of two element with normalised weight parameter.
 
-    :param base_vector: The first vector for the weighted average,
-        return this if parameter is 0
-    :param other_vector: The second vector for the weighted average,
-        return this if parameter is 1
-    :param parameter: The normalised weight parameter, the parameter that
-        determines the weight of the second vector
+    Args:
+        base_vector (Vector3d): The first vector for the weighted average.
+        other_vector (Vector3d): The second vector for the weighted average.
+        parameter (float): The normalised weight parameter, the parameter that
+            determines the weight of the second vector.
 
-    :return: A vector which is the weighted average of the given vectors
+    Returns:
+        Vector3d. A vector which is the weighted average of the given vectors.
+            - `other_vector`: If `parameter` is 0.
+            - `base_vector`: If `parameter` is 1.
     """
     return base_vector * (1 - parameter) + other_vector * parameter
 
 
 def merge_dictionaries(dic_one: dict, dic_two: dict) -> dict:
-    """Combine the key value pairs of two dicitonaries into a new dictionary.
+    """Combine the key value pairs of two dictionaries into a new dictionary.
 
     Throws an error when both dictionaries contain the same key and the
     corresponding values are not equal.
-    :param dic_one: One of the dictionaries which is to be merged
-    :param dic_two: One of the dictionaries which is to be merged
-    :return: The merged dictionary, has the same key value pairs as the pairs in
-    the given dictionaries combined
+
+    Args:
+        dic_one (dict): First dictionary that is to be merged.
+        dic_two (dict): Second dictionary that is to be merged.
+
+    Returns:
+        The merged dictionary, has the same key value pairs as the pairs in the given dictionaries combined.
     """
     merged_dic = {}
     for key_one in dic_one:
@@ -87,21 +85,14 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
         return True
     else:
         if dic_one[key] != dic_two[key]:
-            raise KeyError(
-                f"Dictionaries to be merged both contain key {key} with differing "
-                f"values"
-            )
+            raise KeyError(f"Dictionaries to be merged both contain key {key} with differing values")
         return True
 
 
-def select_lengths_for_inverse_kinematics(
-    lengths: List[float], side: Side = Side.both
-) -> List[float]:
+def select_lengths_for_inverse_kinematics(lengths: List[float], side: Side = Side.both) -> List[float]:
     """Return only the lengths in the list on the requested side."""
     if len(lengths) != 9:
-        Node("march_utility").get_logger().error(
-            "The lengths given did not have size 9. Cannot unpack the lengths."
-        )
+        Node("march_utility").get_logger().error("The lengths given did not have size 9. Cannot unpack the lengths.")
 
     l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = lengths
     if side == Side.left:
@@ -112,7 +103,7 @@ def select_lengths_for_inverse_kinematics(
 
 
 def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
-    length_names: List[str] = None,
+    length_names: Optional[List[str]] = None,
     side: Side = Side.both,
 ) -> List[float]:
     """Grab lengths which are relevant for the inverse kinematics calculation from the urdf file.
@@ -120,14 +111,16 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
     This function returns the lengths relevant for the specified foot, if no
     side is specified,it returns all relevant lengths for both feet.
 
-    :param side: The side of the exoskeleton of which the lengths would like to be known
-    :return: The lengths of the specified side which are relevant for
-        the (inverse) kinematics calculations
+    Args:
+        length_names (List[str], Optional): The link length names for which lengths you wish to retrieve.
+            Default is `None`, meaning it will get all link lengths.
+        side (Side): The side of the exoskeleton of which the lengths would like to be known. Default is `Side.both`.
+
+    Returns:
+        List[float]. The lengths of the specified side which are relevant for the (inverse) kinematics calculations
     """
     if not isinstance(side, Side):
-        raise SideSpecificationError(
-            side, f"Side should be either 'left', 'right' or 'both', but was {side}"
-        )
+        raise SideSpecificationError(side, f"Side should be either 'left', 'right' or 'both', but was {side}")
     try:
         with open(
             os.path.join(
@@ -145,16 +138,11 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
         hip_front_length = robot_dimensions["hip_aa_front"]["length"]
         upper_leg_length = robot_dimensions["upper_leg"]["length"]
         lower_leg_length = robot_dimensions["lower_leg"]["length"]
-        ankle_offset = (
-            robot_dimensions["upper_leg"]["offset"]
-            + robot_dimensions["ankle_plate"]["offset"]
-        )
+        ankle_offset = robot_dimensions["upper_leg"]["offset"] + robot_dimensions["ankle_plate"]["offset"]
         hip_aa_arm_length = hip_side_length - ankle_offset
 
     except KeyError as e:
-        raise KeyError(
-            f"Expected robot.link_map to contain {e.args[0]}, but it was missing."
-        )
+        raise KeyError(f"Expected robot.link_map to contain {e.args[0]}, but it was missing.")
 
     if length_names is None:
         return select_lengths_for_inverse_kinematics(
@@ -181,17 +169,19 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
 LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
 
 
-def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name):
-    """Get the joint from the urdf robot with the given joint
-    name and return the limits of the joint.
+def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
+    """Get the joint from the urdf robot with the given joint name and return the limits of the joint.
 
-    :param robot: The urdf robot to use.
-    :param joint_name: The name to look for.
+    Retrieves it from the `MARCH_URDF`.
+
+    Args:
+        joint_name (str): The name to look for.
+
+    Returns:
+        float. The limit of the given joint.
     """
     robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    urdf_joint = next(
-        (joint for joint in robot.joints if joint.name == joint_name), None
-    )
+    urdf_joint = next((joint for joint in robot.joints if joint.name == joint_name), None)
     return Limits.from_urdf_joint(urdf_joint)
 
 
@@ -205,8 +195,9 @@ def validate_and_get_joint_names_for_inverse_kinematics(
 ) -> Optional[List[str]]:
     """Get a list of the joint names that can be used for the inverse kinematics.
 
-    Returns none if the robot description does not contain the required joints.
-    :return: A list of joint names.
+    Returns:
+        None. If the robot description does not contain the required joints.
+        List[str]. Otherwise, a list of joint names.
     """
     robot = urdf.Robot.from_xml_file(MARCH_URDF)
     robot_joint_names = robot.joint_map.keys()
@@ -219,10 +210,7 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         "right_knee",
     ]
     for joint_name in joint_name_list:
-        if (
-            joint_name not in robot_joint_names
-            or robot.joint_map[joint_name].type == "fixed"
-        ):
+        if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == "fixed":
             if logger is not None:
                 logger.warn(f"{joint_name} is fixed, but required for IK")
             return None
@@ -231,6 +219,10 @@ def validate_and_get_joint_names_for_inverse_kinematics(
 
 
 def get_joint_names_from_urdf():
+    """Gets a list of all the joint names from the urdf that are not fixed.
+
+    Retrieves it from the `MARCH_URDF`.
+    """
     robot = urdf.Robot.from_xml_file(MARCH_URDF)
     robot_joint_names = robot.joint_map.keys()
     joint_names = []
@@ -243,6 +235,17 @@ def get_joint_names_from_urdf():
 
 
 def get_position_from_yaml(position: str):
+    """Gets a dictionary for default joint angles and given positions.
+
+    Note:
+        Gets the position from the 'default.yaml` located in the "march_gait_files" package in "airgait_vi".
+
+    Args:
+        position (str): Name of the position, e.g. "stand", for home stand.
+
+    Returns:
+        dict[str, float]. The str is the joint name and the float is the joint angle in radians.
+    """
     try:
         with open(
             os.path.join(

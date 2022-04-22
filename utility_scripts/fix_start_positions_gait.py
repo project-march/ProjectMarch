@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-# Author: Wolf Nederpel
-# Date: 25 - 08 - 2021  # noqa: E800
-# Description: Updates the starting postions of the specified gaits
-# Usage: set the right old and new stand positions,
-# fix the path from which to change and run ./fix_start_positions_gait.py
+"""Updates the starting positions of the specified gaits.
+
+Author: Wolf Nederpel, MVI.
+Date: 25 - 08 - 2021
+Usage: Set the right old and new stand positions, fix the path from which to change
+    and run `./fix_start_positions_gait.py`.
+"""
 from pathlib import Path
 import yaml
 import copy
@@ -99,12 +101,11 @@ new_stand_position_end = copy.deepcopy(new_stand_position_start)
 
 # actually for dicts in dicts
 def almost_equal_nested_dict(dict1: dict, dict2: dict) -> bool:
+    """Todo: Add docstrings."""
     result = True
     for key_outer, value in dict1.items():
         for key_inner, true_value in value.items():
-            result = result and (
-                round(true_value, 4) == round(dict2[key_outer][key_inner], 4)
-            )
+            result = result and (round(true_value, 4) == round(dict2[key_outer][key_inner], 4))
     return result
 
 
@@ -134,9 +135,7 @@ for path in Path(
                 old_stand_position_start,
             ):
                 for joint in content["joints"].keys():
-                    content["joints"][joint][0] = new_stand_position_start[
-                        joint
-                    ]  # noqa: E501
+                    content["joints"][joint][0] = new_stand_position_start[joint]  # noqa: E501
                 amount_of_start_positions_set += 1
 
             if almost_equal_nested_dict(
@@ -144,9 +143,7 @@ for path in Path(
                 old_stand_position_end,
             ):
                 for joint in content["joints"].keys():
-                    content["joints"][joint][-1] = new_stand_position_end[
-                        joint
-                    ]  # noqa: E501
+                    content["joints"][joint][-1] = new_stand_position_end[joint]  # noqa: E501
                 amount_of_end_positions_set += 1
             subgait_file.close()
 

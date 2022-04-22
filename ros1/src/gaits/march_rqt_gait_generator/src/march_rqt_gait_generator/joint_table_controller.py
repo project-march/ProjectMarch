@@ -7,6 +7,8 @@ from .model.modifiable_setpoint import ModifiableSetpoint
 
 
 class JointTableController:
+    """ """
+
     TABLE_DIGITS = 4
 
     def __init__(self, joint_table_widget, joint):
@@ -14,18 +16,22 @@ class JointTableController:
         self.update_setpoints(joint)
 
     def update_setpoints(self, joint):
+        """
+
+        Args:
+          joint:
+
+        Returns:
+
+        """
         self.table_widget.setRowCount(len(joint.setpoints))
 
         for i, setpoint in enumerate(joint.setpoints):
             time_item = QTableWidgetItem(str(round(setpoint.time, self.TABLE_DIGITS)))
 
-            position_item = QTableWidgetItem(
-                str(round(math.degrees(setpoint.position), self.TABLE_DIGITS))
-            )
+            position_item = QTableWidgetItem(str(round(math.degrees(setpoint.position), self.TABLE_DIGITS)))
 
-            velocity_item = QTableWidgetItem(
-                str(round(math.degrees(setpoint.velocity), self.TABLE_DIGITS))
-            )
+            velocity_item = QTableWidgetItem(str(round(math.degrees(setpoint.velocity), self.TABLE_DIGITS)))
 
             self.table_widget.setItem(i, 0, time_item)
             self.table_widget.setItem(i, 1, position_item)
@@ -42,6 +48,7 @@ class JointTableController:
         self.table_widget.resizeColumnsToContents()
 
     def to_setpoints(self):
+        """ """
         setpoints = []
         for i in range(self.table_widget.rowCount()):
             time = float(self.table_widget.item(i, 0).text())

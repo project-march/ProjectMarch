@@ -82,11 +82,17 @@ Copy and paste the following code into your :code:`~/.bashrc` or :code:`~/.march
 You can change the :code:`$MARCH_DOCKER_CPU_CAP` to cap the ros cpu usage. If you have 12 CPU's you can put down any number
 between 0.01 and 12. This specifies how much of the CPU's can be used with 12 being 100% in this case.
 To check how many CPU's you have available, run :code:`nproc --all`.
+You can change the :code:'$MARCH_DOCKER_MEMORY_CAP' to cap the memory usage. The minimum required is 4GB. You can check
+the amount you have available by running :code:'vmstat -s | grep "total memory" | awk '{print $1$2}''. If you do not
+have memory issues, you do not need to change the value.
+Note: the docker works with the following units: k for kilobyte, m for megabyte, g for gigabyte and t for terabyte.
 
 .. code-block:: bash
 
     export MARCH_COMPOSE_FILE="${HOME}/march/.docker_local/docker-compose.yaml"
     export MARCH_DOCKER_CPU_CAP=$(nproc --all) # you can adjust this from anywhere from 0.01 - <$(nproc --all)>
+    export MARCH_DOCKER_MEMORY_CAP=$(vmstat -s | grep "total memory" | awk '{print $1$2}') # you can adjust this between
+    4G and <$(vmstat -s | grep "total memory" | awk '{print $1$2}')>, which is the total amount of RAM in your computer
 
     alias set_uid_gid='export M_UID=$(id -u $USER) && export M_GID=$(id -g $USER)'
     alias march_clean_containers='docker rm ros1 ros2 bridge'

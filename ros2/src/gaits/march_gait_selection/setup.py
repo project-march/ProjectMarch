@@ -1,3 +1,5 @@
+"""Author: Unknown."""
+
 import os
 from glob import glob, iglob
 from setuptools import setup
@@ -6,8 +8,10 @@ package_name = "march_gait_selection"
 
 
 def data_files():
-    """Generates the list of data files necessary for gait selection, the gait and subgait files
-    required for testing are taken from the ros1 directory to decrease duplication."""
+    """Generates the list of data files necessary for gait selection.
+
+    The gait and subgait files required for testing are taken from the ros1 directory to decrease duplication.
+    """
     test_gait_files_source = "test/testing_gait_files"
     data = [
         (
@@ -23,11 +27,13 @@ def data_files():
             os.path.join("share", package_name, "test", "resources"),
             [os.path.join(test_gait_files_source, "realsense_gaits.yaml")],
         ),
-        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
+        (os.path.join("share", package_name, "launch"), glob(os.path.join("launch", "*.launch.py"))),
+        (
+            os.path.join("share", package_name, "position_queue"),
+            glob(os.path.join("config", "position_queue.yaml")),
+        ),
     ]
-    for filename in iglob(
-        os.path.join(test_gait_files_source, "**", "*.subgait"), recursive=True
-    ):
+    for filename in iglob(os.path.join(test_gait_files_source, "**", "*.subgait"), recursive=True):
         data.append(
             (
                 os.path.join(
@@ -40,9 +46,7 @@ def data_files():
                 [filename],
             )
         )
-    for filename in iglob(
-        os.path.join(test_gait_files_source, "**", "*.gait"), recursive=True
-    ):
+    for filename in iglob(os.path.join(test_gait_files_source, "**", "*.gait"), recursive=True):
         data.append(
             (
                 os.path.join(
@@ -77,8 +81,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest", "unittest"],
     entry_points={
-        "console_scripts": [
-            "march_gait_selection = march_gait_selection.gait_selection_node:main"
-        ],
+        "console_scripts": ["march_gait_selection = march_gait_selection.gait_selection_node:main"],
     },
 )
