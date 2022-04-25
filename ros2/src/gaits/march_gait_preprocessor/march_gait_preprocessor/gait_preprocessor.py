@@ -124,8 +124,6 @@ class GaitPreprocessor(Node):
         point.y = foot_location.displacement.z + Y_OFFSET
         point.z = temp_y + np.sign(temp_y) * Z_OFFSET
 
-        self.get_logger().info(f"{point.x}, {point.y}, {point.z}")
-
         return point
 
     def _get_duration_scaled_to_height(self, duration: float, step_height: float) -> float:

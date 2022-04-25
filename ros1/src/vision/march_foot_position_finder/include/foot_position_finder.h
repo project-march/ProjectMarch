@@ -40,8 +40,6 @@ protected:
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);
 
-    void resetHeight(const ros::TimerEvent&);
-
     void processSimulatedDepthFrames(
         const sensor_msgs::PointCloud2 input_cloud);
 
@@ -62,10 +60,7 @@ protected:
     ros::Subscriber current_chosen_point_subscriber_;
     ros::Subscriber other_chosen_point_subscriber_;
 
-    ros::Publisher height_map_publisher;
-
-    std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
-    std::unique_ptr<tf2_ros::TransformListener> tfListener_;
+    ros::Publisher height_map_publisher_;
 
     ros::Timer realsense_timer_;
     ros::Timer height_reset_timer_;
@@ -89,7 +84,6 @@ protected:
     std::string left_or_right_;
     std::string other_side_;
 
-    std::string base_frame_;
     std::string other_frame_id_;
     std::string current_frame_id_;
 

@@ -1,3 +1,5 @@
+"""Author: Jelmer de Wolde, MVII."""
+
 import rospy
 from std_msgs.msg import Float64MultiArray
 import numpy as np
@@ -12,6 +14,8 @@ from pubsub import pub
 
 
 class Gui(QWidget):
+    """A simple tool used for debugging to visualize the height_map used in point_finder.cpp."""
+
     def __init__(self):
         super(Gui, self).__init__()
 
@@ -25,6 +29,7 @@ class Gui(QWidget):
         self.show()
 
     def update_data(self, img):
+        """Update the data on the plot."""
         matrix = []
 
         img_filtered = img[img != -10]
@@ -53,14 +58,18 @@ class Gui(QWidget):
 
 # ROS - Worker Thread
 class RosThread(QThread):
+    """A thread used to make a callback on the ros topic."""
+
     def __init__(self, topic, parent=None):
         QThread.__init__(self, parent)
         self.sub = rospy.Subscriber(topic, Float64MultiArray, self.callback)
 
     def run(self):
+        """Run ros on the thread."""
         rospy.spin()
 
     def callback(self, msg: Float64MultiArray):
+        """Callback function to call the plot updater."""
         img_list = np.array(msg.data)
         if msg.layout.data_offset:
             side = int(np.sqrt(len(img_list)))

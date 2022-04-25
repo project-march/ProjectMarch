@@ -47,7 +47,7 @@ void publishCloud(const ros::Publisher& publisher, PointCloud cloud,
     cloud.height = cloud.points.size();
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg(cloud, msg);
-    if (left_or_right == "left") {
+    if (left_or_right == "right") {
         msg.header.frame_id = "toes_right_aligned";
     } else {
         msg.header.frame_id = "toes_left_aligned";
@@ -66,11 +66,7 @@ void publishMarkerPoint(
     ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "found_points";
@@ -104,11 +100,7 @@ void publishArrow(ros::Publisher& publisher, const Point& p1, Point& p2,
     std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "displacement";
@@ -140,11 +132,7 @@ void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2,
     std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "displacement_computed";
@@ -182,11 +170,7 @@ void publishRelativeSearchPoint(
     ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "relative_points";
@@ -226,11 +210,7 @@ void publishDesiredPosition(
     ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "desired_position";
@@ -273,11 +253,7 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
     std::vector<double> dis, const std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "search_region";
@@ -329,11 +305,7 @@ void publishPossiblePoints(ros::Publisher& publisher,
     std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "right") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "possible_points";
@@ -368,11 +340,7 @@ void publishTrackMarkerPoints(ros::Publisher& publisher,
     std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    if (left_or_right == "left") {
-        marker.header.frame_id = "toes_right_aligned";
-    } else {
-        marker.header.frame_id = "toes_left_aligned";
-    }
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "track_points";

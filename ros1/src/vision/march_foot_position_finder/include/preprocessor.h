@@ -15,8 +15,8 @@ using NormalCloud = pcl::PointCloud<pcl::Normal>;
 
 class Preprocessor {
 public:
-    explicit Preprocessor(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-        NormalCloud::Ptr normalcloud, std::string& left_or_right, tf::TransformListener& listener);
+    explicit Preprocessor(PointCloud::Ptr pointcloud,
+        std::string& left_or_right, tf::TransformListener& listener);
 
     void preprocess();
 
@@ -28,10 +28,9 @@ protected:
     void filterOnDistance(float x_min, float x_max, float y_min, float y_max,
         float z_min, float z_max);
 
-    void transformPointCloudFromUrdf();
+    void transformPointCloudToBaseframe();
 
     PointCloud::Ptr pointcloud_;
-    NormalCloud::Ptr normalcloud_;
 
     float voxel_size_;
     float x_min_;
@@ -41,14 +40,9 @@ protected:
     float z_min_;
     float z_max_;
 
-    std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
-    std::unique_ptr<tf2_ros::TransformListener> tfListener_;
-
     std::string base_frame_;
     std::string pointcloud_frame_id_;
-
-    tf::StampedTransform transform;
-    tf::Vector3 translation;
+    tf::StampedTransform transform_;
 };
 
 #endif // MARCH_PREPROCESSOR_H

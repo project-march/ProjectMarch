@@ -116,11 +116,14 @@ void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
     height_map_ = height_map_temp_;
-    publishHeightMap();
+    // publishHeightMap(); //Can be turned on for debugging.
     convolveLaplacianKernel();
     findFeasibleFootPlacements(position_queue);
 }
 
+/**
+ * A function that can be used for debugging to visualize the height_map.
+ */
 void PointFinder::publishHeightMap(){
 
 

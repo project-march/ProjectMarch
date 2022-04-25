@@ -1,4 +1,4 @@
-"""Author: Jelmer de Wolde, MVII"""
+"""Author: Jelmer de Wolde, MVII."""
 
 import rospy
 import tf
@@ -10,8 +10,8 @@ RATE = 100.0
 
 
 def main():
-    """
-    A node that publishes two frames around toes for both feet.
+    """A node that publishes two frames around toes for both feet.
+
     The first frame is a transformation from the 'foot_left'/'foot_right' to the toes, rotated 180 degrees around the z-axis.
     The second frame is te first described frame, but with the z-axis aligned with the gravitation force.
     """
@@ -63,14 +63,6 @@ def main():
             rospy.Time.now(),
             "toes_right_aligned",
             "toes_right",
-        )
-
-        broadcaster.sendTransform(
-            (0.0, 0.0, 0.0),
-            rot_hip,
-            rospy.Time.now(),
-            "hip_base_aligned",
-            "hip_base",
         )
 
         rate.sleep()
