@@ -289,7 +289,7 @@ class GaitStateMachine:
 
         TODO: Add cb type
         Args:
-             cb: Callable method that accepts 5 args: gait name, subgait name, version, duration and gait type.
+            cb: Callable method that accepts 5 args: gait name, subgait name, version, duration and gait type.
         """
         self._add_callback(self._gait_callbacks, cb)
 
@@ -503,7 +503,7 @@ class GaitStateMachine:
         This input is passed on to the current gait to execute the request.
         """
         if self._is_stop_requested() and not self._is_stopping:
-            if self._previous_gait.name == "dynamic_step":
+            if self._previous_gait.name == "dynamic_step" and not isinstance(self._current_state, UnknownEdgePosition):
                 self._current_state = "dynamic_close"
             else:
                 self._should_stop = False

@@ -75,10 +75,10 @@ class DynamicSetpointGait(GaitInterface):
         self.logger = Logger(self.gait_selection, __class__.__name__)
         self._trajectory_failed = False
 
-        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
-        self.start_position_all_joints = get_position_from_yaml("stand")
-        self.home_stand_position_actuating_joints = self.start_position_actuating_joints
-        self.home_stand_position_all_joints = self.start_position_all_joints
+        self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
+        self.home_stand_position_all_joints = get_position_from_yaml("stand")
+        self.start_position_actuating_joints = self.home_stand_position_actuating_joints
+        self.start_position_all_joints = self.home_stand_position_all_joints
 
         self._reset()
         self.all_joint_names = self.home_stand_position_all_joints.keys()
@@ -196,9 +196,6 @@ class DynamicSetpointGait(GaitInterface):
 
         self._start_is_delayed = True
         self._scheduled_early = False
-
-        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
-        self.start_position_all_joints = get_position_from_yaml("stand")
 
         self._trajectory_failed = False
 
