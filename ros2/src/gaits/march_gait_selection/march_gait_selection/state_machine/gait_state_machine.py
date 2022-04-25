@@ -372,6 +372,7 @@ class GaitStateMachine:
 
     def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for what to do next."""
+        self._handle_input()
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
             self.logger.info(f"Requested gait `{gait_name}`")
@@ -416,6 +417,7 @@ class GaitStateMachine:
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
             self._current_gait = self._gait_selection._gaits[self._current_state]
+            self._previous_gait = self._current_gait
 
             self.logger.info(f"Executing gait `{self._current_gait.name}`")
             if self._current_gait.first_subgait_can_be_scheduled_early:
@@ -501,15 +503,18 @@ class GaitStateMachine:
         This input is passed on to the current gait to execute the request.
         """
         if self._is_stop_requested() and not self._is_stopping:
-            self._should_stop = False
-            self._is_stopping = True
-            if self._current_gait.stop():
-                self.logger.info(f"Gait {self._current_gait.name} responded to stop")
-                self._input.stop_accepted()
-                self._call_callbacks(self._stop_accepted_callbacks)
+            if self._previous_gait.name == "dynamic_step":
+                self._current_state = "dynamic_close"
             else:
-                self.logger.info(f"Gait {self._current_gait.name} does not respond to stop")
-                self._input.stop_rejected()
+                self._should_stop = False
+                self._is_stopping = True
+                if self._current_gait.stop():
+                    self.logger.info(f"Gait {self._current_gait.name} responded to stop")
+                    self._input.stop_accepted()
+                    self._call_callbacks(self._stop_accepted_callbacks)
+                else:
+                    self.logger.info(f"Gait {self._current_gait.name} does not respond to stop")
+                    self._input.stop_rejected()
 
         if self._input.transition_requested():
             request = self._input.get_transition_request()
