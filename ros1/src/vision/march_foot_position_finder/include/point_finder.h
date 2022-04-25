@@ -24,7 +24,8 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class PointFinder {
 public:
     explicit PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-        std::string left_or_right, Point& step_point, ros::Publisher &height_map_publisher);
+        std::string left_or_right, Point& step_point,
+        ros::Publisher& height_map_publisher);
 
     ~PointFinder() = default;
 

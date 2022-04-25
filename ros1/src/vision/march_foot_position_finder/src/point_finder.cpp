@@ -32,7 +32,8 @@ using PointCloud = pcl::PointCloud<Point>;
 // Suppress lint error "variables are not initialized" (ros parameters)
 // NOLINTNEXTLINE
 PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
-    std::string left_or_right, Point& step_point, ros::Publisher& height_map_publisher)
+    std::string left_or_right, Point& step_point,
+    ros::Publisher& height_map_publisher)
     : pointcloud_ { std::move(pointcloud) }
     , left_or_right_ { std::move(left_or_right) }
 {
@@ -124,8 +125,8 @@ void PointFinder::findPoints(std::vector<Point>* position_queue)
 /**
  * A function that can be used for debugging to visualize the height_map.
  */
-void PointFinder::publishHeightMap(){
-
+void PointFinder::publishHeightMap()
+{
 
     std::vector<double> height_map_as_vector;
 
@@ -134,13 +135,12 @@ void PointFinder::publishHeightMap(){
             height_map_as_vector.push_back(height_map_[row][col]);
         }
     }
-    
+
     std_msgs::Float64MultiArray msg;
     std_msgs::MultiArrayLayout layout;
-    if (left_or_right_ == "right"){
+    if (left_or_right_ == "right") {
         layout.data_offset = 1;
-    }
-    else{
+    } else {
         layout.data_offset = 0;
     }
     msg.layout = layout;

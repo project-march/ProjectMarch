@@ -39,7 +39,7 @@ Preprocessor::Preprocessor(PointCloud::Ptr pointcloud,
         ros::Time now = ros::Time::now();
         pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
         listener.waitForTransform(
-            base_frame_, pointcloud_frame_id_, now, ros::Duration(1.0));
+            base_frame_, pointcloud_frame_id_, now, ros::Duration(/*t=*/1.0));
         listener.lookupTransform(
             base_frame_, pointcloud_frame_id_, now, transform_);
 

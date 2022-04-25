@@ -17,9 +17,9 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <string>
+#include <tf/transform_listener.h>
 #include <thread>
 #include <vector>
-#include <tf/transform_listener.h>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -35,7 +35,6 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-
     void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);

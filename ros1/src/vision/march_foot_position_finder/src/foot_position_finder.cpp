@@ -325,7 +325,7 @@ Point FootPositionFinder::transformPoint(
     try {
         ros::Time now = ros::Time::now();
         listener.waitForTransform(
-            frame_from, frame_to, now, ros::Duration(1.0));
+            frame_from, frame_to, now, ros::Duration(/*t=*/1.0));
         listener.lookupTransform(frame_from, frame_to, now, transform_stamped);
 
     } catch (tf2::TransformException& ex) {
