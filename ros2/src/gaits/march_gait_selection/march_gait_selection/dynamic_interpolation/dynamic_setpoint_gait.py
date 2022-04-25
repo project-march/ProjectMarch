@@ -113,17 +113,6 @@ class DynamicSetpointGait(GaitInterface):
             DEFAULT_HISTORY_DEPTH,
         )
 
-        self.pub_right = self.gait_selection.create_publisher(
-            FootPosition,
-            "/chosen_foot_position/right",
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.pub_left = self.gait_selection.create_publisher(
-            FootPosition,
-            "/chosen_foot_position/left",
-            DEFAULT_HISTORY_DEPTH,
-        )
-
         # Assign reconfigurable parameters
         self.update_parameters()
 
