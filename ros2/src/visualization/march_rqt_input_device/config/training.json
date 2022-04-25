@@ -66,6 +66,9 @@
     },
     {
       "name": "ramp_down_last_step"
+    },
+    {
+      "name": "dynamic_step_and_hold"
     }
   ],
   [

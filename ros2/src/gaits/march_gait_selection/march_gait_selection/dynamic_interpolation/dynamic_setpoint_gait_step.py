@@ -43,7 +43,6 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         super().__init__(gait_selection_node)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
-        self.gait_selection = gait_selection_node
         self.update_parameter()
 
         if self._use_position_queue:
