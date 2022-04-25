@@ -19,6 +19,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <tf/transform_listener.h>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -34,13 +35,10 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void chosenCurrentPointCallback(const march_shared_msgs::FootPosition msg);
 
     void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);
-
-    void resetHeight(const ros::TimerEvent&);
 
     void processSimulatedDepthFrames(
         const sensor_msgs::PointCloud2 input_cloud);
@@ -62,10 +60,7 @@ protected:
     ros::Subscriber current_chosen_point_subscriber_;
     ros::Subscriber other_chosen_point_subscriber_;
 
-    ros::Publisher height_map_publisher;
-
-    std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
-    std::unique_ptr<tf2_ros::TransformListener> tfListener_;
+    ros::Publisher height_map_publisher_;
 
     ros::Timer realsense_timer_;
     ros::Timer height_reset_timer_;
@@ -89,7 +84,6 @@ protected:
     std::string left_or_right_;
     std::string other_side_;
 
-    std::string base_frame_;
     std::string other_frame_id_;
     std::string current_frame_id_;
 
@@ -108,12 +102,15 @@ protected:
     std::vector<Point> found_points_;
 
     Point ORIGIN;
-    Point last_chosen_point_world_;
-    Point start_point_current_;
-    Point start_point_world_;
-    Point desired_point_world_;
-    Point previous_start_point_world_;
+    Point last_chosen_point_;
+    Point start_point_;
+    Point desired_point_;
+    Point previous_start_point_;
     Point last_displacement_;
+    Point new_displacement_;
+    Point found_covid_point_;
+
+    tf::TransformListener listener;
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

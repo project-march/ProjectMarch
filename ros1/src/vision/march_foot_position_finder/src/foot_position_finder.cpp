@@ -43,7 +43,6 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
     other_frame_id_ = "toes_" + other_side_ + "_aligned";
-    base_frame_ = "world";
     ORIGIN = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
     last_height_ = 0;
     refresh_last_height_ = 0;
@@ -51,8 +50,6 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
 
-    tfBuffer_ = std::make_unique<tf2_ros::Buffer>();
-    tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
     topic_other_chosen_point_
@@ -73,13 +70,7 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
             /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback,
             this);
 
-    current_chosen_point_subscriber_
-        = n_->subscribe<march_shared_msgs::FootPosition>(
-            topic_current_chosen_point_,
-            /*queue_size=*/1, &FootPositionFinder::chosenCurrentPointCallback,
-            this);
-
-    height_map_publisher = n->advertise<std_msgs::Float64MultiArray>(
+    height_map_publisher_ = n->advertise<std_msgs::Float64MultiArray>(
         "/debug/height_map", /*queue_size=*/1);
 
     running_ = false;
@@ -97,7 +88,6 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
 void FootPositionFinder::readParameters(
     march_foot_position_finder::parametersConfig& config, uint32_t level)
 {
-    base_frame_ = config.base_frame;
     foot_gap_ = config.foot_gap;
     step_distance_ = config.step_distance;
     sample_size_ = config.sample_size;
@@ -141,57 +131,17 @@ void FootPositionFinder::readParameters(
             left_or_right_.c_str());
     }
 
-    // Initialize position of other foot in current frame
-    // This position is equal to the last displacement in current frame
-    start_point_current_ = last_displacement_
-        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
+    // Initialize all variables as zero:
+    start_point_ = last_displacement_ = previous_start_point_ = ORIGIN;
 
-    // Initialize position of other foot in base frame
-    last_chosen_point_world_
-        = transformPoint(start_point_current_, current_frame_id_, base_frame_);
-
-    // The last height is used to remember how high the previous step was of the
-    // other foot (relative to the hip base). Here is it initialized to the zero
-    // point in the base frame
-    Point height_init = transformPoint(ORIGIN, base_frame_, "hip_base_aligned");
-    last_height_ = height_init.z;
-
-    // Current start point in world frame (for visualization)
-    start_point_world_
-        = transformPoint(start_point_current_, current_frame_id_, base_frame_);
-    // The previous point of the current foot (for visualization)
-    previous_start_point_world_
-        = transformPoint(ORIGIN, current_frame_id_, base_frame_);
-
-    // Desired point = (current start point) + (usual displacement)
-    // The displacement is the vector (-step_distance_, +-foot_gap_, 0)
-    desired_point_world_ = addPoints(start_point_current_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+    desired_point_ = addPoints(start_point_,
+        Point(-(float)step_distance_, -(float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
-    // Rotation necessary for base_frame computation
-    desired_point_world_ = rotateRight(
-        transformPoint(desired_point_world_, current_frame_id_, base_frame_));
 
     ROS_INFO("Parameters updated in %s foot position finder",
         left_or_right_.c_str());
 
     running_ = true;
-}
-
-/**
- * Callback function for when the gait selection node selects a point for the
- * current leg.
- */
-// Suppress lint error "make reference of argument" (breaks callback)
-void FootPositionFinder::chosenCurrentPointCallback(
-    const march_shared_msgs::FootPosition msg) // NOLINT
-{
-    // Schedule when last_height_ is updated with the height of the other leg.
-    // This timer is used to simulate the moment when pressure soles indicate a
-    // touch of the ground. Currently the duration is equal to the early
-    // schedule duration, but this should be loaded dynamically eventually.
-    height_reset_timer_ = n_->createTimer(ros::Duration(/*t=*/0.250),
-        &FootPositionFinder::resetHeight, this, /*oneshot=*/true);
 }
 
 /**
@@ -202,25 +152,17 @@ void FootPositionFinder::chosenCurrentPointCallback(
 void FootPositionFinder::chosenOtherPointCallback(
     const march_shared_msgs::FootPosition msg) // NOLINT
 {
-    // Start point in current frame is equal to the previous displacement
-    last_displacement_ = start_point_current_
+    // Start point in current frame is equal to the previous displacement:
+    last_displacement_ = start_point_
         = Point(msg.displacement.x, msg.displacement.y, msg.displacement.z);
-    // Store previous chosen point of other foot in world frame
-    start_point_world_
-        = Point(msg.point_world.x, msg.point_world.y, msg.point_world.z);
 
-    // previous_start_point_world_ is the previous start point (for
-    // visualization)
-    previous_start_point_world_
-        = transformPoint(ORIGIN, current_frame_id_, base_frame_);
+    // previous_start_point_ is the current origin:
+    previous_start_point_ = ORIGIN;
 
-    // Compute desired point in base_frame_
-    desired_point_world_ = addPoints(start_point_current_,
+    // Compute desired point:
+    desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
-    // Rotation is necessary for visualization and computation in base frame
-    desired_point_world_ = rotateRight(
-        transformPoint(desired_point_world_, current_frame_id_, base_frame_));
 }
 
 /**
@@ -255,17 +197,6 @@ void FootPositionFinder::processRealSenseDepthFrames(const ros::TimerEvent&)
 }
 
 /**
- * Reset last height when other leg lands on the ground; the height is
- * determined relative to the hip base.
- */
-void FootPositionFinder::resetHeight(const ros::TimerEvent&)
-{
-    Point reset_zero
-        = transformPoint(ORIGIN, other_frame_id_, "hip_base_aligned");
-    last_height_ = reset_zero.z;
-}
-
-/**
  * Callback function for when a simulated RealSense depth frame arrives.
  */
 // Suppress lint error "make reference of argument" (breaks callback)
@@ -288,80 +219,62 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
 
-    // Preprocess point cloud
-    NormalCloud::Ptr normalcloud(new NormalCloud());
-    Preprocessor preprocessor(n_, pointcloud, normalcloud);
+    // Preprocess point cloud and place pointcloud in aligned toes frame:
+    Preprocessor preprocessor(pointcloud, left_or_right_, listener);
     preprocessor.preprocess();
 
-    // Publish cloud for visualization
-    publishCloud(preprocessed_pointcloud_publisher_, *pointcloud);
+    // Publish cloud for visualization:
+    publishCloud(
+        preprocessed_pointcloud_publisher_, *pointcloud, left_or_right_);
 
-    // Find possible points around the desired point determined earlier
+    // Find possible points around the desired point determined earlier:
     PointFinder pointFinder(
-        n_, pointcloud, left_or_right_, desired_point_world_, height_map_publisher);
+        n_, pointcloud, left_or_right_, desired_point_, height_map_publisher_);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
     // Visualization
-    publishSearchRectangle(point_marker_publisher_, desired_point_world_,
+    publishSearchRectangle(point_marker_publisher_, desired_point_,
         pointFinder.getDisplacements(), left_or_right_);
     publishDesiredPosition(
-        point_marker_publisher_, desired_point_world_); // Green
-    publishRelativeSearchPoint(point_marker_publisher_,
-        rotateRight(start_point_world_)); // Purple
+        point_marker_publisher_, desired_point_, left_or_right_); // Green
+    publishRelativeSearchPoint(point_marker_publisher_, start_point_,
+        left_or_right_); // Purple
 
     if (position_queue.size() > 0) {
         // Take the first point of the point queue returned by the point finder
-        Point found_covid_point_world
-            = computeTemporalAveragePoint(position_queue[0]); // Red
+        found_covid_point_ = computeTemporalAveragePoint(position_queue[0]);
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
         std::vector<Point> track_points = pointFinder.retrieveTrackPoints(
-            rotateRight(previous_start_point_world_), found_covid_point_world);
+            previous_start_point_, found_covid_point_);
 
         // Visualization
-        publishTrackMarkerPoints(point_marker_publisher_, track_points);
-        publishMarkerPoint(point_marker_publisher_, found_covid_point_world);
-        publishPossiblePoints(point_marker_publisher_, position_queue);
-
-        // Transform point found with cameras to current frame and to hip frame
-        found_covid_point_world = rotateLeft(found_covid_point_world);
-        Point found_covid_point_current_ = transformPoint(
-            found_covid_point_world, base_frame_, current_frame_id_);
-        Point found_covid_point_hip_ = transformPoint(
-            found_covid_point_world, base_frame_, "hip_base_aligned");
+        publishTrackMarkerPoints(
+            point_marker_publisher_, track_points, left_or_right_); // Orange
+        publishMarkerPoint(
+            point_marker_publisher_, found_covid_point_, left_or_right_); // Red
+        publishPossiblePoints(
+            point_marker_publisher_, position_queue, left_or_right_);
 
         // Compute new foot displacement for gait computation
-        Point new_displacement
-            = subtractPoints(found_covid_point_current_, start_point_current_);
-        // Compute the z displacement with the z-values in hip frame.
-        float displacement_z = found_covid_point_hip_.z - last_height_;
-        new_displacement.z = displacement_z;
+        new_displacement_ = subtractPoints(found_covid_point_, start_point_);
 
         // Apply a threshold for the height of points to be different from 0
-        if (std::abs(new_displacement.z) < height_zero_threshold_) {
-            new_displacement.z = 0;
-        }
-
-        // Transform the height points between start and end position to current
-        // frame
-        std::vector<Point> relative_track_points;
-        for (Point& p : track_points) {
-            Point point = rotateLeft(p);
-            point = transformPoint(point, base_frame_, current_frame_id_);
-            relative_track_points.emplace_back(point);
+        if (std::abs(new_displacement_.z) < height_zero_threshold_) {
+            new_displacement_.z = 0.0;
         }
 
         // Visualization
-        publishArrow(point_marker_publisher_, previous_start_point_world_,
-            start_point_world_); // Blue
-        publishArrow2(point_marker_publisher_, start_point_world_,
-            found_covid_point_world);
+        publishArrow(point_marker_publisher_, ORIGIN, start_point_,
+            left_or_right_); // Blue
+        publishArrow2(point_marker_publisher_, start_point_, found_covid_point_,
+            left_or_right_); // Green
 
         // Publish final point for gait computation
-        publishPoint(point_publisher_, found_covid_point_current_,
-            found_covid_point_world, new_displacement, relative_track_points);
+        publishPoint(point_publisher_, found_covid_point_, found_covid_point_,
+            new_displacement_, track_points);
     }
 }
 
@@ -407,14 +320,14 @@ Point FootPositionFinder::transformPoint(
     PointCloud::Ptr desired_point = boost::make_shared<PointCloud>();
     desired_point->push_back(point);
 
-    geometry_msgs::TransformStamped transform_stamped;
+    tf::StampedTransform transform_stamped;
 
     try {
-        if (tfBuffer_->canTransform(frame_to, frame_from, ros::Time(/*t=*/0),
-                ros::Duration(/*t=*/1.0))) {
-            transform_stamped = tfBuffer_->lookupTransform(
-                frame_to, frame_from, ros::Time(/*t=*/0));
-        }
+        ros::Time now = ros::Time::now();
+        listener.waitForTransform(
+            frame_from, frame_to, now, ros::Duration(1.0));
+        listener.lookupTransform(frame_from, frame_to, now, transform_stamped);
+
     } catch (tf2::TransformException& ex) {
         ROS_WARN_STREAM(
             "Something went wrong when transforming the pointcloud: "
@@ -422,7 +335,7 @@ Point FootPositionFinder::transformPoint(
     }
 
     pcl_ros::transformPointCloud(
-        *desired_point, *desired_point, transform_stamped.transform);
+        *desired_point, *desired_point, transform_stamped);
 
     return desired_point->points[0];
 }

@@ -20,21 +20,11 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 std::string world_frame = "world";
 
 /**
- * Rotates a PCL point counter clockwise, and converts it to a ROS Point
- * message.
+ * Converts a PCL point to a ROS Point message.
  *
- * @param p point to rotate
- * @return rotated point as a geometry_msgs::Point message
+ * @param p point to convert
+ * @return converted geometry_msgs::Point message
  */
-inline geometry_msgs::Point rotate_left(Point p)
-{
-    geometry_msgs::Point msg;
-    msg.x = -p.y;
-    msg.y = p.x;
-    msg.z = p.z;
-    return msg;
-}
-
 inline geometry_msgs::Point to_geometry(Point p)
 {
     geometry_msgs::Point msg;
@@ -45,42 +35,38 @@ inline geometry_msgs::Point to_geometry(Point p)
 }
 
 /**
- * Transforms a pointcloud to world frame and publishes it for visualization. A
- * rotation around the z-axis is necessary to align the pointcloud with the
- * world coordinate system.
+ * Transforms a pointcloud to world frame and publishes it for visualization.
  *
  * @param publisher publisher to use
  * @param cloud cloud to publish
  */
-void publishCloud(const ros::Publisher& publisher, PointCloud cloud)
+void publishCloud(const ros::Publisher& publisher, PointCloud cloud,
+    std::string& left_or_right)
 {
-    Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-
-    // rotate point around z axis (counter clockwise)
-    transform.rotate(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f::UnitZ()));
-    pcl::transformPointCloud(cloud, cloud, transform);
-
     cloud.width = 1;
     cloud.height = cloud.points.size();
-
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg(cloud, msg);
-    msg.header.frame_id = world_frame;
+    if (left_or_right == "right") {
+        msg.header.frame_id = "toes_right_aligned";
+    } else {
+        msg.header.frame_id = "toes_left_aligned";
+    }
     msg.header.stamp = ros::Time::now();
     publisher.publish(msg);
 }
 
 /**
- * Publishes a marker point with a given publisher. A rotation around the z
- * axis is needed to correctly align the realsense and world coordinate systems.
+ * Publishes a marker point with a given publisher.
  *
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
+void publishMarkerPoint(
+    ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "found_points";
@@ -88,9 +74,8 @@ void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
     marker.type = visualization_msgs::Marker::CUBE;
     marker.action = visualization_msgs::Marker::ADD;
 
-    // rotate point around z axis (counter clockwise)
-    marker.pose.position.x = -p.y;
-    marker.pose.position.y = p.x;
+    marker.pose.position.x = p.x;
+    marker.pose.position.y = p.y;
     marker.pose.position.z = p.z;
 
     marker.pose.orientation.x = 0.0;
@@ -111,10 +96,11 @@ void publishMarkerPoint(ros::Publisher& publisher, const Point& p)
     publisher.publish(marker);
 }
 
-void publishArrow(ros::Publisher& publisher, const Point& p1, Point& p2)
+void publishArrow(ros::Publisher& publisher, const Point& p1, Point& p2,
+    std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "displacement";
@@ -142,10 +128,11 @@ void publishArrow(ros::Publisher& publisher, const Point& p1, Point& p2)
     publisher.publish(marker);
 }
 
-void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2)
+void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2,
+    std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "displacement_computed";
@@ -173,32 +160,17 @@ void publishArrow2(ros::Publisher& publisher, const Point& p1, Point& p2)
     publisher.publish(marker);
 }
 
-// m = Marker()
-// m.action = Marker.ADD
-// m.header.frame_id = '/base_link'
-// m.header.stamp = rospy.Time.now()
-// m.ns = 'points_arrows'
-// m.id = idnum
-// m.type = Marker.ARROW
-// m.pose.orientation.y = 0
-// m.pose.orientation.w = 1
-// m.scale = scale
-// m.color.r = 0.2
-// m.color.g = 0.5
-// m.color.b = 1.0
-// m.color.a = 0.3
-
 /**
- * Publishes a marker point with a given publisher. A rotation around the z
- * axis is needed to correctly align the realsense and world coordinate systems.
+ * Publishes a marker point with a given publisher.
  *
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishRelativeSearchPoint(ros::Publisher& publisher, const Point& p)
+void publishRelativeSearchPoint(
+    ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "relative_points";
@@ -206,9 +178,8 @@ void publishRelativeSearchPoint(ros::Publisher& publisher, const Point& p)
     marker.type = visualization_msgs::Marker::CUBE;
     marker.action = visualization_msgs::Marker::ADD;
 
-    // rotate point around z axis (counter clockwise)
-    marker.pose.position.x = -p.y;
-    marker.pose.position.y = p.x;
+    marker.pose.position.x = p.x;
+    marker.pose.position.y = p.y;
     marker.pose.position.z = p.z;
 
     marker.pose.orientation.x = 0.0;
@@ -230,16 +201,16 @@ void publishRelativeSearchPoint(ros::Publisher& publisher, const Point& p)
 }
 
 /**
- * Publishes a marker point with a given publisher. A rotation around the z
- * axis is needed to correctly align the realsense and world coordinate systems.
+ * Publishes a marker point with a given publisher.
  *
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishDesiredPosition(ros::Publisher& publisher, const Point& p)
+void publishDesiredPosition(
+    ros::Publisher& publisher, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "desired_position";
@@ -247,9 +218,8 @@ void publishDesiredPosition(ros::Publisher& publisher, const Point& p)
     marker.type = visualization_msgs::Marker::CUBE;
     marker.action = visualization_msgs::Marker::ADD;
 
-    // rotate point around z axis (counter clockwise)
-    marker.pose.position.x = -p.y;
-    marker.pose.position.y = p.x;
+    marker.pose.position.x = p.x;
+    marker.pose.position.y = p.y;
     marker.pose.position.z = p.z;
 
     marker.pose.orientation.x = 0.0;
@@ -271,8 +241,7 @@ void publishDesiredPosition(ros::Publisher& publisher, const Point& p)
 }
 
 /**
- * Publishes a rectangle with a given publisher. A rotation around the z
- * axis is needed to correctly align the realsense and world coordinate systems.
+ * Publishes a rectangle with a given publisher.
  *
  * @param publisher publisher to use
  * @param p1 vertex of rectangle
@@ -284,7 +253,7 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
     std::vector<double> dis, const std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "search_region";
@@ -296,23 +265,23 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
     float inside;
 
     if (left_or_right == "right") {
-        outside = dis[0];
-        inside = dis[1];
-    } else {
         outside = dis[1];
         inside = dis[0];
+    } else {
+        outside = dis[0];
+        inside = dis[1];
     }
 
-    Point p1((float)p.x - inside, (float)(p.y + dis[3]), /*_z=*/0);
-    Point p2((float)p.x + outside, (float)(p.y + dis[3]), /*_z=*/0);
-    Point p3((float)p.x + outside, (float)(p.y - dis[2]), /*_z=*/0);
-    Point p4((float)p.x - inside, (float)(p.y - dis[2]), /*_z=*/0);
+    Point p1((float)(p.x - dis[3]), (float)(p.y + inside), /*_z=*/0);
+    Point p2((float)(p.x - dis[3]), (float)(p.y - outside), /*_z=*/0);
+    Point p3((float)(p.x + dis[2]), (float)(p.y - outside), /*_z=*/0);
+    Point p4((float)(p.x + dis[2]), (float)(p.y + inside), /*_z=*/0);
 
-    marker.points.push_back(rotate_left(p1));
-    marker.points.push_back(rotate_left(p2));
-    marker.points.push_back(rotate_left(p3));
-    marker.points.push_back(rotate_left(p4));
-    marker.points.push_back(rotate_left(p1));
+    marker.points.push_back(to_geometry(p1));
+    marker.points.push_back(to_geometry(p2));
+    marker.points.push_back(to_geometry(p3));
+    marker.points.push_back(to_geometry(p4));
+    marker.points.push_back(to_geometry(p1));
 
     marker.pose.orientation.w = 1.0;
 
@@ -332,11 +301,11 @@ void publishSearchRectangle(ros::Publisher& publisher, Point& p,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-void publishPossiblePoints(
-    ros::Publisher& publisher, std::vector<Point>& points)
+void publishPossiblePoints(ros::Publisher& publisher,
+    std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "possible_points";
@@ -345,7 +314,7 @@ void publishPossiblePoints(
     marker.action = visualization_msgs::Marker::ADD;
 
     for (Point& point : points) {
-        marker.points.push_back(rotate_left(point));
+        marker.points.push_back(to_geometry(point));
     }
 
     marker.pose.orientation.w = 1.0;
@@ -367,11 +336,11 @@ void publishPossiblePoints(
  * @param publisher publisher to use
  * @param points points to visualize
  */
-void publishTrackMarkerPoints(
-    ros::Publisher& publisher, std::vector<Point>& points)
+void publishTrackMarkerPoints(ros::Publisher& publisher,
+    std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::Marker marker;
-    marker.header.frame_id = world_frame;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = "track_points";
@@ -380,7 +349,7 @@ void publishTrackMarkerPoints(
     marker.action = visualization_msgs::Marker::ADD;
 
     for (auto& point : points) {
-        marker.points.push_back(rotate_left(point));
+        marker.points.push_back(to_geometry(point));
     }
 
     marker.pose.orientation.w = 1.0;
@@ -421,14 +390,10 @@ void publishPoint(ros::Publisher& publisher, Point& p, Point& p_world,
     msg.displacement.y = displacement.y;
     msg.displacement.z = displacement.z;
 
-    // start_point_world_ = last_chosen_point_;
-    // world_frame_avg_ = last_chosen_point_world_;
-
     msg.header.stamp = ros::Time::now();
 
-    // rotate the track points
     for (const Point& p : track_points) {
-        msg.track_points.push_back(rotate_left(p));
+        msg.track_points.push_back(to_geometry(p));
     }
 
     publisher.publish(msg);

@@ -44,15 +44,16 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     ros::param::get("~foot_width", foot_width_);
     ros::param::get("~foot_length", foot_length_);
 
-    ros::param::get("~x_displacements_outside", x_displacements_outside_);
-    ros::param::get("~x_displacements_inside", x_displacements_inside_);
-    ros::param::get("~y_displacements_near", y_displacements_near_);
-    ros::param::get("~y_displacements_far", y_displacements_far_);
+    ros::param::get("~displacements_outside", displacements_outside_);
+    ros::param::get("~displacements_inside", displacements_inside_);
+    ros::param::get("~displacements_near", displacements_near_);
+    ros::param::get("~displacements_far", displacements_far_);
 
-    x_displacements_outside_ = ceil(x_displacements_outside_ / cell_width_);
-    x_displacements_inside_ = ceil(x_displacements_inside_ / cell_width_);
-    y_displacements_near_ = ceil(y_displacements_near_ / cell_width_);
-    y_displacements_far_ = ceil(y_displacements_far_ / cell_width_);
+    // Convert displacements from meters to number of grid cells
+    displacements_outside_ = ceil(displacements_outside_ / cell_width_);
+    displacements_inside_ = ceil(displacements_inside_ / cell_width_);
+    displacements_near_ = ceil(displacements_near_ / cell_width_);
+    displacements_far_ = ceil(displacements_far_ / cell_width_);
 
     ros::param::get("~available_points_ratio", available_points_ratio_);
     ros::param::get("~derivative_threshold", derivative_threshold_);
@@ -82,25 +83,26 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     x_width_ = search_dimensions_[1] - search_dimensions_[0];
     y_width_ = search_dimensions_[3] - search_dimensions_[2];
 
-    for (int y = 0; y >= -y_displacements_near_; y--) {
-        y_displacements_.push_back(y);
+    for (int y = 1; y <= displacements_near_; y++) {
+        vertical_displacements_.push_back(y);
     }
-    for (int y = 1; y <= y_displacements_far_; y++) {
-        y_displacements_.push_back(y);
+    for (int y = 0; y >= -displacements_far_; y--) {
+        vertical_displacements_.push_back(y);
     }
+
     if (left_or_right_ == "left") {
-        for (int x = 0; x >= -x_displacements_outside_; x--) {
-            x_displacements_.push_back(x);
+        for (int x = 0; x >= -displacements_inside_; x--) {
+            horizontal_displacements_.push_back(x);
         }
-        for (int x = 1; x <= x_displacements_inside_; x++) {
-            x_displacements_.push_back(x);
+        for (int x = 1; x <= displacements_outside_; x++) {
+            horizontal_displacements_.push_back(x);
         }
     } else if (left_or_right_ == "right") {
-        for (int x = 0; x <= x_displacements_outside_; x++) {
-            x_displacements_.push_back(x);
+        for (int x = 0; x <= displacements_inside_; x++) {
+            horizontal_displacements_.push_back(x);
         }
-        for (int x = -1; x >= -x_displacements_inside_; x--) {
-            x_displacements_.push_back(x);
+        for (int x = -1; x >= -displacements_outside_; x--) {
+            horizontal_displacements_.push_back(x);
         }
     }
 }
@@ -114,11 +116,14 @@ void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
     height_map_ = height_map_temp_;
-    publishHeightMap();
+    // publishHeightMap(); //Can be turned on for debugging.
     convolveLaplacianKernel();
     findFeasibleFootPlacements(position_queue);
 }
 
+/**
+ * A function that can be used for debugging to visualize the height_map.
+ */
 void PointFinder::publishHeightMap(){
 
 
@@ -197,11 +202,11 @@ void PointFinder::convolveLaplacianKernel()
  */
 void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 {
-    for (auto& x_shift : x_displacements_) {
-        for (auto& y_shift : y_displacements_) {
+    for (auto& y_shift : horizontal_displacements_) {
+        for (auto& x_shift : vertical_displacements_) {
             int num_free_cells = 0;
             int x_opt = xCoordinateToIndex(optimal_foot_x_) + x_shift;
-            int y_opt = yCoordinateToIndex(optimal_foot_y_) - y_shift;
+            int y_opt = yCoordinateToIndex(optimal_foot_y_) + y_shift;
 
             for (int x = x_opt - rect_width_ / 2; x < x_opt + rect_width_ / 2.0;
                  x++) {
@@ -317,10 +322,10 @@ std::vector<double> PointFinder::getDisplacements()
 {
     double x_outside, x_inside, y_near, y_far;
 
-    ros::param::get("~x_displacements_outside", x_outside);
-    ros::param::get("~x_displacements_inside", x_inside);
-    ros::param::get("~y_displacements_near", y_near);
-    ros::param::get("~y_displacements_far", y_far);
+    ros::param::get("~displacements_outside", x_outside);
+    ros::param::get("~displacements_inside", x_inside);
+    ros::param::get("~displacements_near", y_near);
+    ros::param::get("~displacements_far", y_far);
 
     return std::vector<double> { x_outside, x_inside, y_near, y_far };
 }
