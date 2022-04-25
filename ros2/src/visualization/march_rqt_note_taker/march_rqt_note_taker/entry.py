@@ -1,3 +1,4 @@
+"""Author: Olav de Haas, MIV."""
 import sys
 from typing import Optional
 
@@ -7,18 +8,15 @@ from rcl_interfaces.msg import Log
 
 
 class Entry(QObject):
-    def __init__(
-        self,
-        content: str,
-        date_time: Optional[QDateTime] = None,
-        is_error: Optional[bool] = False,
-    ):
-        """Construct an Entry.
+    """An Entry object with data for QtTableModel objects.
 
-        :param content Content of the message
-        :param date_time Time the entry was created
-        :param is_error Whether the entry corresponds to an error
-        """
+    Args:
+        content (str): Content of the message.
+        date_time (QDateTime, Optional): Time the entry was created. Defaults to None.
+        is_error (bool, Optional): Whether the entry corresponds to an error. Defaults to False.
+    """
+
+    def __init__(self, content: str, date_time: Optional[QDateTime] = None, is_error: Optional[bool] = False):
         super(Entry, self).__init__()
 
         self.content = content
@@ -29,9 +27,10 @@ class Entry(QObject):
     def from_ros_msg(cls, log_msg: Log, use_current_time: Optional[bool] = True):
         """Returns an Entry from a given ROS log message.
 
-        :param log_msg: The message to convert
-        :param use_current_time: Whether the current time should be used,
-                                instead of the timestamp of the log
+        Args:
+            log_msg (Log): The message to convert.
+            use_current_time (bool, Optional): Whether the current time should be used,
+                instead of the timestamp of the log. Default is uses the current time.
         """
         if use_current_time or log_msg.stamp is None:
             date_time = QDateTime.currentDateTime()
@@ -44,6 +43,7 @@ class Entry(QObject):
         )
 
     def time_string(self) -> str:
+        """Returns the time of the enry in the format: `HH:mm:ss`."""
         return self.date_time.toString("HH:mm:ss")
 
     def __str__(self):

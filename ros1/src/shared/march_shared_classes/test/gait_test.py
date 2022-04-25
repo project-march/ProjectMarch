@@ -15,7 +15,10 @@ from march_shared_classes.gait.subgait import Subgait
 
 
 class GaitTest(unittest.TestCase):
+    """ """
+
     def setUp(self):
+        """ """
         self.gait_name = "walk"
         self.resources_folder = rospkg.RosPack().get_path("march_shared_classes") + "/test/resources"
         self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path("march_description") + "/urdf/march4.urdf")
@@ -29,9 +32,11 @@ class GaitTest(unittest.TestCase):
 
     # Gait.from_file tests
     def test_from_file_valid_path(self):
+        """ """
         self.assertIsInstance(self.gait, Gait)
 
     def test_from_file_invalid_path(self):
+        """ """
         with self.assertRaises(FileNotFoundError):
             Gait.from_file(
                 self.gait_name,
@@ -42,12 +47,14 @@ class GaitTest(unittest.TestCase):
 
     # __init__ (_validate_trajectory_transition) test
     def test_init_invalid_joint_trajectory_transition(self):
+        """ """
         left_swing = self.gait.subgaits["left_swing"].joints[0].setpoints[-1].position = 124
         with self.assertRaises(NonValidGaitContentError):
             Gait(self.gait_name, self.gait.subgaits, self.gait.graph)
 
     # load_subgait tests
     def test_load_existing_subgait(self):
+        """ """
         subgait = Gait.load_subgait(
             self.robot,
             self.resources_folder,
@@ -58,6 +65,7 @@ class GaitTest(unittest.TestCase):
         self.assertIsInstance(subgait, Subgait)
 
     def test_load_subgait_unexisting_gait_error(self):
+        """ """
         with self.assertRaises(GaitNameNotFoundError):
             Gait.load_subgait(
                 self.robot,
@@ -68,6 +76,7 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_load_subgait_unexisting_subgait_error(self):
+        """ """
         with self.assertRaises(SubgaitNameNotFoundError):
             Gait.load_subgait(
                 self.robot,
@@ -78,6 +87,7 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_load_subgait_unexisting_version_error(self):
+        """ """
         self.gait_version_map["walk"]["right_open"] = "MV_walk_rightopen_non_existing_banana_version"
 
         with self.assertRaises(FileNotFoundError):
@@ -90,15 +100,18 @@ class GaitTest(unittest.TestCase):
             )
 
     def test_set_no_subgait_versions(self):
+        """ """
         self.gait.set_subgait_versions(self.robot, self.resources_folder, {})
 
     def test_set_one_new_subgait_version(self):
+        """ """
         subgait_name = "right_open"
         new_version = "MIV_final"
         self.gait.set_subgait_versions(self.robot, self.resources_folder, {subgait_name: new_version})
         self.assertEqual(new_version, self.gait.subgaits[subgait_name].version)
 
     def test_set_multiple_subgait_versions(self):
+        """ """
         subgait_name1 = "left_close"
         subgait_name2 = "left_swing"
         new_version = "MIV_final"
@@ -111,14 +124,17 @@ class GaitTest(unittest.TestCase):
         self.assertEqual(new_version, self.gait.subgaits[subgait_name2].version)
 
     def test_set_version_non_existing_subgait(self):
+        """ """
         with self.assertRaises(SubgaitNameNotFoundError):
             self.gait.set_subgait_versions(self.robot, self.resources_folder, {"this_subgait_does_not_exist": "1"})
 
     def test_set_non_existing_version_subgait(self):
+        """ """
         with self.assertRaises(FileNotFoundError):
             self.gait.set_subgait_versions(self.robot, self.resources_folder, {"left_swing": "1"})
 
     def test_set_new_subgait_version_invalid_transition(self):
+        """ """
         right_swing = self.gait.subgaits["right_swing"].joints[0].setpoints[-1].position = 124
         subgait_name = "left_close"
         new_version = "MIV_final"
@@ -126,6 +142,7 @@ class GaitTest(unittest.TestCase):
             self.gait.set_subgait_versions(self.robot, self.resources_folder, {subgait_name: new_version})
 
     def test_set_new_subgait_version_invalid_start(self):
+        """ """
         right_open = self.gait.subgaits["right_open"].joints[0].setpoints[0].position = 124
         subgait_name = "right_open"
         new_version = "MIV_final"
@@ -133,6 +150,7 @@ class GaitTest(unittest.TestCase):
             self.gait.set_subgait_versions(self.robot, self.resources_folder, {subgait_name: new_version})
 
     def test_set_new_subgait_version_invalid_final(self):
+        """ """
         left_close = self.gait.subgaits["left_close"].joints[0].setpoints[-1].position = 124
         subgait_name = "left_close"
         new_version = "MIV_final"

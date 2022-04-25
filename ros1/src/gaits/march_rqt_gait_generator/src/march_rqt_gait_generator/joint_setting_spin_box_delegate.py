@@ -1,3 +1,4 @@
+"""Author: Isha Dijcks, MV."""
 import math
 
 from pyqtgraph.Qt import QtCore, QtGui
@@ -8,6 +9,20 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
     """Delegate for the QDoubleSpinBox that opens when you edit a table cell.
 
     The min and max allowed value is based on the row (time, position, velocity).
+
+    Args:
+        velocity_limit:
+        min_position:
+        max_position:
+        duration:
+        digits:
+
+    Attributes:
+        velocity_limit:
+        min_position:
+        max_position:
+        duration:
+        digits:
     """
 
     def __init__(self, velocity_limit, min_position, max_position, duration, digits=4):
@@ -19,6 +34,16 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
         self.digits = digits
 
     def createEditor(self, parent, option, index):  # noqa: N802
+        """Todo: Add docstring.
+
+        Args:
+          parent:
+          option:
+          index:
+
+        Returns:
+            QDoubleSpinBox:
+        """
         time_offset = 1 / math.pow(10, self.digits)
 
         row = index.row()
@@ -61,14 +86,34 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
 
         return editor
 
-    def setEditorData(self, spin_box, index):  # noqa: N802
+    def setEditorData(self, spin_box, index) -> None:  # noqa: N802
+        """Todo: Add docstring.
+
+        Args:
+          spin_box:
+          index:
+        """
         value = float(index.model().data(index, QtCore.Qt.EditRole))
         spin_box.setValue(value)
 
-    def setModelData(self, spin_box, model, index):  # noqa: N802
+    def setModelData(self, spin_box, model, index) -> None:  # noqa: N802
+        """Todo: Add docstring.
+
+        Args:
+          spin_box:
+          model:
+          index:
+        """
         spin_box.interpretText()
         value = round(spin_box.value(), self.digits)
         model.setData(index, str(value), QtCore.Qt.EditRole)
 
-    def updateEditorGeometry(self, editor, option, index):  # noqa: N802
+    def updateEditorGeometry(self, editor, option, index) -> None:  # noqa: N802
+        """Todo: Add docstring.
+
+        Args:
+          editor:
+          option:
+          index:
+        """
         editor.setGeometry(option.rect)

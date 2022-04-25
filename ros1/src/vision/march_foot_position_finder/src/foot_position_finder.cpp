@@ -56,11 +56,12 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
     topic_other_chosen_point_
-        = "/chosen_foot_position/" + other_side_; // in current_frame_id
-    topic_current_chosen_point_ = "/chosen_foot_position/" + left_or_right_;
+        = "/march/chosen_foot_position/" + other_side_; // in current_frame_id
+    topic_current_chosen_point_
+        = "/march/chosen_foot_position/" + left_or_right_;
 
     point_publisher_ = n_->advertise<march_shared_msgs::FootPosition>(
-        "/foot_position/" + left_or_right_, /*queue_size=*/1);
+        "/march/foot_position/" + left_or_right_, /*queue_size=*/1);
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>(
         "/camera_" + left_or_right_ + "/preprocessed_cloud", /*queue_size=*/1);
     point_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(

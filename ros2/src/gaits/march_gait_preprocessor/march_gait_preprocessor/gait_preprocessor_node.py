@@ -1,4 +1,4 @@
-"""Author: Marten Haitjema, MVII"""
+"""Author: Marten Haitjema, MVII."""
 
 import signal
 import sys
@@ -12,11 +12,13 @@ from contextlib import suppress
 
 
 def sys_exit(*_):
+    """To shut down the node without an error."""
     rclpy.shutdown()
     sys.exit(0)
 
 
 def main():
+    """To start up the Node."""
     rclpy.init()
     gait_preprocessor = GaitPreprocessor()
 
@@ -31,16 +33,14 @@ def main():
 
 
 def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Parameter]) -> SetParametersResult:
-    """Update parameter of gait_preprocessor and return if
-    this is done succesfully.
+    """Update parameter of gait_preprocessor and return if this is done successfully.
 
-    :param gait_preprocessor: gait_preprocessor class
-    :type gait_preprocessor: GaitPreprocessor
-    :param parameters: list containing the changed parameters
-    :type parameters: list
+    Args:
+        gait_preprocessor (GaitPreprocessor): gait_preprocessor class.
+        parameters (list[Parameter]): List containing the changed parameters.
 
-    :returns: whether or not the parameters were set succesfully
-    :rtype: SetParametersResult
+    Returns:
+        SetParametersResult: Whether the parameters were set successfully.
     """
     for param in parameters:
         if param.name == "location_x":
@@ -59,5 +59,5 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
 
 
 def parameter_updated_logger(gait_preprocessor: GaitPreprocessor, param: Parameter):
-    """Log which param has been updated to which value"""
+    """Log which param has been updated to which value."""
     gait_preprocessor.get_logger().info(f"{param.name} set to {param.value}")

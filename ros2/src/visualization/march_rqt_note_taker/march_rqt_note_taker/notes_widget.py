@@ -1,3 +1,4 @@
+"""Author: Olav de Haas, MIV."""
 import os
 from datetime import datetime
 from pathlib import Path
@@ -13,17 +14,19 @@ from .entry import Entry
 
 
 class NotesWidget(QWidget):
+    """Initialize the NotesWidget.
+
+    Args:
+        model (QAbstractTableModel): The table with data.
+        ui_file (str): Path to ui file.
+        node (Node): Handle to a node, used for logging.
+    """
+
     INSERT = 0
     REMOVE = 1
     SAVE_DIRECTORY_FROM_HOME = "/.ros/note-taker-notes"
 
     def __init__(self, model: QAbstractTableModel, ui_file: str, node: Node):
-        """Initialize the NotesWidget.
-
-        :param model
-        :param ui_file Path to ui file.
-        :param node Handle to a node, used for logging
-        """
         super(NotesWidget, self).__init__()
 
         self._model = model
@@ -124,6 +127,9 @@ class NotesWidget(QWidget):
     def _handle_load(self):
         """Callback for when the load button is pressed.
 
+        Todo:
+            * implement this method.
+
         Not yet implemented.
         """
         self._node.get_logger().warn("Loading notes from a file is not yet implemented")
@@ -136,8 +142,7 @@ class NotesWidget(QWidget):
             self._save(file_name)
 
     def _handle_autosave(self, state):
-        """If the autosave checkbox is marked, any new entries are
-        automatically added to the saved file"""
+        """If the autosave checkbox is marked, any new entries are automatically added to the saved file."""
         self._has_autosave = state == QtCore.Qt.Checked
         if not self._has_autosave and self._autosave_file is not None:
             self._autosave_file.close()
@@ -147,9 +152,10 @@ class NotesWidget(QWidget):
     def _autosave(self, first: int, last: int, action: int):
         """Write the last changes incrementally to the autosave file.
 
-        :param first: The first index of affected entries in the model
-        :param last: the last index of affected entries in the model(inclusive)
-        :param action: Either INSERT or REMOVE
+        Args:
+            first (int): The first index of affected entries in the model.
+            last (int): The last index of affected entries in the model(inclusive).
+            action (int): Either NotesWidget.INSERT or NotesWidget.REMOVE.
         """
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
@@ -180,7 +186,8 @@ class NotesWidget(QWidget):
     def _save(self, file_name: str):
         """Save the model contents to a file.
 
-        :param file_name Name of the file
+        Args:
+            file_name (str): Name of the file.
         """
         if file_name[-4:] != ".txt":
             file_name += ".txt"
