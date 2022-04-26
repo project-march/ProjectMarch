@@ -44,13 +44,13 @@ class GaitPreprocessor(Node):
         """Create subscribers to the topics on which covid publishes found points."""
         self.subscription_left = self.create_subscription(
             FootPosition,
-            "/march/foot_position/left",
+            "/march_stone_finder/found_points/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
         self.subscription_right = self.create_subscription(
             FootPosition,
-            "/march/foot_position/right",
+            "/march_stone_finder/found_points/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )

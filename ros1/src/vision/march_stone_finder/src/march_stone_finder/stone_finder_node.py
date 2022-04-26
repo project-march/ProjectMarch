@@ -30,9 +30,9 @@ def main():
         pipe.start(cfg)
         pipelines.append(pipe)
 
-        if dev.get_info(rs.camera_info.serial_number) == "109122070820":
+        if dev.get_info(rs.camera_info.serial_number) == "944622074337":
             pipelines[0] = pipe
-        elif dev.get_info(rs.camera_info.serial_number) == "033322070612":
+        elif dev.get_info(rs.camera_info.serial_number) == "944622071535":
             pipelines[1] = pipe
 
     if pipelines[0] is None or pipelines[1] is None:
