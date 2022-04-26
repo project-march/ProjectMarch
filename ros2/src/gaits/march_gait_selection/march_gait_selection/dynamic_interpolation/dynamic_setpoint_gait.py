@@ -16,7 +16,7 @@ from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
     VelocitySoftLimitError,
-    ShouldStartFromHomestandError,
+    WrongStartPositionError,
 )
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -183,7 +183,9 @@ class DynamicSetpointGait(GaitInterface):
     def _reset(self) -> None:
         """Reset all attributes of the gait."""
         if self.start_position_actuating_joints != self.home_stand_position_actuating_joints:
-            raise ShouldStartFromHomestandError(self.start_position_actuating_joints)
+            raise WrongStartPositionError(
+                self.home_stand_position_actuating_joints, self.start_position_actuating_joints
+            )
 
         self._should_stop = False
         self._end = False
@@ -218,7 +220,7 @@ class DynamicSetpointGait(GaitInterface):
         """
         try:
             self._reset()
-        except ShouldStartFromHomestandError as e:
+        except WrongStartPositionError as e:
             self.logger.error(e.msg)
             return None
         self.update_parameters()
