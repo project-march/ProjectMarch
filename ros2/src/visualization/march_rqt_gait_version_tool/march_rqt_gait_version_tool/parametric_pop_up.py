@@ -1,3 +1,4 @@
+"""Author: MV, MVI."""
 from typing import List
 
 from PyQt5.QtCore import Qt
@@ -6,16 +7,14 @@ from python_qt_binding import loadUi
 
 
 class ParametricPopUpWindow(QDialog):
-    def __init__(self, parent, ui_file):
-        """A pop up window for retrieving a base version, other version and parameter for a parametric subgait.
+    """A pop-up window for retrieving a base version, other version and parameter for a parametric subgait.
 
-        :param parent:
-            The parent widget to connect to the pop up
-        :param width:
-            Starting width of the the pop up widget
-        :param height:
-            Starting height of the the pop up widget
-        """
+    Args:
+        parent: The parent widget to connect to the pop-up.
+        ui_file (str): The absolute path to the UI-file for the pop-up.
+    """
+
+    def __init__(self, parent, ui_file: str):
         super(ParametricPopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         loadUi(ui_file, self)
 
@@ -78,13 +77,14 @@ class ParametricPopUpWindow(QDialog):
         )
 
     def four_subgait_interpolation_changed(self):
-        """Unlocks the buttons for four subgait interpolation when it is enabled"""
+        """Unlocks the buttons for four subgait interpolation when it is enabled."""
         if self.fourSubgaitInterpolation.isChecked():
             self.set_second_parameterize_enabled(True)
         else:
             self.set_second_parameterize_enabled(False)
 
     def set_second_parameterize_enabled(self, value: bool):
+        """Todo: Add docstring."""
         self.thirdVersionComboBox.setEnabled(value)
         self.fourthVersionComboBox.setEnabled(value)
         self.secondParameterSlider.setEnabled(value)

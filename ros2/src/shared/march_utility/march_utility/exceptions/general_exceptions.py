@@ -1,33 +1,30 @@
 """This module contains some errors that are specific to the Project March code."""
 from __future__ import annotations
-from march_utility.utilities.side import Side
 
 
 class PackageNotFoundError(Exception):
-    """Class to raise an error when a ros package cannot be found."""
+    """Class to raise an error when a ros1 package cannot be found.
 
-    def __init__(self, package_name: str, msg: str = None) -> None:
-        """
-        Initialize PackageNotFoundError.
+    Args:
+        package_name (str): The package name which is not found by rospkg.RosPack().get_path().
+        msg (str, optional) a custom error message to return. Default is `None`.
+    """
 
-        :param package_name: The package that was not found.
-        :param msg: Optional, a custom error message to return.
-        """
+    def __init__(self, package_name, msg=None):
         if msg is None:
-            msg = f"Package: {package_name} could not be found."
+            msg = "Package: {fp} could not be found.".format(fp=package_name)
 
         super(PackageNotFoundError, self).__init__(msg)
 
 
 class MsgTypeError(Exception):
-    """Class to raise an error when an non msg type is added to a message."""
+    """Class to raise an error when an non msg type is added to a message.
 
-    def __init__(self, msg: str = None) -> None:
-        """
-        Initialize MsgTypeError.
+    Args:
+        msg (str, optional): The error message to display. Default is `None`.
+    """
 
-        :param msg: Optional, a custom error message to return.
-        """
+    def __init__(self, msg=None):
         if msg is None:
             msg = "A non msg type (defined in shared resources) was added to a ROS-message"
 
@@ -35,30 +32,29 @@ class MsgTypeError(Exception):
 
 
 class SideSpecificationError(Exception):
-    """Class to raise an error when wrong side ('right' or 'left') was specified."""
+    """Class to raise an error when a foot ('right' or 'left') has to be specified but this did not happen.
 
-    def __init__(self, foot: Side, msg: str = None) -> None:
-        """
-        Initialize side specification error.
+    Args:
+        msg (str, optional): The error message to display. Default is `None`.
+    """
 
-        :param foot: The foot which was wrongly specified.
-        :param msg: Optional, a custom error message to return.
-        """
+    def __init__(self, foot, msg=None):
         if msg is None:
-            msg = f"An incorrect side was supplied. Must be a either Side.left or Side.right, but was {foot}."
+            msg = "An incorrect side was supplied. Must be a either Side.left or Side.right, but was {foot}.".format(
+                foot=foot
+            )
 
         super(SideSpecificationError, self).__init__(msg)
 
 
 class IncorrectCoordinateError(Exception):
-    """Class to raise an error when the coordinates of a position are incorrect."""
+    """Class to raise an error when the coordinates of a position are incorrect.
 
-    def __init__(self, msg: str = None) -> None:
-        """
-        Initialize IncorrectCoordinateError.
+    Args:
+        msg (str, optional): The error message to display. Default is `None`.
+    """
 
-        :param msg: Optional, a custom error message to return.
-        """
+    def __init__(self, msg=None):
         if msg is None:
             msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."
 
@@ -66,14 +62,13 @@ class IncorrectCoordinateError(Exception):
 
 
 class WeightedAverageError(Exception):
-    """Class to raise an error when a weighted average cannot be computed."""
+    """Class to raise an error when a weighted average cannot be computed.
 
-    def __init__(self, msg: str = None) -> None:
-        """
-        Initialize WeightedAverageError.
+    Args:
+        msg (str, optional): The error message to display. Default is `None`.
+    """
 
-        :param msg: Optional, a custom error message to return.
-        """
+    def __init__(self, msg=None):
         if msg is None:
             msg = "The calculation of the weighted average cannot be executed safely."
 
@@ -81,16 +76,17 @@ class WeightedAverageError(Exception):
 
 
 class InconsistentDigitsError(Exception):
-    def __init__(self, msg: str = None, number1: float = None, number2: float = None) -> None:
-        """
-        Class to raise an error when precision or digits are not consistent where they should be.
+    """Class to raise an error when precision or digits are not consistent where they should be.
 
-        :param msg: Optional, a custom error message to return
-        :param number1: Optional, if both number1 and number2 are specified
-        they are included in the default error message
-        :param number2: Optional, if both number1 and number2 are specified
-        they are included in the default error message
-        """
+    Args:
+        msg (str, Optional): The custom error message to return.
+        number1 (float, Optional): If `number1` and `number2` are specified, then
+            they are included in the default error message.
+        number2 (float, Optional): If `number1` and `number2` are specified, then
+            they are included in the default error message.
+    """
+
+    def __init__(self, msg: str = None, number1: float = None, number2: float = None) -> None:
         if msg is None:
             msg = "Two numbers which which should have the same number of digits but do not were supplied."
             if number1 is not None and number2 is not None:

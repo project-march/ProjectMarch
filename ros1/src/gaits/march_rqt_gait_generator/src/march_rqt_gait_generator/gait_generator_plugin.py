@@ -6,6 +6,8 @@ from .gait_generator_view import GaitGeneratorView
 
 
 class GaitGeneratorPlugin(Plugin):
+    """ """
+
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
 
@@ -16,4 +18,5 @@ class GaitGeneratorPlugin(Plugin):
         self.controller = GaitGeneratorController(self.view, robot)
 
     def shutdown_plugin(self):
+        """ """
         self.controller.stop_time_slider_thread()

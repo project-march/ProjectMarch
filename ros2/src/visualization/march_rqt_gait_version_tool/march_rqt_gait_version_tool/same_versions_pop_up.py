@@ -1,3 +1,4 @@
+"""Author: Bas Volkers, MVI."""
 from typing import Tuple, Dict
 
 from PyQt5.QtCore import Qt
@@ -6,6 +7,13 @@ from python_qt_binding import loadUi
 
 
 class SameVersionsPopUpWindow(QDialog):
+    """A pop-up window to set the same version for all subgaits.
+
+    Args:
+        parent: The parent widget to connect to the pop-up.
+        ui_file (str): The absolute path to the UI-file for the pop-up.
+    """
+
     def __init__(self, parent, ui_file):
         super(SameVersionsPopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         loadUi(ui_file, self)

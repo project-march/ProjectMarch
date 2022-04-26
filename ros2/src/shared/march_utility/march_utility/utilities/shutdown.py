@@ -1,3 +1,4 @@
+"""Author: Bas Volkers, MVI."""
 import os
 import signal
 import subprocess  # noqa: S404

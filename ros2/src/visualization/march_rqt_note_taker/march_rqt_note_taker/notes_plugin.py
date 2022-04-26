@@ -1,3 +1,4 @@
+"""Author: Olav de Haas, MIV."""
 import ast
 import os
 import sys
@@ -51,8 +52,9 @@ def main(args=None):
 
 
 class NotesPlugin(Plugin):
+    """Initialize the NotesPLugin."""
+
     def __init__(self, context):
-        """Initialize the NotesPLugin."""
         super(NotesPlugin, self).__init__(context)
 
         ui_file = os.path.join(get_package_share_directory("march_rqt_note_taker"), "note_taker.ui")
@@ -90,16 +92,17 @@ class NotesPlugin(Plugin):
             lambda res: self._model.insert_row(Entry(f"Configuration is {future.result().message}"))
         )
 
-    def filter_useful_text(self, log):
+    @staticmethod
+    def filter_useful_text(log) -> bool:
+        """Checks if all text in the log.msg is useful, according to USEFUL_MESSAGE_TEXTS."""
         return any(text in log.msg for text in USEFUL_MESSAGE_TEXTS)
 
     def _should_use_current_time(self) -> bool:
-        """Determine whether the rqt_note_taker should use the current time
-        when creating a new entry or the timestamp of the log msg.
+        """If the rqt_note_taker should use the current time when creating a new entry or the timestamp of the log msg.
 
         This is determined based on whether the use_sim_time parameter is True.
         When this parameter is true, the log msg will not have
-        an useful timestamp, meaning the current time should be used.
+        a useful timestamp, meaning the current time should be used.
 
         If the node is launched via the launch file, then the parameter can
         simply be retrieved from the node's parameter server.
@@ -107,8 +110,8 @@ class NotesPlugin(Plugin):
         correctly set in its own parameter server, therefore the parameter
         is retrieved from the march_monitor node.
 
-        :return Returns a boolean, indicating whether the current time should
-        be used when creating a new entry.
+        Returns:
+             boolean: Indicating whether the current time should be used when creating a new entry.
         """
         client = self._node.create_client(GetParameters, "/march_monitor/get_parameters")
         if client.service_is_ready():
@@ -133,7 +136,8 @@ class NotesPlugin(Plugin):
         If the message is accepted by the filter map, the message is added as a
         new entry to the model.
 
-        :param log_msg Log message in the topic.
+        Args:
+            log_msg (Log): Log message in the topic.
         """
         mapped_msg = self._filter_map(log_msg)
         if mapped_msg:
@@ -147,7 +151,8 @@ class NotesPlugin(Plugin):
         2) Log the gait that is selected, by getting the version_map and
         creating a new entry.
 
-        :param current_state: Current state being executed
+        Args:
+             current_state: Current state being executed.
         """
         if current_state.state_type == CurrentState.IDLE:
             message = f"March is idle in {current_state.state}"
@@ -164,7 +169,9 @@ class NotesPlugin(Plugin):
 
         Parses the result of the future and inserts a new entry.
 
-        :param future_done Future that holds the result
+        Args:
+            future_done (Future): Future object that holds the result.
+            current_state: Current state being executed.
         """
         result = future_done.result()
 

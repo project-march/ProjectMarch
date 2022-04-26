@@ -58,13 +58,14 @@ class Subgait:
     def from_file(cls, robot, file_name, *args):
         """Extract sub gait data of the given yaml.
 
-        :param robot:
-            The robot corresponding to the given subgait file
-        :param file_name:
-            The .yaml file name of the subgait
+        Args:
+          robot: The robot corresponding to the given subgait file
+          file_name: The .yaml file name of the subgait
+          *args:
 
-        :returns
-            A populated Subgait object
+        Returns:
+          : A populated Subgait object
+
         """
         if file_name is None or not os.path.isfile(file_name):
             raise FileNotFoundError(file_path=file_name)
@@ -86,13 +87,18 @@ class Subgait:
     def from_name_and_version(cls, robot, gait_dir, gait_name, subgait_name, version, *args):
         """Load subgait based from file(s) based on name and version.
 
-        :param robot: The robot corresponding to the given subgait file
-        :param gait_dir: The directory with all the gaits
-        :param gait_name: The name of the corresponding gait
-        :param subgait_name: The name of the subgait to load
-        :param version: The version to use, this can be parametric
-        :param args:
-        :return: A populated Subgait object.
+        Args:
+          robot: The robot corresponding to the given subgait file
+          gait_dir: The directory with all the gaits
+          gait_name: The name of the corresponding gait
+          subgait_name: The name of the subgait to load
+          version: The version to use, this can be parametric
+          args: return: A populated Subgait object.
+          *args:
+
+        Returns:
+          : A populated Subgait object.
+
         """
         subgait_path = os.path.join(gait_dir, gait_name, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
@@ -118,19 +124,17 @@ class Subgait:
     def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, use_foot_position=False, *args):
         """Extract two subgaits from files and interpolate.
 
-        :param robot:
-            The robot corresponding to the given subgait file
-        :param file_name_base:
-            The file name of the base subgait
-        :param file_name_other:
-            the file name of the oter subgait
-        :param parameter:
-            The parameter to use for interpolation. Should be 0 <= parameter <= 1
-        :param use_foot_position:
-            Determine whether the interpolation should be done on the foot location or on the joint angles
+        Args:
+          robot: The robot corresponding to the given subgait file
+          file_name_base: The file name of the base subgait
+          file_name_other: the file name of the oter subgait
+          parameter: The parameter to use for interpolation. Should be 0 <= parameter <= 1
+          use_foot_position: Determine whether the interpolation should be done on the foot location or on the joint angles (Default value = False)
+          *args:
 
-        :return:
-            A populated Subgait object
+        Returns:
+          : A populated Subgait object
+
         """
         base_subgait = cls.from_file(robot, file_name_base, *args)
         other_subgait = cls.from_file(robot, file_name_other, *args)
@@ -140,19 +144,17 @@ class Subgait:
     def from_dict(cls, robot, subgait_dict, gait_name, subgait_name, version, *args):
         """List parameters from the yaml file in organized lists.
 
-        :param robot:
-            The robot corresponding to the given sub-gait file
-        :param subgait_dict:
-            The dictionary extracted from the yaml file
-        :param gait_name:
-            The name of the parent gait
-        :param subgait_name:
-            The name of the child (sub)gait
-        :param version:
-            The version of the yaml file
+        Args:
+          robot: The robot corresponding to the given sub-gait file
+          subgait_dict: The dictionary extracted from the yaml file
+          gait_name: The name of the parent gait
+          subgait_name: The name of the child (sub)gait
+          version: The version of the yaml file
+          *args:
 
-        :returns
-            A populated Subgait object
+        Returns:
+          : A populated Subgait object
+
         """
         if robot is None:
             rospy.logerr("Cannot create gait without a loaded robot.")
@@ -189,8 +191,11 @@ class Subgait:
     def to_joint_trajectory_msg(self):
         """Create trajectory msg for the publisher.
 
-        :returns
-            a ROS msg for the joint trajectory
+        Args:
+
+        Returns:
+          : a ROS msg for the joint trajectory
+
         """
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
 
@@ -222,11 +227,12 @@ class Subgait:
     def validate_subgait_transition(self, next_subgait):
         """Validate the trajectory transition of this gait to a given gait.
 
-        :param next_subgait:
-            The subgait subsequently to this gait (not the previous one!)
+        Args:
+          next_subgait: The subgait subsequently to this gait (not the previous one!)
 
-        :returns:
-            True if trajectory transition correct else False
+        Returns:
+          : True if trajectory transition correct else False
+
         """
         from_subgait_joint_names = set(self.get_joint_names())
         to_subgait_joint_names = set(next_subgait.get_joint_names())
@@ -255,8 +261,12 @@ class Subgait:
     def scale_timestamps_subgait(self, new_duration, rescale=True):
         """Scale or cut off all the setpoint to match the duration in both subgaits.
 
-        :param new_duration: the new duration to scale the setpoints with
-        :param rescale: set to true if all points should be rescaled, alternative is cut off after new duration
+        Args:
+          new_duration: the new duration to scale the setpoints with
+          rescale: set to true if all points should be rescaled, alternative is cut off after new duration (Default value = True)
+
+        Returns:
+
         """
         new_duration = round(new_duration, Setpoint.digits)
 
@@ -267,7 +277,11 @@ class Subgait:
     def create_interpolated_setpoints(self, timestamps):
         """Equalize the setpoints of the subgait match the given timestamps.
 
-        :param timestamps: the new timestamps to use when creating the setpoints
+        Args:
+          timestamps: the new timestamps to use when creating the setpoints
+
+        Returns:
+
         """
         timestamps = sorted(set(timestamps + self.get_unique_timestamps()))
 
@@ -288,17 +302,15 @@ class Subgait:
     def interpolate_subgaits(cls, base_subgait, other_subgait, parameter, use_foot_position=False):
         """Linearly interpolate two subgaits with the parameter to get a new subgait. based on foot_pos, or on angles.
 
-        :param base_subgait:
-            base subgait, return value if parameter is equal to zero
-        :param other_subgait:
-            other subgait, return value if parameter is equal to one
-        :param parameter:
-            The parameter to use for interpolation. Should be 0 <= parameter <= 1
-        :param use_foot_position:
-            Determine whether the interpolation should be done on the foot location or on the joint angles
+        Args:
+          base_subgait: base subgait, return value if parameter is equal to zero
+          other_subgait: other subgait, return value if parameter is equal to one
+          parameter: The parameter to use for interpolation. Should be 0 <= parameter <= 1
+          use_foot_position: Determine whether the interpolation should be done on the foot location or on the joint angles (Default value = False)
 
-        :return:
-            The interpolated subgait
+        Returns:
+          : The interpolated subgait
+
         """
         if parameter == 1:
             return other_subgait
@@ -349,7 +361,14 @@ class Subgait:
         return sorted(set(timestamps))
 
     def get_joint(self, name):
-        """Get joint object with given name or index."""
+        """Get joint object with given name or index.
+
+        Args:
+          name:
+
+        Returns:
+
+        """
         return next(joint for joint in self.joints if joint.name == name)
 
     def get_joint_names(self):
@@ -404,7 +423,16 @@ class Subgait:
 
     @staticmethod
     def validate_version(gait_path, subgait_name, version):
-        """Check whether a gait exists for the gait."""
+        """Check whether a gait exists for the gait.
+
+        Args:
+          gait_path:
+          subgait_name:
+          version:
+
+        Returns:
+
+        """
         subgait_path = os.path.join(gait_path, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, _ = Subgait.unpack_parametric_version(version)
@@ -423,7 +451,14 @@ class Subgait:
 
     @staticmethod
     def unpack_parametric_version(version):
-        """Unpack a version to base version, other version and parameter."""
+        """Unpack a version to base version, other version and parameter.
+
+        Args:
+          version:
+
+        Returns:
+
+        """
         parameter_str = re.search(r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version).group(1)
         parameter = float(parameter_str)
         versions = re.findall(r"\([^\)]*\)", version)
@@ -433,7 +468,15 @@ class Subgait:
 
     @staticmethod
     def check_foot_position_interpolation_is_safe(base_subgait, other_subgait):
-        """Checks whether two subgaits are safe to be interpolated based on foot location."""
+        """Checks whether two subgaits are safe to be interpolated based on foot location.
+
+        Args:
+          base_subgait:
+          other_subgait:
+
+        Returns:
+
+        """
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         joint_to_compare_to = base_subgait.joints[0].name
         for base_joint, other_joint in zip(
@@ -480,10 +523,15 @@ class Subgait:
         The foot location corresponding to the resulting trajectories is equal to the weighted average (with the
         parameter) of the foor locations corresponding to the base and other subgait.
 
-        :param base_subgait: base subgait, return value if parameter is equal to zero
-        :param other_subgiat: other subgait, return value if parameter is equal to one
-        :param parameter: Parameter for interpolation, between 0 and 1
-        :return: A list of interpolated joint trajectories
+        Args:
+          base_subgait: base subgait, return value if parameter is equal to zero
+          other_subgiat: other subgait, return value if parameter is equal to one
+          parameter: Parameter for interpolation, between 0 and 1
+          other_subgait:
+
+        Returns:
+          : A list of interpolated joint trajectories
+
         """
         interpolated_joint_trajectories = []
         # for inverse kinematics it is required that all joints have the same number of setpoints as to calculate
@@ -528,10 +576,15 @@ class Subgait:
     def get_joint_angle_interpolated_joint_trajectories(base_subgait, other_subgait, parameter):
         """Calls the interpolate_joint_trajectories method for each joint trajectory in two subgaits.
 
-        :param base_subgait: base subgait, return value if parameter is equal to zero
-        :param other_subgiat: other subgait, return value if parameter is equal to one
-        :param parameter: Parameter for interpolation, between 0 and 1
-        :return: A list of linearly interpolated joint trajectories
+        Args:
+          base_subgait: base subgait, return value if parameter is equal to zero
+          other_subgiat: other subgait, return value if parameter is equal to one
+          parameter: Parameter for interpolation, between 0 and 1
+          other_subgait:
+
+        Returns:
+          : A list of linearly interpolated joint trajectories
+
         """
         interpolated_joint_trajectories = []
         for base_joint, other_joint in zip(
@@ -553,17 +606,41 @@ class Subgait:
     # Compatability with new subgait file structure
     @staticmethod
     def sec_to_nsec(seconds: float) -> int:
-        """Convert seconds to nanoseconds."""
+        """Convert seconds to nanoseconds.
+
+        Args:
+          seconds: float:
+          seconds: float:
+
+        Returns:
+
+        """
         return int(seconds * SEC_TO_NSEC)
 
     @staticmethod
     def nsec_to_sec(nanoseconds: int) -> float:
-        """Convert nanoseconds to seconds."""
+        """Convert nanoseconds to seconds.
+
+        Args:
+          nanoseconds: int:
+          nanoseconds: int:
+
+        Returns:
+
+        """
         return float(nanoseconds) / SEC_TO_NSEC
 
     @staticmethod
     def convert_points_dict(points: dict):
-        """Convert the new point dictionary structure to the old structure"""
+        """Convert the new point dictionary structure to the old structure
+
+        Args:
+          points: dict:
+          points: dict:
+
+        Returns:
+
+        """
         for point in points:
             nanoseconds = point["time_from_start"]
             duration = Duration(nsecs=nanoseconds)

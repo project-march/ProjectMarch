@@ -4,6 +4,8 @@ from march_shared_classes.exceptions.gait_exceptions import SubgaitGraphError
 
 
 class SubgaitGraph:
+    """ """
+
     START = "start"
     END = "end"
     TO = "to"
@@ -25,6 +27,11 @@ class SubgaitGraph:
         2. Checks that is possible to get to every state from `start`
         3. Checks that it is possible to get from every state to `end`
         4. Checks that all subgaits do not have equal `stop` and `to` transitions
+
+        Args:
+
+        Returns:
+
         """
         if self.START not in self._graph:
             raise SubgaitGraphError("There is no state {s}".format(s=self.START))
@@ -55,6 +62,14 @@ class SubgaitGraph:
         self._validate_visited(visited)
 
     def _validate_subgait(self, name):
+        """
+
+        Args:
+          name:
+
+        Returns:
+
+        """
         subgait = self._graph.get(name)
         if subgait is None:
             raise SubgaitGraphError("Subgait {n} is not a subgait in the graph".format(n=name))
@@ -68,6 +83,14 @@ class SubgaitGraph:
             raise SubgaitGraphError("Subgait {n} transitions cannot be equal".format(n=name))
 
     def _validate_visited(self, visited):
+        """
+
+        Args:
+          visited:
+
+        Returns:
+
+        """
         if len(visited[self.START]) != 0:
             raise SubgaitGraphError("Transition to `{s}` is not allowed".format(s=self.START))
         if self.END not in visited:

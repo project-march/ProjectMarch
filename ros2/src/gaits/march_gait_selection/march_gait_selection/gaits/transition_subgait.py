@@ -1,4 +1,8 @@
+"""Author: ???."""
+
 from copy import deepcopy
+from typing import List
+
 from march_utility.exceptions.gait_exceptions import TransitionError
 from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.gait.setpoint import Setpoint
@@ -7,12 +11,21 @@ from march_utility.utilities.duration import Duration
 
 
 class TransitionSubgait(Subgait):
-    """Class that defines the subgait used for transitioning between
-    subgaits with not matching begin and end points"""
+    """Class that defines the subgait used for transitioning between subgaits with not matching begin and end points.
+
+    Args:
+        joints (List[JointTrajectory]): list containing joint trajectories for each joint
+        duration (Duration): duration of the subgait
+        gait_type (:obj: str, optional): Type of the gait, defaults to 'walk_like'
+        gait_name (:obj: str, optional): Name of the gait, defaults to 'Walk'
+        subgait_name (:obj: str, optional): Name of the subgait, defaults to 'right_open'
+        version (:obj: str, optional): Version of the subgait, defaults to 'First try'
+        description (:obj: str, optional): Description of the subgait, defaults to 'Just a simple gait'
+    """
 
     def __init__(
         self,
-        joints,
+        joints: List[JointTrajectory],
         duration: Duration,
         gait_type="walk_like",
         gait_name="Transition",
@@ -20,22 +33,22 @@ class TransitionSubgait(Subgait):
         version="Default",
         description="The subgait used to transition between two subgaits",
     ):
-
         super(TransitionSubgait, self).__init__(
             joints, duration, gait_type, gait_name, subgait_name, version, description
         )
 
     @classmethod
-    def from_subgaits(cls, old_subgait, new_subgait, transition_subgait_name):
+    def from_subgaits(cls, old_subgait: Subgait, new_subgait: Subgait, transition_subgait_name: str):
         """Create a new transition subgait object between two given subgaits.
 
-        :param old_subgait: The old subgait to transition from
-        :param new_subgait: The new gait which must be executed after the old gait
-        :param transition_subgait_name: Name to use for the subgait that will be created
-                                        in which the transition will occur
-
-        :return: A populated TransitionSubgait object which holds the data to
-                 transition between given gaits
+        Args:
+            old_subgait (Subgait): the old subgait to transition from
+            new_subgait (Subgait): the new gait which must be executed after the old gait
+            transition_subgait_name (str): Name to use for the subgait that will be created in which the
+                transition will occur
+        Returns:
+            TransitionSubgait: A populated TransitionSubgait object which holds the data to transition
+                between given gaits
         """
         old_subgait_copy = deepcopy(old_subgait)
         new_subgait_copy = deepcopy(new_subgait)
@@ -50,13 +63,15 @@ class TransitionSubgait(Subgait):
         return transition_subgait
 
     @staticmethod
-    def _transition_joints(old_subgait, new_subgait):
-        """Calculate a transition trajectory which starts at the old gait and
-        ends with the endpoints of the new gait.
+    def _transition_joints(old_subgait: Subgait, new_subgait: Subgait) -> List[JointTrajectory]:
+        """Calculate a transition trajectory which starts at the old gait and ends with the endpoints of the new gait.
 
-        :returns:
-             list of joints which hold the transition setpoints including
-             position, velocity and duration
+        Args:
+            old_subgait (Subgait): the old subgait to transition from
+            new_subgait (Subgait): the new gait which must be executed after the old gait
+        Returns:
+            List[JointTrajectory]: list of joints which hold the transition setpoints including
+                 position, velocity and duration
         """
         max_duration = max(old_subgait.duration, new_subgait.duration)
 
@@ -91,9 +106,16 @@ class TransitionSubgait(Subgait):
         return joints
 
     @staticmethod
-    def _transition_setpoint(old_setpoint, new_setpoint, new_factor):
-        """Create a transition setpoint with the use of the old setpoint,
-        new setpoint and transition factor."""
+    def _transition_setpoint(old_setpoint: Setpoint, new_setpoint: Setpoint, new_factor: float) -> Setpoint:
+        """Create a transition setpoint with the use of the old setpoint, new setpoint and transition factor.
+
+        Args:
+            old_setpoint (Setpoint): old setpoint to transition from
+            new_setpoint (Setpoint): new setpoint to transition to
+            new_factor (float): weight factor between old and new setpoints
+        Returns:
+            Setpoint: setpoint with scaled position and velocity and time of new_setpoint
+        """
         old_factor = 1.0 - new_factor
 
         position = (old_setpoint.position * old_factor) + (new_setpoint.position * new_factor)
@@ -102,8 +124,16 @@ class TransitionSubgait(Subgait):
         return Setpoint(new_setpoint.time, position, velocity)
 
     @staticmethod
-    def _validate_transition_gait(old_subgait, transition_subgait, new_subgait):
-        """Validates the transition point."""
+    def _validate_transition_gait(old_subgait: Subgait, transition_subgait: Subgait, new_subgait: Subgait) -> None:
+        """Validates the transition point.
+
+        Args:
+            old_subgait (Subgait): old subgait to validate transition
+            transition_subgait (Subgait): transitions to validate
+            new_subgait (Subgait): new subgait to validate transition
+        Raises:
+            TransitionError: raised when transition is not valid
+        """
         try:
             if not old_subgait.validate_subgait_transition(
                 transition_subgait
@@ -113,8 +143,18 @@ class TransitionSubgait(Subgait):
             TransitionError("Error when creating transition: {er}".format(er=error))
 
     @staticmethod
-    def _validate_transition_trajectory(old_subgait, transition_subgait, new_subgait):
-        """Validate if the calculated trajectory is within the given subgaits."""
+    def _validate_transition_trajectory(
+        old_subgait: Subgait, transition_subgait: Subgait, new_subgait: Subgait
+    ) -> None:
+        """Validate if the calculated trajectory is within the given subgaits.
+
+        Args:
+            old_subgait (Subgait): old subgait to validate transition
+            transition_subgait (Subgait): transitions to validate
+            new_subgait (Subgait): new subgait to validate transition
+        Raises:
+            TransitionError: raised when transition is not valid
+        """
         for transition_joint in transition_subgait.joints:
             old_joint = old_subgait.get_joint(transition_joint.name)
             new_joint = new_subgait.get_joint(transition_joint.name)

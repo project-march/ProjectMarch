@@ -1,7 +1,9 @@
+"""Author: Bas Volkers, MVI."""
 import re
 
 
-def select_same_subgait_versions(gait: str, subgaits: dict, prefix: str, postfix: str):
+def select_same_subgait_versions(gait: str, subgaits: dict, prefix: str, postfix: str) -> dict:
+    """Returns dict of (subgait: version_name)."""
     selected_versions = {}
 
     if prefix == "" and postfix == "":
