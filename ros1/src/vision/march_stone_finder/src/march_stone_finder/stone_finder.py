@@ -27,7 +27,7 @@ class StoneFinder:
 
         self.current_frame_id = "toes_" + left_or_right + "_aligned"
         self.other_frame_id = "toes_" + self.other_side + "_aligned"
-        self.camera_frame_id = "camera_front_left_depth_optical_frame"
+        self.camera_frame_id = "camera_front_" + left_or_right + "_depth_optical_frame"
 
         self.listener = tf.TransformListener()
         self.publisher = rospy.Publisher("/march_stone_finder/found_points/" + left_or_right, FootPosition, queue_size=1)
