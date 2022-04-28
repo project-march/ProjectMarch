@@ -29,7 +29,8 @@ def main():
                 address = interface_info["addr"]
                 if address[0:3] == "192":
                     ip = address
-
+    
+    ip = "192.168.0.100"
     rclpy.init()
 
     node = WirelessIPDNode()
