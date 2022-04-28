@@ -135,19 +135,16 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             else:
                 try:
                     self.foot_location = self._get_foot_location(self.subgait_id)
+                    stop = self._check_msg_time(self.foot_location)
                 except AttributeError:
                     self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
                     self._end = True
                     return None
-                stop = self._check_msg_time(self.foot_location)
 
             self.logger.warn(
                 f"Stepping to location ({self.foot_location.processed_point.x}, "
                 f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
-
-        if start and stop:
-            return None
 
         return self._get_first_feasible_trajectory(start, stop)
 
@@ -162,8 +159,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
         if self.position_queue.empty():
-            msg = "Next step will be a close gait."
-            self.logger.warn(msg)
+            self.logger.warn("Next step will be a close gait.")
 
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 

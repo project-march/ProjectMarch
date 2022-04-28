@@ -193,8 +193,7 @@ class DynamicSubgait:
                 self.desired_setpoint_dict[name],
             ]
 
-            # Add an extra setpoint to the ankle to create a push off, except for
-            # a start gait:
+            # Add an extra setpoint to the ankle to create a push off, except for a start gait:
             if (
                 push_off
                 and not self.start

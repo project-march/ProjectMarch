@@ -129,10 +129,11 @@ class Pose:
     def calculate_joint_positions(self, joint: str = "all") -> Union[Tuple[float], float]:
         """Calculates the joint positions for a given pose as a chain from rear toes (toes1) to front toes (toes2).
 
-        If a positive angle represents a anti-clockwise rotation, the angle variable is positive in the rot function.
+        If a positive angle represents an anti-clockwise rotation, the angle variable is positive in the rot function.
         If a positive angle represents a clockwise rotation, the angle variable is negative in the rot function.
         The vectors (all np.array's) do always describe the translation when no rotation is applied.
-        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the chain.
+        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the
+        chain.
 
         Args:
             joint (str): specific joint of which the joint position should be returned.
