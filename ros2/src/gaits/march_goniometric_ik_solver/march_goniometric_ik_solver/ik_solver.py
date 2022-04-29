@@ -400,7 +400,7 @@ class Pose:
 
         Args:
             y (float): the distance between the two feet in upward direction.
-            z (float): the distance between the two feet in sideward direction.
+            z (float): the distance between the two feet in sidewards direction.
         """
         # Get y position of hip and toes:
         y_hip = self.pos_hip[1]

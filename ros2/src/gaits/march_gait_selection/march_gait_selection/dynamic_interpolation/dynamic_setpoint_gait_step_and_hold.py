@@ -39,11 +39,15 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             self._create_position_queue()
 
         self._end_position_right = get_position_from_yaml("stand")
+        self._end_position_right["right_hip_aa"] = 0
+        self._end_position_right["left_hip_aa"] = 0
         self._end_position_right["right_hip_fe"] = 0
         self._end_position_right["left_hip_fe"] = 0
         self._end_position_right["right_knee"] = 1
 
         self._end_position_left = get_position_from_yaml("stand")
+        self._end_position_left["right_hip_aa"] = 0
+        self._end_position_left["left_hip_aa"] = 0
         self._end_position_left["right_hip_fe"] = 0
         self._end_position_left["left_hip_fe"] = 0
         self._end_position_left["left_knee"] = 1
@@ -111,7 +115,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         """
         if stop:
             self.logger.info("Stopping dynamic gait.")
-            self.foot_location = FootPosition(processed_point=Point(x=0.0, y=0.0, z=0.45), duration=1.5)
+            self.foot_location = FootPosition(processed_point=Point(x=0.0, y=0.0, z=0.44699999999999995), duration=1.5)
         else:
             if self._use_position_queue:
                 if not self.position_queue.empty():
