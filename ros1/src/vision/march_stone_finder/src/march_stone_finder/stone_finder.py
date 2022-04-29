@@ -42,22 +42,27 @@ class StoneFinder:
         self.ellipse_similarity_threshold = rospy.get_param("~ellipse_similarity_threshold")
         self.minimum_ellipse_size = rospy.get_param("~minimum_ellipse_size")
 
-        self.lower_gray = np.array([0, 0, 168])
-        self.upper_gray = np.array([172, 111, 255])
-        self.lower_brown = np.array([1, 7, 110])
-        self.upper_brown = np.array([55, 76, 206])
+        # self.lower_gray = np.array([0, 0, 168])
+        # self.upper_gray = np.array([172, 111, 255])
+        # self.lower_brown = np.array([1, 7, 110])
+        # self.upper_brown = np.array([55, 76, 206])
+
+        self.lower_brown = np.array([0, 0, 77])
+        self.upper_brown = np.array([57, 249, 228])
+        self.lower_gray = np.array([62, 40, 113])
+        self.upper_gray = np.array([174, 151, 219])
 
     def find_points(self, frames):
         self.retrieve_parameters()
 
         color_hsv_image, pointcloud = self.preprocess_frames(frames)
         color_segmented = self.color_segment(color_hsv_image)
-        components = self.find_connected_components(color_segmented)
+        # components = self.find_connected_components(color_segmented)
 
-        components = cv2.morphologyEx(components, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-        components = cv2.morphologyEx(components, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
+        # components = cv2.morphologyEx(components, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+        # components = cv2.morphologyEx(components, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
 
-        contours, _ = cv2.findContours(components, 1, 2)
+        contours, _ = cv2.findContours(color_segmented, 1, 2)
         ellipses = self.find_ellipses(contours)
         point = self.find_closest_point(ellipses, pointcloud)
 
@@ -67,7 +72,7 @@ class StoneFinder:
                 publish_point(self.publisher, displacement)
                 # Visualize in rviz
                 displacement.header.frame_id = self.other_frame_id
-                self.listener.waitForTransform(self.other_frame_id, "world", rospy.Time.now(), rospy.Duration(0.100))
+                self.listener.waitForTransform(self.other_frame_id, "world", rospy.Time.now(), rospy.Duration(1.0))
                 displacement = self.listener.transformPoint("world", displacement)
                 publish_point_marker(self.marker_publisher, displacement, "world")
             except Exception as e:
@@ -158,7 +163,7 @@ class StoneFinder:
         try:
             found_point = to_point_stamped(point)
             found_point.header.frame_id = self.camera_frame_id
-            self.listener.waitForTransform(self.camera_frame_id, self.other_frame_id, rospy.Time.now(), rospy.Duration(0.100))
+            self.listener.waitForTransform(self.camera_frame_id, self.other_frame_id, rospy.Time.now(), rospy.Duration(1.0))
         except Exception as e:
             print(e)
         return self.listener.transformPoint(self.other_frame_id, found_point)
