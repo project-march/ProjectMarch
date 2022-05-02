@@ -2,25 +2,14 @@ import getpass
 import socket
 
 from rclpy import Future
-from std_msgs.msg import Header, String
-from rosgraph_msgs.msg import Clock
-from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState
+from std_msgs.msg import Header
+from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 
 
 class InputDeviceController:
-    """
-    The controller for the input device, uses the node provided in the rqt context.
-    Subscriptions:
-    - /march/input_device/instruction_response
-    - /march/gait/current
-    - /clock if the provided node is using simulation time
-    Publishers:
-    - /march/input_device/instruction
-    - /march/error
-    - /march/alive if pinging safety node
-    """
+    """The controller for the wireless input device."""
 
     # Format of the identifier for the alive message
     ID_FORMAT = "rqt@{machine}@{user}ros2"
@@ -62,9 +51,7 @@ class InputDeviceController:
         self.current_state_cb = None
         self._possible_gaits = []
 
-        self._id = self.ID_FORMAT.format(
-            machine=socket.gethostname(), user=getpass.getuser()
-        )
+        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
         self.gait_future = None
         self.update_possible_gaits()
@@ -76,28 +63,23 @@ class InputDeviceController:
         """
         Callback for instruction response messages.
         Calls registered callbacks when the gait is accepted, finished or rejected.
-        The actual callbacks are defined in InputDeviceView
 
-        :type msg: GaitInstructionResponse
+        Args:
+            msg (GaitInstructionResponse): the response to the published gait instruction
         """
-        if msg.result == GaitInstructionResponse.GAIT_ACCEPTED and callable(
-            self.accepted_cb
-        ):
+        if msg.result == GaitInstructionResponse.GAIT_ACCEPTED and callable(self.accepted_cb):
             self.accepted_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_FINISHED and callable(
-            self.finished_cb
-        ):
+        elif msg.result == GaitInstructionResponse.GAIT_FINISHED and callable(self.finished_cb):
             self.finished_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_REJECTED and callable(
-            self.rejected_cb
-        ):
+        elif msg.result == GaitInstructionResponse.GAIT_REJECTED and callable(self.rejected_cb):
             self.rejected_cb()
 
     def _current_gait_callback(self, msg: CurrentGait) -> None:
         """
         Callback for when the current gait changes, sends the msg through to public current_gait_callback
-        :param msg: The string with the name of the current gait
-        :type msg: String
+
+        Args:
+            msg (CurrentGait): the current gait of the exoskeleton
         """
         if callable(self.current_gait_cb):
             self.current_gait_cb(msg)
@@ -105,8 +87,9 @@ class InputDeviceController:
     def _current_state_callback(self, msg: CurrentState) -> None:
         """
         Callback for when the current state changes, sends the msg through to public current_state_callback
-        :param msg: The string with the name of the current state
-        :type msg: String
+
+        Args:
+            msg (CurrentState): the current state of the exoskeleton
         """
         if callable(self.current_state_cb):
             self.current_state_cb(msg)
@@ -116,9 +99,7 @@ class InputDeviceController:
         Send out an asynchronous request to get the possible gaits and stores response in gait_future
         """
         if self._possible_gait_client.service_is_ready():
-            self.gait_future = self._possible_gait_client.call_async(
-                PossibleGaits.Request()
-            )
+            self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
@@ -126,19 +107,27 @@ class InputDeviceController:
     def get_possible_gaits(self) -> Future:
         """
         Returns the future for the names of possible gaits.
-        :return: Future for the possible gaits
+
+        Returns:
+            Future: the future of the available gaits
         """
         return self.gait_future
 
     def get_node(self) -> Node:
         """
         Simple get function for the node
-        :return: the node
+
+        Returns:
+            Node: the node object
         """
         return self._node
 
     def publish_gait(self, string) -> None:
-        self._node.get_logger().debug("Wireless Input Device published gait: " + string)
+        """Publish a gait instruction to the gait state machine.
+
+        Args:
+            string (str): name of the gait
+        """
         self._instruction_gait_pub.publish(
             GaitInstruction(
                 header=Header(stamp=self._node.get_clock().now().to_msg()),
@@ -149,7 +138,7 @@ class InputDeviceController:
         )
 
     def publish_stop(self) -> None:
-        self._node.get_logger().debug("Wireless input device published stop")
+        """Publish a stop instruction to the gait state machine."""
         msg = GaitInstruction(
             header=Header(stamp=self._node.get_clock().now().to_msg()),
             type=GaitInstruction.STOP,
@@ -157,38 +146,3 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._instruction_gait_pub.publish(msg)
-
-    def publish_continue(self) -> None:
-        self._node.get_logger().debug("Wireless Input Device published continue")
-        self._instruction_gait_pub.publish(
-            GaitInstruction(
-                header=Header(stamp=self._node.get_clock().now().to_msg()),
-                type=GaitInstruction.CONTINUE,
-                gait_name="",
-                id=str(self._id),
-            )
-        )
-
-    def publish_pause(self) -> None:
-        self._node.get_logger().debug("Wireless Input Device published pause")
-        self._instruction_gait_pub.publish(
-            GaitInstruction(
-                header=Header(stamp=self._node.get_clock().now().to_msg()),
-                type=GaitInstruction.PAUSE,
-                gait_name="",
-                id=str(self._id),
-            )
-        )
-
-    def publish_sm_to_unknown(self) -> None:
-        self._node.get_logger().debug(
-            "Wireless Input Device published state machine to unknown"
-        )
-        self._instruction_gait_pub.publish(
-            GaitInstruction(
-                header=Header(stamp=self._node.get_clock().now().to_msg()),
-                type=GaitInstruction.UNKNOWN,
-                gait_name="",
-                id=str(self._id),
-            )
-        )

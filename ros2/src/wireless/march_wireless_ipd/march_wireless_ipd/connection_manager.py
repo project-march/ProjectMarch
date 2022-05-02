@@ -1,7 +1,4 @@
 import select
-from march_rqt_input_device.input_device_controller import InputDeviceController
-from march_shared_msgs.msg import CurrentGait
-
 import socket
 import json
 import traceback
@@ -19,21 +16,19 @@ class ConnectionManager:
         self.s.listen()
         self.controller = controller
         self.seq = 0
-        self.stop_receive = False
+        self.pause_receiving_messages = False
         self.requested_gait = None
         self.current_gait = "unknown"
         self.last_heartbeat = datetime.now()
         self.node = node
         self.stopped = False
-        self.controller.accepted_cb = partial(
-            self.send_message_till_confirm, "Accepted", True
-        )
+        self.controller.accepted_cb = partial(self.send_message_till_confirm, "Accepted", True)
         self.controller.rejected_cb = partial(self.send_message_till_confirm, "Reject")
         self.controller.current_gait_cb = self._current_gait_cb
         self.controller.current_state_cb = self._current_state_cb
-        self.controller.finished_cb = self.gait_finished
 
     def _current_gait_cb(self, msg):
+        """Callback when the exoskeleton gait is updated."""
         if self.stopped or "close" in msg.subgait:
             self.current_gait = self.requested_gait = "stop"
             self.stopped = False
@@ -41,98 +36,119 @@ class ConnectionManager:
             self.current_gait = msg.gait
 
     def _current_state_cb(self, msg):
+        """Callback when the exoskeleton state is updated."""
         if msg.state == "unknown" or msg.state == "home_stand":
             self.current_gait = msg.state
 
+    def validate_received_data(self, msg):
+        if msg == "":
+            self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (empty message)")
+            self.empty_socket()
+            raise Exception("Connection lost")
+        else:
+            self.last_heartbeat = datetime.now()
+
     def wait_for_request(self):
+        """Loop that receives heartbeat and gait request messages from the IPD and handles them."""
         while True:
             try:
+                # Remove any lingering messages from the last cycle
                 self.empty_socket()
 
                 counter = 0
-                while self.stop_receive and counter < 15:
+                while self.pause_receiving_messages and counter < 15:
                     time.sleep(0.20)
                     counter += 1
 
-                req = self.wait_for_message(1.0)
+                req = self.wait_for_message(5.0)
 
-                if req == "":
-                    self.controller.get_node().get_logger().warning(
-                        "Connection lost with wireless IPD (empty message)"
-                    )
-                    raise Exception("Connection lost")
-                    # self.reset_connection()
-                else:
-                    self.last_heartbeat = datetime.now()
+                # Check if connection is still valid, empty message means broken socket connection
+                self.validate_received_data(req)
 
+                # Handle various message types
                 if "Received" in req:
                     continue
+
                 elif "GaitRequest" in req:
                     req = json.loads(req)
                     self.seq = req["seq"]
-
                     if req["gait"]["gaitName"] == "stop":
-                        self.stop_receive = True
-                        self.controller.update_possible_gaits()
-                        self.controller.publish_stop()
-                        self.stopped = True
-                        self.current_gait = self.requested_gait = "stop"
-                        self.send_message_till_confirm("Accepted", True)
+                        self.request_stop()
                     else:
                         self.request_gait(req)
+
                 elif "Heartbeat" in req:
                     req = json.loads(req)
                     self.seq = req["seq"]
+                    self.send_message_till_confirm(msg_type="Heartbeat")
 
-                    self.send_message_till_confirm("Heartbeat")
-                    # Wait untill response comes back from android IPD
-
+            # Reset connection when a message has not been received for 5 seconds
             except socket.timeout:
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 5.0:
-                    self.controller.get_node().get_logger().warning(
-                        "Connection lost with wireless IPD (no heartbeat)"
-                    )
+                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
                     raise Exception("Connection lost")
 
+            # Reset connection if another exception occurs
             except Exception as e:
-                print(e)
+                self.controller.get_node().get_logger().warning(traceback.format_exc())
                 raise e
 
-    def gait_finished(self):
-        pass
+    def request_stop(self):
+        """Stop the current gait."""
+        self.pause_receiving_messages = True
+        self.controller.update_possible_gaits()
+        self.controller.publish_stop()
+        self.stopped = True
+        self.current_gait = self.requested_gait = "stop"
+        self.send_message_till_confirm(msg_type="Accepted", requested_gait=True)
 
     def request_gait(self, req):
-        self.stop_receive = True
+        """Check whether a gait requested on the wireless IPD is available, and publish it to the state machine if so.
 
+        Args:
+            req (str): gait request message from the IPD
+        """
+        self.pause_receiving_messages = True
+
+        # Retrieve whether the requested gait is available as next gait state or not
         self.controller.update_possible_gaits()
         future = self.controller.get_possible_gaits()
-
         counter = 0
         while not future.done() and counter < 50:
             time.sleep(0.010)
             counter += 1
 
         self.requested_gait = req["gait"]["gaitName"]
-
         if self.requested_gait in future.result().gaits:
             self.controller.get_node().get_logger().info("Succesful gait")
             self.controller.publish_gait(self.requested_gait)
-            return True
         else:
             self.controller.get_node().get_logger().info("Failed gait: " + self.requested_gait)
-            self.send_message_till_confirm("Fail")
-            return False
+            self.send_message_till_confirm(msg_type="Fail")
 
-    def wait_for_message(self, timeout=5.0):
+    def wait_for_message(self, timeout):
+        """Wait until a message is received on the socket connection, until the timeout is reached.
+
+        Args:
+            timeout (double): timeout for the wait duration
+        Returns:
+            str: decoded message from the wireless IPD
+        """
         try:
             self.connection.settimeout(timeout)
             data = self.connection.recv(1024).decode("utf-8")
             self.connection.settimeout(None)
-        except Exception:
-            raise
+        except Exception as e:
+            self.controller.get_node().get_logger().warning(traceback.format_exc())
+            raise e
         return data
 
     def send_message(self, msg):
+        """Send a message via the socket connection.
+
+        Args:
+            msg (str): message to send
+        """
         try:
             msg = msg + "\r\n"
             self.connection.sendall(msg.encode())
@@ -141,41 +157,39 @@ class ConnectionManager:
         except Exception:
             self.controller.get_node().get_logger().warning(traceback.format_exc())
 
-    def send_message_till_confirm(self, type, requested_gait=False):
+    def send_message_till_confirm(self, msg_type, requested_gait=False):
+        """Send a message to the wireless IPD until confirmation is received.
 
+        Args:
+            msg_type (str): the type of message that is sent
+            requested_gait (bool): whether this message is a response to a requested gait or not
+        """
         if requested_gait:
-            sendGait = self.requested_gait
+            send_gait = self.requested_gait
         else:
-            sendGait = self.current_gait
+            send_gait = self.current_gait
 
         if self.connection is None:
             return
 
-        msg = {"type": type, "currentGait": sendGait, "seq": self.seq}
+        msg = {"type": msg_type, "currentGait": send_gait, "seq": self.seq}
 
         while True:
             try:
+                # Send a message and wait until a "Received" confirmation message is received.
                 self.send_message(json.dumps(msg))
-                data = self.wait_for_message(0.40)
+                response = self.wait_for_message(5.0)
+                self.validate_received_data(response)
 
-                if data == "":
-                    self.controller.get_node().get_logger().warning(
-                        "Connection lost with wireless IPD (empty message)"
-                    )
-                    self.empty_socket()
-                    raise Exception("Connection lost")
-                else:
-                    self.last_heartbeat = datetime.now()
-
-                if "Received" in data:
-                    data = json.loads(data)
-                    if data["seq"] == self.seq:
-                        self.stop_receive = False
+                if "Received" in response:
+                    if json.loads(response)["seq"] == self.seq:
+                        self.pause_receiving_messages = False
                         self.empty_socket()
                         return
                     else:
                         self.controller.get_node().get_logger().warning("Different seq")
 
+            # A timeout is triggered if no "Received" confirmation message is read within 5 seconds.
             except socket.timeout:
                 self.controller.get_node().get_logger().info("Socket timeout")
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 5.0:
@@ -190,21 +204,20 @@ class ConnectionManager:
                 raise e
 
     def establish_connection(self):
+        """Connect with the wireless IPD via a socket connection."""
         while True:
             try:
                 self.connection, self.addr = self.s.accept()
                 self.controller.get_node().get_logger().info("Wireless IPD connected")
                 self.wait_for_request()
-
-            except Exception as e:
-                print(e, "(no traceback)")
-
+            except Exception:
+                self.controller.get_node().get_logger().warning(traceback.format_exc())
             self.connection.close()
 
     def empty_socket(self):
-        input = [self.s]
-        while 1:
-            input_ready, _, _ = select.select(input, [], [], 0.0)
+        """Empty all remaining messages on the socket connection."""
+        while True:
+            input_ready, _, _ = select.select([self.s], [], [], 0.0)
             if len(input_ready) == 0:
                 break
             for s in input_ready:
