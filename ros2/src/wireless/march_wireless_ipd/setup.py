@@ -2,7 +2,7 @@ import os
 from glob import glob
 from setuptools import setup
 
-package_name = 'march_wireless_ipd'
+package_name = "march_wireless_ipd"
 
 setup(
     name=package_name,

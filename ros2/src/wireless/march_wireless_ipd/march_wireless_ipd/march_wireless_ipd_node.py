@@ -24,6 +24,7 @@ def sys_exit(*_):
 
 
 def main():
+    """Initialize wireless IPD node."""
     ip = "192.168.0.100"
     rclpy.init()
 

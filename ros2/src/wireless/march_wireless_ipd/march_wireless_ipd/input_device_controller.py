@@ -59,6 +59,7 @@ class InputDeviceController:
         self.update_possible_gaits()
 
     def __del__(self):
+        """Destroy node cleanly."""
         self._node.destroy_publisher(self._instruction_gait_pub)
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:

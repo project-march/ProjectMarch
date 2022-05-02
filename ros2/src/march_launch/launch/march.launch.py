@@ -112,8 +112,7 @@ def generate_launch_description() -> LaunchDescription:
             DeclareLaunchArgument(
                 name="wireless_ipd",
                 default_value="False",
-                description="If this argument is false, the wireless input device will"
-                "not be launched.",
+                description="If this argument is false, the wireless input device will not be launched.",
             ),
             DeclareLaunchArgument(
                 name="layout",
