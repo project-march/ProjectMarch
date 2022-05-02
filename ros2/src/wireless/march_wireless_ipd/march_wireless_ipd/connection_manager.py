@@ -51,9 +51,9 @@ class ConnectionManager:
             msg (str): the message to validate
         """
         if msg == "":
-            self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (empty message)")
+            self.ros_warning("Connection lost with wireless IPD (empty message)")
             self.empty_socket()
-            raise Exception("Connection lost")
+            raise socket.error
         else:
             self.last_heartbeat = datetime.now()
 
@@ -61,15 +61,13 @@ class ConnectionManager:
         """Loop that receives heartbeat and gait request messages from the IPD and handles them."""
         while True:
             try:
-                # Remove any lingering messages from the last cycle
-                self.empty_socket()
-
                 counter = 0
                 while self.pause_receiving_messages and counter < 15:
                     time.sleep(0.20)
                     counter += 1
 
                 req = self.wait_for_message(5.0)
+                self.empty_socket()
 
                 # Handle various message types
                 if "Received" in req:
@@ -88,15 +86,17 @@ class ConnectionManager:
                     self.seq = req["seq"]
                     self.send_message_till_confirm(msg_type="Heartbeat")
 
+            except (json.JSONDecodeError, BlockingIOError):
+                continue
+
             # Reset connection when a message has not been received for 5 seconds
-            except socket.timeout:
+            except socket.timeout as e:
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 5.0:
-                    self.controller.get_node().get_logger().warning("Connection lost with wireless IPD (no heartbeat)")
-                    raise Exception("Connection lost")
+                    self.ros_warning("Connection lost with wireless IPD (no heartbeat)")
+                    raise e
 
             # Reset connection if another exception occurs
-            except Exception as e:
-                self.controller.get_node().get_logger().warning(traceback.format_exc())
+            except socket.error as e:
                 raise e
 
     def request_stop(self):
@@ -126,10 +126,9 @@ class ConnectionManager:
 
         self.requested_gait = req["gait"]["gaitName"]
         if self.requested_gait in future.result().gaits:
-            self.controller.get_node().get_logger().info("Succesful gait")
             self.controller.publish_gait(self.requested_gait)
         else:
-            self.controller.get_node().get_logger().info("Failed gait: " + self.requested_gait)
+            self.ros_warning("Failed gait: " + self.requested_gait)
             self.send_message_till_confirm(msg_type="Fail")
 
     def wait_for_message(self, timeout):
@@ -145,8 +144,7 @@ class ConnectionManager:
             data = self.connection.recv(1024).decode("utf-8")
             self.connection.settimeout(None)
             self.validate_received_data(data)
-        except Exception as e:
-            self.controller.get_node().get_logger().warning(traceback.format_exc())
+        except (socket.error, ConnectionResetError, BlockingIOError) as e:
             raise e
         return data
 
@@ -159,10 +157,9 @@ class ConnectionManager:
         try:
             msg = msg + "\r\n"
             self.connection.sendall(msg.encode())
-        except BrokenPipeError:
-            raise
-        except Exception:
-            self.controller.get_node().get_logger().warning(traceback.format_exc())
+        except (BrokenPipeError, InterruptedError, socket.error) as e:
+            print(e)
+            raise socket.error
 
     def send_message_till_confirm(self, msg_type, requested_gait=False):
         """Send a message to the wireless IPD until confirmation is received.
@@ -188,24 +185,27 @@ class ConnectionManager:
                 response = self.wait_for_message(5.0)
 
                 if "Received" in response:
-                    if json.loads(response)["seq"] == self.seq:
+                    response = json.loads(response)
+                    seq = response["seq"]
+                    if seq == self.seq:
                         self.pause_receiving_messages = False
                         self.empty_socket()
                         return
                     else:
-                        self.controller.get_node().get_logger().warning("Different seq")
+                        raise socket.error
+
+                self.empty_socket()
+            except (json.JSONDecodeError, BlockingIOError):
+                continue
 
             # A timeout is triggered if no "Received" confirmation message is read within 5 seconds.
-            except socket.timeout:
-                self.controller.get_node().get_logger().info("Socket timeout")
+            except socket.timeout as e:
                 if (datetime.now() - self.last_heartbeat).total_seconds() > 5.0:
-                    self.controller.get_node().get_logger().warning(
-                        "Connection lost with wireless IPD (no heartbeat 2)"
-                    )
+                    self.ros_warning("Connection lost with wireless IPD (no heartbeat)")
                     self.empty_socket()
-                    raise Exception("Connection lost")
+                    raise e
 
-            except Exception as e:
+            except socket.error as e:
                 self.empty_socket()
                 raise e
 
@@ -214,10 +214,11 @@ class ConnectionManager:
         while True:
             try:
                 self.connection, self.addr = self.s.accept()
-                self.controller.get_node().get_logger().info("Wireless IPD connected")
+                self.ros_info("Wireless IPD connected")
                 self.wait_for_request()
-            except Exception:
-                self.controller.get_node().get_logger().warning(traceback.format_exc())
+            except (socket.timeout, socket.error):
+                self.ros_warning("Reconnecting Wireless IPD")
+                # self.ros_warning(traceback.format_exc())
             self.connection.close()
 
     def empty_socket(self):
@@ -228,3 +229,11 @@ class ConnectionManager:
                 break
             for s in input_ready:
                 s.recv(1)
+
+    def ros_info(self, msg):
+        """Print ros info message."""
+        self.controller.get_node().get_logger().info(msg)
+
+    def ros_warning(self, msg):
+        """Print ros warning message."""
+        self.controller.get_node().get_logger().warning(msg)
