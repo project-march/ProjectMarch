@@ -149,9 +149,6 @@
       "name": "error",
       "callback": "publish_error",
       "always_enabled": true
-    },
-    {
-      "name": "walk_single_step_large"
     }
   ]
 ]
