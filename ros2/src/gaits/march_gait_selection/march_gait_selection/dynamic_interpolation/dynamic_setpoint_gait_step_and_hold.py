@@ -102,6 +102,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             self.joint_soft_limits,
             start,
             stop,
+            hold_subgait=True,
         )
 
     def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
@@ -137,6 +138,12 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             )
 
         return self._get_first_feasible_trajectory(start, stop)
+
+    def _try_to_get_second_step(self, is_final_iteration: bool) -> bool:
+        return True
+
+    def _get_stop_gait(self) -> Optional[TrajectoryCommand]:
+        return None
 
     def _get_foot_location_from_queue(self) -> FootPosition:
         """Get FootPosition message from the position queue.

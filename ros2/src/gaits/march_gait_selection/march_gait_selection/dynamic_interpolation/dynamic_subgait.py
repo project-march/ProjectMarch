@@ -48,6 +48,7 @@ class DynamicSubgait:
         joint_soft_limits (List[Limits]): List containing soft limits of joints in alphabetical order
         start (bool): whether it is an open gait or not
         stop (bool): whether it is a close gait or not
+        hold_subgait (bool): whether the subgait is created by the dynamic_setpoint_gait_step_and_hold class
 
     Attributes:
         logger (Logger): used for logging to the terminal
@@ -61,6 +62,7 @@ class DynamicSubgait:
         start (bool): True if it is an open gait, else False
         stop (bool): True if it is a close gait, else False
         pose (Pose): pose object used to calculate inverse kinematics
+        hold_subgait (bool): whether the subgait is created by the dynamic_setpoint_gait_step_and_hold class
     """
 
     def __init__(
@@ -74,6 +76,7 @@ class DynamicSubgait:
         joint_soft_limits: List[Limits],
         start: bool,
         stop: bool,
+        hold_subgait: bool = False,
     ):
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
@@ -100,6 +103,7 @@ class DynamicSubgait:
 
         self.start = start
         self.stop = stop
+        self.hold_subgait = hold_subgait
 
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
@@ -187,6 +191,9 @@ class DynamicSubgait:
         """
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
+            if self.stop and self.hold_subgait:
+                self.middle_setpoint_dict[name].position = self.desired_setpoint_dict[name].position
+
             setpoint_list = [
                 self.starting_position_dict[name],
                 self.middle_setpoint_dict[name],
@@ -207,6 +214,7 @@ class DynamicSubgait:
             if name in ["right_ankle", "left_ankle"] or (
                 (name == "right_knee" and self.subgait_id == "left_swing")
                 or (name == "left_knee" and self.subgait_id == "right_swing")
+                or (self.stop and self.hold_subgait)
             ):
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
