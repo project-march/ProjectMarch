@@ -11,6 +11,7 @@ from datetime import datetime
 
 class ConnectionManager:
     """Class that maintains the wireless IPD connection and all wireless communication."""
+
     def __init__(self, host, port, controller, node):
         server_address = (host, port)
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,7 +46,7 @@ class ConnectionManager:
 
     def validate_received_data(self, msg):
         """Check if a received message is valid or is empty, meaning the connection is broken.
-        
+
         Args:
             msg (str): the message to validate
         """

@@ -6,7 +6,6 @@ import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 import threading
-from netifaces import interfaces, ifaddresses, AF_INET
 import signal
 import sys
 from contextlib import suppress
@@ -14,6 +13,7 @@ from contextlib import suppress
 
 class WirelessIPDNode(Node):
     """Node that runs the wireless IPD."""
+
     def __init__(self):
         super().__init__("wireless_ipd_node")
 

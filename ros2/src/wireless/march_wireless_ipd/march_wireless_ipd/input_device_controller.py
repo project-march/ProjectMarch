@@ -11,7 +11,7 @@ from rclpy.node import Node
 
 
 class InputDeviceController:
-    """The controller for the wireless input device."""
+    """The gait controller for the wireless input device."""
 
     # Format of the identifier for the alive message
     ID_FORMAT = "rqt@{machine}@{user}ros2"
@@ -63,8 +63,7 @@ class InputDeviceController:
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
         """
-        Callback for instruction response messages.
-        Calls registered callbacks when the gait is accepted, finished or rejected.
+        Callback for instruction response messages. Calls registered callbacks when the gait is accepted, finished or rejected.
 
         Args:
             msg (GaitInstructionResponse): the response to the published gait instruction
@@ -78,7 +77,7 @@ class InputDeviceController:
 
     def _current_gait_callback(self, msg: CurrentGait) -> None:
         """
-        Callback for when the current gait changes, sends the msg through to public current_gait_callback
+        Callback for when the current gait changes, sends the msg through to public current_gait_callback.
 
         Args:
             msg (CurrentGait): the current gait of the exoskeleton
@@ -88,7 +87,7 @@ class InputDeviceController:
 
     def _current_state_callback(self, msg: CurrentState) -> None:
         """
-        Callback for when the current state changes, sends the msg through to public current_state_callback
+        Callback for when the current state changes, sends the msg through to public current_state_callback.
 
         Args:
             msg (CurrentState): the current state of the exoskeleton
@@ -98,7 +97,7 @@ class InputDeviceController:
 
     def update_possible_gaits(self) -> None:
         """
-        Send out an asynchronous request to get the possible gaits and stores response in gait_future
+        Send out an asynchronous request to get the possible gaits and stores response in gait_future.
         """
         if self._possible_gait_client.service_is_ready():
             self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
@@ -117,7 +116,7 @@ class InputDeviceController:
 
     def get_node(self) -> Node:
         """
-        Simple get function for the node
+        Simple get function for the node.
 
         Returns:
             Node: the node object
