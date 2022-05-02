@@ -3,7 +3,6 @@
 import select
 import socket
 import json
-import traceback
 import time
 from functools import partial
 from datetime import datetime
@@ -218,7 +217,6 @@ class ConnectionManager:
                 self.wait_for_request()
             except (socket.timeout, socket.error):
                 self.ros_warning("Reconnecting Wireless IPD")
-                # self.ros_warning(traceback.format_exc())
             self.connection.close()
 
     def empty_socket(self):
