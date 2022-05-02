@@ -71,9 +71,6 @@ class ConnectionManager:
 
                 req = self.wait_for_message(5.0)
 
-                # Check if connection is still valid, empty message means broken socket connection
-                self.validate_received_data(req)
-
                 # Handle various message types
                 if "Received" in req:
                     continue
@@ -147,6 +144,7 @@ class ConnectionManager:
             self.connection.settimeout(timeout)
             data = self.connection.recv(1024).decode("utf-8")
             self.connection.settimeout(None)
+            self.validate_received_data(data)
         except Exception as e:
             self.controller.get_node().get_logger().warning(traceback.format_exc())
             raise e
@@ -188,7 +186,6 @@ class ConnectionManager:
                 # Send a message and wait until a "Received" confirmation message is received.
                 self.send_message(json.dumps(msg))
                 response = self.wait_for_message(5.0)
-                self.validate_received_data(response)
 
                 if "Received" in response:
                     if json.loads(response)["seq"] == self.seq:

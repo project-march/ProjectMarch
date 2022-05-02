@@ -62,8 +62,7 @@ class InputDeviceController:
         self._node.destroy_publisher(self._instruction_gait_pub)
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
-        """
-        Callback for instruction response messages. Calls registered callbacks when the gait is accepted, finished or rejected.
+        """Callback for instruction response messages. Calls registered callbacks when the gait is accepted, finished or rejected.
 
         Args:
             msg (GaitInstructionResponse): the response to the published gait instruction
@@ -76,8 +75,7 @@ class InputDeviceController:
             self.rejected_cb()
 
     def _current_gait_callback(self, msg: CurrentGait) -> None:
-        """
-        Callback for when the current gait changes, sends the msg through to public current_gait_callback.
+        """Callback for when the current gait changes, sends the msg through to public current_gait_callback.
 
         Args:
             msg (CurrentGait): the current gait of the exoskeleton
@@ -86,8 +84,7 @@ class InputDeviceController:
             self.current_gait_cb(msg)
 
     def _current_state_callback(self, msg: CurrentState) -> None:
-        """
-        Callback for when the current state changes, sends the msg through to public current_state_callback.
+        """Callback for when the current state changes, sends the msg through to public current_state_callback.
 
         Args:
             msg (CurrentState): the current state of the exoskeleton
@@ -96,9 +93,7 @@ class InputDeviceController:
             self.current_state_cb(msg)
 
     def update_possible_gaits(self) -> None:
-        """
-        Send out an asynchronous request to get the possible gaits and stores response in gait_future.
-        """
+        """Send out an asynchronous request to get the possible gaits and stores response in gait_future."""
         if self._possible_gait_client.service_is_ready():
             self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
@@ -106,8 +101,7 @@ class InputDeviceController:
                 self._node.get_logger().warn("Failed to contact possible gaits service")
 
     def get_possible_gaits(self) -> Future:
-        """
-        Returns the future for the names of possible gaits.
+        """Returns the future for the names of possible gaits.
 
         Returns:
             Future: the future of the available gaits
@@ -115,8 +109,7 @@ class InputDeviceController:
         return self.gait_future
 
     def get_node(self) -> Node:
-        """
-        Simple get function for the node.
+        """Simple get function for the node.
 
         Returns:
             Node: the node object
