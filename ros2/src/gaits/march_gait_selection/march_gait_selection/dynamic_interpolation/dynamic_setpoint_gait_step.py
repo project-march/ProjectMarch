@@ -15,6 +15,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.utility_functions import get_position_from_yaml
 
@@ -41,6 +42,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
+        self.logger = Logger(gait_selection_node, __class__.__name__)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
         self.update_parameter()
@@ -50,7 +52,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         self.gait_selection.create_subscription(
             Point,
-            "/march/add_point_to_queue",
+            "/march/step/add_point_to_queue",
             self._add_point_to_queue,
             DEFAULT_HISTORY_DEPTH,
         )
