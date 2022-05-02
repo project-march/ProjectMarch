@@ -16,10 +16,11 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.logger import Logger
+from march_utility.exceptions.gait_exceptions import WrongStartPositionError
 
 from march_shared_msgs.msg import FootPosition
 from geometry_msgs.msg import Point
-from std_msgs.msg import Header
+from std_msgs.msg import Header, String
 
 
 class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
@@ -43,6 +44,12 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             Point,
             "/march/step_and_hold/add_point_to_queue",
             self._add_point_to_queue,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.gait_selection.create_subscription(
+            String,
+            "/march/step_and_hold/start_side",
+            self._set_start_subgait_id,
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -204,3 +211,14 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.put(point_dict)
         self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
+
+    def _set_start_subgait_id(self, start_side: String) -> None:
+        """Sets the subgait_id to the given start side, if and only if exo is in homestand."""
+        try:
+            if self.start_position_all_joints == self.home_stand_position_all_joints:
+                self.subgait_id = start_side.data
+                self.logger.info(f"Starting subgait set to {self.subgait_id}")
+            else:
+                raise WrongStartPositionError(self.home_stand_position_all_joints, self.start_position_all_joints)
+        except WrongStartPositionError as e:
+            self.logger.warn(f"Can only change start side in home stand position. {e.msg}")
