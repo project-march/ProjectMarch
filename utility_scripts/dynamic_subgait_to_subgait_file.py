@@ -15,7 +15,17 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import INTERPOLA
 
 
 def main():
-    """Script that writes a dynamic joint trajectory to a .subgait file to be used with the test setup."""
+    """Script that writes a dynamic joint trajectory to a .subgait file to be used with the test setup.
+
+    Note:
+        Make sure you have sourced ros2 and foxy.
+
+    Example:
+        Add the following alias to run the script:
+
+        `alias create_subgait_script='sfox && sros2 &&
+        python3 ~/march/utility_scripts/dynamic_subgait_to_subgait_file.py'`
+    """
     joint_names_from_urdf = get_joint_names_from_urdf()
     pose = Pose()
 
