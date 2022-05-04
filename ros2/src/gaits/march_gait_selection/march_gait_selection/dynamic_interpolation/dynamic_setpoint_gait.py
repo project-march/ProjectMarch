@@ -66,6 +66,7 @@ class DynamicSetpointGait(GaitInterface):
     _should_stop: bool
     minimum_stair_height: float
     add_push_off: bool
+    amount_of_steps: int
 
     def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
@@ -186,6 +187,7 @@ class DynamicSetpointGait(GaitInterface):
 
         self._should_stop = False
         self._end = False
+        self._trajectory_failed = False
 
         self._start_time_next_command = None
         self._next_command = None
@@ -197,7 +199,7 @@ class DynamicSetpointGait(GaitInterface):
         self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.start_position_all_joints = get_position_from_yaml("stand")
 
-        self._trajectory_failed = False
+        self._step_counter = 0
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -324,7 +326,7 @@ class DynamicSetpointGait(GaitInterface):
         elif self._should_stop:
             return self._get_trajectory_command(stop=True)
         else:
-            return self._get_trajectory_command()
+            return self._get_trajectory_command(stop=self._check_step_count())
 
     def _update_start_pos(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
@@ -389,11 +391,11 @@ class DynamicSetpointGait(GaitInterface):
         else:
             try:
                 self.foot_location = self._get_foot_location(self.subgait_id)
+                stop = self._check_msg_time(self.foot_location)
             except AttributeError:
                 self.logger.warn("No FootLocation found. Connect the camera or use simulated points.")
                 self._end = True
                 return None
-            stop = self._check_msg_time(self.foot_location)
             if not stop:
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
                 self.logger.info(
@@ -406,6 +408,17 @@ class DynamicSetpointGait(GaitInterface):
             return None
 
         return self._get_first_feasible_trajectory(start, stop)
+
+    def _check_step_count(self) -> bool:
+        """Returns True if the gait should stop because it has reached its max step count."""
+        if self.amount_of_steps < 1:
+            return False
+        elif self._step_counter == self.amount_of_steps - 1:
+            self._end = True
+            self.logger.info("Stopping dynamic gait.")
+            return True
+        self._step_counter += 1
+        return False
 
     def _get_first_feasible_trajectory(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
         """Returns the first trajectory than can be executed.
@@ -596,6 +609,7 @@ class DynamicSetpointGait(GaitInterface):
         """Callback for gait_selection_node when the parameters have been updated."""
         self.minimum_stair_height = self.gait_selection.minimum_stair_height
         self.add_push_off = self.gait_selection.add_push_off
+        self.amount_of_steps = self.gait_selection.amount_of_steps
 
     def _callback_force_unknown(self, msg: GaitInstruction) -> None:
         """Reset start position to home stand after force unknown.

@@ -67,6 +67,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     push_off_fraction = LaunchConfiguration("push_off_fraction")
     push_off_position = LaunchConfiguration("push_off_position")
     add_push_off = LaunchConfiguration("add_push_off")
+    amount_of_steps = LaunchConfiguration("amount_of_steps")
     use_position_queue = LaunchConfiguration("use_position_queue")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
@@ -219,6 +220,11 @@ def generate_launch_description() -> launch.LaunchDescription:
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
+                name="amount_of_steps",
+                default_value="0",
+                description="Amount of steps the dynamic gait should make before stopping. 0 or -1 is infinite.",
+            ),
+            DeclareLaunchArgument(
                 name="use_position_queue",
                 default_value="False",
                 description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
@@ -324,6 +330,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("push_off_fraction", push_off_fraction),
                     ("push_off_position", push_off_position),
                     ("add_push_off", add_push_off),
+                    ("amount_of_steps", amount_of_steps),
                     ("use_position_queue", use_position_queue),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
