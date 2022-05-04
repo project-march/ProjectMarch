@@ -8,39 +8,42 @@ from std_msgs.msg import Header, String
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_utility.utilities.logger import Logger
 
 
-class InputDeviceController:
+class WirelessInputDeviceController:
     """The gait controller for the wireless input device."""
 
     # Format of the identifier for the alive message
     ID_FORMAT = "rqt@{machine}@{user}ros2"
 
-    def __init__(self, node):
+    def __init__(self, node: Node, logger: Logger):
         self._node = node
+        self._logger = logger
 
         self._instruction_gait_pub = self._node.create_publisher(
             msg_type=GaitInstruction,
             topic="/march/input_device/instruction",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._instruction_response_pub = self._node.create_subscription(
             msg_type=GaitInstructionResponse,
             topic="/march/input_device/instruction_response",
             callback=self._response_callback,
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._current_gait = self._node.create_subscription(
             msg_type=CurrentGait,
             topic="/march/gait_selection/current_gait",
             callback=self._current_gait_callback,
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._current_state = self._node.create_subscription(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
             callback=self._current_state_callback,
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
@@ -48,7 +51,7 @@ class InputDeviceController:
         self._start_side_pub = self._node.create_publisher(
             msg_type=String,
             topic="/march/step_and_hold/start_side",
-            qos_profile=10,
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
         self.accepted_cb = None
@@ -104,7 +107,7 @@ class InputDeviceController:
             self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
-                self._node.get_logger().warn("Failed to contact possible gaits service")
+                self._logger.warn("Failed to contact possible gaits service")
 
     def get_possible_gaits(self) -> Future:
         """Returns the future for the names of possible gaits.
@@ -147,7 +150,7 @@ class InputDeviceController:
         )
         self._instruction_gait_pub.publish(msg)
 
-    def publish_start_side(self, string) -> None:
+    def publish_start_side(self, string: str) -> None:
         """Publish which leg should swing first for step and hold.
 
         Args:

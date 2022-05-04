@@ -1,10 +1,11 @@
 """Author: Tuhin Das, MVII."""
 
 from .connection_manager import ConnectionManager
-from .input_device_controller import InputDeviceController
+from .input_device_controller import WirelessInputDeviceController
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
+from march_utility.utilities.logger import Logger
 import threading
 import signal
 import sys
@@ -30,8 +31,9 @@ def main():
 
     node = WirelessIPDNode()
     executor = MultiThreadedExecutor()
-    controller = InputDeviceController(node)
-    manager = ConnectionManager(ip, 4000, controller, node)
+    logger = Logger(node, "WirelessIPDNode")
+    controller = WirelessInputDeviceController(node, logger)
+    manager = ConnectionManager(ip, 4000, controller, node, logger)
     thr = threading.Thread(target=manager.establish_connection)
     thr.start()
 
