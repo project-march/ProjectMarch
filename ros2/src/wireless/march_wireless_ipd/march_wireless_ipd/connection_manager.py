@@ -5,7 +5,6 @@ import socket
 import json
 import time
 from functools import partial
-from datetime import datetime
 from march_shared_msgs.msg import CurrentGait, CurrentState
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.duration import Duration
@@ -19,7 +18,7 @@ class ConnectionManager:
     """Class that maintains the wireless IPD connection and all wireless communication."""
 
     def __init__(self, host: str, port: int, controller: WirelessInputDeviceController, node: Node, logger: Logger):
-        """ConnectionManager constructor.
+        """Connection manager constructor.
 
         Args:
             host (str): ip address for the connection
