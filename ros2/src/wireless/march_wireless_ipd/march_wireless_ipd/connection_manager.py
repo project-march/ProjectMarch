@@ -68,22 +68,27 @@ class ConnectionManager:
                 req = self.wait_for_message(5.0)
                 self.empty_socket()
 
+                req = json.loads(req)
+                self.seq = req["seq"]
+                msg_type = req["type"]
+
                 # Handle various message types
-                if "Received" in req:
+                if msg_type == "Received":
                     continue
 
-                elif "GaitRequest" in req:
-                    req = json.loads(req)
-                    self.seq = req["seq"]
+                elif msg_type == "GaitRequest":
                     if req["gait"]["gaitName"] == "stop":
                         self.request_stop()
                     else:
                         self.request_gait(req)
 
-                elif "Heartbeat" in req:
-                    req = json.loads(req)
-                    self.seq = req["seq"]
+                elif msg_type == "Heartbeat":
                     self.send_message_till_confirm(msg_type="Heartbeat")
+
+                elif msg_type == "Information" and "swing" in req["message"]:
+                    self.controller.publish_start_side(req["message"])
+                    self.send_message_till_confirm(msg_type="Information", message=req["message"])
+                    self.ros_info("Switch side to " + req["message"])
 
             except (json.JSONDecodeError, BlockingIOError):
                 continue
@@ -160,7 +165,7 @@ class ConnectionManager:
             print(e)
             raise socket.error
 
-    def send_message_till_confirm(self, msg_type, requested_gait=False):
+    def send_message_till_confirm(self, msg_type, requested_gait=False, message=None):
         """Send a message to the wireless IPD until confirmation is received.
 
         Args:
@@ -175,7 +180,7 @@ class ConnectionManager:
         if self.connection is None:
             return
 
-        msg = {"type": msg_type, "currentGait": send_gait, "seq": self.seq}
+        msg = {"type": msg_type, "currentGait": send_gait, "message": message, "seq": self.seq}
 
         while True:
             try:
@@ -215,7 +220,8 @@ class ConnectionManager:
                 self.connection, self.addr = self.s.accept()
                 self.ros_info("Wireless IPD connected")
                 self.wait_for_request()
-            except (socket.timeout, socket.error):
+            except (socket.timeout, socket.error) as e:
+                self.ros_warning(repr(e))
                 self.ros_warning("Reconnecting Wireless IPD")
             self.connection.close()
 

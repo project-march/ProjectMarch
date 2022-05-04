@@ -4,7 +4,7 @@ import getpass
 import socket
 
 from rclpy import Future
-from std_msgs.msg import Header
+from std_msgs.msg import Header, String
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
@@ -44,6 +44,11 @@ class InputDeviceController:
         )
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
+        )
+        self._start_side_pub = self._node.create_publisher(
+            msg_type=String,
+            topic="/march/step_and_hold/start_side",
+            qos_profile=10,
         )
 
         self.accepted_cb = None
@@ -141,3 +146,11 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._instruction_gait_pub.publish(msg)
+
+    def publish_start_side(self, string) -> None:
+        """Publish which leg should swing first for step and hold.
+
+        Args:
+            string (str): left_swing or right_swing
+        """
+        self._start_side_pub.publish(String(data=string))
