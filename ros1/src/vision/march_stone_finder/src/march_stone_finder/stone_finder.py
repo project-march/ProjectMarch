@@ -130,7 +130,7 @@ class StoneFinder:
         """Find ellipse shapes from contours in a given image.
 
         Args:
-            contours (List[np.ndarray]) a list of contours in the image:
+            contours (List[np.ndarray]): a list of contours in the image:
         Returns:
             List[cv2.ellipse]: a list of ellipses in the image
         """
@@ -167,7 +167,7 @@ class StoneFinder:
         """Determines which ellipse center is the closest to the camera.
 
         Args:
-            ellipses ([cv2.ellipse]):
+            ellipses ([cv2.ellipse]): a list of found ellipses
             pointcloud (np.ndarray): the source point cloud
         Returns:
             Optional[np.ndarray]: the closest center if one exists, else None
