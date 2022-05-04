@@ -1,66 +1,77 @@
-"""Author: Tuhin Das, MVII"""
+"""Author: Tuhin Das, MVII."""
 
 import rospy
 import numpy as np
 import pyrealsense2 as rs
 from .utilities import convert_depth_frame_to_pointcloud, publish_point, to_point_stamped, publish_point_marker
 import cv2
+from typing import List, Optional, Tuple
 from march_shared_msgs.msg import FootPosition
+from geometry_msgs.msg import PointStamped
 import tf
 from visualization_msgs.msg import Marker
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 
 class StoneFinder:
-    def __init__(self, left_or_right):
-        self.width = 640
-        self.height = 480
-        self.dimensions = (self.height, self.width)
-        self.left_or_right = left_or_right
-        self.initialized = False
+    """Class that looks for gray ellipses in a color frame, and return the center of the closest ellipse as a depth point."""
+
+    def __init__(self, left_or_right: str) -> None:
+        """Constructor of the stone finder.
+
+        Args:
+            left_or_right (str): whether the class is used to find left or right points
+        """
+        self._width = 640
+        self._height = 480
+        self._dimensions = (self._height, self._width)
+        self._left_or_right = left_or_right
+        self._initialized = False
 
         if left_or_right == "left":
-            self.other_side = "right"
+            self._other_side = "right"
         else:
-            self.other_side = "left"
+            self._other_side = "left"
 
-        self.retrieve_parameters()
+        self._lower_brown = np.array([0, 0, 77])
+        self._upper_brown = np.array([57, 249, 228])
+        self._lower_gray = np.array([62, 40, 113])
+        self._upper_gray = np.array([174, 151, 219])
 
-        self.current_frame_id = "toes_" + left_or_right + "_aligned"
-        self.other_frame_id = "toes_" + self.other_side + "_aligned"
-        self.camera_frame_id = "camera_front_" + left_or_right + "_depth_optical_frame"
+        self._retrieve_parameters()
 
-        self.listener = tf.TransformListener()
-        self.publisher = rospy.Publisher("/march_stone_finder/found_points/" + left_or_right, FootPosition, queue_size=1)
-        self.marker_publisher = rospy.Publisher("/camera_" + left_or_right + "/found_points", Marker, queue_size=1)
+        self._current_frame_id = "toes_" + left_or_right + "_aligned"
+        self._other_frame_id = "toes_" + self._other_side + "_aligned"
+        self._camera_frame_id = "camera_front_" + left_or_right + "_depth_optical_frame"
+
+        self._listener = tf.TransformListener()
+        self._publisher = rospy.Publisher(
+            "/march_stone_finder/found_points/" + left_or_right, FootPosition, queue_size=DEFAULT_HISTORY_DEPTH
+        )
+        self._marker_publisher = rospy.Publisher(
+            "/camera_" + left_or_right + "/found_points", Marker, queue_size=DEFAULT_HISTORY_DEPTH
+        )
 
         align_to = rs.stream.color
-        self.align = rs.align(align_to)
+        self._align = rs.align(align_to)
 
-    def retrieve_parameters(self):
+    def _retrieve_parameters(self) -> None:
+        """Retrieve parameters from the ros parameter server."""
         self.minimum_connected_component_size = rospy.get_param("~minimum_connected_component_size")
         self.connectivity = rospy.get_param("~connectivity")
         self.ellipse_similarity_threshold = rospy.get_param("~ellipse_similarity_threshold")
         self.minimum_ellipse_size = rospy.get_param("~minimum_ellipse_size")
 
-        # self.lower_gray = np.array([0, 0, 168])
-        # self.upper_gray = np.array([172, 111, 255])
-        # self.lower_brown = np.array([1, 7, 110])
-        # self.upper_brown = np.array([55, 76, 206])
+    def find_points(self, frames: rs.composite_frame) -> None:
+        """Find the closest ellipse center point in realsense color and depth frames.
 
-        self.lower_brown = np.array([0, 0, 77])
-        self.upper_brown = np.array([57, 249, 228])
-        self.lower_gray = np.array([62, 40, 113])
-        self.upper_gray = np.array([174, 151, 219])
-
-    def find_points(self, frames):
-        self.retrieve_parameters()
+        Args:
+            frames (rs.composite_frame): a color and depth frame from a realsense pipeline
+        """
+        self._retrieve_parameters()
 
         color_hsv_image, pointcloud = self.preprocess_frames(frames)
         color_segmented = self.color_segment(color_hsv_image)
-        # components = self.find_connected_components(color_segmented)
-
-        # components = cv2.morphologyEx(components, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-        # components = cv2.morphologyEx(components, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
 
         contours, _ = cv2.findContours(color_segmented, 1, 2)
         ellipses = self.find_ellipses(contours)
@@ -69,17 +80,25 @@ class StoneFinder:
         if point is not None and np.sum(np.abs(point)) > 0.02:
             try:
                 displacement = self.compute_displacement(point)
-                publish_point(self.publisher, displacement)
+                publish_point(self._publisher, displacement)
+
                 # Visualize in rviz
-                displacement.header.frame_id = self.other_frame_id
-                self.listener.waitForTransform(self.other_frame_id, "world", rospy.Time.now(), rospy.Duration(1.0))
-                displacement = self.listener.transformPoint("world", displacement)
-                publish_point_marker(self.marker_publisher, displacement, "world")
-            except Exception as e:
+                displacement.header.frame_id = self._other_frame_id
+                self._listener.waitForTransform(self._other_frame_id, "world", rospy.Time.now(), rospy.Duration(1.0))
+                displacement = self._listener.transformPoint("world", displacement)
+                publish_point_marker(self._marker_publisher, displacement, "world")
+            except (tf.LookupException, tf.ExtrapolationException) as e:
                 print(e)
 
-    def preprocess_frames(self, frames):
-        aligned_frames = self.align.process(frames)
+    def preprocess_frames(self, frames: rs.composite_frame) -> Tuple[np.ndarray, np.ndarray]:
+        """Align depth and color frames, preprocess, and generate a pointcloud.
+
+        Args;
+            frames (rs.composite_frame): a color and depth frame from a realsense pipeline
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: the preprocessed color image and the pointcloud
+        """
+        aligned_frames = self._align.process(frames)
         aligned_depth_frame = aligned_frames.get_depth_frame()
 
         color_frame = aligned_frames.get_color_frame()
@@ -93,25 +112,28 @@ class StoneFinder:
         color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2HSV)
         return color_image, pointcloud
 
-    def color_segment(self, color_hsv_image):
-        mask_gray = cv2.inRange(color_hsv_image, self.lower_gray, self.upper_gray)
-        mask_wood = cv2.inRange(color_hsv_image, self.lower_brown, self.upper_brown)
-        white = np.full(self.dimensions, 255, np.uint8)
+    def color_segment(self, color_hsv_image: np.ndarray) -> np.ndarray:
+        """Perform color segmentation on the images to select gray and remove brown.
+
+        Args:
+            color_hsv_image (np.ndarray): the color image in HSV color space
+        Returns:
+            np.ndarray: the color segmented image in black and white
+        """
+        mask_gray = cv2.inRange(color_hsv_image, self._lower_gray, self._upper_gray)
+        mask_wood = cv2.inRange(color_hsv_image, self._lower_brown, self._upper_brown)
+        white = np.full(self._dimensions, 255, np.uint8)
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         return cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
 
-    def find_connected_components(self, color_segmented):
-        result = np.full(self.dimensions, 0, np.uint8)
-        n_components, output, _, _ = cv2.connectedComponentsWithStats(color_segmented, self.connectivity, cv2.CV_32S)
+    def find_ellipses(self, contours: List[np.ndarray]) -> List[cv2.ellipse]:
+        """Find ellipse shapes from contours in a given image.
 
-        for i in range(1, n_components + 1):
-            pts = np.where(output == i)
-            if len(pts[0]) >= self.minimum_connected_component_size:
-                result[output == i] = 255
-
-        return result
-
-    def find_ellipses(self, contours):
+        Args:
+            contours (List[np.ndarray]) a list of contours in the image:
+        Returns:
+            List[cv2.ellipse]: a list of ellipses in the image
+        """
         ellipses = []
         for contour in contours:
             if len(contour) < 5:
@@ -120,10 +142,10 @@ class StoneFinder:
             convex_hull = cv2.convexHull(contour)
             ellipse = cv2.fitEllipse(contour)
 
-            contour_mask = np.zeros(self.dimensions, np.uint8)
+            contour_mask = np.zeros(self._dimensions, np.uint8)
             contour_mask = cv2.drawContours(contour_mask, convex_hull, -1, (255, 255, 255), 2)
 
-            ellipse_mask = np.zeros(self.dimensions, np.uint8)
+            ellipse_mask = np.zeros(self._dimensions, np.uint8)
             ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, (255, 255, 255), 2)
 
             intersection = cv2.bitwise_and(contour_mask, ellipse_mask)
@@ -141,7 +163,15 @@ class StoneFinder:
                 ellipses += [ellipse]
         return ellipses
 
-    def find_closest_point(self, ellipses, pointcloud):
+    def find_closest_point(self, ellipses: List[cv2.ellipse], pointcloud: np.ndarray) -> Optional[np.ndarray]:
+        """Determines which ellipse center is the closest to the camera.
+
+        Args:
+            ellipses ([cv2.ellipse]):
+            pointcloud (np.ndarray): the source point cloud
+        Returns:
+            Optional[np.ndarray]: the closest center if one exists, else None
+        """
         distances = []
         depthpoints = []
         for ellipse in ellipses:
@@ -149,7 +179,7 @@ class StoneFinder:
             x_pixel = int(centroid[0])
             y_pixel = int(centroid[1])
 
-            if y_pixel < pointcloud.shape[0] and x_pixel < pointcloud.shape[1]:
+            if y_pixel >= 0 and x_pixel >= 0 and y_pixel < pointcloud.shape[0] and x_pixel < pointcloud.shape[1]:
                 depthpoint = pointcloud[y_pixel][x_pixel]
                 distances += [np.sqrt(np.sum(np.square(depthpoint)))]
                 depthpoints += [depthpoint]
@@ -159,11 +189,20 @@ class StoneFinder:
         else:
             return None
 
-    def compute_displacement(self, point):
+    def compute_displacement(self, point: np.ndarray) -> PointStamped:
+        """Takes a found depth point as a numpy array, transforms it to the frame of the other leg and returns it as a PointStamped message.
+
+        Args:
+            point (np.ndarray): a depth point to step towards
+        Returns:
+            PointStamped: the depth point in the other leg frame
+        """
         try:
             found_point = to_point_stamped(point)
-            found_point.header.frame_id = self.camera_frame_id
-            self.listener.waitForTransform(self.camera_frame_id, self.other_frame_id, rospy.Time.now(), rospy.Duration(1.0))
-        except Exception as e:
+            found_point.header.frame_id = self._camera_frame_id
+            self._listener.waitForTransform(
+                self._camera_frame_id, self._other_frame_id, rospy.Time.now(), rospy.Duration(1.0)
+            )
+        except (tf.LookupException, tf.ExtrapolationException) as e:
             print(e)
-        return self.listener.transformPoint(self.other_frame_id, found_point)
+        return self._listener.transformPoint(self._other_frame_id, found_point)

@@ -1,4 +1,4 @@
-"""Author: Tuhin Das, MVII"""
+"""Author: Tuhin Das, MVII."""
 
 import rospy
 from .stone_finder import StoneFinder
@@ -8,12 +8,13 @@ from march_stone_finder.cfg import parametersConfig
 
 
 def callback(config, _):
+    """Notify when parameters are updated."""
     rospy.loginfo("Updated parameters of stone finder")
     return config
 
 
 def main():
-
+    """Connect to realsense devices and run stone finding algorithm on the received frames."""
     rospy.init_node("march_stone_finder", anonymous=True)
     Server(parametersConfig, callback)
 
