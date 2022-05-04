@@ -13,7 +13,6 @@ from march_shared_msgs.msg import FootPosition, CurrentGait
 
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.utility_functions import get_position_from_yaml
 
 
 class DynamicSetpointGaitClose(DynamicSetpointGait):
@@ -76,9 +75,6 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
             self.logger.warn("Already in home stand position.")
             return None
-
-        # TODO: find out why this line is needed
-        self.home_stand_position_all_joints = get_position_from_yaml("stand")
 
         self.update_parameters()
         self._start_time_next_command = current_time + first_subgait_delay

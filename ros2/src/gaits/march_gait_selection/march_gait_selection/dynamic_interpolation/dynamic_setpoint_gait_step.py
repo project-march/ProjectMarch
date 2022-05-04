@@ -126,12 +126,11 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             TrajectoryCommand: command with the current subgait and start time
         """
-        if self._use_position_queue:
-            if not self.position_queue.empty():
-                self.foot_location = self._get_foot_location_from_queue()
-            else:
-                stop = True
-                self._end = True
+        if self._use_position_queue and not self.position_queue.empty():
+            self.foot_location = self._get_foot_location_from_queue()
+        elif self._use_position_queue and self.position_queue.empty():
+            stop = True
+            self._end = True
         else:
             try:
                 self.foot_location = self._get_foot_location(self.subgait_id)
@@ -142,7 +141,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             stop = self._check_msg_time(self.foot_location)
             self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
 
-        self.logger.warn(
+        self.logger.info(
             f"Stepping to location ({self.foot_location.processed_point.x}, "
             f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
         )

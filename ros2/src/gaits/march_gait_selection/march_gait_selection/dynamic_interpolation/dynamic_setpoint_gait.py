@@ -3,7 +3,7 @@
 from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
-from sensor_msgs.msg import JointState
+from copy import copy
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
@@ -25,7 +25,9 @@ from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
+
 from march_shared_msgs.msg import FootPosition
+from sensor_msgs.msg import JointState
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 DURATION_INCREASE_FACTOR = 1.5
@@ -77,8 +79,8 @@ class DynamicSetpointGait(GaitInterface):
 
         self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.home_stand_position_all_joints = get_position_from_yaml("stand")
-        self.start_position_actuating_joints = self.home_stand_position_actuating_joints
-        self.start_position_all_joints = self.home_stand_position_all_joints
+        self.start_position_actuating_joints = copy(self.home_stand_position_actuating_joints)
+        self.start_position_all_joints = copy(self.home_stand_position_all_joints)
 
         self._reset()
         self.all_joint_names = self.home_stand_position_all_joints.keys()
@@ -128,7 +130,12 @@ class DynamicSetpointGait(GaitInterface):
     @property
     def subgait_name(self) -> str:
         """Returns the name of the subgait. Should return left_swing/right_swing for simulation to work."""
-        return self.subgait_id
+        if self._end and "right" in self.subgait_id:
+            return "right_close"
+        elif self._end and "left" in self.subgait_id:
+            return "left_close"
+        else:
+            return self.subgait_id
 
     @property
     def version(self) -> str:
