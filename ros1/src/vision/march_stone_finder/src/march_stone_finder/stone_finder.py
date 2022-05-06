@@ -115,7 +115,7 @@ class StoneFinder:
 
         Args;
             frames (rs.composite_frame): A color and depth frame from a realsense pipeline.
-            
+
         Returns:
             Tuple[np.ndarray, np.ndarray]: The preprocessed color image and the pointcloud.
         """

@@ -15,7 +15,7 @@ def convert_depth_frame_to_pointcloud(depth_image: np.ndarray, camera_intrinsics
     Args:
         depth_image (np.ndarray): Depth points from the depth camera.
         camera_intrinsics (intrinsics): Intrinsic details of the camera.
-        
+
     Returns:
         np.ndarray: Pointcloud of the depth points.
     """
