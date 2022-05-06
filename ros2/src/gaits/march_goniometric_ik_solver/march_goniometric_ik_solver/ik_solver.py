@@ -290,7 +290,7 @@ class Pose:
         return LENGTH_FOOT + np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - self.ankle_limit_ankle_hip_distance ** 2)
 
     @property
-    def max_step_size_flat_floot(self) -> float:
+    def max_step_size_flat_foot(self) -> float:
         """Returns the maximum step distance with the rear foot flat on the ground."""
         return self.ankle_limit_pos_hip[0] * 2
 
@@ -345,7 +345,7 @@ class Pose:
             rotation_point (str): the point we rotate around to reduce dorsi flexion.
             rotation (float): the amount of rotation we apply to reduce dorsi flexion.
             angle_knee2 (float): the angle of knee2 calculated with the reduce_swing_dorsi_flexion_calculate_angles() method.
-            angle_knee2 (float): the angle of hip calculated with the reduce_swing_dorsi_flexion_calculate_angles() method.
+            angle_hip (float): the angle of hip calculated with the reduce_swing_dorsi_flexion_calculate_angles() method.
         """
         if rotation_point == "toes":
             self.rot_foot1 -= rotation
@@ -679,90 +679,73 @@ class Pose:
         self.hip_x_fraction = hip_x_fraction
         self.knee_bend = default_knee_bend
 
-        # Determine hip y-location:
-        if ankle_y > 0:
-            if hip_x_fraction >= 0.5:
+        pos_ankle1 = np.array([0, 0])
+        pos_ankle2 = np.array([self.ankle_x, self.ankle_y])
+
+        # If we step up or flat:
+        if self.ankle_y >= 0:
+
+            # If we can make the step with flat rear foot:
+            if self.ankle_x <= self.max_step_size_flat_foot:
+
+                # Hip location is just in the middle of the two ankles, forming a triangle:
                 hip_y = np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2)
+                pos_hip = np.array([self.hip_x, hip_y])
+                self.solve_leg(pos_hip, pos_ankle1, "rear")
+                self.solve_leg(pos_hip, pos_ankle2, "front")
+
+            # If we can NOT make the step with flat rear foot:
             else:
-                hip_y = np.sqrt(self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2)
+
+                # If the step is large enough to reach it with foot rotation:
+                if self.ankle_x >= self.ankle_limit_minimum_step_distance:
+
+                    # Hip location is determined using intersection of circles:
+                    pos_hip = abs(
+                        qas.get_intersection_of_circles(
+                            self.pos_toes1,
+                            np.array([self.ankle_x, 0.0]),
+                            self.ankle_limit_toes_hip_distance,
+                            self.ankle_limit_ankle_hip_distance,
+                        )[0]
+                    )
+
+                # If the step is too small to reach the desired location with foot rotation:
+                else:
+
+                    # Hip location is determined based on ankle2 location as percentage between
+                    # max_step_size_flat_foot and ankle_limit_minimum_step_distance:
+                    hip_x = self.ankle_limit_pos_hip[0] + (self.ankle_x - self.max_step_size_flat_foot) / (
+                        self.ankle_limit_minimum_step_distance - self.max_step_size_flat_foot
+                    ) * (self.ankle_limit_minimum_step_distance - self.ankle_limit_pos_hip[0])
+                    hip_y = np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - (hip_x - self.pos_toes1[0]) ** 2)
+                    pos_hip = np.array([hip_x, hip_y])
+
+                    # Determine required ankle height:
+                    leg_height = np.sqrt(self.ankle_limit_ankle_hip_distance ** 2 - (self.ankle_x - hip_x) ** 2)
+                    ankle_y_required = hip_y - leg_height
+
+                    # If the required ankle height is larger than the desired height, we will use the required ankle height:
+                    if ankle_y_required > self.ankle_y:
+                        self.ankle_y = ankle_y_required
+
+                # Determine foot rotation and define joint angles:
+                self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, pos_hip])
+                self.fe_ankle1 = MAX_ANKLE_FLEXION
+                self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+                    [self.pos_knee1, self.pos_hip, self.point_below_hip]
+                )
+                self.solve_leg(pos_hip, np.array([self.ankle_x, self.ankle_y]), "front")
+
+        # If we step down:
         else:
             hip_y = min(
-                ankle_y + np.sqrt(self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2),
+                self.ankle_y + np.sqrt(self.max_leg_length ** 2 - (self.ankle_x - self.hip_x) ** 2),
                 np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2),
             )
-
-        # Define hip and ankle locations:
-        pos_hip = np.array([self.hip_x, hip_y])
-        pos_ankle1 = np.array([0, 0])
-        pos_ankle2 = np.array([ankle_x, ankle_y])
-
-        # Solve legs without constraints:
-        self.solve_leg(pos_hip, pos_ankle1, "rear")
-        self.solve_leg(pos_hip, pos_ankle2, "front")
-
-        # NEW METHOD:
-        raise_leg = True
-        if ankle_y >= 0 and ankle_x > self.max_step_size_flat_floot:
-
-            # If the step_size is larger than the minimum, we can determine hip location using intersection of circles method:
-            if ankle_x > self.ankle_limit_minimum_step_distance:
-                self.reset_to_zero_pose()
-
-                # Determine hip location based on rear toe and front ankle locations:
-                pos_hip = abs(
-                    qas.get_intersection_of_circles(
-                        self.pos_toes1,
-                        np.array([ankle_x, 0.0]),
-                        self.ankle_limit_toes_hip_distance,
-                        self.ankle_limit_ankle_hip_distance,
-                    )[0]
-                )
-
-                # Determine foot rotation and define joint angles:
-                self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, pos_hip])
-                self.fe_ankle1 = MAX_ANKLE_FLEXION
-                self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
-                    [self.pos_knee1, self.pos_hip, self.point_below_hip]
-                )
-                self.solve_leg(pos_hip, np.array([ankle_x, 0.0]), "front")
-
-            else:
-                self.reset_to_zero_pose()
-
-                # Determine hip location based on ankle2 location as percentage between max flat step and minimum step with foot rotation:
-                hip_x = self.ankle_limit_pos_hip[0] + (ankle_x - self.max_step_size_flat_floot) / (
-                    self.ankle_limit_minimum_step_distance - self.max_step_size_flat_floot
-                ) * (self.ankle_limit_minimum_step_distance - self.ankle_limit_pos_hip[0])
-                hip_y = np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - (hip_x - self.pos_toes1[0]) ** 2)
-                pos_hip = np.array([hip_x, hip_y])
-
-                # Determine foot rotation and define joint angles:
-                self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, pos_hip])
-                self.fe_ankle1 = MAX_ANKLE_FLEXION
-                self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
-                    [self.pos_knee1, self.pos_hip, self.point_below_hip]
-                )
-
-                leg_height = np.sqrt(self.ankle_limit_ankle_hip_distance ** 2 - (ankle_x - hip_x) ** 2)
-                ankle_y_flat = hip_y - leg_height
-                self.solve_leg(pos_hip, np.array([ankle_x, ankle_y_flat]), "front")
-
-                if ankle_y_flat > ankle_y:
-                    raise_leg = False
-
-            if ankle_y > 0 and raise_leg:
-                dist_hip_ankle = np.linalg.norm(self.pos_hip - pos_ankle2)
-                angle_hip, angle_knee, angle_ankle = tas.get_angles_from_sides(
-                    [LENGTH_LOWER_LEG, dist_hip_ankle, LENGTH_UPPER_LEG]
-                )
-                self.fe_hip2 = (
-                    qas.get_angle_between_points([self.point_below_hip, self.pos_hip, pos_ankle2]) + angle_hip
-                )
-                self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee
-                self.fe_ankle2 = ANKLE_ZERO_ANGLE - qas.get_angle_between_points(
-                    [self.pos_knee2, self.pos_ankle2, self.point_right_to_ankle2]
-                )
-        # NEW METHOD END
+            pos_hip = np.array([self.hip_x, hip_y])
+            self.solve_leg(pos_hip, pos_ankle1, "rear")
+            self.solve_leg(pos_hip, pos_ankle2, "front")
 
         # Reduce dorsi flexion to meet constraints:
         if reduce_df_front and self.fe_ankle2 > MAX_ANKLE_FLEXION:
@@ -772,12 +755,11 @@ class Pose:
             if self.pos_hip[0] < self.pos_ankle1[0]:
                 self.keep_hip_above_rear_ankle()
 
-        # If we step down and we exceed dorsi flexion with the stance leg, reduce it:
-        if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION and ankle_y <= 0:
+        if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION and self.ankle_y < 0:
             self.reduce_stance_dorsi_flexion()
 
         # Apply side_step, hard_coded to default feet distance for now:
-        self.perform_side_step(abs(ankle_y), abs(ankle_z))
+        self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
 
         # Create a list of the pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
