@@ -13,10 +13,10 @@ def convert_depth_frame_to_pointcloud(depth_image: np.ndarray, camera_intrinsics
     """Convert a realsense depth frame to a point cloud using the camera intrinsics.
 
     Args:
-        depth_image (np.ndarray): depth points from the depth camera
-        camera_intrinsics (intrinsics): intrinsic details of the camera
+        depth_image (np.ndarray): Depth points from the depth camera.
+        camera_intrinsics (intrinsics): Intrinsic details of the camera.
     Returns:
-        np.ndarray: pointcloud of the depth points
+        np.ndarray: Pointcloud of the depth points.
     """
     [height, width] = depth_image.shape
 
@@ -37,8 +37,8 @@ def publish_point(publisher: Publisher, point: np.ndarray) -> None:
     """Publish a displacement which is used for dynamic gait generation.
 
     Args:
-        publisher (Publisher): publisher to publish the message with
-        point (np.ndarray): point to publish
+        publisher (Publisher): Publisher to publish the message with.
+        point (np.ndarray): Point to publish.
     """
     point_msg = FootPosition()
     point_msg.header.stamp = rospy.Time.now()
@@ -52,9 +52,9 @@ def publish_point_marker(publisher: Publisher, point: np.ndarray, frame: str) ->
     """Publish a visualization marker for the center of an ellipse.
 
     Args:
-        publisher (Publisher): publisher to publish the message with
-        point (np.ndarray): a point array of size (3,)
-        frame (str): frame in which the point is published
+        publisher (Publisher): Publisher to publish the message with.
+        point (np.ndarray): A point array of size (3,).
+        frame (str): Frame in which the point is published.
     """
     marker = Marker()
     marker.header.frame_id = frame
@@ -90,10 +90,10 @@ def to_point_stamped(point: np.ndarray) -> PointStamped:
     """Convert a numpy point array to a PointStamped message.
 
     Args:
-        point (np.ndarray): a point array of size (3,)
+        point (np.ndarray): A point array of size (3,).
 
     Returns:
-        PointStamped: a ros point message with a timestamp
+        PointStamped: A ros point message with a timestamp.
     """
     point_stamped = PointStamped()
     point_stamped.header.stamp = rospy.Time.now()

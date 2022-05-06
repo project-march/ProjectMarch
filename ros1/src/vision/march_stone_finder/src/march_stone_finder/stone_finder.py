@@ -30,6 +30,9 @@ class StoneFinder:
         _listener (TransformListener): A ROS TF frame transformation listener.
         _point_publisher (Publisher): Publisher for found points to step towards.
         _marker_publisher (Publisher): Marker publisher for the found points.
+        _last_time_point_found (Time): Timestamp of the last found point.
+        _not_found_counter (int): How many iterations of 5 seconds no points were found.
+        _left_or_right (string): Which leg points are found for.
     """
 
     def __init__(self, left_or_right: str) -> None:
@@ -71,7 +74,7 @@ class StoneFinder:
         """Find the closest ellipse center point in realsense color and depth frames.
 
         Args:
-            frames (rs.composite_frame): a color and depth frame from a realsense pipeline
+            frames (rs.composite_frame): A color and depth frame from a realsense pipeline.
         """
         self._retrieve_parameters()
 
@@ -111,9 +114,9 @@ class StoneFinder:
         """Align depth and color frames, preprocess, and generate a pointcloud.
 
         Args;
-            frames (rs.composite_frame): a color and depth frame from a realsense pipeline
+            frames (rs.composite_frame): A color and depth frame from a realsense pipeline.
         Returns:
-            Tuple[np.ndarray, np.ndarray]: the preprocessed color image and the pointcloud
+            Tuple[np.ndarray, np.ndarray]: The preprocessed color image and the pointcloud.
         """
         aligned_frames = self._align.process(frames)
         aligned_depth_frame = aligned_frames.get_depth_frame()
@@ -133,9 +136,9 @@ class StoneFinder:
         """Perform color segmentation on the images to select gray and remove brown.
 
         Args:
-            color_hsv_image (np.ndarray): the color image in HSV color space
+            color_hsv_image (np.ndarray): The color image in HSV color space.
         Returns:
-            np.ndarray: the color segmented image in black and white
+            np.ndarray: The color segmented image in black and white.
         """
         mask_gray = cv2.inRange(color_hsv_image, self._lower_gray, self._upper_gray)
         mask_wood = cv2.inRange(color_hsv_image, self._lower_brown, self._upper_brown)
@@ -147,9 +150,9 @@ class StoneFinder:
         """Find ellipse shapes from contours in a given image.
 
         Args:
-            contours (List[np.ndarray]): a list of contours in the image:
+            contours (List[np.ndarray]): A list of contours in the image.
         Returns:
-            List[cv2.ellipse]: a list of ellipses in the image
+            List[cv2.ellipse]: A list of ellipses in the image.
         """
         ellipses = []
         for contour in contours:
@@ -182,10 +185,10 @@ class StoneFinder:
         """Determines which ellipse center is the closest to the camera.
 
         Args:
-            ellipses ([cv2.ellipse]): a list of found ellipses
-            pointcloud (np.ndarray): the source point cloud
+            ellipses ([cv2.ellipse]): A list of found ellipses.
+            pointcloud (np.ndarray): The source point cloud.
         Returns:
-            Optional[np.ndarray]: the closest center if one exists, else None
+            Optional[np.ndarray]: The closest center if one exists, else None.
         """
         distances = []
         depthpoints = []
@@ -208,9 +211,9 @@ class StoneFinder:
         """Takes a found depth point as a numpy array, transforms it to the frame of the other leg and returns it as a PointStamped message.
 
         Args:
-            point (np.ndarray): a depth point to step towards
+            point (np.ndarray): A depth point to step towards.
         Returns:
-            PointStamped: the depth point in the other leg frame
+            PointStamped: The depth point in the other leg frame.
         """
         try:
             found_point = to_point_stamped(point)
