@@ -13,7 +13,29 @@ from march_utility.utilities.logger import Logger
 
 
 class WirelessInputDeviceController:
-    """The gait controller for the wireless input device."""
+    """The gait controller for the wireless input device.
+
+    Attributes:
+        _node (Node): Node that runs the wireless IPD connection manager.
+        _logger (Logger): Logger to print information to the terminal.
+        _id (str): ID of entity that sends a gait instruction.
+        _gait_future (Future): Possible gaits in the current exo state.
+
+        accepted_cb (Callable): Callback when a gait is accepted.
+        rejected_cb (Callable): Callback when a gait is rejected.
+        current_gait_cb (Callable): Callback when the current gait is updated.
+        current_state_cb (Callable): Callback when the current state is updated.
+
+    Publishers:
+    - /march/input_device/instruction
+    - /march/step_and_hold/start_side
+    Subscriptions:
+    - /march/input_device/instruction_response
+    - /march/gait_selection/current_gait
+    - /march/gait_selection/current_state
+    Clients:
+    - /march/gait_selection/get_possible_gaits
+    """
 
     # Format of the identifier for the alive message
     ID_FORMAT = "rqt@{machine}@{user}ros2"
@@ -21,10 +43,17 @@ class WirelessInputDeviceController:
     def __init__(self, node: Node, logger: Logger):
         self._node = node
         self._logger = logger
+        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
+        self._gait_future = None
 
         self._instruction_gait_pub = self._node.create_publisher(
             msg_type=GaitInstruction,
             topic="/march/input_device/instruction",
+            qos_profile=DEFAULT_HISTORY_DEPTH,
+        )
+        self._start_side_pub = self._node.create_publisher(
+            msg_type=String,
+            topic="/march/step_and_hold/start_side",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
         self._instruction_response_pub = self._node.create_subscription(
@@ -48,22 +77,12 @@ class WirelessInputDeviceController:
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
         )
-        self._start_side_pub = self._node.create_publisher(
-            msg_type=String,
-            topic="/march/step_and_hold/start_side",
-            qos_profile=DEFAULT_HISTORY_DEPTH,
-        )
 
         self.accepted_cb = None
-        self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
         self.current_state_cb = None
-        self._possible_gaits = []
 
-        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
-
-        self.gait_future = None
         self.update_possible_gaits()
 
     def __del__(self):
@@ -71,15 +90,13 @@ class WirelessInputDeviceController:
         self._node.destroy_publisher(self._instruction_gait_pub)
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
-        """Callback for instruction response messages. Calls registered callbacks when the gait is accepted, finished or rejected.
+        """Callback for instruction response messages. Calls registered callbacks when the gait is accepted or rejected.
 
         Args:
-            msg (GaitInstructionResponse): the response to the published gait instruction
+            msg (GaitInstructionResponse): The response to the published gait instruction.
         """
         if msg.result == GaitInstructionResponse.GAIT_ACCEPTED and callable(self.accepted_cb):
             self.accepted_cb()
-        elif msg.result == GaitInstructionResponse.GAIT_FINISHED and callable(self.finished_cb):
-            self.finished_cb()
         elif msg.result == GaitInstructionResponse.GAIT_REJECTED and callable(self.rejected_cb):
             self.rejected_cb()
 
@@ -87,7 +104,7 @@ class WirelessInputDeviceController:
         """Callback for when the current gait changes, sends the msg through to public current_gait_callback.
 
         Args:
-            msg (CurrentGait): the current gait of the exoskeleton
+            msg (CurrentGait): The current gait of the exoskeleton.
         """
         if callable(self.current_gait_cb):
             self.current_gait_cb(msg)
@@ -96,7 +113,7 @@ class WirelessInputDeviceController:
         """Callback for when the current state changes, sends the msg through to public current_state_callback.
 
         Args:
-            msg (CurrentState): the current state of the exoskeleton
+            msg (CurrentState): The current state of the exoskeleton.
         """
         if callable(self.current_state_cb):
             self.current_state_cb(msg)
@@ -104,7 +121,8 @@ class WirelessInputDeviceController:
     def update_possible_gaits(self) -> None:
         """Send out an asynchronous request to get the possible gaits and stores response in gait_future."""
         if self._possible_gait_client.service_is_ready():
-            self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
+            self._gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
+            print(type(self._gait_future))
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._logger.warn("Failed to contact possible gaits service")
@@ -113,15 +131,15 @@ class WirelessInputDeviceController:
         """Returns the future for the names of possible gaits.
 
         Returns:
-            Future: the future of the available gaits
+            Future: The future of the available gaits.
         """
-        return self.gait_future
+        return self._gait_future
 
     def get_node(self) -> Node:
         """Simple get function for the node.
 
         Returns:
-            Node: the node object
+            Node: The node object.
         """
         return self._node
 
@@ -129,7 +147,7 @@ class WirelessInputDeviceController:
         """Publish a gait instruction to the gait state machine.
 
         Args:
-            string (str): name of the gait
+            string (str): Name of the gait.
         """
         self._instruction_gait_pub.publish(
             GaitInstruction(
@@ -154,6 +172,6 @@ class WirelessInputDeviceController:
         """Publish which leg should swing first for step and hold.
 
         Args:
-            string (str): left_swing or right_swing
+            string (str): Either left_swing or right_swing.
         """
         self._start_side_pub.publish(String(data=string))

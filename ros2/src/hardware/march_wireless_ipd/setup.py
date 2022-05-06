@@ -16,9 +16,9 @@ setup(
     ],
     install_requires=["setuptools"],
     zip_safe=True,
-    maintainer="Tuhin Das",
-    maintainer_email="2hin.das@gmail.com",
-    description="TODO: Package description",
+    maintainer="Project March",
+    maintainer_email="software@projectmarch.nl",
+    description="Node that manages the connection and communication with the wireless IPD app.",
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={

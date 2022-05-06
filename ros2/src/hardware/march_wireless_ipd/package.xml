@@ -3,16 +3,12 @@
 <package format="3">
   <name>march_wireless_ipd</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="2hin.das@gmail.com">parallels</maintainer>
+  <description>Node that manages the connection and communication with the wireless IPD app.</description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 
   <depend>march_rqt_input_device</depend>
-
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
+  <depend>rclpy</depend>
 
   <export>
     <build_type>ament_python</build_type>

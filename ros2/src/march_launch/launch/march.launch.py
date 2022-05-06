@@ -36,7 +36,8 @@ def generate_launch_description() -> LaunchDescription:
     The settable ros parameters are:
         use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
             Default is True.
-        ...
+        wireless_ipd (bool): Whether the wireless IPD connection manager node should be started.
+            Default is False.
     """
     # General arguments
     use_sim_time = LaunchConfiguration("use_sim_time")
