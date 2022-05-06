@@ -10,50 +10,55 @@ from march_shared_msgs.msg import FootPosition
 from geometry_msgs.msg import PointStamped
 import tf
 from visualization_msgs.msg import Marker
-from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 
 class StoneFinder:
-    """Class that looks for gray ellipses in a color frame, and return the center of the closest ellipse as a depth point."""
+    """Class that looks for gray ellipses in a color frame, and return the center of the closest ellipse as a depth point.
+
+    Args:
+        left_or_right (str): Whether the class is used to find left or right points.
+
+    Attributes:
+        _dimensions (Tuple[int, int]): Dimensions of the realsense frames.
+        _lower_brown (np.ndarray): Lower HSV values of the base plate color for color segmentation.
+        _upper_brown (np.ndarray): Upper HSV values of the base plate color for color segmentation.
+        _lower_gray (np.ndarray): Lower HSV values of the stone color for color segmentation.
+        _upper_gray (np.ndarray): Upper HSV values of the stone color for color segmentation.
+        _align (rs.align): Realsense alignment object.
+        _other_frame_id (str): ROS TF frame of the standing leg.
+        _camera_frame_id (str): ROS TF frame of the current realsense camera.
+        _listener (TransformListener): A ROS TF frame transformation listener.
+        _point_publisher (Publisher): Publisher for found points to step towards.
+        _marker_publisher (Publisher): Marker publisher for the found points.
+    """
 
     def __init__(self, left_or_right: str) -> None:
-        """Constructor of the stone finder.
-
-        Args:
-            left_or_right (str): whether the class is used to find left or right points
-        """
-        self._width = 640
-        self._height = 480
-        self._dimensions = (self._height, self._width)
-        self._left_or_right = left_or_right
-        self._initialized = False
-
-        if left_or_right == "left":
-            self._other_side = "right"
-        else:
-            self._other_side = "left"
-
+        """Constructor of the stone finder."""
+        self._dimensions = (480, 640)
         self._lower_brown = np.array([0, 0, 77])
         self._upper_brown = np.array([57, 249, 228])
         self._lower_gray = np.array([62, 40, 113])
         self._upper_gray = np.array([174, 151, 219])
+        self._align = rs.align(rs.stream.color)
+        self._last_time_point_found = rospy.Time.now()
+        self._not_found_counter = 0
+        self._left_or_right = left_or_right
 
         self._retrieve_parameters()
 
-        self._current_frame_id = "toes_" + left_or_right + "_aligned"
-        self._other_frame_id = "toes_" + self._other_side + "_aligned"
+        if left_or_right == "left":
+            other_side = "right"
+        else:
+            other_side = "left"
+
+        self._other_frame_id = "toes_" + other_side + "_aligned"
         self._camera_frame_id = "camera_front_" + left_or_right + "_depth_optical_frame"
 
         self._listener = tf.TransformListener()
-        self._publisher = rospy.Publisher(
-            "/march_stone_finder/found_points/" + left_or_right, FootPosition, queue_size=DEFAULT_HISTORY_DEPTH
+        self._point_publisher = rospy.Publisher(
+            "/march_stone_finder/found_points/" + left_or_right, FootPosition, queue_size=1
         )
-        self._marker_publisher = rospy.Publisher(
-            "/camera_" + left_or_right + "/found_points", Marker, queue_size=DEFAULT_HISTORY_DEPTH
-        )
-
-        align_to = rs.stream.color
-        self._align = rs.align(align_to)
+        self._marker_publisher = rospy.Publisher("/camera_" + left_or_right + "/found_points", Marker, queue_size=1)
 
     def _retrieve_parameters(self) -> None:
         """Retrieve parameters from the ros parameter server."""
@@ -77,18 +82,30 @@ class StoneFinder:
         ellipses = self.find_ellipses(contours)
         point = self.find_closest_point(ellipses, pointcloud)
 
-        if point is not None and np.sum(np.abs(point)) > 0.02:
+        if point is not None and np.sum(np.abs(point)) > 0.02:  # check if point is not [0, 0, 0]
             try:
                 displacement = self.compute_displacement(point)
-                publish_point(self._publisher, displacement)
+                publish_point(self._point_publisher, displacement)
 
                 # Visualize in rviz
                 displacement.header.frame_id = self._other_frame_id
                 self._listener.waitForTransform(self._other_frame_id, "world", rospy.Time.now(), rospy.Duration(1.0))
                 displacement = self._listener.transformPoint("world", displacement)
                 publish_point_marker(self._marker_publisher, displacement, "world")
+
+                self._last_time_point_found = rospy.Time.now()
+                self._not_found_counter = 0
+
             except (tf.LookupException, tf.ExtrapolationException) as e:
-                print(e)
+                rospy.logwarn(repr(e))
+        else:
+            time_difference = rospy.Time.now() - self._last_time_point_found
+            if time_difference >= rospy.Duration(5.0):
+                self._not_found_counter += 1
+                self._last_time_point_found = rospy.Time.now()
+                rospy.logwarn(
+                    f"[march_stone_finder] No stones found for {self._left_or_right} leg in last {self._not_found_counter * 5} seconds."
+                )
 
     def preprocess_frames(self, frames: rs.composite_frame) -> Tuple[np.ndarray, np.ndarray]:
         """Align depth and color frames, preprocess, and generate a pointcloud.
@@ -144,10 +161,8 @@ class StoneFinder:
 
             contour_mask = np.zeros(self._dimensions, np.uint8)
             contour_mask = cv2.drawContours(contour_mask, convex_hull, -1, (255, 255, 255), 2)
-
             ellipse_mask = np.zeros(self._dimensions, np.uint8)
             ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, (255, 255, 255), 2)
-
             intersection = cv2.bitwise_and(contour_mask, ellipse_mask)
 
             num_intersection = cv2.countNonZero(intersection)
@@ -204,5 +219,5 @@ class StoneFinder:
                 self._camera_frame_id, self._other_frame_id, rospy.Time.now(), rospy.Duration(1.0)
             )
         except (tf.LookupException, tf.ExtrapolationException) as e:
-            print(e)
+            rospy.logwarn(repr(e))
         return self._listener.transformPoint(self._other_frame_id, found_point)

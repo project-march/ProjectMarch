@@ -37,7 +37,8 @@ def main():
             pipelines[1] = pipe
 
     if pipelines[0] is None or pipelines[1] is None:
-        rospy.signal_shutdown("Was not able to find two realsense cameras")
+        rospy.logerr("[march_stone_finder] Was not able to find 2 realsense cameras.")
+        rospy.signal_shutdown("Could not find 2 realsense cameras.")
 
     left_stone_finder = StoneFinder("left")
     right_stone_finder = StoneFinder("right")
