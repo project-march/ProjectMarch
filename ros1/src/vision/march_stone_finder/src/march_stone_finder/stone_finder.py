@@ -102,8 +102,7 @@ class StoneFinder:
             except (tf.LookupException, tf.ExtrapolationException) as e:
                 rospy.logwarn(repr(e))
         else:
-            time_difference = rospy.Time.now() - self._last_time_point_found
-            if time_difference >= rospy.Duration(5.0):
+            if rospy.Time.now() - self._last_time_point_found >= rospy.Duration(5.0):
                 self._not_found_counter += 1
                 self._last_time_point_found = rospy.Time.now()
                 rospy.logwarn(
