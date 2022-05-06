@@ -175,6 +175,7 @@ class ConnectionManager:
 
         Args:
             timeout (float): Timeout for the wait duration.
+
         Returns:
             str: Decoded message from the wireless IPD.
         """
@@ -253,7 +254,8 @@ class ConnectionManager:
 
         After a connection has been established, `_wait_for_request()` is called and receives any messages in
         a loop. If any errors are thrown in `_wait_for_request()`, they are caught here and the connection
-        is reset. Afterwards `_wait_for_request()` is called again."""
+        is reset. Afterwards `_wait_for_request()` is called again.
+        """
         while True:
             try:
                 self._connection, _ = self._socket.accept()
