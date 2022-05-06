@@ -115,6 +115,7 @@ class StoneFinder:
 
         Args;
             frames (rs.composite_frame): A color and depth frame from a realsense pipeline.
+            
         Returns:
             Tuple[np.ndarray, np.ndarray]: The preprocessed color image and the pointcloud.
         """
@@ -137,6 +138,7 @@ class StoneFinder:
 
         Args:
             color_hsv_image (np.ndarray): The color image in HSV color space.
+
         Returns:
             np.ndarray: The color segmented image in black and white.
         """
@@ -151,6 +153,7 @@ class StoneFinder:
 
         Args:
             contours (List[np.ndarray]): A list of contours in the image.
+
         Returns:
             List[cv2.ellipse]: A list of ellipses in the image.
         """
@@ -187,6 +190,7 @@ class StoneFinder:
         Args:
             ellipses ([cv2.ellipse]): A list of found ellipses.
             pointcloud (np.ndarray): The source point cloud.
+
         Returns:
             Optional[np.ndarray]: The closest center if one exists, else None.
         """
@@ -212,6 +216,7 @@ class StoneFinder:
 
         Args:
             point (np.ndarray): A depth point to step towards.
+
         Returns:
             PointStamped: The depth point in the other leg frame.
         """
