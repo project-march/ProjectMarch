@@ -124,7 +124,6 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         """
         if stop:
             self.logger.info("Stopping dynamic gait.")
-            self.foot_location = FootPosition(processed_point=Point(x=0.0, y=0.0, z=0.44699999999999995), duration=1.5)
         else:
             if self._use_position_queue:
                 if not self.position_queue.empty():
@@ -137,6 +136,8 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                 try:
                     self.foot_location = self._get_foot_location(self.subgait_id)
                     stop = self._check_msg_time(self.foot_location)
+                    if stop:
+                        return None
                 except AttributeError:
                     self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
                     self._end = True
