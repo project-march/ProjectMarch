@@ -73,7 +73,7 @@ class Pose:
         rot_foot1 (float): angle between flat ground and the foot on the stance leg.
     """
 
-    def __init__(self, all_joint_names: List[str], pose: List[float] = None) -> None:
+    def __init__(self, all_joint_names: List[str] = JOINT_NAMES, pose: List[float] = None) -> None:
         self.all_joint_names = all_joint_names
         if pose is None:
             angle_ankle, angle_hip, angle_knee = self.leg_length_angles(self.max_leg_length)
@@ -257,6 +257,13 @@ class Pose:
         pose = Pose(self.all_joint_names)
         pose.fe_ankle1 = MAX_ANKLE_FLEXION
         return np.linalg.norm(pose.pos_toes1 - pose.pos_knee1)
+
+    @property
+    def ankle_limit_toes_hip_distance(self) -> float:
+        """Returns the distance between hip and toes when the ankle is in max dorsi flexion."""
+        pose = Pose(self.all_joint_names)
+        pose.fe_ankle1 = MAX_ANKLE_FLEXION
+        return np.linalg.norm(pose.pos_toes1 - pose.pos_hip)
 
     def leg_length_angles(self, leg_length: float) -> Tuple[float]:
         """Returns the required angles in the triangle between ankle, hip and knee to meet the leg_length.
@@ -557,6 +564,9 @@ class Pose:
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
+        # Reset:
+        self.reset_to_zero_pose()
+
         # Set parameters:
         self.ankle_x = ankle_x
         self.ankle_y = ankle_y
