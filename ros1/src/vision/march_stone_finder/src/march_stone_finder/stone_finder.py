@@ -66,10 +66,9 @@ class StoneFinder:
 
     def _retrieve_parameters(self) -> None:
         """Retrieve parameters from the ros parameter server."""
-        self.minimum_connected_component_size = rospy.get_param("~minimum_connected_component_size")
-        self.connectivity = rospy.get_param("~connectivity")
         self.ellipse_similarity_threshold = rospy.get_param("~ellipse_similarity_threshold")
         self.minimum_ellipse_size = rospy.get_param("~minimum_ellipse_size")
+        self.overlap_distance = rospy.get_param("~overlap_distance")
 
     def find_points(self, frames: rs.composite_frame) -> None:
         """Find the closest ellipse center point in realsense color and depth frames.
@@ -87,6 +86,12 @@ class StoneFinder:
         point = self.find_closest_point(ellipses, pointcloud)
 
         if point is not None and np.sum(np.abs(point)) > 0.02:  # check if point is not [0, 0, 0]
+
+            if self._left_or_right == "left" and point[0] > self.overlap_distance:
+                return
+            if self._left_or_right == "right" and point[0] < -self.overlap_distance:
+                return
+
             try:
                 displacement = self.compute_displacement(point)
                 publish_point(self._point_publisher, displacement)
@@ -99,16 +104,17 @@ class StoneFinder:
 
                 self._last_time_point_found = rospy.Time.now()
                 self._not_found_counter = 0
+                return
 
             except (tf.LookupException, tf.ExtrapolationException, tf2.TransformException) as e:
                 rospy.logwarn(f"[march_stone_finder] Error {type(e).__name__} was raised.")
-        else:
-            if rospy.Time.now() - self._last_time_point_found >= rospy.Duration(5.0):
-                self._not_found_counter += 1
-                self._last_time_point_found = rospy.Time.now()
-                rospy.logwarn(
-                    f"[march_stone_finder] No stones found for {self._left_or_right} leg in last {self._not_found_counter * 5} seconds."
-                )
+
+        if rospy.Time.now() - self._last_time_point_found >= rospy.Duration(5.0):
+            self._not_found_counter += 1
+            self._last_time_point_found = rospy.Time.now()
+            rospy.logwarn(
+                f"[march_stone_finder] No stones found for {self._left_or_right} leg in last {self._not_found_counter * 5} seconds."
+            )
 
     def preprocess_frames(self, frames: rs.composite_frame) -> Tuple[np.ndarray, np.ndarray]:
         """Align depth and color frames, preprocess, and generate a pointcloud.
@@ -227,5 +233,5 @@ class StoneFinder:
                 self._camera_frame_id, self._other_frame_id, rospy.Time.now(), rospy.Duration(1.0)
             )
         except (tf.LookupException, tf.ExtrapolationException, tf2.TransformException) as e:
-            rospy.logwarn(f"[march_stone_finder] Error {type(e).__name__} was raised.")
+            raise e
         return self._listener.transformPoint(self._other_frame_id, found_point)
