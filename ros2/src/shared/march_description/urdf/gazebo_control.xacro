@@ -14,74 +14,90 @@
       <!--      </hardware>-->
 
       <joint name="left_ankle">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="left_hip_aa">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="left_hip_fe">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="left_knee">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="right_ankle">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="right_hip_aa">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="right_hip_fe">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
 
       <joint name="right_knee">
-        <command_interface name="position">
-          <param name="min">-10</param>
-          <param name="max">10</param>
+        <command_interface name="effort">
+          <param name="min">-1000</param>
+          <param name="max">1000</param>
         </command_interface>
         <state_interface name="position"/>
+        <state_interface name="effort"/>
+        <state_interface name="velocity"/>
       </joint>
 
     </ros2_control>

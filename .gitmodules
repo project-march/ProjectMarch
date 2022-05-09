@@ -26,3 +26,4 @@
 [submodule "ros2/src/libraries/control/ros2_controllers"]
 	path = ros2/src/libraries/control/ros2_controllers
 	url = git@gitlab.com:project-march/libraries/control/ros2_controllers.git
+	branch = mergify/bp/foxy/pr-225
