@@ -3,6 +3,7 @@
 import os
 import yaml
 
+from copy import copy
 from queue import Queue
 from typing import Dict, Optional
 from ament_index_python import get_package_share_path
@@ -14,7 +15,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_c
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import WrongStartPositionError
 
@@ -53,14 +53,14 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             DEFAULT_HISTORY_DEPTH,
         )
 
-        self._end_position_right = get_position_from_yaml("stand")
+        self._end_position_right = copy(self.home_stand_position_all_joints)
         self._end_position_right["right_hip_aa"] = 0
         self._end_position_right["left_hip_aa"] = 0
         self._end_position_right["right_hip_fe"] = 0
         self._end_position_right["left_hip_fe"] = 0
         self._end_position_right["right_knee"] = 1
 
-        self._end_position_left = get_position_from_yaml("stand")
+        self._end_position_left = copy(self.home_stand_position_all_joints)
         self._end_position_left["right_hip_aa"] = 0
         self._end_position_left["left_hip_aa"] = 0
         self._end_position_left["right_hip_fe"] = 0

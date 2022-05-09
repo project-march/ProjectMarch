@@ -1,5 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
+from copy import copy
 from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
@@ -74,10 +75,10 @@ class DynamicSetpointGait(GaitInterface):
         self.logger = Logger(self.gait_selection, __class__.__name__)
         self._trajectory_failed = False
 
-        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
-        self.start_position_all_joints = get_position_from_yaml("stand")
-        self.home_stand_position_actuating_joints = self.start_position_actuating_joints
-        self.home_stand_position_all_joints = self.start_position_all_joints
+        self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
+        self.home_stand_position_all_joints = get_position_from_yaml("stand")
+        self.start_position_actuating_joints = copy(self.home_stand_position_actuating_joints)
+        self.start_position_all_joints = copy(self.home_stand_position_all_joints)
 
         self._reset()
         self.joint_names = get_joint_names_from_urdf()
