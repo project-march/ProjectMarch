@@ -9,6 +9,7 @@ from typing import List, Optional, Tuple
 from march_shared_msgs.msg import FootPosition
 from geometry_msgs.msg import PointStamped
 import tf
+import tf2_ros as tf2
 from visualization_msgs.msg import Marker
 
 
@@ -99,8 +100,8 @@ class StoneFinder:
                 self._last_time_point_found = rospy.Time.now()
                 self._not_found_counter = 0
 
-            except (tf.LookupException, tf.ExtrapolationException) as e:
-                rospy.logwarn(repr(e))
+            except (tf.LookupException, tf.ExtrapolationException, tf2.TransformException) as e:
+                rospy.logwarn(f"[march_stone_finder] Error {type(e).__name__} was raised.")
         else:
             if rospy.Time.now() - self._last_time_point_found >= rospy.Duration(5.0):
                 self._not_found_counter += 1
@@ -225,6 +226,6 @@ class StoneFinder:
             self._listener.waitForTransform(
                 self._camera_frame_id, self._other_frame_id, rospy.Time.now(), rospy.Duration(1.0)
             )
-        except (tf.LookupException, tf.ExtrapolationException) as e:
-            rospy.logwarn(repr(e))
+        except (tf.LookupException, tf.ExtrapolationException, tf2.TransformException) as e:
+            rospy.logwarn(f"[march_stone_finder] Error {type(e).__name__} was raised.")
         return self._listener.transformPoint(self._other_frame_id, found_point)
