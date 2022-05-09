@@ -19,8 +19,21 @@ joint_trajectory_controller:
       - right_hip_aa
       - right_hip_fe
       - right_knee
+    gains:
+      left_ankle: { p: 0.0, i: 0.0, d: 10.0, i_clamp: 100.0, publish_state: true, antiwindup: true }
+      left_hip_aa: { p: 0.0, i: 0.0, d: 10.0, i_clamp: 100.0, publish_state: true,
+                     antiwindup: true }
+      left_hip_fe: { p: -60.0, i: 0.0, d: 5.0, i_clamp: 100.0, publish_state: true, antiwindup: true }
+      left_knee: { p: 0.0, i: 0.0, d: 10.0, i_clamp: 100.0, publish_state: true, antiwindup: true }
+      right_ankle: { p: .0, i: 0.0, d: 10.0, i_clamp: 100.0, publish_state: true, antiwindup: true }
+      right_hip_aa: { p: .0, i: 0.0, d: 10.0, i_clamp: 100.0, publish_state: true,
+                      antiwindup: true }
+      right_hip_fe: { p: 0.0, i: 0.0, d: 5.0, i_clamp: 100.0, publish_state: true, antiwindup: true }
+      right_knee: { p: 0.0, i: 0.0, d: 10.0, i_clamp: 100.0, publish_state: true, antiwindup: true }
     interface_name: position
     command_interfaces:
-      - position
+#      - position
+      - effort
     state_interfaces:
       - position
+      - velocity
