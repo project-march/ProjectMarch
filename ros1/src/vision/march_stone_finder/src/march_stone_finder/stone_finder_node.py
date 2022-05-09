@@ -29,7 +29,6 @@ def main():
         cfg.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 15)
         cfg.enable_device(dev.get_info(rs.camera_info.serial_number))
         pipe.start(cfg)
-        pipelines.append(pipe)
 
         if dev.get_info(rs.camera_info.serial_number) == "944622074337":
             pipelines[0] = pipe
