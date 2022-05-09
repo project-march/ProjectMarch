@@ -130,6 +130,7 @@ class GaitSelection(Node):
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
             self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
+            self.amount_of_steps = self.get_parameter("amount_of_steps").get_parameter_value().integer_value
 
         except ParameterNotDeclaredException:
             self.logger.error(
