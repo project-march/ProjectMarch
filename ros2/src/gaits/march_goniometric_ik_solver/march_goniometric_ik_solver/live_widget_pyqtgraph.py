@@ -11,7 +11,7 @@ DEFAULT_HIP_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
 
 X_MIN = 0.0
-X_MAX = 0.6
+X_MAX = 1.0
 Y_MIN = -0.3
 Y_MAX = 0.3
 
