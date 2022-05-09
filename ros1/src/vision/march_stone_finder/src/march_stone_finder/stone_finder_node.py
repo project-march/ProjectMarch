@@ -15,7 +15,7 @@ def callback(config, _):
 
 def main():
     """Connect to realsense devices and run stone finding algorithm on the received frames."""
-    rospy.init_node("march_stone_finder", anonymous=True)
+    rospy.init_node("march_stone_finder")
     Server(parametersConfig, callback)
 
     context = rs.context()
@@ -31,30 +31,30 @@ def main():
         pipe.start(cfg)
         pipelines.append(pipe)
 
-        if dev.get_info(rs.camera_info.serial_number) == "944622074337":
-            pipelines[0] = pipe
-        elif dev.get_info(rs.camera_info.serial_number) == "944622071535":
-            pipelines[1] = pipe
+        # if dev.get_info(rs.camera_info.serial_number) == "944622074337":
+        pipelines[0] = pipe
+        # elif dev.get_info(rs.camera_info.serial_number) == "944622071535":
+        #     pipelines[1] = pipe
 
-    if pipelines[0] is None or pipelines[1] is None:
-        rospy.logerr("[march_stone_finder] Was not able to find 2 realsense cameras.")
-        rospy.signal_shutdown("Could not find 2 realsense cameras.")
+    # if pipelines[0] is None or pipelines[1] is None:
+    #     rospy.logerr("[march_stone_finder] Was not able to find 2 realsense cameras.")
+    #     rospy.signal_shutdown("Could not find 2 realsense cameras.")
 
     left_stone_finder = StoneFinder("left")
-    right_stone_finder = StoneFinder("right")
+    # right_stone_finder = StoneFinder("right")
 
     def left_callback(_):
         while not rospy.is_shutdown():
             left_frame = pipelines[0].wait_for_frames()
             left_stone_finder.find_points(left_frame)
 
-    def right_callback(_):
-        while not rospy.is_shutdown():
-            right_frame = pipelines[1].wait_for_frames()
-            right_stone_finder.find_points(right_frame)
+    # def right_callback(_):
+    #     while not rospy.is_shutdown():
+    #         right_frame = pipelines[1].wait_for_frames()
+    #         right_stone_finder.find_points(right_frame)
 
-    rospy.Timer(rospy.Duration(0.010), left_callback, True)
-    rospy.Timer(rospy.Duration(0.010), right_callback, True)
+    rospy.Timer(rospy.Duration(1.0), left_callback, oneshot=True)
+    # rospy.Timer(rospy.Duration(1.0), right_callback, oneshot=True)
 
     rospy.spin()
 

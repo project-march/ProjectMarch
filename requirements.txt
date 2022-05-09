@@ -9,3 +9,5 @@ Flask==2.0.3
 scipy==1.7.1
 parameterized==0.8.1 
 numpy==1.21.2
+pyrealsense2==2.50.0.3812
+opencv-python==4.5.5.64

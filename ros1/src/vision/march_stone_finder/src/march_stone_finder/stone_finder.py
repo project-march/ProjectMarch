@@ -39,10 +39,10 @@ class StoneFinder:
     def __init__(self, left_or_right: str) -> None:
         """Constructor of the stone finder."""
         self._dimensions = (480, 640)
-        self._lower_brown = np.array([0, 0, 77])
-        self._upper_brown = np.array([57, 249, 228])
-        self._lower_gray = np.array([62, 40, 113])
-        self._upper_gray = np.array([174, 151, 219])
+        self._lower_HSV_plate = np.array([0, 0, 77])
+        self._upper_HSV_plate = np.array([57, 249, 228])
+        self._lower_HSV_stone = np.array([62, 40, 113])
+        self._upper_HSV_stone = np.array([174, 151, 219])
         self._align = rs.align(rs.stream.color)
         self._last_time_point_found = rospy.Time.now()
         self._not_found_counter = 0
@@ -50,18 +50,13 @@ class StoneFinder:
 
         self._retrieve_parameters()
 
-        if left_or_right == "left":
-            other_side = "right"
-        else:
-            other_side = "left"
+        other_side = "right" if left_or_right == "left" else "left"
 
         self._other_frame_id = "toes_" + other_side + "_aligned"
         self._camera_frame_id = "camera_front_" + left_or_right + "_depth_optical_frame"
 
         self._listener = tf.TransformListener()
-        self._point_publisher = rospy.Publisher(
-            "/march_stone_finder/found_points/" + left_or_right, FootPosition, queue_size=1
-        )
+        self._point_publisher = rospy.Publisher("/march/foot_position/" + left_or_right, FootPosition, queue_size=1)
         self._marker_publisher = rospy.Publisher("/camera_" + left_or_right + "/found_points", Marker, queue_size=1)
 
     def _retrieve_parameters(self) -> None:
@@ -95,12 +90,7 @@ class StoneFinder:
             try:
                 displacement = self.compute_displacement(point)
                 publish_point(self._point_publisher, displacement)
-
-                # Visualize in rviz
-                displacement.header.frame_id = self._other_frame_id
-                self._listener.waitForTransform(self._other_frame_id, "world", rospy.Time.now(), rospy.Duration(1.0))
-                displacement = self._listener.transformPoint("world", displacement)
-                publish_point_marker(self._marker_publisher, displacement, "world")
+                publish_point_marker(self._marker_publisher, displacement)
 
                 self._last_time_point_found = rospy.Time.now()
                 self._not_found_counter = 0
@@ -148,8 +138,8 @@ class StoneFinder:
         Returns:
             np.ndarray: The color segmented image in black and white.
         """
-        mask_gray = cv2.inRange(color_hsv_image, self._lower_gray, self._upper_gray)
-        mask_wood = cv2.inRange(color_hsv_image, self._lower_brown, self._upper_brown)
+        mask_gray = cv2.inRange(color_hsv_image, self._lower_HSV_stone, self._upper_HSV_stone)
+        mask_wood = cv2.inRange(color_hsv_image, self._lower_HSV_plate, self._upper_HSV_plate)
         white = np.full(self._dimensions, 255, np.uint8)
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         return cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
@@ -161,20 +151,26 @@ class StoneFinder:
             contours (List[np.ndarray]): A list of contours in the image.
 
         Returns:
-            List[cv2.ellipse]: A list of ellipses in the image.
+            List[cv2.ellipse]: A list of ellipses in the image.s
         """
         ellipses = []
         for contour in contours:
+
+            #  A contour requires at least 5 points to be able to fit an ellipse with cv2
             if len(contour) < 5:
                 continue
 
             convex_hull = cv2.convexHull(contour)
             ellipse = cv2.fitEllipse(contour)
 
-            contour_mask = np.zeros(self._dimensions, np.uint8)
-            contour_mask = cv2.drawContours(contour_mask, convex_hull, -1, (255, 255, 255), 2)
-            ellipse_mask = np.zeros(self._dimensions, np.uint8)
-            ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, (255, 255, 255), 2)
+            try:
+                contour_mask = np.zeros(self._dimensions, np.uint8)
+                contour_mask = cv2.drawContours(contour_mask, convex_hull, -1, 255, 2)
+                ellipse_mask = np.zeros(self._dimensions, np.uint8)
+                ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, 255, 2)
+            except cv2.error:
+                continue
+
             intersection = cv2.bitwise_and(contour_mask, ellipse_mask)
 
             num_intersection = cv2.countNonZero(intersection)
@@ -201,19 +197,19 @@ class StoneFinder:
             Optional[np.ndarray]: The closest center if one exists, else None.
         """
         distances = []
-        depthpoints = []
+        depth_points = []
         for ellipse in ellipses:
             centroid = ellipse[0]
             x_pixel = int(centroid[0])
             y_pixel = int(centroid[1])
 
             if y_pixel >= 0 and x_pixel >= 0 and y_pixel < pointcloud.shape[0] and x_pixel < pointcloud.shape[1]:
-                depthpoint = pointcloud[y_pixel][x_pixel]
-                distances += [np.sqrt(np.sum(np.square(depthpoint)))]
-                depthpoints += [depthpoint]
+                depth_point = pointcloud[y_pixel][x_pixel]
+                distances += [np.linalg.norm(depth_point)]
+                depth_points += [depth_point]
 
         if len(distances) > 0:
-            return depthpoints[np.argmin(distances)]
+            return depth_points[np.argmin(distances)]
         else:
             return None
 
@@ -232,6 +228,10 @@ class StoneFinder:
             self._listener.waitForTransform(
                 self._camera_frame_id, self._other_frame_id, rospy.Time.now(), rospy.Duration(1.0)
             )
+            displacement = self._listener.transformPoint(self._other_frame_id, found_point)
+            displacement.header.frame_id = self._other_frame_id
+
         except (tf.LookupException, tf.ExtrapolationException, tf2.TransformException) as e:
             raise e
-        return self._listener.transformPoint(self._other_frame_id, found_point)
+
+        return displacement

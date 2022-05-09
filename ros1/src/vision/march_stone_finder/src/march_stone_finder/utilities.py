@@ -34,12 +34,12 @@ def convert_depth_frame_to_pointcloud(depth_image: np.ndarray, camera_intrinsics
     return np.dstack((x, y, z))
 
 
-def publish_point(publisher: Publisher, point: np.ndarray) -> None:
+def publish_point(publisher: Publisher, point: PointStamped) -> None:
     """Publish a displacement which is used for dynamic gait generation.
 
     Args:
         publisher (Publisher): Publisher to publish the message with.
-        point (np.ndarray): Point to publish.
+        point (PointStamped): Point to publish.
     """
     point_msg = FootPosition()
     point_msg.header.stamp = rospy.Time.now()
@@ -49,16 +49,15 @@ def publish_point(publisher: Publisher, point: np.ndarray) -> None:
     publisher.publish(point_msg)
 
 
-def publish_point_marker(publisher: Publisher, point: np.ndarray, frame: str) -> None:
+def publish_point_marker(publisher: Publisher, point: PointStamped) -> None:
     """Publish a visualization marker for the center of an ellipse.
 
     Args:
         publisher (Publisher): Publisher to publish the message with.
-        point (np.ndarray): A point array of size (3,).
-        frame (str): Frame in which the point is published.
+        point (PointStamped): A point array of size (3,).
     """
     marker = Marker()
-    marker.header.frame_id = frame
+    marker.header.frame_id = point.header.frame_id
     marker.header.stamp = rospy.get_rostime()
     marker.ns = "ellipse_center"
     marker.id = 10
@@ -77,9 +76,14 @@ def publish_point_marker(publisher: Publisher, point: np.ndarray, frame: str) ->
     marker.scale.y = 0.02
     marker.scale.z = 0.02
 
-    marker.color.r = 1.0
+    if "left" in point.header.frame_id:
+        marker.color.r = 1.0
+        marker.color.b = 0.0
+    else:
+        marker.color.r = 0.0
+        marker.color.b = 1.0
+
     marker.color.g = 1.0
-    marker.color.b = 0.0
     marker.color.a = 1.0
 
     marker.lifetime = rospy.Duration(0.3)
