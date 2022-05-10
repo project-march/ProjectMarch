@@ -56,7 +56,7 @@ def publish_point_marker(publisher: Publisher, points: List[PointStamped]) -> No
 
     Args:
         publisher (Publisher): Publisher to publish the message with.
-        point (List[PointStamped]): A list with PointStamped messages of ellipse circles.
+        points (List[PointStamped]): A list with PointStamped messages of ellipse circles.
     """
     marker_array = MarkerArray()
 
