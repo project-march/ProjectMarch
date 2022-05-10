@@ -18,9 +18,16 @@ from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import WrongStartPositionError
 
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPosition, GaitInstruction
 from geometry_msgs.msg import Point
 from std_msgs.msg import Header, String
+
+PREDETERMINED_FOOT_LOCATIONS = {
+    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.3, y=0.0, z=0.44699999999999995)),
+    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.4, y=0.0, z=0.44699999999999995)),
+    "large_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.7, y=0.0, z=0.44699999999999995)),
+    "large_wide": FootPosition(duration=1.5, processed_point=Point(x=0.8, y=0.0, z=0.44699999999999995)),
+}
 
 
 class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
@@ -35,6 +42,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         super().__init__(gait_selection_node)
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
+        self._use_predetermined_foot_location = False
 
         self.update_parameter()
         if self._use_position_queue:
@@ -50,6 +58,12 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             String,
             "/march/step_and_hold/start_side",
             self._set_start_subgait_id,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.gait_selection.create_subscription(
+            String,
+            "/march/step_and_hold/step_size",
+            self._predetermined_foot_location_callback,
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -132,25 +146,29 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         if stop:
             self.logger.info("Stopping dynamic gait.")
         else:
-            if self._use_position_queue:
-                if not self.position_queue.empty():
-                    self.foot_location = self._get_foot_location_from_queue()
-                else:
-                    self.logger.warn("Queue is empty. Resetting queue.")
-                    self._fill_queue()
-                    return None
+            if self._use_predetermined_foot_location:
+                self.foot_location = self._predetermined_foot_location
+                self._use_predetermined_foot_location = False
             else:
-                try:
-                    self.foot_location = self._get_foot_location(self.subgait_id)
-                    stop = self._check_msg_time(self.foot_location)
-                    if stop:
+                if self._use_position_queue:
+                    if not self.position_queue.empty():
+                        self.foot_location = self._get_foot_location_from_queue()
+                    else:
+                        self.logger.warn("Queue is empty. Resetting queue.")
+                        self._fill_queue()
                         return None
-                except AttributeError:
-                    self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
-                    self._end = True
-                    return None
+                else:
+                    try:
+                        self.foot_location = self._get_foot_location(self.subgait_id)
+                        stop = self._check_msg_time(self.foot_location)
+                        if stop:
+                            return None
+                    except AttributeError:
+                        self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                        self._end = True
+                        return None
 
-            self.logger.warn(
+            self.logger.info(
                 f"Stepping to location ({self.foot_location.processed_point.x}, "
                 f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
@@ -222,3 +240,23 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                 raise WrongStartPositionError(self.home_stand_position_all_joints, self.start_position_all_joints)
         except WrongStartPositionError as e:
             self.logger.warn(f"Can only change start side in home stand position. {e.msg}")
+
+    def _predetermined_foot_location_callback(self, msg: String) -> None:
+        self._use_predetermined_foot_location = True
+        self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
+        self.logger.info(f"Stepping to stone {msg.data}")
+
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Reset start position to home stand after force unknown.
+
+        Args:
+            msg (GaitInstruction): message containing a gait_instruction from the IPD
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self.start_position_all_joints = self.home_stand_position_all_joints
+            self.start_position_actuating_joints = {
+                name: self.start_position_all_joints[name] for name in self.joint_names
+            }
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
+            self._use_predetermined_foot_location = False
