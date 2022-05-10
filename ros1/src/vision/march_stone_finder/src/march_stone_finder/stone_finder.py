@@ -5,7 +5,7 @@ import numpy as np
 import pyrealsense2 as rs
 from .utilities import convert_depth_frame_to_pointcloud, publish_point, to_point_stamped, publish_point_marker
 import cv2
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 from march_shared_msgs.msg import FootPosition
 from geometry_msgs.msg import PointStamped
 import tf
@@ -134,8 +134,7 @@ class StoneFinder:
             )
 
     def _preprocess_frames(self, frames: rs.composite_frame) -> Tuple[np.ndarray, np.ndarray]:
-        """Align depth and color frames, preprocess with realsense filters and a Gaussian blur,
-        and generate and visualize a pointcloud.
+        """Align frames, preprocess with filters and a Gaussian blur, and generate and visualize the pointcloud.
 
         Args;
             frames (rs.composite_frame): A color and depth frame from a realsense pipeline.
