@@ -6,6 +6,8 @@ from rospy import Publisher
 from march_shared_msgs.msg import FootPosition
 from geometry_msgs.msg import PointStamped
 from visualization_msgs.msg import Marker
+from visualization_msgs.msg import MarkerArray
+from typing import List
 from pyrealsense2 import intrinsics
 
 
@@ -49,46 +51,55 @@ def publish_point(publisher: Publisher, point: PointStamped) -> None:
     publisher.publish(point_msg)
 
 
-def publish_point_marker(publisher: Publisher, point: PointStamped) -> None:
-    """Publish a visualization marker for the center of an ellipse.
+def publish_point_marker(publisher: Publisher, points: List[PointStamped]) -> None:
+    """Publish a visualization marker array with all found ellipse centers.
 
     Args:
         publisher (Publisher): Publisher to publish the message with.
-        point (PointStamped): A point array of size (3,).
+        point (List[PointStamped]): A list with PointStamped messages of ellipse circles.
     """
-    marker = Marker()
-    marker.header.frame_id = point.header.frame_id
-    marker.header.stamp = rospy.get_rostime()
-    marker.ns = "ellipse_center"
-    marker.id = 10
-    marker.type = 1
-    marker.action = 0
+    marker_array = MarkerArray()
 
-    marker.pose.position.x = point.point.x
-    marker.pose.position.y = point.point.y
-    marker.pose.position.z = point.point.z
-    marker.pose.orientation.x = 0
-    marker.pose.orientation.y = 0
-    marker.pose.orientation.z = 0
-    marker.pose.orientation.w = 1.0
+    for i, point_stamped in enumerate(points):
+        marker = Marker()
+        marker.header.frame_id = point_stamped.header.frame_id
+        marker.header.stamp = rospy.get_rostime()
+        marker.ns = "ellipse_center"
+        marker.id = i
+        marker.type = 1
+        marker.action = 0
 
-    marker.scale.x = 0.02
-    marker.scale.y = 0.02
-    marker.scale.z = 0.02
+        marker.pose.position.x = point_stamped.point.x
+        marker.pose.position.y = point_stamped.point.y
+        marker.pose.position.z = point_stamped.point.z
+        marker.pose.orientation.x = 0
+        marker.pose.orientation.y = 0
+        marker.pose.orientation.z = 0
+        marker.pose.orientation.w = 1.0
 
-    if "left" in point.header.frame_id:
-        marker.color.r = 1.0
-        marker.color.b = 0.0
-    else:
-        marker.color.r = 0.0
-        marker.color.b = 1.0
+        marker.scale.x = 0.02
+        marker.scale.y = 0.02
+        marker.scale.z = 0.02
 
-    marker.color.g = 1.0
-    marker.color.a = 1.0
+        if "left" in point_stamped.header.frame_id and i == 0:
+            marker.color.r = 1.0
+            marker.color.g = 0.5
+            marker.color.b = 0.0
+        elif "right" in point_stamped.header.frame_id and i == 0:
+            marker.color.r = 0.0
+            marker.color.g = 1.0
+            marker.color.b = 1.0
+        elif i > 0:
+            marker.color.r = 1.0
+            marker.color.g = 1.0
+            marker.color.b = 1.0
 
-    marker.lifetime = rospy.Duration(0.3)
+        marker.color.a = 1.0
+        marker.lifetime = rospy.Duration(0.3)
 
-    publisher.publish(marker)
+        marker_array.markers.append(marker)
+
+    publisher.publish(marker_array)
 
 
 def to_point_stamped(point: np.ndarray) -> PointStamped:

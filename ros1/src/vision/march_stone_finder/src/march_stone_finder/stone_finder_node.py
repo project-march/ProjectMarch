@@ -22,6 +22,7 @@ def main():
     context = rs.context()
     pipelines = [None, None]
     serial_numbers = ["944622074337", "944622071535"]
+    serial_numbers = ["109122070820"]
 
     # Perform hardware resets on cameras
     while True:
@@ -67,7 +68,7 @@ def main():
             right_stone_finder.find_points(right_frame)
 
     rospy.Timer(rospy.Duration(1.0), left_callback, oneshot=True)
-    rospy.Timer(rospy.Duration(1.0), right_callback, oneshot=True)
+    # rospy.Timer(rospy.Duration(1.0), right_callback, oneshot=True)
 
     rospy.spin()
 
