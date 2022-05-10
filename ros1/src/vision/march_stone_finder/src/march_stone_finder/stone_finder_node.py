@@ -1,6 +1,5 @@
 """Author: Tuhin Das, MVII."""
 
-from cv2 import trace
 import rospy
 import time
 from .stone_finder import StoneFinder
