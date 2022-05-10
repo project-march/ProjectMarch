@@ -1,6 +1,8 @@
 """Author: Tuhin Das, MVII."""
 
+from cv2 import trace
 import rospy
+import time
 from .stone_finder import StoneFinder
 import pyrealsense2 as rs
 from dynamic_reconfigure.server import Server
@@ -20,24 +22,37 @@ def main():
 
     context = rs.context()
     pipelines = [None, None]
+    serial_numbers = ["944622074337", "944622071535"]
 
-    for dev in context.query_devices():
-        dev.hardware_reset()
-        pipe = rs.pipeline(context)
-        cfg = rs.config()
-        cfg.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 15)
-        cfg.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 15)
-        cfg.enable_device(dev.get_info(rs.camera_info.serial_number))
-        pipe.start(cfg)
+    # Perform hardware resets on cameras
+    while True:
+        try:
+            for dev in context.query_devices():
+                dev.hardware_reset()
+        except RuntimeError as e:
+            rospy.logwarn(f"[march_stone_finder] Could not perform hardware reset. ({e}) Retrying...")
+            continue
+        break
 
-        if dev.get_info(rs.camera_info.serial_number) == "944622074337":
-            pipelines[0] = pipe
-        elif dev.get_info(rs.camera_info.serial_number) == "944622071535":
-            pipelines[1] = pipe
+    # Start frame pipelines for left and right cameras
+    for index, serial in enumerate(serial_numbers):
+        pipe = rs.pipeline()
+        config = rs.config()
+        while True:
+            side = "left" if index == 0 else "right"
+            try:
+                config.enable_device(serial)
+                config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 15)
+                config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 15)
+                pipe.start(config)
+            except RuntimeError as e:
+                rospy.logwarn(f"[march_stone_finder] Error while initializing {side} RealSense ({e})")
+                time.sleep(1)
+                continue
 
-    if pipelines[0] is None or pipelines[1] is None:
-        rospy.logerr("[march_stone_finder] Was not able to find 2 realsense cameras.")
-        rospy.signal_shutdown("Could not find 2 realsense cameras.")
+            rospy.loginfo(f"[march_stone_finder] \033[1;36m{side} RealSense connected ({serial}) \033[0m")
+            pipelines[index] = pipe
+            break
 
     left_stone_finder = StoneFinder("left")
     right_stone_finder = StoneFinder("right")
