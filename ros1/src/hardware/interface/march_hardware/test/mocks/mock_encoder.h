@@ -6,8 +6,8 @@
 
 class MockEncoder : public march::Encoder {
 public:
-    explicit MockEncoder(size_t resolution)
-        : Encoder(resolution, march::MotorControllerType::IMotionCube)
+    explicit MockEncoder(size_t counts_per_rotation)
+        : Encoder(counts_per_rotation, march::MotorControllerType::IMotionCube)
     {
     }
 
