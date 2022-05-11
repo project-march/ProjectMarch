@@ -132,10 +132,10 @@ void FootPositionFinder::readParameters(
     }
 
     // Initialize all variables as zero:
-    start_point_ = last_displacement_ = previous_start_point_ = ORIGIN;
+    last_displacement_ = previous_start_point_ = start_point_ = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
 
     desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, -(float)(switch_factor_ * foot_gap_),
+        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
 
     ROS_INFO("Parameters updated in %s foot position finder",
