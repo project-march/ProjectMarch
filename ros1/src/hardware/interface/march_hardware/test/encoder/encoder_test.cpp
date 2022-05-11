@@ -20,21 +20,21 @@ using testing::Return;
 class EncoderTest : public testing::Test {
 protected:
     const uint16_t slave_index = 1;
-    const size_t resolution = 12;
+    const size_t counts_per_rotation = 1 << 12;
 };
 
-TEST_F(EncoderTest, ResolutionBelowRange)
+TEST_F(EncoderTest, CountsPerRotationBelowRange)
 {
-    ASSERT_THROW(MockEncoder(0), march::error::HardwareException);
+    ASSERT_THROW(MockEncoder((size_t)1 << 0), march::error::HardwareException);
 }
 
-TEST_F(EncoderTest, ResolutionAboveRange)
+TEST_F(EncoderTest, CountsPerRotationAboveRange)
 {
-    ASSERT_THROW(MockEncoder(50), march::error::HardwareException);
+    ASSERT_THROW(MockEncoder((size_t)1 << 50), march::error::HardwareException);
 }
 
 TEST_F(EncoderTest, CorrectTotalPositions)
 {
-    MockEncoder encoder(this->resolution);
-    ASSERT_EQ(std::pow(2, this->resolution), encoder.getTotalPositions());
+    MockEncoder encoder(this->counts_per_rotation);
+    ASSERT_EQ(counts_per_rotation, encoder.getTotalPositions());
 }
