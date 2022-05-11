@@ -27,9 +27,16 @@ public:
             && lhs.object_name_ == rhs.object_name_;
     }
 
+    /** @brief Override non-equality operator */
+    friend bool operator!=(
+        const MissingKeyException& lhs, const MissingKeyException& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
 private:
-    std::string& key_name_;
-    std::string& object_name_;
+    std::string key_name_;
+    std::string object_name_;
 
     static std::string createDescription(
         const std::string& key_name, const std::string& object_name)

@@ -136,7 +136,9 @@ public:
         const march::SdoInterfacePtr& sdo_interface) const;
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
+    static const std::vector<std::string> OLD_INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
+    static const std::vector<std::string> OLD_ABSOLUTE_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
     static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
     static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
