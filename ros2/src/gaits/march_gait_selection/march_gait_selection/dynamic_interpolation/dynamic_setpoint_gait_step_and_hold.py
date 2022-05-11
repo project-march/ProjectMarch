@@ -23,10 +23,10 @@ from geometry_msgs.msg import Point
 from std_msgs.msg import Header, String
 
 PREDETERMINED_FOOT_LOCATIONS = {
-    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.3, y=0.0, z=0.44699999999999995)),
-    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.4, y=0.0, z=0.44699999999999995)),
-    "large_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.7, y=0.0, z=0.44699999999999995)),
-    "large_wide": FootPosition(duration=1.5, processed_point=Point(x=0.8, y=0.0, z=0.44699999999999995)),
+    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.45, y=0.0, z=0.44699999999999995)),
+    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.0, z=0.44699999999999995)),
+    "large_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.65, y=0.0, z=0.44699999999999995)),
+    "large_wide": FootPosition(duration=1.5, processed_point=Point(x=0.75, y=0.0, z=0.44699999999999995)),
 }
 
 
@@ -126,7 +126,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             end_position,
             start_position,
             subgait_id,
-            self.joint_names,
+            self.actuating_joint_names,
             self.foot_location,
             self.joint_soft_limits,
             start,
@@ -167,11 +167,12 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                         self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
                         self._end = True
                         return None
-
-            self.logger.info(
-                f"Stepping to location ({self.foot_location.processed_point.x}, "
-                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-            )
+            if not stop:
+                self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self.logger.info(
+                    f"Stepping to location ({self.foot_location.processed_point.x}, "
+                    f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+                )
 
         return self._get_first_feasible_trajectory(start, stop)
 
@@ -245,18 +246,3 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         self._use_predetermined_foot_location = True
         self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
         self.logger.info(f"Stepping to stone {msg.data}")
-
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Reset start position to home stand after force unknown.
-
-        Args:
-            msg (GaitInstruction): message containing a gait_instruction from the IPD
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position_all_joints = self.home_stand_position_all_joints
-            self.start_position_actuating_joints = {
-                name: self.start_position_all_joints[name] for name in self.joint_names
-            }
-            self.subgait_id = "right_swing"
-            self._trajectory_failed = False
-            self._use_predetermined_foot_location = False
