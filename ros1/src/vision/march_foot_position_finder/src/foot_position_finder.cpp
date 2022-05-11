@@ -132,7 +132,8 @@ void FootPositionFinder::readParameters(
     }
 
     // Initialize all variables as zero:
-    last_displacement_ = previous_start_point_ = start_point_ = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
+    last_displacement_ = previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
 
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
