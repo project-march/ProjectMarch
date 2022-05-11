@@ -57,8 +57,8 @@ public:
     Direction getDirection() const;
     MotorControllerType getMotorControllerType() const;
 
-    static const size_t MIN_RESOLUTION = 1;
-    static const size_t MAX_RESOLUTION = 32;
+    static const size_t MIN_COUNTS_PER_ROTATION = 1 << 1;
+    static const size_t MAX_COUNTS_PER_ROTATION = 1 << 32;
 
     static constexpr double PI_2 = 2 * M_PI;
 
@@ -72,8 +72,8 @@ private:
      * @param counts_per_rotation The total amount of different positions.
      * @returns The total amount of different positions
      * @throws HardwareException When the given resolution is outside the
-     * allowed range Which is determined by Encoder::MIN_RESOLUTION and
-     * Encoder::MAX_RESOLUTION.
+     * allowed range Which is determined by Encoder::MIN_COUNTS_PER_ROTATION and
+     * Encoder::MAX_COUNTS_PER_ROTATION.
      */
     static size_t calculateTotalPositions(size_t counts_per_rotation);
 

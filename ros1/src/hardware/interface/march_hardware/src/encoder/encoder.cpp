@@ -41,14 +41,14 @@ Encoder::Direction Encoder::getDirection() const
 
 size_t Encoder::calculateTotalPositions(size_t counts_per_rotation)
 {
-    if (counts_per_rotation < (size_t)1 << Encoder::MIN_RESOLUTION
-        || counts_per_rotation > (size_t)1 << Encoder::MAX_RESOLUTION) {
+    if (counts_per_rotation < Encoder::MIN_COUNTS_PER_ROTATION
+        || counts_per_rotation > Encoder::MAX_COUNTS_PER_ROTATION) {
         throw error::HardwareException(
             error::ErrorType::INVALID_ENCODER_RESOLUTION,
             "Encoder CPR (counts per rotation) of %d is not within range [%ld, "
             "%ld]",
-            counts_per_rotation, 1 << Encoder::MIN_RESOLUTION,
-            1 << Encoder::MAX_RESOLUTION);
+            counts_per_rotation, Encoder::MIN_COUNTS_PER_ROTATION,
+            Encoder::MAX_COUNTS_PER_ROTATION);
     }
     return counts_per_rotation;
 }
