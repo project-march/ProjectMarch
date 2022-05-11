@@ -20,9 +20,15 @@
 #include <march_hardware/pressure_sole/pressure_sole.h>
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
+    = { "countsPerRotation", "minPositionIU", "maxPositionIU" };
+const std::vector<std::string>
+    HardwareBuilder::OLD_ABSOLUTE_ENCODER_REQUIRED_KEYS
     = { "resolution", "minPositionIU", "maxPositionIU" };
 const std::vector<std::string>
     HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS
+    = { "countsPerRotation", "transmission" };
+const std::vector<std::string>
+    HardwareBuilder::OLD_INCREMENTAL_ENCODER_REQUIRED_KEYS
     = { "resolution", "transmission" };
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
     = { "incrementalEncoder", "absoluteEncoder" };
@@ -251,38 +257,63 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
         return nullptr;
     }
 
-    HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
-        HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
+    /* Validate that the absolute encoder is configured correctly */
+    try {
+        HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
+            HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
+        const auto counts_per_rotation
+            = absolute_encoder_config["countsPerRotation"].as<size_t>();
+    } catch (MissingKeyException& e) {
+        /* If the error is unrelated to the counts per rotation, rethrow it */
+        if
+            !(e == MissingKeyException("countsPerRotation", "absoluteEncoder"))
+            {
+                throw e;
+            }
 
-    const auto resolution = absolute_encoder_config["resolution"].as<size_t>();
-    const auto min_position
-        = absolute_encoder_config["minPositionIU"].as<int32_t>();
-    const auto max_position
-        = absolute_encoder_config["maxPositionIU"].as<int32_t>();
-
-    if (!urdf_joint->limits) {
-        throw march::error::HardwareException(
-            march::error::ErrorType::MISSING_REQUIRED_KEY,
-            "Missing limits in the urdf");
+        /* Otherwise, check wheter resolution is set */
+        try {
+            HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
+                HardwareBuilder::OLD_ABSOLUTE_ENCODER_REQUIRED_KEYS,
+                "absoluteEncoder");
+            const auto counts_per_rotation = (size_t)1
+                << absolute_encoder_config["resolution"].as<size_t>();
+        } catch (MissingKeyException& e) {
+            /* If neither is set, throw a special exception complaining about
+             * either one of them */
+            throw MissingKeyException(
+                "resolution' or 'countsPerRotation", "absoluteEncoder");
+        }
     }
+}
+const auto min_position
+    = absolute_encoder_config["minPositionIU"].as<int32_t>();
+const auto max_position
+    = absolute_encoder_config["maxPositionIU"].as<int32_t>();
 
-    double soft_lower_limit;
-    double soft_upper_limit;
-    if (urdf_joint->safety) {
-        soft_lower_limit = urdf_joint->safety->soft_lower_limit;
-        soft_upper_limit = urdf_joint->safety->soft_upper_limit;
-    } else {
-        ROS_WARN("URDF joint %s has no defined soft limits, so using hard "
-                 "limits as soft limits",
-            urdf_joint->name.c_str());
-        soft_lower_limit = urdf_joint->limits->lower;
-        soft_upper_limit = urdf_joint->limits->upper;
-    }
+if (!urdf_joint->limits) {
+    throw march::error::HardwareException(
+        march::error::ErrorType::MISSING_REQUIRED_KEY,
+        "Missing limits in the urdf");
+}
 
-    return std::make_unique<march::AbsoluteEncoder>(resolution,
-        motor_controller_type, getEncoderDirection(absolute_encoder_config),
-        min_position, max_position, urdf_joint->limits->lower,
-        urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
+double soft_lower_limit;
+double soft_upper_limit;
+if (urdf_joint->safety) {
+    soft_lower_limit = urdf_joint->safety->soft_lower_limit;
+    soft_upper_limit = urdf_joint->safety->soft_upper_limit;
+} else {
+    ROS_WARN("URDF joint %s has no defined soft limits, so using hard "
+             "limits as soft limits",
+        urdf_joint->name.c_str());
+    soft_lower_limit = urdf_joint->limits->lower;
+    soft_upper_limit = urdf_joint->limits->upper;
+}
+
+return std::make_unique<march::AbsoluteEncoder>(counts_per_rotation,
+    motor_controller_type, getEncoderDirection(absolute_encoder_config),
+    min_position, max_position, urdf_joint->limits->lower,
+    urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
 }
 
 std::unique_ptr<march::IncrementalEncoder>
@@ -294,15 +325,41 @@ HardwareBuilder::createIncrementalEncoder(
         return nullptr;
     }
 
-    HardwareBuilder::validateRequiredKeysExist(incremental_encoder_config,
-        HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS,
-        "incrementalEncoder");
+    /* Validate that the incremental encoder is configured correctly */
+    try {
+        HardwareBuilder::validateRequiredKeysExist(incremental_encoder_config,
+            HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS,
+            "incrementalEncoder");
+        const auto counts_per_rotation
+            = incremental_encoder_config["countsPerRotation"].as<size_t>();
+    } catch (MissingKeyException& e) {
+        /* If the error is unrelated to the counts per rotation, rethrow it */
+        if
+            !(e
+                == MissingKeyException(
+                    "countsPerRotation", "incrementalEncoder"))
+            {
+                throw e;
+            }
+        /* Otherwise, check wheter resolution is set */
+        try {
+            HardwareBuilder::validateRequiredKeysExist(
+                incremental_encoder_config,
+                HardwareBuilder::OLD_INCREMENTAL_ENCODER_REQUIRED_KEYS,
+                "incrementalEncoder");
+            const auto counts_per_rotation = (size_t)1
+                << incremental_encoder_config["resolution"].as<size_t>();
+        } catch (MissingKeyException& e) {
+            /* If neither is set, throw a special exception complaining about
+             * both of them */
+            throw MissingKeyException(
+                "resolution' or 'countsPerRotation", "incrementalEncoder");
+        }
+    }
 
-    const auto resolution
-        = incremental_encoder_config["resolution"].as<size_t>();
     const auto transmission
         = incremental_encoder_config["transmission"].as<double>();
-    return std::make_unique<march::IncrementalEncoder>(resolution,
+    return std::make_unique<march::IncrementalEncoder>(counts_per_rotation,
         motor_controller_type, getEncoderDirection(incremental_encoder_config),
         transmission);
 }
