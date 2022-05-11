@@ -58,7 +58,7 @@ public:
     MotorControllerType getMotorControllerType() const;
 
     static const size_t MIN_COUNTS_PER_ROTATION = 1 << 1;
-    static const size_t MAX_COUNTS_PER_ROTATION = 1 << 32;
+    static const size_t MAX_COUNTS_PER_ROTATION = 1 << 31;
 
     static constexpr double PI_2 = 2 * M_PI;
 
