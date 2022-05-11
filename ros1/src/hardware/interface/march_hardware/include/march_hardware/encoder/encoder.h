@@ -68,10 +68,11 @@ protected:
 private:
     /**
      * Returns the total number of positions possible on an encoder
-     * after checking that the resolution is within the correct range.
+     * after checking that the input CPR (counts per rotation) is within the
+     * correct range.
      * @param counts_per_rotation The total amount of different positions.
      * @returns The total amount of different positions
-     * @throws HardwareException When the given resolution is outside the
+     * @throws HardwareException When the given CPR is outside the
      * allowed range Which is determined by Encoder::MIN_COUNTS_PER_ROTATION and
      * Encoder::MAX_COUNTS_PER_ROTATION.
      */
