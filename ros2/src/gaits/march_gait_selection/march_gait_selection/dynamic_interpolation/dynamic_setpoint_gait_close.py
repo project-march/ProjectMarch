@@ -6,6 +6,10 @@ from rclpy.node import Node
 from rclpy.time import Time
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
+    END_POSITION_RIGHT,
+    END_POSITION_LEFT,
+)
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
 
@@ -51,10 +55,7 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
     def _set_subgait_id(self, current_gait: CurrentGait) -> None:
         """Sets the subgait_id based on the gait that has been previously executed."""
         previous_subgait_id = current_gait.subgait
-        if current_gait.gait == "dynamic_step_and_hold":
-            self.subgait_id = previous_subgait_id
-        else:
-            self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
+        self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
 
     def _set_last_foot_position(self, foot_position: FootPosition) -> None:
         """Set the foot position to use for the close gait to the last used foot position."""
@@ -78,6 +79,10 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
             self.logger.warn("Already in home stand position.")
             return None
+        elif self.start_position_all_joints == END_POSITION_RIGHT:
+            self.subgait_id = "right_swing"
+        elif self.start_position_all_joints == END_POSITION_LEFT:
+            self.subgait_id = "left_swing"
 
         self.update_parameters()
         self._start_time_next_command = current_time + first_subgait_delay

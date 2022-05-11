@@ -378,19 +378,19 @@ class GaitStateMachine:
             self.logger.info(f"Requested gait `{gait_name}`")
             gait = self._gait_selection._gaits.get(gait_name)
             if (
-                    gait is not None
-                    and gait_name in self._gait_graph.possible_gaits_from_idle(self._current_state)
-                    or gait_name
-                    == [
-                        "dynamic_walk",
-                        "dynamic_step_and_close",
-                        "dynamic_step",
-                        "dynamic_close",
-                    ]
+                gait is not None
+                and gait_name in self._gait_graph.possible_gaits_from_idle(self._current_state)
+                or gait_name
+                == [
+                    "dynamic_walk",
+                    "dynamic_step_and_close",
+                    "dynamic_step",
+                    "dynamic_close",
+                ]
             ):
                 if (
-                        isinstance(gait.starting_position, DynamicEdgePosition)
-                        and gait.starting_position != self._current_state
+                    isinstance(gait.starting_position, DynamicEdgePosition)
+                    and gait.starting_position != self._current_state
                 ):
                     self.logger.warn(
                         f"The gait {gait_name} does not have the correct dynamic "
@@ -485,13 +485,13 @@ class GaitStateMachine:
             # Therefore, it needs to be added to the idle_transitions dictionary of the
             # gait_graph.
             if (
-                    self._current_gait.name == "dynamic_step"
-                    and self._current_state not in self._gait_graph._idle_transitions
+                self._current_gait.name == "dynamic_step"
+                and self._current_state not in self._gait_graph._idle_transitions
             ):
                 self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step", "dynamic_close"}
             if (
-                    self._current_gait.name == "dynamic_step_and_hold"
-                    and self._current_state not in self._gait_graph._idle_transitions
+                self._current_gait.name == "dynamic_step_and_hold"
+                and self._current_state not in self._gait_graph._idle_transitions
             ):
                 self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step_and_hold", "dynamic_close"}
             self._current_gait.end()
@@ -508,8 +508,9 @@ class GaitStateMachine:
         This input is passed on to the current gait to execute the request.
         """
         if self._is_stop_requested() and not self._is_stopping:
-            if (self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold"]
-                    and not isinstance(self._current_state, UnknownEdgePosition)):
+            if self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold"] and not isinstance(
+                self._current_state, UnknownEdgePosition
+            ):
                 self._current_state = "dynamic_close"
             else:
                 self._should_stop = False
