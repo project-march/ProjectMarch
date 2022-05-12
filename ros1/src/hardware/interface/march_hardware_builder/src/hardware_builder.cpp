@@ -268,10 +268,10 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     } catch (MissingKeyException& e) {
         /* If the error is unrelated to the counts per rotation, rethrow it */
         if (e != MissingKeyException("countsPerRotation", "absoluteEncoder")) {
-            throw e;
+            throw;
         }
 
-        /* Otherwise, check wheter resolution is set */
+        /* Otherwise, check whether resolution is set */
         try {
             HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
                 HardwareBuilder::OLD_ABSOLUTE_ENCODER_REQUIRED_KEYS,
@@ -338,9 +338,9 @@ HardwareBuilder::createIncrementalEncoder(
         /* If the error is unrelated to the counts per rotation, rethrow it */
         if (e
             != MissingKeyException("countsPerRotation", "incrementalEncoder")) {
-            throw e;
+            throw;
         }
-        /* Otherwise, check wheter resolution is set */
+        /* Otherwise, check whether resolution is set */
         try {
             HardwareBuilder::validateRequiredKeysExist(
                 incremental_encoder_config,
