@@ -19,16 +19,17 @@
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 
-const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
+const std::vector<std::string>
+    HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS_WITH_COUNTS_PER_ROTATION
     = { "countsPerRotation", "minPositionIU", "maxPositionIU" };
 const std::vector<std::string>
-    HardwareBuilder::OLD_ABSOLUTE_ENCODER_REQUIRED_KEYS
+    HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS_WITH_RESOLUTION
     = { "resolution", "minPositionIU", "maxPositionIU" };
 const std::vector<std::string>
-    HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS
+    HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS_WITH_COUNTS_PER_ROTATION
     = { "countsPerRotation", "transmission" };
 const std::vector<std::string>
-    HardwareBuilder::OLD_INCREMENTAL_ENCODER_REQUIRED_KEYS
+    HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS_WITH_RESOLUTION
     = { "resolution", "transmission" };
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
     = { "incrementalEncoder", "absoluteEncoder" };
@@ -262,7 +263,9 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     /* Validate that the absolute encoder is configured correctly */
     try {
         HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
-            HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
+            HardwareBuilder::
+                ABSOLUTE_ENCODER_REQUIRED_KEYS_WITH_COUNTS_PER_ROTATION,
+            "absoluteEncoder");
         counts_per_rotation
             = absolute_encoder_config["countsPerRotation"].as<size_t>();
     } catch (MissingKeyException& e) {
@@ -274,7 +277,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
         /* Otherwise, check whether resolution is set */
         try {
             HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
-                HardwareBuilder::OLD_ABSOLUTE_ENCODER_REQUIRED_KEYS,
+                HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS_WITH_RESOLUTION,
                 "absoluteEncoder");
             counts_per_rotation = (size_t)1
                 << absolute_encoder_config["resolution"].as<size_t>();
@@ -330,7 +333,8 @@ HardwareBuilder::createIncrementalEncoder(
     /* Validate that the incremental encoder is configured correctly */
     try {
         HardwareBuilder::validateRequiredKeysExist(incremental_encoder_config,
-            HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS,
+            HardwareBuilder::
+                INCREMENTAL_ENCODER_REQUIRED_KEYS_WITH_COUNTS_PER_ROTATION,
             "incrementalEncoder");
         counts_per_rotation
             = incremental_encoder_config["countsPerRotation"].as<size_t>();
@@ -344,7 +348,8 @@ HardwareBuilder::createIncrementalEncoder(
         try {
             HardwareBuilder::validateRequiredKeysExist(
                 incremental_encoder_config,
-                HardwareBuilder::OLD_INCREMENTAL_ENCODER_REQUIRED_KEYS,
+                HardwareBuilder::
+                    INCREMENTAL_ENCODER_REQUIRED_KEYS_WITH_RESOLUTION,
                 "incrementalEncoder");
             counts_per_rotation = (size_t)1
                 << incremental_encoder_config["resolution"].as<size_t>();
