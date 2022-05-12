@@ -1,6 +1,5 @@
 """Author: Marten Haitjema, MVII."""
 
-from copy import copy
 from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
