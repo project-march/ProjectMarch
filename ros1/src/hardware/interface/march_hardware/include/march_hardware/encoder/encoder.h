@@ -57,8 +57,8 @@ public:
     Direction getDirection() const;
     MotorControllerType getMotorControllerType() const;
 
-    static const size_t MIN_COUNTS_PER_ROTATION = 1 << 1;
-    static const size_t MAX_COUNTS_PER_ROTATION = 1 << 31;
+    static const size_t MIN_COUNTS_PER_ROTATION = (size_t)1 << 1;
+    static const size_t MAX_COUNTS_PER_ROTATION = (size_t)1 << 32;
 
     static constexpr double PI_2 = 2 * M_PI;
 
