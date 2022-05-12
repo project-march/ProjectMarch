@@ -33,8 +33,7 @@ EffortWarner::EffortWarner(Node& node, std::vector<std::string>& joint_names)
     this->subscription_ = node.create_subscription<JointStateMsg>(
         "/march/joint_states", SystemDefaultsQoS(),
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        [this](const JointStateMsg::SharedPtr msg_ptr)
-            -> void {
+        [this](const JointStateMsg::SharedPtr msg_ptr) -> void {
             effortValueCallback(msg_ptr);
         });
 }
