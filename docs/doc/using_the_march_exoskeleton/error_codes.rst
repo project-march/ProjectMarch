@@ -204,7 +204,7 @@ verify that those are correct.
 .. _e112:
 
 ``E112``: Invalid encoder counts per rotation
-------------------------------------
+---------------------------------------------
 The encoder CPR (counts per rotation) is outside the allowed range.
 
 **Cause:** The given encoder CPR to construct an encoder are outside its allowed limits defined in
