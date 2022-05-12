@@ -112,7 +112,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             end_position,
             start_position,
             subgait_id,
-            self.joint_names,
+            self.actuating_joint_names,
             self.foot_location,
             self.joint_soft_limits,
             start,
