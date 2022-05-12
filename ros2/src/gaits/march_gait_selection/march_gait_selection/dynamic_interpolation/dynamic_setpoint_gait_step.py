@@ -16,11 +16,10 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.utility_functions import get_position_from_yaml
 
 from std_msgs.msg import Header
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition, GaitInstruction
+from march_shared_msgs.msg import FootPosition
 
 
 class DynamicSetpointGaitStep(DynamicSetpointGait):
@@ -58,6 +57,9 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
     def _reset(self) -> None:
         """Reset all attributes of the gait."""
+        if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
+            self.subgait_id = "right_swing"
+
         self._should_stop = False
         self._end = False
 
@@ -124,28 +126,25 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             TrajectoryCommand: command with the current subgait and start time
         """
-        if stop:
-            self.logger.info("Stopping dynamic gait.")
+        if self._use_position_queue and not self.position_queue.empty():
+            self.foot_location = self._get_foot_location_from_queue()
+        elif self._use_position_queue and self.position_queue.empty():
+            stop = True
+            self._end = True
         else:
-            if self._use_position_queue:
-                if not self.position_queue.empty():
-                    self.foot_location = self._get_foot_location_from_queue()
-                else:
-                    stop = True
-                    self._end = True
-            else:
-                try:
-                    self.foot_location = self._get_foot_location(self.subgait_id)
-                except AttributeError:
-                    self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
-                    self._end = True
-                    return None
-                stop = self._check_msg_time(self.foot_location)
+            try:
+                self.foot_location = self._get_foot_location(self.subgait_id)
+            except AttributeError:
+                self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                self._end = True
+                return None
+            stop = self._check_msg_time(self.foot_location)
+            self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
 
-            self.logger.warn(
-                f"Stepping to location ({self.foot_location.processed_point.x}, "
-                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-            )
+        self.logger.info(
+            f"Stepping to location ({self.foot_location.processed_point.x}, "
+            f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+        )
 
         if start and stop:
             return None
@@ -201,21 +200,6 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.put(point_dict)
         self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
-
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown.
-
-        Args:
-            msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            # TODO: Refactor such that _reset method can be used
-            self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
-            self.start_position_all_joints = get_position_from_yaml("stand")
-            self.subgait_id = "right_swing"
-            self._trajectory_failed = False
-            self.position_queue = Queue()
-            self._fill_queue()
 
     def _try_to_get_second_step(self, final_iteration: bool) -> bool:
         """Returns true if second step is possible, always true for single step."""

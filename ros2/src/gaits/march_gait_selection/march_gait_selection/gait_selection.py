@@ -45,6 +45,9 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_c
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import (
     DynamicSetpointGaitStep,
 )
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import (
+    DynamicSetpointGaitClose,
+)
 
 NODE_NAME = "gait_selection"
 
@@ -461,6 +464,7 @@ class GaitSelection(Node):
                 self.dynamic_setpoint_gait,
                 self.dynamic_setpoint_gait_step,
                 DynamicSetpointGaitStepAndClose(gait_selection_node=self),
+                DynamicSetpointGaitClose(gait_selection_node=self),
             ]
 
             for dynamic_gait in dynamic_gaits:
