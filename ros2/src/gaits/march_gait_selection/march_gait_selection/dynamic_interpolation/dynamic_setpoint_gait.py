@@ -26,8 +26,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 
-from march_shared_msgs.msg import FootPosition
-from sensor_msgs.msg import JointState
+from march_shared_msgs.msg import FootPosition, GaitInstruction
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 DURATION_INCREASE_FACTOR = 1.5
@@ -104,9 +103,9 @@ class DynamicSetpointGait(GaitInterface):
             DEFAULT_HISTORY_DEPTH,
         )
         self.gait_selection.create_subscription(
-            JointState,
-            "/march/gait_selection/final_position",
-            self._update_start_position_idle_state,
+            GaitInstruction,
+            "/march/input_device/instruction",
+            self._callback_force_unknown,
             DEFAULT_HISTORY_DEPTH,
         )
         self.pub_right = self.gait_selection.create_publisher(
@@ -345,14 +344,6 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
         self.start_position_all_joints = self.dynamic_subgait.get_final_position()
-        self.start_position_actuating_joints = {
-            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
-        }
-
-    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
-        """Update the start position of the next subgait to be the last position of the previous gait."""
-        for i, name in enumerate(self.all_joint_names):
-            self.start_position_all_joints[name] = joint_state.position[i]
         self.start_position_actuating_joints = {
             name: self.start_position_all_joints[name] for name in self.actuating_joint_names
         }
@@ -640,6 +631,20 @@ class DynamicSetpointGait(GaitInterface):
         self.joint_soft_limits = []
         for joint_name in self.actuating_joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
+
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Reset start position to home stand after force unknown.
+
+        Args:
+            msg (GaitInstruction): message containing a gait_instruction from the IPD
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self.start_position_all_joints = copy(self.home_stand_position_all_joints)
+            self.start_position_actuating_joints = {
+                name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+            }
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
 
     def _check_msg_time(self, foot_location: FootPosition) -> bool:
         """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.
