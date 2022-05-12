@@ -197,6 +197,3 @@ codequality.json
 
 .vscode/*
 .DS_Store
-
-# position queue for step and step_and_hold gaits
-/ros2/src/gaits/march_gait_selection/config/position_queue.yaml
