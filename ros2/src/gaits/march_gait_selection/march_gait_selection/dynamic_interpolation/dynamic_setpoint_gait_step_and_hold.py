@@ -158,10 +158,11 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         return self._get_first_feasible_trajectory(start, stop)
 
     def _try_to_get_second_step(self, is_final_iteration: bool) -> bool:
-        return True
+        """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
 
-    def _get_stop_gait(self) -> Optional[TrajectoryCommand]:
-        return None
+        This safety check is not relevant for step and hold and thus always returns True.
+        """
+        return True
 
     def _get_foot_location_from_queue(self) -> FootPosition:
         """Get FootPosition message from the position queue.
