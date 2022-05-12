@@ -26,6 +26,7 @@ set(XACRO_FILES
     urdf/march4_with_koen_lengths.xacro
     urdf/test_joint_linear.xacro
     urdf/test_joint_rotational.xacro
+    urdf/march6_three_cameras.xacro
 )
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
