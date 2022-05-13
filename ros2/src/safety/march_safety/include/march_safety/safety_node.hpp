@@ -7,8 +7,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/timer.hpp"
 
-#include "march_safety/safety_type.hpp"
 #include "march_safety/effort_warner.h"
+#include "march_safety/safety_type.hpp"
 
 #include <string>
 #include <vector>
