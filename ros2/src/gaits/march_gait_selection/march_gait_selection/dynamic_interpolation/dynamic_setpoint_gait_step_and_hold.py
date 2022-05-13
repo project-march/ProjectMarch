@@ -193,6 +193,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                         self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
                         self._end = True
                         return None
+
             if not stop:
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
                 self.logger.info(
