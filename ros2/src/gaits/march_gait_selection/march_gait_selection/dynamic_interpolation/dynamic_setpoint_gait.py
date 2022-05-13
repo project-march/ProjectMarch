@@ -407,7 +407,7 @@ class DynamicSetpointGait(GaitInterface):
         else:
             try:
                 self.foot_location = self._get_foot_location(self.subgait_id)
-                stop = self._check_msg_time(self.foot_location)
+                stop = self._is_foot_location_too_old(self.foot_location)
             except AttributeError:
                 self.logger.warn("No FootLocation found. Connect the camera or use simulated points.")
                 self._end = True
@@ -647,7 +647,7 @@ class DynamicSetpointGait(GaitInterface):
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
 
-    def _check_msg_time(self, foot_location: FootPosition) -> bool:
+    def _is_foot_location_too_old(self, foot_location: FootPosition) -> bool:
         """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.
 
         Args:

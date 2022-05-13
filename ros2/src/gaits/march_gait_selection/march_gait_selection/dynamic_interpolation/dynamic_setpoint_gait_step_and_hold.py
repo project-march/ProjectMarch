@@ -187,7 +187,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                 else:
                     try:
                         self.foot_location = self._get_foot_location(self.subgait_id)
-                        if self._check_msg_time(self.foot_location):
+                        if self._is_foot_location_too_old(self.foot_location):
                             return None
                     except AttributeError:
                         self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
