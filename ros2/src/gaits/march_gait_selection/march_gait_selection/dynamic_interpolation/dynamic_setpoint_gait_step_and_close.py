@@ -40,7 +40,7 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
             self._end = True
             return self._get_trajectory_command(stop=True)
 
-    def _try_to_get_second_step(self, is_final_iteration: bool) -> bool:
+    def _can_get_second_step(self, is_final_iteration: bool) -> bool:
         """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
 
         If this is not possible, the first subgait should not be executed.

@@ -45,9 +45,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
         self.update_parameter()
-
-        if self._use_position_queue:
-            self._create_position_queue()
+        self._create_position_queue()
 
         self.gait_selection.create_subscription(
             Point,
@@ -114,7 +112,6 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         if self._end:
             self.subgait_id = "right_swing"
-            self._fill_queue()
 
         return GaitUpdate.finished()
 
@@ -125,11 +122,14 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             start (:obj: bool, optional): whether it is a start gait or not, default False
             stop (:obj: bool, optional): whether it is a stop gait or not, default False
         Returns:
-            TrajectoryCommand: command with the current subgait and start time
+            TrajectoryCommand: command with the current subgait and start time. Returns None if the location found by
+                CoViD is too old.
         """
         if self._use_position_queue and not self.position_queue.empty():
             self.foot_location = self._get_foot_location_from_queue()
         elif self._use_position_queue and self.position_queue.empty():
+            self._fill_queue()
+            self.logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
             stop = True
             self._end = True
         else:
@@ -167,15 +167,16 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
     def update_parameter(self) -> None:
         """Updates '_use_position_queue' to the newest value in gait_selection."""
         self._use_position_queue = self.gait_selection.use_position_queue
-        if self._use_position_queue:
-            self._create_position_queue()
 
     def _create_position_queue(self) -> None:
         """Creates and fills the queue with values from position_queue.yaml."""
         queue_path = get_package_share_path("march_gait_selection")
-        queue_directory = os.path.join(queue_path, "position_queue", "position_queue.yaml")
-        with open(queue_directory, "r") as queue_file:
-            position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
+        queue_file_loc = os.path.join(queue_path, "position_queue", "position_queue.yaml")
+        try:
+            with open(queue_file_loc, "r") as queue_file:
+                position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
+        except OSError as e:
+            self.logger.error(f"Position queue file does not exist. {e}")
 
         self.duration_from_yaml = position_queue_yaml["duration"]
         self.points_from_yaml = position_queue_yaml["points"]
@@ -184,9 +185,8 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
     def _fill_queue(self) -> None:
         """Fills the position queue with the values specified in position_queue.yaml."""
-        if self._use_position_queue:
-            for point in self.points_from_yaml:
-                self.position_queue.put(point)
+        for point in self.points_from_yaml:
+            self.position_queue.put(point)
 
     def _add_point_to_queue(self, point: Point) -> None:
         """Adds a point to the end of the queue.
@@ -198,6 +198,6 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         self.position_queue.put(point_dict)
         self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
 
-    def _try_to_get_second_step(self, final_iteration: bool) -> bool:
+    def _can_get_second_step(self, final_iteration: bool) -> bool:
         """Returns true if second step is possible, always true for single step."""
         return True
