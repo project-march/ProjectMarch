@@ -473,20 +473,14 @@ class GaitStateMachine:
         # Process finishing of the gait
         if gait_update.is_finished:
             self._current_state = self._current_gait.final_position
-            # To make the half step dynamic gait work, the current state (that is final
-            # position) needs to be a position from which the next half step can be started.
-            # Therefore, it needs to be added to the idle_transitions dictionary of the
-            # gait_graph.
+            # To make the step (and hold) gait work, the current state (that is final position) needs to be a position
+            # from which the next step can be started. Therefore, it needs to be added to the idle_transitions
+            # dictionary of the gait_graph.
             if (
-                self._current_gait.name == "dynamic_step"
-                and self._current_state not in self._gait_graph._idle_transitions
-            ):
-                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step", "dynamic_close"}
-            if (
-                self._current_gait.name == "dynamic_step_and_hold"
-                and self._current_state not in self._gait_graph._idle_transitions
-            ):
-                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step_and_hold", "dynamic_close"}
+                self._current_gait.name == "dynamic_step" or self._current_gait.name == "dynamic_step_and_hold"
+            ) and self._current_state not in self._gait_graph._idle_transitions:
+                self._gait_graph._idle_transitions[self._current_state] = {self._current_gait.name, "dynamic_close"}
+
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()

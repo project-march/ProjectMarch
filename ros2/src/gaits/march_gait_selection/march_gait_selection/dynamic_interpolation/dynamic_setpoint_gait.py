@@ -398,7 +398,8 @@ class DynamicSetpointGait(GaitInterface):
             start (:obj: bool, optional): whether` it is a start gait or not, default False
             stop (:obj: bool, optional): whether it is a stop gait or not, default False
         Returns:
-            TrajectoryCommand: command with the current subgait and start time
+            TrajectoryCommand: command with the current subgait and start time. Returns None if the location found by
+                CoViD is too old.
         """
         if stop:
             self._end = True
@@ -463,7 +464,7 @@ class DynamicSetpointGait(GaitInterface):
                 is_final_iteration,
             )
             # Return command if current and next step can be made at same duration
-            second_step = self._try_to_get_second_step(is_final_iteration)
+            second_step = self._can_get_second_step(is_final_iteration)
             if trajectory_command is not None and second_step:
                 self._trajectory_failed = False
                 self._update_start_position_gait_state()
@@ -525,7 +526,7 @@ class DynamicSetpointGait(GaitInterface):
                 )
             return None
 
-    def _try_to_get_second_step(self, is_final_iteration: bool) -> bool:
+    def _can_get_second_step(self, is_final_iteration: bool) -> bool:
         """Tries to create the subgait that is one step ahead.
 
         If this is not possible, the first subgait should not be executed.
