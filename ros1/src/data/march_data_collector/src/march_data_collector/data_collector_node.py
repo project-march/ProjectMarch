@@ -89,6 +89,14 @@ class DataCollectorNode:
             rospy.logdebug("running without pressure soles")
 
     def trajectory_state_callback(self, data):
+        """
+
+        Args:
+          data:
+
+        Returns:
+
+        """
         com = self._com_calculator.calculate_com()
         for cp_calculator in self._cp_calculators:
             cp_calculator.center_of_mass = com
@@ -129,6 +137,14 @@ class DataCollectorNode:
             self.joint_values_publisher.publish(self.joint_values)
 
     def imu_callback(self, data):
+        """
+
+        Args:
+          data:
+
+        Returns:
+
+        """
         if data.header.frame_id == "imu_link":
 
             z_diff = float("-inf")
@@ -160,10 +176,19 @@ class DataCollectorNode:
                 rospy.logdebug("Cannot calculate imu transform, because tf frames are not available, {0}".format(e))
 
     def send_udp(self, data):
+        """
+
+        Args:
+          data:
+
+        Returns:
+
+        """
         message = " ".join([str(180 * val / pi) for val in data])
         self.output_sock.sendto(message.encode("utf-8"), (self.output_host, self.output_port))
 
     def receive_udp(self):
+        """ """
         try:
             data, addr = self.input_sock.recvfrom(1024)
             datachannels = data.split()
@@ -188,10 +213,12 @@ class DataCollectorNode:
         return
 
     def close_sockets(self):
+        """ """
         self.output_sock.close()
         self.input_sock.close()
 
     def run(self):
+        """ """
         if self.pressure_soles_on:
             while not rospy.is_shutdown() and self.pressure_soles_on:
                 self.receive_udp()
@@ -200,6 +227,7 @@ class DataCollectorNode:
 
 
 def main():
+    """ """
     rospy.init_node("data_collector", anonymous=True)
     try:
         robot = URDF.from_parameter_server("/robot_description")

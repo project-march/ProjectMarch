@@ -1,3 +1,4 @@
+"""Author: Thijs Veen, MVI."""
 import rclpy
 from march_mpc_visualization.mpc_visualization_listener import MpcListener
 from march_mpc_visualization import app
@@ -7,6 +8,7 @@ from contextlib import suppress
 
 
 def main():
+    """Starts the mpc listener node."""
     rclpy.init()
     mpc_listener = MpcListener()
 

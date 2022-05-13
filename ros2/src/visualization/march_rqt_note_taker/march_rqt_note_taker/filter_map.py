@@ -1,3 +1,4 @@
+"""Author: Olav de Haas, MIV."""
 import sys
 from typing import Any, Callable, List, Optional, Tuple
 
@@ -5,23 +6,19 @@ from rcl_interfaces.msg import Log
 
 
 class FilterMap:
-    """Filter class that can add filters and mappings for accepting logs"""
+    """Filter class that can add filters and mappings for accepting logs."""
 
     def __init__(self):
         self._filter_maps: List[Tuple[Callable[[Log], bool], Callable[[str], Any]]] = []  # noqa: TAE002
 
-    def add_filter(
-        self,
-        msg_filter: Callable[[Log], bool],
-        msg_map: Optional[Callable[[str], Any]] = lambda msg: msg,
-    ):
+    def add_filter(self, msg_filter: Callable[[Log], bool], msg_map: Optional[Callable[[str], Any]] = lambda msg: msg):
         """Adds a filter to accept messages by and map to transform them.
 
-        :param msg_filter: Filter method that accepts a
-                           `rcl_interfaces.msg.Log`
-                           and returns True when the message should be accepted
-                           and returns False otherwise
-        :param msg_map: Optional map method that accepts a string
+        Args:
+            msg_filter (Callable[[Log], bool]): Filter method that accepts a `rcl_interfaces.msg.Log` and returns:
+                `True` when the message should be accepted,
+                `False` otherwise.
+            msg_map (Callable[[str], Any], Optional): Optional map method that accepts a string.
         """
         self._filter_maps.append((msg_filter, msg_map))
 
@@ -35,12 +32,13 @@ class FilterMap:
 
         All messages with log.level == level get accepted.
 
-        :param msg_filter: (Optional)
-                           Additional filter method that accepts a
-                           `rcl_interfaces.msg.Log`
-                           and returns True when the message should be accepted
-                           and returns False otherwise.
-        :param msg_map: Optional map method that accepts a string
+        Args:
+            level (bytes): The log LEVEL in bytes.
+            msg_filter (Callable[[Log], bool], Optional): Additional filter method
+                that accepts a `rcl_interfaces.msg.Log` and returns:
+                 `True` when the message should be accepted,
+                 `False` otherwise.
+            msg_map (Callable[[str], Any], Optional): Optional map method that accepts a string.
         """
         self.add_filter(
             lambda l: msg_filter(l) if l.level == self.log_level_to_int(level) else False,
@@ -59,7 +57,7 @@ class FilterMap:
         Hence, When level=Log.DEBUG all messages get accepted, as debug is the
         minimal logging level.
 
-        :param msg_filter: (Optional)
+        Args: msg_filter: (Optional)
                            Additional filter method that accepts a
                            `rcl_interfaces.msg.Log`
                            and returns True when the message should be accepted
@@ -71,13 +69,15 @@ class FilterMap:
             msg_map,
         )
 
-    def __call__(self, log_msg: Log):
+    def __call__(self, log_msg: Log) -> Optional[Log]:
         """Filters a ROS log msg based on the given filters.
 
-        :param log_msg: Log msg to filter
+        Args:
+            log_msg (Log): Log msg to filter.
 
-        :return Mapped message string when the message is accepted by at least
-                one include filter, None otherwise
+        Returns:
+            Optional(Log). Mapped message string when the message is accepted by at least one include filter,
+                None otherwise.
         """
         for (f, m) in self._filter_maps:
             if f(log_msg):

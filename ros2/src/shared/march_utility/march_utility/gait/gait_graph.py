@@ -1,3 +1,4 @@
+"""Author: Bas Volkers, MVI."""
 from typing import Dict, Set
 
 from march_gait_selection.gait_selection import GaitSelection
@@ -12,10 +13,10 @@ from .edge_position import EdgePosition, StaticEdgePosition, UnknownEdgePosition
 
 
 class GaitGraph:
-    """
-    The gait graph is made to keep track of all named positions and gait transitions
-    that are available. It is generated at startup and is used by the gait state
-    machine to get the possible gaits and to verify a requested gait.
+    """The gait graph is made to keep track of all named positions and gait transitions that are available.
+
+    It is generated at startup and is used by the gait state machine
+    to get the possible gaits and to verify a requested gait.
     """
 
     NamedPositions = Dict[EdgePosition, str]
@@ -35,12 +36,14 @@ class GaitGraph:
         self._gait_transitions: GaitGraph.GaitTransitions = {}
         self._unnamed_count = 0
 
-    def possible_gaits_from_idle(self, current_state: EdgePosition) -> Set:
-        """
-        Get the list of gait names that are (possibly) available from this edge
-        position.
-        :param current_state: The current position of the exo.
-        :return: A list of gait names
+    def possible_gaits_from_idle(self, current_state: EdgePosition) -> set:
+        """Get the list of gait names that are (possibly) available from this edge position.
+
+        Args:
+            current_state (EdgePosition): The current position of the exo.
+
+        Returns:
+            set. A set of the gait names that are available.
         """
         if isinstance(current_state, DynamicEdgePosition):
             return self._dynamic_transitions
@@ -66,12 +69,16 @@ class GaitGraph:
         self._named_positions[UnknownEdgePosition()] = GaitGraph.UNKNOWN
 
     def get_name_of_position(self, position: EdgePosition) -> str:
-        """
-        Get the name of a given position. Static positions will have a name from the
-        default.yaml or a name generated at startup. Dynamic gaits have no name,
-        but return a string with the values.
-        :param position: The position to get the name from.
-        :return: The name.
+        """Get the name of a given position.
+
+        Static positions will have a name from the default.yaml or a name generated at startup.
+        Dynamic gaits have no name, but return a string with the values.
+
+        Args:
+            position (EdgePosition): The position to get the name from.
+
+        Returns:
+            str. The name of the position.
         """
         if position in self._named_positions:
             return self._named_positions[position]
@@ -133,8 +140,9 @@ class GaitGraph:
     def _add_idle_transition(self, start_position: EdgePosition, gait_name: str):
         """Add an idle transition.
 
-        :param start_position Position the gait is started from.
-        :param gait_name Name of the gait that is started.
+        Args:
+            start_position (EdgePosition): Position the gait is started from.
+            gait_name (str): Name of the gait that is started.
         """
         if isinstance(start_position, DynamicEdgePosition):
             self._dynamic_transitions.add(gait_name)
@@ -144,9 +152,10 @@ class GaitGraph:
             self._idle_transitions[start_position] = {gait_name}
 
     def _validate_from_transitions(self):
-        """Check that from every position there is a transition
+        """Check that from every position there is a transition.
 
-        :return Returns true if from every position there is a transition.
+        Returns:
+             bool. `True` if from every position there is a transition.
         """
         no_from_transitions = []
         for position, name in self._named_positions.items():
@@ -160,7 +169,8 @@ class GaitGraph:
     def _validate_to_transitions(self):
         """Check that all positions can be reached.
 
-        :return Returns true if all positions can be reached.
+        Returns
+            bool. `True` if all positions can be reached.
         """
         no_to_transitions = []
         for position, name in self._named_positions.items():

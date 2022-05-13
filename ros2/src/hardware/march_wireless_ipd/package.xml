@@ -1,17 +1,14 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>march_fake_covid</name>
+  <name>march_wireless_ipd</name>
   <version>0.0.0</version>
-  <description>Publishes fake foot locations</description>
+  <description>Node that manages the connection and communication with the wireless IPD app.</description>
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 
-  <buildtool_depend>python3-setuptools</buildtool_depend>
-
-  <depend>geometry_msgs</depend>
-  <test_depend>python3-pytest</test_depend>
-  <exec_depend>rclpy</exec_depend>
+  <depend>march_rqt_input_device</depend>
+  <depend>rclpy</depend>
 
   <export>
     <build_type>ament_python</build_type>

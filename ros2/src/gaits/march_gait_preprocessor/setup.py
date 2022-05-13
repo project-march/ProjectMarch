@@ -2,7 +2,7 @@ from setuptools import setup
 from glob import glob
 import os
 
-package_name = "march_fake_covid"
+package_name = "march_gait_preprocessor"
 
 setup(
     name=package_name,
@@ -20,5 +20,5 @@ setup(
     description="Publishes fake foot locations",
     license="TODO: License declaration",
     tests_require=["pytest", "unittest"],
-    entry_points={"console_scripts": ["march_fake_covid = march_fake_covid.fake_covid_publisher:main"]},
+    entry_points={"console_scripts": ["march_gait_preprocessor = march_gait_preprocessor.gait_preprocessor_node:main"]},
 )

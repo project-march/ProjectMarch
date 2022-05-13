@@ -7,6 +7,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/timer.hpp"
 
+#include "march_safety/effort_warner.h"
 #include "march_safety/safety_type.hpp"
 
 #include <string>
@@ -41,6 +42,7 @@ public:
 
 private:
     rclcpp::TimerBase::SharedPtr timer;
+    const EffortWarner effort_warner_;
 };
 
 #endif // MARCH_SAFETY_SAFETY_NODE_H
