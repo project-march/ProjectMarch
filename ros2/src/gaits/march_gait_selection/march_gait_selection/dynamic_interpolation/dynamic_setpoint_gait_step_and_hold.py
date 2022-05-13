@@ -3,7 +3,7 @@
 import os
 import yaml
 
-from copy import copy
+from copy import copy, deepcopy
 from queue import Queue
 from typing import Dict, Optional
 from ament_index_python import get_package_share_path
@@ -175,7 +175,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             self.logger.info("Stopping dynamic gait.")
         else:
             if self._use_predetermined_foot_location:
-                self.foot_location = self._predetermined_foot_location
+                self.foot_location = deepcopy(self._predetermined_foot_location)
                 self._use_predetermined_foot_location = False
             else:
                 if self._use_position_queue and not self.position_queue.empty():
