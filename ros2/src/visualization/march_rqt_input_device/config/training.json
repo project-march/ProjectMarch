@@ -26,6 +26,9 @@
     },
     {
       "name": "dynamic_step"
+    },
+    {
+      "name": "dynamic_step_and_hold"
     }
   ],
   [

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import march_goniometric_ik_solver.triangle_angle_solver as tas
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
     get_limits_robot_from_urdf_for_inverse_kinematics,
@@ -129,10 +130,11 @@ class Pose:
     def calculate_joint_positions(self, joint: str = "all") -> Union[Tuple[float], float]:
         """Calculates the joint positions for a given pose as a chain from rear toes (toes1) to front toes (toes2).
 
-        If a positive angle represents a anti-clockwise rotation, the angle variable is positive in the rot function.
+        If a positive angle represents an anti-clockwise rotation, the angle variable is positive in the rot function.
         If a positive angle represents a clockwise rotation, the angle variable is negative in the rot function.
         The vectors (all np.array's) do always describe the translation when no rotation is applied.
-        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the chain.
+        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the
+        chain.
 
         Args:
             joint (str): specific joint of which the joint position should be returned.
@@ -399,7 +401,7 @@ class Pose:
 
         Args:
             y (float): the distance between the two feet in upward direction.
-            z (float): the distance between the two feet in sideward direction.
+            z (float): the distance between the two feet in sidewards direction.
         """
         # Get y position of hip and toes:
         y_hip = self.pos_hip[1]
@@ -610,10 +612,7 @@ class Pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
         # Perform a limit check and raise error if limit is exceeded:
-        errors = check_on_limits(self.all_joint_names, pose_list)
-        if errors:
-            for error in errors:
-                raise ValueError(error)
+        check_on_limits(self.all_joint_names, pose_list)
 
         # return pose as list:
         return pose_list
@@ -639,38 +638,25 @@ def rot(t: float) -> np.array:
     return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
 
 
-def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> List:
+def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> None:
     """Checks all joints limits of the current pose and create error messages for exceeding limits.
 
     Args:
         all_joint_names (List[str]): list containing all joint names in alphabetical order.
         pose_list (List[float]): A list of joints poses in alphabetical order.
     """
-    errors = []
     joint_pose_dict = {}
     # TODO: add global enum for all joint names
     for i, joint_name in enumerate(all_joint_names):
         joint_pose_dict[joint_name] = pose_list[i]
 
     for joint_name in JOINT_NAMES:
-        if joint_pose_dict[joint_name] < JOINT_LIMITS[joint_name].lower:
-            errors.append(
-                "IK solver found a solution with joint "
-                + joint_name
-                + " "
-                + str(round(JOINT_LIMITS[joint_name].lower - joint_pose_dict[joint_name], 3))
-                + " rad below lower limit"
+        if (joint_pose_dict[joint_name] < JOINT_LIMITS[joint_name].lower) or (
+            joint_pose_dict[joint_name] > JOINT_LIMITS[joint_name].upper
+        ):
+            raise PositionSoftLimitError(
+                joint_name, joint_pose_dict[joint_name], JOINT_LIMITS[joint_name].lower, JOINT_LIMITS[joint_name].upper
             )
-        elif joint_pose_dict[joint_name] > JOINT_LIMITS[joint_name].upper:
-            errors.append(
-                "IK solver found a solution with joint "
-                + joint_name
-                + " "
-                + str(round(joint_pose_dict[joint_name] - JOINT_LIMITS[joint_name].upper, 3))
-                + " rad above upper limit"
-            )
-
-    return errors
 
 
 def make_plot(pose: Pose):

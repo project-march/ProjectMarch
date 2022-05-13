@@ -489,6 +489,12 @@ class GaitStateMachine:
                 and self._current_state not in self._gait_graph._idle_transitions
             ):
                 self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step", "dynamic_close"}
+            elif (
+                self._current_gait.name == "dynamic_step_and_hold"
+                and self._current_state not in self._gait_graph._idle_transitions
+            ):
+                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_step_and_hold"}
+
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
