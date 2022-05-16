@@ -33,6 +33,40 @@
   ],
   [
     {
+      "name": "small_narrow",
+      "callback": "publish_small_narrow",
+      "always_enabled": true
+    },
+    {
+      "name": "small_wide",
+      "callback": "publish_small_wide",
+      "always_enabled": true
+    },
+    {
+      "name": "large_narrow",
+      "callback": "publish_large_narrow",
+      "always_enabled": true
+    },
+    {
+      "name": "large_wide",
+      "callback": "publish_large_wide",
+      "always_enabled": true
+    }
+  ],
+  [
+    {
+      "name": "start_with_right",
+      "callback": "publish_start_with_right",
+      "always_enabled": true
+    },
+    {
+      "name": "start_with_left",
+      "callback": "publish_start_with_left",
+      "always_enabled": true
+    }
+  ],
+  [
+    {
       "name": "walk"
     },
     {
