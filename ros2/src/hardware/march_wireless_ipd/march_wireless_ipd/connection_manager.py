@@ -1,20 +1,15 @@
 """Author: Tuhin Das, MVII."""
 
-from cv2 import trace
-from builtins import OSError, RuntimeError
-import sys
 import select
 import socket
 import json
 import time
-import rclpy
 from functools import partial
 from march_shared_msgs.msg import CurrentGait, CurrentState
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
 from march_shared_msgs.msg import FootPosition
-from std_msgs.msg import String
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from rclpy.node import Node
 
@@ -51,6 +46,10 @@ class ConnectionManager:
         _last_right_displacement (List): Last displacement found for the right foot with the cameras.
         _last_left_point_timestamp (Time): Last time a left point has been found.
         _last_right_point_timestamp (Time): Last time a right point has been found.
+
+    Subscriptions:
+    - /march/foot_position/left
+    - /march/foot_position/right
     """
 
     def __init__(self, host: str, port: int, controller: WirelessInputDeviceController, node: Node, logger: Logger):
@@ -69,8 +68,8 @@ class ConnectionManager:
         self._current_gait = "unknown"
         self._last_heartbeat = self._node.get_clock().now()
         self._stopped = False
-        self._last_left_displacement = [0, 0, 0]
-        self._last_right_displacement = [0, 0, 0]
+        self._last_left_point = [0, 0, 0]
+        self._last_right_point = [0, 0, 0]
         self._last_left_point_timestamp = self._node.get_clock().now()
         self._last_right_point_timestamp = self._node.get_clock().now()
         self._controller.accepted_cb = partial(self._send_message_till_confirm, "Accepted", True)
@@ -90,11 +89,6 @@ class ConnectionManager:
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._step_size_publisher = self._node.create_publisher(
-            String,
-            "/march/step_and_hold/step_size",
-            DEFAULT_HISTORY_DEPTH,
-        )
 
     def _current_gait_cb(self, msg: CurrentGait):
         """Callback when the exoskeleton gait is updated."""
@@ -111,12 +105,12 @@ class ConnectionManager:
 
     def _callback_left(self, msg: FootPosition):
         """Callback when a new left foot position is found."""
-        self._last_left_displacement = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
+        self._last_left_point = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
         self._last_left_point_timestamp = self._node.get_clock().now()
 
     def _callback_right(self, msg: FootPosition):
         """Callback when a new right foot position is found."""
-        self._last_right_displacement = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
+        self._last_right_point = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
         self._last_right_point_timestamp = self._node.get_clock().now()
 
     def _validate_received_data(self, msg: str):
@@ -205,12 +199,6 @@ class ConnectionManager:
 
         self._requested_gait = req["gait"]["gaitName"]
 
-        if self._requested_gait in ["small_narrow", "small_wide", "large_narrow", "large_wide"]:
-            self._step_size_publisher.publish(String(data=self._requested_gait))
-            self._requested_gait = "dynamic_step_and_hold"
-            self._controller.publish_gait(self._requested_gait)
-            return
-
         if future.result() is not None and self._requested_gait in future.result().gaits:
             self._controller.publish_gait(self._requested_gait)
         else:
@@ -263,15 +251,7 @@ class ConnectionManager:
         if self._connection is None:
             return
 
-        if (self._node.get_clock().now() - self._last_left_point_timestamp) > Duration(0.5):
-            point_left = None
-        else:
-            point_left = self._last_left_displacement
-
-        if (self._node.get_clock().now() - self._last_right_point_timestamp) > Duration(0.5):
-            point_right = None
-        else:
-            point_right = self._last_right_displacement
+        point_left, point_right = self._update_points()
 
         msg = {
             "type": msg_type,
@@ -332,10 +312,16 @@ class ConnectionManager:
 
     def _empty_socket(self):
         """Empty all remaining messages on the socket connection."""
-        # return
         while True:
             input_ready, _, _ = select.select([self._connection], [], [], 0.0)
             if len(input_ready) == 0:
                 break
             for s in input_ready:
                 s.recv(1)
+
+    def _update_points(self):
+        """Update point found with the cameras before sending them to the IPD."""
+        now = self._node.get_clock().now()
+        point_left = self._last_left_point if now - self._last_left_point_timestamp <= Duration(0.5) else None
+        point_right = self._last_right_point if now - self._last_right_point_timestamp <= Duration(0.5) else None
+        return point_left, point_right
