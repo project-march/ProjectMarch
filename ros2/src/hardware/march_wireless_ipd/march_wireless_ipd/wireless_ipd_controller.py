@@ -122,7 +122,6 @@ class WirelessInputDeviceController:
         """Send out an asynchronous request to get the possible gaits and stores response in gait_future."""
         if self._possible_gait_client.service_is_ready():
             self._gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
-            print(type(self._gait_future))
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._logger.warn("Failed to contact possible gaits service")
