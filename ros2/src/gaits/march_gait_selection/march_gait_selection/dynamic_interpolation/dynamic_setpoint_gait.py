@@ -636,20 +636,6 @@ class DynamicSetpointGait(GaitInterface):
         self.add_push_off = self.gait_selection.add_push_off
         self.amount_of_steps = self.gait_selection.amount_of_steps
 
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Reset start position to home stand after force unknown.
-
-        Args:
-            msg (GaitInstruction): message containing a gait_instruction from the IPD
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position_all_joints = get_position_from_yaml("stand")
-            self.start_position_actuating_joints = {
-                name: self.start_position_all_joints[name] for name in self.joint_names
-            }
-            self.subgait_id = "right_swing"
-            self._trajectory_failed = False
-
     def _get_soft_limits(self):
         """Get the limits of all joints in the urdf."""
         self.joint_soft_limits = []
