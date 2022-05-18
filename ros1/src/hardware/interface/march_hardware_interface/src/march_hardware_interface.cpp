@@ -434,8 +434,8 @@ void MarchHardwareInterface::reserveMemory()
     joint_temperature_variance_.resize(num_joints_);
     soft_limits_.resize(num_joints_);
     soft_limits_error_.resize(num_joints_);
-    soft_limit_breach_times_.resize(num_joints_);
-    soft_limit_touched_.resize(num_joints_);
+    soft_limit_breach_times_.resize(2);
+    soft_limit_touched_.resize(2);
 
     after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
     after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
@@ -551,6 +551,7 @@ bool MarchHardwareInterface::MotorControllerStateCheck(size_t joint_index)
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
 {
     march::Joint& joint = march_robot_->getJoint(joint_index);
+    int ankle_index = -1;
 
     if (joint_position_[joint_index] < soft_limits_[joint_index].min_position
         || joint_position_[joint_index]
@@ -561,9 +562,24 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
             || joint_position_[joint_index]
                 > soft_limits_error_[joint_index].max_position) {
 
-            if (soft_limit_touched_[joint_index]
-                && ros::Time::now() - soft_limit_breach_times_[joint_index]
-                    >= ros::Duration(1)) {
+            if (joint.getName() == "left_ankle") {
+                ankle_index = 0;
+            } else if (joint.getName() == "right_ankle") {
+                ankle_index = 1;
+            }
+            bool throw_error = true;
+
+            if (ankle_index >= 0 && !soft_limit_touched_[ankle_index]) {
+                soft_limit_breach_times_[ankle_index] = ros::Time::now();
+                soft_limit_touched_[ankle_index] = true;
+                throw_error = false;
+            } else if (ankle_index >= 0) {
+                throw_error
+                    = ros::Time::now() - soft_limit_breach_times_[ankle_index]
+                    >= ankle_timeout;
+            }
+
+            if (throw_error) {
                 ROS_ERROR_THROTTLE(1,
                     "Joint %s is outside of its error soft limits (%f, %f). "
                     "Actual "
@@ -581,14 +597,10 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
                     << soft_limits_[joint_index].max_position
                     << "). Actual position: " << joint_position_[joint_index];
                 throw std::runtime_error(error_stream.str());
-
-            } else {
-                soft_limit_breach_times_[joint_index] = ros::Time::now();
-                soft_limit_touched_[joint_index] = true;
             }
 
-        } else {
-            soft_limit_touched_[joint_index] = false;
+        } else if (ankle_index >= 0) {
+            soft_limit_touched_[ankle_index] = false;
         }
 
         ROS_WARN_THROTTLE(1,
@@ -597,8 +609,9 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
             joint.getName().c_str(), soft_limits_[joint_index].min_position,
             soft_limits_[joint_index].max_position,
             joint_position_[joint_index]);
-    } else {
-        soft_limit_touched_[joint_index] = false;
+
+    } else if (ankle_index >= 0) {
+        soft_limit_touched_[ankle_index] = false;
     }
 }
 
