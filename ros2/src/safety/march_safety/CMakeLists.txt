@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME}
         src/input_device_safety.cpp
         src/safety_handler.cpp
         src/temperature_safety.cpp
+        src/effort_warner.cpp
 )
 ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp sensor_msgs std_msgs urdf march_utility)
 target_include_directories(${PROJECT_NAME} PUBLIC

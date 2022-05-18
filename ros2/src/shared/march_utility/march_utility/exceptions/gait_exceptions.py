@@ -168,17 +168,18 @@ class VelocitySoftLimitError(Exception):
         super(VelocitySoftLimitError, self).__init__(self.msg)
 
 
-class ShouldStartFromHomestandError(Exception):
-    """Exception for when the exo is not starting from "Home Stand".
+class WrongStartPositionError(Exception):
+    """Exception for when the exo is not starting from the correct position.
 
     Mainly raised if an error when the previous subgait failed and dynamic gait is selected again
     without the exo being in home stand.
 
     Args:
-        position (Dict[str, float]): current position of the exo.
+        correct_position (Dict[str, float]): position the exo should start in.
+        wrong_position (Dict[str, float]): current position of the exo.
     """
 
-    def __init__(self, position: Dict[str, float]):
-        self.msg = f"Gait can only be executed from homestand, current position is {position}."
+    def __init__(self, correct_position: Dict[str, float], wrong_position: Dict[str, float]):
+        self.msg = f"Gait can only be executed from position {correct_position}, current position is {wrong_position}."
 
-        super(ShouldStartFromHomestandError, self).__init__(self.msg)
+        super(WrongStartPositionError, self).__init__(self.msg)
