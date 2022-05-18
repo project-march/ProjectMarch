@@ -92,6 +92,9 @@ def parameter_callback(
         elif param.name == "add_push_off":
             gait_selection.add_push_off = param.value
             dynamic_gait_updated = True
+        elif param.name == "amount_of_steps":
+            gait_selection.amount_of_steps = param.get_parameter_value().integer_value
+            dynamic_gait_updated = True
         elif param.name == "use_position_queue":
             gait_selection.use_position_queue = param.get_parameter_value().bool_value
             position_queue_updated = True
@@ -112,6 +115,7 @@ def parameter_callback(
         gait_selection.dynamic_setpoint_gait.update_parameters()
     elif position_queue_updated:
         gait_selection.dynamic_setpoint_gait_step.update_parameter()
+        gait_selection.dynamic_setpoint_gait_step_and_hold.update_parameter()
     elif gaits_updated:
         # TODO: Updating the parameters in gait_selection does not work
         gait_selection.update_gaits()

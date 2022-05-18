@@ -5,26 +5,12 @@ import numpy as np
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
-from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP
-
-DEFAULT_HIP_FRACTION = 0.5
-DEFAULT_KNEE_BEND = np.deg2rad(8)
+from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
 
 X_MIN = 0.0
 X_MAX = 0.6
 Y_MIN = -0.3
 Y_MAX = 0.3
-
-JOINT_NAMES = [
-    "ankle1",
-    "hip1_aa",
-    "hip1_fe",
-    "knee1",
-    "ankle2",
-    "hip2_aa",
-    "hip2_fe",
-    "knee2",
-]
 
 
 class LiveWidget:
@@ -101,7 +87,7 @@ class LiveWidget:
         self.vertical_sliders.addWidget(self.slider_next_y, 0, 1)
 
     def create_buttons(self):
-        """Create buttons to reset pose and turn dorsiflection reduction on or off."""
+        """Create buttons to reset pose and turn dorsiflexion reduction on or off."""
         self.reset_button = QPushButton("Reset")
         self.reset_button.clicked.connect(self.reset)
 
@@ -188,10 +174,8 @@ class LiveWidget:
                 self.sliders[pose]["y"],
                 LENGTH_HIP,
                 "",
-                DEFAULT_HIP_FRACTION,
-                DEFAULT_KNEE_BEND,
-                self.reduce_df_front,
-                self.reduce_df_rear,
+                reduce_df_front=self.reduce_df_front,
+                reduce_df_rear=self.reduce_df_rear,
             )
         except (ValueError) as value_error:
             print(value_error)
