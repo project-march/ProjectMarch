@@ -434,8 +434,8 @@ void MarchHardwareInterface::reserveMemory()
     joint_temperature_variance_.resize(num_joints_);
     soft_limits_.resize(num_joints_);
     soft_limits_error_.resize(num_joints_);
-    soft_limit_breach_times_.resize(2);
-    soft_limit_touched_.resize(2);
+    soft_limit_breach_times_.resize(/*__new_size=*/2);
+    soft_limit_touched_.resize(/*__new_size=*/2);
 
     after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
     after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
