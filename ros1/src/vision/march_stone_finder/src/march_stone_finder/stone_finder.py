@@ -72,7 +72,7 @@ class StoneFinder:
         self._marker_publisher = rospy.Publisher(
             "/camera_" + left_or_right + "/found_points", MarkerArray, queue_size=1
         )
-        self._pointcloud_publisher = rospy.Publisher("/stone_finder_pointcloud", PointCloud2, queue_size=1)
+        self._pointcloud_publisher = rospy.Publisher("/stone_finder_pointcloud/" + left_or_right, PointCloud2, queue_size=1)
 
     def _retrieve_parameters(self) -> None:
         """Retrieve parameters from the ros parameter server."""
@@ -91,8 +91,9 @@ class StoneFinder:
 
         color_hsv_image, pointcloud = self._preprocess_frames(frames)
         color_segmented = self._color_segment(color_hsv_image)
+        components = self.find_connected_components(color_segmented)
 
-        contours, _ = cv2.findContours(color_segmented, 1, 2)
+        contours, _ = cv2.findContours(components, 1, 2)
         ellipses = self._find_ellipses(contours)
         closest_points = self._find_closest_points(ellipses, pointcloud)
         visualize_points = []
@@ -102,17 +103,17 @@ class StoneFinder:
             if point is not None and np.sum(np.abs(point)) > 0.02:  # check if point is not [0, 0, 0]
 
                 if self._left_or_right == "left" and (
-                    point[0] > self._margin_inside or point[0] < -self._margin_outside
+                    point[1] > self._margin_inside or point[1] < -self._margin_outside
                 ):
                     continue
                 if self._left_or_right == "right" and (
-                    point[0] < -self._margin_inside or point[0] > self._margin_outside
+                    point[1] > self._margin_outside or point[1] < -self._margin_inside 
                 ):
                     continue
 
                 try:
                     displacement = self._compute_displacement(point)
-                    if not point_published:
+                    if not point_published and displacement.point.x < -0.15 and displacement.point.x > -0.9:
                         publish_point(self._point_publisher, displacement)
                         point_published = True
                     visualize_points.append(displacement)
@@ -181,6 +182,18 @@ class StoneFinder:
         white = np.full(self._dimensions, 255, np.uint8)
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         return cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
+
+    def find_connected_components(self, color_segmented):
+        result = np.full(self._dimensions, 0, np.uint8)
+        n_components, output, _, _ = cv2.connectedComponentsWithStats(color_segmented, 8, cv2.CV_32S)
+
+        for i in range(1, n_components + 1):
+            pts = np.where(output == i)
+            if len(pts[0]) >= 1000:
+                result[output == i] = 255
+
+        return result
+
 
     def _find_ellipses(self, contours: List[np.ndarray]) -> List[cv2.ellipse]:
         """Find ellipse shapes from contours in a given image.

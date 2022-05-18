@@ -48,7 +48,7 @@
     <arg name="realsense_test_data" default="$(eval hull_finder)" doc="Whether the node which can publish pointclouds
     from datasets should be started."/>
 
-    <arg name="use_imu_data" default="$(eval (hull_finder or point_finder) and not realsense_simulation)"
+    <arg name="use_imu_data" default="$(eval ((hull_finder or point_finder or stone_finder) and not realsense_simulation))"
          doc="Whether the imu data will be used to"/>
     <arg name="ground_gait" default="$(arg use_imu_data)"
          doc="Exoskeleton will ground gait in gazebo_ui if true. When the imu data is used,
