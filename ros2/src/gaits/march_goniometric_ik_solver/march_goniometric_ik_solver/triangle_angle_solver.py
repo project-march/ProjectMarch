@@ -3,7 +3,7 @@ import numpy as np
 from typing import List
 
 
-def get_angle_from_sides(opposite_side: float, adjacent_sides: List[float]) -> float:
+def get_angle_from_sides(opposite_side: float, adjacent_sides: np.ndarray) -> float:
     """Calculates the angle in a triangle opposite to 'opposite_side' when all sides are given.
 
     Based on the cosine rule.

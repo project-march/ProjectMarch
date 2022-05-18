@@ -196,7 +196,7 @@ class LiveWidget:
         except (ValueError) as value_error:
             print(value_error)
 
-        positions = self.poses[pose].calculate_joint_positions()
+        positions = list(self.poses[pose].calculate_joint_positions().values())
 
         # shift positions to have toes of stand legs at (0,0):
         if pose == "last":
