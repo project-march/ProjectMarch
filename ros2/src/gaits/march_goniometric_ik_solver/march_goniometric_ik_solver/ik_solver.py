@@ -37,7 +37,9 @@ for name in JOINT_NAMES:
 
 # Create a constant for frequently used limits:
 ANKLE_BUFFER = np.deg2rad(1)
-MAX_ANKLE_FLEXION = get_limits_robot_from_urdf_for_inverse_kinematics("left_ankle").upper - ANKLE_BUFFER
+HIP_BUFFER = np.deg2rad(1)
+MAX_ANKLE_FLEXION = min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper) - ANKLE_BUFFER
+MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower) + HIP_BUFFER
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -502,6 +504,12 @@ class Pose:
             [self.pos_knee1, self.pos_hip, self.point_below_hip]
         )
 
+    def reduce_hip_extension(self) -> None:
+        """Reduces hip extension of one while keeping the same step size, by adding flexion to the other leg."""
+        reduction = MAX_HIP_EXTENSION - self.fe_hip1
+        self.fe_hip1 += reduction
+        self.fe_hip2 += reduction
+
     def perform_side_step(self, y: float, z: float):
         """Calculates the required hip adduction/abduction to step sidewards.
 
@@ -765,6 +773,10 @@ class Pose:
 
         if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION and self.ankle_y < 0:
             self.reduce_stance_dorsi_flexion()
+
+        # Reduce hip extension to meet constraints:
+        if self.fe_hip1 < MAX_HIP_EXTENSION:
+            self.reduce_hip_extension()
 
         # Apply side_step, hard_coded to default feet distance for now:
         self.perform_side_step(abs(self.ankle_y), abs(ankle_z))

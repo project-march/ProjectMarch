@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushBu
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
 
 X_MIN = 0.0
-X_MAX = 0.6
+X_MAX = 1.0
 Y_MIN = -0.3
 Y_MAX = 0.3
 
