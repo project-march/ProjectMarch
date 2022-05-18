@@ -158,7 +158,7 @@ private:
 
     std::vector<ros::Time> soft_limit_breach_times_;
     std::vector<bool> soft_limit_touched_;
-    ros::Duration ankle_timeout = ros::Duration(1);
+    ros::Duration ankle_timeout = ros::Duration(/*t=*/1);
 
     bool master_shutdown_allowed_command_ = false;
     bool enable_high_voltage_command_ = true;
