@@ -4,8 +4,13 @@ from typing import Optional
 
 from rclpy.node import Node
 from rclpy.time import Time
+from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
+    END_POSITION_RIGHT,
+    END_POSITION_LEFT,
+)
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
 
@@ -41,6 +46,23 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
             self._set_last_foot_position,
             DEFAULT_HISTORY_DEPTH,
         )
+        gait_selection_node.create_subscription(
+            JointState,
+            "/march/step/final_position",
+            self._update_start_position_idle_state,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        gait_selection_node.create_subscription(
+            JointState,
+            "/march/step_and_hold/final_position",
+            self._update_start_position_idle_state,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self._final_position_pub = gait_selection_node.create_publisher(
+            JointState,
+            "/march/close/final_position",
+            DEFAULT_HISTORY_DEPTH,
+        )
 
     @property
     def gait_type(self) -> Optional[str]:
@@ -74,9 +96,36 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         """
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
             self.logger.warn("Already in home stand position.")
-            return None
+            return GaitUpdate.empty()
+        elif self.start_position_all_joints == END_POSITION_RIGHT:
+            self.subgait_id = "right_swing"
+        elif self.start_position_all_joints == END_POSITION_LEFT:
+            self.subgait_id = "left_swing"
 
         self.update_parameters()
         self._start_time_next_command = current_time + first_subgait_delay
         self._next_command = self._get_trajectory_command(stop=True)
         return GaitUpdate.should_schedule_early(self._next_command)
+
+    def _update_state_machine(self) -> GaitUpdate:
+        """Update the state machine that the new subgait has begun. Also updates time stamps for the next subgait.
+
+        Returns:
+            GaitUpdate: a GaitUpdate for the state machine
+        """
+        self._final_position_pub.publish(JointState(position=self.dynamic_subgait.get_final_position().values()))
+        if self._next_command is None:
+            return GaitUpdate.finished()
+
+        self._update_time_stamps(self._next_command.duration)
+        self._scheduled_early = False
+
+        return GaitUpdate.subgait_updated()
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
