@@ -39,6 +39,7 @@ class StoneFinder:
         _listener (TransformListener): A ROS TF frame transformation listener.
         _point_publisher (Publisher): Publisher for found points to step towards.
         _marker_publisher (Publisher): Marker publisher for the found points.
+        _pointcloud_publisher (Publisher): Pointcloud publisher for visualization.
 
     Reconfigurable Parameters:
         _ellipse_similarity_threshold (float): Required similarity cost for a shape to be considered an ellipse.
@@ -72,7 +73,9 @@ class StoneFinder:
         self._marker_publisher = rospy.Publisher(
             "/camera_" + left_or_right + "/found_points", MarkerArray, queue_size=1
         )
-        self._pointcloud_publisher = rospy.Publisher("/stone_finder_pointcloud/" + left_or_right, PointCloud2, queue_size=1)
+        self._pointcloud_publisher = rospy.Publisher(
+            "/stone_finder_pointcloud/" + left_or_right, PointCloud2, queue_size=1
+        )
 
     def _retrieve_parameters(self) -> None:
         """Retrieve parameters from the ros parameter server."""
@@ -91,8 +94,7 @@ class StoneFinder:
 
         color_hsv_image, pointcloud = self._preprocess_frames(frames)
         color_segmented = self._color_segment(color_hsv_image)
-        components = self.find_connected_components(color_segmented)
-
+        components = self._find_connected_components(color_segmented)
         contours, _ = cv2.findContours(components, 1, 2)
         ellipses = self._find_ellipses(contours)
         closest_points = self._find_closest_points(ellipses, pointcloud)
@@ -101,23 +103,22 @@ class StoneFinder:
 
         for point in closest_points:
             if point is not None and np.sum(np.abs(point)) > 0.02:  # check if point is not [0, 0, 0]
-
                 if self._left_or_right == "left" and (
                     point[1] > self._margin_inside or point[1] < -self._margin_outside
                 ):
                     continue
                 if self._left_or_right == "right" and (
-                    point[1] > self._margin_outside or point[1] < -self._margin_inside 
+                    point[1] > self._margin_outside or point[1] < -self._margin_inside
                 ):
                     continue
 
                 try:
                     displacement = self._compute_displacement(point)
+                    # Point should be at least 0.15 m and at most 0.9 m far away
                     if not point_published and displacement.point.x < -0.15 and displacement.point.x > -0.9:
                         publish_point(self._point_publisher, displacement)
                         point_published = True
                     visualize_points.append(displacement)
-
                     self._last_time_point_found = rospy.Time.now()
                     self._not_found_counter = 0
                     continue
@@ -183,7 +184,15 @@ class StoneFinder:
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         return cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
 
-    def find_connected_components(self, color_segmented):
+    def _find_connected_components(self, color_segmented):
+        """Finds connected components of a minimum pixel size in a black and white color segmented image.
+
+        Args:
+            color_segmented (np.ndarray): The color segmented image in black and white.
+
+        Returns:
+            np.ndarray: An black and white image where all connected components are white.
+        """
         result = np.full(self._dimensions, 0, np.uint8)
         n_components, output, _, _ = cv2.connectedComponentsWithStats(color_segmented, 8, cv2.CV_32S)
 
@@ -193,7 +202,6 @@ class StoneFinder:
                 result[output == i] = 255
 
         return result
-
 
     def _find_ellipses(self, contours: List[np.ndarray]) -> List[cv2.ellipse]:
         """Find ellipse shapes from contours in a given image.
