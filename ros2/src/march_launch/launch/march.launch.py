@@ -297,12 +297,12 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="location_x",
-                default_value="0.4",
+                default_value="0.5",
                 description="x-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
                 name="location_y",
-                default_value="0.0",
+                default_value="0.03",
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
