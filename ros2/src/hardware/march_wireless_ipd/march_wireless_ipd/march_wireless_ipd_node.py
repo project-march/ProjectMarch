@@ -20,7 +20,6 @@ def sys_exit(*_):
 
 def main():
     """Initialize wireless IPD node."""
-
     rclpy.init()
     node = rclpy.create_node(NODE_NAME)
     logger = Logger(node, NODE_NAME)
