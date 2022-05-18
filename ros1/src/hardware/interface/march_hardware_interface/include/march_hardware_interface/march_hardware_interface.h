@@ -156,6 +156,9 @@ private:
     std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
     std::vector<joint_limits_interface::SoftJointLimits> soft_limits_error_;
 
+    std::vector<ros::Time> soft_limit_breach_times_;
+    std::vector<bool> soft_limit_touched_;
+
     bool master_shutdown_allowed_command_ = false;
     bool enable_high_voltage_command_ = true;
     bool reset_motor_controllers_ = false;
