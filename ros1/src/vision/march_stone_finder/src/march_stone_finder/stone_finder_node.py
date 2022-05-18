@@ -7,6 +7,9 @@ import pyrealsense2 as rs
 from dynamic_reconfigure.server import Server
 from march_stone_finder.cfg import parametersConfig
 
+LEFT_SERIAL_NUMBER = "944622074337"
+RIGHT_SERIAL_NUMBER = "944622071535"
+
 
 def callback(config, _):
     """Notify when parameters are updated."""
@@ -21,7 +24,7 @@ def main():
 
     context = rs.context()
     pipelines = []
-    serial_numbers = ["944622074337", "944622071535"]
+    serial_numbers = [LEFT_SERIAL_NUMBER, RIGHT_SERIAL_NUMBER]
 
     # Perform hardware resets on cameras
     while True:

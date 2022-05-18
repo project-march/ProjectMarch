@@ -29,7 +29,7 @@ def convert_depth_frame_to_pointcloud(depth_image: np.ndarray, camera_intrinsics
     x = (u - camera_intrinsics.ppx) / camera_intrinsics.fx
     y = (v - camera_intrinsics.ppy) / camera_intrinsics.fy
 
-    z = depth_image / 1000
+    z = depth_image / 1000  # Set depth values to meters
     x = np.multiply(x, z)
     y = np.multiply(y, z)
 

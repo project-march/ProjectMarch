@@ -15,6 +15,12 @@ from sensor_msgs.msg import PointCloud2
 import std_msgs.msg
 import sensor_msgs.point_cloud2 as pcl2
 
+DIMENSIONS = (480, 640)
+LOWER_HSV_PLATE = np.array([0, 0, 77])
+UPPER_HSV_PLATE = np.array([57, 249, 228])
+LOWER_HSV_STONE = np.array([62, 40, 113])
+UPPER_HSV_STONE = np.array([174, 151, 219])
+
 
 class StoneFinder:
     """Class that looks for gray ellipses in a color frame, and return the center of the closest ellipse as a depth point.
@@ -22,12 +28,14 @@ class StoneFinder:
     Args:
         left_or_right (str): Whether the class is used to find left or right points.
 
+    Constants:
+        DIMENSIONS (Tuple[int, int]): Dimensions of the realsense frames.
+        LOWER_HSV_PLATE (np.ndarray): Lower HSV values of the base plate color for color segmentation.
+        UPPER_HSV_PLATE (np.ndarray): Upper HSV values of the base plate color for color segmentation.
+        LOWER_HSV_STONE (np.ndarray): Lower HSV values of the stone color for color segmentation.
+        UPPER_HSV_STONE (np.ndarray): Upper HSV values of the stone color for color segmentation.
+
     Attributes:
-        _dimensions (Tuple[int, int]): Dimensions of the realsense frames.
-        _lower_HSV_plate (np.ndarray): Lower HSV values of the base plate color for color segmentation.
-        _upper_HSV_plate (np.ndarray): Upper HSV values of the base plate color for color segmentation.
-        _lower_HSV_stone (np.ndarray): Lower HSV values of the stone color for color segmentation.
-        _upper_HSV_stone (np.ndarray): Upper HSV values of the stone color for color segmentation.
         _decimation_filter (rs.decimation_filter): Realsense decimation filter.
         _spatial_filter (rs.spatial_filter): Realsense spatial filter.
         _align (rs.align): Realsense alignment object.
@@ -50,11 +58,6 @@ class StoneFinder:
 
     def __init__(self, left_or_right: str) -> None:
         """Constructor of the stone finder."""
-        self._dimensions = (480, 640)
-        self._lower_HSV_plate = np.array([0, 0, 77])
-        self._upper_HSV_plate = np.array([57, 249, 228])
-        self._lower_HSV_stone = np.array([62, 40, 113])
-        self._upper_HSV_stone = np.array([174, 151, 219])
         self._decimation_filter = rs.decimation_filter(3)
         self._spatial_filter = rs.spatial_filter()
         self._align = rs.align(rs.stream.color)
@@ -163,7 +166,7 @@ class StoneFinder:
         header = std_msgs.msg.Header()
         header.stamp = rospy.Time.now()
         header.frame_id = self._camera_frame_id
-        pointcloud_reshaped = pointcloud.reshape((self._dimensions[0] * self._dimensions[1], 3))
+        pointcloud_reshaped = pointcloud.reshape((DIMENSIONS[0] * DIMENSIONS[1], 3))
         pointcloud_msg = pcl2.create_cloud_xyz32(header, pointcloud_reshaped[::8])
         self._pointcloud_publisher.publish(pointcloud_msg)
 
@@ -178,9 +181,9 @@ class StoneFinder:
         Returns:
             np.ndarray: The color segmented image in black and white.
         """
-        mask_gray = cv2.inRange(color_hsv_image, self._lower_HSV_stone, self._upper_HSV_stone)
-        mask_wood = cv2.inRange(color_hsv_image, self._lower_HSV_plate, self._upper_HSV_plate)
-        white = np.full(self._dimensions, 255, np.uint8)
+        mask_gray = cv2.inRange(color_hsv_image, LOWER_HSV_STONE, UPPER_HSV_STONE)
+        mask_wood = cv2.inRange(color_hsv_image, LOWER_HSV_PLATE, UPPER_HSV_PLATE)
+        white = np.full(DIMENSIONS, 255, np.uint8)
         filtered = cv2.bitwise_and(white, white, mask=mask_gray)
         return cv2.bitwise_and(filtered, cv2.bitwise_not(white, white, mask=mask_wood))
 
@@ -193,7 +196,7 @@ class StoneFinder:
         Returns:
             np.ndarray: An black and white image where all connected components are white.
         """
-        result = np.full(self._dimensions, 0, np.uint8)
+        result = np.full(DIMENSIONS, 0, np.uint8)
         n_components, output, _, _ = cv2.connectedComponentsWithStats(color_segmented, 8, cv2.CV_32S)
 
         for i in range(1, n_components + 1):
@@ -223,9 +226,9 @@ class StoneFinder:
             ellipse = cv2.fitEllipse(contour)
 
             try:
-                contour_mask = np.zeros(self._dimensions, np.uint8)
+                contour_mask = np.zeros(DIMENSIONS, np.uint8)
                 contour_mask = cv2.drawContours(contour_mask, convex_hull, -1, 255, 2)
-                ellipse_mask = np.zeros(self._dimensions, np.uint8)
+                ellipse_mask = np.zeros(DIMENSIONS, np.uint8)
                 ellipse_mask = cv2.ellipse(ellipse_mask, ellipse, 255, 2)
             except cv2.error:
                 continue
