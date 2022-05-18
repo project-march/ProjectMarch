@@ -7,7 +7,7 @@ from rclpy.time import Time
 from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
     END_POSITION_RIGHT,
     END_POSITION_LEFT,
 )
