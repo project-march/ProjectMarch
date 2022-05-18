@@ -31,6 +31,16 @@ PREDETERMINED_FOOT_LOCATIONS = {
 
 
 class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
+    """Class for doing step and closes on the cybathlon stepping stones obstacle.
+
+    Args:
+        gait_selection_node (GaitSelection): the gait selection node
+
+    Attributes:
+        _start_from_left_side (bool): whether the gaits start with a left swing
+        _use_predetermined_foot_location (bool): whether one of the five predetermined locations will be used
+    """
+
     def __init__(self, gait_selection_node):
         super().__init__(gait_selection_node)
         self._start_from_left_side = False
@@ -54,9 +64,9 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
     def start(
-            self,
-            current_time: Time,
-            first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
+        self,
+        current_time: Time,
+        first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> Optional[GaitUpdate]:
         """Starts the gait. The subgait will be scheduled with the delay given by first_subgait_delay.
 
@@ -138,6 +148,7 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
             self.logger.warn(f"Can only change start side in home stand position. {e.msg}")
 
     def _predetermined_foot_location_callback(self, msg: String) -> None:
+        """Sets the predetermined foot location to the requested location given by the IPD."""
         self._use_predetermined_foot_location = True
         self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
         self.logger.info(f"Stepping to stone {msg.data}")

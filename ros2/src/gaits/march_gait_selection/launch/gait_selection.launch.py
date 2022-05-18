@@ -84,7 +84,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="add_cybathlon_gaits",
                 default_value="False",
-                description="Will add gaits created specifically for cybathlon obstacles to gait selection."
+                description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
             ),
             # State machine parameters:
             DeclareLaunchArgument(

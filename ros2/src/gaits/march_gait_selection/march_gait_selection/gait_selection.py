@@ -45,7 +45,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_c
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import (
     DynamicSetpointGaitStep,
 )
-from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import(
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import (
     SteppingStonesStepAndClose,
 )
 from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (

@@ -234,7 +234,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             DeclareLaunchArgument(
                 name="add_cybathlon_gaits",
                 default_value="False",
-                description="Will add gaits created specifically for cybathlon obstacles to gait selection."
+                description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
             ),
             DeclareLaunchArgument(
                 name="first_subgait_delay",
