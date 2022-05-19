@@ -483,7 +483,7 @@ class DynamicSetpointGait(GaitInterface):
         if not start:
             try:
                 return self._get_stop_gait()
-            except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+            except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
                 self.logger.warn(f"Can not get stop gait. {e.msg}")
 
         # If close gait is not feasible, stop gait completely
@@ -524,7 +524,7 @@ class DynamicSetpointGait(GaitInterface):
                 self.subgait_id,
                 self._start_time_next_command,
             )
-        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
                 self.logger.warn(
                     f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
@@ -551,7 +551,7 @@ class DynamicSetpointGait(GaitInterface):
         )
         try:
             subgait.get_joint_trajectory_msg(self.add_push_off)
-        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
                 self.logger.warn(f"Second step is not feasible. {e.msg}")
             return False
