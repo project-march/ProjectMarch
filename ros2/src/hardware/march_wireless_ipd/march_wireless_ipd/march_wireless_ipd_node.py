@@ -5,9 +5,12 @@ from .wireless_ipd_controller import WirelessInputDeviceController
 import rclpy
 from march_utility.utilities.logger import Logger
 import threading
-import signal
 import sys
-from contextlib import suppress
+from rclpy.executors import MultiThreadedExecutor
+
+NODE_NAME = "march_wireless_ipd_node"
+PORT = 4000
+IP = "192.168.0.101"
 
 
 def sys_exit(*_):
@@ -17,23 +20,22 @@ def sys_exit(*_):
 
 def main():
     """Initialize wireless IPD node."""
-    ip = "192.168.0.100"
     rclpy.init()
-
-    node = rclpy.create_node("march_wireless_ipd_node")
-    logger = Logger(node, "march_wireless_ipd_node")
+    node = rclpy.create_node(NODE_NAME)
+    logger = Logger(node, NODE_NAME)
     controller = WirelessInputDeviceController(node, logger)
-    manager = ConnectionManager(ip, 4000, controller, node, logger)
-    thr = threading.Thread(target=manager.establish_connection)
-    thr.daemon = True
-    thr.start()
+    manager = ConnectionManager(IP, PORT, controller, node, logger)
+    executor = MultiThreadedExecutor()
 
-    signal.signal(signal.SIGTERM, sys_exit)
+    def spin_node():
+        rclpy.spin(node, executor)
 
-    with suppress(KeyboardInterrupt):
-        rclpy.spin(node)
+    # Spinning is done from a new thread, because manager.establish_connection() is blocking
+    spin_thread = threading.Thread(target=spin_node)
+    spin_thread.daemon = True
+    spin_thread.start()
 
-    rclpy.shutdown()
+    manager.establish_connection()
 
 
 if __name__ == "__main__":

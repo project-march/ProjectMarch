@@ -9,6 +9,9 @@ from march_shared_msgs.msg import CurrentGait, CurrentState
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
+from march_shared_msgs.msg import FootPosition
+from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import FOOT_LOCATION_TIME_OUT
 from rclpy.node import Node
 
 HEARTBEAT_TIMEOUT = Duration(0.5)
@@ -40,6 +43,14 @@ class ConnectionManager:
         _current_gait (str): The current gait of the exoskeleton, runnin or just finished.
         _last_heartbeat (Time): Last time a message has been received from the wireless IPD.
         _stopped (bool): Whether stop was pressed on the IPD.
+        _last_left_displacement (List): Last displacement found for the left foot with the cameras.
+        _last_right_displacement (List): Last displacement found for the right foot with the cameras.
+        _last_left_point_timestamp (Time): Last time a left point has been found.
+        _last_right_point_timestamp (Time): Last time a right point has been found.
+
+    Subscriptions:
+    - /march/foot_position/left
+    - /march/foot_position/right
     """
 
     def __init__(self, host: str, port: int, controller: WirelessInputDeviceController, node: Node, logger: Logger):
@@ -58,10 +69,27 @@ class ConnectionManager:
         self._current_gait = "unknown"
         self._last_heartbeat = self._node.get_clock().now()
         self._stopped = False
+        self._last_left_point = [0, 0, 0]
+        self._last_right_point = [0, 0, 0]
+        self._last_left_point_timestamp = self._node.get_clock().now()
+        self._last_right_point_timestamp = self._node.get_clock().now()
         self._controller.accepted_cb = partial(self._send_message_till_confirm, "Accepted", True)
         self._controller.rejected_cb = partial(self._send_message_till_confirm, "Reject")
         self._controller.current_gait_cb = self._current_gait_cb
         self._controller.current_state_cb = self._current_state_cb
+
+        self._subscription_left = self._node.create_subscription(
+            FootPosition,
+            "/march/foot_position/left",
+            self._callback_left,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self._subscription_right = self._node.create_subscription(
+            FootPosition,
+            "/march/foot_position/right",
+            self._callback_right,
+            DEFAULT_HISTORY_DEPTH,
+        )
 
     def _current_gait_cb(self, msg: CurrentGait):
         """Callback when the exoskeleton gait is updated."""
@@ -76,6 +104,16 @@ class ConnectionManager:
         if msg.state == "unknown" or "home" in msg.state:
             self._current_gait = msg.state
 
+    def _callback_left(self, msg: FootPosition):
+        """Callback when a new left foot position is found."""
+        self._last_left_point = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
+        self._last_left_point_timestamp = self._node.get_clock().now()
+
+    def _callback_right(self, msg: FootPosition):
+        """Callback when a new right foot position is found."""
+        self._last_right_point = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
+        self._last_right_point_timestamp = self._node.get_clock().now()
+
     def _validate_received_data(self, msg: str):
         """Check if a received message is valid or is empty, meaning the connection is broken.
 
@@ -84,7 +122,6 @@ class ConnectionManager:
         """
         if msg == "":
             self._logger.warning("Connection lost with wireless IPD (empty message)")
-            self._empty_socket()
             raise socket.error
         else:
             self._last_heartbeat = self._node.get_clock().now()
@@ -101,7 +138,6 @@ class ConnectionManager:
                     counter += 1
 
                 req = self._wait_for_message(5.0)
-                self._empty_socket()
 
                 req = json.loads(req)
                 self._seq = req["seq"]
@@ -123,7 +159,6 @@ class ConnectionManager:
                 elif msg_type == "Information" and "swing" in req["message"]:
                     self._controller.publish_start_side(req["message"])
                     self._send_message_till_confirm(msg_type="Information", message=req["message"])
-                    self._logger.info("Switch side to " + req["message"])
 
             except (json.JSONDecodeError, BlockingIOError):
                 continue
@@ -164,7 +199,8 @@ class ConnectionManager:
             counter += 1
 
         self._requested_gait = req["gait"]["gaitName"]
-        if self._requested_gait in future.result().gaits:
+
+        if future.result() is not None and self._requested_gait in future.result().gaits:
             self._controller.publish_gait(self._requested_gait)
         else:
             self._logger.warning("Failed gait: " + self._requested_gait)
@@ -216,7 +252,16 @@ class ConnectionManager:
         if self._connection is None:
             return
 
-        msg = {"type": msg_type, "currentGait": send_gait, "message": message, "seq": self._seq}
+        point_left, point_right = self._update_points()
+
+        msg = {
+            "type": msg_type,
+            "currentGait": send_gait,
+            "message": message,
+            "seq": self._seq,
+            "point_left": point_left,
+            "point_right": point_right,
+        }
 
         while True:
             try:
@@ -232,9 +277,10 @@ class ConnectionManager:
                         self._empty_socket()
                         return
                     else:
-                        raise socket.error
+                        self._empty_socket()
+                        self._seq = seq
+                        continue
 
-                self._empty_socket()
             except (json.JSONDecodeError, BlockingIOError):
                 continue
 
@@ -242,11 +288,9 @@ class ConnectionManager:
             except socket.timeout as e:
                 if (self._node.get_clock().now() - self._last_heartbeat) > HEARTBEAT_TIMEOUT:
                     self._logger.warning("Connection lost with wireless IPD (no heartbeat)")
-                    self._empty_socket()
                     raise e
 
             except socket.error as e:
-                self._empty_socket()
                 raise e
 
     def establish_connection(self):
@@ -264,13 +308,21 @@ class ConnectionManager:
             except (socket.timeout, socket.error) as e:
                 self._logger.warning(repr(e))
                 self._logger.warning("Reconnecting Wireless IPD")
+
             self._connection.close()
 
     def _empty_socket(self):
         """Empty all remaining messages on the socket connection."""
         while True:
-            input_ready, _, _ = select.select([self._socket], [], [], 0.0)
+            input_ready, _, _ = select.select([self._connection], [], [], 0.0)
             if len(input_ready) == 0:
                 break
             for s in input_ready:
                 s.recv(1)
+
+    def _update_points(self):
+        """Update point found with the cameras before sending them to the IPD."""
+        now = self._node.get_clock().now()
+        left = self._last_left_point if now - self._last_left_point_timestamp <= FOOT_LOCATION_TIME_OUT else None
+        right = self._last_right_point if now - self._last_right_point_timestamp <= FOOT_LOCATION_TIME_OUT else None
+        return left, right

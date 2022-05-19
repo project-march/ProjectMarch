@@ -14,6 +14,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 output="screen",
                 name="wireless_ipd",
                 namespace="march",
+                respawn=True,
             ),
         ]
     )
