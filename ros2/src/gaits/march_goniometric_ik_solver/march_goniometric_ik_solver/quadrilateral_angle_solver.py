@@ -43,15 +43,20 @@ def get_intersection_of_circles(p0: np.array, p1: np.array, r0: float, r1: float
     """
     d = np.linalg.norm(p0 - p1)
     dis_p0_p2 = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
-    h = np.sqrt(r0 ** 2 - dis_p0_p2 ** 2)
-    p2 = p0 + dis_p0_p2 * (p1 - p0) / d
 
-    p3 = []
+    # Return None if input is invalid:
+    if r0 ** 2 - dis_p0_p2 ** 2 > 0:
+        h = np.sqrt(r0 ** 2 - dis_p0_p2 ** 2)
+        p2 = p0 + dis_p0_p2 * (p1 - p0) / d
 
-    for kernel in [np.array([-1, 1]), np.array([1, -1])]:
-        p3.append(p2 + kernel * h / d * np.flip(p1 - p0))
+        p3 = []
 
-    return p3
+        for kernel in [np.array([-1, 1]), np.array([1, -1])]:
+            p3.append(p2 + kernel * h / d * np.flip(p1 - p0))
+
+        return p3
+    else:
+        return [None, None]
 
 
 def find_fourth_point(
