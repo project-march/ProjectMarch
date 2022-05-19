@@ -11,6 +11,7 @@ from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import FOOT_LOCATION_TIME_OUT
 from rclpy.node import Node
 
 HEARTBEAT_TIMEOUT = Duration(0.5)
@@ -322,6 +323,6 @@ class ConnectionManager:
     def _update_points(self):
         """Update point found with the cameras before sending them to the IPD."""
         now = self._node.get_clock().now()
-        point_left = self._last_left_point if now - self._last_left_point_timestamp <= Duration(0.5) else None
-        point_right = self._last_right_point if now - self._last_right_point_timestamp <= Duration(0.5) else None
-        return point_left, point_right
+        left = self._last_left_point if now - self._last_left_point_timestamp <= FOOT_LOCATION_TIME_OUT else None
+        right = self._last_right_point if now - self._last_right_point_timestamp <= FOOT_LOCATION_TIME_OUT else None
+        return left, right
