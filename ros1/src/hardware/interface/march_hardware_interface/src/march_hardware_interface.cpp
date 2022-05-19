@@ -562,11 +562,13 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
             || joint_position_[joint_index]
                 > soft_limits_error_[joint_index].max_position) {
 
+            // Add a timeout for the soft limits errors to the ankles only
             if (joint.getName() == "left_ankle") {
                 ankle_index = 0;
             } else if (joint.getName() == "right_ankle") {
                 ankle_index = 1;
             }
+
             bool throw_error = true;
 
             if (ankle_index >= 0 && !soft_limit_touched_[ankle_index]) {
@@ -579,6 +581,7 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
                     >= ankle_timeout;
             }
 
+            // This error is always thrown for joints other than the ankles
             if (throw_error) {
                 ROS_ERROR_THROTTLE(1,
                     "Joint %s is outside of its error soft limits (%f, %f). "
