@@ -21,7 +21,7 @@ from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import WrongStartPositionError
 from march_utility.utilities.utility_functions import get_position_from_yaml
 
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPosition, GaitInstruction
 from geometry_msgs.msg import Point
 from std_msgs.msg import Header, String
 
@@ -279,3 +279,15 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         self.logger.info(
             f"Stepping to stone {msg.data} with a step size of {self._predetermined_foot_location.processed_point.x}"
         )
+
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Reset start position to home stand after force unknown.
+
+        Args:
+            msg (GaitInstruction): message containing a gait_instruction from the IPD
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self._set_start_position_to_home_stand()
+            self._use_predetermined_foot_location = False
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
