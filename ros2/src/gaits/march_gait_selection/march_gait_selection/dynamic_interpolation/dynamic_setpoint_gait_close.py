@@ -121,11 +121,3 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         self._scheduled_early = False
 
         return GaitUpdate.subgait_updated()
-
-    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
-        """Update the start position of the next subgait to be the last position of the previous gait."""
-        for i, name in enumerate(self.all_joint_names):
-            self.start_position_all_joints[name] = joint_state.position[i]
-        self.start_position_actuating_joints = {
-            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
-        }

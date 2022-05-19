@@ -27,6 +27,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 
 from march_shared_msgs.msg import FootPosition, GaitInstruction
+from sensor_msgs.msg import JointState
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 DURATION_INCREASE_FACTOR = 1.5
@@ -344,6 +345,14 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
         self.start_position_all_joints = self.dynamic_subgait.get_final_position()
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
         self.start_position_actuating_joints = {
             name: self.start_position_all_joints[name] for name in self.actuating_joint_names
         }

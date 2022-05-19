@@ -233,11 +233,3 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             self._trajectory_failed = False
             self.position_queue = Queue()
             self._fill_queue()
-
-    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
-        """Update the start position of the next subgait to be the last position of the previous gait."""
-        for i, name in enumerate(self.all_joint_names):
-            self.start_position_all_joints[name] = joint_state.position[i]
-        self.start_position_actuating_joints = {
-            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
-        }
