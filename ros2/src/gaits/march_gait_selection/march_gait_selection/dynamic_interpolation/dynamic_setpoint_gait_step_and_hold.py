@@ -276,4 +276,6 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
     def _predetermined_foot_location_callback(self, msg: String) -> None:
         self._use_predetermined_foot_location = True
         self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
-        self.logger.info(f"Stepping to stone {msg.data}")
+        self.logger.info(
+            f"Stepping to stone {msg.data} with a step size of {self._predetermined_foot_location.processed_point.x}"
+        )

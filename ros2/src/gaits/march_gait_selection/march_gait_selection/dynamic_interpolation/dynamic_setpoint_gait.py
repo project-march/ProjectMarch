@@ -80,12 +80,10 @@ class DynamicSetpointGait(GaitInterface):
 
         self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.home_stand_position_all_joints = get_position_from_yaml("stand")
-        self.start_position_actuating_joints = copy(self.home_stand_position_actuating_joints)
-        self.start_position_all_joints = copy(self.home_stand_position_all_joints)
-
-        self._reset()
         self.all_joint_names = self.home_stand_position_all_joints.keys()
         self.actuating_joint_names = get_joint_names_from_urdf()
+        self._set_start_position_to_home_stand()
+        self._reset()
         self._get_soft_limits()
 
         self.gait_name = "dynamic_walk"
@@ -209,11 +207,9 @@ class DynamicSetpointGait(GaitInterface):
         self._scheduled_early = False
 
         self._trajectory_failed = False
-
-        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
-        self.start_position_all_joints = get_position_from_yaml("stand")
-
         self._step_counter = 0
+
+        self._set_start_position_to_home_stand()
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -649,12 +645,16 @@ class DynamicSetpointGait(GaitInterface):
             msg (GaitInstruction): message containing a gait_instruction from the IPD
         """
         if msg.type == GaitInstruction.UNKNOWN:
-            self.start_position_all_joints = copy(self.home_stand_position_all_joints)
-            self.start_position_actuating_joints = {
-                name: self.start_position_all_joints[name] for name in self.actuating_joint_names
-            }
+            self._set_start_position_to_home_stand()
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
+
+    def _set_start_position_to_home_stand(self) -> None:
+        """Sets the starting position to home_stand."""
+        self.start_position_all_joints = copy(self.home_stand_position_all_joints)
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
 
     def _is_foot_location_too_old(self, foot_location: FootPosition) -> bool:
         """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.

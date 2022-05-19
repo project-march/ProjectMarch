@@ -1,8 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
 import os
-from copy import copy
-
 import yaml
 
 from queue import Queue
@@ -75,12 +73,9 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         self._should_stop = False
         self._end = False
-
         self._start_time_next_command = None
         self._current_time = None
-
         self._next_command = None
-
         self._start_is_delayed = True
         self._scheduled_early = False
 
@@ -224,11 +219,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
         """
         if msg.type == GaitInstruction.UNKNOWN:
-            # TODO: Refactor such that _reset method can be used
-            self.start_position_all_joints = copy(self.home_stand_position_all_joints)
-            self.start_position_actuating_joints = {
-                name: self.start_position_all_joints[name] for name in self.actuating_joint_names
-            }
+            self._set_start_position_to_home_stand()
             self.subgait_id = "right_swing"
             self._trajectory_failed = False
             self.position_queue = Queue()
