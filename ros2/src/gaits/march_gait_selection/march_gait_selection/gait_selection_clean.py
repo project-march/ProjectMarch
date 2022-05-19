@@ -1,15 +1,15 @@
 """Author: Marten Haitjema."""
 
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import yaml
 from ament_index_python import get_package_share_directory
-from rclpy import Node
+from rclpy.node import Node
 from rclpy.exceptions import ParameterNotDeclaredException
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
     DynamicSetpointGaitStepAndHold,
 )
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
@@ -21,10 +21,10 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_c
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.exceptions.gait_exceptions import NonValidGaitContentError
-from march_utility.gait.edge_position import StaticEdgePosition, UnknownEdgePosition
+from march_utility.gait.edge_position import UnknownEdgePosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.logger import Logger
-from march_utility.utilities.node_utils import get_joint_names_from_robot
+from march_utility.utilities.node_utils import get_joint_names_from_robot, get_robot_urdf_from_service
 
 NODE_NAME = "gait_selection"
 UNKNOWN = "unknown"
@@ -34,23 +34,23 @@ class GaitSelectionClean(Node):
     """Base class for the gait selection module."""
 
     def __init__(
-            self,
-            gait_package: Optional[str] = None,
-            directory: Optional[str] = None,
-            robot: Optional[urdf.Robot] = None,
-            dynamic_gait: Optional[bool] = None,
+        self,
+        gait_package: Optional[str] = None,
+        directory: Optional[str] = None,
+        robot: Optional[urdf.Robot] = None,
+        dynamic_gait: Optional[bool] = None,
     ):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         self.logger = Logger(self, __class__.__name__)
-        self._robot = robot
+        self._robot = self._robot = get_robot_urdf_from_service(self) if robot is None else robot
         self._joint_names = sorted(get_joint_names_from_robot(self._robot))
         self._get_gait_parameters(gait_package, directory, dynamic_gait)
 
         package_path = get_package_share_directory(self._gait_package)
         self._gait_directory = os.path.join(package_path, self._directory_name)
         self._default_positions_yaml = os.path.join(self._gait_directory, "default_positions.yaml")
-        self.gaits = {}
-        self._positions = {}
+        self._loaded_gaits = {}
+        self._named_positions = {}
         self._load_gaits()
 
     @property
@@ -61,7 +61,7 @@ class GaitSelectionClean(Node):
     @property
     def gaits(self) -> dict:
         """Return a dictionary containing the loaded gaits."""
-        return self.gaits
+        return self._loaded_gaits
 
     @property
     def robot(self) -> urdf.Robot:
@@ -115,8 +115,8 @@ class GaitSelectionClean(Node):
 
     def _load_gaits(self) -> None:
         """Load all gaits."""
-        self._load_dynamic_gaits()
         self._load_named_positions()
+        self._load_dynamic_gaits()
         self._load_home_gaits()
         self._load_sit_and_stand_gaits()
 
@@ -136,7 +136,7 @@ class GaitSelectionClean(Node):
         ]
 
         for dynamic_gait in dynamic_gaits:
-            self.gaits[dynamic_gait.name] = dynamic_gait
+            self._loaded_gaits[dynamic_gait.name] = dynamic_gait
 
     def _load_named_positions(self) -> None:
         """Load the named positions from default.yaml."""
@@ -146,35 +146,42 @@ class GaitSelectionClean(Node):
         self._gait_version_map = default_config["gaits"]
 
         for position_name, position_values in default_config["positions"].items():
-            self._positions[position_name] = {
+            self._named_positions[position_name] = {
                 "gait_type": position_values["gait_type"],
                 "joints": {},
             }
             for joint, joint_value in position_values["joints"].items():
                 if joint in self._joint_names:
-                    self._positions[position_name]["joints"][joint] = joint_value
+                    self._named_positions[position_name]["joints"][joint] = joint_value
 
-            if set(self._positions[position_name]["joints"].keys()) != set(self._joint_names):
+            if set(self._named_positions[position_name]["joints"].keys()) != set(self._joint_names):
                 raise NonValidGaitContentError(
                     f"The position {position_name} does not have a position for all required joints: it "
-                    f"has {self._positions[position_name]['joints'].keys()}, required: {self._joint_names}"
+                    f"has {self._named_positions[position_name]['joints'].keys()}, required: {self._joint_names}"
                 )
-
-        self._named_positions = {
-            StaticEdgePosition(position["joints"]): name for name, position in self._positions.items()
-        }
-        self._named_positions[UnknownEdgePosition()] = UNKNOWN
 
     def _load_home_gaits(self) -> None:
         """Create the home gaits based on the named positions."""
-        for position, name in self._named_positions.items():
+        for name in self._named_positions.keys():
+            position = self._named_positions[name]["joints"]
             if isinstance(position, UnknownEdgePosition):
                 continue
-            position_dict = dict(zip(self._joint_names, position.values))
-            home_gait = HomeGait(name, position_dict, "")
+            home_gait = HomeGait(name, position, "")
             self.gaits[home_gait.name] = home_gait
 
     def _load_sit_and_stand_gaits(self) -> None:
         """Loads the sit and stand gaits."""
         for gait in self._gait_version_map:
-            self.gaits[gait] = SetpointsGait.from_file(gait, self._gait_directory, self._robot, self._gait_version_map)
+            self._loaded_gaits[gait] = SetpointsGait.from_file(
+                gait, self._gait_directory, self._robot, self._gait_version_map
+            )
+
+    def get_named_position(self, position: str) -> Dict[str, float]:
+        """Returns a joint dict of a named position from the gait_selection node.
+
+        Args:
+            position (str): name of the position
+        Returns:
+            Dict[str, float]: a dict containing joint names and positions for the actuating joints.
+        """
+        return self.positions[position]["joints"]
