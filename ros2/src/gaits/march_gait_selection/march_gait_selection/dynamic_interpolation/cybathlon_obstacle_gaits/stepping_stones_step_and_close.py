@@ -106,6 +106,7 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
         Returns:
             TrajectoryCommand: command with the current subgait and start time
         """
+        assert start != stop
         if stop:
             self.logger.info("Stopping dynamic gait.")
         else:
