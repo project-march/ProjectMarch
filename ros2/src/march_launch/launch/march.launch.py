@@ -36,7 +36,8 @@ def generate_launch_description() -> LaunchDescription:
     The settable ros parameters are:
         use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
             Default is True.
-        ...
+        wireless_ipd (bool): Whether the wireless IPD connection manager node should be started.
+            Default is False.
     """
     # General arguments
     use_sim_time = LaunchConfiguration("use_sim_time")
@@ -44,6 +45,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
+    wireless_ipd = LaunchConfiguration("wireless_ipd")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
     layout = LaunchConfiguration("layout")
 
@@ -76,6 +78,7 @@ def generate_launch_description() -> LaunchDescription:
     push_off_position = LaunchConfiguration("push_off_position")
     add_push_off = LaunchConfiguration("add_push_off")
     use_position_queue = LaunchConfiguration("use_position_queue")
+    amount_of_steps = LaunchConfiguration("amount_of_steps")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -107,6 +110,11 @@ def generate_launch_description() -> LaunchDescription:
                 name="rqt_input",
                 default_value="True",
                 description="If this argument is false, the rqt input device will not be launched.",
+            ),
+            DeclareLaunchArgument(
+                name="wireless_ipd",
+                default_value="False",
+                description="If this argument is false, the wireless input device will not be launched.",
             ),
             DeclareLaunchArgument(
                 name="layout",
@@ -241,6 +249,11 @@ def generate_launch_description() -> LaunchDescription:
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
+                name="amount_of_steps",
+                default_value="0",
+                description="Amount of steps the dynamic gait should make before stopping. 0 or -1 is infinite.",
+            ),
+            DeclareLaunchArgument(
                 name="use_position_queue",
                 default_value="False",
                 description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
@@ -284,12 +297,12 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="location_x",
-                default_value="0.4",
+                default_value="0.5",
                 description="x-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
                 name="location_y",
-                default_value="0.0",
+                default_value="0.03",
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
@@ -317,6 +330,17 @@ def generate_launch_description() -> LaunchDescription:
                     ("layout", layout),
                 ],
                 condition=IfCondition(rqt_input),
+            ),
+            # Launch wireless input device if not wireless_ipd:=false
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_wireless_ipd"),
+                        "launch",
+                        "wireless_ipd.launch.py",
+                    )
+                ),
+                condition=IfCondition(wireless_ipd),
             ),
             # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
             IncludeLaunchDescription(
@@ -362,6 +386,7 @@ def generate_launch_description() -> LaunchDescription:
                     ("push_off_fraction", push_off_fraction),
                     ("push_off_position", push_off_position),
                     ("add_push_off", add_push_off),
+                    ("amount_of_steps", amount_of_steps),
                     ("use_position_queue", use_position_queue),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),

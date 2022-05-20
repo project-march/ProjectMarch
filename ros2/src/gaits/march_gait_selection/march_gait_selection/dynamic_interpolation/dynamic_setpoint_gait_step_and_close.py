@@ -6,6 +6,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 )
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
+from march_utility.utilities.logger import Logger
 
 
 class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
@@ -17,6 +18,7 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
 
     def __init__(self, gait_selection_node):
         super().__init__(gait_selection_node)
+        self.logger = Logger(gait_selection_node, __class__.__name__)
         self.gait_name = "dynamic_step_and_close"
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
@@ -38,7 +40,7 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
             self._end = True
             return self._get_trajectory_command(stop=True)
 
-    def _try_to_get_second_step(self, is_final_iteration: bool) -> bool:
+    def _can_get_second_step(self, is_final_iteration: bool) -> bool:
         """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
 
         If this is not possible, the first subgait should not be executed.
