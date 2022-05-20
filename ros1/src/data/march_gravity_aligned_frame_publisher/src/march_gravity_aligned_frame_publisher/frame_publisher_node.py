@@ -15,17 +15,18 @@ def main():
     The first frame is a transformation from the 'foot_left'/'foot_right' to the toes, rotated 180 degrees around the z-axis.
     The second frame is te first described frame, but with the z-axis aligned with the gravitation force.
     """
-    rospy.init_node("frame_aligner")
+    rospy.init_node("march_gravity_aligned_frame_publisher")
 
     listener = tf.TransformListener()
     broadcaster = tf.TransformBroadcaster()
     rate = rospy.Rate(RATE)
+    previous = rospy.Time.now()
 
     while not rospy.is_shutdown():
         try:
-            (trans_left, rot_left) = listener.lookupTransform("/foot_left", "/world", rospy.Time(0))
-            (trans_right, rot_right) = listener.lookupTransform("/foot_right", "/world", rospy.Time(0))
-            (trans_hip, rot_hip) = listener.lookupTransform("/hip_base", "/world", rospy.Time(0))
+            (_, rot_left) = listener.lookupTransform("/foot_left", "/world", rospy.Time(0))
+            (_, rot_right) = listener.lookupTransform("/foot_right", "/world", rospy.Time(0))
+            (_, _) = listener.lookupTransform("/hip_base", "/world", rospy.Time(0))
         except (
             tf.LookupException,
             tf.ConnectivityException,
@@ -33,36 +34,40 @@ def main():
         ):
             continue
 
-        broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, -0.025),
-            Z_ROTATION,
-            rospy.Time.now(),
-            "toes_left",
-            "foot_left",
-        )
+        now = rospy.Time.now()
+        if now > previous:
 
-        broadcaster.sendTransform(
-            (0.0, 0.0, 0.0),
-            rot_left,
-            rospy.Time.now(),
-            "toes_left_aligned",
-            "toes_left",
-        )
+            broadcaster.sendTransform(
+                (-FOOT_LENGTH, 0.0, -0.025),
+                Z_ROTATION,
+                now,
+                "toes_left",
+                "foot_left",
+            )
 
-        broadcaster.sendTransform(
-            (-FOOT_LENGTH, 0.0, -0.025),
-            Z_ROTATION,
-            rospy.Time.now(),
-            "toes_right",
-            "foot_right",
-        )
+            broadcaster.sendTransform(
+                (0.0, 0.0, 0.0),
+                rot_left,
+                now,
+                "toes_left_aligned",
+                "toes_left",
+            )
 
-        broadcaster.sendTransform(
-            (0.0, 0.0, 0.0),
-            rot_right,
-            rospy.Time.now(),
-            "toes_right_aligned",
-            "toes_right",
-        )
+            broadcaster.sendTransform(
+                (-FOOT_LENGTH, 0.0, -0.025),
+                Z_ROTATION,
+                now,
+                "toes_right",
+                "foot_right",
+            )
 
-        rate.sleep()
+            broadcaster.sendTransform(
+                (0.0, 0.0, 0.0),
+                rot_right,
+                now,
+                "toes_right_aligned",
+                "toes_right",
+            )
+
+            previous = now
+            rate.sleep()
