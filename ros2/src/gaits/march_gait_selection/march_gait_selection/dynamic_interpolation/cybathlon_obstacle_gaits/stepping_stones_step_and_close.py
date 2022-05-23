@@ -22,11 +22,11 @@ from geometry_msgs.msg import Point
 from std_msgs.msg import String
 
 PREDETERMINED_FOOT_LOCATIONS = {
-    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.03, z=0.44699999999999995)),
-    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.65, y=0.03, z=0.44699999999999995)),
-    "large_narrow": FootPosition(duration=2.0, processed_point=Point(x=0.75, y=0.03, z=0.44699999999999995)),
-    "large_wide": FootPosition(duration=2.0, processed_point=Point(x=0.85, y=0.03, z=0.44699999999999995)),
-    "step_up_obstacle": FootPosition(duration=1.5, processed_point=Point(x=0.65, y=0.09, z=0.44699999999999995)),
+    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.45, y=0.03, z=0.44699999999999995)),
+    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.03, z=0.44699999999999995)),
+    "large_narrow": FootPosition(duration=2.0, processed_point=Point(x=0.65, y=0.03, z=0.44699999999999995)),
+    "large_wide": FootPosition(duration=2.0, processed_point=Point(x=0.75, y=0.03, z=0.44699999999999995)),
+    "step_up_obstacle": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.09, z=0.44699999999999995)),
 }
 
 
@@ -106,7 +106,6 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
         Returns:
             TrajectoryCommand: command with the current subgait and start time
         """
-        assert start != stop
         if stop:
             self.logger.info("Stopping dynamic gait.")
         else:
