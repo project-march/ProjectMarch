@@ -26,10 +26,10 @@ from geometry_msgs.msg import Point
 from std_msgs.msg import Header, String
 
 PREDETERMINED_FOOT_LOCATIONS = {
-    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.45, y=0.0, z=0.44699999999999995)),
-    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.0, z=0.44699999999999995)),
-    "large_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.65, y=0.0, z=0.44699999999999995)),
-    "large_wide": FootPosition(duration=1.5, processed_point=Point(x=0.75, y=0.0, z=0.44699999999999995)),
+    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.03, z=0.44699999999999995)),
+    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.65, y=0.03, z=0.44699999999999995)),
+    "large_narrow": FootPosition(duration=2.0, processed_point=Point(x=0.75, y=0.03, z=0.44699999999999995)),
+    "large_wide": FootPosition(duration=2.0, processed_point=Point(x=0.85, y=0.03, z=0.44699999999999995)),
 }
 
 END_POSITION_RIGHT = get_position_from_yaml("stand")
@@ -193,6 +193,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                         self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
                         self._end = True
                         return None
+
             if not stop:
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
                 self.logger.info(
