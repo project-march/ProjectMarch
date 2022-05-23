@@ -49,6 +49,7 @@ protected:
     std::array<std::array<double, RES>, RES> height_map_;
     std::array<std::array<double, RES>, RES> height_map_temp_;
     std::array<std::array<double, RES>, RES> derivatives_;
+    std::array<std::array<double, RES>, RES> derivatives_temp_;
 
     double derivative_threshold_;
 
@@ -58,8 +59,10 @@ protected:
 
     double foot_width_;
     double foot_length_;
+    double actual_foot_length_;
     int rect_width_;
     int rect_height_;
+    int actual_rect_height_;
 
     double displacements_outside_;
     double displacements_inside_;
@@ -68,6 +71,7 @@ protected:
 
     std::vector<int> horizontal_displacements_;
     std::vector<int> vertical_displacements_;
+    std::vector<int> flipping_displacements_;
 
     double x_offset_;
     double y_offset_;
@@ -84,11 +88,10 @@ protected:
 
     void interpolateMap();
 
-    void convolveGaussianKernel();
-
-    void convolveLaplacianKernel();
-
     void findFeasibleFootPlacements(std::vector<Point>* position_queue);
+
+    void computeFootPlateDisplacement(
+        int x, int y, double height, std::vector<Point>* position_queue);
 
     int xCoordinateToIndex(double x);
 

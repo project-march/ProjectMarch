@@ -38,6 +38,41 @@ void convolve2D(std::array<std::array<double, K>, K>& kernel,
 }
 
 /**
+ * Smoothen a matrix by convolving a Gaussian kernel.
+ *
+ * @param source reference of the matrix to apply the convolution to
+ * @param destination reference of array where the result is stored
+ */
+template <std::size_t R>
+void convolveGaussianKernel(std::array<std::array<double, R>, R>& source,
+    std::array<std::array<double, R>, R>& destination)
+{
+    std::array<std::array<double, 3>, 3> gaussian = {
+        { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 },
+            { 1.0 / 16, 2.0 / 16, 1.0 / 16 } }
+    };
+
+    convolve2D(gaussian, source, destination);
+}
+
+/**
+ * Compute the second derivatives of a matrix with a Laplacian kernel.
+ *
+ * @param source reference of the matrix to apply the convolution to
+ * @param destination reference of array where the result is stored
+ */
+template <std::size_t R>
+void convolveLaplacianKernel(std::array<std::array<double, R>, R>& source,
+    std::array<std::array<double, R>, R>& destination)
+{
+    std::array<std::array<double, 3>, 3> laplacian
+        = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 },
+            { 1 / 6.0, 4 / 6.0, 1 / 6.0 } } };
+
+    convolve2D(laplacian, source, destination);
+}
+
+/**
  * Compute the average point of a vector of points.
  *
  * @param points a list of pcl points

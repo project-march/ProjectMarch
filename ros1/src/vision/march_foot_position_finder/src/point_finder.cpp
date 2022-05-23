@@ -41,9 +41,12 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     std::fill_n(
         &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -10);
     std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 10);
+    std::fill_n(
+        &derivatives_temp_[0][0], grid_resolution_ * grid_resolution_, 10);
 
     ros::param::get("~foot_width", foot_width_);
     ros::param::get("~foot_length", foot_length_);
+    ros::param::get("~actual_foot_length", actual_foot_length_);
 
     ros::param::get("~displacements_outside", displacements_outside_);
     ros::param::get("~displacements_inside", displacements_inside_);
@@ -63,6 +66,7 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 
     rect_width_ = ceil(foot_width_ / cell_width_);
     rect_height_ = ceil(foot_length_ / cell_width_);
+    actual_rect_height_ = ceil(actual_foot_length_ / cell_width_);
 
     optimal_foot_x_ = step_point.x;
     optimal_foot_y_ = step_point.y;
@@ -77,6 +81,12 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
     }
     if (rect_height_ % 2 == 0) {
         rect_height_--;
+    }
+
+    flipping_displacements_.push_back(0);
+    for (int i = 1; i < actual_rect_height_ / 2.0; i++) {
+        flipping_displacements_.push_back(i);
+        flipping_displacements_.push_back(-i);
     }
 
     x_offset_ = -search_dimensions_[0];
@@ -116,9 +126,8 @@ PointFinder::PointFinder(ros::NodeHandle* n, PointCloud::Ptr pointcloud,
 void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
     mapPointCloudToHeightMap();
-    height_map_ = height_map_temp_;
     // publishHeightMap(); //Can be turned on for debugging.
-    convolveLaplacianKernel();
+    convolveLaplacianKernel(height_map_, derivatives_);
     findFeasibleFootPlacements(position_queue);
 }
 
@@ -164,36 +173,9 @@ void PointFinder::mapPointCloudToHeightMap()
             continue;
         }
 
-        auto current_height = height_map_temp_[y_index][x_index];
-        height_map_temp_[y_index][x_index]
-            = std::max(current_height, (double)p.z);
+        auto current_height = height_map_[y_index][x_index];
+        height_map_[y_index][x_index] = std::max(current_height, (double)p.z);
     }
-}
-
-/**
- * Smooths the height matrix by convolving a Gaussian kernel.
- */
-void PointFinder::convolveGaussianKernel()
-{
-    std::array<std::array<double, 3>, 3> gaussian = {
-        { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 },
-            { 1.0 / 16, 2.0 / 16, 1.0 / 16 } }
-    };
-
-    convolve2D(gaussian, height_map_temp_, height_map_);
-}
-
-/**
- * Computed the second derivatives of the height matrix with a Laplacian kernel.
- */
-void PointFinder::convolveLaplacianKernel()
-{
-
-    std::array<std::array<double, 3>, 3> laplacian
-        = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 },
-            { 1 / 6.0, 4 / 6.0, 1 / 6.0 } } };
-
-    convolve2D(laplacian, height_map_, derivatives_);
 }
 
 /**
@@ -208,10 +190,10 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
             int x_opt = xCoordinateToIndex(optimal_foot_x_) + x_shift;
             int y_opt = yCoordinateToIndex(optimal_foot_y_) + y_shift;
 
-            for (int x = x_opt - rect_width_ / 2; x < x_opt + rect_width_ / 2.0;
-                 x++) {
-                for (int y = y_opt - rect_height_ / 2;
-                     y < y_opt + rect_height_ / 2.0; y++) {
+            for (int x = x_opt - rect_height_ / 2;
+                 x < x_opt + rect_height_ / 2.0; x++) {
+                for (int y = y_opt - rect_width_ / 2;
+                     y < y_opt + rect_width_ / 2.0; y++) {
                     if (std::abs(derivatives_[y][x]) < derivative_threshold_) {
                         num_free_cells++;
                     }
@@ -221,15 +203,58 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
             if (num_free_cells
                 >= rect_height_ * rect_width_ * available_points_ratio_) {
 
-                double x = xIndexToCoordinate(x_opt);
-                double y = yIndexToCoordinate(y_opt);
-                double z = height_map_[y_opt][x_opt];
-
-                if (std::abs(z - current_foot_z_) <= 1.0 && !std::isnan(x)
-                    && !std::isnan(y) && !std::isnan(z)) {
-                    position_queue->push_back(
-                        Point((float)x, (float)y, (float)z));
+                double height = height_map_[y_opt][x_opt];
+                if (std::abs(height - current_foot_z_) <= 0.30) {
+                    computeFootPlateDisplacement(
+                        x_opt, y_opt, height, position_queue);
                 }
+            }
+
+            if (position_queue->size() > 0) {
+                return;
+            }
+        }
+    }
+}
+
+void PointFinder::computeFootPlateDisplacement(
+    int x, int y, double height, std::vector<Point>* position_queue)
+{
+    // Make the minimum height map value equal to the found point z-value
+    for (int row = 0; row < RES; row++) {
+        for (int col = 0; col < RES; col++) {
+            height_map_temp_[row][col]
+                = std::max(height, height_map_[row][col]);
+        }
+    }
+
+    convolveLaplacianKernel(height_map_temp_, derivatives_temp_);
+
+    for (auto& shift : flipping_displacements_) {
+
+        int x_index = x + shift;
+        int y_index = y;
+        int num_free_cells = 0;
+
+        for (int x = x_index - actual_rect_height_ / 2;
+             x < x_index + actual_rect_height_ / 2.0; x++) {
+            for (int y = y_index - rect_width_ / 2;
+                 y < y_index + rect_width_ / 2.0; y++) {
+                if (std::abs(derivatives_temp_[y][x]) < derivative_threshold_) {
+                    num_free_cells++;
+                }
+            }
+        }
+
+        if (num_free_cells >= actual_rect_height_ * rect_width_ * 0.97) {
+
+            double x_final = xIndexToCoordinate(x_index);
+            double y_final = yIndexToCoordinate(y_index);
+
+            if (!std::isnan(x_final) && !std::isnan(y_final)) {
+                Point p = Point((float)x_final, (float)y_final, (float)height);
+                position_queue->push_back(p);
+                return;
             }
         }
     }
