@@ -46,15 +46,9 @@ class DynamicSetpointGait(GaitInterface):
         home_stand_position_all_joints (Dict[str, float]): joint dict of home stand position for all eight joints
         start_position_actuating_joints (Dict[str, float]): start_position of the actuating joints. Home stand if the
         gait has not  started yet, last setpoint of previous step if gait is running
-        start_position_all_joints (Dict[str, float): start_position of all eight joints. Home stand if the gait has not
-<<<<<<< HEAD
-        started yet, last setpoint of previous step if gait is running.
-        joint_names (List[str]): names of the joints
-=======
-            started yet, last setpoint of previous step if gait is running.
+        start_position_all_joints (Dict[str, float): start_position of all eight joints. Home stand if the gait has not started yet, last setpoint of previous step if gait is running.
         actuating_joint_names (List[str]): names of the actuating joints in alphabetical order
         all_joint_names (List[srt]): names of all eight joints in alphabetical order
->>>>>>> origin/dev
         gait_name (str): name of the gait
         subgait_id (str): either left_swing or right_swing
         logger (Logger): used to log messages to the terminal with the class name as a prefix
