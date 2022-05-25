@@ -1,8 +1,8 @@
 """Author: Marten Haitjema."""
 
 from typing import Optional
-
 from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.timer import Timer
 
 from march_gait_selection.gait_selection_clean import GaitSelectionClean
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -23,21 +23,16 @@ from std_msgs.msg import Header
 class GaitStateMachineClean:
     """Clean version of the state machine that can only be used with limited gaits."""
 
+    update_timer: Timer
+
     def __init__(self, gait_selection: GaitSelectionClean, trajectory_scheduler: TrajectoryScheduler):
         self._gait_selection = gait_selection
         self._trajectory_scheduler = trajectory_scheduler
         self._logger = Logger(self._gait_selection, __class__.__name__)
         self._input = StateMachineInput(gait_selection)
         self._timer_period = self._gait_selection.get_parameter("timer_period").get_parameter_value().double_value
-
-        self._shutdown_requested = False
-        self._should_stop = False
-        self._is_stopping = False
-
-        self._current_gait = None
         self._last_idle_position = UnknownEdgePosition()
-        self._executing_gait = False
-        self._has_gait_started = False
+        self._reset_attributes()
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
@@ -67,6 +62,15 @@ class GaitStateMachineClean:
             callback_group=ReentrantCallbackGroup(),
         )
 
+    def _reset_attributes(self) -> None:
+        """Resets attributes."""
+        self._current_gait = None
+        self._shutdown_requested = False
+        self._should_stop = False
+        self._is_stopping = False
+        self._executing_gait = False
+        self._has_gait_started = False
+
     def run(self) -> None:
         """Runs the state machine until shutdown is requested."""
         self.update_timer = self._gait_selection.create_timer(timer_period_sec=self._timer_period, callback=self.update)
@@ -75,12 +79,7 @@ class GaitStateMachineClean:
         """Updates the current state each timer period, after the state machine is started."""
         if not self._shutdown_requested:
             if self._input.unknown_requested():
-                self._input.gait_accepted()
-                self._transition_to_unknown()
-                self._input.gait_finished()
-                self._publish_idle_state()
-                self._current_gait = None
-                self._trajectory_scheduler.reset()
+                self._handle_unknown_requested()
             elif not self._executing_gait:
                 self._process_idle_state()
             else:
@@ -94,7 +93,6 @@ class GaitStateMachineClean:
             self._current_gait = self._gait_selection.gaits.get(self._input.gait_name())
             self._logger.info(f"Requested gait `{self._current_gait.name}`")
             if self._current_gait.starting_position == self._last_idle_position:
-                self._should_stop = False
                 self._input.gait_accepted()
                 self._publish_gait_state()
                 self._executing_gait = True
@@ -102,7 +100,7 @@ class GaitStateMachineClean:
             else:
                 self._input.gait_rejected()
                 self._logger.info(
-                    f"Cannot execute gait `{self._current_gait.name}` from idle state `{self._current_state}`"
+                    f"Cannot execute gait `{self._current_gait.name}` from idle state `{self._last_idle_position}`"
                 )
 
     def _process_gait_state(self) -> None:
@@ -113,11 +111,9 @@ class GaitStateMachineClean:
         """
         self._handle_stop_input()
         if self._trajectory_scheduler.failed():
-            self._trajectory_scheduler.reset()
-            self._current_gait.end()
+            self._process_end_of_gait()
             self._current_gait = None
             self._transition_to_unknown()
-            self._input.gait_finished()
             return
 
         now = self._gait_selection.get_clock().now()
@@ -127,9 +123,7 @@ class GaitStateMachineClean:
 
             if gait_update == GaitUpdate.empty():
                 self._input.gait_finished()
-                self._executing_gait = False
-                self._has_gait_started = False
-                self._current_gait = None
+                self._reset_attributes()
                 self._logger.info(
                     f"Starting the gait returned no trajectory, going back to previous "
                     f"idle state {self._last_idle_position}"
@@ -146,7 +140,10 @@ class GaitStateMachineClean:
         This input is passed on to the current gait to execute the request.
         """
         if self._is_stop_requested() and not self._is_stopping:
-            if self._previous_gait.name == "dynamic_step" and not isinstance(self._current_state, UnknownEdgePosition):
+            if (
+                self._previous_gait.name == "dynamic_step"
+                and not isinstance(self._last_idle_position, UnknownEdgePosition)
+            ):
                 self._current_state = "dynamic_close"
             else:
                 self._should_stop = False
@@ -171,25 +168,19 @@ class GaitStateMachineClean:
         if gait_update.new_trajectory_command is not None:
             self._trajectory_scheduler.schedule(gait_update.new_trajectory_command)
         if gait_update.is_finished:
-            self._last_idle_position = self._current_gait.final_position
             self._previous_gait = self._current_gait
-            self.final_position_pub.publish(JointState(position=self._last_idle_position.values))
+            self._last_idle_position = self._current_gait.final_position
             self._publish_idle_state()
-            self._current_gait.end()
-            self._input.gait_finished()
-            self._trajectory_scheduler.reset()
-            self._executing_gait = False
-            self._has_gait_started = False
-            self._logger.info(f"Finished gait `{self._current_gait.name}`")
-            self._current_gait = None
-            self._is_stopping = False
+            self._process_end_of_gait()
+            self._reset_attributes()
+            self._logger.info(f"Finished gait `{self._previous_gait.name}`")
 
     def _transition_to_unknown(self) -> None:
         """When the unknown button is pressed, this function resets the state machine to unknown state."""
         if self._current_gait is not None:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
-        self._current_state = UnknownEdgePosition()
+        self._last_idle_position = UnknownEdgePosition()
         self._logger.info("Transitioned to unknown")
 
     def _is_stop_requested(self) -> bool:
@@ -232,7 +223,24 @@ class GaitStateMachineClean:
         self._shutdown_requested = True
         shutdown_system()
 
+    def _handle_unknown_requested(self) -> None:
+        """Accept gait, set state to unknown and reset trajectory_scheduler."""
+        self._input.gait_accepted()
+        self._transition_to_unknown()
+        self._input.gait_finished()
+        self._publish_idle_state()
+        self._executing_gait = False
+        self._current_gait = None
+        self._trajectory_scheduler.reset()
+
+    def _process_end_of_gait(self) -> None:
+        """Resets trajectory_scheduler, end the current gait and calls gait_finished on input device."""
+        self._trajectory_scheduler.reset()
+        self._current_gait.end()
+        self._input.gait_finished()
+
     def _publish_gait_state(self) -> None:
+        """Publish the name of the gait that is currently executing."""
         self.current_state_pub.publish(
             CurrentState(
                 header=Header(stamp=self._gait_selection.get_clock().now().to_msg()),
@@ -242,6 +250,7 @@ class GaitStateMachineClean:
         )
 
     def _publish_idle_state(self) -> None:
+        """Publish the name of the position of the current idle state and publish the joint_angles."""
         if self._last_idle_position in self._gait_selection.positions:
             state = self._gait_selection.positions[self._last_idle_position]
         else:
@@ -254,6 +263,9 @@ class GaitStateMachineClean:
                 state_type=CurrentState.IDLE,
             )
         )
+
+        if not isinstance(self._last_idle_position, UnknownEdgePosition):
+            self.final_position_pub.publish(JointState(position=self._last_idle_position.values))
 
     def _publish_current_gait(self) -> None:
         """Standard callback when gait changes, publishes the current gait."""
@@ -277,9 +289,11 @@ class GaitStateMachineClean:
         """
         possible_gaits = []
         if not self._executing_gait:
+            self._logger.warn(f"Last idle position: {self._last_idle_position}")
             for gait in self._gait_selection.gaits.values():
                 if self._last_idle_position == gait.starting_position:
                     possible_gaits.append(gait.name)
+        self._logger.warn(f"Possible gaits: {possible_gaits}")
 
         response.gaits = possible_gaits
         return response

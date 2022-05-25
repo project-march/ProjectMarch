@@ -165,8 +165,6 @@ class HomeGait(GaitInterface):
         msg = JointTrajectory()
         msg.joint_names = sorted(self._position.keys())
 
-        print([self._position[name] for name in msg.joint_names])
-
         point = JointTrajectoryPoint()
         point.time_from_start = self._duration.to_msg()
         point.positions = [self._position[name] for name in msg.joint_names]
