@@ -200,3 +200,7 @@ Secondly add a file named ~/.march_bash_aliases, and paste the code below in tha
     # Format code
     alias format_cpp='cm && python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file -i'
     alias format_py='cm && black .'
+
+    # Start Clion & PyCharm with no consol output
+    alias pycharm_no_out='pycharm-professional > /dev/null 2> /dev/null & disown'
+    alias clion_no_out='clion > /dev/null 2> /dev/null & disown'
