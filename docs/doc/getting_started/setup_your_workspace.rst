@@ -174,10 +174,24 @@ Secondly add a file named ~/.march_bash_aliases, and paste the code below in tha
     alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge parameter_bridge'
 
     # Clean march builds
-    alias march_clean_ros1='rm -rf ~/march/ros1/build ~/march/ros1/log ~/march/ros1/install'
-    alias march_clean_ros2='rm -rf ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install'
-    alias march_clean_bridge='rm -rf ~/ros1_bridge/build ~/ros1_bridge/log ~/ros1_bridge/install'
+    # script to ask for confirmation before cleaning ros
+    confirm() {
+        echo -n "Do you want to run $*? [N/y] "
+        read -N 1 REPLY
+        echo
+        if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
+            "$@"
+        else
+            echo "Cancelled by user"
+        fi
+    }
+    alias march_clean_ros1='confirm rm -rf ~/march/ros1/build ~/march/ros1/log ~/march/ros1/install'
+    alias march_clean_ros2='confirm rm -rf ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install'
+    alias march_clean_bridge='confirm rm -rf ~/ros1_bridge/build ~/ros1_bridge/log ~/ros1_bridge/install'
     alias march_clean_all='march_clean_ros1 && march_clean_ros2 && march_clean_bridge'
+
+    # To give errors colors in ros2
+    export RCUTILS_COLORIZED_OUTPUT=1
 
     # Install dependencies
     alias install_dep_ros1='cm1 && snoe && rosdep install --from-paths src --ignore-src -y --rosdistro noetic'
