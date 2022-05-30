@@ -153,7 +153,7 @@ void FootPositionFinder::readParameters(
  * Callback function for when the gait selection node selects a point for the
  * other leg.
  */
-// Suppress lint error "make reference of argument" (breaks callback)
+// Suppress lint error "make reference of argument" as it breaks callback
 void FootPositionFinder::chosenOtherPointCallback(
     const march_shared_msgs::FootPosition msg) // NOLINT
 {
@@ -174,9 +174,9 @@ void FootPositionFinder::chosenOtherPointCallback(
  * Callback function to reset the position values when the exoskeleton enters
  * the "stand" state.
  */
-// Suppress lint error "make reference of argument" (breaks callback)
+// Suppress lint error "make reference of argument" as it breaks the callback
 void FootPositionFinder::currentStateCallback(
-    const march_shared_msgs::CurrentState msg)
+    const march_shared_msgs::CurrentState msg) // NOLINT
 {
     if (msg.state == "stand") {
         initial_position_reset_timer_ = n_->createTimer(
