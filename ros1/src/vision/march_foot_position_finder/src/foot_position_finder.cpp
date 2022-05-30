@@ -70,6 +70,10 @@ FootPositionFinder::FootPositionFinder(ros::NodeHandle* n,
             /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback,
             this);
 
+    current_state_subscriber_ = n_->subscribe<march_shared_msgs::CurrentState>(
+        "/march/gait_selection/current_state", /*queue_size=*/1,
+        &FootPositionFinder::currentStateCallback, this);
+
     height_map_publisher_ = n->advertise<std_msgs::Float64MultiArray>(
         "/debug/height_map", /*queue_size=*/1);
 
@@ -161,6 +165,33 @@ void FootPositionFinder::chosenOtherPointCallback(
     previous_start_point_ = ORIGIN;
 
     // Compute desired point:
+    desired_point_ = addPoints(start_point_,
+        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+            /*_z=*/0));
+}
+
+/**
+ * Callback function to reset the position values when the exoskeleton enters
+ * the "stand" state.
+ */
+// Suppress lint error "make reference of argument" (breaks callback)
+void FootPositionFinder::currentStateCallback(
+    const march_shared_msgs::CurrentState msg)
+{
+    if (msg.state == "stand") {
+        initial_position_reset_timer_ = n_->createTimer(
+            ros::Duration(/*t=*/0.200),
+            &FootPositionFinder::resetInitialPosition, this, /*oneshot=*/true);
+    }
+}
+
+/**
+ * Reset initial position, relative to which points are found.
+ */
+void FootPositionFinder::resetInitialPosition(const ros::TimerEvent&)
+{
+    last_displacement_ = previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));

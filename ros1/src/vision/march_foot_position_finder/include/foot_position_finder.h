@@ -5,6 +5,7 @@
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
+#include "march_shared_msgs/CurrentState.h"
 #include "march_shared_msgs/FootPosition.h"
 #include <chrono>
 #include <cmath>
@@ -35,6 +36,10 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
+    void currentStateCallback(const march_shared_msgs::CurrentState msg);
+
+    void resetInitialPosition(const ros::TimerEvent&);
+
     void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
 
     void processRealSenseDepthFrames(const ros::TimerEvent&);
@@ -58,11 +63,12 @@ protected:
     ros::Publisher point_marker_publisher_;
     ros::Subscriber current_chosen_point_subscriber_;
     ros::Subscriber other_chosen_point_subscriber_;
+    ros::Subscriber current_state_subscriber_;
 
     ros::Publisher height_map_publisher_;
 
     ros::Timer realsense_timer_;
-    ros::Timer height_reset_timer_;
+    ros::Timer initial_position_reset_timer_;
 
     clock_t last_frame_time_;
     int frame_wait_counter_;
