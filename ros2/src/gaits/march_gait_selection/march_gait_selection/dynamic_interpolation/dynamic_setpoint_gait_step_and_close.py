@@ -7,6 +7,7 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
 from march_utility.utilities.logger import Logger
+from .trajectory_command_handler import TrajectoryCommandHandler
 
 
 class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
@@ -18,7 +19,11 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
 
     def __init__(self, gait_selection_node):
         super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self._logger = Logger(gait_selection_node, __class__.__name__)
+        self.trajectory_command_handler = TrajectoryCommandHandlerStepAndClose(
+            gait=self,
+            points_handler=self._camera_points_handler,
+        )
         self.gait_name = "dynamic_step_and_close"
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
@@ -38,7 +43,20 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
             return None
         else:
             self._end = True
-            return self._get_trajectory_command(stop=True)
+            return self.trajectory_command_handler.get_trajectory_command(
+                self.subgait_id, self.start_position_all_joints, stop=True
+            )
+
+
+class TrajectoryCommandHandlerStepAndClose(TrajectoryCommandHandler):
+    """Class that creates and validates a trajectory command for a step and close."""
+
+    def __init__(self, gait, points_handler):
+        super().__init__(gait, points_handler)
+        self._gait = gait
+        self._points_handler = points_handler
+        self._logger = Logger(self._gait.gait_selection, __class__.__name__)
+        self._trajectory_failed = False
 
     def _can_get_second_step(self, is_final_iteration: bool) -> bool:
         """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
@@ -59,9 +77,9 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
             stop=True,
         )
         try:
-            subgait.get_joint_trajectory_msg(self.add_push_off)
+            subgait.get_joint_trajectory_msg(self._gait.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if is_final_iteration:
-                self.logger.warn(f"Close gait is not feasible. {e.msg}")
+                self._logger.warn(f"Close gait is not feasible. {e.msg}")
             return False
         return True

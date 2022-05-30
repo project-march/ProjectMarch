@@ -2,6 +2,7 @@
 
 from typing import Optional
 
+from geometry_msgs.msg import Point
 from rclpy.node import Node
 from rclpy.time import Time
 from sensor_msgs.msg import JointState
@@ -13,11 +14,13 @@ from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
-
-from march_shared_msgs.msg import FootPosition, CurrentGait
-
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+
+from march_shared_msgs.msg import CurrentGait, FootPosition
+
+from .trajectory_command_handler import TrajectoryCommandHandler
+from .camera_points_handler import CameraPointsHandler
 
 
 class DynamicSetpointGaitClose(DynamicSetpointGait):
@@ -26,24 +29,14 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self.logger = Logger(gait_selection_node, __class__.__name__)
+        camera_points_handler = CameraPointsHandler(self)
+        self.trajectory_command_handler = TrajectoryCommandHandlerStep(self, camera_points_handler)
         self.gait_name = "dynamic_close"
 
         gait_selection_node.create_subscription(
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._set_subgait_id,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        gait_selection_node.create_subscription(
-            FootPosition,
-            "/march/chosen_foot_position/right",
-            self._set_last_foot_position,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        gait_selection_node.create_subscription(
-            FootPosition,
-            "/march/chosen_foot_position/left",
-            self._set_last_foot_position,
             DEFAULT_HISTORY_DEPTH,
         )
         gait_selection_node.create_subscription(
@@ -75,10 +68,6 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         previous_subgait_id = current_gait.subgait
         self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
 
-    def _set_last_foot_position(self, foot_position: FootPosition) -> None:
-        """Set the foot position to use for the close gait to the last used foot position."""
-        self.foot_location = foot_position
-
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
     def start(
@@ -103,8 +92,12 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
             self.subgait_id = "left_swing"
 
         self.update_parameters()
-        self._start_time_next_command = current_time + first_subgait_delay
-        self._next_command = self._get_trajectory_command(stop=True)
+        self.start_time_next_command = current_time + first_subgait_delay
+        self._next_command = self.trajectory_command_handler.get_trajectory_command(
+            self.subgait_id,
+            self.start_position_all_joints,
+            stop=True,
+        )
         return GaitUpdate.should_schedule_early(self._next_command)
 
     def _update_state_machine(self) -> GaitUpdate:
@@ -113,7 +106,9 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._final_position_pub.publish(JointState(position=self.dynamic_subgait.get_final_position().values()))
+        self._final_position_pub.publish(
+            JointState(position=self.trajectory_command_handler.dynamic_subgait.get_final_position().values())
+        )
         if self._next_command is None:
             return GaitUpdate.finished()
 
@@ -121,3 +116,16 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         self._scheduled_early = False
 
         return GaitUpdate.subgait_updated()
+
+
+class TrajectoryCommandHandlerStep(TrajectoryCommandHandler):
+    """TrajectoryCommandHandler class but with a hard coded foot location for the close gait."""
+
+    def __init__(self, gait, points_handler):
+        super().__init__(gait, points_handler)
+        self._gait = gait
+        self._points_handler = points_handler
+        self._logger = Logger(self._gait.gait_selection, __class__.__name__)
+        self._trajectory_failed = False
+        # TODO: remove hardcoded foot location after bug in stop gait is fixed.
+        self.foot_location = FootPosition(duration=1.5, processed_point=Point(x=0.5, y=0.03, z=0.446))

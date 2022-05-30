@@ -1,18 +1,14 @@
 """Author: Marten Haitjema, MVII."""
 
-import os
-import yaml
-
 from copy import copy, deepcopy
-from queue import Queue
 from typing import Dict, Optional
-from ament_index_python import get_package_share_path
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
     DynamicSetpointGaitStepAndClose,
 )
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import TrajectoryCommandHandlerStep
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
@@ -23,7 +19,7 @@ from march_utility.utilities.utility_functions import get_position_from_yaml
 
 from march_shared_msgs.msg import FootPosition, GaitInstruction
 from geometry_msgs.msg import Point
-from std_msgs.msg import Header, String
+from std_msgs.msg import String
 
 PREDETERMINED_FOOT_LOCATIONS = {
     "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.03, z=0.44699999999999995)),
@@ -47,33 +43,13 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
 
     def __init__(self, gait_selection_node: Node):
         self.subgait_id = "right_swing"
-        self._use_predetermined_foot_location = False
-        self._start_from_left_side = False
+        self.use_predetermined_foot_location = False
+        self.start_from_left_side = False
         super().__init__(gait_selection_node)
+        self.trajectory_command_handler = TrajectoryCommandHandlerStepAndHold(self, self._camera_points_handler)
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
 
-        self.update_parameter()
-        self._create_position_queue()
-
-        self.gait_selection.create_subscription(
-            Point,
-            "/march/step_and_hold/add_point_to_queue",
-            self._add_point_to_queue,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.gait_selection.create_subscription(
-            String,
-            "/march/step_and_hold/start_side",
-            self._set_start_subgait_id,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.gait_selection.create_subscription(
-            String,
-            "/march/step_and_hold/step_size",
-            self._predetermined_foot_location_callback,
-            DEFAULT_HISTORY_DEPTH,
-        )
         self.gait_selection.create_subscription(
             JointState,
             "/march/close/final_position",
@@ -100,7 +76,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         self._scheduled_early = False
 
         if (
-            self.start_position_all_joints == self.home_stand_position_all_joints and not self._start_from_left_side
+            self.start_position_all_joints == self.home_stand_position_all_joints and not self.start_from_left_side
         ) or (self.start_position_all_joints == END_POSITION_RIGHT):
             self.subgait_id = "right_swing"
         elif self.start_position_all_joints == END_POSITION_LEFT:
@@ -114,7 +90,9 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._final_position_pub.publish(JointState(position=self.dynamic_subgait.get_final_position().values()))
+        self._final_position_pub.publish(
+            JointState(position=self.trajectory_command_handler.dynamic_subgait.get_final_position().values())
+        )
         if self._next_command is None:
             return GaitUpdate.finished()
 
@@ -122,6 +100,89 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         self._scheduled_early = False
 
         return GaitUpdate.subgait_updated()
+
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Reset start position to home stand after force unknown.
+
+        Args:
+            msg (GaitInstruction): message containing a gait_instruction from the IPD
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self._set_start_position_to_home_stand()
+            self.use_predetermined_foot_location = False
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
+
+
+class TrajectoryCommandHandlerStepAndHold(TrajectoryCommandHandlerStep):
+    """TrajectoryCommandHandler for a step and hold."""
+
+    _end: bool
+
+    def __init__(self, gait, points_handler):
+        super().__init__(gait, points_handler)
+
+        self._gait.gait_selection.create_subscription(
+            String,
+            "/march/step_and_hold/start_side",
+            self._set_start_subgait_id,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self._gait.gait_selection.create_subscription(
+            String,
+            "/march/step_and_hold/step_size",
+            self._predetermined_foot_location_callback,
+            DEFAULT_HISTORY_DEPTH,
+        )
+
+    def get_trajectory_command(
+        self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
+    ) -> Optional[TrajectoryCommand]:
+        """Return a TrajectoryCommand based on current subgait_id, or based on the _position_queue if enabled.
+
+        Args:
+            subgait_id (str): whether it is a right_swing or left_swing
+            start_position_all_joints (Dict[str, float]): start joint angles of all joints
+            start (bool): whether it is a start gait, default False
+            stop (bool): whether it is a stop gait, default False
+        Returns:
+            TrajectoryCommand: command with the current subgait and start time. Returns None if the location found by
+                CoViD is too old.
+        """
+        self.subgait_id = subgait_id
+        self.start_position_all_joints = start_position_all_joints
+
+        if stop:
+            self._logger.info("Stopping dynamic gait.")
+        else:
+            if self._gait.use_predetermined_foot_location:
+                self.foot_location = deepcopy(self._predetermined_foot_location)
+                self._gait.use_predetermined_foot_location = False
+            else:
+                if self._use_position_queue and not self.position_queue.empty():
+                    self.foot_location = self._get_foot_location_from_queue()
+                elif self._use_position_queue and self.position_queue.empty():
+                    self._logger.warn(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}.")
+                    self.fill_queue()
+                    return None
+                else:
+                    try:
+                        self.foot_location = self._points_handler.get_foot_location(self.subgait_id)
+                        if self._points_handler.is_foot_location_too_old(self.foot_location):
+                            return None
+                    except AttributeError:
+                        self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                        self._end = True
+                        return None
+
+            if not stop:
+                self._points_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self._logger.info(
+                    f"Stepping to location ({self.foot_location.processed_point.x}, "
+                    f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+                )
+
+        return self._get_first_feasible_trajectory(start, stop)
 
     def _create_subgait_instance(
         self,
@@ -145,150 +206,40 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         else:
             end_position = END_POSITION_LEFT
 
-        # reset _start_from_left_side attribute
-        self._start_from_left_side = False
+        # reset start_from_left_side attribute
+        self._gait.start_from_left_side = False
 
         return DynamicSubgait(
-            self.gait_selection,
+            self._gait.gait_selection,
             end_position,
             start_position,
             subgait_id,
-            self.actuating_joint_names,
+            self._gait.actuating_joint_names,
             self.foot_location,
-            self.joint_soft_limits,
+            self._gait.joint_soft_limits,
             start,
             stop,
             hold_subgait=True,
         )
 
-    def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
-        """Return a TrajectoryCommand based on current subgait_id, or based on the _position_queue if enabled.
-
-        Args:
-            start (Optional[bool]): whether it is a start gait or not, default False
-            stop (Optional[bool]): whether it is a stop gait or not, default False
-        Returns:
-            TrajectoryCommand: command with the current subgait and start time. Returns None if the position queue is
-                empty, if the location found by CoViD is too old, or if CoViD has not found any location.
-        """
-        if stop:
-            self.logger.info("Stopping dynamic gait.")
-        else:
-            if self._use_predetermined_foot_location:
-                self.foot_location = deepcopy(self._predetermined_foot_location)
-                self._use_predetermined_foot_location = False
-            else:
-                if self._use_position_queue and not self.position_queue.empty():
-                    self.foot_location = self._get_foot_location_from_queue()
-                elif self._use_position_queue and self.position_queue.empty():
-                    self.logger.warn(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}.")
-                    self._fill_queue()
-                    return None
-                else:
-                    try:
-                        self.foot_location = self._get_foot_location(self.subgait_id)
-                        if self._is_foot_location_too_old(self.foot_location):
-                            return None
-                    except AttributeError:
-                        self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
-                        self._end = True
-                        return None
-
-            if not stop:
-                self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
-                self.logger.info(
-                    f"Stepping to location ({self.foot_location.processed_point.x}, "
-                    f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-                )
-
-        return self._get_first_feasible_trajectory(start, stop)
-
-    def _can_get_second_step(self, is_final_iteration: bool) -> bool:
-        """Tries to create the subgait that is one step ahead, which is a stop gait for step and close.
-
-        This safety check is not relevant for step and hold and thus always returns True.
-        """
-        return True
-
-    def _get_foot_location_from_queue(self) -> FootPosition:
-        """Get FootPosition message from the position queue.
-
-        Returns:
-            FootPosition: FootPosition msg with position from queue
-        """
-        header = Header(stamp=self.gait_selection.get_clock().now().to_msg())
-        point_from_queue = self.position_queue.get()
-        point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
-
-        if self.position_queue.empty():
-            self.logger.warn("Position queue empty. Use force unknown + homestand to close the gait.")
-
-        return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
-
-    def update_parameter(self) -> None:
-        """Updates '_use_position_queue' to the newest value in gait_selection."""
-        self._use_position_queue = self.gait_selection.use_position_queue
-
-    def _create_position_queue(self) -> None:
-        """Creates and fills the queue with values from position_queue.yaml."""
-        queue_path = get_package_share_path("march_gait_selection")
-        queue_file_loc = os.path.join(queue_path, "position_queue", "position_queue.yaml")
-        try:
-            with open(queue_file_loc, "r") as queue_file:
-                position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
-        except OSError as e:
-            self.logger.error(f"Position queue file does not exist. {e}")
-
-        self.duration_from_yaml = position_queue_yaml["duration"]
-        self.points_from_yaml = position_queue_yaml["points"]
-        self.position_queue = Queue()
-        self._fill_queue()
-
-    def _fill_queue(self) -> None:
-        """Fills the position queue with the values specified in position_queue.yaml."""
-        for point in self.points_from_yaml:
-            self.position_queue.put(point)
-
-    def _add_point_to_queue(self, point: Point) -> None:
-        """Adds a point to the end of the queue.
-
-        Args:
-            point (Point): point message to add to the queue.
-        """
-        point_dict = {"x": point.x, "y": point.y, "z": point.z}
-        self.position_queue.put(point_dict)
-        self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
-
     def _set_start_subgait_id(self, start_side: String) -> None:
         """Sets the subgait_id to the given start side, if and only if exo is in homestand."""
         try:
-            if self.start_position_all_joints == self.home_stand_position_all_joints:
+            if self.start_position_all_joints == self._gait.home_stand_position_all_joints:
                 self.subgait_id = start_side.data
                 if self.subgait_id == "left_swing":
-                    self._start_from_left_side = True
+                    self._gait.start_from_left_side = True
                 else:
-                    self._start_from_left_side = False
-                self.logger.info(f"Starting subgait set to {self.subgait_id}")
+                    self._gait.start_from_left_side = False
+                self._logger.info(f"Starting subgait set to {self.subgait_id}")
             else:
-                raise WrongStartPositionError(self.home_stand_position_all_joints, self.start_position_all_joints)
+                raise WrongStartPositionError(self._gait.home_stand_position_all_joints, self.start_position_all_joints)
         except WrongStartPositionError as e:
-            self.logger.warn(f"Can only change start side in home stand position. {e.msg}")
+            self._logger.warn(f"Can only change start side in home stand position. {e.msg}")
 
     def _predetermined_foot_location_callback(self, msg: String) -> None:
-        self._use_predetermined_foot_location = True
+        self._gait.use_predetermined_foot_location = True
         self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
-        self.logger.info(
+        self._logger.info(
             f"Stepping to stone {msg.data} with a step size of {self._predetermined_foot_location.processed_point.x}"
         )
-
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Reset start position to home stand after force unknown.
-
-        Args:
-            msg (GaitInstruction): message containing a gait_instruction from the IPD
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self._set_start_position_to_home_stand()
-            self._use_predetermined_foot_location = False
-            self.subgait_id = "right_swing"
-            self._trajectory_failed = False

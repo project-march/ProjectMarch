@@ -6,7 +6,7 @@ import yaml
 from queue import Queue
 from rclpy.node import Node
 from rclpy.time import Time
-from typing import Optional
+from typing import Optional, Dict
 from ament_index_python.packages import get_package_share_path
 from sensor_msgs.msg import JointState
 
@@ -23,18 +23,14 @@ from std_msgs.msg import Header
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition, GaitInstruction
 
+from .trajectory_command_handler import TrajectoryCommandHandler
+
 
 class DynamicSetpointGaitStep(DynamicSetpointGait):
     """Step gait based on dynamic setpoint gait.
 
     Args:
         gait_selection_node (GaitSelection): the gait selection node
-
-    Attributes:
-        position_queue (List[Dict[str, float]]): List containing foot position dictionaries for x, y and z coordinates.
-            Defined in _position_queue.yaml
-        duration_from_yaml (float): duration of the step as specified in _position_queue.yaml
-        _use_position_queue (bool): True if _position_queue will be used instead of covid points, else False
     """
 
     _current_time: Optional[Time]
@@ -43,17 +39,12 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self.logger = Logger(gait_selection_node, __class__.__name__)
+        self.trajectory_command_handler = TrajectoryCommandHandlerStep(
+            gait=self, points_handler=self._camera_points_handler
+        )
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
-        self.update_parameter()
-        self._create_position_queue()
 
-        self.gait_selection.create_subscription(
-            Point,
-            "/march/step/add_point_to_queue",
-            self._add_point_to_queue,
-            DEFAULT_HISTORY_DEPTH,
-        )
         self.gait_selection.create_subscription(
             JointState,
             "/march/close/final_position",
@@ -73,7 +64,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         self._should_stop = False
         self._end = False
-        self._start_time_next_command = None
+        self.start_time_next_command = None
         self._current_time = None
         self._next_command = None
         self._start_is_delayed = True
@@ -97,13 +88,15 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
         if self._start_is_delayed:
-            if current_time >= self._start_time_next_command:
+            if current_time >= self.start_time_next_command:
                 return self._update_start_subgait()
             else:
                 return GaitUpdate.empty()
 
-        if current_time >= self._start_time_next_command:
-            self._final_position_pub.publish(JointState(position=self.dynamic_subgait.get_final_position().values()))
+        if current_time >= self.start_time_next_command:
+            self._final_position_pub.publish(
+                JointState(position=self.trajectory_command_handler.dynamic_subgait.get_final_position().values())
+            )
             return self._update_state_machine()
 
         return GaitUpdate.empty()
@@ -125,34 +118,81 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         return GaitUpdate.finished()
 
-    def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown.
+
+        Args:
+            msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self._set_start_position_to_home_stand()
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
+            self.position_queue = Queue()
+            self.trajectory_command_handler.fill_queue()
+
+
+class TrajectoryCommandHandlerStep(TrajectoryCommandHandler):
+    """Class that creates and validates a trajectory command for a step.
+
+    Attributes:
+        position_queue (List[Dict[str, float]]): List containing foot position dictionaries for x, y and z coordinates.
+            Defined in _position_queue.yaml
+        duration_from_yaml (float): duration of the step as specified in _position_queue.yaml
+        _use_position_queue (bool): True if _position_queue will be used instead of covid points, else False
+    """
+
+    _use_position_queue: bool
+
+    def __init__(self, gait, points_handler):
+        super().__init__(gait, points_handler)
+        self._logger = Logger(self._gait.gait_selection, __class__.__name__)
+        self._create_position_queue()
+        self.update_parameter()
+        self._trajectory_failed = False
+
+        self._gait.gait_selection.create_subscription(
+            Point,
+            "/march/step/add_point_to_queue",
+            self._add_point_to_queue,
+            DEFAULT_HISTORY_DEPTH,
+        )
+
+    def get_trajectory_command(
+        self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
+    ) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id, or based on the _position_queue if enabled.
 
         Args:
-            start (:obj: bool, optional): whether it is a start gait or not, default False
-            stop (:obj: bool, optional): whether it is a stop gait or not, default False
+            subgait_id (str): whether it is a right_swing or left_swing
+            start_position_all_joints (Dict[str, float]): start joint angles of all joints
+            start (bool): whether it is a start gait, default False
+            stop (bool): whether it is a stop gait, default False
         Returns:
             TrajectoryCommand: command with the current subgait and start time. Returns None if the location found by
                 CoViD is too old.
         """
+        self.subgait_id = subgait_id
+        self.start_position_all_joints = start_position_all_joints
+        self._logger.warn(f"use position queue: {self._use_position_queue}")
         if self._use_position_queue and not self.position_queue.empty():
             self.foot_location = self._get_foot_location_from_queue()
         elif self._use_position_queue and self.position_queue.empty():
-            self._fill_queue()
-            self.logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
+            self.fill_queue()
+            self._logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
             stop = True
             self._end = True
         else:
             try:
-                self.foot_location = self._get_foot_location(self.subgait_id)
-                stop = self._is_foot_location_too_old(self.foot_location)
-                self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self.foot_location = self._points_handler.get_foot_location(self.subgait_id)
+                stop = self._points_handler.is_foot_location_too_old(self.foot_location)
+                self._points_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
             except AttributeError:
-                self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
                 self._end = True
                 return None
 
-        self.logger.info(
+        self._logger.info(
             f"Stepping to location ({self.foot_location.processed_point.x}, "
             f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
         )
@@ -165,18 +205,18 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             FootPosition: FootPosition msg with position from queue
         """
-        header = Header(stamp=self.gait_selection.get_clock().now().to_msg())
+        header = Header(stamp=self._gait.gait_selection.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
         if self.position_queue.empty():
-            self.logger.warn("Next step will be a close gait.")
+            self._logger.warn("Next step will be a close gait.")
 
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
     def update_parameter(self) -> None:
         """Updates '_use_position_queue' to the newest value in gait_selection."""
-        self._use_position_queue = self.gait_selection.use_position_queue
+        self._use_position_queue = self._gait.gait_selection.use_position_queue
 
     def _create_position_queue(self) -> None:
         """Creates and fills the queue with values from position_queue.yaml."""
@@ -186,14 +226,14 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             with open(queue_file_loc, "r") as queue_file:
                 position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
         except OSError as e:
-            self.logger.error(f"Position queue file does not exist. {e}")
+            self._logger.error(f"Position queue file does not exist. {e}")
 
         self.duration_from_yaml = position_queue_yaml["duration"]
         self.points_from_yaml = position_queue_yaml["points"]
         self.position_queue = Queue()
-        self._fill_queue()
+        self.fill_queue()
 
-    def _fill_queue(self) -> None:
+    def fill_queue(self) -> None:
         """Fills the position queue with the values specified in position_queue.yaml."""
         for point in self.points_from_yaml:
             self.position_queue.put(point)
@@ -206,21 +246,8 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         """
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.put(point_dict)
-        self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
+        self._logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
 
     def _can_get_second_step(self, final_iteration: bool) -> bool:
         """Returns true if second step is possible, always true for single step."""
         return True
-
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown.
-
-        Args:
-            msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self._set_start_position_to_home_stand()
-            self.subgait_id = "right_swing"
-            self._trajectory_failed = False
-            self.position_queue = Queue()
-            self._fill_queue()
