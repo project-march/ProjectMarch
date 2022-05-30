@@ -58,7 +58,7 @@ alias gg2='ag2'
 alias march_run_monitor='sfox && sros2 && ros2 launch march_monitor monitor.launch.py'
 alias monitor="march_run_monitor"
 alias multiplot="asrock_ros1 && rqt_multiplot"
-alias recon="snoe && sros1 && rosrun rqt_reconfigure rqt_reconfigure"
+alias recon1="snoe && sros1 && rosrun rqt_reconfigure rqt_reconfigure"
 alias recon2="sfox && sros2 && ros2 run rqt_reconfigure rqt_reconfigure"
 
 
