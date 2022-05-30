@@ -23,7 +23,6 @@ set(XACRO_FILES
     urdf/march3.xacro
     urdf/march4.xacro
     urdf/march6.xacro
-    urdf/march6_ros2.xacro
     urdf/march4_with_koen_lengths.xacro
     urdf/test_joint_linear.xacro
     urdf/test_joint_rotational.xacro

@@ -21,6 +21,16 @@ joint_trajectory_controller:
       - right_knee
     interface_name: position
     command_interfaces:
-      - position
+      - effort
     state_interfaces:
       - position
+      - velocity
+    gains:
+      left_ankle: { p: 160.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
+      left_hip_aa: { p: 330.0, i: 0.0, d: 10.0, i_clamp: 100.0  }
+      left_hip_fe: { p: 60.0, i: 0.0, d: 5.0, i_clamp: 100.0 }
+      left_knee: { p: 60.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
+      right_ankle: { p: 130.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
+      right_hip_aa: { p: 330.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
+      right_hip_fe: { p: 60.0, i: 0.0, d: 5.0, i_clamp: 100.0 }
+      right_knee: { p: 60.0, i: 0.0, d: 10.0, i_clamp: 100.0  }
