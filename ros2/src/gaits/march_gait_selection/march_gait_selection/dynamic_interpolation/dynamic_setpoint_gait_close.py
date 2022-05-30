@@ -19,8 +19,12 @@ from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_shared_msgs.msg import CurrentGait, FootPosition
 
-from .trajectory_command_handler import TrajectoryCommandHandler
-from .camera_points_handler import CameraPointsHandler
+from march_gait_selection.dynamic_interpolation.trajectory_command_handlers.trajectory_command_handler import (
+    TrajectoryCommandHandler,
+)
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
+    CameraPointsHandler,
+)
 
 
 class DynamicSetpointGaitClose(DynamicSetpointGait):
@@ -30,7 +34,7 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         super().__init__(gait_selection_node)
         self.logger = Logger(gait_selection_node, __class__.__name__)
         camera_points_handler = CameraPointsHandler(self)
-        self.trajectory_command_handler = TrajectoryCommandHandlerStep(self, camera_points_handler)
+        self.trajectory_command_handler = TrajectoryCommandHandlerClose(self, camera_points_handler)
         self.gait_name = "dynamic_close"
 
         gait_selection_node.create_subscription(
@@ -118,7 +122,7 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         return GaitUpdate.subgait_updated()
 
 
-class TrajectoryCommandHandlerStep(TrajectoryCommandHandler):
+class TrajectoryCommandHandlerClose(TrajectoryCommandHandler):
     """TrajectoryCommandHandler class but with a hard coded foot location for the close gait."""
 
     def __init__(self, gait, points_handler):

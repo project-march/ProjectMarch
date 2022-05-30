@@ -21,8 +21,12 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
-from .trajectory_command_handler import TrajectoryCommandHandler
-from .camera_points_handler import CameraPointsHandler
+from march_gait_selection.dynamic_interpolation.trajectory_command_handlers.trajectory_command_handler import (
+    TrajectoryCommandHandler,
+)
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
+    CameraPointsHandler,
+)
 
 from march_shared_msgs.msg import GaitInstruction
 from sensor_msgs.msg import JointState

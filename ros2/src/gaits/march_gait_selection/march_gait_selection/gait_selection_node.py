@@ -115,7 +115,7 @@ def parameter_callback(
         gait_selection.dynamic_setpoint_gait.update_parameters()
     elif position_queue_updated:
         gait_selection.dynamic_setpoint_gait_step.trajectory_command_handler.update_parameter()
-        gait_selection.dynamic_setpoint_gait_step_and_hold.update_parameter()
+        gait_selection.dynamic_setpoint_gait_step_and_hold.trajectory_command_handler.update_parameter()
     elif gaits_updated:
         # TODO: Updating the parameters in gait_selection does not work
         gait_selection.update_gaits()

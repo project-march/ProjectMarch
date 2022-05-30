@@ -7,7 +7,9 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
 from march_utility.utilities.logger import Logger
-from .trajectory_command_handler import TrajectoryCommandHandler
+from march_gait_selection.dynamic_interpolation.trajectory_command_handlers.trajectory_command_handler import (
+    TrajectoryCommandHandler,
+)
 
 
 class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):

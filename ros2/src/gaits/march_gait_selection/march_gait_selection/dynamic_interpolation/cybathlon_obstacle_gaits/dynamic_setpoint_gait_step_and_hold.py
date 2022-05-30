@@ -8,25 +8,17 @@ from sensor_msgs.msg import JointState
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
     DynamicSetpointGaitStepAndClose,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import TrajectoryCommandHandlerStep
+from march_gait_selection.dynamic_interpolation.trajectory_command_handlers.trajectory_command_handler_fixed_sizes import (
+    TrajectoryCommandHandlerFixedSizes,
+)
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.logger import Logger
-from march_utility.exceptions.gait_exceptions import WrongStartPositionError
 from march_utility.utilities.utility_functions import get_position_from_yaml
 
-from march_shared_msgs.msg import FootPosition, GaitInstruction
-from geometry_msgs.msg import Point
-from std_msgs.msg import String
-
-PREDETERMINED_FOOT_LOCATIONS = {
-    "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.03, z=0.44699999999999995)),
-    "small_wide": FootPosition(duration=1.5, processed_point=Point(x=0.65, y=0.03, z=0.44699999999999995)),
-    "large_narrow": FootPosition(duration=2.0, processed_point=Point(x=0.75, y=0.03, z=0.44699999999999995)),
-    "large_wide": FootPosition(duration=2.0, processed_point=Point(x=0.85, y=0.03, z=0.44699999999999995)),
-}
+from march_shared_msgs.msg import GaitInstruction
 
 END_POSITION_RIGHT = get_position_from_yaml("stand")
 END_POSITION_RIGHT = dict.fromkeys(END_POSITION_RIGHT, 0)
@@ -114,26 +106,13 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             self._trajectory_failed = False
 
 
-class TrajectoryCommandHandlerStepAndHold(TrajectoryCommandHandlerStep):
+class TrajectoryCommandHandlerStepAndHold(TrajectoryCommandHandlerFixedSizes):
     """TrajectoryCommandHandler for a step and hold."""
 
     _end: bool
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
-
-        self._gait.gait_selection.create_subscription(
-            String,
-            "/march/step_and_hold/start_side",
-            self._set_start_subgait_id,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self._gait.gait_selection.create_subscription(
-            String,
-            "/march/step_and_hold/step_size",
-            self._predetermined_foot_location_callback,
-            DEFAULT_HISTORY_DEPTH,
-        )
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
@@ -162,8 +141,8 @@ class TrajectoryCommandHandlerStepAndHold(TrajectoryCommandHandlerStep):
                 if self._use_position_queue and not self.position_queue.empty():
                     self.foot_location = self._get_foot_location_from_queue()
                 elif self._use_position_queue and self.position_queue.empty():
-                    self._logger.warn(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}.")
                     self.fill_queue()
+                    self._logger.warn(f"Queue is empty. Reset queue to {list(self.position_queue.queue)}.")
                     return None
                 else:
                     try:
@@ -220,26 +199,4 @@ class TrajectoryCommandHandlerStepAndHold(TrajectoryCommandHandlerStep):
             start,
             stop,
             hold_subgait=True,
-        )
-
-    def _set_start_subgait_id(self, start_side: String) -> None:
-        """Sets the subgait_id to the given start side, if and only if exo is in homestand."""
-        try:
-            if self.start_position_all_joints == self._gait.home_stand_position_all_joints:
-                self.subgait_id = start_side.data
-                if self.subgait_id == "left_swing":
-                    self._gait.start_from_left_side = True
-                else:
-                    self._gait.start_from_left_side = False
-                self._logger.info(f"Starting subgait set to {self.subgait_id}")
-            else:
-                raise WrongStartPositionError(self._gait.home_stand_position_all_joints, self.start_position_all_joints)
-        except WrongStartPositionError as e:
-            self._logger.warn(f"Can only change start side in home stand position. {e.msg}")
-
-    def _predetermined_foot_location_callback(self, msg: String) -> None:
-        self._gait.use_predetermined_foot_location = True
-        self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
-        self._logger.info(
-            f"Stepping to stone {msg.data} with a step size of {self._predetermined_foot_location.processed_point.x}"
         )
