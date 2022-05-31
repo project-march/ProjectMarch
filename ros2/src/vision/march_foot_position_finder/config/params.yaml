@@ -1,0 +1,13 @@
+march_foot_position_finder:
+  ros__parameters:
+    bool_value: True
+    int_number: 5
+    float_number: 3.14
+    str_text: "Hello Universe"
+    bool_array: [True, False, True]
+    int_array: [10, 11, 12, 13]
+    float_array: [7.5, 400.4]
+    str_array: ['Nice', 'more', 'params']
+    bytes_array: [0x01, 0xF1, 0xA2]
+    nested_param:
+      another_int: 7
