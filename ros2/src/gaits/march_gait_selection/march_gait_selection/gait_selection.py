@@ -155,7 +155,7 @@ class GaitSelection(Node):
 
         self._robot_description_sub = self.create_subscription(
             msg_type=String,
-            topic="/march/robot_description",
+            topic="/robot_description",
             callback=self._update_robot_description_cb,
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )

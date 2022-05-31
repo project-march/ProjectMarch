@@ -56,7 +56,7 @@ class RobotInformation(Node):
     def query_joint_names(self) -> List[str]:
         """Query the joint names from the robot_state_publisher."""
         robot_description = self.make_get_parameters_request(
-            node="/march/robot_state_publisher", names=["robot_description"]
+            node="/robot_state_publisher", names=["robot_description"]
         )[0].string_value
         robot = urdf.Robot.from_xml_string(robot_description)
 
