@@ -54,6 +54,13 @@ from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import (
     DynamicSetpointGaitClose,
 )
+from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_setpoint_gait import FixedSetpointGait
+from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_setpoint_gait_step_and_close import (
+    FixedSetpointGaitStepAndClose,
+)
+from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_setpoint_gait_step import (
+    FixedSetpointGaitStep,
+)
 
 NODE_NAME = "gait_selection"
 
@@ -473,6 +480,9 @@ class GaitSelection(Node):
                 self.dynamic_setpoint_gait_step,
                 DynamicSetpointGaitStepAndClose(gait_selection_node=self),
                 DynamicSetpointGaitClose(gait_selection_node=self),
+                FixedSetpointGait(node=self),
+                FixedSetpointGaitStep(node=self),
+                FixedSetpointGaitStepAndClose(node=self),
             ]
 
             if self._add_cybathlon_gaits:

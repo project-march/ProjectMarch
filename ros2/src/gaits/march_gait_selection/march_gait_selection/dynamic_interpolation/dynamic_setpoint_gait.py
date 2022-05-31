@@ -74,10 +74,10 @@ class DynamicSetpointGait(GaitInterface):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
         self.logger = Logger(self.gait_selection, __class__.__name__)
-        self._camera_points_handler = CameraPointsHandler(gait=self)
+        self._points_handler = CameraPointsHandler(gait=self)
         self.trajectory_command_handler = TrajectoryCommandHandler(
             gait=self,
-            points_handler=self._camera_points_handler,
+            points_handler=self._points_handler,
         )
         self._trajectory_failed = False
 
@@ -133,9 +133,8 @@ class DynamicSetpointGait(GaitInterface):
         """Returns the type of gait, for example 'walk_like' or 'sit_like'."""
         if self._next_command is not None:
             if (
-                self._camera_points_handler.get_foot_location(self.subgait_id).processed_point.y
-                > self.minimum_stair_height
-                or self._camera_points_handler.get_foot_location(self.subgait_id).processed_point.y
+                self._points_handler.get_foot_location(self.subgait_id).processed_point.y > self.minimum_stair_height
+                or self._points_handler.get_foot_location(self.subgait_id).processed_point.y
                 < -self.minimum_stair_height
             ):
                 return "stairs_like"

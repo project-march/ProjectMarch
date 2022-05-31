@@ -24,7 +24,7 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
         self._logger = Logger(gait_selection_node, __class__.__name__)
         self.trajectory_command_handler = TrajectoryCommandHandlerStepAndClose(
             gait=self,
-            points_handler=self._camera_points_handler,
+            points_handler=self._points_handler,
         )
         self.gait_name = "dynamic_step_and_close"
 

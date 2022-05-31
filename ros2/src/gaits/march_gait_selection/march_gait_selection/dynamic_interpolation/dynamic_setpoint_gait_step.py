@@ -33,9 +33,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self.logger = Logger(gait_selection_node, __class__.__name__)
-        self.trajectory_command_handler = TrajectoryCommandHandlerQueue(
-            gait=self, points_handler=self._camera_points_handler
-        )
+        self.trajectory_command_handler = TrajectoryCommandHandlerQueue(gait=self, points_handler=self._points_handler)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
 

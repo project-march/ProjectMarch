@@ -38,7 +38,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         self.use_predetermined_foot_location = False
         self.start_from_left_side = False
         super().__init__(gait_selection_node)
-        self.trajectory_command_handler = TrajectoryCommandHandlerStepAndHold(self, self._camera_points_handler)
+        self.trajectory_command_handler = TrajectoryCommandHandlerStepAndHold(self, self._points_handler)
         self.logger = Logger(gait_selection_node, __class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
 
