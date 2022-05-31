@@ -102,10 +102,11 @@
 
     </ros2_control>
 
+    <xacro:arg name="gazebo_control_file" default="NO FILE SPECIFIED"/>
     <gazebo>
       <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
         <robot_sim_type>gazebo_ros2_control/GazeboSystem</robot_sim_type>
-        <parameters>$(find march_control)/config/gazebo/march6_control.yaml</parameters>
+        <parameters>$(arg gazebo_control_file)</parameters>
       </plugin>
     </gazebo>
 
