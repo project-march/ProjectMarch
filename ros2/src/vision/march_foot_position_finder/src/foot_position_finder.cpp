@@ -106,8 +106,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     height_zero_threshold_
         = n_->get_parameter("height_zero_threshold").as_double();
     realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
-    std::cout << "SIM" << std::endl;
-    std::cout << realsense_simulation_ << std::endl;
     found_points_.resize(sample_size_);
 
     // Connect the physical RealSense cameras
@@ -319,12 +317,18 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     Preprocessor preprocessor(n_, pointcloud, left_or_right_);
     preprocessor.preprocess();
 
+    std::cout << "frame received" << std::endl;
+
     // Publish cloud for visualization:
     publishCloud(
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
+        std::cout << "frame received" << std::endl;
+
     // Find possible points around the desired point determined earlier:
     PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point_);
+
+
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
@@ -336,9 +340,15 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
         left_or_right_); // Purple
 
+        std::cout << "frame received4" << std::endl;
+
+        std::cout << position_queue.size() << std::endl;
+
     if (position_queue.size() > 0) {
         // Take the first point of the point queue returned by the point finder
         found_covid_point_ = computeTemporalAveragePoint(position_queue[0]);
+
+        std::cout << "frame received5" << std::endl;
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
@@ -353,6 +363,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPossiblePoints(
             point_marker_publisher_, n_, position_queue, left_or_right_);
 
+        std::cout << "frame received6" << std::endl;
+
         // Compute new foot displacement for gait computation
         new_displacement_ = subtractPoints(found_covid_point_, start_point_);
 
@@ -360,6 +372,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         if (std::abs(new_displacement_.z) < height_zero_threshold_) {
             new_displacement_.z = 0.0;
         }
+
+        std::cout << "frame received6" << std::endl;
 
         // Visualization
         publishArrow(point_marker_publisher_, n_, ORIGIN, start_point_,
@@ -371,7 +385,11 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Publish final point for gait computation
         publishPoint(point_publisher_, n_, found_covid_point_,
             found_covid_point_, new_displacement_, track_points);
+
+            std::cout << "frame received7" << std::endl;
     }
+
+    std::cout << "frame received8" << std::endl;
 }
 
 /**
@@ -404,7 +422,7 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 
 /**
  * Transforms a point in place from one frame to another using ROS
- * transformations
+ * transformations.
  *
  * @param point Point to transform between frames
  * @param frame_from source frame in which the point is currently

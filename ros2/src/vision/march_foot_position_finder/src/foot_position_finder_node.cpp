@@ -13,7 +13,6 @@ public:
         : Node("march_foot_position_finder")
     {
 
-        std::cout << "A" << std::endl;
         this->declare_parameter("realsense_simulation", false);
 
         this->declare_parameter("foot_gap", 0.0);
@@ -37,10 +36,8 @@ public:
         this->declare_parameter("displacements_near", 0.0);
         this->declare_parameter("displacements_far", 0.0);
 
-        std::cout << "A" << std::endl;
-
         left = new FootPositionFinder(this, "left");
-        right = new FootPositionFinder(this, "right");
+        // right = new FootPositionFinder(this, "right");
 
         this->set_on_parameters_set_callback(
             std::bind(&FootPositionFinderNode::parametersCallback, this,
@@ -51,28 +48,8 @@ public:
         const std::vector<rclcpp::Parameter>& parameters)
     {
         left->startParameterCallback(parameters);
-        left->startParameterCallback(parameters);
+        // right->startParameterCallback(parameters);
 
-        // left = new
-        // boost::thread(boost::bind(&FootPositionFinder::readParameters,
-        //     positionFinderLeft, boost::ref(parameters)));
-        // right = new
-        // boost::thread(boost::bind(&FootPositionFinder::readParameters,
-        //     positionFinderRight, boost::ref(parameters)));
-        // left->detach();
-        // right->detach();
-
-        // for (const auto &parameter : parameters)
-        // {
-        //     if (parameter.get_name() == "my_str" &&
-        //         parameter.get_type() ==
-        //         rclcpp::ParameterType::PARAMETER_STRING)
-        //     {
-        //         my_str_ = parameter.as_string();
-        //         RCLCPP_INFO(this->get_logger(), "Parameter 'my_str' changed:
-        //         %s", my_str_.c_str());
-        //     }
-        // }
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = true;
         return result;

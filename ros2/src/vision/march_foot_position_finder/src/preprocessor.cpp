@@ -30,26 +30,13 @@ using NormalCloud = pcl::PointCloud<Normal>;
 Preprocessor::Preprocessor(
     rclcpp::Node* n, PointCloud::Ptr pointcloud, std::string& left_or_right)
     : pointcloud_ { std::move(pointcloud) }
-{
-
-    std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-
+    , n_{ n }
+    {
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(n->get_clock());
     transform_listener_
         = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     base_frame_ = "toes_" + left_or_right + "_aligned";
-
-    // Define current transformation between realsense pointcloud and
-    // base_frame:
-    try {
-        transform_ = tf_buffer_->lookupTransform(
-            base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
-    } catch (tf2::TransformException& ex) {
-
-        RCLCPP_WARN(n->get_logger(), "Could not retrieve transformation.");
-    }
 }
 
 /**
@@ -80,12 +67,20 @@ void Preprocessor::voxelDownSample(float voxel_size)
  */
 void Preprocessor::transformPointCloudToBaseframe()
 {
-    Eigen::Matrix<double, 3, 1> translation;
-    Eigen::Quaternion<double> rotation;
+    try {
+        transform_ = tf_buffer_->lookupTransform(
+            base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
 
-    tf2::fromMsg(transform_.transform.translation, translation);
-    tf2::fromMsg(transform_.transform.rotation, rotation);
+        Eigen::Matrix<double, 3, 1> translation;
+        Eigen::Quaternion<double> rotation;
 
-    pcl::transformPointCloud(*pointcloud_, *pointcloud_, translation, rotation);
-    pointcloud_->header.frame_id = base_frame_;
+        tf2::fromMsg(transform_.transform.translation, translation);
+        tf2::fromMsg(transform_.transform.rotation, rotation);
+
+        pcl::transformPointCloud(*pointcloud_, *pointcloud_, translation, rotation);
+        pointcloud_->header.frame_id = base_frame_;
+
+    } catch (tf2::TransformException& ex) {
+        RCLCPP_WARN(n_->get_logger(), "Could not transform pointcloud: %s", ex.what());
+    }
 }

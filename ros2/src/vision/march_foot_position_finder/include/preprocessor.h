@@ -30,6 +30,10 @@ protected:
 
     void transformPointCloudToBaseframe();
 
+    rclcpp::Node* n_;
+    std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
+    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
     PointCloud::Ptr pointcloud_;
 
     float voxel_size_;
