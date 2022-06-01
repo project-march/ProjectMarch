@@ -8,6 +8,7 @@ from rclpy.node import Node
 from rclpy.time import Time
 from typing import Optional, Dict
 from ament_index_python.packages import get_package_share_path
+from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
@@ -23,7 +24,7 @@ from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from std_msgs.msg import Header
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPosition, GaitInstruction
 
 
 class DynamicSetpointGaitStep(DynamicSetpointGait):
@@ -56,9 +57,15 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             self._add_point_to_queue,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.final_position_pub = self._node.create_publisher(
+        self._node.create_subscription(
             JointState,
-            "/march/gait_selection/final_position",
+            "/march/close/final_position",
+            self._update_start_position_idle_state,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self._final_position_pub = self._node.create_publisher(
+            JointState,
+            "/march/step/final_position",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -69,12 +76,9 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         self._should_stop = False
         self._end = False
-
         self._start_time_next_command = None
         self._current_time = None
-
         self._next_command = None
-
         self._start_is_delayed = True
         self._scheduled_early = False
 
@@ -102,6 +106,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
                 return GaitUpdate.empty()
 
         if current_time >= self._start_time_next_command:
+            self._final_position_pub.publish(JointState(position=self.dynamic_subgait.get_final_position().values()))
             return self._update_state_machine()
 
         return GaitUpdate.empty()
@@ -120,10 +125,16 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
         if self._end:
             self.subgait_id = "right_swing"
-            if not isinstance(self.final_position, UnknownEdgePosition):
-                self.final_position_pub.publish(JointState(position=self.final_position.values))
 
         return GaitUpdate.finished()
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
 
     def _get_trajectory_command(self, start=False, stop=False) -> Optional[TrajectoryCommand]:
         """Return a TrajectoryCommand based on current subgait_id, or based on the _position_queue if enabled.
@@ -145,7 +156,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         else:
             try:
                 self.foot_location = self._get_foot_location(self.subgait_id)
-                stop = self._check_msg_time(self.foot_location)
+                stop = self._is_foot_location_too_old(self.foot_location)
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
             except AttributeError:
                 self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
@@ -212,3 +223,16 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
     def _can_get_second_step(self, final_iteration: bool) -> bool:
         """Returns true if second step is possible, always true for single step."""
         return True
+
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown.
+
+        Args:
+            msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self._set_start_position_to_home_stand()
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
+            self.position_queue = Queue()
+            self._fill_queue()

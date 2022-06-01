@@ -27,7 +27,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPosition, GaitInstruction
 from sensor_msgs.msg import JointState
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
@@ -82,12 +82,10 @@ class DynamicSetpointGait(GaitInterface):
 
         self.home_stand_position_actuating_joints = self._positions["stand"]["joints"]
         self.home_stand_position_all_joints = get_position_from_yaml("stand")
-        self.start_position_actuating_joints = copy(self.home_stand_position_actuating_joints)
-        self.start_position_all_joints = copy(self.home_stand_position_all_joints)
-
-        self._reset()
         self.all_joint_names = self.home_stand_position_all_joints.keys()
         self.actuating_joint_names = get_joint_names_from_urdf()
+        self._set_start_position_to_home_stand()
+        self._reset()
         self._get_soft_limits()
 
         self.gait_name = "dynamic_walk"
@@ -103,6 +101,12 @@ class DynamicSetpointGait(GaitInterface):
             FootPosition,
             "/march/processed_foot_position/left",
             self._callback_left,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self._node.create_subscription(
+            GaitInstruction,
+            "/march/input_device/instruction",
+            self._callback_force_unknown,
             DEFAULT_HISTORY_DEPTH,
         )
         self.pub_right = self._node.create_publisher(
@@ -205,11 +209,9 @@ class DynamicSetpointGait(GaitInterface):
         self._scheduled_early = False
 
         self._trajectory_failed = False
-
-        self.start_position_actuating_joints = self._positions["stand"]["joints"]
-        self.start_position_all_joints = get_position_from_yaml("stand")
-
         self._step_counter = 0
+
+        self._set_start_position_to_home_stand()
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -404,7 +406,7 @@ class DynamicSetpointGait(GaitInterface):
         else:
             try:
                 self.foot_location = self._get_foot_location(self.subgait_id)
-                stop = self._check_msg_time(self.foot_location)
+                stop = self._is_foot_location_too_old(self.foot_location)
             except AttributeError:
                 self.logger.warn("No FootLocation found. Connect the camera or use simulated points.")
                 self._end = True
@@ -475,7 +477,7 @@ class DynamicSetpointGait(GaitInterface):
         if not start:
             try:
                 return self._get_stop_gait()
-            except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+            except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
                 self.logger.warn(f"Can not get stop gait. {e.msg}")
 
         # If close gait is not feasible, stop gait completely
@@ -516,7 +518,7 @@ class DynamicSetpointGait(GaitInterface):
                 self.subgait_id,
                 self._start_time_next_command,
             )
-        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
                 self.logger.warn(
                     f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
@@ -543,7 +545,7 @@ class DynamicSetpointGait(GaitInterface):
         )
         try:
             subgait.get_joint_trajectory_msg(self.add_push_off)
-        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
                 self.logger.warn(f"Second step is not feasible. {e.msg}")
             return False
@@ -630,7 +632,25 @@ class DynamicSetpointGait(GaitInterface):
         for joint_name in self.actuating_joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
-    def _check_msg_time(self, foot_location: FootPosition) -> bool:
+    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
+        """Reset start position to home stand after force unknown.
+
+        Args:
+            msg (GaitInstruction): message containing a gait_instruction from the IPD
+        """
+        if msg.type == GaitInstruction.UNKNOWN:
+            self._set_start_position_to_home_stand()
+            self.subgait_id = "right_swing"
+            self._trajectory_failed = False
+
+    def _set_start_position_to_home_stand(self) -> None:
+        """Sets the starting position to home_stand."""
+        self.start_position_all_joints = copy(self.home_stand_position_all_joints)
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
+
+    def _is_foot_location_too_old(self, foot_location: FootPosition) -> bool:
         """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.
 
         Args:

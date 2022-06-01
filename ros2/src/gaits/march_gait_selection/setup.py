@@ -70,6 +70,7 @@ setup(
         "march_gait_selection.state_machine",
         "march_gait_selection.gaits",
         "march_gait_selection.dynamic_interpolation",
+        "march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits",
     ],
     data_files=data_files(),
     install_requires=["setuptools"],

@@ -81,6 +81,11 @@ def generate_launch_description():
                 description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
                 "points given by (simulated) covid.",
             ),
+            DeclareLaunchArgument(
+                name="add_cybathlon_gaits",
+                default_value="False",
+                description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
+            ),
             # State machine parameters:
             DeclareLaunchArgument(
                 name="first_subgait_delay",
@@ -116,6 +121,7 @@ def generate_launch_description():
                     {"add_push_off": LaunchConfiguration("add_push_off")},
                     {"amount_of_steps": LaunchConfiguration("amount_of_steps")},
                     {"use_position_queue": LaunchConfiguration("use_position_queue")},
+                    {"add_cybathlon_gaits": LaunchConfiguration("add_cybathlon_gaits")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
                     {"timer_period": LaunchConfiguration("timer_period")},

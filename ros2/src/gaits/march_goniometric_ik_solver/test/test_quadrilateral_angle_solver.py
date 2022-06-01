@@ -60,7 +60,7 @@ class TestQuadrilateralAngleSolver(unittest.TestCase):
         convex = True
 
         d_expected = np.array([0, 1])
-        d_actual = find_fourth_point(a, b, c, da, cd, convex)
+        d_actual = find_fourth_point(a, c, da, cd, convex)
 
         self.assertAlmostEqual(
             d_expected[0],

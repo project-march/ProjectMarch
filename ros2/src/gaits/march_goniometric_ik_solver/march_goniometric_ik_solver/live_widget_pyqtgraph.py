@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushBu
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
 
 X_MIN = 0.0
-X_MAX = 0.6
+X_MAX = 1.0
 Y_MIN = -0.3
 Y_MAX = 0.3
 
@@ -25,8 +25,7 @@ class LiveWidget:
 
     def __init__(self) -> None:
         self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}}
-        self.reduce_df_rear = False
-        self.reduce_df_front = False
+        self.reduce_df_front = True
 
         self.create_window()
         self.create_plot()
@@ -91,16 +90,13 @@ class LiveWidget:
         self.reset_button = QPushButton("Reset")
         self.reset_button.clicked.connect(self.reset)
 
-        self.df_rear_button = QCheckBox("DF rear")
-        self.df_rear_button.clicked.connect(self.toggle_df_rear)
-
         self.df_front_button = QCheckBox("DF front")
+        self.df_front_button.setChecked(True)
         self.df_front_button.clicked.connect(self.toggle_df_front)
 
         self.buttons = QGridLayout()
         self.buttons.addWidget(self.reset_button, 0, 0)
-        self.buttons.addWidget(self.df_rear_button, 0, 1)
-        self.buttons.addWidget(self.df_front_button, 0, 2)
+        self.buttons.addWidget(self.df_front_button, 0, 1)
 
     def create_table(self):
         """Create a table where we write the angles of all joints."""
@@ -154,14 +150,8 @@ class LiveWidget:
         self.update_poses()
         self.update_tables()
 
-    def toggle_df_rear(self):
-        """Toggle dorsiflection reduction of rear leg."""
-        self.reduce_df_rear = not self.reduce_df_rear
-        self.update_poses()
-        self.update_tables()
-
     def toggle_df_front(self):
-        """Toggle dorsiflection reduction of front lef."""
+        """Toggle dorsiflexion reduction of front lef."""
         self.reduce_df_front = not self.reduce_df_front
         self.update_poses()
         self.update_tables()
@@ -175,12 +165,11 @@ class LiveWidget:
                 LENGTH_HIP,
                 "",
                 reduce_df_front=self.reduce_df_front,
-                reduce_df_rear=self.reduce_df_rear,
             )
         except (ValueError) as value_error:
             print(value_error)
 
-        positions = self.poses[pose].calculate_joint_positions()
+        positions = list(self.poses[pose].calculate_joint_positions().values())
 
         # shift positions to have toes of stand legs at (0,0):
         if pose == "last":

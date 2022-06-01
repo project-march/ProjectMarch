@@ -45,7 +45,10 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_c
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import (
     DynamicSetpointGaitStep,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import (
+    SteppingStonesStepAndClose,
+)
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
     DynamicSetpointGaitStepAndHold,
 )
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import (
@@ -134,6 +137,7 @@ class GaitSelection(Node):
             self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
             self.amount_of_steps = self.get_parameter("amount_of_steps").get_parameter_value().integer_value
+            self._add_cybathlon_gaits = self.get_parameter("add_cybathlon_gaits").get_parameter_value().bool_value
 
         except ParameterNotDeclaredException:
             self.logger.error(
@@ -467,10 +471,13 @@ class GaitSelection(Node):
             dynamic_gaits = [
                 self.dynamic_setpoint_gait,
                 self.dynamic_setpoint_gait_step,
-                self.dynamic_setpoint_gait_step_and_hold,
                 DynamicSetpointGaitStepAndClose(gait_selection_node=self),
                 DynamicSetpointGaitClose(gait_selection_node=self),
             ]
+
+            if self._add_cybathlon_gaits:
+                dynamic_gaits.append(self.dynamic_setpoint_gait_step_and_hold)
+                dynamic_gaits.append(SteppingStonesStepAndClose(gait_selection_node=self))
 
             for dynamic_gait in dynamic_gaits:
                 gaits[dynamic_gait.name] = dynamic_gait

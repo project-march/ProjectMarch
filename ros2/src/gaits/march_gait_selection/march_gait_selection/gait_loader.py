@@ -8,7 +8,7 @@ from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
     DynamicSetpointGaitStepAndHold,
 )
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
