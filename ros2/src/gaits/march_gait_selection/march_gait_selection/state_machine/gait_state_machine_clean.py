@@ -8,7 +8,6 @@ from rclpy.node import Node
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
-from march_shared_msgs.srv import PossibleGaits
 
 from march_utility.gait.edge_position import UnknownEdgePosition
 from march_utility.utilities.logger import Logger
@@ -16,6 +15,7 @@ from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
+from march_shared_msgs.srv import PossibleGaits
 from std_msgs.msg import Header
 
 
@@ -23,6 +23,8 @@ class GaitStateMachine:
     """Clean version of the state machine that can only be used with limited gaits."""
 
     update_timer: Timer
+    _should_stop: bool
+    _shutdown_requested: bool
 
     def __init__(self, node: Node, trajectory_scheduler: TrajectoryScheduler, gaits: dict, positions: dict):
         self._node = node
@@ -110,7 +112,8 @@ class GaitStateMachine:
     def _is_stop_requested_after_step_or_step_and_hold(self) -> bool:
         """Returns true if a stop is requested and the previous gait was a step or step and hold."""
         return (
-            self._is_stop_requested() and not self._is_stopping
+            self._is_stop_requested()
+            and not self._is_stopping
             and self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold"]
             and not isinstance(self._last_end_position, UnknownEdgePosition)
         )
@@ -308,5 +311,5 @@ class GaitStateMachine:
         Args:
             gait_name (str): Name of the gait of which the parameters should be updated.
         """
-        if gait_name in self._gaits.keys():
+        if gait_name in self._gaits:
             self._gaits[gait_name].update_parameters()

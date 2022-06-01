@@ -15,9 +15,8 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
-from sensor_msgs.msg import JointState
 
-from march_utility.gait.edge_position import EdgePosition, UnknownEdgePosition
+from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH

@@ -40,9 +40,7 @@ def main():
     gait_state_machine = GaitStateMachine(node, scheduler, gaits, positions)
     gait_state_machine.run()
 
-    node.add_on_set_parameters_callback(
-        lambda params: parameter_callback(node, gait_state_machine, params)
-    )
+    node.add_on_set_parameters_callback(lambda params: parameter_callback(node, gait_state_machine, params))
 
     signal.signal(signal.SIGTERM, sys_exit)
 
@@ -60,7 +58,8 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
     implemented here.
 
     Args:
-        node (Node): The current GaitSelection object
+        node (Node): The node that is used in the GaitLoader and GaitStateMachine
+        gait_state_machine (GaitStateMachine): The GaitStateMachine object, to access the gait objects
         parameters (???): The parameters to update
     Returns:
         SetParametersResult: Whether the callback was successful
@@ -132,9 +131,7 @@ class GaitNode(Node):
             self.early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
             self.first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
         except ParameterNotDeclaredException:
-            self.logger.error(
-                "Gait node started without the required parameters."
-            )
+            self.logger.error("Gait node started without the required parameters.")
 
     def _parse_duration_parameter(self, name: str) -> Duration:
         """Get a duration parameter from the parameter server.

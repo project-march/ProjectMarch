@@ -28,7 +28,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 
 from march_shared_msgs.msg import FootPosition, GaitInstruction
-from sensor_msgs.msg import JointState
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 DURATION_INCREASE_FACTOR = 1.5

@@ -8,15 +8,12 @@ from queue import Queue
 from typing import Dict, Optional
 from ament_index_python import get_package_share_path
 from rclpy.node import Node
-from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
     DynamicSetpointGaitStepAndClose,
 )
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
-from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
-from sensor_msgs.msg import JointState
 
 from march_utility.gait.edge_position import EdgePosition, UnknownEdgePosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -27,6 +24,7 @@ from march_utility.utilities.utility_functions import get_position_from_yaml
 from march_shared_msgs.msg import FootPosition, GaitInstruction
 from geometry_msgs.msg import Point
 from std_msgs.msg import Header, String
+from sensor_msgs.msg import JointState
 
 PREDETERMINED_FOOT_LOCATIONS = {
     "small_narrow": FootPosition(duration=1.5, processed_point=Point(x=0.55, y=0.03, z=0.44699999999999995)),
