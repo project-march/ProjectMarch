@@ -2,7 +2,6 @@
 
 from enum import Enum
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse
-from march_utility.utilities.logger import Logger
 
 
 class TransitionRequest(Enum):
@@ -19,7 +18,7 @@ class StateMachineInput:
     Args:
         node (Node): node used to create subscribers/publishers on
     Attributes:
-        logger (Logger): used to log to the terminal
+        _logger (Logger): used to log to the terminal
         _stopped (bool): ???
         _paused (bool): ???
         _unknown (bool): ???
@@ -38,7 +37,7 @@ class StateMachineInput:
         self._transition_index = 0
         self._gait = None
         self._node = node
-        self.logger = Logger(self._node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._instruction_subscriber = node.create_subscription(
             msg_type=GaitInstruction,
             topic="/march/input_device/instruction",
@@ -129,7 +128,7 @@ class StateMachineInput:
         Args:
             msg (GaitInstruction): message containing the instruction for the state machine
         """
-        self.logger.debug(f"Callback input device instruction {msg}")
+        self._logger.debug(f"Callback input device instruction {msg}")
         if msg.type == GaitInstruction.STOP:
             self._stopped = True
         elif msg.type == GaitInstruction.GAIT:

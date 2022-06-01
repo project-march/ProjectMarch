@@ -13,7 +13,6 @@ from march_utility.utilities.utility_functions import (
     get_position_from_yaml,
 )
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
     VelocitySoftLimitError,
@@ -53,7 +52,7 @@ class DynamicSetpointGait(GaitInterface):
         all_joint_names (List[srt]): names of all eight joints in alphabetical order
         gait_name (str): name of the gait
         subgait_id (str): either left_swing or right_swing
-        logger (Logger): used to log messages to the terminal with the class name as a prefix
+        _logger (Logger): used to log messages to the terminal with the class name as a prefix
         pub_left (Publisher): used to publish the chosen foot position of the left leg
         pub_right (Publisher): used to publish the chosen foot position of the right leg
         minimum_stair_height (float): steps higher or lower than this height will be classified as 'stairs-like'
@@ -75,7 +74,7 @@ class DynamicSetpointGait(GaitInterface):
     def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
         self.gait_selection = gait_selection_node
-        self.logger = Logger(self.gait_selection, __class__.__name__)
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
         self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
@@ -229,7 +228,7 @@ class DynamicSetpointGait(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self.logger.error(e.msg)
+            self._logger.error(e.msg)
             return None
         self.update_parameters()
         self._start_time_next_command = current_time + first_subgait_delay
@@ -408,18 +407,18 @@ class DynamicSetpointGait(GaitInterface):
         """
         if stop:
             self._end = True
-            self.logger.info("Stopping dynamic gait.")
+            self._logger.info("Stopping dynamic gait.")
         else:
             try:
                 self.foot_location = self._get_foot_location(self.subgait_id)
                 stop = self._is_foot_location_too_old(self.foot_location)
             except AttributeError:
-                self.logger.warn("No FootLocation found. Connect the camera or use simulated points.")
+                self._logger.warn("No FootLocation found. Connect the camera or use simulated points.")
                 self._end = True
                 return None
             if not stop:
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
-                self.logger.info(
+                self._logger.info(
                     f"Stepping to location ({self.foot_location.processed_point.x}, "
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
                 )
@@ -436,7 +435,7 @@ class DynamicSetpointGait(GaitInterface):
             return False
         elif self._step_counter == self.amount_of_steps - 1:
             self._end = True
-            self.logger.info("Stopping dynamic gait.")
+            self._logger.info("Stopping dynamic gait.")
             return True
         self._step_counter += 1
         return False
@@ -484,7 +483,7 @@ class DynamicSetpointGait(GaitInterface):
             try:
                 return self._get_stop_gait()
             except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-                self.logger.warn(f"Can not get stop gait. {e.msg}")
+                self._logger.warn(f"Can not get stop gait. {e.msg}")
 
         # If close gait is not feasible, stop gait completely
         self._end = True
@@ -514,7 +513,7 @@ class DynamicSetpointGait(GaitInterface):
                 self.start_position_all_joints, self.subgait_id, start, stop
             )
             trajectory = self.dynamic_subgait.get_joint_trajectory_msg(self.add_push_off)
-            self.logger.debug(
+            self._logger.debug(
                 f"Found trajectory after {iteration + 1} iterations at duration of {self.foot_location.duration}. "
                 f"Original duration was {original_duration}."
             )
@@ -526,7 +525,7 @@ class DynamicSetpointGait(GaitInterface):
             )
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self.logger.warn(
+                self._logger.warn(
                     f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
                 )
             return None
@@ -553,7 +552,7 @@ class DynamicSetpointGait(GaitInterface):
             subgait.get_joint_trajectory_msg(self.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self.logger.warn(f"Second step is not feasible. {e.msg}")
+                self._logger.warn(f"Second step is not feasible. {e.msg}")
             return False
         return True
 
@@ -674,12 +673,12 @@ class DynamicSetpointGait(GaitInterface):
         )
         time_difference = current_time - msg_time
         readable_time_difference = f"{time_difference.nanoseconds / NANOSECONDS_TO_SECONDS}"
-        self.logger.debug(
+        self._logger.debug(
             f"Time difference between CoViD foot location and current time: {readable_time_difference}.",
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
-            self.logger.warn(
+            self._logger.warn(
                 f"Foot location is more than {FOOT_LOCATION_TIME_OUT} seconds old, time difference is "
                 f"{readable_time_difference} seconds. Stopping gait."
             )
