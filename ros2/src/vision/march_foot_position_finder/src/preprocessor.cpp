@@ -49,7 +49,7 @@ Preprocessor::Preprocessor(
     } catch (tf2::TransformException& ex) {
 
         RCLCPP_WARN(n->get_logger(),
-            "Something went wrong when transforming the pointcloud.");
+            "Could not retrieve transformation.");
     }
 }
 

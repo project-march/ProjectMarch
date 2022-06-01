@@ -97,6 +97,74 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
             /*queue_size=*/1, state_callback);
 
     running_ = false;
+
+    foot_gap_ = n_->get_parameter("foot_gap").as_double();
+    step_distance_ = n_->get_parameter("step_distance").as_double();
+    sample_size_ = n_->get_parameter("sample_size").as_int();
+
+    outlier_distance_ = n_->get_parameter("outlier_distance").as_double();
+    height_zero_threshold_
+        = n_->get_parameter("height_zero_threshold").as_double();
+    realsense_simulation_
+        = n_->get_parameter("realsense_simulation").as_bool();
+        std::cout << realsense_simulation_ << std::endl;
+    found_points_.resize(sample_size_);
+
+    // Connect the physical RealSense cameras
+    if (!realsense_simulation_) {
+        while (true) {
+            try {
+                config_.enable_device(serial_number_);
+                config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
+                    /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
+                pipe_.start(config_);
+            } catch (const rs2::error& e) {
+                std::string error_message = e.what();
+                RCLCPP_WARN(n_->get_logger(),
+                    "Error while initializing %s RealSense camera: %s",
+                    left_or_right_.c_str(), error_message.c_str());
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                continue;
+            }
+
+            realsense_timer_ = n_->create_wall_timer(
+                std::chrono::milliseconds(5), [this]() -> void {
+                    processRealSenseDepthFrames();
+                });
+
+            RCLCPP_INFO(n_->get_logger(),
+                "\033[1;36m%s RealSense connected (%s) \033[0m",
+                left_or_right_.c_str(), serial_number_.c_str());
+
+            break;
+        }
+    } else {
+        // Initialize the callback for the RealSense simulation plugin
+        std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)> callback = std::bind(&FootPositionFinder::processSimulatedDepthFrames, this, std::placeholders::_1);
+        pointcloud_subscriber_
+            = n_->create_subscription<sensor_msgs::msg::PointCloud2>(
+                topic_camera_front_,
+                /*queue_size=*/1, callback);
+
+        RCLCPP_INFO(n_->get_logger(), "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m", left_or_right_.c_str());
+    }
+
+    last_displacement_ = previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
+
+    desired_point_ = addPoints(start_point_,
+        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+            /*_z=*/0));
+
+}
+
+void FootPositionFinder::startParameterCallback(
+    const std::vector<rclcpp::Parameter>& parameters)
+{
+    parameter_callback_timer_ = n_->create_wall_timer(
+        std::chrono::milliseconds(10), [this, parameters]() -> void {
+            readParameters(parameters);
+        });
 }
 
 /**
@@ -108,68 +176,36 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 // No lint is used to avoid linting in the RealSense library, where a potential
 // memory leak error is present
 // NOLINTNEXTLINE
-// void FootPositionFinder::readParameters(
-//     march_foot_position_finder::parametersConfig& config, uint32_t level)
-// {
-//     foot_gap_ = config.foot_gap;
-//     step_distance_ = config.step_distance;
-//     sample_size_ = config.sample_size;
-//     outlier_distance_ = config.outlier_distance;
-//     height_zero_threshold_ = config.height_zero_threshold;
-//     found_points_.resize(sample_size_);
-//     realsense_simulation_ =
-//     n_->get_parameter("realsense_simulation").as_double();
+void FootPositionFinder::readParameters(
+    const std::vector<rclcpp::Parameter>& parameters)
+{
+    parameter_callback_timer_->cancel();
 
-//     // Connect the physical RealSense cameras
-//     if (!running_ && !realsense_simulation_) {
-//         while (true) {
-//             try {
-//                 config_.enable_device(serial_number_);
-//                 config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
-//                     /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
-//                 pipe_.start(config_);
-//             } catch (const rs2::error& e) {
-//                 std::string error_message = e.what();
-//                 RCLCPP_WARN("Error while initializing %s RealSense camera:
-//                 %s",
-//                     left_or_right_.c_str(), error_message.c_str());
-//                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-//                 continue;
-//             }
+    foot_gap_ = n_->get_parameter("foot_gap").as_double();
+    step_distance_ = n_->get_parameter("step_distance").as_double();
+    sample_size_ = n_->get_parameter("sample_size").as_int();
 
-//             realsense_timer_ = n_->createTimer(rclcpp::Duration(/*t=*/0.005),
-//                 &FootPositionFinder::processRealSenseDepthFrames, this);
-//             ROS_INFO("\033[1;36m%s RealSense connected (%s) \033[0m",
-//                 left_or_right_.c_str(), serial_number_.c_str());
+    outlier_distance_ = n_->get_parameter("outlier_distance").as_double();
+    height_zero_threshold_
+        = n_->get_parameter("height_zero_threshold").as_double();
+    realsense_simulation_
+        = n_->get_parameter("realsense_simulation").as_bool();
+    found_points_.resize(sample_size_);
 
-//             break;
-//         }
-//     }
+    // Initialize all variables as zero:
+    last_displacement_ = previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
 
-//     // Initialize the callback for the RealSense simulation plugin
-//     if (!running_ && realsense_simulation_) {
-//         pointcloud_subscriber_ =
-//         n_->create_subscription<sensor_msgs::msg::PointCloud2>(
-//             topic_camera_front_, /*queue_size=*/1,
-//             &FootPositionFinder::processSimulatedDepthFrames, this);
-//         ROS_INFO(
-//             "\033[1;36mSimulated RealSense callback initialized (%s)
-//             \033[0m", left_or_right_.c_str());
-//     }
+    desired_point_ = addPoints(start_point_,
+        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+            /*_z=*/0));
 
-//     // Initialize all variables as zero:
-//     last_displacement_ = previous_start_point_ = start_point_
-//         = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
+    RCLCPP_INFO(n_->get_logger(),
+        "Parameters updated in %s foot position finder",
+        left_or_right_.c_str());
 
-//     desired_point_ = addPoints(start_point_,
-//         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-//             /*_z=*/0));
-
-//     ROS_INFO("Parameters updated in %s foot position finder",
-//         left_or_right_.c_str());
-
-//     running_ = true;
-// }
+    running_ = true;
+}
 
 /**
  * Callback function for when the gait selection node selects a point for the
@@ -258,13 +294,13 @@ void FootPositionFinder::processRealSenseDepthFrames()
  */
 // Suppress lint error "make reference of argument" (breaks callback)
 void FootPositionFinder::processSimulatedDepthFrames(
-    const sensor_msgs::msg::PointCloud2 input_cloud) // NOLINT
+    const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud) // NOLINT
 {
-    // PointCloud converted_cloud;
-    // pcl::fromROSMsg(input_cloud, converted_cloud);
-    // PointCloud::Ptr pointcloud
-    //     = boost::make_shared<PointCloud>(converted_cloud);
-    // processPointCloud(pointcloud);
+    PointCloud converted_cloud;
+    pcl::fromROSMsg(*input_cloud, converted_cloud);
+    PointCloud::Ptr pointcloud
+        = boost::make_shared<PointCloud>(converted_cloud);
+    processPointCloud(pointcloud);
 }
 
 /**

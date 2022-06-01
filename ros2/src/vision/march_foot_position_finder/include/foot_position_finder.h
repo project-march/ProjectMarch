@@ -32,9 +32,8 @@ public:
     explicit FootPositionFinder(
         rclcpp::Node* n, const std::string& left_or_right);
 
-    // void readParameters(
-    //     march_foot_position_finder::parametersConfig& config, uint32_t
-    //     level);
+    void startParameterCallback(
+        const std::vector<rclcpp::Parameter>& parameters);
 
     ~FootPositionFinder() = default;
 
@@ -50,9 +49,11 @@ protected:
     void processRealSenseDepthFrames();
 
     void processSimulatedDepthFrames(
-        const sensor_msgs::msg::PointCloud2 input_cloud);
+        const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
 
     void processPointCloud(const PointCloud::Ptr& pointcloud);
+
+    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
 
     Point computeTemporalAveragePoint(const Point& new_point);
 
@@ -75,6 +76,7 @@ protected:
     rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr
         current_state_subscriber_;
 
+    rclcpp::TimerBase::SharedPtr parameter_callback_timer_;
     rclcpp::TimerBase::SharedPtr realsense_timer_;
     rclcpp::TimerBase::SharedPtr initial_position_reset_timer_;
 

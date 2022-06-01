@@ -65,6 +65,7 @@ def generate_launch_description() -> LaunchDescription:
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
+    point_finder = LaunchConfiguration("point_finder")
 
     # Gait selection arguments
     gait_package = LaunchConfiguration("gait_package")
@@ -127,21 +128,7 @@ def generate_launch_description() -> LaunchDescription:
                 description="Whether the input device should ping the safety node"
                 "with an alive message every 0.2 seconds",
             ),
-            # ROBOT STATE PUBLISHER ARGUMENTS
-            DeclareLaunchArgument(
-                name="robot_state_publisher",
-                default_value="True",
-                description="Whether or not to launch the robot state publisher,"
-                "this allows nodes to get the urdf and to subscribe to"
-                "potential urdf updates. This is necesary for gait selection"
-                "to be able to launch",
-            ),
-            DeclareLaunchArgument(
-                name="robot_description",
-                default_value=robot,
-                description="Which <robot_description>.xacro file to use. "
-                "This file must be available in the march_desrciption/urdf/ folder",
-            ),
+            # COMPUTER VISION ARGUMENTS
             DeclareLaunchArgument(
                 name="realsense",
                 default_value="True",
@@ -153,9 +140,9 @@ def generate_launch_description() -> LaunchDescription:
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
-                name="use_hud",
+                name="point_finder",
                 default_value="False",
-                description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
+                description="Whether to run the point finding algorithm",
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
@@ -178,6 +165,26 @@ def generate_launch_description() -> LaunchDescription:
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting.",
+            ),
+            # ROBOT STATE PUBLISHER ARGUMENTS
+            DeclareLaunchArgument(
+                name="robot_state_publisher",
+                default_value="True",
+                description="Whether or not to launch the robot state publisher,"
+                "this allows nodes to get the urdf and to subscribe to"
+                "potential urdf updates. This is necesary for gait selection"
+                "to be able to launch",
+            ),
+            DeclareLaunchArgument(
+                name="robot_description",
+                default_value=robot,
+                description="Which <robot_description>.xacro file to use. "
+                "This file must be available in the march_desrciption/urdf/ folder",
+            ),
+            DeclareLaunchArgument(
+                name="use_hud",
+                default_value="False",
+                description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
             ),
             DeclareLaunchArgument(
                 "jointless",
@@ -330,6 +337,20 @@ def generate_launch_description() -> LaunchDescription:
                     ("layout", layout),
                 ],
                 condition=IfCondition(rqt_input),
+            ),
+            # Launch computer vision algorithms
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_foot_position_finder"),
+                        "launch",
+                        "march_foot_position_finder.launch.py",
+                    )
+                ),
+                launch_arguments=[
+                    ("realsense_simulation", realsense_simulation),
+                ],
+                condition=IfCondition(point_finder),
             ),
             # Launch wireless input device if not wireless_ipd:=false
             IncludeLaunchDescription(
