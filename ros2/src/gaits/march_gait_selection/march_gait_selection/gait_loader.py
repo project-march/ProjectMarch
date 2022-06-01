@@ -8,14 +8,17 @@ from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
-    DynamicSetpointGaitStepAndHold,
-)
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import DynamicSetpointGaitClose
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import DynamicSetpointGaitStep
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
     DynamicSetpointGaitStepAndClose,
+)
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
+    DynamicSetpointGaitStepAndHold,
+)
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import (
+    SteppingStonesStepAndClose,
 )
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
@@ -80,10 +83,13 @@ class GaitLoader:
         dynamic_gaits = [
             DynamicSetpointGait(self._node, self.positions),
             DynamicSetpointGaitStep(self._node, self.positions),
-            DynamicSetpointGaitStepAndHold(self._node, self.positions),
             DynamicSetpointGaitStepAndClose(self._node, self.positions),
             DynamicSetpointGaitClose(self._node, self.positions),
         ]
+
+        if self._node.add_cybathlon_gaits:
+            dynamic_gaits.append(DynamicSetpointGaitStepAndHold(self._node, self.positions))
+            dynamic_gaits.append(SteppingStonesStepAndClose(self._node, self.positions))
 
         for dynamic_gait in dynamic_gaits:
             self._loaded_gaits[dynamic_gait.name] = dynamic_gait

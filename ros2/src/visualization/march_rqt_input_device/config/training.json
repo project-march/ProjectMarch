@@ -26,12 +26,37 @@
     },
     {
       "name": "dynamic_step"
+    }
+  ],
+  [
+    {
+      "name": "sit"
     },
+    {
+      "name": "stand"
+    },
+    {
+    "name": "error",
+      "callback": "publish_error",
+      "always_enabled": true
+    }
+  ],
+  [
     {
       "name": "dynamic_step_and_hold"
     },
     {
       "name": "stepping_stones_step_and_close"
+    },
+    {
+      "name": "start_with_right",
+      "callback": "publish_start_with_right",
+      "always_enabled": true
+    },
+    {
+      "name": "start_with_left",
+      "callback": "publish_start_with_left",
+      "always_enabled": true
     }
   ],
   [
@@ -53,143 +78,6 @@
     {
       "name": "large_wide",
       "callback": "publish_large_wide",
-      "always_enabled": true
-    }
-  ],
-  [
-    {
-      "name": "start_with_right",
-      "callback": "publish_start_with_right",
-      "always_enabled": true
-    },
-    {
-      "name": "start_with_left",
-      "callback": "publish_start_with_left",
-      "always_enabled": true
-    }
-  ],
-  [
-    {
-      "name": "walk"
-    },
-    {
-      "name": "walk_large"
-    },
-    {
-      "name": "walk_single_step"
-    },
-    {
-      "name": "walk_single_step_large"
-    }
-  ],
-  [
-    {
-      "name": "ramp_up"
-    },
-    {
-      "name": "ramp_up_single_step"
-    },
-    {
-      "name": "realsense_ramp_up"
-    },
-    {
-      "name": "realsense_ramp_up_single_step"
-    }
-  ],
-  [
-    {
-      "name": "ramp_down"
-    },
-    {
-      "name": "ramp_down_start_single_step"
-    },
-    {
-      "name": "ramp_down_single_step"
-    },
-    {
-      "name": "ramp_down_last_step"
-    }
-  ],
-  [
-    {
-      "name": "realsense_ramp_down"
-    },
-    {
-      "name": "realsense_ramp_down_start_single_step"
-    },
-    {
-      "name": "realsense_ramp_down_single_step"
-    },
-    {
-      "name": "realsense_ramp_down_last_step"
-    }
-  ],
-  [
-    {
-      "name": "sit"
-    },
-    {
-      "name": "stand"
-    },
-    {
-      "name": "realsense_sit"
-    },
-    {
-      "name": "realsense_stand"
-    }
-  ],
-  [
-    {
-      "name": "stairs_up"
-    },
-    {
-      "name": "stairs_up_single_step"
-    },
-    {
-      "name": "realsense_stairs_up"
-    },
-    {
-      "name": "realsense_stairs_up_single_step"
-    }
-  ],
-  [
-    {
-      "name": "stairs_down"
-    },
-    {
-      "name": "stairs_down_single_step"
-    },
-    {
-      "name": "realsense_stairs_down"
-    },
-    {
-      "name": "realsense_stairs_down_single_step"
-    }
-  ],
-  [
-    {
-      "name": "curb_up"
-    },
-    {
-      "name": "curb_down"
-    },
-    {
-      "name": "realsense_curb_up"
-    },
-    {
-      "name": "realsense_curb_down"
-    }
-  ],
-  [
-    {
-      "name": "stairs_down_backwards"
-    },
-    {
-      "name": "stairs_down_backwards_single_step"
-    },
-    {
-      "name": "error",
-      "callback": "publish_error",
       "always_enabled": true
     }
   ]

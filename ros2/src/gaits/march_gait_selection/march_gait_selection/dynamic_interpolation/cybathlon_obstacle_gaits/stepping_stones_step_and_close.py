@@ -1,7 +1,7 @@
 """Author: Marten Haitjema, MVII."""
 
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, Dict
 
 from rclpy.time import Time
 
@@ -13,6 +13,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_utility.exceptions.gait_exceptions import (
     WrongStartPositionError,
 )
+from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -34,27 +35,30 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
     """Class for doing step and closes on the cybathlon stepping stones obstacle.
 
     Args:
-        gait_selection_node (GaitSelection): the gait selection node
+        node (Node): the gait node
+        positions (Dict[str, EdgePosition]):  named positions loaded in the gait loader
 
     Attributes:
         _start_from_left_side (bool): whether the gaits start with a left swing
         _use_predetermined_foot_location (bool): whether one of the five predetermined locations will be used
     """
 
-    def __init__(self, gait_selection_node):
-        super().__init__(gait_selection_node)
+    def __init__(self, node, positions: Dict[str, EdgePosition]):
+        super().__init__(node, positions)
+        self._node = node
+        self._positions = positions
         self._start_from_left_side = False
         self._use_predetermined_foot_location = False
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self.logger = Logger(self._node, __class__.__name__)
         self.gait_name = "stepping_stones_step_and_close"
 
-        self.gait_selection.create_subscription(
+        self._node.create_subscription(
             String,
             "/march/step_and_hold/start_side",
             self._set_start_subgait_id,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.gait_selection.create_subscription(
+        self._node.create_subscription(
             String,
             "/march/step_and_hold/step_size",
             self._predetermined_foot_location_callback,

@@ -296,11 +296,9 @@ class GaitStateMachine:
         """
         possible_gaits = []
         if not self._executing_gait:
-            self._logger.warn(f"Last idle position: {self._last_end_position}")
             for gait in self._gaits.values():
                 if self._last_end_position == gait.starting_position:
                     possible_gaits.append(gait.name)
-        self._logger.warn(f"Possible gaits: {possible_gaits}")
 
         response.gaits = possible_gaits
         return response
