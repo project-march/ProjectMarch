@@ -16,7 +16,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from std_msgs.msg import Header
@@ -42,7 +41,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
 
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
         self.update_parameter()
@@ -139,7 +138,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             self.foot_location = self._get_foot_location_from_queue()
         elif self._use_position_queue and self.position_queue.empty():
             self._fill_queue()
-            self.logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
+            self._logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
             stop = True
             self._end = True
         else:
@@ -148,11 +147,11 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
                 stop = self._is_foot_location_too_old(self.foot_location)
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
             except AttributeError:
-                self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
                 self._end = True
                 return None
 
-        self.logger.info(
+        self._logger.info(
             f"Stepping to location ({self.foot_location.processed_point.x}, "
             f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
         )
@@ -170,7 +169,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
         if self.position_queue.empty():
-            self.logger.warn("Next step will be a close gait.")
+            self._logger.warn("Next step will be a close gait.")
 
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
@@ -186,7 +185,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
             with open(queue_file_loc, "r") as queue_file:
                 position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
         except OSError as e:
-            self.logger.error(f"Position queue file does not exist. {e}")
+            self._logger.error(f"Position queue file does not exist. {e}")
 
         self.duration_from_yaml = position_queue_yaml["duration"]
         self.points_from_yaml = position_queue_yaml["points"]
@@ -206,7 +205,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         """
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.put(point_dict)
-        self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
+        self._logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
 
     def _can_get_second_step(self, final_iteration: bool) -> bool:
         """Returns true if second step is possible, always true for single step."""
