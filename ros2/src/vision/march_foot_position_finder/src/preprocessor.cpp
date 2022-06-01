@@ -67,20 +67,30 @@ void Preprocessor::voxelDownSample(float voxel_size)
  */
 void Preprocessor::transformPointCloudToBaseframe()
 {
+    std::cout << "start" << std::endl;
     try {
         transform_ = tf_buffer_->lookupTransform(
             base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
 
+            std::cout << "start" << std::endl;
+
         Eigen::Matrix<double, 3, 1> translation;
         Eigen::Quaternion<double> rotation;
+
+        std::cout << "start" << std::endl;
 
         tf2::fromMsg(transform_.transform.translation, translation);
         tf2::fromMsg(transform_.transform.rotation, rotation);
 
+        std::cout << "start" << std::endl;
+
         pcl::transformPointCloud(*pointcloud_, *pointcloud_, translation, rotation);
         pointcloud_->header.frame_id = base_frame_;
+
+        std::cout << "start" << std::endl;
 
     } catch (tf2::TransformException& ex) {
         RCLCPP_WARN(n_->get_logger(), "Could not transform pointcloud: %s", ex.what());
     }
+    std::cout << "end" << std::endl;
 }

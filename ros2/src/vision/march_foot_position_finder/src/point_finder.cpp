@@ -34,10 +34,6 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     , left_or_right_ { std::move(left_or_right) }
     , n_ { n }
 {
-
-    std::cout << "frame received2" << std::endl;
-
-
     std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
     std::fill_n(
         &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -10);
@@ -120,8 +116,6 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
             horizontal_displacements_.push_back(x);
         }
     }
-
-    std::cout << "frame received2" << std::endl;
 }
 
 /**
@@ -131,14 +125,9 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
  */
 void PointFinder::findPoints(std::vector<Point>* position_queue)
 {
-
-    std::cout << "frame received3" << std::endl;
-
     mapPointCloudToHeightMap();
     convolveLaplacianKernel(height_map_, derivatives_);
     findFeasibleFootPlacements(position_queue);
-
-    std::cout << "frame received3" << std::endl;
 }
 
 /**
