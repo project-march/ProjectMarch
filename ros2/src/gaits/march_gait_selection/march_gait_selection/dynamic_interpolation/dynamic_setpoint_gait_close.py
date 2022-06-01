@@ -76,7 +76,6 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         """Sets the subgait_id based on the gait that has been previously executed."""
         previous_subgait_id = current_gait.subgait
         self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
-        self.logger.warn(f"Setting subgait id to {self.subgait_id}")
 
     def _set_last_foot_position(self, foot_position: FootPosition) -> None:
         """Set the foot position to use for the close gait to the last used foot position."""

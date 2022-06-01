@@ -236,6 +236,7 @@ class GaitStateMachine:
         self._input.gait_finished()
         self._publish_idle_state()
         self._executing_gait = False
+        self._has_gait_started = False
         self._current_gait = None
         self._trajectory_scheduler.reset()
 
