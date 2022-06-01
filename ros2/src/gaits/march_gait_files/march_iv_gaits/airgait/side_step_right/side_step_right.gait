@@ -1,0 +1,8 @@
+name: side_step_right
+subgaits:
+  left_close:
+    to: end
+  right_open:
+    to: left_close
+  start:
+    to: right_open

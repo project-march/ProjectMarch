@@ -1,0 +1,8 @@
+name: Walk
+subgaits:
+  left_swing:
+    to: right_swing
+  right_swing:
+    to: end
+  start:
+    to: left_swing

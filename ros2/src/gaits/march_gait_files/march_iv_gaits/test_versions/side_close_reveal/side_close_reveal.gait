@@ -1,0 +1,6 @@
+name: side_close_reveal
+subgaits:
+  left_close:
+    to: end
+  start:
+    to: left_close

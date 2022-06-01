@@ -1,0 +1,154 @@
+description: The setpoints of this walking gait are the same as the setpoints of the
+  MIII walking gait, except for the fact that the timing of the setpoints in different.
+  More hip extension is added at heel strike in this version.
+duration: 3100000000
+gait_type: ''
+joints:
+  left_ankle:
+  - position: 0.1658
+    time_from_start: 38800000
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: 1550000000
+    velocity: -0.0
+  - position: 0.1658
+    time_from_start: 1588800000
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: 3100000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 38800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 581200000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 775000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1550000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1588800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2131200000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2325000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3100000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.2269
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.5585
+    time_from_start: 930000000
+    velocity: 0.1396
+  - position: 0.3491
+    time_from_start: 1550000000
+    velocity: -0.3491
+  - position: -0.2269
+    time_from_start: 3100000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: 651000000
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: 1395000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1550000000
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 1860000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 2604000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 3100000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.1658
+    time_from_start: 38800000
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: 1550000000
+    velocity: -0.0
+  - position: 0.1658
+    time_from_start: 1588800000
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: 3100000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 38800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 581200000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 775000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1550000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1588800000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2131200000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2325000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3100000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.3491
+    time_from_start: 0
+    velocity: -0.3491
+  - position: -0.2269
+    time_from_start: 1550000000
+    velocity: 0.0
+  - position: 0.5585
+    time_from_start: 2480000000
+    velocity: 0.1396
+  - position: 0.3491
+    time_from_start: 3100000000
+    velocity: -0.3491
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 310000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1054000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1550000000
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: 2201000000
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: 2944999999
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 3100000000
+    velocity: 0.0
+name: left_swing
+version: test_MIII_tweaked_more_hip_extension_total

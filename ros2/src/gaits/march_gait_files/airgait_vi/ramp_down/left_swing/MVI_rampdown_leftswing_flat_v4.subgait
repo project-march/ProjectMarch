@@ -1,0 +1,76 @@
+description: 'Faster ramp down version 3 with right ankle movements. '
+duration: 2500000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 752200000
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: 1250000000
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.1745
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.6981
+    time_from_start: 1059900000
+    velocity: 0.0
+  - position: 0.3665
+    time_from_start: 2500000000
+    velocity: -0.0
+  left_knee:
+  - position: 0.6981
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0996
+    time_from_start: 813400000
+    velocity: -0.6283
+  - position: 0.2065
+    time_from_start: 2500000000
+    velocity: -0.0
+  right_ankle:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0349
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.3665
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.1745
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.2065
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.5089
+    time_from_start: 1249000000
+    velocity: 0.4189
+  - position: 0.6981
+    time_from_start: 2500000000
+    velocity: -0.0
+name: left_swing

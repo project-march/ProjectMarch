@@ -1,0 +1,9 @@
+name: home
+subgaits:
+  home_sit:
+    to: end
+  home_stand:
+    to: end
+  start:
+    stop: home_stand
+    to: home_sit

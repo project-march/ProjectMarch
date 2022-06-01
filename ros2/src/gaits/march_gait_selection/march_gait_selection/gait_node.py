@@ -11,7 +11,8 @@ from rclpy.node import Node
 from contextlib import suppress
 
 from march_gait_selection.gait_loader import GaitLoader
-from march_gait_selection.state_machine.gait_state_machine import GaitStateMachine
+from march_gait_selection.state_machine.gait_state_machine_clean import GaitStateMachine
+
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.logger import Logger

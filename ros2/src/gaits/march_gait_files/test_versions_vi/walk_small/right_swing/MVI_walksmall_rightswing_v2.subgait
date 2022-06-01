@@ -1,0 +1,91 @@
+description: The MVI small walk, with the version 2 HAA movements of normal walking
+duration: 1200000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 1200000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0524
+    time_from_start: 327272730
+    velocity: -0.192
+  - position: -0.0524
+    time_from_start: 872727270
+    velocity: 0.192
+  - position: 0.0
+    time_from_start: 1200000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: 0.192
+    time_from_start: 0
+    velocity: -0.3491
+  - position: -0.1667
+    time_from_start: 1200000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 240000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 816000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1200000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0698
+    time_from_start: 196363640
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 490909090
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1200000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0873
+    time_from_start: 600000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1200000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: -0.1667
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.4189
+    time_from_start: 720000000
+    velocity: 0.128
+  - position: 0.192
+    time_from_start: 1200000000
+    velocity: -0.3491
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: 504000000
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: 1080000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1200000000
+    velocity: 0.0
+name: right_swing

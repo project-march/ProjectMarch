@@ -1,0 +1,91 @@
+description: Stairs up with height of 22 cm and depth of 20 cm, based on cybathlon_v6
+duration: 3000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 2000000000
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: 1.2915
+    time_from_start: 0
+    velocity: -0.0
+  - position: 1.4835
+    time_from_start: 642900000
+    velocity: -0.0
+  - position: 0.0873
+    time_from_start: 2000000000
+    velocity: -0.0
+  - position: -0.1745
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_knee:
+  - position: 1.6232
+    time_from_start: 0
+    velocity: -0.0
+  - position: 1.9199
+    time_from_start: 1000000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2000000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0349
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 2000000000
+    velocity: -0.0
+  - position: 0.0349
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.0873
+    time_from_start: 0
+    velocity: -0.2036
+  - position: 0.0873
+    time_from_start: 857100000
+    velocity: -0.0251
+  - position: 0.0873
+    time_from_start: 2000000000
+    velocity: -0.0
+  - position: -0.1745
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_knee:
+  - position: 0.2443
+    time_from_start: 0
+    velocity: -0.8145
+  - position: 0.1396
+    time_from_start: 385700000
+    velocity: -0.0407
+  - position: 0.0268
+    time_from_start: 2000000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3000000000
+    velocity: -0.0
+name: left_close

@@ -1,0 +1,6 @@
+name: ik_test
+subgaits:
+  swing:
+    to: end
+  start:
+    to: swing
