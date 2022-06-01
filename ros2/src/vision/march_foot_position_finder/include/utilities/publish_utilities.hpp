@@ -5,16 +5,19 @@
 #ifndef MARCH_PUBLISH_UTILITIES
 #define MARCH_PUBLISH_UTILITIES
 
-#include <librealsense2/rs.hpp>
 #include "march_shared_msgs/msg/foot_position.hpp"
+#include <librealsense2/rs.hpp>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <visualization_msgs/msg/marker_array.hpp>
+#include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
+using MarkerPublisher = rclcpp::Publisher<visualization_msgs::msg::Marker>;
 
 std::string world_frame = "world";
 
@@ -39,9 +42,8 @@ inline geometry_msgs::msg::Point to_geometry(Point p)
  * @param publisher publisher to use
  * @param cloud cloud to publish
  */
-template <class T>
-void publishCloud(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, PointCloud cloud,
-    std::string& left_or_right)
+void publishCloud(const PointCloudPublisher::SharedPtr publisher,
+    rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
 {
     cloud.width = 1;
     cloud.height = cloud.points.size();
@@ -53,18 +55,17 @@ void publishCloud(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclc
         msg.header.frame_id = "toes_left_aligned";
     }
     msg.header.stamp = n->get_clock()->now();
-    publisher.publish(msg);
+    publisher->publish(msg);
 }
 
 /**
- * Publishes a marker point with a given publisher.
+ * Publishes a marker point with a given publisher->
  *
  * @param publisher publisher to use
  * @param p point to publish
  */
-template <class T>
-void publishMarkerPoint(
-const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
+void publishMarkerPoint(const MarkerPublisher::SharedPtr publisher,
+    rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -94,12 +95,11 @@ const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*t=*/0.3);
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
-template <class T>
-void publishArrow(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const Point& p1, Point& p2,
-    std::string& left_or_right)
+void publishArrow(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
+    const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -127,12 +127,11 @@ void publishArrow(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclc
     marker.points.push_back(to_geometry(p1));
     marker.points.push_back(to_geometry(p2));
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
-template <class T>
-void publishArrow2(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const Point& p1, Point& p2,
-    std::string& left_or_right)
+void publishArrow2(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
+    const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -160,18 +159,17 @@ void publishArrow2(const typename rclcpp::Publisher<T>::SharedPtr publisher, rcl
     marker.points.push_back(to_geometry(p1));
     marker.points.push_back(to_geometry(p2));
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
 /**
- * Publishes a marker point with a given publisher.
+ * Publishes a marker point with a given publisher->
  *
  * @param publisher publisher to use
  * @param p point to publish
  */
-template <class T>
-void publishRelativeSearchPoint(
-const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
+void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr publisher,
+    rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -201,18 +199,17 @@ const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*t=*/0.3);
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
 /**
- * Publishes a marker point with a given publisher.
+ * Publishes a marker point with a given publisher->
  *
  * @param publisher publisher to use
  * @param p point to publish
  */
-template <class T>
-void publishDesiredPosition(
-const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
+void publishDesiredPosition(const MarkerPublisher::SharedPtr publisher,
+    rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -242,11 +239,11 @@ const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*t=*/0.3);
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
 /**
- * Publishes a rectangle with a given publisher.
+ * Publishes a rectangle with a given publisher->
  *
  * @param publisher publisher to use
  * @param p1 vertex of rectangle
@@ -254,9 +251,9 @@ const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, const
  * @param p3 vertex of rectangle
  * @param p4 vertex of rectangle
  */
-template <class T>
-void publishSearchRectangle(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, Point& p,
-    std::vector<double> dis, const std::string& left_or_right)
+void publishSearchRectangle(const MarkerPublisher::SharedPtr publisher,
+    rclcpp::Node* n, Point& p, std::vector<double> dis,
+    const std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -298,7 +295,7 @@ void publishSearchRectangle(const typename rclcpp::Publisher<T>::SharedPtr publi
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*t=*/0.3);
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
 /**
@@ -307,9 +304,8 @@ void publishSearchRectangle(const typename rclcpp::Publisher<T>::SharedPtr publi
  * @param publisher publisher to use
  * @param points points to visualize
  */
-template <class T>
-void publishPossiblePoints(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n,
-    std::vector<Point>& points, std::string& left_or_right)
+void publishPossiblePoints(const MarkerPublisher::SharedPtr publisher,
+    rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -334,7 +330,7 @@ void publishPossiblePoints(const typename rclcpp::Publisher<T>::SharedPtr publis
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*t=*/0.2);
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
 /**
@@ -343,9 +339,8 @@ void publishPossiblePoints(const typename rclcpp::Publisher<T>::SharedPtr publis
  * @param publisher publisher to use
  * @param points points to visualize
  */
-template <class T>
-void publishTrackMarkerPoints(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n,
-    std::vector<Point>& points, std::string& left_or_right)
+void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr publisher,
+    rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -370,20 +365,22 @@ void publishTrackMarkerPoints(const typename rclcpp::Publisher<T>::SharedPtr pub
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*t=*/0.2);
 
-    publisher.publish(marker);
+    publisher->publish(marker);
 }
 
 /**
- * Publishes a point to a given publisher.
+ * Publishes a point to a given publisher->
  *
  * @param publisher publisher to use
  * @param p point to publish
  * @param track_points vector of points between start and end position of this
  * step
  */
-template <class T>
-void publishPoint(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclcpp::Node* n, Point& p, Point& p_world,
-    Point& displacement, const std::vector<Point>& track_points)
+void publishPoint(
+    const rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr
+        publisher,
+    rclcpp::Node* n, Point& p, Point& p_world, Point& displacement,
+    const std::vector<Point>& track_points)
 {
     march_shared_msgs::msg::FootPosition msg;
 
@@ -405,7 +402,7 @@ void publishPoint(const typename rclcpp::Publisher<T>::SharedPtr publisher, rclc
         msg.track_points.push_back(to_geometry(p));
     }
 
-    publisher.publish(msg);
+    publisher->publish(msg);
 }
 
 #endif // MARCH_PUBLISH_UTILITIES

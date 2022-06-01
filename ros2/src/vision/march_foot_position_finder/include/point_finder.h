@@ -7,6 +7,7 @@
 
 #define RES 80
 
+#include "rclcpp/rclcpp.hpp"
 #include "utilities/math_utilities.hpp"
 #include <array>
 #include <cmath>
@@ -14,7 +15,6 @@
 #include <pcl/point_types.h>
 #include <string>
 #include <vector>
-#include "rclcpp/rclcpp.hpp"
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -34,7 +34,6 @@ public:
     std::vector<double> getDisplacements();
 
 protected:
-
     rclcpp::Node* n_;
     PointCloud::Ptr pointcloud_;
     std::vector<double> search_dimensions_;

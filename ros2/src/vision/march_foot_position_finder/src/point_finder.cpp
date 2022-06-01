@@ -32,7 +32,7 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     std::string left_or_right, Point& step_point)
     : pointcloud_ { std::move(pointcloud) }
     , left_or_right_ { std::move(left_or_right) }
-    , n_{ n }
+    , n_ { n }
 {
     std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
     std::fill_n(
@@ -45,8 +45,10 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     foot_length_ = n_->get_parameter("foot_length").as_double();
     actual_foot_length_ = n_->get_parameter("actual_foot_length").as_double();
 
-    displacements_outside_ = n_->get_parameter("displacements_outside").as_double();
-    displacements_inside_ = n_->get_parameter("displacements_inside").as_double();
+    displacements_outside_
+        = n_->get_parameter("displacements_outside").as_double();
+    displacements_inside_
+        = n_->get_parameter("displacements_inside").as_double();
     displacements_near_ = n_->get_parameter("displacements_near").as_double();
     displacements_far_ = n_->get_parameter("displacements_far").as_double();
 
@@ -56,8 +58,10 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     displacements_near_ = ceil(displacements_near_ / cell_width_);
     displacements_far_ = ceil(displacements_far_ / cell_width_);
 
-    available_points_ratio_ = n_->get_parameter("available_points_ratio").as_double();
-    derivative_threshold_ = n_->get_parameter("derivative_threshold").as_double();
+    available_points_ratio_
+        = n_->get_parameter("available_points_ratio").as_double();
+    derivative_threshold_
+        = n_->get_parameter("derivative_threshold").as_double();
     max_z_distance_ = n_->get_parameter("max_z_distance").as_double();
     num_track_points_ = n_->get_parameter("num_track_points").as_int();
 

@@ -5,24 +5,24 @@
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
-#include "march_shared_msgs/msg/foot_position.hpp"
 #include "march_shared_msgs/msg/current_state.hpp"
-#include "visualization_msgs/msg/marker.hpp"
+#include "march_shared_msgs/msg/foot_position.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include <chrono>
 #include <cmath>
+#include <functional>
 #include <librealsense2/rs.hpp>
 #include <pcl/common/distances.h>
+#include <pcl/common/transforms.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include "rclcpp/rclcpp.hpp"
 #include <string>
-#include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 #include <thread>
 #include <vector>
-#include <pcl/common/transforms.h>
-
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -33,16 +33,19 @@ public:
         rclcpp::Node* n, const std::string& left_or_right);
 
     // void readParameters(
-    //     march_foot_position_finder::parametersConfig& config, uint32_t level);
+    //     march_foot_position_finder::parametersConfig& config, uint32_t
+    //     level);
 
     ~FootPositionFinder() = default;
 
 protected:
-    void currentStateCallback(const march_shared_msgs::msg::CurrentState msg);
+    void currentStateCallback(
+        const march_shared_msgs::msg::CurrentState::SharedPtr msg);
 
     void resetInitialPosition();
 
-    void chosenOtherPointCallback(const march_shared_msgs::msg::FootPosition msg);
+    void chosenOtherPointCallback(
+        const march_shared_msgs::msg::FootPosition::SharedPtr msg);
 
     void processRealSenseDepthFrames();
 
@@ -58,13 +61,19 @@ protected:
 
     rclcpp::Node* n_;
 
-    rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr point_publisher_;
-    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_subscriber_;
+    rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr
+        point_publisher_;
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr
+        pointcloud_subscriber_;
 
-    rclcpp::Publisher<PointCloud>::SharedPtr preprocessed_pointcloud_publisher_;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr point_marker_publisher_;
-    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr other_chosen_point_subscriber_;
-    rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr current_state_subscriber_;
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr
+        preprocessed_pointcloud_publisher_;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr
+        point_marker_publisher_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr
+        other_chosen_point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr
+        current_state_subscriber_;
 
     rclcpp::TimerBase::SharedPtr realsense_timer_;
     rclcpp::TimerBase::SharedPtr initial_position_reset_timer_;
@@ -114,10 +123,8 @@ protected:
     Point new_displacement_;
     Point found_covid_point_;
 
-    std::shared_ptr<tf2_ros::TransformListener> transform_listener_{nullptr};
+    std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-
-
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

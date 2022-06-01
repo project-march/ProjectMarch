@@ -10,9 +10,8 @@
 #include "utilities/realsense_to_pcl.hpp"
 #include <iostream>
 #include <string>
-#include <visualization_msgs/msg/marker_array.hpp>
 #include <tf2_eigen/tf2_eigen.h>
-
+#include <visualization_msgs/msg/marker_array.hpp>
 
 /**
  * Constructs an object that listens to simulated or real RealSense depth frames
@@ -40,10 +39,9 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         serial_number_ = "944622071535";
     }
 
-    tf_buffer_ =
-      std::make_unique<tf2_ros::Buffer>(n_->get_clock());
-    transform_listener_ =
-        std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(n_->get_clock());
+    transform_listener_
+        = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
     other_frame_id_ = "toes_" + other_side_ + "_aligned";
@@ -61,23 +59,42 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     topic_current_chosen_point_
         = "/march/chosen_foot_position/" + left_or_right_;
 
-
-    point_publisher_ = n_->create_publisher<march_shared_msgs::msg::FootPosition>(
-        "/march/foot_position/" + left_or_right_, /*queue_size=*/1);
-    preprocessed_pointcloud_publisher_ = n_->create_publisher<PointCloud>(
-        "/camera_" + left_or_right_ + "/preprocessed_cloud", /*queue_size=*/1);
-    point_marker_publisher_ = n_->create_publisher<visualization_msgs::msg::Marker>(
-        "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
+    point_publisher_
+        = n_->create_publisher<march_shared_msgs::msg::FootPosition>(
+            "/march/foot_position/" + left_or_right_, /*queue_size=*/1);
+    preprocessed_pointcloud_publisher_
+        = n_->create_publisher<sensor_msgs::msg::PointCloud2>(
+            "/camera_" + left_or_right_ + "/preprocessed_cloud",
+            /*queue_size=*/1);
+    point_marker_publisher_
+        = n_->create_publisher<visualization_msgs::msg::Marker>(
+            "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
 
     other_chosen_point_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
             topic_other_chosen_point_,
-            /*queue_size=*/1, &FootPositionFinder::chosenOtherPointCallback,
-            this);
+            /*queue_size=*/1,
+            std::bind(&FootPositionFinder::chosenOtherPointCallback, this,
+                std::placeholders::_1));
 
-    current_state_subscriber_ = n_->create_subscription<march_shared_msgs::msg::CurrentState>(
-        "/march/gait_selection/current_state", /*queue_size=*/1,
-        &FootPositionFinder::currentStateCallback, this);
+    std::function<void(
+        const march_shared_msgs::msg::FootPosition::SharedPtr msg)>
+        point_callback
+        = std::bind(&FootPositionFinder::chosenOtherPointCallback, this,
+            std::placeholders::_1);
+    other_chosen_point_subscriber_
+        = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
+            topic_other_chosen_point_,
+            /*queue_size=*/1, point_callback);
+
+    std::function<void(
+        const march_shared_msgs::msg::CurrentState::SharedPtr msg)>
+        state_callback = std::bind(&FootPositionFinder::currentStateCallback,
+            this, std::placeholders::_1);
+    current_state_subscriber_
+        = n_->create_subscription<march_shared_msgs::msg::CurrentState>(
+            "/march/gait_selection/current_state",
+            /*queue_size=*/1, state_callback);
 
     running_ = false;
 }
@@ -100,7 +117,8 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 //     outlier_distance_ = config.outlier_distance;
 //     height_zero_threshold_ = config.height_zero_threshold;
 //     found_points_.resize(sample_size_);
-//     realsense_simulation_ = n_->get_parameter("realsense_simulation").as_double();
+//     realsense_simulation_ =
+//     n_->get_parameter("realsense_simulation").as_double();
 
 //     // Connect the physical RealSense cameras
 //     if (!running_ && !realsense_simulation_) {
@@ -112,7 +130,8 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 //                 pipe_.start(config_);
 //             } catch (const rs2::error& e) {
 //                 std::string error_message = e.what();
-//                 RCLCPP_WARN("Error while initializing %s RealSense camera: %s",
+//                 RCLCPP_WARN("Error while initializing %s RealSense camera:
+//                 %s",
 //                     left_or_right_.c_str(), error_message.c_str());
 //                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 //                 continue;
@@ -129,12 +148,13 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 
 //     // Initialize the callback for the RealSense simulation plugin
 //     if (!running_ && realsense_simulation_) {
-//         pointcloud_subscriber_ = n_->create_subscription<sensor_msgs::msg::PointCloud2>(
+//         pointcloud_subscriber_ =
+//         n_->create_subscription<sensor_msgs::msg::PointCloud2>(
 //             topic_camera_front_, /*queue_size=*/1,
 //             &FootPositionFinder::processSimulatedDepthFrames, this);
 //         ROS_INFO(
-//             "\033[1;36mSimulated RealSense callback initialized (%s) \033[0m",
-//             left_or_right_.c_str());
+//             "\033[1;36mSimulated RealSense callback initialized (%s)
+//             \033[0m", left_or_right_.c_str());
 //     }
 
 //     // Initialize all variables as zero:
@@ -157,11 +177,11 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
  */
 // Suppress lint error "make reference of argument" as it breaks callback
 void FootPositionFinder::chosenOtherPointCallback(
-    const march_shared_msgs::msg::FootPosition msg) // NOLINT
+    const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT
 {
     // Start point in current frame is equal to the previous displacement:
     last_displacement_ = start_point_
-        = Point(msg.displacement.x, msg.displacement.y, msg.displacement.z);
+        = Point(msg->displacement.x, msg->displacement.y, msg->displacement.z);
 
     // previous_start_point_ is the current origin:
     previous_start_point_ = ORIGIN;
@@ -178,15 +198,13 @@ void FootPositionFinder::chosenOtherPointCallback(
  */
 // Suppress lint error "make reference of argument" as it breaks the callback
 void FootPositionFinder::currentStateCallback(
-    const march_shared_msgs::msg::CurrentState msg) // NOLINT
+    const march_shared_msgs::msg::CurrentState::SharedPtr msg) // NOLINT
 {
-    if (msg.state == "stand") {
-        initial_position_reset_timer_ = n_->createTimer(
-            rclcpp::Duration(/*t=*/0.200),
-            &FootPositionFinder::resetInitialPosition, this, /*oneshot=*/true);
-
+    if (msg->state == "stand") {
         initial_position_reset_timer_ = n_->create_wall_timer(
-            200, std::bind(&FootPositionFinder::resetInitialPosition, this));
+            std::chrono::milliseconds(200), [this]() -> void {
+                resetInitialPosition();
+            });
     }
 }
 
@@ -212,7 +230,8 @@ void FootPositionFinder::processRealSenseDepthFrames()
     float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
     if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
         frame_wait_counter_++;
-        RCLCPP_WARN(n_->get_logger(), "RealSense (%s) did not receive frames last %d seconds",
+        RCLCPP_WARN(n_->get_logger(),
+            "RealSense (%s) did not receive frames last %d seconds",
             left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
     }
 
@@ -266,8 +285,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
     // Find possible points around the desired point determined earlier:
-    PointFinder pointFinder(
-        n_, pointcloud, left_or_right_, desired_point_);
+    PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point_);
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
 
@@ -289,10 +307,10 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             previous_start_point_, found_covid_point_);
 
         // Visualization
-        publishTrackMarkerPoints(
-            point_marker_publisher_, n_, track_points, left_or_right_); // Orange
-        publishMarkerPoint(
-            point_marker_publisher_, n_, found_covid_point_, left_or_right_); // Red
+        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
+            left_or_right_); // Orange
+        publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
+            left_or_right_); // Red
         publishPossiblePoints(
             point_marker_publisher_, n_, position_queue, left_or_right_);
 
@@ -307,12 +325,13 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Visualization
         publishArrow(point_marker_publisher_, n_, ORIGIN, start_point_,
             left_or_right_); // Blue
-        publishArrow2(point_marker_publisher_, n_, start_point_, found_covid_point_,
+        publishArrow2(point_marker_publisher_, n_, start_point_,
+            found_covid_point_,
             left_or_right_); // Green
 
         // Publish final point for gait computation
-        publishPoint(point_publisher_, n_, found_covid_point_, found_covid_point_,
-            new_displacement_, track_points);
+        publishPoint(point_publisher_, n_, found_covid_point_,
+            found_covid_point_, new_displacement_, track_points);
     }
 }
 
@@ -361,10 +380,10 @@ Point FootPositionFinder::transformPoint(
     geometry_msgs::msg::TransformStamped transform_;
     try {
         transform_ = tf_buffer_->lookupTransform(
-            frame_to, frame_from,
-            tf2::TimePointZero);
+            frame_to, frame_from, tf2::TimePointZero);
     } catch (tf2::TransformException& ex) {
-        RCLCPP_WARN(n_->get_logger(), "Something went wrong when transforming the pointcloud.");
+        RCLCPP_WARN(n_->get_logger(),
+            "Something went wrong when transforming the pointcloud.");
     }
 
     Eigen::Matrix<double, 3, 1> translation;
@@ -372,8 +391,9 @@ Point FootPositionFinder::transformPoint(
 
     tf2::fromMsg(transform_.transform.translation, translation);
     tf2::fromMsg(transform_.transform.rotation, rotation);
-    
-    pcl::transformPointCloud(*desired_point, *desired_point, translation, rotation);
+
+    pcl::transformPointCloud(
+        *desired_point, *desired_point, translation, rotation);
     desired_point->header.frame_id = frame_to;
 
     return desired_point->points[0];

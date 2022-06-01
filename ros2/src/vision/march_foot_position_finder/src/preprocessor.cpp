@@ -27,31 +27,29 @@ using NormalCloud = pcl::PointCloud<Normal>;
  */
 // Suppress lint error: "fields are not initialized by constructor"
 // NOLINTNEXTLINE
-Preprocessor::Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-    std::string& left_or_right)
+Preprocessor::Preprocessor(
+    rclcpp::Node* n, PointCloud::Ptr pointcloud, std::string& left_or_right)
     : pointcloud_ { std::move(pointcloud) }
 {
 
-    std::shared_ptr<tf2_ros::TransformListener> transform_listener_{nullptr};
+    std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
-    tf_buffer_ =
-      std::make_unique<tf2_ros::Buffer>(n->get_clock());
-    transform_listener_ =
-        std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(n->get_clock());
+    transform_listener_
+        = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     base_frame_ = "toes_" + left_or_right + "_aligned";
-    
+
     // Define current transformation between realsense pointcloud and
     // base_frame:
     try {
         transform_ = tf_buffer_->lookupTransform(
-            base_frame_, pointcloud_frame_id_,
-            tf2::TimePointZero);
+            base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
     } catch (tf2::TransformException& ex) {
 
-        RCLCPP_WARN(n->get_logger(), "Something went wrong when transforming the pointcloud.");
-
+        RCLCPP_WARN(n->get_logger(),
+            "Something went wrong when transforming the pointcloud.");
     }
 }
 
@@ -88,7 +86,7 @@ void Preprocessor::transformPointCloudToBaseframe()
 
     tf2::fromMsg(transform_.transform.translation, translation);
     tf2::fromMsg(transform_.transform.rotation, rotation);
-    
+
     pcl::transformPointCloud(*pointcloud_, *pointcloud_, translation, rotation);
     pointcloud_->header.frame_id = base_frame_;
 }
