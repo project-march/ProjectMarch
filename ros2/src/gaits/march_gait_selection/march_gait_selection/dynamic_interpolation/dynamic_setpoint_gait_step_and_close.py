@@ -1,11 +1,12 @@
 """Author: Marten Haitjema, MVII."""
 
-from typing import Optional
+from typing import Optional, Dict
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
+from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.logger import Logger
 
 
@@ -16,9 +17,9 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
         gait_selection_node (GaitSelection): the gait selection node
     """
 
-    def __init__(self, gait_selection_node):
-        super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+    def __init__(self, node, positions: Dict[str, EdgePosition]):
+        super().__init__(node, positions)
+        self.logger = Logger(self._node, __class__.__name__)
         self.gait_name = "dynamic_step_and_close"
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:

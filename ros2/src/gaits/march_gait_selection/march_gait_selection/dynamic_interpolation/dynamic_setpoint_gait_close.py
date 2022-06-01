@@ -1,44 +1,52 @@
 """Author: Marten Haitjema, MVII."""
 
-from typing import Optional
+from typing import Optional, Dict
 
 from rclpy.node import Node
 from rclpy.time import Time
 
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
 from march_gait_selection.state_machine.gait_update import GaitUpdate
+
+from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
-
-from march_shared_msgs.msg import FootPosition, CurrentGait
-
 from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+
+from march_shared_msgs.msg import FootPosition, CurrentGait
+from sensor_msgs.msg import JointState
 
 
 class DynamicSetpointGaitClose(DynamicSetpointGait):
     """Class for closing the gait after a dynamic step."""
 
-    def __init__(self, gait_selection_node: Node):
-        super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
+        super().__init__(node, positions)
+        self.logger = Logger(self._node, __class__.__name__)
         self.gait_name = "dynamic_close"
 
-        gait_selection_node.create_subscription(
+        self._node.create_subscription(
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._set_subgait_id,
             DEFAULT_HISTORY_DEPTH,
         )
-        gait_selection_node.create_subscription(
+        self._node.create_subscription(
             FootPosition,
             "/march/chosen_foot_position/right",
             self._set_last_foot_position,
             DEFAULT_HISTORY_DEPTH,
         )
-        gait_selection_node.create_subscription(
+        self._node.create_subscription(
             FootPosition,
             "/march/chosen_foot_position/left",
             self._set_last_foot_position,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self._node.create_subscription(
+            JointState,
+            "/march/gait_selection/final_position",
+            self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -52,6 +60,7 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         """Sets the subgait_id based on the gait that has been previously executed."""
         previous_subgait_id = current_gait.subgait
         self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
+        self.logger.warn(f"Setting subgait id to {self.subgait_id}")
 
     def _set_last_foot_position(self, foot_position: FootPosition) -> None:
         """Set the foot position to use for the close gait to the last used foot position."""
@@ -80,3 +89,11 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         self._start_time_next_command = current_time + first_subgait_delay
         self._next_command = self._get_trajectory_command(stop=True)
         return GaitUpdate.should_schedule_early(self._next_command)
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }

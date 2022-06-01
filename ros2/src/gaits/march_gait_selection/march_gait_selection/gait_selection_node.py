@@ -10,7 +10,7 @@ from rclpy import Parameter
 from rclpy.executors import MultiThreadedExecutor
 
 from .gait_selection import GaitSelection
-from .gait_selection_clean import GaitSelectionClean
+from .gait_loader import GaitSelectionClean
 from march_gait_selection.state_machine.gait_state_machine import GaitStateMachine
 from march_gait_selection.state_machine.gait_state_machine_clean import GaitStateMachineClean
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler

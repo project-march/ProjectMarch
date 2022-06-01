@@ -14,6 +14,9 @@ from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_c
 )
 from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from sensor_msgs.msg import JointState
+
+from march_utility.gait.edge_position import EdgePosition, UnknownEdgePosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import WrongStartPositionError
@@ -28,27 +31,32 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
 
     _use_position_queue: bool
 
-    def __init__(self, gait_selection_node: Node):
+    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
         self.subgait_id = "right_swing"
         self._end_position_right = {}
         self._end_position_left = {}
-        super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        super().__init__(node, positions)
+        self.logger = Logger(self._node, __class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
 
-        self.update_parameter()
+        self.update_parameters()
         self._create_position_queue()
 
-        self.gait_selection.create_subscription(
+        self._node.create_subscription(
             Point,
             "/march/step_and_hold/add_point_to_queue",
             self._add_point_to_queue,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.gait_selection.create_subscription(
+        self._node.create_subscription(
             String,
             "/march/step_and_hold/start_side",
             self._set_start_subgait_id,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.final_position_pub = self._node.create_publisher(
+            JointState,
+            "/march/gait_selection/final_position",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -84,6 +92,27 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         elif self.start_position_all_joints == self._end_position_left:
             self.subgait_id = "left_swing"
 
+    def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
+        """Create the next command. Because it is a single step, this will always be a left_swing and a close gait.
+
+        Returns:
+            TrajectoryCommand: A TrajectoryCommand for the next subgait
+        """
+        if not self._trajectory_failed:
+            if self.subgait_id == "right_swing":
+                self.subgait_id = "left_swing"
+            elif self.subgait_id == "left_swing":
+                self.subgait_id = "right_swing"
+
+        if self._end:
+            if not isinstance(self.final_position, UnknownEdgePosition):
+                self.final_position_pub.publish(JointState(position=self.final_position.values))
+            # If the gait has ended, the next command should be None
+            return None
+        else:
+            self._end = True
+            return self._get_trajectory_command(stop=True)
+
     def _create_subgait_instance(
         self,
         start_position: Dict[str, float],
@@ -107,7 +136,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             end_position = self._end_position_left
 
         return DynamicSubgait(
-            self.gait_selection,
+            self._node,
             end_position,
             start_position,
             subgait_id,
@@ -148,7 +177,9 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                     self._end = True
                     return None
 
-            self.logger.warn(
+        if not stop:
+            self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
+            self.logger.info(
                 f"Stepping to location ({self.foot_location.processed_point.x}, "
                 f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
@@ -168,7 +199,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         Returns:
             FootPosition: FootPosition msg with position from queue
         """
-        header = Header(stamp=self.gait_selection.get_clock().now().to_msg())
+        header = Header(stamp=self._node.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
@@ -177,9 +208,10 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
 
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
-    def update_parameter(self) -> None:
-        """Updates '_use_position_queue' to the newest value in gait_selection."""
-        self._use_position_queue = self.gait_selection.use_position_queue
+    def update_parameters(self) -> None:
+        """Updates '_use_position_queue' to the newest value in the gait_node."""
+        super().update_parameters()
+        self._use_position_queue = self._node.use_position_queue
 
     def _create_position_queue(self) -> None:
         """Creates and fills the queue with values from position_queue.yaml."""

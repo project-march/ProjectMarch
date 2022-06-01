@@ -3,6 +3,7 @@
 from typing import Optional, Dict, Union
 from math import floor
 from rclpy.time import Time
+from rclpy.node import Node
 from copy import copy
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
@@ -72,13 +73,14 @@ class DynamicSetpointGait(GaitInterface):
     add_push_off: bool
     amount_of_steps: int
 
-    def __init__(self, gait_selection_node):
+    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
         super(DynamicSetpointGait, self).__init__()
-        self.gait_selection = gait_selection_node
-        self.logger = Logger(self.gait_selection, __class__.__name__)
+        self._node = node
+        self._positions = positions
+        self.logger = Logger(self._node, __class__.__name__)
         self._trajectory_failed = False
 
-        self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
+        self.home_stand_position_actuating_joints = self._positions["stand"]["joints"]
         self.home_stand_position_all_joints = get_position_from_yaml("stand")
         self.start_position_actuating_joints = copy(self.home_stand_position_actuating_joints)
         self.start_position_all_joints = copy(self.home_stand_position_all_joints)
@@ -91,30 +93,24 @@ class DynamicSetpointGait(GaitInterface):
         self.gait_name = "dynamic_walk"
 
         # Create subscribers and publishers for CoViD
-        self.gait_selection.create_subscription(
+        self._node.create_subscription(
             FootPosition,
             "/march/processed_foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.gait_selection.create_subscription(
+        self._node.create_subscription(
             FootPosition,
             "/march/processed_foot_position/left",
             self._callback_left,
             DEFAULT_HISTORY_DEPTH,
         )
-        self.gait_selection.create_subscription(
-            JointState,
-            "/march/gait_selection/final_position",
-            self._update_start_position_idle_state,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self.pub_right = self.gait_selection.create_publisher(
+        self.pub_right = self._node.create_publisher(
             FootPosition,
             "/march/chosen_foot_position/right",
             DEFAULT_HISTORY_DEPTH,
         )
-        self.pub_left = self.gait_selection.create_publisher(
+        self.pub_left = self._node.create_publisher(
             FootPosition,
             "/march/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
@@ -210,7 +206,7 @@ class DynamicSetpointGait(GaitInterface):
 
         self._trajectory_failed = False
 
-        self.start_position_actuating_joints = self.gait_selection.get_named_position("stand")
+        self.start_position_actuating_joints = self._positions["stand"]["joints"]
         self.start_position_all_joints = get_position_from_yaml("stand")
 
         self._step_counter = 0
@@ -345,14 +341,6 @@ class DynamicSetpointGait(GaitInterface):
     def _update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
         self.start_position_all_joints = self.dynamic_subgait.get_final_position()
-        self.start_position_actuating_joints = {
-            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
-        }
-
-    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
-        """Update the start position of the next subgait to be the last position of the previous gait."""
-        for i, name in enumerate(self.all_joint_names):
-            self.start_position_all_joints[name] = joint_state.position[i]
         self.start_position_actuating_joints = {
             name: self.start_position_all_joints[name] for name in self.actuating_joint_names
         }
@@ -610,7 +598,7 @@ class DynamicSetpointGait(GaitInterface):
             DynamicSubgait: DynamicSubgait instance for the desired step
         """
         return DynamicSubgait(
-            self.gait_selection,
+            self._node,
             self.home_stand_position_all_joints,
             start_position,
             subgait_id,
@@ -631,10 +619,10 @@ class DynamicSetpointGait(GaitInterface):
         self._start_time_next_command = start_time_previous_command + next_command_duration
 
     def update_parameters(self) -> None:
-        """Callback for gait_selection_node when the parameters have been updated."""
-        self.minimum_stair_height = self.gait_selection.minimum_stair_height
-        self.add_push_off = self.gait_selection.add_push_off
-        self.amount_of_steps = self.gait_selection.amount_of_steps
+        """Callback for gait_node when the parameters have been updated."""
+        self.minimum_stair_height = self._node.minimum_stair_height
+        self.add_push_off = self._node.add_push_off
+        self.amount_of_steps = self._node.amount_of_steps
 
     def _get_soft_limits(self):
         """Get the limits of all joints in the urdf."""
@@ -655,8 +643,8 @@ class DynamicSetpointGait(GaitInterface):
             nanoseconds=foot_location.header.stamp.nanosec,
         )
         current_time = Time(
-            seconds=self.gait_selection.get_clock().now().seconds_nanoseconds()[0],
-            nanoseconds=self.gait_selection.get_clock().now().seconds_nanoseconds()[1],
+            seconds=self._node.get_clock().now().seconds_nanoseconds()[0],
+            nanoseconds=self._node.get_clock().now().seconds_nanoseconds()[1],
         )
         time_difference = current_time - msg_time
         readable_time_difference = f"{time_difference.nanoseconds / NANOSECONDS_TO_SECONDS}"
