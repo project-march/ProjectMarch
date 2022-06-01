@@ -13,7 +13,7 @@ public:
         : Node("march_foot_position_finder")
     {
 
-        std::cout << "A" << std::endl; 
+        std::cout << "A" << std::endl;
         this->declare_parameter("realsense_simulation", false);
 
         this->declare_parameter("foot_gap", 0.0);
@@ -37,7 +37,7 @@ public:
         this->declare_parameter("displacements_near", 0.0);
         this->declare_parameter("displacements_far", 0.0);
 
-        std::cout << "A" << std::endl; 
+        std::cout << "A" << std::endl;
 
         left = new FootPositionFinder(this, "left");
         right = new FootPositionFinder(this, "right");

@@ -48,8 +48,7 @@ Preprocessor::Preprocessor(
             base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
     } catch (tf2::TransformException& ex) {
 
-        RCLCPP_WARN(n->get_logger(),
-            "Could not retrieve transformation.");
+        RCLCPP_WARN(n->get_logger(), "Could not retrieve transformation.");
     }
 }
 

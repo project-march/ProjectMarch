@@ -105,9 +105,9 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     outlier_distance_ = n_->get_parameter("outlier_distance").as_double();
     height_zero_threshold_
         = n_->get_parameter("height_zero_threshold").as_double();
-    realsense_simulation_
-        = n_->get_parameter("realsense_simulation").as_bool();
-        std::cout << realsense_simulation_ << std::endl;
+    realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
+    std::cout << "SIM" << std::endl;
+    std::cout << realsense_simulation_ << std::endl;
     found_points_.resize(sample_size_);
 
     // Connect the physical RealSense cameras
@@ -140,13 +140,18 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         }
     } else {
         // Initialize the callback for the RealSense simulation plugin
-        std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)> callback = std::bind(&FootPositionFinder::processSimulatedDepthFrames, this, std::placeholders::_1);
+        std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)>
+            callback
+            = std::bind(&FootPositionFinder::processSimulatedDepthFrames, this,
+                std::placeholders::_1);
         pointcloud_subscriber_
             = n_->create_subscription<sensor_msgs::msg::PointCloud2>(
                 topic_camera_front_,
                 /*queue_size=*/1, callback);
 
-        RCLCPP_INFO(n_->get_logger(), "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m", left_or_right_.c_str());
+        RCLCPP_INFO(n_->get_logger(),
+            "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m",
+            left_or_right_.c_str());
     }
 
     last_displacement_ = previous_start_point_ = start_point_
@@ -155,7 +160,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
-
 }
 
 void FootPositionFinder::startParameterCallback(
@@ -188,8 +192,7 @@ void FootPositionFinder::readParameters(
     outlier_distance_ = n_->get_parameter("outlier_distance").as_double();
     height_zero_threshold_
         = n_->get_parameter("height_zero_threshold").as_double();
-    realsense_simulation_
-        = n_->get_parameter("realsense_simulation").as_bool();
+    realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
     found_points_.resize(sample_size_);
 
     // Initialize all variables as zero:
