@@ -2,6 +2,7 @@
 
 from typing import Optional, Union, List
 from gazebo_msgs.msg import ContactsState
+
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
@@ -282,7 +283,7 @@ class GaitStateMachine:
 
         TODO: Add cb type
         Args:
-             cb: Callable method that accepts 5 args: gait name, subgait name, version, duration and gait type.
+            cb: Callable method that accepts 5 args: gait name, subgait name, version, duration and gait type.
         """
         self._add_callback(self._gait_callbacks, cb)
 
@@ -365,6 +366,7 @@ class GaitStateMachine:
 
     def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for what to do next."""
+        self._handle_input()
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
             self.logger.info(f"Requested gait `{gait_name}`")
@@ -375,8 +377,9 @@ class GaitStateMachine:
                 or gait_name
                 == [
                     "dynamic_walk",
-                    "dynamic_walk_single_step",
-                    "dynamic_walk_half_step",
+                    "dynamic_step_and_close",
+                    "dynamic_step",
+                    "dynamic_close",
                 ]
             ):
                 if (
@@ -408,6 +411,7 @@ class GaitStateMachine:
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
             self._current_gait = self._gait_selection._gaits[self._current_state]
+            self._previous_gait = self._current_gait
 
             self.logger.info(f"Executing gait `{self._current_gait.name}`")
             if self._current_gait.first_subgait_can_be_scheduled_early:
@@ -469,15 +473,14 @@ class GaitStateMachine:
         # Process finishing of the gait
         if gait_update.is_finished:
             self._current_state = self._current_gait.final_position
-            # To make the half step dynamic gait work, the current state (that is final
-            # position) needs to be a position from which the next half step can be started.
-            # Therefore, it needs to be added to the idle_transitions dictionary of the
-            # gait_graph.
+            # To make the step (and hold) gait work, the current state (that is final position) needs to be a position
+            # from which the next step can be started. Therefore, it needs to be added to the idle_transitions
+            # dictionary of the gait_graph.
             if (
-                self._current_gait.name == "dynamic_walk_half_step"
-                and self._current_state not in self._gait_graph._idle_transitions
-            ):
-                self._gait_graph._idle_transitions[self._current_state] = {"dynamic_walk_half_step"}
+                self._current_gait.name == "dynamic_step" or self._current_gait.name == "dynamic_step_and_hold"
+            ) and self._current_state not in self._gait_graph._idle_transitions:
+                self._gait_graph._idle_transitions[self._current_state] = {self._current_gait.name, "dynamic_close"}
+
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
@@ -492,15 +495,20 @@ class GaitStateMachine:
         This input is passed on to the current gait to execute the request.
         """
         if self._is_stop_requested() and not self._is_stopping:
-            self._should_stop = False
-            self._is_stopping = True
-            if self._current_gait.stop():
-                self.logger.info(f"Gait {self._current_gait.name} responded to stop")
-                self._input.stop_accepted()
-                self._call_callbacks(self._stop_accepted_callbacks)
+            if self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold"] and not isinstance(
+                self._current_state, UnknownEdgePosition
+            ):
+                self._current_state = "dynamic_close"
             else:
-                self.logger.info(f"Gait {self._current_gait.name} does not respond to stop")
-                self._input.stop_rejected()
+                self._should_stop = False
+                self._is_stopping = True
+                if self._current_gait.stop():
+                    self.logger.info(f"Gait {self._current_gait.name} responded to stop")
+                    self._input.stop_accepted()
+                    self._call_callbacks(self._stop_accepted_callbacks)
+                else:
+                    self.logger.info(f"Gait {self._current_gait.name} does not respond to stop")
+                    self._input.stop_rejected()
 
         if self._input.transition_requested():
             request = self._input.get_transition_request()

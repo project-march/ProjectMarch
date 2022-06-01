@@ -68,7 +68,10 @@ def generate_launch_description() -> launch.LaunchDescription:
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     push_off_fraction = LaunchConfiguration("push_off_fraction")
     push_off_position = LaunchConfiguration("push_off_position")
+    add_push_off = LaunchConfiguration("add_push_off")
+    amount_of_steps = LaunchConfiguration("amount_of_steps")
     use_position_queue = LaunchConfiguration("use_position_queue")
+    add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -189,8 +192,8 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="dynamic_gait",
-            default_value="False",
-            description="Wether dynamic_setpoint_gait is enabled",
+            default_value="True",
+            description="Whether dynamic_setpoint_gait is enabled",
         ),
         DeclareLaunchArgument(
             name="middle_point_fraction",
@@ -220,10 +223,25 @@ def generate_launch_description() -> launch.LaunchDescription:
             description="Maximum joint position of the ankle during push off.",
         ),
         DeclareLaunchArgument(
+            name="add_push_off",
+            default_value="True",
+            description="Whether to add a push off setpoint for the ankle.",
+        ),
+        DeclareLaunchArgument(
+            name="amount_of_steps",
+            default_value="0",
+            description="Amount of steps the dynamic gait should make before stopping. 0 or -1 is infinite.",
+        ),
+        DeclareLaunchArgument(
             name="use_position_queue",
             default_value="False",
             description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
                         "points given by (simulated) covid.",
+        ),
+        DeclareLaunchArgument(
+            name="add_cybathlon_gaits",
+            default_value="False",
+            description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
         ),
         DeclareLaunchArgument(
             name="first_subgait_delay",
@@ -234,7 +252,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="early_schedule_duration",
-            default_value="0.4",
+            default_value="0.3",
             description="Duration to schedule next subgait early. If 0 then the"
                         "next subgait is never scheduled early.",
         ),
@@ -272,12 +290,12 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="location_x",
-            default_value="0.4",
+            default_value="0.5",
             description="x-location for fake covid topic, takes double or 'random'",
         ),
         DeclareLaunchArgument(
             name="location_y",
-            default_value="0.0",
+            default_value="0.03",
             description="y-location for fake covid topic, takes double or 'random'",
         ),
         DeclareLaunchArgument(
@@ -323,10 +341,13 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("duration", duration),
             ("middle_point_fraction", middle_point_fraction),
             ("middle_point_height", middle_point_height),
-            ("mininum_stair_height", minimum_stair_height),
+            ("minimum_stair_height", minimum_stair_height),
             ("push_off_fraction", push_off_fraction),
             ("push_off_position", push_off_position),
+            ("add_push_off", add_push_off),
+            ("amount_of_steps", amount_of_steps),
             ("use_position_queue", use_position_queue),
+            ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
             ("early_schedule_duration", early_schedule_duration),
             ("timer_period", timer_period),
@@ -334,7 +355,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("minimum_fake_temperature", minimum_fake_temperature),
             ("maximum_fake_temperature", maximum_fake_temperature),
             ("simulation", simulation),
-            ("jointlesss", jointless),
+            ("jointless", jointless),
             ("simulate_points", simulate_points),
             ("location_x", location_x),
             ("location_y", location_y),

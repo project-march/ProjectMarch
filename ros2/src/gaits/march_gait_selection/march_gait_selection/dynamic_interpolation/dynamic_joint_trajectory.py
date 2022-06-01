@@ -21,9 +21,9 @@ class DynamicJointTrajectory:
         ankle (bool): True if it concerns an ankle trajectory, default False
     """
 
-    def __init__(self, setpoints: List[Setpoint], interpolate_ankle: bool = False):
+    def __init__(self, setpoints: List[Setpoint], fixed_midpoint_velocity: bool = False):
         self.setpoints = setpoints
-        self.ankle = interpolate_ankle
+        self.fixed_midpoint_velocity = fixed_midpoint_velocity
         self._interpolate_setpoints()
 
     def _get_setpoints_unzipped(
@@ -55,9 +55,8 @@ class DynamicJointTrajectory:
         duration, position, velocity = self._get_setpoints_unzipped()
         time = [d.nanoseconds / NANOSECONDS_TO_SECONDS for d in duration]
 
-        if self.ankle:
+        if self.fixed_midpoint_velocity:
             yi = [[position[i], velocity[i]] for i in range(len(duration))]
-
             self.interpolated_position = BPoly.from_derivatives(time, yi)
         else:
             boundary_condition = (

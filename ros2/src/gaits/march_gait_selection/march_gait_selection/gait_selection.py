@@ -39,11 +39,20 @@ from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
     DynamicSetpointGait,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_single_step import (
-    DynamicSetpointGaitSingleStep,
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
+    DynamicSetpointGaitStepAndClose,
 )
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_half_step import (
-    DynamicSetpointGaitHalfStep,
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import (
+    DynamicSetpointGaitStep,
+)
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import (
+    SteppingStonesStepAndClose,
+)
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
+    DynamicSetpointGaitStepAndHold,
+)
+from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import (
+    DynamicSetpointGaitClose,
 )
 
 NODE_NAME = "gait_selection"
@@ -125,7 +134,10 @@ class GaitSelection(Node):
             self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
             self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
+            self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
+            self.amount_of_steps = self.get_parameter("amount_of_steps").get_parameter_value().integer_value
+            self._add_cybathlon_gaits = self.get_parameter("add_cybathlon_gaits").get_parameter_value().bool_value
 
         except ParameterNotDeclaredException:
             self.logger.error(
@@ -453,13 +465,19 @@ class GaitSelection(Node):
             # We pass along the gait_selection_node to be able to listen to the CoViD topic within the
             # DynamicSetpointGait class. Dynamic setpoint gait needs to be an attribute for updating parameters.
             self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
-            self.dynamic_setpoint_gait_half_step = DynamicSetpointGaitHalfStep(gait_selection_node=self)
+            self.dynamic_setpoint_gait_step = DynamicSetpointGaitStep(gait_selection_node=self)
+            self.dynamic_setpoint_gait_step_and_hold = DynamicSetpointGaitStepAndHold(gait_selection_node=self)
 
             dynamic_gaits = [
                 self.dynamic_setpoint_gait,
-                self.dynamic_setpoint_gait_half_step,
-                DynamicSetpointGaitSingleStep(gait_selection_node=self),
+                self.dynamic_setpoint_gait_step,
+                DynamicSetpointGaitStepAndClose(gait_selection_node=self),
+                DynamicSetpointGaitClose(gait_selection_node=self),
             ]
+
+            if self._add_cybathlon_gaits:
+                dynamic_gaits.append(self.dynamic_setpoint_gait_step_and_hold)
+                dynamic_gaits.append(SteppingStonesStepAndClose(gait_selection_node=self))
 
             for dynamic_gait in dynamic_gaits:
                 gaits[dynamic_gait.name] = dynamic_gait
