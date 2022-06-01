@@ -5,21 +5,24 @@
 #ifndef MARCH_FOOT_POSITION_FINDER_H
 #define MARCH_FOOT_POSITION_FINDER_H
 
-#include "march_shared_msgs/msg/foot_position.h"
-#include "march_shared_msgs/msg/current_state.h"
+#include "march_shared_msgs/msg/foot_position.hpp"
+#include "march_shared_msgs/msg/current_state.hpp"
+#include "visualization_msgs/msg/marker.hpp"
+#include "sensor_msgs/msg/point_cloud2.hpp"
 #include <chrono>
 #include <cmath>
 #include <librealsense2/rs.hpp>
 #include <pcl/common/distances.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include "sensor_msgs/msg/point_cloud2.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <string>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
 #include <thread>
 #include <vector>
+#include <pcl/common/transforms.h>
+
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -27,24 +30,24 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class FootPositionFinder {
 public:
     explicit FootPositionFinder(
-        ros::NodeHandle* n, const std::string& left_or_right);
+        rclcpp::Node* n, const std::string& left_or_right);
 
-    void readParameters(
-        march_foot_position_finder::parametersConfig& config, uint32_t level);
+    // void readParameters(
+    //     march_foot_position_finder::parametersConfig& config, uint32_t level);
 
     ~FootPositionFinder() = default;
 
 protected:
-    void currentStateCallback(const march_shared_msgs::CurrentState msg);
+    void currentStateCallback(const march_shared_msgs::msg::CurrentState msg);
 
-    void resetInitialPosition(const ros::TimerEvent&);
+    void resetInitialPosition();
 
-    void chosenOtherPointCallback(const march_shared_msgs::FootPosition msg);
+    void chosenOtherPointCallback(const march_shared_msgs::msg::FootPosition msg);
 
-    void processRealSenseDepthFrames(const ros::TimerEvent&);
+    void processRealSenseDepthFrames();
 
     void processSimulatedDepthFrames(
-        const sensor_msgs::PointCloud2 input_cloud);
+        const sensor_msgs::msg::PointCloud2 input_cloud);
 
     void processPointCloud(const PointCloud::Ptr& pointcloud);
 
@@ -53,21 +56,18 @@ protected:
     Point transformPoint(Point point, const std::string& frame_from,
         const std::string& frame_to);
 
-    ros::NodeHandle* n_;
+    rclcpp::Node* n_;
 
-    ros::Publisher point_publisher_;
-    ros::Subscriber pointcloud_subscriber_;
+    rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr point_publisher_;
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_subscriber_;
 
-    ros::Publisher preprocessed_pointcloud_publisher_;
-    ros::Publisher point_marker_publisher_;
-    ros::Subscriber current_chosen_point_subscriber_;
-    ros::Subscriber other_chosen_point_subscriber_;
-    ros::Subscriber current_state_subscriber_;
+    rclcpp::Publisher<PointCloud>::SharedPtr preprocessed_pointcloud_publisher_;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr point_marker_publisher_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr other_chosen_point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr current_state_subscriber_;
 
-    ros::Publisher height_map_publisher_;
-
-    ros::Timer realsense_timer_;
-    ros::Timer initial_position_reset_timer_;
+    rclcpp::TimerBase::SharedPtr realsense_timer_;
+    rclcpp::TimerBase::SharedPtr initial_position_reset_timer_;
 
     clock_t last_frame_time_;
     int frame_wait_counter_;
@@ -114,7 +114,10 @@ protected:
     Point new_displacement_;
     Point found_covid_point_;
 
-    tf::TransformListener listener;
+    std::shared_ptr<tf2_ros::TransformListener> transform_listener_{nullptr};
+    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

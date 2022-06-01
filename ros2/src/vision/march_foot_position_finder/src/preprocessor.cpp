@@ -28,7 +28,7 @@ using NormalCloud = pcl::PointCloud<Normal>;
 // Suppress lint error: "fields are not initialized by constructor"
 // NOLINTNEXTLINE
 Preprocessor::Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-    std::string& left_or_right, tf2_ros::TransformListener& listener)
+    std::string& left_or_right)
     : pointcloud_ { std::move(pointcloud) }
 {
 

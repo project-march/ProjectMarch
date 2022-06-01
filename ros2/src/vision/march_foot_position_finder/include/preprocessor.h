@@ -16,7 +16,7 @@ using NormalCloud = pcl::PointCloud<pcl::Normal>;
 class Preprocessor {
 public:
     explicit Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-        std::string& left_or_right, tf2_ros::TransformListener& listener);
+        std::string& left_or_right);
 
     void preprocess();
 
