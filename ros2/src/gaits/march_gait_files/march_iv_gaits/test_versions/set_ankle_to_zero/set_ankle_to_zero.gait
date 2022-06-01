@@ -1,6 +1,0 @@
-name: set_ankle_to_zero
-subgaits:
-  set_ankle_to_zero:
-    to: end
-  start:
-    to: set_ankle_to_zero
