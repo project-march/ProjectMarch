@@ -14,7 +14,6 @@ from march_utility.exceptions.gait_exceptions import (
     WrongStartPositionError,
 )
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_shared_msgs.msg import FootPosition
@@ -45,7 +44,7 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
         super().__init__(gait_selection_node)
         self._start_from_left_side = False
         self._use_predetermined_foot_location = False
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.gait_name = "stepping_stones_step_and_close"
 
         self.gait_selection.create_subscription(
@@ -79,7 +78,7 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self.logger.error(e.msg)
+            self._logger.error(e.msg)
             return None
 
         if self._start_from_left_side:
@@ -107,7 +106,7 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
             TrajectoryCommand: command with the current subgait and start time
         """
         if stop:
-            self.logger.info("Stopping dynamic gait.")
+            self._logger.info("Stopping dynamic gait.")
         else:
             if self._use_predetermined_foot_location:
                 self.foot_location = deepcopy(self._predetermined_foot_location)
@@ -119,13 +118,13 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
                     if stop:
                         return None
                 except AttributeError:
-                    self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                    self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
                     self._end = True
                     return None
 
             if not stop:
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
-                self.logger.info(
+                self._logger.info(
                     f"Stepping to location ({self.foot_location.processed_point.x}, "
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
                 )
@@ -141,14 +140,14 @@ class SteppingStonesStepAndClose(DynamicSetpointGaitStepAndClose):
                     self._start_from_left_side = True
                 else:
                     self._start_from_left_side = False
-                self.logger.info(f"Starting subgait set to {self.subgait_id}")
+                self._logger.info(f"Starting subgait set to {self.subgait_id}")
             else:
                 raise WrongStartPositionError(self.home_stand_position_all_joints, self.start_position_all_joints)
         except WrongStartPositionError as e:
-            self.logger.warn(f"Can only change start side in home stand position. {e.msg}")
+            self._logger.warn(f"Can only change start side in home stand position. {e.msg}")
 
     def _predetermined_foot_location_callback(self, msg: String) -> None:
         """Sets the predetermined foot location to the requested location given by the IPD."""
         self._use_predetermined_foot_location = True
         self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
-        self.logger.info(f"Stepping to stone {msg.data}")
+        self._logger.info(f"Stepping to stone {msg.data}")

@@ -5,8 +5,10 @@ import socket
 import json
 import time
 from functools import partial
+
+from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
+
 from march_shared_msgs.msg import CurrentGait, CurrentState
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
 from march_shared_msgs.msg import FootPosition

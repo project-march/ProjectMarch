@@ -17,7 +17,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSu
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import WrongStartPositionError
 from march_utility.utilities.utility_functions import get_position_from_yaml
 
@@ -50,7 +49,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         self._use_predetermined_foot_location = False
         self._start_from_left_side = False
         super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
 
         self.update_parameter()
@@ -172,7 +171,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                 empty, if the location found by CoViD is too old, or if CoViD has not found any location.
         """
         if stop:
-            self.logger.info("Stopping dynamic gait.")
+            self._logger.info("Stopping dynamic gait.")
         else:
             if self._use_predetermined_foot_location:
                 self.foot_location = deepcopy(self._predetermined_foot_location)
@@ -181,7 +180,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                 if self._use_position_queue and not self.position_queue.empty():
                     self.foot_location = self._get_foot_location_from_queue()
                 elif self._use_position_queue and self.position_queue.empty():
-                    self.logger.warn(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}.")
+                    self._logger.warn(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}.")
                     self._fill_queue()
                     return None
                 else:
@@ -190,13 +189,13 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                         if self._is_foot_location_too_old(self.foot_location):
                             return None
                     except AttributeError:
-                        self.logger.info("No FootLocation found. Connect the camera or use simulated points.")
+                        self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
                         self._end = True
                         return None
 
             if not stop:
                 self._publish_chosen_foot_position(self.subgait_id, self.foot_location)
-                self.logger.info(
+                self._logger.info(
                     f"Stepping to location ({self.foot_location.processed_point.x}, "
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
                 )
@@ -221,7 +220,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
         if self.position_queue.empty():
-            self.logger.warn("Position queue empty. Use force unknown + homestand to close the gait.")
+            self._logger.warn("Position queue empty. Use force unknown + homestand to close the gait.")
 
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
@@ -237,7 +236,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             with open(queue_file_loc, "r") as queue_file:
                 position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
         except OSError as e:
-            self.logger.error(f"Position queue file does not exist. {e}")
+            self._logger.error(f"Position queue file does not exist. {e}")
 
         self.duration_from_yaml = position_queue_yaml["duration"]
         self.points_from_yaml = position_queue_yaml["points"]
@@ -257,7 +256,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
         """
         point_dict = {"x": point.x, "y": point.y, "z": point.z}
         self.position_queue.put(point_dict)
-        self.logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
+        self._logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
 
     def _set_start_subgait_id(self, start_side: String) -> None:
         """Sets the subgait_id to the given start side, if and only if exo is in homestand."""
@@ -268,16 +267,16 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
                     self._start_from_left_side = True
                 else:
                     self._start_from_left_side = False
-                self.logger.info(f"Starting subgait set to {self.subgait_id}")
+                self._logger.info(f"Starting subgait set to {self.subgait_id}")
             else:
                 raise WrongStartPositionError(self.home_stand_position_all_joints, self.start_position_all_joints)
         except WrongStartPositionError as e:
-            self.logger.warn(f"Can only change start side in home stand position. {e.msg}")
+            self._logger.warn(f"Can only change start side in home stand position. {e.msg}")
 
     def _predetermined_foot_location_callback(self, msg: String) -> None:
         self._use_predetermined_foot_location = True
         self._predetermined_foot_location = PREDETERMINED_FOOT_LOCATIONS[msg.data]
-        self.logger.info(
+        self._logger.info(
             f"Stepping to stone {msg.data} with a step size of {self._predetermined_foot_location.processed_point.x}"
         )
 
