@@ -26,21 +26,50 @@ def get_angle_between_points(points: List[np.array]) -> float:
     return np.arccos(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
 
 
+def get_intersection_of_circles(p0: np.array, p1: np.array, r0: float, r1: float) -> List[np.array]:
+    """Finds the two points with distance r0 from p0 and distance r1 from p1.
+
+    This is actually calculating the intersection points of two circles, based on:
+    http://paulbourke.net/geometry/circlesphere/#:~:text=Intersection%20of%20two%20circles.
+
+    Args:
+        p0 (np.array):  a 2D array of the position of the first point.
+        p1 (np.array):  a 2D array of the position of the second point.
+        r0 (float): the distance between point p0 and the point of intersection (p3).
+        r1 (float): the distance between point p1 and the point of intersection (p3).
+
+    Returns:
+        List[np.array]: the two points of intersection.
+    """
+    d = np.linalg.norm(p0 - p1)
+    dis_p0_p2 = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
+
+    # Return None if input is invalid:
+    if r0 ** 2 - dis_p0_p2 ** 2 > 0:
+        h = np.sqrt(r0 ** 2 - dis_p0_p2 ** 2)
+        p2 = p0 + dis_p0_p2 * (p1 - p0) / d
+
+        p3 = []
+
+        for kernel in [np.array([-1, 1]), np.array([1, -1])]:
+            p3.append(p2 + kernel * h / d * np.flip(p1 - p0))
+
+        return p3
+    else:
+        return [None, None]
+
+
 def find_fourth_point(
     a: np.array,
-    b: np.array,
     c: np.array,
     da: float,
     cd: float,
     convex: bool,
 ) -> np.array:
-    """Finds the fourth point (d) of a quadrilateral when 3 points (a, b, c) and the distances da and cd are given.
-
-    Based on http://paulbourke.net/geometry/circlesphere/#:~:text=Intersection%20of%20two%20circles.
+    """Finds the fourth point (d) of a quadrilateral when 2 points (a, c) and the distances da and cd are given, assuming point b is already known.
 
     Args:
         a (np.array): a 2D array of the position of the first point of the quadrilateral.
-        b (np.array): a 2D array of the position of the second point of the quadrilateral.
         c (np.array): a 2D array of the position of the third point of the quadrilateral.
         da (float): the distance between point a and the fourth point (d) we try to find.
         cd (float): the distance between point c and the fourth point (d) we try to find.
@@ -51,15 +80,10 @@ def find_fourth_point(
     """
     r0, r1 = da, cd
     p0, p1 = a, c
-    d = np.linalg.norm(p0 - p1)
 
-    dis_p0_p2 = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
-    h = np.sqrt(r0 ** 2 - dis_p0_p2 ** 2)
-    p2 = p0 + dis_p0_p2 * (p1 - p0) / d
+    d = get_intersection_of_circles(p0, p1, r0, r1)
 
-    kernel = np.array([-1, 1]) if convex else np.array([1, -1])
-
-    return p2 + kernel * h / d * np.flip(p1 - p0)  # = p3
+    return d[0] if convex else d[1]
 
 
 def get_angles(points: List[np.array]) -> List[float]:
@@ -104,7 +128,7 @@ def solve_quadritlateral(lengths: List[float], angle_b: float, convex: bool = Tr
     a = np.array([0, 0])
     b = a + np.array([ab, 0])
     c = b + np.array([-np.cos(angle_b) * bc, np.sin(angle_b) * bc])
-    d = find_fourth_point(a, b, c, da, cd, convex)
+    d = find_fourth_point(a, c, da, cd, convex)
     points = [a, b, c, d]
 
     angles = get_angles(points)

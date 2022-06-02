@@ -1,12 +1,13 @@
 """Author: Jelmer de Wolde, MVII."""
 
 import numpy as np
-from typing import List, Tuple, Union
+from typing import List, Dict, Union
 import matplotlib.pyplot as plt
 
 import march_goniometric_ik_solver.triangle_angle_solver as tas
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
 
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
     get_limits_robot_from_urdf_for_inverse_kinematics,
@@ -36,7 +37,9 @@ for name in JOINT_NAMES:
 
 # Create a constant for frequently used limits:
 ANKLE_BUFFER = np.deg2rad(1)
-MAX_ANKLE_FLEXION = get_limits_robot_from_urdf_for_inverse_kinematics("left_ankle").upper - ANKLE_BUFFER
+HIP_BUFFER = np.deg2rad(1)
+MAX_ANKLE_FLEXION = min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper) - ANKLE_BUFFER
+MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower) + HIP_BUFFER
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
@@ -52,7 +55,7 @@ DEFAULT_KNEE_BEND = np.deg2rad(8)
 class Pose:
     """Pose class used for inverse kinematic calculations.
 
-    Used to solve inverse kinematics for a desired end_postion or mid_position of the foot.
+    Used to solve inverse kinematics for a desired end_position or mid_position of the foot.
     The class contains the joint_angles and the foot_rotation of the rear foot (in case of a toe-off)
     Solving can be done for the left or right foot, therefore this class uses the definition of 1 or 2
     for the joints, where 1 is the rear leg and 2 the front leg.
@@ -73,7 +76,7 @@ class Pose:
         rot_foot1 (float): angle between flat ground and the foot on the stance leg.
     """
 
-    def __init__(self, all_joint_names: List[str], pose: List[float] = None) -> None:
+    def __init__(self, all_joint_names: List[str] = JOINT_NAMES, pose: Union[List[float], None] = None) -> None:
         self.all_joint_names = all_joint_names
         if pose is None:
             angle_ankle, angle_hip, angle_knee = self.leg_length_angles(self.max_leg_length)
@@ -126,13 +129,14 @@ class Pose:
             self.fe_knee1,
         ]
 
-    def calculate_joint_positions(self, joint: str = "all") -> Union[Tuple[float], float]:
+    def calculate_joint_positions(self) -> Dict[str, np.ndarray]:
         """Calculates the joint positions for a given pose as a chain from rear toes (toes1) to front toes (toes2).
 
-        If a positive angle represents a anti-clockwise rotation, the angle variable is positive in the rot function.
+        If a positive angle represents an anti-clockwise rotation, the angle variable is positive in the rot function.
         If a positive angle represents a clockwise rotation, the angle variable is negative in the rot function.
         The vectors (all np.array's) do always describe the translation when no rotation is applied.
-        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the chain.
+        The rot_total matrix expands every step, since every joint location depends on all previous joint angles in the
+        chain.
 
         Args:
             joint (str): specific joint of which the joint position should be returned.
@@ -178,59 +182,61 @@ class Pose:
         rot_total = rot_total @ rot_ankle2
         pos_toes2 = pos_ankle2 + rot_total @ np.array([LENGTH_FOOT, 0])
 
-        # return all positions, or one specific if asked:
-        if joint == "all":
-            return (
-                pos_toes1,
-                pos_ankle1,
-                pos_knee1,
-                pos_hip,
-                pos_knee2,
-                pos_ankle2,
-                pos_toes2,
-            )
-        else:
-            return locals()[joint]
+        # return all joint positions:
+        return {
+            "pos_toes1": pos_toes1,
+            "pos_ankle1": pos_ankle1,
+            "pos_knee1": pos_knee1,
+            "pos_hip": pos_hip,
+            "pos_knee2": pos_knee2,
+            "pos_ankle2": pos_ankle2,
+            "pos_toes2": pos_toes2,
+        }
 
     @property
-    def pos_toes1(self) -> np.array:
+    def pos_toes1(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the stance leg toes."""
-        return self.calculate_joint_positions("pos_toes1")
+        return self.calculate_joint_positions()["pos_toes1"]
 
     @property
-    def pos_ankle1(self) -> np.array:
+    def pos_ankle1(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the stance leg ankle."""
-        return self.calculate_joint_positions("pos_ankle1")
+        return self.calculate_joint_positions()["pos_ankle1"]
 
     @property
-    def pos_knee1(self) -> np.array:
+    def pos_knee1(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the stance leg knee."""
-        return self.calculate_joint_positions("pos_knee1")
+        return self.calculate_joint_positions()["pos_knee1"]
 
     @property
-    def pos_hip(self) -> np.array:
+    def pos_hip(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the hip."""
-        return self.calculate_joint_positions("pos_hip")
+        return self.calculate_joint_positions()["pos_hip"]
 
     @property
-    def pos_knee2(self) -> np.array:
+    def pos_knee2(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the swing leg knee."""
-        return self.calculate_joint_positions("pos_knee2")
+        return self.calculate_joint_positions()["pos_knee2"]
 
     @property
-    def pos_ankle2(self) -> np.array:
+    def pos_ankle2(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the swing leg ankle."""
-        return self.calculate_joint_positions("pos_ankle2")
+        return self.calculate_joint_positions()["pos_ankle2"]
 
     @property
-    def pos_toes2(self) -> np.array:
+    def pos_toes2(self) -> np.ndarray:
         """np.Array[x,y]. Calculates position of the swing leg toes."""
-        return self.calculate_joint_positions("pos_toes2")
+        return self.calculate_joint_positions()["pos_toes2"]
 
     @property
-    def point_below_hip(self) -> np.array:
+    def point_below_hip(self) -> np.ndarray:
         """np.Array[x,y]. Returns a ground point below the hip."""
         return np.array([self.pos_hip[0], 0])
+
+    @property
+    def point_right_to_ankle2(self) -> np.ndarray:
+        """np.Array[x,y]. Returns a point right from ankle at distance LENGTH_FOOT."""
+        return np.array([self.pos_ankle2[0] + LENGTH_FOOT, self.pos_ankle2[1]])
 
     @property
     def hip_x(self) -> float:
@@ -252,29 +258,69 @@ class Pose:
         return np.linalg.norm(pos_hip - pos_ankle)
 
     @property
+    def ankle_limit_pos_hip(self) -> np.ndarray:
+        """Returns the hip position when the ankle is in max dorsi flexion."""
+        pose = Pose(self.all_joint_names)
+        pose.fe_ankle1 = MAX_ANKLE_FLEXION
+        return pose.pos_hip
+
+    @property
     def ankle_limit_toes_knee_distance(self) -> float:
         """Returns the distance between knee and toes when the ankle is in max dorsi flexion."""
         pose = Pose(self.all_joint_names)
         pose.fe_ankle1 = MAX_ANKLE_FLEXION
-        return np.linalg.norm(pose.pos_toes1 - pose.pos_knee1)
+        return np.linalg.norm(pose.pos_knee1 - pose.pos_toes1)
 
-    def leg_length_angles(self, leg_length: float) -> Tuple[float]:
+    @property
+    def ankle_limit_toes_hip_distance(self) -> float:
+        """Returns the distance between hip and toes when the ankle is in max dorsi flexion."""
+        pose = Pose(self.all_joint_names)
+        pose.fe_ankle1 = MAX_ANKLE_FLEXION
+        return np.linalg.norm(pose.pos_hip - pose.pos_toes1)
+
+    @property
+    def min_step_size_rotated_foot(self) -> float:
+        """Returns the minimum step distance at which ankle2 can reach the ground with ankle1 at maximum dorsi flexion and no flat rear foot."""
+        return LENGTH_FOOT + np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - self.max_leg_length ** 2)
+
+    @property
+    def min_step_height_rotated_foot(self) -> float:
+        """Returns the lowest possible ankle2 height which can be reached with ankle1 at maximum dorsi flexion and no flat rear foot."""
+        long_side = self.ankle_limit_toes_hip_distance ** 2
+        horizontal_side = (self.ankle_x - LENGTH_FOOT) ** 2
+        if long_side >= horizontal_side:
+            hip_height = np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - (self.ankle_x - LENGTH_FOOT) ** 2)
+        else:
+            hip_height = 0.0
+        return hip_height - self.max_leg_length
+
+    @property
+    def max_step_size_flat_foot(self) -> float:
+        """Returns the maximum step distance with the rear foot flat on the ground."""
+        return self.ankle_limit_pos_hip[0] * 2
+
+    def leg_length_angles(self, leg_length: float) -> List[float]:
         """Returns the required angles in the triangle between ankle, hip and knee to meet the leg_length.
 
         Args:
             leg_length (float): the desired distance between ankle and hip.
 
         Returns:
-            Tuple[float]: returns the required angles in order: ankle, hip knee.
+            List[float]: returns the required angles in order: ankle, hip knee.
         """
         if leg_length < LENGTH_LEG:
             sides = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, leg_length]
             angle_ankle, angled_hip, angle_knee = tas.get_angles_from_sides(sides)
-            return angle_ankle, angled_hip, angle_knee
+            return [angle_ankle, angled_hip, angle_knee]
         else:
-            return 0.0, 0.0, np.pi
+            return [0.0, 0.0, np.pi]
 
-    def solve_leg(self, pos_hip: np.array, pos_ankle: np.array, leg: str) -> None:
+    def solve_leg(
+        self,
+        pos_hip: np.ndarray,
+        pos_ankle: np.ndarray,
+        leg: str,
+    ) -> None:
         """Solve the joint angles for a given leg to have hip and ankle at given positions.
 
         Args:
@@ -300,41 +346,119 @@ class Pose:
         else:
             raise ValueError("Expected leg to be 'rear' or 'front'.")
 
-    def reduce_swing_dorsi_flexion(self) -> None:
-        """Calculates the pose after reducing the dorsiflexion for the swing leg.
+    def reduce_swing_dorsi_flexion_update_pose(
+        self, rotation_point: str, rotation: float, angle_knee2: float, angle_hip: float
+    ) -> None:
+        """Updates the pose based on a certain dorsi flexion reduction of the swing leg.
 
-        Creates a quadrilateral between ankle2, knee2, hip, knee1.
-        Reduces the angle at the ankle so that dorsiflexion is within the limit.
-        Next it defines the other angles in the quadrilateral with this new ankle angle.
-        Finally it updates the pose with the reduced dorsiflexion.
+        Args:
+            rotation_point (str): the point we rotate around to reduce dorsi flexion. This can be 'toes' or 'ankle'.
+            rotation (float): the amount of rotation we apply to reduce dorsi flexion.
+            angle_knee2 (float): the angle of knee2 calculated with the reduce_swing_dorsi_flexion_calculate_angles() method.
+            angle_hip (float): the angle of hip calculated with the reduce_swing_dorsi_flexion_calculate_angles() method.
         """
-        # Determine required reduction:
-        reduction = self.fe_ankle2 - MAX_ANKLE_FLEXION
+        if rotation_point == "toes":
+            self.rot_foot1 -= rotation
+            pos_rot = self.pos_toes1
+        elif rotation_point == "ankle":
+            self.fe_ankle1 -= rotation
+            pos_rot = self.pos_ankle1
 
-        # Store current angle of ankle1 between ankle2 and hip:
-        angle_ankle1_before = qas.get_angle_between_points([self.pos_ankle2, self.pos_ankle1, self.pos_hip])
-
-        # Define desired angle_ankle2 and determine other angles in quadrilateral:
-        angle_ankle2 = qas.get_angle_between_points([self.pos_ankle1, self.pos_ankle2, self.pos_knee2]) - reduction
-        dist_ankle1_ankle2 = np.linalg.norm(self.pos_ankle1 - self.pos_ankle2)
-        sides = [
-            self.max_leg_length,
-            dist_ankle1_ankle2,
-            LENGTH_LOWER_LEG,
-            LENGTH_UPPER_LEG,
-        ]
-        angle_ankle1, angle_ankle2, angle_knee2, angle_hip = qas.solve_quadritlateral(sides, angle_ankle2)
-
-        # Update the pose:
-        self.fe_ankle1 = self.fe_ankle1 - (angle_ankle1 - angle_ankle1_before)
         self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
             [self.pos_knee1, self.pos_hip, self.point_below_hip]
         )
-        self.fe_hip2 = (
-            angle_hip - qas.get_angle_between_points([self.pos_ankle1, self.pos_hip, self.pos_knee1]) + self.fe_hip1
+        self.fe_hip2 = angle_hip + np.sign(pos_rot[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+            [pos_rot, self.pos_hip, self.point_below_hip]
         )
         self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee2
-        self.fe_ankle2 -= reduction
+        self.fe_ankle2 = ANKLE_ZERO_ANGLE - qas.get_angle_between_points(
+            [self.pos_knee2, self.pos_ankle2, self.point_right_to_ankle2]
+        )
+
+    def reduce_swing_dorsi_flexion_calculate_angles(self, known_angle: float, rotation_point: str) -> List[float]:
+        """Calculates the other angles for the quadrilateral used to reduce dorsi_flexion.
+
+        Args:
+            known_angle (float): the angle in the quadrilateral that is known/defined.
+            rotation_point (str): the point we rotate around to reduce dorsi flexion. This can be 'toes' or 'ankle'.
+
+        Returns:
+            List[float]: returns the angles for the used quadrilateral.
+        """
+        # Define desired angle_ankle2 and determine other angles in quadrilateral:
+        dist_toes1_ankle2 = np.linalg.norm(self.pos_toes1 - self.pos_ankle2)
+        dist_ankle1_ankle2 = np.linalg.norm(self.pos_ankle1 - self.pos_ankle2)
+
+        if rotation_point == "toes":
+            sides = [
+                self.ankle_limit_toes_hip_distance,
+                dist_toes1_ankle2,
+                LENGTH_LOWER_LEG,
+                LENGTH_UPPER_LEG,
+            ]
+        elif rotation_point == "ankle":
+            sides = [
+                self.max_leg_length,
+                dist_ankle1_ankle2,
+                LENGTH_LOWER_LEG,
+                LENGTH_UPPER_LEG,
+            ]
+
+        angle_rotation_point, angle_ankle2, angle_knee2, angle_hip = qas.solve_quadritlateral(sides, known_angle)
+        return [angle_rotation_point, angle_ankle2, angle_knee2, angle_hip]
+
+    def reduce_swing_dorsi_flexion(self) -> None:
+        """Calculates the pose after reducing the dorsiflexion for the swing leg.
+
+        If the current pose has foot rotation, it creates a quadrilateral between toes1, ankle2, knee2, hip.
+        If reducing is not (completely) possible with foot rotation, it creates a quadrilateral between ankle1, ankle2, knee2, hip.
+        It reduces the angle at ankle2 so that dorsiflexion is within the limit.
+        Next it defines the other angles in the quadrilateral with this new ankle angle.
+        Finally it updates the pose with the reduced dorsiflexion.
+        """
+        # First try to reduce dorsi flexion with foot rotation:
+        if self.rot_foot1 > 0:
+
+            # Define desired angle_ankle2 and determine other angles in quadrilateral:
+            reduction = self.fe_ankle2 - MAX_ANKLE_FLEXION
+            angle_ankle2 = qas.get_angle_between_points([self.pos_toes1, self.pos_ankle2, self.pos_knee2]) - reduction
+            angle_toes1, angle_ankle2, angle_knee2, angle_hip = self.reduce_swing_dorsi_flexion_calculate_angles(
+                known_angle=angle_ankle2, rotation_point="toes"
+            )
+
+            # If we can compensate everything with foot rotation, we update the pose:
+            angle_toes1_before = qas.get_angle_between_points([self.pos_ankle2, self.pos_toes1, self.pos_hip])
+            rotation = angle_toes1 - angle_toes1_before
+            if rotation < self.rot_foot1:
+                self.reduce_swing_dorsi_flexion_update_pose(
+                    "toes", rotation=rotation, angle_knee2=angle_knee2, angle_hip=angle_hip
+                )
+
+            # Otherwise we reset pose to have zero foot rotation and compensate the rest with ankle rotation:
+            else:
+                self.reset_to_zero_pose()
+                self.fe_ankle1 = MAX_ANKLE_FLEXION
+                self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+                    [self.pos_knee1, self.pos_hip, self.point_below_hip]
+                )
+                self.solve_leg(self.pos_hip, np.array([self.ankle_x, self.ankle_y]), "front")
+
+        # If it was not possible to reduce (everything) with foot rotation, we will reduce with ankle rotation:
+        if self.fe_ankle2 > MAX_ANKLE_FLEXION:
+
+            # Define desired angle_ankle2 and determine other angles in quadrilateral:
+            reduction = self.fe_ankle2 - MAX_ANKLE_FLEXION
+            angle_ankle2 = qas.get_angle_between_points([self.pos_ankle1, self.pos_ankle2, self.pos_knee2]) - reduction
+            angle_ankle1, angle_ankle2, angle_knee2, angle_hip = self.reduce_swing_dorsi_flexion_calculate_angles(
+                known_angle=angle_ankle2, rotation_point="ankle"
+            )
+
+            # Update the pose:
+            angle_ankle1_before = qas.get_angle_between_points([self.pos_ankle2, self.pos_ankle1, self.pos_hip])
+            rotation = angle_ankle1 - angle_ankle1_before
+            self.reduce_swing_dorsi_flexion_update_pose(
+                "ankle", rotation=rotation, angle_knee2=angle_knee2, angle_hip=angle_hip
+            )
 
     def keep_hip_above_rear_ankle(self) -> None:
         """Calculates the pose required to keep the hip above the rear ankle while reaching the goal location for the toes."""
@@ -358,31 +482,11 @@ class Pose:
         self.fe_knee2 = KNEE_ZERO_ANGLE - (angle_knee2 - angle_knee2_out)
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
-    def reduce_stance_dorsi_flexion(self) -> None:
-        """Calculates the pose after reducing the dorsiflexion for the stance leg.
-
-        Creates a quadrilateral between toes1, ankle1, knee1, and hip.
-        Reduces the angle at the ankle so that dorsiflexion is within the limit.
-        Next it defines the other angles in the quadrilateral with this new ankle angle.
-        Finally it updates the pose with the reduced dorsiflexion.
-        """
-        # Save current angle at toes1 between ankle1 and hip:
-        toes1_angle_ankle1_hip = qas.get_angle_between_points([self.pos_ankle1, self.pos_toes1, self.pos_hip])
-
-        # Reduce dorsi flexion of stance leg:
-        dis_toes1_hip = np.linalg.norm(self.pos_toes1 - self.pos_hip)
-        lengths = [LENGTH_UPPER_LEG, LENGTH_LOWER_LEG, LENGTH_FOOT, dis_toes1_hip]
-        angle_knee1, angle_ankle1, angle_toes1, angle_hip = qas.solve_quadritlateral(
-            lengths=lengths, angle_b=ANKLE_ZERO_ANGLE - MAX_ANKLE_FLEXION, convex=False
-        )
-
-        # Update pose:
-        self.rot_foot1 = toes1_angle_ankle1_hip - angle_toes1
-        self.fe_ankle1 = ANKLE_ZERO_ANGLE - angle_ankle1
-        self.fe_knee1 = KNEE_ZERO_ANGLE - angle_knee1
-        self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
-            [self.pos_knee1, self.pos_hip, self.point_below_hip]
-        )
+    def reduce_hip_extension(self) -> None:
+        """Reduces hip extension of one while keeping the same step size, by adding flexion to the other leg."""
+        reduction = MAX_HIP_EXTENSION - self.fe_hip1
+        self.fe_hip1 += reduction
+        self.fe_hip2 += reduction
 
     def perform_side_step(self, y: float, z: float):
         """Calculates the required hip adduction/abduction to step sidewards.
@@ -392,7 +496,7 @@ class Pose:
 
         Args:
             y (float): the distance between the two feet in upward direction.
-            z (float): the distance between the two feet in sideward direction.
+            z (float): the distance between the two feet in sidewards direction.
         """
         # Get y position of hip and toes:
         y_hip = self.pos_hip[1]
@@ -483,7 +587,7 @@ class Pose:
             ankle_y (float): the upward distance for the end position.
             ankle_z (float): the sideward distance for the end position.
             midpoint_fraction (float): the fraction of the step at which the mid position should be.
-            midpoint_height: the height the mid position should be relative to the end position.
+            midpoint_height (float): the height the mid position should be relative to the end position.
             subgait_id (str): either 'left_swing' or 'right_swing', defines which leg is the swing leg.
 
         Returns:
@@ -527,6 +631,114 @@ class Pose:
         # return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
+    def step_with_flat_stance_foot(self) -> None:
+        """Solves the required pose for a step small enough to keep the stance foot flat on the ground."""
+        hip_y = np.sqrt(self.max_leg_length ** 2 - self.hip_x ** 2)
+        pos_hip = np.array([self.hip_x, hip_y])
+        self.solve_leg(pos_hip, self.desired_pos_ankle1, "rear")
+        self.solve_leg(pos_hip, self.desired_pos_ankle2, "front")
+
+    def set_hip_intersection_of_circles(self) -> None:
+        """Determines the desired hip position using the intersection of circles method."""
+        pos_hip_solutions = qas.get_intersection_of_circles(
+            self.pos_toes1,
+            np.array([self.ankle_x, 0.0]),
+            self.ankle_limit_toes_hip_distance,
+            self.max_leg_length,
+        )
+
+        if pos_hip_solutions[0] is not None:
+            self.desired_pos_hip = abs(pos_hip_solutions[0])
+        else:
+            raise ValueError("Expected a solution for the hip that is not None.")
+
+    def set_hip_linearly_scaled(self) -> None:
+        """Determines the desired hip position as a percentage between the two other methods.
+
+        It linearly scales the hip position between the hip position for the largest possible flat foot step and
+        the hip position for the smallest possible step using the intersection_of_circles method.
+        This linearly scaling results in a fluent transition between the two previous methods.
+        """
+        hip_x = self.ankle_limit_pos_hip[0] + (self.ankle_x - self.max_step_size_flat_foot) / (
+            self.min_step_size_rotated_foot - self.max_step_size_flat_foot
+        ) * (self.min_step_size_rotated_foot - self.ankle_limit_pos_hip[0])
+        hip_y = np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - (hip_x - self.pos_toes1[0]) ** 2)
+        self.desired_pos_hip = np.array([hip_x, hip_y])
+
+        # If the required ankle height is larger than the desired height, we will use the required ankle height:
+        leg_height = np.sqrt(self.max_leg_length ** 2 - (self.ankle_x - hip_x) ** 2)
+        ankle_y_required = hip_y - leg_height
+        if ankle_y_required > self.ankle_y:
+            self.ankle_y = ankle_y_required
+
+    def step_with_rotated_stance_foot(self) -> None:
+        """Solves the required pose for a step that requires foot rotation of the stance foot to reach the desired location."""
+        self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, self.desired_pos_hip])
+        self.fe_ankle1 = MAX_ANKLE_FLEXION
+        self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+            [self.pos_knee1, self.pos_hip, self.point_below_hip]
+        )
+        self.solve_leg(self.desired_pos_hip, np.array([self.ankle_x, self.ankle_y]), "front")
+
+    def step_down_with_rotated_stance_foot(self) -> None:
+        """Solves the required pose for a step down that requires foot rotation of the stance foot to reach the desired location."""
+        pos_hip_solutions = qas.get_intersection_of_circles(
+            self.pos_toes1,
+            self.desired_pos_ankle2,
+            self.ankle_limit_toes_hip_distance,
+            self.max_leg_length,
+        )
+
+        if pos_hip_solutions[0] is not None:
+            pos_hip = abs(pos_hip_solutions[0])
+            self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, pos_hip])
+            self.fe_ankle1 = MAX_ANKLE_FLEXION
+            self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+                [self.pos_knee1, self.pos_hip, self.point_below_hip]
+            )
+            self.solve_leg(pos_hip, self.desired_pos_ankle2, "front")
+        else:
+            raise ValueError("Expected a solution for the hip that is not None.")
+
+    def get_knee1_position_for_hip_above_ankle2(self) -> Union[np.ndarray, None]:
+        """Calculates the knee1 position for step down with the hip above ankle2.
+
+        Returns:
+            Union[np.ndarray, None]: Returns the position of knee1, or None if there is no solution possible.
+        """
+        self.desired_pos_hip = self.desired_pos_ankle2 + np.array([0.0, self.max_leg_length])
+
+        # pos_knee1:
+        return qas.get_intersection_of_circles(
+            self.pos_toes1,
+            self.desired_pos_hip,
+            self.ankle_limit_toes_knee_distance,
+            LENGTH_UPPER_LEG,
+        )[1]
+
+    def step_down_with_hip_above_ankle2(self, pos_knee1: np.ndarray) -> None:
+        """Solves the required pose for a step down with the hip located above ankle2.
+
+        Args:
+            pos_knee1 (np.ndarray): The required position of pos_knee1 to get the hip above ankle2.
+        """
+        self.fe_ankle1 = MAX_ANKLE_FLEXION
+        self.rot_foot1 = qas.get_angle_between_points([pos_knee1, self.pos_toes1, self.pos_knee1])
+        self.fe_knee1 = KNEE_ZERO_ANGLE - qas.get_angle_between_points(
+            [self.pos_ankle1, self.pos_knee1, self.desired_pos_hip]
+        )
+        self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+            [self.pos_knee1, self.pos_hip, self.point_below_hip]
+        )
+        self.solve_leg(self.desired_pos_hip, self.desired_pos_ankle2, "front")
+
+    def step_down_wih_triangle_method(self) -> None:
+        """Solves the required pose for a step down by forming triangle between the two ankles and the hip."""
+        hip_y = self.ankle_y + np.sqrt(self.max_leg_length ** 2 - (self.ankle_x - self.hip_x) ** 2)
+        pos_hip = np.array([self.hip_x, hip_y])
+        self.solve_leg(pos_hip, self.desired_pos_ankle1, "rear")
+        self.solve_leg(pos_hip, self.desired_pos_ankle2, "front")
+
     def solve_end_position(
         self,
         ankle_x: float,
@@ -536,7 +748,6 @@ class Pose:
         hip_x_fraction: float = DEFAULT_HIP_X_FRACTION,
         default_knee_bend: float = DEFAULT_KNEE_BEND,
         reduce_df_front: bool = True,
-        reduce_df_rear: bool = True,
     ) -> List[float]:
         """Solves inverse kinematics for the end position.
 
@@ -557,60 +768,64 @@ class Pose:
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
+        # Reset:
+        self.reset_to_zero_pose()
+
         # Set parameters:
         self.ankle_x = ankle_x
         self.ankle_y = ankle_y
         self.hip_x_fraction = hip_x_fraction
         self.knee_bend = default_knee_bend
 
-        # Determine hip y-location:
-        if ankle_y > 0:
-            if hip_x_fraction >= 0.5:
-                hip_y = np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2)
+        self.desired_pos_ankle1 = np.array([0, 0])
+        self.desired_pos_ankle2 = np.array([self.ankle_x, self.ankle_y])
+
+        # Solve pose:
+        if self.ankle_y >= 0:
+            if self.ankle_x <= self.max_step_size_flat_foot:
+                self.step_with_flat_stance_foot()
             else:
-                hip_y = np.sqrt(self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2)
+                if self.ankle_x >= self.min_step_size_rotated_foot:
+                    self.set_hip_intersection_of_circles()
+                else:
+                    self.set_hip_linearly_scaled()
+                self.step_with_rotated_stance_foot()
         else:
-            hip_y = min(
-                ankle_y + np.sqrt(self.max_leg_length ** 2 - (ankle_x - self.hip_x) ** 2),
-                np.sqrt(self.max_leg_length ** 2 - (self.hip_x) ** 2),
-            )
+            if self.ankle_x >= self.min_step_size_rotated_foot and (self.ankle_y >= self.min_step_height_rotated_foot):
+                self.step_down_with_rotated_stance_foot()
+            else:
+                pos_knee1 = self.get_knee1_position_for_hip_above_ankle2()
 
-        # Define hip and ankle locations:
-        pos_hip = np.array([self.hip_x, hip_y])
-        pos_ankle1 = np.array([0, 0])
-        pos_ankle2 = np.array([ankle_x, ankle_y])
+                if pos_knee1 is not None:
+                    self.step_down_with_hip_above_ankle2(pos_knee1=pos_knee1)
+                else:
+                    self.step_down_wih_triangle_method()
 
-        # Solve legs without constraints:
-        self.solve_leg(pos_hip, pos_ankle1, "rear")
-        self.solve_leg(pos_hip, pos_ankle2, "front")
-
-        # Reduce dorsi flexion to meet constraints:
+        # Reduce ankle2 dorsi flexion and hip extension to meet constraints:
         if reduce_df_front and self.fe_ankle2 > MAX_ANKLE_FLEXION:
             self.reduce_swing_dorsi_flexion()
+
             if self.pos_hip[0] < self.pos_ankle1[0]:
                 self.keep_hip_above_rear_ankle()
 
-        if reduce_df_rear and self.fe_ankle1 > MAX_ANKLE_FLEXION:
-            self.reduce_stance_dorsi_flexion()
+        if self.fe_hip1 < MAX_HIP_EXTENSION:
+            self.reduce_hip_extension()
 
         # Apply side_step, hard_coded to default feet distance for now:
-        self.perform_side_step(abs(ankle_y), abs(ankle_z))
+        self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
 
         # Create a list of the pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
         # Perform a limit check and raise error if limit is exceeded:
-        errors = check_on_limits(self.all_joint_names, pose_list)
-        if errors:
-            for error in errors:
-                raise ValueError(error)
+        check_on_limits(self.all_joint_names, pose_list)
 
         # return pose as list:
         return pose_list
 
 
 # Static methods:
-def rot(t: float) -> np.array:
+def rot(t: float) -> np.ndarray:
     """Gives the rotation matrix for a given rotation.
 
     Returns the 2D rotation matrix R to rotate a vector with rotation t (in rad), so that::
@@ -629,38 +844,25 @@ def rot(t: float) -> np.array:
     return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
 
 
-def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> List:
+def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> None:
     """Checks all joints limits of the current pose and create error messages for exceeding limits.
 
     Args:
         all_joint_names (List[str]): list containing all joint names in alphabetical order.
         pose_list (List[float]): A list of joints poses in alphabetical order.
     """
-    errors = []
     joint_pose_dict = {}
     # TODO: add global enum for all joint names
     for i, joint_name in enumerate(all_joint_names):
         joint_pose_dict[joint_name] = pose_list[i]
 
     for joint_name in JOINT_NAMES:
-        if joint_pose_dict[joint_name] < JOINT_LIMITS[joint_name].lower:
-            errors.append(
-                "IK solver found a solution with joint "
-                + joint_name
-                + " "
-                + str(round(JOINT_LIMITS[joint_name].lower - joint_pose_dict[joint_name], 3))
-                + " rad below lower limit"
+        if (joint_pose_dict[joint_name] < JOINT_LIMITS[joint_name].lower) or (
+            joint_pose_dict[joint_name] > JOINT_LIMITS[joint_name].upper
+        ):
+            raise PositionSoftLimitError(
+                joint_name, joint_pose_dict[joint_name], JOINT_LIMITS[joint_name].lower, JOINT_LIMITS[joint_name].upper
             )
-        elif joint_pose_dict[joint_name] > JOINT_LIMITS[joint_name].upper:
-            errors.append(
-                "IK solver found a solution with joint "
-                + joint_name
-                + " "
-                + str(round(joint_pose_dict[joint_name] - JOINT_LIMITS[joint_name].upper, 3))
-                + " rad above upper limit"
-            )
-
-    return errors
 
 
 def make_plot(pose: Pose):
