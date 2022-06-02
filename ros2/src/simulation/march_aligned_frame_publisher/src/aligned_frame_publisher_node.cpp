@@ -115,7 +115,6 @@ int main(int argc, char** argv)
 
     rclcpp::executors::MultiThreadedExecutor exec;
     auto node = std::make_shared<AlignedFramePublisherNode>();
-
     exec.add_node(node);
     exec.spin();
 

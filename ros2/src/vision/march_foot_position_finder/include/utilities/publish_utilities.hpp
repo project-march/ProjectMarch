@@ -103,10 +103,10 @@ void publishArrow(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "displacement";
-    marker.id = 0;
+    marker.id = 1;
     marker.type = visualization_msgs::msg::Marker::ARROW;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -135,10 +135,10 @@ void publishArrow2(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "displacement_computed";
-    marker.id = 0;
+    marker.id = 2;
     marker.type = visualization_msgs::msg::Marker::ARROW;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -173,10 +173,10 @@ void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr publisher,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "relative_points";
-    marker.id = 0;
+    marker.id = 3;
     marker.type = visualization_msgs::msg::Marker::CUBE;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -213,10 +213,10 @@ void publishDesiredPosition(const MarkerPublisher::SharedPtr publisher,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "desired_position";
-    marker.id = 0;
+    marker.id = 4;
     marker.type = visualization_msgs::msg::Marker::CUBE;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -257,10 +257,10 @@ void publishSearchRectangle(const MarkerPublisher::SharedPtr publisher,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "search_region";
-    marker.id = 1;
+    marker.id = 5;
     marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -309,10 +309,10 @@ void publishPossiblePoints(const MarkerPublisher::SharedPtr publisher,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "possible_points";
-    marker.id = 2;
+    marker.id = 6;
     marker.type = visualization_msgs::msg::Marker::POINTS;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -344,10 +344,10 @@ void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr publisher,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "track_points";
-    marker.id = 2;
+    marker.id = 7;
     marker.type = visualization_msgs::msg::Marker::POINTS;
     marker.action = visualization_msgs::msg::Marker::ADD;
 
@@ -396,7 +396,7 @@ void publishPoint(
     msg.displacement.y = displacement.y;
     msg.displacement.z = displacement.z;
 
-    msg.header.stamp = n->get_clock()->now();
+    msg.header.stamp = n->now();
 
     for (const Point& p : track_points) {
         msg.track_points.push_back(to_geometry(p));

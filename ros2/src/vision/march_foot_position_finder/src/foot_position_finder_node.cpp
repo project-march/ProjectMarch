@@ -36,8 +36,8 @@ public:
         this->declare_parameter("displacements_near");
         this->declare_parameter("displacements_far");
 
-        left = new FootPositionFinder(this, "left");
-        // right = new FootPositionFinder(this, "right");
+        // left = new FootPositionFinder(this, "left");
+        right = new FootPositionFinder(this, "right");
 
         this->set_on_parameters_set_callback(
             std::bind(&FootPositionFinderNode::parametersCallback, this,
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
 
-    rclcpp::executors::MultiThreadedExecutor exec;
+    rclcpp::executors::SingleThreadedExecutor exec;
     auto node = std::make_shared<FootPositionFinderNode>();
     exec.add_node(node);
     exec.spin();

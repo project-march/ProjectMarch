@@ -37,6 +37,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         other_side_ = "left";
         switch_factor_ = 1;
         serial_number_ = "944622071535";
+        serial_number_ = "944622074337";
     }
 
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(n_->get_clock());
@@ -149,8 +150,9 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
             left_or_right_.c_str());
     }
 
-    last_displacement_ = previous_start_point_ = start_point_
-        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
+    previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
+
 
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
@@ -161,7 +163,7 @@ void FootPositionFinder::startParameterCallback(
     const std::vector<rclcpp::Parameter>& parameters)
 {
     parameter_callback_timer_ = n_->create_wall_timer(
-        std::chrono::milliseconds(10), [this, parameters]() -> void {
+        std::chrono::milliseconds(1), [this, parameters]() -> void {
             readParameters(parameters);
         });
 }
@@ -191,8 +193,8 @@ void FootPositionFinder::readParameters(
     found_points_.resize(sample_size_);
 
     // Initialize all variables as zero:
-    last_displacement_ = previous_start_point_ = start_point_
-        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
+    previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
 
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
@@ -212,7 +214,7 @@ void FootPositionFinder::chosenOtherPointCallback(
     const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT
 {
     // Start point in current frame is equal to the previous displacement:
-    last_displacement_ = start_point_
+    start_point_
         = Point(msg->displacement.x, msg->displacement.y, msg->displacement.z);
 
     // previous_start_point_ is the current origin:
@@ -245,12 +247,16 @@ void FootPositionFinder::currentStateCallback(
  */
 void FootPositionFinder::resetInitialPosition()
 {
-    last_displacement_ = previous_start_point_ = start_point_
-        = transformPoint(ORIGIN, current_frame_id_, other_frame_id_);
+    previous_start_point_ = start_point_
+        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
     initial_position_reset_timer_->cancel();
+
+    RCLCPP_INFO(n_->get_logger(),
+        "Initial position reset in %s foot position finder",
+        left_or_right_.c_str());
 }
 
 /**
@@ -331,6 +337,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
     publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
         left_or_right_); // Purple
+
+    std::cout << start_point_ << std::endl;
 
     if (position_queue.size() > 0) {
         // Take the first point of the point queue returned by the point finder
