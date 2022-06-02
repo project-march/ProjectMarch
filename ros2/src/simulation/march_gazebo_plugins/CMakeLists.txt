@@ -7,6 +7,7 @@ find_package(gazebo REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(rclcpp REQUIRED)
 
 include_directories(include ${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
@@ -21,5 +22,5 @@ install(TARGETS ${PROJECT_NAME}
   DESTINATION lib
 )
 
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs)
+ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp)
 ament_package()

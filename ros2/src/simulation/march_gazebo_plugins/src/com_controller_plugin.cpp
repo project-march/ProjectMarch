@@ -3,6 +3,8 @@
 namespace gazebo {
 // The documentation on the CoM controller Plugin can be found at
 // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#com-controller-plugin
+// ComControllerPlugin::ComControllerPlugin() : n)){}
+
 void ComControllerPlugin::Load(
     physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
@@ -16,6 +18,10 @@ void ComControllerPlugin::Load(
     // simulation iteration.
     update_connection_ = event::Events::ConnectWorldUpdateBegin(
         std::bind(&ComControllerPlugin::onUpdate, this));
+
+    // Start ros on a new thread:
+    node_ = std::make_shared<ComControllerNode>();
+    ros_thread = std::thread(&ComControllerPlugin::startRos, node_);
 }
 
 // Called by the world update start event
