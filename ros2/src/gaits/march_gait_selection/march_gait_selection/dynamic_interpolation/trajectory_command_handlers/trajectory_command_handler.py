@@ -15,7 +15,23 @@ DURATION_INCREASE_SIZE = 0.25
 
 
 class TrajectoryCommandHandler:
-    """Class that creates and validates a trajectory command."""
+    """Class that creates and validates a trajectory command.
+
+    Args:
+        gait: The gait class
+        points_handler: The points handler class
+
+    Attributes:
+        subgait_id (str): either 'left_swing' or 'right_swing'
+        start_position_all_joints (Dict[str, float]): start joint angles of all joints
+        foot_location (FootPosition): foot position message to step towards
+        dynamic_subgait (DynamicSubgait): instance of the DynamicSubgait class, used to get trajectory msg
+
+        _gait: the gait class
+        _points_handler: the points handler class
+        _logger (Logger): used to log with the class name as a prefix
+        _trajectory_failed (bool): true if no feasible trajectory can be found
+    """
 
     subgait_id: str
     foot_location: FootPosition
@@ -67,6 +83,14 @@ class TrajectoryCommandHandler:
             return None
 
         return self._get_first_feasible_trajectory(start, stop)
+
+    def has_trajectory_failed(self) -> bool:
+        """Returns true if no feasible trajectory could be created."""
+        return self._trajectory_failed
+
+    def set_trajectory_failed_false(self) -> None:
+        """Sets the _trajectory_failed attribute to False."""
+        self._trajectory_failed = False
 
     def _get_first_feasible_trajectory(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
         """Returns the first trajectory than can be executed.

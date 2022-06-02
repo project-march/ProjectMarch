@@ -103,7 +103,7 @@ class DynamicSetpointGaitStepAndHold(DynamicSetpointGaitStepAndClose):
             self._set_start_position_to_home_stand()
             self.use_predetermined_foot_location = False
             self.subgait_id = "right_swing"
-            self._trajectory_failed = False
+            self.trajectory_command_handler.set_trajectory_failed_false()
 
 
 class TrajectoryCommandHandlerStepAndHold(TrajectoryCommandHandlerFixedSizes):

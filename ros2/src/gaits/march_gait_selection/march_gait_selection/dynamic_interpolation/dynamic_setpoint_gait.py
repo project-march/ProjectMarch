@@ -40,6 +40,7 @@ class DynamicSetpointGait(GaitInterface):
 
     Attributes:
         gait_selection (GaitSelection): the gait selection node
+        trajectory_command_handler (TrajectoryCommandHandler): the trajectory command handler used to create trajectory commands
         home_stand_position_actuating_joints (Dict[str, float]): joint dict of home stand position for only the
             actuating joints
         home_stand_position_all_joints (Dict[str, float]): joint dict of home stand position for all eight joints
@@ -53,22 +54,25 @@ class DynamicSetpointGait(GaitInterface):
         subgait_id (str): either left_swing or right_swing
         logger (Logger): used to log messages to the terminal with the class name as a prefix
         minimum_stair_height (float): steps higher or lower than this height will be classified as 'stairs-like'
-        _end (bool): whether the gait has ended
+        start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
+        amount_of_steps (int): the amount of steps the gait makes before closing the gait
 
+        _camera_points_handler (CameraPointsHandler): the camera points handler used to handle communication with vision
+        _end (bool): whether the gait has ended
         _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
         _trajectory_failed (bool): True if step is not feasible (e.g. due to soft limits), else False
-        start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
         _should_stop (bool): Set to true if the next subgait should be a close gait
+        _has_gait_started (bool): Whether the start time of the gait has passed
     """
 
     start_time_next_command: Optional[Union[Duration, Time]]
-    _next_command: Optional[TrajectoryCommand]
-    _should_stop: bool
     minimum_stair_height: float
     add_push_off: bool
     amount_of_steps: int
     start_position_all_joints: Dict[str, float]
     start_position_actuating_joints: Dict[str, float]
+    _next_command: Optional[TrajectoryCommand]
+    _should_stop: bool
 
     def __init__(self, gait_selection_node):
         super(DynamicSetpointGait, self).__init__()
@@ -79,7 +83,6 @@ class DynamicSetpointGait(GaitInterface):
             gait=self,
             points_handler=self._camera_points_handler,
         )
-        self._trajectory_failed = False
 
         self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
         self.home_stand_position_all_joints = get_position_from_yaml("stand")
@@ -181,16 +184,14 @@ class DynamicSetpointGait(GaitInterface):
 
         self._should_stop = False
         self._end = False
-        self._trajectory_failed = False
+        self.trajectory_command_handler.set_trajectory_failed_false()
 
         self.start_time_next_command = None
         self._next_command = None
         self.subgait_id = "right_swing"
 
-        self._start_is_delayed = True
+        self._has_gait_started = False
         self._scheduled_early = False
-
-        self._trajectory_failed = False
         self._step_counter = 0
 
         self._set_start_position_to_home_stand()
@@ -240,19 +241,23 @@ class DynamicSetpointGait(GaitInterface):
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        if self._start_is_delayed:
-            if current_time >= self.start_time_next_command:
-                return self._update_start_subgait()
-            else:
-                return GaitUpdate.empty()
+        if current_time >= self.start_time_next_command and not self._has_gait_started:
+            self._has_gait_started = True
+            return self._update_start_subgait()
 
-        if current_time >= self.start_time_next_command - early_schedule_duration and not self._scheduled_early:
+        elif (
+            current_time >= self.start_time_next_command - early_schedule_duration
+            and not self._scheduled_early
+            and self._has_gait_started
+        ):
+            self._scheduled_early = True
             return self._update_next_subgait_early()
 
-        if current_time >= self.start_time_next_command:
+        elif current_time >= self.start_time_next_command:
             return self._update_state_machine()
 
-        return GaitUpdate.empty()
+        else:
+            return GaitUpdate.empty()
 
     def stop(self) -> bool:
         """Called when the current gait should be stopped."""
@@ -269,9 +274,7 @@ class DynamicSetpointGait(GaitInterface):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._start_is_delayed = False
         self._update_time_stamps(self._next_command.duration)
-
         return GaitUpdate.subgait_updated()
 
     def _update_next_subgait_early(self) -> GaitUpdate:
@@ -280,7 +283,6 @@ class DynamicSetpointGait(GaitInterface):
         Returns:
             GaitUpdate: a GaitUpdate that is empty or contains a trajectory command
         """
-        self._scheduled_early = True
         self._next_command = self._set_and_get_next_command()
 
         if self._next_command is None:
@@ -303,14 +305,14 @@ class DynamicSetpointGait(GaitInterface):
         return GaitUpdate.subgait_updated()
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
-        """Create the next command, based on what the current subgait is.
+        """Get the next command, based on what the current subgait is.
 
         Also checks if the gait has to be stopped. If true, it returns a close gait.
 
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
-        if not self._trajectory_failed:
+        if not self.trajectory_command_handler.has_trajectory_failed():
             if self.subgait_id == "right_swing":
                 self.subgait_id = "left_swing"
             elif self.subgait_id == "left_swing":
@@ -386,7 +388,7 @@ class DynamicSetpointGait(GaitInterface):
         if msg.type == GaitInstruction.UNKNOWN:
             self._set_start_position_to_home_stand()
             self.subgait_id = "right_swing"
-            self._trajectory_failed = False
+            self.trajectory_command_handler.set_trajectory_failed_false()
 
     def _set_start_position_to_home_stand(self) -> None:
         """Sets the starting position to home_stand."""

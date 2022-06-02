@@ -34,7 +34,7 @@ class DynamicSetpointGaitStepAndClose(DynamicSetpointGait):
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
-        if not self._trajectory_failed:
+        if not self.trajectory_command_handler.has_trajectory_failed():
             if self.subgait_id == "right_swing":
                 self.subgait_id = "left_swing"
             elif self.subgait_id == "left_swing":

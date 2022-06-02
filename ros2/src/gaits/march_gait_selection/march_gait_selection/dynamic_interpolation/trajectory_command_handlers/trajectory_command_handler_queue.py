@@ -30,7 +30,11 @@ class TrajectoryCommandHandlerQueue(TrajectoryCommandHandler):
         _use_position_queue (bool): True if _position_queue will be used instead of covid points, else False
     """
 
+    subgait_id: str
+    start_position_all_joints: Dict[str, float]
+    foot_location: FootPosition
     _use_position_queue: bool
+    _end: bool
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)

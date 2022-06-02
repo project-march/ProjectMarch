@@ -61,7 +61,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         self.start_time_next_command = None
         self._current_time = None
         self._next_command = None
-        self._start_is_delayed = True
+        self._has_gait_started = False
         self._scheduled_early = False
 
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
@@ -81,19 +81,19 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        if self._start_is_delayed:
-            if current_time >= self.start_time_next_command:
-                return self._update_start_subgait()
-            else:
-                return GaitUpdate.empty()
+        if current_time >= self.start_time_next_command and not self._has_gait_started:
+            self._has_gait_started = True
+            return self._update_start_subgait()
 
-        if current_time >= self.start_time_next_command:
+        elif current_time >= self.start_time_next_command and self._has_gait_started:
+            self._scheduled_early = True
             self._final_position_pub.publish(
                 JointState(position=self.trajectory_command_handler.dynamic_subgait.get_final_position().values())
             )
             return self._update_state_machine()
 
-        return GaitUpdate.empty()
+        else:
+            return GaitUpdate.empty()
 
     def _update_state_machine(self) -> GaitUpdate:
         """Update the state machine that the single single step has finished. Also switches the subgait_id.
@@ -101,7 +101,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if not self._trajectory_failed:
+        if not self.trajectory_command_handler.has_trajectory_failed():
             if self.subgait_id == "right_swing":
                 self.subgait_id = "left_swing"
             elif self.subgait_id == "left_swing":
@@ -121,6 +121,6 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         if msg.type == GaitInstruction.UNKNOWN:
             self._set_start_position_to_home_stand()
             self.subgait_id = "right_swing"
-            self._trajectory_failed = False
+            self.trajectory_command_handler.set_trajectory_failed_false()
             self.position_queue = Queue()
             self.trajectory_command_handler.fill_queue()
