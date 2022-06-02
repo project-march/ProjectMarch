@@ -39,9 +39,8 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         serial_number_ = "944622071535";
     }
 
-    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(n_->get_clock());
-    transform_listener_
-        = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+    tf_buffer_ = std::make_shared<tf2_ros::Buffer>(n_->get_clock());
+    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
     other_frame_id_ = "toes_" + other_side_ + "_aligned";
@@ -95,8 +94,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         = n_->create_subscription<march_shared_msgs::msg::CurrentState>(
             "/march/gait_selection/current_state",
             /*queue_size=*/1, state_callback);
-
-    running_ = false;
 
     foot_gap_ = n_->get_parameter("foot_gap").as_double();
     step_distance_ = n_->get_parameter("step_distance").as_double();
@@ -204,8 +201,6 @@ void FootPositionFinder::readParameters(
     RCLCPP_INFO(n_->get_logger(),
         "Parameters updated in %s foot position finder",
         left_or_right_.c_str());
-
-    running_ = true;
 }
 
 /**
@@ -264,7 +259,6 @@ void FootPositionFinder::resetInitialPosition()
  */
 void FootPositionFinder::processRealSenseDepthFrames()
 {
-    std::cout << "Wait for frames" << std::endl;
     float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
     if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
         frame_wait_counter_++;
@@ -289,8 +283,6 @@ void FootPositionFinder::processRealSenseDepthFrames()
     pointcloud->header.frame_id
         = "camera_front_" + left_or_right_ + "_depth_optical_frame";
 
-        std::cout << "Process frames" << std::endl;
-
     processPointCloud(pointcloud);
 }
 
@@ -314,12 +306,12 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
-    std::cout << "loop start" << std::endl;
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
 
     // Preprocess point cloud and place pointcloud in aligned toes frame:
-    Preprocessor preprocessor(n_, pointcloud, left_or_right_);
+    Preprocessor preprocessor(
+        n_, pointcloud, left_or_right_, tf_listener_, tf_buffer_);
     preprocessor.preprocess();
 
     // Publish cloud for visualization:
@@ -328,7 +320,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Find possible points around the desired point determined earlier:
     PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point_);
-
 
     std::vector<Point> position_queue;
     pointFinder.findPoints(&position_queue);
@@ -340,8 +331,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
     publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
         left_or_right_); // Purple
-
-        std::cout << "loop end" << std::endl;
 
     if (position_queue.size() > 0) {
         // Take the first point of the point queue returned by the point finder
@@ -379,8 +368,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPoint(point_publisher_, n_, found_covid_point_,
             found_covid_point_, new_displacement_, track_points);
     }
-
-    std::cout << "loop end 2" << std::endl;
 }
 
 /**
@@ -389,19 +376,13 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
  */
 Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 {
-    std::cout << sample_size_ << std::endl;
-
     if (found_points_.size() < sample_size_) {
-        std::cout << "start" << std::endl;
         found_points_.push_back(new_point);
-        std::cout << "end" << std::endl;
     } else {
-        std::cout << "start2" << std::endl;
         std::rotate(found_points_.begin(), found_points_.begin() + 1,
             found_points_.end());
         found_points_[sample_size_ - 1] = new_point;
         Point avg = computeAveragePoint(found_points_);
-        std::cout << "A" << std::endl;
 
         std::vector<Point> non_outliers;
         for (Point& p : found_points_) {
@@ -409,14 +390,11 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
                 non_outliers.push_back(p);
             }
         }
-        std::cout << "A" << std::endl;
 
         if (non_outliers.size() == sample_size_) {
             Point final_point = computeAveragePoint(non_outliers);
-            std::cout << "B" << std::endl;
             return final_point;
         }
-        std::cout << "A" << std::endl;
     }
 }
 

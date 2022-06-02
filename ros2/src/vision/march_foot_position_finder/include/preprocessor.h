@@ -16,7 +16,9 @@ using NormalCloud = pcl::PointCloud<pcl::Normal>;
 class Preprocessor {
 public:
     explicit Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-        std::string& left_or_right);
+        std::string& left_or_right,
+        std::shared_ptr<tf2_ros::TransformListener>& listener,
+        std::shared_ptr<tf2_ros::Buffer>& buffer);
 
     void preprocess();
 
@@ -31,8 +33,8 @@ protected:
     void transformPointCloudToBaseframe();
 
     rclcpp::Node* n_;
-    std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+    std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };
+    std::shared_ptr<tf2_ros::Buffer> tf_buffer_ { nullptr };
 
     PointCloud::Ptr pointcloud_;
 

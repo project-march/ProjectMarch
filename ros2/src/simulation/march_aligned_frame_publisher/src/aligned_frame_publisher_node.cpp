@@ -1,7 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include <tf2_ros/buffer.h>
-#include <tf2_ros/transform_listener.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/transform_listener.h>
 
 using TransformStamped = geometry_msgs::msg::TransformStamped;
 
@@ -14,19 +14,14 @@ public:
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
         transform_listener_
             = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
-        tf_broadcaster_ =
-            std::make_unique<tf2_ros::TransformBroadcaster>(*this); 
-
-        // last_published_left_ = rclcpp::Time(0.0);
-        // last_published_right_ = rclcpp::Time(0.0);
+        tf_broadcaster_
+            = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
             
         publish_timer_ = this->create_wall_timer(
-        std::chrono::milliseconds(10), [this]() -> void {
-            publishAlignedFrames();
-        });
+            std::chrono::milliseconds(10), [this]() -> void {
+                publishAlignedFrames();
+            });
     }
-
-
 
 private:
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -43,9 +38,9 @@ private:
     rclcpp::Time last_published_right_;
     bool start_time_initialized = false;
 
+    void publishAlignedFrames()
+    {
 
-    void publishAlignedFrames() {
-        
         using namespace geometry_msgs::msg;
 
         try {
@@ -61,11 +56,11 @@ private:
             }
 
         } catch (tf2::TransformException& ex) {
-            RCLCPP_WARN(this->get_logger(), "Could not compute aligned frames: %s", ex.what());
             return;
         }
 
-        if (rclcpp::Time(trans_left_.header.stamp) > rclcpp::Time(last_published_left_)) {
+        if (rclcpp::Time(trans_left_.header.stamp)
+            > rclcpp::Time(last_published_left_)) {
             // Transformation from left foot to left toes
             TransformStamped tr1;
             tr1.header.stamp = trans_left_.header.stamp;
@@ -88,7 +83,8 @@ private:
             last_published_left_ = trans_left_.header.stamp;
         }
 
-        if (rclcpp::Time(trans_right_.header.stamp) > rclcpp::Time(last_published_right_)) {
+        if (rclcpp::Time(trans_right_.header.stamp)
+            > rclcpp::Time(last_published_right_)) {
             // Transformation from right foot to right toes
             TransformStamped tr3;
             tr3.header.stamp = trans_right_.header.stamp;
@@ -108,23 +104,17 @@ private:
             tr4.transform.rotation = trans_right_.transform.rotation;
             tf_broadcaster_->sendTransform(tr4);
 
-        last_published_right_ = trans_right_.header.stamp;
-
+            last_published_right_ = trans_right_.header.stamp;
         }
     }
-
 };
 
-
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
 
     rclcpp::executors::MultiThreadedExecutor exec;
     auto node = std::make_shared<AlignedFramePublisherNode>();
-
-    // rclcpp::Parameter simTime( "use_sim_time", rclcpp::ParameterValue( true ) );
-    // node.set_parameter( simTime );
 
     exec.add_node(node);
     exec.spin();

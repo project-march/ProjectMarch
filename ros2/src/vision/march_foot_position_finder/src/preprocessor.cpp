@@ -27,16 +27,18 @@ using NormalCloud = pcl::PointCloud<Normal>;
  */
 // Suppress lint error: "fields are not initialized by constructor"
 // NOLINTNEXTLINE
-Preprocessor::Preprocessor(
-    rclcpp::Node* n, PointCloud::Ptr pointcloud, std::string& left_or_right)
+Preprocessor::Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
+    std::string& left_or_right,
+    std::shared_ptr<tf2_ros::TransformListener>& listener,
+    std::shared_ptr<tf2_ros::Buffer>& buffer)
     : pointcloud_ { std::move(pointcloud) }
-    , n_{ n }
-    {
-    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(n->get_clock());
-    transform_listener_
-        = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+    , n_ { n }
+    , tf_buffer_ { buffer }
+    , tf_listener_ { listener }
+{
 
     base_frame_ = "toes_" + left_or_right + "_aligned";
+    pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
 }
 
 /**
@@ -67,30 +69,23 @@ void Preprocessor::voxelDownSample(float voxel_size)
  */
 void Preprocessor::transformPointCloudToBaseframe()
 {
-    std::cout << "start" << std::endl;
+
     try {
         transform_ = tf_buffer_->lookupTransform(
             base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
 
-            std::cout << "start" << std::endl;
-
         Eigen::Matrix<double, 3, 1> translation;
         Eigen::Quaternion<double> rotation;
-
-        std::cout << "start" << std::endl;
 
         tf2::fromMsg(transform_.transform.translation, translation);
         tf2::fromMsg(transform_.transform.rotation, rotation);
 
-        std::cout << "start" << std::endl;
-
-        pcl::transformPointCloud(*pointcloud_, *pointcloud_, translation, rotation);
+        pcl::transformPointCloud(
+            *pointcloud_, *pointcloud_, translation, rotation);
         pointcloud_->header.frame_id = base_frame_;
 
-        std::cout << "start" << std::endl;
-
     } catch (tf2::TransformException& ex) {
-        RCLCPP_WARN(n_->get_logger(), "Could not transform pointcloud: %s", ex.what());
+        RCLCPP_WARN(
+            n_->get_logger(), "Could not transform pointcloud: %s", ex.what());
     }
-    std::cout << "end" << std::endl;
 }

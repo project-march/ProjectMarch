@@ -54,7 +54,7 @@ void publishCloud(const PointCloudPublisher::SharedPtr publisher,
     } else {
         msg.header.frame_id = "toes_left_aligned";
     }
-    msg.header.stamp = n->get_clock()->now();
+    msg.header.stamp = n->now();
     publisher->publish(msg);
 }
 
@@ -69,7 +69,7 @@ void publishMarkerPoint(const MarkerPublisher::SharedPtr publisher,
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->get_clock()->now();
+    marker.header.stamp = n->now();
 
     marker.ns = "found_points";
     marker.id = 0;

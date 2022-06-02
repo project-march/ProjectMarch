@@ -3,7 +3,8 @@ from launch import LaunchDescription
 import os
 from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
+from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 
 
@@ -11,6 +12,12 @@ def generate_launch_description() -> LaunchDescription:
     """Todo: Add docstring."""
     return LaunchDescription(
         [
+            DeclareLaunchArgument(
+                "use_sim_time",
+                default_value="true",
+                description="Whether to use simulation time as published on the "
+                "/clock topic by gazebo instead of system time.",
+            ),
             DeclareLaunchArgument(
                 "foot_gap",
                 default_value="0.25",
@@ -103,9 +110,8 @@ def generate_launch_description() -> LaunchDescription:
                 namespace="march",
                 output="screen",
                 respawn=True,
-                emulate_tty=True,
-                arguments=[('__log_level:=debug')],
                 parameters=[
+                    {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"foot_gap": LaunchConfiguration("foot_gap")},
                     {"step_distance": LaunchConfiguration("step_distance")},
                     {"outlier_distance": LaunchConfiguration("outlier_distance")},

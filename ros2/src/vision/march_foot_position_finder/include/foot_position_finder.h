@@ -125,8 +125,8 @@ protected:
     Point new_displacement_;
     Point found_covid_point_;
 
-    std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+    std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };
+    std::shared_ptr<tf2_ros::Buffer> tf_buffer_ { nullptr };
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H
