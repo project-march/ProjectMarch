@@ -447,6 +447,15 @@ def generate_launch_description() -> LaunchDescription:
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(
+                        get_package_share_directory("march_aligned_frame_publisher"),
+                        "launch",
+                        "march_aligned_frame_publisher.launch.py",
+                    )
+                )
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
                         get_package_share_directory("march_robot_information"),
                         "launch",
                         "robot_information.launch.py",

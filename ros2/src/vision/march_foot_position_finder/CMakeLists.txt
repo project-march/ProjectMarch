@@ -27,7 +27,6 @@ find_package(std_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
-find_package(march_utility REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(PCL 1.7 REQUIRED COMPONENTS)
 find_package(tf2 REQUIRED)
@@ -43,14 +42,14 @@ add_library(${PROJECT_NAME}
     src/foot_position_finder.cpp
 )
 
-ament_target_dependencies(${PROJECT_NAME} tf2 tf2_ros rclcpp sensor_msgs std_msgs march_shared_msgs march_utility realsense2 pcl_conversions geometry_msgs visualization_msgs)
+ament_target_dependencies(${PROJECT_NAME} tf2 tf2_ros rclcpp sensor_msgs std_msgs march_shared_msgs realsense2 pcl_conversions geometry_msgs visualization_msgs)
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
 
 add_executable(${PROJECT_NAME}_node src/foot_position_finder_node.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node tf2 tf2_ros rclcpp sensor_msgs std_msgs march_shared_msgs march_utility realsense2 pcl_conversions geometry_msgs visualization_msgs)
+ament_target_dependencies(${PROJECT_NAME}_node tf2 tf2_ros rclcpp sensor_msgs std_msgs march_shared_msgs realsense2 pcl_conversions geometry_msgs visualization_msgs)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}_node PUBLIC

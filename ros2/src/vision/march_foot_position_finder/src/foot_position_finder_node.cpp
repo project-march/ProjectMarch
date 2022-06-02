@@ -66,6 +66,5 @@ int main(int argc, char** argv)
     exec.spin();
 
     rclcpp::shutdown();
-
     return 0;
 }

@@ -102,6 +102,9 @@ def generate_launch_description() -> LaunchDescription:
                 name="march_foot_position_finder",
                 namespace="march",
                 output="screen",
+                respawn=True,
+                emulate_tty=True,
+                arguments=[('__log_level:=debug')],
                 parameters=[
                     {"foot_gap": LaunchConfiguration("foot_gap")},
                     {"step_distance": LaunchConfiguration("step_distance")},

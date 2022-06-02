@@ -379,6 +379,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPoint(point_publisher_, n_, found_covid_point_,
             found_covid_point_, new_displacement_, track_points);
     }
+
+    std::cout << "loop end 2" << std::endl;
 }
 
 /**
