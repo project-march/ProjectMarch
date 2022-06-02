@@ -15,8 +15,10 @@ public:
         transform_listener_
             = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
         tf_broadcaster_ =
-            std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+            std::make_unique<tf2_ros::TransformBroadcaster>(*this); 
 
+        // last_published_left_ = rclcpp::Time(0.0);
+        // last_published_right_ = rclcpp::Time(0.0);
             
         publish_timer_ = this->create_wall_timer(
         std::chrono::milliseconds(10), [this]() -> void {
@@ -37,7 +39,9 @@ private:
 
     TransformStamped trans_left_;
     TransformStamped trans_right_;
-    
+    rclcpp::Time last_published_left_;
+    rclcpp::Time last_published_right_;
+    bool start_time_initialized = false;
 
 
     void publishAlignedFrames() {
@@ -49,48 +53,64 @@ private:
                 "foot_left", "world", tf2::TimePointZero);
             trans_right_ = tf_buffer_->lookupTransform(
                 "foot_right", "world", tf2::TimePointZero);
+
+            if (!start_time_initialized) {
+                last_published_left_ = trans_left_.header.stamp;
+                last_published_right_ = trans_right_.header.stamp;
+                start_time_initialized = true;
+            }
+
         } catch (tf2::TransformException& ex) {
             RCLCPP_WARN(this->get_logger(), "Could not compute aligned frames: %s", ex.what());
             return;
         }
-        
-        // Transformation from left foot to left toes
-        TransformStamped tr1;
-        tr1.header.stamp = this->get_clock()->now();
-        tr1.header.frame_id = "foot_left";
-        tr1.child_frame_id = "toes_left";
-        tr1.transform.translation.x = -FOOT_LENGTH;
-        tr1.transform.translation.y = 0.0;
-        tr1.transform.translation.z = -0.025;
-        tr1.transform.rotation = Quaternion();
-        tf_broadcaster_->sendTransform(tr1);
 
-        // Transformation from left toes to left aligned
-        TransformStamped tr2;
-        tr2.header.stamp = this->get_clock()->now();
-        tr2.header.frame_id = "toes_left";
-        tr2.child_frame_id = "toes_left_aligned";
-        tr2.transform.rotation = trans_left_.transform.rotation;
-        tf_broadcaster_->sendTransform(tr2);
+        if (rclcpp::Time(trans_left_.header.stamp) > rclcpp::Time(last_published_left_)) {
+            // Transformation from left foot to left toes
+            TransformStamped tr1;
+            tr1.header.stamp = trans_left_.header.stamp;
+            tr1.header.frame_id = "foot_left";
+            tr1.child_frame_id = "toes_left";
+            tr1.transform.translation.x = -FOOT_LENGTH;
+            tr1.transform.translation.y = 0.0;
+            tr1.transform.translation.z = -0.025;
+            tr1.transform.rotation = Quaternion();
+            tf_broadcaster_->sendTransform(tr1);
 
-        // Transformation from right foot to right toes
-        TransformStamped tr3;
-        tr3.header.stamp = this->get_clock()->now();
-        tr3.header.frame_id = "foot_right";
-        tr3.child_frame_id = "toes_right";
-        tr3.transform.translation.x = -FOOT_LENGTH;
-        tr3.transform.translation.y = 0.0;
-        tr3.transform.translation.z = -0.025;
-        tr3.transform.rotation = Quaternion();
-        tf_broadcaster_->sendTransform(tr3);
+            // Transformation from left toes to left aligned
+            TransformStamped tr2;
+            tr2.header.stamp = trans_left_.header.stamp;
+            tr2.header.frame_id = "toes_left";
+            tr2.child_frame_id = "toes_left_aligned";
+            tr2.transform.rotation = trans_left_.transform.rotation;
+            tf_broadcaster_->sendTransform(tr2);
 
-        // Transformation from right toes to right aligned
-        TransformStamped tr4;
-        tr4.header.stamp = this->get_clock()->now();
-        tr4.header.frame_id = "toes_right";
-        tr4.child_frame_id = "toes_right_aligned";
-        tr4.transform.rotation = trans_right_.transform.rotation;
-        tf_broadcaster_->sendTransform(tr4);
+            last_published_left_ = trans_left_.header.stamp;
+        }
+
+        if (rclcpp::Time(trans_right_.header.stamp) > rclcpp::Time(last_published_right_)) {
+            // Transformation from right foot to right toes
+            TransformStamped tr3;
+            tr3.header.stamp = trans_right_.header.stamp;
+            tr3.header.frame_id = "foot_right";
+            tr3.child_frame_id = "toes_right";
+            tr3.transform.translation.x = -FOOT_LENGTH;
+            tr3.transform.translation.y = 0.0;
+            tr3.transform.translation.z = -0.025;
+            tr3.transform.rotation = Quaternion();
+            tf_broadcaster_->sendTransform(tr3);
+
+            // Transformation from right toes to right aligned
+            TransformStamped tr4;
+            tr4.header.stamp = trans_right_.header.stamp;
+            tr4.header.frame_id = "toes_right";
+            tr4.child_frame_id = "toes_right_aligned";
+            tr4.transform.rotation = trans_right_.transform.rotation;
+            tf_broadcaster_->sendTransform(tr4);
+
+        last_published_right_ = trans_right_.header.stamp;
+
+        }
     }
 
 };
@@ -102,6 +122,10 @@ int main(int argc, char ** argv)
 
     rclcpp::executors::MultiThreadedExecutor exec;
     auto node = std::make_shared<AlignedFramePublisherNode>();
+
+    // rclcpp::Parameter simTime( "use_sim_time", rclcpp::ParameterValue( true ) );
+    // node.set_parameter( simTime );
+
     exec.add_node(node);
     exec.spin();
 
