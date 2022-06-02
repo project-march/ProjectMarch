@@ -1,29 +1,25 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
+#include <march_gazebo_plugins/walk_controller.h>
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 
 
 namespace gazebo {
-class TestPlugin : public ModelPlugin {
+class ComControllerPlugin : public ModelPlugin {
 public:
     void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
-    
-    // Called by the world update start event
     void onUpdate();
 
-    int counter;
-
 private:
-    physics::ModelPtr model;
-
-    // Pointer to the update event connection
+    physics::ModelPtr model_;
     event::ConnectionPtr update_connection_;
+    std::unique_ptr<ObstacleController> controller_;
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_MODEL_PLUGIN(TestPlugin)
+GZ_REGISTER_MODEL_PLUGIN(ComControllerPlugin)
 } // namespace gazebo
 
 #endif // MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H

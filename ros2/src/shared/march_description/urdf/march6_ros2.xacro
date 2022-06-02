@@ -33,11 +33,6 @@
         </gazebo>
     </xacro:if>
 
-    <!-- Temporarily load the plugin also if ground_gait is false -->
-    <gazebo>
-        <plugin name="com_controller_plugin" filename="libmarch_gazebo_plugins.so"/>
-    </gazebo>
-
     <xacro:arg name="configuration" default="exoskeleton"/>
     <xacro:property name="configuration" value="$(arg configuration)"/>
 
