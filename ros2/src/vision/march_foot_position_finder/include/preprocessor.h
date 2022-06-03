@@ -19,12 +19,12 @@ public:
         std::shared_ptr<tf2_ros::TransformListener>& listener,
         std::shared_ptr<tf2_ros::Buffer>& buffer);
 
-    void preprocess(PointCloud::Ptr pointcloud);
+    void preprocess(const PointCloud::Ptr& pointcloud);
 
 protected:
-    void voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size);
+    void voxelDownSample(const PointCloud::Ptr& pointcloud, float voxel_size);
 
-    void transformPointCloudToBaseframe(PointCloud::Ptr pointcloud);
+    void transformPointCloudToBaseframe(const PointCloud::Ptr& pointcloud);
 
     rclcpp::Node* n_;
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };

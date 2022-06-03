@@ -42,7 +42,7 @@ inline geometry_msgs::msg::Point to_geometry(Point p)
  * @param publisher publisher to use
  * @param cloud cloud to publish
  */
-void publishCloud(const PointCloudPublisher::SharedPtr publisher,
+void publishCloud(const PointCloudPublisher::SharedPtr& publisher,
     rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
 {
     cloud.width = 1;
@@ -64,7 +64,7 @@ void publishCloud(const PointCloudPublisher::SharedPtr publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishMarkerPoint(const MarkerPublisher::SharedPtr publisher,
+void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -93,12 +93,12 @@ void publishMarkerPoint(const MarkerPublisher::SharedPtr publisher,
     marker.color.g = 0.0;
     marker.color.b = 0.0;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
     publisher->publish(marker);
 }
 
-void publishArrow(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
+void publishArrow(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
     const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -122,7 +122,7 @@ void publishArrow(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
     marker.color.g = 0.0;
     marker.color.b = 1.0;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3);
 
     marker.points.push_back(to_geometry(p1));
     marker.points.push_back(to_geometry(p2));
@@ -130,7 +130,7 @@ void publishArrow(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
     publisher->publish(marker);
 }
 
-void publishArrow2(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
+void publishArrow2(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
     const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -154,7 +154,7 @@ void publishArrow2(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
     marker.color.g = 1.0;
     marker.color.b = 0.0;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
     marker.points.push_back(to_geometry(p1));
     marker.points.push_back(to_geometry(p2));
@@ -168,7 +168,7 @@ void publishArrow2(const MarkerPublisher::SharedPtr publisher, rclcpp::Node* n,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr publisher,
+void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -197,7 +197,7 @@ void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr publisher,
     marker.color.g = 0.0;
     marker.color.b = 1.0;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
     publisher->publish(marker);
 }
@@ -208,7 +208,7 @@ void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishDesiredPosition(const MarkerPublisher::SharedPtr publisher,
+void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -237,7 +237,7 @@ void publishDesiredPosition(const MarkerPublisher::SharedPtr publisher,
     marker.color.g = 1.0;
     marker.color.b = 0.0;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
     publisher->publish(marker);
 }
@@ -251,7 +251,7 @@ void publishDesiredPosition(const MarkerPublisher::SharedPtr publisher,
  * @param p3 vertex of rectangle
  * @param p4 vertex of rectangle
  */
-void publishSearchRectangle(const MarkerPublisher::SharedPtr publisher,
+void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, Point& p, std::vector<double> dis,
     const std::string& left_or_right)
 {
@@ -293,7 +293,7 @@ void publishSearchRectangle(const MarkerPublisher::SharedPtr publisher,
     marker.color.g = 1.0;
     marker.color.b = 0.8;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
     publisher->publish(marker);
 }
@@ -304,7 +304,7 @@ void publishSearchRectangle(const MarkerPublisher::SharedPtr publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-void publishPossiblePoints(const MarkerPublisher::SharedPtr publisher,
+void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -328,7 +328,7 @@ void publishPossiblePoints(const MarkerPublisher::SharedPtr publisher,
     marker.color.g = 0.75;
     marker.color.b = 0.25;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.2);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.2, /*nanoseconds=*/0);
 
     publisher->publish(marker);
 }
@@ -339,7 +339,7 @@ void publishPossiblePoints(const MarkerPublisher::SharedPtr publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr publisher,
+void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -363,7 +363,7 @@ void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr publisher,
     marker.color.r = 1.0;
     marker.color.g = 0.5;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*t=*/0.2);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.2, /*nanoseconds=*/0);
 
     publisher->publish(marker);
 }
@@ -377,7 +377,7 @@ void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr publisher,
  * step
  */
 void publishPoint(
-    const rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr
+    const rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr&
         publisher,
     rclcpp::Node* n, Point& p, Point& p_world, Point& displacement,
     const std::vector<Point>& track_points)

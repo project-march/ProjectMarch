@@ -52,7 +52,7 @@ protected:
     void processSimulatedDepthFrames(
         const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
 
-    void processPointCloud(PointCloud::Ptr pointcloud);
+    void processPointCloud(const PointCloud::Ptr& pointcloud);
 
     Point computeTemporalAveragePoint(const Point& new_point);
 

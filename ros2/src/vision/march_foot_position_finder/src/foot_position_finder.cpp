@@ -60,19 +60,19 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 
     point_publisher_
         = n_->create_publisher<march_shared_msgs::msg::FootPosition>(
-            "/march/foot_position/" + left_or_right_, /*queue_size=*/1);
+            "/march/foot_position/" + left_or_right_, /*qos=*/1);
     preprocessed_pointcloud_publisher_
         = n_->create_publisher<sensor_msgs::msg::PointCloud2>(
             "/camera_" + left_or_right_ + "/preprocessed_cloud",
-            /*queue_size=*/1);
+            /*qos=*/1);
     point_marker_publisher_
         = n_->create_publisher<visualization_msgs::msg::Marker>(
-            "/camera_" + left_or_right_ + "/found_points", /*queue_size=*/1);
+            "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
 
     other_chosen_point_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
             topic_other_chosen_point_,
-            /*queue_size=*/1,
+            /*qos=*/1,
             std::bind(&FootPositionFinder::chosenOtherPointCallback, this,
                 std::placeholders::_1));
 
@@ -84,7 +84,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     other_chosen_point_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
             topic_other_chosen_point_,
-            /*queue_size=*/1, point_callback);
+            /*qos=*/1, point_callback);
 
     std::function<void(
         const march_shared_msgs::msg::CurrentState::SharedPtr msg)>
@@ -93,7 +93,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     current_state_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::CurrentState>(
             "/march/gait_selection/current_state",
-            /*queue_size=*/1, state_callback);
+            /*qos=*/1, state_callback);
 
     foot_gap_ = n_->get_parameter("foot_gap").as_double();
     step_distance_ = n_->get_parameter("step_distance").as_double();
@@ -142,7 +142,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         pointcloud_subscriber_
             = n_->create_subscription<sensor_msgs::msg::PointCloud2>(
                 topic_camera_front_,
-                /*queue_size=*/1, callback);
+                /*qos=*/1, callback);
 
         RCLCPP_INFO(n_->get_logger(),
             "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m",
@@ -167,7 +167,7 @@ void FootPositionFinder::readParameters(
         } else if (param.get_name() == "step_distance") {
             step_distance_ = param.as_double();
         } else if (param.get_name() == "sample_size") {
-            sample_size_ = param.as_double();
+            sample_size_ = param.as_int();
         } else if (param.get_name() == "outlier_distance") {
             outlier_distance_ = param.as_double();
         } else if (param.get_name() == "height_zero_threshold") {
@@ -301,7 +301,7 @@ void FootPositionFinder::processSimulatedDepthFrames(
  *
  * @param pointcloud Pointcloud to find points in.
  */
-void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
+void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;

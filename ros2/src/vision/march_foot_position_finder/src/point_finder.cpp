@@ -192,7 +192,7 @@ void PointFinder::findPoints(PointCloud::Ptr pointcloud, Point& step_point,
  *
  * @param pointcloud Pointcloud pointer where points will be found.
  */
-void PointFinder::mapPointCloudToHeightMap(PointCloud::Ptr pointcloud)
+void PointFinder::mapPointCloudToHeightMap(const PointCloud::Ptr& pointcloud)
 {
     std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
 

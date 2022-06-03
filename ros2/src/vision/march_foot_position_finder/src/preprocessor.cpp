@@ -43,7 +43,7 @@ Preprocessor::Preprocessor(rclcpp::Node* n, std::string& left_or_right,
  *
  * @param pointcloud Pointcloud to preprocess.
  */
-void Preprocessor::preprocess(PointCloud::Ptr pointcloud)
+void Preprocessor::preprocess(const PointCloud::Ptr& pointcloud)
 {
     transformPointCloudToBaseframe(pointcloud);
 }
@@ -54,7 +54,8 @@ void Preprocessor::preprocess(PointCloud::Ptr pointcloud)
  * @param pointcloud Pointcloud to downsample.
  * @param voxel_size cell size of the voxel grid
  */
-void Preprocessor::voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size)
+void Preprocessor::voxelDownSample(
+    const PointCloud::Ptr& pointcloud, float voxel_size)
 {
     pcl::VoxelGrid<Point> voxel_grid;
     voxel_grid.setInputCloud(pointcloud);
@@ -68,7 +69,8 @@ void Preprocessor::voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size)
  *
  * @param pointcloud Pointcloud to transform.
  */
-void Preprocessor::transformPointCloudToBaseframe(PointCloud::Ptr pointcloud)
+void Preprocessor::transformPointCloudToBaseframe(
+    const PointCloud::Ptr& pointcloud)
 {
     pointcloud_frame_id_ = pointcloud->header.frame_id.c_str();
     try {

@@ -86,7 +86,7 @@ protected:
 
     void initializeSearchDimensions(Point& step_point);
 
-    void mapPointCloudToHeightMap(PointCloud::Ptr pointcloud);
+    void mapPointCloudToHeightMap(const PointCloud::Ptr& pointcloud);
 
     void publishHeightMap();
 
