@@ -12,7 +12,9 @@
   <depend>gazebo</depend>
   <depend>gazebo_ros</depend>
   <depend>march_shared_msgs</depend>
+  <depend>yaml-cpp</depend>
   <depend>rclcpp</depend>
+  <depend>ament_index_cpp</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
 

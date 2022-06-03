@@ -1,9 +1,8 @@
 // Copyright 2019 Project March.
 
-#include "yaml-cpp/yaml.h"
-#include <gazebo/physics/physics.hh>
 #include <march_gazebo_plugins/walk_controller.h>
-#include <utility>
+#include "yaml-cpp/yaml.h"
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 namespace gazebo {
 WalkController::WalkController(physics::ModelPtr model)
@@ -12,8 +11,7 @@ WalkController::WalkController(physics::ModelPtr model)
     swing_step_size_ = 0.7; // This estimate will be adjusted every step
 
     // Get the values from the configuration file
-    std::string path = "/home/jelmer/march/ros2/src/simulation/march_gazebo_plugins/config/com_levels.yaml";
-    //TODO: Get path with ROS, instead of hardcoding.
+    std::string path = ament_index_cpp::get_package_share_directory("march_gazebo_plugins") + "/config/com_levels.yaml";
     com_levels_tree = YAML::LoadFile(path);
 
     for (YAML::const_iterator it = com_levels_tree.begin();
