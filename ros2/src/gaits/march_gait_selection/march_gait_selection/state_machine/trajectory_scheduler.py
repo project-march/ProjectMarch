@@ -1,19 +1,23 @@
 """Author: ???."""
 
 from __future__ import annotations
-from typing import List
+
+from queue import LifoQueue
+from typing import List, Set
 
 from attr import dataclass
+
+from control_msgs.action._follow_joint_trajectory import FollowJointTrajectory_GetResult_Response
+from rclpy import Future
+from rclpy.action import ActionClient
+from rclpy.action.client import ClientGoalHandle
+
+from control_msgs.action import FollowJointTrajectory
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from rclpy.node import Node
-from std_msgs.msg import Header
-from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
-    FollowJointTrajectoryGoal,
-    FollowJointTrajectoryActionGoal,
-    FollowJointTrajectoryActionResult,
     FollowJointTrajectoryResult,
 )
 from trajectory_msgs.msg import JointTrajectory
@@ -75,42 +79,22 @@ class TrajectoryScheduler:
             "march/controller/trajectory/follow_joint_trajectory/result. Receives the errors
         _trajectory_command_pub (Publisher): publishes JointTrajectory messages on
             /march/controller/trajectory/command
+
+        For more information on the Action client see these pages:
+            * https://docs.ros.org/en/foxy/Tutorials/Understanding-ROS2-Actions.html?highlight=action
+            * https://docs.ros.org/en/foxy/Tutorials/Actions/Creating-an-Action.html
+            * https://docs.ros.org/en/foxy/Tutorials/Actions/Writing-a-Py-Action-Server-Client.html
     """
 
     def __init__(self, node: Node):
         self._failed = False
         self._node = node
-        self._goals: List[TrajectoryCommand] = []
+        self._active_goals = LifoQueue()
+        self._messages_in_transit: Set[Future] = set()
         self._logger = node.get_logger().get_child(__class__.__name__)
-
-        # Temporary solution to communicate with ros1 action server, should
-        # be updated to use ros2 action implementation when simulation is
-        # migrated to ros2
-        self._trajectory_goal_pub = self._node.create_publisher(
-            msg_type=FollowJointTrajectoryActionGoal,
-            topic="/march/controller/trajectory/follow_joint_trajectory/goal",
-            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
-        )
-
-        self._cancel_pub = self._node.create_publisher(
-            msg_type=GoalID,
-            topic="/march/controller/trajectory/follow_joint_trajectory/cancel",
-            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
-        )
-
-        self._trajectory_goal_result_sub = self._node.create_subscription(
-            msg_type=FollowJointTrajectoryActionResult,
-            topic="/march/controller/trajectory/follow_joint_trajectory/result",
-            callback=self._done_cb,
-            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
-        )
-
-        # Publisher for sending hold position mode
-        self._trajectory_command_pub = self._node.create_publisher(
-            msg_type=JointTrajectory,
-            topic="/march/controller/trajectory/command",
-            qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
-        )
+        self._schedule_timeout = node.get_parameter("early_schedule_duration").get_parameter_value().double_value
+        self._action_client = ActionClient(self._node, FollowJointTrajectory,
+                                           "/joint_trajectory_controller/follow_joint_trajectory")
 
     def schedule(self, command: TrajectoryCommand) -> None:
         """Schedules a new trajectory.
@@ -119,38 +103,50 @@ class TrajectoryScheduler:
             command (TrajectoryCommand): The trajectory command to schedule
         """
         self._failed = False
-        stamp = command.start_time.to_msg()
-        command.trajectory.header.stamp = stamp
-        goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
-        self._trajectory_goal_pub.publish(
-            FollowJointTrajectoryActionGoal(
-                header=Header(stamp=stamp),
-                goal_id=GoalID(stamp=stamp, id=str(command)),
-                goal=goal,
-            )
-        )
-        info_log_message = f"Scheduling {command.name}"
-        debug_log_message = f"Subgait {command.name} starts "
-        if self._node.get_clock().now() < command.start_time:
-            time_difference = Duration.from_ros_duration(command.start_time - self._node.get_clock().now())
-            debug_log_message += f"in {round(time_difference.seconds, 3)}s"
-        else:
-            debug_log_message += "now"
+        goal_msg = FollowJointTrajectory.Goal()
+        command.trajectory.header.stamp = command.start_time.to_msg()  # To set early scheduling
+        goal_msg.trajectory = command.trajectory
+        if not self._action_client.wait_for_server(self._schedule_timeout):
+            self._logger.warn(f"Failed to schedule trajectory {command} within {self._schedule_timeout} seconds")
+            return
 
-        self._goals.append(command)
-        self._logger.info(info_log_message)
-        self._logger.debug(debug_log_message)
+        goal_future: Future = self._action_client.send_goal_async(goal_msg)
+        goal_future.add_done_callback(self._gait_executor_start_request_cb)
+        self._messages_in_transit.add(goal_future)
+
+    def _gait_executor_start_request_cb(self, future: Future):
+        self._messages_in_transit.remove(future)
+        gait_executor_response_goal_handle: ClientGoalHandle = future.result()
+        if not gait_executor_response_goal_handle.accepted:
+            self._logger.warning("Goal message to execute gait was not accepted by the Action server (e.g. gazebo). "
+                                 f"Goal: {gait_executor_response_goal_handle}")
+            return
+
+        self._active_goals.put(future)
+        self._logger.info(f"Goal message to execute gait is accepted.")
+        gait_execution_result_future: Future = gait_executor_response_goal_handle.get_result_async()
+        gait_execution_result_future.add_done_callback(self._gait_executor_finished_cb)
+
+    def _gait_executor_finished_cb(self, future: Future):
+        """
+
+        Args:
+            future (Future[FollowJointTrajectory_GetResult_Response]):
+
+        Returns:
+
+        """
+        result: FollowJointTrajectoryResult = future.result().result
+        if result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
+            self._logger.warning(f"Failed to execute trajectory: {result.error_string}")
+            self._failed = True
 
     def cancel_active_goals(self) -> None:
         """Cancels the active goal."""
-        now = self._node.get_clock().now()
-        for goal in self._goals:
-            if goal.start_time + goal.duration > now:
-                self._cancel_pub.publish(GoalID(stamp=goal.start_time.to_msg(), id=str(goal)))
-
-    def send_position_hold(self) -> None:
-        """Schedule empty JointTrajectory message to hold position. Used during force unknown."""
-        self._trajectory_command_pub.publish(JointTrajectory())
+        for msg in self._messages_in_transit:
+            msg.cancel()
+        while not self._active_goals.empty():
+            self._active_goals.get().result().cancel_goal_async()
 
     def failed(self) -> bool:
         """Returns true if the trajectory failed."""
@@ -159,12 +155,5 @@ class TrajectoryScheduler:
     def reset(self) -> None:
         """Reset attributes of class."""
         self._failed = False
-        self._goals = []
-
-    def _done_cb(self, result) -> None:
-        """Callback for when a result is published."""
-        if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            self._logger.error(
-                f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
-            )
-            self._failed = True
+        self._active_goals = LifoQueue()
+        self._messages_in_transit.clear()

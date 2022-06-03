@@ -546,7 +546,6 @@ class GaitStateMachine:
     def _transition_to_unknown(self) -> None:
         """When the unknown button is pressed, this function resets the state machine to unknown state."""
         if self._current_gait is not None:
-            self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
         self._current_state = UnknownEdgePosition()
         self._logger.info("Transitioned to unknown")
