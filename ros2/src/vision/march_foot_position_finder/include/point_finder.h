@@ -21,12 +21,15 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class PointFinder {
 public:
-    explicit PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-        std::string left_or_right, Point& step_point);
+    explicit PointFinder(rclcpp::Node* n, std::string left_or_right);
 
     ~PointFinder() = default;
 
-    void findPoints(std::vector<Point>* position_queue);
+    void findPoints(PointCloud::Ptr pointcloud, Point& step_point,
+        std::vector<Point>* position_queue);
+
+    void startParameterCallback(
+        const std::vector<rclcpp::Parameter>& parameters);
 
     std::vector<Point> retrieveTrackPoints(
         const Point& start, const Point& end);
@@ -35,7 +38,6 @@ public:
 
 protected:
     rclcpp::Node* n_;
-    PointCloud::Ptr pointcloud_;
     std::vector<double> search_dimensions_;
     std::string left_or_right_;
 
@@ -78,7 +80,13 @@ protected:
     double available_points_ratio_;
     int num_track_points_;
 
-    void mapPointCloudToHeightMap();
+    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
+
+    void initializeValues();
+
+    void initializeSearchDimensions(Point& step_point);
+
+    void mapPointCloudToHeightMap(PointCloud::Ptr pointcloud);
 
     void publishHeightMap();
 

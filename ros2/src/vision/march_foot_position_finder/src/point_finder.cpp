@@ -28,11 +28,9 @@ using PointCloud = pcl::PointCloud<Point>;
  */
 // Suppress lint error "variables are not initialized" (ros parameters)
 // NOLINTNEXTLINE
-PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-    std::string left_or_right, Point& step_point)
-    : pointcloud_ { std::move(pointcloud) }
+PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
+    : n_ { n }
     , left_or_right_ { std::move(left_or_right) }
-    , n_ { n }
 {
     std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
     std::fill_n(
@@ -52,12 +50,6 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     displacements_near_ = n_->get_parameter("displacements_near").as_double();
     displacements_far_ = n_->get_parameter("displacements_far").as_double();
 
-    // Convert displacements from meters to number of grid cells
-    displacements_outside_ = ceil(displacements_outside_ / cell_width_);
-    displacements_inside_ = ceil(displacements_inside_ / cell_width_);
-    displacements_near_ = ceil(displacements_near_ / cell_width_);
-    displacements_far_ = ceil(displacements_far_ / cell_width_);
-
     available_points_ratio_
         = n_->get_parameter("available_points_ratio").as_double();
     derivative_threshold_
@@ -65,16 +57,54 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     max_z_distance_ = n_->get_parameter("max_z_distance").as_double();
     num_track_points_ = n_->get_parameter("num_track_points").as_int();
 
+    initializeValues();
+}
+
+void PointFinder::readParameters(
+    const std::vector<rclcpp::Parameter>& parameters)
+{
+
+    for (const auto &param: parameters)
+    {
+        if (param.get_name() == "foot_width") {
+            std::cout << param.as_string();
+        } else if (param.get_name() == "foot_length") {
+            std::cout << "1";
+        }
+    }
+
+    // foot_width_ = n_->get_parameter("foot_width").as_double();
+    // foot_length_ = n_->get_parameter("foot_length").as_double();
+    // actual_foot_length_ = n_->get_parameter("actual_foot_length").as_double();
+
+    // displacements_outside_
+    //     = n_->get_parameter("displacements_outside").as_double();
+    // displacements_inside_
+    //     = n_->get_parameter("displacements_inside").as_double();
+    // displacements_near_ = n_->get_parameter("displacements_near").as_double();
+    // displacements_far_ = n_->get_parameter("displacements_far").as_double();
+
+    // available_points_ratio_
+    //     = n_->get_parameter("available_points_ratio").as_double();
+    // derivative_threshold_
+    //     = n_->get_parameter("derivative_threshold").as_double();
+    // max_z_distance_ = n_->get_parameter("max_z_distance").as_double();
+    // num_track_points_ = n_->get_parameter("num_track_points").as_int();
+
+    initializeValues();
+}
+
+void PointFinder::initializeValues()
+{
+    // Convert displacements from meters to number of grid cells
+    displacements_outside_ = ceil(displacements_outside_ / cell_width_);
+    displacements_inside_ = ceil(displacements_inside_ / cell_width_);
+    displacements_near_ = ceil(displacements_near_ / cell_width_);
+    displacements_far_ = ceil(displacements_far_ / cell_width_);
+
     rect_width_ = ceil(foot_width_ / cell_width_);
     rect_height_ = ceil(foot_length_ / cell_width_);
     actual_rect_height_ = ceil(actual_foot_length_ / cell_width_);
-
-    optimal_foot_x_ = step_point.x;
-    optimal_foot_y_ = step_point.y;
-    current_foot_z_ = step_point.z;
-
-    search_dimensions_ = { optimal_foot_x_ - 0.5, optimal_foot_x_ + 0.5,
-        optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5, -1, 1 };
 
     if (rect_width_ % 2 == 0) {
         rect_width_--;
@@ -87,18 +117,6 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
     for (int i = 1; i < actual_rect_height_ / 2.0; i++) {
         flipping_displacements_.push_back(i);
         flipping_displacements_.push_back(-i);
-    }
-
-    x_offset_ = -search_dimensions_[0];
-    y_offset_ = -search_dimensions_[2];
-    x_width_ = search_dimensions_[1] - search_dimensions_[0];
-    y_width_ = search_dimensions_[3] - search_dimensions_[2];
-
-    for (int y = 1; y <= displacements_near_; y++) {
-        vertical_displacements_.push_back(y);
-    }
-    for (int y = 0; y >= -displacements_far_; y--) {
-        vertical_displacements_.push_back(y);
     }
 
     if (left_or_right_ == "left") {
@@ -116,6 +134,28 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
             horizontal_displacements_.push_back(x);
         }
     }
+
+    for (int y = 1; y <= displacements_near_; y++) {
+        vertical_displacements_.push_back(y);
+    }
+    for (int y = 0; y >= -displacements_far_; y--) {
+        vertical_displacements_.push_back(y);
+    }
+}
+
+void PointFinder::initializeSearchDimensions(Point& step_point)
+{
+    optimal_foot_x_ = step_point.x;
+    optimal_foot_y_ = step_point.y;
+    current_foot_z_ = step_point.z;
+
+    search_dimensions_ = { optimal_foot_x_ - 0.5, optimal_foot_x_ + 0.5,
+        optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5, -1, 1 };
+
+    x_offset_ = -search_dimensions_[0];
+    y_offset_ = -search_dimensions_[2];
+    x_width_ = search_dimensions_[1] - search_dimensions_[0];
+    y_width_ = search_dimensions_[3] - search_dimensions_[2];
 }
 
 /**
@@ -123,9 +163,11 @@ PointFinder::PointFinder(rclcpp::Node* n, PointCloud::Ptr pointcloud,
  *
  * @param position_queue a pointer to a queue with possible foot positions
  */
-void PointFinder::findPoints(std::vector<Point>* position_queue)
+void PointFinder::findPoints(PointCloud::Ptr pointcloud, Point& step_point,
+    std::vector<Point>* position_queue)
 {
-    mapPointCloudToHeightMap();
+    initializeSearchDimensions(step_point);
+    mapPointCloudToHeightMap(pointcloud);
     convolveLaplacianKernel(height_map_, derivatives_);
     findFeasibleFootPlacements(position_queue);
 }
@@ -134,10 +176,12 @@ void PointFinder::findPoints(std::vector<Point>* position_queue)
  * Maps a pointcloud to a 2D matrix where only heights are inserted.
  * Indices in the matrix are found based on the x and y coordinates in 3D space.
  */
-void PointFinder::mapPointCloudToHeightMap()
+void PointFinder::mapPointCloudToHeightMap(PointCloud::Ptr pointcloud)
 {
-    for (std::size_t i = 0; i < pointcloud_->size(); i++) {
-        Point p = pointcloud_->points[i];
+    std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
+
+    for (std::size_t i = 0; i < pointcloud->size(); i++) {
+        Point p = pointcloud->points[i];
 
         int x_index = xCoordinateToIndex(p.x);
         int y_index = yCoordinateToIndex(p.y);

@@ -3,8 +3,6 @@
  */
 
 #include "foot_position_finder.h"
-#include "point_finder.h"
-#include "preprocessor.h"
 #include "utilities/math_utilities.hpp"
 #include "utilities/publish_utilities.hpp"
 #include "utilities/realsense_to_pcl.hpp"
@@ -42,6 +40,9 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(n_->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+    preprocessor_ = std::make_unique<Preprocessor>(
+        n_, left_or_right_, tf_listener_, tf_buffer_);
+    point_finder_ = std::make_unique<PointFinder>(n_, left_or_right_);
 
     current_frame_id_ = "toes_" + left_or_right_ + "_aligned";
     other_frame_id_ = "toes_" + other_side_ + "_aligned";
@@ -150,13 +151,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
             left_or_right_.c_str());
     }
 
-    previous_start_point_ = start_point_
-        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
-
-
-    desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-            /*_z=*/0));
+    resetInitialPosition(/*stop_timer=*/false);
 }
 
 void FootPositionFinder::startParameterCallback(
@@ -192,13 +187,7 @@ void FootPositionFinder::readParameters(
     realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
     found_points_.resize(sample_size_);
 
-    // Initialize all variables as zero:
-    previous_start_point_ = start_point_
-        = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
-
-    desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-            /*_z=*/0));
+    resetInitialPosition(/*stop_timer=*/false);
 
     RCLCPP_INFO(n_->get_logger(),
         "Parameters updated in %s foot position finder",
@@ -237,7 +226,7 @@ void FootPositionFinder::currentStateCallback(
     if (msg->state == "stand") {
         initial_position_reset_timer_ = n_->create_wall_timer(
             std::chrono::milliseconds(200), [this]() -> void {
-                resetInitialPosition();
+                resetInitialPosition(/*stop_timer=*/true);
             });
     }
 }
@@ -245,14 +234,17 @@ void FootPositionFinder::currentStateCallback(
 /**
  * Reset initial position, relative to which points are found.
  */
-void FootPositionFinder::resetInitialPosition()
+void FootPositionFinder::resetInitialPosition(bool stop_timer)
 {
     previous_start_point_ = start_point_
         = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
     desired_point_ = addPoints(start_point_,
         Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
             /*_z=*/0));
-    initial_position_reset_timer_->cancel();
+
+    if (stop_timer) {
+        initial_position_reset_timer_->cancel();
+    }
 
     RCLCPP_INFO(n_->get_logger(),
         "Initial position reset in %s foot position finder",
@@ -310,35 +302,31 @@ void FootPositionFinder::processSimulatedDepthFrames(
  * Run a complete processing pipeline for a point cloud with as a result a new
  * point.
  */
-void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
+void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
 {
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
 
     // Preprocess point cloud and place pointcloud in aligned toes frame:
-    Preprocessor preprocessor(
-        n_, pointcloud, left_or_right_, tf_listener_, tf_buffer_);
-    preprocessor.preprocess();
+    preprocessor_->preprocess(pointcloud);
 
     // Publish cloud for visualization:
     publishCloud(
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
     // Find possible points around the desired point determined earlier:
-    PointFinder pointFinder(n_, pointcloud, left_or_right_, desired_point_);
-
     std::vector<Point> position_queue;
-    pointFinder.findPoints(&position_queue);
+    point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Visualization
     publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
-        pointFinder.getDisplacements(), left_or_right_);
+        point_finder_->getDisplacements(), left_or_right_); // Cyan
     publishDesiredPosition(
         point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
     publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
         left_or_right_); // Purple
-
-    std::cout << start_point_ << std::endl;
+    publishArrow(point_marker_publisher_, n_, ORIGIN, start_point_,
+        left_or_right_); // Blue
 
     if (position_queue.size() > 0) {
         // Take the first point of the point queue returned by the point finder
@@ -346,7 +334,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
-        std::vector<Point> track_points = pointFinder.retrieveTrackPoints(
+        std::vector<Point> track_points = point_finder_->retrieveTrackPoints(
             previous_start_point_, found_covid_point_);
 
         // Visualization
@@ -365,9 +353,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             new_displacement_.z = 0.0;
         }
 
-        // Visualization
-        publishArrow(point_marker_publisher_, n_, ORIGIN, start_point_,
-            left_or_right_); // Blue
+        // Visualize new displacement
         publishArrow2(point_marker_publisher_, n_, start_point_,
             found_covid_point_,
             left_or_right_); // Green

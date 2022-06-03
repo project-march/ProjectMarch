@@ -16,9 +16,9 @@ public:
             = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
         tf_broadcaster_
             = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-            
+
         publish_timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(10), [this]() -> void {
+            std::chrono::milliseconds(20), [this]() -> void {
                 publishAlignedFrames();
             });
     }

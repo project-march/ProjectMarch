@@ -7,6 +7,8 @@
 
 #include "march_shared_msgs/msg/current_state.hpp"
 #include "march_shared_msgs/msg/foot_position.hpp"
+#include "point_finder.h"
+#include "preprocessor.h"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "visualization_msgs/msg/marker.hpp"
@@ -41,7 +43,7 @@ protected:
     void currentStateCallback(
         const march_shared_msgs::msg::CurrentState::SharedPtr msg);
 
-    void resetInitialPosition();
+    void resetInitialPosition(bool stop_timer);
 
     void chosenOtherPointCallback(
         const march_shared_msgs::msg::FootPosition::SharedPtr msg);
@@ -51,7 +53,7 @@ protected:
     void processSimulatedDepthFrames(
         const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
 
-    void processPointCloud(const PointCloud::Ptr& pointcloud);
+    void processPointCloud(PointCloud::Ptr pointcloud);
 
     void readParameters(const std::vector<rclcpp::Parameter>& parameters);
 
@@ -61,6 +63,8 @@ protected:
         const std::string& frame_to);
 
     rclcpp::Node* n_;
+    std::unique_ptr<Preprocessor> preprocessor_ { nullptr };
+    std::unique_ptr<PointFinder> point_finder_ { nullptr };
 
     rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr
         point_publisher_;

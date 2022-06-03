@@ -27,27 +27,23 @@ using NormalCloud = pcl::PointCloud<Normal>;
  */
 // Suppress lint error: "fields are not initialized by constructor"
 // NOLINTNEXTLINE
-Preprocessor::Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-    std::string& left_or_right,
+Preprocessor::Preprocessor(rclcpp::Node* n, std::string& left_or_right,
     std::shared_ptr<tf2_ros::TransformListener>& listener,
     std::shared_ptr<tf2_ros::Buffer>& buffer)
-    : pointcloud_ { std::move(pointcloud) }
-    , n_ { n }
+    : n_ { n }
     , tf_buffer_ { buffer }
     , tf_listener_ { listener }
 {
-
     base_frame_ = "toes_" + left_or_right + "_aligned";
-    pointcloud_frame_id_ = pointcloud_->header.frame_id.c_str();
 }
 
 /**
  * Preprocess the current pointcloud by transforming the coordinates to world
  * frame.
  */
-void Preprocessor::preprocess()
+void Preprocessor::preprocess(PointCloud::Ptr pointcloud)
 {
-    transformPointCloudToBaseframe();
+    transformPointCloudToBaseframe(pointcloud);
 }
 
 /**
@@ -55,21 +51,21 @@ void Preprocessor::preprocess()
  *
  * @param voxel_size cell size of the voxel grid
  */
-void Preprocessor::voxelDownSample(float voxel_size)
+void Preprocessor::voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size)
 {
     pcl::VoxelGrid<Point> voxel_grid;
-    voxel_grid.setInputCloud(pointcloud_);
+    voxel_grid.setInputCloud(pointcloud);
     voxel_grid.setLeafSize(voxel_size, voxel_size, voxel_size);
-    voxel_grid.filter(*pointcloud_);
+    voxel_grid.filter(*pointcloud);
 }
 
 /**
  * Transform the realsense pointclouds to given base frame using given
  * transformations.
  */
-void Preprocessor::transformPointCloudToBaseframe()
+void Preprocessor::transformPointCloudToBaseframe(PointCloud::Ptr pointcloud)
 {
-
+    pointcloud_frame_id_ = pointcloud->header.frame_id.c_str();
     try {
         transform_ = tf_buffer_->lookupTransform(
             base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
@@ -81,11 +77,11 @@ void Preprocessor::transformPointCloudToBaseframe()
         tf2::fromMsg(transform_.transform.rotation, rotation);
 
         pcl::transformPointCloud(
-            *pointcloud_, *pointcloud_, translation, rotation);
-        pointcloud_->header.frame_id = base_frame_;
+            *pointcloud, *pointcloud, translation, rotation);
+        pointcloud->header.frame_id = base_frame_;
 
     } catch (tf2::TransformException& ex) {
-        RCLCPP_WARN(
+        RCLCPP_DEBUG(
             n_->get_logger(), "Could not transform pointcloud: %s", ex.what());
     }
 }

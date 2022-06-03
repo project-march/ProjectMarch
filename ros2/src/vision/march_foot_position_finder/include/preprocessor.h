@@ -15,22 +15,16 @@ using NormalCloud = pcl::PointCloud<pcl::Normal>;
 
 class Preprocessor {
 public:
-    explicit Preprocessor(rclcpp::Node* n, PointCloud::Ptr pointcloud,
-        std::string& left_or_right,
+    explicit Preprocessor(rclcpp::Node* n, std::string& left_or_right,
         std::shared_ptr<tf2_ros::TransformListener>& listener,
         std::shared_ptr<tf2_ros::Buffer>& buffer);
 
-    void preprocess();
+    void preprocess(PointCloud::Ptr pointcloud);
 
 protected:
-    void voxelDownSample(float voxel_size);
+    void voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size);
 
-    void estimateNormals(int number_of_neighbours);
-
-    void filterOnDistance(float x_min, float x_max, float y_min, float y_max,
-        float z_min, float z_max);
-
-    void transformPointCloudToBaseframe();
+    void transformPointCloudToBaseframe(PointCloud::Ptr pointcloud);
 
     rclcpp::Node* n_;
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };
