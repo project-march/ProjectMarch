@@ -6,11 +6,11 @@ from rclpy.time import Time
 from typing import Optional
 from sensor_msgs.msg import JointState
 
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
-    DynamicSetpointGait,
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
+    DynamicGaitWalk,
 )
-from march_gait_selection.dynamic_interpolation.trajectory_command_handlers.trajectory_command_handler_queue import (
-    TrajectoryCommandHandlerQueue,
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_queue import (
+    TrajectoryCommandFactoryQueue,
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
@@ -20,7 +20,7 @@ from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_shared_msgs.msg import GaitInstruction
 
 
-class DynamicSetpointGaitStep(DynamicSetpointGait):
+class DynamicGaitStep(DynamicGaitWalk):
     """Step gait based on dynamic setpoint gait.
 
     Args:
@@ -33,7 +33,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self.logger = Logger(gait_selection_node, __class__.__name__)
-        self.trajectory_command_handler = TrajectoryCommandHandlerQueue(
+        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(
             gait=self, points_handler=self._camera_points_handler
         )
         self.subgait_id = "right_swing"
@@ -88,7 +88,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         elif current_time >= self.start_time_next_command and self._has_gait_started:
             self._scheduled_early = True
             self._final_position_pub.publish(
-                JointState(position=self.trajectory_command_handler.dynamic_subgait.get_final_position().values())
+                JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
             )
             return self._update_state_machine()
 
@@ -101,7 +101,7 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if not self.trajectory_command_handler.has_trajectory_failed():
+        if not self.trajectory_command_factory.has_trajectory_failed():
             if self.subgait_id == "right_swing":
                 self.subgait_id = "left_swing"
             elif self.subgait_id == "left_swing":
@@ -121,6 +121,6 @@ class DynamicSetpointGaitStep(DynamicSetpointGait):
         if msg.type == GaitInstruction.UNKNOWN:
             self._set_start_position_to_home_stand()
             self.subgait_id = "right_swing"
-            self.trajectory_command_handler.set_trajectory_failed_false()
+            self.trajectory_command_factory.set_trajectory_failed_false()
             self.position_queue = Queue()
-            self.trajectory_command_handler.fill_queue()
+            self.trajectory_command_factory.fill_queue()

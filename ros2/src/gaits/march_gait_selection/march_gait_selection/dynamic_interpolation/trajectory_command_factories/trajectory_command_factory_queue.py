@@ -10,8 +10,8 @@ from march_utility.utilities.logger import Logger
 
 
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
-from march_gait_selection.dynamic_interpolation.trajectory_command_handlers.trajectory_command_handler import (
-    TrajectoryCommandHandler,
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
+    TrajectoryCommandFactory,
 )
 
 from std_msgs.msg import Header
@@ -20,7 +20,7 @@ from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 
-class TrajectoryCommandHandlerQueue(TrajectoryCommandHandler):
+class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
     """Class that creates and validates a trajectory command and has the ability to put position in a queue.
 
     Attributes:

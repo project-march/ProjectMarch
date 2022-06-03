@@ -3,7 +3,7 @@
 from typing import Optional
 from rclpy.time import Time
 
-from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.logger import Logger
