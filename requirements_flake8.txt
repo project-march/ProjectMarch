@@ -30,3 +30,4 @@ flake8-bandit==2.1.2
 bandit==1.7.2
 pep8-naming==0.12.1
 pylint==2.11.1
+click==8.0.4
