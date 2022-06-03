@@ -3,7 +3,7 @@
 from math import floor
 from typing import Optional, Dict
 
-from march_gait_selection.dynamic_interpolation.dynamic_subgait import DynamicSubgait
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_shared_msgs.msg import FootPosition
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
@@ -14,8 +14,24 @@ DURATION_INCREASE_FACTOR = 1.5
 DURATION_INCREASE_SIZE = 0.25
 
 
-class TrajectoryCommandHandler:
-    """Class that creates and validates a trajectory command."""
+class TrajectoryCommandFactory:
+    """Class that creates and validates a trajectory command.
+
+    Args:
+        gait: The gait class
+        points_handler: The points handler class
+
+    Attributes:
+        subgait_id (str): either 'left_swing' or 'right_swing'
+        start_position_all_joints (Dict[str, float]): start joint angles of all joints
+        foot_location (FootPosition): foot position message to step towards
+        dynamic_step (DynamicStep): instance of the DynamicStep class, used to get trajectory msg
+
+        _gait: the gait class
+        _points_handler: the points handler class
+        _logger (Logger): used to log with the class name as a prefix
+        _trajectory_failed (bool): true if no feasible trajectory can be found
+    """
 
     subgait_id: str
     foot_location: FootPosition
@@ -67,6 +83,14 @@ class TrajectoryCommandHandler:
             return None
 
         return self._get_first_feasible_trajectory(start, stop)
+
+    def has_trajectory_failed(self) -> bool:
+        """Returns true if no feasible trajectory could be created."""
+        return self._trajectory_failed
+
+    def set_trajectory_failed_false(self) -> None:
+        """Sets the _trajectory_failed attribute to False."""
+        self._trajectory_failed = False
 
     def _get_first_feasible_trajectory(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
         """Returns the first trajectory than can be executed.
@@ -137,10 +161,10 @@ class TrajectoryCommandHandler:
             TrajectoryCommand: optional command if successful, otherwise None
         """
         try:
-            self.dynamic_subgait = self._create_subgait_instance(
+            self.dynamic_step = self._create_subgait_instance(
                 self.start_position_all_joints, self.subgait_id, start, stop
             )
-            trajectory = self.dynamic_subgait.get_joint_trajectory_msg(self._gait.add_push_off)
+            trajectory = self.dynamic_step.get_joint_trajectory_msg(self._gait.add_push_off)
             self._logger.debug(
                 f"Found trajectory after {iteration + 1} iterations at duration of {self.foot_location.duration}. "
                 f"Original duration was {original_duration}."
@@ -168,7 +192,7 @@ class TrajectoryCommandHandler:
         Returns:
             bool: True if second step can be made, otherwise false
         """
-        start_position = self.dynamic_subgait.get_final_position()
+        start_position = self.dynamic_step.get_final_position()
         subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
         subgait = self._create_subgait_instance(
             start_position,
@@ -221,8 +245,8 @@ class TrajectoryCommandHandler:
         subgait_id: str,
         start: bool,
         stop: bool,
-    ) -> DynamicSubgait:
-        """Create a DynamicSubgait instance.
+    ) -> DynamicStep:
+        """Create a DynamicStep instance.
 
         Args:
             start_position (Dict[str, float]): dict containing joint_names and positions of the joint as floats
@@ -230,9 +254,9 @@ class TrajectoryCommandHandler:
             start (bool): whether it is a start gait or not
             stop (bool): whether it is a stop gait or not
         Returns:
-            DynamicSubgait: DynamicSubgait instance for the desired step
+            DynamicStep: DynamicStep instance for the desired step
         """
-        return DynamicSubgait(
+        return DynamicStep(
             self._gait.gait_selection,
             self._gait.home_stand_position_all_joints,
             start_position,

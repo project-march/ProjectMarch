@@ -3,7 +3,7 @@
 import numpy as np
 
 from rclpy.node import Node
-from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import (
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
 from march_utility.gait.limits import Limits
@@ -35,7 +35,7 @@ class SetpointTime(IntEnum):
     END_POINT_INDEX = 3
 
 
-class DynamicSubgait:
+class DynamicStep:
     """Creates joint trajectories based on the desired foot location.
 
     Args:

@@ -3,7 +3,7 @@
 from typing import Optional
 from rclpy.time import Time
 
-from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.logger import Logger
@@ -13,7 +13,20 @@ FOOT_LOCATION_TIME_OUT = Duration(0.5)
 
 
 class CameraPointsHandler:
-    """Class to handle all communications between CoViD and gaits."""
+    """Class to handle all communications between CoViD and gaits.
+
+    Args:
+        gait: the gait class
+
+    Attributes:
+        pub_right (rclpy.Publisher): Publisher for right chosen foot position
+        pub_left (rclpy.Publisher): Publisher for left chosen foot position
+
+        _foot_location_right (FootPosition): the latest right foot position
+        _foot_location_left (FootPosition): the latest left foot position
+        _gait: the gait class
+        _logger: used to log with class name as message prefix
+    """
 
     def __init__(self, gait):
         self._gait = gait
@@ -55,7 +68,7 @@ class CameraPointsHandler:
         Args:
             foot_location (FootPosition): a Point containing the x, y, and z location
         """
-        self.foot_location_right = foot_location
+        self._foot_location_right = foot_location
 
     def _callback_left(self, foot_location: FootPosition) -> None:
         """Update the left foot position with the latest point published on the CoViD-topic.
@@ -63,7 +76,7 @@ class CameraPointsHandler:
         Args:
             foot_location (FootPosition): a Point containing the x, y, and z location
         """
-        self.foot_location_left = foot_location
+        self._foot_location_left = foot_location
 
     def get_foot_location(self, subgait_id: str) -> Optional[FootPosition]:
         """Returns the right or left foot position based upon the subgait_id.
@@ -74,9 +87,9 @@ class CameraPointsHandler:
             FootPosition: either the left or right foot position or none
         """
         if subgait_id == "left_swing":
-            return self.foot_location_left
+            return self._foot_location_left
         elif subgait_id == "right_swing":
-            return self.foot_location_right
+            return self._foot_location_right
         else:
             return None
 
