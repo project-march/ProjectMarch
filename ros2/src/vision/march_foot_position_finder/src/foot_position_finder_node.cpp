@@ -47,8 +47,8 @@ public:
     rcl_interfaces::msg::SetParametersResult parametersCallback(
         const std::vector<rclcpp::Parameter>& parameters)
     {
-        // left->startParameterCallback(parameters);
-        right->startParameterCallback(parameters);
+        // left->readParameters(parameters);
+        right->readParameters(parameters);
 
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = true;

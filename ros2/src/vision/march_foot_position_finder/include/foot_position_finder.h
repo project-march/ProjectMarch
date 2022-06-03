@@ -34,8 +34,7 @@ public:
     explicit FootPositionFinder(
         rclcpp::Node* n, const std::string& left_or_right);
 
-    void startParameterCallback(
-        const std::vector<rclcpp::Parameter>& parameters);
+    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
 
     ~FootPositionFinder() = default;
 
@@ -55,8 +54,6 @@ protected:
 
     void processPointCloud(PointCloud::Ptr pointcloud);
 
-    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
-
     Point computeTemporalAveragePoint(const Point& new_point);
 
     Point transformPoint(Point point, const std::string& frame_from,
@@ -65,6 +62,9 @@ protected:
     rclcpp::Node* n_;
     std::unique_ptr<Preprocessor> preprocessor_ { nullptr };
     std::unique_ptr<PointFinder> point_finder_ { nullptr };
+
+    std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };
+    std::shared_ptr<tf2_ros::Buffer> tf_buffer_ { nullptr };
 
     rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr
         point_publisher_;
@@ -80,7 +80,6 @@ protected:
     rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr
         current_state_subscriber_;
 
-    rclcpp::TimerBase::SharedPtr parameter_callback_timer_;
     rclcpp::TimerBase::SharedPtr realsense_timer_;
     rclcpp::TimerBase::SharedPtr initial_position_reset_timer_;
 
@@ -128,9 +127,6 @@ protected:
     Point last_displacement_;
     Point new_displacement_;
     Point found_covid_point_;
-
-    std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };
-    std::shared_ptr<tf2_ros::Buffer> tf_buffer_ { nullptr };
 };
 
 #endif // MARCH_FOOT_POSITION_FINDER_H

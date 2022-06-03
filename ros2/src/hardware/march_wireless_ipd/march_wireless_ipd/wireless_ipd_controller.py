@@ -124,7 +124,7 @@ class WirelessInputDeviceController:
             self._gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
-                self._logger.warn("Failed to contact possible gaits service")
+                pass
 
     def get_possible_gaits(self) -> Future:
         """Returns the future for the names of possible gaits.

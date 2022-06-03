@@ -36,6 +36,8 @@ public:
 
     std::vector<double> getDisplacements();
 
+    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
+
 protected:
     rclcpp::Node* n_;
     std::vector<double> search_dimensions_;
@@ -79,8 +81,6 @@ protected:
     double max_z_distance_;
     double available_points_ratio_;
     int num_track_points_;
-
-    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
 
     void initializeValues();
 

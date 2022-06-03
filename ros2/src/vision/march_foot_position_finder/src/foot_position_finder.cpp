@@ -15,10 +15,9 @@
  * Constructs an object that listens to simulated or real RealSense depth frames
  * and processes these frames with a PointFinder.
  *
- * @param n NodeHandle for running ROS commands
- * @param realsense whether RealSense cameras are connected
+ * @param n ROS Node instance.
  * @param left_or_right whether the FootPositionFinder runs for the left or
- * right foot
+ * right foot.
  */
 // No lint is used to allow uninitialized variables (ros parameters)
 // NOLINTNEXTLINE
@@ -154,49 +153,45 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     resetInitialPosition(/*stop_timer=*/false);
 }
 
-void FootPositionFinder::startParameterCallback(
-    const std::vector<rclcpp::Parameter>& parameters)
-{
-    parameter_callback_timer_ = n_->create_wall_timer(
-        std::chrono::milliseconds(1), [this, parameters]() -> void {
-            readParameters(parameters);
-        });
-}
-
 /**
- * Callback for when parameters are updated with ros reconfigure.
+ * Retrieve parameter values that are dynamically reconfigured and update the
+ * values in the class.
  *
- * @param parametersConfig container that contains all (updated) parameters
- * @param uint32_t level is not used but is required for correct callback
+ * @param parameters Instance containing updated parameters.
  */
-// No lint is used to avoid linting in the RealSense library, where a potential
-// memory leak error is present
-// NOLINTNEXTLINE
 void FootPositionFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
-    parameter_callback_timer_->cancel();
+    for (const auto& param : parameters) {
+        if (param.get_name() == "foot_gap") {
+            foot_gap_ = param.as_double();
+        } else if (param.get_name() == "step_distance") {
+            step_distance_ = param.as_double();
+        } else if (param.get_name() == "sample_size") {
+            sample_size_ = param.as_double();
+        } else if (param.get_name() == "outlier_distance") {
+            outlier_distance_ = param.as_double();
+        } else if (param.get_name() == "height_zero_threshold") {
+            height_zero_threshold_ = param.as_double();
+        } else if (param.get_name() == "realsense_simulation") {
+            realsense_simulation_ = param.as_double();
+        }
 
-    foot_gap_ = n_->get_parameter("foot_gap").as_double();
-    step_distance_ = n_->get_parameter("step_distance").as_double();
-    sample_size_ = n_->get_parameter("sample_size").as_int();
+        RCLCPP_INFO(n_->get_logger(),
+            "\033[92mParameter %s updated in %s Foot Position Finder\033[0m",
+            param.get_name().c_str(), left_or_right_.c_str());
+    }
 
-    outlier_distance_ = n_->get_parameter("outlier_distance").as_double();
-    height_zero_threshold_
-        = n_->get_parameter("height_zero_threshold").as_double();
-    realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
     found_points_.resize(sample_size_);
-
     resetInitialPosition(/*stop_timer=*/false);
-
-    RCLCPP_INFO(n_->get_logger(),
-        "Parameters updated in %s foot position finder",
-        left_or_right_.c_str());
+    point_finder_->readParameters(parameters);
 }
 
 /**
  * Callback function for when the gait selection node selects a point for the
  * other leg.
+ *
+ * @param msg FootPosition message from the callback.
  */
 // Suppress lint error "make reference of argument" as it breaks callback
 void FootPositionFinder::chosenOtherPointCallback(
@@ -218,6 +213,8 @@ void FootPositionFinder::chosenOtherPointCallback(
 /**
  * Callback function to reset the position values when the exoskeleton enters
  * the "stand" state.
+ *
+ * @param msg CurrentState message from the callback.
  */
 // Suppress lint error "make reference of argument" as it breaks the callback
 void FootPositionFinder::currentStateCallback(
@@ -233,6 +230,8 @@ void FootPositionFinder::currentStateCallback(
 
 /**
  * Reset initial position, relative to which points are found.
+ *
+ * @param stop_timer Whether to stop a ROS timer that scheduled this callback.
  */
 void FootPositionFinder::resetInitialPosition(bool stop_timer)
 {
@@ -245,10 +244,6 @@ void FootPositionFinder::resetInitialPosition(bool stop_timer)
     if (stop_timer) {
         initial_position_reset_timer_->cancel();
     }
-
-    RCLCPP_INFO(n_->get_logger(),
-        "Initial position reset in %s foot position finder",
-        left_or_right_.c_str());
 }
 
 /**
@@ -286,6 +281,9 @@ void FootPositionFinder::processRealSenseDepthFrames()
 
 /**
  * Callback function for when a simulated RealSense depth frame arrives.
+ *
+ * @param input_cloud PointCloud2 message from the realsense gazebo plugin
+ * callback.
  */
 // Suppress lint error "make reference of argument" (breaks callback)
 void FootPositionFinder::processSimulatedDepthFrames(
@@ -301,6 +299,8 @@ void FootPositionFinder::processSimulatedDepthFrames(
 /**
  * Run a complete processing pipeline for a point cloud with as a result a new
  * point.
+ *
+ * @param pointcloud Pointcloud to find points in.
  */
 void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
 {
@@ -367,6 +367,8 @@ void FootPositionFinder::processPointCloud(PointCloud::Ptr pointcloud)
 /**
  * Computes a temporal average of the last X points and removes any outliers,
  * then publishes the average of the points without the outliers.
+ *
+ * @param new_point New point to compute the temporal average with.
  */
 Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 {
@@ -411,8 +413,9 @@ Point FootPositionFinder::transformPoint(
         transform_ = tf_buffer_->lookupTransform(
             frame_to, frame_from, tf2::TimePointZero);
     } catch (tf2::TransformException& ex) {
-        RCLCPP_WARN(n_->get_logger(),
-            "Something went wrong when transforming the pointcloud.");
+        rclcpp::Clock steady_clock(RCL_STEADY_TIME);
+        RCLCPP_WARN_THROTTLE(n_->get_logger(), steady_clock, 4000,
+            "Could not transform pointcloud: %s", ex.what());
     }
 
     Eigen::Matrix<double, 3, 1> translation;

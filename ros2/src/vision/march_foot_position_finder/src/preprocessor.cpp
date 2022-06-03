@@ -22,11 +22,11 @@ using NormalCloud = pcl::PointCloud<Normal>;
 /**
  * Constructs a preprocessor object.
  *
- * @param pointcloud realsense pointcloud
- * @return PointCloud::Ptr pcl pointcloud
+ * @param n ROS node instance.
+ * @param left_or_right Whether to find left or right foot points.
+ * @param listener ROS Transform listener.
+ * @param buffer ROS transform buffer.
  */
-// Suppress lint error: "fields are not initialized by constructor"
-// NOLINTNEXTLINE
 Preprocessor::Preprocessor(rclcpp::Node* n, std::string& left_or_right,
     std::shared_ptr<tf2_ros::TransformListener>& listener,
     std::shared_ptr<tf2_ros::Buffer>& buffer)
@@ -40,6 +40,8 @@ Preprocessor::Preprocessor(rclcpp::Node* n, std::string& left_or_right,
 /**
  * Preprocess the current pointcloud by transforming the coordinates to world
  * frame.
+ *
+ * @param pointcloud Pointcloud to preprocess.
  */
 void Preprocessor::preprocess(PointCloud::Ptr pointcloud)
 {
@@ -49,6 +51,7 @@ void Preprocessor::preprocess(PointCloud::Ptr pointcloud)
 /**
  * Downsample the pointcloud using a voxel grid.
  *
+ * @param pointcloud Pointcloud to downsample.
  * @param voxel_size cell size of the voxel grid
  */
 void Preprocessor::voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size)
@@ -62,6 +65,8 @@ void Preprocessor::voxelDownSample(PointCloud::Ptr pointcloud, float voxel_size)
 /**
  * Transform the realsense pointclouds to given base frame using given
  * transformations.
+ *
+ * @param pointcloud Pointcloud to transform.
  */
 void Preprocessor::transformPointCloudToBaseframe(PointCloud::Ptr pointcloud)
 {
@@ -81,7 +86,8 @@ void Preprocessor::transformPointCloudToBaseframe(PointCloud::Ptr pointcloud)
         pointcloud->header.frame_id = base_frame_;
 
     } catch (tf2::TransformException& ex) {
-        RCLCPP_DEBUG(
-            n_->get_logger(), "Could not transform pointcloud: %s", ex.what());
+        rclcpp::Clock steady_clock(RCL_STEADY_TIME);
+        RCLCPP_WARN_THROTTLE(n_->get_logger(), steady_clock, 4000,
+            "Could not transform pointcloud: %s", ex.what());
     }
 }

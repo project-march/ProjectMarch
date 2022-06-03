@@ -16,15 +16,15 @@ using PointCloud = pcl::PointCloud<Point>;
 
 /**
  * Constructs a PointFinder object to find a possible foot location in a single
- * depth frame. The parameterised variables are also initialised here.
+ * depth frame.
  *
  * Heights/derivatives are initialized with the values ±10, so that no
  * nonexisting points can be found by default.
  *
- * @param pointcloud a pointer to a PCL pointcloud
- * @param left_or_right whether a position should be found for the left or right
- * foot
- * @param step_point an initial desired step point
+ * @param n ROS node instance.
+ * @param left_or_right Whether a position should be found for the left or right
+ * foot.
+ * @param step_point An initial desired step point.
  */
 // Suppress lint error "variables are not initialized" (ros parameters)
 // NOLINTNEXTLINE
@@ -60,40 +60,47 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
     initializeValues();
 }
 
+/**
+ * Retrieve parameter values that are dynamically reconfigured and update the
+ * values in the class.
+ *
+ * @param parameters Instance containing updated parameters.
+ */
 void PointFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
-
-    for (const auto &param: parameters)
-    {
+    for (const auto& param : parameters) {
         if (param.get_name() == "foot_width") {
-            std::cout << param.as_string();
+            foot_width_ = param.as_double();
         } else if (param.get_name() == "foot_length") {
-            std::cout << "1";
+            foot_length_ = param.as_double();
+        } else if (param.get_name() == "actual_foot_length") {
+            actual_foot_length_ = param.as_double();
+        } else if (param.get_name() == "displacements_outside") {
+            displacements_outside_ = param.as_double();
+        } else if (param.get_name() == "displacements_inside") {
+            displacements_inside_ = param.as_double();
+        } else if (param.get_name() == "displacements_near") {
+            displacements_near_ = param.as_double();
+        } else if (param.get_name() == "displacements_far") {
+            displacements_far_ = param.as_double();
+        } else if (param.get_name() == "available_points_ratio") {
+            available_points_ratio_ = param.as_double();
+        } else if (param.get_name() == "derivative_threshold") {
+            derivative_threshold_ = param.as_double();
+        } else if (param.get_name() == "max_z_distance") {
+            max_z_distance_ = param.as_double();
+        } else if (param.get_name() == "num_track_points") {
+            num_track_points_ = param.as_int();
         }
     }
-
-    // foot_width_ = n_->get_parameter("foot_width").as_double();
-    // foot_length_ = n_->get_parameter("foot_length").as_double();
-    // actual_foot_length_ = n_->get_parameter("actual_foot_length").as_double();
-
-    // displacements_outside_
-    //     = n_->get_parameter("displacements_outside").as_double();
-    // displacements_inside_
-    //     = n_->get_parameter("displacements_inside").as_double();
-    // displacements_near_ = n_->get_parameter("displacements_near").as_double();
-    // displacements_far_ = n_->get_parameter("displacements_far").as_double();
-
-    // available_points_ratio_
-    //     = n_->get_parameter("available_points_ratio").as_double();
-    // derivative_threshold_
-    //     = n_->get_parameter("derivative_threshold").as_double();
-    // max_z_distance_ = n_->get_parameter("max_z_distance").as_double();
-    // num_track_points_ = n_->get_parameter("num_track_points").as_int();
 
     initializeValues();
 }
 
+/**
+ * Initialize class attributes that determine the search region.
+ */
 void PointFinder::initializeValues()
 {
     // Convert displacements from meters to number of grid cells
@@ -143,6 +150,11 @@ void PointFinder::initializeValues()
     }
 }
 
+/**
+ * Determine the area around a desired point where positions will be found.
+ *
+ * @param step_point Desired stepping point.
+ */
 void PointFinder::initializeSearchDimensions(Point& step_point)
 {
     optimal_foot_x_ = step_point.x;
@@ -161,7 +173,9 @@ void PointFinder::initializeSearchDimensions(Point& step_point)
 /**
  * Finds possible stepping points in the pointcloud and inserts them in a queue
  *
- * @param position_queue a pointer to a queue with possible foot positions
+ * @param pointcloud Pointcloud pointer where points will be found.
+ * @param step_point Desired stepping point.
+ * @param position_queue Queue with possible foot positions.
  */
 void PointFinder::findPoints(PointCloud::Ptr pointcloud, Point& step_point,
     std::vector<Point>* position_queue)
@@ -175,6 +189,8 @@ void PointFinder::findPoints(PointCloud::Ptr pointcloud, Point& step_point,
 /**
  * Maps a pointcloud to a 2D matrix where only heights are inserted.
  * Indices in the matrix are found based on the x and y coordinates in 3D space.
+ *
+ * @param pointcloud Pointcloud pointer where points will be found.
  */
 void PointFinder::mapPointCloudToHeightMap(PointCloud::Ptr pointcloud)
 {
@@ -197,6 +213,8 @@ void PointFinder::mapPointCloudToHeightMap(PointCloud::Ptr pointcloud)
 /**
  * Looks for feasible foot positions around the desired position. A preference
  * is given to points closer to the exo, or points towards the outer sides.
+ *
+ * @param position_queue Queue with possible foot positions.
  */
 void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 {
@@ -233,6 +251,12 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
     }
 }
 
+/**
+ * Determine whether the exoskeleton steps with its toes or heels on the found
+ * point (or with a point in between).
+ *
+ * @param position_queue Queue with possible foot positions.
+ */
 void PointFinder::computeFootPlateDisplacement(
     int x, int y, double height, std::vector<Point>* position_queue)
 {
@@ -276,6 +300,14 @@ void PointFinder::computeFootPlateDisplacement(
     }
 }
 
+/**
+ * Retrieve a list of points between the start and end position of the moving
+ * leg.
+ *
+ * @param start Start point.
+ * @param end End point.
+ * @return std::vector<Point> A list of pointcloud points.
+ */
 std::vector<Point> PointFinder::retrieveTrackPoints(
     const Point& start, const Point& end)
 {

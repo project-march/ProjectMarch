@@ -5,7 +5,7 @@ march/safety_node:
     send_errors_interval: 1000 # Milliseconds
     max_effort_time_limit: 1.2 # Seconds
     time_between_effort_warnings: 0.5 # Seconds
-    max_effort_limit: 27.0
+    max_effort_limit: 1000.0
     temperature_thresholds_warning:
       left_hip_aa: 45.0
       left_hip_fe: 40.0
