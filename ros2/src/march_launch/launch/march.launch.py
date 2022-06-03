@@ -527,7 +527,7 @@ def generate_launch_description() -> LaunchDescription:
     gazebo_spawn_entity = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "fred"],
+        arguments=["-topic", "robot_description", "-entity", robot],
         output="screen",
         condition=IfCondition(gazebo),
     )

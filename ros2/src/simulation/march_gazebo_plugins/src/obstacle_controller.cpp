@@ -1,5 +1,7 @@
 // Copyright 2019 Project March.
 
+#include "yaml-cpp/yaml.h"
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <march_gazebo_plugins/obstacle_controller.h>
 #include <typeinfo>
 
@@ -34,13 +36,18 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
 {
     foot_left_ = model_->GetLink("ankle_plate_left");
     foot_right_ = model_->GetLink("ankle_plate_right");
-    // Roughly the length of the upper leg, this is bodged for now as I cannot
-    // seem to get the length of the link from the urdf in here. This is used
-    // for the goal position calculation when siting & standing up
-    double upper_leg_length_ = 0.40;
+
+    // Get upper_leg_length from properties yaml:
+    std::string path
+        = ament_index_cpp::get_package_share_directory("march_description")
+        + "/urdf/properties/properties_" + model_->GetName() + ".yaml";
+    YAML::Node properties = YAML::LoadFile(path);
+    double upper_leg_length_
+        = properties["dimensions"]["upper_leg"]["length"].as<double>();
     halved_upper_leg_length_ = upper_leg_length_ / 2.0;
 
-    //TODO: balance_ parameter was updated here with ROS. Need a new method for this. Right now, balance is always false.
+    // TODO: balance_ parameter was updated here with ROS. Need a new method for
+    // this. Right now, balance is always false.
 
     // As long as no sitting gait is executed, the default to use when no
     // subgait is idle_stand
