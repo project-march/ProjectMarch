@@ -14,6 +14,12 @@ ARG DEBIAN_FRONTEND=noninteractive
 # inside the container.
 RUN apt update && apt install -y python3-pip clang clang-tidy git git-lfs
 
+# RealSense C++ SDK
+RUN apt-get install -y software-properties-common && apt update
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
+RUN apt-get install -y librealsense2-dev
+
 # Non-ROS Python dependencies
 COPY requirements.txt /march/requirements.txt
 RUN bash -c "python3 -m pip install -r /march/requirements.txt"

@@ -34,7 +34,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         other_side_ = "left";
         switch_factor_ = 1;
         serial_number_ = "944622071535";
-        serial_number_ = "944622074337";
     }
 
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(n_->get_clock());
