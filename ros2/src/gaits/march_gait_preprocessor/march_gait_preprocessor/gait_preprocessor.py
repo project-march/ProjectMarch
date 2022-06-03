@@ -29,18 +29,18 @@ class GaitPreprocessor(Node):
         self.subscription_right = None
 
         self._init_parameters()
-        self.set_simulate_points_parameter()
+        self._create_subscribers()
         self._create_publishers()
+        self.timer = self.create_timer(0.2, self._publish_simulated_locations)
 
     def _init_parameters(self) -> None:
         """Read node parameters from parameter server."""
-        self._simulate_points = self.get_parameter("simulate_points").get_parameter_value().bool_value
         self._duration = self.get_parameter("duration").get_parameter_value().double_value
         self._location_x = self.get_parameter("location_x").get_parameter_value().double_value
         self._location_y = self.get_parameter("location_y").get_parameter_value().double_value
         self._location_z = self.get_parameter("location_z").get_parameter_value().double_value
 
-    def _create_covid_subscribers(self) -> None:
+    def _create_subscribers(self) -> None:
         """Create subscribers to the topics on which covid publishes found points."""
         self.subscription_left = self.create_subscription(
             FootPosition,
@@ -65,6 +65,11 @@ class GaitPreprocessor(Node):
         self.publisher_left = self.create_publisher(
             FootPosition,
             "/march/processed_foot_position/left",
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.publisher_fixed_distance = self.create_publisher(
+            FootPosition,
+            "/march/fixed_foot_position",
             DEFAULT_HISTORY_DEPTH,
         )
 
@@ -150,15 +155,4 @@ class GaitPreprocessor(Node):
         point_msg.processed_point.z = self._location_z
         point_msg.duration = self._get_duration_scaled_to_height(self._duration, self._location_y)
 
-        self.publisher_right.publish(point_msg)
-        self.publisher_left.publish(point_msg)
-
-    def set_simulate_points_parameter(self) -> None:
-        """Creates either a publisher that publishes simulated points or a subscription on the covid points topics."""
-        if self._simulate_points:
-            self.destroy_subscription(self.subscription_right)
-            self.destroy_subscription(self.subscription_left)
-            self.timer = self.create_timer(0.1, self._publish_simulated_locations)
-        else:
-            self.destroy_timer(self.timer)
-            self._create_covid_subscribers()
+        self.publisher_fixed_distance.publish(point_msg)

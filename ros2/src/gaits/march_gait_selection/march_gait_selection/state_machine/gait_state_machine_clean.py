@@ -114,7 +114,7 @@ class GaitStateMachine:
         return (
             self._is_stop_requested()
             and not self._is_stopping
-            and self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold"]
+            and self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold", "fixed_step"]
             and not isinstance(self._last_end_position, UnknownEdgePosition)
         )
 

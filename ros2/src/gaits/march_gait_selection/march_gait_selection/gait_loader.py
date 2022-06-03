@@ -8,18 +8,20 @@ from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import DynamicSetpointGaitClose
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import DynamicSetpointGaitStep
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
-    DynamicSetpointGaitStepAndClose,
-)
-from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
-    DynamicSetpointGaitStepAndHold,
-)
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step import DynamicGaitStep
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_close import DynamicGaitClose
 from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import (
     SteppingStonesStepAndClose,
 )
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_gait_step_and_hold import (
+    DynamicGaitStepAndHold,
+)
+from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_walk import FixedGaitWalk
+from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_step_and_close import FixedGaitStepAndClose
+from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_step import FixedGaitStep
+
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.exceptions.gait_exceptions import NonValidGaitContentError
@@ -81,14 +83,17 @@ class GaitLoader:
     def _load_dynamic_gaits(self) -> None:
         """Load the dynamic gait classes."""
         dynamic_gaits = [
-            DynamicSetpointGait(self._node, self.positions),
-            DynamicSetpointGaitStep(self._node, self.positions),
-            DynamicSetpointGaitStepAndClose(self._node, self.positions),
-            DynamicSetpointGaitClose(self._node, self.positions),
+            DynamicGaitWalk(self._node, self.positions),
+            DynamicGaitStep(self._node, self.positions),
+            DynamicGaitStepAndClose(self._node, self.positions),
+            DynamicGaitClose(self._node, self.positions),
+            FixedGaitWalk(self._node, self.positions),
+            FixedGaitStepAndClose(self._node, self.positions),
+            FixedGaitStep(self._node, self.positions),
         ]
 
         if self._node.add_cybathlon_gaits:
-            dynamic_gaits.append(DynamicSetpointGaitStepAndHold(self._node, self.positions))
+            dynamic_gaits.append(DynamicGaitStepAndHold(self._node, self.positions))
             dynamic_gaits.append(SteppingStonesStepAndClose(self._node, self.positions))
 
         for dynamic_gait in dynamic_gaits:

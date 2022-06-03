@@ -4,6 +4,7 @@ These functions are not a part of any specific part of the code, but will be use
 for general use cases.
 """
 import os
+from copy import copy
 from typing import List, Optional
 
 from ament_index_python.packages import get_package_share_directory
@@ -261,3 +262,11 @@ def get_position_from_yaml(position: str):
                 raise KeyError(f"No position found with name {e}")
     except FileNotFoundError as e:
         Node("march_utility").get_logger().error(e)
+
+
+STEPPING_STONES_END_POSITION_RIGHT = get_position_from_yaml("stand")
+STEPPING_STONES_END_POSITION_RIGHT = dict.fromkeys(STEPPING_STONES_END_POSITION_RIGHT, 0)
+STEPPING_STONES_END_POSITION_LEFT = copy(STEPPING_STONES_END_POSITION_RIGHT)
+
+STEPPING_STONES_END_POSITION_RIGHT["right_knee"] = 1
+STEPPING_STONES_END_POSITION_LEFT["left_knee"] = 1

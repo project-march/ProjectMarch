@@ -89,6 +89,7 @@ class GaitStateMachine:
 
         # Boolean flag that indicates that the gait should stop
         self._should_stop = False
+        self._previous_gait = None
 
         # Boolean flag to not execute a stop when the gait is already stopping
         self._is_stopping = False
@@ -477,7 +478,7 @@ class GaitStateMachine:
             # from which the next step can be started. Therefore, it needs to be added to the idle_transitions
             # dictionary of the gait_graph.
             if (
-                self._current_gait.name == "dynamic_step" or self._current_gait.name == "dynamic_step_and_hold"
+                self._current_gait.name in ["dynamic_step", "dynamic_step_and_hold", "fixed_step"]
             ) and self._current_state not in self._gait_graph._idle_transitions:
                 self._gait_graph._idle_transitions[self._current_state] = {self._current_gait.name, "dynamic_close"}
 
@@ -495,7 +496,8 @@ class GaitStateMachine:
         This input is passed on to the current gait to execute the request.
         """
         if self._is_stop_requested() and not self._is_stopping:
-            if self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold"] and not isinstance(
+            # TODO: terminal gets spammed when 'stop' is pressed before a gait is executed.
+            if self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold", "fixed_step"] and not isinstance(
                 self._current_state, UnknownEdgePosition
             ):
                 self._current_state = "dynamic_close"

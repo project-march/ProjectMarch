@@ -34,10 +34,8 @@ def main():
     robot = get_robot_urdf_from_service(node)
 
     gait_loader = GaitLoader(node, robot)
-    gaits = gait_loader.gaits
-    positions = gait_loader.positions
     scheduler = TrajectoryScheduler(node)
-    gait_state_machine = GaitStateMachine(node, scheduler, gaits, positions)
+    gait_state_machine = GaitStateMachine(node, scheduler, gait_loader.gaits, gait_loader.positions)
     gait_state_machine.run()
 
     node.add_on_set_parameters_callback(lambda params: parameter_callback(node, gait_state_machine, params))

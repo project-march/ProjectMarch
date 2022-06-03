@@ -30,10 +30,21 @@
   ],
   [
     {
-      "name": "sit"
+      "name": "fixed_walk"
     },
     {
+      "name": "fixed_step_and_close"
+    },
+    {
+      "name": "fixed_step"
+    }
+  ],
+  [
+    {
       "name": "stand"
+    },
+    {
+      "name": "sit"
     },
     {
     "name": "error",
