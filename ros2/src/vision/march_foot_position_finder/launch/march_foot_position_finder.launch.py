@@ -26,6 +26,11 @@ def generate_launch_description() -> LaunchDescription:
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
+            DeclareLaunchArgument(
+                "realsense_simulation",
+                default_value="false",
+                description="Whether to run the simulated realsense plugin.",
+            ),
             Node(
                 package="march_foot_position_finder",
                 executable="march_foot_position_finder_node",
@@ -36,6 +41,7 @@ def generate_launch_description() -> LaunchDescription:
                 parameters=[
                     LaunchConfiguration("config_path"),
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
+                    {"realsense_simulation": LaunchConfiguration("realsense_simulation")},
                 ],
             ),
         ]

@@ -20,5 +20,3 @@ march/march_foot_position_finder:
     displacements_inside: 0.10
     displacements_near: 0.25
     displacements_far: 0.10
-
-    realsense_simulation: False

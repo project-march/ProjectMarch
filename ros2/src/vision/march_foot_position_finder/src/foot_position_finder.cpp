@@ -173,7 +173,7 @@ void FootPositionFinder::readParameters(
         } else if (param.get_name() == "height_zero_threshold") {
             height_zero_threshold_ = param.as_double();
         } else if (param.get_name() == "realsense_simulation") {
-            realsense_simulation_ = param.as_double();
+            realsense_simulation_ = param.as_bool();
         }
 
         RCLCPP_INFO(n_->get_logger(),
