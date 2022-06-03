@@ -10,19 +10,17 @@
 namespace gazebo {
 class ComControllerPlugin : public ModelPlugin {
 public:
-    // ComControllerPlugin();
     void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
     void onUpdate();
     static void startRos(std::shared_ptr<ComControllerNode> node)
     {
-        std::cout << "START SPIN..." << std::endl;
         rclcpp::spin(node);
     };
 
 private:
     physics::ModelPtr model_;
     event::ConnectionPtr update_connection_;
-    std::unique_ptr<ObstacleController> controller_;
+    std::shared_ptr<ObstacleController> controller_;
     std::shared_ptr<ComControllerNode> node_;
     std::thread ros_thread;
 };
