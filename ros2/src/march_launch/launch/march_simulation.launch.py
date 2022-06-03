@@ -127,23 +127,23 @@ def generate_launch_description() -> launch.LaunchDescription:
             description="Whether or not to launch the robot state publisher,"
                         "this allows nodes to get the urdf and to subscribe to"
                         "potential urdf updates. This is necesary for gait selection"
-                        "to be able to launch",
+                        "to be able to launch.",
         ),
         DeclareLaunchArgument(
             name="robot_description",
             default_value=robot,
             description="Which <robot_description>.xacro file to use. "
-                        "This file must be available in the march_desrciption/urdf/ folder",
+                        "This file must be available in the `march_desrciption/urdf/` folder.",
         ),
         DeclareLaunchArgument(
             name="realsense",
             default_value="False",
-            description="Whether any realsense camera will be used",
+            description="Whether any realsense camera will be used.",
         ),
         DeclareLaunchArgument(
             name="realsense_simulation",
             default_value=realsense,
-            description="Whether the simulation camera or the physical camera should be used",
+            description="Whether the simulation camera or the physical camera should be used.",
         ),
         DeclareLaunchArgument(
             name="ground_gait",
@@ -160,18 +160,18 @@ def generate_launch_description() -> launch.LaunchDescription:
         DeclareLaunchArgument(
             name="use_imu_data",
             default_value=realsense,
-            description="Whether to use the camera imu to know the real orientation of the exoskeleton",
+            description="Whether to use the camera imu to know the real orientation of the exoskeleton.",
         ),
         DeclareLaunchArgument(name="imu_to_use", default_value="back", description="Which imu to use"),
         DeclareLaunchArgument(
             name="imu_topic",
             default_value="/camera_back/imu/data",
-            description="The topic that should be used to determine the orientation",
+            description="The topic that should be used to determine the orientation.",
         ),
         DeclareLaunchArgument(
             name="simulation",
             default_value="True",
-            description="Whether simulation is used",
+            description="Whether simulation is used.",
         ),
         # GAIT SELECTION ARGUMENTS
         DeclareLaunchArgument(
@@ -193,7 +193,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         DeclareLaunchArgument(
             name="dynamic_gait",
             default_value="True",
-            description="Whether dynamic_setpoint_gait is enabled",
+            description="Whether dynamic_setpoint_gait is enabled.",
         ),
         DeclareLaunchArgument(
             name="middle_point_fraction",
@@ -264,7 +264,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         DeclareLaunchArgument(
             "jointless",
             default_value="False",
-            description="If true, no joints will be actuated",
+            description="If true, no joints will be actuated.",
         ),
         # FAKE SENSOR DATA ARGUMENTS
         DeclareLaunchArgument(
@@ -275,38 +275,38 @@ def generate_launch_description() -> launch.LaunchDescription:
         DeclareLaunchArgument(
             "minimum_fake_temperature",
             default_value="10",
-            description="Lower bound to generate fake temperatures from",
+            description="Lower bound to generate fake temperatures from.",
         ),
         DeclareLaunchArgument(
             "maximum_fake_temperature",
             default_value="30",
-            description="Upper bound to generate fake temperatures from",
+            description="Upper bound to generate fake temperatures from.",
         ),
         # GAIT PREPROCESSOR ARGUMENTS
         DeclareLaunchArgument(
             name="simulate_points",
             default_value="False",
-            description="Whether to simulate fake foot positions for gait generation",
+            description="Whether to simulate fake foot positions for gait generation.",
         ),
         DeclareLaunchArgument(
             name="location_x",
             default_value="0.5",
-            description="x-location for fake covid topic, takes double or 'random'",
+            description="x-location for fake covid topic, takes double or 'random'.",
         ),
         DeclareLaunchArgument(
             name="location_y",
             default_value="0.03",
-            description="y-location for fake covid topic, takes double or 'random'",
+            description="y-location for fake covid topic, takes double or 'random'.",
         ),
         DeclareLaunchArgument(
             name="location_z",
             default_value=str(DEFAULT_FEET_DISTANCE),
-            description="z-location for fake covid topic, takes double or 'random'",
+            description="z-location for fake covid topic, takes double or 'random'.",
         ),
         DeclareLaunchArgument(
             name="duration",
             default_value="1.5",
-            description="Base duration of dynamic gait, may be scaled depending on step height",
+            description="Base duration of dynamic gait, may be scaled depending on step height.",
         )
     ]
 
