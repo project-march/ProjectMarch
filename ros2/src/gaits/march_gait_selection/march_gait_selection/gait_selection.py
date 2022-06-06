@@ -35,23 +35,15 @@ from urdf_parser_py import urdf
 
 from march_gait_selection.gaits.realsense_gait import RealsenseGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import (
-    DynamicSetpointGait,
-)
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_close import (
-    DynamicSetpointGaitStepAndClose,
-)
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step import (
-    DynamicSetpointGaitStep,
-)
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step import DynamicGaitStep
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_close import DynamicGaitClose
 from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.stepping_stones_step_and_close import (
     SteppingStonesStepAndClose,
 )
-from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_setpoint_gait_step_and_hold import (
-    DynamicSetpointGaitStepAndHold,
-)
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_close import (
-    DynamicSetpointGaitClose,
+from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_gait_step_and_hold import (
+    DynamicGaitStepAndHold,
 )
 
 NODE_NAME = "gait_selection"
@@ -462,19 +454,19 @@ class GaitSelection(Node):
         if self._dynamic_gait:
             # We pass along the gait_selection_node to be able to listen to the CoViD topic within the
             # DynamicSetpointGait class. Dynamic setpoint gait needs to be an attribute for updating parameters.
-            self.dynamic_setpoint_gait = DynamicSetpointGait(gait_selection_node=self)
-            self.dynamic_setpoint_gait_step = DynamicSetpointGaitStep(gait_selection_node=self)
-            self.dynamic_setpoint_gait_step_and_hold = DynamicSetpointGaitStepAndHold(gait_selection_node=self)
+            self.dynamic_gait_walk = DynamicGaitWalk(gait_selection_node=self)
+            self.dynamic_gait_step = DynamicGaitStep(gait_selection_node=self)
+            self.dynamic_gait_step_and_hold = DynamicGaitStepAndHold(gait_selection_node=self)
 
             dynamic_gaits = [
-                self.dynamic_setpoint_gait,
-                self.dynamic_setpoint_gait_step,
-                DynamicSetpointGaitStepAndClose(gait_selection_node=self),
-                DynamicSetpointGaitClose(gait_selection_node=self),
+                self.dynamic_gait_walk,
+                self.dynamic_gait_step,
+                DynamicGaitStepAndClose(gait_selection_node=self),
+                DynamicGaitClose(gait_selection_node=self),
             ]
 
             if self._add_cybathlon_gaits:
-                dynamic_gaits.append(self.dynamic_setpoint_gait_step_and_hold)
+                dynamic_gaits.append(self.dynamic_gait_step_and_hold)
                 dynamic_gaits.append(SteppingStonesStepAndClose(gait_selection_node=self))
 
             for dynamic_gait in dynamic_gaits:

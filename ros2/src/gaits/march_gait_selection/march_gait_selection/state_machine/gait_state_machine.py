@@ -476,7 +476,7 @@ class GaitStateMachine:
             # from which the next step can be started. Therefore, it needs to be added to the idle_transitions
             # dictionary of the gait_graph.
             if (
-                self._current_gait.name == "dynamic_step" or self._current_gait.name == "dynamic_step_and_hold"
+                self._current_gait.name in ["dynamic_step", "dynamic_step_and_hold"]
             ) and self._current_state not in self._gait_graph._idle_transitions:
                 self._gait_graph._idle_transitions[self._current_state] = {self._current_gait.name, "dynamic_close"}
 
