@@ -9,7 +9,6 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_RIGHT,
     STEPPING_STONES_END_POSITION_LEFT,
@@ -29,7 +28,7 @@ class DynamicGaitStepAndHold(DynamicGaitStepAndClose):
         self.start_from_left_side = False
         super().__init__(gait_selection_node)
         self.trajectory_command_factory = TrajectoryCommandFactoryStepAndHold(self, self._points_handler)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
 
         self.gait_selection.create_subscription(

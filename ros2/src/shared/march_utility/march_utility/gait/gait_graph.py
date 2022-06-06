@@ -7,7 +7,6 @@ from march_gait_selection.state_machine.gait_state_machine_error import (
 )
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_utility.gait.edge_position import DynamicEdgePosition
-from march_utility.utilities.logger import Logger
 
 from .edge_position import EdgePosition, StaticEdgePosition, UnknownEdgePosition
 
@@ -26,9 +25,9 @@ class GaitGraph:
     UNNAMED = "unnamed"
     UNKNOWN = "unknown"
 
-    def __init__(self, gait_selection: GaitSelection):
-        self._gait_selection = gait_selection
-        self.logger = Logger(self._gait_selection, __class__.__name__)
+    def __init__(self, gait_selection_node: GaitSelection):
+        self._gait_selection = gait_selection_node
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
 
         self._named_positions: GaitGraph.NamedPositions = {}
         self._idle_transitions: GaitGraph.IdleTransitions = {}
@@ -98,7 +97,7 @@ class GaitGraph:
                 gait.starting_position, StaticEdgePosition
             ):
                 position_name = self._new_unnamed()
-                self.logger.warn(
+                self._logger.warn(
                     f"No named position given for starting position of gait `"
                     f"{gait.name}, creating {position_name}. The starting position "
                     f"is {gait.starting_position}"
@@ -110,7 +109,7 @@ class GaitGraph:
                 gait.final_position, StaticEdgePosition
             ):
                 position_name = self._new_unnamed()
-                self.logger.warn(
+                self._logger.warn(
                     f"No named position given for final position of gait `"
                     f"{gait.name}, creating {position_name}. The final position is "
                     f"{gait.final_position}"
@@ -162,7 +161,7 @@ class GaitGraph:
             if position not in self._idle_transitions:
                 no_from_transitions.append(name)
         if len(no_from_transitions) > 0:
-            self.logger.warn(f'There are no transitions from named positions: [{", ".join(no_from_transitions)}]')
+            self._logger.warn(f'There are no transitions from named positions: [{", ".join(no_from_transitions)}]')
             return False
         return True
 
@@ -178,7 +177,7 @@ class GaitGraph:
                 no_to_transitions.append(name)
 
         if len(no_to_transitions) > 0:
-            self.logger.warn(f'There are no transitions to named positions: [{", ".join(no_to_transitions)}]')
+            self._logger.warn(f'There are no transitions to named positions: [{", ".join(no_to_transitions)}]')
             return False
         return True
 

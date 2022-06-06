@@ -3,7 +3,6 @@
 from typing import Optional
 
 from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import CameraPointsHandler
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_shared_msgs.msg import FootPosition
 
@@ -13,7 +12,7 @@ class SimulatedPointsHandler(CameraPointsHandler):
 
     def __init__(self, gait):
         self._gait = gait
-        self._logger = Logger(self._gait.gait_selection, __class__.__name__)
+        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
         super().__init__(gait)
 
     def _create_subscribers(self) -> None:

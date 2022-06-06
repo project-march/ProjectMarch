@@ -1,7 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
-from march_utility.utilities.logger import Logger
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
     TrajectoryCommandFactory,
 )
@@ -14,7 +13,7 @@ class TrajectoryCommandFactoryStepAndClose(TrajectoryCommandFactory):
         super().__init__(gait, points_handler)
         self._gait = gait
         self._points_handler = points_handler
-        self._logger = Logger(self._gait.gait_selection, __class__.__name__)
+        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
     def _can_get_second_step(self, is_final_iteration: bool) -> bool:

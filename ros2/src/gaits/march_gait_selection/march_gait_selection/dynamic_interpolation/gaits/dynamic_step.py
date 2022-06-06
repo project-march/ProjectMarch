@@ -9,7 +9,6 @@ from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory i
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
     VelocitySoftLimitError,
@@ -51,7 +50,6 @@ class DynamicStep:
         hold_subgait (bool): whether the subgait is created by the dynamic_setpoint_gait_step_and_hold class
 
     Attributes:
-        logger (Logger): used for logging to the terminal
         starting_position (Dict[str, Setpoint]): the first setpoint of the gait
         location (Point): the desired location given by (fake) covid
         joint_names (List[str]): list of joint names
@@ -78,9 +76,8 @@ class DynamicStep:
         stop: bool,
         hold_subgait: bool = False,
     ):
-        self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
-
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.home_stand_position = home_stand_position
         self.starting_position = starting_position
         self.location = location.processed_point
