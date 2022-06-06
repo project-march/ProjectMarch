@@ -37,6 +37,8 @@ alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && so
 # Shorter aliases
 alias mb1='march_build_ros1'
 alias mb2='march_build_ros2'
+alias sim1='march_run_ros1_sim'
+alias sim2='march_run_ros2_sim'
 alias bridge='march_run_bridge'
 alias b='march_run_bridge'
 
@@ -44,8 +46,8 @@ alias b='march_run_bridge'
 # Training aliases
 export URDF='robot_description:=march6_three_cameras'
 
-alias sim1='march_run_ros1_sim $URDF point_finder:=true realsense_simulation:=true ground_gait:=true'
-alias sim2='march_run_ros2_sim $URDF realsense_simulation:=true ground_gait:=true use_imu_data:=false'
+alias cov1='march_run_ros1_sim $URDF point_finder:=true realsense_simulation:=true ground_gait:=true'
+alias cov2='march_run_ros2_sim $URDF realsense_simulation:=true ground_gait:=true use_imu_data:=false'
 
 alias ag1='march_run_ros1_airgait $URDF point_finder:=true ground_gait:=true use_imu_data:=true'
 alias ag2='march_run_ros2_training $URDF use_imu_data:=true wireless_ipd:=true'
