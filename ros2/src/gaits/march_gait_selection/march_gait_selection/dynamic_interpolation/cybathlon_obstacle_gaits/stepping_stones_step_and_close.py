@@ -10,7 +10,6 @@ from march_utility.exceptions.gait_exceptions import (
 )
 from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_stepping_stones import (
     TrajectoryCommandFactorySteppingStones,
@@ -35,7 +34,7 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
         self._positions = positions
         self.start_from_left_side = False
         self.use_predetermined_foot_location = False
-        self.logger = Logger(self.node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactorySteppingStones(self, self._points_handler)
         self.gait_name = "stepping_stones_step_and_close"
 
@@ -57,7 +56,7 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self.logger.error(e.msg)
+            self._logger.error(e.msg)
             return None
 
         if self.start_from_left_side:

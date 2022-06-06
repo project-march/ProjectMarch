@@ -21,6 +21,7 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False

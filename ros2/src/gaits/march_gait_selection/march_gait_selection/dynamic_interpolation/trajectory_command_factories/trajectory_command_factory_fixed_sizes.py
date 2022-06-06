@@ -22,6 +22,7 @@ class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactoryQueue):
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
         self._gait.node.create_subscription(
             String,

@@ -16,7 +16,6 @@ from march_shared_msgs.msg import (
     FollowJointTrajectoryActionResult,
     FollowJointTrajectoryResult,
 )
-from march_utility.utilities.logger import Logger
 from trajectory_msgs.msg import JointTrajectory
 
 TRAJECTORY_SCHEDULER_HISTORY_DEPTH = 5
@@ -64,7 +63,7 @@ class TrajectoryScheduler:
     Args:
         node (Node): node that is used to create subscribers/publishers
     Attributes:
-        logger (Logger): used to log to the terminal
+        _logger (Logger): used to log to the terminal
         _failed (bool): ???
         _node (Node): node that is used to create subscribers/publishers
         _goals (List[TrajectoryCommand]): list containing trajectory commands
@@ -82,7 +81,7 @@ class TrajectoryScheduler:
         self._failed = False
         self._node = node
         self._goals: List[TrajectoryCommand] = []
-        self.logger = Logger(self._node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -139,8 +138,8 @@ class TrajectoryScheduler:
             debug_log_message += "now"
 
         self._goals.append(command)
-        self.logger.info(info_log_message)
-        self.logger.debug(debug_log_message)
+        self._logger.info(info_log_message)
+        self._logger.debug(debug_log_message)
 
     def cancel_active_goals(self) -> None:
         """Cancels the active goal."""
@@ -165,7 +164,7 @@ class TrajectoryScheduler:
     def _done_cb(self, result) -> None:
         """Callback for when a result is published."""
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
             )
             self._failed = True

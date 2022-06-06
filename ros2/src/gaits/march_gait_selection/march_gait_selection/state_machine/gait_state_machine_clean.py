@@ -10,7 +10,6 @@ from march_gait_selection.state_machine.state_machine_input import StateMachineI
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 
 from march_utility.gait.edge_position import UnknownEdgePosition
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -32,7 +31,7 @@ class GaitStateMachine:
         self._gaits = gaits
         self._positions = positions
 
-        self._logger = Logger(self._node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._input = StateMachineInput(node)
         self._timer_period = self._node.get_parameter("timer_period").get_parameter_value().double_value
         self._last_end_position = UnknownEdgePosition()

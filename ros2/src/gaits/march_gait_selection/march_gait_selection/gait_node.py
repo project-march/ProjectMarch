@@ -15,7 +15,6 @@ from march_gait_selection.state_machine.gait_state_machine_clean import GaitStat
 
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import get_robot_urdf_from_service
 
 NODE_NAME = "gait"
@@ -100,7 +99,7 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
         gait_state_machine.update_parameters("dynamic_step")
         gait_state_machine.update_parameters("dynamic_step_and_hold")
 
-    node.get_logger().info(f"{param.name} set to {param.value}.")
+    node._logger.info(f"{param.name} set to {param.value}.")
 
     return SetParametersResult(successful=True)
 
@@ -110,7 +109,7 @@ class GaitNode(Node):
 
     def __init__(self):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
-        self.logger = Logger(self, __class__.__name__)
+        self._logger = self.get_logger().get_child(__class__.__name__)
         self._set_reconfigurable_parameters()
 
     def _set_reconfigurable_parameters(self) -> None:

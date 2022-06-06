@@ -8,7 +8,6 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_shared_msgs.msg import FootPosition
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 
 DURATION_INCREASE_FACTOR = 1.5
 DURATION_INCREASE_SIZE = 0.25
@@ -40,7 +39,7 @@ class TrajectoryCommandFactory:
     def __init__(self, gait, points_handler):
         self._gait = gait
         self._points_handler = points_handler
-        self._logger = Logger(self._gait.node, __class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
     def get_trajectory_command(

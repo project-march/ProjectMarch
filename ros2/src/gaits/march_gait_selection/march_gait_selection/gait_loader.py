@@ -26,7 +26,6 @@ from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.exceptions.gait_exceptions import NonValidGaitContentError
 from march_utility.gait.edge_position import UnknownEdgePosition
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import get_joint_names_from_robot
 
 NODE_NAME = "gait_selection"
@@ -43,7 +42,7 @@ class GaitLoader:
     ):
         self._node = node
         self._robot = robot
-        self._logger = Logger(self._node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._joint_names = sorted(get_joint_names_from_robot(self._robot))
 
         package_path = get_package_share_directory(self._node.gait_package)

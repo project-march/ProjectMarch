@@ -13,7 +13,6 @@ from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_LEFT,
 )
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -35,7 +34,7 @@ class DynamicGaitClose(DynamicGaitWalk):
 
     def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
         super().__init__(node, positions)
-        self.logger = Logger(self.node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._points_handler = CameraPointsHandler(self)
         self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._points_handler)
         self.gait_name = "dynamic_close"
@@ -91,7 +90,7 @@ class DynamicGaitClose(DynamicGaitWalk):
             GaitUpdate: An optional GaitUpdate containing a TrajectoryCommand if step is feasible
         """
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
-            self.logger.warn("Already in home stand position.")
+            self._logger.warn("Already in home stand position.")
             return GaitUpdate.empty()
         elif self.start_position_all_joints == STEPPING_STONES_END_POSITION_RIGHT:
             self.subgait_id = "right_swing"

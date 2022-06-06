@@ -6,8 +6,6 @@ import yaml
 from queue import Queue
 from typing import Dict, Optional
 from ament_index_python.packages import get_package_share_path
-from march_utility.utilities.logger import Logger
-
 
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
@@ -38,7 +36,7 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
-        self._logger = Logger(self._gait.node, __class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._create_position_queue()
         self.update_parameter()
         self._trajectory_failed = False

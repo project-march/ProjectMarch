@@ -13,7 +13,6 @@ from march_utility.utilities.utility_functions import (
     get_position_from_yaml,
 )
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     WrongStartPositionError,
 )
@@ -52,7 +51,7 @@ class DynamicGaitWalk(GaitInterface):
         all_joint_names (List[srt]): names of all eight joints in alphabetical order
         gait_name (str): name of the gait
         subgait_id (str): either left_swing or right_swing
-        logger (Logger): used to log messages to the terminal with the class name as a prefix
+        _logger (rclpy.logger): used to log messages to the terminal with the class name as a prefix
         minimum_stair_height (float): steps higher or lower than this height will be classified as 'stairs-like'
         start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
         amount_of_steps (int): the amount of steps the gait makes before closing the gait
@@ -78,7 +77,7 @@ class DynamicGaitWalk(GaitInterface):
         super(DynamicGaitWalk, self).__init__()
         self.node = node
         self._positions = positions
-        self.logger = Logger(self.node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._points_handler = CameraPointsHandler(gait=self)
         self.trajectory_command_factory = TrajectoryCommandFactory(
             gait=self,
@@ -214,7 +213,7 @@ class DynamicGaitWalk(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self.logger.error(e.msg)
+            self._logger.error(e.msg)
             return None
         self.update_parameters()
         self.start_time_next_command = current_time + first_subgait_delay
@@ -353,7 +352,7 @@ class DynamicGaitWalk(GaitInterface):
             return False
         elif self._step_counter == self.amount_of_steps - 1:
             self._end = True
-            self.logger.info("Stopping dynamic gait.")
+            self._logger.info("Stopping dynamic gait.")
             return True
         self._step_counter += 1
         return False

@@ -16,7 +16,6 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 
 from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_shared_msgs.msg import GaitInstruction
@@ -34,7 +33,7 @@ class DynamicGaitStep(DynamicGaitWalk):
 
     def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
         super().__init__(node, positions)
-        self.logger = Logger(self.node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, points_handler=self._points_handler)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
