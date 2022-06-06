@@ -14,7 +14,6 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_shared_msgs.msg import GaitInstruction
@@ -32,7 +31,7 @@ class DynamicGaitStep(DynamicGaitWalk):
 
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryQueue(
             gait=self, points_handler=self._camera_points_handler
         )

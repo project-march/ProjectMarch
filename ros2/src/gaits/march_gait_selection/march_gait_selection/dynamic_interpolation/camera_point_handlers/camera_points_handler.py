@@ -6,7 +6,6 @@ from rclpy.time import Time
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
@@ -30,7 +29,7 @@ class CameraPointsHandler:
 
     def __init__(self, gait):
         self._gait = gait
-        self._logger = Logger(self._gait.gait_selection, __class__.__name__)
+        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
         self._create_subscribers()
         self._create_publishers()
 
