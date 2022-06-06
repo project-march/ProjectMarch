@@ -13,7 +13,6 @@ from march_utility.utilities.utility_functions import (
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
 
-from march_shared_msgs.msg import FootPosition, CurrentGait
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 from march_shared_msgs.msg import CurrentGait
