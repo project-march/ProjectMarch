@@ -56,7 +56,7 @@ class DynamicGaitWalk(GaitInterface):
         start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
         amount_of_steps (int): the amount of steps the gait makes before closing the gait
 
-        _camera_points_handler (CameraPointsHandler): the camera points handler used to handle communication with vision
+        _points_handler (CameraPointsHandler): the camera points handler used to handle communication with vision
         _end (bool): whether the gait has ended
         _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
         _should_stop (bool): Set to true if the next subgait should be a close gait
@@ -76,10 +76,10 @@ class DynamicGaitWalk(GaitInterface):
         super(DynamicGaitWalk, self).__init__()
         self.gait_selection = gait_selection_node
         self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
-        self._camera_points_handler = CameraPointsHandler(gait=self)
+        self._points_handler = CameraPointsHandler(gait=self)
         self.trajectory_command_factory = TrajectoryCommandFactory(
             gait=self,
-            points_handler=self._camera_points_handler,
+            points_handler=self._points_handler,
         )
 
         self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
@@ -134,9 +134,8 @@ class DynamicGaitWalk(GaitInterface):
         """Returns the type of gait, for example 'walk_like' or 'sit_like'."""
         if self._next_command is not None:
             if (
-                self._camera_points_handler.get_foot_location(self.subgait_id).processed_point.y
-                > self.minimum_stair_height
-                or self._camera_points_handler.get_foot_location(self.subgait_id).processed_point.y
+                self._points_handler.get_foot_location(self.subgait_id).processed_point.y > self.minimum_stair_height
+                or self._points_handler.get_foot_location(self.subgait_id).processed_point.y
                 < -self.minimum_stair_height
             ):
                 return "stairs_like"

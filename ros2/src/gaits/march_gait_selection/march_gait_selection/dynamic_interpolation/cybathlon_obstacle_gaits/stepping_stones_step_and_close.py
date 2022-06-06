@@ -31,7 +31,7 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
         self.start_from_left_side = False
         self.use_predetermined_foot_location = False
         self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactorySteppingStones(self, self._camera_points_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactorySteppingStones(self, self._points_handler)
         self.gait_name = "stepping_stones_step_and_close"
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)

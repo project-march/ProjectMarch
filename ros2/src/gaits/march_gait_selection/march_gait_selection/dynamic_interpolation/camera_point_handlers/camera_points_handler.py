@@ -34,6 +34,7 @@ class CameraPointsHandler:
         self._create_publishers()
 
     def _create_subscribers(self) -> None:
+        """Create subscribers to listen to points given by depth cameras."""
         self._gait.gait_selection.create_subscription(
             FootPosition,
             "/march/processed_foot_position/right",
@@ -48,6 +49,7 @@ class CameraPointsHandler:
         )
 
     def _create_publishers(self) -> None:
+        """Create publishers to publish chosen point back to covid."""
         self.pub_right = self._gait.gait_selection.create_publisher(
             FootPosition,
             "/march/chosen_foot_position/right",

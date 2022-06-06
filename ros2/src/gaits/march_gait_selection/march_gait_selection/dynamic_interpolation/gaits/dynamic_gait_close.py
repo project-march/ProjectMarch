@@ -34,8 +34,8 @@ class DynamicGaitClose(DynamicGaitWalk):
     def __init__(self, gait_selection_node: Node):
         super().__init__(gait_selection_node)
         self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
-        camera_points_handler = CameraPointsHandler(self)
-        self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, camera_points_handler)
+        self._points_handler = CameraPointsHandler(self)
+        self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._points_handler)
         self.gait_name = "dynamic_close"
 
         gait_selection_node.create_subscription(
