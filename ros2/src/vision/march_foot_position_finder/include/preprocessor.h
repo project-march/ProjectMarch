@@ -32,14 +32,6 @@ protected:
 
     PointCloud::Ptr pointcloud_;
 
-    float voxel_size_;
-    float x_min_;
-    float x_max_;
-    float y_min_;
-    float y_max_;
-    float z_min_;
-    float z_max_;
-
     std::string base_frame_;
     std::string pointcloud_frame_id_;
     geometry_msgs::msg::TransformStamped transform_;

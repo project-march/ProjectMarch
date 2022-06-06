@@ -177,8 +177,8 @@ void PointFinder::initializeSearchDimensions(Point& step_point)
  * @param step_point Desired stepping point.
  * @param position_queue Queue with possible foot positions.
  */
-void PointFinder::findPoints(PointCloud::Ptr pointcloud, Point& step_point,
-    std::vector<Point>* position_queue)
+void PointFinder::findPoints(const PointCloud::Ptr& pointcloud,
+    Point& step_point, std::vector<Point>* position_queue)
 {
     initializeSearchDimensions(step_point);
     mapPointCloudToHeightMap(pointcloud);

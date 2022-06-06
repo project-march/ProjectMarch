@@ -324,7 +324,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
     publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
         left_or_right_); // Purple
-    publishArrow(point_marker_publisher_, n_, ORIGIN, start_point_,
+    publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN,
+        start_point_,
         left_or_right_); // Blue
 
     if (position_queue.size() > 0) {
@@ -353,7 +354,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         }
 
         // Visualize new displacement
-        publishArrow2(point_marker_publisher_, n_, start_point_,
+        publishNewDisplacement(point_marker_publisher_, n_, start_point_,
             found_covid_point_,
             left_or_right_); // Green
 

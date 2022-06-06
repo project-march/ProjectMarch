@@ -25,7 +25,7 @@ public:
 
     ~PointFinder() = default;
 
-    void findPoints(PointCloud::Ptr pointcloud, Point& step_point,
+    void findPoints(const PointCloud::Ptr& pointcloud, Point& step_point,
         std::vector<Point>* position_queue);
 
     void startParameterCallback(

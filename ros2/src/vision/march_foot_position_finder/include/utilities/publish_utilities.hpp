@@ -98,8 +98,8 @@ void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     publisher->publish(marker);
 }
 
-void publishArrow(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
-    const Point& p1, Point& p2, std::string& left_or_right)
+void publishPreviousDisplacement(const MarkerPublisher::SharedPtr& publisher,
+    rclcpp::Node* n, const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -122,7 +122,7 @@ void publishArrow(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
     marker.color.g = 0.0;
     marker.color.b = 1.0;
     marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3);
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
     marker.points.push_back(to_geometry(p1));
     marker.points.push_back(to_geometry(p2));
@@ -130,8 +130,8 @@ void publishArrow(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
     publisher->publish(marker);
 }
 
-void publishArrow2(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
-    const Point& p1, Point& p2, std::string& left_or_right)
+void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
+    rclcpp::Node* n, const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -239,7 +239,7 @@ void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
 
-    publisher->publish(marker);
+    publisher->publish(marker); // NOLINT
 }
 
 /**
