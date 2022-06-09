@@ -19,6 +19,7 @@ def generate_launch_description():
         )
     ]
 
+    # region Controllers
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
@@ -30,6 +31,8 @@ def generate_launch_description():
         executable="spawner.py",
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
     )
+
+    # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
@@ -55,13 +58,15 @@ def generate_launch_description():
     # Path to the control file. Must be in `march_control/config/gazebo/`.
     control_yaml = LaunchConfiguration("control_yaml")
 
-    robot_desc_xacro = Command(generate_robot_desc_command(
-        robot_descr_file=robot_description,
-        ground_gait=ground_gait,
-        realsense_simulation=realsense_simulation,
-        simulation=simulation,
-        jointless=jointless,
-        control_yaml=control_yaml)
+    robot_desc_xacro = Command(
+        generate_robot_desc_command(
+            robot_descr_file=robot_description,
+            ground_gait=ground_gait,
+            realsense_simulation=realsense_simulation,
+            simulation=simulation,
+            jointless=jointless,
+            control_yaml=control_yaml,
+        )
     )
     robot_desc_dict = {"robot_description": robot_desc_xacro}
     # endregion
@@ -75,7 +80,7 @@ def generate_launch_description():
             "stdout": "screen",
             "stderr": "screen",
         },
-        condition=UnlessCondition(simulation)
+        condition=UnlessCondition(simulation),
     )
     nodes.append(control_node)
     # endregion
