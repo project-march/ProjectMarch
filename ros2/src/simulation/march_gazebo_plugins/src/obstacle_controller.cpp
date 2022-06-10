@@ -6,7 +6,8 @@
 #include <typeinfo>
 
 namespace gazebo {
-ObstacleController::ObstacleController(physics::ModelPtr model)
+ObstacleController::ObstacleController(
+    physics::ModelPtr model, std::map<std::string, int>& pd_values)
     : model_(std::move(model))
     , HOME_STAND(/*__s=*/"home_stand")
     , STAND_IDLE(/*__s=*/"idle_stand")
@@ -14,19 +15,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
     , subgait_start_time_(0)
     , subgait_duration_(0)
     , subgait_changed_(true)
-    , balance_(false)
-    , p_yaw_(0)
-    , d_yaw_(0)
-    , p_yaw_balance_(0)
-    , d_yaw_balance_(0)
-    , p_pitch_(0)
-    , d_pitch_(0)
-    , p_pitch_balance_(0)
-    , d_pitch_balance_(0)
-    , p_roll_(0)
-    , d_roll_(0)
-    , p_roll_balance_(0)
-    , d_roll_balance_(0)
+    , pd_values_(pd_values)
     , error_x_last_timestep_(0)
     , error_y_last_timestep_(0)
     , error_yaw_last_timestep_(0)
@@ -45,9 +34,6 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
     double upper_leg_length_
         = properties["dimensions"]["upper_leg"]["length"].as<double>();
     halved_upper_leg_length_ = upper_leg_length_ / 2.0;
-
-    // TODO: balance_ parameter was updated here with ROS. Need a new method for
-    // this. Right now, balance is always false.
 
     // As long as no sitting gait is executed, the default to use when no
     // subgait is idle_stand
@@ -122,35 +108,13 @@ void ObstacleController::update(
         error_yaw_last_timestep_ = error_yaw;
         subgait_changed_ = false;
     }
-    double p_pitch_actual, p_roll_actual, p_yaw_actual, d_pitch_actual,
-        d_roll_actual, d_yaw_actual;
 
-    // roll, pitch and yaw are defined in
-    // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
-    // turn (bodge) off plug-in at right time when balance is set to true
-    if (balance_ == true && subgait_name_ != HOME_STAND
-        && subgait_name_ != STAND_IDLE) {
-        p_pitch_actual = p_pitch_balance_;
-        p_roll_actual = p_roll_balance_;
-        p_yaw_actual = p_yaw_balance_;
-        d_pitch_actual = d_pitch_balance_;
-        d_roll_actual = d_roll_balance_;
-        d_yaw_actual = d_yaw_balance_;
-    } else {
-        p_pitch_actual = p_pitch_;
-        p_roll_actual = p_roll_;
-        p_yaw_actual = p_yaw_;
-        d_pitch_actual = d_pitch_;
-        d_roll_actual = d_roll_;
-        d_yaw_actual = d_yaw_;
-    }
-
-    double T_pitch = -p_pitch_actual * error_x
-        - d_pitch_actual * (error_x - error_x_last_timestep_);
-    double T_roll = p_roll_actual * error_y
-        + d_roll_actual * (error_y - error_y_last_timestep_);
-    double T_yaw = -p_yaw_actual * error_yaw
-        - d_yaw_actual * (error_yaw - error_yaw_last_timestep_);
+    double T_pitch
+        = -pd_values_["p_pitch"] * error_x - pd_values_["d_pitch"] * (error_x - error_x_last_timestep_);
+    double T_roll
+        = pd_values_["p_roll"] * error_y + pd_values_["d_roll"] * (error_y - error_y_last_timestep_);
+    double T_yaw
+        = -pd_values_["p_yaw"] * error_yaw - pd_values_["d_yaw"] * (error_yaw - error_yaw_last_timestep_);
 
     if (subgait_name_.substr(/*__pos=*/0, /*__n=*/4) == "left") {
         torque_right
@@ -257,25 +221,6 @@ void ObstacleController::getWalkGoalPositionX(
     else if (subgait_name_.substr(subgait_name_.size() - 5) == "close") {
         goal_position_x += 0.25 * swing_step_size_
             - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
-    }
-}
-
-bool ObstacleController::changeComLevel(const std::string& level_name)
-{
-    if (not std::count(com_levels.begin(), com_levels.end(), level_name)) {
-        return false;
-    } else {
-        p_pitch_balance_
-            = com_levels_tree[level_name]["pitch"]["p"].as<double>();
-        d_pitch_balance_
-            = com_levels_tree[level_name]["pitch"]["d"].as<double>();
-
-        p_roll_balance_ = com_levels_tree[level_name]["roll"]["p"].as<double>();
-        d_roll_balance_ = com_levels_tree[level_name]["roll"]["d"].as<double>();
-
-        p_yaw_balance_ = com_levels_tree[level_name]["yaw"]["p"].as<double>();
-        d_yaw_balance_ = com_levels_tree[level_name]["yaw"]["d"].as<double>();
-        return true;
     }
 }
 

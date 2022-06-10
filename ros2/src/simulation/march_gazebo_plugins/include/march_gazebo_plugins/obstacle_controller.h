@@ -5,13 +5,16 @@
 #include "yaml-cpp/yaml.h"
 #include <gazebo/physics/physics.hh>
 #include <march_shared_msgs/msg/current_gait.hpp>
+#include <map>
+#include <string>
 
 namespace gazebo {
 class ObstacleController {
 public:
-    explicit ObstacleController(physics::ModelPtr model);
+    explicit ObstacleController(physics::ModelPtr model, std::map<std::string, int>& pd_values);
 
-    void newSubgait(const march_shared_msgs::msg::CurrentGait::ConstSharedPtr& msg);
+    void newSubgait(
+        const march_shared_msgs::msg::CurrentGait::ConstSharedPtr& msg);
     ignition::math::v6::Vector3<double> GetCom();
     void update(ignition::math::v6::Vector3<double>& torque_all,
         ignition::math::v6::Vector3<double>& torque_stable);
@@ -22,9 +25,6 @@ public:
         double time_since_start, double stable_foot_pose_x);
     void getWalkGoalPositionX(
         double time_since_start, double stable_foot_pose_x);
-    bool changeComLevel(const std::string&);
-
-    std::vector<std::string> com_levels;
 
 protected:
     physics::ModelPtr model_;
@@ -44,22 +44,8 @@ protected:
     double subgait_duration_;
 
     bool subgait_changed_;
-    bool balance_;
 
-    double p_yaw_;
-    double d_yaw_;
-    double p_yaw_balance_;
-    double d_yaw_balance_;
-
-    double p_pitch_;
-    double d_pitch_;
-    double p_pitch_balance_;
-    double d_pitch_balance_;
-
-    double p_roll_;
-    double d_roll_;
-    double p_roll_balance_;
-    double d_roll_balance_;
+    std::map<std::string, int>& pd_values_;
 
     double error_x_last_timestep_;
     double error_y_last_timestep_;

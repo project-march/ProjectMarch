@@ -16,7 +16,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 add_library(${PROJECT_NAME} SHARED
   src/com_controller_plugin.cpp
   src/obstacle_controller.cpp
-  src/walk_controller.cpp
   src/com_controller_node.cpp
   )
 target_link_libraries(${PROJECT_NAME} ${GAZEBO_LIBRARIES} yaml-cpp)

@@ -1,8 +1,9 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
 #include <march_gazebo_plugins/com_controller_node.h>
-#include <march_gazebo_plugins/walk_controller.h>
 #include <thread>
+#include <map>
+#include <string>
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
@@ -23,6 +24,7 @@ private:
     std::shared_ptr<ObstacleController> controller_;
     std::shared_ptr<ComControllerNode> node_;
     std::thread ros_thread;
+    std::map<std::string, int> pd_values_;
 };
 
 // Register this plugin with the simulator
