@@ -93,15 +93,15 @@ def generate_launch_description() -> launch.LaunchDescription:
         # GENERAL ARGUMENTS
         DeclareLaunchArgument(
             name="use_sim_time",
-            default_value="True",
+            default_value="False",
             description="Whether to use simulation time as published on the "
-                        "/clock topic by gazebo instead of system time.",
+            "/clock topic by gazebo instead of system time.",
         ),
         DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
             default_value="gazebo/march6_control.yaml",
-            description="The controller yaml file to use. Must be in: `march_control/config/`."
+            description="The controller yaml file to use. Must be in: `march_control/config/`.",
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -118,22 +118,22 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="ping_safety_node",
             default_value="True",
             description="Whether the input device should ping the safety node"
-                        "with an alive message every 0.2 seconds",
+            "with an alive message every 0.2 seconds",
         ),
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
             name="robot_state_publisher",
             default_value="True",
             description="Whether or not to launch the robot state publisher,"
-                        "this allows nodes to get the urdf and to subscribe to"
-                        "potential urdf updates. This is necesary for gait selection"
-                        "to be able to launch.",
+            "this allows nodes to get the urdf and to subscribe to"
+            "potential urdf updates. This is necesary for gait selection"
+            "to be able to launch.",
         ),
         DeclareLaunchArgument(
             name="robot_description",
-            default_value=robot,
+            default_value="march6_ros2",
             description="Which <robot_description>.xacro file to use. "
-                        "This file must be available in the `march_desrciption/urdf/` folder.",
+            "This file must be available in the `march_desrciption/urdf/` folder.",
         ),
         DeclareLaunchArgument(
             name="realsense",
@@ -154,8 +154,8 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="to_world_transform",
             default_value=ground_gait,
             description="Whether a transform from the world to base_link is "
-                        "necessary, this is the case when you are "
-                        "groundgaiting in rviz.",
+            "necessary, this is the case when you are "
+            "groundgaiting in rviz.",
         ),
         DeclareLaunchArgument(
             name="use_imu_data",
@@ -182,8 +182,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         DeclareLaunchArgument(
             name="gait_directory",
             default_value="airgait_vi",
-            description="The directory in which the gait files to use are located, "
-                        "relative to the gait_package.",
+            description="The directory in which the gait files to use are located, " "relative to the gait_package.",
         ),
         DeclareLaunchArgument(
             name="balance",
@@ -204,13 +203,13 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="middle_point_height",
             default_value="0.15",
             description="Height of the middle setpoint of dynamic gait "
-                        "relative to the desired position, given in meters.",
+            "relative to the desired position, given in meters.",
         ),
         DeclareLaunchArgument(
             name="minimum_stair_height",
             default_value="0.15",
             description="A step lower or higher than the minimum_stair_height"
-                        "will change the gait type to stairs_like instead of walk_like.",
+            "will change the gait type to stairs_like instead of walk_like.",
         ),
         DeclareLaunchArgument(
             name="push_off_fraction",
@@ -236,7 +235,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="use_position_queue",
             default_value="False",
             description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
-                        "points given by (simulated) covid.",
+            "points given by (simulated) covid.",
         ),
         DeclareLaunchArgument(
             name="add_cybathlon_gaits",
@@ -247,14 +246,14 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="first_subgait_delay",
             default_value="0.2",
             description="Duration to wait before starting first subgait."
-                        "If 0 then the first subgait is started immediately,"
-                        "dropping the first setpoint in the process.",
+            "If 0 then the first subgait is started immediately,"
+            "dropping the first setpoint in the process.",
         ),
         DeclareLaunchArgument(
             name="early_schedule_duration",
             default_value="0.3",
             description="Duration to schedule next subgait early. If 0 then the"
-                        "next subgait is never scheduled early.",
+            "next subgait is never scheduled early.",
         ),
         DeclareLaunchArgument(
             "timer_period",
@@ -307,7 +306,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="duration",
             default_value="1.5",
             description="Base duration of dynamic gait, may be scaled depending on step height.",
-        )
+        ),
     ]
 
     # region Use normal launch file with different launch_arguments
@@ -360,7 +359,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("location_x", location_x),
             ("location_y", location_y),
             ("location_z", location_z),
-            ("gazebo", 'true')
+            ("gazebo", "true"),
         ],
     )
     # endregion

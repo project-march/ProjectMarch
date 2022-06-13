@@ -44,7 +44,7 @@ def generate_launch_description() -> LaunchDescription:
             Default is False.
         ...
     """
-    #region LaunchConfigurations
+    # region LaunchConfigurations
 
     declared_arguments = []
 
@@ -89,13 +89,13 @@ def generate_launch_description() -> LaunchDescription:
             name="to_world_transform",
             default_value=ground_gait,
             description="Whether a transform from the world to base_link is necessary, "
-                        "this is the case when you are groundgaiting.",
+            "this is the case when you are groundgaiting.",
         ),
         DeclareLaunchArgument(
             name="gazebo",
             default_value=simulation,
             description="Whether we want to run it in simulation with Gazebo control.",
-        )
+        ),
     ]
     # endregion
 
@@ -136,13 +136,13 @@ def generate_launch_description() -> LaunchDescription:
             name="use_sim_time",
             default_value="False",
             description="Whether to use simulation time as published on the "
-                        "/clock topic by gazebo instead of system time.",
+            "/clock topic by gazebo instead of system time.",
         ),
         DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
             default_value="effort_control/march6.yaml",
-            description="The controller yaml file to use. Must be in: `march_control/config/`."
+            description="The controller yaml file to use. Must be in: `march_control/config/`.",
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -164,22 +164,22 @@ def generate_launch_description() -> LaunchDescription:
             name="ping_safety_node",
             default_value="True",
             description="Whether the input device should ping the safety node"
-                        "with an alive message every 0.2 seconds",
+            "with an alive message every 0.2 seconds",
         ),
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
             name="robot_state_publisher",
             default_value="True",
             description="Whether or not to launch the robot state publisher,"
-                        "this allows nodes to get the urdf and to subscribe to"
-                        "potential urdf updates. This is necesary for gait selection"
-                        "to be able to launch",
+            "this allows nodes to get the urdf and to subscribe to"
+            "potential urdf updates. This is necesary for gait selection"
+            "to be able to launch",
         ),
         DeclareLaunchArgument(
             name="robot_description",
             default_value=robot,
             description="Which <robot_description>.xacro file to use. "
-                        "This file must be available in the march_desrciption/urdf/ folder",
+            "This file must be available in the march_desrciption/urdf/ folder",
         ),
         DeclareLaunchArgument(
             name="realsense",
@@ -206,7 +206,6 @@ def generate_launch_description() -> LaunchDescription:
             default_value="back",
             description="Which imu to use for knowing the exoskeleton orientation",
         ),
-
         DeclareLaunchArgument(
             "jointless",
             default_value="False",
@@ -231,8 +230,7 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(
             name="gait_directory",
             default_value="airgait_vi",
-            description="The directory in which the gait files to use are located, "
-                        "relative to the gait_package.",
+            description="The directory in which the gait files to use are located, " "relative to the gait_package.",
         ),
         DeclareLaunchArgument(
             name="balance",
@@ -253,13 +251,13 @@ def generate_launch_description() -> LaunchDescription:
             name="middle_point_height",
             default_value="0.15",
             description="Height of the middle setpoint of dynamic gait "
-                        "relative to the desired position, given in meters.",
+            "relative to the desired position, given in meters.",
         ),
         DeclareLaunchArgument(
             name="minimum_stair_height",
             default_value="0.15",
             description="A step lower or higher than the minimum_stair_height"
-                        "will change the gait type to stairs_like instead of walk_like.",
+            "will change the gait type to stairs_like instead of walk_like.",
         ),
         DeclareLaunchArgument(
             name="push_off_fraction",
@@ -285,7 +283,7 @@ def generate_launch_description() -> LaunchDescription:
             name="use_position_queue",
             default_value="False",
             description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
-                        "points given by (simulated) covid.",
+            "points given by (simulated) covid.",
         ),
         DeclareLaunchArgument(
             name="add_cybathlon_gaits",
@@ -296,14 +294,14 @@ def generate_launch_description() -> LaunchDescription:
             name="first_subgait_delay",
             default_value="0.2",
             description="Duration to wait before starting first subgait."
-                        "If 0 then the first subgait is started immediately,"
-                        "dropping the first setpoint in the process.",
+            "If 0 then the first subgait is started immediately,"
+            "dropping the first setpoint in the process.",
         ),
         DeclareLaunchArgument(
             name="early_schedule_duration",
             default_value="0.3",
             description="Duration to schedule next subgait early. If 0 then the"
-                        "next subgait is never scheduled early.",
+            "next subgait is never scheduled early.",
         ),
         DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
         # FAKE SENSOR DATA ARGUMENTS
@@ -347,10 +345,10 @@ def generate_launch_description() -> LaunchDescription:
             name="duration",
             default_value="1.5",
             description="Base duration of dynamic gait, may be scaled depending on step height",
-        )
+        ),
     ]
 
-    #region Launch rqt input device if not rqt_input:=false
+    # region Launch rqt input device if not rqt_input:=false
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -366,7 +364,7 @@ def generate_launch_description() -> LaunchDescription:
         ],
         condition=IfCondition(rqt_input),
     )
-    #endregion
+    # endregion
 
     # region Launch wireless input device if not wireless_ipd:=false
     wireless_ipd_node = IncludeLaunchDescription(
@@ -381,7 +379,7 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    #region Launch robot state publisher (from march_description) if not robot_state_publisher:=false
+    # region Launch robot state publisher (from march_description) if not robot_state_publisher:=false
     robot_state_publisher_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -401,13 +399,13 @@ def generate_launch_description() -> LaunchDescription:
             ("imu_topic", imu_topic),
             ("simulation", simulation),
             ("jointless", jointless),
-            ("control_yaml", control_yaml)
+            ("control_yaml", control_yaml),
         ],
         condition=IfCondition(robot_state_publisher),
     )
-    #endregion
+    # endregion
 
-    #region Launch March gait selection
+    # region Launch March gait selection
     march_gait_selection_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -436,9 +434,9 @@ def generate_launch_description() -> LaunchDescription:
             ("timer_period", timer_period),
         ],
     )
-    #endregion
+    # endregion
 
-    #region Launch Gait preprocessor
+    # region Launch Gait preprocessor
     gait_preprocessor_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -456,9 +454,9 @@ def generate_launch_description() -> LaunchDescription:
             ("duration", duration),
         ],
     )
-    #endregion
+    # endregion
 
-    #region Launch Safety
+    # region Launch Safety
     safety_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -469,9 +467,9 @@ def generate_launch_description() -> LaunchDescription:
         ),
         launch_arguments=[("use_sim_time", use_sim_time)],
     )
-    #endregion
+    # endregion
 
-    #region Launch March robot information
+    # region Launch March robot information
     robot_information_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -481,9 +479,9 @@ def generate_launch_description() -> LaunchDescription:
             )
         )
     )
-    #endregion
+    # endregion
 
-    #region Launch Fake temperature sensor data node
+    # region Launch Fake temperature sensor data node
     fake_sensor_data_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -498,9 +496,9 @@ def generate_launch_description() -> LaunchDescription:
         ],
         condition=IfCondition(fake_sensor_data),
     )
-    #endregion
+    # endregion
 
-    #region Launch Smartglass bridge
+    # region Launch Smartglass bridge
     smartglass_bridge_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -511,7 +509,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         condition=IfCondition(use_hud),
     )
-    #endregion
+    # endregion
 
     # region Launch Gazebo
     gazebo_node = IncludeLaunchDescription(
@@ -534,9 +532,7 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     # region Launch RViz
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("march_launch"), "rviz", "ros2.rviz"]
-    )
+    rviz_config_file = PathJoinSubstitution([FindPackageShare("march_launch"), "rviz", "ros2.rviz"])
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -562,7 +558,7 @@ def generate_launch_description() -> LaunchDescription:
             )
         ),
         launch_arguments=[
-            ("simulation", 'true'),
+            ("simulation", "true"),
         ],
     )
     # endregion
@@ -580,7 +576,7 @@ def generate_launch_description() -> LaunchDescription:
         gazebo_node,
         gazebo_spawn_entity,
         # rviz_node_delay_after_gazebo,
-        march_control
+        march_control,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

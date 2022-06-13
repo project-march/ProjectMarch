@@ -58,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
             name="use_imu_data",
             default_value="False",
             description="Whether the data from the physical imu should be used to"
-                        "publish the rotation of the exoskeleton.",
+            "publish the rotation of the exoskeleton.",
         ),
         DeclareLaunchArgument(
             name="imu_topic",
@@ -69,13 +69,13 @@ def generate_launch_description() -> LaunchDescription:
             name="to_world_transform",
             default_value="False",
             description="Whether a transform from the world to base_link is necessary, "
-                        "this is the case when you are groundgaiting in rviz.",
+            "this is the case when you are groundgaiting in rviz.",
         ),
         DeclareLaunchArgument(
             "balance",
             default_value="False",
             description="Whether balance is being used.",
-        )
+        ),
     ]
     # endregion
 
@@ -94,7 +94,8 @@ def generate_launch_description() -> LaunchDescription:
                         realsense_simulation=realsense_simulation,
                         simulation=simulation,
                         jointless=jointless,
-                        control_yaml=control_yaml)
+                        control_yaml=control_yaml,
+                    )
                 ),
                 "use_sim_time": use_sim_time,
                 "use_imu_data": use_imu_data,

@@ -15,12 +15,13 @@ from control_msgs.msg import JointTolerance
 
 
 class MinimalPublisher(Node):
-
     def __init__(self):
-        super().__init__('temp_goal_publisher')
+        super().__init__("temp_goal_publisher")
         self.get_logger().info("Started the node.")
         self.create_subscription(Float64, "/walk_to", self.send_goal_callback, 10)
-        self.action_client = ActionClient(self, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory")
+        self.action_client = ActionClient(
+            self, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
+        )
 
     def send_goal_callback(self, msg: Float64):
         position = msg.data
@@ -43,10 +44,7 @@ class MinimalPublisher(Node):
         # point2.accelerations = [0.0] * len(joints)
         # point2.effort = [0.0] * len(joints)
 
-        trajectory_msg = JointTrajectory(
-            joint_names=joints,
-            points=[point1, point2]
-        )
+        trajectory_msg = JointTrajectory(joint_names=joints, points=[point1, point2])
         self.action_client.wait_for_server()
 
         goal_msg.trajectory = trajectory_msg
@@ -55,7 +53,6 @@ class MinimalPublisher(Node):
         self.get_logger().info(f"Starting the goal, for joint names: {joints}, to positions: {point2.positions}")
         res = self.action_client.send_goal_async(goal_msg)
         self.get_logger().info(f"Moved to: {res}")
-
 
 
 def main(args=None):
@@ -72,5 +69,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
