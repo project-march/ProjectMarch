@@ -9,8 +9,6 @@ from march_gait_selection.dynamic_interpolation.dynamic_joint_trajectory import 
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.utility_functions import get_position_from_yaml
-from march_utility.utilities.logger import Logger
 from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
     VelocitySoftLimitError,
@@ -49,9 +47,9 @@ class DynamicSubgait:
         joint_soft_limits (List[Limits]): List containing soft limits of joints in alphabetical order
         start (bool): whether it is an open gait or not
         stop (bool): whether it is a close gait or not
+        hold_subgait (bool): whether the subgait is created by the dynamic_setpoint_gait_step_and_hold class
 
     Attributes:
-        logger (Logger): used for logging to the terminal
         starting_position (Dict[str, Setpoint]): the first setpoint of the gait
         location (Point): the desired location given by (fake) covid
         joint_names (List[str]): list of joint names
@@ -62,11 +60,13 @@ class DynamicSubgait:
         start (bool): True if it is an open gait, else False
         stop (bool): True if it is a close gait, else False
         pose (Pose): pose object used to calculate inverse kinematics
+        hold_subgait (bool): whether the subgait is created by the dynamic_setpoint_gait_step_and_hold class
     """
 
     def __init__(
         self,
-        gait_selection_node,
+        gait_selection_node: Node,
+        home_stand_position: Dict[str, float],
         starting_position: Dict[str, float],
         subgait_id: str,
         joint_names: List[str],
@@ -74,10 +74,11 @@ class DynamicSubgait:
         joint_soft_limits: List[Limits],
         start: bool,
         stop: bool,
+        hold_subgait: bool = False,
     ):
-        self.logger = Logger(gait_selection_node, __class__.__name__)
         self._get_parameters(gait_selection_node)
 
+        self.home_stand_position = home_stand_position
         self.starting_position = starting_position
         self.location = location.processed_point
         self.actuating_joint_names = joint_names
@@ -99,10 +100,13 @@ class DynamicSubgait:
 
         self.start = start
         self.stop = stop
+        self.hold_subgait = hold_subgait
 
-    def get_joint_trajectory_msg(self) -> JointTrajectory:
+    def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
+        Args:
+            push_off (bool): True if push off should be present in the gait
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
@@ -110,7 +114,7 @@ class DynamicSubgait:
         self._solve_desired_setpoint()
 
         # Create joint_trajectory_msg
-        self._to_joint_trajectory_class()
+        self._to_joint_trajectory_class(push_off)
         joint_trajectory_msg = JointTrajectory()
         joint_trajectory_msg.joint_names = self.actuating_joint_names
 
@@ -163,7 +167,7 @@ class DynamicSubgait:
     def _solve_desired_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
         if self.stop:
-            self.desired_position = list(get_position_from_yaml("stand").values())
+            self.desired_position = list(self.home_stand_position.values())
         else:
             self.desired_position = self.pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
@@ -176,26 +180,40 @@ class DynamicSubgait:
             self.time[SetpointTime.END_POINT_INDEX],
         )
 
-    def _to_joint_trajectory_class(self) -> None:
-        """Creates a list of DynamicJointTrajectories for each joint."""
+    def _to_joint_trajectory_class(self, push_off: bool) -> None:
+        """Creates a list of DynamicJointTrajectories for each joint.
+
+        Args:
+            push_off (bool): True if push off should be present in the gait
+        """
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
+            if self.stop and self.hold_subgait:
+                self.middle_setpoint_dict[name].position = self.desired_setpoint_dict[name].position
+
             setpoint_list = [
                 self.starting_position_dict[name],
                 self.middle_setpoint_dict[name],
                 self.desired_setpoint_dict[name],
             ]
 
-            # Add an extra setpoint to the ankle to create a push off, except for
-            # a start gait:
-            if not self.start and (
-                (name == "right_ankle" and self.subgait_id == "right_swing")
-                or (name == "left_ankle" and self.subgait_id == "left_swing")
+            # Add an extra setpoint to the ankle to create a push off, except for a start gait:
+            if (
+                push_off
+                and not self.start
+                and (
+                    (name == "right_ankle" and self.subgait_id == "right_swing")
+                    or (name == "left_ankle" and self.subgait_id == "left_swing")
+                )
             ):
                 setpoint_list.insert(EXTRA_ANKLE_SETPOINT_INDEX, self._get_extra_ankle_setpoint())
 
-            if name in ["right_ankle", "left_ankle"]:
-                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, interpolate_ankle=True))
+            if name in ["right_ankle", "left_ankle"] or (
+                (name == "right_knee" and self.subgait_id == "left_swing")
+                or (name == "left_knee" and self.subgait_id == "right_swing")
+                or (self.stop and self.hold_subgait)
+            ):
+                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 

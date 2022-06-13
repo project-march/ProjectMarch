@@ -14,10 +14,7 @@
       <!--      </hardware>-->
 
       <joint name="left_ankle">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -25,10 +22,7 @@
 
 
       <joint name="left_hip_aa">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -36,10 +30,7 @@
 
 
       <joint name="left_hip_fe">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -47,10 +38,7 @@
 
 
       <joint name="left_knee">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -58,10 +46,7 @@
 
 
       <joint name="right_ankle">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -69,10 +54,7 @@
 
 
       <joint name="right_hip_aa">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -80,10 +62,7 @@
 
 
       <joint name="right_hip_fe">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -91,10 +70,7 @@
 
 
       <joint name="right_knee">
-        <command_interface name="effort">
-          <param name="min">-1000</param>
-          <param name="max">1000</param>
-        </command_interface>
+        <command_interface name="effort"/>
         <state_interface name="position"/>
         <state_interface name="effort"/>
         <state_interface name="velocity"/>
@@ -102,10 +78,11 @@
 
     </ros2_control>
 
+    <xacro:arg name="gazebo_control_file" default="NO FILE SPECIFIED"/>
     <gazebo>
       <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
         <robot_sim_type>gazebo_ros2_control/GazeboSystem</robot_sim_type>
-        <parameters>$(find march_control)/config/gazebo/march6_control.yaml</parameters>
+        <parameters>$(arg gazebo_control_file)</parameters>
       </plugin>
     </gazebo>
 

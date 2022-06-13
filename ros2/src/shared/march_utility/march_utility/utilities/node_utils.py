@@ -22,7 +22,7 @@ def get_robot_urdf_from_service(node: Node) -> urdf.Robot:
     """
     robot_description_client = node.create_client(
         srv_type=GetParameters,
-        srv_name="/march/robot_state_publisher/get_parameters",
+        srv_name="/robot_state_publisher/get_parameters",
     )
     wait_for_service(node, robot_description_client, 2)
 

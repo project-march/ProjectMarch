@@ -58,7 +58,6 @@ def parameter_callback(
     Returns:
         SetParametersResult: Whether the callback was successful
     """
-    gait_selection.get_logger().info("Parameters are updated")
     position_queue_updated = False
     gaits_updated = False
     dynamic_gait_updated = False
@@ -90,6 +89,12 @@ def parameter_callback(
         elif param.name == "push_off_position":
             gait_selection.push_off_position = param.get_parameter_value().double_value
             dynamic_gait_updated = True
+        elif param.name == "add_push_off":
+            gait_selection.add_push_off = param.value
+            dynamic_gait_updated = True
+        elif param.name == "amount_of_steps":
+            gait_selection.amount_of_steps = param.get_parameter_value().integer_value
+            dynamic_gait_updated = True
         elif param.name == "use_position_queue":
             gait_selection.use_position_queue = param.get_parameter_value().bool_value
             position_queue_updated = True
@@ -108,14 +113,15 @@ def parameter_callback(
     # Separate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
         gait_selection.dynamic_setpoint_gait.update_parameters()
-        gait_selection.get_logger().info("Dynamic gait parameters updated.")
     elif position_queue_updated:
-        gait_selection.dynamic_setpoint_gait_half_step.update_parameter()
-        gait_selection.get_logger().info(f"use_position_queue set to {param.value}")
+        gait_selection.dynamic_setpoint_gait_step.update_parameter()
+        gait_selection.dynamic_setpoint_gait_step_and_hold.update_parameter()
     elif gaits_updated:
         # TODO: Updating the parameters in gait_selection does not work
         gait_selection.update_gaits()
         gait_state_machine._generate_graph()
         gait_selection.get_logger().info("Gaits were updated")
+
+    gait_selection.get_logger().info(f"{param.name} set to {param.value}.")
 
     return SetParametersResult(successful=True)
