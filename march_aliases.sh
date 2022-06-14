@@ -26,7 +26,7 @@ alias march_run_ros1_training='march_run_ros1_groundgait gain_tuning:=training'
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
 alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
-alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py'
+alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py rqt_input:=false'
 
 
 # Build and run the bridge
