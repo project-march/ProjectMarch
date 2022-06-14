@@ -38,7 +38,7 @@ class GaitLoader:
     def __init__(
         self,
         node: Node,
-        robot: Optional[urdf.Robot] = None,
+        robot: Optional[urdf.Robot],
     ):
         self._node = node
         self._robot = robot
