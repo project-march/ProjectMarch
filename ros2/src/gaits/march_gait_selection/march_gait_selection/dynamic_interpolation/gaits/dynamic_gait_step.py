@@ -50,6 +50,14 @@ class DynamicGaitStep(DynamicGaitWalk):
             DEFAULT_HISTORY_DEPTH,
         )
 
+    @property
+    def requires_dynamic_stop(self) -> bool:
+        """Return whether this gait needs a dynamic stop.
+
+        This means that the gait does not end in home_stand, but in another random (dynamic) position.
+        """
+        return True
+
     def _reset(self) -> None:
         """Reset all attributes of the gait."""
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:

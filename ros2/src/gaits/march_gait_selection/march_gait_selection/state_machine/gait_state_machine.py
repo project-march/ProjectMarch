@@ -17,6 +17,8 @@ from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 from std_msgs.msg import Header
 
+DYNAMIC_CLOSE_GAIT_NAME = "dynamic_close"
+
 
 class GaitStateMachine:
     """Clean version of the state machine that can only be used with limited gaits."""
@@ -90,8 +92,8 @@ class GaitStateMachine:
         if self._input.gait_requested():
             self._current_gait = self._gaits.get(self._input.gait_name())
             self._process_gait_request()
-        elif self._is_stop_requested_after_step_or_step_and_hold():
-            self._current_gait = self._gaits.get("dynamic_close")
+        elif self._is_dynamic_stop_requested():
+            self._current_gait = self._gaits.get(DYNAMIC_CLOSE_GAIT_NAME)
             self._process_gait_request()
 
     def _process_gait_request(self) -> None:
@@ -108,12 +110,12 @@ class GaitStateMachine:
                 f"Cannot execute gait `{self._current_gait.name}` from idle state `{self._last_end_position}`"
             )
 
-    def _is_stop_requested_after_step_or_step_and_hold(self) -> bool:
+    def _is_dynamic_stop_requested(self) -> bool:
         """Returns true if a stop is requested and the previous gait was a step or step and hold."""
         return (
             self._is_stop_requested()
             and not self._is_stopping
-            and self._previous_gait.name in ["dynamic_step", "dynamic_step_and_hold", "fixed_step"]
+            and self._previous_gait.requires_dynamic_stop
             and not isinstance(self._last_end_position, UnknownEdgePosition)
         )
 
