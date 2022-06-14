@@ -110,8 +110,7 @@ class GaitLoader:
             dynamic_gaits.append(DynamicGaitStepAndHold(self._node, self.positions))
             dynamic_gaits.append(SteppingStonesStepAndClose(self._node, self.positions))
 
-        for dynamic_gait in dynamic_gaits:
-            self._loaded_gaits[dynamic_gait.name] = dynamic_gait
+        self._loaded_gaits = {gait.name: gait for gait in dynamic_gaits}
 
     def _load_named_positions(self) -> None:
         """Load the named positions from default.yaml."""

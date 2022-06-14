@@ -17,8 +17,6 @@ from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 from std_msgs.msg import Header
 
-DYNAMIC_CLOSE_GAIT_NAME = "dynamic_close"
-
 
 class GaitStateMachine:
     """Class that keeps track of the current gait state and schedules new gaits, if possible.
@@ -105,15 +103,16 @@ class GaitStateMachine:
 
     def update(self) -> None:
         """Updates the current state each timer period, after the state machine is started."""
-        if not self._shutdown_requested:
-            if self._input.unknown_requested():
-                self._handle_unknown_requested()
-            elif not self._executing_gait:
-                self._process_idle_state()
-            else:
-                self._process_gait_state()
-        else:
+        if self._shutdown_requested:
             self._update_timer.cancel()
+            return
+
+        if self._input.unknown_requested():
+            self._handle_unknown_requested()
+        elif self._executing_gait:
+            self._process_gait_state()
+        else:
+            self._process_idle_state()
 
     def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for what to do next."""
@@ -121,7 +120,7 @@ class GaitStateMachine:
             self._current_gait = self._gaits.get(self._input.gait_name())
             self._process_gait_request()
         elif self._is_dynamic_stop_requested():
-            self._current_gait = self._gaits.get(DYNAMIC_CLOSE_GAIT_NAME)
+            self._current_gait = self._gaits.get("dynamic_close")
             self._process_gait_request()
 
     def _process_gait_request(self) -> None:
