@@ -33,7 +33,22 @@ UNKNOWN = "unknown"
 
 
 class GaitLoader:
-    """Base class for the gait selection module."""
+    """Class that returns a dictionary of all loaded gaits and positions.
+
+    Args:
+        node (rclpy.Node): the gait node
+        robot (urdf.Robot): the robot that is used
+
+    Attributes:
+        _node (rclpy.Node): the gait node
+        _robot (urdf.Robot): the robot that is used
+        _logger (rclpy.Logger): used to log to the terminal
+        _joint_names (List[str]): a list of names of the actuating joints in the urdf
+        _gait_directory (str): path to the directory that contains the gait files
+        _default_positions_yaml (str): path to the yaml that contains the named positions
+        _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
+        _named_positions(Dict[str, EdgePosition]): dictionary containing the name and EdgePosition of each named pos
+    """
 
     def __init__(
         self,

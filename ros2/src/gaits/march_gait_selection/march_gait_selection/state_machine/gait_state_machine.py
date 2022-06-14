@@ -21,9 +21,37 @@ DYNAMIC_CLOSE_GAIT_NAME = "dynamic_close"
 
 
 class GaitStateMachine:
-    """Clean version of the state machine that can only be used with limited gaits."""
+    """Class that keeps track of the current gait state and schedules new gaits, if possible.
 
-    update_timer: Timer
+    Args:
+        node (Node): the gait_node
+        trajectory_scheduler (TrajectoryScheduler): class to publish trajectory commands
+        gaits (dict): dictionary containing the name and class instance of all loaded gaits
+        positions (dict): dictionary containing the name and the EdgePosition of all loaded positions
+
+    Attributes:
+        _node (Node): the gait_node
+        _gaits (dict): dictionary containing the name and class instance of all loaded gaits
+        _positions (dict): dictionary containing the name and the EdgePosition of all loaded positions
+        _logger (rclpy.Logger): used to log to the terminal
+        _input (StateMachineInput): class that handles the input to the state machine
+        _timer_period (double): update period that the state machine runs on
+        _last_end_position (EdgePosition): final position of all joints of the last executed gait
+        _current_gait (Gait): instance of the gait class that is currently being executed
+        _shutdown_requested (bool): whether the state machine should shut down (in case of an error)
+        _should_stop (bool): whether the current gait should be stopped (with a close gait)
+        _is_stopping (bool): whether the current gait is already stopping
+        _executing_gait (bool): whether a gait is currently being executed
+        _has_gait_started (bool): whether the requested gait has started executing
+        _previous_gait (Gait): instance of the gait class that has previously been executed
+        _current_state_pub (rclpy.Publisher): publisher to publish on the current state topic
+        _current_gait_pub (rclpy.Publisher): publisher to publish on the current gait topic
+        _error_sub (rclpy.Subscriber): subscriber of /march/error topic
+        _get_possible_gaits_client (rclpy.Service): service to send possible gaits to input device
+        _update_timer (rclpy.Timer): timer on which the update method is called
+    """
+
+    _update_timer: Timer
     _should_stop: bool
     _shutdown_requested: bool
 
@@ -39,17 +67,17 @@ class GaitStateMachine:
         self._last_end_position = UnknownEdgePosition()
         self._reset_attributes()
 
-        self.current_state_pub = self._node.create_publisher(
+        self._current_state_pub = self._node.create_publisher(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
-        self.current_gait_pub = self._node.create_publisher(
+        self._current_gait_pub = self._node.create_publisher(
             msg_type=CurrentGait,
             topic="/march/gait_selection/current_gait",
             qos_profile=DEFAULT_HISTORY_DEPTH,
         )
-        self.error_sub = self._node.create_subscription(
+        self._error_sub = self._node.create_subscription(
             msg_type=Error,
             topic="/march/error",
             callback=self._error_cb,
@@ -73,7 +101,7 @@ class GaitStateMachine:
 
     def run(self) -> None:
         """Runs the state machine until shutdown is requested."""
-        self.update_timer = self._node.create_timer(timer_period_sec=self._timer_period, callback=self.update)
+        self._update_timer = self._node.create_timer(timer_period_sec=self._timer_period, callback=self.update)
 
     def update(self) -> None:
         """Updates the current state each timer period, after the state machine is started."""
@@ -85,7 +113,7 @@ class GaitStateMachine:
             else:
                 self._process_gait_state()
         else:
-            self.update_timer.cancel()
+            self._update_timer.cancel()
 
     def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for what to do next."""
@@ -252,7 +280,7 @@ class GaitStateMachine:
 
     def _publish_gait_state(self) -> None:
         """Publish the name of the gait that is currently executing."""
-        self.current_state_pub.publish(
+        self._current_state_pub.publish(
             CurrentState(
                 header=Header(stamp=self._node.get_clock().now().to_msg()),
                 state=self._current_gait.name,
@@ -267,7 +295,7 @@ class GaitStateMachine:
         else:
             state = f"unnamed: {self._last_end_position}"
 
-        self.current_state_pub.publish(
+        self._current_state_pub.publish(
             CurrentState(
                 header=Header(stamp=self._node.get_clock().now().to_msg()),
                 state=state,
@@ -277,7 +305,7 @@ class GaitStateMachine:
 
     def _publish_current_gait(self) -> None:
         """Standard callback when gait changes, publishes the current gait."""
-        self.current_gait_pub.publish(
+        self._current_gait_pub.publish(
             CurrentGait(
                 header=Header(stamp=self._node.get_clock().now().to_msg()),
                 gait=self._current_gait.name,
