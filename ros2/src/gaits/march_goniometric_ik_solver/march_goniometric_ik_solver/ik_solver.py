@@ -27,7 +27,7 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # List the joints we have:
-JOINT_NAMES = get_joint_names_from_urdf()
+JOINT_NAMES = get_joint_names_from_urdf(return_fixed_joints=True)
 
 # Create a dictionary of joint limits:
 JOINT_LIMITS = {}
