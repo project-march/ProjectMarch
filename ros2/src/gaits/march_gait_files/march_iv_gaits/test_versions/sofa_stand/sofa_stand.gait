@@ -1,8 +1,0 @@
-name: sofa_stand
-subgaits:
-  prepare_stand_up:
-    to: stand_up
-  stand_up:
-    to: end
-  start:
-    to: prepare_stand_up

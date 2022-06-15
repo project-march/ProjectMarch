@@ -1,8 +1,0 @@
-name: side_step_left_small
-subgaits:
-  left_open:
-    to: right_close
-  right_close:
-    to: end
-  start:
-    to: left_open
