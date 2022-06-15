@@ -27,7 +27,9 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
     CameraPointsHandler,
 )
-
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
+    SimulatedPointsHandler,
+)
 from march_shared_msgs.msg import GaitInstruction
 from sensor_msgs.msg import JointState
 
@@ -73,11 +75,11 @@ class DynamicGaitWalk(GaitInterface):
     _next_command: Optional[TrajectoryCommand]
     _should_stop: bool
 
-    def __init__(self, node: Node):
+    def __init__(self, name: str, node: Node, points_handler: Union[SimulatedPointsHandler, CameraPointsHandler]):
         super(DynamicGaitWalk, self).__init__()
         self.node = node
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._points_handler = CameraPointsHandler(gait=self)
+        self._points_handler = points_handler
         self.trajectory_command_factory = TrajectoryCommandFactory(
             gait=self,
             points_handler=self._points_handler,
@@ -93,7 +95,7 @@ class DynamicGaitWalk(GaitInterface):
         self._set_start_position_to_home_stand()
         self._reset()
         self._get_soft_limits()
-        self.gait_name = "dynamic_walk"
+        self.gait_name = name
 
         self.node.create_subscription(
             GaitInstruction,
