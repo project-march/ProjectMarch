@@ -21,7 +21,7 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
@@ -98,7 +98,7 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
         self._gait.start_from_left_side = False
 
         return DynamicStep(
-            self._gait.gait_selection,
+            self._gait.node,
             end_position,
             start_position,
             subgait_id,

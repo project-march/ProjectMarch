@@ -19,18 +19,19 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
     """Class for doing step and closes on the cybathlon stepping stones obstacle.
 
     Args:
-        gait_selection_node (GaitSelection): the gait selection node
+        node (Node): the gait node
 
     Attributes:
         start_from_left_side (bool): whether the gaits start with a left swing
         use_predetermined_foot_location (bool): whether one of the five predetermined locations will be used
     """
 
-    def __init__(self, gait_selection_node):
-        super().__init__(gait_selection_node)
+    def __init__(self, node):
+        super().__init__(node)
+        self.node = node
         self.start_from_left_side = False
         self.use_predetermined_foot_location = False
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactorySteppingStones(self, self._points_handler)
         self.gait_name = "stepping_stones_step_and_close"
 

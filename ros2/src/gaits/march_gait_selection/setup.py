@@ -86,6 +86,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest", "unittest"],
     entry_points={
-        "console_scripts": ["march_gait_selection = march_gait_selection.gait_selection_node:main"],
+        "console_scripts": ["march_gait_selection = march_gait_selection.gait_node:main"],
     },
 )

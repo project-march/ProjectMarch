@@ -38,7 +38,7 @@ class DynamicStep:
     """Creates joint trajectories based on the desired foot location.
 
     Args:
-        gait_selection_node (GaitSelection): The gait selection node
+        node (Node): The gait node
         starting_position (Dict[str, float]): The first setpoint of the subgait, usually the last setpoint
             of the previous subgait.
         subgait_id (str): Whether it is a left_swing or right_swing
@@ -65,7 +65,7 @@ class DynamicStep:
 
     def __init__(
         self,
-        gait_selection_node: Node,
+        node: Node,
         home_stand_position: Dict[str, float],
         starting_position: Dict[str, float],
         subgait_id: str,
@@ -76,8 +76,8 @@ class DynamicStep:
         stop: bool,
         hold_subgait: bool = False,
     ):
-        self._get_parameters(gait_selection_node)
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
+        self._get_parameters(node)
         self.home_stand_position = home_stand_position
         self.starting_position = starting_position
         self.location = location.processed_point
@@ -266,16 +266,16 @@ class DynamicStep:
 
         return setpoint_dict
 
-    def _get_parameters(self, gait_selection_node: Node) -> None:
-        """Gets the dynamic gait parameters from the gait_selection_node.
+    def _get_parameters(self, node: Node) -> None:
+        """Gets the dynamic gait parameters from the node.
 
         Args:
-            gait_selection_node (GaitSelection): the gait selection node
+            node (Node): the gait selection node
         """
-        self.middle_point_height = gait_selection_node.middle_point_height
-        self.middle_point_fraction = gait_selection_node.middle_point_fraction
-        self.push_off_fraction = gait_selection_node.push_off_fraction
-        self.push_off_position = gait_selection_node.push_off_position
+        self.middle_point_height = node.middle_point_height
+        self.middle_point_fraction = node.middle_point_fraction
+        self.push_off_fraction = node.push_off_fraction
+        self.push_off_position = node.push_off_position
 
     def _check_joint_limits(
         self,

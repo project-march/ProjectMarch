@@ -36,12 +36,12 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._create_position_queue()
         self.update_parameter()
         self._trajectory_failed = False
 
-        self._gait.gait_selection.create_subscription(
+        self._gait.node.create_subscription(
             Point,
             "/march/step/add_point_to_queue",
             self._add_point_to_queue,
@@ -95,7 +95,7 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
         Returns:
             FootPosition: FootPosition msg with position from queue
         """
-        header = Header(stamp=self._gait.gait_selection.get_clock().now().to_msg())
+        header = Header(stamp=self._gait.node.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
@@ -105,8 +105,8 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
     def update_parameter(self) -> None:
-        """Updates '_use_position_queue' to the newest value in gait_selection."""
-        self._use_position_queue = self._gait.gait_selection.use_position_queue
+        """Updates '_use_position_queue' to the newest value in gait_node."""
+        self._use_position_queue = self._gait.node.use_position_queue
 
     def _create_position_queue(self) -> None:
         """Creates and fills the queue with values from position_queue.yaml."""

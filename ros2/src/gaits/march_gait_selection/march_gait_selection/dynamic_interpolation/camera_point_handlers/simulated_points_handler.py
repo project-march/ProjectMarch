@@ -12,12 +12,12 @@ class SimulatedPointsHandler(CameraPointsHandler):
 
     def __init__(self, gait):
         self._gait = gait
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         super().__init__(gait)
 
     def _create_subscribers(self) -> None:
         """Create subscribers to listen to simulated points."""
-        self._gait.gait_selection.create_subscription(
+        self._gait.node.create_subscription(
             FootPosition,
             "/march/fixed_foot_position",
             self._update_foot_location,

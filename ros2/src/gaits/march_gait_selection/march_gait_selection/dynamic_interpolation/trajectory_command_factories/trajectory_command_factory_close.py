@@ -14,7 +14,7 @@ class TrajectoryCommandFactoryClose(TrajectoryCommandFactory):
         super().__init__(gait, points_handler)
         self._gait = gait
         self._points_handler = points_handler
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
         # TODO: remove hardcoded foot location after bug in stop gait is fixed.
         self.foot_location = FootPosition(duration=1.5, processed_point=Point(x=0.5, y=0.03, z=0.446))

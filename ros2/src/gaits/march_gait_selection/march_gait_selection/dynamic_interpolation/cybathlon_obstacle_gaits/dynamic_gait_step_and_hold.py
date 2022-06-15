@@ -8,6 +8,7 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 )
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
 from march_gait_selection.state_machine.gait_update import GaitUpdate
+
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_RIGHT,
@@ -22,26 +23,34 @@ class DynamicGaitStepAndHold(DynamicGaitStepAndClose):
 
     _use_position_queue: bool
 
-    def __init__(self, gait_selection_node: Node):
+    def __init__(self, node: Node):
         self.subgait_id = "right_swing"
         self.use_predetermined_foot_location = False
         self.start_from_left_side = False
-        super().__init__(gait_selection_node)
+        super().__init__(node)
         self.trajectory_command_factory = TrajectoryCommandFactoryStepAndHold(self, self._points_handler)
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self.gait_name = "dynamic_step_and_hold"
 
-        self.gait_selection.create_subscription(
+        self.node.create_subscription(
             JointState,
             "/march/close/final_position",
             self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._final_position_pub = self.gait_selection.create_publisher(
+        self._final_position_pub = self.node.create_publisher(
             JointState,
             "/march/step_and_hold/final_position",
             DEFAULT_HISTORY_DEPTH,
         )
+
+    @property
+    def requires_dynamic_stop(self) -> bool:
+        """Return whether this gait needs a dynamic stop.
+
+        This means that the gait does not end in home_stand, but in another random (dynamic) position.
+        """
+        return True
 
     def _reset(self) -> None:
         """Reset all attributes of the gait."""

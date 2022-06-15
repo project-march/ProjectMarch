@@ -29,19 +29,19 @@ class CameraPointsHandler:
 
     def __init__(self, gait):
         self._gait = gait
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._create_subscribers()
         self._create_publishers()
 
     def _create_subscribers(self) -> None:
         """Create subscribers to listen to points given by depth cameras."""
-        self._gait.gait_selection.create_subscription(
+        self._gait.node.create_subscription(
             FootPosition,
             "/march/processed_foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._gait.gait_selection.create_subscription(
+        self._gait.node.create_subscription(
             FootPosition,
             "/march/processed_foot_position/left",
             self._callback_left,
@@ -50,12 +50,12 @@ class CameraPointsHandler:
 
     def _create_publishers(self) -> None:
         """Create publishers to publish chosen point back to covid."""
-        self.pub_right = self._gait.gait_selection.create_publisher(
+        self.pub_right = self._gait.node.create_publisher(
             FootPosition,
             "/march/chosen_foot_position/right",
             DEFAULT_HISTORY_DEPTH,
         )
-        self.pub_left = self._gait.gait_selection.create_publisher(
+        self.pub_left = self._gait.node.create_publisher(
             FootPosition,
             "/march/chosen_foot_position/left",
             DEFAULT_HISTORY_DEPTH,
@@ -117,8 +117,8 @@ class CameraPointsHandler:
             nanoseconds=foot_location.header.stamp.nanosec,
         )
         current_time = Time(
-            seconds=self._gait.gait_selection.get_clock().now().seconds_nanoseconds()[0],
-            nanoseconds=self._gait.gait_selection.get_clock().now().seconds_nanoseconds()[1],
+            seconds=self._gait.node.get_clock().now().seconds_nanoseconds()[0],
+            nanoseconds=self._gait.node.get_clock().now().seconds_nanoseconds()[1],
         )
         time_difference = current_time - msg_time
         readable_time_difference = f"{time_difference.nanoseconds / NANOSECONDS_TO_SECONDS}"

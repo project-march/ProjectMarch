@@ -13,7 +13,7 @@ class TrajectoryCommandFactoryStepAndClose(TrajectoryCommandFactory):
         super().__init__(gait, points_handler)
         self._gait = gait
         self._points_handler = points_handler
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
     def _can_get_second_step(self, is_final_iteration: bool) -> bool:
