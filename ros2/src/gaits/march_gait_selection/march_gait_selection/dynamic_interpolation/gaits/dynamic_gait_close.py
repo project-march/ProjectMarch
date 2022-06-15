@@ -1,9 +1,12 @@
 """Author: Marten Haitjema, MVII."""
 
-from typing import Optional
+from typing import Optional, Union
 from rclpy.node import Node
 from rclpy.time import Time
 
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
+    SimulatedPointsHandler,
+)
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from sensor_msgs.msg import JointState
 
@@ -31,12 +34,12 @@ class DynamicGaitClose(DynamicGaitWalk):
     subgait_id: str
     start_time_next_command: Time
 
-    def __init__(self, node: Node):
-        super().__init__(node)
+    def __init__(self, name: str, node: Node, points_handler: Union[SimulatedPointsHandler, CameraPointsHandler]):
+        super().__init__(name, node, points_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._points_handler = CameraPointsHandler(self)
+        self._points_handler = points_handler
         self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._points_handler)
-        self.gait_name = "dynamic_close"
+        self.gait_name = name
 
         self.node.create_subscription(
             CurrentGait,
