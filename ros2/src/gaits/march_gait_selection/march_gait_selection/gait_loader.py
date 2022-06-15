@@ -125,7 +125,7 @@ class GaitLoader:
             else:
                 self._logger.error(
                     f"Position '{position_name}' with joint values {position_values} cannot be added because it will "
-                    f"overwrite position '{self._positions[edge_position]}'. Each named position should be unique."
+                    f"overwrite position '{self._named_positions[edge_position]}'. Each named position should be unique."
                 )
 
     def _load_home_gaits(self) -> None:
