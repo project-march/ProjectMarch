@@ -9,8 +9,9 @@ from rclpy.node import Node
 from urdf_parser_py import urdf
 
 from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import CameraPointsHandler
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import \
-    SimulatedPointsHandler
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
+    SimulatedPointsHandler,
+)
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step import DynamicGaitStep
@@ -110,9 +111,7 @@ class GaitLoader:
         if self._node.add_cybathlon_gaits:
             dynamic_gaits.append(DynamicGaitStepAndHold("step_and_hold", self._node, camera_points_handler))
             dynamic_gaits.append(
-                SteppingStonesStepAndClose(
-                    "stepping_stones_step_and_close", self._node, camera_points_handler
-                )
+                SteppingStonesStepAndClose("stepping_stones_step_and_close", self._node, camera_points_handler)
             )
 
         self._loaded_gaits = {gait.name: gait for gait in dynamic_gaits}
