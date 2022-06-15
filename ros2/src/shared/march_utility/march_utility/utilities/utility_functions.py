@@ -252,7 +252,7 @@ def get_position_from_yaml(position: str):
             os.path.join(
                 get_package_share_directory("march_gait_files"),
                 "airgait_vi",
-                "default.yaml",
+                "default_positions.yaml",
             ),
             MODE_READING,
         ) as yaml_file:

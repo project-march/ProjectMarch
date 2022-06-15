@@ -1,6 +1,0 @@
-name: exo_test
-subgaits:
-  start:
-    to: perform_test
-  perform_test:
-    to: end

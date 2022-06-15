@@ -1,6 +1,0 @@
-name: set_ankle_from_min5_to_min10
-subgaits:
-  set_ankle_from_min5_to_min10:
-    to: end
-  start:
-    to: set_ankle_from_min5_to_min10
