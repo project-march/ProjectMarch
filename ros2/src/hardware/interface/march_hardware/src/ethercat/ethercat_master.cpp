@@ -10,7 +10,6 @@
 #include <vector>
 
 #include <pthread.h>
-#include <ros/ros.h>
 #include <soem/ethercat.h>
 
 namespace march {
@@ -62,12 +61,12 @@ bool EthercatMaster::start(std::vector<Joint>& joints)
 
 void EthercatMaster::ethercatMasterInitiation()
 {
-    ROS_INFO("Trying to start EtherCAT");
+    // ROS_INFO("Trying to start EtherCAT");
     if (!ec_init(this->if_name_.c_str())) {
         throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION,
             "No socket connection on %s", this->if_name_.c_str());
     }
-    ROS_INFO("ec_init on %s succeeded", this->if_name_.c_str());
+    // ROS_INFO("ec_init on %s succeeded", this->if_name_.c_str());
 
     const int slave_count = ec_config_init(FALSE);
     if (slave_count < this->max_slave_index_) {
@@ -76,7 +75,7 @@ void EthercatMaster::ethercatMasterInitiation()
             "%d slaves configured while soem only found %d slave(s)",
             this->max_slave_index_, slave_count);
     }
-    ROS_INFO("%d slave(s) found and initialized.", slave_count);
+    // ROS_INFO("%d slave(s) found and initialized.", slave_count);
 }
 
 int setSlaveWatchdogTimer(uint16 slave)
@@ -96,7 +95,7 @@ int setSlaveWatchdogTimer(uint16 slave)
 
 bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 {
-    ROS_INFO("Request pre-operational state for all slaves");
+    // ROS_INFO("Request pre-operational state for all slaves");
     bool reset = false;
     ec_statecheck(/*slave=*/0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
@@ -109,7 +108,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ec_config_map(&this->io_map_);
     ec_configdc();
 
-    ROS_INFO("Request safe-operational state for all slaves");
+    // ROS_INFO("Request safe-operational state for all slaves");
     ec_statecheck(/*slave=*/0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
     this->expected_working_counter_
@@ -119,7 +118,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
 
-    ROS_INFO("Request operational state for all slaves");
+    // ROS_INFO("Request operational state for all slaves");
     ec_writestate(/*slave=*/0);
     int chk = 40;
 
@@ -130,7 +129,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
     if (ec_slave[0].state == EC_STATE_OPERATIONAL) {
-        ROS_INFO("Operational state reached for all slaves");
+        // ROS_INFO("Operational state reached for all slaves");
         this->is_operational_ = true;
         this->ethercat_thread_
             = std::thread(&EthercatMaster::ethercatLoop, this);
@@ -190,9 +189,9 @@ void EthercatMaster::ethercatLoop()
             const double not_achieved_percentage
                 = 100.0 * ((double)not_achieved_count / total_loops);
             if (not_achieved_percentage > 5.0) {
-                ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not "
-                         "achieved for %f percent of all cycles",
-                    this->cycle_time_ms_, not_achieved_percentage);
+                // ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not "
+                //          "achieved for %f percent of all cycles",
+                //     this->cycle_time_ms_, not_achieved_percentage);
             }
             total_loops = 0;
             not_achieved_count = 0;
@@ -225,9 +224,9 @@ bool EthercatMaster::sendReceivePdo()
         ec_send_processdata();
         const int wkc = ec_receive_processdata(EC_TIMEOUTRET);
         if (wkc < this->expected_working_counter_) {
-            ROS_WARN_THROTTLE(1,
-                "Working counter: %d  is lower than expected: %d", wkc,
-                this->expected_working_counter_);
+            // ROS_WARN_THROTTLE(1,
+            //     "Working counter: %d  is lower than expected: %d", wkc,
+            //     this->expected_working_counter_);
             return false;
         }
         return true;
@@ -240,8 +239,8 @@ void EthercatMaster::monitorSlaveConnection()
     ec_readstate();
     for (int slave = 1; slave <= ec_slavecount; slave++) {
         if (ec_slave[slave].state != EC_STATE_OPERATIONAL) {
-            ROS_WARN_THROTTLE(1,
-                "EtherCAT train lost connection from slave %d onwards", slave);
+            // ROS_WARN_THROTTLE(1,
+            //     "EtherCAT train lost connection from slave %d onwards", slave);
 
             if (!this->attemptSlaveRecover(slave)) {
                 this->latest_lost_slave_ = slave;
@@ -251,7 +250,7 @@ void EthercatMaster::monitorSlaveConnection()
     }
 
     if (this->latest_lost_slave_ > -1) {
-        ROS_INFO("All slaves returned to operational state.");
+        // ROS_INFO("All slaves returned to operational state.");
     }
 
     this->latest_lost_slave_ = -1;
@@ -282,7 +281,7 @@ bool EthercatMaster::attemptSlaveRecover(int slave)
             ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
             if (ec_slave[slave].state == EC_STATE_NONE) {
                 ec_slave[slave].islost = TRUE;
-                ROS_ERROR("Ethercat lost connection to slave %d", slave);
+                // ROS_ERROR("Ethercat lost connection to slave %d", slave);
             }
         }
     }
@@ -298,7 +297,7 @@ bool EthercatMaster::attemptSlaveRecover(int slave)
     }
 
     if (ec_slave[slave].state == EC_STATE_OPERATIONAL) {
-        ROS_INFO("Slave %i resumed operational state", slave);
+        // ROS_INFO("Slave %i resumed operational state", slave);
         return true;
     } else {
         return false;
@@ -315,7 +314,7 @@ void EthercatMaster::closeEthercat()
 void EthercatMaster::stop()
 {
     if (this->is_operational_) {
-        ROS_INFO("Stopping EtherCAT");
+        // ROS_INFO("Stopping EtherCAT");
         this->is_operational_ = false;
         this->ethercat_thread_.join();
 
@@ -332,11 +331,11 @@ void EthercatMaster::setThreadPriority(int priority)
     const int error = pthread_setschedparam(
         this->ethercat_thread_.native_handle(), SCHED_FIFO, &param);
     if (error != 0) {
-        ROS_ERROR("Failed to set the ethercat thread priority to %d. (error "
-                  "code: %d)",
-            priority, error);
+        // ROS_ERROR("Failed to set the ethercat thread priority to %d. (error "
+        //           "code: %d)",
+        //     priority, error);
     } else {
-        ROS_DEBUG("Set ethercat thread priority to %d", param.sched_priority);
+        // ROS_DEBUG("Set ethercat thread priority to %d", param.sched_priority);
     }
 }
 } // namespace march

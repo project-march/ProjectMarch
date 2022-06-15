@@ -2,8 +2,6 @@
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/ethercat/pdo_types.h"
 
-#include <ros/ros.h>
-
 namespace march {
 PowerDistributionBoard::PowerDistributionBoard(
     const Slave& slave, uint8_t byte_offset)

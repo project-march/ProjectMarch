@@ -5,13 +5,12 @@
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/motor_controller/motor_controller_state.h"
 
-#include <ros/ros.h>
-
 #include <bitset>
 #include <cmath>
 #include <memory>
 #include <string>
 #include <utility>
+#include <iostream>
 
 namespace march {
 Joint::Joint(std::string name, int net_number,
@@ -47,16 +46,16 @@ bool Joint::initSdo(int cycle_time)
     return reset;
 }
 
-std::optional<ros::Duration> Joint::prepareActuation()
+std::optional<std::chrono::duration<double>> Joint::prepareActuation()
 {
-    ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
+    // ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
     auto wait_duration = motor_controller_->prepareActuation();
     return wait_duration;
 }
 
 void Joint::enableActuation()
 {
-    ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
+    // ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
     motor_controller_->enableActuation();
 }
 
@@ -67,14 +66,14 @@ void Joint::actuate(float target)
 
 void Joint::readFirstEncoderValues(bool operational_check)
 {
-    ROS_INFO("[%s] Reading first values", this->name_.c_str());
+    // ROS_INFO("[%s] Reading first values", this->name_.c_str());
 
     // Preconditions check
     if (operational_check) {
         auto motor_controller_state = motor_controller_->getState();
         if (!motor_controller_state->isOperational()) {
-            ROS_FATAL("[%s]: %s", this->name_.c_str(),
-                motor_controller_state->getErrorStatus().value().c_str());
+            // ROS_FATAL("[%s]: %s", this->name_.c_str(),
+            //     motor_controller_state->getErrorStatus().value().c_str());
             throw error::HardwareException(
                 error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
@@ -107,10 +106,10 @@ void Joint::readFirstEncoderValues(bool operational_check)
         }
         position_ = initial_absolute_position_;
     }
-    ROS_INFO("[%s] Read first values", this->name_.c_str());
+    // ROS_INFO("[%s] Read first values", this->name_.c_str());
 }
 
-void Joint::readEncoders(const ros::Duration& elapsed_time)
+void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
 {
     if (this->receivedDataUpdate()) {
         /* Calculate position by using the base absolute position and adding
@@ -150,8 +149,7 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        ROS_WARN("Data was not updated within %.3fs, using old data",
-            elapsed_time.toSec());
+        std::cout << "Data was not updated within " << elapsed_time.count() << ", using old data" << std::endl;
     }
 }
 

@@ -9,8 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include <ros/ros.h>
-
 namespace march {
 
 struct ODriveObject {

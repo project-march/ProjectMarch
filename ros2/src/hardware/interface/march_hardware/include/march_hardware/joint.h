@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <chrono>
 
 #include <march_hardware/motor_controller/motor_controller.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
@@ -39,14 +40,14 @@ public:
 
     // Read the encoder data and store the position and velocity values in the
     // Joint
-    void readEncoders(const ros::Duration& elapsed_time);
+    void readEncoders(const std::chrono::duration<double>& elapsed_time);
 
     // Check whether the state of the MotorController has changed
     bool receivedDataUpdate();
 
     // Prepare the joint for actuation
     // Returns an optional wait duration
-    std::optional<ros::Duration> prepareActuation();
+    std::optional<std::chrono::duration<double>> prepareActuation();
 
     // Enable actuation for this joint
     // Returns an optional wait duration

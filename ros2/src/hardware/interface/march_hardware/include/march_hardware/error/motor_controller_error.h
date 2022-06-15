@@ -5,7 +5,6 @@
 #include <array>
 #include <bitset>
 #include <climits>
-#include <ros/ros.h>
 #include <string>
 
 namespace march {

@@ -59,8 +59,8 @@ void IMCPDOmap::addObject(IMCObjectName object_name)
     }
 
     if (this->PDO_objects.count(object_name) != 0) {
-        ROS_WARN("IMC object %i is already added to PDO map",
-            static_cast<int>(object_name));
+        // ROS_WARN("IMC object %i is already added to PDO map",
+        //     static_cast<int>(object_name));
         return;
     }
 
@@ -88,7 +88,7 @@ std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::map(
             return configurePDO(
                 sdo, /*base_register=*/0x1600, /*base_sync_manager=*/0x1C12);
         default:
-            ROS_ERROR("Invalid data direction given, returning empty map");
+            // ROS_ERROR("Invalid data direction given, returning empty map");
             return {};
     }
 }
@@ -119,8 +119,8 @@ std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::configurePDO(
             // Move to the next PDO register by incrementing with one
             current_register++;
             if (current_register > (base_register + nr_of_regs)) {
-                ROS_ERROR("Amount of registers was overwritten, amount of "
-                          "parameters does not fit in the PDO messages.");
+                // ROS_ERROR("Amount of registers was overwritten, amount of "
+                //           "parameters does not fit in the PDO messages.");
             }
 
             size_left = this->bits_per_register;

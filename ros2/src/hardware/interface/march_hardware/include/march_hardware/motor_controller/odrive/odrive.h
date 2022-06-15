@@ -46,13 +46,13 @@ public:
     ~ODrive() noexcept override = default;
 
     // Override functions for actuating the ODrive
-    std::optional<ros::Duration> prepareActuation() override;
+    std::optional<std::chrono::duration<double>> prepareActuation() override;
     void enableActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
 
     // Override reset function
-    std::optional<ros::Duration> reset() override;
+    std::optional<std::chrono::duration<double>> reset() override;
 
     bool requiresUniqueSlaves() const override;
 

@@ -17,8 +17,6 @@
 #include <unistd.h>
 #include <utility>
 
-#include <ros/ros.h>
-
 //#define DEBUG_EFFORT
 
 namespace march {
@@ -35,18 +33,18 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     this->is_incremental_encoder_more_precise_ = true;
 }
 
-std::optional<ros::Duration> ODrive::reset()
+std::optional<std::chrono::duration<double>> ODrive::reset()
 {
     setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
-    return std::make_optional<ros::Duration>(1);
+    return std::make_optional<std::chrono::duration<double>>(1);
 }
 
-std::optional<ros::Duration> ODrive::prepareActuation()
+std::optional<std::chrono::duration<double>> ODrive::prepareActuation()
 {
     if (!index_found_
         && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-        return ros::Duration(/*t=*/10);
+        return std::chrono::duration<double>(/*t=*/10);
     } else {
         return std::nullopt;
     }
@@ -66,10 +64,10 @@ void ODrive::waitForState(ODriveAxisState target_state)
 {
     auto current_state = getAxisState();
     while (current_state != target_state) {
-        ROS_INFO("Waiting for '%s', currently in '%s'",
-            target_state.toString().c_str(), current_state.toString().c_str());
+        // ROS_INFO("Waiting for '%s', currently in '%s'",
+        //     target_state.toString().c_str(), current_state.toString().c_str());
 
-        ros::Duration(/*t=*/1).sleep();
+        usleep(1000);
         current_state = getAxisState();
     }
 }
@@ -86,8 +84,8 @@ void ODrive::actuateTorque(float target_effort)
     float target_torque
         = target_effort * torque_constant_ * (float)getMotorDirection();
 #ifdef DEBUG_EFFORT
-    ROS_INFO("Effort: %f", target_effort);
-    ROS_INFO("Torque: %f", target_torque);
+    // ROS_INFO("Effort: %f", target_effort);
+    // ROS_INFO("Torque: %f", target_torque);
 #endif
     bit32 write_torque = { .f = target_torque };
     this->write32(

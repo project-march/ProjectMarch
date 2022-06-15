@@ -10,8 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include <ros/ros.h>
-
 namespace march {
 /** Store IMC data as a struct to prevent data overlap.*/
 struct IMCObject {

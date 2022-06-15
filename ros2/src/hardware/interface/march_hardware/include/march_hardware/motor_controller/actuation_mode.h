@@ -2,7 +2,6 @@
 
 #ifndef MARCH_HARDWARE_ACTUATION_MODE_H
 #define MARCH_HARDWARE_ACTUATION_MODE_H
-#include <ros/console.h>
 #include <string>
 
 namespace march {
@@ -35,9 +34,9 @@ public:
         } else if (actuationMode == "torque") {
             this->value_ = torque;
         } else {
-            ROS_WARN("Actuation mode (%s) is not recognized, setting to "
-                     "unknown mode",
-                actuationMode.c_str());
+            // ROS_WARN("Actuation mode (%s) is not recognized, setting to "
+            //          "unknown mode",
+            //     actuationMode.c_str());
             this->value_ = ActuationMode::unknown;
         }
     }
@@ -77,8 +76,8 @@ public:
             case torque:
                 return "torque";
             default:
-                ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position",
-                    this->value_);
+                // ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position",
+                //     this->value_);
                 return "unknown";
         }
     }

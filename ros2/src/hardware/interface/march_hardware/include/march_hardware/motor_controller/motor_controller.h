@@ -9,6 +9,7 @@
 #include "march_hardware/motor_controller/motor_controller_state.h"
 #include <memory>
 #include <string>
+#include <chrono>
 
 namespace march {
 class MotorController : public Slave {
@@ -52,11 +53,11 @@ public:
      * Can be overridden by child classes
      * @returns Returns an optional wait duration
      */
-    virtual std::optional<ros::Duration> reset();
+    virtual std::optional<std::chrono::duration<double>> reset();
 
     // Prepare the MotorController for actuation
     // Returns an optional wait duration
-    virtual std::optional<ros::Duration> prepareActuation() = 0;
+    virtual std::optional<std::chrono::duration<double>> prepareActuation() = 0;
 
     // Enable actuation for the MotorController, move it into its 'ready' state
     // Returns an optional wait duration

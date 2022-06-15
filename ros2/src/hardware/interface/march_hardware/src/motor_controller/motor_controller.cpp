@@ -49,7 +49,7 @@ MotorController::MotorController(const Slave& slave,
 {
 }
 
-std::optional<ros::Duration> MotorController::reset()
+std::optional<std::chrono::duration<double>> MotorController::reset()
 {
     return std::nullopt;
 }

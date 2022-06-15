@@ -15,8 +15,6 @@
 #include <unistd.h>
 #include <utility>
 
-#include <ros/ros.h>
-
 namespace march {
 IMotionCube::IMotionCube(const Slave& slave,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -93,22 +91,22 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
     bool checksum_verified = this->verifySetup(sdo);
 
     if (!checksum_verified) {
-        ROS_WARN("The .sw file for slave %d is not equal to the setup of the "
-                 "drive, downloading is necessary",
-            this->getSlaveIndex());
+        // ROS_WARN("The .sw file for slave %d is not equal to the setup of the "
+        //          "drive, downloading is necessary",
+        //     this->getSlaveIndex());
         this->downloadSetupToDrive(sdo);
         checksum_verified = this->verifySetup(sdo);
         if (checksum_verified) {
-            ROS_INFO("writing of the setup data has succeeded");
+            // ROS_INFO("writing of the setup data has succeeded");
         } else {
-            ROS_FATAL("writing of the setup data has failed");
+            // ROS_FATAL("writing of the setup data has failed");
         }
         return true; // Resets all imcs and restart the EtherCAT train
         // (necessary after downloading a "new" setup to the drive)
     } else {
-        ROS_DEBUG(
-            "The .sw file for slave %d is equal to the setup of the drive.",
-            this->getSlaveIndex());
+        // ROS_DEBUG(
+        //     "The .sw file for slave %d is equal to the setup of the drive.",
+        //     this->getSlaveIndex());
     }
 
     /* All addresses were retrieved from the IMC Manual:
@@ -241,8 +239,8 @@ int32_t IMotionCube::getAbsolutePositionIU()
     if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord())
         && !IMotionCubeTargetState::OPERATION_ENABLED.isReached(
             this->getStatusWord())) {
-        ROS_WARN_THROTTLE(
-            10, "Invalid use of encoders, you're not in the correct state.");
+        // ROS_WARN_THROTTLE(
+        //     10, "Invalid use of encoders, you're not in the correct state.");
     }
     bit32 return_byte = this->read32(
         this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
@@ -254,8 +252,8 @@ int32_t IMotionCube::getIncrementalPositionIU()
     if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord())
         && !IMotionCubeTargetState::OPERATION_ENABLED.isReached(
             this->getStatusWord())) {
-        ROS_WARN_THROTTLE(
-            10, "Invalid use of encoders, you're not in the correct state.");
+        // ROS_WARN_THROTTLE(
+        //     10, "Invalid use of encoders, you're not in the correct state.");
     }
     bit32 return_byte = this->read32(
         this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
@@ -357,40 +355,40 @@ void IMotionCube::setControlWord(uint16_t control_word)
 
 void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
 {
-    ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
+    // ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
     while (!target_state.isReached(this->getStatusWord())) {
         this->setControlWord(target_state.getControlWord());
-        ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s",
-            target_state.getDescription().c_str(),
-            std::bitset<16>(this->getStatusWord()).to_string().c_str());
+        // ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s",
+        //     target_state.getDescription().c_str(),
+        //     std::bitset<16>(this->getStatusWord()).to_string().c_str());
         if (target_state.getState()
                 == IMotionCubeTargetState::OPERATION_ENABLED.getState()
             && IMCStateOfOperation(this->getStatusWord())
                 == IMCStateOfOperation::FAULT) {
-            ROS_FATAL("IMotionCube went to fault state while attempting to go "
-                      "to '%s'. Shutting down.",
-                target_state.getDescription().c_str());
-            ROS_FATAL("Motion Error (MER): %s",
-                error::parseError(this->getMotionError(),
-                    error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
-                    .c_str());
-            ROS_FATAL("Detailed Error (DER): %s",
-                error::parseError(this->getDetailedError(),
-                    error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
-                    .c_str());
-            ROS_FATAL("Detailed Error 2 (DER2): %s",
-                error::parseError(this->getSecondDetailedError(),
-                    error::ErrorRegister::
-                        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
-                    .c_str());
+            // ROS_FATAL("IMotionCube went to fault state while attempting to go "
+            //           "to '%s'. Shutting down.",
+            //     target_state.getDescription().c_str());
+            // ROS_FATAL("Motion Error (MER): %s",
+            //     error::parseError(this->getMotionError(),
+            //         error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
+            //         .c_str());
+            // ROS_FATAL("Detailed Error (DER): %s",
+            //     error::parseError(this->getDetailedError(),
+            //         error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
+            //         .c_str());
+            // ROS_FATAL("Detailed Error 2 (DER2): %s",
+            //     error::parseError(this->getSecondDetailedError(),
+            //         error::ErrorRegister::
+            //             IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
+            //         .c_str());
 
             throw std::domain_error("IMC to fault state");
         }
     }
-    ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
+    // ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
 }
 
-std::optional<ros::Duration> IMotionCube::prepareActuation()
+std::optional<std::chrono::duration<double>> IMotionCube::prepareActuation()
 {
     if (this->actuation_mode_ == ActuationMode::unknown) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
@@ -435,7 +433,7 @@ std::optional<ros::Duration> IMotionCube::prepareActuation()
 void IMotionCube::resetSlave(SdoSlaveInterface& sdo)
 {
     this->setControlWord(/*control_word=*/0);
-    ROS_DEBUG("Slave: %d, Try to reset IMC", this->getSlaveIndex());
+    // ROS_DEBUG("Slave: %d, Try to reset IMC", this->getSlaveIndex());
     sdo.write<uint16_t>(/*index=*/0x2080, /*sub=*/0, /*value=*/1);
 }
 
@@ -489,8 +487,8 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
             "Failed checking the checksum on slave: %d", this->getSlaveIndex());
     }
 
-    ROS_DEBUG("The .sw checksum is : %d, and the drive checksum is %d",
-        sw_value, imc_value);
+    // ROS_DEBUG("The .sw checksum is : %d, and the drive checksum is %d",
+    //     sw_value, imc_value);
     return sw_value == imc_value;
 }
 

@@ -8,8 +8,6 @@
 #include <memory>
 #include <stdexcept>
 
-#include <ros/ros.h>
-
 namespace march {
 class Slave : public PdoSlaveInterface {
 public:

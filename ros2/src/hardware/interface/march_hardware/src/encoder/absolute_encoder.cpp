@@ -3,8 +3,6 @@
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/motor_controller/motor_controller_type.h"
 
-#include <ros/ros.h>
-
 namespace march {
 AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
     MotorControllerType motor_controller_type, Direction direction,
@@ -60,11 +58,11 @@ void AbsoluteEncoder::checkRangeOfMotion(
         = std::abs(encoder_range_of_motion - range_of_motion)
         / encoder_range_of_motion;
     if (difference > AbsoluteEncoder::MAX_RANGE_DIFFERENCE) {
-        ROS_WARN("Difference in range of motion of %.2f%% exceeds %.2f%%\n"
-                 "Absolute encoder range of motion = %f rad\n"
-                 "Limits range of motion = %f rad",
-            difference * 100, AbsoluteEncoder::MAX_RANGE_DIFFERENCE * 100,
-            encoder_range_of_motion, range_of_motion);
+        // ROS_WARN("Difference in range of motion of %.2f%% exceeds %.2f%%\n"
+        //          "Absolute encoder range of motion = %f rad\n"
+        //          "Limits range of motion = %f rad",
+        //     difference * 100, AbsoluteEncoder::MAX_RANGE_DIFFERENCE * 100,
+        //     encoder_range_of_motion, range_of_motion);
     }
 }
 
