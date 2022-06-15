@@ -1,31 +1,22 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(march_hardware)
 
 add_compile_options(-std=c++17 -Wall -Wextra -Werror)
 
-find_package(catkin REQUIRED COMPONENTS
-    roscpp
-    soem
-    urdf
-)
+find_package(ament_cmake REQUIRED)
+find_package(soem)
+find_package(urdf)
+find_package(ament_cmake_gmock REQUIRED)
 
-catkin_package(
-    INCLUDE_DIRS include
-    CATKIN_DEPENDS
-    roscpp
-    soem
-    urdf
-    LIBRARIES ${PROJECT_NAME}
-    CFG_EXTRAS
-    ${PROJECT_NAME}-extras.cmake
-)
+ament_export_include_directories(include)
+ament_export_dependencies(soem urdf)
+ament_export_libraries(${PROJECT_NAME})
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
 include_directories(
     include
     SYSTEM
-    ${catkin_INCLUDE_DIRS}
     ${soem_INCLUDE_DIRS}/soem
 )
 
@@ -34,7 +25,7 @@ include_directories(
 set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
-if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
     # Add compiler flags for coverage instrumentation before defining any targets
     append_coverage_compiler_flags()
@@ -90,61 +81,65 @@ add_library(${PROJECT_NAME}
     src/power_distribution_board/power_distribution_board.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)
+target_link_libraries(${PROJECT_NAME} pthread)
+ament_target_dependencies(${PROJECT_NAME} soem urdf)
 
 add_executable(slave_count_check check/slave_count.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})
 ros_enable_rpath(slave_count_check)
 
 install(DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    DESTINATION include/${PROJECT_NAME}
 )
 
 install(TARGETS ${PROJECT_NAME}
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
 )
 
 install(TARGETS slave_count_check
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY launch config
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    DESTINATION share/${PROJECT_NAME}
 )
 
-## Add gtest based cpp test target and link libraries
-if(CATKIN_ENABLE_TESTING)
-    catkin_add_gmock(${PROJECT_NAME}_test
-        test/encoder/absolute_encoder_test.cpp
-        test/encoder/encoder_test.cpp
-        test/encoder/incremental_encoder_test.cpp
-        test/error/hardware_exception_test.cpp
-        test/error/motor_controller_error_test.cpp
-        test/ethercat/imotioncube_pdo_map_test.cpp
-        test/ethercat/slave_test.cpp
-        test/imotioncube/imotioncube_test.cpp
-        test/joint_test.cpp
-        test/mocks/mock_absolute_encoder.h
-        test/mocks/mock_encoder.h
-        test/mocks/mock_imotioncube.h
-        test/mocks/mock_incremental_encoder.h
-        test/mocks/mock_motorcontroller_state.h
-        test/mocks/mock_pdo_interface.h
-        test/mocks/mock_sdo_interface.h
-        test/mocks/mock_slave.h
-        test/mocks/mock_temperature_ges.h
-        test/temperature/temperature_ges_test.cpp
-        test/pressure_sole/pressure_sole_test.cpp
-        test/test_runner.cpp
-    )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
+ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 
-    if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
-        add_code_coverage(
-            NAME coverage_report
-            DEPENDENCIES ${PROJECT_NAME}_test
-        )
-    endif()
-endif()
+## Add gtest based cpp test target and link libraries
+# if(BUILD_TESTING)
+#     ament_add_gmock(${PROJECT_NAME}_test
+#         test/encoder/absolute_encoder_test.cpp
+#         test/encoder/encoder_test.cpp
+#         test/encoder/incremental_encoder_test.cpp
+#         test/error/hardware_exception_test.cpp
+#         test/error/motor_controller_error_test.cpp
+#         test/ethercat/imotioncube_pdo_map_test.cpp
+#         test/ethercat/slave_test.cpp
+#         test/imotioncube/imotioncube_test.cpp
+#         test/joint_test.cpp
+#         test/mocks/mock_absolute_encoder.h
+#         test/mocks/mock_encoder.h
+#         test/mocks/mock_imotioncube.h
+#         test/mocks/mock_incremental_encoder.h
+#         test/mocks/mock_motorcontroller_state.h
+#         test/mocks/mock_pdo_interface.h
+#         test/mocks/mock_sdo_interface.h
+#         test/mocks/mock_slave.h
+#         test/mocks/mock_temperature_ges.h
+#         test/temperature/temperature_ges_test.cpp
+#         test/pressure_sole/pressure_sole_test.cpp
+#         test/test_runner.cpp
+#     )
+#     target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+#     ament_target_dependencies(${PROJECT_NAME}_test soem urdf)
+
+#     if(ENABLE_COVERAGE_TESTING)
+#         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
+#         add_code_coverage(
+#             NAME coverage_report
+#             DEPENDENCIES ${PROJECT_NAME}_test
+#         )
+#     endif()
+# endif()
