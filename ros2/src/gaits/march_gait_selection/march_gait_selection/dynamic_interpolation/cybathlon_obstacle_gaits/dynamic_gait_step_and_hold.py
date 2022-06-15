@@ -2,7 +2,6 @@
 
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-from typing import Dict
 
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_step_and_hold import (
     TrajectoryCommandFactoryStepAndHold,
@@ -10,7 +9,6 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 
-from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_RIGHT,
@@ -25,11 +23,11 @@ class DynamicGaitStepAndHold(DynamicGaitStepAndClose):
 
     _use_position_queue: bool
 
-    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
+    def __init__(self, node: Node):
         self.subgait_id = "right_swing"
         self.use_predetermined_foot_location = False
         self.start_from_left_side = False
-        super().__init__(node, positions)
+        super().__init__(node)
         self.trajectory_command_factory = TrajectoryCommandFactoryStepAndHold(self, self._points_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self.gait_name = "dynamic_step_and_hold"

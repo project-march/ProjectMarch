@@ -1,13 +1,12 @@
 """Author: Marten Haitjema, MVII."""
 
-from typing import Optional, Dict
+from typing import Optional
 from rclpy.node import Node
 from rclpy.time import Time
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from sensor_msgs.msg import JointState
 
-from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_RIGHT,
     STEPPING_STONES_END_POSITION_LEFT,
@@ -32,8 +31,8 @@ class DynamicGaitClose(DynamicGaitWalk):
     subgait_id: str
     start_time_next_command: Time
 
-    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
-        super().__init__(node, positions)
+    def __init__(self, node: Node):
+        super().__init__(node)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._points_handler = CameraPointsHandler(self)
         self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._points_handler)

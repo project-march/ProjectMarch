@@ -1,7 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
 from rclpy.node import Node
-from typing import Dict
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import (
     DynamicGaitStepAndClose,
@@ -13,14 +12,12 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
     TrajectoryCommandFactory,
 )
 
-from march_utility.gait.edge_position import EdgePosition
-
 
 class FixedGaitStepAndClose(DynamicGaitStepAndClose):
     """Class to have a setpoint gait step and close with a fixed step distance."""
 
-    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
-        super().__init__(node, positions)
+    def __init__(self, node: Node):
+        super().__init__(node)
         self.gait_name = "fixed_step_and_close"
         self._points_handler = SimulatedPointsHandler(gait=self)
         self.trajectory_command_factory = TrajectoryCommandFactory(

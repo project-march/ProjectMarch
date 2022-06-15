@@ -73,10 +73,9 @@ class DynamicGaitWalk(GaitInterface):
     _next_command: Optional[TrajectoryCommand]
     _should_stop: bool
 
-    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
+    def __init__(self, node: Node):
         super(DynamicGaitWalk, self).__init__()
         self.node = node
-        self._positions = positions
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._points_handler = CameraPointsHandler(gait=self)
         self.trajectory_command_factory = TrajectoryCommandFactory(
@@ -84,10 +83,13 @@ class DynamicGaitWalk(GaitInterface):
             points_handler=self._points_handler,
         )
 
-        self.home_stand_position_actuating_joints = self._positions["stand"]["joints"]
-        self.home_stand_position_all_joints = get_position_from_yaml("stand")
-        self.all_joint_names = self.home_stand_position_all_joints.keys()
         self.actuating_joint_names = get_joint_names_from_urdf()
+        self.all_joint_names = get_joint_names_from_urdf(return_fixed_joints=True)
+        self.home_stand_position_all_joints = get_position_from_yaml("stand")
+        self.home_stand_position_actuating_joints = {
+            name: self.home_stand_position_all_joints[name] for name in self.actuating_joint_names
+        }
+
         self._set_start_position_to_home_stand()
         self._reset()
         self._get_soft_limits()

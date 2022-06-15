@@ -3,7 +3,7 @@
 from queue import Queue
 from rclpy.node import Node
 from rclpy.time import Time
-from typing import Optional, Dict
+from typing import Optional
 from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
@@ -14,7 +14,6 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 
-from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -31,8 +30,8 @@ class DynamicGaitStep(DynamicGaitWalk):
     _current_time: Optional[Time]
     _use_position_queue: bool
 
-    def __init__(self, node: Node, positions: Dict[str, EdgePosition]):
-        super().__init__(node, positions)
+    def __init__(self, node: Node):
+        super().__init__(node)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, points_handler=self._points_handler)
         self.subgait_id = "right_swing"

@@ -1,6 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
-from typing import Optional, Dict
+from typing import Optional
 from rclpy.time import Time
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
@@ -8,7 +8,6 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.exceptions.gait_exceptions import (
     WrongStartPositionError,
 )
-from march_utility.gait.edge_position import EdgePosition
 from march_utility.utilities.duration import Duration
 
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_stepping_stones import (
@@ -21,17 +20,15 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
 
     Args:
         node (Node): the gait node
-        positions (Dict[str, EdgePosition]):  named positions loaded in the gait loader
 
     Attributes:
         start_from_left_side (bool): whether the gaits start with a left swing
         use_predetermined_foot_location (bool): whether one of the five predetermined locations will be used
     """
 
-    def __init__(self, node, positions: Dict[str, EdgePosition]):
-        super().__init__(node, positions)
+    def __init__(self, node):
+        super().__init__(node)
         self.node = node
-        self._positions = positions
         self.start_from_left_side = False
         self.use_predetermined_foot_location = False
         self._logger = node.get_logger().get_child(__class__.__name__)
