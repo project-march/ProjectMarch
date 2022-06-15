@@ -1,9 +1,9 @@
 """Author: Marten Haitjema."""
 
 import os
-from typing import List, Optional
-
 import yaml
+
+from typing import List, Optional, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 from urdf_parser_py import urdf
@@ -24,8 +24,7 @@ from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_step impo
 
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
-from march_utility.exceptions.gait_exceptions import NonValidGaitContentError
-from march_utility.gait.edge_position import UnknownEdgePosition
+from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
 from march_utility.utilities.node_utils import get_joint_names_from_robot
 
 NODE_NAME = "gait_selection"
@@ -47,7 +46,7 @@ class GaitLoader:
         _gait_directory (str): path to the directory that contains the gait files
         _default_positions_yaml (str): path to the yaml that contains the named positions
         _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
-        _named_positions(Dict[str, EdgePosition]): dictionary containing the name and EdgePosition of each named pos
+        _named_positions (Dict[EdgePosition, str]): dictionary containing the EdgePosition and name of each named pos
     """
 
     def __init__(
@@ -83,7 +82,7 @@ class GaitLoader:
         return self._robot
 
     @property
-    def positions(self) -> dict:
+    def positions(self) -> Dict[EdgePosition, str]:
         """Returns the named idle positions."""
         return self._named_positions
 
@@ -97,18 +96,18 @@ class GaitLoader:
     def _load_dynamic_gaits(self) -> None:
         """Load the dynamic gait classes."""
         dynamic_gaits = [
-            DynamicGaitWalk(self._node, self.positions),
-            DynamicGaitStep(self._node, self.positions),
-            DynamicGaitStepAndClose(self._node, self.positions),
-            DynamicGaitClose(self._node, self.positions),
-            FixedGaitWalk(self._node, self.positions),
-            FixedGaitStepAndClose(self._node, self.positions),
-            FixedGaitStep(self._node, self.positions),
+            DynamicGaitWalk(self._node),
+            DynamicGaitStep(self._node),
+            DynamicGaitStepAndClose(self._node),
+            DynamicGaitClose(self._node),
+            FixedGaitWalk(self._node),
+            FixedGaitStepAndClose(self._node),
+            FixedGaitStep(self._node),
         ]
 
         if self._node.add_cybathlon_gaits:
-            dynamic_gaits.append(DynamicGaitStepAndHold(self._node, self.positions))
-            dynamic_gaits.append(SteppingStonesStepAndClose(self._node, self.positions))
+            dynamic_gaits.append(DynamicGaitStepAndHold(self._node))
+            dynamic_gaits.append(SteppingStonesStepAndClose(self._node))
 
         self._loaded_gaits = {gait.name: gait for gait in dynamic_gaits}
 
@@ -120,26 +119,21 @@ class GaitLoader:
         self._gait_version_map = default_config["gaits"]
 
         for position_name, position_values in default_config["positions"].items():
-            self._named_positions[position_name] = {
-                "gait_type": position_values["gait_type"],
-                "joints": {},
-            }
-            for joint, joint_value in position_values["joints"].items():
-                if joint in self._joint_names:
-                    self._named_positions[position_name]["joints"][joint] = joint_value
-
-            if set(self._named_positions[position_name]["joints"].keys()) != set(self._joint_names):
-                raise NonValidGaitContentError(
-                    f"The position {position_name} does not have a position for all required joints: it "
-                    f"has {self._named_positions[position_name]['joints'].keys()}, required: {self._joint_names}"
+            edge_position = StaticEdgePosition(list(position_values["joints"].values()))
+            if edge_position not in self._named_positions:
+                self._named_positions[edge_position] = position_name
+            else:
+                self._logger.error(
+                    f"Position '{position_name}' with joint values {position_values} cannot be added because it will "
+                    f"overwrite position '{self._positions[edge_position]}'. Each named position should be unique."
                 )
 
     def _load_home_gaits(self) -> None:
         """Create the home gaits based on the named positions."""
-        for name in self._named_positions.keys():
-            position = self._named_positions[name]["joints"]
+        for position in self._named_positions:
             if isinstance(position, UnknownEdgePosition):
                 continue
+            name = self._named_positions[position]
             home_gait = HomeGait(name, position, "")
             self.gaits[home_gait.name] = home_gait
 

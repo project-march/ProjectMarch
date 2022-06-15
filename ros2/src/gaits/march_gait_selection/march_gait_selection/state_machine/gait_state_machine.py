@@ -1,6 +1,6 @@
 """Author: Marten Haitjema."""
 
-from typing import Optional
+from typing import Optional, Dict
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.timer import Timer
 from rclpy.node import Node
@@ -9,7 +9,7 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 
-from march_utility.gait.edge_position import UnknownEdgePosition
+from march_utility.gait.edge_position import UnknownEdgePosition, EdgePosition
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -53,7 +53,9 @@ class GaitStateMachine:
     _should_stop: bool
     _shutdown_requested: bool
 
-    def __init__(self, node: Node, trajectory_scheduler: TrajectoryScheduler, gaits: dict, positions: dict):
+    def __init__(
+        self, node: Node, trajectory_scheduler: TrajectoryScheduler, gaits: dict, positions: Dict[EdgePosition, str]
+    ):
         self._node = node
         self._trajectory_scheduler = trajectory_scheduler
         self._gaits = gaits
