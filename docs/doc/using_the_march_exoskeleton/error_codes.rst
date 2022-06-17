@@ -203,14 +203,14 @@ verify that those are correct.
 
 .. _e112:
 
-``E112``: Invalid encoder resolution
-------------------------------------
-The encoder resolution is outside the allowed range.
+``E112``: Invalid encoder counts per rotation
+---------------------------------------------
+The encoder CPR (counts per rotation) is outside the allowed range.
 
-**Cause:** The given encoder resolution to construct an encoder are outside its allowed limits defined in
+**Cause:** The given encoder CPR to construct an encoder are outside its allowed limits defined in
 :hardware-interface:`encoder.h <march_hardware/include/march_hardware/encoder/encoder.h>`.
 
-**Fix:** Check if the resolutions given in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are
+**Fix:** Check if the CPR specified in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are
 within this range.
 
 

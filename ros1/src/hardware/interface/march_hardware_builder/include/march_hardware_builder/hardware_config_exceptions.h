@@ -14,10 +14,30 @@ public:
         : march::error::HardwareException(
             march::error::ErrorType::MISSING_REQUIRED_KEY,
             createDescription(key_name, object_name))
+        , key_name_(key_name)
+        , object_name_(object_name)
     {
     }
 
+    /** @brief Override comparison operator */
+    friend bool operator==(
+        const MissingKeyException& lhs, const MissingKeyException& rhs)
+    {
+        return lhs.key_name_ == rhs.key_name_
+            && lhs.object_name_ == rhs.object_name_;
+    }
+
+    /** @brief Override non-equality operator */
+    friend bool operator!=(
+        const MissingKeyException& lhs, const MissingKeyException& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
 private:
+    std::string key_name_;
+    std::string object_name_;
+
     static std::string createDescription(
         const std::string& key_name, const std::string& object_name)
     {

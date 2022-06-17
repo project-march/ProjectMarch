@@ -13,9 +13,10 @@ namespace march {
 class Encoder {
 public:
     enum Direction { Positive = 1, Negative = -1 };
-    Encoder(size_t resolution, MotorControllerType motor_controller_type,
-        Direction direction);
-    Encoder(size_t resolution, MotorControllerType motor_controller_type);
+    Encoder(size_t counts_per_rotation,
+        MotorControllerType motor_controller_type, Direction direction);
+    Encoder(
+        size_t counts_per_rotation, MotorControllerType motor_controller_type);
 
     virtual ~Encoder() noexcept = default;
 
@@ -38,8 +39,8 @@ public:
     /**
      * Returns the amount of radians corresponding to a single Internal Unit
      *
-     * Say for example an absolute encoder has a resolution of 12 bits.
-     * Then there are 2^12 = 4096 different positions that can be encoded.
+     * Say for example an absolute encoder has a 4096 counts per rotation.
+     * Then there are 4096 different positions that can be encoded.
      * A complete circle is 2 PI radians.
      * Hence to encode a complete circle each position must account for 2 PI /
      * 4096 radians. In this case adding a single IU results in a position
@@ -56,8 +57,8 @@ public:
     Direction getDirection() const;
     MotorControllerType getMotorControllerType() const;
 
-    static const size_t MIN_RESOLUTION = 1;
-    static const size_t MAX_RESOLUTION = 32;
+    static const size_t MIN_COUNTS_PER_ROTATION = (size_t)1 << 1;
+    static const size_t MAX_COUNTS_PER_ROTATION = (size_t)1 << 32;
 
     static constexpr double PI_2 = 2 * M_PI;
 
@@ -67,14 +68,15 @@ protected:
 private:
     /**
      * Returns the total number of positions possible on an encoder
-     * with the given amount of bits.
-     * @param resolution The resolution of the encoder
+     * after checking that the input CPR (counts per rotation) is within the
+     * correct range.
+     * @param counts_per_rotation The total amount of different positions.
      * @returns The total amount of different positions
-     * @throws HardwareException When the given resolution is outside the
-     * allowed range Which is determined by Encoder::MIN_RESOLUTION and
-     * Encoder::MAX_RESOLUTION.
+     * @throws HardwareException When the given CPR is outside the
+     * allowed range Which is determined by Encoder::MIN_COUNTS_PER_ROTATION and
+     * Encoder::MAX_COUNTS_PER_ROTATION.
      */
-    static size_t calculateTotalPositions(size_t resolution);
+    static size_t calculateTotalPositions(size_t counts_per_rotation);
 
     size_t total_positions_ = 0;
 
