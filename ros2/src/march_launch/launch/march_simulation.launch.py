@@ -94,7 +94,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
-            DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
+            DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
                 name="rqt_input",

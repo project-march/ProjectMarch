@@ -44,13 +44,13 @@ alias b='march_run_bridge'
 
 
 # Training aliases
-export URDF='robot_description:=march6_three_cameras'
+export URDF6='robot:=march6_three_cameras'
 
-alias cov1='march_run_ros1_sim $URDF point_finder:=true realsense_simulation:=true ground_gait:=true'
-alias cov2='march_run_ros2_sim $URDF realsense_simulation:=true ground_gait:=true use_imu_data:=false'
+alias cov1='march_run_ros1_sim point_finder:=true realsense_simulation:=true ground_gait:=true'
+alias cov2='march_run_ros2_sim realsense_simulation:=true ground_gait:=true use_imu_data:=false'
 
-alias ag1='march_run_ros1_airgait $URDF point_finder:=true ground_gait:=true use_imu_data:=true'
-alias ag2='march_run_ros2_training $URDF use_imu_data:=true wireless_ipd:=true'
+alias ag1='march_run_ros1_airgait point_finder:=true ground_gait:=true use_imu_data:=true'
+alias ag2='march_run_ros2_training use_imu_data:=true wireless_ipd:=true'
 
 alias gg1='ag1 gain_tuning:=ground_gait'
 alias gg2='ag2'
