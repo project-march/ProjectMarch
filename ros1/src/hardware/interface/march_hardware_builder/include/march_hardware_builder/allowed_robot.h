@@ -10,6 +10,7 @@
 class AllowedRobot {
 public:
     enum Value : int {
+        march7,
         march6,
         march4,
         march3,
@@ -25,7 +26,9 @@ public:
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
     AllowedRobot(const std::string& robot_name)
     {
-        if (robot_name == "march6") {
+        if (robot_name == "march7") {
+            this->value = march7;
+        } else if (robot_name == "march6") {
             this->value = march6;
         } else if (robot_name == "march4") {
             this->value = march4;
@@ -48,7 +51,9 @@ public:
     std::string getFilePath()
     {
         std::string base_path = ros::package::getPath("march_hardware_builder");
-        if (this->value == AllowedRobot::march6) {
+        if (this->value == AllowedRobot::march7) {
+            return base_path.append(/*__s=*/"/robots/march7.yaml");
+        } else if (this->value == AllowedRobot::march6) {
             return base_path.append(/*__s=*/"/robots/march6.yaml");
         } else if (this->value == AllowedRobot::march4) {
             return base_path.append(/*__s=*/"/robots/march4.yaml");
@@ -89,6 +94,8 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const AllowedRobot& c)
     {
         switch (c.value) {
+            case march7:
+                out << "march7";
             case march6:
                 out << "march6";
                 break;
