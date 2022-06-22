@@ -6,6 +6,7 @@ from rclpy.time import Time
 from typing import Optional
 from sensor_msgs.msg import JointState
 
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
@@ -30,12 +31,12 @@ class DynamicGaitStep(DynamicGaitWalk):
     _current_time: Optional[Time]
     _use_position_queue: bool
 
-    def __init__(self, node: Node):
-        super().__init__(node)
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, points_handler=self._points_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, point_handler=self._point_handler)
         self.subgait_id = "right_swing"
-        self.gait_name = "dynamic_step"
+        self.gait_name = name
 
         self.node.create_subscription(
             JointState,

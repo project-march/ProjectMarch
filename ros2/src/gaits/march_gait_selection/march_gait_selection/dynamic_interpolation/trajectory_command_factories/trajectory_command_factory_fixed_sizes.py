@@ -20,8 +20,8 @@ PREDETERMINED_FOOT_LOCATIONS = {
 class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactoryQueue):
     """TrajectoryCommandFactory class with the ability to use predetermined step sizes and change the start side."""
 
-    def __init__(self, gait, points_handler):
-        super().__init__(gait, points_handler)
+    def __init__(self, gait, point_handler):
+        super().__init__(gait, point_handler)
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
         self._gait.node.create_subscription(

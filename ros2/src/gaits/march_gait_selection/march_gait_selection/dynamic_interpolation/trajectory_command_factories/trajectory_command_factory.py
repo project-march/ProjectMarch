@@ -18,7 +18,7 @@ class TrajectoryCommandFactory:
 
     Args:
         gait: The gait class
-        points_handler: The points handler class
+        point_handler: The points handler class
 
     Attributes:
         subgait_id (str): either 'left_swing' or 'right_swing'
@@ -27,7 +27,7 @@ class TrajectoryCommandFactory:
         dynamic_step (DynamicStep): instance of the DynamicStep class, used to get trajectory msg
 
         _gait: the gait class
-        _points_handler: the points handler class
+        _point_handler: the points handler class
         _logger (Logger): used to log with the class name as a prefix
         _trajectory_failed (bool): true if no feasible trajectory can be found
     """
@@ -36,9 +36,9 @@ class TrajectoryCommandFactory:
     foot_location: FootPosition
     start_position_all_joints: Dict[str, float]
 
-    def __init__(self, gait, points_handler):
+    def __init__(self, gait, point_handler):
         self._gait = gait
-        self._points_handler = points_handler
+        self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
@@ -64,14 +64,14 @@ class TrajectoryCommandFactory:
             self._logger.info("Stopping dynamic gait.")
         else:
             try:
-                self.foot_location = self._points_handler.get_foot_location(self.subgait_id)
-                stop = self._points_handler.is_foot_location_too_old(self.foot_location)
+                self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
+                stop = self._point_handler.is_foot_location_too_old(self.foot_location)
             except AttributeError:
                 self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
                 self._gait._end = True
                 return None
             if not stop:
-                self._points_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
                 self._logger.info(
                     f"Stepping to location ({self.foot_location.processed_point.x}, "
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"

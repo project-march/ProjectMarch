@@ -8,6 +8,10 @@ from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
+from march_gait_selection.dynamic_interpolation.point_handlers.camera_point_handler import CameraPointHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.simulated_point_handler import (
+    SimulatedPointHandler,
+)
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step import DynamicGaitStep
@@ -18,9 +22,6 @@ from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.steppin
 from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic_gait_step_and_hold import (
     DynamicGaitStepAndHold,
 )
-from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_walk import FixedGaitWalk
-from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_step_and_close import FixedGaitStepAndClose
-from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_step import FixedGaitStep
 
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
@@ -95,19 +96,23 @@ class GaitLoader:
 
     def _load_dynamic_gaits(self) -> None:
         """Load the dynamic gait classes."""
+        camera_point_handler = CameraPointHandler(self._node)
+        simulated_point_handler = SimulatedPointHandler(self._node)
         dynamic_gaits = [
-            DynamicGaitWalk(self._node),
-            DynamicGaitStep(self._node),
-            DynamicGaitStepAndClose(self._node),
-            DynamicGaitClose(self._node),
-            FixedGaitWalk(self._node),
-            FixedGaitStepAndClose(self._node),
-            FixedGaitStep(self._node),
+            DynamicGaitWalk("dynamic_walk", self._node, camera_point_handler),
+            DynamicGaitStep("dynamic_step", self._node, camera_point_handler),
+            DynamicGaitStepAndClose("dynamic_step_and_close", self._node, camera_point_handler),
+            DynamicGaitClose("dynamic_close", self._node, camera_point_handler),
+            DynamicGaitWalk("fixed_walk", self._node, simulated_point_handler),
+            DynamicGaitStepAndClose("fixed_step_and_close", self._node, simulated_point_handler),
+            DynamicGaitStep("fixed_step", self._node, simulated_point_handler),
         ]
 
         if self._node.add_cybathlon_gaits:
-            dynamic_gaits.append(DynamicGaitStepAndHold(self._node))
-            dynamic_gaits.append(SteppingStonesStepAndClose(self._node))
+            dynamic_gaits.append(DynamicGaitStepAndHold("step_and_hold", self._node, camera_point_handler))
+            dynamic_gaits.append(
+                SteppingStonesStepAndClose("stepping_stones_step_and_close", self._node, camera_point_handler)
+            )
 
         self._loaded_gaits = {gait.name: gait for gait in dynamic_gaits}
 
@@ -127,7 +132,8 @@ class GaitLoader:
             else:
                 self._logger.error(
                     f"Position '{position_name}' with joint values {position_values} cannot be added because it will "
-                    f"overwrite position '{self._named_positions[edge_position]}'. Each named position should be unique."
+                    f"overwrite position '{self._named_positions[edge_position]}'. "
+                    f"Each named position should be unique."
                 )
 
     def _load_home_gaits(self) -> None:
