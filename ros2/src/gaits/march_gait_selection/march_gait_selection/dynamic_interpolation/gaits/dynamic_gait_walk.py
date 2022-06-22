@@ -24,12 +24,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
     TrajectoryCommandFactory,
 )
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
-    CameraPointsHandler,
-)
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
-    SimulatedPointsHandler,
-)
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
 from march_shared_msgs.msg import GaitInstruction
 from sensor_msgs.msg import JointState
 
@@ -75,7 +70,7 @@ class DynamicGaitWalk(GaitInterface):
     _next_command: Optional[TrajectoryCommand]
     _should_stop: bool
 
-    def __init__(self, name: str, node: Node, points_handler: Union[SimulatedPointsHandler, CameraPointsHandler]):
+    def __init__(self, name: str, node: Node, points_handler: PointsHandler):
         super(DynamicGaitWalk, self).__init__()
         self.node = node
         self._logger = node.get_logger().get_child(__class__.__name__)

@@ -3,13 +3,10 @@
 from queue import Queue
 from rclpy.node import Node
 from rclpy.time import Time
-from typing import Optional, Union
+from typing import Optional
 from sensor_msgs.msg import JointState
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import CameraPointsHandler
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
-    SimulatedPointsHandler,
-)
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
@@ -34,7 +31,7 @@ class DynamicGaitStep(DynamicGaitWalk):
     _current_time: Optional[Time]
     _use_position_queue: bool
 
-    def __init__(self, name: str, node: Node, points_handler: Union[SimulatedPointsHandler, CameraPointsHandler]):
+    def __init__(self, name: str, node: Node, points_handler: PointsHandler):
         super().__init__(name, node, points_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, points_handler=self._points_handler)
