@@ -25,4 +25,3 @@ joint_trajectory_controller:
       - position
     state_interfaces:
       - position
-
