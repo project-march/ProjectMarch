@@ -7,8 +7,6 @@
     the hover_height to 0.0. Set ground_gait to true to ground gait in simulation.-->
     <xacro:arg name="ground_gait" default="false"/>
 
-    <xacro:arg name="gazebo_control" default="true"/>
-
     <!--    Switch between using the physical camera and the simulation camera -->
     <!--    If set to 'true', no physical camera is needed -->
     <!--    If this value is set to 'false', the plugin will not be started and the topics -->
@@ -452,10 +450,8 @@
         <origin xyz="0 0 ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
-
-    <xacro:if value="$(arg gazebo_control)">
-        <xacro:include filename="gazebo_control.xacro"/>
-    </xacro:if>
+    <!-- Takes as argument 'type={effort|rviz}' and 'gazebo={true|false}'. 'type' should not matter.-->
+    <xacro:include filename="$(find march_control)/xacro/ros2_control.xacro"/>
 
 
 </robot>

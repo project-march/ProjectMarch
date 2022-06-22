@@ -3,7 +3,7 @@ project(march_control)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY launch config
+install(DIRECTORY launch config xacro
         DESTINATION share/${PROJECT_NAME}
         )
 

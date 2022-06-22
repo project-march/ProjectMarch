@@ -54,6 +54,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
+    gazebo = LaunchConfiguration("gazebo")
     realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
@@ -93,21 +94,24 @@ def generate_launch_description() -> launch.LaunchDescription:
         # GENERAL ARGUMENTS
         DeclareLaunchArgument(
             name="use_sim_time",
-            default_value="False",
+            default_value="false",
             description="Whether to use simulation time as published on the "
             "/clock topic by gazebo instead of system time.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="gazebo/march6_control.yaml",
-            description="The controller yaml file to use. Must be in: `march_control/config/`.",
+            default_value="rviz/march6_control.yaml",
+            description="The controller yaml file to use loaded in through the controller manager "
+                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
             name="rqt_input",
-            default_value="True",
+            default_value="true",
             description="If this argument is false, the rqt input device will not be launched.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="layout",
@@ -116,18 +120,20 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="ping_safety_node",
-            default_value="True",
+            default_value="true",
             description="Whether the input device should ping the safety node"
             "with an alive message every 0.2 seconds",
+            choices=["true", "false"],
         ),
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
             name="robot_state_publisher",
-            default_value="True",
+            default_value="true",
             description="Whether or not to launch the robot state publisher,"
             "this allows nodes to get the urdf and to subscribe to"
             "potential urdf updates. This is necesary for gait selection"
             "to be able to launch.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="robot_description",
@@ -137,7 +143,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="realsense",
-            default_value="False",
+            default_value="false",
             description="Whether any realsense camera will be used.",
         ),
         DeclareLaunchArgument(
@@ -169,9 +175,16 @@ def generate_launch_description() -> launch.LaunchDescription:
             description="The topic that should be used to determine the orientation.",
         ),
         DeclareLaunchArgument(
+            name="gazebo",
+            default_value="false",
+            description="Whether gazebo should be launched.",
+            choices=["true", "false"]
+        ),
+        DeclareLaunchArgument(
             name="simulation",
-            default_value="True",
+            default_value="true",
             description="Whether simulation is used.",
+            choices=["true", "false"]
         ),
         # GAIT SELECTION ARGUMENTS
         DeclareLaunchArgument(
@@ -186,12 +199,12 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="balance",
-            default_value="False",
+            default_value="false",
             description="Whether balance is being used.",
         ),
         DeclareLaunchArgument(
             name="dynamic_gait",
-            default_value="True",
+            default_value="true",
             description="Whether dynamic_setpoint_gait is enabled.",
         ),
         DeclareLaunchArgument(
@@ -223,8 +236,9 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="add_push_off",
-            default_value="True",
+            default_value="true",
             description="Whether to add a push off setpoint for the ankle.",
+            choices=["true", "false"]
         ),
         DeclareLaunchArgument(
             name="amount_of_steps",
@@ -233,14 +247,16 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="use_position_queue",
-            default_value="False",
-            description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
+            default_value="false",
+            description="Uses the values in position_queue.yaml for the half step if true, otherwise uses "
             "points given by (simulated) covid.",
+            choices=["true", "false"]
         ),
         DeclareLaunchArgument(
             name="add_cybathlon_gaits",
-            default_value="False",
+            default_value="false",
             description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="first_subgait_delay",
@@ -262,14 +278,16 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             "jointless",
-            default_value="False",
+            default_value="false",
             description="If true, no joints will be actuated.",
+            choices=["true", "false"],
         ),
         # FAKE SENSOR DATA ARGUMENTS
         DeclareLaunchArgument(
             name="fake_sensor_data",
-            default_value="False",
+            default_value="false",
             description="Whether to launch the fake sensor data node.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             "minimum_fake_temperature",
@@ -284,8 +302,9 @@ def generate_launch_description() -> launch.LaunchDescription:
         # GAIT PREPROCESSOR ARGUMENTS
         DeclareLaunchArgument(
             name="simulate_points",
-            default_value="False",
+            default_value="true",
             description="Whether to simulate fake foot positions for gait generation.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="location_x",
@@ -359,7 +378,8 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("location_x", location_x),
             ("location_y", location_y),
             ("location_z", location_z),
-            ("gazebo", "true"),
+            ("gazebo", gazebo),
+            ("control_yaml", control_yaml)
         ],
     )
     # endregion

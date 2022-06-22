@@ -73,23 +73,6 @@ def generate_launch_description():
     )
     # endregion
 
-    # region Launch RViz
-    rviz_config_file = PathJoinSubstitution([FindPackageShare("march_launch"), "rviz", "ros2.rviz"])
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_config_file],
-    )
-    # rviz_node_delay_after_gazebo = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=gazebo_spawn_entity,
-    #         on_exit=[rviz_node],
-    #     )
-    # )
-    # endregion
-
     # region Launch march control
     march_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -108,9 +91,7 @@ def generate_launch_description():
     nodes = [
         robot_state_pub_node,
         gazebo,
-        march_control,
-        rviz_node,
-        # rviz_node_delay_after_gazebo,  # Rviz after broadcast spawner.
+        march_control
     ]
 
     return LaunchDescription(declared_arguments + nodes)

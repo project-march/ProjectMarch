@@ -22,7 +22,6 @@ joint_trajectory_controller:
       - right_knee
     interface_name: position
     command_interfaces:
-#      - position
       - effort
     state_interfaces:
       - position
@@ -39,7 +38,6 @@ joint_trajectory_controller:
 
     state_publish_rate: 1000.0 # Defaults to 50
     action_monitor_rate: 20.0 # Defaults to 20
-
     allow_partial_joints_goal: false # Defaults to false
 #    open_loop_control: false
     allow_integration_in_goal_trajectories: true

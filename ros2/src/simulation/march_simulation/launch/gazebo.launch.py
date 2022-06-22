@@ -16,6 +16,7 @@ def generate_launch_description():
     debug = LaunchConfiguration("gazebo_debug")
     use_sim_time = LaunchConfiguration("use_sim_time")
     fixed = LaunchConfiguration("fixed")
+    verbose = LaunchConfiguration("gazebo_verbose")
 
     # region Declared arguments
     declared_arguments = [
@@ -49,6 +50,12 @@ def generate_launch_description():
             description='Fixes the exoskeleton in the world. Transforms baselink to world if not fixed.',
             choices=["true", "false"]
         ),
+        DeclareLaunchArgument(
+            name='gazebo_verbose',
+            default_value='true',
+            description='If gazebo should print errors and logs.',
+            choices=["true", "false"]
+        ),
     ]
     # endregion
 
@@ -70,7 +77,7 @@ def generate_launch_description():
             ("gui", gazebo_ui),  # default 'True'
             ("recording", "false"),  # Enable gazebo state log recording
             ("debug", debug),  # default 'false'
-            ("verbose", "true"),
+            ("verbose", verbose),  # default 'true'
             ("server_required", "false"),  # If set to 'True' crashes ros on startup, if 'False' entities persist.
         ],
     )

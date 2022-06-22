@@ -2,12 +2,10 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
-from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 from march_utility.utilities.utility_functions import (
@@ -52,6 +50,7 @@ def generate_launch_description() -> LaunchDescription:
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")
     control_yaml = LaunchConfiguration("control_yaml")
+    gazebo_control_yaml = LaunchConfiguration("gazebo_control_yaml")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
@@ -93,7 +92,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="gazebo",
-            default_value=simulation,
+            default_value="false",
             description="Whether we want to run it in simulation with Gazebo control.",
         ),
     ]
@@ -134,25 +133,32 @@ def generate_launch_description() -> LaunchDescription:
         # GENERAL ARGUMENTS
         DeclareLaunchArgument(
             name="use_sim_time",
-            default_value="False",
+            default_value="false",
             description="Whether to use simulation time as published on the "
             "/clock topic by gazebo instead of system time.",
         ),
         DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="effort_control/march6.yaml",
-            description="The controller yaml file to use. Must be in: `march_control/config/`.",
+            default_value="effort_control/march6_control.yaml",
+            description="The controller yaml file to use loaded in through the controller manager "
+                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+        ),
+        DeclareLaunchArgument(
+            name="gazebo_control_yaml",
+            default_value="gazebo/march6_control.yaml",
+            description="The gazebo controller yaml file to use this is added in through the urdf published "
+                        "on /robot_description. Must be in: `march_control/config/`.",
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
             name="rqt_input",
-            default_value="True",
+            default_value="true",
             description="If this argument is false, the rqt input device will not be launched.",
         ),
         DeclareLaunchArgument(
             name="wireless_ipd",
-            default_value="False",
+            default_value="false",
             description="If this argument is false, the wireless input device will not be launched.",
         ),
         DeclareLaunchArgument(
@@ -162,14 +168,14 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="ping_safety_node",
-            default_value="True",
+            default_value="true",
             description="Whether the input device should ping the safety node"
             "with an alive message every 0.2 seconds",
         ),
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
             name="robot_state_publisher",
-            default_value="True",
+            default_value="true",
             description="Whether or not to launch the robot state publisher,"
             "this allows nodes to get the urdf and to subscribe to"
             "potential urdf updates. This is necesary for gait selection"
@@ -183,17 +189,17 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="realsense",
-            default_value="True",
+            default_value="true",
             description="Whether to start up everything for working with the realsense",
         ),
         DeclareLaunchArgument(
             name="realsense_simulation",
-            default_value="False",
+            default_value="false",
             description="Whether the simulation camera or the physical camera should be used",
         ),
         DeclareLaunchArgument(
             name="use_hud",
-            default_value="False",
+            default_value="false",
             description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
         ),
         DeclareLaunchArgument(
@@ -208,7 +214,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             "jointless",
-            default_value="False",
+            default_value="false",
             description="If true, no joints will be actuated",
         ),
         DeclareLaunchArgument(
@@ -218,7 +224,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="simulation",
-            default_value="False",
+            default_value="false",
             description="Whether the exoskeleton is ran physically or in simulation.",
         ),
         # GAIT SELECTION ARGUMENTS
@@ -234,12 +240,12 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="balance",
-            default_value="False",
+            default_value="false",
             description="Whether balance is being used.",
         ),
         DeclareLaunchArgument(
             name="dynamic_gait",
-            default_value="True",
+            default_value="true",
             description="Whether dynamic_setpoint_gait is enabled",
         ),
         DeclareLaunchArgument(
@@ -271,7 +277,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="add_push_off",
-            default_value="False",
+            default_value="false",
             description="Whether to add a push off setpoint for the ankle.",
         ),
         DeclareLaunchArgument(
@@ -281,13 +287,13 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="use_position_queue",
-            default_value="False",
+            default_value="false",
             description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
             "points given by (simulated) covid.",
         ),
         DeclareLaunchArgument(
             name="add_cybathlon_gaits",
-            default_value="False",
+            default_value="false",
             description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
         ),
         DeclareLaunchArgument(
@@ -307,7 +313,7 @@ def generate_launch_description() -> LaunchDescription:
         # FAKE SENSOR DATA ARGUMENTS
         DeclareLaunchArgument(
             name="fake_sensor_data",
-            default_value="False",
+            default_value="false",
             description="Whether to launch the fake sensor data node.",
         ),
         DeclareLaunchArgument(
@@ -323,7 +329,7 @@ def generate_launch_description() -> LaunchDescription:
         # GAIT PREPROCESSOR ARGUMENTS
         DeclareLaunchArgument(
             name="simulate_points",
-            default_value="False",
+            default_value="false",
             description="Whether to simulate fake foot positions for gait generation",
         ),
         DeclareLaunchArgument(
@@ -379,7 +385,7 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch robot state publisher (from march_description) if not robot_state_publisher:=false
+    # region Launch robot description publisher (from march_description) if not robot_state_publisher:=false
     robot_state_publisher_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -399,7 +405,7 @@ def generate_launch_description() -> LaunchDescription:
             ("imu_topic", imu_topic),
             ("simulation", simulation),
             ("jointless", jointless),
-            ("control_yaml", control_yaml),
+            ("gazebo_control_yaml", gazebo_control_yaml),
         ],
         condition=IfCondition(robot_state_publisher),
     )
@@ -514,37 +520,9 @@ def generate_launch_description() -> LaunchDescription:
     # region Launch Gazebo
     gazebo_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [PathJoinSubstitution([FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"])]
+            [PathJoinSubstitution([FindPackageShare("march_simulation"), "launch", "gazebo.launch.py"])]
         ),
-        launch_arguments={"verbose": "false"}.items(),
         condition=IfCondition(gazebo),
-    )
-
-    # Will create an entity with the name -entity [name] based on the urdf in the topic -topic [topic]
-    # Check this link for more information: https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-Spawn-and-delete
-    gazebo_spawn_entity = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "fred"],
-        output="screen",
-        condition=IfCondition(gazebo),
-    )
-    # endregion
-
-    # region Launch RViz
-    rviz_config_file = PathJoinSubstitution([FindPackageShare("march_launch"), "rviz", "ros2.rviz"])
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_config_file],
-    )
-    rviz_node_delay_after_gazebo = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=gazebo_spawn_entity,
-            on_exit=[rviz_node],
-        )
     )
     # endregion
 
@@ -558,7 +536,8 @@ def generate_launch_description() -> LaunchDescription:
             )
         ),
         launch_arguments=[
-            ("simulation", "true"),
+            ("simulation", simulation),
+            ("control_yaml", control_yaml)
         ],
     )
     # endregion
@@ -574,8 +553,6 @@ def generate_launch_description() -> LaunchDescription:
         fake_sensor_data_node,
         smartglass_bridge_node,
         gazebo_node,
-        gazebo_spawn_entity,
-        # rviz_node_delay_after_gazebo,
         march_control,
     ]
 

@@ -61,7 +61,7 @@ def copy_subdir(dir_path: str, file_extension: str, package_name: str) -> List[T
 
 
 def generate_robot_desc_command(
-    robot_descr_file, ground_gait, realsense_simulation, simulation, jointless, control_yaml
+    robot_descr_file, ground_gait, realsense_simulation, simulation, jointless, gazebo_control_yaml
 ):
     return [
         PathJoinSubstitution([FindExecutable(name="xacro")]),
@@ -79,7 +79,7 @@ def generate_robot_desc_command(
         " jointless:=",
         jointless,
         " gazebo_control_file:=",
-        get_control_file_loc(control_yaml),
+        get_control_file_loc(gazebo_control_yaml),
     ]
 
 

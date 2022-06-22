@@ -39,7 +39,7 @@ def generate_launch_description() -> LaunchDescription:
     # Whether the exoskeleton is ran physically or in simulation.
     simulation = LaunchConfiguration("simulation")
     # Path to the control file. Must be in `march_control/config/`. Is not used if simulation:=true.
-    control_yaml = LaunchConfiguration("control_yaml")
+    gazebo_control_yaml = LaunchConfiguration("gazebo_control_yaml")
     # endregion
 
     # region March statepublisher arguments.
@@ -94,7 +94,7 @@ def generate_launch_description() -> LaunchDescription:
                         realsense_simulation=realsense_simulation,
                         simulation=simulation,
                         jointless=jointless,
-                        control_yaml=control_yaml,
+                        gazebo_control_yaml=gazebo_control_yaml,
                     )
                 ),
                 "use_sim_time": use_sim_time,
