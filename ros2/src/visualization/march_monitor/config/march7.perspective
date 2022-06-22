@@ -1,0 +1,165 @@
+{
+  "keys": {},
+  "groups": {
+    "mainwindow": {
+      "keys": {
+        "geometry": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb00030000000007800000000000000eff00000437000007800000002500000eff0000043700000001000000000780000007800000002500000eff00000437')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "           7   %   7        %   7"
+        },
+        "state": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000000fd000000010000000300000780000003e7fc0100000003fc00000000000005210000021400fffffffc0200000002fc00000016000003e70000010f00080014fc0100000003fb00000072006d0061007200630068005f007200710074005f0069006e007000750074005f006400650076006900630065005f005f0049006e0070007500740044006500760069006300650050006c007500670069006e005f005f0031005f005f006d00610069006e005f007700690064006700650074010000000000000237000000f70007fffffb0000006c007200710074005f007200650063006f006e006600690067007500720065005f005f0050006100720061006d005f005f0031005f005f005f0070006c007500670069006e0063006f006e007400610069006e00650072005f0074006f0070005f007700690064006700650074010000023d000002e40000011700fffffffb00000064006d0061007200630068005f007200710074005f006e006f00740065005f00740061006b00650072005f005f004e006f0074006500730050006c007500670069006e005f005f0031005f005f006e006f007400650073005f0077006900640067006500740100000266000002ba0000000000000000fb00000088006d0061007200630068005f007200710074005f0067006100690074005f00760065007200730069006f006e005f0074006f006f006c005f005f004700610069007400560065007200730069006f006e0054006f006f006c0050006c007500670069006e005f005f0031005f005f004700610069007400530065006c0065006300740069006f006e010000028c000001710000000000000000fb00000030005f005f0044006f0063006b0057006900640067006500740043006f006e007400610069006e00650072005f005f003101000006e50000009b0000000000000000fb00000062007200710074005f0072006f0062006f0074005f006d006f006e00690074006f0072005f005f0052006f0062006f0074004d006f006e00690074006f0072005f005f0031005f005f0052006f0062006f00740020004d006f006e00690074006f0072010000052700000259000000dd00ffffff000007800000000000000004000000040000000800000008fc00000001000000030000000100000036004d0069006e0069006d0069007a006500640044006f0063006b00570069006400670065007400730054006f006f006c0062006100720000000000ffffffff0000000000000000')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "                   !                    rmarch_rqt_input_device__InputDevicePlugin__1__main_widget          lrqt_reconfigure__Param__1___plugincontainer_top_widget          dmarch_rqt_note_taker__NotesPlugin__1__notes_widget           march_rqt_gait_version_tool__GaitVersionToolPlugin__1__GaitSelection          0__DockWidgetContainer__1          brqt_robot_monitor__RobotMonitor__1__Robot Monitor                            6MinimizedDockWidgetsToolbar        "
+        }
+      },
+      "groups": {
+        "toolbar_areas": {
+          "keys": {
+            "MinimizedDockWidgetsToolbar": {
+              "repr": "8",
+              "type": "repr"
+            }
+          },
+          "groups": {}
+        }
+      }
+    },
+    "pluginmanager": {
+      "keys": {
+        "running-plugins": {
+          "repr": "{'march_rqt_input_device/InputDevicePlugin': [1], 'rqt_reconfigure/Param': [1], 'rqt_robot_monitor/RobotMonitor': [1]}",
+          "type": "repr"
+        }
+      },
+      "groups": {
+        "plugin__march_rqt_input_device__InputDevicePlugin__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__main_widget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'March Input Device'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__march_rqt_note_taker__NotesPlugin__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__notes_widget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Note taker'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_reconfigure__Param__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget___plugincontainer_top_widget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Parameter Reconfigure'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            },
+            "plugin": {
+              "keys": {
+                "_splitter": {
+                  "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000001000000020000037e0000004b0100000009010000000200')",
+                  "type": "repr(QByteArray.hex)",
+                  "pretty-print": "       ~ K     "
+                },
+                "expanded_nodes": {
+                  "repr": "['/diag_agg', '/march', '/march/gait_preprocessor', '/march/gait_selection', '/march/input_device', '/march/march_rqt_robot_monitor_node', '/march/monitor', '/march/monitor/robot_monitor_log_node', '/march/monitor/rqt_gui_py_node_363043', '/march/monitor/timeline_log_node', '/march/monitor/timeline_subscriber', '/march/robot_information', '/march/robot_state_publisher', '/march/safety_node']",
+                  "type": "repr"
+                },
+                "selected_nodes": {
+                  "repr": "['/march/gait_preprocessor']",
+                  "type": "repr"
+                },
+                "splitter": {
+                  "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff0000000100000002000000ae0000006401ffffffff010000000100')",
+                  "type": "repr(QByteArray.hex)",
+                  "pretty-print": "         d     "
+                },
+                "text": {
+                  "repr": "''",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_robot_monitor__RobotMonitor__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__Robot Monitor": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Robot Monitor'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            },
+            "plugin": {
+              "keys": {
+                "splitter": {
+                  "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000001000000030000006400000064000000c80100000009010000000200')",
+                  "type": "repr(QByteArray.hex)",
+                  "pretty-print": "       d d       "
+                }
+              },
+              "groups": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

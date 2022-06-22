@@ -18,7 +18,7 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march7.urdf"
 MODE_READING = "r"
 
 
@@ -128,7 +128,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
                 get_package_share_directory("march_description"),
                 "urdf",
                 "properties",
-                "march6.yaml",
+                "march7.yaml",
             ),
             MODE_READING,
         ) as yaml_file:
@@ -220,7 +220,7 @@ def validate_and_get_joint_names_for_inverse_kinematics(
 
 
 def get_joint_names_from_urdf(return_fixed_joints: bool = False):
-    """Gets a list of all the joint names from the urdf. Filters out the fixed joint if not explicitely asked to return these too.
+    """Gets a list of all the joint names from the URDF. Filters out the fixed joint if not explicitly asked to return these too.
 
     Retrieves it from the `MARCH_URDF`.
     """
@@ -231,11 +231,8 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
 
     # Joints we cannot control are fixed in the urdf. These should be removed, unless explicitely asked to return fixed joints.
     if not return_fixed_joints:
-        active_joint_names = []
-        for name in joint_names:
-            if robot.joint_map[name].type != "fixed":
-                active_joint_names.append(name)
-        joint_names = active_joint_names
+        joint_names = [name for name in joint_names if robot.joint_map[name].type != "fixed"]
+
     return sorted(joint_names)
 
 

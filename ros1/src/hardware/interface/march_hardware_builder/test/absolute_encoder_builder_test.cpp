@@ -42,7 +42,8 @@ TEST_F(AbsoluteEncoderBuilderTest, ValidEncoderHip)
     this->joint->safety->soft_upper_limit = 1.9;
 
     march::AbsoluteEncoder expected = march::AbsoluteEncoder(
-        /*resolution=*/16, motor_controller_type, /*lower_limit_iu=*/22134,
+        /*counts_per_rotation=*/(size_t)1 << 16, motor_controller_type,
+        /*lower_limit_iu=*/22134,
         /*upper_limit_iu=*/43436, this->joint->limits->lower,
         this->joint->limits->upper, this->joint->safety->soft_lower_limit,
         this->joint->safety->soft_upper_limit);
@@ -59,7 +60,7 @@ TEST_F(AbsoluteEncoderBuilderTest, NoConfig)
             config[""], motor_controller_type, this->joint));
 }
 
-TEST_F(AbsoluteEncoderBuilderTest, NoResolution)
+TEST_F(AbsoluteEncoderBuilderTest, NoResolutionOrCPR)
 {
     YAML::Node config
         = this->loadTestYaml("/absolute_encoder_no_resolution.yaml");

@@ -33,7 +33,8 @@ TEST_F(IncrementalEncoderBuilderTest, ValidIncrementalEncoder)
     YAML::Node config = this->loadTestYaml("/incremental_encoder_correct.yaml");
 
     march::IncrementalEncoder expected = march::IncrementalEncoder(
-        /*resolution=*/12, motor_controller_type, /*transmission=*/45.5);
+        /*counts_per_rotation=*/(size_t)1 << 12, motor_controller_type,
+        /*transmission=*/45.5);
     auto created = HardwareBuilder::createIncrementalEncoder(
         config, motor_controller_type);
     ASSERT_EQ(expected, *created);
@@ -47,7 +48,7 @@ TEST_F(IncrementalEncoderBuilderTest, NoConfig)
             config[""], motor_controller_type));
 }
 
-TEST_F(IncrementalEncoderBuilderTest, NoResolution)
+TEST_F(IncrementalEncoderBuilderTest, NoResolutionOrCPR)
 {
     YAML::Node config
         = this->loadTestYaml("/incremental_encoder_no_resolution.yaml");

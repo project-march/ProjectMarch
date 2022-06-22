@@ -10,25 +10,26 @@
 
 class AbsoluteEncoderTest : public testing::Test {
 protected:
-    const size_t resolution = 17;
+    const size_t counts_per_rotation = 1 << 17;
     const march::MotorControllerType motor_controller_type
         = march::MotorControllerType::IMotionCube;
-    const size_t total_positions = std::pow(/*__x=*/2, resolution);
     const int32_t lower_limit = 2053;
     const int32_t upper_limit = 45617;
     const double lower_limit_rad = -0.34906585;
     const double upper_limit_rad = 1.745329252;
     const int32_t zero_position
-        = lower_limit - lower_limit_rad * total_positions / (2 * M_PI);
+        = lower_limit - lower_limit_rad * counts_per_rotation / (2 * M_PI);
     const double soft_buffer = 0.05;
     const double lower_soft_limit_rad = lower_limit_rad + soft_buffer;
     const double upper_soft_limit_rad = upper_limit_rad - soft_buffer;
     const int32_t lower_soft_limit
-        = lower_soft_limit_rad * total_positions / (2 * M_PI) + zero_position;
+        = lower_soft_limit_rad * counts_per_rotation / (2 * M_PI)
+        + zero_position;
     const int32_t upper_soft_limit
-        = upper_soft_limit_rad * total_positions / (2 * M_PI) + zero_position;
+        = upper_soft_limit_rad * counts_per_rotation / (2 * M_PI)
+        + zero_position;
 
-    march::AbsoluteEncoder encoder = march::AbsoluteEncoder(resolution,
+    march::AbsoluteEncoder encoder = march::AbsoluteEncoder(counts_per_rotation,
         motor_controller_type, lower_limit, upper_limit, lower_limit_rad,
         upper_limit_rad, lower_soft_limit_rad, upper_soft_limit_rad);
 };
@@ -70,17 +71,18 @@ TEST_F(AbsoluteEncoderTest, CorrectUpperSoftLimits)
 
 TEST_F(AbsoluteEncoderTest, LowerSoftLimitAboveUpperSoftLimit)
 {
-    ASSERT_THROW(march::AbsoluteEncoder(this->resolution, motor_controller_type,
-                     this->lower_limit, this->upper_limit,
-                     this->lower_limit_rad, this->upper_limit_rad,
-                     this->upper_soft_limit_rad, this->lower_soft_limit_rad),
+    ASSERT_THROW(
+        march::AbsoluteEncoder(this->counts_per_rotation, motor_controller_type,
+            this->lower_limit, this->upper_limit, this->lower_limit_rad,
+            this->upper_limit_rad, this->upper_soft_limit_rad,
+            this->lower_soft_limit_rad),
         march::error::HardwareException);
 }
 
 TEST_F(AbsoluteEncoderTest, LowerSoftLimitLowerThanLowerHardLimit)
 {
     ASSERT_THROW(
-        march::AbsoluteEncoder(this->resolution, motor_controller_type,
+        march::AbsoluteEncoder(this->counts_per_rotation, motor_controller_type,
             this->lower_limit, this->upper_limit, this->lower_limit_rad,
             this->upper_limit_rad, -0.4, this->upper_soft_limit_rad),
         march::error::HardwareException);
@@ -89,7 +91,7 @@ TEST_F(AbsoluteEncoderTest, LowerSoftLimitLowerThanLowerHardLimit)
 TEST_F(AbsoluteEncoderTest, UpperSoftLimitHigherThanUpperHardLimit)
 {
     ASSERT_THROW(
-        march::AbsoluteEncoder(this->resolution, motor_controller_type,
+        march::AbsoluteEncoder(this->counts_per_rotation, motor_controller_type,
             this->lower_limit, this->upper_limit, this->lower_limit_rad,
             this->upper_limit_rad, this->lower_soft_limit_rad, 2.0),
         march::error::HardwareException);
@@ -104,8 +106,8 @@ TEST_F(AbsoluteEncoderTest, ZeroPositionRadToZeroPosition)
 TEST_F(AbsoluteEncoderTest, CorrectFromRad)
 {
     const double radians = 1.0;
-    const int32_t expected
-        = (radians * this->total_positions / (2 * M_PI)) + this->zero_position;
+    const int32_t expected = (radians * this->counts_per_rotation / (2 * M_PI))
+        + this->zero_position;
     ASSERT_EQ((int32_t)this->encoder.positionRadiansToIU(radians), expected);
 }
 
@@ -119,7 +121,7 @@ TEST_F(AbsoluteEncoderTest, CorrectToRad)
 {
     const int32_t iu = 1.0;
     const double expected
-        = (iu - this->zero_position) * 2 * M_PI / this->total_positions;
+        = (iu - this->zero_position) * 2 * M_PI / this->counts_per_rotation;
     ASSERT_EQ(this->encoder.positionIUToRadians(iu), expected);
 }
 

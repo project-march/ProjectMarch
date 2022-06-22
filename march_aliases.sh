@@ -26,7 +26,7 @@ alias march_run_ros1_training='march_run_ros1_groundgait gain_tuning:=training'
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
 alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
-alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py'
+alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py rqt_input:=false'
 
 
 # Build and run the bridge
@@ -44,13 +44,13 @@ alias b='march_run_bridge'
 
 
 # Training aliases
-export URDF='robot_description:=march6_three_cameras'
+export URDF6='robot:=march6_three_cameras'
 
-alias cov1='march_run_ros1_sim $URDF point_finder:=true realsense_simulation:=true ground_gait:=true'
-alias cov2='march_run_ros2_sim $URDF realsense_simulation:=true ground_gait:=true use_imu_data:=false'
+alias cov1='march_run_ros1_sim point_finder:=true realsense_simulation:=true ground_gait:=true'
+alias cov2='march_run_ros2_sim realsense_simulation:=true ground_gait:=true use_imu_data:=false'
 
-alias ag1='march_run_ros1_airgait $URDF point_finder:=true ground_gait:=true use_imu_data:=true'
-alias ag2='march_run_ros2_training $URDF use_imu_data:=true wireless_ipd:=true'
+alias ag1='march_run_ros1_airgait point_finder:=true ground_gait:=true use_imu_data:=true'
+alias ag2='march_run_ros2_training use_imu_data:=true wireless_ipd:=true'
 
 alias gg1='ag1 gain_tuning:=ground_gait'
 alias gg2='ag2'
@@ -129,6 +129,6 @@ alias pdb='snoe && sros1 && rostopic echo /march/pdb_data -n 1'
 
 
 # Sourcing ROS distributions on the Asrock
-alias export_asrock_master_uri='export ROS_MASTER_URI=http://192.168.1.253:11311/'
+alias export_asrock_master_uri='export ROS_MASTER_URI=http://192.168.1.177:11311/'
 alias asrock_ros1="snoe && sros1 && export_asrock_master_uri"
 alias asrock_ros2="sfox && sros2 && export_asrock_master_uri"
