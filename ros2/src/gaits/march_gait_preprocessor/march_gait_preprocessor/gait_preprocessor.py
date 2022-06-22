@@ -150,7 +150,7 @@ class GaitPreprocessor(Node):
         return point
 
     def _get_duration_scaled_to_height(self, duration: float, step_height_current: float) -> float:
-        """Scales the duration based on the absolute step height.
+        """Scales the duration based on the maximum absolute step height of previous or current step.
 
         Args:
             duration (float): Duration of the step in seconds.
@@ -159,10 +159,7 @@ class GaitPreprocessor(Node):
         Returns:
             float: Scaled duration in seconds.
         """
-        if step_height_current == self._step_height_previous:
-            return duration + DURATION_SCALING_FACTOR * abs(step_height_current)
-        else:
-            return duration + DURATION_SCALING_FACTOR * abs(step_height_current - self._step_height_previous)
+        return duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(self._step_height_previous))
 
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations."""
