@@ -8,23 +8,23 @@ march7:
   ecatCycleTime: 8
   ecatSlaveTimeout: 200
   joints:
-#     - left_ankle:
-#         motor_controller:
-#           type: odrive
-#           actuationMode: torque
-#           slaveIndex: 3
-#           axis: 1
-#           motorKV: 355
-# #          indexFound: true
-#           absoluteEncoder:
-#             resolution: 14
-#             direction: 1
-#             minPositionIU: 9063
-#             maxPositionIU: 11212
-#           incrementalEncoder:
-#             resolution: 13
-#             transmission: 236
-#             direction: -1
+    - left_ankle:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 2
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 3860
+            maxPositionIU: 5866
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
 
     - left_hip_aa:
         motor_controller:
@@ -80,23 +80,23 @@ march7:
             resolution: 12
             transmission: 121
 
-#     - right_ankle:
-#         motor_controller:
-#           type: odrive
-#           actuationMode: torque
-#           slaveIndex: 4
-#           axis: 0
-#           motorKV: 355
-# #          indexFound: true
-#           absoluteEncoder:
-#             resolution: 14
-#             direction: -1
-#             minPositionIU: 1943
-#             maxPositionIU: 4048
-#           incrementalEncoder:
-#             resolution: 13
-#             transmission: 236
-#             direction: -1
+    - right_ankle:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 1
+          axis: 0
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: -1
+            minPositionIU: 6000
+            maxPositionIU: 8015
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
 
     - right_hip_aa:
         motor_controller:
