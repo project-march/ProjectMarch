@@ -121,8 +121,7 @@ def generate_launch_description() -> LaunchDescription:
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
-    # Fake covid (CoViD = Computer Vision Department)
-    simulate_points = LaunchConfiguration("simulate_points")
+    # Gait Preprocessor
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
     duration = LaunchConfiguration("duration")
@@ -328,11 +327,6 @@ def generate_launch_description() -> LaunchDescription:
         ),
         # GAIT PREPROCESSOR ARGUMENTS
         DeclareLaunchArgument(
-            name="simulate_points",
-            default_value="false",
-            description="Whether to simulate fake foot positions for gait generation",
-        ),
-        DeclareLaunchArgument(
             name="location_x",
             default_value="0.5",
             description="x-location for fake covid topic, takes double or 'random'",
@@ -453,7 +447,6 @@ def generate_launch_description() -> LaunchDescription:
         ),
         launch_arguments=[
             ("use_sim_time", use_sim_time),
-            ("simulate_points", simulate_points),
             ("location_x", location_x),
             ("location_y", location_y),
             ("location_z", location_z),

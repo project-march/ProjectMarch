@@ -36,6 +36,17 @@
   ],
   [
     {
+      "name": "fixed_walk"
+    },
+    {
+      "name": "fixed_step_and_close"
+    },
+    {
+      "name": "fixed_step"
+    }
+  ],
+  [
+    {
       "name": "small_narrow",
       "callback": "publish_small_narrow",
       "always_enabled": true
