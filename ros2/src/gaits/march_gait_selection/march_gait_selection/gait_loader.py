@@ -25,7 +25,7 @@ from march_gait_selection.dynamic_interpolation.fixed_gaits.fixed_gait_step impo
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
-from march_utility.utilities.node_utils import get_joint_names_from_robot
+from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 
 NODE_NAME = "gait_selection"
 UNKNOWN = "unknown"
@@ -42,7 +42,7 @@ class GaitLoader:
         _node (rclpy.Node): the gait node
         _robot (urdf.Robot): the robot that is used
         _logger (rclpy.Logger): used to log to the terminal
-        _joint_names (List[str]): a list of names of the actuating joints in the urdf
+        _actuating_joint_names (List[str]): a list of names of the actuating joints in the urdf
         _gait_directory (str): path to the directory that contains the gait files
         _default_positions_yaml (str): path to the yaml that contains the named positions
         _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
@@ -57,7 +57,7 @@ class GaitLoader:
         self._node = node
         self._robot = robot
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._joint_names = sorted(get_joint_names_from_robot(self._robot))
+        self._actuating_joint_names = get_joint_names_from_urdf()
 
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
@@ -69,7 +69,7 @@ class GaitLoader:
     @property
     def joint_names(self) -> List[str]:
         """Return a list containing joint names."""
-        return self._joint_names
+        return self._actuating_joint_names
 
     @property
     def gaits(self) -> dict:
@@ -119,7 +119,9 @@ class GaitLoader:
         self._gait_version_map = default_config["gaits"]
 
         for position_name, position_values in default_config["positions"].items():
-            edge_position = StaticEdgePosition(list(position_values["joints"].values()))
+            edge_position = StaticEdgePosition(
+                [position_values["joints"][joint_name] for joint_name in self._actuating_joint_names]
+            )
             if edge_position not in self._named_positions:
                 self._named_positions[edge_position] = position_name
             else:
