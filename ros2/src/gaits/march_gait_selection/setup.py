@@ -71,7 +71,7 @@ setup(
         "march_gait_selection.gaits",
         "march_gait_selection.dynamic_interpolation",
         "march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits",
-        "march_gait_selection.dynamic_interpolation.camera_point_handlers",
+        "march_gait_selection.dynamic_interpolation.point_handlers",
         "march_gait_selection.dynamic_interpolation.trajectory_command_factories",
         "march_gait_selection.dynamic_interpolation.gaits",
     ],

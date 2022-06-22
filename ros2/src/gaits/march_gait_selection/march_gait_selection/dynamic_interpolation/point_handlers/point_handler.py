@@ -12,7 +12,7 @@ from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 
 
-class PointsHandler(ABC):
+class PointHandler(ABC):
     """Class to handle all communications between CoViD and gaits.
 
     Args:

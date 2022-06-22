@@ -4,7 +4,7 @@ from typing import Optional
 from rclpy.node import Node
 from rclpy.time import Time
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_close import (
@@ -28,11 +28,11 @@ class DynamicGaitClose(DynamicGaitWalk):
     subgait_id: str
     start_time_next_command: Time
 
-    def __init__(self, name: str, node: Node, points_handler: PointsHandler):
-        super().__init__(name, node, points_handler)
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._points_handler = points_handler
-        self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._points_handler)
+        self._point_handler = point_handler
+        self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._point_handler)
         self.gait_name = name
 
         self.node.create_subscription(

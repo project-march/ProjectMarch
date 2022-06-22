@@ -3,10 +3,10 @@
 from typing import Optional
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 
 
-class CameraPointsHandler(PointsHandler):
+class CameraPointHandler(PointHandler):
     """Class to handle all communications between CoViD and gaits.
 
     Args:

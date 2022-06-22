@@ -2,12 +2,12 @@
 
 from typing import Optional
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_shared_msgs.msg import FootPosition
 
 
-class SimulatedPointsHandler(PointsHandler):
+class SimulatedPointHandler(PointHandler):
     """Class to handle communication between gaits and simulated foot locations."""
 
     def __init__(self, node):

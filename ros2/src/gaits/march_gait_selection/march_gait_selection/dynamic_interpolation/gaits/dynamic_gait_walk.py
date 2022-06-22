@@ -24,7 +24,7 @@ from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCo
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
     TrajectoryCommandFactory,
 )
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_shared_msgs.msg import GaitInstruction
 from sensor_msgs.msg import JointState
 
@@ -54,7 +54,7 @@ class DynamicGaitWalk(GaitInterface):
         amount_of_steps (int): the amount of steps the gait makes before closing the gait
 
         node (Node): the gait selection node
-        _points_handler (CameraPointsHandler): the camera points handler used to handle communication with vision
+        _point_handler (CameraPointHandler): the camera points handler used to handle communication with vision
         _end (bool): whether the gait has ended
         _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
         _should_stop (bool): Set to true if the next subgait should be a close gait
@@ -70,14 +70,14 @@ class DynamicGaitWalk(GaitInterface):
     _next_command: Optional[TrajectoryCommand]
     _should_stop: bool
 
-    def __init__(self, name: str, node: Node, points_handler: PointsHandler):
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
         super(DynamicGaitWalk, self).__init__()
         self.node = node
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._points_handler = points_handler
+        self._point_handler = point_handler
         self.trajectory_command_factory = TrajectoryCommandFactory(
             gait=self,
-            points_handler=self._points_handler,
+            point_handler=self._point_handler,
         )
 
         self.actuating_joint_names = get_joint_names_from_urdf()
@@ -135,9 +135,8 @@ class DynamicGaitWalk(GaitInterface):
         """Returns the type of gait, for example 'walk_like' or 'sit_like'."""
         if self._next_command is not None:
             if (
-                self._points_handler.get_foot_location(self.subgait_id).processed_point.y > self.minimum_stair_height
-                or self._points_handler.get_foot_location(self.subgait_id).processed_point.y
-                < -self.minimum_stair_height
+                self._point_handler.get_foot_location(self.subgait_id).processed_point.y > self.minimum_stair_height
+                or self._point_handler.get_foot_location(self.subgait_id).processed_point.y < -self.minimum_stair_height
             ):
                 return "stairs_like"
             else:

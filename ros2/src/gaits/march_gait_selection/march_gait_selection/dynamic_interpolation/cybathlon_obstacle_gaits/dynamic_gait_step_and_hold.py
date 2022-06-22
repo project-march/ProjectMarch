@@ -3,7 +3,7 @@
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_step_and_hold import (
     TrajectoryCommandFactoryStepAndHold,
 )
@@ -24,12 +24,12 @@ class DynamicGaitStepAndHold(DynamicGaitStepAndClose):
 
     _use_position_queue: bool
 
-    def __init__(self, name: str, node: Node, points_handler: PointsHandler):
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
         self.subgait_id = "right_swing"
         self.use_predetermined_foot_location = False
         self.start_from_left_side = False
-        super().__init__(name, node, points_handler)
-        self.trajectory_command_factory = TrajectoryCommandFactoryStepAndHold(self, self._points_handler)
+        super().__init__(name, node, point_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactoryStepAndHold(self, self._point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self.gait_name = name
 

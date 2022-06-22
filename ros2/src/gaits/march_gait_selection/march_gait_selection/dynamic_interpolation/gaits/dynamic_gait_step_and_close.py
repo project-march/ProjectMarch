@@ -3,7 +3,7 @@
 from typing import Optional
 from rclpy.node import Node
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.points_handler import PointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
@@ -21,12 +21,12 @@ class DynamicGaitStepAndClose(DynamicGaitWalk):
         node (Node): the gait selection node
     """
 
-    def __init__(self, name: str, node: Node, points_handler: PointsHandler):
-        super().__init__(name, node, points_handler)
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryStepAndClose(
             gait=self,
-            points_handler=self._points_handler,
+            point_handler=self._point_handler,
         )
         self.gait_name = name
 
