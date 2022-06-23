@@ -7,7 +7,7 @@
 class MockIncrementalEncoder : public march::IncrementalEncoder {
 public:
     MockIncrementalEncoder()
-        : IncrementalEncoder(/*resolution=*/10,
+        : IncrementalEncoder(/*counts_per_rotation=*/1 << 10,
             march::MotorControllerType::IMotionCube, /*transmission=*/100.0)
     {
     }

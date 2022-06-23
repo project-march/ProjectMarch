@@ -8,9 +8,9 @@ from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import CameraPointsHandler
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
-    SimulatedPointsHandler,
+from march_gait_selection.dynamic_interpolation.point_handlers.camera_point_handler import CameraPointHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.simulated_point_handler import (
+    SimulatedPointHandler,
 )
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
@@ -26,7 +26,7 @@ from march_gait_selection.dynamic_interpolation.cybathlon_obstacle_gaits.dynamic
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
-from march_utility.utilities.node_utils import get_joint_names_from_robot
+from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 
 NODE_NAME = "gait_selection"
 UNKNOWN = "unknown"
@@ -43,7 +43,7 @@ class GaitLoader:
         _node (rclpy.Node): the gait node
         _robot (urdf.Robot): the robot that is used
         _logger (rclpy.Logger): used to log to the terminal
-        _joint_names (List[str]): a list of names of the actuating joints in the urdf
+        _actuating_joint_names (List[str]): a list of names of the actuating joints in the urdf
         _gait_directory (str): path to the directory that contains the gait files
         _default_positions_yaml (str): path to the yaml that contains the named positions
         _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
@@ -58,7 +58,7 @@ class GaitLoader:
         self._node = node
         self._robot = robot
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._joint_names = sorted(get_joint_names_from_robot(self._robot))
+        self._actuating_joint_names = get_joint_names_from_urdf()
 
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
@@ -70,7 +70,7 @@ class GaitLoader:
     @property
     def joint_names(self) -> List[str]:
         """Return a list containing joint names."""
-        return self._joint_names
+        return self._actuating_joint_names
 
     @property
     def gaits(self) -> dict:
@@ -96,22 +96,22 @@ class GaitLoader:
 
     def _load_dynamic_gaits(self) -> None:
         """Load the dynamic gait classes."""
-        camera_points_handler = CameraPointsHandler(self._node)
-        simulated_points_handler = SimulatedPointsHandler(self._node)
+        camera_point_handler = CameraPointHandler(self._node)
+        simulated_point_handler = SimulatedPointHandler(self._node)
         dynamic_gaits = [
-            DynamicGaitWalk("dynamic_walk", self._node, camera_points_handler),
-            DynamicGaitStep("dynamic_step", self._node, camera_points_handler),
-            DynamicGaitStepAndClose("dynamic_step_and_close", self._node, camera_points_handler),
-            DynamicGaitClose("dynamic_close", self._node, camera_points_handler),
-            DynamicGaitWalk("fixed_walk", self._node, simulated_points_handler),
-            DynamicGaitStepAndClose("fixed_step_and_close", self._node, simulated_points_handler),
-            DynamicGaitStep("fixed_step", self._node, simulated_points_handler),
+            DynamicGaitWalk("dynamic_walk", self._node, camera_point_handler),
+            DynamicGaitStep("dynamic_step", self._node, camera_point_handler),
+            DynamicGaitStepAndClose("dynamic_step_and_close", self._node, camera_point_handler),
+            DynamicGaitClose("dynamic_close", self._node, camera_point_handler),
+            DynamicGaitWalk("fixed_walk", self._node, simulated_point_handler),
+            DynamicGaitStepAndClose("fixed_step_and_close", self._node, simulated_point_handler),
+            DynamicGaitStep("fixed_step", self._node, simulated_point_handler),
         ]
 
         if self._node.add_cybathlon_gaits:
-            dynamic_gaits.append(DynamicGaitStepAndHold("step_and_hold", self._node, camera_points_handler))
+            dynamic_gaits.append(DynamicGaitStepAndHold("step_and_hold", self._node, camera_point_handler))
             dynamic_gaits.append(
-                SteppingStonesStepAndClose("stepping_stones_step_and_close", self._node, camera_points_handler)
+                SteppingStonesStepAndClose("stepping_stones_step_and_close", self._node, camera_point_handler)
             )
 
         self._loaded_gaits = {gait.name: gait for gait in dynamic_gaits}
@@ -124,7 +124,9 @@ class GaitLoader:
         self._gait_version_map = default_config["gaits"]
 
         for position_name, position_values in default_config["positions"].items():
-            edge_position = StaticEdgePosition(list(position_values["joints"].values()))
+            edge_position = StaticEdgePosition(
+                [position_values["joints"][joint_name] for joint_name in self._actuating_joint_names]
+            )
             if edge_position not in self._named_positions:
                 self._named_positions[edge_position] = position_name
             else:

@@ -9,10 +9,10 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 class TrajectoryCommandFactoryStepAndClose(TrajectoryCommandFactory):
     """Class that creates and validates a trajectory command for a step and close."""
 
-    def __init__(self, gait, points_handler):
-        super().__init__(gait, points_handler)
+    def __init__(self, gait, point_handler):
+        super().__init__(gait, point_handler)
         self._gait = gait
-        self._points_handler = points_handler
+        self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 

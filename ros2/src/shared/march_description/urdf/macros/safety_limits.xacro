@@ -6,7 +6,7 @@
         If the limits are supplied in radians, no calculation is applied.
         If the limits are supplied in degrees, they are converted to radians through a multiplication of pi/180
         If the limits are supplied in internal units, then some additional information is needed about the conversion:
-            - the resolution of the encoder
+            - the resolution or countsPerRotation of the encoder
             - the zero position of the encoder
 
         The safety limits always have the following units:
@@ -24,7 +24,12 @@
             <xacro:property name="upper_limit_rad" value="${radians(limits['upper_limit'])}"/>
         </xacro:if>
         <xacro:if value="${limits['unit'] == 'iu'}">
-            <xacro:property name="iu_to_rad" value="${(2 * pi) / (2 ** limits['resolution'])}"/>
+            <xacro:if value="${'countsPerRotation' in limits}"> 
+                <xacro:property name="iu_to_rad" value="${(2 * pi) / limits['countsPerRotation']}"/>
+            </xacro:if>    
+            <xacro:unless value="${'countsPerRotation' in limits}">
+                <xacro:property name="iu_to_rad" value="${(2 * pi) / (2 ** limits['resolution'])}"/>
+            </xacro:unless>
             <xacro:property name="lower_limit_rad" value="${iu_to_rad * -(limits['zero_position'] - limits['lower_limit'])}"/>
             <xacro:property name="upper_limit_rad" value="${iu_to_rad * (limits['upper_limit'] - limits['zero_position'])}"/>
         </xacro:if>

@@ -34,8 +34,8 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
     _use_position_queue: bool
     _end: bool
 
-    def __init__(self, gait, points_handler):
-        super().__init__(gait, points_handler)
+    def __init__(self, gait, point_handler):
+        super().__init__(gait, point_handler)
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._create_position_queue()
         self.update_parameter()
@@ -74,9 +74,9 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
             self._end = True
         else:
             try:
-                self.foot_location = self._points_handler.get_foot_location(self.subgait_id)
-                stop = self._points_handler.is_foot_location_too_old(self.foot_location)
-                self._points_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
+                stop = self._point_handler.is_foot_location_too_old(self.foot_location)
+                self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
             except AttributeError:
                 self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
                 self._end = True

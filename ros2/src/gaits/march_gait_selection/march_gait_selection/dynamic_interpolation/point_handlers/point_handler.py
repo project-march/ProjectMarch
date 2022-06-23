@@ -1,5 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
+from abc import ABC, abstractmethod
 from typing import Optional
 from rclpy.time import Time
 
@@ -11,11 +12,11 @@ from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 FOOT_LOCATION_TIME_OUT = Duration(0.5)
 
 
-class CameraPointsHandler:
+class PointHandler(ABC):
     """Class to handle all communications between CoViD and gaits.
 
     Args:
-        gait: the gait class
+        node: the gait node
 
     Attributes:
         pub_right (rclpy.Publisher): Publisher for right chosen foot position
@@ -33,20 +34,17 @@ class CameraPointsHandler:
         self._create_subscribers()
         self._create_publishers()
 
+    @abstractmethod
     def _create_subscribers(self) -> None:
-        """Create subscribers to listen to points given by depth cameras."""
-        self._node.create_subscription(
-            FootPosition,
-            "/march/processed_foot_position/right",
-            self._callback_right,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        self._node.create_subscription(
-            FootPosition,
-            "/march/processed_foot_position/left",
-            self._callback_left,
-            DEFAULT_HISTORY_DEPTH,
-        )
+        """Create subscribers that listen to published foot locations."""
+
+    @abstractmethod
+    def get_foot_location(self, subgait_id: str) -> Optional[FootPosition]:
+        """Returns the foot location.
+
+        Returns:
+            FootPosition: either the left or right foot position or none
+        """
 
     def _create_publishers(self) -> None:
         """Create publishers to publish chosen point back to covid."""
@@ -76,21 +74,6 @@ class CameraPointsHandler:
             foot_location (FootPosition): a Point containing the x, y, and z location
         """
         self._foot_location_left = foot_location
-
-    def get_foot_location(self, subgait_id: str) -> Optional[FootPosition]:
-        """Returns the right or left foot position based upon the subgait_id.
-
-        Args:
-            subgait_id (str): Either right_swing or left_swing
-        Returns:
-            FootPosition: either the left or right foot position or none
-        """
-        if subgait_id == "left_swing":
-            return self._foot_location_left
-        elif subgait_id == "right_swing":
-            return self._foot_location_right
-        else:
-            return None
 
     def publish_chosen_foot_position(self, subgait_id: str, foot_position: FootPosition) -> None:
         """Publish the point to which the step is planned.

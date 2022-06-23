@@ -6,12 +6,12 @@
 #include <ros/ros.h>
 
 namespace march {
-AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+AbsoluteEncoder::AbsoluteEncoder(size_t counts_per_rotation,
     MotorControllerType motor_controller_type, Direction direction,
     int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
     double upper_limit_rad, double lower_soft_limit_rad,
     double upper_soft_limit_rad)
-    : Encoder(resolution, motor_controller_type, direction)
+    : Encoder(counts_per_rotation, motor_controller_type, direction)
     , lower_limit_iu_(lower_limit_iu)
     , upper_limit_iu_(upper_limit_iu)
 {
@@ -28,13 +28,13 @@ AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
     }
 }
 
-AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+AbsoluteEncoder::AbsoluteEncoder(size_t counts_per_rotation,
     MotorControllerType motor_controller_type, int32_t lower_limit_iu,
     int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
     double lower_soft_limit_rad, double upper_soft_limit_rad)
-    : AbsoluteEncoder(resolution, motor_controller_type, Direction::Positive,
-        lower_limit_iu, upper_limit_iu, lower_limit_rad, upper_limit_rad,
-        lower_soft_limit_rad, upper_soft_limit_rad)
+    : AbsoluteEncoder(counts_per_rotation, motor_controller_type,
+        Direction::Positive, lower_limit_iu, upper_limit_iu, lower_limit_rad,
+        upper_limit_rad, lower_soft_limit_rad, upper_soft_limit_rad)
 {
 }
 
