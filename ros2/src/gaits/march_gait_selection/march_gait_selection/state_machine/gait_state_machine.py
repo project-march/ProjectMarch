@@ -60,6 +60,7 @@ class GaitStateMachine:
         self._trajectory_scheduler = trajectory_scheduler
         self._gaits = gaits
         self._positions = positions
+        self._previous_gait = None
 
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._input = StateMachineInput(node)
