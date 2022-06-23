@@ -157,6 +157,8 @@ class GaitStateMachine:
         self._handle_stop_input()
         if self._trajectory_scheduler.failed():
             self._process_end_of_gait()
+            self._executing_gait = False
+            self._has_gait_started = False
             self._current_gait = None
             self._transition_to_unknown()
             return
