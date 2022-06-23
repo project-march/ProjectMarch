@@ -1,5 +1,4 @@
-description: 'Stand up gait: from the sit block of 50 cm to the standing position.
-  With haa at 2 degrees.'
+description: v4 but then with hfe at 5.1566 deg
 duration: 1700000000
 gait_type: sit_like
 joints:
@@ -8,13 +7,13 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1000000000
+    time_from_start: 1000100000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   left_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -24,15 +23,12 @@ joints:
   - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.309
-    time_from_start: 400000000
-    velocity: -1.1345
-  - position: 0.6945
+  - position: 1.4802
+    time_from_start: 349200000
+    velocity: -0.9592
+  - position: 0.6109
     time_from_start: 900000000
     velocity: -1.7453
-  - position: 0.0
-    time_from_start: 1600000000
-    velocity: -1.0123
   - position: 0.09
     time_from_start: 1700000000
     velocity: 0.0
@@ -40,12 +36,12 @@ joints:
   - position: 1.4835
     time_from_start: 0
     velocity: 0.0
-  - position: 0.4681
-    time_from_start: 730300000
-    velocity: -0.9052
-  - position: 0.0873
-    time_from_start: 1600000000
-    velocity: -1.0123
+  - position: 1.2217
+    time_from_start: 433300000
+    velocity: -0.8378
+  - position: 0.1745
+    time_from_start: 1350000000
+    velocity: -0.8378
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
@@ -54,13 +50,13 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 1000000000
+    time_from_start: 1000100000
     velocity: 0.0
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   right_hip_aa:
-  - position: 0.0349
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -70,15 +66,12 @@ joints:
   - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.309
-    time_from_start: 400000000
-    velocity: -1.1345
-  - position: 0.6945
+  - position: 1.4802
+    time_from_start: 349200000
+    velocity: -0.9592
+  - position: 0.6109
     time_from_start: 900000000
-    velocity: -1.7453
-  - position: 0.0
-    time_from_start: 1600000000
-    velocity: -1.0123
+    velocity: -1.7279
   - position: 0.09
     time_from_start: 1700000000
     velocity: 0.0
@@ -86,12 +79,12 @@ joints:
   - position: 1.4835
     time_from_start: 0
     velocity: 0.0
-  - position: 0.4681
-    time_from_start: 730271430
-    velocity: -0.9052
-  - position: 0.0873
-    time_from_start: 1600000000
-    velocity: -1.0123
+  - position: 1.2217
+    time_from_start: 433300000
+    velocity: -0.8378
+  - position: 0.1745
+    time_from_start: 1350000000
+    velocity: -0.8378
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0

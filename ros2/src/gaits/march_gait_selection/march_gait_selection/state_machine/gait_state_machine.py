@@ -122,7 +122,7 @@ class GaitStateMachine:
         if self._input.gait_requested():
             self._current_gait = self._gaits.get(self._input.gait_name())
             self._process_gait_request()
-        elif self._is_dynamic_stop_requested():
+        elif self._previous_gait is not None and self._is_dynamic_stop_requested():
             self._current_gait = self._gaits.get("dynamic_close")
             self._process_gait_request()
 
