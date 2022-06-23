@@ -56,7 +56,7 @@ old_stand_position_end = copy.deepcopy(old_stand_position_start)
 
 new_stand_position_start = {
     "left_ankle": {
-        "position": 0.0524,
+        "position": 0.0,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -66,7 +66,7 @@ new_stand_position_start = {
         "velocity": 0.0,
     },
     "left_hip_fe": {
-        "position": -0.1745,
+        "position": 0.0,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -76,7 +76,7 @@ new_stand_position_start = {
         "velocity": 0.0,
     },
     "right_ankle": {
-        "position": 0.0524,
+        "position": 0.0,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -86,7 +86,7 @@ new_stand_position_start = {
         "velocity": 0.0,
     },
     "right_hip_fe": {
-        "position": -0.1745,
+        "position": 0.0,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -113,7 +113,7 @@ amount_of_start_positions_set = 0
 amount_of_end_positions_set = 0
 paths_that_failed = []
 for path in Path(
-    "../ros2/src/gaits/march_gait_files/airgait_vi/",
+    "../ros2/src/gaits/march_gait_files/airgait_vi/stand",
 ).rglob("*.subgait"):
     try:
         with open(path, "r") as subgait_file:
