@@ -44,6 +44,10 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+        march_shared_msgs
+        std_msgs
+)
 install(DIRECTORY include/${PROJECT_NAME}
         DESTINATION include/)
 install(TARGETS ${PROJECT_NAME}
