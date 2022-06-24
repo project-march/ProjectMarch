@@ -118,7 +118,8 @@ class GaitStateMachine:
             else:
                 self._process_idle_state()
         except (AttributeError, ValueError) as e:
-            self.request_shutdown(f"{e}")
+            self._logger.error(f"Error occurred in the state machine: {e}. Restart ROS2.")
+            self._update_timer.cancel()
 
     def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for what to do next."""
