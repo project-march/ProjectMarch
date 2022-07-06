@@ -21,12 +21,12 @@ march:
         - right_hip_fe
         - right_knee
       gains: # Required because we're controlling an effort interface
-        left_ankle: {p: 25, i: 0, d: 4.5, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_ankle: {p: 30, i: 0, d: 4.5, i_clamp: 100, publish_state: true, antiwindup: true}
         left_hip_aa: {p: 40, i: 0, d: 2, i_clamp: 100, publish_state: true,
                       antiwindup: true}
         left_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
         left_knee: {p: 60, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_ankle: {p: 25, i: 0, d: 4.5, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_ankle: {p: 30, i: 0, d: 4.5, i_clamp: 100, publish_state: true, antiwindup: true}
         right_hip_aa: {p: 40, i: 0, d: 2, i_clamp: 100, publish_state: true,
                        antiwindup: true}
         right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
@@ -36,33 +36,33 @@ march:
         goal_time: 0.5
         left_ankle:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         left_hip_aa:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         left_hip_fe:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         left_knee:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         right_ankle:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         right_hip_aa:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         right_hip_fe:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
         right_knee:
           margin_soft_limit_error: 0.5
-          trajectory: 0.305
-          goal: 0.305
+          trajectory: 2.0
+          goal: 2.0
