@@ -7,7 +7,7 @@
 
 <!--    Although the M6 contains a front camera, it is turned of by default as we
         do not use this camera anymore due to the new 2 front cameras.-->
-    <arg name="use_camera_back" default="$(eval hull_finder or stone_finder)"
+    <arg name="use_camera_back" default="$(eval use_imu_data or hull_finder or stone_finder)"
          doc="Whether to start the second (back) camera"/>
     <arg name="use_camera_front" default="false"
          doc="Whether to start the front camera"/>
