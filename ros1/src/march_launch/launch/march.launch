@@ -55,7 +55,7 @@
     <arg name="imu_to_use" default="back"
          doc="Which imu to use for determining exo orientation"/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
-             if="$(eval (not realsense_simulation) and (hull_finder or stone_finder))" pass_all_args="true"/>
+             if="$(eval use_imu_data or ((not realsense_simulation) and (hull_finder or stone_finder)))" pass_all_args="true"/>
     <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
     <param name="realsense_debug" value="$(arg realsense_debug)"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
