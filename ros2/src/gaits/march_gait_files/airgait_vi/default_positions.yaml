@@ -1,37 +1,37 @@
 gaits:
   sit:
-    sit_down: MVI_sit_down_v4
+    sit_down: MVI_sit_down_v5
     sit_home: MVI_sit_home_v2
-    prepare_sit_down: MVI_prepare_sit_down_v4
+    prepare_sit_down: MVI_prepare_sit_down_v5
   stand:
     prepare_stand_up: MVI_prepare_stand_up_v4
-    stand_up: MVI_stand_up_v5
-    stand_home: MVI_stand_home_v5
+    stand_up: MVI_stand_up_v6
+    stand_home: MVI_stand_home_v6
 
 positions:
+        #  stand:
+        #gait_type: walk_like
+        #joints:
+        #left_ankle: 0.0
+        #left_hip_aa: 0.0
+        #left_hip_fe: 0.09
+        #left_knee: 0.0
+        #right_ankle: 0.0
+        #right_hip_aa: 0.0
+        #right_hip_fe: 0.09
+        #right_knee: 0.0
   stand:
+   # use v5 subgaits for sit_down and prepare_sit_down and v6 for stand_up and stand_home
     gait_type: walk_like
     joints:
-      left_ankle: 0.0
+      left_ankle: 0.09
       left_hip_aa: 0.0
-      left_hip_fe: 0.09
+      left_hip_fe: -0.1745
       left_knee: 0.0
-      right_ankle: 0.0
+      right_ankle: 0.09
       right_hip_aa: 0.0
-      right_hip_fe: 0.09
+      right_hip_fe: -0.1745
       right_knee: 0.0
-#  stand:
-#    # use v5 subgaits for sit_down and prepare_sit_down and v6 for stand_up and stand_home
-#    gait_type: walk_like
-#    joints:
-#      left_ankle: 0.09
-#      left_hip_aa: 0.0
-#      left_hip_fe: -0.1745
-#      left_knee: 0.0
-#      right_ankle: 0.09
-#      right_hip_aa: 0.0
-#      right_hip_fe: -0.1745
-#      right_knee: 0.0
   # stand_hfe_zero_degrees:
   #   # Easier for checking whether hfe's are aligned
   #   gait_type: walk_like
