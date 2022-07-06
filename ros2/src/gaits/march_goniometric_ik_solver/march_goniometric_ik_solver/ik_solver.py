@@ -41,7 +41,6 @@ HIP_BUFFER = np.deg2rad(1)
 MAX_ANKLE_FLEXION = min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper) - ANKLE_BUFFER
 MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower) + HIP_BUFFER
 
-
 # Constants:
 LENGTH_FOOT = 0.10  # m
 
