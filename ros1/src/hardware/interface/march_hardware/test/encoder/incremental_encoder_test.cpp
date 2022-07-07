@@ -8,12 +8,13 @@
 
 class IncrementalEncoderTest : public testing::Test {
 protected:
-    const size_t resolution = 12;
+    const size_t counts_per_rotation = 1 << 12;
     const double transmission = 100;
     const march::MotorControllerType motor_controller_type
         = march::MotorControllerType::IMotionCube;
-    march::IncrementalEncoder encoder = march::IncrementalEncoder(
-        this->resolution, this->motor_controller_type, this->transmission);
+    march::IncrementalEncoder encoder
+        = march::IncrementalEncoder(this->counts_per_rotation,
+            this->motor_controller_type, this->transmission);
 };
 
 TEST_F(IncrementalEncoderTest, ZeroIUToRad)
@@ -24,7 +25,7 @@ TEST_F(IncrementalEncoderTest, ZeroIUToRad)
 TEST_F(IncrementalEncoderTest, CorrectToRad)
 {
     const int32_t iu = 1000;
-    const double expected = iu * 2.0 * M_PI
-        / (std::pow(/*__x=*/2, this->resolution) * this->transmission);
+    const double expected
+        = iu * 2.0 * M_PI / (this->counts_per_rotation * this->transmission);
     ASSERT_DOUBLE_EQ(expected, this->encoder.positionIUToRadians(iu));
 }

@@ -69,6 +69,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     add_push_off = LaunchConfiguration("add_push_off")
     amount_of_steps = LaunchConfiguration("amount_of_steps")
     use_position_queue = LaunchConfiguration("use_position_queue")
+    add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -78,8 +79,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
-    # Fake covid (CoViD = Computer Vision Department)
-    simulate_points = LaunchConfiguration("simulate_points")
+    # Gait Preprocessor
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
     duration = LaunchConfiguration("duration")
@@ -94,7 +94,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
-            DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
+            DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
                 name="rqt_input",
@@ -231,6 +231,11 @@ def generate_launch_description() -> launch.LaunchDescription:
                 "points given by (simulated) covid.",
             ),
             DeclareLaunchArgument(
+                name="add_cybathlon_gaits",
+                default_value="False",
+                description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
+            ),
+            DeclareLaunchArgument(
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
@@ -270,11 +275,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                 description="Upper bound to generate fake temperatures from",
             ),
             # GAIT PREPROCESSOR ARGUMENTS
-            DeclareLaunchArgument(
-                name="simulate_points",
-                default_value="False",
-                description="Whether to simulate fake foot positions for gait generation",
-            ),
             DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.5",
@@ -332,6 +332,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("add_push_off", add_push_off),
                     ("amount_of_steps", amount_of_steps),
                     ("use_position_queue", use_position_queue),
+                    ("add_cybathlon_gaits", add_cybathlon_gaits),
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
                     ("timer_period", timer_period),
@@ -340,7 +341,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("maximum_fake_temperature", maximum_fake_temperature),
                     ("simulation", simulation),
                     ("jointless", jointless),
-                    ("simulate_points", simulate_points),
                     ("location_x", location_x),
                     ("location_y", location_y),
                     ("location_z", location_z),

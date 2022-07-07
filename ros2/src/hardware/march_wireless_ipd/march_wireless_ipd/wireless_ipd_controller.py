@@ -4,12 +4,12 @@ import getpass
 import socket
 
 from rclpy import Future
+from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
 from std_msgs.msg import Header, String
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_utility.utilities.logger import Logger
 
 
 class WirelessInputDeviceController:

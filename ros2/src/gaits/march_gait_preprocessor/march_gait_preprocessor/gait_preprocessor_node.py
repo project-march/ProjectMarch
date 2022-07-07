@@ -47,9 +47,6 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._location_x = param.get_parameter_value().double_value
         elif param.name == "location_y":
             gait_preprocessor._location_y = param.get_parameter_value().double_value
-        if param.name == "simulate_points":
-            gait_preprocessor._simulate_points = param.get_parameter_value().bool_value
-            gait_preprocessor.set_simulate_points_parameter()
         if param.name == "duration":
             gait_preprocessor._duration = param.get_parameter_value().double_value
 

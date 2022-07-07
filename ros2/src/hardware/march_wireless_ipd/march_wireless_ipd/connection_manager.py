@@ -5,13 +5,17 @@ import socket
 import json
 import time
 from functools import partial
+
+from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
+
 from march_shared_msgs.msg import CurrentGait, CurrentState
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import FOOT_LOCATION_TIME_OUT
+from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
+    FOOT_LOCATION_TIME_OUT,
+)
 from rclpy.node import Node
 
 HEARTBEAT_TIMEOUT = Duration(0.5)

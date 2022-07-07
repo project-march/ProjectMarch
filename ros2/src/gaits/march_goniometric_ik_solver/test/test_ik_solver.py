@@ -26,9 +26,10 @@ class TestIkSolver(unittest.TestCase):
         )
         hip = self.pose.calculate_joint_positions()["pos_hip"]
         hip_y = hip[1]
-        self.assertEqual(
+        self.assertAlmostEqual(
             leg_length,
             hip_y,
+            2,
             "Hip_y should be equal to total leg length in zero pose.",
         )
 

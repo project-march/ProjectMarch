@@ -21,7 +21,6 @@ from march_utility.gait.edge_position import (
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.dimensions import (
     InterpolationDimensions,
     amount_of_subgaits,
@@ -49,7 +48,7 @@ class RealsenseGait(SetpointsGait):
         gait_name (str): Name of the gait
         subgaits (dict): Mapping of names to subgait instances
         graph (SubgaitGraph): Mapping of subgait names to transitions
-        gait_selection (GaitSelection): the gait selection node
+        gait_selection_node (GaitSelection): the gait selection node
         realsense_category (str): ??? TODO: Add docs
         camera_to_use (str): which camera to use
         subgaits_to_interpolate (dict): dict containing subgaits
@@ -62,7 +61,7 @@ class RealsenseGait(SetpointsGait):
         responsible_for (List[str]): ??? TODO: Add docs
 
     Attributes:
-        logger (Logger): used to log to the terminal
+        _logger (Logger): used to log to the terminal
         parameters (List[float): ??? TODO: Add docs
         dimensions (InterpolationDimensions): ??? TODO: Add docs
         realsense_category (str): ??? TODO: Add docs
@@ -99,7 +98,7 @@ class RealsenseGait(SetpointsGait):
         gait_name: str,
         subgaits: dict,
         graph: SubgaitGraph,
-        gait_selection: GaitSelection,
+        gait_selection_node: GaitSelection,
         realsense_category: str,
         camera_to_use: str,
         subgaits_to_interpolate: dict,
@@ -112,8 +111,8 @@ class RealsenseGait(SetpointsGait):
         responsible_for: List[str],
     ):
         super(RealsenseGait, self).__init__(gait_name, subgaits, graph)
-        self._gait_selection = gait_selection
-        self.logger = Logger(self._gait_selection, __class__.__name__)
+        self._gait_selection = gait_selection_node
+        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
         self.parameters = parameters
         self.dimensions = dimensions
         self.realsense_category = self.realsense_category_from_string(realsense_category)
@@ -246,7 +245,7 @@ class RealsenseGait(SetpointsGait):
             gait_name=gait_name,
             subgaits=subgaits,
             graph=graph,
-            gait_selection=gait_selection,
+            gait_selection_node=gait_selection,
             realsense_category=realsense_category,
             camera_to_use=camera_to_use,
             subgaits_to_interpolate=subgaits_to_interpolate,
@@ -373,12 +372,12 @@ class RealsenseGait(SetpointsGait):
         """
         service_call_succesful = self.make_realsense_service_call()
         if not service_call_succesful:
-            self.logger.warn("No service response received within timeout")
+            self._logger.warn("No service response received within timeout")
             return False
 
         gait_parameters_response = self.realsense_service_result
         if gait_parameters_response is None or not gait_parameters_response.success:
-            self.logger.warn(f"No gait parameters were found, gait will not be started, {gait_parameters_response}")
+            self._logger.warn(f"No gait parameters were found, gait will not be started, {gait_parameters_response}")
             return False
 
         return self.update_gaits_from_realsense_call(gait_parameters_response.gait_parameters)
@@ -425,7 +424,7 @@ class RealsenseGait(SetpointsGait):
             gait_parameters_response_future = self._get_gait_parameters_service.call_async(request)
             gait_parameters_response_future.add_done_callback(self._realsense_response_cb)
         else:
-            self.logger.error(
+            self._logger.error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
                 f"available, is the realsense reader running?"
             )
@@ -450,7 +449,7 @@ class RealsenseGait(SetpointsGait):
         Raises:
             NonValidGaitContentError: if subgaits cannot be set
         """
-        self.logger.info(f"Interpolating gait {self.gait_name} with parameters: {self.parameters}")
+        self._logger.info(f"Interpolating gait {self.gait_name} with parameters: {self.parameters}")
 
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():

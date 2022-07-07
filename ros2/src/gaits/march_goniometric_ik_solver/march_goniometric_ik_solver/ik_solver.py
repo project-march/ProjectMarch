@@ -27,7 +27,7 @@ LENGTH_LEG = LENGTH_UPPER_LEG + LENGTH_LOWER_LEG
 LENGTH_HIP = 2 * LENGTH_HIP_AA + LENGTH_HIP_BASE
 
 # List the joints we have:
-JOINT_NAMES = get_joint_names_from_urdf()
+JOINT_NAMES = get_joint_names_from_urdf(return_fixed_joints=True)
 
 # Create a dictionary of joint limits:
 JOINT_LIMITS = {}
@@ -40,6 +40,7 @@ ANKLE_BUFFER = np.deg2rad(1)
 HIP_BUFFER = np.deg2rad(1)
 MAX_ANKLE_FLEXION = min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper) - ANKLE_BUFFER
 MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower) + HIP_BUFFER
+
 
 # Constants:
 LENGTH_FOOT = 0.10  # m

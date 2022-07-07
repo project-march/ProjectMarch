@@ -3,14 +3,13 @@
 from .connection_manager import ConnectionManager
 from .wireless_ipd_controller import WirelessInputDeviceController
 import rclpy
-from march_utility.utilities.logger import Logger
 import threading
 import sys
 from rclpy.executors import MultiThreadedExecutor
 
 NODE_NAME = "march_wireless_ipd_node"
 PORT = 4000
-IP = "192.168.0.101"
+IP = "192.168.0.107"
 
 
 def sys_exit(*_):
@@ -22,7 +21,7 @@ def main():
     """Initialize wireless IPD node."""
     rclpy.init()
     node = rclpy.create_node(NODE_NAME)
-    logger = Logger(node, NODE_NAME)
+    logger = node.get_logger()
     controller = WirelessInputDeviceController(node, logger)
     manager = ConnectionManager(IP, PORT, controller, node, logger)
     executor = MultiThreadedExecutor()

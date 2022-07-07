@@ -36,6 +36,16 @@ class InputDeviceController:
             topic="/march/input_device/instruction",
             qos_profile=10,
         )
+        self._step_and_hold_step_size_pub = self._node.create_publisher(
+            msg_type=String,
+            topic="/march/step_and_hold/step_size",
+            qos_profile=10,
+        )
+        self._step_and_hold_start_side_pub = self._node.create_publisher(
+            msg_type=String,
+            topic="/march/step_and_hold/start_side",
+            qos_profile=10,
+        )
         self._instruction_response_pub = self._node.create_subscription(
             msg_type=GaitInstructionResponse,
             topic="/march/input_device/instruction_response",
@@ -236,3 +246,27 @@ class InputDeviceController:
                 id=str(self._id),
             )
         )
+
+    def publish_small_narrow(self) -> None:
+        """Publish a small_narrow gait on the step_and_hold topic."""
+        self._step_and_hold_step_size_pub.publish(String(data="small_narrow"))
+
+    def publish_small_wide(self) -> None:
+        """Publish a small_wide gait on the step_and_hold topic."""
+        self._step_and_hold_step_size_pub.publish(String(data="small_wide"))
+
+    def publish_large_narrow(self) -> None:
+        """Publish a large_narrow gait on the step_and_hold topic."""
+        self._step_and_hold_step_size_pub.publish(String(data="large_narrow"))
+
+    def publish_large_wide(self) -> None:
+        """Publish a large_wide gait on the step_and_hold topic."""
+        self._step_and_hold_step_size_pub.publish(String(data="large_wide"))
+
+    def publish_start_with_left(self) -> None:
+        """Publish that a step_and_hold starts from left_swing."""
+        self._step_and_hold_start_side_pub.publish(String(data="left_swing"))
+
+    def publish_start_with_right(self) -> None:
+        """Publish that a step_and_hold starts from right_swing."""
+        self._step_and_hold_start_side_pub.publish(String(data="right_swing"))

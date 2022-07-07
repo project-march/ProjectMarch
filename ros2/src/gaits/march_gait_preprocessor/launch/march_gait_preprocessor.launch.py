@@ -33,11 +33,6 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
-                name="simulate_points",
-                default_value="False",
-                description="Whether to simulate fake foot positions for gait generation",
-            ),
-            DeclareLaunchArgument(
                 name="location_x",
                 default_value="0.5",
                 description="x-location for fake covid topic, takes double'",
@@ -65,7 +60,6 @@ def generate_launch_description():
                 namespace="march",
                 parameters=[
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
-                    {"simulate_points": LaunchConfiguration("simulate_points")},
                     {"location_x": LaunchConfiguration("location_x")},
                     {"location_y": LaunchConfiguration("location_y")},
                     {"duration": LaunchConfiguration("duration")},

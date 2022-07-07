@@ -4,6 +4,7 @@ These functions are not a part of any specific part of the code, but will be use
 for general use cases.
 """
 import os
+from copy import copy
 from typing import List, Optional
 
 from ament_index_python.packages import get_package_share_directory
@@ -17,7 +18,7 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march7.urdf"
 MODE_READING = "r"
 
 
@@ -127,7 +128,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
                 get_package_share_directory("march_description"),
                 "urdf",
                 "properties",
-                "march6.yaml",
+                "march7.yaml",
             ),
             MODE_READING,
         ) as yaml_file:
@@ -218,19 +219,20 @@ def validate_and_get_joint_names_for_inverse_kinematics(
     return sorted(joint_name_list)
 
 
-def get_joint_names_from_urdf():
-    """Gets a list of all the joint names from the urdf that are not fixed.
+def get_joint_names_from_urdf(return_fixed_joints: bool = False):
+    """Gets a list of all the joint names from the URDF. Filters out the fixed joint if not explicitly asked to return these too.
 
     Retrieves it from the `MARCH_URDF`.
     """
     robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    robot_joint_names = robot.joint_map.keys()
-    joint_names = []
 
-    # Joints we cannot control are fixed in the urdf. These should be removed.
-    for joint_name in robot_joint_names:
-        if robot.joint_map[joint_name].type != "fixed":
-            joint_names.append(joint_name)
+    # Get all joints from URDF. A joint can be fixed, but something is only considered as a joint when it contains the limit value:
+    joint_names = [name for name in robot.joint_map.keys() if robot.joint_map[name].limit is not None]
+
+    # Joints we cannot control are fixed in the urdf. These should be removed, unless explicitely asked to return fixed joints.
+    if not return_fixed_joints:
+        joint_names = [name for name in joint_names if robot.joint_map[name].type != "fixed"]
+
     return sorted(joint_names)
 
 
@@ -261,3 +263,11 @@ def get_position_from_yaml(position: str):
                 raise KeyError(f"No position found with name {e}")
     except FileNotFoundError as e:
         Node("march_utility").get_logger().error(e)
+
+
+STEPPING_STONES_END_POSITION_RIGHT = get_position_from_yaml("stand")
+STEPPING_STONES_END_POSITION_RIGHT = dict.fromkeys(STEPPING_STONES_END_POSITION_RIGHT, 0)
+STEPPING_STONES_END_POSITION_LEFT = copy(STEPPING_STONES_END_POSITION_RIGHT)
+
+STEPPING_STONES_END_POSITION_RIGHT["right_knee"] = 1
+STEPPING_STONES_END_POSITION_LEFT["left_knee"] = 1

@@ -1,64 +1,59 @@
 """Author: Marten Haitjema, MVII."""
 
 from typing import Optional
-
 from rclpy.node import Node
 from rclpy.time import Time
-from sensor_msgs.msg import JointState
 
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait import DynamicSetpointGait
-from march_gait_selection.dynamic_interpolation.dynamic_setpoint_gait_step_and_hold import (
-    END_POSITION_RIGHT,
-    END_POSITION_LEFT,
-)
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_close import (
+    TrajectoryCommandFactoryClose,
+)
+
+from march_utility.utilities.utility_functions import (
+    STEPPING_STONES_END_POSITION_RIGHT,
+    STEPPING_STONES_END_POSITION_LEFT,
+)
 from march_utility.utilities.duration import Duration
-
-from march_shared_msgs.msg import FootPosition, CurrentGait
-
-from march_utility.utilities.logger import Logger
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
+from sensor_msgs.msg import JointState
+from march_shared_msgs.msg import CurrentGait
 
-class DynamicSetpointGaitClose(DynamicSetpointGait):
+
+class DynamicGaitClose(DynamicGaitWalk):
     """Class for closing the gait after a dynamic step."""
 
-    def __init__(self, gait_selection_node: Node):
-        super().__init__(gait_selection_node)
-        self.logger = Logger(gait_selection_node, __class__.__name__)
-        self.gait_name = "dynamic_close"
+    subgait_id: str
+    start_time_next_command: Time
 
-        gait_selection_node.create_subscription(
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
+        self._logger = node.get_logger().get_child(__class__.__name__)
+        self._point_handler = point_handler
+        self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._point_handler)
+        self.gait_name = name
+
+        self.node.create_subscription(
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._set_subgait_id,
             DEFAULT_HISTORY_DEPTH,
         )
-        gait_selection_node.create_subscription(
-            FootPosition,
-            "/march/chosen_foot_position/right",
-            self._set_last_foot_position,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        gait_selection_node.create_subscription(
-            FootPosition,
-            "/march/chosen_foot_position/left",
-            self._set_last_foot_position,
-            DEFAULT_HISTORY_DEPTH,
-        )
-        gait_selection_node.create_subscription(
+        self.node.create_subscription(
             JointState,
             "/march/step/final_position",
             self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
-        gait_selection_node.create_subscription(
+        self.node.create_subscription(
             JointState,
             "/march/step_and_hold/final_position",
             self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._final_position_pub = gait_selection_node.create_publisher(
+        self._final_position_pub = self.node.create_publisher(
             JointState,
             "/march/close/final_position",
             DEFAULT_HISTORY_DEPTH,
@@ -74,10 +69,6 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         """Sets the subgait_id based on the gait that has been previously executed."""
         previous_subgait_id = current_gait.subgait
         self.subgait_id = "left_swing" if previous_subgait_id == "right_swing" else "right_swing"
-
-    def _set_last_foot_position(self, foot_position: FootPosition) -> None:
-        """Set the foot position to use for the close gait to the last used foot position."""
-        self.foot_location = foot_position
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -95,17 +86,29 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
             GaitUpdate: An optional GaitUpdate containing a TrajectoryCommand if step is feasible
         """
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
-            self.logger.warn("Already in home stand position.")
+            self._logger.warn("Already in home stand position.")
             return GaitUpdate.empty()
-        elif self.start_position_all_joints == END_POSITION_RIGHT:
+        elif self.start_position_all_joints == STEPPING_STONES_END_POSITION_RIGHT:
             self.subgait_id = "right_swing"
-        elif self.start_position_all_joints == END_POSITION_LEFT:
+        elif self.start_position_all_joints == STEPPING_STONES_END_POSITION_LEFT:
             self.subgait_id = "left_swing"
 
         self.update_parameters()
-        self._start_time_next_command = current_time + first_subgait_delay
-        self._next_command = self._get_trajectory_command(stop=True)
+        self.start_time_next_command = current_time + first_subgait_delay
+        self._next_command = self.trajectory_command_factory.get_trajectory_command(
+            self.subgait_id,
+            self.start_position_all_joints,
+            stop=True,
+        )
         return GaitUpdate.should_schedule_early(self._next_command)
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
 
     def _update_state_machine(self) -> GaitUpdate:
         """Update the state machine that the new subgait has begun. Also updates time stamps for the next subgait.
@@ -113,7 +116,9 @@ class DynamicSetpointGaitClose(DynamicSetpointGait):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._final_position_pub.publish(JointState(position=self.dynamic_subgait.get_final_position().values()))
+        self._final_position_pub.publish(
+            JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
+        )
         if self._next_command is None:
             return GaitUpdate.finished()
 
