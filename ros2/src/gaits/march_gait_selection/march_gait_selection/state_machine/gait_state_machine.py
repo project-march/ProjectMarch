@@ -5,6 +5,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.timer import Timer
 from rclpy.node import Node
 
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
@@ -106,20 +107,16 @@ class GaitStateMachine:
 
     def update(self) -> None:
         """Updates the current state each timer period, after the state machine is started."""
-        try:
-            if self._shutdown_requested:
-                self._update_timer.cancel()
-                return
-
-            if self._input.unknown_requested():
-                self._handle_unknown_requested()
-            elif self._accepted_gait:
-                self._process_gait_state()
-            else:
-                self._process_idle_state()
-        except (AttributeError, ValueError) as e:
-            self._logger.error(f"Error occurred in the state machine: {e}. Restart ROS2.")
+        if self._shutdown_requested:
             self._update_timer.cancel()
+            return
+
+        if self._input.unknown_requested():
+            self._handle_unknown_requested()
+        elif self._accepted_gait:
+            self._process_gait_state()
+        else:
+            self._process_idle_state()
 
     def _process_idle_state(self) -> None:
         """If the current state is idle, this function processes input for what to do next."""
@@ -167,7 +164,14 @@ class GaitStateMachine:
 
         now = self._node.get_clock().now()
         if not self._executing_gait:
-            gait_update = self._current_gait.start(now, self._node.first_subgait_delay)
+            try:
+                gait_update = self._current_gait.start(now, self._node.first_subgait_delay)
+            except (AttributeError, ValueError) as e:
+                self._logger.error(f"Gait cannot be started due to an error: {e}. Transitioning to unknown state.")
+                self._input.gait_finished()
+                self._handle_unknown_requested()
+                return
+
             self._executing_gait = True
 
             if gait_update == GaitUpdate.empty():
@@ -179,7 +183,13 @@ class GaitStateMachine:
                 )
                 return
         else:
-            gait_update = self._current_gait.update(now, self._node.early_schedule_duration)
+            try:
+                gait_update = self._current_gait.update(now, self._node.early_schedule_duration)
+            except (AttributeError, ValueError) as e:
+                self._logger.error(f"Calling update of gait failed: {e}. Transitioning to unknown state.")
+                self._input.gait_finished()
+                self._handle_unknown_requested()
+                return
 
         self._process_gait_update(gait_update)
 
@@ -222,6 +232,10 @@ class GaitStateMachine:
         if self._current_gait is not None:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
+
+        if isinstance(self._current_gait, DynamicGaitWalk):
+            self._current_gait.set_state_to_unknown()
+
         self._last_end_position = UnknownEdgePosition()
         self._reset_attributes()
         self._logger.info("Transitioned to unknown")
