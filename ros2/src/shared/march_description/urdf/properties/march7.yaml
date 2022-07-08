@@ -101,7 +101,7 @@ joint_limits:
     unit: iu
     lower_limit: 3991
     upper_limit: 5696
-    zero_position: 5177
+    zero_position: 5077
     resolution: 14
   right_ankle:
     unit: iu
