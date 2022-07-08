@@ -556,6 +556,10 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
         || joint_position_[joint_index]
             > soft_limits_[joint_index].max_position) {
 
+        if (joint.getName() == "left_knee") {
+            throw std::runtime_error("Left knee is outside its soft limits.");
+        }
+
         if (joint_position_[joint_index]
                 < soft_limits_error_[joint_index].min_position
             || joint_position_[joint_index]
