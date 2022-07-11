@@ -1,9 +1,9 @@
 actuating_joints:
-  # - left_ankle
+  - left_ankle
   - left_hip_aa
   - left_hip_fe
   - left_knee
-  # - right_ankle
+  - right_ankle
   - right_hip_aa
   - right_hip_fe
   - right_knee
@@ -75,9 +75,9 @@ joint_limits:
   # The upper and lower limits of the joints
   left_knee:
     unit: iu
-    lower_limit: 594768
-    upper_limit: 963440
-    zero_position: 640464
+    lower_limit: 618048
+    upper_limit: 965792
+    zero_position: 638128
     resolution: 20
   right_knee:
     unit: iu
@@ -87,9 +87,9 @@ joint_limits:
     resolution: 20
   left_hfe:
     unit: iu
-    lower_limit: 81296
-    upper_limit: 430496
-    zero_position: 147504
+    lower_limit: 91072
+    upper_limit: 453840
+    zero_position: 152312
     resolution: 20
   right_hfe:
     unit: iu
@@ -99,15 +99,15 @@ joint_limits:
     resolution: 20
   left_ankle:
     unit: iu
-    lower_limit: 9063
-    upper_limit: 11212
-    zero_position: 10827
+    lower_limit: 3991
+    upper_limit: 5696
+    zero_position: 5077
     resolution: 14
   right_ankle:
     unit: iu
-    lower_limit: 1943
-    upper_limit: 4048
-    zero_position: 3671
+    lower_limit: 6203
+    upper_limit: 7810
+    zero_position: 7100
     resolution: 14
   left_haa:
     unit: iu

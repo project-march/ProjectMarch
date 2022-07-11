@@ -1,12 +1,12 @@
-description: Move the hips aa to 0 degrees .
+description: Keep joints at same angle for stand_v2
 duration: 1500000000
 gait_type: sit_like
 joints:
   left_ankle:
-  - position: 0.0
+  - position: 0.09
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.09
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_aa:
@@ -20,7 +20,7 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.09
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
   - position: -0.1745
@@ -34,10 +34,10 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
-  - position: 0.0
+  - position: 0.09
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.09
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_aa:
@@ -51,7 +51,7 @@ joints:
     time_from_start: 1500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.09
+  - position: -0.1745
     time_from_start: 0
     velocity: 0.0
   - position: -0.1745

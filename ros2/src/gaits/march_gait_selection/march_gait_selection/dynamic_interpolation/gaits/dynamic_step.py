@@ -150,7 +150,7 @@ class DynamicStep:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
         middle_position = self.pose.solve_mid_position(
             self.location.x,
-            self.location.y,
+            max(0.0, self.location.y),
             self.location.z,
             self.middle_point_fraction,
             self.middle_point_height,
