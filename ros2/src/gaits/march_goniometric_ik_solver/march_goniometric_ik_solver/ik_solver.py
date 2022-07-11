@@ -36,11 +36,10 @@ for name in JOINT_NAMES:
     JOINT_LIMITS[name] = get_limits_robot_from_urdf_for_inverse_kinematics(name)
 
 # Create a constant for frequently used limits:
-ANKLE_BUFFER = np.deg2rad(5)
+ANKLE_BUFFER = np.deg2rad(1)
 HIP_BUFFER = np.deg2rad(1)
 MAX_ANKLE_FLEXION = min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper) - ANKLE_BUFFER
 MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower) + HIP_BUFFER
-print(MAX_ANKLE_FLEXION)
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
