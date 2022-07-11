@@ -38,6 +38,6 @@ class TrajectoryCommandFactoryStepAndClose(TrajectoryCommandFactory):
             subgait.get_joint_trajectory_msg(self._gait.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if is_final_iteration:
-                self._logger.warn(f"Close gait is not feasible. {e.msg}")
+                self._logger.warn(f"Close gait is not feasible. {e}")
             return False
         return True

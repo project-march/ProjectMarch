@@ -136,17 +136,12 @@ class PositionSoftLimitError(Exception):
     """
 
     def __init__(self, joint_name: str, position: float, lower_limit: float, upper_limit: float):
-        self.joint_name = joint_name
-        self.position = position
-        self.lower_limit = lower_limit
-        self.upper_limit = upper_limit
-
-        self.msg = (
+        msg = (
             f"{joint_name} will be outside its soft limits. Position: {position}, soft limits: "
             f"[{lower_limit}, {upper_limit}]."
         )
 
-        super(PositionSoftLimitError, self).__init__(self.msg)
+        super(PositionSoftLimitError, self).__init__(msg)
 
 
 class VelocitySoftLimitError(Exception):
@@ -159,13 +154,9 @@ class VelocitySoftLimitError(Exception):
     """
 
     def __init__(self, joint_name: str, velocity: float, limit: float):
-        self.joint_name = joint_name
-        self.velocity = velocity
-        self.limit = limit
+        msg = f"{joint_name} will be outside of velocity limits, velocity: {velocity}, velocity limit: {limit}."
 
-        self.msg = f"{joint_name} will be outside of velocity limits, velocity: {velocity}, velocity limit: {limit}."
-
-        super(VelocitySoftLimitError, self).__init__(self.msg)
+        super(VelocitySoftLimitError, self).__init__(msg)
 
 
 class WrongStartPositionError(Exception):
@@ -180,6 +171,6 @@ class WrongStartPositionError(Exception):
     """
 
     def __init__(self, correct_position: Dict[str, float], wrong_position: Dict[str, float]):
-        self.msg = f"Gait can only be executed from position {correct_position}, current position is {wrong_position}."
+        msg = f"Gait can only be executed from position {correct_position}, current position is {wrong_position}."
 
-        super(WrongStartPositionError, self).__init__(self.msg)
+        super(WrongStartPositionError, self).__init__(msg)

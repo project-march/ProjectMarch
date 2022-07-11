@@ -134,7 +134,7 @@ class TrajectoryCommandFactory:
             try:
                 return self._get_stop_gait()
             except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-                self._logger.warn(f"Can not get stop gait. {e.msg}")
+                self._logger.warn(f"Can not get stop gait. {e}")
 
         # If close gait is not feasible, stop gait completely
         self._gait._end = True
@@ -177,7 +177,7 @@ class TrajectoryCommandFactory:
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
                 self._logger.warn(
-                    f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
+                    f"Can not get trajectory after {iteration + 1} iterations. {e} Gait will not be executed."
                 )
             return None
 
@@ -203,7 +203,7 @@ class TrajectoryCommandFactory:
             subgait.get_joint_trajectory_msg(self._gait.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self._logger.warn(f"Second step is not feasible. {e.msg}")
+                self._logger.warn(f"Second step is not feasible. {e}")
             return False
         return True
 
