@@ -47,7 +47,9 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._location_x = param.get_parameter_value().double_value
         elif param.name == "location_y":
             gait_preprocessor._location_y = param.get_parameter_value().double_value
-        if param.name == "duration":
+        elif param.name == "location_z":
+            gait_preprocessor._location_z = param.get_parameter_value().double_value
+        elif param.name == "duration":
             gait_preprocessor._duration = param.get_parameter_value().double_value
 
         parameter_updated_logger(gait_preprocessor, param)
