@@ -1,4 +1,4 @@
-description: Move the hips aa to 0 degrees .
+description: v4 but then with hfe at 5.1566 deg
 duration: 1500000000
 gait_type: sit_like
 joints:
@@ -23,7 +23,7 @@ joints:
   - position: 0.09
     time_from_start: 0
     velocity: 0.0
-  - position: -0.1745
+  - position: 0.09
     time_from_start: 1500000000
     velocity: 0.0
   left_knee:
@@ -54,7 +54,7 @@ joints:
   - position: 0.09
     time_from_start: 0
     velocity: 0.0
-  - position: -0.1745
+  - position: 0.09
     time_from_start: 1500000000
     velocity: 0.0
   right_knee:
@@ -64,4 +64,4 @@ joints:
   - position: 0.0
     time_from_start: 1500000000
     velocity: 0.0
-name: prepare_sit_down
+name: stand_home

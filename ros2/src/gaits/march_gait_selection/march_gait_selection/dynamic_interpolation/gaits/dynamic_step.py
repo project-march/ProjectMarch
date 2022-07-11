@@ -163,7 +163,7 @@ class DynamicStep:
 
         middle_position = self.pose.solve_mid_position(
             self.location.x,
-            self.location.y,
+            max(0.0, self.location.y),
             self.location.z,
             fraction,
             height,
