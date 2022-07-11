@@ -133,8 +133,10 @@ class TrajectoryCommandFactory:
         if not start:
             try:
                 return self._get_stop_gait()
-            except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
+            except (PositionSoftLimitError, VelocitySoftLimitError) as e:
                 self._logger.warn(f"Can not get stop gait. {e.msg}")
+            except ValueError as e:
+                self._logger.warn(f"Can not get stop gait. {e}")
 
         # If close gait is not feasible, stop gait completely
         self._gait._end = True
@@ -174,10 +176,16 @@ class TrajectoryCommandFactory:
                 self.subgait_id,
                 self._gait.start_time_next_command,
             )
-        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if is_final_iteration:
                 self._logger.warn(
                     f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
+                )
+            return None
+        except ValueError as e:
+            if is_final_iteration:
+                self._logger.warn(
+                    f"Can not get trajectory after {iteration + 1} iterations. {e} Gait will not be executed."
                 )
             return None
 
@@ -201,10 +209,14 @@ class TrajectoryCommandFactory:
         )
         try:
             subgait.get_joint_trajectory_msg(self._gait.add_push_off)
-        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
+        except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if is_final_iteration:
                 self._logger.warn(f"Second step is not feasible. {e.msg}")
             return False
+        except ValueError as e:
+            if is_final_iteration:
+                self._logger.warn(f"Second step is not feasible. {e}")
+            return None
         return True
 
     def _get_stop_gait(self) -> Optional[TrajectoryCommand]:
