@@ -225,6 +225,7 @@ class GaitStateMachine:
             self._last_end_position = self._current_gait.final_position
             self._publish_idle_state()
             self._process_end_of_gait()
+            self._reset_attributes()
             self._logger.info(f"Finished gait `{self._previous_gait.name}`")
 
     def _transition_to_unknown(self) -> None:
@@ -293,7 +294,6 @@ class GaitStateMachine:
         self._trajectory_scheduler.reset()
         self._current_gait.end()
         self._input.gait_finished()
-        self._reset_attributes()
 
     def _publish_gait_state(self) -> None:
         """Publish the name of the gait that is currently executing."""
