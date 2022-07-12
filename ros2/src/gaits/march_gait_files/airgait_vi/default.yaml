@@ -1,143 +1,49 @@
 gaits:
-  curb_up:
-    right_open: MVI_curbup_rightopen_v3
-    left_close: MVI_curbup_leftclose_v3
-  curb_down:
-    right_open: MVI_curbdown_rightopen_v3
-    left_close: MVI_curbdown_leftclose_v3
-    
-  ramp_up:
-    left_close: MVI_rampup_leftclose_flat_v14
-    left_open: MVI_rampup_leftopen_flat_v14
-    left_swing: MVI_rampup_leftswing_flat_v14
-    right_close: MVI_rampup_rightclose_flat_v14
-    right_open: MVI_rampup_rightopen_flat_v14
-    right_swing: MVI_rampup_rightswing_flat_v14
-
-  ramp_up_single_step:
-    left_close: MVI_rampup_singlestep_leftclose_flat_v14
-    right_open: MVI_rampup_singlestep_rightopen_flat_v14
-
-  stairs_up:
-    left_close: MVI_stairsup_leftclose_high_undeep_v6
-    left_swing: MVI_stairsup_leftswing_high_undeep_v6
-    right_close: MVI_stairsup_rightclose_high_undeep_v6
-    right_open: MVI_stairsup_rightopen_high_undeep_v6
-    right_swing: MVI_stairsup_rightswing_high_undeep_v6
-
-  stairs_up_single_step:
-    right_open: MVI_stairsupsinglestep_rightopen_high_undeep_v6
-    left_close: MVI_stairsupsinglestep_leftclose_high_undeep_v6
-
-  stairs_down:
-    left_close: MVI_stairsdown_leftclose_high_undeep_v4
-    left_swing: MVI_stairsdown_leftswing_high_undeep_v4
-    right_swing: MVI_stairsdown_rightswing_high_undeep_v4
-    right_close: MVI_stairsdown_rightclose_high_undeep_v4
-    right_open: MVI_stairsdown_rightopen_high_undeep_v4
-
-  stairs_down_single_step:
-    left_close: MVI_stairsdown_leftclose_high_undeep_v6
-    right_open: MVI_stairsdown_rightopen_high_undeep_v4
-
-  stairs_down_backwards:
-    left_close: MVI_stairsdownbackwards_leftclose_cybathlon_v2
-    left_swing: MVI_stairsdownbackwards_leftswing_cybathlon_v2
-    right_close: MVI_stairsdownbackwards_rightclose_cybathlon_v2
-    right_open: MVI_stairsdownbackwards_rightopen_cybathlon_v2
-    right_swing: MVI_stairsdownbackwards_rightswing_cybathlon_v2
-
-  stairs_down_backwards_single_step:
-    left_close: MVI_stairsdownbackwards_leftclose_high_undeep_v7
-    right_open: MVI_stairsdownbackwards_rightopen_high_undeep_v7
-
-  walk:
-    left_close: MVI_walk_leftclose_v12
-    left_swing: MVI_walk_leftswing_v12
-    right_close: MVI_walk_rightclose_v12
-    right_open: MVI_walk_rightopen_v12
-    right_swing: MVI_walk_rightswing_v12
-
-  walk_single_step:
-    right_open: MVI_walksinglestep_rightopen_v12
-    left_close: MVI_walksinglestep_leftclose_v12
-  
-  walk_large:
-    left_close: MVI_walklarge_leftclose_v12
-    left_swing: MVI_walklarge_leftswing_v12
-    right_close: MVI_walklarge_rightclose_v12
-    right_open: MVI_walklarge_rightopen_v12
-    right_swing: MVI_walklarge_rightswing_v12
-
-  walk_single_step_large:
-    right_open: MVI_walksinglesteplarge_rightopen_v12
-    left_close: MVI_walksinglesteplarge_leftclose_v12
- 
-  walk_small:
-    left_close: MVI_walksmall_leftclose_v5
-    left_swing: MVI_walksmall_leftswing_v5
-    right_close: MVI_walksmall_rightclose_v5
-    right_open: MVI_walksmall_rightopen_v5
-    right_swing: MVI_walksmall_rightswing_v5
-    
   sit:
-    sit_down: MVI_sit_down_v2
+    sit_down: MVI_sit_down_v6
     sit_home: MVI_sit_home_v2
-    prepare_sit_down: MVI_prepare_sit_down_v2
-  
+    prepare_sit_down: MVI_prepare_sit_down_v6
   stand:
     prepare_stand_up: MVI_prepare_stand_up_v4
-    stand_up: MVI_stand_up_v4
-    stand_home: MVI_stand_home_v4
+    stand_up: MVI_stand_up_v7
+    stand_home: MVI_stand_home_v7
 
-  exo_test:
-    perform_test: perform_test_v1
-
-  walk_single_step_small:
-    right_open: MVI_walksinglestepsmall_rightopen_v5
-    left_close: MVI_walksinglestepsmall_leftclose_v5
-
-dynamic_edge_gaits:
-  ramp_down:
-    start_is_dynamic: false
-    final_is_dynamic: true
-    left_close: MVI_rampdown_leftclose_flat_v8
-    left_open: MVI_rampdown_leftopen_flat_v8
-    left_swing: MVI_rampdown_leftswing_flat_v8
-    right_close: MVI_rampdown_rightclose_flat_v8
-    right_open: MVI_rampdown_rightopen_flat_v8
-    right_swing: MVI_rampdown_rightswing_flat_v8
-
-  ramp_down_start_single_step:
-    start_is_dynamic: false
-    final_is_dynamic: true
-    left_close: MVI_rampdown_startsinglestep_leftclose_flat_v8
-    right_open: MVI_rampdown_startsinglestep_rightopen_flat_v8
-    
-  ramp_down_single_step:
-    start_is_dynamic: true
-    final_is_dynamic: true
-    left_close: MVI_rampdown_singlestep_leftclose_flat_v8
-    right_open: MVI_rampdown_singlestep_rightopen_flat_v8
-
-  ramp_down_last_step:
-    start_is_dynamic: true
-    final_is_dynamic: false
-    left_close: MVI_rampdownlaststep_leftclose_flat_v8
-    right_open: MVI_rampdownlaststep_rightopen_flat_v8
-    
 positions:
   stand:
+    # use v6 for sit and v7 for stand
     gait_type: walk_like
+    joints:
+      left_ankle: 0.13
+      left_hip_aa: 0.0
+      left_hip_fe: 0.09
+      left_knee: 0.0
+      right_ankle: 0.13
+      right_hip_aa: 0.0
+      right_hip_fe: 0.09
+      right_knee: 0.0
+  # stand_hfe_zero_degrees:
+  #   # Easier for checking whether hfe's are aligned
+  #   gait_type: walk_like
+  #   joints:
+  #     left_ankle: 0.0
+  #     left_hip_aa: 0.0349
+  #     left_hip_fe: 0.0
+  #     left_knee: 0.0
+  #     right_ankle: 0.0
+  #     right_hip_aa: 0.0349
+  #     right_hip_fe: 0.0
+  #     right_knee: 0.0
+  sit_without_haa:
+    gait_type: sit_like
     joints:
       left_ankle: 0.0
       left_hip_aa: 0.0349
-      left_hip_fe: -0.1745
-      left_knee: 0.0
+      left_hip_fe: 1.4835
+      left_knee: 1.4835
       right_ankle: 0.0
       right_hip_aa: 0.0349
-      right_hip_fe: -0.1745
-      right_knee: 0.0
+      right_hip_fe: 1.4835
+      right_knee: 1.4835
   sit:
     gait_type: sit_like
     joints:
