@@ -50,6 +50,7 @@ HIP_ZERO_ANGLE = np.pi  # rad
 
 DEFAULT_HIP_X_FRACTION = 0.5
 DEFAULT_KNEE_BEND = np.deg2rad(8)
+UPPER_BODY_FRONT_ROTATION = np.deg2rad(45)
 
 
 class Pose:
@@ -622,6 +623,14 @@ class Pose:
         # update fe_knee2:
         self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee2
 
+        # Apply the desired rotation of the upper body:
+        total_hip_angle = self.fe_hip2 - self.fe_hip1
+        self.fe_hip2 = total_hip_angle / 2 + UPPER_BODY_FRONT_ROTATION
+        self.fe_hip1 = self.fe_hip2 - total_hip_angle
+
+        if self.fe_hip1 < MAX_HIP_EXTENSION:
+            self.reduce_hip_extension()
+
         # lift toes as much as possible:
         self.fe_ankle2 = MAX_ANKLE_FLEXION
 
@@ -807,6 +816,11 @@ class Pose:
                     self.step_down_with_hip_above_ankle2(pos_knee1=pos_knee1)
                 else:
                     self.step_down_wih_triangle_method()
+
+        # Apply the desired rotation of the upper body:
+        total_hip_angle = self.fe_hip2 - self.fe_hip1
+        self.fe_hip2 = total_hip_angle / 2 + UPPER_BODY_FRONT_ROTATION
+        self.fe_hip1 = self.fe_hip2 - total_hip_angle
 
         # Reduce ankle2 dorsi flexion and hip extension to meet constraints:
         if reduce_df_front and self.fe_ankle2 > MAX_ANKLE_FLEXION:
