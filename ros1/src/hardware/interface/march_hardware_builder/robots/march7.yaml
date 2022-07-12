@@ -8,23 +8,23 @@ march7:
   ecatCycleTime: 8
   ecatSlaveTimeout: 200
   joints:
-#     - left_ankle:
-#         motor_controller:
-#           type: odrive
-#           actuationMode: torque
-#           slaveIndex: 3
-#           axis: 1
-#           motorKV: 355
-# #          indexFound: true
-#           absoluteEncoder:
-#             resolution: 14
-#             direction: 1
-#             minPositionIU: 9063
-#             maxPositionIU: 11212
-#           incrementalEncoder:
-#             resolution: 13
-#             transmission: 236
-#             direction: -1
+    - left_ankle:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 2
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 3991
+            maxPositionIU: 5696
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
 
     - left_hip_aa:
         motor_controller:
@@ -55,8 +55,8 @@ march7:
           absoluteEncoder:
             direction: 1
             resolution: 20
-            minPositionIU: 81296
-            maxPositionIU: 430496
+            minPositionIU: 91072
+            maxPositionIU: 453840
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -73,30 +73,30 @@ march7:
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 594768
-            maxPositionIU: 963440
+            minPositionIU: 618048
+            maxPositionIU: 965792
           incrementalEncoder:
             direction: -1
             resolution: 12
             transmission: 121
 
-#     - right_ankle:
-#         motor_controller:
-#           type: odrive
-#           actuationMode: torque
-#           slaveIndex: 4
-#           axis: 0
-#           motorKV: 355
-# #          indexFound: true
-#           absoluteEncoder:
-#             resolution: 14
-#             direction: -1
-#             minPositionIU: 1943
-#             maxPositionIU: 4048
-#           incrementalEncoder:
-#             resolution: 13
-#             transmission: 236
-#             direction: -1
+    - right_ankle:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 1
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: -1
+            minPositionIU: 6203
+            maxPositionIU: 7810
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
 
     - right_hip_aa:
         motor_controller:

@@ -41,7 +41,6 @@ HIP_BUFFER = np.deg2rad(1)
 MAX_ANKLE_FLEXION = min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper) - ANKLE_BUFFER
 MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower) + HIP_BUFFER
 
-
 # Constants:
 LENGTH_FOOT = 0.10  # m
 
@@ -282,15 +281,18 @@ class Pose:
     @property
     def min_step_size_rotated_foot(self) -> float:
         """Returns the minimum step distance at which ankle2 can reach the ground with ankle1 at maximum dorsi flexion and no flat rear foot."""
-        return LENGTH_FOOT + np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - self.max_leg_length ** 2)
+        if self.ankle_limit_toes_hip_distance > self.max_leg_length:
+            return LENGTH_FOOT + np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - self.max_leg_length ** 2)
+        else:
+            return self.ankle_limit_pos_hip[0]
 
     @property
     def min_step_height_rotated_foot(self) -> float:
         """Returns the lowest possible ankle2 height which can be reached with ankle1 at maximum dorsi flexion and no flat rear foot."""
-        long_side = self.ankle_limit_toes_hip_distance ** 2
-        horizontal_side = (self.ankle_x - LENGTH_FOOT) ** 2
+        long_side = self.ankle_limit_toes_hip_distance
+        horizontal_side = self.ankle_x - LENGTH_FOOT
         if long_side >= horizontal_side:
-            hip_height = np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - (self.ankle_x - LENGTH_FOOT) ** 2)
+            hip_height = np.sqrt(long_side ** 2 - horizontal_side ** 2)
         else:
             hip_height = 0.0
         return hip_height - self.max_leg_length
@@ -692,11 +694,15 @@ class Pose:
 
         if pos_hip_solutions[0] is not None:
             pos_hip = abs(pos_hip_solutions[0])
-            self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, pos_hip])
-            self.fe_ankle1 = MAX_ANKLE_FLEXION
-            self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
-                [self.pos_knee1, self.pos_hip, self.point_below_hip]
-            )
+            if pos_hip[0] > self.ankle_limit_pos_hip[0]:
+                self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, pos_hip])
+                self.fe_ankle1 = MAX_ANKLE_FLEXION
+                self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+                    [self.pos_knee1, self.pos_hip, self.point_below_hip]
+                )
+            else:
+                self.solve_leg(pos_hip, np.array([0, 0]), "rear")
+
             self.solve_leg(pos_hip, self.desired_pos_ankle2, "front")
         else:
             raise ValueError("Expected a solution for the hip that is not None.")
@@ -792,7 +798,7 @@ class Pose:
                     self.set_hip_linearly_scaled()
                 self.step_with_rotated_stance_foot()
         else:
-            if self.ankle_x >= self.min_step_size_rotated_foot and (self.ankle_y >= self.min_step_height_rotated_foot):
+            if self.ankle_x >= self.min_step_size_rotated_foot and self.ankle_y >= self.min_step_height_rotated_foot:
                 self.step_down_with_rotated_stance_foot()
             else:
                 pos_knee1 = self.get_knee1_position_for_hip_above_ankle2()

@@ -5,6 +5,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.timer import Timer
 from rclpy.node import Node
 
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
@@ -39,8 +40,8 @@ class GaitStateMachine:
         _shutdown_requested (bool): whether the state machine should shut down (in case of an error)
         _should_stop (bool): whether the current gait should be stopped (with a close gait)
         _is_stopping (bool): whether the current gait is already stopping
-        _executing_gait (bool): whether a gait is currently being executed
-        _has_gait_started (bool): whether the requested gait has started executing
+        _accepted_gait (bool): whether a gait has been accepted
+        _executing_gait (bool): whether the accepted gait has started executing
         _previous_gait (Gait): instance of the gait class that has previously been executed
         _current_state_pub (rclpy.Publisher): publisher to publish on the current state topic
         _current_gait_pub (rclpy.Publisher): publisher to publish on the current gait topic
@@ -60,6 +61,7 @@ class GaitStateMachine:
         self._trajectory_scheduler = trajectory_scheduler
         self._gaits = gaits
         self._positions = positions
+        self._previous_gait = None
 
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._input = StateMachineInput(node)
@@ -96,8 +98,8 @@ class GaitStateMachine:
         self._shutdown_requested = False
         self._should_stop = False
         self._is_stopping = False
+        self._accepted_gait = False
         self._executing_gait = False
-        self._has_gait_started = False
 
     def run(self) -> None:
         """Runs the state machine until shutdown is requested."""
@@ -111,7 +113,7 @@ class GaitStateMachine:
 
         if self._input.unknown_requested():
             self._handle_unknown_requested()
-        elif self._executing_gait:
+        elif self._accepted_gait:
             self._process_gait_state()
         else:
             self._process_idle_state()
@@ -121,7 +123,7 @@ class GaitStateMachine:
         if self._input.gait_requested():
             self._current_gait = self._gaits.get(self._input.gait_name())
             self._process_gait_request()
-        elif self._is_dynamic_stop_requested():
+        elif self._previous_gait is not None and self._is_dynamic_stop_requested():
             self._current_gait = self._gaits.get("dynamic_close")
             self._process_gait_request()
 
@@ -131,7 +133,7 @@ class GaitStateMachine:
         if self._current_gait.starting_position == self._last_end_position:
             self._input.gait_accepted()
             self._publish_gait_state()
-            self._executing_gait = True
+            self._accepted_gait = True
             self._logger.info(f"Accepted gait `{self._current_gait.name}`")
         else:
             self._input.gait_rejected()
@@ -157,14 +159,20 @@ class GaitStateMachine:
         self._handle_stop_input()
         if self._trajectory_scheduler.failed():
             self._process_end_of_gait()
-            self._current_gait = None
             self._transition_to_unknown()
             return
 
         now = self._node.get_clock().now()
-        if not self._has_gait_started:
-            gait_update = self._current_gait.start(now, self._node.first_subgait_delay)
-            self._has_gait_started = True
+        if not self._executing_gait:
+            try:
+                gait_update = self._current_gait.start(now, self._node.first_subgait_delay)
+            except (AttributeError, ValueError) as e:
+                self._logger.error(f"Gait cannot be started due to an error: {e}. Transitioning to unknown state.")
+                self._input.gait_finished()
+                self._handle_unknown_requested()
+                return
+
+            self._executing_gait = True
 
             if gait_update == GaitUpdate.empty():
                 self._input.gait_finished()
@@ -175,7 +183,13 @@ class GaitStateMachine:
                 )
                 return
         else:
-            gait_update = self._current_gait.update(now, self._node.early_schedule_duration)
+            try:
+                gait_update = self._current_gait.update(now, self._node.early_schedule_duration)
+            except (AttributeError, ValueError) as e:
+                self._logger.error(f"Calling update of gait failed: {e}. Transitioning to unknown state.")
+                self._input.gait_finished()
+                self._handle_unknown_requested()
+                return
 
         self._process_gait_update(gait_update)
 
@@ -219,7 +233,12 @@ class GaitStateMachine:
         if self._current_gait is not None:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
+
+        if isinstance(self._current_gait, DynamicGaitWalk):
+            self._current_gait.set_state_to_unknown()
+
         self._last_end_position = UnknownEdgePosition()
+        self._reset_attributes()
         self._logger.info("Transitioned to unknown")
 
     def _is_stop_requested(self) -> bool:
@@ -245,7 +264,7 @@ class GaitStateMachine:
 
     def stop_gait(self) -> None:
         """Requests a stop from the current executing gait, but keeps the state machine running."""
-        if self._executing_gait and not self._is_stopping:
+        if self._accepted_gait and not self._is_stopping:
             self._should_stop = True
 
     def request_shutdown(self, msg: Optional[str] = None) -> None:
@@ -268,9 +287,6 @@ class GaitStateMachine:
         self._transition_to_unknown()
         self._input.gait_finished()
         self._publish_idle_state()
-        self._executing_gait = False
-        self._has_gait_started = False
-        self._current_gait = None
         self._trajectory_scheduler.reset()
 
     def _process_end_of_gait(self) -> None:
@@ -325,7 +341,7 @@ class GaitStateMachine:
             response (PossibleGaits): PossibleGaits message to return at service request
         """
         possible_gaits = []
-        if not self._executing_gait:
+        if not self._accepted_gait:
             for gait in self._gaits.values():
                 if self._last_end_position == gait.starting_position:
                     possible_gaits.append(gait.name)
