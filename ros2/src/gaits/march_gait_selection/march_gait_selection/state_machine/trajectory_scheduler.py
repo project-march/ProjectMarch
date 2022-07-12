@@ -139,7 +139,7 @@ class TrajectoryScheduler:
 
         self._goals.append(command)
         self._logger.info(info_log_message)
-        self._logger.debug(debug_log_message)
+        self._logger.info(debug_log_message)
 
     def cancel_active_goals(self) -> None:
         """Cancels the active goal."""

@@ -60,7 +60,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="midpoint_increase",
                 default_value="0.1",
-                description="How much higher midpoints should be based on the heighest track point",
+                description="How much higher midpoints should be based on the highest track point",
             ),
             DeclareLaunchArgument(
                 name="minimum_high_point_ratio",

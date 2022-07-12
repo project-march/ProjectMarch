@@ -51,7 +51,7 @@ class DynamicStep:
 
     Attributes:
         starting_position (Dict[str, Setpoint]): the first setpoint of the gait
-        location (Point): the desired location given by (fake) covid
+        _location (Point): the desired location given by (fake) covid
         joint_names (List[str]): list of joint names
         subgait_id (str): either left_swing or right_swing
         joint_soft_limits (List[Limits]): a list containing the soft limits of each joint
@@ -80,8 +80,12 @@ class DynamicStep:
         self._get_parameters(node)
         self.home_stand_position = home_stand_position
         self.starting_position = starting_position
+
         self.location = location.processed_point
         self._duration = location.duration
+        self._deviation = location.midpoint_deviation
+        self._height = location.relative_midpoint_height
+
         self.actuating_joint_names = joint_names
         self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
@@ -90,9 +94,9 @@ class DynamicStep:
 
         self.time = [
             0,
-            self.push_off_fraction * location.duration,
-            self.middle_point_fraction * location.duration,
-            location.duration,
+            self.push_off_fraction * self._duration,
+            self.middle_point_fraction * self._duration,
+            self._duration,
         ]
 
         self.starting_position_dict = self._from_list_to_setpoint(
@@ -103,6 +107,8 @@ class DynamicStep:
         self.stop = stop
         self.hold_subgait = hold_subgait
 
+        self._logger.warn(f"Creating step with deviation {self._deviation} and height {self._height}.")
+
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
@@ -111,13 +117,16 @@ class DynamicStep:
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
+
         setpoint_list = [self.starting_position_dict]
 
-        if self.location.y > 0.1 or self.location.y < -0.1:
-            setpoint_list.append(self._solve_middle_setpoint(0.35, 0.1))
-            setpoint_list.append(self._solve_middle_setpoint(0.55, 0.1))
+        if self._deviation == 0.0:
+            setpoint_list.append(self._solve_middle_setpoint(height=self._height))
         else:
-            setpoint_list.append(self._solve_middle_setpoint())
+            lower_deviation = self.middle_point_fraction - self._deviation
+            upper_deviation = self.middle_point_fraction + self._deviation
+            setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
+            setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
 
         setpoint_list.append(self._solve_desired_setpoint())
 
@@ -156,10 +165,12 @@ class DynamicStep:
 
     def _solve_middle_setpoint(self, fraction=None, height=None) -> Dict[str, Setpoint]:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
-        if fraction is None:
-            fraction = self.middle_point_fraction
-        if height is None:
-            height = self.middle_point_height
+        fraction = self.middle_point_fraction if fraction is None else fraction
+        height = self.middle_point_height if height is None else height
+        # if fraction is None:
+        #     fraction = self.middle_point_fraction
+        # if height is None:
+        #     height = self.middle_point_height
 
         middle_position = self.pose.solve_mid_position(
             self.location.x,
@@ -169,6 +180,7 @@ class DynamicStep:
             height,
             self.subgait_id,
         )
+        self._logger.warn(f"fraction {fraction}, height {height}")
 
         return self._from_list_to_setpoint(
             self.all_joint_names,
@@ -228,7 +240,7 @@ class DynamicStep:
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
 
-        self._logger.warn(f"Amount of setpoints: {len(setpoint_list)}")
+        # self._logger.warn(f"Amount of setpoints: {len(setpoint_list)}")
 
     def get_final_position(self) -> Dict[str, float]:
         """Get setpoint_dictionary of the final setpoint.

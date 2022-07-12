@@ -59,7 +59,7 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._minimum_high_point_ratio = param.get_parameter_value().double_value
         elif param.name == "max_deviation":
             gait_preprocessor._max_deviation = param.get_parameter_value().double_value
-            
+
         parameter_updated_logger(gait_preprocessor, param)
 
     return SetParametersResult(successful=True)
@@ -67,4 +67,4 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
 
 def parameter_updated_logger(gait_preprocessor: GaitPreprocessor, param: Parameter):
     """Log which param has been updated to which value."""
-    gait_preprocessor.get_logger().info(f"{param.name} set to {param.value}")
+    gait_preprocessor._logger.info(f"{param.name} set to {param.value}")

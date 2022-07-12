@@ -28,6 +28,7 @@ class GaitPreprocessor(Node):
         self.timer = None
         self.subscription_left = None
         self.subscription_right = None
+        self._logger = self.get_logger().get_child(__class__.__name__)
 
         self._init_parameters()
         self._create_subscribers()
@@ -106,7 +107,9 @@ class GaitPreprocessor(Node):
             Point: Location with transformed axes and scaled duration.
         """
         transformed_foot_location = self._transform_point_to_gait_axes(foot_location.displacement)
-        midpoint_deviation, relative_midpoint_height = self._compute_midpoint_locations(foot_location.track_points, transformed_foot_location)
+        midpoint_deviation, relative_midpoint_height = self._compute_midpoint_locations(
+            foot_location.track_points, transformed_foot_location
+        )
         scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_location.y)
 
         return FootPosition(
@@ -131,22 +134,31 @@ class GaitPreprocessor(Node):
         Returns:
             Tuple[float, float]: A tuple containing the deviation and the relative height of the midpoints.
         """
-        track_points_transformed_heights = np.asarray([self._transform_point_to_gait_axes(p).y for p in track_points])
-        max_height = max(track_points_transformed_heights)
+        max_height = final_point.y
+
+        if len(track_points) != 0:
+            track_points_transformed_heights = np.asarray([self._transform_point_to_gait_axes(p).y for p in track_points])
+            max_height = max(track_points_transformed_heights)
 
         if max_height <= 0.1:
-            self.get_logger().get_child(__class__.__name__).info("Deviation is 0")
-            return (0.0, 0.15)
+            # self._logger.info("Deviation is 0")
+            return 0.0, 0.15
 
         # 0.15 is how high the midpoint is usually relative to the final position
-        absolute_midpoint_height = max(final_point.y + 0.15, max_height + self._midpoint_increase)        
+        absolute_midpoint_height = max(final_point.y + 0.15, max_height + self._midpoint_increase)
 
-        high_points_ratio = (track_points_transformed_heights > (max_height - 0.025)).sum() / len(track_points)
+        if len(track_points) != 0:
+            high_points_ratio = (track_points_transformed_heights > (max_height - 0.025)).sum() / len(track_points)
+        else:
+            high_points_ratio = max_height
+
         high_points_ratio = 0.0 if high_points_ratio < self._minimum_high_point_ratio else high_points_ratio
         midpoint_deviation = min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
-        self.get_logger().get_child(__class__.__name__).info(f"Deviation is {midpoint_deviation}, height is {absolute_midpoint_height - final_point.y}")
-        return (midpoint_deviation, absolute_midpoint_height - final_point.y)
+        # self._logger.info(
+        #     f"Deviation is {midpoint_deviation}, height is {absolute_midpoint_height - final_point.y}"
+        # )
 
+        return midpoint_deviation, absolute_midpoint_height - final_point.y
 
     def _transform_point_to_gait_axes(self, point: Point) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
@@ -187,5 +199,12 @@ class GaitPreprocessor(Node):
         point_msg.processed_point.y = self._location_y
         point_msg.processed_point.z = self._location_z
         point_msg.duration = self._get_duration_scaled_to_height(self._duration, self._location_y)
+
+        midpoint_deviation, relative_midpoint_height = self._compute_midpoint_locations(
+            [], point_msg.processed_point,
+        )
+
+        point_msg.midpoint_deviation = midpoint_deviation
+        point_msg.relative_midpoint_height = relative_midpoint_height
 
         self.publisher_fixed_distance.publish(point_msg)
