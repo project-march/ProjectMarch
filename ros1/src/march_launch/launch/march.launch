@@ -54,8 +54,6 @@
          to publish the transform from world to baselink."/>
     <arg name="imu_to_use" default="back"
          doc="Which imu to use for determining exo orientation"/>
-    <include file="$(find march_launch)/launch/realsense_camera.launch"
-             if="$(arg use_imu_data)" pass_all_args="true"/>
     <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
     <param name="realsense_debug" value="$(arg realsense_debug)"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
