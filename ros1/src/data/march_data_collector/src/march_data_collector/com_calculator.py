@@ -25,12 +25,12 @@ from visualization_msgs.msg import Marker
 
 
 class CoMCalculator:
+    """ """
+
     def __init__(self, robot, tf_buffer):
         self.tf_buffer = tf_buffer
 
-        self.links = dict(
-            filter(lambda __l: __l[1].inertial is not None, robot.link_map.items())
-        )
+        self.links = dict(filter(lambda __l: __l[1].inertial is not None, robot.link_map.items()))
         self.mass = sum(l.inertial.mass for (_, l) in self.links.items())
 
         self.marker = Marker()
@@ -45,6 +45,7 @@ class CoMCalculator:
         self.marker.scale.z = 0.03
 
     def calculate_com(self):
+        """ """
         x = 0
         y = 0
         z = 0
@@ -65,11 +66,7 @@ class CoMCalculator:
                 y += self.links[link].inertial.mass * transformed.point.y
                 z += self.links[link].inertial.mass * transformed.point.z
             except tf2_ros.TransformException as err:
-                rospy.logdebug(
-                    "TF Error in trying to lookup transform for center of mass: {error}".format(
-                        error=err
-                    )
-                )
+                rospy.logdebug("TF Error in trying to lookup transform for center of mass: {error}".format(error=err))
 
         x = x / self.mass
         y = y / self.mass

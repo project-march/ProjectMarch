@@ -1,14 +1,16 @@
-import launch
+"""Author: Bas Volkers, MVI."""
 import os
 from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
 
-def generate_launch_description() -> launch.LaunchDescription:
-    return launch.LaunchDescription(
+def generate_launch_description() -> LaunchDescription:
+    """Todo: Add docstring."""
+    return LaunchDescription(
         [
             DeclareLaunchArgument(
                 "use_sim_time",
@@ -17,7 +19,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="perspective",
-                default_value="full_monitor",
+                default_value="march7",
                 description="Which perspective file to use.",
             ),
             Node(

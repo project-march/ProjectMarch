@@ -1,9 +1,13 @@
+"""Author: ???."""
+
+from __future__ import annotations
 from typing import List
 
 from attr import dataclass
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
+from rclpy.node import Node
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
@@ -12,7 +16,6 @@ from march_shared_msgs.msg import (
     FollowJointTrajectoryActionResult,
     FollowJointTrajectoryResult,
 )
-from march_utility.utilities.logger import Logger
 from trajectory_msgs.msg import JointTrajectory
 
 TRAJECTORY_SCHEDULER_HISTORY_DEPTH = 5
@@ -33,8 +36,15 @@ class TrajectoryCommand:
     start_time: Time
 
     @staticmethod
-    def from_subgait(subgait: Subgait, start_time: Time):
-        """Create a TrajectoryCommand from a subgait."""
+    def from_subgait(subgait: Subgait, start_time: Time) -> TrajectoryCommand:
+        """Create a TrajectoryCommand from a subgait.
+
+        Args:
+            subgait (Subgait): subgait to create a command from
+            start_time (Time): time at which subgait should be scheduled
+        Returns:
+            TrajectoryCommand: command corresponding to the given subgait at the given start time
+        """
         return TrajectoryCommand(
             subgait.to_joint_trajectory_msg(),
             subgait.duration,
@@ -42,21 +52,36 @@ class TrajectoryCommand:
             start_time,
         )
 
-    def __str__(self):
-        return (
-            f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
-        )
+    def __str__(self) -> str:
+        """Returns a string with the name, start time and duration."""
+        return f"({self.name}, {self.start_time.nanoseconds}, {self.duration.nanoseconds})"
 
 
 class TrajectoryScheduler:
-    """Scheduler that sends sends the wanted trajectories to the topic listened
-    to by the exoskeleton/simulation."""
+    """Scheduler that sends the wanted trajectories to the topic listened to by the exoskeleton/simulation.
 
-    def __init__(self, node):
+    Args:
+        node (Node): node that is used to create subscribers/publishers
+    Attributes:
+        _logger (Logger): used to log to the terminal
+        _failed (bool): ???
+        _node (Node): node that is used to create subscribers/publishers
+        _goals (List[TrajectoryCommand]): list containing trajectory commands
+        _trajectory_goal_pub (Publisher): used to publish FollowJointTrajectoryActionGoal on
+            /march/controller/trajectory/follow_joint_trajectory_goal
+        _cancel_pub (Publisher): publishes a GoalID message on /march/controller/trajectory/follow_joint...
+            ..._trajectory/goal
+        _trajectory_goal_result_sub (Subscriber): Listens for FollowJointTrajectoryActionResult on
+            "march/controller/trajectory/follow_joint_trajectory/result. Receives the errors
+        _trajectory_command_pub (Publisher): publishes JointTrajectory messages on
+            /march/controller/trajectory/command
+    """
+
+    def __init__(self, node: Node):
         self._failed = False
         self._node = node
         self._goals: List[TrajectoryCommand] = []
-        self.logger = Logger(self._node, __class__.__name__)
+        self._logger = node.get_logger().get_child(__class__.__name__)
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -87,9 +112,11 @@ class TrajectoryScheduler:
             qos_profile=TRAJECTORY_SCHEDULER_HISTORY_DEPTH,
         )
 
-    def schedule(self, command: TrajectoryCommand):
+    def schedule(self, command: TrajectoryCommand) -> None:
         """Schedules a new trajectory.
-        :param TrajectoryCommand command: The trajectory command to schedule
+
+        Args:
+            command (TrajectoryCommand): The trajectory command to schedule
         """
         self._failed = False
         stamp = command.start_time.to_msg()
@@ -105,38 +132,39 @@ class TrajectoryScheduler:
         info_log_message = f"Scheduling {command.name}"
         debug_log_message = f"Subgait {command.name} starts "
         if self._node.get_clock().now() < command.start_time:
-            time_difference = Duration.from_ros_duration(
-                command.start_time - self._node.get_clock().now()
-            )
+            time_difference = Duration.from_ros_duration(command.start_time - self._node.get_clock().now())
             debug_log_message += f"in {round(time_difference.seconds, 3)}s"
         else:
             debug_log_message += "now"
 
         self._goals.append(command)
-        self.logger.info(info_log_message)
-        self.logger.debug(debug_log_message)
+        self._logger.info(info_log_message)
+        self._logger.debug(debug_log_message)
 
-    def cancel_active_goals(self):
+    def cancel_active_goals(self) -> None:
+        """Cancels the active goal."""
         now = self._node.get_clock().now()
         for goal in self._goals:
             if goal.start_time + goal.duration > now:
-                self._cancel_pub.publish(
-                    GoalID(stamp=goal.start_time.to_msg(), id=str(goal))
-                )
+                self._cancel_pub.publish(GoalID(stamp=goal.start_time.to_msg(), id=str(goal)))
 
-    def send_position_hold(self):
+    def send_position_hold(self) -> None:
+        """Schedule empty JointTrajectory message to hold position. Used during force unknown."""
         self._trajectory_command_pub.publish(JointTrajectory())
 
     def failed(self) -> bool:
+        """Returns true if the trajectory failed."""
         return self._failed
 
-    def reset(self):
+    def reset(self) -> None:
+        """Reset attributes of class."""
         self._failed = False
         self._goals = []
 
-    def _done_cb(self, result):
+    def _done_cb(self, result) -> None:
+        """Callback for when a result is published."""
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
             )
             self._failed = True

@@ -8,10 +8,16 @@ from contextlib import suppress
 
 
 def get_params_for_actuation(joint: str) -> List[str]:
-    """
-    Give all parameters that are set for every joint to be able to spawn a controller
-    :param joint: The name of the joint
-    :return: The parameter names
+    """Give all parameters that are set for every joint to be able to spawn a controller
+
+    Args:
+      joint: The name of the joint
+      joint: str:
+      joint: str:
+
+    Returns:
+      : The parameter names
+
     """
     return [
         f"/march/controller/trajectory/gains/{joint}",
@@ -20,12 +26,16 @@ def get_params_for_actuation(joint: str) -> List[str]:
 
 
 def main():
-    """
-    This script looks at the values that were uploaded for the controller and removes
+    """This script looks at the values that were uploaded for the controller and removes
     values for joints that are fixed in the urdf. By calling this before spawning the
     controller it is made easier to change what joints we are currently working with
     and only controlling these. This way, there are not different config files required
     for every combination of joints.
+
+    Args:
+
+    Returns:
+
     """
     try:
         rospy.init_node("upload_controller_values")

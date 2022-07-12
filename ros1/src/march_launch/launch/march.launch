@@ -3,12 +3,12 @@
     <arg name="configuration" default="exoskeleton" doc="Configuration on launching the 'simulation' or 'exoskeleton'."/>
     <arg name="headless" default="false" doc="Launches no GUI when true."/>
 
-    <arg name="robot" default="march6" doc="Robot to use."/>
+    <arg name="robot" default="march7" doc="Robot to use."/>
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
-    <arg name="gain_scheduling" default="true" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
+    <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
     <arg name="gain_tuning" default="airgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
 
 <!-- Simulation only            -->
@@ -37,14 +37,18 @@
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
-    <arg name="realsense" default="true"
-         doc="Launches the realsense reader node when true."/>
+    <arg name="hull_finder" default="false"
+         doc="Launches the realsense hull finder node when true."/>
+    <arg name="point_finder" default="false"
+         doc="Launches the realsense point finder node when true."/>
+    <arg name="stone_finder" default="false"
+         doc="Launches the stone finder node when true."/>
     <arg name="realsense_simulation" default="false"
          doc="Whether the simulation camera or the physical camera should be used"/>
-    <arg name="realsense_test_data" default="$(eval realsense)" doc="Whether the node which can publish pointclouds
+    <arg name="realsense_test_data" default="$(eval hull_finder)" doc="Whether the node which can publish pointclouds
     from datasets should be started."/>
 
-    <arg name="use_imu_data" default="$(arg realsense)"
+    <arg name="use_imu_data" default="$(eval ((hull_finder or point_finder or stone_finder) and not realsense_simulation))"
          doc="Whether the imu data will be used to"/>
     <arg name="ground_gait" default="$(arg use_imu_data)"
          doc="Exoskeleton will ground gait in gazebo_ui if true. When the imu data is used,
@@ -53,7 +57,7 @@
     <arg name="imu_to_use" default="back"
          doc="Which imu to use for determining exo orientation"/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
-             if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
+             if="$(eval (not realsense_simulation) and (hull_finder or point_finder or stone_finder))" pass_all_args="true"/>
     <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
     <param name="realsense_debug" value="$(arg realsense_debug)"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
@@ -117,7 +121,13 @@
 
     <group ns="march">
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
-                 if="$(arg realsense)"/>
+                 if="$(arg hull_finder)"/>
+        
+        <include file="$(find march_foot_position_finder)/launch/foot_position_finder.launch"
+                 if="$(arg point_finder)"/>
+
+        <include file="$(find march_stone_finder)/launch/march_stone_finder.launch"
+                 if="$(arg stone_finder)"/>
 
         <include file="$(find march_realsense_test_publisher)/launch/realsense_test_publisher.launch"
                  if="$(arg realsense_test_data)"/>
@@ -128,19 +138,29 @@
             <arg name="simulation" value="$(eval configuration == 'simulation')"/>
         </include>
 
+    <include file="$(find march_gravity_aligned_frame_publisher)/launch/march_gravity_aligned_frame_publisher.launch"/>
 
 <!-- Bridge -->
         <!-- To prevent unnecessary topics and messages, we disable the plugins that
          send a lot of compressed versions of the camera topics. -->
-        <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(arg realsense)">
-            <arg name="camera_name" value="camera_front"/>
-        </include>
-        <include file="$(find march_launch)/launch/disable_camera_plugins.launch"
-                 if="$(arg realsense)">
-            <arg name="camera_name" value="camera_back"/>
-        </include>
+        <group if="$(eval point_finder or stone_finder)">
+            <include file="$(find march_launch)/launch/disable_camera_plugins.launch">
+                <arg name="camera_name" value="camera_front_left"/>
+            </include>
+            <include file="$(find march_launch)/launch/disable_camera_plugins.launch">
+                <arg name="camera_name" value="camera_front_right"/>
+            </include>
+        </group>
 
+        <group if="$(arg hull_finder)">
+            <include file="$(find march_launch)/launch/disable_camera_plugins.launch">
+                <arg name="camera_name" value="camera_front"/>
+            </include>
+            <include file="$(find march_launch)/launch/disable_camera_plugins.launch">
+                <arg name="camera_name" value="camera_back"/>
+            </include>
+        </group>
+       
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>
             <arg name="robot" value="$(arg robot)"/>

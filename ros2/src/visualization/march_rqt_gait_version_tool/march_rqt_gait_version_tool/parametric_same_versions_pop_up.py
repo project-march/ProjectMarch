@@ -1,3 +1,4 @@
+"""Author: Bas Volkers, MVI."""
 import ast
 from typing import Dict, List
 
@@ -19,20 +20,24 @@ NUM_SECTIONS = 4
 
 
 class ParseError(Exception):
+    """Exception for if something went wrong while parsing the input."""
+
     def __init__(self, msg: str):
         super().__init__(f"Something went wrong while parsing input: {msg}")
 
 
 class ParseSubgaitError(ParseError):
+    """Exception for if something went wrong while parsing the subgait."""
+
     def __init__(self, index: int):
         super().__init__(f"Unable to parse selected subgaits of box {index}")
 
 
 class ParametricSameVersionsPopUpWindow(QDialog):
+    """Todo: Add docstring."""
+
     def __init__(self, parent, ui_file):
-        super(ParametricSameVersionsPopUpWindow, self).__init__(
-            parent=parent, flags=Qt.Window
-        )
+        super(ParametricSameVersionsPopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         loadUi(ui_file, self)
 
         self.buttonBox.accepted.connect(self.save)
@@ -40,42 +45,20 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
 
         # Connect parameter sliders to parameter labels
-        self._get_parameter_slider(1).valueChanged.connect(
-            lambda: self._parameter_value_changed(1)
-        )
-        self._get_parameter_slider(2).valueChanged.connect(
-            lambda: self._parameter_value_changed(2)
-        )
+        self._get_parameter_slider(1).valueChanged.connect(lambda: self._parameter_value_changed(1))
+        self._get_parameter_slider(2).valueChanged.connect(lambda: self._parameter_value_changed(2))
 
-        self.fourSubgaitInterpolation.stateChanged.connect(
-            lambda: self._four_subgait_interpolation_changed()
-        )
+        self.fourSubgaitInterpolation.stateChanged.connect(lambda: self._four_subgait_interpolation_changed())
 
         # Connect subgaitButtonBoxes to selecting same versions
-        self._get_subgait_button_box(1).accepted.connect(
-            lambda: self._select_same_versions(1)
-        )
-        self._get_subgait_button_box(1).rejected.connect(
-            lambda: self._clear_subgait_selection(1)
-        )
-        self._get_subgait_button_box(2).accepted.connect(
-            lambda: self._select_same_versions(2)
-        )
-        self._get_subgait_button_box(2).rejected.connect(
-            lambda: self._clear_subgait_selection(2)
-        )
-        self._get_subgait_button_box(3).accepted.connect(
-            lambda: self._select_same_versions(3)
-        )
-        self._get_subgait_button_box(3).rejected.connect(
-            lambda: self._clear_subgait_selection(3)
-        )
-        self._get_subgait_button_box(4).accepted.connect(
-            lambda: self._select_same_versions(4)
-        )
-        self._get_subgait_button_box(4).rejected.connect(
-            lambda: self._clear_subgait_selection(4)
-        )
+        self._get_subgait_button_box(1).accepted.connect(lambda: self._select_same_versions(1))
+        self._get_subgait_button_box(1).rejected.connect(lambda: self._clear_subgait_selection(1))
+        self._get_subgait_button_box(2).accepted.connect(lambda: self._select_same_versions(2))
+        self._get_subgait_button_box(2).rejected.connect(lambda: self._clear_subgait_selection(2))
+        self._get_subgait_button_box(3).accepted.connect(lambda: self._select_same_versions(3))
+        self._get_subgait_button_box(3).rejected.connect(lambda: self._clear_subgait_selection(3))
+        self._get_subgait_button_box(4).accepted.connect(lambda: self._select_same_versions(4))
+        self._get_subgait_button_box(4).rejected.connect(lambda: self._clear_subgait_selection(4))
 
         self.resetAllButton.clicked.connect(self._reset_all)
 
@@ -140,7 +123,7 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         )
 
     def _four_subgait_interpolation_changed(self):
-        """Unlocks the buttons for four subgait interpolation when it is enabled"""
+        """Unlocks the buttons for four subgait interpolation when it is enabled."""
         self.uses_four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
         if self.uses_four_subgait_interpolation:
             self.set_second_parameterize_enabled(True)
@@ -169,14 +152,10 @@ class ParametricSameVersionsPopUpWindow(QDialog):
         postfix = self.get_subgait_postfix(index)
 
         if not (prefix == "" and postfix == ""):
-            selected_versions = select_same_subgait_versions(
-                self.gait, self.subgaits, prefix, postfix
-            )
+            selected_versions = select_same_subgait_versions(self.gait, self.subgaits, prefix, postfix)
 
             if len(selected_versions) != len(self.subgaits):
-                difference = set(self.subgaits.keys()).difference(
-                    set(selected_versions.keys())
-                )
+                difference = set(self.subgaits.keys()).difference(set(selected_versions.keys()))
                 output = f"Could not find version for subgaits: {difference}"
             else:
                 output = str(selected_versions)

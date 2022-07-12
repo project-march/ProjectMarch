@@ -5,7 +5,9 @@ pytest-rerunfailures==10.2
 pytest==6.2.5
 pyqtgraph==0.11.0
 numpy_ringbuffer==0.2.1
-Flask==1.1.2
+Flask==2.0.3
 scipy==1.7.1
 parameterized==0.8.1 
 numpy==1.21.2
+pyrealsense2==2.50.0.3812
+opencv-python==4.5.5.64

@@ -16,7 +16,7 @@ setup(
     maintainer_email="software@projectmarch.nl",
     description="Performs geometric inverse kinematic solving to get pose for desired foot location",
     license="TODO: License declaration",
-    tests_require=["pytest"],
+    tests_require=["pytest", "unittest"],
     entry_points={
         "console_scripts": [],
     },

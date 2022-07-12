@@ -12,6 +12,8 @@ pg.setConfigOptions(antialias=True)
 
 
 class JointPlot(pg.PlotItem):
+    """ """
+
     # Custom signals
 
     # time, position, button_pressed
@@ -66,6 +68,15 @@ class JointPlot(pg.PlotItem):
         self.update_setpoints(joint, show_velocity_plot, show_effort_plot)
 
     def create_velocity_markers(self, setpoints, display=False):
+        """
+
+        Args:
+          setpoints:
+          display: (Default value = False)
+
+        Returns:
+
+        """
         # Remove old sliders
         while self.velocity_markers:
             self.removeItem(self.velocity_markers.pop())
@@ -84,21 +95,33 @@ class JointPlot(pg.PlotItem):
             x_start = setpoint.time - dx
             x_end = setpoint.time + dx
 
-            dy = math.degrees(
-                0.5 * marker_length * math.sin(math.atan(setpoint.velocity))
-            )
+            dy = math.degrees(0.5 * marker_length * math.sin(math.atan(setpoint.velocity)))
             y_start = math.degrees(setpoint.position) - dy
             y_end = math.degrees(setpoint.position) + dy
 
-            self.velocity_markers.append(
-                self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen)
-            )
+            self.velocity_markers.append(self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen))
             self.velocities.append(setpoint.velocity)
 
     def update_time_slider(self, time):
+        """
+
+        Args:
+          time:
+
+        Returns:
+
+        """
         self.time_line.setValue(time)
 
     def create_plots(self, joint):
+        """
+
+        Args:
+          joint:
+
+        Returns:
+
+        """
         self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen="w")
         self.showGrid(True, True, 1)
         self.plot_position_interpolation = self.plot()
@@ -107,6 +130,7 @@ class JointPlot(pg.PlotItem):
         self.plot_max_effort = self.plot(pen=pg.mkPen(color="r"))
 
     def to_setpoints(self):
+        """ """
         plot_data = self.plot_item.getData()
         setpoints = []
         for i in range(len(plot_data[0])):
@@ -117,6 +141,16 @@ class JointPlot(pg.PlotItem):
         return setpoints
 
     def update_setpoints(self, joint, show_velocity_plot=False, show_effort_plot=False):
+        """
+
+        Args:
+          joint:
+          show_velocity_plot: (Default value = False)
+          show_effort_plot: (Default value = False)
+
+        Returns:
+
+        """
         time, position, velocity = joint.get_setpoints_unzipped()
 
         self.duration = joint.duration
@@ -133,20 +167,12 @@ class JointPlot(pg.PlotItem):
         indices = np.linspace(0, self.duration, int(self.duration * 100))
         position_data = joint.interpolated_position(indices)
         velocity_data = joint.interpolated_velocity(indices)
-        min_effort_data, max_effort_data = self.calculate_min_max_effort(
-            position_data, velocity_data
-        )
+        min_effort_data, max_effort_data = self.calculate_min_max_effort(position_data, velocity_data)
         for i in range(len(position_data)):
             position_data[i] = math.degrees(position_data[i])
-            velocity_data[i] = self.scale_parameter(
-                velocity_data[i], self.limits.velocity
-            )
-            min_effort_data[i] = self.scale_parameter(
-                min_effort_data[i], self.limits.effort
-            )
-            max_effort_data[i] = self.scale_parameter(
-                max_effort_data[i], self.limits.effort
-            )
+            velocity_data[i] = self.scale_parameter(velocity_data[i], self.limits.velocity)
+            min_effort_data[i] = self.scale_parameter(min_effort_data[i], self.limits.effort)
+            max_effort_data[i] = self.scale_parameter(max_effort_data[i], self.limits.effort)
 
         self.plot_position_interpolation.setData(indices, position_data)
         self.zero_line.setPen(None)
@@ -164,6 +190,15 @@ class JointPlot(pg.PlotItem):
             self.plot_max_effort.clear()
 
     def calculate_min_max_effort(self, position, velocity):
+        """
+
+        Args:
+          position:
+          velocity:
+
+        Returns:
+
+        """
         max_velocity = [0] * len(position)
         min_velocity = [0] * len(position)
         max_effort = [0] * len(position)
@@ -188,16 +223,31 @@ class JointPlot(pg.PlotItem):
         return min_effort, max_effort
 
     def scale_parameter(self, parameter, max_paramter, min_parameter=None):
+        """
+
+        Args:
+          parameter:
+          max_paramter:
+          min_parameter: (Default value = None)
+
+        Returns:
+
+        """
         if min_parameter is None:
             min_parameter = -max_paramter
         plot_range = self.upper_limit - self.lower_limit
         parameter_range = max_paramter - min_parameter
-        return (
-            self.lower_limit
-            + plot_range * (parameter - min_parameter) / parameter_range
-        )
+        return self.lower_limit + plot_range * (parameter - min_parameter) / parameter_range
 
     def mouseClickEvent(self, event):  # noqa: N802
+        """
+
+        Args:
+          event:
+
+        Returns:
+
+        """
 
         scene_position = event.scenePos()
 
@@ -237,6 +287,14 @@ class JointPlot(pg.PlotItem):
         event.accept()
 
     def mouseDragEvent(self, ev):  # noqa: N802
+        """
+
+        Args:
+          ev:
+
+        Returns:
+
+        """
         # Check to make sure the button is the left mouse button. If not, ignore it.
         # Would have to change this if porting to Mac I assume.
         if ev.button() != QtCore.Qt.LeftButton:
@@ -291,9 +349,7 @@ class JointPlot(pg.PlotItem):
                     x_min = x[self.dragIndex - 1] + 0.01
                 if self.dragIndex < len(x) - 1:
                     x_max = x[self.dragIndex + 1] - 0.01
-                x[self.dragIndex] = min(
-                    max(local_pos.x() + self.dragOffset.x(), x_min), x_max
-                )
+                x[self.dragIndex] = min(max(local_pos.x() + self.dragOffset.x(), x_min), x_max)
                 y[self.dragIndex] = min(
                     max(local_pos.y() + self.dragOffset.y(), self.lower_limit),
                     self.upper_limit,

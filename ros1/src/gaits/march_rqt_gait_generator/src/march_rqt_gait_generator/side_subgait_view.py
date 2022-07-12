@@ -1,39 +1,34 @@
+"""Author: Roel Vos, MV"""
 from python_qt_binding.QtWidgets import QCheckBox, QPushButton
 import rospy
 
 
 class SideSubgaitView:
+    """Todo: Add docstring."""
+
     def __init__(self, widget, side: str = None):
         if side == "previous":
-            self.import_button = widget.findChildren(
-                QPushButton, "import_previous_subgait_button"
-            )[0]
-            self.default_checkbox = widget.findChildren(
-                QCheckBox, "previous_is_standing_check_box"
-            )[0]
-            self.lock_checkbox = widget.findChildren(
-                QCheckBox, "lock_startpoint_check_box"
-            )[0]
+            self.import_button = widget.findChildren(QPushButton, "import_previous_subgait_button")[0]
+            self.default_checkbox = widget.findChildren(QCheckBox, "previous_is_standing_check_box")[0]
+            self.lock_checkbox = widget.findChildren(QCheckBox, "lock_startpoint_check_box")[0]
         elif side == "next":
-            self.import_button = widget.findChildren(
-                QPushButton, "import_next_subgait_button"
-            )[0]
-            self.default_checkbox = widget.findChildren(
-                QCheckBox, "next_is_standing_check_box"
-            )[0]
-            self.lock_checkbox = widget.findChildren(
-                QCheckBox, "lock_endpoint_check_box"
-            )[0]
+            self.import_button = widget.findChildren(QPushButton, "import_next_subgait_button")[0]
+            self.default_checkbox = widget.findChildren(QCheckBox, "next_is_standing_check_box")[0]
+            self.lock_checkbox = widget.findChildren(QCheckBox, "lock_endpoint_check_box")[0]
         else:
             rospy.loginfo(
-                "SideSubgaitView initialized without specified side, "
-                "can raise issues with locking setpoints."
+                "SideSubgaitView initialized without specified side, can raise issues with locking setpoints."
             )
             self.import_button = widget.findChildren(QPushButton)[0]
             self.default_checkbox = widget.findChildren(QCheckBox)[1]
             self.lock_checkbox = widget.findChildren(QCheckBox)[0]
 
-    def update_widget(self, controller):
+    def update_widget(self, controller) -> None:
+        """Todo: Add docstring.
+
+        Args:
+          controller:
+        """
         self.import_button.setText(controller.subgait_text)
 
         self.lock_checkbox.blockSignals(True)

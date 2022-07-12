@@ -26,9 +26,7 @@ class EntryTest(unittest.TestCase):
         entry = Entry.from_ros_msg(msg)
         self.assertEqual(entry.content, content)
         self.assertFalse(entry.is_error)
-        self.assertAlmostEqual(
-            entry.date_time.toSecsSinceEpoch(), QDateTime.currentSecsSinceEpoch(), 10
-        )
+        self.assertAlmostEqual(entry.date_time.toSecsSinceEpoch(), QDateTime.currentSecsSinceEpoch(), 10)
 
     def test_create_from_error_log_msg(self):
         msg = Log()

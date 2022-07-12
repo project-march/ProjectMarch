@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-# Author: Wolf Nederpel
-# Date: 25 - 08 - 2021  # noqa: E800
-# Description: Speeds up selected gaits
-# Usage: set the subgaits to speed up either by a suffix and prefix or by giving the entire name,
-# optionally set the neww extension and description and run ./speed_up_gait.py
+"""Speeds up selected gaits.
+
+Author: Wolf Nederpel, MVI.
+Date: 25 - 08 - 2021
+Usage: Set the subgaits to speed up either by a suffix and prefix or by giving the entire name,
+    optionally set the neww extension and description and run ./speed_up_gait.py
+"""
 import os
 import yaml
 
@@ -23,9 +25,7 @@ subgaits = [
 ]
 versions_to_speed_up = {}
 for subgait_name in subgaits:
-    versions_to_speed_up[subgait_name] = (
-        common_prefix + subgait_name.replace("_", "") + common_suffix
-    )
+    versions_to_speed_up[subgait_name] = common_prefix + subgait_name.replace("_", "") + common_suffix
 # versions_to_speed_up = {  # noqa: E800
 #     "left_close": "MVI_walk_leftclose_v9",  # noqa: E800
 #     "left_swing": "MVI_walk_leftswing_v9",  # noqa: E800
@@ -62,9 +62,7 @@ for subgait_name, version in versions_to_speed_up.items():
                         4,
                     )
         if new_version_extension != "":
-            new_version_name = (
-                version[: version.rfind("_") + 1] + new_version_extension
-            )  # noqa: E501
+            new_version_name = version[: version.rfind("_") + 1] + new_version_extension  # noqa: E501
         else:
             new_version_name = version
         if new_description != "":

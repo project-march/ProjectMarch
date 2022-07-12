@@ -1,3 +1,5 @@
+"""Author: ???."""
+
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_utility.utilities.duration import Duration
 from march_utility.gait.edge_position import EdgePosition
@@ -7,8 +9,7 @@ from .gait_update import GaitUpdate
 
 
 class GaitInterface:
-    """The interface that defines the properties and functions that every gait
-    should have."""
+    """The interface that defines the properties and functions that every gait should have."""
 
     @property
     def name(self) -> str:
@@ -27,8 +28,7 @@ class GaitInterface:
 
     @property
     def duration(self) -> Duration:
-        """Returns the duration in seconds of the currently executing trajectory
-        from the start of the gait."""
+        """Returns the duration in seconds of the currently executing trajectory from the start of the gait."""
         return Duration(0)
 
     @property
@@ -53,21 +53,37 @@ class GaitInterface:
 
     @property
     def first_subgait_can_be_scheduled_early(self) -> bool:
-        """Return whether this gait can be started early, this means that the first
-        subgait will be delayed, with the first_subgait_delay, default is False."""
+        """Return whether this gait can be started early.
+
+        This means that the first subgait will be delayed, with the first_subgait_delay, default is False.
+        """
+        return False
+
+    @property
+    def requires_dynamic_stop(self) -> bool:
+        """Return whether this gait needs a dynamic stop.
+
+        This means that the gait does not end in home_stand, but in another random (dynamic) position.
+        """
         return False
 
     def start(self, current_time: Time) -> GaitUpdate:
         """Start the gait.
 
-        :returns Returns a GaitUpdate that usually contains a TrajectoryCommand."""
+        Args:
+            current_time (Time): the current time
+        Returns:
+             GaitUpdate: a GaitUpdate that usually contains a TrajectoryCommand.
+        """
         return GaitUpdate.empty()
 
     def update(self, current_time: Time) -> GaitUpdate:
         """Give an update on the progress of the gait.
 
-        :param current_time: Current time
-        :returns Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+        Args:
+           current_time (Time): Current time
+        Returns:
+             GaitUpdate: a GaitUpdate that may contain a TrajectoryCommand, and any of the
                 flags set to true, depending on the state of the Gait.
         """
         return GaitUpdate.finished()
@@ -75,17 +91,18 @@ class GaitInterface:
     def transition(self, transition_request: TransitionRequest) -> bool:
         """Requests a special transition.
 
-        :param TransitionRequest transition_request: request on what special
-               transition to perform
-
-        :returns True when the request has been accepted, False otherwise.
+        Args:
+             transition_request: (TransitionRequest): request on what special transition to perform
+        Returns:
+            bool: True when the request has been accepted, False otherwise.
         """
         return False
 
     def stop(self) -> bool:
         """Called when the gait has been instructed to stop.
 
-        :returns True when the stop action has been accepted, False otherwise.
+        Returns:
+            bool: True when the stop action has been accepted, False otherwise.
         """
         return False
 

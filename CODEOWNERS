@@ -1,26 +1,26 @@
 # The software department will always be marked as a CODEOWNER.
 [Software department]
-* @BasVolkers @kschmahl @ThijsRay
+* @jsdewolde @2hindas @martenhaitjema @George_Vegelien
 
 [Software license]
 LICENSE @ThijsRay @wnederpel
 LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel
 
 [CI/CD and Pipeline]
-.catkin_lint @ThijsRay
-.clang-format @ThijsRay
-.clang-format-ignore @ThijsRay
-.clang-tidy @ThijsRay
-.gitlab-ci.yml @ThijsRay
-Dockerfile @ThijsRay
-/.scripts/ @ThijsRay
-.flake8 @ThijsRay
+.catkin_lint @ThijsRay @George_Vegelien
+.clang-format @ThijsRay @George_Vegelien
+.clang-format-ignore @ThijsRay @George_Vegelien
+.clang-tidy @ThijsRay @George_Vegelien
+.gitlab-ci.yml @ThijsRay @George_Vegelien
+Dockerfile @ThijsRay @George_Vegelien
+/.scripts/ @ThijsRay @George_Vegelien
+.flake8 @ThijsRay @George_Vegelien
 
 ^[C/C++]
-*.cpp @ThijsRay
-*.hpp @ThijsRay
-*.c @ThijsRay
-*.h @ThijsRay
+*.cpp @ThijsRay @George_Vegelien
+*.hpp @ThijsRay @George_Vegelien
+*.c @ThijsRay @George_Vegelien
+*.h @ThijsRay @George_Vegelien
 
 [Movement]
 /ros1/src/gaits/march_gait_files @floorheijs @wnederpel
@@ -33,6 +33,9 @@ Dockerfile @ThijsRay
 [Control]
 /ros1/src/control/ @MZZRD @Hvaneven @ttveen @BasVolkers
 /ros1/src/control/march_acado_mpc/ @MZZRD
+/ros1/src/bridge/march_dynamic_reconfigure_parameters @George_Vegelien
+/ros2/src/control/ @George_Vegelien
+
 
 [Depth camera]
 /ros1/src/data/march_realsense_reader/ @kschmahl @ttveen @wnederpel
@@ -42,7 +45,7 @@ Dockerfile @ThijsRay
 /ros2/src/visualization/march_mpc_visualization @ttveen
 
 [Hardware]
-/ros1/src/hardware/ @BasVolkers
+/ros1/src/hardware/ @BasVolkers @George_Vegelien
 
 [Simulation]
 /ros1/src/simulation @kschmahl
@@ -58,3 +61,11 @@ Dockerfile @ThijsRay
 /ros2/src/shared/march_utility @BasVolkers @kschmahl @wnederpel
 /ros2/src/shared/march_description @kschmahl @ttveen
 /ros2/src/gait/march_gait_selection @kschmahl BasVolkers
+
+[CoViD]
+/ros1/src/vision @2hindas
+
+[Gaits]
+/ros2/src/gaits/march_goniometric_ik_solver @jsdewolde
+/ros2/src/gaits/march_gait_preprocessor @martenhaitjema
+ros2/src/gaits/march_gait_selection/march_gait_selection/dynamic_interpolation @martenhaitjema

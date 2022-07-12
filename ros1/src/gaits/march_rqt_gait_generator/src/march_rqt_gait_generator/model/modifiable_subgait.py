@@ -6,25 +6,42 @@ from .modifiable_joint_trajectory import ModifiableJointTrajectory
 
 
 class ModifiableSubgait(Subgait):
+    """ """
 
     joint_class = ModifiableJointTrajectory
 
     def has_multiple_setpoints_before_duration(self, duration):
-        """Check if all setpoints are before a given duration."""
+        """Check if all setpoints are before a given duration.
+
+        Args:
+          duration:
+
+        Returns:
+
+        """
         return not any(joint.setpoints[1].time > duration for joint in self.joints)
 
     def has_setpoints_after_duration(self, duration):
-        """Check if a joint has a setpoint which is larger then the given duration."""
+        """Check if a joint has a setpoint which is larger then the given duration.
+
+        Args:
+          duration:
+
+        Returns:
+
+        """
         return any(joint.setpoints[-1].time > duration for joint in self.joints)
 
     def can_mirror(self, key_1, key_2):
         """Check if the given keys exist in the available joint names and subgait name and if a replacement is possible.
 
-        :param key_1: The first key to check in the joint names and subgait name
-        :param key_2: The second key key to check in the joint names and subgait name
+        Args:
+          key_1: The first key to check in the joint names and subgait name
+          key_2: The second key key to check in the joint names and subgait name
 
-        :return:
-            True if the replacement is possible and no errors occurred
+        Returns:
+          : True if the replacement is possible and no errors occurred
+
         """
         if not key_1 or not key_2:
             rospy.loginfo("Keys are invalid")
@@ -72,11 +89,13 @@ class ModifiableSubgait(Subgait):
     def get_mirror(self, key_1, key_2):
         """Mirror the subgait by changing replacing key_1 to key_2 and visa versa in every subgait.
 
-        :param key_1: prefix name which specifies a side within the subgait (for example: right)
-        :param key_2: prefix name which specifies a side within the subgait (for example: left)
+        Args:
+          key_1: prefix name which specifies a side within the subgait (for example: right)
+          key_2: prefix name which specifies a side within the subgait (for example: left)
 
-        :return:
-            The mirrored subgait as subgait object
+        Returns:
+          : The mirrored subgait as subgait object
+
         """
         if not self.can_mirror(key_1, key_2):
             rospy.logwarn("Cannot mirror gait %s", self.gait_name)
@@ -106,9 +125,7 @@ class ModifiableSubgait(Subgait):
             else:
                 continue
 
-            mirrored_joint = ModifiableJointTrajectory(
-                mirrored_name, joint.limits, joint.setpoints, joint.duration
-            )
+            mirrored_joint = ModifiableJointTrajectory(mirrored_name, joint.limits, joint.setpoints, joint.duration)
             mirrored_joints.append(mirrored_joint)
 
         return ModifiableSubgait(
@@ -123,7 +140,15 @@ class ModifiableSubgait(Subgait):
 
     @staticmethod
     def verify_mirrored_joint(joint_1, joint_2):
-        """Verify if joint_1 and joint_2 are mirrored versions of each other."""
+        """Verify if joint_1 and joint_2 are mirrored versions of each other.
+
+        Args:
+          joint_1:
+          joint_2:
+
+        Returns:
+
+        """
         if joint_1 is None or joint_2 is None:
             rospy.logwarn("Joints %s and %s are not valid.", str(joint_1), str(joint_2))
             return False
@@ -151,28 +176,71 @@ class ModifiableSubgait(Subgait):
         return True
 
     def scale_timestamps_subgait(self, new_duration, rescale=True):
-        """Update the interpolated setpoints whenever a new duration is set to the subgait."""
+        """Update the interpolated setpoints whenever a new duration is set to the subgait.
+
+        Args:
+          new_duration:
+          rescale: (Default value = True)
+
+        Returns:
+
+        """
         super(ModifiableSubgait, self).scale_timestamps_subgait(new_duration, rescale)
 
         for joint in self.joints:
             joint.interpolated_setpoints = joint.interpolate_setpoints()
 
     def set_gait_type(self, gait_type):
-        """Set the subgait type as string."""
+        """Set the subgait type as string.
+
+        Args:
+          gait_type:
+
+        Returns:
+
+        """
         self.gait_type = str(gait_type)
 
     def set_gait_name(self, gait_name):
-        """Set the gait name as string."""
+        """Set the gait name as string.
+
+        Args:
+          gait_name:
+
+        Returns:
+
+        """
         self.gait_name = str(gait_name)
 
     def set_description(self, description):
-        """Set the subgait description as string."""
+        """Set the subgait description as string.
+
+        Args:
+          description:
+
+        Returns:
+
+        """
         self.description = str(description)
 
     def set_version(self, version):
-        """Set the subgait version as string."""
+        """Set the subgait version as string.
+
+        Args:
+          version:
+
+        Returns:
+
+        """
         self.version = str(version)
 
     def set_subgait_name(self, subgait_name):
-        """Set the subgait name as string."""
+        """Set the subgait name as string.
+
+        Args:
+          subgait_name:
+
+        Returns:
+
+        """
         self.subgait_name = str(subgait_name)

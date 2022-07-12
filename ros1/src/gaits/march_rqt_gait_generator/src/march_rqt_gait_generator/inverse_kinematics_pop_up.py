@@ -1,3 +1,4 @@
+"""Author: Wolf Nederpel, MVI."""
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
@@ -12,9 +13,7 @@ class InverseKinematicsPopUpWindow(QDialog):
 
     def __init__(self, parent: QWidget, ui_file: str) -> None:
         """Connects the ok and cancel buttons."""
-        super(InverseKinematicsPopUpWindow, self).__init__(
-            parent=parent, flags=Qt.Window
-        )
+        super(InverseKinematicsPopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         loadUi(ui_file, self)
 
         self.buttonBox.accepted.connect(self.save)

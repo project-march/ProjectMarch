@@ -34,8 +34,9 @@ namespace error {
             case ErrorType::FAILED_TO_REACH_OPERATIONAL_STATE:
                 return "At least one slave failed to reach ethercat "
                        "operational state";
-            case ErrorType::INVALID_ENCODER_RESOLUTION:
-                return "The encoder resolution is outside the allowed range";
+            case ErrorType::INVALID_ENCODER_COUNTS_PER_ROTATION:
+                return "The encoder CPR (counts per rotation) is outside the "
+                       "allowed range";
             case ErrorType::INVALID_RANGE_OF_MOTION:
                 return "The lower and upper limits of an encoder are "
                        "conflicting";

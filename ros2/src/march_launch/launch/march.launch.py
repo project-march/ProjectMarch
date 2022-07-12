@@ -1,6 +1,7 @@
+"""Author: MARCH."""
 import os
-import launch
 from ament_index_python import get_package_share_directory
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -16,13 +17,35 @@ LENGTH_HIP_AA, LENGTH_HIP_BASE = get_lengths_robot_from_urdf_for_inverse_kinemat
 DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
+    """Generates the default launch file for the exo.
+
+    Todo:
+        - Fill in the settable ros parameters.
+
+    Implemented launch files:
+        - "[march_rqt_input_device]/launch/input_device.launch.py"
+        - "[march_description]/launch/march_description.launch.py"
+        - "[march_gait_selection]/launch/gait_selection.launch.py"
+        - "[march_fake_covid]/launch/march_fake_covid.launch.py"
+        - "[march_safety]/launch/march_safety.launch.py"
+        - "[march_robot_information]/launch/robot_information.launch.py"
+        - "[march_fake_sensor_data]/launch/march_fake_sensor_data.launch.py"
+        - "[march_smartglasses_bridge]/launch/smartglasses_bridge.launch.py"
+
+    The settable ros parameters are:
+        use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
+            Default is True.
+        wireless_ipd (bool): Whether the wireless IPD connection manager node should be started.
+            Default is False.
+    """
     # General arguments
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
+    wireless_ipd = LaunchConfiguration("wireless_ipd")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
     layout = LaunchConfiguration("layout")
 
@@ -48,12 +71,15 @@ def generate_launch_description():
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
     dynamic_gait = LaunchConfiguration("dynamic_gait")
-    dynamic_subgait_duration = LaunchConfiguration("dynamic_subgait_duration")
     middle_point_fraction = LaunchConfiguration("middle_point_fraction")
     middle_point_height = LaunchConfiguration("middle_point_height")
     minimum_stair_height = LaunchConfiguration("minimum_stair_height")
     push_off_fraction = LaunchConfiguration("push_off_fraction")
     push_off_position = LaunchConfiguration("push_off_position")
+    add_push_off = LaunchConfiguration("add_push_off")
+    use_position_queue = LaunchConfiguration("use_position_queue")
+    add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
+    amount_of_steps = LaunchConfiguration("amount_of_steps")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
@@ -63,12 +89,13 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
-    # Fake covid (CoViD = Computer Vision Department)
+    # Gait Preprocessor
     location_x = LaunchConfiguration("location_x")
     location_y = LaunchConfiguration("location_y")
+    duration = LaunchConfiguration("duration")
     location_z = LaunchConfiguration("location_z")
 
-    return launch.LaunchDescription(
+    return LaunchDescription(
         [
             # GENERAL ARGUMENTS
             DeclareLaunchArgument(
@@ -77,15 +104,17 @@ def generate_launch_description():
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
-            DeclareLaunchArgument(
-                name="robot", default_value="march6", description="Robot to use."
-            ),
+            DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
                 name="rqt_input",
                 default_value="True",
-                description="If this argument is false, the rqt input device will"
-                "not be launched.",
+                description="If this argument is false, the rqt input device will not be launched.",
+            ),
+            DeclareLaunchArgument(
+                name="wireless_ipd",
+                default_value="False",
+                description="If this argument is false, the wireless input device will not be launched.",
             ),
             DeclareLaunchArgument(
                 name="layout",
@@ -116,8 +145,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="realsense",
                 default_value="True",
-                description="Whether to start up everything for working with the "
-                "realsense",
+                description="Whether to start up everything for working with the realsense",
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
@@ -132,8 +160,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="use_imu_data",
                 default_value=realsense,
-                description="Whether to use the camera imu to know the real "
-                "orientation of the exoskeleton",
+                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
                 name="imu_to_use",
@@ -143,8 +170,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value=use_imu_data,
-                description="Whether the simulation should be simulating "
-                "ground_gaiting instead of airgaiting.",
+                description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
@@ -166,8 +192,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="simulation",
                 default_value="False",
-                description="Whether the exoskeleton is ran physically or in "
-                "simulation.",
+                description="Whether the exoskeleton is ran physically or in simulation.",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -188,19 +213,13 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="dynamic_gait",
-                default_value="False",
-                description="Wether dynamic_setpoint_gait is enabled",
-            ),
-            DeclareLaunchArgument(
-                name="dynamic_subgait_duration",
-                default_value="1.5",
-                description="Duration of a subgait created by the dynamic gait",
+                default_value="True",
+                description="Whether dynamic_setpoint_gait is enabled",
             ),
             DeclareLaunchArgument(
                 name="middle_point_fraction",
                 default_value="0.45",
-                description="Fraction of the step at which the middle point "
-                "of the dynamic gait will take place.",
+                description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
                 name="middle_point_height",
@@ -217,13 +236,33 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="push_off_fraction",
                 default_value="0.15",
-                description="Fraction of the step at which the push off will"
-                "take place.",
+                description="Fraction of the step at which the push off will take place.",
             ),
             DeclareLaunchArgument(
                 name="push_off_position",
                 default_value="-0.15",
                 description="Maximum joint position of the ankle during push off.",
+            ),
+            DeclareLaunchArgument(
+                name="add_push_off",
+                default_value="True",
+                description="Whether to add a push off setpoint for the ankle.",
+            ),
+            DeclareLaunchArgument(
+                name="amount_of_steps",
+                default_value="0",
+                description="Amount of steps the dynamic gait should make before stopping. 0 or -1 is infinite.",
+            ),
+            DeclareLaunchArgument(
+                name="use_position_queue",
+                default_value="False",
+                description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
+                "points given by (simulated) covid.",
+            ),
+            DeclareLaunchArgument(
+                name="add_cybathlon_gaits",
+                default_value="False",
+                description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
             ),
             DeclareLaunchArgument(
                 name="first_subgait_delay",
@@ -234,13 +273,11 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.2",
+                default_value="0.3",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
-            DeclareLaunchArgument(
-                name="timer_period", default_value="0.004", description=""
-            ),
+            DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -257,20 +294,26 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            # GAIT PREPROCESSOR ARGUMENTS
             DeclareLaunchArgument(
                 name="location_x",
-                default_value="0.4",
+                default_value="0.5",
                 description="x-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
                 name="location_y",
-                default_value="0.0",
+                default_value="0.03",
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
                 name="location_z",
                 default_value=str(DEFAULT_FEET_DISTANCE),
                 description="z-location for fake covid topic, takes double or 'random'",
+            ),
+            DeclareLaunchArgument(
+                name="duration",
+                default_value="1.5",
+                description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
@@ -287,6 +330,17 @@ def generate_launch_description():
                     ("layout", layout),
                 ],
                 condition=IfCondition(rqt_input),
+            ),
+            # Launch wireless input device if not wireless_ipd:=false
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_wireless_ipd"),
+                        "launch",
+                        "wireless_ipd.launch.py",
+                    )
+                ),
+                condition=IfCondition(wireless_ipd),
             ),
             # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
             IncludeLaunchDescription(
@@ -326,24 +380,27 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("balance", balance),
                     ("dynamic_gait", dynamic_gait),
-                    ("dynamic_subgait_duration", dynamic_subgait_duration),
                     ("middle_point_fraction", middle_point_fraction),
                     ("middle_point_height", middle_point_height),
-                    ("mininum_stair_height", minimum_stair_height),
+                    ("minimum_stair_height", minimum_stair_height),
                     ("push_off_fraction", push_off_fraction),
                     ("push_off_position", push_off_position),
+                    ("add_push_off", add_push_off),
+                    ("amount_of_steps", amount_of_steps),
+                    ("use_position_queue", use_position_queue),
+                    ("add_cybathlon_gaits", add_cybathlon_gaits),
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
                     ("timer_period", timer_period),
                 ],
             ),
-            # Fake covid publisher
+            # Gait preprocessor
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(
-                        get_package_share_directory("march_fake_covid"),
+                        get_package_share_directory("march_gait_preprocessor"),
                         "launch",
-                        "march_fake_covid.launch.py",
+                        "march_gait_preprocessor.launch.py",
                     )
                 ),
                 launch_arguments=[
@@ -351,6 +408,7 @@ def generate_launch_description():
                     ("location_x", location_x),
                     ("location_y", location_y),
                     ("location_z", location_z),
+                    ("duration", duration),
                 ],
             ),
             # Safety

@@ -42,29 +42,40 @@ class MoveItInterface:
                 move_group.set_pose_reference_frame("world")
 
         except RuntimeError:
-            rospy.logerr(
-                "Could not connect to move groups, aborting initialisation of the "
-                "moveit interface node"
-            )
+            rospy.logerr("Could not connect to move groups, aborting initialisation of the moveit interface node")
 
     def set_swing_leg_target(self, leg_name: str, target_pose: Pose):
         """Set the swing leg target to capture point.
 
-        :param leg_name: The name of the used move group.
-        :param target_pose: The capture point pose that the swing leg should go to.
+        Args:
+          leg_name: The name of the used move group.
+          target_pose: The capture point pose that the swing leg should go to.
+          leg_name: str:
+          target_pose: Pose:
+          leg_name: str:
+          target_pose: Pose:
+
+        Returns:
+
         """
         # The move group sets a target for moveit, the end effector should be
         # specified, since otherwise the default is used, the boolean (True)
         # specifies that the pose is an approximate.
-        self.move_group[leg_name].set_joint_value_target(
-            target_pose, self._end_effectors[leg_name], True
-        )
+        self.move_group[leg_name].set_joint_value_target(target_pose, self._end_effectors[leg_name], True)
 
     def set_stance_leg_target(self, leg_name: str, joint_state: JointState):
         """Set the target of the stance leg to the end of the gait file.
 
-        :param leg_name: The name of the move group which does not use capture point.
-        :param joint_state: The end state in which the stance leg should be planned.
+        Args:
+          leg_name: The name of the move group which does not use capture point.
+          joint_state: The end state in which the stance leg should be planned.
+          leg_name: str:
+          joint_state: JointState:
+          leg_name: str:
+          joint_state: JointState:
+
+        Returns:
+
         """
         self.move_group[leg_name].set_joint_value_target(joint_state)
 
@@ -73,11 +84,20 @@ class MoveItInterface:
     ) -> Optional[JointTrajectory]:
         """Construct a balance trajectory for all joints.
 
-        :param swing_leg: The name of the swing leg.
-        :param swing_leg_target: The capture point target for swing leg.
-        :param stance_leg_target: The target state for the stance leg.
+        Args:
+          swing_leg: The name of the swing leg.
+          swing_leg_target: The capture point target for swing leg.
+          stance_leg_target: The target state for the stance leg.
+          swing_leg: str:
+          swing_leg_target: Pose:
+          stance_leg_target: JointState:
+          swing_leg: str:
+          swing_leg_target: Pose:
+          stance_leg_target: JointState:
 
-        :return: The balance trajectory
+        Returns:
+          : The balance trajectory
+
         """
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
 
@@ -87,8 +107,7 @@ class MoveItInterface:
         self._joint_state_target = JointState()
 
         targets = (
-            self.move_group["left_leg"].get_joint_value_target()
-            + self.move_group["right_leg"].get_joint_value_target()
+            self.move_group["left_leg"].get_joint_value_target() + self.move_group["right_leg"].get_joint_value_target()
         )
 
         self._joint_state_target.header.stamp = rospy.Time.now()
@@ -105,24 +124,23 @@ class MoveItInterface:
 
         return plan[1].joint_trajectory
 
-    def get_joint_trajectory(
-        self, req: GetMoveItTrajectoryRequest
-    ) -> GetMoveItTrajectoryResponse:
+    def get_joint_trajectory(self, req: GetMoveItTrajectoryRequest) -> GetMoveItTrajectoryResponse:
         """Create a moveit trajectory as a service callback.
 
-        :param req: The request for the moveit trajectory.
+        Args:
+          req: The request for the moveit trajectory.
+          req: GetMoveItTrajectoryRequest:
+          req: GetMoveItTrajectoryRequest:
+
+        Returns:
+
         """
         res = GetMoveItTrajectoryResponse()
         if req.swing_leg not in ["right_leg", "left_leg"]:
             res.success = False
-            rospy.logwarn(
-                f"Incorrect swing leg {req.swing_leg} was given, no moveit "
-                f"trajectory can be constructed."
-            )
+            rospy.logwarn(f"Incorrect swing leg {req.swing_leg} was given, no moveit trajectory can be constructed.")
             return res
-        trajectory = self.construct_trajectory(
-            req.swing_leg, req.swing_leg_target_pose, req.stance_leg_target
-        )
+        trajectory = self.construct_trajectory(req.swing_leg, req.swing_leg_target_pose, req.stance_leg_target)
         if trajectory is not None:
             res.success = True
             res.trajectory = trajectory

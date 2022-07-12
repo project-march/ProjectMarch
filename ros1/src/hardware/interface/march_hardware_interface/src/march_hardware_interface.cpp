@@ -97,6 +97,7 @@ bool MarchHardwareInterface::init(
 
         soft_limits_[i] = soft_limits;
         soft_limits_error_[i] = soft_limits_error;
+        soft_limit_touched_[i] = false;
     }
 
     // Initialize interfaces for each joint
@@ -433,6 +434,8 @@ void MarchHardwareInterface::reserveMemory()
     joint_temperature_variance_.resize(num_joints_);
     soft_limits_.resize(num_joints_);
     soft_limits_error_.resize(num_joints_);
+    soft_limit_breach_times_.resize(num_joints_);
+    soft_limit_touched_.resize(num_joints_);
 
     after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
     after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
@@ -552,26 +555,39 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
     if (joint_position_[joint_index] < soft_limits_[joint_index].min_position
         || joint_position_[joint_index]
             > soft_limits_[joint_index].max_position) {
+
         if (joint_position_[joint_index]
                 < soft_limits_error_[joint_index].min_position
             || joint_position_[joint_index]
                 > soft_limits_error_[joint_index].max_position) {
-            ROS_ERROR_THROTTLE(1,
-                "Joint %s is outside of its error soft limits (%f, %f). Actual "
-                "position: %f",
-                joint.getName().c_str(),
-                soft_limits_error_[joint_index].min_position,
-                soft_limits_error_[joint_index].max_position,
-                joint_position_[joint_index]);
 
-            std::ostringstream error_stream;
-            error_stream << "Joint " << joint.getName()
-                         << " is out of its soft limits ("
-                         << soft_limits_[joint_index].min_position << ", "
-                         << soft_limits_[joint_index].max_position
-                         << "). Actual position: "
-                         << joint_position_[joint_index];
-            throw std::runtime_error(error_stream.str());
+            if (soft_limit_touched_[joint_index]
+                && ros::Time::now() - soft_limit_breach_times_[joint_index]
+                    >= soft_limit_timeout_) {
+                ROS_ERROR_THROTTLE(1,
+                    "Joint %s is outside of its error soft limits (%f, %f). "
+                    "Actual position: %f",
+                    joint.getName().c_str(),
+                    soft_limits_error_[joint_index].min_position,
+                    soft_limits_error_[joint_index].max_position,
+                    joint_position_[joint_index]);
+
+                std::ostringstream error_stream;
+                error_stream
+                    << "Joint " << joint.getName()
+                    << " is out of its soft limits ("
+                    << soft_limits_[joint_index].min_position << ", "
+                    << soft_limits_[joint_index].max_position
+                    << "). Actual position: " << joint_position_[joint_index];
+                throw std::runtime_error(error_stream.str());
+
+            } else if (!soft_limit_touched_[joint_index]) {
+                soft_limit_breach_times_[joint_index] = ros::Time::now();
+                soft_limit_touched_[joint_index] = true;
+            }
+
+        } else {
+            soft_limit_touched_[joint_index] = false;
         }
 
         ROS_WARN_THROTTLE(1,
@@ -580,6 +596,9 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
             joint.getName().c_str(), soft_limits_[joint_index].min_position,
             soft_limits_[joint_index].max_position,
             joint_position_[joint_index]);
+
+    } else {
+        soft_limit_touched_[joint_index] = false;
     }
 }
 
