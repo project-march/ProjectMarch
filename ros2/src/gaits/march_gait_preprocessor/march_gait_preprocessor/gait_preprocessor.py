@@ -1,5 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
+from typing import List, Tuple
 from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
@@ -39,6 +40,10 @@ class GaitPreprocessor(Node):
         self._location_x = self.get_parameter("location_x").get_parameter_value().double_value
         self._location_y = self.get_parameter("location_y").get_parameter_value().double_value
         self._location_z = self.get_parameter("location_z").get_parameter_value().double_value
+        self._deviation_coefficient = self.get_parameter("deviation_coefficient").get_parameter_value().double_value
+        self._midpoint_increase = self.get_parameter("midpoint_increase").get_parameter_value().double_value
+        self._minimum_high_point_ratio = self.get_parameter("minimum_high_point_ratio").get_parameter_value().double_value
+        self._max_deviation = self.get_parameter("max_deviation").get_parameter_value().double_value
 
     def _create_subscribers(self) -> None:
         """Create subscribers to the topics on which covid publishes found points."""
@@ -100,7 +105,8 @@ class GaitPreprocessor(Node):
         Returns:
             Point: Location with transformed axes and scaled duration.
         """
-        transformed_foot_location = self._get_foot_location_in_gait_axes(foot_location)
+        transformed_foot_location = self._transform_point_to_gait_axes(foot_location.displacement)
+        midpoint_deviation, relative_midpoint_height = self._compute_midpoint_locations(foot_location.track_points, transformed_foot_location)
         scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_location.y)
 
         return FootPosition(
@@ -111,29 +117,56 @@ class GaitPreprocessor(Node):
             displacement=foot_location.displacement,
             track_points=foot_location.track_points,
             duration=scaled_duration,
+            midpoint_deviation=midpoint_deviation,
+            relative_midpoint_height=relative_midpoint_height,
         )
 
-    @staticmethod
-    def _get_foot_location_in_gait_axes(foot_location: FootPosition) -> Point:
+    def _compute_midpoint_locations(self, track_points: List[Point], final_point: Point) -> Tuple[float, float]:
+        """Determines whether multiple midpoints are necessary, and computes their deviations from a middle fraction and relative heights to the final point. 
+
+        Args:
+            track_points (List[Point]): A list of track points from the start and end point of a foot.
+            final_point (Point): The final point to step to. 
+
+        Returns:
+            Tuple[float, float]: A tuple containing the deviation and the relative height of the midpoints.
+        """
+        track_points_transformed_heights = np.asarray([self._transform_point_to_gait_axes(p).y for p in track_points])
+        max_height = max(track_points_transformed_heights)
+
+        if max_height <= 0.1:
+            self.get_logger().get_child(__class__.__name__).info("Deviation is 0")
+            return (0.0, 0.15)
+
+        # 0.15 is how high the midpoint is usually relative to the final position
+        absolute_midpoint_height = max(final_point.y + 0.15, max_height + self._midpoint_increase)        
+
+        high_points_ratio = (track_points_transformed_heights > (max_height - 0.025)).sum() / len(track_points)
+        high_points_ratio = 0.0 if high_points_ratio < self._minimum_high_point_ratio else high_points_ratio
+        midpoint_deviation = min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
+        self.get_logger().get_child(__class__.__name__).info(f"Deviation is {midpoint_deviation}, height is {absolute_midpoint_height - final_point.y}")
+        return (midpoint_deviation, absolute_midpoint_height - final_point.y)
+
+
+    def _transform_point_to_gait_axes(self, point: Point) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
 
         Args:
-            foot_location (FootPosition): Location given by covid.
+            point (Point): Location given by covid.
 
         Returns:
             Point: Foot location transformed to ik solver axes.
         """
-        temp_y = foot_location.displacement.y
-        point = Point()
+        temp_y = point.y
+        transformed = Point()
 
-        point.x = -foot_location.displacement.x + X_OFFSET
-        point.y = foot_location.displacement.z + Y_OFFSET
-        point.z = temp_y + np.sign(temp_y) * Z_OFFSET
+        transformed.x = -point.x + X_OFFSET
+        transformed.y = point.z + Y_OFFSET
+        transformed.z = temp_y + np.sign(temp_y) * Z_OFFSET
 
-        return point
+        return transformed
 
-    @staticmethod
-    def _get_duration_scaled_to_height(duration: float, step_height: float) -> float:
+    def _get_duration_scaled_to_height(self, duration: float, step_height: float) -> float:
         """Scales the duration based on the absolute step height.
 
         Args:
