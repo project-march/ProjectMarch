@@ -131,9 +131,6 @@
                     value="${upper_leg_height + lower_leg_height + ankle_plate_height - 0.789788}"/>
     <xacro:property name="foot_scale" value="1.35"/>
 
-    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="march.gazebo"/>
-
     <material name="visuals_material">
         <color rgba="0 0 0.6 1"/>
     </material>
