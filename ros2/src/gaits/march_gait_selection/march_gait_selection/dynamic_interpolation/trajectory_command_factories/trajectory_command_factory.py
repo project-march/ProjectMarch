@@ -1,13 +1,21 @@
 """Author: Marten Haitjema, MVII."""
 
+import os
+import yaml
+
 from math import floor
 from typing import Optional, Dict
+from queue import Queue
+from ament_index_python.packages import get_package_share_path
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_shared_msgs.msg import FootPosition
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
 from march_utility.utilities.duration import Duration
+
+from std_msgs.msg import Header
+from geometry_msgs.msg import Point
 
 DURATION_INCREASE_FACTOR = 1.5
 DURATION_INCREASE_SIZE = 0.25
@@ -25,7 +33,11 @@ class TrajectoryCommandFactory:
         start_position_all_joints (Dict[str, float]): start joint angles of all joints
         foot_location (FootPosition): foot position message to step towards
         dynamic_step (DynamicStep): instance of the DynamicStep class, used to get trajectory msg
+        position_queue (List[Dict[str, float]]): List containing foot position dictionaries for x, y and z coordinates.
+            Defined in _position_queue.yaml
+        duration_from_yaml (float): duration of the step as specified in _position_queue.yaml
 
+        _use_position_queue (bool): True if _position_queue will be used instead of covid points, else False
         _gait: the gait class
         _point_handler: the points handler class
         _logger (Logger): used to log with the class name as a prefix
@@ -41,11 +53,13 @@ class TrajectoryCommandFactory:
         self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
+        self._create_position_queue()
+        self.update_parameter()
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
     ) -> Optional[TrajectoryCommand]:
-        """Return a TrajectoryCommand based on current subgait_id.
+        """Return a TrajectoryCommand based on current subgait_id, or based on the _position_queue if enabled.
 
         Args:
             subgait_id (str): whether it is a right_swing or left_swing
@@ -63,23 +77,29 @@ class TrajectoryCommandFactory:
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
         else:
-            try:
-                self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
-                stop = self._point_handler.is_foot_location_too_old(self.foot_location)
-            except AttributeError:
-                self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
+            if self._use_position_queue and not self.position_queue.empty():
+                self.foot_location = self._get_foot_location_from_queue()
+            elif self._use_position_queue and self.position_queue.empty():
+                self.fill_queue()
+                self._logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
+                stop = True
                 self._gait._end = True
-                return None
-            if not stop:
-                self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
-                self._logger.info(
-                    f"Stepping to location ({self.foot_location.processed_point.x}, "
-                    f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-                )
+            else:
+                try:
+                    self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
+                    stop = self._point_handler.is_foot_location_too_old(self.foot_location)
+                    self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                except AttributeError:
+                    self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
+                    self._gait._end = True
+                    return None
 
-        if start and stop:
-            # If it is a start gait and stop is set to true because of the message time, do not return a trajectory.
-            return None
+        if not stop:
+            self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+            self._logger.info(
+                f"Stepping to location ({self.foot_location.processed_point.x}, "
+                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+            )
 
         return self._get_first_feasible_trajectory(start, stop)
 
@@ -266,3 +286,42 @@ class TrajectoryCommandFactory:
             start,
             stop,
         )
+
+    def _get_foot_location_from_queue(self) -> FootPosition:
+        """Get FootPosition message from the position queue.
+
+        Returns:
+            FootPosition: FootPosition msg with position from queue
+        """
+        header = Header(stamp=self._gait.node.get_clock().now().to_msg())
+        point_from_queue = self.position_queue.get()
+        point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
+
+        if self.position_queue.empty():
+            self._logger.warn("Next step will be a close gait.")
+
+        return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
+
+    def update_parameter(self) -> None:
+        """Updates '_use_position_queue' to the newest value in gait_node."""
+        self._use_position_queue = self._gait.node.use_position_queue
+
+    def _create_position_queue(self) -> None:
+        """Creates and fills the queue with values from position_queue.yaml."""
+        queue_path = get_package_share_path("march_gait_selection")
+        queue_file_loc = os.path.join(queue_path, "position_queue", "position_queue.yaml")
+        try:
+            with open(queue_file_loc, "r") as queue_file:
+                position_queue_yaml = yaml.load(queue_file, Loader=yaml.SafeLoader)
+        except OSError as e:
+            self._logger.error(f"Position queue file does not exist. {e}")
+
+        self.duration_from_yaml = position_queue_yaml["duration"]
+        self.points_from_yaml = position_queue_yaml["points"]
+        self.position_queue = Queue()
+        self.fill_queue()
+
+    def fill_queue(self) -> None:
+        """Fills the position queue with the values specified in position_queue.yaml."""
+        for point in self.points_from_yaml:
+            self.position_queue.put(point)
