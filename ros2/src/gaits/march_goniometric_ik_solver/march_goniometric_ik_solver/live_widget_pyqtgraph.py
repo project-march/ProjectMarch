@@ -7,6 +7,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 
 X_MIN = 0.0
 X_MAX = 1.0
@@ -175,20 +176,23 @@ class LiveWidget:
         self.update_tables()
 
     def update_pose(self, pose):
-        if pose == "mid":
-            self.poses[pose] = copy.deepcopy(self.poses["last"])
-            self.poses[pose].solve_mid_position(
-                self.poses["next"],
-                self.sliders[pose],
-                "",
-            )
-        else:
-            self.poses[pose].solve_end_position(
-                self.sliders[pose]["x"],
-                self.sliders[pose]["y"],
-                LENGTH_HIP,
-                "",
-            )
+        try:
+            if pose == "mid":
+                self.poses[pose] = copy.deepcopy(self.poses["last"])
+                self.poses[pose].solve_mid_position(
+                    self.poses["next"],
+                    self.sliders[pose],
+                    "",
+                )
+            else:
+                self.poses[pose].solve_end_position(
+                    self.sliders[pose]["x"],
+                    self.sliders[pose]["y"],
+                    LENGTH_HIP,
+                    "",
+                )
+        except (PositionSoftLimitError) as value_error:
+            print(value_error)
 
         positions = list(self.poses[pose].calculate_joint_positions().values())
 
