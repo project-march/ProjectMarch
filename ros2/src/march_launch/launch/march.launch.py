@@ -352,6 +352,16 @@ def generate_launch_description() -> LaunchDescription:
                 ],
                 condition=IfCondition(point_finder),
             ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_launch"),
+                        "launch",
+                        "back_realsense.launch.py",
+                    )
+                ),
+                condition=IfCondition(use_imu_data),
+            ),
             # Launch wireless input device if not wireless_ipd:=false
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(

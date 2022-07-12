@@ -146,12 +146,24 @@ limitations under the License.
     </joint>
     <link name="${name}_color_optical_frame"/>
 
-    <link name="${name}_imu_optical_frame"/>
-    <joint name="${name}_imu_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}"/>
-      <parent link="${name}_depth_frame" />
-      <child link="${name}_imu_optical_frame"/>
-    </joint>
+    <!-- This block is needed as the realsense ROS2 wrapper uses the frame 'camera_imu_optical_frame' for IMU data -->
+    <xacro:if value="${name == 'camera_back'}">
+      <link name="camera_imu_optical_frame"/>
+      <joint name="${name}_imu_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}"/>
+        <parent link="${name}_depth_frame" />
+        <child link="camera_imu_optical_frame"/>
+      </joint>
+    </xacro:if>
+
+    <xacro:unless value="${name == 'camera_back'}">
+      <link name="${name}_imu_optical_frame"/>
+      <joint name="${name}_imu_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}"/>
+        <parent link="${name}_depth_frame" />
+        <child link="${name}_imu_optical_frame"/>
+      </joint>
+    </xacro:unless>
 
     <!-- Realsense Gazebo Plugin -->
     <xacro:if value="${plugin}">
