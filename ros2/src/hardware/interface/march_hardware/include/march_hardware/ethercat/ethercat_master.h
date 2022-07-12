@@ -24,7 +24,7 @@ namespace march {
 class EthercatMaster {
 public:
     EthercatMaster(std::string if_name, int max_slave_index, int cycle_time,
-        int slave_timeout);
+        int slave_timeout, const march_logger::BaseLogger& logger);
     ~EthercatMaster();
 
     /* Delete copy constructor/assignment since the member thread can not be
@@ -120,6 +120,8 @@ private:
     const int max_slave_index_;
     const int cycle_time_ms_;
 
+    const march_logger::BaseLogger& logger_;
+
     std::mutex wait_on_pdo_condition_mutex_;
     std::condition_variable wait_on_pdo_condition_var_;
     bool pdo_received_ = false;
@@ -133,6 +135,9 @@ private:
 
     std::thread ethercat_thread_;
     std::exception_ptr last_exception_;
+
+    bool has_warned_about_worker_counter = false;
+    bool has_warned_about_ethercat_lost_connection = false;
 };
 
 } // namespace march

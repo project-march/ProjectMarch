@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 project(march_hardware)
 
-add_compile_options(-std=c++17 -Wall -Wextra -Werror)
+add_compile_options(-std=c++17 -Wall -Wextra -Werror -Wpedantic)
 
 find_package(ament_cmake REQUIRED)
-find_package(soem)
-find_package(urdf)
+find_package(soem REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
+find_package(march_logger_cpp REQUIRED)
 
 ament_export_include_directories(include)
-ament_export_dependencies(soem urdf)
+ament_export_dependencies(soem march_logger_cpp)
 ament_export_libraries(${PROJECT_NAME})
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
@@ -82,7 +82,7 @@ add_library(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} pthread)
-ament_target_dependencies(${PROJECT_NAME} soem urdf)
+ament_target_dependencies(${PROJECT_NAME} soem march_logger_cpp)
 
 add_executable(slave_count_check check/slave_count.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})

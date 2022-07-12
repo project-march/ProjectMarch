@@ -4,22 +4,21 @@
   <name>march_hardware</name>
   <version>0.0.0</version>
   <description>
-    Communicates with the March4 hardware.
+    Communicates with the March hardware.
   </description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
 
   <license>TODO</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>roscpp</depend>
   <depend>soem</depend>
-  <depend>urdf</depend>
+  <depend>march_logger_cpp</depend>
 
-  <test_depend>rosunit</test_depend>
-  <test_depend>code_coverage</test_depend>
-  <test_depend>ament_cmake_gmock</test_depend>
+<!--  <test_depend>rosunit</test_depend>-->
+<!--  <test_depend>code_coverage</test_depend>-->
+<!--  <test_depend>ament_cmake_gmock</test_depend>-->
   <export>
     <build_type>ament_cmake</build_type>
   </export>

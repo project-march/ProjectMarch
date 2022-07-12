@@ -19,7 +19,8 @@ public:
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController.
     Joint(std::string name, int net_number,
-        std::unique_ptr<MotorController> motor_controller);
+        std::unique_ptr<MotorController> motor_controller,
+        const march_logger::BaseLogger& logger);
 
     // Initialize a Joint with motor controller and temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
@@ -27,7 +28,8 @@ public:
     // a Temperature ges.
     Joint(std::string name, int net_number,
         std::unique_ptr<MotorController> motor_controller,
-        std::unique_ptr<TemperatureGES> temperature_ges);
+        std::unique_ptr<TemperatureGES> temperature_ges,
+        const march_logger::BaseLogger& logger);
 
     virtual ~Joint() noexcept = default;
 
@@ -75,6 +77,27 @@ public:
     bool hasTemperatureGES() const;
     std::unique_ptr<TemperatureGES>& getTemperatureGES();
 
+    /**
+     * \brief Checks whether the joint is in its soft limits.
+     * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
+     * @return True if it is in its soft limit.
+     */
+    bool isInSoftLimits() const;
+
+    /**
+     * \brief Checks whether the joint is in its error soft limits.
+     * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
+     * @return True if it is in its error soft limit.
+     */
+    bool isInSoftErrorLimits() const;
+
+    /**
+     * \brief Checks whether the joint is in its hard limits.
+     * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
+     * @return True if it is in its hard limit.
+     */
+    bool isInHardLimits() const;
+
     /** @brief Override comparison operator */
     friend bool operator==(const Joint& lhs, const Joint& rhs)
     {
@@ -113,7 +136,7 @@ private:
     // readEncoders()
     double initial_incremental_position_ = 0.0;
     double initial_absolute_position_ = 0.0;
-    double position_ = 0.0;
+    double position_ = 0.0;  // In radians
     double velocity_ = 0.0;
 
     // Keep track of the state of the MotorController
@@ -123,6 +146,8 @@ private:
     // A joint must have a MotorController but may have a TemperatureGES
     std::unique_ptr<MotorController> motor_controller_;
     std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
+    const march_logger::BaseLogger& logger_;
+
 };
 
 } // namespace march

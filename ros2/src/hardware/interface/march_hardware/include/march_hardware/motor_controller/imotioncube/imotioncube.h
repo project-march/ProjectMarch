@@ -32,6 +32,8 @@ public:
     /**
      * Constructs an IMotionCube with an incremental and absolute encoder.
      *
+     * TODO: Add march_logger_cpp to this class to be able to log messages.
+     *
      * @param slave slave of the IMotionCube
      * @param absolute_encoder pointer to absolute encoder, required so cannot
      * be nullptr
@@ -45,11 +47,11 @@ public:
     IMotionCube(const Slave& slave,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode);
+        ActuationMode actuation_mode, const march_logger::BaseLogger& logger);
     IMotionCube(const Slave& slave,
         std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        std::string& sw_stream, ActuationMode actuation_mode);
+        std::string& sw_stream, ActuationMode actuation_mode, const march_logger::BaseLogger& logger);
 
     ~IMotionCube() noexcept override = default;
 

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <utility>
+#include <march_logger_cpp/base_logger.hpp>
 
 namespace march {
 /**
@@ -48,7 +49,6 @@ public:
     }
 
     virtual ~SdoInterface() = default;
-    ;
 
 protected:
     virtual int write(uint16_t slave, uint16_t index, uint8_t sub,
@@ -97,13 +97,15 @@ private:
  */
 class SdoInterfaceImpl : public SdoInterface {
 public:
+
+    explicit SdoInterfaceImpl(const march_logger::BaseLogger& logger): logger_(logger) {};
     /**
      * Creates a new shared SdoInterfaceImpl.
      * @return Generic PdoInterface shared ptr
      */
-    static SdoInterfacePtr create()
+    static SdoInterfacePtr create(const march_logger::BaseLogger& logger)
     {
-        return std::make_shared<SdoInterfaceImpl>();
+        return std::make_shared<SdoInterfaceImpl>(SdoInterfaceImpl{logger});
     }
 
 protected:
@@ -112,6 +114,8 @@ protected:
 
     int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
         void* value) const override;
+
+    const march_logger::BaseLogger& logger_;
 };
 } // namespace march
 #endif // MARCH_HARDWARE_SDO_INTERFACE_H

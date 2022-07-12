@@ -14,14 +14,15 @@
 #include <string>
 #include <unistd.h>
 #include <utility>
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 namespace march {
 IMotionCube::IMotionCube(const Slave& slave,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode)
+    ActuationMode actuation_mode, const march_logger::BaseLogger& logger)
     : MotorController(slave, std::move(absolute_encoder),
-        std::move(incremental_encoder), actuation_mode)
+        std::move(incremental_encoder), actuation_mode, logger)
     , sw_string_(/*__s=*/"empty")
 {
     if (!absolute_encoder_ || !incremental_encoder_) {
@@ -34,9 +35,9 @@ IMotionCube::IMotionCube(const Slave& slave,
 IMotionCube::IMotionCube(const Slave& slave,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    std::string& sw_stream, ActuationMode actuation_mode)
+    std::string& sw_stream, ActuationMode actuation_mode, const march_logger::BaseLogger& logger)
     : IMotionCube(slave, std::move(absolute_encoder),
-        std::move(incremental_encoder), actuation_mode)
+        std::move(incremental_encoder), actuation_mode, logger)
 {
     this->sw_string_ = std::move(sw_stream);
 }
@@ -45,9 +46,7 @@ bool IMotionCube::initSdo(SdoSlaveInterface& sdo, int cycle_time)
 {
     if (this->actuation_mode_ == ActuationMode::unknown) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-            "Cannot write initial settings to "
-            "IMotionCube "
-            "as it has actuation mode of unknown");
+            "Cannot write initial settings to IMotionCube as it has actuation mode of unknown");
     }
 
     this->mapMisoPDOs(sdo);
@@ -629,5 +628,6 @@ double IMotionCube::getEffortLimit()
 void IMotionCube::enableActuation()
 {
 }
+#pragma GCC diagnostic pop
 
 } // namespace march

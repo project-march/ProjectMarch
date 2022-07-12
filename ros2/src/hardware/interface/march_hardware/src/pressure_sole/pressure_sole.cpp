@@ -5,7 +5,7 @@ PressureSole::PressureSole(
     const Slave& slave, uint8_t byte_offset, std::string side)
     : Slave(slave)
     , byte_offset_(byte_offset)
-    , side_(std::move(side)) {};
+    , side_(std::move(side)) {}
 
 std::string PressureSole::getSide()
 {

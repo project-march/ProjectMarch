@@ -32,7 +32,6 @@ struct IMCObject {
     }
 
     IMCObject() = default;
-    ;
 };
 
 /** The data direction to which the PDO is specified is restricted to master in
@@ -69,6 +68,8 @@ class IMCPDOmap {
 public:
     /**
      * Initiate all the entered IMC objects to prepare the PDO.
+     *
+     * TODO: Add march_logger_cpp to this class to be able to log messages.
      *
      * @param object_name enum of the object to be added.
      * @throws HardwareException when the object to be added is not defined or

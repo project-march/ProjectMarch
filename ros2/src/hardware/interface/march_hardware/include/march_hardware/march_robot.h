@@ -6,6 +6,7 @@
 #include "march_hardware/joint.h"
 #include "march_hardware/power_distribution_board/power_distribution_board.h"
 #include "march_hardware/pressure_sole/pressure_sole.h"
+#include "march_logger_cpp/base_logger.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -18,22 +19,22 @@ namespace march {
 class MarchRobot {
 private:
     ::std::vector<Joint> jointList;
-    urdf::Model urdf_;
     EthercatMaster ethercatMaster;
     std::vector<PressureSole> pressureSoles;
     std::optional<PowerDistributionBoard> powerDistributionBoard;
+    const march_logger::BaseLogger& logger_;
 
 public:
     using iterator = std::vector<Joint>::iterator;
 
-    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+    MarchRobot(::std::vector<Joint> jointList, const march_logger::BaseLogger& logger,
         ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
 
-    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+    MarchRobot(::std::vector<Joint> jointList, const march_logger::BaseLogger& logger,
         std::vector<PressureSole> pressureSoles, ::std::string if_name,
         int ecatCycleTime, int ecatSlaveTimeout);
 
-    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+    MarchRobot(::std::vector<Joint> jointList, const march_logger::BaseLogger& logger,
         std::vector<PressureSole> pressureSoles, ::std::string if_name,
         int ecatCycleTime, int ecatSlaveTimeout,
         std::optional<PowerDistributionBoard>);
@@ -81,8 +82,6 @@ public:
 
     bool hasPowerDistributionBoard() const;
     PowerDistributionBoard getPowerDistributionBoard() const;
-
-    const urdf::Model& getUrdf() const;
 
     /**
      * Are the joints of the robot operational

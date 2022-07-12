@@ -25,7 +25,6 @@ public:
     virtual bit16 read16(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual bit32 read32(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual ~PdoInterface() = default;
-    ;
 };
 
 /**

@@ -23,9 +23,10 @@ namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode, bool index_found, unsigned int motor_kv)
+    ActuationMode actuation_mode, bool index_found, unsigned int motor_kv,
+    const march_logger::BaseLogger& logger)
     : MotorController(slave, std::move(absolute_encoder),
-        std::move(incremental_encoder), actuation_mode)
+        std::move(incremental_encoder), actuation_mode, logger)
     , axis_(axis)
     , index_found_(index_found)
 {
@@ -64,8 +65,8 @@ void ODrive::waitForState(ODriveAxisState target_state)
 {
     auto current_state = getAxisState();
     while (current_state != target_state) {
-        // ROS_INFO("Waiting for '%s', currently in '%s'",
-        //     target_state.toString().c_str(), current_state.toString().c_str());
+        logger_.info(logger_.fstring("Waiting for '%s', currently in '%s'",
+                                     target_state.toString().c_str(), current_state.toString().c_str()));
 
         usleep(1000);
         current_state = getAxisState();
@@ -84,10 +85,11 @@ void ODrive::actuateTorque(float target_effort)
     float target_torque
         = target_effort * torque_constant_ * (float)getMotorDirection();
 #ifdef DEBUG_EFFORT
-    // ROS_INFO("Effort: %f", target_effort);
-    // ROS_INFO("Torque: %f", target_torque);
+    logger_.info(logger_.fstring("Effort: %f", target_effort));
+    logger_.info(logger_.fstring("Torque: %f", target_torque));
 #endif
-    bit32 write_torque = { .f = target_torque };
+    bit32 write_torque{};
+    write_torque.f = target_torque;
     this->write32(
         ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
         write_torque);
@@ -287,7 +289,8 @@ Encoder::Direction ODrive::getMotorDirection() const
 
 void ODrive::setAxisState(ODriveAxisState state)
 {
-    bit32 write_struct = { .ui = state.value_ };
+    bit32 write_struct{ };
+    write_struct.ui = state.value_;
     this->write32(ODrivePDOmap::getMOSIByteOffset(
                       ODriveObjectName::RequestedState, axis_),
         write_struct);

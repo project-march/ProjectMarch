@@ -1,12 +1,11 @@
 #include "march_hardware/power_distribution_board/power_distribution_board.h"
-#include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/ethercat/pdo_types.h"
 
 namespace march {
 PowerDistributionBoard::PowerDistributionBoard(
     const Slave& slave, uint8_t byte_offset)
     : Slave(slave)
-    , byte_offset_(byte_offset) {};
+    , byte_offset_(byte_offset) {}
 
 PowerDistributionBoardData PowerDistributionBoard::read()
 {

@@ -4,67 +4,85 @@
 #include "march_hardware/motor_controller/motor_controller_type.h"
 
 namespace march {
-AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
-    MotorControllerType motor_controller_type, Direction direction,
-    int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
-    double upper_limit_rad, double lower_soft_limit_rad,
-    double upper_soft_limit_rad)
-    : Encoder(resolution, motor_controller_type, direction)
-    , lower_limit_iu_(lower_limit_iu)
-    , upper_limit_iu_(upper_limit_iu)
-{
-    radians_per_iu_ = calculateRadiansPerIU();
-    zero_position_iu_ = lower_limit_iu_ - lower_limit_rad / (getRadiansPerIU());
+    AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+                                     MotorControllerType motor_controller_type, Direction direction,
+                                     int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
+                                     double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
+                                     double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff)
+            : Encoder(resolution, motor_controller_type, direction),
+              zero_position_iu_(zero_position_iu),
+              lower_hard_limit_iu_(lower_limit_iu), upper_hard_limit_iu_(upper_limit_iu) {
 
-    lower_soft_limit_iu_ = positionRadiansToIU(lower_soft_limit_rad);
-    upper_soft_limit_iu_ = positionRadiansToIU(upper_soft_limit_rad);
+        radians_per_iu_ = calculateRadiansPerIU();
+        lower_error_soft_limit_iu_ = lower_limit_iu + lower_error_soft_limit_rad_diff / getRadiansPerIU();
+        upper_error_soft_limit_iu_ = upper_limit_iu - upper_error_soft_limit_rad_diff / getRadiansPerIU();
+        lower_soft_limit_iu_ = lower_limit_iu + lower_soft_limit_rad_diff / getRadiansPerIU();
+        upper_soft_limit_iu_ = upper_limit_iu - upper_soft_limit_rad_diff / getRadiansPerIU();
 
-    // TODO: Don't skip RoM check for ODrive
-    // https://gitlab.com/project-march/march/-/issues/982
-    if (motor_controller_type != MotorControllerType::ODrive) {
-        checkRangeOfMotion(lower_limit_rad, upper_limit_rad);
-    }
+        inputSanityCheck(lower_error_soft_limit_rad_diff, upper_error_soft_limit_rad_diff,
+                         lower_soft_limit_rad_diff, upper_soft_limit_rad_diff);
+
 }
 
-AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
-    MotorControllerType motor_controller_type, int32_t lower_limit_iu,
-    int32_t upper_limit_iu, double lower_limit_rad, double upper_limit_rad,
-    double lower_soft_limit_rad, double upper_soft_limit_rad)
-    : AbsoluteEncoder(resolution, motor_controller_type, Direction::Positive,
-        lower_limit_iu, upper_limit_iu, lower_limit_rad, upper_limit_rad,
-        lower_soft_limit_rad, upper_soft_limit_rad)
-{
-}
-
-void AbsoluteEncoder::checkRangeOfMotion(
-    double lower_limit_rad, double upper_limit_rad)
-{
-    if (lower_limit_iu_ >= upper_limit_iu_
-        || lower_soft_limit_iu_ >= upper_soft_limit_iu_
-        || lower_soft_limit_iu_ < lower_limit_iu_
-        || upper_soft_limit_iu_ > upper_limit_iu_) {
-        throw error::HardwareException(
-            error::ErrorType::INVALID_RANGE_OF_MOTION,
-            "lower_soft_limit: %d IU, upper_soft_limit: %d IU\n"
-            "lower_hard_limit: %d IU, upper_hard_limit: %d IU",
-            lower_soft_limit_iu_, upper_soft_limit_iu_, lower_limit_iu_,
-            upper_limit_iu_);
+    AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+                                     MotorControllerType motor_controller_type,
+                                     int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
+                                     double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
+                                     double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff)
+            : AbsoluteEncoder(resolution, motor_controller_type, Direction::Positive,
+                              lower_limit_iu, upper_limit_iu, zero_position_iu,
+                              lower_error_soft_limit_rad_diff,
+                              upper_error_soft_limit_rad_diff, lower_soft_limit_rad_diff, upper_soft_limit_rad_diff) {
     }
 
-    const double range_of_motion = upper_limit_rad - lower_limit_rad;
-    const double encoder_range_of_motion = positionIUToRadians(upper_limit_iu_)
-        - positionIUToRadians(lower_limit_iu_);
-    const double difference
-        = std::abs(encoder_range_of_motion - range_of_motion)
-        / encoder_range_of_motion;
-    if (difference > AbsoluteEncoder::MAX_RANGE_DIFFERENCE) {
-        // ROS_WARN("Difference in range of motion of %.2f%% exceeds %.2f%%\n"
-        //          "Absolute encoder range of motion = %f rad\n"
-        //          "Limits range of motion = %f rad",
-        //     difference * 100, AbsoluteEncoder::MAX_RANGE_DIFFERENCE * 100,
-        //     encoder_range_of_motion, range_of_motion);
+
+    void AbsoluteEncoder::inputSanityCheck(double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
+                                           double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff) const {
+        if (lower_hard_limit_iu_ >= upper_hard_limit_iu_) {
+            throw error::HardwareException(
+                    error::ErrorType::INVALID_RANGE_OF_MOTION,
+                    "Lower HARD limit iu (= %d) should be smaller than upper HARD limit iu (= %d)",
+                    lower_hard_limit_iu_, upper_hard_limit_iu_);
+        }
+        if (zero_position_iu_ < lower_hard_limit_iu_ || zero_position_iu_ > upper_hard_limit_iu_) {
+            throw error::HardwareException(
+                    error::ErrorType::INVALID_RANGE_OF_MOTION,
+                    "Zero position (= %d iu) should lie between, its lower and upper hard limit ['%d', '%d'].",
+                    zero_position_iu_, lower_hard_limit_iu_, upper_hard_limit_iu_);
+        }
+        if (lower_soft_limit_rad_diff > lower_error_soft_limit_rad_diff) {
+            throw error::HardwareException(
+                    error::ErrorType::INVALID_RANGE_OF_MOTION,
+                    "Lower SOFT limit difference (= %d rad) is bigger than "
+                    "lower ERROR_SOFT limit difference (= %d rad). "
+                    "Error soft limits should lie between (inclusive) the soft and hard limits. ",
+                    lower_soft_limit_rad_diff, lower_error_soft_limit_rad_diff);
+        }
+        if (upper_soft_limit_rad_diff > upper_error_soft_limit_rad_diff) {
+            throw error::HardwareException(
+                    error::ErrorType::INVALID_RANGE_OF_MOTION,
+                    "Upper SOFT limit difference (= %d rad) is bigger than "
+                    "upper ERROR_SOFT limit difference (= %d rad). "
+                    "Error soft limits should lie between (inclusive) the soft and hard limits. ",
+                    upper_soft_limit_rad_diff, upper_error_soft_limit_rad_diff);
+        }
+        if (lower_soft_limit_iu_ >= upper_soft_limit_iu_) {
+            throw error::HardwareException(
+                    error::ErrorType::INVALID_RANGE_OF_MOTION,
+                    "Lower SOFT limit (= %d iu, = %d rad diff) >= upper SOFT limit (= %d iu, = %d rad diff).",
+                    lower_soft_limit_iu_, lower_soft_limit_rad_diff,
+                    upper_soft_limit_iu_, upper_soft_limit_rad_diff);
+        }
+        if (lower_error_soft_limit_iu_ >= upper_error_soft_limit_iu_) {
+            throw error::HardwareException(
+                    error::ErrorType::INVALID_RANGE_OF_MOTION,
+                    "Lower ERROR_SOFT limit (= %d iu, = %d rad diff) "
+                    ">= upper ERROR_SOFT limit (= %d iu, = %d rad diff).",
+                    lower_error_soft_limit_iu_, lower_error_soft_limit_rad_diff,
+                    upper_error_soft_limit_iu_, upper_error_soft_limit_rad_diff);
+        }
+
     }
-}
 
 double AbsoluteEncoder::calculateRadiansPerIU() const
 {
@@ -83,13 +101,31 @@ double AbsoluteEncoder::positionRadiansToIU(double position) const
 
 bool AbsoluteEncoder::isWithinHardLimitsIU(int32_t iu) const
 {
-    return (iu >= lower_limit_iu_ && iu <= upper_limit_iu_);
+    return (iu >= lower_hard_limit_iu_ && iu <= upper_hard_limit_iu_);
+}
+
+bool AbsoluteEncoder::isWithinHardLimitsRadians(double pos_in_radians) const {
+    return isWithinHardLimitsIU(positionRadiansToIU(pos_in_radians));
 }
 
 bool AbsoluteEncoder::isWithinSoftLimitsIU(int32_t iu) const
 {
     return (iu >= lower_soft_limit_iu_ && iu <= upper_soft_limit_iu_);
 }
+
+bool AbsoluteEncoder::isWithinSoftLimitsRadians(double pos_in_radians) const {
+    return isWithinSoftLimitsIU(positionRadiansToIU(pos_in_radians));
+}
+
+bool AbsoluteEncoder::isWithinErrorSoftLimitsIU(int32_t iu) const
+{
+    return (iu >= lower_error_soft_limit_iu_ && iu <= upper_error_soft_limit_iu_);
+}
+
+bool AbsoluteEncoder::isWithinErrorSoftLimitsRadians(double pos_in_radians) const {
+    return isWithinErrorSoftLimitsIU(positionRadiansToIU(pos_in_radians));
+}
+
 
 bool AbsoluteEncoder::isValidTargetIU(
     int32_t current_iu, int32_t target_iu) const
@@ -115,14 +151,24 @@ int32_t AbsoluteEncoder::getLowerSoftLimitIU() const
     return lower_soft_limit_iu_;
 }
 
+int32_t AbsoluteEncoder::getUpperErrorSoftLimitIU() const
+{
+    return upper_soft_limit_iu_;
+}
+
+int32_t AbsoluteEncoder::getLowerErrorSoftLimitIU() const
+{
+    return lower_soft_limit_iu_;
+}
+
 int32_t AbsoluteEncoder::getUpperHardLimitIU() const
 {
-    return upper_limit_iu_;
+    return upper_hard_limit_iu_;
 }
 
 int32_t AbsoluteEncoder::getLowerHardLimitIU() const
 {
-    return lower_limit_iu_;
+    return lower_hard_limit_iu_;
 }
 
 } // namespace march

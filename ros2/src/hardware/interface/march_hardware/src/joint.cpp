@@ -14,11 +14,13 @@
 
 namespace march {
 Joint::Joint(std::string name, int net_number,
-    std::unique_ptr<MotorController> motor_controller)
+    std::unique_ptr<MotorController> motor_controller, const march_logger::BaseLogger& logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , motor_controller_(std::move(motor_controller))
+    , logger_(logger)
 {
+    logger_.error(logger_.fstring("Joint '%s' must have a MotorController.", name_));
     if (!motor_controller_) {
         throw error::HardwareException(
             error::ErrorType::MISSING_MOTOR_CONTROLLER,
@@ -28,11 +30,13 @@ Joint::Joint(std::string name, int net_number,
 
 Joint::Joint(std::string name, int net_number,
     std::unique_ptr<MotorController> motor_controller,
-    std::unique_ptr<TemperatureGES> temperature_ges)
+    std::unique_ptr<TemperatureGES> temperature_ges,
+    const march_logger::BaseLogger& logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , motor_controller_(std::move(motor_controller))
     , temperature_ges_(std::move(temperature_ges))
+    , logger_(logger)
 {
 }
 
@@ -48,14 +52,14 @@ bool Joint::initSdo(int cycle_time)
 
 std::optional<std::chrono::duration<double>> Joint::prepareActuation()
 {
-    // ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
+    logger_.info(logger_.fstring("[%s] Preparing for actuation", this->name_.c_str()));
     auto wait_duration = motor_controller_->prepareActuation();
     return wait_duration;
 }
 
 void Joint::enableActuation()
 {
-    // ROS_INFO("[%s] Enabling for actuation", this->name_.c_str());
+    logger_.info(logger_.fstring("[%s] Enabling for actuation", this->name_.c_str()));
     motor_controller_->enableActuation();
 }
 
@@ -66,14 +70,14 @@ void Joint::actuate(float target)
 
 void Joint::readFirstEncoderValues(bool operational_check)
 {
-    // ROS_INFO("[%s] Reading first values", this->name_.c_str());
+     logger_.info(logger_.fstring("[%s] Reading first values", this->name_.c_str()));
 
     // Preconditions check
     if (operational_check) {
         auto motor_controller_state = motor_controller_->getState();
         if (!motor_controller_state->isOperational()) {
-            // ROS_FATAL("[%s]: %s", this->name_.c_str(),
-            //     motor_controller_state->getErrorStatus().value().c_str());
+            logger_.fatal(logger_.fstring("[%s]: %s", this->name_.c_str(),
+                                          motor_controller_state->getErrorStatus().value().c_str()));
             throw error::HardwareException(
                 error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
@@ -85,28 +89,18 @@ void Joint::readFirstEncoderValues(bool operational_check)
     }
     if (motor_controller_->hasAbsoluteEncoder()) {
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
-        uint32_t position_iu
-            = motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(
-                initial_absolute_position_);
 
-        if (operational_check) {
-            if (!motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsIU(
-                    position_iu)) {
-                throw error::HardwareException(
-                    error::ErrorType::OUTSIDE_HARD_LIMITS,
-                    "Joint %s is outside hard limits, value is %d, limits are "
-                    "[%d, "
-                    "%d]",
-                    name_.c_str(), position_iu,
-                    motor_controller_->getAbsoluteEncoder()
-                        ->getLowerHardLimitIU(),
-                    motor_controller_->getAbsoluteEncoder()
-                        ->getUpperHardLimitIU());
-            }
-        }
         position_ = initial_absolute_position_;
+        if (operational_check && !isInHardLimits()) {
+                throw error::HardwareException(
+                        error::ErrorType::OUTSIDE_HARD_LIMITS,
+                        "Joint %s is outside hard limits, value is %d, limits are [%d, %d]",
+                        name_.c_str(), position_,
+                        motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
+                        motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
+        }
     }
-    // ROS_INFO("[%s] Read first values", this->name_.c_str());
+    logger_.info(logger_.fstring("[%s] Read first values", this->name_.c_str()));
 }
 
 void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
@@ -202,11 +196,25 @@ std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
     if (hasTemperatureGES()) {
         return temperature_ges_;
     } else {
+        logger_.error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
         throw error::HardwareException(
             error::ErrorType::MISSING_TEMPERATURE_GES,
-            "Cannot get TemperatureGES of a Joint that does not have a "
-            "TemperatureGES");
+            "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
     }
 }
+
+bool Joint::isInSoftLimits() const{
+    return motor_controller_->getAbsoluteEncoder()->isWithinSoftLimitsRadians(position_);
+}
+
+bool Joint::isInSoftErrorLimits() const{
+
+    return motor_controller_->getAbsoluteEncoder()->isWithinErrorSoftLimitsRadians(position_);
+}
+
+bool Joint::isInHardLimits() const{
+    return motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsRadians(position_);
+}
+
 
 } // namespace march
