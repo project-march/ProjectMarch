@@ -14,11 +14,11 @@ class RosLogger : public BaseLogger {
 public:
     RosLogger(const rclcpp::Logger& rclcpp_logger);
 
-    void debug(const std::string& msg) override;
-    void info(const std::string& msg) override;
-    void warn(const std::string& msg) override;
-    void error(const std::string& msg) override;
-    void fatal(const std::string& msg) override;
+    void debug(const std::string& msg) const override;
+    void info(const std::string& msg) const override;
+    void warn(const std::string& msg) const override;
+    void error(const std::string& msg) const override;
+    void fatal(const std::string& msg) const override;
 
 private:
     const rclcpp::Logger rcl_logger_;

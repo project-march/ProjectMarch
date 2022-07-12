@@ -16,31 +16,31 @@ public:
      * \brief Log a message with severity DEBUG.
      * \param msg The msg that should be logged. (Can be constructed by calling the fstring method)
      */
-    virtual void debug(const std::string& msg) = 0;
+    virtual void debug(const std::string& msg) const = 0;
 
     /**
      * \brief Log a message with severity INFO.
      * \param msg The msg that should be logged.
      */
-    virtual void info(const std::string& msg) = 0;
+    virtual void info(const std::string& msg) const = 0;
 
     /**
      * \brief Log a message with severity WARN.
      * \param msg The msg that should be logged. (Can be constructed by calling the fstring method)
      */
-    virtual void warn(const std::string& msg) = 0;
+    virtual void warn(const std::string& msg) const = 0;
 
     /**
      * \brief Log a message with severity WARN.
      * \param msg The msg that should be logged. (Can be constructed by calling the fstring method)
      */
-    virtual void error(const std::string& msg) = 0;
+    virtual void error(const std::string& msg) const = 0;
 
     /**
      * \brief Log a message with severity FATAL.
      * \param msg The msg that should be logged. (Can be constructed by calling the fstring method)
      */
-    virtual void fatal(const std::string& msg) = 0;
+    virtual void fatal(const std::string& msg) const = 0;
 
     /**
      * \brief Generates an f string based on random length of arguments.
