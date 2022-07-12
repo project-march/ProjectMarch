@@ -10,9 +10,9 @@ from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 
 X_MIN = 0.0
-X_MAX = 1.0
-Y_MIN = -0.3
-Y_MAX = 0.3
+X_MAX = 0.7
+Y_MIN = -0.35
+Y_MAX = 0.35
 
 
 class LiveWidget:
@@ -184,7 +184,7 @@ class LiveWidget:
                 self.poses[pose].solve_mid_position(
                     self.poses["next"],
                     self.sliders[pose],
-                    self.poses[pose].get_mid_location_from_ankle_trajectory(self.poses["next"], self.sliders[pose]),
+                    self.poses[pose].get_ankle_location_from_ankle_trajectory(self.poses["next"], self.sliders[pose]),
                     "",
                 )
             else:

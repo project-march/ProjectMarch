@@ -493,9 +493,14 @@ class Pose:
 
     def reduce_hip_extension(self) -> None:
         """Reduces hip extension of one while keeping the same step size, by adding flexion to the other leg."""
-        reduction = MAX_HIP_EXTENSION - self.fe_hip1
-        self.fe_hip1 += reduction
-        self.fe_hip2 += reduction
+        if self.fe_hip1 < MAX_HIP_EXTENSION:
+            reduction = MAX_HIP_EXTENSION - self.fe_hip1
+            self.fe_hip1 += reduction
+            self.fe_hip2 += reduction
+        if self.fe_hip2 < MAX_HIP_EXTENSION:
+            reduction = MAX_HIP_EXTENSION - self.fe_hip2
+            self.fe_hip1 += reduction
+            self.fe_hip2 += reduction
 
     def perform_side_step(self, y: float, z: float):
         """Calculates the required hip adduction/abduction to step sidewards.
@@ -612,8 +617,16 @@ class Pose:
 
         return x, y
 
-    def get_mid_location_from_ankle_trajectory(self, next_pose: "Pose", frac: float):
-        """Gets the location of the ankle for a midpoint from the generated ankle_trajectory."""
+    def get_ankle_location_from_ankle_trajectory(self, next_pose: "Pose", frac: float):
+        """Gets the location of the ankle for a midpoint from the generated ankle_trajectory.
+
+        Args:
+            next_pose (Pose): the next pose to move to.
+            frac (float): the fraction of the step at which the mid position should be.
+
+        Returns:
+            pos_ankle (np.ndarray): the desired position of the ankle at the given fraction of a step.
+        """
         ankle_trajectory = np.array(self.create_ankle_trajectory(next_pose))
         index = round(np.shape(ankle_trajectory)[1] * frac)
         ankle_current = self.pos_ankle1 - self.pos_ankle2
@@ -665,6 +678,12 @@ class Pose:
         if self.fe_ankle1 > MAX_ANKLE_DORSI_FLEXION:
             self.reset_to_zero_pose()
             self.solve_end_position(pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id)
+
+        # Reduce ankle1 flexion and hip extension to meet constraints:
+        if self.fe_ankle1 < MAX_ANKLE_PLANTAR_FLEXION:
+            self.fe_ankle1 = MAX_ANKLE_PLANTAR_FLEXION
+
+        self.reduce_hip_extension()
 
         # Lift toes of swing leg as much as possible:
         self.fe_ankle2 = MAX_ANKLE_DORSI_FLEXION
@@ -866,8 +885,7 @@ class Pose:
         if self.fe_ankle2 < MAX_ANKLE_PLANTAR_FLEXION:
             self.fe_ankle2 = MAX_ANKLE_PLANTAR_FLEXION
 
-        if self.fe_hip1 < MAX_HIP_EXTENSION:
-            self.reduce_hip_extension()
+        self.reduce_hip_extension()
 
         # Apply side_step, hard_coded to default feet distance for now:
         self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
