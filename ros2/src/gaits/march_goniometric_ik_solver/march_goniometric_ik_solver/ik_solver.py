@@ -44,6 +44,7 @@ MAX_HIP_EXTENSION = max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_h
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
+DEFAULT_FOOT_DISTANCE = 0.55  # m
 
 ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
@@ -103,12 +104,6 @@ class Pose:
     def reset_to_zero_pose(self) -> None:
         """Reset the post to the default zero pose."""
         self.__init__(self.all_joint_names)
-
-    def swap_sides(self) -> None:
-        self.fe_ankle1, self.fe_ankle2 = self.fe_ankle2, self.fe_ankle1
-        self.aa_hip1, self.aa_hip2 = self.aa_hip2, self.aa_hip1
-        self.fe_hip1, self.fe_hip2 = self.fe_hip2, self.fe_hip1
-        self.fe_knee1, self.fe_knee2 = self.fe_knee2, self.fe_knee1
 
     @property
     def pose_right(self) -> List[float]:
@@ -582,8 +577,16 @@ class Pose:
             self.aa_hip2 = hip_aa_short
 
     def create_ankle_trajectory(self, next_pose: "Pose"):
-        """
-        Create a ankle trajectory from current pose (self) to given next_pose.
+        """Create a ankle trajectory from current pose (self) to given next_pose.
+
+        Used to debug the midpoint_solver with the live_widget tool.
+
+        Args:
+            next_pose (Pose): the next pose we want to move to.
+
+        Returns:
+            x (np.ndarray): the x values of the ankle trajectory.
+            y (np.ndarray): the y values of the ankle trajectory.
         """
         # Get ankle positions via the static toes:
         ankle_start = self.pos_ankle1
@@ -609,10 +612,18 @@ class Pose:
 
         return x, y
 
+    def get_mid_location_from_ankle_trajectory(self, next_pose: "Pose", frac: float):
+        """Gets the location of the ankle for a midpoint from the generated ankle_trajectory."""
+        ankle_trajectory = np.array(self.create_ankle_trajectory(next_pose))
+        index = round(np.shape(ankle_trajectory)[1] * frac)
+        ankle_current = self.pos_ankle1 - self.pos_ankle2
+        return ankle_current + ankle_trajectory[:, index]
+
     def solve_mid_position(
         self,
         next_pose: "Pose",
         frac: float,
+        pos_ankle: np.ndarray,
         subgait_id: str,
     ) -> List[float]:
         """Solves inverse kinematics for the middle position.
@@ -622,11 +633,9 @@ class Pose:
         Next it resets to zero pose and calculates the required angles for the swing leg to reach the calculated midpoint.
 
         Args:
-            ankle_x (float): the forward distance for the end position.
-            ankle_y (float): the upward distance for the end position.
-            ankle_z (float): the sideward distance for the end position.
-            midpoint_fraction (float): the fraction of the step at which the mid position should be.
-            midpoint_height (float): the height the mid position should be relative to the end position.
+            next_pose (Pose): the next pose to move to.
+            frac (float): the fraction of the step at which the mid position should be.
+            pos_ankle (np.ndarray) the desired position of the ankle for the mid position.
             subgait_id (str): either 'left_swing' or 'right_swing', defines which leg is the swing leg.
 
         Returns:
@@ -637,41 +646,25 @@ class Pose:
 
         # Translate current hip and ankle location to new reference frame:
         hip_current = self.pos_hip - self.pos_ankle2
-        ankle_current = self.pos_ankle1 - self.pos_ankle2
-
-        # # Get swing distance in current pose and calculate ankle2 midpoint location:
-        # swing_distance = np.linalg.norm(self.pos_ankle1 - self.pos_ankle2)
-        # midpoint_x = midpoint_fraction * (swing_distance + ankle_x) - swing_distance
-        # midpoint_y = ankle_y + midpoint_height
-        # pos_ankle2 = np.array([midpoint_x, midpoint_y])
-
-        # Create ankle_trajectory and get ankle_mid location of given frac:
-        ankle_trajectory = np.array(self.create_ankle_trajectory(next_pose))
-        index = round(np.shape(ankle_trajectory)[1] * frac)
-        ankle_mid = ankle_current + ankle_trajectory[:, index]
 
         # Define hip_mid_x as the given fraction between current hip location and the hip location in next pose:
         hip_mid_x = (1 - frac) * hip_current[0] + frac * next_pose.pos_hip[0]
 
         # Define hip_mid_y as the minimum of the heights both legs can reach:
-        max_height_swing_leg = ankle_mid[1] + np.sqrt(self.max_leg_length ** 2 - (ankle_mid[0] - hip_mid_x) ** 2)
+        max_height_swing_leg = pos_ankle[1] + np.sqrt(self.max_leg_length ** 2 - (pos_ankle[0] - hip_mid_x) ** 2)
         max_height_stance_leg = np.sqrt(self.max_leg_length ** 2 - (hip_mid_x) ** 2)
         hip_mid_y = min(max_height_swing_leg, max_height_stance_leg)
-
         hip_mid = np.array([hip_mid_x, hip_mid_y])
-
-        # # fe_hip2 = angle_hip +- hip angle between ankle2 and knee1:
-        # hip_angle_ankle2_knee1 = qas.get_angle_between_points([pos_ankle2, self.pos_hip, self.pos_knee1])
-        # self.fe_hip2 = angle_hip + np.sign(midpoint_x) * hip_angle_ankle2_knee1
 
         # Solve the mid pose with the define hip and ankle positions:
         self.reset_to_zero_pose()
         self.solve_leg(hip_mid, self.pos_ankle1, "rear")
-        self.solve_leg(hip_mid, ankle_mid, "front")
+        self.solve_leg(hip_mid, pos_ankle, "front")
 
+        # If the dorsi flexion limition is exceeded, the end position is used:
         if self.fe_ankle1 > MAX_ANKLE_DORSI_FLEXION:
             self.reset_to_zero_pose()
-            self.solve_end_position(ankle_mid[0], ankle_mid[1], 0.55, subgait_id)
+            self.solve_end_position(pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id)
 
         # Lift toes of swing leg as much as possible:
         self.fe_ankle2 = MAX_ANKLE_DORSI_FLEXION

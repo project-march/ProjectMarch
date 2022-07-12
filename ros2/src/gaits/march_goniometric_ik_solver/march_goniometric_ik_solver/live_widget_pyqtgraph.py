@@ -153,6 +153,7 @@ class LiveWidget:
         self.update_tables()
 
     def update_midpoint(self, value):
+        """Update the fraction of the step at which we want to show a midpoint."""
         self.sliders["mid"] = value / 100
         self.update_trajectory()
         self.update_pose("mid")
@@ -176,12 +177,14 @@ class LiveWidget:
         self.update_tables()
 
     def update_pose(self, pose):
+        """Update the given pose."""
         try:
             if pose == "mid":
                 self.poses[pose] = copy.deepcopy(self.poses["last"])
                 self.poses[pose].solve_mid_position(
                     self.poses["next"],
                     self.sliders[pose],
+                    self.poses[pose].get_mid_location_from_ankle_trajectory(self.poses["next"], self.sliders[pose]),
                     "",
                 )
             else:
@@ -213,6 +216,7 @@ class LiveWidget:
             self.update_pose(pose)
 
     def update_trajectory(self):
+        """Update the ankle trajectory line that is plotted."""
         x, y = self.poses["last"].create_ankle_trajectory(self.poses["next"])
 
         # shift positions to let trajectory start in ankle:
