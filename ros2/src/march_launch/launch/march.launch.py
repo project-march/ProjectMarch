@@ -136,16 +136,16 @@ def generate_launch_description() -> LaunchDescription:
             description="Whether to use simulation time as published on the "
             "/clock topic by gazebo instead of system time.",
         ),
-        DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
+        DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="effort_control/march6_control.yaml",
+            default_value="effort_control/march7_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
                         "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
         DeclareLaunchArgument(
             name="gazebo_control_yaml",
-            default_value="gazebo/march6_control.yaml",
+            default_value="gazebo/march7_control.yaml",
             description="The gazebo controller yaml file to use this is added in through the urdf published "
                         "on /robot_description. Must be in: `march_control/config/`.",
         ),

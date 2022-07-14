@@ -2,22 +2,20 @@
 
 from typing import Optional
 
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import CameraPointsHandler
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_shared_msgs.msg import FootPosition
 
 
-class SimulatedPointsHandler(CameraPointsHandler):
+class SimulatedPointHandler(PointHandler):
     """Class to handle communication between gaits and simulated foot locations."""
 
-    def __init__(self, gait):
-        self._gait = gait
-        self._logger = gait.node.get_logger().get_child(__class__.__name__)
-        super().__init__(gait)
+    def __init__(self, node):
+        super().__init__(node)
 
     def _create_subscribers(self) -> None:
         """Create subscribers to listen to simulated points."""
-        self._gait.node.create_subscription(
+        self._node.create_subscription(
             FootPosition,
             "/march/fixed_foot_position",
             self._update_foot_location,

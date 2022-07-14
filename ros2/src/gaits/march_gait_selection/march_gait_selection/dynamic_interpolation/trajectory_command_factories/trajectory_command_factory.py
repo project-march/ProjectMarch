@@ -6,7 +6,7 @@ from typing import Optional, Dict
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_shared_msgs.msg import FootPosition
-from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError, GaitError
 from march_utility.utilities.duration import Duration
 
 DURATION_INCREASE_FACTOR = 1.5
@@ -18,7 +18,7 @@ class TrajectoryCommandFactory:
 
     Args:
         gait: The gait class
-        points_handler: The points handler class
+        point_handler: The points handler class
 
     Attributes:
         subgait_id (str): either 'left_swing' or 'right_swing'
@@ -27,7 +27,7 @@ class TrajectoryCommandFactory:
         dynamic_step (DynamicStep): instance of the DynamicStep class, used to get trajectory msg
 
         _gait: the gait class
-        _points_handler: the points handler class
+        _point_handler: the points handler class
         _logger (Logger): used to log with the class name as a prefix
         _trajectory_failed (bool): true if no feasible trajectory can be found
     """
@@ -36,9 +36,9 @@ class TrajectoryCommandFactory:
     foot_location: FootPosition
     start_position_all_joints: Dict[str, float]
 
-    def __init__(self, gait, points_handler):
+    def __init__(self, gait, point_handler):
         self._gait = gait
-        self._points_handler = points_handler
+        self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
@@ -64,14 +64,14 @@ class TrajectoryCommandFactory:
             self._logger.info("Stopping dynamic gait.")
         else:
             try:
-                self.foot_location = self._points_handler.get_foot_location(self.subgait_id)
-                stop = self._points_handler.is_foot_location_too_old(self.foot_location)
+                self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
+                stop = self._point_handler.is_foot_location_too_old(self.foot_location)
             except AttributeError:
                 self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
                 self._gait._end = True
                 return None
             if not stop:
-                self._points_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
                 self._logger.info(
                     f"Stepping to location ({self.foot_location.processed_point.x}, "
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
@@ -134,7 +134,8 @@ class TrajectoryCommandFactory:
             try:
                 return self._get_stop_gait()
             except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-                self._logger.warn(f"Can not get stop gait. {e.msg}")
+                msg = f"Can not get stop gait. {e}"
+                raise GaitError(msg)
 
         # If close gait is not feasible, stop gait completely
         self._gait._end = True
@@ -176,9 +177,8 @@ class TrajectoryCommandFactory:
             )
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self._logger.warn(
-                    f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
-                )
+                msg = f"Can not get trajectory after {iteration + 1} iterations. {e} Gait will not be executed."
+                raise GaitError(msg)
             return None
 
     def _can_get_second_step(self, is_final_iteration: bool) -> bool:
@@ -203,7 +203,8 @@ class TrajectoryCommandFactory:
             subgait.get_joint_trajectory_msg(self._gait.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self._logger.warn(f"Second step is not feasible. {e.msg}")
+                msg = f"Second step is not feasible. {e}"
+                raise GaitError(msg)
             return False
         return True
 

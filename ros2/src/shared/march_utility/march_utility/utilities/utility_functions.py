@@ -18,7 +18,7 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march6.urdf"
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march7.urdf"
 MODE_READING = "r"
 
 
@@ -128,7 +128,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
                 get_package_share_directory("march_description"),
                 "urdf",
                 "properties",
-                "march6.yaml",
+                "march7.yaml",
             ),
             MODE_READING,
         ) as yaml_file:
@@ -253,7 +253,7 @@ def get_position_from_yaml(position: str):
             os.path.join(
                 get_package_share_directory("march_gait_files"),
                 "airgait_vi",
-                "default_positions.yaml",
+                "default.yaml",
             ),
             MODE_READING,
         ) as yaml_file:

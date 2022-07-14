@@ -10,10 +10,10 @@ from march_shared_msgs.msg import FootPosition
 class TrajectoryCommandFactoryClose(TrajectoryCommandFactory):
     """TrajectoryCommandFactory class but with a hard coded foot location for the close gait."""
 
-    def __init__(self, gait, points_handler):
-        super().__init__(gait, points_handler)
+    def __init__(self, gait, point_handler):
+        super().__init__(gait, point_handler)
         self._gait = gait
-        self._points_handler = points_handler
+        self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
         # TODO: remove hardcoded foot location after bug in stop gait is fixed.

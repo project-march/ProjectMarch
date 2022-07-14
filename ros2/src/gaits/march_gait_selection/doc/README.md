@@ -51,7 +51,7 @@ TrajectoryCommand is sent to the state machine. At the point in time that the ga
 ## TrajectoryCommandHandler
 
 `DynamicSetpointGait` uses the `TrajectoryCommandHandler` class to generate TrajectoryCommands. This class uses the
-`CameraPointsHandler` to get a foot position to step towards. Next, it tries to construct a trajectory with
+`CameraPointHandler` to get a foot position to step towards. Next, it tries to construct a trajectory with
 `DynamicSubgait`. There are several safety checks to ensure that unsafe gaits are not executed. 
 1. If the trajectory can not be constructed within the position and velocity limits of the joints, it
 will iterate with increasing duration to try and create a feasible trajectory.
@@ -61,9 +61,9 @@ same point as the current step.
 If one of these checks are not met, the TrajectoryCommandHandler will try to close the gait, such that the exoskeleton
 ends in a comfortable position for the pilot. If the close gait is also not possible, the exoskeleton will do nothing.
 
-## CameraPointsHandler
+## CameraPointHandler
 
-`CameraPointsHandler` handles all communication with the `GaitPreprocessor`. It gets a foot position to step towards
+`CameraPointHandler` handles all communication with the `GaitPreprocessor`. It gets a foot position to step towards
 from the GaitPreprocessor. It checks the time at which the foot position was sent to ensure that positions that are 
 too old are not used.
 

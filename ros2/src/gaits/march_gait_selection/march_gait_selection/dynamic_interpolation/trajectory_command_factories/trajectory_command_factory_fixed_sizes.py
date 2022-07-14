@@ -20,8 +20,8 @@ PREDETERMINED_FOOT_LOCATIONS = {
 class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactoryQueue):
     """TrajectoryCommandFactory class with the ability to use predetermined step sizes and change the start side."""
 
-    def __init__(self, gait, points_handler):
-        super().__init__(gait, points_handler)
+    def __init__(self, gait, point_handler):
+        super().__init__(gait, point_handler)
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
         self._gait.node.create_subscription(
@@ -50,7 +50,7 @@ class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactoryQueue):
             else:
                 raise WrongStartPositionError(self._gait.home_stand_position_all_joints, self.start_position_all_joints)
         except WrongStartPositionError as e:
-            self._logger.warn(f"Can only change start side in home stand position. {e.msg}")
+            self._logger.warn(f"Can only change start side in home stand position. {e}")
 
     def _predetermined_foot_location_callback(self, msg: String) -> None:
         self._gait.use_predetermined_foot_location = True

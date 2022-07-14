@@ -10,11 +10,9 @@
 namespace march {
 class IncrementalEncoder : public Encoder {
 public:
-    IncrementalEncoder(size_t resolution,
-        MotorControllerType motor_controller_type, Direction direction,
+    IncrementalEncoder(size_t counts_per_rotation, MotorControllerType motor_controller_type, Direction direction,
         double transmission);
-    IncrementalEncoder(size_t resolution,
-        MotorControllerType motor_controller_type, double transmission);
+    IncrementalEncoder(size_t counts_per_rotation, MotorControllerType motor_controller_type, double transmission);
 
     ~IncrementalEncoder() noexcept override = default;
 

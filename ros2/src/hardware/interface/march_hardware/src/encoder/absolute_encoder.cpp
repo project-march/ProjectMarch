@@ -4,12 +4,12 @@
 #include "march_hardware/motor_controller/motor_controller_type.h"
 
 namespace march {
-    AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+    AbsoluteEncoder::AbsoluteEncoder(size_t counts_per_rotation,
                                      MotorControllerType motor_controller_type, Direction direction,
                                      int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
                                      double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
                                      double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff)
-            : Encoder(resolution, motor_controller_type, direction),
+            : Encoder(counts_per_rotation, motor_controller_type, direction),
               zero_position_iu_(zero_position_iu),
               lower_hard_limit_iu_(lower_limit_iu), upper_hard_limit_iu_(upper_limit_iu) {
 
@@ -24,12 +24,12 @@ namespace march {
 
 }
 
-    AbsoluteEncoder::AbsoluteEncoder(size_t resolution,
+    AbsoluteEncoder::AbsoluteEncoder(size_t counts_per_rotation,
                                      MotorControllerType motor_controller_type,
                                      int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
                                      double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
                                      double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff)
-            : AbsoluteEncoder(resolution, motor_controller_type, Direction::Positive,
+            : AbsoluteEncoder(counts_per_rotation, motor_controller_type, Direction::Positive,
                               lower_limit_iu, upper_limit_iu, zero_position_iu,
                               lower_error_soft_limit_rad_diff,
                               upper_error_soft_limit_rad_diff, lower_soft_limit_rad_diff, upper_soft_limit_rad_diff) {

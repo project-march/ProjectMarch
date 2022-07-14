@@ -2,7 +2,9 @@
 
 from typing import Optional
 from rclpy.time import Time
+from rclpy.node import Node
 
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step_and_close import DynamicGaitStepAndClose
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.exceptions.gait_exceptions import (
@@ -26,14 +28,14 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
         use_predetermined_foot_location (bool): whether one of the five predetermined locations will be used
     """
 
-    def __init__(self, node):
-        super().__init__(node)
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
         self.node = node
         self.start_from_left_side = False
         self.use_predetermined_foot_location = False
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactorySteppingStones(self, self._points_handler)
-        self.gait_name = "stepping_stones_step_and_close"
+        self.trajectory_command_factory = TrajectoryCommandFactorySteppingStones(self, self._point_handler)
+        self.gait_name = name
 
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
@@ -53,7 +55,7 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e.msg)
+            self._logger.error(e)
             return None
 
         if self.start_from_left_side:

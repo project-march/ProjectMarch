@@ -18,11 +18,9 @@
 
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
-    = { "resolution", "minPositionIU", "maxPositionIU", "marginLowerSoftLimit", "marginUpperSoftLimit",
+    = { "minPositionIU", "maxPositionIU", "marginLowerSoftLimit", "marginUpperSoftLimit",
         "marginLowerSoftError", "marginLUpperSoftError"};
-const std::vector<std::string>
-    HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS
-    = { "resolution", "transmission" };
+const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "transmission" };
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
     = { "incrementalEncoder", "absoluteEncoder" };
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS
@@ -234,7 +232,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config,
         HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
 
-    const auto resolution = absolute_encoder_config["resolution"].as<size_t>();
+    const auto counts_per_rotation = validate_and_get_counts_per_rotation(absolute_encoder_config);
     const auto min_position = absolute_encoder_config["minPositionIU"].as<int32_t>();
     const auto max_position = absolute_encoder_config["maxPositionIU"].as<int32_t>();
     const auto zero_position = absolute_encoder_config["zeroPositionIU"].as<int32_t>();
@@ -244,7 +242,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const auto upper_error_soft_limit_margin = absolute_encoder_config["upperErrorSoftLimitMarginRad"].as<double>();
 
     return std::make_unique<march::AbsoluteEncoder>(
-            /*resolution=*/resolution,
+            /*counts_per_rotation=*/counts_per_rotation,
             /*motor_controller_type=*/motor_controller_type,
             /*direction=*/getEncoderDirection(absolute_encoder_config),
             /*lower_limit_iu=*/min_position,
@@ -269,10 +267,10 @@ HardwareBuilder::createIncrementalEncoder(
         HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS,
         "incrementalEncoder");
 
-    const auto resolution= incremental_encoder_config["resolution"].as<size_t>();
+    const auto counts_per_rotation = validate_and_get_counts_per_rotation(incremental_encoder_config);
     const auto transmission= incremental_encoder_config["transmission"].as<double>();
     return std::make_unique<march::IncrementalEncoder>(
-            /*resolution=*/resolution,
+            /*counts_per_rotation=*/counts_per_rotation,
             /*motor_controller_type=*/motor_controller_type,
             /*direction=*/getEncoderDirection(incremental_encoder_config),
             /*transmission=*/transmission);
@@ -369,6 +367,18 @@ void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config,
         }
     }
 }
+
+size_t HardwareBuilder::validate_and_get_counts_per_rotation(const YAML::Node &config) {
+    if (config["countsPerRotation"]) {
+        return config["countsPerRotation"].as<size_t>();
+    } else if (config["resolution"]) {
+        return (size_t)1 << config["resolution"].as<size_t>();
+    } else {
+        // If neither is set, throw a special exception complaining about both of them.
+        throw MissingKeyException("resolution' or 'countsPerRotation", "incrementalEncoder");
+    }
+}
+
 
 //std::string convertSWFileToString(std::ifstream& sw_file)
 //{

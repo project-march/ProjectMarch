@@ -85,6 +85,14 @@ public:
                                           const std::vector<std::string>& key_list,
                                           const std::string& object_name);
 
+    /**
+    * @brief Loops over all keys in the keyList and check if they exist in the
+    * config.
+    *
+    * @throws MissingKeyException when required keys are missing.
+    */
+    static size_t validate_and_get_counts_per_rotation(const YAML::Node& config);
+
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;

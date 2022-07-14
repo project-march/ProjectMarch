@@ -98,10 +98,10 @@ def generate_launch_description() -> launch.LaunchDescription:
             "/clock topic by gazebo instead of system time.",
             choices=["true", "false"],
         ),
-        DeclareLaunchArgument(name="robot", default_value="march6", description="Robot to use."),
+        DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="rviz/march6_control.yaml",
+            default_value="rviz/march7_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
                         "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
@@ -136,7 +136,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="robot_description",
-            default_value="march6_ros2",
+            default_value="march7_ros2",
             description="Which <robot_description>.xacro file to use. "
             "This file must be available in the `march_desrciption/urdf/` folder.",
         ),

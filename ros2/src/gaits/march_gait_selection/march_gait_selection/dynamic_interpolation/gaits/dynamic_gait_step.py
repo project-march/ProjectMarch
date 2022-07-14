@@ -6,6 +6,7 @@ from rclpy.time import Time
 from typing import Optional
 from sensor_msgs.msg import JointState
 
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
@@ -16,8 +17,6 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-
-from march_shared_msgs.msg import GaitInstruction
 
 
 class DynamicGaitStep(DynamicGaitWalk):
@@ -30,12 +29,12 @@ class DynamicGaitStep(DynamicGaitWalk):
     _current_time: Optional[Time]
     _use_position_queue: bool
 
-    def __init__(self, node: Node):
-        super().__init__(node)
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, points_handler=self._points_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, point_handler=self._point_handler)
         self.subgait_id = "right_swing"
-        self.gait_name = "dynamic_step"
+        self.gait_name = name
 
         self.node.create_subscription(
             JointState,
@@ -118,15 +117,10 @@ class DynamicGaitStep(DynamicGaitWalk):
 
         return GaitUpdate.finished()
 
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown.
-
-        Args:
-            msg (GaitInstruction): the GaitInstruction message that may contain a force unknown
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self._set_start_position_to_home_stand()
-            self.subgait_id = "right_swing"
-            self.trajectory_command_factory.set_trajectory_failed_false()
-            self.position_queue = Queue()
-            self.trajectory_command_factory.fill_queue()
+    def set_state_to_unknown(self) -> None:
+        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown."""
+        self._set_start_position_to_home_stand()
+        self.subgait_id = "right_swing"
+        self.trajectory_command_factory.set_trajectory_failed_false()
+        self.position_queue = Queue()
+        self.trajectory_command_factory.fill_queue()

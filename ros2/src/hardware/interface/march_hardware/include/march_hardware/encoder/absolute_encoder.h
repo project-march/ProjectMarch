@@ -14,12 +14,12 @@ public:
     /**
      * Construct AbsoluteEncoder with both hard and soft limits.
      */
-    AbsoluteEncoder(size_t resolution,
+    AbsoluteEncoder(size_t counts_per_rotation,
         MotorControllerType motor_controller_type, Direction direction,
         int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
         double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
         double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff);
-    AbsoluteEncoder(size_t resolution,
+    AbsoluteEncoder(size_t counts_per_rotation,
         MotorControllerType motor_controller_type,
         int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
         double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,

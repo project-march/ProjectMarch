@@ -1,7 +1,9 @@
 """Author: Marten Haitjema, MVII."""
 
 from typing import Optional
+from rclpy.node import Node
 
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
@@ -19,14 +21,14 @@ class DynamicGaitStepAndClose(DynamicGaitWalk):
         node (Node): the gait selection node
     """
 
-    def __init__(self, node):
-        super().__init__(node)
+    def __init__(self, name: str, node: Node, point_handler: PointHandler):
+        super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryStepAndClose(
             gait=self,
-            points_handler=self._points_handler,
+            point_handler=self._point_handler,
         )
-        self.gait_name = "dynamic_step_and_close"
+        self.gait_name = name
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Create the next command. Because it is a single step, this will always be a left_swing and a close gait.

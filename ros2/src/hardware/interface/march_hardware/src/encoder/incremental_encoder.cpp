@@ -4,19 +4,19 @@
 #include "march_hardware/motor_controller/motor_controller_type.h"
 
 namespace march {
-IncrementalEncoder::IncrementalEncoder(size_t resolution,
+IncrementalEncoder::IncrementalEncoder(size_t counts_per_rotation,
     MotorControllerType motor_controller_type, Direction direction,
     double transmission)
-    : Encoder(resolution, motor_controller_type, direction)
+    : Encoder(counts_per_rotation, motor_controller_type, direction)
     , transmission_(transmission)
 {
     radians_per_iu_ = calculateRadiansPerIU();
 }
 
-IncrementalEncoder::IncrementalEncoder(size_t resolution,
+IncrementalEncoder::IncrementalEncoder(size_t counts_per_rotation,
     MotorControllerType motor_controller_type, double transmission)
     : IncrementalEncoder(
-        resolution, motor_controller_type, Direction::Positive, transmission)
+        counts_per_rotation, motor_controller_type, Direction::Positive, transmission)
 {
 }
 

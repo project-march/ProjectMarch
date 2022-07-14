@@ -19,8 +19,8 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
 
     _end: bool
 
-    def __init__(self, gait, points_handler):
-        super().__init__(gait, points_handler)
+    def __init__(self, gait, point_handler):
+        super().__init__(gait, point_handler)
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
     def get_trajectory_command(
@@ -55,8 +55,8 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
                     return None
                 else:
                     try:
-                        self.foot_location = self._points_handler.get_foot_location(self.subgait_id)
-                        if self._points_handler.is_foot_location_too_old(self.foot_location):
+                        self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
+                        if self._point_handler.is_foot_location_too_old(self.foot_location):
                             return None
                     except AttributeError:
                         self._logger.info("No FootLocation found. Connect the camera or use simulated points.")
@@ -64,7 +64,7 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
                         return None
 
             if not stop:
-                self._points_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+                self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
                 self._logger.info(
                     f"Stepping to location ({self.foot_location.processed_point.x}, "
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
