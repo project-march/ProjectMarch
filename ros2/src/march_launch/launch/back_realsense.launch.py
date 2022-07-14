@@ -7,7 +7,7 @@ from launch.substitutions import LaunchConfiguration
 
 
 configurable_parameters = [{'name': 'camera_name',                  'default': 'camera_back', 'description': 'camera unique name'},
-                           {'name': 'serial_no',                    'default': "_109122070820", 'description': 'choose device by serial number'},
+                           {'name': 'serial_no',                    'default': "_033322070612", 'description': 'choose device by serial number'},
                            {'name': 'usb_port_id',                  'default': "''", 'description': 'choose device by usb port id'},
                            {'name': 'device_type',                  'default': "''", 'description': 'choose device by type'},
                            {'name': 'config_file',                  'default': "''", 'description': 'yaml config file'},
@@ -80,7 +80,6 @@ def set_configurable_parameters(parameters):
     return dict([(param['name'], LaunchConfiguration(param['name'])) for param in parameters])
 
 def generate_launch_description():
-    log_level = 'info'
     return LaunchDescription(declare_configurable_parameters(configurable_parameters) + [
         # Realsense
         launch_ros.actions.Node(
@@ -89,7 +88,7 @@ def generate_launch_description():
             name=LaunchConfiguration("camera_name"),
             executable='realsense2_camera_node',
             parameters=[set_configurable_parameters(configurable_parameters)],
-            output='screen',
+            output='log',
             arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
             emulate_tty=True,
             ),
@@ -115,6 +114,7 @@ def generate_launch_description():
                 {"publish_tf": LaunchConfiguration("publish_tf")},
                 {"world_frame": LaunchConfiguration("world_frame")},
             ],
+            arguments=['--ros-args', '--log-level', 'ERROR'],
             remappings=[
                 ("imu/data_raw", "imu"),
             ],
