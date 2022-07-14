@@ -126,8 +126,8 @@ class GaitPreprocessor(Node):
         temp_y = foot_location.displacement.y
         point = Point()
 
-        point.x = -foot_position.displacement.x + X_OFFSET
-        point.y = foot_position.displacement.z + Y_OFFSET
+        point.x = -foot_location.displacement.x + X_OFFSET
+        point.y = foot_location.displacement.z + Y_OFFSET
         point.z = 0.51
         # point.z = temp_y + np.sign(temp_y) * Z_OFFSET
 

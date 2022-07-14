@@ -52,7 +52,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
-    realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 
@@ -128,18 +127,18 @@ def generate_launch_description() -> launch.LaunchDescription:
                 "This file must be available in the march_desrciption/urdf/ folder",
             ),
             DeclareLaunchArgument(
-                name="realsense",
-                default_value="False",
-                description="Whether any realsense camera will be used",
-            ),
-            DeclareLaunchArgument(
                 name="realsense_simulation",
-                default_value=realsense,
+                default_value="False",
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
+                name="use_imu_data",
+                default_value="False",
+                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
+            ),
+            DeclareLaunchArgument(
                 name="ground_gait",
-                default_value=realsense,
+                default_value=use_imu_data,
                 description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
@@ -148,11 +147,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting in rviz.",
-            ),
-            DeclareLaunchArgument(
-                name="use_imu_data",
-                default_value=realsense,
-                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(name="imu_to_use", default_value="back", description="Which imu to use"),
             DeclareLaunchArgument(
@@ -316,7 +310,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("imu_to_use", imu_to_use),
                     ("robot_description", robot_description),
                     ("ground_gait", ground_gait),
-                    ("realsense", realsense),
                     ("realsense_simulation", realsense_simulation),
                     ("to_world_transform", to_world_transform),
                     ("gait_package", gait_package),

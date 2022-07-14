@@ -17,6 +17,14 @@ public:
         tf_broadcaster_
             = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
+        this->declare_parameter("use_imu_data");
+        bool use_imu_data = this->get_parameter("use_imu_data").as_bool();
+        if (use_imu_data) {
+            base_frame_ = "base_link";
+        } else {
+            base_frame_ = "world";
+        }
+
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(20), [this]() -> void {
                 publishAlignedFrames();
@@ -37,6 +45,7 @@ private:
     rclcpp::Time last_published_left_;
     rclcpp::Time last_published_right_;
     bool start_time_initialized = false;
+    std::string base_frame_;
 
     void publishAlignedFrames()
     {
@@ -45,9 +54,9 @@ private:
 
         try {
             trans_left_ = tf_buffer_->lookupTransform(
-                "foot_left", "world", tf2::TimePointZero);
+                "foot_left", base_frame_, tf2::TimePointZero);
             trans_right_ = tf_buffer_->lookupTransform(
-                "foot_right", "world", tf2::TimePointZero);
+                "foot_right", base_frame_, tf2::TimePointZero);
 
             if (!start_time_initialized) {
                 last_published_left_ = trans_left_.header.stamp;

@@ -61,7 +61,6 @@ def generate_launch_description() -> LaunchDescription:
     use_hud = LaunchConfiguration("use_hud")
 
     # RealSense/simulation arguments
-    realsense = LaunchConfiguration("realsense")
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
@@ -130,11 +129,6 @@ def generate_launch_description() -> LaunchDescription:
             ),
             # COMPUTER VISION ARGUMENTS
             DeclareLaunchArgument(
-                name="realsense",
-                default_value="True",
-                description="Whether to start up everything for working with the realsense",
-            ),
-            DeclareLaunchArgument(
                 name="realsense_simulation",
                 default_value="False",
                 description="Whether the simulation camera or the physical camera should be used",
@@ -146,7 +140,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
-                default_value=realsense,
+                default_value="False",
                 description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
@@ -461,7 +455,10 @@ def generate_launch_description() -> LaunchDescription:
                         "launch",
                         "march_aligned_frame_publisher.launch.py",
                     )
-                )
+                ),
+                launch_arguments=[
+                    ("use_imu_data", use_imu_data),
+                ],
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
