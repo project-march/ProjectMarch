@@ -20,7 +20,7 @@ public:
         this->declare_parameter("use_imu_data");
         bool use_imu_data = this->get_parameter("use_imu_data").as_bool();
         if (use_imu_data) {
-            base_frame_ = "base_link";
+            base_frame_ = "world";
         } else {
             base_frame_ = "world";
         }
