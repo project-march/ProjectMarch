@@ -7,7 +7,7 @@ from launch.substitutions import LaunchConfiguration
 
 
 configurable_parameters = [{'name': 'camera_name',                  'default': 'camera_back', 'description': 'camera unique name'},
-                           {'name': 'serial_no',                    'default': "_033322070612", 'description': 'choose device by serial number'},
+                           {'name': 'serial_no',                    'default': "_109122070820", 'description': 'choose device by serial number'},
                            {'name': 'usb_port_id',                  'default': "''", 'description': 'choose device by usb port id'},
                            {'name': 'device_type',                  'default': "''", 'description': 'choose device by type'},
                            {'name': 'config_file',                  'default': "''", 'description': 'yaml config file'},

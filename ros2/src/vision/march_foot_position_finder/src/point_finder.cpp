@@ -122,7 +122,7 @@ void PointFinder::initializeValues()
     }
 
     flipping_displacements_.push_back(0);
-    for (int i = 1; i < actual_rect_height_ / 2.0; i++) {
+    for (int i = 1; i < actual_rect_height_ / 3.0; i++) {
         flipping_displacements_.push_back(i);
         flipping_displacements_.push_back(-i);
     }
@@ -245,6 +245,10 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
                 }
             }
 
+            if (position_queue->size() > 0 && (position_queue->back()).z < 0.05) {
+                return;
+            }
+
             // if (position_queue->size() > 0) {
             //     return;
             // }
@@ -261,6 +265,19 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 void PointFinder::computeFootPlateDisplacement(
     int x, int y, double height, std::vector<Point>* position_queue)
 {
+
+    if (std::abs(height) < 0.05) {
+        
+        double x_final = xIndexToCoordinate(x);
+        double y_final = yIndexToCoordinate(y);
+
+        if (!std::isnan(x_final) && !std::isnan(y_final) && std::abs(x_final) < 1.0 && std::abs(y_final) < 1.0 && std::abs(height) < 0.5) {
+            Point p = Point((float)x_final, (float)y_final, (float)height);
+            position_queue->push_back(p);
+            return;
+        }
+    }
+
     // Make the minimum height map value equal to the found point z-value
     for (int row = 0; row < RES; row++) {
         for (int col = 0; col < RES; col++) {

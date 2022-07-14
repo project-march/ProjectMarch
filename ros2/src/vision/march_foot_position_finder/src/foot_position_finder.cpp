@@ -317,6 +317,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     std::vector<Point> position_queue;
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
+    std::cout << position_queue.size() << std::endl;
+
     // Visualization
     publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
         point_finder_->getDisplacements(), left_or_right_); // Cyan
@@ -372,7 +374,7 @@ Point FootPositionFinder::retrieveOptimalPoint(std::vector<Point>* position_queu
     double optimal_distance_height_tradeoff = 0;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
-        double new_tradeoff = std::abs(p->x) - 2 * std::abs(p->z);
+        double new_tradeoff = std::abs(p->x) - 2.5 * std::abs(p->z);
         if (new_tradeoff > optimal_distance_height_tradeoff) {
             optimal_point = (*p);
             optimal_distance_height_tradeoff = new_tradeoff;

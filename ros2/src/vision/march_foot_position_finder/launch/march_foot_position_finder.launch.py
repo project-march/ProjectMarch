@@ -61,23 +61,23 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="num_track_points",
-                default_value="45",
+                default_value="5",
             ),
             DeclareLaunchArgument(
                 name="displacements_outside",
-                default_value="0.04",
+                default_value="0.0",
             ),
             DeclareLaunchArgument(
                 name="displacements_inside",
-                default_value="0.04",
+                default_value="0.0",
             ),
             DeclareLaunchArgument(
                 name="displacements_near",
-                default_value="0.15",
+                default_value="0.20",
             ),
             DeclareLaunchArgument(
                 name="displacements_far",
-                default_value="0.05",
+                default_value="0.0",
             ),
             DeclareLaunchArgument(
                 "realsense_simulation",
