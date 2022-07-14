@@ -3,6 +3,7 @@
 from typing import Optional, Dict, Union
 from rclpy.time import Time
 from copy import copy
+from rclpy.node import Node
 
 from march_utility.gait.edge_position import EdgePosition, StaticEdgePosition
 from march_utility.utilities.duration import Duration
@@ -35,10 +36,9 @@ class DynamicGaitWalk(GaitInterface):
     """Gait built up from dynamic setpoints.
 
     Args:
-        gait_selection_node (GaitSelection): the gait selection node
+        node (Node): the gait selection node
 
     Attributes:
-        gait_selection (GaitSelection): the gait selection node
         trajectory_command_factory (TrajectoryCommandFactory): the trajectory command handler used to create trajectory commands
         home_stand_position_actuating_joints (Dict[str, float]): joint dict of home stand position for only the
             actuating joints
@@ -56,6 +56,7 @@ class DynamicGaitWalk(GaitInterface):
         start_time_next_command (Optional[Union[Duration, Time]]): time at which the next command will be scheduled
         amount_of_steps (int): the amount of steps the gait makes before closing the gait
 
+        node (Node): the gait selection node
         _points_handler (CameraPointsHandler): the camera points handler used to handle communication with vision
         _end (bool): whether the gait has ended
         _next_command (Optional[TrajectoryCommand]): TrajectoryCommand that should be scheduled next
@@ -72,26 +73,29 @@ class DynamicGaitWalk(GaitInterface):
     _next_command: Optional[TrajectoryCommand]
     _should_stop: bool
 
-    def __init__(self, gait_selection_node):
+    def __init__(self, node: Node):
         super(DynamicGaitWalk, self).__init__()
-        self.gait_selection = gait_selection_node
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+        self.node = node
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._points_handler = CameraPointsHandler(gait=self)
         self.trajectory_command_factory = TrajectoryCommandFactory(
             gait=self,
             points_handler=self._points_handler,
         )
 
-        self.home_stand_position_actuating_joints = self.gait_selection.get_named_position("stand")
-        self.home_stand_position_all_joints = get_position_from_yaml("stand")
-        self.all_joint_names = self.home_stand_position_all_joints.keys()
         self.actuating_joint_names = get_joint_names_from_urdf()
+        self.all_joint_names = get_joint_names_from_urdf(return_fixed_joints=True)
+        self.home_stand_position_all_joints = get_position_from_yaml("stand")
+        self.home_stand_position_actuating_joints = {
+            name: self.home_stand_position_all_joints[name] for name in self.actuating_joint_names
+        }
+
         self._set_start_position_to_home_stand()
         self._reset()
         self._get_soft_limits()
         self.gait_name = "dynamic_walk"
 
-        self.gait_selection.create_subscription(
+        self.node.create_subscription(
             GaitInstruction,
             "/march/input_device/instruction",
             self._callback_force_unknown,
@@ -171,6 +175,14 @@ class DynamicGaitWalk(GaitInterface):
     def first_subgait_can_be_scheduled_early(self) -> bool:
         """Returns if the first open subgait can be scheduled early."""
         return True
+
+    @property
+    def requires_dynamic_stop(self) -> bool:
+        """Return whether this gait needs a dynamic stop.
+
+        This means that the gait does not end in home_stand, but in another random (dynamic) position.
+        """
+        return False
 
     def _reset(self) -> None:
         """Reset all attributes of the gait."""
@@ -365,10 +377,10 @@ class DynamicGaitWalk(GaitInterface):
         self.start_time_next_command = start_time_previous_command + next_command_duration
 
     def update_parameters(self) -> None:
-        """Callback for gait_selection_node when the parameters have been updated."""
-        self.minimum_stair_height = self.gait_selection.minimum_stair_height
-        self.add_push_off = self.gait_selection.add_push_off
-        self.amount_of_steps = self.gait_selection.amount_of_steps
+        """Callback for gait_node when the parameters have been updated."""
+        self.minimum_stair_height = self.node.minimum_stair_height
+        self.add_push_off = self.node.add_push_off
+        self.amount_of_steps = self.node.amount_of_steps
 
     def _get_soft_limits(self):
         """Get the limits of all joints in the urdf."""

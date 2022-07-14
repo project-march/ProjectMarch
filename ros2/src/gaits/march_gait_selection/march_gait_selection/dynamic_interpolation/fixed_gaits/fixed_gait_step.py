@@ -1,5 +1,7 @@
 """Author: Marten Haitjema, MVII."""
 
+from rclpy.node import Node
+
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step import DynamicGaitStep
 from march_gait_selection.dynamic_interpolation.camera_point_handlers.simulated_points_handler import (
     SimulatedPointsHandler,
@@ -12,7 +14,7 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
 class FixedGaitStep(DynamicGaitStep):
     """Class to have a setpoint gait step and close with a fixed step distance."""
 
-    def __init__(self, node):
+    def __init__(self, node: Node):
         super().__init__(node)
         self.gait_name = "fixed_step"
         self._points_handler = SimulatedPointsHandler(gait=self)

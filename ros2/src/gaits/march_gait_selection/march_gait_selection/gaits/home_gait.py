@@ -1,16 +1,16 @@
 """Author: Unknown."""
 
 from typing import Optional, Dict
-
-from march_utility.gait.edge_position import StaticEdgePosition, UnknownEdgePosition
-from march_utility.utilities.duration import Duration
 from rclpy.time import Time
+
+from march_utility.gait.edge_position import UnknownEdgePosition
+from march_utility.utilities.duration import Duration
+from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
-
 
 DEFAULT_HOMEGAIT_DURATION = Duration(seconds=3)
 ZERO_DURATION = Duration(seconds=0)
@@ -48,7 +48,8 @@ class HomeGait(GaitInterface):
         self._start_time = None
         self._end_time = None
         self._starting_position = UnknownEdgePosition()
-        self._final_position = StaticEdgePosition(self._position)
+        self._final_position = self._position
+        self._actuating_joint_names = get_joint_names_from_urdf()
 
     @property
     def name(self):
@@ -163,11 +164,11 @@ class HomeGait(GaitInterface):
             JointTrajectory: message containing joint trajectories
         """
         msg = JointTrajectory()
-        msg.joint_names = sorted(self._position.keys())
+        msg.joint_names = self._actuating_joint_names
 
         point = JointTrajectoryPoint()
         point.time_from_start = self._duration.to_msg()
-        point.positions = [self._position[name] for name in msg.joint_names]
+        point.positions = self._position.values
         point.velocities = [0.0] * len(msg.joint_names)
         point.accelerations = [0.0] * len(msg.joint_names)
         point.effort = [0.0] * len(msg.joint_names)

@@ -1,10 +1,12 @@
 """Author: Marten Haitjema, MVII."""
 
 from typing import Optional
+
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_step_and_close import (
     TrajectoryCommandFactoryStepAndClose,
 )
@@ -14,12 +16,12 @@ class DynamicGaitStepAndClose(DynamicGaitWalk):
     """Single step gait based on dynamic setpoint gait.
 
     Args:
-        gait_selection_node (GaitSelection): the gait selection node
+        node (Node): the gait selection node
     """
 
-    def __init__(self, gait_selection_node):
-        super().__init__(gait_selection_node)
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+    def __init__(self, node):
+        super().__init__(node)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryStepAndClose(
             gait=self,
             points_handler=self._points_handler,

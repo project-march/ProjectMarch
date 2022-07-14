@@ -39,7 +39,7 @@ class TrajectoryCommandFactory:
     def __init__(self, gait, points_handler):
         self._gait = gait
         self._points_handler = points_handler
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._trajectory_failed = False
 
     def get_trajectory_command(
@@ -256,7 +256,7 @@ class TrajectoryCommandFactory:
             DynamicStep: DynamicStep instance for the desired step
         """
         return DynamicStep(
-            self._gait.gait_selection,
+            self._gait.node,
             self._gait.home_stand_position_all_joints,
             start_position,
             subgait_id,

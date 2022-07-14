@@ -3,26 +3,26 @@
 from typing import Optional
 from rclpy.node import Node
 from rclpy.time import Time
-from sensor_msgs.msg import JointState
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import DynamicGaitWalk
+from sensor_msgs.msg import JointState
+
 from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_RIGHT,
     STEPPING_STONES_END_POSITION_LEFT,
 )
-from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_utility.utilities.duration import Duration
-
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
-from march_shared_msgs.msg import CurrentGait
-
+from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_close import (
     TrajectoryCommandFactoryClose,
 )
 from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
     CameraPointsHandler,
 )
+
+from march_shared_msgs.msg import CurrentGait
 
 
 class DynamicGaitClose(DynamicGaitWalk):
@@ -31,32 +31,32 @@ class DynamicGaitClose(DynamicGaitWalk):
     subgait_id: str
     start_time_next_command: Time
 
-    def __init__(self, gait_selection_node: Node):
-        super().__init__(gait_selection_node)
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+    def __init__(self, node: Node):
+        super().__init__(node)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self._points_handler = CameraPointsHandler(self)
         self.trajectory_command_factory = TrajectoryCommandFactoryClose(self, self._points_handler)
         self.gait_name = "dynamic_close"
 
-        gait_selection_node.create_subscription(
+        self.node.create_subscription(
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._set_subgait_id,
             DEFAULT_HISTORY_DEPTH,
         )
-        gait_selection_node.create_subscription(
+        self.node.create_subscription(
             JointState,
             "/march/step/final_position",
             self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
-        gait_selection_node.create_subscription(
+        self.node.create_subscription(
             JointState,
             "/march/step_and_hold/final_position",
             self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._final_position_pub = gait_selection_node.create_publisher(
+        self._final_position_pub = self.node.create_publisher(
             JointState,
             "/march/close/final_position",
             DEFAULT_HISTORY_DEPTH,
@@ -104,6 +104,14 @@ class DynamicGaitClose(DynamicGaitWalk):
             stop=True,
         )
         return GaitUpdate.should_schedule_early(self._next_command)
+
+    def _update_start_position_idle_state(self, joint_state: JointState) -> None:
+        """Update the start position of the next subgait to be the last position of the previous gait."""
+        for i, name in enumerate(self.all_joint_names):
+            self.start_position_all_joints[name] = joint_state.position[i]
+        self.start_position_actuating_joints = {
+            name: self.start_position_all_joints[name] for name in self.actuating_joint_names
+        }
 
     def _update_state_machine(self) -> GaitUpdate:
         """Update the state machine that the new subgait has begun. Also updates time stamps for the next subgait.

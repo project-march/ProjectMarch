@@ -9,7 +9,7 @@ from rclpy.executors import MultiThreadedExecutor
 
 NODE_NAME = "march_wireless_ipd_node"
 PORT = 4000
-IP = "192.168.0.101"
+IP = "192.168.0.107"
 
 
 def sys_exit(*_):

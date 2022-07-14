@@ -59,6 +59,14 @@ class GaitInterface:
         """
         return False
 
+    @property
+    def requires_dynamic_stop(self) -> bool:
+        """Return whether this gait needs a dynamic stop.
+
+        This means that the gait does not end in home_stand, but in another random (dynamic) position.
+        """
+        return False
+
     def start(self, current_time: Time) -> GaitUpdate:
         """Start the gait.
 

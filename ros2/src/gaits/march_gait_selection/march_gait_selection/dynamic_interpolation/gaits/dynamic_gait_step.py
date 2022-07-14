@@ -13,6 +13,7 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
     TrajectoryCommandFactoryQueue,
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
+
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -23,30 +24,38 @@ class DynamicGaitStep(DynamicGaitWalk):
     """Step gait based on dynamic setpoint gait.
 
     Args:
-        gait_selection_node (GaitSelection): the gait selection node
+        node (GaitSelection): the gait selection node
     """
 
     _current_time: Optional[Time]
     _use_position_queue: bool
 
-    def __init__(self, gait_selection_node: Node):
-        super().__init__(gait_selection_node)
-        self._logger = gait_selection_node.get_logger().get_child(__class__.__name__)
+    def __init__(self, node: Node):
+        super().__init__(node)
+        self._logger = node.get_logger().get_child(__class__.__name__)
         self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, points_handler=self._points_handler)
         self.subgait_id = "right_swing"
         self.gait_name = "dynamic_step"
 
-        self.gait_selection.create_subscription(
+        self.node.create_subscription(
             JointState,
             "/march/close/final_position",
             self._update_start_position_idle_state,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._final_position_pub = self.gait_selection.create_publisher(
+        self._final_position_pub = self.node.create_publisher(
             JointState,
             "/march/step/final_position",
             DEFAULT_HISTORY_DEPTH,
         )
+
+    @property
+    def requires_dynamic_stop(self) -> bool:
+        """Return whether this gait needs a dynamic stop.
+
+        This means that the gait does not end in home_stand, but in another random (dynamic) position.
+        """
+        return True
 
     def _reset(self) -> None:
         """Reset all attributes of the gait."""

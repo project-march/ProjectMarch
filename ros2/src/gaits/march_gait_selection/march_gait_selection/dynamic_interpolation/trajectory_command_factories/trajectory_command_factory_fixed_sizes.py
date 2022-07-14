@@ -22,15 +22,15 @@ class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactoryQueue):
 
     def __init__(self, gait, points_handler):
         super().__init__(gait, points_handler)
-        self._logger = gait.gait_selection.get_logger().get_child(__class__.__name__)
+        self._logger = gait.node.get_logger().get_child(__class__.__name__)
 
-        self._gait.gait_selection.create_subscription(
+        self._gait.node.create_subscription(
             String,
             "/march/step_and_hold/start_side",
             self._set_start_subgait_id,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._gait.gait_selection.create_subscription(
+        self._gait.node.create_subscription(
             String,
             "/march/step_and_hold/step_size",
             self._predetermined_foot_location_callback,
