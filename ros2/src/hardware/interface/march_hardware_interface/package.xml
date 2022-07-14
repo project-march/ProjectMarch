@@ -10,6 +10,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>hardware_interface</depend>
+  <depend>march_hardware</depend>
+  <depend>march_hardware_builder</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
 

@@ -15,6 +15,7 @@ def generate_launch_description():
     rviz = LaunchConfiguration("rviz")
     gazebo = LaunchConfiguration("gazebo")
     control_type = LaunchConfiguration("control_type")
+    actuating = LaunchConfiguration("actuating")
 
     declared_arguments = [
         DeclareLaunchArgument(
@@ -27,6 +28,13 @@ def generate_launch_description():
             name="rviz",
             default_value="true",
             description="Whether we should startup rviz.",
+            choices=["true", "false"]
+        ),
+        DeclareLaunchArgument(
+            name="actuating",
+            default_value="true",
+            description="Whether we should only read the values of the joints (thus not send actuation commands).",
+            choices=["true", "false"]
         ),
         # region set control type. (This section set the control types for either gazebo, exo, or rviz control)
         DeclareLaunchArgument(
@@ -61,6 +69,7 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner.py",
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
+        condition=IfCondition(actuating),
     )
 
     # endregion

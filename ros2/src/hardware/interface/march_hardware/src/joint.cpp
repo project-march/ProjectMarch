@@ -143,7 +143,7 @@ void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        std::cout << "Data was not updated within " << elapsed_time.count() << ", using old data" << std::endl;
+        logger_.warn(logger_.fstring("Data was not updated within %d seconds, using old data.", elapsed_time.count()));
     }
 }
 

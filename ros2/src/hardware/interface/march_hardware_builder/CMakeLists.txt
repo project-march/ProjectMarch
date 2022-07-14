@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(march_hardware_builder)
 
-#add_compile_options(-std=c++17 -Wall -Wextra -Werror)
-# Default to C++17
+# Set to C++17, because we make use of the 'optional' dependency.
 if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 17)
 endif()
@@ -22,8 +21,13 @@ find_package(march_logger_cpp REQUIRED)
 #    append_coverage_compiler_flags()
 #endif()
 add_library(${PROJECT_NAME}
+        SHARED
         src/hardware_builder.cpp
         )
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
 
 ament_target_dependencies(
         ${PROJECT_NAME}
@@ -31,38 +35,35 @@ ament_target_dependencies(
         yaml-cpp
         march_logger_cpp
 )
-#target_link_libraries(${PROJECT_NAME}
-#        ${catkin_LIBRARIES}
-#        yaml-cpp
-#        )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
+# This is needed for some reason otherwise you can get linker errors.
+# Normally this should have been done by ament_target_dependencies, .
+target_link_libraries(${PROJECT_NAME} ${YAML_CPP_LIBRARIES})
 
 
+
+# EXPORT
 # These must be above the two installs otherwise can't be recognized by other packages.
-ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp)  # For the ros_logger
-
-# INSTALL
-
-install(
-        TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION lib/${PROJECT_NAME}
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+        march_hardware
+        yaml-cpp
+        march_logger_cpp
 )
-
-install(DIRECTORY robots
-        DESTINATION share/${PROJECT_NAME}
-        )
 
 install(
         DIRECTORY include/
         DESTINATION include
 )
 
-ament_package()
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
 
 
 ### Add gtest based cpp test target and link libraries
@@ -86,3 +87,4 @@ ament_package()
 #        )
 #    endif()
 #endif()
+ament_package()

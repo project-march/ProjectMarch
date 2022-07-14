@@ -28,6 +28,9 @@ public:
     RCLCPP_SHARED_PTR_DEFINITIONS(MarchRvizSystemInterface);
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
+        MarchRvizSystemInterface();
+
+    MARCH_HARDWARE_INTERFACE_PUBLIC
             hardware_interface::return_type configure(const hardware_interface::HardwareInfo & info) override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
@@ -35,6 +38,10 @@ public:
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
             std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+
+    MARCH_HARDWARE_INTERFACE_PUBLIC hardware_interface::return_type
+    perform_command_mode_switch(const std::vector<std::string> & start_interfaces,
+                                const std::vector<std::string> & stop_interfaces) override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
             hardware_interface::return_type start() override;
@@ -49,9 +56,10 @@ public:
             hardware_interface::return_type write() override;
 
 private:
+    const std::shared_ptr<rclcpp::Logger> logger_;
     static const std::string COMMAND_AND_STATE_TYPE;  // = hardware_interface::HW_IF_POSITION
     std::vector<double> hw_positions_;
-    std::shared_ptr<rclcpp::Logger> logger_;
+
 
 };
 

@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 project(march_hardware)
 
-add_compile_options(-std=c++17 -Wall -Wextra -Werror -Wpedantic)
+# Default to C++17
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wall -Wextra -Werror -Wpedantic)
+endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(soem REQUIRED)
@@ -32,6 +39,7 @@ if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
 endif()
 
 add_library(${PROJECT_NAME}
+    SHARED
     include/${PROJECT_NAME}/encoder/absolute_encoder.h
     include/${PROJECT_NAME}/encoder/encoder.h
     include/${PROJECT_NAME}/encoder/incremental_encoder.h

@@ -3,7 +3,6 @@
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
 #include <algorithm>
-#include <fstream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -42,10 +41,11 @@ const std::vector<std::string>
 
 HardwareBuilder::HardwareBuilder(const std::string &yaml_path,
                                  const march_logger::BaseLogger &logger) :
-        robot_config_(YAML::LoadFile(yaml_path)),
+//        robot_config_(YAML::LoadFile(yaml_path)),
         logger_(logger),
         pdo_interface_(march::PdoInterfaceImpl::create()),
         sdo_interface_(march::SdoInterfaceImpl::create(logger)) {
+    logger_.info(yaml_path.c_str());
 }
 
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot(const std::vector<std::string> &active_joint_names)
@@ -169,8 +169,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(c
         motor_controller = createODrive(config, mode);
     } else {
         throw march::error::HardwareException(
-            march::error::ErrorType::INVALID_MOTOR_CONTROLLER,
-            "Motorcontroller %s not valid", type);
+            march::error::ErrorType::INVALID_MOTOR_CONTROLLER, "Motorcontroller %s not valid", type);
     }
     return motor_controller;
 }
@@ -371,8 +370,8 @@ void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config,
     }
 }
 
-std::string convertSWFileToString(std::ifstream& sw_file)
-{
-    return std::string(std::istreambuf_iterator<char>(sw_file),
-        std::istreambuf_iterator<char>());
-}
+//std::string convertSWFileToString(std::ifstream& sw_file)
+//{
+//    return std::string(std::istreambuf_iterator<char>(sw_file),
+//        std::istreambuf_iterator<char>());
+//}

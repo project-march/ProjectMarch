@@ -33,18 +33,23 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 endif()
 
+# EXPORTS
 # These must be above the two installs otherwise can't be recognized by other packages.
-ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp)  # For the ros_logger
-# INSTALL
-install(
-        TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION lib/${PROJECT_NAME}
-)
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+ament_export_dependencies(rclcpp)
+
 install(
         DIRECTORY include/
         DESTINATION include
+)
+
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
 )
 
 ament_package()

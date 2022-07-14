@@ -13,8 +13,6 @@
 #include <string>
 #include <vector>
 
-#include <urdf/model.h>
-
 namespace march {
 class MarchRobot {
 private:
