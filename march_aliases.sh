@@ -62,6 +62,8 @@ alias monitor="march_run_monitor"
 alias multiplot="asrock_ros1 && rqt_multiplot"
 alias recon1="snoe && sros1 && rosrun rqt_reconfigure rqt_reconfigure"
 alias recon2="sfox && sros2 && ros2 run rqt_reconfigure rqt_reconfigure"
+alias left="sfox && sros2 && ros2 topic echo /march/foot_position/left | grep -A 3 'displacement'"
+alias right="sfox && sros2 && ros2 topic echo /march/foot_position/right | grep -A 3 'displacement'"
 
 
 # Clean march builds

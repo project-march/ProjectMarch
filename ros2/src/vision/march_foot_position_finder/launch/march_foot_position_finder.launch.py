@@ -17,11 +17,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="foot_gap",
-                default_value="0.25",
+                default_value="0.255",
             ),
             DeclareLaunchArgument(
                 name="step_distance",
-                default_value="0.30",
+                default_value="0.50",
             ),
             DeclareLaunchArgument(
                 name="outlier_distance",
@@ -33,7 +33,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="height_zero_threshold",
-                default_value="0.02",
+                default_value="0.025",
             ),
             DeclareLaunchArgument(
                 name="foot_width",
@@ -57,27 +57,27 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="max_z_distance",
-                default_value="0.25",
+                default_value="0.24",
             ),
             DeclareLaunchArgument(
                 name="num_track_points",
-                default_value="30",
+                default_value="45",
             ),
             DeclareLaunchArgument(
                 name="displacements_outside",
-                default_value="0.05",
+                default_value="0.04",
             ),
             DeclareLaunchArgument(
                 name="displacements_inside",
-                default_value="0.10",
+                default_value="0.04",
             ),
             DeclareLaunchArgument(
                 name="displacements_near",
-                default_value="0.25",
+                default_value="0.15",
             ),
             DeclareLaunchArgument(
                 name="displacements_far",
-                default_value="0.10",
+                default_value="0.05",
             ),
             DeclareLaunchArgument(
                 "realsense_simulation",

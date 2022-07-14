@@ -8,6 +8,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <point_finder.h>
+#include <cmath>
 
 #include <vector>
 
@@ -291,7 +292,7 @@ void PointFinder::computeFootPlateDisplacement(
             double x_final = xIndexToCoordinate(x_index);
             double y_final = yIndexToCoordinate(y_index);
 
-            if (!std::isnan(x_final) && !std::isnan(y_final)) {
+            if (!std::isnan(x_final) && !std::isnan(y_final) && std::abs(x_final) < 1.0 && std::abs(y_final) < 1.0 && std::abs(height) < 0.5) {
                 Point p = Point((float)x_final, (float)y_final, (float)height);
                 position_queue->push_back(p);
                 return;

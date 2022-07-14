@@ -7,14 +7,14 @@ from launch.substitutions import LaunchConfiguration
 
 
 configurable_parameters = [{'name': 'camera_name',                  'default': 'camera_back', 'description': 'camera unique name'},
-                           {'name': 'serial_no',                    'default': "_048322070237", 'description': 'choose device by serial number'},
+                           {'name': 'serial_no',                    'default': "_109122070820", 'description': 'choose device by serial number'},
                            {'name': 'usb_port_id',                  'default': "''", 'description': 'choose device by usb port id'},
                            {'name': 'device_type',                  'default': "''", 'description': 'choose device by type'},
                            {'name': 'config_file',                  'default': "''", 'description': 'yaml config file'},
                            {'name': 'enable_pointcloud',            'default': 'false', 'description': 'enable pointcloud'},
                            {'name': 'unite_imu_method',             'default': '2', 'description': '[copy|linear_interpolation]'},
                            {'name': 'json_file_path',               'default': "''", 'description': 'allows advanced configuration'},
-                           {'name': 'log_level',                    'default': 'warn', 'description': 'debug log level [DEBUG|INFO|WARN|ERROR|FATAL]'},
+                           {'name': 'log_level',                    'default': "ERROR", 'description': 'debug log level [DEBUG|INFO|WARN|ERROR|FATAL]'},
                            {'name': 'output',                       'default': 'log', 'description': 'pipe node output [screen|log]'},
                            {'name': 'depth_width',                  'default': '-1', 'description': 'depth image width'},
                            {'name': 'depth_height',                 'default': '-1', 'description': 'depth image height'},
