@@ -157,7 +157,7 @@ limitations under the License.
       <link name="camera_imu_optical_frame"/>
       <joint name="camera_imu_optical_joint" type="fixed">
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="camera_back_depth_frame" />
+        <parent link="camera_back_imu_optical_frame" />
         <child link="camera_imu_optical_frame"/>
       </joint>
     </xacro:if>

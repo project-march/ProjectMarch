@@ -15,11 +15,6 @@ def generate_launch_description() -> LaunchDescription:
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
-            DeclareLaunchArgument(
-                name="use_imu_data",
-                default_value="False",
-                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
-            ),
             Node(
                 package="march_aligned_frame_publisher",
                 executable="march_aligned_frame_publisher_node",
@@ -29,7 +24,6 @@ def generate_launch_description() -> LaunchDescription:
                 respawn=True,
                 parameters=[
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
-                    {"use_imu_data": LaunchConfiguration("use_imu_data")},
                 ],
             ),
         ]

@@ -456,9 +456,6 @@ def generate_launch_description() -> LaunchDescription:
                         "march_aligned_frame_publisher.launch.py",
                     )
                 ),
-                launch_arguments=[
-                    ("use_imu_data", use_imu_data),
-                ],
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
