@@ -1,8 +1,0 @@
-name: ramp_up_single_step
-subgaits:
-  start:
-    to: right_open
-  right_open:
-    to: left_close
-  left_close:
-    to: end

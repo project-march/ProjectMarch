@@ -208,7 +208,7 @@ class DynamicGaitWalk(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e.msg)
+            self._logger.error(e)
             return None
         self.update_parameters()
         self.start_time_next_command = current_time + first_subgait_delay
