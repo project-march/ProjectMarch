@@ -245,9 +245,9 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
                 }
             }
 
-            if (position_queue->size() > 0) {
-                return;
-            }
+            // if (position_queue->size() > 0) {
+            //     return;
+            // }
         }
     }
 }

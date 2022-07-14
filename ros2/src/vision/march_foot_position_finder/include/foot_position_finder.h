@@ -54,6 +54,8 @@ protected:
 
     void processPointCloud(const PointCloud::Ptr& pointcloud);
 
+    Point retrieveOptimalPoint(std::vector<Point>* position_queue);
+
     Point computeTemporalAveragePoint(const Point& new_point);
 
     Point transformPoint(Point point, const std::string& frame_from,

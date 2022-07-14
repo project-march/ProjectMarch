@@ -329,13 +329,15 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         left_or_right_); // Blue
 
     if (position_queue.size() > 0) {
+        Point optimal_point = retrieveOptimalPoint(&position_queue);
+
         // Take the first point of the point queue returned by the point finder
-        found_covid_point_ = computeTemporalAveragePoint(position_queue[0]);
+        found_covid_point_ = computeTemporalAveragePoint(optimal_point);
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
         std::vector<Point> track_points = point_finder_->retrieveTrackPoints(
-            previous_start_point_, found_covid_point_);
+            ORIGIN, found_covid_point_);
 
         // Visualization
         publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
@@ -362,6 +364,22 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPoint(point_publisher_, n_, found_covid_point_,
             found_covid_point_, new_displacement_, track_points);
     }
+}
+
+Point FootPositionFinder::retrieveOptimalPoint(std::vector<Point>* position_queue)
+{
+    Point optimal_point = *position_queue->begin();
+    double optimal_distance_height_tradeoff = 0;
+
+    for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
+        double new_tradeoff = std::abs(p->x) - 2 * std::abs(p->z);
+        if (new_tradeoff > optimal_distance_height_tradeoff) {
+            optimal_point = (*p);
+            optimal_distance_height_tradeoff = new_tradeoff;
+        }
+    }
+
+    return optimal_point;
 }
 
 /**
