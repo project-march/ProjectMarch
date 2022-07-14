@@ -47,6 +47,8 @@ class TrajectoryCommandFactory:
     subgait_id: str
     foot_location: FootPosition
     start_position_all_joints: Dict[str, float]
+    _stop: bool
+    _use_position_queue: bool
 
     def __init__(self, gait, point_handler):
         self._gait = gait
@@ -70,38 +72,56 @@ class TrajectoryCommandFactory:
             TrajectoryCommand: command with the current subgait and start time. Returns None if the location found by
                 CoViD is too old.
         """
+        self._stop = stop
         self.subgait_id = subgait_id
         self.start_position_all_joints = start_position_all_joints
 
-        if stop:
+        if self._stop:
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
         else:
-            if self._use_position_queue and not self.position_queue.empty():
-                self.foot_location = self._get_foot_location_from_queue()
-            elif self._use_position_queue and self.position_queue.empty():
-                self.fill_queue()
-                self._logger.info(f"Queue is empty. Resetting queue to {list(self.position_queue.queue)}")
-                stop = True
-                self._gait._end = True
+            if self._use_position_queue:
+                self.foot_location = self._check_if_queue_is_not_empty_and_get_foot_location()
             else:
-                try:
-                    self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
-                    stop = self._point_handler.is_foot_location_too_old(self.foot_location)
-                    self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
-                except AttributeError:
-                    self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
-                    self._gait._end = True
-                    return None
+                self.foot_location = self._get_foot_location_from_point_handler()
 
-        if not stop:
+        if self.foot_location is None:
+            return None
+
+        if not self._stop:
             self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
             self._logger.info(
                 f"Stepping to location ({self.foot_location.processed_point.x}, "
                 f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
             )
 
-        return self._get_first_feasible_trajectory(start, stop)
+        return self._get_first_feasible_trajectory(start, self._stop)
+
+    def _check_if_queue_is_not_empty_and_get_foot_location(self) -> Optional[FootPosition]:
+        """If the queue is empty, the gait is closed and the queue is reset. Else, gets location from queue."""
+        if self.position_queue.empty():
+            self._close_gait_and_reset_queue()
+            return self.foot_location
+        else:
+            return self._get_foot_location_from_queue()
+
+    def _get_foot_location_from_point_handler(self) -> Optional[FootPosition]:
+        """Returns a FootPosition message from the point handler, if available."""
+        try:
+            self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
+            self._stop = self._point_handler.is_foot_location_too_old(self.foot_location)
+            return self.foot_location
+        except AttributeError:
+            self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
+            self._gait._end = True
+            return None
+
+    def _close_gait_and_reset_queue(self) -> None:
+        """Closes the gait and reset the queue after the queue is empty."""
+        self.fill_queue()
+        self._logger.warn(f"Queue is empty. Closing the gait. Resetting queue to {list(self.position_queue.queue)}")
+        self._stop = True
+        self._gait._end = True
 
     def has_trajectory_failed(self) -> bool:
         """Returns true if no feasible trajectory could be created."""
@@ -296,9 +316,6 @@ class TrajectoryCommandFactory:
         header = Header(stamp=self._gait.node.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
         point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
-
-        if self.position_queue.empty():
-            self._logger.warn("Next step will be a close gait.")
 
         return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
 
