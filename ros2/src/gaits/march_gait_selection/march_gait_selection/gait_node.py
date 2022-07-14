@@ -93,10 +93,9 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             dynamic_gait_updated = True
 
     # Separate update function for dynamic gait to avoid time performance issues
-    if dynamic_gait_updated:
-        gait_state_machine.update_parameters("dynamic_walk")
-    elif position_queue_updated:
-        gait_state_machine.update_parameters("dynamic_walk")
+    gait_state_machine.update_parameters("dynamic_walk")
+
+    if position_queue_updated:
         gait_state_machine.update_parameters("dynamic_step")
         gait_state_machine.update_parameters("dynamic_step_and_hold")
 
