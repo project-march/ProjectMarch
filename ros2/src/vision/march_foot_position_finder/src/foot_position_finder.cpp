@@ -50,6 +50,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
+    paused_ = false;
 
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
@@ -104,6 +105,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         = n_->get_parameter("height_zero_threshold").as_double();
     realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
     found_points_.resize(sample_size_);
+    displacements_ = point_finder_->getDisplacements();
 
     // Connect the physical RealSense cameras
     if (!realsense_simulation_) {
@@ -161,6 +163,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 void FootPositionFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
+    paused_ = true;
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_gap") {
             foot_gap_ = param.as_double();
@@ -177,13 +180,17 @@ void FootPositionFinder::readParameters(
         }
 
         RCLCPP_INFO(n_->get_logger(),
-            "\033[92mParameter %s updated in %s Foot Position Finder\033[0m",
-            param.get_name().c_str(), left_or_right_.c_str());
+        "\033[92mParameter %s updated in %s Foot Position Finder\033[0m",
+        param.get_name().c_str(), left_or_right_.c_str());
     }
 
     found_points_.resize(sample_size_);
     resetInitialPosition(/*stop_timer=*/false);
     point_finder_->readParameters(parameters);
+    displacements_ = point_finder_->getDisplacements();
+    paused_ = false;
+
+    RCLCPP_INFO(n_->get_logger(), "\033[92mUpdate finished\033[0m");
 }
 
 /**
@@ -259,6 +266,10 @@ void FootPositionFinder::processRealSenseDepthFrames()
             left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
     }
 
+    if (paused_) {
+        return;
+    }
+
     rs2::frameset frames = pipe_.wait_for_frames();
     rs2::depth_frame depth = frames.get_depth_frame();
 
@@ -303,6 +314,10 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
+    if (paused_) {
+        return;
+    }
+
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
 
@@ -317,18 +332,18 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     std::vector<Point> position_queue;
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
-    std::cout << position_queue.size() << std::endl;
-
     // Visualization
-    publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
-        point_finder_->getDisplacements(), left_or_right_); // Cyan
-    publishDesiredPosition(
-        point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
-    publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
-        left_or_right_); // Purple
-    publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN,
-        start_point_,
-        left_or_right_); // Blue
+    if (validatePoint(desired_point_) && validatePoint(start_point_)) {
+        publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
+            displacements_, left_or_right_); // Cyan
+        publishDesiredPosition(
+            point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
+        publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
+            left_or_right_); // Purple
+        publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN,
+            start_point_,
+            left_or_right_); // Blue
+    }
 
     if (position_queue.size() > 0) {
         Point optimal_point = retrieveOptimalPoint(&position_queue);
@@ -342,12 +357,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_);
 
         // Visualization
-        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
-            left_or_right_); // Orange
-        publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
-            left_or_right_); // Red
-        publishPossiblePoints(
-            point_marker_publisher_, n_, position_queue, left_or_right_);
+        
 
         // Compute new foot displacement for gait computation
         new_displacement_ = subtractPoints(found_covid_point_, start_point_);
@@ -358,6 +368,12 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         }
 
         // Visualize new displacement
+        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
+            left_or_right_); // Orange
+        publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
+            left_or_right_); // Red
+        publishPossiblePoints(
+            point_marker_publisher_, n_, position_queue, left_or_right_);
         publishNewDisplacement(point_marker_publisher_, n_, start_point_,
             found_covid_point_,
             left_or_right_); // Green
@@ -368,6 +384,14 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     }
 }
 
+/**
+ * Compute the optimal step point by maximizing the value `distance - factor *
+ * abs(height)`. This results in finding the furthest point that has the least
+ * height difference.
+ *
+ * @param position_queue Queue with possible foot positions.
+ * @return Point Final optimal point to step towards.
+ */
 Point FootPositionFinder::retrieveOptimalPoint(
     std::vector<Point>* position_queue)
 {
@@ -390,6 +414,7 @@ Point FootPositionFinder::retrieveOptimalPoint(
  * then publishes the average of the points without the outliers.
  *
  * @param new_point New point to compute the temporal average with.
+ * @return Point Average point of last n number of final points.
  */
 Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
 {
@@ -419,9 +444,10 @@ Point FootPositionFinder::computeTemporalAveragePoint(const Point& new_point)
  * Transforms a point in place from one frame to another using ROS
  * transformations.
  *
- * @param point Point to transform between frames
- * @param frame_from source frame in which the point is currently
- * @param frame_to target frame in which point is transformed
+ * @param point Point to transform between frames.
+ * @param frame_from Source frame in which the point is currently.
+ * @param frame_to Target frame in which point is transformed.
+ * @return Point Transformed point.
  */
 Point FootPositionFinder::transformPoint(
     Point point, const std::string& frame_from, const std::string& frame_to)

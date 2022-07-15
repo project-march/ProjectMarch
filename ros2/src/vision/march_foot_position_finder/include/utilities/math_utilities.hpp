@@ -167,4 +167,16 @@ inline Point subtractPoints(const Point p1, const Point p2)
     return difference;
 }
 
+/**
+ * Check if a point contains realistic values.
+ *
+ * @param Point p point to check
+ * @return bool whether the point can be published
+ */
+inline bool validatePoint(const Point p)
+{
+    return (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z)
+        && std::abs(p.x) < 1.0 && std::abs(p.y) < 0.7 && std::abs(p.z) < 0.5);
+}
+
 #endif // MARCH_MATH_UTILITIES

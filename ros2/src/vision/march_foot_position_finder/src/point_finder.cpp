@@ -94,6 +94,9 @@ void PointFinder::readParameters(
         } else if (param.get_name() == "num_track_points") {
             num_track_points_ = param.as_int();
         }
+        RCLCPP_INFO(n_->get_logger(),
+        "\033[92mParameter %s updated in %s Point Finder\033[0m",
+        param.get_name().c_str(), left_or_right_.c_str());
     }
 
     initializeValues();
@@ -249,10 +252,6 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
                 && (position_queue->back()).z < 0.05) {
                 return;
             }
-
-            // if (position_queue->size() > 0) {
-            //     return;
-            // }
         }
     }
 }
@@ -266,16 +265,13 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 void PointFinder::computeFootPlateDisplacement(
     int x, int y, double height, std::vector<Point>* position_queue)
 {
-
+    // Check if height difference is not significant
     if (std::abs(height) < 0.05) {
-
         double x_final = xIndexToCoordinate(x);
         double y_final = yIndexToCoordinate(y);
 
-        if (!std::isnan(x_final) && !std::isnan(y_final)
-            && std::abs(x_final) < 1.0 && std::abs(y_final) < 1.0
-            && std::abs(height) < 0.5) {
-            Point p = Point((float)x_final, (float)y_final, (float)height);
+        Point p = Point((float)x_final, (float)y_final, (float)height);
+        if (validatePoint(p)) {
             position_queue->push_back(p);
             return;
         }
@@ -312,10 +308,8 @@ void PointFinder::computeFootPlateDisplacement(
             double x_final = xIndexToCoordinate(x_index);
             double y_final = yIndexToCoordinate(y_index);
 
-            if (!std::isnan(x_final) && !std::isnan(y_final)
-                && std::abs(x_final) < 1.0 && std::abs(y_final) < 1.0
-                && std::abs(height) < 0.5) {
-                Point p = Point((float)x_final, (float)y_final, (float)height);
+            Point p = Point((float)x_final, (float)y_final, (float)height);
+            if (validatePoint(p)) {
                 position_queue->push_back(p);
                 return;
             }

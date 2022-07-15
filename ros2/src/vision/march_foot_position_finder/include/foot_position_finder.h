@@ -107,7 +107,7 @@ protected:
     std::string other_frame_id_;
     std::string current_frame_id_;
 
-    bool running_;
+    bool paused_;
     bool realsense_simulation_;
 
     double foot_gap_;
@@ -120,6 +120,7 @@ protected:
     int refresh_last_height_;
 
     std::vector<Point> found_points_;
+    std::vector<double> displacements_;
 
     Point ORIGIN;
     Point last_chosen_point_;
