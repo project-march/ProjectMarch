@@ -93,7 +93,8 @@ class GaitPreprocessor(Node):
             foot_position (FootPosition): Location given by CoViD (Computer Vision).
         """
         foot_position_msg = self._process_foot_position(foot_position)
-        self.publisher_left.publish(foot_position_msg)
+        if self._validate_point(foot_position_msg):
+            self.publisher_left.publish(foot_position_msg)
 
     def _callback_right(self, foot_position: FootPosition) -> None:
         """Callback for new right point from covid. Makes the point usable for the gait.
@@ -102,7 +103,8 @@ class GaitPreprocessor(Node):
             foot_position (FootPosition): Location given by CoViD (Computer Vision).
         """
         foot_position_msg = self._process_foot_position(foot_position)
-        self.publisher_right.publish(foot_position_msg)
+        if self._validate_point(foot_position_msg):
+            self.publisher_right.publish(foot_position_msg)
 
     def _update_step_height_previous(self, foot_position: FootPosition) -> None:
         """Update the _step_height_previous attribute with the height of the last chosen foot position."""
@@ -145,7 +147,7 @@ class GaitPreprocessor(Node):
 
         point.x = -foot_position.displacement.x + X_OFFSET
         point.y = foot_position.displacement.z + Y_OFFSET
-        point.z = temp_y + np.sign(temp_y) * Z_OFFSET
+        point.z = 0.51  # TODO: change this back to location from msg when functional
 
         return point
 
@@ -172,3 +174,7 @@ class GaitPreprocessor(Node):
         point_msg.duration = self._get_duration_scaled_to_height(self._duration, self._location_y)
 
         self.publisher_fixed_distance.publish(point_msg)
+
+    def _validate_point(self, point: FootPosition) -> None:
+        """Validates if the point sent by covid if valid."""
+        return abs(point.processed_point.x) < 0.7 and abs(point.processed_point.y) < 0.25
