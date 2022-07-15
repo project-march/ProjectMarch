@@ -110,6 +110,9 @@ class TrajectoryCommandFactory:
         try:
             self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
             self._stop = self._point_handler.is_foot_location_too_old(self.foot_location)
+            if self._stop:
+                self._gait._end = True
+                return None
             return self.foot_location
         except AttributeError:
             self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
