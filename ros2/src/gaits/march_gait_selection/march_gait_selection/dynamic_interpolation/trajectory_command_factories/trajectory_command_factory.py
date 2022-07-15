@@ -109,10 +109,10 @@ class TrajectoryCommandFactory:
         """Returns a FootPosition message from the point handler, if available."""
         try:
             self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
-            self._stop = self._point_handler.is_foot_location_too_old(self.foot_location)
-            if self._stop:
+            msg_too_old, msg = self._point_handler.is_foot_location_too_old(self.foot_location)
+            if msg_too_old:
                 self._gait._end = True
-                return None
+                raise GaitError(msg)
             return self.foot_location
         except AttributeError:
             self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
