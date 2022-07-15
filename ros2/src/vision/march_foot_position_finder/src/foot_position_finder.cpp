@@ -338,8 +338,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
-        std::vector<Point> track_points = point_finder_->retrieveTrackPoints(
-            ORIGIN, found_covid_point_);
+        std::vector<Point> track_points
+            = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_);
 
         // Visualization
         publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
@@ -368,7 +368,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     }
 }
 
-Point FootPositionFinder::retrieveOptimalPoint(std::vector<Point>* position_queue)
+Point FootPositionFinder::retrieveOptimalPoint(
+    std::vector<Point>* position_queue)
 {
     Point optimal_point = *position_queue->begin();
     double optimal_distance_height_tradeoff = 0;
