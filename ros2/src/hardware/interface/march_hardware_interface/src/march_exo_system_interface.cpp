@@ -61,6 +61,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Makes the virtual hardware objects to handle the ethercat communication with the hardware.
     try {
         march_robot_ = load_march_hardware(info);
+        RCLCPP_INFO((*logger_), "Finished creating march hardware. With %i joints. ", march_robot_->size());
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), "Something went wrong in the making of march hardware see: \n\t%s", e.what());
         return hardware_interface::return_type::ERROR;
@@ -70,8 +71,8 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     for (const auto& joint : info.joints) {
 
         JointInfo jointInfo {
-            /*name=*/joint.name,
-            /*joint=*/march_robot_->getJoint(joint.name),
+            /*name=*/joint.name.c_str(),
+            /*joint=*/march_robot_->getJoint(joint.name.c_str()),
             /*position=*/std::numeric_limits<double>::quiet_NaN(),
             /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
@@ -81,11 +82,9 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
             return hardware_interface::return_type::ERROR;
         }
         joints_info_.push_back(jointInfo);
-        RCLCPP_INFO((*logger_), "Joint: %s, has '%d' max_effort and a max_velocity of '%d'.",
+        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max_effort and a max_velocity of '%g'.",
                     joint.name.c_str(), jointInfo.max_effort, jointInfo.max_velocity);
     }
-
-
 
     status_ = hardware_interface::status::CONFIGURED;
     return hardware_interface::return_type::OK;
@@ -101,6 +100,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 */
 std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_state_interfaces()
 {
+    RCLCPP_INFO((*logger_), "Creating export state interface.");
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (JointInfo jointInfo : joints_info_) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
@@ -125,6 +125,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 */
 std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::export_command_interfaces()
 {
+    RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo jointInfo : joints_info_) {
         // Effort: Couples the command controller to the value jointInfo.effort through a pointer.
@@ -216,17 +217,19 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
                                     "'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
     }
     string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder") +
-            '/' + "xacro" + '/' + pos_iterator->second + ".xacro";
+            '/' + "robots" + '/' + pos_iterator->second + ".yaml";
+
+    RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 
 
     HardwareBuilder hw_builder {
         /*yaml_path=*/robot_config_file_path,
-        /*logger=*/march_logger::RosLogger((*logger_))};
+        /*logger=*/shared_ptr<march_logger::RosLogger>(new march_logger::RosLogger(logger_))};
 
     std::vector<std::string> joint_names;
     joint_names.reserve(info.joints.size());
     for (const auto& joint : info.joints) {
-        joint_names.push_back(joint.name);
+        joint_names.emplace_back(joint.name.c_str());
     }
 
     return hw_builder.createMarchRobot(/*active_joint_names=*/joint_names);

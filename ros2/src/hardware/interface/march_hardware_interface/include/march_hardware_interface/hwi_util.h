@@ -102,18 +102,18 @@ inline static const char PATH_SEPARATOR =
         '/';
 #endif
 
-///** \brief Executes a given function on joint until successful with a set amount of maximum tries.
-// *
-// * @param function_goal The goal of the function. This is logged if it did not succeed in the maximum amount of tries.
-// * @param function The function that should be executed on the joint until successful. The success of the function
-// *                  is defined by the return boolean of the function.
-// * @param logger This is used to log with verbosity 'ERROR' if the function did not succeed for every joint.
-// * @param robot The robot to get the march::joints from.
-// * @param function_when_timeout The function that is executed on all joints that did not succeed.
-// * @param sleep_between_tries The time between retries.
-// * @param maximum_tries The maximum number of retries.
-// * \throws march::error::HardwareException if it did not succeed to execute for every joint in the given amount of tries.
-// */
+/** \brief Executes a given function on joint until successful with a set amount of maximum tries.
+ *
+ * @param function_goal The goal of the function. This is logged if it did not succeed in the maximum amount of tries.
+ * @param function The function that should be executed on the joint until successful. The success of the function
+ *                  is defined by the return boolean of the function.
+ * @param logger This is used to log with verbosity 'ERROR' if the function did not succeed for every joint.
+ * @param robot The robot to get the march::joints from.
+ * @param function_when_timeout The function that is executed on all joints that did not succeed.
+ * @param sleep_between_tries The time between retries.
+ * @param maximum_tries The maximum number of retries.
+ * \throws march::error::HardwareException if it did not succeed to execute for every joint in the given amount of tries.
+ */
 inline void repeat_function_on_joints_until_timeout(const string &function_goal,
                                                     const function<bool(march::Joint &)> &function,
                                                     const rclcpp::Logger &logger,
@@ -127,36 +127,36 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
     unsigned int amount_ok = 0;
     unsigned int amount_of_joints = robot->size();
     is_ok.resize(amount_of_joints, false);
-
+    RCLCPP_INFO(logger, "Trying to perform '%s' in %i tries.", function_goal.c_str(), maximum_tries);
     unsigned int num_tries = 0;
     for (; num_tries < maximum_tries; num_tries++) {
         for (unsigned int i = 0; i < amount_of_joints; i++) {
             if (!is_ok.at(i) && function(/*input_to_given_function=*/robot->getJoint(i))) {
                 amount_ok++;
                 is_ok.at(i) = true;
-                if (amount_ok == amount_of_joints) { break; }
+                if (amount_ok == amount_of_joints) { return; }
             }
             rclcpp::sleep_for(sleep_between_tries);
         }
+    }
 
-        if (amount_ok != amount_of_joints) {
+    if (amount_ok != amount_of_joints) {
+        for (unsigned int i = 0; i < amount_of_joints; i++) {
+            if (!is_ok.at(i)) {
+                RCLCPP_ERROR(logger, "Couldn't perform '%s' on joint '%s' in %i tries.",
+                             function_goal.c_str(), robot->getJoint(i).getName().c_str(), num_tries);
+            }
+        }
+        if (function_when_timeout.has_value()) {
+            auto const &callable = function_when_timeout.value();
             for (unsigned int i = 0; i < amount_of_joints; i++) {
                 if (!is_ok.at(i)) {
-                    RCLCPP_ERROR(logger, "Couldn't perform %s on joint '%s' in %i tries.",
-                                 function_goal.c_str(), robot->getJoint(i).getName().c_str(), num_tries);
+                    callable(robot->getJoint(i));
                 }
             }
-            if (function_when_timeout.has_value()) {
-                auto const &callable = function_when_timeout.value();
-                for (unsigned int i = 0; i < amount_of_joints; i++) {
-                    if (!is_ok.at(i)) {
-                        callable(robot->getJoint(i));
-                    }
-                }
-            }
-            throw march::error::HardwareException(
-                    march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
         }
+        throw march::error::HardwareException(
+                march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
     }
 }
 

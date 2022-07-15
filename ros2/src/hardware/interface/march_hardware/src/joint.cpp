@@ -14,29 +14,28 @@
 
 namespace march {
 Joint::Joint(std::string name, int net_number,
-    std::unique_ptr<MotorController> motor_controller, const march_logger::BaseLogger& logger)
+    std::unique_ptr<MotorController> motor_controller, std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , motor_controller_(std::move(motor_controller))
-    , logger_(logger)
+    , logger_(std::move(logger))
 {
-    logger_.error(logger_.fstring("Joint '%s' must have a MotorController.", name_));
     if (!motor_controller_) {
         throw error::HardwareException(
             error::ErrorType::MISSING_MOTOR_CONTROLLER,
-            "A Joint must have a MotorController");
+            "Joint '%s' must have a MotorController.", name_.c_str());
     }
 }
 
 Joint::Joint(std::string name, int net_number,
     std::unique_ptr<MotorController> motor_controller,
     std::unique_ptr<TemperatureGES> temperature_ges,
-    const march_logger::BaseLogger& logger)
+             std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , motor_controller_(std::move(motor_controller))
     , temperature_ges_(std::move(temperature_ges))
-    , logger_(logger)
+    , logger_(std::move(logger))
 {
 }
 
@@ -52,14 +51,14 @@ bool Joint::initSdo(int cycle_time)
 
 std::optional<std::chrono::duration<double>> Joint::prepareActuation()
 {
-    logger_.info(logger_.fstring("[%s] Preparing for actuation", this->name_.c_str()));
+    logger_->info(logger_->fstring("[%s] Preparing for actuation", this->name_.c_str()));
     auto wait_duration = motor_controller_->prepareActuation();
     return wait_duration;
 }
 
 void Joint::enableActuation()
 {
-    logger_.info(logger_.fstring("[%s] Enabling for actuation", this->name_.c_str()));
+    logger_->info(logger_->fstring("[%s] Enabling for actuation", this->name_.c_str()));
     motor_controller_->enableActuation();
 }
 
@@ -70,13 +69,13 @@ void Joint::actuate(float target)
 
 void Joint::readFirstEncoderValues(bool operational_check)
 {
-     logger_.info(logger_.fstring("[%s] Reading first values", this->name_.c_str()));
+     logger_->info(logger_->fstring("[%s] Reading first values", this->name_.c_str()));
 
     // Preconditions check
     if (operational_check) {
         auto motor_controller_state = motor_controller_->getState();
         if (!motor_controller_state->isOperational()) {
-            logger_.fatal(logger_.fstring("[%s]: %s", this->name_.c_str(),
+            logger_->fatal(logger_->fstring("[%s]: %s", this->name_.c_str(),
                                           motor_controller_state->getErrorStatus().value().c_str()));
             throw error::HardwareException(
                 error::ErrorType::PREPARE_ACTUATION_ERROR);
@@ -100,7 +99,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
                         motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
         }
     }
-    logger_.info(logger_.fstring("[%s] Read first values", this->name_.c_str()));
+    logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));
 }
 
 void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
@@ -143,7 +142,7 @@ void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        logger_.warn(logger_.fstring("Data was not updated within %d seconds, using old data.", elapsed_time.count()));
+        logger_->warn(logger_->fstring("Data was not updated within %d seconds, using old data.", elapsed_time.count()));
     }
 }
 
@@ -196,7 +195,7 @@ std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
     if (hasTemperatureGES()) {
         return temperature_ges_;
     } else {
-        logger_.error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
+        logger_->error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
         throw error::HardwareException(
             error::ErrorType::MISSING_TEMPERATURE_GES,
             "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");

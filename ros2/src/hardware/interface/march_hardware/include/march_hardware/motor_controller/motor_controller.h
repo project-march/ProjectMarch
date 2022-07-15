@@ -14,19 +14,21 @@
 namespace march {
 class MotorController : public Slave {
 public:
-    MotorController(const Slave& slave,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode,
-        const march_logger::BaseLogger& logger);
-    MotorController(const Slave& slave,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        ActuationMode actuation_mode,
-        const march_logger::BaseLogger& logger);
-    MotorController(const Slave& slave,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode,
-        const march_logger::BaseLogger& logger);
+    MotorController(const Slave &slave,
+                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                    ActuationMode actuation_mode,
+                    std::shared_ptr<march_logger::BaseLogger> logger);
+
+    MotorController(const Slave &slave,
+                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                    ActuationMode actuation_mode,
+                    std::shared_ptr<march_logger::BaseLogger> logger);
+
+    MotorController(const Slave &slave,
+                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                    ActuationMode actuation_mode,
+                    std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Get the most precise position or velocity
     float getPosition();
@@ -154,7 +156,7 @@ protected:
 
     bool is_incremental_encoder_more_precise_;
 
-    const march_logger::BaseLogger& logger_;
+    std::shared_ptr<march_logger::BaseLogger> logger_;
 };
 
 } // namespace march

@@ -50,34 +50,34 @@ namespace march {
                     "Zero position (= %d iu) should lie between, its lower and upper hard limit ['%d', '%d'].",
                     zero_position_iu_, lower_hard_limit_iu_, upper_hard_limit_iu_);
         }
-        if (lower_soft_limit_rad_diff > lower_error_soft_limit_rad_diff) {
+        if (lower_soft_limit_rad_diff < lower_error_soft_limit_rad_diff) {
             throw error::HardwareException(
                     error::ErrorType::INVALID_RANGE_OF_MOTION,
-                    "Lower SOFT limit difference (= %d rad) is bigger than "
-                    "lower ERROR_SOFT limit difference (= %d rad). "
+                    "Lower SOFT limit difference (= %g rad) is bigger than "
+                    "lower ERROR_SOFT limit difference (= %g rad). "
                     "Error soft limits should lie between (inclusive) the soft and hard limits. ",
                     lower_soft_limit_rad_diff, lower_error_soft_limit_rad_diff);
         }
-        if (upper_soft_limit_rad_diff > upper_error_soft_limit_rad_diff) {
+        if (upper_soft_limit_rad_diff < upper_error_soft_limit_rad_diff) {
             throw error::HardwareException(
                     error::ErrorType::INVALID_RANGE_OF_MOTION,
-                    "Upper SOFT limit difference (= %d rad) is bigger than "
-                    "upper ERROR_SOFT limit difference (= %d rad). "
+                    "Upper SOFT limit difference (= %g rad) is bigger than "
+                    "upper ERROR_SOFT limit difference (= %g rad). "
                     "Error soft limits should lie between (inclusive) the soft and hard limits. ",
                     upper_soft_limit_rad_diff, upper_error_soft_limit_rad_diff);
         }
         if (lower_soft_limit_iu_ >= upper_soft_limit_iu_) {
             throw error::HardwareException(
                     error::ErrorType::INVALID_RANGE_OF_MOTION,
-                    "Lower SOFT limit (= %d iu, = %d rad diff) >= upper SOFT limit (= %d iu, = %d rad diff).",
+                    "Lower SOFT limit (= %d iu, = %g rad diff) >= upper SOFT limit (= %d iu, = %g rad diff).",
                     lower_soft_limit_iu_, lower_soft_limit_rad_diff,
                     upper_soft_limit_iu_, upper_soft_limit_rad_diff);
         }
         if (lower_error_soft_limit_iu_ >= upper_error_soft_limit_iu_) {
             throw error::HardwareException(
                     error::ErrorType::INVALID_RANGE_OF_MOTION,
-                    "Lower ERROR_SOFT limit (= %d iu, = %d rad diff) "
-                    ">= upper ERROR_SOFT limit (= %d iu, = %d rad diff).",
+                    "Lower ERROR_SOFT limit (= %d iu, = %g rad diff) "
+                    ">= upper ERROR_SOFT limit (= %d iu, = %g rad diff).",
                     lower_error_soft_limit_iu_, lower_error_soft_limit_rad_diff,
                     upper_error_soft_limit_iu_, upper_error_soft_limit_rad_diff);
         }

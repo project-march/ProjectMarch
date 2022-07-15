@@ -31,8 +31,7 @@ public:
     /**
     * @brief Initialises with a robot name and URDF.
     */
-    HardwareBuilder(const std::string &yaml_path,
-                    const march_logger::BaseLogger &logger);
+    HardwareBuilder(const std::string &yaml_path, std::shared_ptr<march_logger::BaseLogger> logger);
 
     /**
      * @brief Creates a march::MarchRobot.
@@ -108,7 +107,7 @@ private:
 
     YAML::Node robot_config_;
     std::string if_name_;
-    const march_logger::BaseLogger& logger_;
+    std::shared_ptr<march_logger::BaseLogger> logger_;
     const march::PdoInterfacePtr pdo_interface_;
     const march::SdoInterfacePtr sdo_interface_;
 };

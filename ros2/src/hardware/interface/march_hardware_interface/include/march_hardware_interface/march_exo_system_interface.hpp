@@ -27,7 +27,7 @@ namespace march_hardware_interface
     /// Contains all the needed information for the Hardware Interface for a Joint.
     struct JointInfo
     {
-        std::string name;
+        const std::string name;
         march::Joint& joint;
         double position;
         double velocity;

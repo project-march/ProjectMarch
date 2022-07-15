@@ -11,12 +11,12 @@ MotorController::MotorController(const Slave& slave,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder,
     ActuationMode actuation_mode,
-    const march_logger::BaseLogger& logger)
+    std::shared_ptr<march_logger::BaseLogger> logger)
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
     , incremental_encoder_(std::move(incremental_encoder))
     , actuation_mode_(actuation_mode)
-    , logger_(logger)
+    , logger_(std::move(logger))
 {
     if (!absolute_encoder_ && !incremental_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
@@ -35,22 +35,20 @@ MotorController::MotorController(const Slave& slave,
     }
 }
 
-MotorController::MotorController(const Slave& slave,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    ActuationMode actuation_mode,
-    const march_logger::BaseLogger& logger)
-    : MotorController(
-        slave, std::move(absolute_encoder), nullptr, actuation_mode, logger)
-{
+MotorController::MotorController(const Slave &slave,
+                                 std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                                 ActuationMode actuation_mode,
+                                 std::shared_ptr<march_logger::BaseLogger> logger)
+        : MotorController(
+        slave, std::move(absolute_encoder), nullptr, actuation_mode, std::move(logger)) {
 }
 
-MotorController::MotorController(const Slave& slave,
-    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode,
-    const march_logger::BaseLogger& logger)
-    : MotorController(
-        slave, nullptr, std::move(incremental_encoder), actuation_mode, logger)
-{
+MotorController::MotorController(const Slave &slave,
+                                 std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                                 ActuationMode actuation_mode,
+                                 std::shared_ptr<march_logger::BaseLogger> logger)
+        : MotorController(
+        slave, nullptr, std::move(incremental_encoder), actuation_mode, std::move(logger)) {
 }
 
 std::optional<std::chrono::duration<double>> MotorController::reset()
@@ -147,8 +145,7 @@ std::unique_ptr<AbsoluteEncoder>& MotorController::getAbsoluteEncoder()
 std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
 {
     if (!hasIncrementalEncoder()) {
-        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-            "Cannot get incremental encoder");
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental encoder");
     }
     return incremental_encoder_;
 }

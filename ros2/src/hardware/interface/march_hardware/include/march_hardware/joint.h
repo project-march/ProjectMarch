@@ -20,7 +20,7 @@ public:
     // MotorController.
     Joint(std::string name, int net_number,
         std::unique_ptr<MotorController> motor_controller,
-        const march_logger::BaseLogger& logger);
+          std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Initialize a Joint with motor controller and temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
@@ -29,7 +29,7 @@ public:
     Joint(std::string name, int net_number,
         std::unique_ptr<MotorController> motor_controller,
         std::unique_ptr<TemperatureGES> temperature_ges,
-        const march_logger::BaseLogger& logger);
+          std::shared_ptr<march_logger::BaseLogger> logger);
 
     virtual ~Joint() noexcept = default;
 
@@ -146,7 +146,7 @@ private:
     // A joint must have a MotorController but may have a TemperatureGES
     std::unique_ptr<MotorController> motor_controller_;
     std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
-    const march_logger::BaseLogger& logger_;
+    std::shared_ptr<march_logger::BaseLogger> logger_;
 
 };
 

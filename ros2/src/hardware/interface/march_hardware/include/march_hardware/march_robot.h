@@ -16,23 +16,23 @@
 namespace march {
 class MarchRobot {
 private:
-    ::std::vector<Joint> jointList;
-    EthercatMaster ethercatMaster;
-    std::vector<PressureSole> pressureSoles;
-    std::optional<PowerDistributionBoard> powerDistributionBoard;
-    const march_logger::BaseLogger& logger_;
+    ::std::vector<Joint> joint_list_;
+    EthercatMaster ethercat_master_;
+    std::vector<PressureSole> pressure_soles_;
+    std::optional<PowerDistributionBoard> power_distribution_board_;
+    std::shared_ptr<march_logger::BaseLogger> logger_;
 
 public:
     using iterator = std::vector<Joint>::iterator;
 
-    MarchRobot(::std::vector<Joint> jointList, const march_logger::BaseLogger& logger,
+    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
         ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
 
-    MarchRobot(::std::vector<Joint> jointList, const march_logger::BaseLogger& logger,
+    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
         std::vector<PressureSole> pressureSoles, ::std::string if_name,
         int ecatCycleTime, int ecatSlaveTimeout);
 
-    MarchRobot(::std::vector<Joint> jointList, const march_logger::BaseLogger& logger,
+    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
         std::vector<PressureSole> pressureSoles, ::std::string if_name,
         int ecatCycleTime, int ecatSlaveTimeout,
         std::optional<PowerDistributionBoard>);
@@ -91,12 +91,12 @@ public:
     /** @brief Override comparison operator */
     friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)
     {
-        if (lhs.jointList.size() != rhs.jointList.size()) {
+        if (lhs.joint_list_.size() != rhs.joint_list_.size()) {
             return false;
         }
-        for (unsigned int i = 0; i < lhs.jointList.size(); i++) {
-            const march::Joint& lhsJoint = lhs.jointList.at(i);
-            const march::Joint& rhsJoint = rhs.jointList.at(i);
+        for (unsigned int i = 0; i < lhs.joint_list_.size(); i++) {
+            const march::Joint& lhsJoint = lhs.joint_list_.at(i);
+            const march::Joint& rhsJoint = rhs.joint_list_.at(i);
             if (lhsJoint != rhsJoint) {
                 return false;
             }
@@ -108,8 +108,8 @@ public:
     friend ::std::ostream& operator<<(
         std::ostream& os, const MarchRobot& marchRobot)
     {
-        for (unsigned int i = 0; i < marchRobot.jointList.size(); i++) {
-            os << marchRobot.jointList.at(i) << "\n";
+        for (unsigned int i = 0; i < marchRobot.joint_list_.size(); i++) {
+            os << marchRobot.joint_list_.at(i) << "\n";
         }
         return os;
     }

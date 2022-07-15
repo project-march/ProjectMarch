@@ -15,11 +15,12 @@
 #include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
+#include <march_logger_cpp/ros_logger.hpp>
 
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
-    = { "minPositionIU", "maxPositionIU", "marginLowerSoftLimit", "marginUpperSoftLimit",
-        "marginLowerSoftError", "marginLUpperSoftError"};
+    = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad",
+        "lowerErrorSoftLimitMarginRad", "upperErrorSoftLimitMarginRad"};
 const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "transmission" };
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS
     = { "incrementalEncoder", "absoluteEncoder" };
@@ -38,36 +39,37 @@ const std::vector<std::string>
     = { "slaveIndex", "byteOffset" };
 
 HardwareBuilder::HardwareBuilder(const std::string &yaml_path,
-                                 const march_logger::BaseLogger &logger) :
-//        robot_config_(YAML::LoadFile(yaml_path)),
-        logger_(logger),
+                                 std::shared_ptr<march_logger::BaseLogger> logger) :
+        robot_config_(YAML::LoadFile(yaml_path)),
+        logger_(std::move(logger)),
         pdo_interface_(march::PdoInterfaceImpl::create()),
-        sdo_interface_(march::SdoInterfaceImpl::create(logger)) {
-    logger_.info(yaml_path.c_str());
+        sdo_interface_(march::SdoInterfaceImpl::create(logger_)) {
+    logger_->info(yaml_path.c_str());
 }
 
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot(const std::vector<std::string> &active_joint_names)
 {
-
+    logger_->info("Starting march_hardware_builder...");
     const auto robot_name = this->robot_config_.begin()->first.as<std::string>();
 
     // Remove top level robot name key
+    logger_->info(logger_->fstring("Got robot name: %s.", robot_name.c_str()));
     YAML::Node config = this->robot_config_[robot_name];
 
     if_name_ = config["if_name"].as<std::string>();
 
     std::vector<march::Joint> joints = this->createJoints(config["joints"], active_joint_names);
-
+    logger_->info("Finished creating joints.");
     auto pressure_soles = createPressureSoles(config["pressure_soles"]);
     auto power_distribution_board = createPowerDistributionBoard(config["power_distribution_board"]);
     return std::make_unique<march::MarchRobot>(
-            /*jointList=*/std::move(joints),
+            /*joint_list_=*/std::move(joints),
             /*logger=*/logger_,
-            /*pressureSoles=*/std::move(pressure_soles),
+            /*pressure_soles_=*/std::move(pressure_soles),
             /*if_name=*/if_name_,
             /*ecatCycleTime=*/config["ecatCycleTime"].as<int>(),
             /*ecatSlaveTimeout=*/config["ecatSlaveTimeout"].as<int>(),
-            /*PowerDistributionBoard=*/power_distribution_board);
+            /*PowerDistributionBoard=*/std::move(power_distribution_board));
 }
 
 std::vector<march::Joint> HardwareBuilder::createJoints(
@@ -76,6 +78,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     std::map<std::string, YAML::Node> joint_configs_map = getMapOfActiveJointConfigs(joints_config, active_joint_names);
 
     std::vector<march::Joint> joints;
+    joints.reserve(active_joint_names.size());
     std::stringstream ss;
     for (auto& entry : joint_configs_map) {
         const std::string joint_name = entry.first;
@@ -83,7 +86,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
         joints.push_back(HardwareBuilder::createJoint(joint_name, joint_config));
         ss << joint_name << ", ";
     }
-    logger_.info(logger_.fstring("Sorted actuating joints are: [%s]", ss.str().c_str()));
+    logger_->info(logger_->fstring("Sorted actuating joints are: [%s]", ss.str().c_str()));
 
     joints.shrink_to_fit();
     return joints;
@@ -91,7 +94,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
 
 march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const YAML::Node& joint_config) const
 {
-    logger_.debug(logger_.fstring("Starting creation of joint %s", joint_name.c_str()));
+    logger_->debug(logger_->fstring("Starting creation of joint %s", joint_name.c_str()));
     HardwareBuilder::validateRequiredKeysExist(
             joint_config, HardwareBuilder::JOINT_REQUIRED_KEYS, "joint " + joint_name);
 
@@ -101,7 +104,7 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
     }
 
     int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
-    logger_.info(logger_.fstring("Joint %s will be actuated with slave index %i", joint_name.c_str(), slaveIndex));
+    logger_->info(logger_->fstring("Joint %s will be actuated with slave index %i", joint_name.c_str(), slaveIndex));
 
     auto motor_controller = HardwareBuilder::createMotorController(joint_config["motor_controller"]);
 
@@ -118,27 +121,26 @@ std::map<std::string, YAML::Node> HardwareBuilder::getMapOfActiveJointConfigs(
         std::vector<std::string> active_joint_names) const {
     // Use a sorted map to store the joint names and yaml configurations
     std::map<std::string, YAML::Node> joint_configs_map;
-
     for (YAML::Node joint_config: joints_config) {
-        const std::string joint_name = joint_config.begin()->first.as<std::string>();
+        const auto joint_name = joint_config.begin()->first.as<std::string>();
         auto found_position = std::find(active_joint_names.begin(), active_joint_names.end(), joint_name);
         if (found_position != active_joint_names.end()) {
             joint_configs_map.insert(std::pair<std::string, YAML::Node>(joint_name, joint_config[joint_name]));
             active_joint_names.erase(found_position);
         } else {
-            logger_.warn(logger_.fstring(
+            logger_->warn(logger_->fstring(
                     "Joint %s is not in the controller yaml, but is defined in the robot yaml.",
                     joint_name.c_str()));
         }
     }
 
     // Warn if not all active joints have a config.
-    if (active_joint_names.empty()) {
+    if (!active_joint_names.empty()) {
         std::stringstream active_joint_names_ss;
         for (const auto &active_joint_without_config: active_joint_names) {
             active_joint_names_ss << active_joint_without_config << ", ";
         }
-        logger_.warn(logger_.fstring(
+        logger_->warn(logger_->fstring(
                 "Joints [%s] are defined in the controller yaml, but not in the robot yaml.",
                 active_joint_names_ss.str().c_str()));
     }
@@ -154,7 +156,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(c
 
     march::ActuationMode mode;
     if (config["actuationMode"]) {
-        mode = march::ActuationMode(config["actuationMode"].as<std::string>(), logger_);
+        mode = march::ActuationMode(config["actuationMode"].as<std::string>(), (*logger_.get()));
     }
 
     std::unique_ptr<march::MotorController> motor_controller;
@@ -164,6 +166,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(c
                 march::error::ErrorType::INVALID_MOTOR_CONTROLLER,
                 "Imotioncube is not supported anymore.");
     } else if (type == "odrive") {
+        logger_->info("Creating Odrive.");
         motor_controller = createODrive(config, mode);
     } else {
         throw march::error::HardwareException(
@@ -344,7 +347,7 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node &power_distributi
     if (!power_distribution_board_config) {
         return std::nullopt;
     }
-    logger_.info("Running with PowerDistributionBoard");
+    logger_->info("Running with PowerDistributionBoard");
     HardwareBuilder::validateRequiredKeysExist(power_distribution_board_config,
         HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
         "power_distribution_board");
@@ -353,7 +356,7 @@ HardwareBuilder::createPowerDistributionBoard(const YAML::Node &power_distributi
         = power_distribution_board_config["slaveIndex"].as<int>();
     const auto byte_offset
         = power_distribution_board_config["byteOffset"].as<int>();
-
+    logger_->info("Finished creating PowerDistributionBoard");
     return std::make_optional<march::PowerDistributionBoard>(
         march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset);
 }

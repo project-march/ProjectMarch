@@ -12,7 +12,7 @@
 namespace march_logger {
 class RosLogger : public BaseLogger {
 public:
-    RosLogger(const rclcpp::Logger& rclcpp_logger);
+    RosLogger(const std::shared_ptr<rclcpp::Logger>& rclcpp_logger);
 
     void debug(const std::string& msg) const override;
     void info(const std::string& msg) const override;
@@ -21,7 +21,7 @@ public:
     void fatal(const std::string& msg) const override;
 
 private:
-    const rclcpp::Logger rcl_logger_;
+    const std::shared_ptr<rclcpp::Logger> rcl_logger_;
 };
 }  // namespace march_logger
 

@@ -40,7 +40,9 @@ ament_target_dependencies(
 # Normally this should have been done by ament_target_dependencies, .
 target_link_libraries(${PROJECT_NAME} ${YAML_CPP_LIBRARIES})
 
-
+install(DIRECTORY robots
+        DESTINATION share/${PROJECT_NAME}
+        )
 
 # EXPORT
 # These must be above the two installs otherwise can't be recognized by other packages.

@@ -5,7 +5,7 @@
 #include "../include/march_logger_cpp/ros_logger.hpp"
 #include <rclcpp/logging.hpp>
 namespace march_logger {
-RosLogger::RosLogger(const rclcpp::Logger& rclcpp_logger)
+RosLogger::RosLogger(const std::shared_ptr<rclcpp::Logger>& rclcpp_logger)
     : rcl_logger_(rclcpp_logger)
 {
 }
@@ -16,7 +16,7 @@ RosLogger::RosLogger(const rclcpp::Logger& rclcpp_logger)
  */
 void RosLogger::debug(const std::string& msg) const
 {
-    RCLCPP_DEBUG(rcl_logger_, msg);
+    RCLCPP_DEBUG((*rcl_logger_), msg);
 }
 
 /**
@@ -25,7 +25,7 @@ void RosLogger::debug(const std::string& msg) const
  */
 void RosLogger::info(const std::string& msg) const
 {
-    RCLCPP_INFO(rcl_logger_, msg);
+    RCLCPP_INFO((*rcl_logger_), msg);
 }
 
 /**
@@ -34,7 +34,7 @@ void RosLogger::info(const std::string& msg) const
  */
 void RosLogger::warn(const std::string& msg) const
 {
-    RCLCPP_WARN(rcl_logger_, msg);
+    RCLCPP_WARN((*rcl_logger_), msg);
 }
 
 /**
@@ -43,7 +43,7 @@ void RosLogger::warn(const std::string& msg) const
  */
 void RosLogger::error(const std::string& msg) const
 {
-    RCLCPP_ERROR(rcl_logger_, msg);
+    RCLCPP_ERROR((*rcl_logger_), msg);
 }
 
 /**
@@ -52,7 +52,7 @@ void RosLogger::error(const std::string& msg) const
  */
 void RosLogger::fatal(const std::string& msg) const
 {
-    RCLCPP_FATAL(rcl_logger_, msg);
+    RCLCPP_FATAL((*rcl_logger_), msg);
 }
 
 }  // namespace march_logger
