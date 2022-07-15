@@ -286,7 +286,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="upper_body_front_rotation",
-                default_value="5.0",
+                default_value="10.0",
                 description="forward tilt of the backpack, in deg",
             ),
             # FAKE SENSOR DATA ARGUMENTS

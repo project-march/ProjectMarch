@@ -258,7 +258,7 @@ class Pose:
         pos_knee = pos_ankle + np.array([0, LENGTH_LOWER_LEG])
 
         try:
-            knee_angle = self._parameters.default_knee_bend_radians
+            knee_angle = self.knee_bend
         except AttributeError:
             knee_angle = self._parameters.default_knee_bend_radians
 
@@ -769,6 +769,7 @@ class Pose:
         ankle_z: float,
         subgait_id: str,
         hip_x_fraction: Optional[float] = None,
+        default_knee_bend: Optional[float] = None,
         reduce_df_front: bool = True,
     ) -> List[float]:
         """Solves inverse kinematics for the end position.
@@ -782,8 +783,9 @@ class Pose:
             ankle_y (float): the upward distance for the end position.
             ankle_z (float): the sideward distance for the end position.
             subgait_id (str): either 'left_swing' or 'right_swing', defines which leg is the swing leg.
-            reduce_df_front (bool): whether to reduce dorsiflexion for swing leg.
             hip_x_fraction (float): the fraction between the two feet (forward) at which the hip is desired.
+            default_knee_bend (float): the default bending of the knee for a straight leg.
+            reduce_df_front (bool): whether to reduce dorsiflexion for swing leg.
 
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
@@ -795,7 +797,7 @@ class Pose:
         self.ankle_x = ankle_x
         self.ankle_y = ankle_y
         self.hip_x_fraction = self._parameters.hip_x_fraction if hip_x_fraction is None else hip_x_fraction
-
+        self.knee_bend = default_knee_bend if default_knee_bend else self._parameters.default_knee_bend_radians
         self.desired_pos_ankle1 = np.array([0, 0])
         self.desired_pos_ankle2 = np.array([self.ankle_x, self.ankle_y])
 
