@@ -91,6 +91,21 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
         elif param.name == "add_cybathlon_gaits":
             node.add_cybathlon_gaits = param.get_parameter_value().bool_value
             dynamic_gait_updated = True
+        elif param.name == "ankle_buffer":
+            node.ankle_buffer = param.get_parameter_value().double_value
+            dynamic_gait_updated = True
+        elif param.name == "hip_buffer":
+            node.hip_buffer = param.get_parameter_value().double_value
+            dynamic_gait_updated = True
+        elif param.name == "default_knee_bend":
+            node.default_knee_bend = param.get_parameter_value().double_value
+            dynamic_gait_updated = True
+        elif param.name == "hip_x_fraction":
+            node.hip_x_fraction = param.get_parameter_value().double_value
+            dynamic_gait_updated = True
+        elif param.name == "upper_body_front_rotation":
+            node.upper_body_front_rotation = param.get_parameter_value().double_value
+            dynamic_gait_updated = True
 
     # Separate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
@@ -117,22 +132,31 @@ class GaitNode(Node):
         try:
             self.gait_package = self.get_parameter("gait_package").get_parameter_value().string_value
             self.directory_name = self.get_parameter("gait_directory").get_parameter_value().string_value
+            self.early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
+            self.first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
 
+            # Dynamic gait parameters
             self.middle_point_fraction = self.get_parameter("middle_point_fraction").get_parameter_value().double_value
             self.middle_point_height = self.get_parameter("middle_point_height").get_parameter_value().double_value
             self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
             self.amount_of_steps = self.get_parameter("amount_of_steps").get_parameter_value().integer_value
             self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
             self.add_cybathlon_gaits = self.get_parameter("add_cybathlon_gaits").get_parameter_value().bool_value
-
             self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
 
-            self.early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
-            self.first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
+            # IK Solver parameters
+            self.ankle_buffer = self.get_parameter("ankle_buffer").get_parameter_value().double_value
+            self.hip_buffer = self.get_parameter("hip_buffer").get_parameter_value().double_value
+            self.default_knee_bend = self.get_parameter("default_knee_bend").get_parameter_value().double_value
+            self.hip_x_fraction = self.get_parameter("hip_x_fraction").get_parameter_value().double_value
+            self.upper_body_front_rotation = (
+                self.get_parameter("upper_body_front_rotation").get_parameter_value().double_value
+            )
+
         except ParameterNotDeclaredException:
-            self.logger.error("Gait node started without the required parameters.")
+            self._logger.error("Gait node started without the required parameters.")
 
     def _parse_duration_parameter(self, name: str) -> Duration:
         """Get a duration parameter from the parameter server.

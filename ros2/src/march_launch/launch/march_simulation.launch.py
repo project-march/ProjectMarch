@@ -73,6 +73,11 @@ def generate_launch_description() -> launch.LaunchDescription:
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
+    ankle_buffer = LaunchConfiguration("ankle_buffer")
+    hip_buffer = LaunchConfiguration("hip_buffer")
+    default_knee_bend = LaunchConfiguration("default_knee_bend")
+    hip_x_fraction = LaunchConfiguration("hip_x_fraction")
+    upper_body_front_rotation = LaunchConfiguration("upper_body_front_rotation")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -258,6 +263,32 @@ def generate_launch_description() -> launch.LaunchDescription:
                 default_value="False",
                 description="If true, no joints will be actuated",
             ),
+            # IK solver parameters
+            DeclareLaunchArgument(
+                name="ankle_buffer",
+                default_value="1.0",
+                description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_buffer",
+                default_value="1.0",
+                description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="default_knee_bend",
+                default_value="8.0",
+                description="efault knee flexion angle, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_x_fraction",
+                default_value="0.5",
+                description="fraction of step at which hip is located",
+            ),
+            DeclareLaunchArgument(
+                name="upper_body_front_rotation",
+                default_value="5.0",
+                description="forward tilt of the backpack, in deg",
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -336,6 +367,11 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
                     ("timer_period", timer_period),
+                    ("ankle_buffer", ankle_buffer),
+                    ("hip_buffer", hip_buffer),
+                    ("default_knee_bend", default_knee_bend),
+                    ("hip_x_fraction", hip_x_fraction),
+                    ("upper_body_front_rotation", upper_body_front_rotation),
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),

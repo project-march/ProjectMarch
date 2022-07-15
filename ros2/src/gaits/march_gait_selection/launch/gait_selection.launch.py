@@ -101,6 +101,32 @@ def generate_launch_description():
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
+            # IK solver parameters
+            DeclareLaunchArgument(
+                name="ankle_buffer",
+                default_value="1.0",
+                description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_buffer",
+                default_value="1.0",
+                description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="default_knee_bend",
+                default_value="8.0",
+                description="efault knee flexion angle, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_x_fraction",
+                default_value="0.5",
+                description="fraction of step at which hip is located",
+            ),
+            DeclareLaunchArgument(
+                name="upper_body_front_rotation",
+                default_value="5.0",
+                description="forward tilt of the backpack, in deg",
+            ),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -125,6 +151,11 @@ def generate_launch_description():
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
                     {"timer_period": LaunchConfiguration("timer_period")},
+                    {"ankle_buffer": LaunchConfiguration("ankle_buffer")},
+                    {"hip_buffer": LaunchConfiguration("hip_buffer")},
+                    {"default_knee_bend": LaunchConfiguration("default_knee_bend")},
+                    {"hip_x_fraction": LaunchConfiguration("hip_x_fraction")},
+                    {"upper_body_front_rotation": LaunchConfiguration("upper_body_front_rotation")},
                 ],
                 on_exit=Shutdown(),
             ),
