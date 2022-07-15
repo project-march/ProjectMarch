@@ -7,6 +7,7 @@ from dataclasses import dataclass
 @dataclass()
 class IKSolverParameters:
     """Dataclass to contain all reconfigurable parameters of the IK solver."""
+
     ankle_buffer: float
     hip_buffer: float
     default_knee_bend: float
@@ -15,32 +16,40 @@ class IKSolverParameters:
 
     @property
     def ankle_buffer_degrees(self) -> float:
+        """Returns the ankle buffer in degrees."""
         return self.ankle_buffer
 
     @property
     def ankle_buffer_radians(self) -> float:
+        """Returns the ankle buffer in radians."""
         return deg2rad(self.ankle_buffer)
 
     @property
     def hip_buffer_degrees(self) -> float:
+        """Returns the hip buffer in degrees."""
         return self.hip_buffer
 
     @property
     def hip_buffer_radians(self) -> float:
+        """Returns the hip buffer in radians."""
         return deg2rad(self.hip_buffer)
 
     @property
     def default_knee_bend_degrees(self) -> float:
+        """Returns the default knee in bend in degrees."""
         return self.default_knee_bend
 
     @property
     def default_knee_bend_radians(self) -> float:
+        """Returns the default knee bend in radians."""
         return deg2rad(self.default_knee_bend)
 
     @property
     def upper_body_front_rotation_degrees(self) -> float:
+        """Returns the upper body front rotation in degrees."""
         return self.upper_body_front_rotation
 
     @property
     def upper_body_front_rotation_radians(self) -> float:
+        """Returns the upper body front radians."""
         return deg2rad(self.upper_body_front_rotation)
