@@ -49,7 +49,7 @@ bool Joint::initSdo(int cycle_time)
     return reset;
 }
 
-std::optional<std::chrono::duration<double>> Joint::prepareActuation()
+std::chrono::nanoseconds Joint::prepareActuation()
 {
     logger_->info(logger_->fstring("[%s] Preparing for actuation", this->name_.c_str()));
     auto wait_duration = motor_controller_->prepareActuation();

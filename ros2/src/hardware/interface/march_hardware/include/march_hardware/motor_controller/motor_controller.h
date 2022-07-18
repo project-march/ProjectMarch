@@ -58,11 +58,11 @@ public:
      * Can be overridden by child classes
      * @returns Returns an optional wait duration
      */
-    virtual std::optional<std::chrono::duration<double>> reset();
+    virtual std::chrono::nanoseconds reset();
 
     // Prepare the MotorController for actuation
     // Returns an optional wait duration
-    virtual std::optional<std::chrono::duration<double>> prepareActuation() = 0;
+    virtual std::chrono::nanoseconds prepareActuation() = 0;
 
     // Enable actuation for the MotorController, move it into its 'ready' state
     // Returns an optional wait duration

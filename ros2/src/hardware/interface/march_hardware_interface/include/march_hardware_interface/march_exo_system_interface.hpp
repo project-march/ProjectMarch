@@ -53,6 +53,10 @@ public:
             std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
+    hardware_interface::return_type perform_command_mode_switch(const std::vector<std::string> &start_interfaces,
+                                                                const std::vector<std::string> &stop_interfaces) override;
+
+    MARCH_HARDWARE_INTERFACE_PUBLIC
             hardware_interface::return_type start() override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
@@ -68,6 +72,7 @@ private:
 
     std::unique_ptr<march::MarchRobot> load_march_hardware(const hardware_interface::HardwareInfo& info) const;
     bool has_correct_actuation_mode(march::Joint& joint) const;
+    void make_joints_operational(std::vector<march::Joint*> joints) const;
 
     const std::shared_ptr<rclcpp::Logger> logger_;
     std::unique_ptr<march::MarchRobot> march_robot_;

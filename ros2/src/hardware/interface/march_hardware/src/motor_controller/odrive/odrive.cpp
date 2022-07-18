@@ -34,20 +34,20 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
     this->is_incremental_encoder_more_precise_ = true;
 }
 
-std::optional<std::chrono::duration<double>> ODrive::reset()
+std::chrono::nanoseconds ODrive::reset()
 {
     setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
-    return std::make_optional<std::chrono::duration<double>>(1);
+    return std::chrono::nanoseconds(1);
 }
 
-std::optional<std::chrono::duration<double>> ODrive::prepareActuation()
+std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_
         && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-        return std::chrono::duration<double>(/*t=*/10);
+        return std::chrono::nanoseconds(/*t=*/10);
     } else {
-        return std::nullopt;
+        return std::chrono::nanoseconds(0);
     }
 }
 

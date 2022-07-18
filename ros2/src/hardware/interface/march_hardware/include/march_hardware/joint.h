@@ -49,7 +49,7 @@ public:
 
     // Prepare the joint for actuation
     // Returns an optional wait duration
-    std::optional<std::chrono::duration<double>> prepareActuation();
+    std::chrono::nanoseconds prepareActuation();
 
     // Enable actuation for this joint
     // Returns an optional wait duration

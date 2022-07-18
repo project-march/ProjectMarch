@@ -47,13 +47,13 @@ public:
     ~ODrive() noexcept override = default;
 
     // Override functions for actuating the ODrive
-    std::optional<std::chrono::duration<double>> prepareActuation() override;
+    std::chrono::nanoseconds prepareActuation() override;
     void enableActuation() override;
     void actuateTorque(float target_torque) override;
     void actuateRadians(float target_position) override;
 
     // Override reset function
-    std::optional<std::chrono::duration<double>> reset() override;
+    std::chrono::nanoseconds reset() override;
 
     bool requiresUniqueSlaves() const override;
 

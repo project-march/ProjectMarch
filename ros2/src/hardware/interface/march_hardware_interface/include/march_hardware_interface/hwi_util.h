@@ -102,6 +102,16 @@ inline static const char PATH_SEPARATOR =
         '/';
 #endif
 
+inline string joint_vector_to_string(std::vector<march::Joint*>& joints) {
+    std::stringstream joint_names_ss;
+    joint_names_ss << "[ ";
+    for (ulong i = 0; i < joints.size() - 1; i++) {
+        joint_names_ss << joints[i]->getName().c_str() << ", ";
+    }
+    joint_names_ss << joints[joints.size() - 1]->getName().c_str() << " ]";
+    return joint_names_ss.str();
+}
+
 /** \brief Executes a given function on joint until successful with a set amount of maximum tries.
  *
  * @param function_goal The goal of the function. This is logged if it did not succeed in the maximum amount of tries.
@@ -117,7 +127,7 @@ inline static const char PATH_SEPARATOR =
 inline void repeat_function_on_joints_until_timeout(const string &function_goal,
                                                     const function<bool(march::Joint &)> &function,
                                                     const rclcpp::Logger &logger,
-                                                    march::MarchRobot *robot,
+                                                    std::vector<march::Joint*>& joints,
                                                     const optional<std::function<void(march::Joint &)>> &
                                                         function_when_timeout = nullopt,
                                                     const chrono::nanoseconds sleep_between_tries
@@ -125,13 +135,14 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
                                                     const unsigned maximum_tries  = 10) {
     vector<bool> is_ok;
     unsigned int amount_ok = 0;
-    unsigned int amount_of_joints = robot->size();
+    unsigned int amount_of_joints = joints.size();
     is_ok.resize(amount_of_joints, false);
-    RCLCPP_INFO(logger, "Trying to perform '%s' in %i tries.", function_goal.c_str(), maximum_tries);
+    RCLCPP_INFO(logger, "Trying to perform '%s' on joints: '%s' in %i tries.",
+                function_goal.c_str(), joint_vector_to_string(joints).c_str(), maximum_tries);
     unsigned int num_tries = 0;
     for (; num_tries < maximum_tries; num_tries++) {
         for (unsigned int i = 0; i < amount_of_joints; i++) {
-            if (!is_ok.at(i) && function(/*input_to_given_function=*/robot->getJoint(i))) {
+            if (!is_ok.at(i) && function(/*input_to_given_function=*/*joints[i])) {
                 amount_ok++;
                 is_ok.at(i) = true;
                 if (amount_ok == amount_of_joints) { return; }
@@ -144,20 +155,38 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
         for (unsigned int i = 0; i < amount_of_joints; i++) {
             if (!is_ok.at(i)) {
                 RCLCPP_ERROR(logger, "Couldn't perform '%s' on joint '%s' in %i tries.",
-                             function_goal.c_str(), robot->getJoint(i).getName().c_str(), num_tries);
+                             function_goal.c_str(), joints[i]->getName().c_str(), num_tries);
             }
         }
         if (function_when_timeout.has_value()) {
             auto const &callable = function_when_timeout.value();
             for (unsigned int i = 0; i < amount_of_joints; i++) {
                 if (!is_ok.at(i)) {
-                    callable(robot->getJoint(i));
+                    callable(*joints[i]);
                 }
             }
         }
         throw march::error::HardwareException(
                 march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
     }
+}
+
+inline void call_function_and_wait_on_joints(const string &function_goal,
+                                             const function<const chrono::nanoseconds(march::Joint &)> &function,
+                                             const rclcpp::Logger &logger,
+                                             std::vector<march::Joint*>& joints) {
+    RCLCPP_INFO(logger, "Performing '%s' on joints: '%s'.",
+                function_goal.c_str(), joint_vector_to_string(joints).c_str());
+    chrono::nanoseconds max_sleep {0};
+    for (auto joint : joints) {
+        max_sleep = max(max_sleep, function(*joint));
+    }
+    if (max_sleep.count() > 0) {
+        RCLCPP_INFO(logger, "%s Successful after %l nanoseconds'.",
+                    function_goal.c_str(), max_sleep.count());
+    }
+    rclcpp::sleep_for(max_sleep);
+
 }
 
 

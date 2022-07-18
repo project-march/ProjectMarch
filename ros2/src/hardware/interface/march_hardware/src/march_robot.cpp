@@ -215,6 +215,19 @@ Joint& MarchRobot::getJoint(size_t index)
     return this->joint_list_.at(index);
 }
 
+std::vector<Joint*> MarchRobot::getJoints()
+{
+    if (!ethercat_master_.isOperational()) {
+        logger_->warn("Trying to access joints while ethercat is not operational. "
+                      "This may lead to incorrect sensor data.");
+    }
+    std::vector<Joint*> jointPtrs(joint_list_.size());
+    for (size_t i = 0; i < joint_list_.size(); ++i) {
+        jointPtrs.push_back(&joint_list_[i]);
+    }
+    return jointPtrs;
+}
+
 size_t MarchRobot::size() const
 {
     return this->joint_list_.size();
@@ -259,15 +272,15 @@ MarchRobot::~MarchRobot()
     stopEtherCAT();
 }
 
-std::vector<bool> MarchRobot::areJointsOperational()
+std::vector<Joint*> MarchRobot::getNotOperationalJoints()
 {
-    std::vector<bool> is_operational;
-    is_operational.resize(joint_list_.size());
+    std::vector<Joint*> not_operational_joints;
     for (size_t i = 0; i < joint_list_.size(); ++i) {
-        is_operational[i]
-            = joint_list_[i].getMotorController()->getState()->isOperational();
+        if (!joint_list_[i].getMotorController()->getState()->isOperational()) {
+            not_operational_joints.push_back(&joint_list_[i]);
+        }
     }
-    return is_operational;
+    return not_operational_joints;
 }
 
 } // namespace march

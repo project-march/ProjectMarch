@@ -56,7 +56,7 @@ public:
     ~IMotionCube() noexcept override = default;
 
     // Override functions for actuating the IMotionCube
-    std::optional<std::chrono::duration<double>> prepareActuation() override;
+    std::chrono::nanoseconds prepareActuation() override;
     void enableActuation() override;
     void actuateRadians(float target_position) override;
     void actuateTorque(float target_torque) override;

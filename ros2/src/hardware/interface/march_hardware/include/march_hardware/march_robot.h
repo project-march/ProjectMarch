@@ -70,6 +70,8 @@ public:
 
     Joint& getJoint(size_t index);
 
+    std::vector<Joint*> getJoints();
+
     size_t size() const;
 
     iterator begin();
@@ -84,9 +86,9 @@ public:
     /**
      * Are the joints of the robot operational
      * Calls the isOperational method of the MotorControler of the joint
-     * @return List of booleans, true when a joint is operational, false if not.
+     * @return List of not operational Joints.
      */
-    std::vector<bool> areJointsOperational();
+    std::vector<Joint*> getNotOperationalJoints();
 
     /** @brief Override comparison operator */
     friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)

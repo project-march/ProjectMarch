@@ -51,9 +51,9 @@ MotorController::MotorController(const Slave &slave,
         slave, nullptr, std::move(incremental_encoder), actuation_mode, std::move(logger)) {
 }
 
-std::optional<std::chrono::duration<double>> MotorController::reset()
+std::chrono::nanoseconds MotorController::reset()
 {
-    return std::nullopt;
+    return std::chrono::nanoseconds(0);
 }
 
 bool MotorController::isIncrementalEncoderMorePrecise() const

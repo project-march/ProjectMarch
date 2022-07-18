@@ -143,12 +143,12 @@ hardware_interface::return_type MarchExoSystemInterface::start()
     // Start ethercat cycle in the hardware
     RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
     march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
-
+    auto jointPtrs = march_robot_->getJoints();
     RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
     repeat_function_on_joints_until_timeout(
             /*function_goal=*/"Waiting on ethercat data.",
             /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->dataIsValid();},
-            /*logger=*/(*logger_), /*robot=*/march_robot_.get(),
+            /*logger=*/(*logger_), /*joints=*/jointPtrs,
             /*function_when_timeout=*/[this](march::Joint& joint) {
                 RCLCPP_ERROR((*logger_), "Joints %s is not receiving data",
                              joint.getName().c_str());
@@ -168,6 +168,63 @@ hardware_interface::return_type MarchExoSystemInterface::start()
     RCLCPP_INFO((*logger_), "All joints are ready for reading!");
     status_ = hardware_interface::status::STARTED;
     return hardware_interface::return_type::OK;
+}
+
+/** \brief This method is used to switch command modes, but we use it to activate the command options on the hardware.
+*
+* By handling making the hardware actuation ready in this step we can make sure to,
+* read values of the joints (while they are not even actuation ready).
+*
+* @param start_interfaces The new starting interfaces.
+* @param stop_interfaces  The interfaces that are stopping.
+* @return hardware_interface::return_type::OK if everything is correct,
+*          hardware_interface::return_type::ERROR otherwise.
+*/
+hardware_interface::return_type
+MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::string> &start_interfaces,
+                                                     const std::vector<std::string> &stop_interfaces) {
+    for (const auto& start: start_interfaces) {
+        RCLCPP_INFO((*logger_), "Starting interfaces: %s", start.c_str());
+    }
+    for (const auto& stop: stop_interfaces) {
+        RCLCPP_INFO((*logger_), "Stopping interfaces: %s", stop.c_str());
+    }
+
+    make_joints_operational(march_robot_->getNotOperationalJoints());
+
+    return hardware_interface::return_type::OK;
+}
+
+void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*> joints) const {
+    if (joints.empty()) { return; }
+
+    // Tell every MotorController to clear its errors.
+    call_function_and_wait_on_joints(
+            /*function_goal=*/"Clearing errors of joints.",
+            /*function=*/[](march::Joint& joint) {return joint.getMotorController()->reset();},
+            /*logger=*/(*logger_), /*joints=*/joints);
+
+    // Prepare every joint for actuation.
+    call_function_and_wait_on_joints(
+            /*function_goal=*/"Preparing joints for actuation.",
+            /*function=*/[](march::Joint& joint) {return joint.prepareActuation();},
+            /*logger=*/(*logger_), /*joints=*/joints);
+
+    // Tell every joint to enable actuation.
+    // TODO: Check if this needs be done for every joint or the non operational once.
+    RCLCPP_INFO((*logger_), "Enabling every joint for actuation");
+    for (auto joint : joints) {
+        joint->enableActuation();
+    }
+
+    repeat_function_on_joints_until_timeout(
+            /*function_goal=*/"Check if joints are  in operational state.",
+            /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->isOperational();},
+            /*logger=*/(*logger_), /*joints=*/joints,
+            /*function_when_timeout=*/[this](march::Joint& joint) {
+                RCLCPP_ERROR((*logger_), "Joint %s is not an operational state.",
+                             joint.getName().c_str());
+            });
 }
 
 /// This method is ran when you stop the controller, (start is ran earlier).

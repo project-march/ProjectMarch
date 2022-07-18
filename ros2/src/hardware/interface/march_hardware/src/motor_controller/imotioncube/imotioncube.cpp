@@ -387,7 +387,7 @@ void IMotionCube::goToTargetState(const IMotionCubeTargetState& target_state)
     // ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
 }
 
-std::optional<std::chrono::duration<double>> IMotionCube::prepareActuation()
+std::chrono::nanoseconds IMotionCube::prepareActuation()
 {
     if (this->actuation_mode_ == ActuationMode::unknown) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
@@ -426,7 +426,7 @@ std::optional<std::chrono::duration<double>> IMotionCube::prepareActuation()
     }
 
     this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
-    return std::nullopt;
+    return std::chrono::nanoseconds(0);
 }
 
 void IMotionCube::resetSlave(SdoSlaveInterface& sdo)
