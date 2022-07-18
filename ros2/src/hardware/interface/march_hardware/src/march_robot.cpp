@@ -221,7 +221,8 @@ std::vector<Joint*> MarchRobot::getJoints()
         logger_->warn("Trying to access joints while ethercat is not operational. "
                       "This may lead to incorrect sensor data.");
     }
-    std::vector<Joint*> jointPtrs(joint_list_.size());
+    std::vector<Joint*> jointPtrs;
+    jointPtrs.reserve(joint_list_.size());
     for (size_t i = 0; i < joint_list_.size(); ++i) {
         jointPtrs.push_back(&joint_list_[i]);
     }
