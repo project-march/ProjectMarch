@@ -78,6 +78,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     default_knee_bend = LaunchConfiguration("default_knee_bend")
     hip_x_fraction = LaunchConfiguration("hip_x_fraction")
     upper_body_front_rotation = LaunchConfiguration("upper_body_front_rotation")
+    dorsiflexion_at_end_position = LaunchConfiguration("dorsiflexion_at_end_position")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -286,8 +287,14 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="upper_body_front_rotation",
-                default_value="10.0",
+                default_value="30.0",
                 description="forward tilt of the backpack, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="dorsiflexion_at_end_position",
+                default_value="0.0",
+                description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
+                            "if it is set to zero."
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
@@ -372,6 +379,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("default_knee_bend", default_knee_bend),
                     ("hip_x_fraction", hip_x_fraction),
                     ("upper_body_front_rotation", upper_body_front_rotation),
+                    ("dorsiflexion_at_end_position", dorsiflexion_at_end_position),
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),

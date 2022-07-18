@@ -841,6 +841,10 @@ class Pose:
         self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
 
         # Create a list of the pose:
+        if self._parameters.dorsiflexion_at_end_position_radians != 0:
+            self.fe_ankle2 = self._parameters.dorsiflexion_at_end_position_radians
+        elif self._parameters.dorsiflexion_at_end_position_radians > self._max_ankle_flexion:
+            self.fe_ankle2 = self._max_ankle_flexion
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
         # Perform a limit check and raise error if limit is exceeded:

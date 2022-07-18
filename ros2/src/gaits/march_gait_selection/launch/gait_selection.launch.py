@@ -124,8 +124,14 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="upper_body_front_rotation",
-                default_value="10.0",
+                default_value="30.0",
                 description="forward tilt of the backpack, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="dorsiflexion_at_end_position",
+                default_value="0.0",
+                description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
+                "if it is set to zero."
             ),
             Node(
                 package="march_gait_selection",
@@ -156,6 +162,7 @@ def generate_launch_description():
                     {"default_knee_bend": LaunchConfiguration("default_knee_bend")},
                     {"hip_x_fraction": LaunchConfiguration("hip_x_fraction")},
                     {"upper_body_front_rotation": LaunchConfiguration("upper_body_front_rotation")},
+                    {"dorsiflexion_at_end_position": LaunchConfiguration("dorsiflexion_at_end_position")}
                 ],
                 on_exit=Shutdown(),
             ),

@@ -106,6 +106,9 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
         elif param.name == "upper_body_front_rotation":
             node.upper_body_front_rotation = param.get_parameter_value().double_value
             dynamic_gait_updated = True
+        elif param.name == "dorsiflexion_at_end_position":
+            node.dorsiflexion_at_end_position = param.get_parameter_value().double_value
+            dynamic_gait_updated = True
 
     # Separate update function for dynamic gait to avoid time performance issues
     if dynamic_gait_updated:
@@ -153,6 +156,9 @@ class GaitNode(Node):
             self.hip_x_fraction = self.get_parameter("hip_x_fraction").get_parameter_value().double_value
             self.upper_body_front_rotation = (
                 self.get_parameter("upper_body_front_rotation").get_parameter_value().double_value
+            )
+            self.dorsiflexion_at_end_position = (
+                self.get_parameter("dorsiflexion_at_end_position").get_parameter_value().double_value
             )
 
         except ParameterNotDeclaredException:
