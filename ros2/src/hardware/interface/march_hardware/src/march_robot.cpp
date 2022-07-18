@@ -61,8 +61,8 @@ void MarchRobot::startEtherCAT(bool reset_motor_controllers)
         return;
     }
 
-//    bool sw_reset = ethercat_master_.start(this->joint_list_);
-    bool sw_reset = false;
+    bool sw_reset = ethercat_master_.start(this->joint_list_);
+//    bool sw_reset = false;
 
     if (reset_motor_controllers || sw_reset) {
         logger_->debug(logger_->fstring(
