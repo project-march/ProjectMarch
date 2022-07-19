@@ -3,7 +3,7 @@
 from typing import List, Tuple
 from rclpy.node import Node
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition
+from march_shared_msgs.msg import FootPosition, CurrentGait
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 import numpy as np
 
@@ -78,6 +78,12 @@ class GaitPreprocessor(Node):
             self._update_step_height_previous,
             DEFAULT_HISTORY_DEPTH,
         )
+        self.create_subscription(
+            CurrentGait,
+            "/march/gait_selection/current_gait",
+            self._reset_previous_step_height_after_close,
+            1,
+        )
 
     def _create_publishers(self) -> None:
         """Create publishers for the topics gait listens to."""
@@ -119,6 +125,11 @@ class GaitPreprocessor(Node):
         """Update the _step_height_previous attribute with the height of the last chosen foot position."""
         self._step_height_previous = foot_position.processed_point.y
 
+    def _reset_previous_step_height_after_close(self, current_gait: CurrentGait) -> None:
+        """Resets the _step_height_previous attribute after a close gait."""
+        if current_gait.subgait in ["left_close", "right_close"]:
+            self._step_height_previous = 0.0
+
     def _process_foot_position(self, foot_position: FootPosition) -> FootPosition:
         """Reformat the foot location so that gait can use it.
 
@@ -128,16 +139,16 @@ class GaitPreprocessor(Node):
         Returns:
             Point: Location with transformed axes and scaled duration.
         """
-        transformed_foot_location = self._transform_point_to_gait_axes(foot_location.displacement)
+        transformed_foot_position = self._transform_point_to_gait_axes(foot_position.displacement)
         if self._new_midpoint_method:
             midpoint_deviation, relative_midpoint_height = self._compute_midpoint_locations(
-                foot_location.track_points, transformed_foot_location
+                foot_position.track_points, transformed_foot_position
             )
         else:
             midpoint_deviation = 0.0
             relative_midpoint_height = 0.15
 
-        scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_location.y)
+        scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_position.y)
 
         return FootPosition(
             header=foot_position.header,
@@ -217,9 +228,7 @@ class GaitPreprocessor(Node):
         Returns:
             float: Scaled duration in seconds.
         """
-        scaled_duration = duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(self._step_height_previous))
-        self._logger.warn(f"{scaled_duration}")
-        return scaled_duration
+        return duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(self._step_height_previous))
 
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations."""

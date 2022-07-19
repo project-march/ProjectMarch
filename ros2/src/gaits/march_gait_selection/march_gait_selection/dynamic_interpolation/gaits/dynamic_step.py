@@ -102,6 +102,7 @@ class DynamicStep:
         self.starting_position_dict = self._from_list_to_setpoint(
             self.all_joint_names, list(self.starting_position.values()), None, self.time[SetpointTime.START_INDEX]
         )
+        self._logger.warn(f"{self._duration}")
 
         self.start = start
         self.stop = stop
