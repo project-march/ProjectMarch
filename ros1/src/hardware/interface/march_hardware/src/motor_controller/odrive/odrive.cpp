@@ -125,7 +125,8 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     // Set general attributes
     state->motor_current_ = getMotorCurrent();
-    state->temperature_ = getTemperature();
+    state->motor_temperature_ = getMotorTemperature();
+    state->fet_temperature_ = getODriveTemperature();
 
     if (hasAbsoluteEncoder()) {
         state->absolute_position_iu_ = getAbsolutePositionIU();
@@ -155,11 +156,19 @@ float ODrive::getTorque()
     return getMotorCurrent() * torque_constant_;
 }
 
-float ODrive::getTemperature()
+float ODrive::getODriveTemperature()
 {
     return this
         ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::Temperature, axis_))
+            ODriveObjectName::OdriveTemperature, axis_))
+        .f;
+}
+
+float ODrive::getMotorTemperature()
+{
+    return this
+        ->read32(ODrivePDOmap::getMISOByteOffset(
+            ODriveObjectName::MotorTemperature, axis_))
         .f;
 }
 
@@ -174,7 +183,7 @@ int32_t ODrive::getAbsolutePositionIU()
 {
     int32_t iu_value
         = this->read32(ODrivePDOmap::getMISOByteOffset(
-                           ODriveObjectName::ActualPosition, axis_))
+                           ODriveObjectName::AbsolutePosition, axis_))
               .i;
 
     switch (absolute_encoder_->getDirection()) {
@@ -191,7 +200,7 @@ int32_t ODrive::getAbsolutePositionIU()
 int32_t ODrive::getIncrementalPositionIU()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::MotorPosition, axis_))
+                            ODriveObjectName::ShadowCount, axis_))
                .i
         * incremental_encoder_->getDirection();
 }
@@ -199,7 +208,7 @@ int32_t ODrive::getIncrementalPositionIU()
 float ODrive::getIncrementalVelocityIU()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::ActualVelocity, axis_))
+                            ODriveObjectName::MotorVelocity, axis_))
                .f
         * (float)incremental_encoder_->getDirection();
 }
@@ -231,7 +240,7 @@ float ODrive::getIncrementalVelocityUnchecked()
 float ODrive::getMotorCurrent()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::ActualCurrent, axis_))
+                            ODriveObjectName::Current, axis_))
                .f
         * (float)getMotorDirection();
 }
