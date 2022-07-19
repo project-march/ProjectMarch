@@ -29,6 +29,7 @@ class GaitPreprocessor(Node):
         self.subscription_left = None
         self.subscription_right = None
         self._logger = self.get_logger().get_child(__class__.__name__)
+        self._step_height_previous = 0.0
 
         self._init_parameters()
         self._create_subscribers()
@@ -65,6 +66,18 @@ class GaitPreprocessor(Node):
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
+        self.create_subscription(
+            FootPosition,
+            "/march/chosen_foot_position/right",
+            self._update_step_height_previous,
+            DEFAULT_HISTORY_DEPTH,
+        )
+        self.create_subscription(
+            FootPosition,
+            "/march/chosen_foot_position/left",
+            self._update_step_height_previous,
+            DEFAULT_HISTORY_DEPTH,
+        )
 
     def _create_publishers(self) -> None:
         """Create publishers for the topics gait listens to."""
@@ -84,29 +97,33 @@ class GaitPreprocessor(Node):
             DEFAULT_HISTORY_DEPTH,
         )
 
-    def _callback_left(self, foot_location: FootPosition) -> None:
+    def _callback_left(self, foot_position: FootPosition) -> None:
         """Callback for new left point from covid. Makes the point usable for the gait.
 
         Args:
-            foot_location (FootPosition): Location given by CoViD (Computer Vision).
+            foot_position (FootPosition): Location given by CoViD (Computer Vision).
         """
-        foot_location_msg = self._process_foot_location(foot_location)
-        self.publisher_left.publish(foot_location_msg)
+        foot_position_msg = self._process_foot_position(foot_position)
+        self.publisher_left.publish(foot_position_msg)
 
-    def _callback_right(self, foot_location: FootPosition) -> None:
+    def _callback_right(self, foot_position: FootPosition) -> None:
         """Callback for new right point from covid. Makes the point usable for the gait.
 
         Args:
-            foot_location (FootPosition): Location given by CoViD (Computer Vision).
+            foot_position (FootPosition): Location given by CoViD (Computer Vision).
         """
-        foot_location_msg = self._process_foot_location(foot_location)
-        self.publisher_right.publish(foot_location_msg)
+        foot_position_msg = self._process_foot_position(foot_position)
+        self.publisher_right.publish(foot_position_msg)
 
-    def _process_foot_location(self, foot_location: FootPosition) -> FootPosition:
+    def _update_step_height_previous(self, foot_position: FootPosition) -> None:
+        """Update the _step_height_previous attribute with the height of the last chosen foot position."""
+        self._step_height_previous = foot_position.processed_point.y
+
+    def _process_foot_position(self, foot_position: FootPosition) -> FootPosition:
         """Reformat the foot location so that gait can use it.
 
         Args:
-            foot_location (FootPosition): Location given by CoViD (Computer Vision).
+            foot_position (FootPosition): Location given by CoViD (Computer Vision).
 
         Returns:
             Point: Location with transformed axes and scaled duration.
@@ -123,12 +140,12 @@ class GaitPreprocessor(Node):
         scaled_duration = self._get_duration_scaled_to_height(self._duration, transformed_foot_location.y)
 
         return FootPosition(
-            header=foot_location.header,
-            processed_point=transformed_foot_location,
-            point=foot_location.point,
-            point_world=foot_location.point_world,
-            displacement=foot_location.displacement,
-            track_points=foot_location.track_points,
+            header=foot_position.header,
+            processed_point=transformed_foot_position,
+            point=foot_position.point,
+            point_world=foot_position.point_world,
+            displacement=foot_position.displacement,
+            track_points=foot_position.track_points,
             duration=scaled_duration,
             midpoint_deviation=midpoint_deviation,
             relative_midpoint_height=relative_midpoint_height,
@@ -190,17 +207,19 @@ class GaitPreprocessor(Node):
 
         return transformed
 
-    def _get_duration_scaled_to_height(self, duration: float, step_height: float) -> float:
-        """Scales the duration based on the absolute step height.
+    def _get_duration_scaled_to_height(self, duration: float, step_height_current: float) -> float:
+        """Scales the duration based on the maximum absolute step height of previous or current step.
 
         Args:
             duration (float): Duration of the step in seconds.
-            step_height (float): Y-coordinate of the covid point.
+            step_height_current (float): Y-coordinate of the covid point.
 
         Returns:
             float: Scaled duration in seconds.
         """
-        return duration + DURATION_SCALING_FACTOR * abs(step_height)
+        scaled_duration = duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(self._step_height_previous))
+        self._logger.warn(f"{scaled_duration}")
+        return scaled_duration
 
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations."""
