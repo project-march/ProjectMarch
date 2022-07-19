@@ -44,7 +44,7 @@ march7:
             direction: 1
             minPositionIU: 9364  # Ros doesn't start if it is in its hard limits (same as encode limits).
             maxPositionIU: 10377  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 7156
+            zeroPositionIU: 9818
             lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
