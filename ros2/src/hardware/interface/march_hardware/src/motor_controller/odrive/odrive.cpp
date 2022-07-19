@@ -37,7 +37,7 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
 std::chrono::nanoseconds ODrive::reset()
 {
     setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
-    return std::chrono::nanoseconds(1);
+    return std::chrono::seconds{1};
 }
 
 std::chrono::nanoseconds ODrive::prepareActuation()
@@ -45,7 +45,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
     if (!index_found_
         && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-        return std::chrono::nanoseconds(/*t=*/10);
+        return std::chrono::seconds{10};
     } else {
         return std::chrono::nanoseconds(0);
     }
