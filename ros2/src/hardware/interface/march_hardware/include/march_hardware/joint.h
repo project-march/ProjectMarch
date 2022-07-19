@@ -42,7 +42,7 @@ public:
 
     // Read the encoder data and store the position and velocity values in the
     // Joint
-    void readEncoders(const std::chrono::duration<double>& elapsed_time);
+    void readEncoders();
 
     // Check whether the state of the MotorController has changed
     bool receivedDataUpdate();
@@ -138,6 +138,7 @@ private:
     double initial_absolute_position_ = 0.0;
     double position_ = 0.0;  // In radians
     double velocity_ = 0.0;
+    std::chrono::steady_clock::time_point last_read_time_;
 
     // Keep track of the state of the MotorController
     std::optional<std::unique_ptr<MotorControllerState>> previous_state_

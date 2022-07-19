@@ -189,6 +189,31 @@ inline void call_function_and_wait_on_joints(const string &function_goal,
 
 }
 
+inline bool is_ethercat_alive(std::exception_ptr exceptionPtr, const rclcpp::Logger &logger) {
+    if (exceptionPtr) {
+        try {
+            std::rethrow_exception(exceptionPtr);
+        } catch (const std::exception& e) {
+            RCLCPP_FATAL(logger, "Ethercat threw exception: \n\t%s", e.what());
+        }
+        return false;
+    }
+    return true;
+}
+
+inline bool is_motor_controller_in_a_valid_state(march::Joint& joint, const rclcpp::Logger &logger)
+{
+    auto motor_controller_state = joint.getMotorController()->getState();
+    if (!motor_controller_state->isOperational()) {
+        RCLCPP_ERROR(logger, "MotorController of joint %s is in fault state %s.\n Error Status: \n%s",
+                  joint.getName().c_str(),
+                  motor_controller_state->getOperationalState().c_str(),
+                  motor_controller_state->getErrorStatus()->c_str());
+        return false;
+    }
+    return true;
+}
+
 
 } // namespace march_hardware_interface_util
 

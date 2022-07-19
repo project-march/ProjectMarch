@@ -42,10 +42,17 @@ public:
     float getIncrementalPosition();
     float getIncrementalVelocity();
 
+    /**
+     * \brief Applies an clamp, an motor-direction and Effort to IU Effort conversion transformation.
+     * @param joint_effort_command The general effort command.
+     * @return The effort ready to be sent to the controller.
+     */
+    double getMotorControllerSpecificEffort(double joint_effort_command) const;
+
     // A MotorController should support both actuating by position (radians) or
     // by torque
-    virtual void actuateRadians(float target_position) = 0;
     virtual void actuateTorque(float target_effort) = 0;
+    virtual void actuateRadians(float target_position) = 0;
 
     // Getter and setter for the ActuationMode
     ActuationMode getActuationMode() const;
@@ -99,10 +106,10 @@ public:
 
     // Effort may have to be multiplied by a constant
     // because ROS control limits the pid values to a certain maximum
-    virtual double effortMultiplicationConstant();
+    virtual double effortMultiplicationConstant() const;
 
     // Get the effort limit of the motor controller
-    virtual double getEffortLimit() = 0;
+    virtual double getEffortLimit() const = 0;
 
     ~MotorController() override = default;
 
@@ -142,6 +149,9 @@ public:
     static const uint16_t WATCHDOG_TIME = 500;
 
 protected:
+    /// Get the direction of the most significant encoder.
+    Encoder::Direction getMotorDirection() const;
+
     // Getters for absolute and incremental position and velocity.
     // These will not check whether the encoder actually exists but may give a
     // segmentation fault.
@@ -157,6 +167,18 @@ protected:
     bool is_incremental_encoder_more_precise_;
 
     std::shared_ptr<march_logger::BaseLogger> logger_;
+
+private:
+
+    /**
+    * \brief This converts the effort from amper to the Internal Units the motor controller uses.
+    * \note This conversion rate is dictated by the `effortMultiplicationConstant` of the motor controller. When:
+    * `this->effortMultiplicationConstant()` = 1 => Internal Units = Ampere.
+    * @param joint_effort_command The joint effort command in Ampere.
+    * @return The joint effort command in IU.
+    */
+    double convertEffortToIUEffort(double joint_effort_command) const;
+
 };
 
 } // namespace march

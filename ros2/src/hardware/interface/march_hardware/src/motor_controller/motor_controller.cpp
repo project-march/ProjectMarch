@@ -6,6 +6,8 @@
 #include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/motor_controller/motor_controller_state.h"
 #include <memory>
+#include <algorithm>
+
 namespace march {
 MotorController::MotorController(const Slave& slave,
     std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -113,6 +115,13 @@ float MotorController::getIncrementalVelocity()
     return getIncrementalVelocityUnchecked();
 }
 
+double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const {
+    joint_effort_command = convertEffortToIUEffort(joint_effort_command);
+    // Clamp effort to (-MAX_EFFORT, MAX_EFFORT)
+    auto effort_limit = getEffortLimit();
+    return std::clamp(joint_effort_command, -effort_limit, effort_limit) * getMotorDirection();
+}
+
 ActuationMode MotorController::getActuationMode() const
 {
     return actuation_mode_;
@@ -163,7 +172,17 @@ void MotorController::actuate(float target)
     }
 }
 
-double MotorController::effortMultiplicationConstant()
+double MotorController::convertEffortToIUEffort(double joint_effort_command) const {
+    return joint_effort_command * effortMultiplicationConstant();
+}
+
+Encoder::Direction MotorController::getMotorDirection() const
+{
+    // Use the incremental encoder to determine motor direction
+    return this->incremental_encoder_->getDirection();
+}
+
+double MotorController::effortMultiplicationConstant() const
 {
     return 1.0;
 }

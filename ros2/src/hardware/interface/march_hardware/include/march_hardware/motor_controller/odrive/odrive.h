@@ -49,7 +49,7 @@ public:
     // Override functions for actuating the ODrive
     std::chrono::nanoseconds prepareActuation() override;
     void enableActuation() override;
-    void actuateTorque(float target_torque) override;
+    void actuateTorque(float target_effort) override;
     void actuateRadians(float target_position) override;
 
     // Override reset function
@@ -72,7 +72,7 @@ public:
     float getActualEffort() override;
     float getTemperature();
 
-    double getEffortLimit() override;
+    double getEffortLimit() const override;
     static constexpr double EFFORT_LIMIT = 30.0; // [A]
 
 protected:
@@ -98,8 +98,6 @@ private:
     uint32_t getEncoderError();
     uint32_t getControllerError();
 
-    // Get the direction of the most significant encoder
-    Encoder::Direction getMotorDirection() const;
 
     ODriveAxis axis_;
     bool index_found_;

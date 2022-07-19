@@ -78,10 +78,10 @@ public:
     float getMotorVoltage() override;
     float getActualEffort() override;
 
-    double effortMultiplicationConstant() override;
+    double effortMultiplicationConstant() const override;
     static constexpr double EFFORT_MULTIPLICATION_CONSTANT = 1000.0;
 
-    double getEffortLimit() override;
+    double getEffortLimit() const override;
 
     constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
     // This value is slightly larger than the current limit of the

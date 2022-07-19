@@ -29,8 +29,8 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis,
         std::move(incremental_encoder), actuation_mode, std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
+    ,torque_constant_(KV_TO_TORQUE_CONSTANT / (float)motor_kv)
 {
-    torque_constant_ = KV_TO_TORQUE_CONSTANT / (float)motor_kv;
     this->is_incremental_encoder_more_precise_ = true;
 }
 
@@ -58,7 +58,7 @@ void ODrive::enableActuation()
     }
 
     // Reset target torque
-    actuateTorque(/*target_torque=*/0.0);
+    actuateTorque(/*torque=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -82,8 +82,7 @@ void ODrive::actuateTorque(float target_effort)
             EFFORT_LIMIT);
     }
 
-    float target_torque
-        = target_effort * torque_constant_ * (float)getMotorDirection();
+    float target_torque = target_effort * torque_constant_ ;
     logger_->debug(logger_->fstring("Effort: %f", target_effort));
     logger_->debug(logger_->fstring("Torque: %f", target_torque));
     bit32 write_torque{};
@@ -279,12 +278,6 @@ uint32_t ODrive::getControllerError()
         .ui;
 }
 
-Encoder::Direction ODrive::getMotorDirection() const
-{
-    // Use the incremental encoder to determine motor direction
-    return this->incremental_encoder_->getDirection();
-}
-
 void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct{ };
@@ -294,7 +287,7 @@ void ODrive::setAxisState(ODriveAxisState state)
         write_struct);
 }
 
-double ODrive::getEffortLimit()
+double ODrive::getEffortLimit() const
 {
     return EFFORT_LIMIT;
 }

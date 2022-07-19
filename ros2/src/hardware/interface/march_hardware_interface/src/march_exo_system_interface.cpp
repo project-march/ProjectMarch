@@ -32,8 +32,9 @@ namespace march_hardware_interface {
 
 MarchExoSystemInterface::MarchExoSystemInterface() :
         logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface"))),
-        last_read_time_(std::chrono::steady_clock::now())
-{}
+        clock_(rclcpp::Clock())
+{
+}
 
 /** Configures the controller.
 * Checkout https://design.ros2.org/articles/node_lifecycle.html, for more information on the execution order.
@@ -53,7 +54,8 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/{ hardware_interface::HW_IF_EFFORT },
-            /*required_state_interfaces=*/{hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY},
+            /*required_state_interfaces=*/{ hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY ,
+                                            hardware_interface::HW_IF_EFFORT },
             /*logger=*/(*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
@@ -69,25 +71,40 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     joints_info_.reserve(info_.joints.size());
     for (const auto& joint : info.joints) {
-
-        JointInfo jointInfo {
-            /*name=*/joint.name.c_str(),
-            /*joint=*/march_robot_->getJoint(joint.name.c_str()),
-            /*position=*/std::numeric_limits<double>::quiet_NaN(),
-            /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
-            /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
-            /*max_effort=*/stod(get_parameter(joint, "max_effort", "30")),
-            /*max_velocity=*/stod(get_parameter(joint, "max_velocity", "3.5"))};
+        JointInfo jointInfo = build_joint_info(joint);
         if(!has_correct_actuation_mode(jointInfo.joint)){
             return hardware_interface::return_type::ERROR;
         }
         joints_info_.push_back(jointInfo);
-        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max_effort and a max_velocity of '%g'.",
-                    joint.name.c_str(), jointInfo.max_effort, jointInfo.max_velocity);
+        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max effort difference.",
+                    joint.name.c_str(), jointInfo.limit.max_effort_differance);
     }
 
     status_ = hardware_interface::status::CONFIGURED;
     return hardware_interface::return_type::OK;
+}
+
+/// Builds a JointInfo object uses parameters for some value.
+JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::ComponentInfo& joint) {
+    return {
+            /*name=*/joint.name.c_str(),
+            /*joint=*/march_robot_->getJoint(joint.name.c_str()),
+            /*position=*/std::numeric_limits<double>::quiet_NaN(),
+            /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
+            /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
+            /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
+            /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
+            /*limit=*/JointLimit{
+                /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint,
+                                                                        "soft_limit_warning_throttle_msec", "200")),
+                /*last_time_not_in_soft_error_limit=*/std::chrono::steady_clock::now(),
+                /*msec_until_error_when_in_error_soft_limits=*/std::chrono::milliseconds{
+                        stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "0"))},
+                /*soft_error_limit_warning_throttle_msec=*/
+                    stoi(get_parameter(joint,"soft_error_limit_warning_throttle_msec","50")),
+                /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10"))
+            }
+    };
 }
 
 /** Returns a vector of the StateInterfaces.
@@ -111,6 +128,9 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(
                 hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_VELOCITY,
                                                    &jointInfo.velocity));
+        state_interfaces.emplace_back(
+                hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT,
+                                                   &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
@@ -190,12 +210,14 @@ MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::stri
         RCLCPP_INFO((*logger_), "Stopping interfaces: %s", stop.c_str());
     }
 
-    make_joints_operational(march_robot_->getNotOperationalJoints());
+    if (!start_interfaces.empty()) {
+        make_joints_operational(march_robot_->getNotOperationalJoints());
+    }
 
     return hardware_interface::return_type::OK;
 }
 
-void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*> joints) const {
+void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*> joints) {
     if (joints.empty()) { return; }
 
     // Tell every MotorController to clear its errors.
@@ -225,6 +247,8 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
                 RCLCPP_ERROR((*logger_), "Joint %s is not an operational state.",
                              joint.getName().c_str());
             });
+    RCLCPP_INFO((*logger_), "All joints ready for writing.");
+    joints_ready_for_actuation_ = true;
 }
 
 /// This method is ran when you stop the controller, (start is ran earlier).
@@ -232,6 +256,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
 {
     // Stopping ethercat cycle in the hardware
     RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
+    joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
     RCLCPP_INFO((*logger_), "EthercatCycle successfully stopped.");
     status_ = hardware_interface::status::STOPPED;
@@ -245,14 +270,17 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
 */
 hardware_interface::return_type MarchExoSystemInterface::read()
 {
-    auto current_time = std::chrono::steady_clock::now();
-    std::chrono::duration<double> time_between_last_update = current_time - last_read_time_;
-    last_read_time_ = std::chrono::steady_clock::now();
+    if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
+        return hardware_interface::return_type::ERROR;
+    }
+    // Wait for the ethercat train to be back.
+    this->march_robot_->waitForPdo();
 
-    for(JointInfo jointInfo : joints_info_) {
-        jointInfo.joint.readEncoders(time_between_last_update);
+    for (JointInfo jointInfo: joints_info_) {
+        jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
+        jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
     }
     return hardware_interface::return_type::OK;
 }
@@ -264,7 +292,79 @@ hardware_interface::return_type MarchExoSystemInterface::read()
 */
 hardware_interface::return_type MarchExoSystemInterface::write()
 {
+    // When the joints are not yet ready don't write anything to them.
+    if (!joints_ready_for_actuation_) {
+        return hardware_interface::return_type::OK;
+    }
+    for (JointInfo jointInfo: joints_info_) {
+        if (!is_joint_in_valid_state(jointInfo)) {
+            return hardware_interface::return_type::ERROR;
+        }
+        auto converted_effort = jointInfo.joint.getMotorController()
+                ->getMotorControllerSpecificEffort(jointInfo.effort_command);
+        auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
+        if (abs(effort_diff_with_previous) > jointInfo.limit.max_effort_differance) {
+            converted_effort += effort_diff_with_previous;
+            RCLCPP_WARN((*logger_), "Effort is increased with %g effort, which is more than %g effort in one iteration."
+                                    " Clamped the effort difference. New total effort will be %g.",
+                        effort_diff_with_previous, jointInfo.limit.max_effort_differance, converted_effort);
+        }
+        jointInfo.effort_command_converted = converted_effort;
+        jointInfo.joint.actuate(jointInfo.effort_command_converted);
+    }
+
     return hardware_interface::return_type::OK;
+}
+
+bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo) {
+    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) || !is_joint_in_limit(jointInfo);
+}
+
+bool MarchExoSystemInterface::is_joint_in_limit(JointInfo &jointInfo) {
+    // SOFT Limit check.
+    if (!jointInfo.joint.isInSoftLimits()) {
+        return false;
+    }
+    const auto &abs_encoder = jointInfo.joint.getMotorController()->getAbsoluteEncoder();
+    const double joint_pos_rad = jointInfo.joint.getPosition();
+    const int joint_pos_iu = abs_encoder->positionRadiansToIU(joint_pos_rad);
+
+    RCLCPP_WARN_THROTTLE((*logger_), clock_, jointInfo.limit.soft_limit_warning_throttle_msec,
+                         "Joint %s outside its soft limits [%i, %i] at (%g rad; %i IU)",
+                         jointInfo.name.c_str(), abs_encoder->getLowerSoftLimitIU(), abs_encoder->getUpperSoftLimitIU(),
+                         joint_pos_rad, joint_pos_iu);
+
+    // ERROR Soft Limit Check
+    if (!jointInfo.joint.isInSoftErrorLimits()) {
+        jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
+        return false;
+    }
+    auto time_in_error_limits = (jointInfo.limit.last_time_not_in_soft_error_limit -
+                                std::chrono::steady_clock::now());
+    if (time_in_error_limits > jointInfo.limit.msec_until_error_when_in_error_soft_limits) {
+        RCLCPP_FATAL((*logger_), "Joint %s (%g rad; %i IU) is outside its soft ERROR limits [%i, %i], for %d "
+                                 "milliseconds. REACHED its max allowed time of %i milliseconds, STOPPING ROS...",
+                                 jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu,
+                                 abs_encoder->getLowerErrorSoftLimitIU(), abs_encoder->getUpperErrorSoftLimitIU(),
+                                 time_in_error_limits.count(),
+                                 jointInfo.limit.msec_until_error_when_in_error_soft_limits.count());
+        return true;
+    }
+    RCLCPP_WARN_THROTTLE((*logger_), clock_, jointInfo.limit.soft_error_limit_warning_throttle_msec,
+                         "Joint %s (%g rad; %i IU) is outside its soft ERROR limits [%i, %i], for %d milliseconds",
+                         jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu, abs_encoder->getLowerErrorSoftLimitIU(),
+                         abs_encoder->getUpperErrorSoftLimitIU(), time_in_error_limits.count());
+
+    // HARD limit check.
+    if (jointInfo.joint.isInHardLimits()) {
+        RCLCPP_FATAL((*logger_), "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
+                                 "\n\tposition: %g rad; %i IU."
+                                 "\n\thard limit: [%i, %i]",
+                     jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu,
+                     abs_encoder->getLowerHardLimitIU(), abs_encoder->getUpperHardLimitIU());
+        return true;
+    }
+    return false;
 }
 
 std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(const hardware_interface::HardwareInfo &info) const {
@@ -274,7 +374,7 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
                                     "'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
     }
     string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder") +
-            '/' + "robots" + '/' + pos_iterator->second + ".yaml";
+            PATH_SEPARATOR + "robots" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
 
     RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 

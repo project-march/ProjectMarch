@@ -615,12 +615,12 @@ float IMotionCube::getIncrementalVelocityUnchecked()
         getIncrementalVelocityIU());
 }
 
-double IMotionCube::effortMultiplicationConstant()
+double IMotionCube::effortMultiplicationConstant() const
 {
     return EFFORT_MULTIPLICATION_CONSTANT;
 }
 
-double IMotionCube::getEffortLimit()
+double IMotionCube::getEffortLimit() const
 {
     return MAX_TARGET_TORQUE;
 }

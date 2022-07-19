@@ -19,11 +19,19 @@
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
+#include <rclcpp/clock.hpp>
 #include "rclcpp/macros.hpp"
 #include "march_hardware_interface/visibility_control.h"
 
 namespace march_hardware_interface
 {
+    struct JointLimit {
+        int soft_limit_warning_throttle_msec;
+        std::chrono::time_point<std::chrono::steady_clock> last_time_not_in_soft_error_limit;
+        std::chrono::milliseconds msec_until_error_when_in_error_soft_limits;
+        int soft_error_limit_warning_throttle_msec;
+        double max_effort_differance;
+    };
     /// Contains all the needed information for the Hardware Interface for a Joint.
     struct JointInfo
     {
@@ -31,9 +39,10 @@ namespace march_hardware_interface
         march::Joint& joint;
         double position;
         double velocity;
+        double effort_actual;
         double effort_command;
-        double max_effort;
-        double max_velocity;
+        double effort_command_converted;
+        JointLimit limit;
     };
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface>
@@ -70,19 +79,22 @@ public:
 
 private:
 
+    bool is_joint_in_valid_state(JointInfo& jointInfo);
+    bool is_joint_in_limit(JointInfo& jointInfo);
+    JointInfo build_joint_info(const hardware_interface::ComponentInfo& joint);
+
     std::unique_ptr<march::MarchRobot> load_march_hardware(const hardware_interface::HardwareInfo& info) const;
     bool has_correct_actuation_mode(march::Joint& joint) const;
-    void make_joints_operational(std::vector<march::Joint*> joints) const;
+    void make_joints_operational(std::vector<march::Joint*> joints);
 
     const std::shared_ptr<rclcpp::Logger> logger_;
     std::unique_ptr<march::MarchRobot> march_robot_;
     std::vector<JointInfo> joints_info_;
-    // Store the command for the simulated robot
-    std::vector<double> hw_effort_commands_;
-    std::vector<double> hw_positions_;
-    std::vector<double> hw_velocities_;
+    bool joints_ready_for_actuation_ = false;
 
-    std::chrono::steady_clock::time_point last_read_time_;
+    rclcpp::Clock clock_;
+
+
 };
 
 }  // namespace march_hardware_interface

@@ -17,8 +17,10 @@ Joint::Joint(std::string name, int net_number,
     std::unique_ptr<MotorController> motor_controller, std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
+    , last_read_time_(std::chrono::steady_clock::now())
     , motor_controller_(std::move(motor_controller))
     , logger_(std::move(logger))
+
 {
     if (!motor_controller_) {
         throw error::HardwareException(
@@ -33,6 +35,7 @@ Joint::Joint(std::string name, int net_number,
              std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
+    , last_read_time_(std::chrono::steady_clock::now())
     , motor_controller_(std::move(motor_controller))
     , temperature_ges_(std::move(temperature_ges))
     , logger_(std::move(logger))
@@ -102,9 +105,13 @@ void Joint::readFirstEncoderValues(bool operational_check)
     logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));
 }
 
-void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
+void Joint::readEncoders()
 {
+    auto current_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> time_between_last_update = current_time - last_read_time_;
+
     if (this->receivedDataUpdate()) {
+        last_read_time_ = std::chrono::steady_clock::now();
         /* Calculate position by using the base absolute position and adding
          * the difference between the initial incremental position and the new
          * incremental position
@@ -142,7 +149,8 @@ void Joint::readEncoders(const std::chrono::duration<double>& elapsed_time)
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        logger_->warn(logger_->fstring("Data was not updated within %d seconds, using old data.", elapsed_time.count()));
+        logger_->warn(logger_->fstring("Data was not updated within %.3fs seconds, using old data.",
+                                       time_between_last_update.count()));
     }
 }
 
