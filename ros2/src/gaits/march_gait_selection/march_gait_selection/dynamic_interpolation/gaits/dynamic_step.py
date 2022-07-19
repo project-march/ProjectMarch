@@ -51,7 +51,7 @@ class DynamicStep:
 
     Attributes:
         starting_position (Dict[str, Setpoint]): the first setpoint of the gait
-        _location (Point): the desired location given by (fake) covid
+        location (Point): the desired location given by (fake) covid
         joint_names (List[str]): list of joint names
         subgait_id (str): either left_swing or right_swing
         joint_soft_limits (List[Limits]): a list containing the soft limits of each joint
@@ -107,8 +107,6 @@ class DynamicStep:
         self.stop = stop
         self.hold_subgait = hold_subgait
 
-        self._logger.warn(f"Creating step with deviation {self._deviation} and height {self._height}.")
-
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
@@ -117,11 +115,10 @@ class DynamicStep:
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
-
         setpoint_list = [self.starting_position_dict]
 
-        if self._deviation == 0.0:
-            setpoint_list.append(self._solve_middle_setpoint(height=self._height))
+        if self._deviation == 0.0 or self.hold_subgait or self.start:
+            setpoint_list.append(self._solve_middle_setpoint(height=self.middle_point_height))
         else:
             lower_deviation = self.middle_point_fraction - self._deviation
             upper_deviation = self.middle_point_fraction + self._deviation
@@ -167,10 +164,6 @@ class DynamicStep:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
         fraction = self.middle_point_fraction if fraction is None else fraction
         height = self.middle_point_height if height is None else height
-        # if fraction is None:
-        #     fraction = self.middle_point_fraction
-        # if height is None:
-        #     height = self.middle_point_height
 
         middle_position = self.pose.solve_mid_position(
             self.location.x,
@@ -180,13 +173,12 @@ class DynamicStep:
             height,
             self.subgait_id,
         )
-        self._logger.warn(f"fraction {fraction}, height {height}")
 
         return self._from_list_to_setpoint(
             self.all_joint_names,
             middle_position,
             None,
-            fraction*self._duration,
+            fraction * self._duration,
         )
 
     def _solve_desired_setpoint(self) -> Dict[str, Setpoint]:
@@ -209,13 +201,15 @@ class DynamicStep:
         """Creates a list of DynamicJointTrajectories for each joint.
 
         Args:
+            dict_list ([List[Dict[str, Setpoint]]): list containing a dict containing a joint name and corresponding
+                setpoint.
             push_off (bool): True if push off should be present in the gait
         """
+        if self.stop and self.hold_subgait:
+            dict_list[SetpointTime.MIDDLE_POINT_INDEX] = dict_list[SetpointTime.END_POINT_INDEX]
+
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
-            # if self.stop and self.hold_subgait:
-            #     self.middle_setpoint_dict[name].position = self.desired_setpoint_dict[name].position
-
             setpoint_list = []
             for setpoint_dicts in dict_list:
                 setpoint_list.append(setpoint_dicts[name])
@@ -239,8 +233,6 @@ class DynamicStep:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
-
-        # self._logger.warn(f"Amount of setpoints: {len(setpoint_list)}")
 
     def get_final_position(self) -> Dict[str, float]:
         """Get setpoint_dictionary of the final setpoint.
@@ -271,7 +263,7 @@ class DynamicStep:
             dict: A Setpoint_dict containing time, position and velocity for each joint
         """
         setpoint_dict = {}
-        velocity = np.zeros_like(position) if (velocity is None) else velocity
+        velocity = np.zeros_like(position) if velocity is None else velocity
 
         for i, name in enumerate(joint_names):
             if (name == "right_ankle" and self.subgait_id == "right_swing") or (

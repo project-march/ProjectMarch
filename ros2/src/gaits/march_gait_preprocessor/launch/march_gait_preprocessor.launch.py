@@ -72,6 +72,11 @@ def generate_launch_description():
                 default_value="0.15",
                 description="Maximum allowed midpoint deviation from the standard midpoint fraction",
             ),
+            DeclareLaunchArgument(
+                name="new_midpoint_method",
+                default_value="True",
+                description="Whether to use the new method of calculating mid points.",
+            ),
             Node(
                 package="march_gait_preprocessor",
                 executable="march_gait_preprocessor",
@@ -88,6 +93,7 @@ def generate_launch_description():
                     {"midpoint_increase": LaunchConfiguration("midpoint_increase")},
                     {"minimum_high_point_ratio": LaunchConfiguration("minimum_high_point_ratio")},
                     {"max_deviation": LaunchConfiguration("max_deviation")},
+                    {"new_midpoint_method": LaunchConfiguration("new_midpoint_method")},
                 ],
                 on_exit=Shutdown(),
             ),
