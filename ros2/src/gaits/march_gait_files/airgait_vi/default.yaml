@@ -1,7 +1,7 @@
 gaits:
   sit:
-    sit_down: MVI_sit_down_v6
-    sit_home: MVI_sit_home_v2
+    sit_down: MVI_sit_down_v7
+    sit_home: MVI_sit_home_v4
     prepare_sit_down: MVI_prepare_sit_down_v6
   stand:
     prepare_stand_up: MVI_prepare_stand_up_v4
@@ -49,9 +49,9 @@ positions:
     joints:
       left_ankle: 0.0
       left_hip_aa: 0.0
-      left_hip_fe: 1.4835
-      left_knee: 1.4835
+      left_hip_fe: 1.5707
+      left_knee: 1.5707
       right_ankle: 0.0
       right_hip_aa: 0.0
-      right_hip_fe: 1.4835
-      right_knee: 1.4835
+      right_hip_fe: 1.5707
+      right_knee: 1.5707
