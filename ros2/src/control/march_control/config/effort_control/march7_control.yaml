@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 250  # Hz
+    update_rate: 125  # Hz
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
@@ -10,7 +10,7 @@ controller_manager:
 
 joint_trajectory_controller:
   ros__parameters:
-    update_rate: 250
+    update_rate: 125
     joints:
       - left_ankle
       - left_hip_aa
