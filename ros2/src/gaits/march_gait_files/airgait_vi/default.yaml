@@ -4,7 +4,7 @@ gaits:
     sit_home: MVI_sit_home_v4
     prepare_sit_down: MVI_prepare_sit_down_v6
   stand:
-    prepare_stand_up: MVI_prepare_stand_up_v4
+    prepare_stand_up: MVI_prepare_stand_up_v5
     stand_up: MVI_stand_up_v7
     stand_home: MVI_stand_home_v7
 
