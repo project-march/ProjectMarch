@@ -70,11 +70,9 @@ class Pose:
 
     def __init__(
         self,
-        parameters: IKSolverParameters,
-        all_joint_names: List[str] = JOINT_NAMES,
+        parameters: IKSolverParameters = IKSolverParameters,
         pose: Union[List[float], None] = None,
     ) -> None:
-        self.all_joint_names = all_joint_names
         self._parameters = parameters
 
         self._max_ankle_flexion = (
@@ -107,7 +105,7 @@ class Pose:
 
     def reset_to_zero_pose(self) -> None:
         """Reset the post to the default zero pose."""
-        self.__init__(self._parameters, self.all_joint_names)
+        self.__init__(self._parameters)
 
     @property
     def pose_right(self) -> List[float]:
@@ -268,21 +266,21 @@ class Pose:
     @property
     def ankle_limit_pos_hip(self) -> np.ndarray:
         """Returns the hip position when the ankle is in max dorsi flexion."""
-        pose = Pose(self._parameters, self.all_joint_names)
+        pose = Pose(self._parameters)
         pose.fe_ankle1 = self._max_ankle_flexion
         return pose.pos_hip
 
     @property
     def ankle_limit_toes_knee_distance(self) -> float:
         """Returns the distance between knee and toes when the ankle is in max dorsi flexion."""
-        pose = Pose(self._parameters, self.all_joint_names)
+        pose = Pose(self._parameters)
         pose.fe_ankle1 = self._max_ankle_flexion
         return np.linalg.norm(pose.pos_knee1 - pose.pos_toes1)
 
     @property
     def ankle_limit_toes_hip_distance(self) -> float:
         """Returns the distance between hip and toes when the ankle is in max dorsi flexion."""
-        pose = Pose(self._parameters, self.all_joint_names)
+        pose = Pose(self._parameters)
         pose.fe_ankle1 = self._max_ankle_flexion
         return np.linalg.norm(pose.pos_hip - pose.pos_toes1)
 
@@ -642,7 +640,7 @@ class Pose:
         self.fe_ankle2 = self._max_ankle_flexion
 
         # Set hip_aa to average of start and end pose:
-        end_pose = Pose(self._parameters, self.all_joint_names)
+        end_pose = Pose(self._parameters)
         end_pose.solve_end_position(ankle_x, ankle_y, ankle_z, subgait_id)
         self.aa_hip1 = start_hip_aa1 * (1 - midpoint_fraction) + end_pose.aa_hip1 * midpoint_fraction
         self.aa_hip2 = start_hip_aa2 * (1 - midpoint_fraction) + end_pose.aa_hip2 * midpoint_fraction
@@ -848,7 +846,7 @@ class Pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
 
         # Perform a limit check and raise error if limit is exceeded:
-        check_on_limits(self.all_joint_names, pose_list)
+        check_on_limits(pose_list)
 
         # return pose as list:
         return pose_list
@@ -874,7 +872,7 @@ def rot(t: float) -> np.ndarray:
     return np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
 
 
-def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> None:
+def check_on_limits(pose_list: List[float]) -> None:
     """Checks all joints limits of the current pose and create error messages for exceeding limits.
 
     Args:
@@ -883,7 +881,7 @@ def check_on_limits(all_joint_names: List[str], pose_list: List[float]) -> None:
     """
     joint_pose_dict = {}
     # TODO: add global enum for all joint names
-    for i, joint_name in enumerate(all_joint_names):
+    for i, joint_name in enumerate(JOINT_NAMES):
         joint_pose_dict[joint_name] = pose_list[i]
 
     for joint_name in JOINT_NAMES:

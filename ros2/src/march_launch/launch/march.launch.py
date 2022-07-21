@@ -9,6 +9,7 @@ from launch.substitutions import LaunchConfiguration
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
 )
+from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 
 # Get lengths from urdf:
 LENGTH_HIP_AA, LENGTH_HIP_BASE = get_lengths_robot_from_urdf_for_inverse_kinematics(
@@ -287,34 +288,34 @@ def generate_launch_description() -> LaunchDescription:
             # IK solver parameters
             DeclareLaunchArgument(
                 name="ankle_buffer",
-                default_value="1.0",
+                default_value=IKSolverParameters.ankle_buffer,
                 description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
             ),
             DeclareLaunchArgument(
                 name="hip_buffer",
-                default_value="1.0",
+                default_value=IKSolverParameters.hip_buffer,
                 description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
             ),
             DeclareLaunchArgument(
                 name="default_knee_bend",
-                default_value="8.0",
+                default_value=IKSolverParameters.default_knee_bend,
                 description="efault knee flexion angle, in deg",
             ),
             DeclareLaunchArgument(
                 name="hip_x_fraction",
-                default_value="0.5",
+                default_value=IKSolverParameters.hip_x_fraction,
                 description="fraction of step at which hip is located",
             ),
             DeclareLaunchArgument(
                 name="upper_body_front_rotation",
-                default_value="30.0",
+                default_value=IKSolverParameters.upper_body_front_rotation,
                 description="forward tilt of the backpack, in deg",
             ),
             DeclareLaunchArgument(
                 name="dorsiflexion_at_end_position",
-                default_value="0.0",
+                default_value=IKSolverParameters.dorsiflexion_at_end_position,
                 description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
-                            "if it is set to zero."
+                "if it is set to zero.",
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
