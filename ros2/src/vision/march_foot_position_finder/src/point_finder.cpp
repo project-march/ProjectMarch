@@ -95,8 +95,8 @@ void PointFinder::readParameters(
             num_track_points_ = param.as_int();
         }
         RCLCPP_INFO(n_->get_logger(),
-        "\033[92mParameter %s updated in %s Point Finder\033[0m",
-        param.get_name().c_str(), left_or_right_.c_str());
+            "\033[92mParameter %s updated in %s Point Finder\033[0m",
+            param.get_name().c_str(), left_or_right_.c_str());
     }
 
     initializeValues();

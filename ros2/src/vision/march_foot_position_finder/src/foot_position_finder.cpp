@@ -180,8 +180,8 @@ void FootPositionFinder::readParameters(
         }
 
         RCLCPP_INFO(n_->get_logger(),
-        "\033[92mParameter %s updated in %s Foot Position Finder\033[0m",
-        param.get_name().c_str(), left_or_right_.c_str());
+            "\033[92mParameter %s updated in %s Foot Position Finder\033[0m",
+            param.get_name().c_str(), left_or_right_.c_str());
     }
 
     found_points_.resize(sample_size_);
@@ -336,8 +336,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     if (validatePoint(desired_point_) && validatePoint(start_point_)) {
         publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
             displacements_, left_or_right_); // Cyan
-        publishDesiredPosition(
-            point_marker_publisher_, n_, desired_point_, left_or_right_); // Green
+        publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
+            left_or_right_); // Green
         publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
             left_or_right_); // Purple
         publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN,
@@ -357,7 +357,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_);
 
         // Visualization
-        
 
         // Compute new foot displacement for gait computation
         new_displacement_ = subtractPoints(found_covid_point_, start_point_);
