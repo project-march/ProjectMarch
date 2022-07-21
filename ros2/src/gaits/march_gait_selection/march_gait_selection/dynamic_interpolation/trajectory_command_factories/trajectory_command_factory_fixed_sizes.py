@@ -1,7 +1,7 @@
 """Author: Marten Haitjema, MVII."""
 
-from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_queue import (
-    TrajectoryCommandFactoryQueue,
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
+    TrajectoryCommandFactory,
 )
 from march_shared_msgs.msg import FootPosition
 from march_utility.exceptions.gait_exceptions import WrongStartPositionError
@@ -17,7 +17,7 @@ PREDETERMINED_FOOT_LOCATIONS = {
 }
 
 
-class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactoryQueue):
+class TrajectoryCommandFactoryFixedSizes(TrajectoryCommandFactory):
     """TrajectoryCommandFactory class with the ability to use predetermined step sizes and change the start side."""
 
     def __init__(self, gait, point_handler):
