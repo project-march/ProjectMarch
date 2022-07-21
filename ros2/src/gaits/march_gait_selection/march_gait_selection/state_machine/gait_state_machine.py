@@ -360,6 +360,5 @@ class GaitStateMachine:
             for gait_name in self._gaits.keys():
                 if isinstance(self._gaits[gait_name], DynamicGaitWalk):
                     self._gaits[gait_name].update_parameters()
-        else:
-            if gait_name in self._gaits and isinstance(self._gaits[gait_name], DynamicGaitWalk):
-                self._gaits[gait_name].update_parameters()
+        elif gait_name in self._gaits and isinstance(self._gaits[gait_name], DynamicGaitWalk):
+            self._gaits[gait_name].update_parameters()

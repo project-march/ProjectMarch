@@ -4,7 +4,6 @@ from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-import numpy as np
 
 NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
@@ -147,7 +146,7 @@ class GaitPreprocessor(Node):
 
         point.x = -foot_position.displacement.x + X_OFFSET
         point.y = foot_position.displacement.z + Y_OFFSET
-        point.z = 0.51  # TODO: change this back to location from msg when functional
+        point.z = temp_y
 
         return point
 
@@ -177,4 +176,8 @@ class GaitPreprocessor(Node):
 
     def _validate_point(self, point: FootPosition) -> None:
         """Validates if the point sent by covid if valid."""
-        return abs(point.processed_point.x) < 0.7 and abs(point.processed_point.y) < 0.25
+        return (
+            0.15 < abs(point.processed_point.x) < 0.7
+            and abs(point.processed_point.y) < 0.25
+            and 0.35 < abs(point.processed_point.z) < 0.7
+        )
