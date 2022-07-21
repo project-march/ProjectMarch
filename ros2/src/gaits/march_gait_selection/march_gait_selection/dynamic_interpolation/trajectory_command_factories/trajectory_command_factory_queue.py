@@ -39,7 +39,6 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
         self._create_position_queue()
         self.update_parameter()
-        self._trajectory_failed = False
 
         self._gait.node.create_subscription(
             Point,
@@ -87,7 +86,7 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
             f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
         )
 
-        return self._get_first_feasible_trajectory(start, stop)
+        return self._create_and_validate_trajectory_command(start, stop)
 
     def _get_foot_location_from_queue(self) -> FootPosition:
         """Get FootPosition message from the position queue.
@@ -138,6 +137,6 @@ class TrajectoryCommandFactoryQueue(TrajectoryCommandFactory):
         self.position_queue.put(point_dict)
         self._logger.info(f"Point added to position queue. Current queue is: {list(self.position_queue.queue)}")
 
-    def _can_get_second_step(self, final_iteration: bool) -> bool:
+    def _can_get_second_step(self) -> bool:
         """Returns true if second step is possible, always true for single step."""
         return True

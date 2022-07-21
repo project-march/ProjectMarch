@@ -143,10 +143,7 @@ class DynamicGaitWalk(GaitInterface):
         """Returns the final position of the subgait as an EdgePosition."""
         try:
             return StaticEdgePosition(
-                {
-                    name: self.trajectory_command_factory.dynamic_step.get_final_position()[name]
-                    for name in self.actuating_joint_names
-                }
+                {name: self.trajectory_command_factory.final_position[name] for name in self.actuating_joint_names}
             )
         except AttributeError:
             return StaticEdgePosition(self.home_stand_position_actuating_joints)
@@ -178,7 +175,6 @@ class DynamicGaitWalk(GaitInterface):
 
         self._should_stop = False
         self._end = False
-        self.trajectory_command_factory.set_trajectory_failed_false()
 
         self.start_time_next_command = None
         self._next_command = None
@@ -208,7 +204,7 @@ class DynamicGaitWalk(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e)
+            self._logger.error(f"{e}")
             return None
         self.update_parameters()
         self.start_time_next_command = current_time + first_subgait_delay
@@ -306,11 +302,10 @@ class DynamicGaitWalk(GaitInterface):
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
-        if not self.trajectory_command_factory.has_trajectory_failed():
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
+        if self.subgait_id == "right_swing":
+            self.subgait_id = "left_swing"
+        elif self.subgait_id == "left_swing":
+            self.subgait_id = "right_swing"
 
         if self._end:
             # If the gait has ended, the next command should be None
@@ -328,7 +323,7 @@ class DynamicGaitWalk(GaitInterface):
 
     def update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
-        self.start_position_all_joints = self.trajectory_command_factory.dynamic_step.get_final_position()
+        self.start_position_all_joints = self.trajectory_command_factory.final_position
         self.start_position_actuating_joints = {
             name: self.start_position_all_joints[name] for name in self.actuating_joint_names
         }
@@ -377,7 +372,6 @@ class DynamicGaitWalk(GaitInterface):
         """Reset start position to home stand after force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"
-        self.trajectory_command_factory.set_trajectory_failed_false()
 
     def _set_start_position_to_home_stand(self) -> None:
         """Sets the starting position to home_stand."""

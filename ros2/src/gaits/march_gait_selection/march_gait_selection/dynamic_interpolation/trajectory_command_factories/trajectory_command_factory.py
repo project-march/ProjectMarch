@@ -1,13 +1,12 @@
 """Author: Marten Haitjema, MVII."""
 
-from math import floor
 from typing import Optional, Dict
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
-from march_shared_msgs.msg import FootPosition
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError, GaitError
 from march_utility.utilities.duration import Duration
+from march_shared_msgs.msg import FootPosition
 
 DURATION_INCREASE_FACTOR = 1.5
 DURATION_INCREASE_SIZE = 0.25
@@ -29,7 +28,6 @@ class TrajectoryCommandFactory:
         _gait: the gait class
         _point_handler: the points handler class
         _logger (Logger): used to log with the class name as a prefix
-        _trajectory_failed (bool): true if no feasible trajectory can be found
     """
 
     subgait_id: str
@@ -40,7 +38,11 @@ class TrajectoryCommandFactory:
         self._gait = gait
         self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
-        self._trajectory_failed = False
+
+    @property
+    def final_position(self) -> Dict[str, float]:
+        """Returns the position that the gait ends in."""
+        return self._final_position
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
@@ -81,172 +83,78 @@ class TrajectoryCommandFactory:
             # If it is a start gait and stop is set to true because of the message time, do not return a trajectory.
             return None
 
-        return self._get_first_feasible_trajectory(start, stop)
+        return self._create_and_validate_trajectory_command(start, stop)
 
-    def has_trajectory_failed(self) -> bool:
-        """Returns true if no feasible trajectory could be created."""
-        return self._trajectory_failed
+    def _create_and_validate_trajectory_command(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
+        """Creates and returns a TrajectoryCommand if first and second step are feasible.
 
-    def set_trajectory_failed_false(self) -> None:
-        """Sets the _trajectory_failed attribute to False."""
-        self._trajectory_failed = False
+        If first or second step is not feasible, tries to get a close gait. If this is also not possible, returns None.
 
-    def _get_first_feasible_trajectory(self, start: bool, stop: bool) -> Optional[TrajectoryCommand]:
-        """Returns the first trajectory than can be executed.
+        Arguments:
+            start (bool): whether it is a start gait.
+            stop (bool): whether it is a stop gait.
 
-        If a subgait is not feasible, it will first try to increase the duration. If it is
-        still not feasible, execution of the gait will be stopped.
-
-        Args:
-            start (:obj: bool, optional): whether` it is a start gait or not, default False
-            stop (:obj: bool, optional): whether it is a stop gait or not, default False
         Returns:
-            TrajectoryCommand: command with the current subgait and start time
-        """
-        original_duration = self.foot_location.duration
-        max_iteration = (
-            floor(((original_duration * DURATION_INCREASE_FACTOR - original_duration) / DURATION_INCREASE_SIZE)) - 1
-        )
-        iteration = 0
-
-        while not self._is_duration_bigger_than_max_duration(original_duration):
-            is_final_iteration = iteration == max_iteration
-            trajectory_command = self._try_to_get_trajectory_command(
-                start,
-                stop,
-                original_duration,
-                iteration,
-                is_final_iteration,
-            )
-            # Return command if current and next step can be made at same duration
-            second_step = self._can_get_second_step(is_final_iteration)
-            if trajectory_command is not None and second_step:
-                self._trajectory_failed = False
-                self._gait.update_start_position_gait_state()
-                return trajectory_command
-            else:
-                self._trajectory_failed = True
-                self.foot_location.duration += DURATION_INCREASE_SIZE
-            iteration += 1
-
-        # If no feasible subgait can be found, try to execute close gait
-        if not start:
-            try:
-                return self._get_stop_gait()
-            except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-                msg = f"Can not get stop gait. {e}"
-                raise GaitError(msg)
-
-        # If close gait is not feasible, stop gait completely
-        self._gait._end = True
-        return None
-
-    def _try_to_get_trajectory_command(
-        self,
-        start: bool,
-        stop: bool,
-        original_duration: float,
-        iteration: int,
-        is_final_iteration: bool,
-    ) -> Optional[TrajectoryCommand]:
-        """Try to get a joint_trajectory_msg from the dynamic subgait instance.
-
-        Args:
-            start (bool): whether it is a start gait
-            stop (bool): whether it is a stop gait
-            original_duration (float): original duration of the gait as set in the GaitPreprocessor
-            iteration (int): current iteration over the velocity
-            is_final_iteration (bool): True if current iteration equals the maximum amount of iterations
-        Returns:
-            TrajectoryCommand: optional command if successful, otherwise None
+            Optional[TrajectoryCommand]: TrajectoryCommand if feasible, else None.
         """
         try:
-            self.dynamic_step = self._create_subgait_instance(
-                self.start_position_all_joints, self.subgait_id, start, stop
-            )
-            trajectory = self.dynamic_step.get_joint_trajectory_msg(self._gait.add_push_off)
-            self._logger.debug(
-                f"Found trajectory after {iteration + 1} iterations at duration of {self.foot_location.duration}. "
-                f"Original duration was {original_duration}."
-            )
-            return TrajectoryCommand(
-                trajectory,
-                Duration(self.foot_location.duration),
+            trajectory_command = self._create_trajectory_command(
+                self.start_position_all_joints,
                 self.subgait_id,
-                self._gait.start_time_next_command,
+                start,
+                stop,
             )
+            self._final_position = self.dynamic_step.get_final_position()
+            self._is_second_step_possible = self._can_get_second_step()
+            self._gait.update_start_position_gait_state()
+            return trajectory_command  # noqa R504 variable assignment is necessary to get dynamic_step instance
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-            if is_final_iteration:
-                msg = f"Can not get trajectory after {iteration + 1} iterations. {e} Gait will not be executed."
-                raise GaitError(msg)
-            return None
+            if not start:
+                self._logger.error(f"{self._get_error_msg(e)}")
+                return self._get_stop_gait()
+            else:
+                raise GaitError(self._get_error_msg(e))
 
-    def _can_get_second_step(self, is_final_iteration: bool) -> bool:
+    def _get_error_msg(self, error) -> str:
+        if self._is_second_step_possible:
+            return f"Step is not possible. {error}"
+        else:
+            return f"Second step is not possible {error}"
+
+    def _can_get_second_step(self) -> bool:
         """Tries to create the subgait that is one step ahead.
 
         If this is not possible, the first subgait should not be executed.
 
-        Args:
-            is_final_iteration (bool): True if current iteration equals the maximum amount of iterations
         Returns:
-            bool: True if second step can be made, otherwise false
+            bool: True if second step can be made, otherwise false.
         """
         start_position = self.dynamic_step.get_final_position()
         subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
-        subgait = self._create_subgait_instance(
-            start_position,
-            subgait_id,
-            start=False,
-            stop=False,
-        )
-        try:
-            subgait.get_joint_trajectory_msg(self._gait.add_push_off)
-        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-            if is_final_iteration:
-                msg = f"Second step is not feasible. {e}"
-                raise GaitError(msg)
-            return False
-        return True
+        return self._create_trajectory_command(start_position, subgait_id, start=False, stop=False) is not None
 
-    def _get_stop_gait(self) -> Optional[TrajectoryCommand]:
+    def _get_stop_gait(self) -> TrajectoryCommand:
         """Returns a TrajectoryCommand containing a stop gait.
 
         Returns:
             TrajectoryCommand: command containing a stop gait
         """
         self._gait._end = True
-        subgait = self._create_subgait_instance(
-            self.start_position_all_joints,
-            self.subgait_id,
-            start=False,
-            stop=True,
-        )
-        trajectory = subgait.get_joint_trajectory_msg(self._gait.add_push_off)
-        return TrajectoryCommand(
-            trajectory,
-            Duration(self.foot_location.duration),
-            self.subgait_id,
-            self._gait.start_time_next_command,
-        )
+        try:
+            return self._create_trajectory_command(
+                self.start_position_all_joints, self.subgait_id, start=False, stop=True
+            )
+        except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
+            raise GaitError(f"Can not get stop gait. {e}")
 
-    def _is_duration_bigger_than_max_duration(self, original_duration: float) -> bool:
-        """Returns true if duration is bigger than maximum duration, else false.
-
-        Args:
-            original_duration (float): duration before iterations
-        Returns:
-            bool: True if current duration is bigger than max allowed duration, else False
-        """
-        return self.foot_location.duration >= original_duration * DURATION_INCREASE_FACTOR
-
-    def _create_subgait_instance(
+    def _create_trajectory_command(
         self,
         start_position: Dict[str, float],
         subgait_id: str,
         start: bool,
         stop: bool,
-    ) -> DynamicStep:
-        """Create a DynamicStep instance.
+    ) -> TrajectoryCommand:
+        """Create a DynamicStep instance and return the joint_trajectory_msg.
 
         Args:
             start_position (Dict[str, float]): dict containing joint_names and positions of the joint as floats
@@ -254,9 +162,9 @@ class TrajectoryCommandFactory:
             start (bool): whether it is a start gait or not
             stop (bool): whether it is a stop gait or not
         Returns:
-            DynamicStep: DynamicStep instance for the desired step
+            TrajectoryCommand: a trajectory command
         """
-        return DynamicStep(
+        self.dynamic_step = DynamicStep(
             self._gait.node,
             self._gait.home_stand_position_all_joints,
             start_position,
@@ -266,4 +174,11 @@ class TrajectoryCommandFactory:
             self._gait.joint_soft_limits,
             start,
             stop,
+        )
+
+        return TrajectoryCommand(
+            self.dynamic_step.get_joint_trajectory_msg(self._gait.add_push_off),
+            Duration(self.foot_location.duration),
+            self.subgait_id,
+            self._gait.start_time_next_command,
         )

@@ -6,12 +6,13 @@ from copy import deepcopy
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_fixed_sizes import (
     TrajectoryCommandFactoryFixedSizes,
 )
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     STEPPING_STONES_END_POSITION_RIGHT,
     STEPPING_STONES_END_POSITION_LEFT,
 )
-from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
-from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
 
 class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
@@ -70,16 +71,16 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
                     f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
                 )
 
-        return self._get_first_feasible_trajectory(start, stop)
+        return self._create_and_validate_trajectory_command(start, stop)
 
-    def _create_subgait_instance(
+    def _create_trajectory_command(
         self,
         start_position: Dict[str, float],
         subgait_id: str,
         start: bool,
         stop: bool,
-    ) -> DynamicStep:
-        """Create a DynamicStep instance.
+    ) -> TrajectoryCommand:
+        """Create a DynamicStep instance and return the joint_trajectory_msg.
 
         Args:
             start_position (Dict[str, float]): dict containing joint_names and positions of the joint as floats
@@ -87,7 +88,7 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
             start (bool): whether it is a start gait or not
             stop (bool): whether it is a stop gait or not
         Returns:
-            DynamicStep: DynamicStep instance for the desired step
+            TrajectoryCommand: a trajectory command
         """
         if subgait_id == "right_swing":
             end_position = STEPPING_STONES_END_POSITION_RIGHT
@@ -97,7 +98,7 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
         # reset start_from_left_side attribute
         self._gait.start_from_left_side = False
 
-        return DynamicStep(
+        self.dynamic_step = DynamicStep(
             self._gait.node,
             end_position,
             start_position,
@@ -108,4 +109,11 @@ class TrajectoryCommandFactoryStepAndHold(TrajectoryCommandFactoryFixedSizes):
             start,
             stop,
             hold_subgait=True,
+        )
+
+        return TrajectoryCommand(
+            self.dynamic_step.get_joint_trajectory_msg(self._gait.add_push_off),
+            Duration(self.foot_location.duration),
+            subgait_id,
+            self._gait.start_time_next_command,
         )
