@@ -44,7 +44,7 @@ KNEE_ZERO_ANGLE = np.pi  # rad
 HIP_ZERO_ANGLE = np.pi  # rad
 
 # Default parameters:
-DEFUALT_PARAMETERS = IKSolverParameters()
+DEFAULT_PARAMETERS = IKSolverParameters()
 
 
 class Pose:
@@ -73,7 +73,7 @@ class Pose:
 
     def __init__(
         self,
-        parameters: IKSolverParameters = DEFUALT_PARAMETERS,
+        parameters: IKSolverParameters = DEFAULT_PARAMETERS,
         pose: Union[List[float], None] = None,
     ) -> None:
         self._parameters = parameters
