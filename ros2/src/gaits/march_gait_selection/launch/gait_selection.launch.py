@@ -105,32 +105,32 @@ def generate_launch_description():
             # IK solver parameters
             DeclareLaunchArgument(
                 name="ankle_buffer",
-                default_value=IKSolverParameters.ankle_buffer,
+                default_value=str(IKSolverParameters.ankle_buffer),
                 description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
             ),
             DeclareLaunchArgument(
                 name="hip_buffer",
-                default_value=IKSolverParameters.hip_buffer,
+                default_value=str(IKSolverParameters.hip_buffer),
                 description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
             ),
             DeclareLaunchArgument(
                 name="default_knee_bend",
-                default_value=IKSolverParameters.default_knee_bend,
+                default_value=str(IKSolverParameters.default_knee_bend),
                 description="efault knee flexion angle, in deg",
             ),
             DeclareLaunchArgument(
                 name="hip_x_fraction",
-                default_value=IKSolverParameters.hip_x_fraction,
+                default_value=str(IKSolverParameters.hip_x_fraction),
                 description="fraction of step at which hip is located",
             ),
             DeclareLaunchArgument(
                 name="upper_body_front_rotation",
-                default_value=IKSolverParameters.upper_body_front_rotation,
+                default_value=str(IKSolverParameters.upper_body_front_rotation),
                 description="forward tilt of the backpack, in deg",
             ),
             DeclareLaunchArgument(
                 name="dorsiflexion_at_end_position",
-                default_value=IKSolverParameters.dorsiflexion_at_end_position,
+                default_value=str(IKSolverParameters.dorsiflexion_at_end_position),
                 description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
                 "if it is set to zero.",
             ),

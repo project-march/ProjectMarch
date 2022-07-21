@@ -86,7 +86,7 @@ class DynamicStep:
         self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
-        self.pose = Pose(self._ik_solver_parameters, self.all_joint_names, list(self.starting_position.values()))
+        self.pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()))
 
         self.time = [
             0,

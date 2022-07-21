@@ -3,8 +3,7 @@
 import unittest
 import numpy as np
 
-from march_goniometric_ik_solver.ik_solver import Pose
-from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
+from march_goniometric_ik_solver.ik_solver import Pose, DEFUALT_PARAMETERS
 
 
 class TestIkSolver(unittest.TestCase):
@@ -33,7 +32,7 @@ class TestIkSolver(unittest.TestCase):
 
     def test_calculate_joint_position_nonzero_pose(self) -> None:
         leg_length = self.pose.max_leg_length
-        knee_bend = IKSolverParameters.knee_bend
+        knee_bend = DEFUALT_PARAMETERS.default_knee_bend_radians
         self.pose.fe_hip2 = np.pi / 2 + knee_bend / 2
         ankle2 = self.pose.calculate_joint_positions()["pos_ankle2"]
         ankle2_x = ankle2[0]

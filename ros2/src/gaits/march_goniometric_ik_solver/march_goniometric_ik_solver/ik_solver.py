@@ -43,6 +43,9 @@ ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
 HIP_ZERO_ANGLE = np.pi  # rad
 
+# Default parameters:
+DEFUALT_PARAMETERS = IKSolverParameters()
+
 
 class Pose:
     """Pose class used for inverse kinematic calculations.
@@ -70,10 +73,12 @@ class Pose:
 
     def __init__(
         self,
-        parameters: IKSolverParameters = IKSolverParameters,
+        parameters: IKSolverParameters = DEFUALT_PARAMETERS,
         pose: Union[List[float], None] = None,
     ) -> None:
         self._parameters = parameters
+        print(self._parameters.ankle_buffer)
+        print(self._parameters.ankle_buffer_radians)
 
         self._max_ankle_flexion = (
             min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper)
@@ -629,9 +634,8 @@ class Pose:
         self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee2
 
         # Apply the desired rotation of the upper body:
-        total_hip_angle = self.fe_hip2 - self.fe_hip1
-        self.fe_hip2 = total_hip_angle / 2 + self._parameters.upper_body_front_rotation_radians
-        self.fe_hip1 = self.fe_hip2 - total_hip_angle
+        self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
+        self.fe_hip1 += self._parameters.upper_body_front_rotation_radians
 
         if self.fe_hip1 < self._max_hip_extension:
             self.reduce_hip_extension()
