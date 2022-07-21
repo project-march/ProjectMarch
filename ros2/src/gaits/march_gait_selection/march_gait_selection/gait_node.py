@@ -61,44 +61,27 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
     Returns:
         SetParametersResult: Whether the callback was successful
     """
-    position_queue_updated = False
-    dynamic_gait_updated = False
     for param in parameters:
         if param.name == "middle_point_fraction":
             node.middle_point_fraction = param.get_parameter_value().double_value
-            dynamic_gait_updated = True
         elif param.name == "middle_point_height":
             node.middle_point_height = param.get_parameter_value().double_value
-            dynamic_gait_updated = True
         elif param.name == "minimum_stair_height":
             node.minimum_stair_height = param.get_parameter_value().double_value
-            dynamic_gait_updated = True
         elif param.name == "push_off_fraction":
             node.push_off_fraction = param.get_parameter_value().double_value
-            dynamic_gait_updated = True
         elif param.name == "push_off_position":
             node.push_off_position = param.get_parameter_value().double_value
-            dynamic_gait_updated = True
         elif param.name == "add_push_off":
             node.add_push_off = param.value
-            dynamic_gait_updated = True
         elif param.name == "amount_of_steps":
             node.amount_of_steps = param.get_parameter_value().integer_value
-            dynamic_gait_updated = True
         elif param.name == "use_position_queue":
             node.use_position_queue = param.get_parameter_value().bool_value
-            position_queue_updated = True
         elif param.name == "add_cybathlon_gaits":
             node.add_cybathlon_gaits = param.get_parameter_value().bool_value
-            dynamic_gait_updated = True
 
-    # Separate update function for dynamic gait to avoid time performance issues
-    if dynamic_gait_updated:
-        gait_state_machine.update_parameters("dynamic_walk")
-    elif position_queue_updated:
-        gait_state_machine.update_parameters("dynamic_step")
-        gait_state_machine.update_parameters("dynamic_step_and_hold")
-
+    gait_state_machine.update_parameters()
     node._logger.info(f"{param.name} set to {param.value}.")
 
     return SetParametersResult(successful=True)

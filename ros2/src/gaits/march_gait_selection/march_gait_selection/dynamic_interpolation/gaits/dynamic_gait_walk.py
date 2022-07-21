@@ -12,7 +12,6 @@ from march_utility.utilities.utility_functions import (
     get_limits_robot_from_urdf_for_inverse_kinematics,
     get_position_from_yaml,
 )
-from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.exceptions.gait_exceptions import (
     WrongStartPositionError,
 )
@@ -25,7 +24,6 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
     TrajectoryCommandFactory,
 )
 from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import PointHandler
-from march_shared_msgs.msg import GaitInstruction
 from sensor_msgs.msg import JointState
 
 
@@ -91,15 +89,6 @@ class DynamicGaitWalk(GaitInterface):
         self._reset()
         self._get_soft_limits()
         self.gait_name = name
-
-        self.node.create_subscription(
-            GaitInstruction,
-            "/march/input_device/instruction",
-            self._callback_force_unknown,
-            DEFAULT_HISTORY_DEPTH,
-        )
-
-        # Assign reconfigurable parameters
         self.update_parameters()
 
     @property
@@ -219,7 +208,7 @@ class DynamicGaitWalk(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e.msg)
+            self._logger.error(e)
             return None
         self.update_parameters()
         self.start_time_next_command = current_time + first_subgait_delay
@@ -374,6 +363,7 @@ class DynamicGaitWalk(GaitInterface):
 
     def update_parameters(self) -> None:
         """Callback for gait_node when the parameters have been updated."""
+        self.trajectory_command_factory.update_parameter()
         self.minimum_stair_height = self.node.minimum_stair_height
         self.add_push_off = self.node.add_push_off
         self.amount_of_steps = self.node.amount_of_steps
@@ -384,16 +374,11 @@ class DynamicGaitWalk(GaitInterface):
         for joint_name in self.actuating_joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
-    def _callback_force_unknown(self, msg: GaitInstruction) -> None:
-        """Reset start position to home stand after force unknown.
-
-        Args:
-            msg (GaitInstruction): message containing a gait_instruction from the IPD
-        """
-        if msg.type == GaitInstruction.UNKNOWN:
-            self._set_start_position_to_home_stand()
-            self.subgait_id = "right_swing"
-            self.trajectory_command_factory.set_trajectory_failed_false()
+    def set_state_to_unknown(self) -> None:
+        """Reset start position to home stand after force unknown."""
+        self._set_start_position_to_home_stand()
+        self.subgait_id = "right_swing"
+        self.trajectory_command_factory.set_trajectory_failed_false()
 
     def _set_start_position_to_home_stand(self) -> None:
         """Sets the starting position to home_stand."""
