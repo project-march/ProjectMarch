@@ -561,6 +561,13 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
             || joint_position_[joint_index]
                 > soft_limits_error_[joint_index].max_position) {
 
+            if (joint.getName() == "left_ankle"
+                || joint.getName() == "right_ankle") {
+                soft_limit_timeout_ = ros::Duration(/*t=*/2.0);
+            } else {
+                soft_limit_timeout_ = ros::Duration(/*t=*/0.040);
+            }
+
             if (soft_limit_touched_[joint_index]
                 && ros::Time::now() - soft_limit_breach_times_[joint_index]
                     >= soft_limit_timeout_) {

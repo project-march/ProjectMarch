@@ -12,7 +12,7 @@ class IKSolverParameters:
     hip_buffer: float = 1.0  # deg
     default_knee_bend: float = 8.0  # deg
     hip_x_fraction: float = 0.5
-    upper_body_front_rotation: float = 30.0  # deg
+    upper_body_front_rotation: float = 0.0  # deg
     dorsiflexion_at_end_position: float = 0.0  # deg
 
     @property

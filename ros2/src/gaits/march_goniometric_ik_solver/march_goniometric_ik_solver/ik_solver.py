@@ -77,8 +77,6 @@ class Pose:
         pose: Union[List[float], None] = None,
     ) -> None:
         self._parameters = parameters
-        print(self._parameters.ankle_buffer)
-        print(self._parameters.ankle_buffer_radians)
 
         self._max_ankle_flexion = (
             min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper)
