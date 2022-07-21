@@ -1,6 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
-from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError, GaitError
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
     TrajectoryCommandFactory,
 )
@@ -38,6 +38,7 @@ class TrajectoryCommandFactoryStepAndClose(TrajectoryCommandFactory):
             subgait.get_joint_trajectory_msg(self._gait.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError) as e:
             if is_final_iteration:
-                self._logger.warn(f"Close gait is not feasible. {e.msg}")
+                msg = f"Close gait is not feasible. {e}"
+                raise GaitError(msg)
             return False
         return True

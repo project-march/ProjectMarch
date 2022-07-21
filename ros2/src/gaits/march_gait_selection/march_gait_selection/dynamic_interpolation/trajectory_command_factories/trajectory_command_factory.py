@@ -6,7 +6,7 @@ from typing import Optional, Dict
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_shared_msgs.msg import FootPosition
-from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
+from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError, GaitError
 from march_utility.utilities.duration import Duration
 
 DURATION_INCREASE_FACTOR = 1.5
@@ -134,7 +134,8 @@ class TrajectoryCommandFactory:
             try:
                 return self._get_stop_gait()
             except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-                self._logger.warn(f"Can not get stop gait. {e.msg}")
+                msg = f"Can not get stop gait. {e}"
+                raise GaitError(msg)
 
         # If close gait is not feasible, stop gait completely
         self._gait._end = True
@@ -176,9 +177,8 @@ class TrajectoryCommandFactory:
             )
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self._logger.warn(
-                    f"Can not get trajectory after {iteration + 1} iterations. {e.msg} Gait will not be executed."
-                )
+                msg = f"Can not get trajectory after {iteration + 1} iterations. {e} Gait will not be executed."
+                raise GaitError(msg)
             return None
 
     def _can_get_second_step(self, is_final_iteration: bool) -> bool:
@@ -203,7 +203,8 @@ class TrajectoryCommandFactory:
             subgait.get_joint_trajectory_msg(self._gait.add_push_off)
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
             if is_final_iteration:
-                self._logger.warn(f"Second step is not feasible. {e.msg}")
+                msg = f"Second step is not feasible. {e}"
+                raise GaitError(msg)
             return False
         return True
 
