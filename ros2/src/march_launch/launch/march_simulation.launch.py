@@ -128,7 +128,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
-                default_value="False",
+                default_value="false",
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(

@@ -86,6 +86,7 @@ def generate_launch_description() -> LaunchDescription:
             DeclareLaunchArgument(
                 "realsense_simulation",
                 default_value="false",
+                choices=["true", "false"],
                 description="Whether to run the simulated realsense plugin.",
             ),
             Node(
