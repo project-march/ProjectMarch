@@ -823,9 +823,8 @@ class Pose:
                     self.step_down_wih_triangle_method()
 
         # Apply the desired rotation of the upper body:
-        total_hip_angle = self.fe_hip2 - self.fe_hip1
-        self.fe_hip2 = total_hip_angle / 2 + self._parameters.upper_body_front_rotation_radians
-        self.fe_hip1 = self.fe_hip2 - total_hip_angle
+        self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
+        self.fe_hip1 += self._parameters.upper_body_front_rotation_radians
 
         # Reduce ankle2 dorsi flexion and hip extension to meet constraints:
         if reduce_df_front and self.fe_ankle2 > self._max_ankle_flexion:
