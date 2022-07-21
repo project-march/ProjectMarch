@@ -592,7 +592,7 @@ class Pose:
             self.aa_hip2 = hip_aa_short
 
     def create_ankle_trajectory(self, next_pose: "Pose", midpoint_height, trajectory_samples):
-        """Create a ankle trajectory from current pose (self) to given next_pose.
+        """Create an ankle trajectory from current pose (self) to given next_pose.
 
         Used to debug the midpoint_solver with the live_widget tool.
 
@@ -694,6 +694,10 @@ class Pose:
         if self.fe_ankle1 > self._max_ankle_dorsi_flexion:
             self.reset_to_zero_pose()
             self.solve_end_position(pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id)
+
+        # Apply the desired rotation of the upper body:
+        self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
+        self.fe_hip1 += self._parameters.upper_body_front_rotation_radians
 
         # Reduce ankle1 flexion and hip extension to meet constraints:
         if self.fe_ankle1 < self._max_ankle_plantar_flexion:
