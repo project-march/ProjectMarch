@@ -124,9 +124,7 @@ void PointFinder::initializeValues()
         rect_height_--;
     }
 
-    flipping_displacements_.push_back(0);
-    for (int i = 1; i < actual_rect_height_ / 3.0; i++) {
-        flipping_displacements_.push_back(i);
+    for (int i = 0; i < actual_rect_height_ / 2.5; i++) {
         flipping_displacements_.push_back(-i);
     }
 
@@ -228,8 +226,7 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
             int x_opt = xCoordinateToIndex(optimal_foot_x_) + x_shift;
             int y_opt = yCoordinateToIndex(optimal_foot_y_) + y_shift;
 
-            for (int x = x_opt - rect_height_ / 2;
-                 x < x_opt + rect_height_ / 2.0; x++) {
+            for (int x = x_opt; x < x_opt + rect_height_; x++) {
                 for (int y = y_opt - rect_width_ / 2;
                      y < y_opt + rect_width_ / 2.0; y++) {
                     if (std::abs(derivatives_[y][x]) < derivative_threshold_) {
@@ -293,8 +290,7 @@ void PointFinder::computeFootPlateDisplacement(
         int y_index = y;
         int num_free_cells = 0;
 
-        for (int x = x_index - actual_rect_height_ / 2;
-             x < x_index + actual_rect_height_ / 2.0; x++) {
+        for (int x = x_index; x < x_index + actual_rect_height_; x++) {
             for (int y = y_index - rect_width_ / 2;
                  y < y_index + rect_width_ / 2.0; y++) {
                 if (std::abs(derivatives_temp_[y][x]) < derivative_threshold_) {

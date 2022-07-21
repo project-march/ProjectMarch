@@ -63,7 +63,5 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION lib/${PROJECT_NAME})
 install(TARGETS ${PROJECT_NAME}_node
     RUNTIME DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY launch config
-    DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()

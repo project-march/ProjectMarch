@@ -53,7 +53,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="available_points_ratio",
-                default_value="0.90",
+                default_value="0.96",
             ),
             DeclareLaunchArgument(
                 name="max_z_distance",
@@ -77,7 +77,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="displacements_far",
-                default_value="0.0",
+                default_value="0.05",
+            ),
+            DeclareLaunchArgument(
+                name="height_distance_coefficient",
+                default_value="3.0",
             ),
             DeclareLaunchArgument(
                 "realsense_simulation",
@@ -109,6 +113,7 @@ def generate_launch_description() -> LaunchDescription:
                     {"displacements_inside": LaunchConfiguration("displacements_inside")},
                     {"displacements_near": LaunchConfiguration("displacements_near")},
                     {"displacements_far": LaunchConfiguration("displacements_far")},
+                    {"height_distance_coefficient": LaunchConfiguration("height_distance_coefficient")},
                     {"realsense_simulation": LaunchConfiguration("realsense_simulation")},
                 ],
             ),

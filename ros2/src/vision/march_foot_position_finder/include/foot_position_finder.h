@@ -114,6 +114,7 @@ protected:
     double step_distance_;
     double outlier_distance_;
     double height_zero_threshold_;
+    double height_distance_coefficient_;
     float last_height_;
     int switch_factor_;
     int sample_size_;

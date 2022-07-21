@@ -103,6 +103,8 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     outlier_distance_ = n_->get_parameter("outlier_distance").as_double();
     height_zero_threshold_
         = n_->get_parameter("height_zero_threshold").as_double();
+    height_distance_coefficient_
+        = n_->get_parameter("height_distance_coefficient").as_double();
     realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
     found_points_.resize(sample_size_);
     displacements_ = point_finder_->getDisplacements();
@@ -177,6 +179,8 @@ void FootPositionFinder::readParameters(
             height_zero_threshold_ = param.as_double();
         } else if (param.get_name() == "realsense_simulation") {
             realsense_simulation_ = param.as_bool();
+        } else if (param.get_name() == "height_distance_coefficient") {
+            height_distance_coefficient_ = param.as_double();
         }
 
         RCLCPP_INFO(n_->get_logger(),
@@ -398,7 +402,8 @@ Point FootPositionFinder::retrieveOptimalPoint(
     double optimal_distance_height_tradeoff = 0;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
-        double new_tradeoff = std::abs(p->x) - 2.5 * std::abs(p->z);
+        double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x))
+            - height_distance_coefficient_ * std::abs(p->z);
         if (new_tradeoff > optimal_distance_height_tradeoff) {
             optimal_point = (*p);
             optimal_distance_height_tradeoff = new_tradeoff;
