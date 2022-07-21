@@ -65,11 +65,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="displacements_outside",
-                default_value="0.0",
+                default_value="0.05",
             ),
             DeclareLaunchArgument(
                 name="displacements_inside",
-                default_value="0.0",
+                default_value="0.05",
             ),
             DeclareLaunchArgument(
                 name="displacements_near",
