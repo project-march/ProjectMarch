@@ -10,8 +10,8 @@ from march_gait_selection.dynamic_interpolation.point_handlers.point_handler imp
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
-from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_queue import (
-    TrajectoryCommandFactoryQueue,
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
+    TrajectoryCommandFactory,
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 
@@ -32,7 +32,7 @@ class DynamicGaitStep(DynamicGaitWalk):
     def __init__(self, name: str, node: Node, point_handler: PointHandler):
         super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, point_handler=self._point_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactory(gait=self, point_handler=self._point_handler)
         self.subgait_id = "right_swing"
         self.gait_name = name
 

@@ -1,8 +1,0 @@
-name: tilted_path_first_ending_step
-subgaits:
-  left_open:
-    to: right_close
-  right_close:
-    to: end
-  start:
-    to: left_open

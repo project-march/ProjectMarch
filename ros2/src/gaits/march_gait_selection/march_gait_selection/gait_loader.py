@@ -45,7 +45,7 @@ class GaitLoader:
         _logger (rclpy.Logger): used to log to the terminal
         _actuating_joint_names (List[str]): a list of names of the actuating joints in the urdf
         _gait_directory (str): path to the directory that contains the gait files
-        _default_positions_yaml (str): path to the yaml that contains the named positions
+        _default_yaml (str): path to the yaml that contains the named positions
         _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
         _named_positions (Dict[EdgePosition, str]): dictionary containing the EdgePosition and name of each named pos
     """
@@ -62,7 +62,7 @@ class GaitLoader:
 
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
-        self._default_positions_yaml = os.path.join(self._gait_directory, "default_positions.yaml")
+        self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
         self._loaded_gaits = {}
         self._named_positions = {}
         self._load_gaits()
@@ -118,8 +118,8 @@ class GaitLoader:
 
     def _load_named_positions(self) -> None:
         """Load the named positions from default.yaml."""
-        with open(self._default_positions_yaml, "r") as default_positions_yaml_file:
-            default_config = yaml.load(default_positions_yaml_file, Loader=yaml.SafeLoader)
+        with open(self._default_yaml, "r") as default_yaml_file:
+            default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         self._gait_version_map = default_config["gaits"]
 

@@ -208,7 +208,7 @@ class DynamicGaitWalk(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e.msg)
+            self._logger.error(e)
             return None
         self.update_parameters()
         self.start_time_next_command = current_time + first_subgait_delay
@@ -363,6 +363,7 @@ class DynamicGaitWalk(GaitInterface):
 
     def update_parameters(self) -> None:
         """Callback for gait_node when the parameters have been updated."""
+        self.trajectory_command_factory.update_parameter()
         self.minimum_stair_height = self.node.minimum_stair_height
         self.add_push_off = self.node.add_push_off
         self.amount_of_steps = self.node.amount_of_steps

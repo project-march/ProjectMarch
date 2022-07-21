@@ -1,6 +1,0 @@
-name: set_ankle_to_five
-subgaits:
-  set_ankle_to_five:
-    to: end
-  start:
-    to: set_ankle_to_five

@@ -14,6 +14,9 @@ X_MAX = 0.7
 Y_MIN = -0.35
 Y_MAX = 0.35
 
+MIDPOINT_HEIGHT = 0.15
+TRAJECTORY_SAMPLES = 99
+
 
 class LiveWidget:
     """A widget to easily check the solutions of the IK solver for a given x,y location of the ankle.
@@ -184,7 +187,9 @@ class LiveWidget:
                 self.poses[pose].solve_mid_position(
                     self.poses["next"],
                     self.sliders[pose],
-                    self.poses[pose].get_ankle_location_from_ankle_trajectory(self.poses["next"], self.sliders[pose]),
+                    self.poses[pose].get_ankle_location_from_ankle_trajectory(
+                        self.poses["next"], self.sliders[pose], MIDPOINT_HEIGHT, TRAJECTORY_SAMPLES
+                    ),
                     "",
                 )
             else:
@@ -217,7 +222,7 @@ class LiveWidget:
 
     def update_trajectory(self):
         """Update the ankle trajectory line that is plotted."""
-        x, y = self.poses["last"].create_ankle_trajectory(self.poses["next"])
+        x, y = self.poses["last"].create_ankle_trajectory(self.poses["next"], MIDPOINT_HEIGHT, TRAJECTORY_SAMPLES)
 
         # shift positions to let trajectory start in ankle:
         x -= self.poses["last"].pos_toes2[0] - self.poses["last"].pos_ankle1[0]
