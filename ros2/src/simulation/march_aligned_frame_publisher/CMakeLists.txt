@@ -21,6 +21,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 add_executable(${PROJECT_NAME}_node src/aligned_frame_publisher_node.cpp)
 ament_target_dependencies(${PROJECT_NAME}_node tf2 tf2_ros rclcpp geometry_msgs)
@@ -28,6 +29,8 @@ ament_target_dependencies(${PROJECT_NAME}_node tf2 tf2_ros rclcpp geometry_msgs)
 target_include_directories(${PROJECT_NAME}_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(${PROJECT_NAME}_node yaml-cpp)
 
 install(TARGETS ${PROJECT_NAME}_node
   RUNTIME DESTINATION lib/${PROJECT_NAME})
