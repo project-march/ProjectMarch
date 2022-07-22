@@ -77,7 +77,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="displacements_far",
-                default_value="0.05",
+                default_value="0.00",
             ),
             DeclareLaunchArgument(
                 name="height_distance_coefficient",

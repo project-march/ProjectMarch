@@ -58,6 +58,8 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
     max_z_distance_ = n_->get_parameter("max_z_distance").as_double();
     num_track_points_ = n_->get_parameter("num_track_points").as_int();
 
+    ORIGIN = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
+
     initializeValues();
 }
 
@@ -124,30 +126,30 @@ void PointFinder::initializeValues()
         rect_height_--;
     }
 
-    for (int i = 0; i < actual_rect_height_ / 2.5; i++) {
+    for (int i = 0; i < actual_rect_height_ / 2.5; i += 2) {
         flipping_displacements_.push_back(-i);
     }
 
     if (left_or_right_ == "left") {
-        for (int x = 0; x >= -displacements_inside_; x--) {
+        for (int x = 0; x >= -displacements_inside_; x -= 2) {
             horizontal_displacements_.push_back(x);
         }
-        for (int x = 1; x <= displacements_outside_; x++) {
+        for (int x = 1; x <= displacements_outside_; x += 2) {
             horizontal_displacements_.push_back(x);
         }
     } else if (left_or_right_ == "right") {
-        for (int x = 0; x <= displacements_inside_; x++) {
+        for (int x = 0; x <= displacements_inside_; x += 2) {
             horizontal_displacements_.push_back(x);
         }
-        for (int x = -1; x >= -displacements_outside_; x--) {
+        for (int x = -1; x >= -displacements_outside_; x -= 2) {
             horizontal_displacements_.push_back(x);
         }
     }
 
-    for (int y = 1; y <= displacements_near_; y++) {
+    for (int y = 1; y <= displacements_near_; y += 2) {
         vertical_displacements_.push_back(y);
     }
-    for (int y = 0; y >= -displacements_far_; y--) {
+    for (int y = 0; y >= -displacements_far_; y -= 2) {
         vertical_displacements_.push_back(y);
     }
 }
@@ -164,7 +166,7 @@ void PointFinder::initializeSearchDimensions(Point& step_point)
     current_foot_z_ = step_point.z;
 
     search_dimensions_ = { optimal_foot_x_ - 0.5, optimal_foot_x_ + 0.5,
-        optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5, -1, 1 };
+        optimal_foot_y_ - 0.5, optimal_foot_y_ + 0.5 };
 
     x_offset_ = -search_dimensions_[0];
     y_offset_ = -search_dimensions_[2];
@@ -183,6 +185,7 @@ void PointFinder::findPoints(const PointCloud::Ptr& pointcloud,
     Point& step_point, std::vector<Point>* position_queue)
 {
     original_position_queue_.clear();
+    obstacles_found_.clear();
     initializeSearchDimensions(step_point);
     mapPointCloudToHeightMap(pointcloud);
     convolveLaplacianKernel(height_map_, derivatives_);
@@ -268,17 +271,21 @@ void PointFinder::computeFootPlateDisplacement(
     double y_original = yIndexToCoordinate(y);
     Point original = Point((float)x_original, (float)y_original, (float)height);
 
-    // Check if height difference is not significant
-    if (std::abs(height) < 0.05) {
-        double x_final = xIndexToCoordinate(x);
-        double y_final = yIndexToCoordinate(y);
-
-        Point p = Point((float)x_final, (float)y_final, (float)height);
-        if (validatePoint(p)) {
-            position_queue->push_back(p);
-            original_position_queue_.push_back(original);
-            return;
+    std::vector<Point> track = retrieveTrackPoints(ORIGIN, original, 14);
+    bool obstacle_found = false;
+    for (Point& p : track) {
+        if (p.z > height + 0.03) {
+            obstacle_found = true;
+            break;
         }
+    }
+
+    // Do not shift foot if the height difference is positive
+    if (height >= 0 && !obstacle_found && validatePoint(original)) {
+        position_queue->push_back(original);
+        original_position_queue_.push_back(original);
+        obstacles_found_.push_back(obstacle_found);
+        return;
     }
 
     // Make the minimum height map value equal to the found point z-value
@@ -315,6 +322,7 @@ void PointFinder::computeFootPlateDisplacement(
             if (validatePoint(p)) {
                 position_queue->push_back(p);
                 original_position_queue_.push_back(original);
+                obstacles_found_.push_back(obstacle_found);
                 return;
             }
         }
@@ -330,9 +338,12 @@ void PointFinder::computeFootPlateDisplacement(
  * @return std::vector<Point> A list of pointcloud points.
  */
 std::vector<Point> PointFinder::retrieveTrackPoints(
-    const Point& start, const Point& end)
+    const Point& start, const Point& end, int num_points)
 {
-    std::vector<Point> points = linearDomain(start, end, num_track_points_);
+    if (num_points == 0) {
+        num_points = num_track_points_;
+    }
+    std::vector<Point> points = linearDomain(start, end, num_points);
     std::vector<Point> track_points;
 
     for (Point& p : points) {
@@ -422,4 +433,24 @@ std::vector<double> PointFinder::getDisplacements()
     y_far = n_->get_parameter("displacements_far").as_double();
 
     return std::vector<double> { x_outside, x_inside, y_near, y_far };
+}
+
+/**
+ * Return an original point.
+ */
+Point PointFinder::getOriginalPoint(int index)
+{
+    return original_position_queue_[index];
+}
+
+/**
+ * Return whether there is an obstacle in shape of a penalty.
+ */
+int PointFinder::getObstaclePenalty(int index)
+{
+    if (obstacles_found_[index]) {
+        return 1;
+    } else {
+        return 0;
+    }
 }

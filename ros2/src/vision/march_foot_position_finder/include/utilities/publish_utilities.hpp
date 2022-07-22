@@ -299,6 +299,46 @@ void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
 }
 
 /**
+ * Publishes a rectangle around the foot point.
+ *
+ */
+void publishFootRectangle(const MarkerPublisher::SharedPtr& publisher,
+    rclcpp::Node* n, Point& p, const std::string& left_or_right)
+{
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
+    marker.header.stamp = n->now();
+
+    marker.ns = "foot_rectangle";
+    marker.id = 9;
+    marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+
+    Point p1((float)(p.x), (float)(p.y + 0.05), /*_z=*/(float)p.z);
+    Point p2((float)(p.x), (float)(p.y - 0.05), /*_z=*/(float)p.z);
+    Point p3((float)(p.x + 0.20), (float)(p.y - 0.05), /*_z=*/(float)p.z);
+    Point p4((float)(p.x + 0.20), (float)(p.y + 0.05), /*_z=*/(float)p.z);
+
+    marker.points.push_back(to_geometry(p1));
+    marker.points.push_back(to_geometry(p2));
+    marker.points.push_back(to_geometry(p3));
+    marker.points.push_back(to_geometry(p4));
+    marker.points.push_back(to_geometry(p1));
+
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.01;
+
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
+
+    publisher->publish(marker);
+}
+
+/**
  * Publishes a list of points to visualize.
  *
  * @param publisher publisher to use
