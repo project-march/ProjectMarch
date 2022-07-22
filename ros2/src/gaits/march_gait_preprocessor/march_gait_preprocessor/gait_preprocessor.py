@@ -1,11 +1,11 @@
 """Author: Marten Haitjema, MVII."""
 
 from typing import List, Tuple
+import numpy as np
 from rclpy.node import Node
 from geometry_msgs.msg import Point
 from march_shared_msgs.msg import FootPosition, CurrentGait
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-import numpy as np
 
 NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
@@ -110,7 +110,8 @@ class GaitPreprocessor(Node):
             foot_position (FootPosition): Location given by CoViD (Computer Vision).
         """
         foot_position_msg = self._process_foot_position(foot_position)
-        self.publisher_left.publish(foot_position_msg)
+        if self._validate_point(foot_position_msg):
+            self.publisher_left.publish(foot_position_msg)
 
     def _callback_right(self, foot_position: FootPosition) -> None:
         """Callback for new right point from covid. Makes the point usable for the gait.
@@ -119,7 +120,8 @@ class GaitPreprocessor(Node):
             foot_position (FootPosition): Location given by CoViD (Computer Vision).
         """
         foot_position_msg = self._process_foot_position(foot_position)
-        self.publisher_right.publish(foot_position_msg)
+        if self._validate_point(foot_position_msg):
+            self.publisher_right.publish(foot_position_msg)
 
     def _update_step_height_previous(self, foot_position: FootPosition) -> None:
         """Update the _step_height_previous attribute with the height of the last chosen foot position."""
@@ -253,3 +255,11 @@ class GaitPreprocessor(Node):
         point_msg.relative_midpoint_height = relative_midpoint_height
 
         self.publisher_fixed_distance.publish(point_msg)
+
+    def _validate_point(self, point: FootPosition) -> None:
+        """Validates if the point sent by covid if valid."""
+        return (
+            0.15 < abs(point.processed_point.x) < 0.7
+            and abs(point.processed_point.y) < 0.25
+            and 0.35 < abs(point.processed_point.z) < 0.7
+        )

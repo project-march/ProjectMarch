@@ -1,7 +1,7 @@
 """Author: Marten Haitjema, MVII."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Tuple
 from rclpy.time import Time
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import NANOSECONDS_TO_SECONDS
@@ -90,7 +90,7 @@ class PointHandler(ABC):
         elif subgait_id == "right_swing":
             self.pub_right.publish(foot_position)
 
-    def is_foot_location_too_old(self, foot_location: FootPosition) -> bool:
+    def is_foot_location_too_old(self, foot_location: FootPosition) -> Tuple[bool, str]:
         """Checks if the foot_location given by CoViD is not older than FOOT_LOCATION_TIME_OUT.
 
         Args:
@@ -113,10 +113,10 @@ class PointHandler(ABC):
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
-            self._logger.warn(
+            msg = (
                 f"Foot location is more than {FOOT_LOCATION_TIME_OUT} seconds old, time difference is "
                 f"{readable_time_difference} seconds. Stopping gait."
             )
-            return True
+            return True, msg
 
-        return False
+        return False, ""

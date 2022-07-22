@@ -13,7 +13,7 @@ class GaitError(Exception):
     def __init__(self, msg=None):
         if msg is None:
             msg = "An error occurred with a gait module."
-        super(GaitError, self).__init__(msg)
+        super().__init__(msg)
 
 
 class GaitNameNotFoundError(GaitError):
