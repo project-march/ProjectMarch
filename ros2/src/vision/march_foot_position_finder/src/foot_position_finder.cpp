@@ -399,7 +399,9 @@ Point FootPositionFinder::retrieveOptimalPoint(
     std::vector<Point>* position_queue)
 {
     Point optimal_point = *position_queue->begin();
-    double optimal_distance_height_tradeoff = 0;
+    double optimal_distance_height_tradeoff = -10000;
+    int count = 0;
+    int index;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x))
@@ -407,8 +409,13 @@ Point FootPositionFinder::retrieveOptimalPoint(
         if (new_tradeoff > optimal_distance_height_tradeoff) {
             optimal_point = (*p);
             optimal_distance_height_tradeoff = new_tradeoff;
+            index = count;
         }
+        count++;
     }
+
+    publishOriginalMarkerPoint(point_marker_publisher_, n_, point_finder_->original_position_queue_[index],
+        left_or_right_); // Red
 
     return optimal_point;
 }

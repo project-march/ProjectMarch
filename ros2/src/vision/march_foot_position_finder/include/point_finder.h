@@ -38,6 +38,8 @@ public:
 
     void readParameters(const std::vector<rclcpp::Parameter>& parameters);
 
+    std::vector<Point> original_position_queue_;
+
 protected:
     rclcpp::Node* n_;
     std::vector<double> search_dimensions_;

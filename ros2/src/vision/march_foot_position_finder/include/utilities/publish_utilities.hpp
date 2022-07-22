@@ -369,6 +369,46 @@ void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher,
 }
 
 /**
+ * Publishes a marker point with a given publisher
+ *
+ * @param publisher publisher to use
+ * @param p point to publish
+ */
+void publishOriginalMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
+    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+{
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
+    marker.header.stamp = n->now();
+
+    marker.ns = "original_point";
+    marker.id = 8;
+    marker.type = visualization_msgs::msg::Marker::CUBE;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+
+    marker.pose.position.x = p.x;
+    marker.pose.position.y = p.y;
+    marker.pose.position.z = p.z;
+
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.02;
+    marker.scale.y = 0.02;
+    marker.scale.z = 0.02;
+
+    marker.color.r = 0.1;
+    marker.color.g = 1.0;
+    marker.color.b = 1.0;
+    marker.color.a = 1.0;
+    marker.lifetime = rclcpp::Duration(/*seconds=*/0.3, /*nanoseconds=*/0);
+
+    publisher->publish(marker);
+}
+
+/**
  * Publishes a point to a given publisher->
  *
  * @param publisher publisher to use

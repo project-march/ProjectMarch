@@ -182,6 +182,7 @@ void PointFinder::initializeSearchDimensions(Point& step_point)
 void PointFinder::findPoints(const PointCloud::Ptr& pointcloud,
     Point& step_point, std::vector<Point>* position_queue)
 {
+    original_position_queue_.clear();
     initializeSearchDimensions(step_point);
     mapPointCloudToHeightMap(pointcloud);
     convolveLaplacianKernel(height_map_, derivatives_);
@@ -262,6 +263,11 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
 void PointFinder::computeFootPlateDisplacement(
     int x, int y, double height, std::vector<Point>* position_queue)
 {
+
+    double x_original = xIndexToCoordinate(x);
+    double y_original = yIndexToCoordinate(y);
+    Point original = Point((float)x_original, (float)y_original, (float)height);
+
     // Check if height difference is not significant
     if (std::abs(height) < 0.05) {
         double x_final = xIndexToCoordinate(x);
@@ -270,6 +276,7 @@ void PointFinder::computeFootPlateDisplacement(
         Point p = Point((float)x_final, (float)y_final, (float)height);
         if (validatePoint(p)) {
             position_queue->push_back(p);
+            original_position_queue_.push_back(original);
             return;
         }
     }
@@ -307,6 +314,7 @@ void PointFinder::computeFootPlateDisplacement(
             Point p = Point((float)x_final, (float)y_final, (float)height);
             if (validatePoint(p)) {
                 position_queue->push_back(p);
+                original_position_queue_.push_back(original);
                 return;
             }
         }
