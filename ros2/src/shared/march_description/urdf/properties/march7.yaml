@@ -35,7 +35,6 @@ dimensions:
     height_forward: 0.217
     height_backward: 0.079
     mass: 0.789
-    length: 0.1825
 inertia:
   hip_base:
     xx: 0.303498

@@ -34,7 +34,8 @@ private:
 
     std::string robot_properties_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/properties/march7.yaml";
     YAML::Node robot_properties = YAML::LoadFile(robot_properties_path);
-    const double FOOT_LENGTH = robot_properties["dimensions"]["foot"]["length"].as<double>();
+    const double TRANS_X = -robot_properties["dimensions"]["foot"]["height_forward"].as<double>();
+    const double TRANS_Z = -0.025;
 
     TransformStamped trans_left_;
     TransformStamped trans_right_;
@@ -70,9 +71,9 @@ private:
             tr1.header.stamp = trans_left_.header.stamp;
             tr1.header.frame_id = "foot_left";
             tr1.child_frame_id = "toes_left";
-            tr1.transform.translation.x = -FOOT_LENGTH;
+            tr1.transform.translation.x = TRANS_X;
             tr1.transform.translation.y = 0.0;
-            tr1.transform.translation.z = -0.025;
+            tr1.transform.translation.z = TRANS_Z;
             tr1.transform.rotation = Quaternion();
             tf_broadcaster_->sendTransform(tr1);
 
@@ -94,9 +95,9 @@ private:
             tr3.header.stamp = trans_right_.header.stamp;
             tr3.header.frame_id = "foot_right";
             tr3.child_frame_id = "toes_right";
-            tr3.transform.translation.x = -FOOT_LENGTH;
+            tr3.transform.translation.x = TRANS_X;
             tr3.transform.translation.y = 0.0;
-            tr3.transform.translation.z = -0.025;
+            tr3.transform.translation.z = TRANS_Z;
             tr3.transform.rotation = Quaternion();
             tf_broadcaster_->sendTransform(tr3);
 
