@@ -1,9 +1,9 @@
 #include "rclcpp/rclcpp.hpp"
+#include "yaml-cpp/yaml.h"
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
-#include "yaml-cpp/yaml.h"
-#include <ament_index_cpp/get_package_share_directory.hpp>
 
 using TransformStamped = geometry_msgs::msg::TransformStamped;
 
@@ -32,9 +32,13 @@ private:
 
     rclcpp::TimerBase::SharedPtr publish_timer_;
 
-    std::string robot_properties_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/properties/march7.yaml";
+    std::string robot_properties_path
+        = ament_index_cpp::get_package_share_directory("march_description")
+        + "/urdf/properties/march7.yaml";
     YAML::Node robot_properties = YAML::LoadFile(robot_properties_path);
-    const double TRANS_X = -robot_properties["dimensions"]["foot"]["height_forward"].as<double>();
+    const double TRANS_X
+        = -robot_properties["dimensions"]["foot"]["height_forward"]
+               .as<double>();
     const double TRANS_Z = -0.025;
 
     TransformStamped trans_left_;
