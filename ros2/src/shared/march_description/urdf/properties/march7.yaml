@@ -113,13 +113,13 @@ joint_limits:
     unit: iu
     lower_limit: 9364
     upper_limit: 10377
-    zero_position: 9818
+    zero_position: 9864
     resolution: 14
   right_haa:
     unit: iu
     lower_limit: 3977
     upper_limit: 5003
-    zero_position: 4430
+    zero_position: 4418
     resolution: 14
 safety:  # This is still copied from MV
   exoskeleton:
