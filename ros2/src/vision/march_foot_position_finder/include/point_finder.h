@@ -32,11 +32,15 @@ public:
         const std::vector<rclcpp::Parameter>& parameters);
 
     std::vector<Point> retrieveTrackPoints(
-        const Point& start, const Point& end);
+        const Point& start, const Point& end, int num_points);
 
     std::vector<double> getDisplacements();
 
     void readParameters(const std::vector<rclcpp::Parameter>& parameters);
+
+    Point getOriginalPoint(int index);
+
+    int getObstaclePenalty(int index);
 
 protected:
     rclcpp::Node* n_;
@@ -45,6 +49,7 @@ protected:
 
     int grid_resolution_ = RES;
     double cell_width_ = 1.0 / grid_resolution_;
+    Point ORIGIN;
 
     std::array<std::array<double, RES>, RES> height_map_;
     std::array<std::array<double, RES>, RES> height_map_temp_;
@@ -81,6 +86,9 @@ protected:
     double max_z_distance_;
     double available_points_ratio_;
     int num_track_points_;
+
+    std::vector<Point> original_position_queue_;
+    std::vector<bool> obstacles_found_;
 
     void initializeValues();
 

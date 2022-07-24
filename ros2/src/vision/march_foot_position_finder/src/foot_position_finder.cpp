@@ -358,7 +358,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
         std::vector<Point> track_points
-            = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_);
+            = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_, 0);
 
         // Visualization
 
@@ -375,6 +375,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             left_or_right_); // Orange
         publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
             left_or_right_); // Red
+        publishFootRectangle(
+            point_marker_publisher_, n_, found_covid_point_, left_or_right_);
         publishPossiblePoints(
             point_marker_publisher_, n_, position_queue, left_or_right_);
         publishNewDisplacement(point_marker_publisher_, n_, start_point_,
@@ -399,16 +401,25 @@ Point FootPositionFinder::retrieveOptimalPoint(
     std::vector<Point>* position_queue)
 {
     Point optimal_point = *position_queue->begin();
-    double optimal_distance_height_tradeoff = 0;
+    double optimal_distance_height_tradeoff = -10000;
+    int count = 0;
+    int index;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x))
-            - height_distance_coefficient_ * std::abs(p->z);
+            - height_distance_coefficient_ * std::abs(p->z)
+            - point_finder_->getObstaclePenalty(index);
         if (new_tradeoff > optimal_distance_height_tradeoff) {
             optimal_point = (*p);
             optimal_distance_height_tradeoff = new_tradeoff;
+            index = count;
         }
+        count++;
     }
+
+    publishOriginalMarkerPoint(point_marker_publisher_, n_,
+        point_finder_->getOriginalPoint(index),
+        left_or_right_); // Blue
 
     return optimal_point;
 }
