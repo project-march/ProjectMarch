@@ -1,5 +1,0 @@
-#!/usr/bin/env python3
-from march_gravity_aligned_frame_publisher import frame_publisher_node
-
-if __name__ == "__main__":
-    frame_publisher_node.main()

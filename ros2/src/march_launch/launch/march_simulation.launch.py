@@ -8,6 +8,7 @@ from launch.substitutions import LaunchConfiguration
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
 )
+from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 
 # Get lengths from urdf:
 LENGTH_HIP_AA, LENGTH_HIP_BASE = get_lengths_robot_from_urdf_for_inverse_kinematics(
@@ -52,7 +53,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
-    realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 
@@ -73,6 +73,12 @@ def generate_launch_description() -> launch.LaunchDescription:
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
+    ankle_buffer = LaunchConfiguration("ankle_buffer")
+    hip_buffer = LaunchConfiguration("hip_buffer")
+    default_knee_bend = LaunchConfiguration("default_knee_bend")
+    hip_x_fraction = LaunchConfiguration("hip_x_fraction")
+    upper_body_front_rotation = LaunchConfiguration("upper_body_front_rotation")
+    dorsiflexion_at_end_position = LaunchConfiguration("dorsiflexion_at_end_position")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -128,18 +134,18 @@ def generate_launch_description() -> launch.LaunchDescription:
                 "This file must be available in the march_desrciption/urdf/ folder",
             ),
             DeclareLaunchArgument(
-                name="realsense",
-                default_value="False",
-                description="Whether any realsense camera will be used",
-            ),
-            DeclareLaunchArgument(
                 name="realsense_simulation",
-                default_value=realsense,
+                default_value="false",
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
+                name="use_imu_data",
+                default_value="False",
+                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
+            ),
+            DeclareLaunchArgument(
                 name="ground_gait",
-                default_value=realsense,
+                default_value=use_imu_data,
                 description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
@@ -148,11 +154,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting in rviz.",
-            ),
-            DeclareLaunchArgument(
-                name="use_imu_data",
-                default_value=realsense,
-                description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(name="imu_to_use", default_value="back", description="Which imu to use"),
             DeclareLaunchArgument(
@@ -258,6 +259,38 @@ def generate_launch_description() -> launch.LaunchDescription:
                 default_value="False",
                 description="If true, no joints will be actuated",
             ),
+            # IK solver parameters
+            DeclareLaunchArgument(
+                name="ankle_buffer",
+                default_value=str(IKSolverParameters.ankle_buffer),
+                description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_buffer",
+                default_value=str(IKSolverParameters.hip_buffer),
+                description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="default_knee_bend",
+                default_value=str(IKSolverParameters.default_knee_bend),
+                description="efault knee flexion angle, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_x_fraction",
+                default_value=str(IKSolverParameters.hip_x_fraction),
+                description="fraction of step at which hip is located",
+            ),
+            DeclareLaunchArgument(
+                name="upper_body_front_rotation",
+                default_value=str(IKSolverParameters.upper_body_front_rotation),
+                description="forward tilt of the backpack, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="dorsiflexion_at_end_position",
+                default_value=str(IKSolverParameters.dorsiflexion_at_end_position),
+                description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
+                "if it is set to zero.",
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -316,7 +349,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("imu_to_use", imu_to_use),
                     ("robot_description", robot_description),
                     ("ground_gait", ground_gait),
-                    ("realsense", realsense),
                     ("realsense_simulation", realsense_simulation),
                     ("to_world_transform", to_world_transform),
                     ("gait_package", gait_package),
@@ -336,6 +368,12 @@ def generate_launch_description() -> launch.LaunchDescription:
                     ("first_subgait_delay", first_subgait_delay),
                     ("early_schedule_duration", early_schedule_duration),
                     ("timer_period", timer_period),
+                    ("ankle_buffer", ankle_buffer),
+                    ("hip_buffer", hip_buffer),
+                    ("default_knee_bend", default_knee_bend),
+                    ("hip_x_fraction", hip_x_fraction),
+                    ("upper_body_front_rotation", upper_body_front_rotation),
+                    ("dorsiflexion_at_end_position", dorsiflexion_at_end_position),
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),

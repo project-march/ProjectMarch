@@ -6,6 +6,7 @@ from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
+from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
@@ -85,7 +86,7 @@ class DynamicStep:
         self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
-        self.pose = Pose(self.all_joint_names, list(self.starting_position.values()))
+        self.pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()))
 
         self.time = [
             0,
@@ -276,6 +277,14 @@ class DynamicStep:
         self.middle_point_fraction = node.middle_point_fraction
         self.push_off_fraction = node.push_off_fraction
         self.push_off_position = node.push_off_position
+        self._ik_solver_parameters = IKSolverParameters(
+            node.ankle_buffer,
+            node.hip_buffer,
+            node.default_knee_bend,
+            node.hip_x_fraction,
+            node.upper_body_front_rotation,
+            node.dorsiflexion_at_end_position,
+        )
 
     def _check_joint_limits(
         self,
