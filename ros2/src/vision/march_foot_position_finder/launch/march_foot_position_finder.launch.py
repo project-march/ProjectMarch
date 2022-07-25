@@ -33,7 +33,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="height_zero_threshold",
-                default_value="0.025",
+                default_value="0.027",
             ),
             DeclareLaunchArgument(
                 name="foot_width",
@@ -81,7 +81,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="height_distance_coefficient",
-                default_value="3.0",
+                default_value="10.0",
             ),
             DeclareLaunchArgument(
                 "realsense_simulation",
