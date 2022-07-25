@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(march_aligned_frame_publisher)
+project(march_frame_publisher)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -23,7 +23,7 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
-add_executable(${PROJECT_NAME}_node src/aligned_frame_publisher_node.cpp)
+add_executable(${PROJECT_NAME}_node src/frame_publisher_node.cpp)
 ament_target_dependencies(${PROJECT_NAME}_node tf2 tf2_ros rclcpp geometry_msgs)
 
 target_include_directories(${PROJECT_NAME}_node PUBLIC
