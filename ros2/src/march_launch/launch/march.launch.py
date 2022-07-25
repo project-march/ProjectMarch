@@ -465,7 +465,7 @@ def generate_launch_description() -> LaunchDescription:
                         "march_safety.launch.py",
                     )
                 ),
-                launch_arguments=[("use_sim_time", use_sim_time)],
+                launch_arguments=[("use_sim_time", use_sim_time), ("simulation", simulation)],
             ),
             # March robot information
             IncludeLaunchDescription(
