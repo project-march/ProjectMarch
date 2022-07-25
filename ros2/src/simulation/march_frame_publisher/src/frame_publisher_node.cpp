@@ -1,16 +1,18 @@
 #include "rclcpp/rclcpp.hpp"
 #include "yaml-cpp/yaml.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <math.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 
 using TransformStamped = geometry_msgs::msg::TransformStamped;
 
-class AlignedFramePublisherNode : public rclcpp::Node {
+class FramePublisherNode : public rclcpp::Node {
 public:
-    AlignedFramePublisherNode()
-        : Node("march_aligned_frame_publisher")
+    FramePublisherNode()
+        : Node("march_frame_publisher")
     {
 
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
@@ -21,8 +23,21 @@ public:
 
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(20), [this]() -> void {
-                publishAlignedFrames();
+                publishToeFrames();
+                publishCameraFrame("left");
+                publishCameraFrame("right");
             });
+
+        callback_handle_ = this->add_on_set_parameters_callback(
+            std::bind(&FramePublisherNode::parametersCallback, this,
+                std::placeholders::_1));
+
+        range.set__from_value(-5.0).set__to_value(5.0).set__step(0.1);
+        descriptor.floating_point_range = { range };
+        this->declare_parameter<double>(
+            "rotation_camera_left", rotation_camera_left, descriptor);
+        this->declare_parameter<double>(
+            "rotation_camera_right", rotation_camera_right, descriptor);
     }
 
 private:
@@ -47,7 +62,71 @@ private:
     rclcpp::Time last_published_right_;
     bool start_time_initialized = false;
 
-    void publishAlignedFrames()
+    double rotation_camera_left = 0.0;
+    double rotation_camera_right = 0.0;
+
+    TransformStamped tr;
+    rclcpp::Time last_published_camera_left = tr.header.stamp;
+    rclcpp::Time last_published_camera_right = tr.header.stamp;
+
+    rcl_interfaces::msg::ParameterDescriptor descriptor;
+    rcl_interfaces::msg::FloatingPointRange range;
+
+    OnSetParametersCallbackHandle::SharedPtr callback_handle_;
+
+    rcl_interfaces::msg::SetParametersResult parametersCallback(
+        const std::vector<rclcpp::Parameter>& parameters)
+    {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        result.reason = "success";
+        for (const auto& param : parameters) {
+            if (param.get_name() == "rotation_camera_left") {
+                rotation_camera_left = param.as_double();
+            }
+            if (param.get_name() == "rotation_camera_right") {
+                rotation_camera_right = param.as_double();
+            }
+            parameterUpdatedLogger(param);
+        }
+        return result;
+    }
+
+    void parameterUpdatedLogger(rclcpp::Parameter param)
+    {
+        RCLCPP_INFO(this->get_logger(),
+            param.get_name() + " set to " + param.value_to_string());
+    }
+
+    void publishCameraFrame(std::string left_or_right)
+    {
+        tr.header.stamp = this->get_clock()->now();
+        if ((left_or_right == "left"
+                && rclcpp::Time(tr.header.stamp) > last_published_camera_left)
+            || (left_or_right == "right"
+                && rclcpp::Time(tr.header.stamp)
+                    > last_published_camera_right)) {
+            tr.header.frame_id
+                = "camera_front_" + left_or_right + "_depth_optical_frame";
+            tr.child_frame_id
+                = "camera_front_" + left_or_right + "_virtual_rotated";
+            tf2::Quaternion tf2_quaternion;
+            if (left_or_right == "left") {
+                tf2_quaternion.setRPY(
+                    rotation_camera_left / 180 * M_PI, 0.0, 0.0);
+                last_published_camera_left = rclcpp::Time(tr.header.stamp);
+            } else if (left_or_right == "right") {
+                tf2_quaternion.setRPY(
+                    rotation_camera_right / 180 * M_PI, 0.0, 0.0);
+                last_published_camera_right = rclcpp::Time(tr.header.stamp);
+            }
+
+            tr.transform.rotation = tf2::toMsg(tf2_quaternion);
+            tf_broadcaster_->sendTransform(tr);
+        }
+    }
+
+    void publishToeFrames()
     {
 
         using namespace geometry_msgs::msg;
@@ -123,7 +202,7 @@ int main(int argc, char** argv)
     rclcpp::init(argc, argv);
 
     rclcpp::executors::MultiThreadedExecutor exec;
-    auto node = std::make_shared<AlignedFramePublisherNode>();
+    auto node = std::make_shared<FramePublisherNode>();
     exec.add_node(node);
     exec.spin();
 
