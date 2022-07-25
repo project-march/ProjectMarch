@@ -30,12 +30,14 @@ EffortWarner::EffortWarner(Node& node, std::vector<std::string>& joint_names)
         = node.get_parameter("time_between_effort_warnings").as_double();
     this->max_effort_
         = node.get_parameter("max_effort_limit").get_value<float>();
-    this->subscription_ = node.create_subscription<JointStateMsg>(
-        "/march/joint_states", SystemDefaultsQoS(),
-        // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        [this](const JointStateMsg::SharedPtr msg_ptr) -> void {
-            effortValueCallback(msg_ptr);
-        });
+    if (!node.get_parameter("simulation").as_bool()) {
+        this->subscription_ = node.create_subscription<JointStateMsg>(
+            "/march/joint_states", SystemDefaultsQoS(),
+            // NOLINTNEXTLINE(performance-unnecessary-value-param)
+            [this](const JointStateMsg::SharedPtr msg_ptr) -> void {
+                effortValueCallback(msg_ptr);
+            });
+    }
 }
 
 /**
