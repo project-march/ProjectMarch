@@ -61,6 +61,8 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
     ORIGIN = Point(/*_x=*/0, /*_y=*/0, /*_z=*/0);
 
     initializeValues();
+
+    pause_ = false;
 }
 
 /**
@@ -72,6 +74,7 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
 void PointFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
+    pause_ = true;
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_width") {
             foot_width_ = param.as_double();
@@ -96,12 +99,13 @@ void PointFinder::readParameters(
         } else if (param.get_name() == "num_track_points") {
             num_track_points_ = param.as_int();
         }
-        RCLCPP_INFO(n_->get_logger(),
-            "\033[92mParameter %s updated in %s Point Finder\033[0m",
-            param.get_name().c_str(), left_or_right_.c_str());
+        // RCLCPP_INFO(n_->get_logger(),
+        //     "\033[92mParameter %s updated in %s Point Finder\033[0m",
+        //     param.get_name().c_str(), left_or_right_.c_str());
     }
 
     initializeValues();
+    pause_ = false;
 }
 
 /**
@@ -125,6 +129,10 @@ void PointFinder::initializeValues()
     if (rect_height_ % 2 == 0) {
         rect_height_--;
     }
+
+    flipping_displacements_.clear();
+    horizontal_displacements_.clear();
+    vertical_displacements_.clear();
 
     for (int i = 0; i < actual_rect_height_ / 2.5; i += 2) {
         flipping_displacements_.push_back(-i);
@@ -184,6 +192,7 @@ void PointFinder::initializeSearchDimensions(Point& step_point)
 void PointFinder::findPoints(const PointCloud::Ptr& pointcloud,
     Point& step_point, std::vector<Point>* position_queue)
 {
+    while (pause_) {}
     original_position_queue_.clear();
     obstacles_found_.clear();
     initializeSearchDimensions(step_point);

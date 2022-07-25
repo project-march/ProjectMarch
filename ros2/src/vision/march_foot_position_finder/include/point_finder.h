@@ -90,6 +90,8 @@ protected:
     std::vector<Point> original_position_queue_;
     std::vector<bool> obstacles_found_;
 
+    bool pause_;
+
     void initializeValues();
 
     void initializeSearchDimensions(Point& step_point);

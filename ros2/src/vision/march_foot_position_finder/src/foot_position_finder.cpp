@@ -127,7 +127,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
             }
 
             realsense_timer_ = n_->create_wall_timer(
-                std::chrono::milliseconds(5), [this]() -> void {
+                std::chrono::milliseconds(30), [this]() -> void {
                     processRealSenseDepthFrames();
                 });
 
@@ -165,7 +165,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 void FootPositionFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
-    paused_ = true;
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_gap") {
             foot_gap_ = param.as_double();
@@ -191,10 +190,9 @@ void FootPositionFinder::readParameters(
     found_points_.resize(sample_size_);
     resetInitialPosition(/*stop_timer=*/false);
     point_finder_->readParameters(parameters);
-    displacements_ = point_finder_->getDisplacements();
-    paused_ = false;
+    // displacements_ = point_finder_->getDisplacements();
 
-    RCLCPP_INFO(n_->get_logger(), "\033[92mUpdate finished\033[0m");
+    // RCLCPP_INFO(n_->get_logger(), "\033[92mUpdate finished\033[0m");
 }
 
 /**
@@ -338,8 +336,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Visualization
     if (validatePoint(desired_point_) && validatePoint(start_point_)) {
-        publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
-            displacements_, left_or_right_); // Cyan
+        // publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
+        //     displacements_, left_or_right_); // Cyan
         publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
             left_or_right_); // Green
         publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
@@ -371,17 +369,17 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         }
 
         // Visualize new displacement
-        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
-            left_or_right_); // Orange
+        // publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
+        //     left_or_right_); // Orange
         publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
             left_or_right_); // Red
         publishFootRectangle(
             point_marker_publisher_, n_, found_covid_point_, left_or_right_);
-        publishPossiblePoints(
-            point_marker_publisher_, n_, position_queue, left_or_right_);
-        publishNewDisplacement(point_marker_publisher_, n_, start_point_,
-            found_covid_point_,
-            left_or_right_); // Green
+        // publishPossiblePoints(
+        //     point_marker_publisher_, n_, position_queue, left_or_right_);
+        // publishNewDisplacement(point_marker_publisher_, n_, start_point_,
+        //     found_covid_point_,
+        //     left_or_right_); // Green
 
         // Publish final point for gait computation
         publishPoint(point_publisher_, n_, found_covid_point_,
