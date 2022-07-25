@@ -54,8 +54,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/{ hardware_interface::HW_IF_EFFORT },
-            /*required_state_interfaces=*/{ hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY ,
-                                            hardware_interface::HW_IF_EFFORT },
+            /*required_state_interfaces=*/{ hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
             /*logger=*/(*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
@@ -128,9 +127,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(
                 hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_VELOCITY,
                                                    &jointInfo.velocity));
-        state_interfaces.emplace_back(
-                hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT,
-                                                   &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
@@ -170,8 +166,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->dataIsValid();},
             /*logger=*/(*logger_), /*joints=*/jointPtrs,
             /*function_when_timeout=*/[this](march::Joint& joint) {
-                RCLCPP_ERROR((*logger_), "Joints %s is not receiving data",
-                             joint.getName().c_str());
+                RCLCPP_ERROR((*logger_), "Joints %s is not receiving data", joint.getName().c_str());
             });
     RCLCPP_INFO((*logger_), "All slaves are sending EtherCAT data.");
 
@@ -244,8 +239,7 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
             /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->isOperational();},
             /*logger=*/(*logger_), /*joints=*/joints,
             /*function_when_timeout=*/[this](march::Joint& joint) {
-                RCLCPP_ERROR((*logger_), "Joint %s is not an operational state.",
-                             joint.getName().c_str());
+                RCLCPP_ERROR((*logger_), "Joint %s is not an operational state.", joint.getName().c_str());
             });
     RCLCPP_INFO((*logger_), "All joints ready for writing.");
     joints_ready_for_actuation_ = true;
@@ -276,7 +270,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    for (JointInfo jointInfo: joints_info_) {
+    for (JointInfo& jointInfo: joints_info_) {
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
@@ -296,7 +290,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     if (!joints_ready_for_actuation_) {
         return hardware_interface::return_type::OK;
     }
-    for (JointInfo jointInfo: joints_info_) {
+    for (JointInfo& jointInfo: joints_info_) {
         if (!is_joint_in_valid_state(jointInfo)) {
             return hardware_interface::return_type::ERROR;
         }

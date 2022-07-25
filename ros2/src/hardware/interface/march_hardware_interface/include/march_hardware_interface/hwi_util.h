@@ -49,9 +49,10 @@ inline vector<string> get_sorted_interface_names(const vector<hardware_interface
 
 ///// Checks if the interface names are the same as the required ones.
 inline bool has_required_interfaces(const vector<hardware_interface::InterfaceInfo>& interfaces,
-    const vector<string>& required_interface_names, const string& joint_name, const string& interface_type,
+    vector<string>& required_interface_names, const string& joint_name, const string& interface_type,
     const rclcpp::Logger& logger)
 {
+    required_interface_names = sort(required_interface_names.begin(), required_interface_names.end() );
     vector<string> interface_names = get_sorted_interface_names(interfaces);
     if (interface_names != required_interface_names) {
         RCLCPP_FATAL(logger,
@@ -131,7 +132,7 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
                                                     const optional<std::function<void(march::Joint &)>> &
                                                         function_when_timeout = nullopt,
                                                     const chrono::nanoseconds sleep_between_tries
-                                                        = std::chrono::nanoseconds(1),
+                                                        = std::chrono::seconds(1),
                                                     const unsigned maximum_tries  = 10) {
     vector<bool> is_ok;
     unsigned int amount_ok = 0;
