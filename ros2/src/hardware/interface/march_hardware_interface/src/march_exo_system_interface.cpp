@@ -118,7 +118,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 {
     RCLCPP_INFO((*logger_), "Creating export state interface.");
     std::vector<hardware_interface::StateInterface> state_interfaces;
-    for (JointInfo jointInfo : joints_info_) {
+    for (JointInfo& jointInfo : joints_info_) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
         state_interfaces.emplace_back(
                 hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_POSITION,
@@ -143,7 +143,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
 {
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
-    for (JointInfo jointInfo : joints_info_) {
+    for (JointInfo& jointInfo : joints_info_) {
         // Effort: Couples the command controller to the value jointInfo.effort through a pointer.
         command_interfaces.emplace_back(
                 hardware_interface::CommandInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT,
@@ -171,7 +171,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
     RCLCPP_INFO((*logger_), "All slaves are sending EtherCAT data.");
 
     // Read the first encoder values for each joint
-    for (JointInfo jointInfo : joints_info_) {
+    for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
 
         // Set the first target as the current position
@@ -209,6 +209,8 @@ MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::stri
         make_joints_operational(march_robot_->getNotOperationalJoints());
     }
 
+    joints_ready_for_actuation_ = true;
+
     return hardware_interface::return_type::OK;
 }
 
@@ -242,7 +244,6 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
                 RCLCPP_ERROR((*logger_), "Joint %s is not an operational state.", joint.getName().c_str());
             });
     RCLCPP_INFO((*logger_), "All joints ready for writing.");
-    joints_ready_for_actuation_ = true;
 }
 
 /// This method is ran when you stop the controller, (start is ran earlier).
@@ -291,9 +292,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         return hardware_interface::return_type::OK;
     }
     for (JointInfo& jointInfo: joints_info_) {
+//        RCLCPP_INFO((*logger_), "The sending effort is %g. (state: %g)", jointInfo.effort_command, jointInfo.position);
         if (!is_joint_in_valid_state(jointInfo)) {
             return hardware_interface::return_type::ERROR;
         }
+
         auto converted_effort = jointInfo.joint.getMotorController()
                 ->getMotorControllerSpecificEffort(jointInfo.effort_command);
         auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
