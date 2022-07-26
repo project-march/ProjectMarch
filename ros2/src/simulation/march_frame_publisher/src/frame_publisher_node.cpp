@@ -1,7 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "yaml-cpp/yaml.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <math.h>
+#include <cmath>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -80,7 +80,7 @@ private:
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = true;
         result.reason = "success";
-        for (const auto& param : parameters) {
+        for (const rclcpp::Parameter& param : parameters) {
             if (param.get_name() == "rotation_camera_left") {
                 rotation_camera_left = param.as_double();
             }
@@ -92,13 +92,13 @@ private:
         return result;
     }
 
-    void parameterUpdatedLogger(rclcpp::Parameter param)
+    void parameterUpdatedLogger(const rclcpp::Parameter& param)
     {
         RCLCPP_INFO(this->get_logger(),
             param.get_name() + " set to " + param.value_to_string());
     }
 
-    void publishCameraFrame(std::string left_or_right)
+    void publishCameraFrame(const std::string& left_or_right)
     {
         tr.header.stamp = this->get_clock()->now();
         if ((left_or_right == "left"
@@ -119,6 +119,8 @@ private:
                 tf2_quaternion.setRPY(
                     rotation_camera_right / 180 * M_PI, 0.0, 0.0);
                 last_published_camera_right = rclcpp::Time(tr.header.stamp);
+            } else {
+                tf2_quaternion.setRPY(0.0, 0.0, 0.0);
             }
 
             tr.transform.rotation = tf2::toMsg(tf2_quaternion);
