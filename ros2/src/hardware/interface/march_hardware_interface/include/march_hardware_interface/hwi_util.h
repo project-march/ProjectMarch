@@ -49,10 +49,10 @@ inline vector<string> get_sorted_interface_names(const vector<hardware_interface
 
 ///// Checks if the interface names are the same as the required ones.
 inline bool has_required_interfaces(const vector<hardware_interface::InterfaceInfo>& interfaces,
-    vector<string>& required_interface_names, const string& joint_name, const string& interface_type,
+    vector<string> required_interface_names, const string& joint_name, const string& interface_type,
     const rclcpp::Logger& logger)
 {
-    required_interface_names = sort(required_interface_names.begin(), required_interface_names.end() );
+    sort(required_interface_names.begin(), required_interface_names.end());
     vector<string> interface_names = get_sorted_interface_names(interfaces);
     if (interface_names != required_interface_names) {
         RCLCPP_FATAL(logger,
