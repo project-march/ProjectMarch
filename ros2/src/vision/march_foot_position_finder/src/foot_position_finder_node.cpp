@@ -27,9 +27,11 @@ public:
     rcl_interfaces::msg::SetParametersResult parametersCallback(
         const std::vector<rclcpp::Parameter>& parameters)
     {
-        std::thread thread_left(&FootPositionFinder::readParameters, left, parameters);
+        std::thread thread_left(
+            &FootPositionFinder::readParameters, left, parameters);
         thread_left.detach();
-        std::thread thread_right(&FootPositionFinder::readParameters, right, parameters);
+        std::thread thread_right(
+            &FootPositionFinder::readParameters, right, parameters);
         thread_right.detach();
 
         rcl_interfaces::msg::SetParametersResult result;

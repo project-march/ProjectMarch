@@ -50,7 +50,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
-    // locked_ = false;
+    locked_ = false;
 
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
@@ -165,9 +165,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 void FootPositionFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
-    // while (locked_) {}
-    // locked_ = true;
-
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_gap") {
             foot_gap_ = param.as_double();
@@ -194,9 +191,6 @@ void FootPositionFinder::readParameters(
     resetInitialPosition(/*stop_timer=*/false);
     point_finder_->readParameters(parameters);
     // displacements_ = point_finder_->getDisplacements();
-
-    // RCLCPP_INFO(n_->get_logger(), "\033[92mUpdate finished\033[0m");
-    // locked_ = false;
 }
 
 /**
@@ -264,9 +258,6 @@ void FootPositionFinder::resetInitialPosition(bool stop_timer)
  */
 void FootPositionFinder::processRealSenseDepthFrames()
 {
-
-    std::cout << "wait for frame" << std::endl;
-
     float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
     if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
         frame_wait_counter_++;
@@ -319,9 +310,10 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
-    std::cout << "frame in " << std::endl;
-    // while (locked_) {}
-    // locked_ = true;
+    while (locked_) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    locked_ = true;
 
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
@@ -329,13 +321,14 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     // Preprocess point cloud and place pointcloud in aligned toes frame:
     preprocessor_->preprocess(pointcloud);
 
-    // Publish cloud for visualization:
-    publishCloud(
-        preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
-
     // Find possible points around the desired point determined earlier:
     std::vector<Point> position_queue;
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
+
+    // Publish cloud for visualization:
+    preprocessor_->voxelDownSample(pointcloud, 0.035);
+    publishCloud(
+        preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
     // Visualization
     if (validatePoint(desired_point_) && validatePoint(start_point_)) {
@@ -389,7 +382,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
             found_covid_point_, new_displacement_, track_points);
     }
 
-    // locked_ = false;
+    locked_ = false;
 }
 
 /**

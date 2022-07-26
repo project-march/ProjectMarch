@@ -21,9 +21,9 @@ public:
 
     void preprocess(const PointCloud::Ptr& pointcloud);
 
-protected:
     void voxelDownSample(const PointCloud::Ptr& pointcloud, float voxel_size);
 
+protected:
     void transformPointCloudToBaseframe(const PointCloud::Ptr& pointcloud);
 
     rclcpp::Node* n_;

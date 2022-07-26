@@ -32,7 +32,7 @@ public:
             std::bind(&FramePublisherNode::parametersCallback, this,
                 std::placeholders::_1));
 
-        range.set__from_value(-5.0).set__to_value(5.0).set__step(0.1);
+        range.set__from_value(-10.0).set__to_value(10.0).set__step(0.1);
         descriptor.floating_point_range = { range };
         this->declare_parameter<double>(
             "rotation_camera_left", rotation_camera_left, descriptor);
