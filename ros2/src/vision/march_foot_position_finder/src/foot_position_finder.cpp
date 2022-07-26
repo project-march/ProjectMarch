@@ -398,8 +398,7 @@ Point FootPositionFinder::retrieveOptimalPoint(
 {
     Point optimal_point = *position_queue->begin();
     double optimal_distance_height_tradeoff = -10000;
-    int count = 0;
-    int index;
+    int count = 0, index = 0;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x))
