@@ -175,7 +175,4 @@ class GaitPreprocessor(Node):
 
     def _validate_point(self, point: FootPosition) -> None:
         """Validates if the point sent by covid if valid."""
-        return (
-            0.15 < abs(point.processed_point.x) < 0.7
-            and abs(point.processed_point.y) < 0.25
-        )
+        return 0.15 < abs(point.processed_point.x) < 0.7 and abs(point.processed_point.y) < 0.25
