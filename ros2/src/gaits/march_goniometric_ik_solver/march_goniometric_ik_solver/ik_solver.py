@@ -80,7 +80,6 @@ class Pose:
         leg1: str = "left",
     ) -> None:
         self._parameters = parameters
-        print(self._parameters.base_number)
 
         self._max_ankle_flexion = (
             min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper)
@@ -628,7 +627,6 @@ class Pose:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
         pos_ankle = np.array([self.get_ankle_mid_x(frac, next_pose), ankle_y])
-        print(f"frac hip {frac}, ankle x {pos_ankle[0]}")
 
         # Store current hip_aa to calculate hip_aa of midpoint later:
         current_hip_aa_1, current_hip_aa_2 = self.aa_hip1, self.aa_hip2

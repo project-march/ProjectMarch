@@ -39,12 +39,12 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="location_y",
-                default_value="0.03",
+                default_value="0.0",
                 description="y-location for fake covid topic, takes double",
             ),
             DeclareLaunchArgument(
                 name="duration",
-                default_value="1.5",
+                default_value="1.3",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             DeclareLaunchArgument(
@@ -54,7 +54,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="simulated_deviation",
-                default_value="0.0",
+                default_value="0.1",
                 description="midpoint deviation for simulated points."
             ),
             DeclareLaunchArgument(
@@ -74,7 +74,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="max_deviation",
-                default_value="0.15",
+                default_value="0.2",
                 description="Maximum allowed midpoint deviation from the standard midpoint fraction",
             ),
             DeclareLaunchArgument(
