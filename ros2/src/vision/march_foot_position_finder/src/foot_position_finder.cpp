@@ -50,7 +50,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
-    paused_ = false;
+    // locked_ = false;
 
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
@@ -165,6 +165,9 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 void FootPositionFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
+    // while (locked_) {}
+    // locked_ = true;
+
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_gap") {
             foot_gap_ = param.as_double();
@@ -193,6 +196,7 @@ void FootPositionFinder::readParameters(
     // displacements_ = point_finder_->getDisplacements();
 
     // RCLCPP_INFO(n_->get_logger(), "\033[92mUpdate finished\033[0m");
+    // locked_ = false;
 }
 
 /**
@@ -260,16 +264,15 @@ void FootPositionFinder::resetInitialPosition(bool stop_timer)
  */
 void FootPositionFinder::processRealSenseDepthFrames()
 {
+
+    std::cout << "wait for frame" << std::endl;
+
     float difference = float(std::clock() - last_frame_time_) / CLOCKS_PER_SEC;
     if ((int)(difference / frame_timeout_) > frame_wait_counter_) {
         frame_wait_counter_++;
         RCLCPP_WARN(n_->get_logger(),
             "RealSense (%s) did not receive frames last %d seconds",
             left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
-    }
-
-    if (paused_) {
-        return;
     }
 
     rs2::frameset frames = pipe_.wait_for_frames();
@@ -316,9 +319,9 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
-    if (paused_) {
-        return;
-    }
+    std::cout << "frame in " << std::endl;
+    // while (locked_) {}
+    // locked_ = true;
 
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
@@ -385,6 +388,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         publishPoint(point_publisher_, n_, found_covid_point_,
             found_covid_point_, new_displacement_, track_points);
     }
+
+    // locked_ = false;
 }
 
 /**

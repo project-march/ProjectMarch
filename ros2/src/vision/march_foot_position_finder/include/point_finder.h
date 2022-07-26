@@ -47,8 +47,9 @@ protected:
     std::vector<double> search_dimensions_;
     std::string left_or_right_;
 
-    int grid_resolution_ = RES;
-    double cell_width_ = 1.0 / grid_resolution_;
+    int grid_height_resolution_ = RES;
+    int grid_width_resolution_ = RES;
+    double cell_width_ = 1.0 / grid_height_resolution_;
     Point ORIGIN;
 
     std::array<std::array<double, RES>, RES> height_map_;
@@ -90,7 +91,7 @@ protected:
     std::vector<Point> original_position_queue_;
     std::vector<bool> obstacles_found_;
 
-    bool pause_;
+    bool locked_;
 
     void initializeValues();
 

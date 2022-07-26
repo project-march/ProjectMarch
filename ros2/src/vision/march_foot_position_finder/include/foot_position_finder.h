@@ -107,7 +107,7 @@ protected:
     std::string other_frame_id_;
     std::string current_frame_id_;
 
-    bool paused_;
+    bool locked_;
     bool realsense_simulation_;
 
     double foot_gap_;

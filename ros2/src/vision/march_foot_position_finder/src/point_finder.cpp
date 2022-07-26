@@ -33,12 +33,12 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
     : n_ { n }
     , left_or_right_ { std::move(left_or_right) }
 {
-    std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
+    std::fill_n(&height_map_[0][0], grid_width_resolution_ * grid_height_resolution_, -10);
     std::fill_n(
-        &height_map_temp_[0][0], grid_resolution_ * grid_resolution_, -10);
-    std::fill_n(&derivatives_[0][0], grid_resolution_ * grid_resolution_, 10);
+        &height_map_temp_[0][0], grid_width_resolution_ * grid_height_resolution_, -10);
+    std::fill_n(&derivatives_[0][0], grid_width_resolution_ * grid_height_resolution_, 10);
     std::fill_n(
-        &derivatives_temp_[0][0], grid_resolution_ * grid_resolution_, 10);
+        &derivatives_temp_[0][0], grid_width_resolution_ * grid_height_resolution_, 10);
 
     foot_width_ = n_->get_parameter("foot_width").as_double();
     foot_length_ = n_->get_parameter("foot_length").as_double();
@@ -62,7 +62,7 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
 
     initializeValues();
 
-    pause_ = false;
+    // locked_ = false;
 }
 
 /**
@@ -74,7 +74,9 @@ PointFinder::PointFinder(rclcpp::Node* n, std::string left_or_right)
 void PointFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
-    pause_ = true;
+    // while (locked_) {}
+    // locked_ = true;
+
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_width") {
             foot_width_ = param.as_double();
@@ -105,7 +107,7 @@ void PointFinder::readParameters(
     }
 
     initializeValues();
-    pause_ = false;
+    // locked_ = false;
 }
 
 /**
@@ -192,13 +194,17 @@ void PointFinder::initializeSearchDimensions(Point& step_point)
 void PointFinder::findPoints(const PointCloud::Ptr& pointcloud,
     Point& step_point, std::vector<Point>* position_queue)
 {
-    while (pause_) {}
+    // while (locked_) {}
+    // locked_ = true;
+
     original_position_queue_.clear();
     obstacles_found_.clear();
     initializeSearchDimensions(step_point);
     mapPointCloudToHeightMap(pointcloud);
     convolveLaplacianKernel(height_map_, derivatives_);
     findFeasibleFootPlacements(position_queue);
+
+    // locked_ = false;
 }
 
 /**
@@ -209,7 +215,7 @@ void PointFinder::findPoints(const PointCloud::Ptr& pointcloud,
  */
 void PointFinder::mapPointCloudToHeightMap(const PointCloud::Ptr& pointcloud)
 {
-    std::fill_n(&height_map_[0][0], grid_resolution_ * grid_resolution_, -10);
+    std::fill_n(&height_map_[0][0], grid_width_resolution_ * grid_height_resolution_, -10);
 
     for (std::size_t i = 0; i < pointcloud->size(); i++) {
         Point p = pointcloud->points[i];
@@ -381,7 +387,7 @@ std::vector<Point> PointFinder::retrieveTrackPoints(
  */
 int PointFinder::xCoordinateToIndex(double x)
 {
-    int index = (int)((x + x_offset_) / x_width_ * grid_resolution_);
+    int index = (int)((x + x_offset_) / x_width_ * grid_width_resolution_);
     if (index >= RES || index < 0) {
         index = -1;
     }
@@ -396,8 +402,8 @@ int PointFinder::xCoordinateToIndex(double x)
  */
 int PointFinder::yCoordinateToIndex(double y)
 {
-    int index = grid_resolution_
-        - (int)((y + y_offset_) / y_width_ * grid_resolution_);
+    int index = grid_height_resolution_
+        - (int)((y + y_offset_) / y_width_ * grid_height_resolution_);
     if (index >= RES || index < 0) {
         index = -1;
     }
@@ -412,7 +418,7 @@ int PointFinder::yCoordinateToIndex(double y)
  */
 double PointFinder::xIndexToCoordinate(int x)
 {
-    return ((double)x / grid_resolution_) - x_offset_ + cell_width_ / 2.0;
+    return ((double)x / grid_width_resolution_) - x_offset_ + cell_width_ / 2.0;
 }
 
 /**
@@ -423,7 +429,7 @@ double PointFinder::xIndexToCoordinate(int x)
  */
 double PointFinder::yIndexToCoordinate(int y)
 {
-    return ((double)(grid_resolution_ - y) / grid_resolution_) - y_offset_
+    return ((double)(grid_height_resolution_ - y) / grid_height_resolution_) - y_offset_
         - cell_width_ / 2.0;
 }
 
