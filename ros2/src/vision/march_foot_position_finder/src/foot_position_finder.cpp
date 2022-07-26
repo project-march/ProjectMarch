@@ -351,8 +351,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
-        std::vector<Point> track_points
-            = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_, 0);
+        std::vector<Point> track_points = point_finder_->retrieveTrackPoints(
+            ORIGIN, found_covid_point_, /*num_points=*/0);
 
         // Visualization
 

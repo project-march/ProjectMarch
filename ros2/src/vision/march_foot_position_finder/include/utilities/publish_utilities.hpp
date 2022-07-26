@@ -445,7 +445,7 @@ void publishOriginalMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     marker.color.a = 1.0;
     marker.lifetime = rclcpp::Duration::from_seconds(/*seconds=*/0.3);
 
-    publisher->publish(marker);
+    publisher->publish(marker); // NOLINT
 }
 
 /**

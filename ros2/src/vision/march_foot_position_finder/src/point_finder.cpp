@@ -292,7 +292,8 @@ void PointFinder::computeFootPlateDisplacement(
     double y_original = yIndexToCoordinate(y);
     Point original = Point((float)x_original, (float)y_original, (float)height);
 
-    std::vector<Point> track = retrieveTrackPoints(ORIGIN, original, 14);
+    std::vector<Point> track
+        = retrieveTrackPoints(ORIGIN, original, /*num_points=*/14);
     bool obstacle_found = false;
     for (Point& p : track) {
         if (p.z > height + 0.03) {
