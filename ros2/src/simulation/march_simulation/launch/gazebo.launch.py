@@ -2,7 +2,7 @@
 import launch.conditions
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
 from launch.conditions import UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
@@ -17,6 +17,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     fixed = LaunchConfiguration("fixed")
     verbose = LaunchConfiguration("gazebo_verbose")
+    robot = LaunchConfiguration("robot")
 
     # region Declared arguments
     declared_arguments = [
@@ -66,6 +67,12 @@ def generate_launch_description():
         'worlds', 'march.world'
     ])
 
+    # The idea is that this should stop previously open gazebo processes. This is NOT EXTENSIVELY TESTED.
+    close_gazebo = ExecuteProcess(
+        cmd=[['killall', '-9', 'gzserver', 'gzclient']],
+        shell=True
+    )
+
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [PathJoinSubstitution([FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"])]
@@ -87,7 +94,7 @@ def generate_launch_description():
     gazebo_spawn_entity = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "exo"],
+        arguments=["-topic", "robot_description", "-entity", robot],
         output="screen",
     )
     # endregion
@@ -121,6 +128,7 @@ def generate_launch_description():
     # endregion
 
     nodes = [
+        close_gazebo,
         gazebo,
         gazebo_spawn_entity,
         spawn_obstacle,

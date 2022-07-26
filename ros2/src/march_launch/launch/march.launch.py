@@ -81,7 +81,7 @@ def generate_launch_description() -> LaunchDescription:
     simulation_arguments = [
         DeclareLaunchArgument(
             name="ground_gait",
-            default_value=use_imu_data,
+            default_value="false",
             description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
         ),
         DeclareLaunchArgument(
