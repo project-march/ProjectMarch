@@ -141,12 +141,10 @@ class GaitPreprocessor(Node):
         Returns:
             Point: Foot location transformed to ik solver axes.
         """
-        temp_y = foot_position.displacement.y
         point = Point()
 
         point.x = -foot_position.displacement.x + X_OFFSET
         point.y = foot_position.displacement.z + Y_OFFSET
-        # point.z = temp_y
         point.z = 0.52
 
         return point
@@ -180,5 +178,4 @@ class GaitPreprocessor(Node):
         return (
             0.15 < abs(point.processed_point.x) < 0.7
             and abs(point.processed_point.y) < 0.25
-            # and 0.35 < abs(point.processed_point.z) < 0.7
         )

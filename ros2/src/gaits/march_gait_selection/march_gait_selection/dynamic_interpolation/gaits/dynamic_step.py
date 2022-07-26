@@ -1,6 +1,5 @@
 """Author: Marten Haitjema, MVII."""
 
-import copy
 import numpy as np
 
 from rclpy.node import Node
@@ -112,9 +111,8 @@ class DynamicStep:
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
-        self.current_pose = copy.deepcopy(self.pose)
-        self._solve_desired_setpoint()
         self._solve_middle_setpoint()
+        self._solve_desired_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class(push_off)
@@ -151,11 +149,13 @@ class DynamicStep:
 
     def _solve_middle_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
-        middle_position = self.current_pose.solve_mid_position(
-            next_pose=self.pose,
-            frac=self.middle_point_fraction,
-            pos_ankle=np.array([0.0, 0.10]),
-            subgait_id=self.subgait_id,
+        middle_position = self.pose.solve_mid_position(
+            self.location.x,
+            max(0.0, self.location.y),
+            self.location.z,
+            self.middle_point_fraction,
+            self.middle_point_height,
+            self.subgait_id,
         )
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
