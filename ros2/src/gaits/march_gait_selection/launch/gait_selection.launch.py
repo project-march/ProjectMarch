@@ -41,7 +41,7 @@ def generate_launch_description():
             # Dynamic gait parameters:
             DeclareLaunchArgument(
                 name="middle_point_fraction",
-                default_value="0.45",
+                default_value="0.5",
                 description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
@@ -68,7 +68,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="add_push_off",
-                default_value="True",
+                default_value="false",
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(

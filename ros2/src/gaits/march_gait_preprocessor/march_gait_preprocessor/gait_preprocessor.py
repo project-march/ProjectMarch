@@ -11,8 +11,8 @@ NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 5
 # Offsets are used to account for the difference in points between
 # covid (middle of foot) and gait (at the heel)
-X_OFFSET = 0
-Y_OFFSET = -0.01
+X_OFFSET = 0.0
+Y_OFFSET = 0.0
 Z_OFFSET = 0.22
 
 
@@ -188,18 +188,15 @@ class GaitPreprocessor(Node):
         else:
             high_points_ratio = max_height
 
-        if max_height <= 0.1:
-            return 0.0, 0.15 + max(final_point.y, max_height)
-
         relative_midpoint_height = 0.15
-        if 0.17 < max_height < 0.22:
-            relative_midpoint_height = 0.15 - (max_height - 0.17)
-        elif max_height > 0.22:
+        if 0.14 < max_height < 0.19:
+            relative_midpoint_height = 0.15 - (max_height - 0.14)
+        elif max_height > 0.19:
             relative_midpoint_height = 0.1
 
         absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
         high_points_ratio = 0.0 if high_points_ratio < self._minimum_high_point_ratio else high_points_ratio
-        midpoint_deviation = min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
+        midpoint_deviation = 0.05 + min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
 
         return midpoint_deviation, absolute_midpoint_height
 
@@ -250,7 +247,7 @@ class GaitPreprocessor(Node):
             )
         else:
             midpoint_deviation = self._simulated_deviation
-            absolute_midpoint_height = 0.15 + self._location_y
+            absolute_midpoint_height = 0.15 + abs(self._location_y)
 
         point_msg.midpoint_deviation = midpoint_deviation
         point_msg.relative_midpoint_height = absolute_midpoint_height

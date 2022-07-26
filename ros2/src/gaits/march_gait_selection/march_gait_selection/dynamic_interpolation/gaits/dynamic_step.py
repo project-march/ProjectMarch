@@ -97,6 +97,8 @@ class DynamicStep:
         self.stop = stop
         self.hold_subgait = hold_subgait
 
+        self._logger.warn(f"{self._duration}")
+
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
@@ -108,14 +110,21 @@ class DynamicStep:
         setpoint_list = [self.starting_position_dict]
         desired_position = self._solve_desired_setpoint()
 
-        if self._deviation == 0.0 or self.hold_subgait or self.start:
-            setpoint_list.append(self._solve_middle_setpoint(height=self.middle_point_height + self.location.y))
-        else:
-            lower_deviation = self.middle_point_fraction - self._deviation
-            upper_deviation = self.middle_point_fraction + self._deviation
+        import traceback
+        try:
+            if self.start or self.stop:
+                setpoint_list.append(self._solve_middle_setpoint(
+                    fraction=0.7,
+                    height=self.middle_point_height + abs(self.location.y)),
+                )
+            else:
+                lower_deviation = self.middle_point_fraction - self._deviation
+                upper_deviation = self.middle_point_fraction + self._deviation
 
-            setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
-            setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
+                setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
+                setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
+        except Exception as e:
+            self._logger.warn(f"{e}, {traceback.format_exc()}")
 
         setpoint_list.append(desired_position)
 
