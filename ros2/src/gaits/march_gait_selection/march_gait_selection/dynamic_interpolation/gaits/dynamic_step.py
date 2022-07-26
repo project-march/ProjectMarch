@@ -21,19 +21,9 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from march_shared_msgs.msg import FootPosition
 
 from typing import List, Dict, Optional
-from enum import IntEnum
 
 EXTRA_ANKLE_SETPOINT_INDEX = 1
 INTERPOLATION_POINTS = 30
-
-
-class SetpointTime(IntEnum):
-    """Enum for the index of time list."""
-
-    START_INDEX = 0
-    PUSH_OFF_INDEX = 1
-    MIDDLE_POINT_INDEX = 2
-    END_POINT_INDEX = 3
 
 
 class DynamicStep:
@@ -80,6 +70,7 @@ class DynamicStep:
     ):
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._get_parameters(node)
+        self._node = node
         self.home_stand_position = home_stand_position
         self.starting_position = starting_position
 
@@ -92,19 +83,15 @@ class DynamicStep:
         self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
-        self.pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()))
 
-        self.time = [
-            0,
-            self.push_off_fraction * self._duration,
-            self.middle_point_fraction * self._duration,
-            self._duration,
-        ]
+        if self.subgait_id == "right_swing":
+            self._start_pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()), "right")
+        else:
+            self._start_pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()), "left")
 
         self.starting_position_dict = self._from_list_to_setpoint(
-            self.all_joint_names, list(self.starting_position.values()), None, self.time[SetpointTime.START_INDEX]
+            self.all_joint_names, list(self.starting_position.values()), None, 0,
         )
-        self._logger.warn(f"{self._duration}")
 
         self.start = start
         self.stop = stop
@@ -119,26 +106,25 @@ class DynamicStep:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
         setpoint_list = [self.starting_position_dict]
-        self.current_pose = copy.deepcopy(self.pose)
+        desired_position = self._solve_desired_setpoint()
 
         if self._deviation == 0.0 or self.hold_subgait or self.start:
-            setpoint_list.append(self._solve_middle_setpoint(height=self.middle_point_height))
+            setpoint_list.append(self._solve_middle_setpoint(height=self.middle_point_height + self.location.y))
         else:
             lower_deviation = self.middle_point_fraction - self._deviation
             upper_deviation = self.middle_point_fraction + self._deviation
 
             setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
-            self.current_pose = copy.deepcopy(self.pose)
             setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
 
-        setpoint_list.append(self._solve_desired_setpoint())
+        setpoint_list.append(desired_position)
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class(setpoint_list, push_off)
         joint_trajectory_msg = JointTrajectory()
         joint_trajectory_msg.joint_names = self.actuating_joint_names
 
-        timestamps = np.linspace(self.time[0], self.time[-1], INTERPOLATION_POINTS)
+        timestamps = np.linspace(0, self._duration, INTERPOLATION_POINTS)
         for timestamp in timestamps:
             joint_trajectory_point = JointTrajectoryPoint()
             joint_trajectory_point.time_from_start = Duration(timestamp).to_msg()
@@ -158,10 +144,10 @@ class DynamicStep:
         """Returns an extra setpoint for the swing leg ankle that can be used to create a push off.
 
         Returns:
-            Setpoint: extra setpoint for the swing leg ankle
+            Setpoint: Extra setpoint for the swing leg ankle.
         """
         return Setpoint(
-            Duration(self.time[SetpointTime.PUSH_OFF_INDEX]),
+            Duration(self.push_off_fraction * self._duration),
             self.push_off_position,
             0.0,
         )
@@ -170,11 +156,12 @@ class DynamicStep:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
         fraction = self.middle_point_fraction if fraction is None else fraction
         height = self.middle_point_height if height is None else height
+        pose = copy.deepcopy(self._start_pose)
 
-        middle_position = self.current_pose.solve_mid_position(
-            next_pose=self.pose,
+        middle_position = pose.solve_mid_position(
+            next_pose=self._end_pose,
             frac=fraction,
-            pos_ankle=np.array([self.location.x * fraction, height]),
+            ankle_y=height,
             subgait_id=self.subgait_id,
         )
 
@@ -187,10 +174,11 @@ class DynamicStep:
 
     def _solve_desired_setpoint(self) -> Dict[str, Setpoint]:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
+        self._end_pose = Pose(self._ik_solver_parameters)
         if self.stop:
             self.desired_position = list(self.home_stand_position.values())
         else:
-            self.desired_position = self.pose.solve_end_position(
+            self.desired_position = self._end_pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id
             )
 
@@ -198,7 +186,7 @@ class DynamicStep:
             self.all_joint_names,
             self.desired_position,
             None,
-            self.time[SetpointTime.END_POINT_INDEX],
+            self._duration,
         )
 
     def _to_joint_trajectory_class(self, dict_list: List[Dict[str, Setpoint]], push_off: bool) -> None:
@@ -210,7 +198,7 @@ class DynamicStep:
             push_off (bool): True if push off should be present in the gait
         """
         if self.stop and self.hold_subgait:
-            dict_list[SetpointTime.MIDDLE_POINT_INDEX] = dict_list[SetpointTime.END_POINT_INDEX]
+            dict_list[1] = dict_list[2]
 
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
@@ -236,7 +224,10 @@ class DynamicStep:
             ):
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
-                self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list))
+                self.joint_trajectory_list.append(DynamicJointTrajectory(
+                        setpoint_list, fixed_midpoint_velocity=self._fixed_midpoint_velocity,
+                    )
+                )
 
     def get_final_position(self) -> Dict[str, float]:
         """Get setpoint_dictionary of the final setpoint.
@@ -297,6 +288,7 @@ class DynamicStep:
         self.middle_point_fraction = node.middle_point_fraction
         self.push_off_fraction = node.push_off_fraction
         self.push_off_position = node.push_off_position
+        self._fixed_midpoint_velocity = node.fixed_midpoint_velocity
         self._ik_solver_parameters = IKSolverParameters(
             node.ankle_buffer,
             node.hip_buffer,
@@ -305,6 +297,8 @@ class DynamicStep:
             node.upper_body_front_rotation,
             node.dorsiflexion_at_end_position,
             node.hip_swing,
+            node.middle_point_fraction,
+            node.base_number,
         )
 
     def _check_joint_limits(

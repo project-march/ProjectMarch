@@ -94,6 +94,10 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.dorsiflexion_at_end_position = param.get_parameter_value().double_value
         elif param.name == "hip_swing":
             node.hip_swing = param.get_parameter_value().bool_value
+        elif param.name == "fixed_midpoint_velocity":
+            node.fixed_midpoint_velocity = param.get_parameter_value().bool_value
+        elif param.name == "base_number":
+            node.base_number = param.get_parameter_value().double_value
 
     gait_state_machine.update_parameters()
     node._logger.info(f"{param.name} set to {param.value}.")
@@ -127,6 +131,9 @@ class GaitNode(Node):
             self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value
+            self.fixed_midpoint_velocity = (
+                self.get_parameter("fixed_midpoint_velocity").get_parameter_value().bool_value
+            )
 
             # IK Solver parameters
             self.ankle_buffer = self.get_parameter("ankle_buffer").get_parameter_value().double_value
@@ -140,6 +147,7 @@ class GaitNode(Node):
                 self.get_parameter("dorsiflexion_at_end_position").get_parameter_value().double_value
             )
             self.hip_swing = self.get_parameter("hip_swing").get_parameter_value().bool_value
+            self.base_number = self.get_parameter("base_number").get_parameter_value().integer_value
 
         except ParameterNotDeclaredException:
             self._logger.error("Gait node started without the required parameters.")

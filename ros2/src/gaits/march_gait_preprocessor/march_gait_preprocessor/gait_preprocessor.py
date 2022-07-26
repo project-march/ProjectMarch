@@ -42,6 +42,7 @@ class GaitPreprocessor(Node):
         self._location_x = self.get_parameter("location_x").get_parameter_value().double_value
         self._location_y = self.get_parameter("location_y").get_parameter_value().double_value
         self._location_z = self.get_parameter("location_z").get_parameter_value().double_value
+        self._simulated_deviation = self.get_parameter("simulated_deviation").get_parameter_value().double_value
         self._deviation_coefficient = self.get_parameter("deviation_coefficient").get_parameter_value().double_value
         self._midpoint_increase = self.get_parameter("midpoint_increase").get_parameter_value().double_value
         self._minimum_high_point_ratio = (
@@ -188,7 +189,7 @@ class GaitPreprocessor(Node):
             high_points_ratio = max_height
 
         if max_height <= 0.1:
-            return 0.0, 0.15
+            return 0.0, 0.15 + max(final_point.y, max_height)
 
         relative_midpoint_height = 0.15
         if 0.17 < max_height < 0.22:
@@ -196,11 +197,11 @@ class GaitPreprocessor(Node):
         elif max_height > 0.22:
             relative_midpoint_height = 0.1
 
-        absolute_midpoint_height = max(final_point.y + relative_midpoint_height, max_height + relative_midpoint_height)
+        absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
         high_points_ratio = 0.0 if high_points_ratio < self._minimum_high_point_ratio else high_points_ratio
         midpoint_deviation = min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
 
-        return midpoint_deviation, absolute_midpoint_height - final_point.y
+        return midpoint_deviation, absolute_midpoint_height
 
     def _transform_point_to_gait_axes(self, point: Point) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
@@ -243,16 +244,16 @@ class GaitPreprocessor(Node):
         point_msg.duration = self._get_duration_scaled_to_height(self._duration, self._location_y)
 
         if self._new_midpoint_method:
-            midpoint_deviation, relative_midpoint_height = self._compute_midpoint_locations(
+            midpoint_deviation, absolute_midpoint_height = self._compute_midpoint_locations(
                 [],
                 point_msg.processed_point,
             )
         else:
-            midpoint_deviation = 0.0
-            relative_midpoint_height = 0.15
+            midpoint_deviation = self._simulated_deviation
+            absolute_midpoint_height = 0.15 + self._location_y
 
         point_msg.midpoint_deviation = midpoint_deviation
-        point_msg.relative_midpoint_height = relative_midpoint_height
+        point_msg.relative_midpoint_height = absolute_midpoint_height
 
         self.publisher_fixed_distance.publish(point_msg)
 

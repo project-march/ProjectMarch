@@ -53,6 +53,11 @@ def generate_launch_description():
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
+                name="simulated_deviation",
+                default_value="0.0",
+                description="midpoint deviation for simulated points."
+            ),
+            DeclareLaunchArgument(
                 name="deviation_coefficient",
                 default_value="0.3",
                 description="Coefficient used to compute the deviation of two midpoints from a middle fraction",
@@ -89,6 +94,7 @@ def generate_launch_description():
                     {"location_y": LaunchConfiguration("location_y")},
                     {"location_z": LaunchConfiguration("location_z")},
                     {"duration": LaunchConfiguration("duration")},
+                    {"simulated_deviation": LaunchConfiguration("simulated_deviation")},
                     {"deviation_coefficient": LaunchConfiguration("deviation_coefficient")},
                     {"midpoint_increase": LaunchConfiguration("midpoint_increase")},
                     {"minimum_high_point_ratio": LaunchConfiguration("minimum_high_point_ratio")},

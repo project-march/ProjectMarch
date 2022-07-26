@@ -51,6 +51,8 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._location_z = param.get_parameter_value().double_value
         elif param.name == "duration":
             gait_preprocessor._duration = param.get_parameter_value().double_value
+        elif param.name == "simulated_deviation":
+            gait_preprocessor._simulated_deviation = param.get_parameter_value().double_value
         elif param.name == "deviation_coefficient":
             gait_preprocessor._deviation_coefficient = param.get_parameter_value().double_value
         elif param.name == "midpoint_increase":
