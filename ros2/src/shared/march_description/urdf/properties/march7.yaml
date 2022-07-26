@@ -100,14 +100,14 @@ joint_limits:
   left_ankle:
     unit: iu
     lower_limit: 3606
-    upper_limit: 5938
-    zero_position: 4882
+    upper_limit: 5952
+    zero_position: 5200
     resolution: 14
   right_ankle:
     unit: iu
-    lower_limit: 5752
-    upper_limit: 8054
-    zero_position: 7129
+    lower_limit: 5758
+    upper_limit: 7921
+    zero_position: 7268
     resolution: 14
   left_haa:
     unit: iu
