@@ -19,13 +19,13 @@ using Point = pcl::PointXYZ;
  * @param source reference of the matrix to apply the convolution to
  * @param destination reference of array where the result is stored
  */
-template <std::size_t K, std::size_t R>
+template <std::size_t K, std::size_t W, std::size_t H>
 void convolve2D(std::array<std::array<double, K>, K>& kernel,
-    std::array<std::array<double, R>, R>& source,
-    std::array<std::array<double, R>, R>& destination)
+    std::array<std::array<double, W>, H>& source,
+    std::array<std::array<double, W>, H>& destination)
 {
-    for (int i = K / 2; i < R - K / 2; i++) {
-        for (int j = K / 2; j < R - K / 2; j++) {
+    for (int i = K / 2; i < H - K / 2; i++) {
+        for (int j = K / 2; j < W - K / 2; j++) {
             double sum = 0;
             for (int a = 0; a < K; a++) {
                 for (int b = 0; b < K; b++) {
@@ -43,9 +43,9 @@ void convolve2D(std::array<std::array<double, K>, K>& kernel,
  * @param source reference of the matrix to apply the convolution to
  * @param destination reference of array where the result is stored
  */
-template <std::size_t R>
-void convolveGaussianKernel(std::array<std::array<double, R>, R>& source,
-    std::array<std::array<double, R>, R>& destination)
+template <std::size_t W, std::size_t H>
+void convolveGaussianKernel(std::array<std::array<double, W>, H>& source,
+    std::array<std::array<double, W>, H>& destination)
 {
     std::array<std::array<double, 3>, 3> gaussian = {
         { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 },
@@ -61,9 +61,9 @@ void convolveGaussianKernel(std::array<std::array<double, R>, R>& source,
  * @param source reference of the matrix to apply the convolution to
  * @param destination reference of array where the result is stored
  */
-template <std::size_t R>
-void convolveLaplacianKernel(std::array<std::array<double, R>, R>& source,
-    std::array<std::array<double, R>, R>& destination)
+template <std::size_t W, std::size_t H>
+void convolveLaplacianKernel(std::array<std::array<double, W>, H>& source,
+    std::array<std::array<double, W>, H>& destination)
 {
     std::array<std::array<double, 3>, 3> laplacian
         = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 },

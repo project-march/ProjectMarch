@@ -16,9 +16,9 @@ def generate_launch_description() -> LaunchDescription:
                 "/clock topic by gazebo instead of system time.",
             ),
             Node(
-                package="march_aligned_frame_publisher",
-                executable="march_aligned_frame_publisher_node",
-                name="march_aligned_frame_publisher",
+                package="march_frame_publisher",
+                executable="march_frame_publisher_node",
+                name="march_frame_publisher",
                 namespace="march",
                 output="screen",
                 respawn=True,

@@ -50,7 +50,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
-    paused_ = false;
+    locked_ = false;
 
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
@@ -127,7 +127,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
             }
 
             realsense_timer_ = n_->create_wall_timer(
-                std::chrono::milliseconds(5), [this]() -> void {
+                std::chrono::milliseconds(30), [this]() -> void {
                     processRealSenseDepthFrames();
                 });
 
@@ -165,7 +165,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 void FootPositionFinder::readParameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
-    paused_ = true;
     for (const auto& param : parameters) {
         if (param.get_name() == "foot_gap") {
             foot_gap_ = param.as_double();
@@ -191,10 +190,7 @@ void FootPositionFinder::readParameters(
     found_points_.resize(sample_size_);
     resetInitialPosition(/*stop_timer=*/false);
     point_finder_->readParameters(parameters);
-    displacements_ = point_finder_->getDisplacements();
-    paused_ = false;
-
-    RCLCPP_INFO(n_->get_logger(), "\033[92mUpdate finished\033[0m");
+    // displacements_ = point_finder_->getDisplacements();
 }
 
 /**
@@ -270,10 +266,6 @@ void FootPositionFinder::processRealSenseDepthFrames()
             left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
     }
 
-    if (paused_) {
-        return;
-    }
-
     rs2::frameset frames = pipe_.wait_for_frames();
     rs2::depth_frame depth = frames.get_depth_frame();
 
@@ -318,9 +310,10 @@ void FootPositionFinder::processSimulatedDepthFrames(
  */
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
-    if (paused_) {
-        return;
+    while (locked_) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+    locked_ = true;
 
     last_frame_time_ = std::clock();
     frame_wait_counter_ = 0;
@@ -328,18 +321,19 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     // Preprocess point cloud and place pointcloud in aligned toes frame:
     preprocessor_->preprocess(pointcloud);
 
-    // Publish cloud for visualization:
-    publishCloud(
-        preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
-
     // Find possible points around the desired point determined earlier:
     std::vector<Point> position_queue;
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
+    // Publish cloud for visualization:
+    preprocessor_->voxelDownSample(pointcloud, 0.035);
+    publishCloud(
+        preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
+
     // Visualization
     if (validatePoint(desired_point_) && validatePoint(start_point_)) {
-        publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
-            displacements_, left_or_right_); // Cyan
+        // publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
+        //     displacements_, left_or_right_); // Cyan
         publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
             left_or_right_); // Green
         publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
@@ -357,8 +351,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
         // Retrieve 3D points between current and new determined foot position
         // previous_start_point_ is where the current leg is right now
-        std::vector<Point> track_points
-            = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_);
+        std::vector<Point> track_points = point_finder_->retrieveTrackPoints(
+            ORIGIN, found_covid_point_, /*num_points=*/0);
 
         // Visualization
 
@@ -371,20 +365,24 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         }
 
         // Visualize new displacement
-        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
-            left_or_right_); // Orange
+        // publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
+        //     left_or_right_); // Orange
         publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
             left_or_right_); // Red
-        publishPossiblePoints(
-            point_marker_publisher_, n_, position_queue, left_or_right_);
-        publishNewDisplacement(point_marker_publisher_, n_, start_point_,
-            found_covid_point_,
-            left_or_right_); // Green
+        publishFootRectangle(
+            point_marker_publisher_, n_, found_covid_point_, left_or_right_);
+        // publishPossiblePoints(
+        //     point_marker_publisher_, n_, position_queue, left_or_right_);
+        // publishNewDisplacement(point_marker_publisher_, n_, start_point_,
+        //     found_covid_point_,
+        //     left_or_right_); // Green
 
         // Publish final point for gait computation
         publishPoint(point_publisher_, n_, found_covid_point_,
             found_covid_point_, new_displacement_, track_points);
     }
+
+    locked_ = false;
 }
 
 /**
@@ -399,16 +397,25 @@ Point FootPositionFinder::retrieveOptimalPoint(
     std::vector<Point>* position_queue)
 {
     Point optimal_point = *position_queue->begin();
-    double optimal_distance_height_tradeoff = 0;
+    double optimal_distance_height_tradeoff = -10000;
+    int count = 0;
+    int index;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x))
-            - height_distance_coefficient_ * std::abs(p->z);
+            - height_distance_coefficient_ * std::abs(p->z)
+            - point_finder_->getObstaclePenalty(index);
         if (new_tradeoff > optimal_distance_height_tradeoff) {
             optimal_point = (*p);
             optimal_distance_height_tradeoff = new_tradeoff;
+            index = count;
         }
+        count++;
     }
+
+    publishOriginalMarkerPoint(point_marker_publisher_, n_,
+        point_finder_->getOriginalPoint(index),
+        left_or_right_); // Blue
 
     return optimal_point;
 }
