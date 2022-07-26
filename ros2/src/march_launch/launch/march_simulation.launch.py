@@ -157,7 +157,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="to_world_transform",
-            default_value=ground_gait,
+            default_value="false",
             description="Whether a transform from the world to base_link is "
             "necessary, this is the case when you are "
             "groundgaiting in rviz.",
