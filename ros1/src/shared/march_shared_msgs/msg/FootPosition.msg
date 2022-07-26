@@ -15,3 +15,9 @@ geometry_msgs/Point[] track_points
 
 # This contains the duration of the gait
 float32 duration
+
+# This contains the deviation of the midpoint fractions, relative to a middle fraction
+float32 midpoint_deviation
+
+# This contains the height of the midpoints, relative to final displacement
+float32 relative_midpoint_height

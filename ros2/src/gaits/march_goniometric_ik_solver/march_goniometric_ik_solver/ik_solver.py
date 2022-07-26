@@ -57,7 +57,9 @@ class Pose:
     Positive defined are: ankle dorsi-flexion, hip abduction, hip flexion, knee flexion.
 
     Args:
+        parameters (IKSolverParameters): dataclass containing reconfigurable parameters
         pose (List[float]): List of the joint angles for the pose.
+        leg1 (str): Leg that is the stance leg (leg1) of the starting position. For a right_swing, should be 'left'.
 
     Attributes:
         fe_ankle1 (float): dorsi-flexion (flexion) or plantar-flexion (extension) of the ankle of the hip on the stance leg.
@@ -75,8 +77,10 @@ class Pose:
         self,
         parameters: IKSolverParameters = DEFAULT_PARAMETERS,
         pose: Union[List[float], None] = None,
+        leg1: str = "left",
     ) -> None:
         self._parameters = parameters
+        print(self._parameters.base_number)
 
         self._max_ankle_flexion = (
             min(JOINT_LIMITS["left_ankle"].upper, JOINT_LIMITS["right_ankle"].upper)
@@ -84,6 +88,14 @@ class Pose:
         )
         self._max_hip_extension = (
             max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower)
+            + self._parameters.hip_buffer_radians
+        )
+        self._max_hip_abduction = (
+            min(JOINT_LIMITS["left_hip_aa"].upper, JOINT_LIMITS["right_hip_aa"].upper)
+            - self._parameters.hip_buffer_radians
+        )
+        self._max_hip_adduction = (
+            max(JOINT_LIMITS["left_hip_aa"].lower, JOINT_LIMITS["right_hip_aa"].lower)
             + self._parameters.hip_buffer_radians
         )
 
@@ -94,16 +106,30 @@ class Pose:
             self.fe_knee1 = self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee
             self.aa_hip1 = self.aa_hip2 = 0
         else:
-            (
-                self.fe_ankle1,
-                self.aa_hip1,
-                self.fe_hip1,
-                self.fe_knee1,
-                self.fe_ankle2,
-                self.aa_hip2,
-                self.fe_hip2,
-                self.fe_knee2,
-            ) = pose
+            if leg1 == "left":
+                (
+                    self.fe_ankle1,
+                    self.aa_hip1,
+                    self.fe_hip1,
+                    self.fe_knee1,
+                    self.fe_ankle2,
+                    self.aa_hip2,
+                    self.fe_hip2,
+                    self.fe_knee2,
+                ) = pose
+            elif leg1 == "right":
+                (
+                    self.fe_ankle2,
+                    self.aa_hip2,
+                    self.fe_hip2,
+                    self.fe_knee2,
+                    self.fe_ankle1,
+                    self.aa_hip1,
+                    self.fe_hip1,
+                    self.fe_knee1,
+                ) = pose
+            else:
+                raise ValueError(f"Invalid input {leg1}, should be 'right' or 'left'.")
         self.rot_foot1 = 0
 
     def reset_to_zero_pose(self) -> None:
@@ -581,11 +607,9 @@ class Pose:
 
     def solve_mid_position(
         self,
-        ankle_x: float,
+        next_pose: "Pose",
+        frac: float,
         ankle_y: float,
-        ankle_z: float,
-        midpoint_fraction: float,
-        midpoint_height: float,
         subgait_id: str,
     ) -> List[float]:
         """Solves inverse kinematics for the middle position.
@@ -595,21 +619,19 @@ class Pose:
         Next it resets to zero pose and calculates the required angles for the swing leg to reach the calculated midpoint.
 
         Args:
-            ankle_x (float): the forward distance for the end position.
-            ankle_y (float): the upward distance for the end position.
-            ankle_z (float): the sideward distance for the end position.
-            midpoint_fraction (float): the fraction of the step at which the mid position should be.
-            midpoint_height (float): the height the mid position should be relative to the end position.
+            next_pose (Pose): the next pose to move to.
+            frac (float): the fraction of the step at which the mid position should be.
+            ankle_y (float): the desired height  of the ankle for the mid position.
             subgait_id (str): either 'left_swing' or 'right_swing', defines which leg is the swing leg.
 
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
-        # Get swing distance in current pose and calculate ankle2 midpoint location:
-        swing_distance = np.linalg.norm(self.pos_ankle1 - self.pos_ankle2)
-        midpoint_x = midpoint_fraction * (swing_distance + ankle_x) - swing_distance
-        midpoint_y = ankle_y + midpoint_height
-        pos_ankle2 = np.array([midpoint_x, midpoint_y])
+        pos_ankle = np.array([self.get_ankle_mid_x(frac, next_pose), ankle_y])
+        print(f"frac hip {frac}, ankle x {pos_ankle[0]}")
+
+        # Store current hip_aa to calculate hip_aa of midpoint later:
+        current_hip_aa_1, current_hip_aa_2 = self.aa_hip1, self.aa_hip2
 
         # Store start pose:
         start_hip_aa1 = self.aa_hip1
@@ -641,14 +663,40 @@ class Pose:
         # lift toes as much as possible:
         self.fe_ankle2 = self._max_ankle_flexion
 
-        # Set hip_aa to average of start and end pose:
-        end_pose = Pose(self._parameters)
-        end_pose.solve_end_position(ankle_x, ankle_y, ankle_z, subgait_id)
-        self.aa_hip1 = start_hip_aa1 * (1 - midpoint_fraction) + end_pose.aa_hip1 * midpoint_fraction
-        self.aa_hip2 = start_hip_aa2 * (1 - midpoint_fraction) + end_pose.aa_hip2 * midpoint_fraction
+        # Add hip_swing or set hip_aa to average of start and end pose:
+        if self._parameters.hip_swing:
+            max_hip_swing = min(abs(self._max_hip_abduction), abs(self._max_hip_adduction))
+            self.aa_hip1 = max_hip_swing
+            self.aa_hip2 = -max_hip_swing
+        else:
+            self.aa_hip1 = current_hip_aa_1 * (1 - frac) + next_pose.aa_hip1 * frac
+            self.aa_hip2 = current_hip_aa_2 * (1 - frac) + next_pose.aa_hip2 * frac
+
+        # Create a list of the pose:
+        pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
+
+        # Perform a limit check and raise error if limit is exceeded:
+        check_on_limits(pose_list)
 
         # return pose as list:
         return self.pose_left if (subgait_id == "left_swing") else self.pose_right
+
+    def get_ankle_mid_x(self, hip_frac: float, next_pose):
+        """Calculates the ankle x position relative to the stance leg.
+
+        Arguments:
+            hip_frac: fraction of the step at which the hip is placed
+            next_pose (Pose): pose of the end position
+
+        Returns:
+            float: swing leg ankle x position relative to the stance leg
+        """
+        ankle_frac = (hip_frac - self._parameters.middle_point_fraction) / self._parameters.middle_point_fraction
+        return (
+            np.sign(ankle_frac)
+            * (1 - (1 - self._parameters.base_number ** (1 - abs(ankle_frac))) / (1 - self._parameters.base_number))
+            * (next_pose.pos_ankle2[0] / 2)
+        )
 
     def step_with_flat_stance_foot(self) -> None:
         """Solves the required pose for a step small enough to keep the stance foot flat on the ground."""

@@ -52,6 +52,36 @@ def generate_launch_description():
                 default_value=str(DEFAULT_FEET_DISTANCE),
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
+            DeclareLaunchArgument(
+                name="simulated_deviation",
+                default_value="0.0",
+                description="midpoint deviation for simulated points."
+            ),
+            DeclareLaunchArgument(
+                name="deviation_coefficient",
+                default_value="0.3",
+                description="Coefficient used to compute the deviation of two midpoints from a middle fraction",
+            ),
+            DeclareLaunchArgument(
+                name="midpoint_increase",
+                default_value="0.1",
+                description="How much higher midpoints should be based on the highest track point",
+            ),
+            DeclareLaunchArgument(
+                name="minimum_high_point_ratio",
+                default_value="0.1",
+                description="Minimum ratio of high points before the midpoints deviation can become larger than 0",
+            ),
+            DeclareLaunchArgument(
+                name="max_deviation",
+                default_value="0.15",
+                description="Maximum allowed midpoint deviation from the standard midpoint fraction",
+            ),
+            DeclareLaunchArgument(
+                name="new_midpoint_method",
+                default_value="True",
+                description="Whether to use the new method of calculating mid points.",
+            ),
             Node(
                 package="march_gait_preprocessor",
                 executable="march_gait_preprocessor",
@@ -62,8 +92,14 @@ def generate_launch_description():
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"location_x": LaunchConfiguration("location_x")},
                     {"location_y": LaunchConfiguration("location_y")},
-                    {"duration": LaunchConfiguration("duration")},
                     {"location_z": LaunchConfiguration("location_z")},
+                    {"duration": LaunchConfiguration("duration")},
+                    {"simulated_deviation": LaunchConfiguration("simulated_deviation")},
+                    {"deviation_coefficient": LaunchConfiguration("deviation_coefficient")},
+                    {"midpoint_increase": LaunchConfiguration("midpoint_increase")},
+                    {"minimum_high_point_ratio": LaunchConfiguration("minimum_high_point_ratio")},
+                    {"max_deviation": LaunchConfiguration("max_deviation")},
+                    {"new_midpoint_method": LaunchConfiguration("new_midpoint_method")},
                 ],
                 on_exit=Shutdown(),
             ),

@@ -87,6 +87,11 @@ def generate_launch_description():
                 default_value="False",
                 description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
             ),
+            DeclareLaunchArgument(
+                name="fixed_midpoint_velocity",
+                default_value="False",
+                description="Will give all setpoints a velocity of zero if true."
+            ),
             # State machine parameters:
             DeclareLaunchArgument(
                 name="first_subgait_delay",
@@ -134,6 +139,16 @@ def generate_launch_description():
                 description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
                 "if it is set to zero.",
             ),
+            DeclareLaunchArgument(
+                name="hip_swing",
+                default_value=str(IKSolverParameters.hip_swing),
+                description="Whether hip swing is enabled during walking.",
+            ),
+            DeclareLaunchArgument(
+                name="base_number",
+                default_value=str(IKSolverParameters.base_number),
+                description="Base number of the function that calculates the ankle x mid position."
+            ),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -155,6 +170,8 @@ def generate_launch_description():
                     {"amount_of_steps": LaunchConfiguration("amount_of_steps")},
                     {"use_position_queue": LaunchConfiguration("use_position_queue")},
                     {"add_cybathlon_gaits": LaunchConfiguration("add_cybathlon_gaits")},
+                    {"fixed_midpoint_velocity": LaunchConfiguration("fixed_midpoint_velocity")},
+                    {"base_number": LaunchConfiguration("base_number")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
                     {"timer_period": LaunchConfiguration("timer_period")},
@@ -164,6 +181,7 @@ def generate_launch_description():
                     {"hip_x_fraction": LaunchConfiguration("hip_x_fraction")},
                     {"upper_body_front_rotation": LaunchConfiguration("upper_body_front_rotation")},
                     {"dorsiflexion_at_end_position": LaunchConfiguration("dorsiflexion_at_end_position")},
+                    {"hip_swing": LaunchConfiguration("hip_swing")},
                 ],
                 on_exit=Shutdown(),
             ),

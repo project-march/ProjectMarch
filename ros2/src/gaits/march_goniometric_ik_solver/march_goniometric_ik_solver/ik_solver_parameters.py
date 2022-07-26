@@ -14,6 +14,9 @@ class IKSolverParameters:
     hip_x_fraction: float = 0.5
     upper_body_front_rotation: float = 0.0  # deg
     dorsiflexion_at_end_position: float = 0.0  # deg
+    hip_swing: bool = False
+    middle_point_fraction: float = 0.5
+    base_number: int = 77
 
     @property
     def ankle_buffer_degrees(self) -> float:
