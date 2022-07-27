@@ -49,6 +49,12 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._location_y = param.get_parameter_value().double_value
         elif param.name == "location_z":
             gait_preprocessor._location_z = param.get_parameter_value().double_value
+        elif param.name == "offset_x":
+            gait_preprocessor._offset_x = param.get_parameter_value().double_value
+        elif param.name == "offset_y":
+            gait_preprocessor._offset_y = param.get_parameter_value().double_value
+        elif param.name == "offset_z":
+            gait_preprocessor._offset_z = param.get_parameter_value().double_value
         elif param.name == "duration":
             gait_preprocessor._duration = param.get_parameter_value().double_value
         elif param.name == "simulated_deviation":
