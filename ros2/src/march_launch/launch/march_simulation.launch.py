@@ -183,7 +183,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="middle_point_fraction",
-                default_value="0.45",
+                default_value="0.5",
                 description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(

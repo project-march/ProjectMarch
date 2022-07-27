@@ -977,7 +977,9 @@ class Pose:
             self.fe_ankle2 = self._max_ankle_dorsi_flexion
 
         # Create a list of the pose:
+        self.fe_ankle2 = self._max_ankle_dorsi_flexion - np.deg2rad(5)
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
+
 
         # Perform a limit check and raise error if limit is exceeded:
         check_on_limits(pose_list)
