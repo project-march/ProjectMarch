@@ -1,6 +1,7 @@
 """Author: Marten Haitjema, MVII."""
 
 import numpy as np
+import copy
 
 from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import (
@@ -109,21 +110,14 @@ class DynamicStep:
         setpoint_list = [self.starting_position_dict]
         desired_position = self._solve_desired_setpoint()
 
-        import traceback
-        try:
-            if self.start or self.stop:
-                setpoint_list.append(self._solve_middle_setpoint(
-                    fraction=0.7,
-                    height=self.middle_point_height + abs(self.location.y)),
-                )
-            else:
-                lower_deviation = self.middle_point_fraction - self._deviation
-                upper_deviation = self.middle_point_fraction + self._deviation
+        if self.start or self.stop:
+            setpoint_list.append(self._solve_middle_setpoint(fraction=0.45, height=self.middle_point_height))
+        else:
+            lower_deviation = self.middle_point_fraction - self._deviation
+            upper_deviation = self.middle_point_fraction + self._deviation
 
-                setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
-                setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
-        except Exception as e:
-            self._logger.warn(f"{e}, {traceback.format_exc()}")
+            setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
+            setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
 
         setpoint_list.append(desired_position)
 
