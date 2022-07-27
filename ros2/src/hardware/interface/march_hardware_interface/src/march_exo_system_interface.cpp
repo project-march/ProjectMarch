@@ -266,6 +266,8 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
 hardware_interface::return_type MarchExoSystemInterface::read()
 {
     if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
+        // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
+        throw runtime_error("Ethercat is not alive!");
         return hardware_interface::return_type::ERROR;
     }
     // Wait for the ethercat train to be back.
@@ -294,6 +296,8 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     for (JointInfo& jointInfo: joints_info_) {
 //        RCLCPP_INFO((*logger_), "The sending effort is %g. (state: %g)", jointInfo.effort_command, jointInfo.position);
         if (!is_joint_in_valid_state(jointInfo)) {
+            // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
+            throw runtime_error("Joint not in valid state!");
             return hardware_interface::return_type::ERROR;
         }
 
