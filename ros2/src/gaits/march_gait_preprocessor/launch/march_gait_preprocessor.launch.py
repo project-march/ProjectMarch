@@ -53,9 +53,7 @@ def generate_launch_description():
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
-                name="simulated_deviation",
-                default_value="0.1",
-                description="midpoint deviation for simulated points."
+                name="simulated_deviation", default_value="0.1", description="midpoint deviation for simulated points."
             ),
             DeclareLaunchArgument(
                 name="deviation_coefficient",

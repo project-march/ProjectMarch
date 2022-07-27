@@ -38,6 +38,41 @@ void convolve2D(std::array<std::array<double, K>, K>& kernel,
 }
 
 /**
+ * Smoothen a matrix by convolving a Gaussian kernel.
+ *
+ * @param source reference of the matrix to apply the convolution to
+ * @param destination reference of array where the result is stored
+ */
+template <std::size_t R>
+void convolveGaussianKernel(std::array<std::array<double, R>, R>& source,
+    std::array<std::array<double, R>, R>& destination)
+{
+    std::array<std::array<double, 3>, 3> gaussian = {
+        { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 },
+            { 1.0 / 16, 2.0 / 16, 1.0 / 16 } }
+    };
+
+    convolve2D(gaussian, source, destination);
+}
+
+/**
+ * Compute the second derivatives of a matrix with a Laplacian kernel.
+ *
+ * @param source reference of the matrix to apply the convolution to
+ * @param destination reference of array where the result is stored
+ */
+template <std::size_t R>
+void convolveLaplacianKernel(std::array<std::array<double, R>, R>& source,
+    std::array<std::array<double, R>, R>& destination)
+{
+    std::array<std::array<double, 3>, 3> laplacian
+        = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 },
+            { 1 / 6.0, 4 / 6.0, 1 / 6.0 } } };
+
+    convolve2D(laplacian, source, destination);
+}
+
+/**
  * Compute the average point of a vector of points.
  *
  * @param points a list of pcl points
@@ -130,6 +165,18 @@ inline Point subtractPoints(const Point p1, const Point p2)
 {
     Point difference(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
     return difference;
+}
+
+/**
+ * Check if a point contains realistic values.
+ *
+ * @param Point p point to check
+ * @return bool whether the point can be published
+ */
+inline bool validatePoint(const Point p)
+{
+    return (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z)
+        && std::abs(p.x) < 1.0 && std::abs(p.y) < 0.7 && std::abs(p.z) < 0.5);
 }
 
 #endif // MARCH_MATH_UTILITIES
