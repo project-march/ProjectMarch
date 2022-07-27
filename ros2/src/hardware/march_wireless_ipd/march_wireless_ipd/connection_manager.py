@@ -18,7 +18,7 @@ from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_poi
 )
 from rclpy.node import Node
 
-HEARTBEAT_TIMEOUT = Duration(0.5)
+HEARTBEAT_TIMEOUT = Duration(5)
 
 
 class ConnectionManager:
