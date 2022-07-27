@@ -9,7 +9,6 @@ from launch.substitutions import LaunchConfiguration
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
 )
-from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 
 # Get lengths from urdf:
 LENGTH_HIP_AA, LENGTH_HIP_BASE = get_lengths_robot_from_urdf_for_inverse_kinematics(
@@ -84,13 +83,6 @@ def generate_launch_description() -> LaunchDescription:
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     early_schedule_duration = LaunchConfiguration("early_schedule_duration")
     timer_period = LaunchConfiguration("timer_period")
-    ankle_buffer = LaunchConfiguration("ankle_buffer")
-    hip_buffer = LaunchConfiguration("hip_buffer")
-    default_knee_bend = LaunchConfiguration("default_knee_bend")
-    hip_x_fraction = LaunchConfiguration("hip_x_fraction")
-    upper_body_front_rotation = LaunchConfiguration("upper_body_front_rotation")
-    dorsiflexion_at_end_position = LaunchConfiguration("dorsiflexion_at_end_position")
-    hip_swing = LaunchConfiguration("hip_swing")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -254,7 +246,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="add_push_off",
-                default_value="True",
+                default_value="False",
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
@@ -287,43 +279,6 @@ def generate_launch_description() -> LaunchDescription:
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
-            # IK solver parameters
-            DeclareLaunchArgument(
-                name="ankle_buffer",
-                default_value=str(IKSolverParameters.ankle_buffer),
-                description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
-            ),
-            DeclareLaunchArgument(
-                name="hip_buffer",
-                default_value=str(IKSolverParameters.hip_buffer),
-                description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
-            ),
-            DeclareLaunchArgument(
-                name="default_knee_bend",
-                default_value=str(IKSolverParameters.default_knee_bend),
-                description="efault knee flexion angle, in deg",
-            ),
-            DeclareLaunchArgument(
-                name="hip_x_fraction",
-                default_value=str(IKSolverParameters.hip_x_fraction),
-                description="fraction of step at which hip is located",
-            ),
-            DeclareLaunchArgument(
-                name="upper_body_front_rotation",
-                default_value=str(IKSolverParameters.upper_body_front_rotation),
-                description="forward tilt of the backpack, in deg",
-            ),
-            DeclareLaunchArgument(
-                name="dorsiflexion_at_end_position",
-                default_value=str(IKSolverParameters.dorsiflexion_at_end_position),
-                description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
-                "if it is set to zero.",
-            ),
-            DeclareLaunchArgument(
-                name="hip_swing",
-                default_value=str(IKSolverParameters.hip_swing),
-                description="Whether hip swing is enabled during walking.",
-            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -348,7 +303,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="location_y",
-                default_value="0.03",
+                default_value="0.0",
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
@@ -358,7 +313,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="duration",
-                default_value="1.5",
+                default_value="1.3",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             # Launch rqt input device if not rqt_input:=false
@@ -462,13 +417,6 @@ def generate_launch_description() -> LaunchDescription:
                     ("early_schedule_duration", early_schedule_duration),
                     ("first_subgait_delay", first_subgait_delay),
                     ("timer_period", timer_period),
-                    ("ankle_buffer", ankle_buffer),
-                    ("hip_buffer", hip_buffer),
-                    ("default_knee_bend", default_knee_bend),
-                    ("hip_x_fraction", hip_x_fraction),
-                    ("upper_body_front_rotation", upper_body_front_rotation),
-                    ("dorsiflexion_at_end_position", dorsiflexion_at_end_position),
-                    ("hip_swing", hip_swing),
                 ],
             ),
             # Gait preprocessor

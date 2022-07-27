@@ -86,18 +86,22 @@ class DynamicStep:
 
         if self.subgait_id == "right_swing":
             self._start_pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()), "right")
+            self._end_pose = Pose(self._ik_solver_parameters, list(self.home_stand_position.values()), "left")
+
         else:
             self._start_pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()), "left")
+            self._end_pose = Pose(self._ik_solver_parameters, list(self.home_stand_position.values()), "right")
 
         self.starting_position_dict = self._from_list_to_setpoint(
-            self.all_joint_names, list(self.starting_position.values()), None, 0,
+            self.all_joint_names,
+            list(self.starting_position.values()),
+            None,
+            0,
         )
 
         self.start = start
         self.stop = stop
         self.hold_subgait = hold_subgait
-
-        self._logger.warn(f"{self._duration}")
 
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
@@ -110,14 +114,8 @@ class DynamicStep:
         setpoint_list = [self.starting_position_dict]
         desired_position = self._solve_desired_setpoint()
 
-        if self.start or self.stop:
-            setpoint_list.append(self._solve_middle_setpoint(fraction=0.45, height=self.middle_point_height))
-        else:
-            lower_deviation = self.middle_point_fraction - self._deviation
-            upper_deviation = self.middle_point_fraction + self._deviation
-
-            setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
-            setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
+        setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction - self._deviation, self._height))
+        setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction + self._deviation, self._height))
 
         setpoint_list.append(desired_position)
 
@@ -176,7 +174,6 @@ class DynamicStep:
 
     def _solve_desired_setpoint(self) -> Dict[str, Setpoint]:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
-        self._end_pose = Pose(self._ik_solver_parameters)
         if self.stop:
             self.desired_position = list(self.home_stand_position.values())
         else:
@@ -226,8 +223,10 @@ class DynamicStep:
             ):
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:
-                self.joint_trajectory_list.append(DynamicJointTrajectory(
-                        setpoint_list, fixed_midpoint_velocity=self._fixed_midpoint_velocity,
+                self.joint_trajectory_list.append(
+                    DynamicJointTrajectory(
+                        setpoint_list,
+                        fixed_midpoint_velocity=self._fixed_midpoint_velocity,
                     )
                 )
 

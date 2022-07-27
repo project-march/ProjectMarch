@@ -36,11 +36,10 @@ class DynamicGaitStepAndClose(DynamicGaitWalk):
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
-        if not self.trajectory_command_factory.has_trajectory_failed():
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
+        if self.subgait_id == "right_swing":
+            self.subgait_id = "left_swing"
+        elif self.subgait_id == "left_swing":
+            self.subgait_id = "right_swing"
 
         if self._end:
             # If the gait has ended, the next command should be None

@@ -90,7 +90,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="fixed_midpoint_velocity",
                 default_value="False",
-                description="Will give all setpoints a velocity of zero if true."
+                description="Will give all setpoints a velocity of zero if true.",
             ),
             # State machine parameters:
             DeclareLaunchArgument(
@@ -102,7 +102,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.3",
+                default_value="0.2",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
@@ -147,7 +147,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="base_number",
                 default_value=str(IKSolverParameters.base_number),
-                description="Base number of the function that calculates the ankle x mid position."
+                description="Base number of the function that calculates the ankle x mid position.",
             ),
             Node(
                 package="march_gait_selection",

@@ -55,7 +55,7 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e)
+            self._logger.error(f"{e}")
             return None
 
         if self.start_from_left_side:

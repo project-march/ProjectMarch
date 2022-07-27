@@ -753,7 +753,7 @@ class Pose:
         # return pose as list:
         return pose_list
 
-    def get_ankle_mid_x(self, hip_frac: float, next_pose):
+    def get_ankle_mid_x(self, hip_frac: float, next_pose: "Pose"):
         """Calculates the ankle x position relative to the stance leg.
 
         Arguments:
@@ -763,11 +763,20 @@ class Pose:
         Returns:
             float: swing leg ankle x position relative to the stance leg
         """
-        ankle_frac = (hip_frac - self._parameters.middle_point_fraction) / self._parameters.middle_point_fraction
+        frac_relative_to_stance_leg = (
+            hip_frac - self._parameters.middle_point_fraction
+        ) / self._parameters.middle_point_fraction
+        shift_ankle_x_relative_to_stance_leg = (-self.pos_ankle2[0] + next_pose.pos_ankle2[0]) / 2
+        step_length = self.pos_ankle2[0] + next_pose.pos_ankle2[0]
         return (
-            np.sign(ankle_frac)
-            * (1 - (1 - self._parameters.base_number ** (1 - abs(ankle_frac))) / (1 - self._parameters.base_number))
-            * (next_pose.pos_ankle2[0] / 2)
+            np.sign(frac_relative_to_stance_leg)
+            * (
+                1
+                - (1 - self._parameters.base_number ** (1 - abs(frac_relative_to_stance_leg)))
+                / (1 - self._parameters.base_number)
+            )
+            * (step_length / 2)
+            + shift_ankle_x_relative_to_stance_leg
         )
 
     def step_with_flat_stance_foot(self) -> None:
