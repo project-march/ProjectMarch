@@ -326,7 +326,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Publish cloud for visualization:
-    preprocessor_->voxelDownSample(pointcloud, 0.035);
+    preprocessor_->voxelDownSample(pointcloud, /*voxel_size=*/0.035);
     publishCloud(
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
