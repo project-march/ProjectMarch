@@ -97,7 +97,7 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
         elif param.name == "fixed_midpoint_velocity":
             node.fixed_midpoint_velocity = param.get_parameter_value().bool_value
         elif param.name == "base_number":
-            node.base_number = param.get_parameter_value().double_value
+            node.base_number = param.get_parameter_value().integer_value
 
     gait_state_machine.update_parameters()
     node._logger.info(f"{param.name} set to {param.value}.")

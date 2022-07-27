@@ -696,7 +696,6 @@ class Pose:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
         pos_ankle = np.array([self.get_ankle_mid_x(frac, next_pose), ankle_y])
-        print(pos_ankle)
 
         # Store current hip_aa to calculate hip_aa of midpoint later:
         current_hip_aa_1, current_hip_aa_2 = self.aa_hip1, self.aa_hip2
@@ -765,10 +764,10 @@ class Pose:
             float: swing leg ankle x position relative to the stance leg
         """
         frac_relative_to_stance_leg = (
-            (hip_frac - self._parameters.middle_point_fraction) / self._parameters.middle_point_fraction
-        )
+            hip_frac - self._parameters.middle_point_fraction
+        ) / self._parameters.middle_point_fraction
         shift_ankle_x_relative_to_stance_leg = (-self.pos_ankle2[0] + next_pose.pos_ankle2[0]) / 2
-        print(shift_ankle_x_relative_to_stance_leg)
+        step_length = self.pos_ankle2[0] + next_pose.pos_ankle2[0]
         return (
             np.sign(frac_relative_to_stance_leg)
             * (
@@ -776,7 +775,7 @@ class Pose:
                 - (1 - self._parameters.base_number ** (1 - abs(frac_relative_to_stance_leg)))
                 / (1 - self._parameters.base_number)
             )
-            * (next_pose.pos_ankle2[0] / 2)
+            * (step_length / 2)
             + shift_ankle_x_relative_to_stance_leg
         )
 

@@ -103,8 +103,6 @@ class DynamicStep:
         self.stop = stop
         self.hold_subgait = hold_subgait
 
-        self._logger.warn(f"{self._duration}")
-
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
 
@@ -116,14 +114,8 @@ class DynamicStep:
         setpoint_list = [self.starting_position_dict]
         desired_position = self._solve_desired_setpoint()
 
-        # if self.start or self.stop:
-        #     setpoint_list.append(self._solve_middle_setpoint(height=self.middle_point_height + max(self.location.y, 0)))
-        # else:
-        lower_deviation = self.middle_point_fraction - self._deviation
-        upper_deviation = self.middle_point_fraction + self._deviation
-
-        setpoint_list.append(self._solve_middle_setpoint(lower_deviation, self._height))
-        setpoint_list.append(self._solve_middle_setpoint(upper_deviation, self._height))
+        setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction - self._deviation, self._height))
+        setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction + self._deviation, self._height))
 
         setpoint_list.append(desired_position)
 
@@ -166,10 +158,6 @@ class DynamicStep:
         height = self.middle_point_height if height is None else height
         pose = copy.deepcopy(self._start_pose)
 
-        shift_ankle_x_relative_to_stance_leg = (-self._start_pose.pos_ankle2[0] + self._end_pose.pos_ankle2[0]) / 2
-        self._logger.warn(
-            f"(mid: {-self._start_pose.pos_ankle2[0]} + {self._end_pose.pos_ankle2[0]}) / 2 = {shift_ankle_x_relative_to_stance_leg}")
-
         middle_position = pose.solve_mid_position(
             next_pose=self._end_pose,
             frac=fraction,
@@ -188,8 +176,6 @@ class DynamicStep:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
         if self.stop:
             self.desired_position = list(self.home_stand_position.values())
-            shift_ankle_x_relative_to_stance_leg = (-self._start_pose.pos_ankle2[0] + self._end_pose.pos_ankle2[0]) / 2
-            self._logger.warn(f"desired: ({-self._start_pose.pos_ankle2[0]} + {self._end_pose.pos_ankle2[0]}) / 2 = {shift_ankle_x_relative_to_stance_leg}")
         else:
             self.desired_position = self._end_pose.solve_end_position(
                 self.location.x, self.location.y, self.location.z, self.subgait_id

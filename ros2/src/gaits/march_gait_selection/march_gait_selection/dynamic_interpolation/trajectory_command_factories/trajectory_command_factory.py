@@ -80,7 +80,12 @@ class TrajectoryCommandFactory:
         self.start_position_all_joints = start_position_all_joints
 
         if self._stop:
-            self.foot_location = FootPosition(processed_point=Point(x=0.0, y=0.0, z=0.51), midpoint_deviation=0.2, relative_midpoint_height=0.15, duration=1.5)
+            self.foot_location = FootPosition(
+                processed_point=Point(x=0.0, y=0.0, z=0.51),
+                midpoint_deviation=0.1,
+                relative_midpoint_height=0.15,
+                duration=1.5,
+            )
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
         else:
