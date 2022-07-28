@@ -17,12 +17,12 @@ old_stand_position_start = {
         "velocity": 0.0,
     },
     "left_hip_aa": {
-        "position": 0.0349,
+        "position": 0.0,
         "time_from_start": 0,
         "velocity": 0.0,
     },
     "left_hip_fe": {
-        "position": 0.0,
+        "position": 0.09,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -37,12 +37,12 @@ old_stand_position_start = {
         "velocity": 0.0,
     },
     "right_hip_aa": {
-        "position": 0.0349,
+        "position": 0.0,
         "time_from_start": 0,
         "velocity": 0.0,
     },
     "right_hip_fe": {
-        "position": 0.0,
+        "position": 0.09,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -56,7 +56,7 @@ old_stand_position_end = copy.deepcopy(old_stand_position_start)
 
 new_stand_position_start = {
     "left_ankle": {
-        "position": 0.0,
+        "position": 0.13,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -76,7 +76,7 @@ new_stand_position_start = {
         "velocity": 0.0,
     },
     "right_ankle": {
-        "position": 0.0,
+        "position": 0.13,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -112,9 +112,10 @@ def almost_equal_nested_dict(dict1: dict, dict2: dict) -> bool:
 amount_of_start_positions_set = 0
 amount_of_end_positions_set = 0
 paths_that_failed = []
-for path in Path(
-    "../ros2/src/gaits/march_gait_files/airgait_vi/sit",
-).rglob("*.subgait"):
+for path in [
+    Path("../ros2/src/gaits/march_gait_files/airgait_vi/sit/prepare_sit_down/MVI_prepare_sit_down_v6.subgait"),
+    Path("../ros2/src/gaits/march_gait_files/airgait_vi/stand/stand_home/MVI_stand_home_v7.subgait"),
+]:
     try:
         with open(path, "r") as subgait_file:
             print(path)
@@ -133,7 +134,7 @@ for path in Path(
             if almost_equal_nested_dict(
                 current_start_position,
                 old_stand_position_start,
-            ):
+            ) and "sit" in path.name:
                 for joint in content["joints"].keys():
                     content["joints"][joint][0] = new_stand_position_start[joint]  # noqa: E501
                 amount_of_start_positions_set += 1
@@ -141,7 +142,7 @@ for path in Path(
             if almost_equal_nested_dict(
                 current_end_position,
                 old_stand_position_end,
-            ):
+            ) and "stand" in path.name:
                 for joint in content["joints"].keys():
                     content["joints"][joint][-1] = new_stand_position_end[joint]  # noqa: E501
                 amount_of_end_positions_set += 1
