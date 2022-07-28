@@ -7,6 +7,8 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 #include <std_srvs/srv/trigger.hpp>
+#include <rcl_interfaces/srv/set_parameters.hpp>
+#include <rcl_interfaces/srv/get_parameters.hpp>
 #include "march_shared_msgs/msg/foot_position.hpp"
 #include <thread>
 #include <chrono>
@@ -37,6 +39,7 @@ public:
                 std::placeholders::_1));
 
         service_ = this->create_service<std_srvs::srv::Trigger>("~/align_cameras", std::bind(&FramePublisherNode::alignCameras, this, std::placeholders::_1, std::placeholders::_2));
+        vision_parameter_client_ = std::make_shared<rclcpp::SyncParametersClient>(this, "march_foot_position_finder");
 
         left_point_subscriber_
         = this->create_subscription<march_shared_msgs::msg::FootPosition>(
@@ -66,6 +69,7 @@ private:
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr service_;
+    std::shared_ptr<rclcpp::SyncParametersClient> vision_parameter_client_;
 
     rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr left_point_subscriber_;
     rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr right_point_subscriber_;
@@ -247,6 +251,10 @@ private:
     void alignCameras(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
         (void) request; // Silence unused warning. The request parameter does not contain any data.
 
+        auto original_parameter = vision_parameter_client_->get_parameters({"zero_height_threshold"});
+        std::vector<rclcpp::Parameter> set_param = {rclcpp::Parameter("zero_height_threshold", 0.0)};
+        vision_parameter_client_->set_parameters(set_param);
+
         double optimal_left_angle = 0.0, optimal_right_angle = 0.0;
         double closest_left_height_to_zero = 1000, closest_right_height_to_zero = 1000;
 
@@ -296,6 +304,9 @@ private:
 
         this->set_parameter(rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
         this->set_parameter(rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
+
+        std::vector<rclcpp::Parameter> reset_param = {rclcpp::Parameter("zero_height_threshold", original_parameter[0].as_double())};
+        vision_parameter_client_->set_parameters(reset_param);
 
         response->success = true;
     }
