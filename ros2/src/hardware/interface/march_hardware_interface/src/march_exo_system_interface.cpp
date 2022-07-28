@@ -306,7 +306,9 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
         if (abs(effort_diff_with_previous) > jointInfo.limit.max_effort_differance) {
             // TODO: Change to better sign value.
-            converted_effort += effort_diff_with_previous / abs(effort_diff_with_previous) * jointInfo.limit.max_effort_differance;
+            converted_effort += jointInfo.effort_command_converted +
+                std::clamp(effort_diff_with_previous, -jointInfo.limit.max_effort_differance,
+                    jointInfo.limit.max_effort_differance);
             RCLCPP_WARN((*logger_), "Effort is increased with %g effort for %s, "
                                     "which is more than %g effort in one iteration. "
                                     "Clamped the effort difference. New total effort will be %g.",
