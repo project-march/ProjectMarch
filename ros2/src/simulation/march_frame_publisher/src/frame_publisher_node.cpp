@@ -260,6 +260,8 @@ private:
 
         for (double angle = -7.0; angle <= 7.0; angle += 0.1) {
 
+            std::cout << "Checking angle: " << angle << std::endl;
+
             double avg_left_height = 0.0, avg_right_height = 0.0;
             int start_left_index, start_right_index;
 
