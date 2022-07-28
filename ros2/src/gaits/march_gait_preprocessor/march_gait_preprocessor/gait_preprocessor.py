@@ -171,17 +171,13 @@ class GaitPreprocessor(Node):
         Returns:
             Tuple[float, float]: A tuple containing the deviation and the relative height of the midpoints.
         """
-        max_height = final_point.y
-        high_points_ratio = 0
+        max_height = final_point.y if final_point.y > 0 else 0
 
         if len(track_points) != 0:
             track_points_transformed_heights = np.asarray(
                 [point.z for point in track_points]
             )
-            max_height = max(track_points_transformed_heights)
-            # self._logger.warn(f"max_height: {max_height}")
-            high_points_ratio = (track_points_transformed_heights > abs(max_height - 0.025)).sum() / len(track_points)
-            # self._logger.warn(f"high_points_ratio: {high_points_ratio}")
+            max_height = 0 if max(track_points_transformed_heights) < 0 else max(track_points_transformed_heights)
 
         relative_midpoint_height = 0.15
         if 0.14 < max_height < 0.19:
@@ -190,8 +186,7 @@ class GaitPreprocessor(Node):
             relative_midpoint_height = 0.1
 
         absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
-        high_points_ratio = 0.0 if high_points_ratio < self._minimum_high_point_ratio else high_points_ratio
-        midpoint_deviation = 0.05 + min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
+        midpoint_deviation = min(0.05 + self._deviation_coefficient * abs(max_height), self._max_deviation)
 
         if self._new_midpoint_method:
             return midpoint_deviation, absolute_midpoint_height, max_height
