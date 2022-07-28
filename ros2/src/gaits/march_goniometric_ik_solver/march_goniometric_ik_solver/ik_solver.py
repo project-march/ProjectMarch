@@ -768,14 +768,11 @@ class Pose:
         ) / self._parameters.middle_point_fraction
         shift_ankle_x_relative_to_stance_leg = (-self.pos_ankle2[0] + next_pose.pos_ankle2[0]) / 2
         step_length = self.pos_ankle2[0] + next_pose.pos_ankle2[0]
+        relative_fraction = 1 - (1 - self._parameters.base_number ** (1 - abs(frac_relative_to_stance_leg))) / (
+            1 - self._parameters.base_number
+        )
         return (
-            np.sign(frac_relative_to_stance_leg)
-            * (
-                1
-                - (1 - self._parameters.base_number ** (1 - abs(frac_relative_to_stance_leg)))
-                / (1 - self._parameters.base_number)
-            )
-            * (step_length / 2)
+            np.sign(frac_relative_to_stance_leg) * relative_fraction * (step_length / 2)
             + shift_ankle_x_relative_to_stance_leg
         )
 
@@ -977,9 +974,7 @@ class Pose:
             self.fe_ankle2 = self._max_ankle_dorsi_flexion
 
         # Create a list of the pose:
-        self.fe_ankle2 = self._max_ankle_dorsi_flexion - np.deg2rad(5)
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right
-
 
         # Perform a limit check and raise error if limit is exceeded:
         check_on_limits(pose_list)
