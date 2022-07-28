@@ -6,6 +6,10 @@
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
+#include <std_srvs/srv/trigger.hpp>
+#include "march_shared_msgs/msg/foot_position.hpp"
+#include <thread>
+#include <chrono>
 
 using TransformStamped = geometry_msgs::msg::TransformStamped;
 
@@ -32,6 +36,22 @@ public:
             std::bind(&FramePublisherNode::parametersCallback, this,
                 std::placeholders::_1));
 
+        service_ = this->create_service<std_srvs::srv::Trigger>("~/align_cameras", std::bind(&FramePublisherNode::alignCameras, this, std::placeholders::_1, std::placeholders::_2));
+
+        left_point_subscriber_
+        = this->create_subscription<march_shared_msgs::msg::FootPosition>(
+            "/march/chosen_foot_position/left",
+            /*qos=*/1,
+            std::bind(&FramePublisherNode::leftPointCallback, this,
+                std::placeholders::_1));
+
+        right_point_subscriber_
+        = this->create_subscription<march_shared_msgs::msg::FootPosition>(
+            "/march/chosen_foot_position/right",
+            /*qos=*/1,
+            std::bind(&FramePublisherNode::rightPointCallback, this,
+                std::placeholders::_1));
+
         range.set__from_value(-10.0).set__to_value(10.0).set__step(0.1);
         descriptor.floating_point_range = { range };
         this->declare_parameter<double>(
@@ -44,6 +64,11 @@ private:
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
     std::shared_ptr<tf2_ros::TransformListener> transform_listener_ { nullptr };
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+    rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr service_;
+
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr left_point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr right_point_subscriber_;
 
     rclcpp::TimerBase::SharedPtr publish_timer_;
 
@@ -64,6 +89,13 @@ private:
 
     double rotation_camera_left = 0.0;
     double rotation_camera_right = 0.0;
+
+    geometry_msgs::msg::Point last_left_point_;
+    geometry_msgs::msg::Point last_right_point_;
+    int last_left_point_count_ = 0;
+    int last_right_point_count_ = 0;
+
+    int average_count_ = 4;
 
     TransformStamped tr;
     rclcpp::Time last_published_camera_left = tr.header.stamp;
@@ -90,6 +122,20 @@ private:
             parameterUpdatedLogger(param);
         }
         return result;
+    }
+
+    void leftPointCallback(
+    const march_shared_msgs::msg::FootPosition::SharedPtr msg)
+    {
+        last_left_point_ = msg->displacement;
+        last_left_point_count_++;
+    }
+
+    void rightPointCallback(
+        const march_shared_msgs::msg::FootPosition::SharedPtr msg)
+    {
+        last_right_point_ = msg->displacement;
+        last_right_point_count_++;
     }
 
     void parameterUpdatedLogger(const rclcpp::Parameter& param)
@@ -196,6 +242,62 @@ private:
 
             last_published_right_ = trans_right_.header.stamp;
         }
+    }
+
+    void alignCameras(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
+        (void) request; // Silence unused warning. The request parameter does not contain any data.
+
+        double optimal_left_angle = 0.0, optimal_right_angle = 0.0;
+        double closest_left_height_to_zero = 1000, closest_right_height_to_zero = 1000;
+
+        for (double angle = -7.0; angle <= 7.0; angle += 0.1) {
+
+            double avg_left_height = 0.0, avg_right_height = 0.0;
+            int start_left_index, start_right_index;
+
+            rotation_camera_left = angle;
+            start_left_index = last_left_point_count_;
+
+            rotation_camera_right = angle;
+            start_right_index = last_right_point_count_;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            for (int i = 0; i < average_count_; i++) {
+                while (last_left_point_count_ == start_left_index) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                }
+                avg_left_height += last_left_point_.z;
+                start_left_index = last_left_point_count_;
+            }
+            
+            for (int i = 0; i < average_count_; i++) {
+                while (last_right_point_count_ == start_right_index) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                }
+                avg_right_height += last_right_point_.z;
+                start_right_index = last_right_point_count_;
+            }
+
+            avg_right_height /= average_count_;
+            avg_left_height /= average_count_;
+
+            if (abs(avg_left_height) < abs(closest_left_height_to_zero)) {
+                closest_left_height_to_zero = avg_left_height;
+                optimal_left_angle = angle;
+            }
+
+
+            if (abs(avg_right_height) < abs(closest_right_height_to_zero)) {
+                closest_right_height_to_zero = avg_right_height;
+                optimal_right_angle = angle;
+            }
+        }
+
+        this->set_parameter(rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
+        this->set_parameter(rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
+
+        response->success = true;
     }
 };
 

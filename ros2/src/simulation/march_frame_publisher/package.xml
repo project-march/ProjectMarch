@@ -16,6 +16,8 @@
   <depend>geometry_msgs</depend>
   <depend>rclcpp</depend>
   <depend>yaml-cpp</depend>
+  <depend>std_srvs</depend>
+  <depend>march_shared_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
