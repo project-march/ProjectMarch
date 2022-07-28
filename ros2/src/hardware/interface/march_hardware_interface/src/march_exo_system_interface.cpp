@@ -251,6 +251,9 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
 {
     // Stopping ethercat cycle in the hardware
     RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
+    for (JointInfo& jointInfo: joints_info_) {
+        jointInfo.joint.actuate(0);
+    }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
     RCLCPP_INFO((*logger_), "EthercatCycle successfully stopped.");
