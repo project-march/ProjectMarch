@@ -251,7 +251,7 @@ private:
     void alignCameras(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
         (void) request; // Silence unused warning. The request parameter does not contain any data.
 
-        auto original_parameter = vision_parameter_client_->get_parameters({"zero_height_threshold"});
+        double original_parameter = vision_parameter_client_->get_parameter<double>("zero_height_threshold");
         std::vector<rclcpp::Parameter> set_param = {rclcpp::Parameter("zero_height_threshold", 0.0)};
         vision_parameter_client_->set_parameters(set_param);
 
@@ -307,7 +307,7 @@ private:
         this->set_parameter(rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
         this->set_parameter(rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
 
-        std::vector<rclcpp::Parameter> reset_param = {rclcpp::Parameter("zero_height_threshold", original_parameter[0].as_double())};
+        std::vector<rclcpp::Parameter> reset_param = {rclcpp::Parameter("zero_height_threshold", original_parameter)};
         vision_parameter_client_->set_parameters(reset_param);
 
         response->success = true;
