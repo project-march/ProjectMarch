@@ -145,6 +145,11 @@ def generate_launch_description():
                 description="Whether hip swing is enabled during walking.",
             ),
             DeclareLaunchArgument(
+                name="hip_swing_fraction",
+                default_value=str(IKSolverParameters.hip_swing_fraction),
+                description="Amount of hip_swing for the mid position, if mid_swing is enabled.",
+            ),
+            DeclareLaunchArgument(
                 name="base_number",
                 default_value=str(IKSolverParameters.base_number),
                 description="Base number of the function that calculates the ankle x mid position.",
@@ -182,6 +187,7 @@ def generate_launch_description():
                     {"upper_body_front_rotation": LaunchConfiguration("upper_body_front_rotation")},
                     {"dorsiflexion_at_end_position": LaunchConfiguration("dorsiflexion_at_end_position")},
                     {"hip_swing": LaunchConfiguration("hip_swing")},
+                    {"hip_swing_fraction": LaunchConfiguration("hip_swing_fraction")},
                 ],
                 on_exit=Shutdown(),
             ),

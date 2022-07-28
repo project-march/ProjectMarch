@@ -736,10 +736,9 @@ class Pose:
         self.fe_ankle2 = self._max_ankle_dorsi_flexion
 
         # Add hip_swing or set hip_aa to average of start and end pose:
-        if self._parameters.hip_swing:
+        if self._parameters.hip_swing and 0 < self._parameters.hip_swing_fraction < 1:
             max_hip_swing = min(abs(self._max_hip_abduction), abs(self._max_hip_adduction))
-            self.aa_hip1 = max_hip_swing
-            self.aa_hip2 = -max_hip_swing
+            self.aa_hip1 = -max_hip_swing * self._parameters.hip_swing_fraction
         else:
             self.aa_hip1 = current_hip_aa_1 * (1 - frac) + next_pose.aa_hip1 * frac
             self.aa_hip2 = current_hip_aa_2 * (1 - frac) + next_pose.aa_hip2 * frac

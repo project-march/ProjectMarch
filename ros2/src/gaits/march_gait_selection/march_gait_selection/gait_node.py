@@ -94,6 +94,8 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.dorsiflexion_at_end_position = param.get_parameter_value().double_value
         elif param.name == "hip_swing":
             node.hip_swing = param.get_parameter_value().bool_value
+        elif param.name == "hip_swing_fraction":
+            node.hip_swing_fraction = param.get_parameter_value().double_value
         elif param.name == "fixed_midpoint_velocity":
             node.fixed_midpoint_velocity = param.get_parameter_value().bool_value
         elif param.name == "base_number":
@@ -147,6 +149,7 @@ class GaitNode(Node):
                 self.get_parameter("dorsiflexion_at_end_position").get_parameter_value().double_value
             )
             self.hip_swing = self.get_parameter("hip_swing").get_parameter_value().bool_value
+            self.hip_swing_fraction = self.get_parameter("hip_swing_fraction").get_parameter_value().bool_value
             self.base_number = self.get_parameter("base_number").get_parameter_value().integer_value
 
         except ParameterNotDeclaredException:

@@ -298,6 +298,7 @@ class DynamicStep:
             node.upper_body_front_rotation,
             node.dorsiflexion_at_end_position,
             node.hip_swing,
+            node.hip_swing_fraction,
             node.middle_point_fraction,
             node.base_number,
         )
