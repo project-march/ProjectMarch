@@ -733,7 +733,7 @@ class Pose:
         self.reduce_hip_extension()
 
         # Lift toes of swing leg as much as possible:
-        self.fe_ankle2 = self._max_ankle_dorsi_flexion
+        self.fe_ankle2 = self._max_ankle_dorsi_flexion*0.8
 
         # Add hip_swing or set hip_aa to average of start and end pose:
         if self._parameters.hip_swing and 0 < self._parameters.hip_swing_fraction < 1:
