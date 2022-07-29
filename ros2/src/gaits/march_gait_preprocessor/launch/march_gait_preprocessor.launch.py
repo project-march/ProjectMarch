@@ -72,22 +72,12 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="deviation_coefficient",
-                default_value="0.15",
+                default_value="0.5",
                 description="Coefficient used to compute the deviation of two midpoints from a middle fraction",
             ),
             DeclareLaunchArgument(
-                name="midpoint_increase",
-                default_value="0.1",
-                description="How much higher midpoints should be based on the highest track point",
-            ),
-            DeclareLaunchArgument(
-                name="minimum_high_point_ratio",
-                default_value="0.1",
-                description="Minimum ratio of high points before the midpoints deviation can become larger than 0",
-            ),
-            DeclareLaunchArgument(
                 name="max_deviation",
-                default_value="0.2",
+                default_value="0.15",
                 description="Maximum allowed midpoint deviation from the standard midpoint fraction",
             ),
             DeclareLaunchArgument(
@@ -112,8 +102,6 @@ def generate_launch_description():
                     {"duration": LaunchConfiguration("duration")},
                     {"simulated_deviation": LaunchConfiguration("simulated_deviation")},
                     {"deviation_coefficient": LaunchConfiguration("deviation_coefficient")},
-                    {"midpoint_increase": LaunchConfiguration("midpoint_increase")},
-                    {"minimum_high_point_ratio": LaunchConfiguration("minimum_high_point_ratio")},
                     {"max_deviation": LaunchConfiguration("max_deviation")},
                     {"new_midpoint_method": LaunchConfiguration("new_midpoint_method")},
                 ],

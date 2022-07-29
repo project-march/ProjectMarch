@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 from rclpy.node import Node
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition, CurrentGait
+from march_shared_msgs.msg import FootPosition, CurrentGait, GaitInstruction
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "gait_preprocessor_node"
@@ -42,10 +42,6 @@ class GaitPreprocessor(Node):
         self._offset_z = self.get_parameter("offset_z").get_parameter_value().double_value
         self._simulated_deviation = self.get_parameter("simulated_deviation").get_parameter_value().double_value
         self._deviation_coefficient = self.get_parameter("deviation_coefficient").get_parameter_value().double_value
-        self._midpoint_increase = self.get_parameter("midpoint_increase").get_parameter_value().double_value
-        self._minimum_high_point_ratio = (
-            self.get_parameter("minimum_high_point_ratio").get_parameter_value().double_value
-        )
         self._max_deviation = self.get_parameter("max_deviation").get_parameter_value().double_value
 
         # Temporary parameter to test difference between old and new midpoint method
@@ -81,6 +77,12 @@ class GaitPreprocessor(Node):
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._reset_previous_step_height_after_close,
+            1,
+        )
+        self.create_subscription(
+            GaitInstruction,
+            "/march/input_device/instruction",
+            self._reset_previous_step_height_after_force_unknown,
             1,
         )
 
@@ -129,6 +131,11 @@ class GaitPreprocessor(Node):
     def _reset_previous_step_height_after_close(self, current_gait: CurrentGait) -> None:
         """Resets the _step_height_previous attribute after a close gait."""
         if current_gait.subgait in ["left_close", "right_close"]:
+            self._step_height_previous = 0.0
+
+    def _reset_previous_step_height_after_force_unknown(self, gait_instruction: GaitInstruction) -> None:
+        """Resets the _step_height_previous attribute after a force unknown."""
+        if gait_instruction.type == GaitInstruction.UNKNOWN:
             self._step_height_previous = 0.0
 
     def _process_foot_position(self, foot_position: FootPosition) -> FootPosition:
@@ -185,9 +192,12 @@ class GaitPreprocessor(Node):
         elif max_height > 0.19:
             relative_midpoint_height = 0.1
 
-        absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
-        midpoint_deviation = min(0.05 + self._deviation_coefficient * abs(max_height), self._max_deviation)
+        if max_height < 0.05:
+            midpoint_deviation = 0.05
+        else:
+            midpoint_deviation = min(0.05 + self._deviation_coefficient * (abs(max_height) - 0.05), self._max_deviation)
 
+        absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
         if self._new_midpoint_method:
             return midpoint_deviation, absolute_midpoint_height, max_height
         else:
