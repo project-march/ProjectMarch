@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 from rclpy.node import Node
 from geometry_msgs.msg import Point
-from march_shared_msgs.msg import FootPosition, CurrentGait
+from march_shared_msgs.msg import FootPosition, CurrentGait, GaitInstruction
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "gait_preprocessor_node"
@@ -42,10 +42,6 @@ class GaitPreprocessor(Node):
         self._offset_z = self.get_parameter("offset_z").get_parameter_value().double_value
         self._simulated_deviation = self.get_parameter("simulated_deviation").get_parameter_value().double_value
         self._deviation_coefficient = self.get_parameter("deviation_coefficient").get_parameter_value().double_value
-        self._midpoint_increase = self.get_parameter("midpoint_increase").get_parameter_value().double_value
-        self._minimum_high_point_ratio = (
-            self.get_parameter("minimum_high_point_ratio").get_parameter_value().double_value
-        )
         self._max_deviation = self.get_parameter("max_deviation").get_parameter_value().double_value
 
         # Temporary parameter to test difference between old and new midpoint method
@@ -81,6 +77,12 @@ class GaitPreprocessor(Node):
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._reset_previous_step_height_after_close,
+            1,
+        )
+        self.create_subscription(
+            GaitInstruction,
+            "/march/input_device/instruction",
+            self._reset_previous_step_height_after_force_unknown,
             1,
         )
 
@@ -131,6 +133,11 @@ class GaitPreprocessor(Node):
         if current_gait.subgait in ["left_close", "right_close"]:
             self._step_height_previous = 0.0
 
+    def _reset_previous_step_height_after_force_unknown(self, gait_instruction: GaitInstruction) -> None:
+        """Resets the _step_height_previous attribute after a force unknown."""
+        if gait_instruction.type == GaitInstruction.UNKNOWN:
+            self._step_height_previous = 0.0
+
     def _process_foot_position(self, foot_position: FootPosition) -> FootPosition:
         """Reformat the foot location so that gait can use it.
 
@@ -171,17 +178,11 @@ class GaitPreprocessor(Node):
         Returns:
             Tuple[float, float]: A tuple containing the deviation and the relative height of the midpoints.
         """
-        max_height = final_point.y
-        high_points_ratio = 0
+        max_height = final_point.y if final_point.y > 0 else 0
 
         if len(track_points) != 0:
-            track_points_transformed_heights = np.asarray(
-                [point.z for point in track_points]
-            )
-            max_height = max(track_points_transformed_heights)
-            # self._logger.warn(f"max_height: {max_height}")
-            high_points_ratio = (track_points_transformed_heights > abs(max_height - 0.025)).sum() / len(track_points)
-            # self._logger.warn(f"high_points_ratio: {high_points_ratio}")
+            track_points_transformed_heights = np.asarray([point.z for point in track_points])
+            max_height = 0 if max(track_points_transformed_heights) < 0 else max(track_points_transformed_heights)
 
         relative_midpoint_height = 0.15
         if 0.14 < max_height < 0.19:
@@ -189,10 +190,12 @@ class GaitPreprocessor(Node):
         elif max_height > 0.19:
             relative_midpoint_height = 0.1
 
-        absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
-        high_points_ratio = 0.0 if high_points_ratio < self._minimum_high_point_ratio else high_points_ratio
-        midpoint_deviation = 0.05 + min(high_points_ratio * self._deviation_coefficient, self._max_deviation)
+        if max_height < 0.05:
+            midpoint_deviation = 0.05
+        else:
+            midpoint_deviation = min(0.05 + self._deviation_coefficient * (abs(max_height) - 0.05), self._max_deviation)
 
+        absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
         if self._new_midpoint_method:
             return midpoint_deviation, absolute_midpoint_height, max_height
         else:

@@ -61,20 +61,11 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._simulated_deviation = param.get_parameter_value().double_value
         elif param.name == "deviation_coefficient":
             gait_preprocessor._deviation_coefficient = param.get_parameter_value().double_value
-        elif param.name == "midpoint_increase":
-            gait_preprocessor._midpoint_increase = param.get_parameter_value().double_value
-        elif param.name == "minimum_high_point_ratio":
-            gait_preprocessor._minimum_high_point_ratio = param.get_parameter_value().double_value
         elif param.name == "max_deviation":
             gait_preprocessor._max_deviation = param.get_parameter_value().double_value
         elif param.name == "new_midpoint_method":
             gait_preprocessor._new_midpoint_method = param.get_parameter_value().bool_value
 
-        parameter_updated_logger(gait_preprocessor, param)
+        gait_preprocessor._logger.info(f"{param.name} set to {param.value}")
 
     return SetParametersResult(successful=True)
-
-
-def parameter_updated_logger(gait_preprocessor: GaitPreprocessor, param: Parameter):
-    """Log which param has been updated to which value."""
-    gait_preprocessor._logger.info(f"{param.name} set to {param.value}")

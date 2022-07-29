@@ -115,7 +115,12 @@ class DynamicStep:
         desired_position = self._solve_desired_setpoint()
 
         setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction - self._deviation, self._height))
-        setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction + self._deviation, self._height))
+        if not self.stop:
+            setpoint_list.append(
+                self._solve_middle_setpoint(self.middle_point_fraction + self._deviation, self._height)
+            )
+        else:
+            setpoint_list.append(self._solve_middle_setpoint_for_close(0.7, 0.05))
 
         setpoint_list.append(desired_position)
 
@@ -171,6 +176,18 @@ class DynamicStep:
             None,
             fraction * self._duration,
         )
+
+    def _solve_middle_setpoint_for_close(self, fraction, height) -> Dict[str, Setpoint]:
+        pose = copy.deepcopy(self._start_pose)
+
+        middle_position = pose.solve_end_position(
+            0.03,
+            height,
+            0.51,
+            self.subgait_id,
+        )
+
+        return self._from_list_to_setpoint(self.all_joint_names, middle_position, None, fraction * self._duration)
 
     def _solve_desired_setpoint(self) -> Dict[str, Setpoint]:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""

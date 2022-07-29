@@ -11,9 +11,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     return launch.LaunchDescription(
         [
             DeclareLaunchArgument(
-                name="ip_address",
-                default_value="192.168.0.100",
-                description="IP address on which the IPD can connect."
+                name="ip_address", default_value="192.168.0.100", description="IP address on which the IPD can connect."
             ),
             Node(
                 package="march_wireless_ipd",
