@@ -98,6 +98,12 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.fixed_midpoint_velocity = param.get_parameter_value().bool_value
         elif param.name == "base_number":
             node.base_number = param.get_parameter_value().integer_value
+        elif param.name == "stop_mid2_fraction":
+            node.stop_mid2_fraction = param.get_parameter_value().double_value
+        elif param.name == "stop_mid2_x":
+            node.stop_mid2_x = param.get_parameter_value().double_value
+        elif param.name == "stop_mid2_y":
+            node.stop_mid2_y = param.get_parameter_value().double_value
 
     gait_state_machine.update_parameters()
     node._logger.info(f"{param.name} set to {param.value}.")
@@ -134,6 +140,9 @@ class GaitNode(Node):
             self.fixed_midpoint_velocity = (
                 self.get_parameter("fixed_midpoint_velocity").get_parameter_value().bool_value
             )
+            self.stop_mid2_fraction = self.get_parameter("stop_mid2_fraction").get_parameter_value().double_value
+            self.stop_mid2_x = self.get_parameter("stop_mid2_x").get_parameter_value().double_value
+            self.stop_mid2_y = self.get_parameter("stop_mid2_y").get_parameter_value().double_value
 
             # IK Solver parameters
             self.ankle_buffer = self.get_parameter("ankle_buffer").get_parameter_value().double_value
