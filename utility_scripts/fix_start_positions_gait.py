@@ -131,18 +131,24 @@ for path in [
                 old_stand_position_end[joint]["time_from_start"] = final_time
                 new_stand_position_end[joint]["time_from_start"] = final_time
 
-            if almost_equal_nested_dict(
-                current_start_position,
-                old_stand_position_start,
-            ) and "sit" in path.name:
+            if (
+                almost_equal_nested_dict(
+                    current_start_position,
+                    old_stand_position_start,
+                )
+                and "sit" in path.name
+            ):
                 for joint in content["joints"].keys():
                     content["joints"][joint][0] = new_stand_position_start[joint]  # noqa: E501
                 amount_of_start_positions_set += 1
 
-            if almost_equal_nested_dict(
-                current_end_position,
-                old_stand_position_end,
-            ) and "stand" in path.name:
+            if (
+                almost_equal_nested_dict(
+                    current_end_position,
+                    old_stand_position_end,
+                )
+                and "stand" in path.name
+            ):
                 for joint in content["joints"].keys():
                     content["joints"][joint][-1] = new_stand_position_end[joint]  # noqa: E501
                 amount_of_end_positions_set += 1

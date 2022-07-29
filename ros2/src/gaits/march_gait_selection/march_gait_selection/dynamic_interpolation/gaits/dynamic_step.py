@@ -181,15 +181,13 @@ class DynamicStep:
         pose = copy.deepcopy(self._start_pose)
 
         middle_position = pose.solve_end_position(
-            0.03, height, 0.51, self.subgait_id,
+            0.03,
+            height,
+            0.51,
+            self.subgait_id,
         )
 
-        return self._from_list_to_setpoint(
-            self.all_joint_names,
-            middle_position,
-            None,
-            fraction * self._duration
-        )
+        return self._from_list_to_setpoint(self.all_joint_names, middle_position, None, fraction * self._duration)
 
     def _solve_desired_setpoint(self) -> Dict[str, Setpoint]:
         """Calls IK solver to compute the joint angles needed for the desired x and y coordinate."""
