@@ -92,6 +92,21 @@ def generate_launch_description():
                 default_value="False",
                 description="Will give all setpoints a velocity of zero if true.",
             ),
+            DeclareLaunchArgument(
+                name="stop_mid2_fraction",
+                default_value="0.7",
+                description="Fraction at which the second midpoint will be set for a stop gait."
+            ),
+            DeclareLaunchArgument(
+                name="stop_mid2_x",
+                default_value="0.03",
+                description="X-location of the ankle for the second midpoint of a stop gait."
+            ),
+            DeclareLaunchArgument(
+                name="stop_mid2_y",
+                default_value="0.05",
+                description="Y-location of the ankle for the second midpoint of a stop gait."
+            ),
             # State machine parameters:
             DeclareLaunchArgument(
                 name="first_subgait_delay",
@@ -176,6 +191,9 @@ def generate_launch_description():
                     {"use_position_queue": LaunchConfiguration("use_position_queue")},
                     {"add_cybathlon_gaits": LaunchConfiguration("add_cybathlon_gaits")},
                     {"fixed_midpoint_velocity": LaunchConfiguration("fixed_midpoint_velocity")},
+                    {"stop_mid2_fraction": LaunchConfiguration("stop_mid2_fraction")},
+                    {"stop_mid2_x": LaunchConfiguration("stop_mid2_x")},
+                    {"stop_mid2_y": LaunchConfiguration("stop_mid2_y")},
                     {"base_number": LaunchConfiguration("base_number")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},

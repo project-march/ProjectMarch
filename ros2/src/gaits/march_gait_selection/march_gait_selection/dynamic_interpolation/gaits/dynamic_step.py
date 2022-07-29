@@ -120,7 +120,7 @@ class DynamicStep:
                 self._solve_middle_setpoint(self.middle_point_fraction + self._deviation, self._height)
             )
         else:
-            setpoint_list.append(self._solve_middle_setpoint_for_close(0.7, 0.05))
+            setpoint_list.append(self._solve_middle_setpoint_for_close(self._stop_mid2_fraction, self._stop_mid2_y))
 
         setpoint_list.append(desired_position)
 
@@ -181,7 +181,7 @@ class DynamicStep:
         pose = copy.deepcopy(self._start_pose)
 
         middle_position = pose.solve_end_position(
-            0.03,
+            self._stop_mid2_x,
             height,
             0.51,
             self.subgait_id,
@@ -307,6 +307,9 @@ class DynamicStep:
         self.push_off_fraction = node.push_off_fraction
         self.push_off_position = node.push_off_position
         self._fixed_midpoint_velocity = node.fixed_midpoint_velocity
+        self._stop_mid2_fraction = node.stop_mid2_fraction
+        self._stop_mid2_x = node.stop_mid2_x
+        self._stop_mid2_y = node.stop_mid2_y
         self._ik_solver_parameters = IKSolverParameters(
             node.ankle_buffer,
             node.hip_buffer,
