@@ -98,7 +98,11 @@ class DynamicStep:
             None,
             0,
         )
-
+        self._logger.warn(
+            f"Duration: {self._duration}, "
+            f"deviation: {location.midpoint_deviation}, "
+            f"height: {location.relative_midpoint_height}"
+        )
         self.start = start
         self.stop = stop
         self.hold_subgait = hold_subgait
@@ -185,6 +189,7 @@ class DynamicStep:
             height,
             0.51,
             self.subgait_id,
+            for_mid_point=True,
         )
 
         return self._from_list_to_setpoint(self.all_joint_names, middle_position, None, fraction * self._duration)

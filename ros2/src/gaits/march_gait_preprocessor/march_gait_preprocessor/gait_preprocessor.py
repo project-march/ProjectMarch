@@ -178,6 +178,7 @@ class GaitPreprocessor(Node):
         Returns:
             Tuple[float, float]: A tuple containing the deviation and the relative height of the midpoints.
         """
+        absolute_max_height = abs(final_point.y)
         max_height = final_point.y if final_point.y > 0 else 0
 
         if len(track_points) != 0:
@@ -197,9 +198,9 @@ class GaitPreprocessor(Node):
 
         absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
         if self._new_midpoint_method:
-            return midpoint_deviation, absolute_midpoint_height, max_height
+            return midpoint_deviation, absolute_midpoint_height, absolute_max_height
         else:
-            return self._simulated_deviation, absolute_midpoint_height, max_height
+            return self._simulated_deviation, absolute_midpoint_height, absolute_max_height
 
     def _transform_point_to_gait_axes(self, point: Point) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.

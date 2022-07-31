@@ -82,9 +82,6 @@ class PointHandler(ABC):
             subgait_id (str): whether it is a right or left swing
             foot_position (FootPosition): point message to which step is planned
         """
-        self._logger.warn(
-            f"deviation: {foot_position.midpoint_deviation}, height: {foot_position.relative_midpoint_height}"
-        )
         if subgait_id == "left_swing":
             self.pub_left.publish(foot_position)
         elif subgait_id == "right_swing":

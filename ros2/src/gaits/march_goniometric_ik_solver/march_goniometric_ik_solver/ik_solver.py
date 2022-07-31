@@ -720,7 +720,9 @@ class Pose:
         # If the dorsi flexion limition is exceeded, the end position is used:
         if self.fe_ankle1 > self._max_ankle_dorsi_flexion:
             self.reset_to_zero_pose()
-            self.solve_end_position(pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id)
+            self.solve_end_position(
+                pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id, for_mid_point=True,
+            )
 
         # Apply the desired rotation of the upper body:
         self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
@@ -896,6 +898,7 @@ class Pose:
         hip_x_fraction: Optional[float] = None,
         default_knee_bend: Optional[float] = None,
         reduce_df_front: bool = True,
+        for_mid_point: bool = False,
     ) -> List[float]:
         """Solves inverse kinematics for the end position.
 
@@ -911,6 +914,7 @@ class Pose:
             hip_x_fraction (float): the fraction between the two feet (forward) at which the hip is desired.
             default_knee_bend (float): the default bending of the knee for a straight leg.
             reduce_df_front (bool): whether to reduce dorsiflexion for swing leg.
+            for_mid_position (bool): reduces ankle planter flexion when solver is called for mid position
 
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
@@ -971,6 +975,9 @@ class Pose:
             self.fe_ankle2 = self._parameters.dorsiflexion_at_end_position_radians
         if self._parameters.dorsiflexion_at_end_position_radians > self._max_ankle_dorsi_flexion:
             self.fe_ankle2 = self._max_ankle_dorsi_flexion
+
+        if for_mid_point:
+            self.fe_ankle2 = 0
 
         # Create a list of the pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right

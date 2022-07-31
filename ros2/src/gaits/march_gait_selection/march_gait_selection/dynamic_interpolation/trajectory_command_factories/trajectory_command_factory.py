@@ -90,7 +90,7 @@ class TrajectoryCommandFactory:
             if self._use_position_queue:
                 self.foot_location = self._check_if_queue_is_not_empty_and_get_foot_location()
             else:
-                self.foot_location = self._get_foot_location_from_point_handler()
+                self.foot_location = self._get_foot_location_from_point_handler(start)
 
         if self.foot_location is None:
             return None if start else self._get_stop_gait()
@@ -226,13 +226,22 @@ class TrajectoryCommandFactory:
         else:
             return self._get_foot_location_from_queue()
 
-    def _get_foot_location_from_point_handler(self) -> Optional[FootPosition]:
-        """Returns a FootPosition message from the point handler, if available."""
+    def _get_foot_location_from_point_handler(self, start: bool) -> Optional[FootPosition]:
+        """Returns a FootPosition message from the point handler, if available.
+        
+        Arguments:
+            start (bool): Whether it is a start gait.
+
+        Raises:
+            GaitError: Raised when foot location is too old and it is a start gait, so it will not try to get a close.
+        """
         try:
             self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
             msg_too_old, msg = self._point_handler.is_foot_location_too_old(self.foot_location)
             if msg_too_old:
                 self._gait._end = True
+                if start:
+                    raise GaitError(msg)
                 self._stop = True
                 self._logger.error(msg)
             return self.foot_location
