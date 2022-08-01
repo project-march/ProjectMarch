@@ -93,7 +93,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
 
         position_ = initial_absolute_position_;
-        if (operational_check && !isInHardLimits()) {
+        if (operational_check && isInHardLimits()) {
                 throw error::HardwareException(
                         error::ErrorType::OUTSIDE_HARD_LIMITS,
                         "Joint %s is outside hard limits, value is %d, limits are [%d, %d]",
@@ -149,8 +149,10 @@ void Joint::readEncoders()
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        logger_->warn(logger_->fstring("Data was not updated within %.3fs seconds, using old data.",
-                                       time_between_last_update.count()));
+        if (time_between_last_update >= std::chrono::milliseconds{10}) {  // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
+            logger_->warn(logger_->fstring("Data was not updated within %.3f milliseconds, using old data.",
+                                           time_between_last_update.count()));
+        }
     }
 }
 
