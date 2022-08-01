@@ -6,6 +6,7 @@ import yaml
 from typing import Optional, Dict, Tuple
 from queue import Queue
 from ament_index_python.packages import get_package_share_path
+from copy import copy
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
@@ -59,7 +60,7 @@ class TrajectoryCommandFactory:
     @property
     def final_position(self) -> Dict[str, float]:
         """Returns the position that the gait ends in."""
-        return self._final_position
+        return copy(self._final_position)
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
