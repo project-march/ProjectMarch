@@ -214,6 +214,7 @@ MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::stri
         if (!start_interfaces.empty()) {
             make_joints_operational(march_robot_->getNotOperationalJoints());
             joints_ready_for_actuation_ = true;
+            RCLCPP_INFO((*logger_), "All joints ready for writing.");
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
@@ -257,7 +258,6 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
                 joint.getMotorController()->getState()->getOperationalState().c_str() 
                 );
             });
-    RCLCPP_INFO((*logger_), "All joints ready for writing.");
 }
 
 /// This method is ran when you stop the controller, (start is ran earlier).
