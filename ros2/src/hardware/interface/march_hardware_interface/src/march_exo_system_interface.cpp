@@ -345,7 +345,7 @@ bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo) {
 
 bool MarchExoSystemInterface::is_joint_in_limit(JointInfo &jointInfo) {
     // SOFT Limit check.
-    if (!jointInfo.joint.isInSoftLimits()) {
+    if (jointInfo.joint.isWithinSoftLimits()) {
         return false;
     }
     const auto &abs_encoder = jointInfo.joint.getMotorController()->getAbsoluteEncoder();
@@ -358,7 +358,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo &jointInfo) {
                          joint_pos_rad, joint_pos_iu);
 
     // ERROR Soft Limit Check
-    if (!jointInfo.joint.isInSoftErrorLimits()) {
+    if (jointInfo.joint.isWithinSoftErrorLimits()) {
         jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
         return false;
     }
@@ -379,7 +379,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo &jointInfo) {
                          abs_encoder->getUpperErrorSoftLimitIU(), time_in_error_limits.count());
 
     // HARD limit check.
-    if (jointInfo.joint.isInHardLimits()) {
+    if (!jointInfo.joint.isWithinHardLimits()) {
         RCLCPP_FATAL((*logger_), "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
                                  "\n\tposition: %g rad; %i IU."
                                  "\n\thard limit: [%i, %i]"

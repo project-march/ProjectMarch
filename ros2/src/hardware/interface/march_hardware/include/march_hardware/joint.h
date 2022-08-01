@@ -80,23 +80,23 @@ public:
     /**
      * \brief Checks whether the joint is in its soft limits.
      * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
-     * @return True if it is in its soft limit.
+     * @return True if it is in an 'oke' state.
      */
-    bool isInSoftLimits() const;
+    bool isWithinSoftLimits() const;
 
     /**
      * \brief Checks whether the joint is in its error soft limits.
      * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
-     * @return True if it is in its error soft limit.
+     * @return True if it is in an 'oke' state.
      */
-    bool isInSoftErrorLimits() const;
+    bool isWithinSoftErrorLimits() const;
 
     /**
      * \brief Checks whether the joint is in its hard limits.
      * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
-     * @return True if it is in its hard limit.
+     * @return True if it is in an 'oke' state.
      */
-    bool isInHardLimits() const;
+    bool isWithinHardLimits() const;
 
     /** @brief Override comparison operator */
     friend bool operator==(const Joint& lhs, const Joint& rhs)

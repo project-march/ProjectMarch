@@ -93,7 +93,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
 
         position_ = initial_absolute_position_;
-        if (operational_check && isInHardLimits()) {
+        if (operational_check && !isWithinHardLimits()) {
                 throw error::HardwareException(
                         error::ErrorType::OUTSIDE_HARD_LIMITS,
                         "Joint %s is outside hard limits, value is %d, limits are [%d, %d]",
@@ -150,8 +150,8 @@ void Joint::readEncoders()
         velocity_ = motor_controller_->getVelocity();
     } else {
         if (time_between_last_update >= std::chrono::milliseconds{10}) {  // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
-            logger_->warn(logger_->fstring("Data was not updated within %.3f milliseconds, using old data.",
-                                           time_between_last_update.count()));
+            logger_->warn(logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
+                                           this->name_.c_str(), time_between_last_update.count()));
         }
     }
 }
@@ -212,16 +212,15 @@ std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
     }
 }
 
-bool Joint::isInSoftLimits() const{
+bool Joint::isWithinSoftLimits() const{
     return motor_controller_->getAbsoluteEncoder()->isWithinSoftLimitsRadians(position_);
 }
 
-bool Joint::isInSoftErrorLimits() const{
-
+bool Joint::isWithinSoftErrorLimits() const{
     return motor_controller_->getAbsoluteEncoder()->isWithinErrorSoftLimitsRadians(position_);
 }
 
-bool Joint::isInHardLimits() const{
+bool Joint::isWithinHardLimits() const{
     return motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsRadians(position_);
 }
 
