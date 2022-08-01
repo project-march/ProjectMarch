@@ -78,7 +78,6 @@ class GaitStateMachine:
         self._input = StateMachineInput(node)
         self._timer_period = self._node.get_parameter("timer_period").get_parameter_value().double_value
         self._last_end_position = UnknownEdgePosition()
-        self._reset_attributes()
 
         self._node.create_subscription(
             msg_type=Bool,
@@ -113,6 +112,7 @@ class GaitStateMachine:
             callback=self._possible_gaits_cb,
             callback_group=ReentrantCallbackGroup(),
         )
+        self._reset_attributes()
 
     def _reset_attributes(self) -> None:
         """Resets attributes."""
@@ -150,6 +150,9 @@ class GaitStateMachine:
         elif self._previous_gait is not None and self._is_dynamic_stop_requested():
             self._current_gait = self._gaits.get("dynamic_close")
             self._process_gait_request()
+        elif self._is_stop_requested() and self._eeg:
+            self._eeg = False
+            self._eeg_on_off_pub.publish(Bool(data=self._eeg))
 
     def _process_gait_request(self) -> None:
         """Accepts the requested gait if the starting positions equals the last end position."""
@@ -373,7 +376,7 @@ class GaitStateMachine:
             for gait in self._gaits.values():
                 if self._last_end_position == gait.starting_position:
                     possible_gaits.append(gait.name)
-                elif self._last_end_position == self._home_stand_position:
+                elif self._last_end_position == self._home_stand_position and "eeg" not in possible_gaits:
                     possible_gaits.append("eeg")
 
         response.gaits = possible_gaits
