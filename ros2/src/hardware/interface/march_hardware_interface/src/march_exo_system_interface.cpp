@@ -37,7 +37,7 @@ MarchExoSystemInterface::MarchExoSystemInterface() :
 }
 
 /** Configures the controller.
-* Checkout https://design.ros2.org/articles/node_lifecycle.html, for more information on the execution order.
+ * Checkout https://design.ros2.org/articles/node_lifecycle.html, for more information on the execution order.
  * After On_Configure all state interfaces and "non-movement" command interfaces should be available to controllers
 */
 hardware_interface::return_type MarchExoSystemInterface::configure(const hardware_interface::HardwareInfo& info)
@@ -107,13 +107,13 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
 }
 
 /** Returns a vector of the StateInterfaces.
-*
-* This method is implemented so that the joint_state_broadcaster controller can publish joint positions.
-* It does this by getting a pointer to the variable that stores the positions in this class.
-*
-* In this case this is the same as the vector containing the position_command. Meaning that the broadcaster controller
-* will say that the joints are in the exact positions position controller wants them to be.
-*/
+ *
+ * This method is implemented so that the joint_state_broadcaster controller can publish joint positions.
+ * It does this by getting a pointer to the variable that stores the positions in this class.
+ *
+ * In this case this is the same as the vector containing the position_command. Meaning that the broadcaster controller
+ * will say that the joints are in the exact positions position controller wants them to be.
+ */
 std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_state_interfaces()
 {
     RCLCPP_INFO((*logger_), "Creating export state interface.");
@@ -132,13 +132,13 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 }
 
 /** Returns a vector of the CommandInterfaces.
-*
-* This method is implemented so that the position controller can set the calculated positions.
-* It does this by getting a pointer to the variable that stores the effort_commands in this class.
-*
-* In this case this is the same as the vector containing the position state. Meaning that the broadcaster controller
-* will say that the joints are in the exact positions position controller wants them to be.
-*/
+ *
+ * This method is implemented so that the position controller can set the calculated positions.
+ * It does this by getting a pointer to the variable that stores the effort_commands in this class.
+ *
+ * In this case this is the same as the vector containing the position state. Meaning that the broadcaster controller
+ * will say that the joints are in the exact positions position controller wants them to be.
+ */
 std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::export_command_interfaces()
 {
     RCLCPP_INFO((*logger_), "Creating export command interface.");
@@ -186,15 +186,15 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 }
 
 /** \brief This method is used to switch command modes, but we use it to activate the command options on the hardware.
-*
-* By handling making the hardware actuation ready in this step we can make sure to,
-* read values of the joints (while they are not even actuation ready).
-*
-* @param start_interfaces The new starting interfaces.
-* @param stop_interfaces  The interfaces that are stopping.
-* @return hardware_interface::return_type::OK if everything is correct,
-*          hardware_interface::return_type::ERROR otherwise.
-*/
+ *
+ * By handling making the hardware actuation ready in this step we can make sure to,
+ * read values of the joints (while they are not even actuation ready).
+ *
+ * @param start_interfaces The new starting interfaces.
+ * @param stop_interfaces  The interfaces that are stopping.
+ * @return hardware_interface::return_type::OK if everything is correct,
+ *          hardware_interface::return_type::ERROR otherwise.
+ */
 hardware_interface::return_type
 MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::string> &start_interfaces,
                                                      const std::vector<std::string> &stop_interfaces) {
@@ -262,10 +262,10 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
 }
 
 /** This is the update loop of the state interface.
-*
-*  This method is empty in this case as we directly set the state interface to read from the command controller.
-*  See: export_state_interfaces and export_command_interfaces().
-*/
+ *
+ *  This method is empty in this case as we directly set the state interface to read from the command controller.
+ *  See: export_state_interfaces and export_command_interfaces().
+ */
 hardware_interface::return_type MarchExoSystemInterface::read()
 {
     if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
@@ -286,10 +286,10 @@ hardware_interface::return_type MarchExoSystemInterface::read()
 }
 
 /** This is the update loop of the command interface.
-*
-*  This method is empty in this case as we directly set the state interface to read from the command controller.
-*  See: export_state_interfaces and export_command_interfaces().
-*/
+ *
+ *  This method is empty in this case as we directly set the state interface to read from the command controller.
+ *  See: export_state_interfaces and export_command_interfaces().
+ */
 hardware_interface::return_type MarchExoSystemInterface::write()
 {
     // When the joints are not yet ready don't write anything to them.
@@ -368,9 +368,12 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo &jointInfo) {
     if (jointInfo.joint.isInHardLimits()) {
         RCLCPP_FATAL((*logger_), "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
                                  "\n\tposition: %g rad; %i IU."
-                                 "\n\thard limit: [%i, %i]",
+                                 "\n\thard limit: [%i, %i]"
+                                 "\n\thard limit rad: [%i, %i]",
                      jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu,
-                     abs_encoder->getLowerHardLimitIU(), abs_encoder->getUpperHardLimitIU());
+                     abs_encoder->getLowerHardLimitIU(), abs_encoder->getUpperHardLimitIU(),
+                     abs_encoder->positionIUToRadians(abs_encoder->getLowerHardLimitIU()),
+                     abs_encoder->positionIUToRadians(abs_encoder->getUpperHardLimitIU()));
         return true;
     }
     return false;
