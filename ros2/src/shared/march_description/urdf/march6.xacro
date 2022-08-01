@@ -44,7 +44,7 @@
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"
-                    value="properties/march6.yaml"/>
+                    value="properties/properties_march6.yaml"/>
     <xacro:property name="properties" value="${load_yaml(config_yaml_file)}"/>
     <xacro:property name="joint_limits" value="${properties['joint_limits']}"/>
     <xacro:property name="safety_values"
