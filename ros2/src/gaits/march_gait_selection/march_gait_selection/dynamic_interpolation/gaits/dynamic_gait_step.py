@@ -112,7 +112,7 @@ class DynamicGaitStep(DynamicGaitWalk):
 
         return GaitUpdate.finished()
 
-    def set_state_to_unknown(self) -> None:
+    def reset_start_position_to_home_stand(self) -> None:
         """Resets the subgait_id, and position_queue after a force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"

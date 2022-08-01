@@ -372,7 +372,7 @@ class DynamicGaitWalk(GaitInterface):
         for joint_name in self.actuating_joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
-    def set_state_to_unknown(self) -> None:
+    def reset_start_position_to_home_stand(self) -> None:
         """Reset start position to home stand after force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"

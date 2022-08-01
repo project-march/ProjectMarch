@@ -235,9 +235,8 @@ class GaitStateMachine:
             self._trajectory_scheduler.send_position_hold()
             self._trajectory_scheduler.cancel_active_goals()
 
-        for gait in self._gaits.values():
-            if isinstance(gait, DynamicGaitWalk):
-                gait.set_state_to_unknown()
+        if isinstance(self._current_gait, DynamicGaitWalk):
+            self._current_gait.reset_start_position_to_home_stand()
 
         self._last_end_position = UnknownEdgePosition()
         self._reset_attributes()
