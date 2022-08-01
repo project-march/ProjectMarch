@@ -22,15 +22,15 @@ march:
         - right_knee
       gains: # Required because we're controlling an effort interface
         left_ankle: {p: 30, i: 0, d: 4.5, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_hip_aa: {p: 40, i: 0, d: 2, i_clamp: 100, publish_state: true,
+        left_hip_aa: {p: 50, i: 1, d: 2, i_clamp: 2, publish_state: true,
                       antiwindup: true}
-        left_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_knee: {p: 60, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_ankle: {p: 30, i: 0, d: 4.5, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_hip_aa: {p: 40, i: 0, d: 2, i_clamp: 100, publish_state: true,
+        left_hip_fe: {p: 75, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_knee: {p: 75, i: 0, d: 15, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_ankle: {p: 10, i: 0, d: 1.0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_hip_aa: {p: 50, i: 1, d: 2, i_clamp: 2, publish_state: true,
                        antiwindup: true}
-        right_hip_fe: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_knee: {p: 60, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_hip_fe: {p: 75, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_knee: {p: 75, i: 0, d: 15, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
         goal_time: 0.5
