@@ -66,7 +66,9 @@ void EthercatMaster::ethercatMasterInitiation()
     logger_->info("Trying to start EtherCAT");
     if (!ec_init(this->if_name_.c_str())) {
         throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION,
-            "No socket connection on %s", this->if_name_.c_str());
+            "No socket connection on %s. Check if the socket is active by typing `ifconfig` in a terminal "
+            ", or this node is not executed as root.",
+            this->if_name_.c_str());
     }
     logger_->info(logger_->fstring("ec_init on %s succeeded", this->if_name_.c_str()));
 

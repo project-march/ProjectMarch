@@ -156,32 +156,38 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
 /// This method is ran when you start the controller (especially command controller), (configure is ran earlier).
 hardware_interface::return_type MarchExoSystemInterface::start()
 {
-    // Start ethercat cycle in the hardware
-    RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
-    march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
-    auto jointPtrs = march_robot_->getJoints();
-    RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
-    repeat_function_on_joints_until_timeout(
-            /*function_goal=*/"Waiting on ethercat data.",
-            /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->dataIsValid();},
-            /*logger=*/(*logger_), /*joints=*/jointPtrs,
-            /*function_when_timeout=*/[this](march::Joint& joint) {
-                RCLCPP_ERROR((*logger_), "Joints %s is not receiving data", joint.getName().c_str());
-            });
-    RCLCPP_INFO((*logger_), "All slaves are sending EtherCAT data.");
+    try {
+        // Start ethercat cycle in the hardware
+        RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
+        march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
+        auto jointPtrs = march_robot_->getJoints();
+        RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
+        repeat_function_on_joints_until_timeout(
+                /*function_goal=*/"Waiting on ethercat data.",
+                /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->dataIsValid();},
+                /*logger=*/(*logger_), /*joints=*/jointPtrs,
+                /*function_when_timeout=*/[this](march::Joint& joint) {
+                    RCLCPP_ERROR((*logger_), "Joints %s is not receiving data", joint.getName().c_str());
+                });
+        RCLCPP_INFO((*logger_), "All slaves are sending EtherCAT data.");
 
-    // Read the first encoder values for each joint
-    for (JointInfo& jointInfo : joints_info_) {
-        jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+        // Read the first encoder values for each joint
+        for (JointInfo& jointInfo : joints_info_) {
+            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
 
-        // Set the first target as the current position
-        jointInfo.position = jointInfo.joint.getPosition();
-        jointInfo.velocity = 0;
-        jointInfo.effort_command = 0;
+            // Set the first target as the current position
+            jointInfo.position = jointInfo.joint.getPosition();
+            jointInfo.velocity = 0;
+            jointInfo.effort_command = 0;
+        }
+    } catch (const std::exception& e) {
+        RCLCPP_FATAL((*logger_), e.what());
+        throw;
     }
 
     RCLCPP_INFO((*logger_), "All joints are ready for reading!");
     status_ = hardware_interface::status::STARTED;
+    
     return hardware_interface::return_type::OK;
 }
 
@@ -204,12 +210,15 @@ MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::stri
     for (const auto& stop: stop_interfaces) {
         RCLCPP_INFO((*logger_), "Stopping interfaces: %s", stop.c_str());
     }
-
-    if (!start_interfaces.empty()) {
-        make_joints_operational(march_robot_->getNotOperationalJoints());
+    try {
+        if (!start_interfaces.empty()) {
+            make_joints_operational(march_robot_->getNotOperationalJoints());
+            joints_ready_for_actuation_ = true;
+        }
+    } catch (const std::exception& e) {
+        RCLCPP_FATAL((*logger_), e.what());
+        throw;
     }
-
-    joints_ready_for_actuation_ = true;
 
     return hardware_interface::return_type::OK;
 }
@@ -237,11 +246,16 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
     }
 
     repeat_function_on_joints_until_timeout(
-            /*function_goal=*/"Check if joints are  in operational state.",
+            /*function_goal=*/"Check if joints are in operational state.",
             /*function=*/[](march::Joint& joint) {return joint.getMotorController()->getState()->isOperational();},
             /*logger=*/(*logger_), /*joints=*/joints,
             /*function_when_timeout=*/[this](march::Joint& joint) {
-                RCLCPP_ERROR((*logger_), "Joint %s is not an operational state.", joint.getName().c_str());
+                RCLCPP_ERROR((*logger_), "Joint %s is not an operational state."
+                "\n\t\tExpected state '%s' but got state '%s'",
+                joint.getName().c_str(),
+                march::ODriveAxisState::toString(march::ODriveAxisState::CLOSED_LOOP_CONTROL).c_str(),
+                joint.getMotorController()->getState()->getOperationalState().c_str() 
+                );
             });
     RCLCPP_INFO((*logger_), "All joints ready for writing.");
 }
@@ -309,7 +323,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
         if (abs(effort_diff_with_previous) > jointInfo.limit.max_effort_differance) {
             // TODO: Change to better sign value.
-            converted_effort += jointInfo.effort_command_converted +
+            converted_effort = jointInfo.effort_command_converted +
                 std::clamp(effort_diff_with_previous, -jointInfo.limit.max_effort_differance,
                     jointInfo.limit.max_effort_differance);
             RCLCPP_WARN((*logger_), "Effort is increased with %g effort for %s, "
@@ -369,7 +383,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo &jointInfo) {
         RCLCPP_FATAL((*logger_), "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
                                  "\n\tposition: %g rad; %i IU."
                                  "\n\thard limit: [%i, %i]"
-                                 "\n\thard limit rad: [%i, %i]",
+                                 "\n\thard limit rad: [%g, %g]",
                      jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu,
                      abs_encoder->getLowerHardLimitIU(), abs_encoder->getUpperHardLimitIU(),
                      abs_encoder->positionIUToRadians(abs_encoder->getLowerHardLimitIU()),
