@@ -110,10 +110,10 @@ class PointHandler(ABC):
         )
 
         if time_difference > FOOT_LOCATION_TIME_OUT:
-            msg = (
+            error_msg = (
                 f"Foot location is more than {FOOT_LOCATION_TIME_OUT} seconds old, time difference is "
                 f"{readable_time_difference} seconds. Stopping gait."
             )
-            return True, msg
+            return True, error_msg
 
         return False, ""

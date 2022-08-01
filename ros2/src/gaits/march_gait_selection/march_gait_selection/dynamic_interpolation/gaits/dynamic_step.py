@@ -284,6 +284,7 @@ class DynamicStep:
             node.hip_x_fraction,
             node.upper_body_front_rotation,
             node.dorsiflexion_at_end_position,
+            node.hip_swing,
         )
 
     def _check_joint_limits(
