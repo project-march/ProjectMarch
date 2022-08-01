@@ -145,7 +145,7 @@ class GaitPreprocessor(Node):
 
         point.x = -foot_position.displacement.x + X_OFFSET
         point.y = foot_position.displacement.z + Y_OFFSET
-        point.z = 0.52
+        point.z = self._location_z
 
         return point
 
