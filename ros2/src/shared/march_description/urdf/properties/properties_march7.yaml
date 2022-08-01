@@ -75,51 +75,51 @@ joint_limits:
   # The upper and lower limits of the joints
   left_knee:
     unit: iu
-    lower_limit: 618048
-    upper_limit: 965792
-    zero_position: 638128
+    lower_limit: 616064
+    upper_limit: 965360
+    zero_position: 627152
     resolution: 20
   right_knee:
     unit: iu
-    lower_limit: 533392
-    upper_limit: 883152
-    zero_position: 545216
+    lower_limit: 532176
+    upper_limit: 883072
+    zero_position: 548320
     resolution: 20
   left_hfe:
     unit: iu
-    lower_limit: 91072
-    upper_limit: 453840
-    zero_position: 152312
+    lower_limit: 90080
+    upper_limit: 453920
+    zero_position: 153088
     resolution: 20
   right_hfe:
     unit: iu
-    lower_limit: 426784
-    upper_limit: 798560
-    zero_position: 486304
+    lower_limit: 426704
+    upper_limit: 798624
+    zero_position: 495792
     resolution: 20
   left_ankle:
     unit: iu
-    lower_limit: 3991
-    upper_limit: 5696
-    zero_position: 5077
+    lower_limit: 3607
+    upper_limit: 5957
+    zero_position: 5246
     resolution: 14
   right_ankle:
     unit: iu
-    lower_limit: 5771
-    upper_limit: 8083
-    zero_position: 7963
+    lower_limit: 5772
+    upper_limit: 7988
+    zero_position: 7386
     resolution: 14
   left_haa:
     unit: iu
-    lower_limit: 520
-    upper_limit: 1747
-    zero_position: 1062
+    lower_limit: 9360
+    upper_limit: 10392
+    zero_position: 9864
     resolution: 14
   right_haa:
     unit: iu
-    lower_limit: 9242
-    upper_limit: 10487
-    zero_position: 9904
+    lower_limit: 3973
+    upper_limit: 5009
+    zero_position: 4418
     resolution: 14
 safety:  # This is still copied from MV
   exoskeleton:
