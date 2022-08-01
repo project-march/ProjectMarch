@@ -106,11 +106,7 @@ class DynamicGaitStep(DynamicGaitWalk):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if self.subgait_id == "right_swing":
-            self.subgait_id = "left_swing"
-        elif self.subgait_id == "left_swing":
-            self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             self.subgait_id = "right_swing"
 

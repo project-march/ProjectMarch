@@ -302,11 +302,7 @@ class DynamicGaitWalk(GaitInterface):
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
-        if self.subgait_id == "right_swing":
-            self.subgait_id = "left_swing"
-        elif self.subgait_id == "left_swing":
-            self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             # If the gait has ended, the next command should be None
             return None
@@ -320,6 +316,13 @@ class DynamicGaitWalk(GaitInterface):
             return self.trajectory_command_factory.get_trajectory_command(
                 self.subgait_id, self.start_position_all_joints, stop=self._check_step_count()
             )
+
+    def _set_subgait_id(self) -> None:
+        """Switch subgait id to the opposite side."""
+        if self.subgait_id == "right_swing":
+            self.subgait_id = "left_swing"
+        elif self.subgait_id == "left_swing":
+            self.subgait_id = "right_swing"
 
     def update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
