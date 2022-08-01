@@ -301,6 +301,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             DeclareLaunchArgument(
                 name="hip_swing",
                 default_value=str(IKSolverParameters.hip_swing),
+                choices=["True", "False"],
                 description="Whether hip swing is enabled during walking.",
             ),
             # FAKE SENSOR DATA ARGUMENTS
