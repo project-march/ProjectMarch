@@ -131,8 +131,7 @@ class GaitPreprocessor(Node):
             duration=scaled_duration,
         )
 
-    @staticmethod
-    def _get_foot_position_in_gait_axes(foot_position: FootPosition) -> Point:
+    def _get_foot_position_in_gait_axes(self, foot_position: FootPosition) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
 
         Args:
