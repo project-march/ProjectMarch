@@ -10,14 +10,16 @@ from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 
-from march_utility.gait.edge_position import UnknownEdgePosition, EdgePosition
+from march_utility.gait.edge_position import UnknownEdgePosition, EdgePosition, StaticEdgePosition
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.exceptions.gait_exceptions import GaitError
 
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
-from std_msgs.msg import Header
+from std_msgs.msg import Header, Bool
+
+from march_utility.utilities.utility_functions import get_joint_names_from_urdf, get_position_from_yaml
 
 
 class GaitStateMachine:
@@ -44,11 +46,13 @@ class GaitStateMachine:
         _accepted_gait (bool): whether a gait has been accepted
         _executing_gait (bool): whether the accepted gait has started executing
         _previous_gait (Gait): instance of the gait class that has previously been executed
+        _eeg_on_off_pub (rclpy.Publisher): Publishes if eeg is being used.
         _current_state_pub (rclpy.Publisher): publisher to publish on the current state topic
         _current_gait_pub (rclpy.Publisher): publisher to publish on the current gait topic
         _error_sub (rclpy.Subscriber): subscriber of /march/error topic
         _get_possible_gaits_client (rclpy.Service): service to send possible gaits to input device
         _update_timer (rclpy.Timer): timer on which the update method is called
+        _eeg (bool): Whether EEG is being used or not.
     """
 
     _update_timer: Timer
@@ -64,12 +68,29 @@ class GaitStateMachine:
         self._positions = positions
         self._previous_gait = None
 
+        actuating_joint_names = get_joint_names_from_urdf()
+        home_stand_position_all_joints = get_position_from_yaml("stand")
+        self._home_stand_position = StaticEdgePosition(
+            {name: home_stand_position_all_joints[name] for name in actuating_joint_names}
+        )
+
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._input = StateMachineInput(node)
         self._timer_period = self._node.get_parameter("timer_period").get_parameter_value().double_value
         self._last_end_position = UnknownEdgePosition()
         self._reset_attributes()
 
+        self._node.create_subscription(
+            msg_type=Bool,
+            topic="/march/eeg/on_off",
+            qos_profile=DEFAULT_HISTORY_DEPTH,
+            callback=self._update_eeg,
+        )
+        self._eeg_on_off_pub = self._node.create_publisher(
+            msg_type=Bool,
+            topic="/march/eeg/on_off",
+            qos_profile=DEFAULT_HISTORY_DEPTH,
+        )
         self._current_state_pub = self._node.create_publisher(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
@@ -101,6 +122,8 @@ class GaitStateMachine:
         self._is_stopping = False
         self._accepted_gait = False
         self._executing_gait = False
+        self._eeg = False
+        self._eeg_on_off_pub.publish(Bool(data=self._eeg))
 
     def run(self) -> None:
         """Runs the state machine until shutdown is requested."""
@@ -202,6 +225,8 @@ class GaitStateMachine:
         if self._is_stop_requested() and not self._is_stopping:
             self._should_stop = False
             self._is_stopping = True
+            self._eeg = False
+            self._eeg_on_off_pub.publish(Bool(data=self._eeg))
             if self._current_gait.stop():
                 self._logger.info(f"Gait {self._current_gait.name} responded to stop")
                 self._input.stop_accepted()
@@ -342,10 +367,14 @@ class GaitStateMachine:
             response (PossibleGaits): PossibleGaits message to return at service request
         """
         possible_gaits = []
-        if not self._accepted_gait:
+        if self._eeg:
+            possible_gaits = ["eeg"]
+        elif not self._accepted_gait:
             for gait in self._gaits.values():
                 if self._last_end_position == gait.starting_position:
                     possible_gaits.append(gait.name)
+                elif self._last_end_position == self._home_stand_position:
+                    possible_gaits.append("eeg")
 
         response.gaits = possible_gaits
         return response
@@ -362,3 +391,7 @@ class GaitStateMachine:
                     gait.update_parameters()
         elif gait_name in self._gaits and isinstance(self._gaits[gait_name], DynamicGaitWalk):
             self._gaits[gait_name].update_parameters()
+
+    def _update_eeg(self, msg: Bool) -> None:
+        """Update if EEG to true or false. If true, only EEG and stop will be possible."""
+        self._eeg = msg.data

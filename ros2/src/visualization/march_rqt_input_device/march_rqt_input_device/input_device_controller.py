@@ -3,7 +3,7 @@ import getpass
 import socket
 
 from rclpy import Future
-from std_msgs.msg import Header, String
+from std_msgs.msg import Header, String, Bool
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
 from march_shared_msgs.srv import PossibleGaits
@@ -46,6 +46,11 @@ class InputDeviceController:
             topic="/march/step_and_hold/start_side",
             qos_profile=10,
         )
+        self._eeg_on_off_pub = self._node.create_publisher(
+            msg_type=Bool,
+            topic="/march/eeg/on_off",
+            qos_profile=1,
+        )
         self._instruction_response_pub = self._node.create_subscription(
             msg_type=GaitInstructionResponse,
             topic="/march/input_device/instruction_response",
@@ -67,6 +72,7 @@ class InputDeviceController:
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
+        self.eeg = False
         self._possible_gaits = []
 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
@@ -246,6 +252,11 @@ class InputDeviceController:
                 id=str(self._id),
             )
         )
+
+    def publish_eeg_on_off(self) -> None:
+        """Publish eeg on if its off and off if it is on."""
+        self._eeg_on_off_pub.publish(Bool(data=(not self.eeg)))
+        self.eeg = not self.eeg
 
     def publish_small_narrow(self) -> None:
         """Publish a small_narrow gait on the step_and_hold topic."""

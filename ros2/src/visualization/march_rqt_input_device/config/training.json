@@ -47,16 +47,17 @@
       "name": "sit"
     },
     {
-    "name": "error",
-      "callback": "publish_error",
-      "always_enabled": true
+      "name": "eeg",
+      "callback": "publish_eeg_on_off"
     }
   ],
   [
     {
-      "name": "dynamic_step_and_hold"
+      "name": "error",
+      "callback": "publish_error",
+      "always_enabled": true
     },
-    {
+  {
       "name": "stepping_stones_step_and_close"
     },
     {
