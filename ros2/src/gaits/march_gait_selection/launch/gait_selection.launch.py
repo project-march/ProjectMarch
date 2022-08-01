@@ -134,6 +134,11 @@ def generate_launch_description():
                 description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
                 "if it is set to zero.",
             ),
+            DeclareLaunchArgument(
+                name="hip_swing",
+                default_value=str(IKSolverParameters.hip_swing),
+                description="Whether hip swing is enabled during walking.",
+            ),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -164,6 +169,7 @@ def generate_launch_description():
                     {"hip_x_fraction": LaunchConfiguration("hip_x_fraction")},
                     {"upper_body_front_rotation": LaunchConfiguration("upper_body_front_rotation")},
                     {"dorsiflexion_at_end_position": LaunchConfiguration("dorsiflexion_at_end_position")},
+                    {"hip_swing": LaunchConfiguration("hip_swing")},
                 ],
                 on_exit=Shutdown(),
             ),

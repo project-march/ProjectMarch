@@ -43,7 +43,10 @@ def generate_launch_description() -> LaunchDescription:
                 output="screen",
                 parameters=[
                     LaunchConfiguration("config_path"),
-                    {"use_sim_time": LaunchConfiguration("use_sim_time")},
+                    {
+                        "use_sim_time": LaunchConfiguration("use_sim_time"),
+                        "simulation": LaunchConfiguration("simulation"),
+                    },
                 ],
                 # If this node exits, the entire system is shutdown
                 # This is the ROS2 equivalent of required:=true
