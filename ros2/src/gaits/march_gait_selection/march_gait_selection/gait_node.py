@@ -92,6 +92,8 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.upper_body_front_rotation = param.get_parameter_value().double_value
         elif param.name == "dorsiflexion_at_end_position":
             node.dorsiflexion_at_end_position = param.get_parameter_value().double_value
+        elif param.name == "hip_swing":
+            node.hip_swing = param.get_parameter_value().bool_value
 
     gait_state_machine.update_parameters()
     node._logger.info(f"{param.name} set to {param.value}.")
@@ -137,6 +139,7 @@ class GaitNode(Node):
             self.dorsiflexion_at_end_position = (
                 self.get_parameter("dorsiflexion_at_end_position").get_parameter_value().double_value
             )
+            self.hip_swing = self.get_parameter("hip_swing").get_parameter_value().bool_value
 
         except ParameterNotDeclaredException:
             self._logger.error("Gait node started without the required parameters.")

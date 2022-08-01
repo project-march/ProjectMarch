@@ -91,6 +91,14 @@ class Pose:
             max(JOINT_LIMITS["left_hip_fe"].lower, JOINT_LIMITS["right_hip_fe"].lower)
             + self._parameters.hip_buffer_radians
         )
+        self._max_hip_abduction = (
+            min(JOINT_LIMITS["left_hip_aa"].upper, JOINT_LIMITS["right_hip_aa"].upper)
+            - self._parameters.hip_buffer_radians
+        )
+        self._max_hip_adduction = (
+            max(JOINT_LIMITS["left_hip_aa"].lower, JOINT_LIMITS["right_hip_aa"].lower)
+            + self._parameters.hip_buffer_radians
+        )
 
         if pose is None:
             angle_ankle, angle_hip, angle_knee = self.leg_length_angles(self.max_leg_length)
@@ -703,9 +711,14 @@ class Pose:
         # Lift toes of swing leg as much as possible:
         self.fe_ankle2 = self._max_ankle_dorsi_flexion
 
-        # Set hip_aa to average of start and end pose:
-        self.aa_hip1 = current_hip_aa_1 * (1 - frac) + next_pose.aa_hip1 * frac
-        self.aa_hip2 = current_hip_aa_2 * (1 - frac) + next_pose.aa_hip2 * frac
+        # Add hip_swing or set hip_aa to average of start and end pose:
+        if self._parameters.hip_swing:
+            max_hip_swing = min(abs(self._max_hip_abduction), abs(self._max_hip_adduction))
+            self.aa_hip1 = max_hip_swing
+            self.aa_hip2 = -max_hip_swing
+        else:
+            self.aa_hip1 = current_hip_aa_1 * (1 - frac) + next_pose.aa_hip1 * frac
+            self.aa_hip2 = current_hip_aa_2 * (1 - frac) + next_pose.aa_hip2 * frac
 
         # Create a list of the pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right

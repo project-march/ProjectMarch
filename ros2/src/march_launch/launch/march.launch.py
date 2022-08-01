@@ -90,6 +90,7 @@ def generate_launch_description() -> LaunchDescription:
     hip_x_fraction = LaunchConfiguration("hip_x_fraction")
     upper_body_front_rotation = LaunchConfiguration("upper_body_front_rotation")
     dorsiflexion_at_end_position = LaunchConfiguration("dorsiflexion_at_end_position")
+    hip_swing = LaunchConfiguration("hip_swing")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -318,6 +319,12 @@ def generate_launch_description() -> LaunchDescription:
                 description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
                 "if it is set to zero.",
             ),
+            DeclareLaunchArgument(
+                name="hip_swing",
+                default_value=str(IKSolverParameters.hip_swing),
+                choices=["true", "false"],
+                description="Whether hip swing is enabled during walking.",
+            ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
                 name="fake_sensor_data",
@@ -462,6 +469,7 @@ def generate_launch_description() -> LaunchDescription:
                     ("hip_x_fraction", hip_x_fraction),
                     ("upper_body_front_rotation", upper_body_front_rotation),
                     ("dorsiflexion_at_end_position", dorsiflexion_at_end_position),
+                    ("hip_swing", hip_swing),
                 ],
             ),
             # Gait preprocessor
