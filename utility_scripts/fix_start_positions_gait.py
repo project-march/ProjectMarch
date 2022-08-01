@@ -17,7 +17,7 @@ old_stand_position_start = {
         "velocity": 0.0,
     },
     "left_hip_aa": {
-        "position": 0.0,
+        "position": -0.05,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -37,7 +37,7 @@ old_stand_position_start = {
         "velocity": 0.0,
     },
     "right_hip_aa": {
-        "position": 0.0,
+        "position": -0.05,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -56,12 +56,12 @@ old_stand_position_end = copy.deepcopy(old_stand_position_start)
 
 new_stand_position_start = {
     "left_ankle": {
-        "position": 0.05,
+        "position": 0.07,
         "time_from_start": 0,
         "velocity": 0.0,
     },
     "left_hip_aa": {
-        "position": -0.05,
+        "position": -0.025,
         "time_from_start": 0,
         "velocity": 0.0,
     },
@@ -76,12 +76,12 @@ new_stand_position_start = {
         "velocity": 0.0,
     },
     "right_ankle": {
-        "position": 0.05,
+        "position": 0.07,
         "time_from_start": 0,
         "velocity": 0.0,
     },
     "right_hip_aa": {
-        "position": -0.05,
+        "position": -0.025,
         "time_from_start": 0,
         "velocity": 0.0,
     },
