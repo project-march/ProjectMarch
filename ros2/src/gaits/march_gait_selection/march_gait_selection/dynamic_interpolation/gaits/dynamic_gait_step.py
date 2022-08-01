@@ -93,7 +93,7 @@ class DynamicGaitStep(DynamicGaitWalk):
         elif current_time >= self.start_time_next_command and self._has_gait_started:
             self._scheduled_early = True
             self._final_position_pub.publish(
-                JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
+                JointState(position=self.trajectory_command_factory.final_position.values())
             )
             return self._update_state_machine()
 
@@ -106,21 +106,15 @@ class DynamicGaitStep(DynamicGaitWalk):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if not self.trajectory_command_factory.has_trajectory_failed():
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             self.subgait_id = "right_swing"
 
         return GaitUpdate.finished()
 
-    def set_state_to_unknown(self) -> None:
-        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown."""
+    def reset_start_position_to_home_stand(self) -> None:
+        """Resets the subgait_id, and position_queue after a force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"
-        self.trajectory_command_factory.set_trajectory_failed_false()
         self.position_queue = Queue()
         self.trajectory_command_factory.fill_queue()
