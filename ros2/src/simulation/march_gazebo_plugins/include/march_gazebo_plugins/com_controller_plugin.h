@@ -31,5 +31,4 @@ private:
 GZ_REGISTER_MODEL_PLUGIN(ComControllerPlugin)
 } // namespace gazebo
 
-
 #endif // MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H

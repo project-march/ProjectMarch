@@ -35,8 +35,7 @@
 #ifndef CONTROL_TOOLBOX__SINUSOID_HPP_
 #define CONTROL_TOOLBOX__SINUSOID_HPP_
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 /**
  * \class Sinusoid
  * \brief A basic sine class
@@ -45,51 +44,50 @@ namespace control_toolbox
  * phase, frequency and offset.<br>
  *
  */
-class Sinusoid
-{
+class Sinusoid {
 public:
-  /**
-   * \brief Constructor
-   */
-  Sinusoid();
+    /**
+     * \brief Constructor
+     */
+    Sinusoid();
 
-  /**
-   * \brief Constructor which initializes values
-   *
-   * \param offset A DC offset to be added to the sine wave
-   * \param amplitude Amplitude of the sine wave
-   * \param frequency Frequency of the sine wave
-   * \param phase Phase (in radians) of the sine wave at t=0
-   */
-  Sinusoid(double offset, double amplitude, double frequency, double phase);
+    /**
+     * \brief Constructor which initializes values
+     *
+     * \param offset A DC offset to be added to the sine wave
+     * \param amplitude Amplitude of the sine wave
+     * \param frequency Frequency of the sine wave
+     * \param phase Phase (in radians) of the sine wave at t=0
+     */
+    Sinusoid(double offset, double amplitude, double frequency, double phase);
 
-  /**
-   * Destructor
-   */
-  virtual ~Sinusoid();
+    /**
+     * Destructor
+     */
+    virtual ~Sinusoid();
 
-  /**
-   * Prints the parameters of the sine wave to stdout (for debugging)
-   */
-  void debug();
+    /**
+     * Prints the parameters of the sine wave to stdout (for debugging)
+     */
+    void debug();
 
-  /**
-   * \brief Gets the value and derivatives of the sinusoid at a given time
-   *
-   * \param time Time at which to sample the sine wave
-   * \param qd (output) The derivative of the sine wave
-   * \param qdd (output) Second derivative of the sine wave
-   * \return The sampled value of the sine wave
-   */
-  double update(double time, double & qd, double & qdd);
+    /**
+     * \brief Gets the value and derivatives of the sinusoid at a given time
+     *
+     * \param time Time at which to sample the sine wave
+     * \param qd (output) The derivative of the sine wave
+     * \param qdd (output) Second derivative of the sine wave
+     * \return The sampled value of the sine wave
+     */
+    double update(double time, double& qd, double& qdd);
 
 private:
-  double offset_;    /**< DC offset of the sine wave. */
-  double amplitude_; /**< Amplitude of the sine wave. */
-  double frequency_; /**< Frequency of the sine wave. */
-  double phase_;     /**< Phase of the sine wave at t=0. */
+    double offset_; /**< DC offset of the sine wave. */
+    double amplitude_; /**< Amplitude of the sine wave. */
+    double frequency_; /**< Frequency of the sine wave. */
+    double phase_; /**< Phase of the sine wave at t=0. */
 };
 
-}  // namespace control_toolbox
+} // namespace control_toolbox
 
-#endif  // CONTROL_TOOLBOX__SINUSOID_HPP_
+#endif // CONTROL_TOOLBOX__SINUSOID_HPP_

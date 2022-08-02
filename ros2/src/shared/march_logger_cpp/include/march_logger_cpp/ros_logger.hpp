@@ -11,7 +11,7 @@
 namespace march_logger {
 class RosLogger : public BaseLogger {
 public:
-    //NOLINTNEXTLINE(hicpp-explicit-conversions) This is intended behavior.
+    // NOLINTNEXTLINE(hicpp-explicit-conversions) This is intended behavior.
     RosLogger(const std::shared_ptr<rclcpp::Logger>& rclcpp_logger);
 
     void debug(const std::string& msg) const override;

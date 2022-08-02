@@ -35,8 +35,7 @@
 
 #include <rclcpp/duration.hpp>
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 /***************************************************/
 /*! \class SineSweep
     \brief Generates a sine sweep for frequency analysis of a joint
@@ -55,40 +54,39 @@ namespace control_toolbox
 */
 /***************************************************/
 
-class SineSweep
-{
+class SineSweep {
 public:
-  /*!
-   * \brief Constructor
-   */
-  SineSweep();
+    /*!
+     * \brief Constructor
+     */
+    SineSweep();
 
-  /*!
-   * \brief Update the SineSweep loop with nonuniform time step size.
-   *
-   * \param dt Change in time since last call
-   */
-  double update(rclcpp::Duration dt);
+    /*!
+     * \brief Update the SineSweep loop with nonuniform time step size.
+     *
+     * \param dt Change in time since last call
+     */
+    double update(rclcpp::Duration dt);
 
-  /*!
-   * \brief Initializes everything and calculates the constants for the sweep.
-   *
-   * \param start_freq  Start frequency of the sweep, \f$\omega_1\f$ .
-   * \param end_freq  End frequency of the sweep, \f$\omega_2\f$.
-   * \param duration  The duration of the sweep, \f$T\f$.
-   * \param amplitude The amplitude of the sweep, \f$A\f$.
-   */
-  bool init(double start_freq, double end_freq, double duration, double amplitude);
+    /*!
+     * \brief Initializes everything and calculates the constants for the sweep.
+     *
+     * \param start_freq  Start frequency of the sweep, \f$\omega_1\f$ .
+     * \param end_freq  End frequency of the sweep, \f$\omega_2\f$.
+     * \param duration  The duration of the sweep, \f$T\f$.
+     * \param amplitude The amplitude of the sweep, \f$A\f$.
+     */
+    bool init(double start_freq, double end_freq, double duration, double amplitude);
 
 private:
-  double amplitude_;          /**< Amplitude of the sweep. */
-  rclcpp::Duration duration_; /**< Duration of the sweep. */
-  double start_angular_freq_; /**< Start angular frequency of the sweep. */
-  double end_angular_freq_;   /**< End angular frequency of the sweep. */
-  double K_;                  /**< Constant \f$K\f$. */
-  double L_;                  /**< Constant \f$L\f$.*/
-  double cmd_;                /**< Command to send. */
+    double amplitude_; /**< Amplitude of the sweep. */
+    rclcpp::Duration duration_; /**< Duration of the sweep. */
+    double start_angular_freq_; /**< Start angular frequency of the sweep. */
+    double end_angular_freq_; /**< End angular frequency of the sweep. */
+    double K_; /**< Constant \f$K\f$. */
+    double L_; /**< Constant \f$L\f$.*/
+    double cmd_; /**< Command to send. */
 };
-}  // namespace control_toolbox
+} // namespace control_toolbox
 
-#endif  // CONTROL_TOOLBOX__SINE_SWEEP_HPP_
+#endif // CONTROL_TOOLBOX__SINE_SWEEP_HPP_

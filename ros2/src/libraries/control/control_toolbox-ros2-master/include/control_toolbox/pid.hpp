@@ -45,8 +45,7 @@
 
 #include "control_toolbox/visibility_control.hpp"
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 /***************************************************/
 /*! \class Pid
   \brief A basic pid class.
@@ -105,194 +104,205 @@ namespace control_toolbox
 */
 /***************************************************/
 
-class CONTROL_TOOLBOX_PUBLIC Pid
-{
+class CONTROL_TOOLBOX_PUBLIC Pid {
 public:
-  /*!
-   * \brief Store gains in a struct to allow easier realtime buffer usage
-   */
-  struct Gains
-  {
-    // Optional constructor for passing in values without antiwindup
-    Gains(double p, double i, double d, double i_max, double i_min)
-    : p_gain_(p), i_gain_(i), d_gain_(d), i_max_(i_max), i_min_(i_min), antiwindup_(false)
+    /*!
+     * \brief Store gains in a struct to allow easier realtime buffer usage
+     */
+    struct Gains {
+        // Optional constructor for passing in values without antiwindup
+        Gains(double p, double i, double d, double i_max, double i_min)
+            : p_gain_(p)
+            , i_gain_(i)
+            , d_gain_(d)
+            , i_max_(i_max)
+            , i_min_(i_min)
+            , antiwindup_(false)
+        {
+        }
+        // Optional constructor for passing in values
+        Gains(double p, double i, double d, double i_max, double i_min, bool antiwindup)
+            : p_gain_(p)
+            , i_gain_(i)
+            , d_gain_(d)
+            , i_max_(i_max)
+            , i_min_(i_min)
+            , antiwindup_(antiwindup)
+        {
+        }
+        // Default constructor
+        Gains()
+            : p_gain_(0.0)
+            , i_gain_(0.0)
+            , d_gain_(0.0)
+            , i_max_(0.0)
+            , i_min_(0.0)
+            , antiwindup_(false)
+        {
+        }
+        double p_gain_; /**< Proportional gain. */
+        double i_gain_; /**< Integral gain. */
+        double d_gain_; /**< Derivative gain. */
+        double i_max_; /**< Maximum allowable integral term. */
+        double i_min_; /**< Minimum allowable integral term. */
+        bool antiwindup_; /**< Antiwindup. */
+    };
+
+    /*!
+     * \brief Constructor, zeros out Pid values when created and
+     *        initialize Pid-gains and integral term limits.
+     *        Does not initialize dynamic reconfigure for PID gains
+     *
+     * \param p The proportional gain.
+     * \param i The integral gain.
+     * \param d The derivative gain.
+     * \param i_max The max integral windup.
+     * \param i_min The min integral windup.
+     */
+    Pid(double p = 0.0, double i = 0.0, double d = 0.0, double i_max = 0.0, double i_min = -0.0,
+        bool antiwindup = false);
+
+    /**
+     * \brief Copy constructor required for preventing mutexes from being copied
+     * \param source - Pid to copy
+     */
+    Pid(const Pid& source);
+
+    /*!
+     * \brief Destructor of Pid class.
+     */
+    ~Pid();
+
+    /*!
+     * \brief Zeros out Pid values and initialize Pid-gains and integral term limits
+     *        Does not initialize the node's parameter interface for PID gains
+     *
+     * \param p The proportional gain.
+     * \param i The integral gain.
+     * \param d The derivative gain.
+     * \param i_max The max integral windup.
+     * \param i_min The min integral windup.
+     */
+    void initPid(double p, double i, double d, double i_max, double i_min, bool antiwindup = false);
+
+    /*!
+     * \brief Reset the state of this PID controller
+     */
+    void reset();
+
+    /*!
+     * \brief Get PID gains for the controller.
+     * \param p The proportional gain.
+     * \param i The integral gain.
+     * \param d The derivative gain.
+     * \param i_max The max integral windup.
+     * \param i_min The min integral windup.
+     */
+    void getGains(double& p, double& i, double& d, double& i_max, double& i_min);
+    void getGains(double& p, double& i, double& d, double& i_max, double& i_min, bool& antiwindup);
+
+    /*!
+     * \brief Get PID gains for the controller.
+     * \return gains A struct of the PID gain values
+     */
+    Gains getGains();
+
+    /*!
+     * \brief Set PID gains for the controller.
+     * \param p The proportional gain.
+     * \param i The integral gain.
+     * \param d The derivative gain.
+     * \param i_max The max integral windup.
+     * \param i_min The min integral windup.
+     */
+    void setGains(double p, double i, double d, double i_max, double i_min, bool antiwindup = false);
+
+    /*!
+     * \brief Set PID gains for the controller.
+     * \param gains A struct of the PID gain values
+     */
+    void setGains(const Gains& gains);
+
+    /*!
+     * \brief Set the PID error and compute the PID command with nonuniform time
+     * step size. The derivative error is computed from the change in the error
+     * and the timestep \c dt.
+     *
+     * \param error  Error since last call (error = target - state)
+     * \param dt Change in time since last call in nanoseconds
+     *
+     * \returns PID command
+     */
+    double computeCommand(double error, uint64_t dt);
+
+    /*!
+     * \brief Set the PID error and compute the PID command with nonuniform
+     * time step size. This also allows the user to pass in a precomputed
+     * derivative error.
+     *
+     * \param error Error since last call (error = target - state)
+     * \param error_dot d(Error)/dt since last call
+     * \param dt Change in time since last call in nanoseconds
+     *
+     * \returns PID command
+     */
+    double computeCommand(double error, double error_dot, uint64_t dt);
+
+    /*!
+     * \brief Set current command for this PID controller
+     */
+    void setCurrentCmd(double cmd);
+
+    /*!
+     * \brief Return current command for this PID controller
+     */
+    double getCurrentCmd();
+
+    /*!
+     * \brief Return derivative error
+     */
+    double getDerivativeError();
+
+    /*!
+     * \brief Return PID error terms for the controller.
+     * \param pe  The proportional error.
+     * \param ie  The integral error.
+     * \param de  The derivative error.
+     */
+    void getCurrentPIDErrors(double& pe, double& ie, double& de);
+
+    /*!
+     * @brief Custom assignment operator
+     *        Does not initialize dynamic reconfigure for PID gains
+     */
+    Pid& operator=(const Pid& source)
     {
+        if (this == &source) {
+            return *this;
+        }
+
+        // Copy the realtime buffer to then new PID class
+        gains_buffer_ = source.gains_buffer_;
+
+        // Reset the state of this PID controller
+        reset();
+
+        return *this;
     }
-    // Optional constructor for passing in values
-    Gains(double p, double i, double d, double i_max, double i_min, bool antiwindup)
-    : p_gain_(p), i_gain_(i), d_gain_(d), i_max_(i_max), i_min_(i_min), antiwindup_(antiwindup)
-    {
-    }
-    // Default constructor
-    Gains()
-    : p_gain_(0.0), i_gain_(0.0), d_gain_(0.0), i_max_(0.0), i_min_(0.0), antiwindup_(false)
-    {
-    }
-    double p_gain_;   /**< Proportional gain. */
-    double i_gain_;   /**< Integral gain. */
-    double d_gain_;   /**< Derivative gain. */
-    double i_max_;    /**< Maximum allowable integral term. */
-    double i_min_;    /**< Minimum allowable integral term. */
-    bool antiwindup_; /**< Antiwindup. */
-  };
-
-  /*!
-   * \brief Constructor, zeros out Pid values when created and
-   *        initialize Pid-gains and integral term limits.
-   *        Does not initialize dynamic reconfigure for PID gains
-   *
-   * \param p The proportional gain.
-   * \param i The integral gain.
-   * \param d The derivative gain.
-   * \param i_max The max integral windup.
-   * \param i_min The min integral windup.
-   */
-  Pid(
-    double p = 0.0, double i = 0.0, double d = 0.0, double i_max = 0.0, double i_min = -0.0,
-    bool antiwindup = false);
-
-  /**
-   * \brief Copy constructor required for preventing mutexes from being copied
-   * \param source - Pid to copy
-   */
-  Pid(const Pid & source);
-
-  /*!
-   * \brief Destructor of Pid class.
-   */
-  ~Pid();
-
-  /*!
-   * \brief Zeros out Pid values and initialize Pid-gains and integral term limits
-   *        Does not initialize the node's parameter interface for PID gains
-   *
-   * \param p The proportional gain.
-   * \param i The integral gain.
-   * \param d The derivative gain.
-   * \param i_max The max integral windup.
-   * \param i_min The min integral windup.
-   */
-  void initPid(double p, double i, double d, double i_max, double i_min, bool antiwindup = false);
-
-  /*!
-   * \brief Reset the state of this PID controller
-   */
-  void reset();
-
-  /*!
-   * \brief Get PID gains for the controller.
-   * \param p The proportional gain.
-   * \param i The integral gain.
-   * \param d The derivative gain.
-   * \param i_max The max integral windup.
-   * \param i_min The min integral windup.
-   */
-  void getGains(double & p, double & i, double & d, double & i_max, double & i_min);
-  void getGains(
-    double & p, double & i, double & d, double & i_max, double & i_min, bool & antiwindup);
-
-  /*!
-   * \brief Get PID gains for the controller.
-   * \return gains A struct of the PID gain values
-   */
-  Gains getGains();
-
-  /*!
-   * \brief Set PID gains for the controller.
-   * \param p The proportional gain.
-   * \param i The integral gain.
-   * \param d The derivative gain.
-   * \param i_max The max integral windup.
-   * \param i_min The min integral windup.
-   */
-  void setGains(double p, double i, double d, double i_max, double i_min, bool antiwindup = false);
-
-  /*!
-   * \brief Set PID gains for the controller.
-   * \param gains A struct of the PID gain values
-   */
-  void setGains(const Gains & gains);
-
-  /*!
-   * \brief Set the PID error and compute the PID command with nonuniform time
-   * step size. The derivative error is computed from the change in the error
-   * and the timestep \c dt.
-   *
-   * \param error  Error since last call (error = target - state)
-   * \param dt Change in time since last call in nanoseconds
-   *
-   * \returns PID command
-   */
-  double computeCommand(double error, uint64_t dt);
-
-  /*!
-   * \brief Set the PID error and compute the PID command with nonuniform
-   * time step size. This also allows the user to pass in a precomputed
-   * derivative error.
-   *
-   * \param error Error since last call (error = target - state)
-   * \param error_dot d(Error)/dt since last call
-   * \param dt Change in time since last call in nanoseconds
-   *
-   * \returns PID command
-   */
-  double computeCommand(double error, double error_dot, uint64_t dt);
-
-  /*!
-   * \brief Set current command for this PID controller
-   */
-  void setCurrentCmd(double cmd);
-
-  /*!
-   * \brief Return current command for this PID controller
-   */
-  double getCurrentCmd();
-
-  /*!
-   * \brief Return derivative error
-   */
-  double getDerivativeError();
-
-  /*!
-   * \brief Return PID error terms for the controller.
-   * \param pe  The proportional error.
-   * \param ie  The integral error.
-   * \param de  The derivative error.
-   */
-  void getCurrentPIDErrors(double & pe, double & ie, double & de);
-
-  /*!
-   * @brief Custom assignment operator
-   *        Does not initialize dynamic reconfigure for PID gains
-   */
-  Pid & operator=(const Pid & source)
-  {
-    if (this == &source) {
-      return *this;
-    }
-
-    // Copy the realtime buffer to then new PID class
-    gains_buffer_ = source.gains_buffer_;
-
-    // Reset the state of this PID controller
-    reset();
-
-    return *this;
-  }
 
 private:
-  // Store the PID gains in a realtime buffer to allow dynamic reconfigure to update it without
-  // blocking the realtime update loop
-  realtime_tools::RealtimeBuffer<Gains> gains_buffer_;
+    // Store the PID gains in a realtime buffer to allow dynamic reconfigure to update it without
+    // blocking the realtime update loop
+    realtime_tools::RealtimeBuffer<Gains> gains_buffer_;
 
-  double p_error_last_; /**< _Save position state for derivative state calculation. */
-  double p_error_;      /**< Position error. */
-  double i_error_;      /**< Integral of position error. */
-  double d_error_;      /**< Derivative of position error. */
-  double cmd_;          /**< Command to send. */
-  double error_dot_;    /**< Derivative error */
+    double p_error_last_; /**< _Save position state for derivative state calculation. */
+    double p_error_; /**< Position error. */
+    double i_error_; /**< Integral of position error. */
+    double d_error_; /**< Derivative of position error. */
+    double cmd_; /**< Command to send. */
+    double error_dot_; /**< Derivative error */
 };
 
-}  // namespace control_toolbox
+} // namespace control_toolbox
 
-#endif  // CONTROL_TOOLBOX__PID_HPP_
+#endif // CONTROL_TOOLBOX__PID_HPP_

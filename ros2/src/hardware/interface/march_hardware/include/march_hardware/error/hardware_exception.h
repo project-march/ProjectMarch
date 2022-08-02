@@ -65,26 +65,24 @@ namespace error {
             return ss.str();
         }
 
-
-        //NOLINTBEGIN Error about runtime exception if one of args is not c_str().
+        // NOLINTBEGIN Error about runtime exception if one of args is not c_str().
         // If possible this should be checked and caught.
         template <typename... Args> std::string createDescription(const std::string& format, Args... args)
         {
-            #ifdef __clang_analyzer__
+#ifdef __clang_analyzer__
             return "This is only to disable the clang analyzer and should never be actually implemented";
-            #endif
-            #ifndef __clang_analyzer__
+#endif
+#ifndef __clang_analyzer__
             const size_t size = std::snprintf(
                 /*__s=*/nullptr, /*__maxlen=*/0, format.c_str(), args...);
 
             std::vector<char> buffer(size + 1); // note +1 for null terminator
             std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
             return this->createDescription(std::string(buffer.data(), size));
-            #endif
+#endif
         }
 
-        //NOLINTEND
-
+        // NOLINTEND
     };
 
     class NotImplemented : public std::logic_error {

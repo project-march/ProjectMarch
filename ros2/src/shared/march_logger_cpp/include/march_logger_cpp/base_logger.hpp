@@ -59,7 +59,7 @@ public:
     template <typename... Args> static std::string fstring(const std::string& format, Args... args)
     {
         // Extra space for '\0' the null terminator.
-        const size_t size = std::snprintf( /*__s=*/nullptr, /*__maxlen=*/0, format.c_str(), args...) + 1;
+        const size_t size = std::snprintf(/*__s=*/nullptr, /*__maxlen=*/0, format.c_str(), args...) + 1;
         if (size <= 0) {
             throw std::runtime_error("Error during formatting.");
         }

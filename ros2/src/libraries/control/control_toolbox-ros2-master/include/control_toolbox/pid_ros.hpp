@@ -48,185 +48,176 @@
 #include "control_toolbox/pid.hpp"
 #include "control_toolbox/visibility_control.hpp"
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 
-class CONTROL_TOOLBOX_PUBLIC PidROS
-{
+class CONTROL_TOOLBOX_PUBLIC PidROS {
 public:
-  /*!
-   * \brief Constructor of PidROS class.
-   *
-   * The node is passed to this class to handler the ROS parameters, this class allows
-   * to add a prefix to the pid parameters
-   *
-   * \param node ROS node
-   * \param topic_prefix prefix to add to the pid parameters.
-   */
-  template<class NodeT>
-  explicit PidROS(std::shared_ptr<NodeT> node_ptr, std::string topic_prefix = std::string(""))
-  : PidROS(
-      node_ptr->get_node_base_interface(),
-      node_ptr->get_node_logging_interface(),
-      node_ptr->get_node_parameters_interface(),
-      node_ptr->get_node_topics_interface(),
-      topic_prefix)
-  {
-  }
+    /*!
+     * \brief Constructor of PidROS class.
+     *
+     * The node is passed to this class to handler the ROS parameters, this class allows
+     * to add a prefix to the pid parameters
+     *
+     * \param node ROS node
+     * \param topic_prefix prefix to add to the pid parameters.
+     */
+    template <class NodeT>
+    explicit PidROS(std::shared_ptr<NodeT> node_ptr, std::string topic_prefix = std::string(""))
+        : PidROS(node_ptr->get_node_base_interface(), node_ptr->get_node_logging_interface(),
+            node_ptr->get_node_parameters_interface(), node_ptr->get_node_topics_interface(), topic_prefix)
+    {
+    }
 
-  PidROS(
-    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base,
-    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging,
-    rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_params,
-    rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr topics_interface,
-    std::string topic_prefix = std::string(""))
-  : node_base_(node_base),
-    node_logging_(node_logging),
-    node_params_(node_params),
-    topics_interface_(topics_interface)
-  {
-    initialize(topic_prefix);
-  }
+    PidROS(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base,
+        rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging,
+        rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_params,
+        rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr topics_interface,
+        std::string topic_prefix = std::string(""))
+        : node_base_(node_base)
+        , node_logging_(node_logging)
+        , node_params_(node_params)
+        , topics_interface_(topics_interface)
+    {
+        initialize(topic_prefix);
+    }
 
-  /*!
-   * \brief Initialize the PID controller and set the parameters
-   * \param p The proportional gain.
-   * \param i The integral gain.
-   * \param d The derivative gain.
-   * \param i_max The max integral windup.
-   * \param i_min The min integral windup.
-   * \param antiwindup antiwindup.
-   */
-  void initPid(double p, double i, double d, double i_max, double i_min, bool antiwindup);
+    /*!
+     * \brief Initialize the PID controller and set the parameters
+     * \param p The proportional gain.
+     * \param i The integral gain.
+     * \param d The derivative gain.
+     * \param i_max The max integral windup.
+     * \param i_min The min integral windup.
+     * \param antiwindup antiwindup.
+     */
+    void initPid(double p, double i, double d, double i_max, double i_min, bool antiwindup);
 
-  /*!
-   * \brief Initialize the PID controller based on already set parameters
-   * \return True is all parameters are set (p, i, d, i_min and i_max), False otherwise
-   */
-  bool initPid();
+    /*!
+     * \brief Initialize the PID controller based on already set parameters
+     * \return True is all parameters are set (p, i, d, i_min and i_max), False otherwise
+     */
+    bool initPid();
 
-  /*!
-   * \brief Reset the state of this PID controller
-   */
-  void reset();
+    /*!
+     * \brief Reset the state of this PID controller
+     */
+    void reset();
 
-  /*!
-   * \brief Set the PID error and compute the PID command with nonuniform time
-   * step size. The derivative error is computed from the change in the error
-   * and the timestep \c dt.
-   *
-   * \param error  Error since last call (error = target - state)
-   * \param dt Change in time since last call in seconds
-   *
-   * \returns PID command
-   */
-  double computeCommand(double error, rclcpp::Duration dt);
+    /*!
+     * \brief Set the PID error and compute the PID command with nonuniform time
+     * step size. The derivative error is computed from the change in the error
+     * and the timestep \c dt.
+     *
+     * \param error  Error since last call (error = target - state)
+     * \param dt Change in time since last call in seconds
+     *
+     * \returns PID command
+     */
+    double computeCommand(double error, rclcpp::Duration dt);
 
-  /*!
-   * \brief Set the PID error and compute the PID command with nonuniform
-   * time step size. This also allows the user to pass in a precomputed
-   * derivative error.
-   *
-   * \param error Error since last call (error = target - state)
-   * \param error_dot d(Error)/dt since last call
-   * \param dt Change in time since last call in seconds
-   *
-   * \returns PID command
-   */
-  double computeCommand(double error, double error_dot, rclcpp::Duration dt);
+    /*!
+     * \brief Set the PID error and compute the PID command with nonuniform
+     * time step size. This also allows the user to pass in a precomputed
+     * derivative error.
+     *
+     * \param error Error since last call (error = target - state)
+     * \param error_dot d(Error)/dt since last call
+     * \param dt Change in time since last call in seconds
+     *
+     * \returns PID command
+     */
+    double computeCommand(double error, double error_dot, rclcpp::Duration dt);
 
-  /*!
-   * \brief Get PID gains for the controller.
-   * \return gains A struct of the PID gain values
-   */
-  Pid::Gains getGains();
+    /*!
+     * \brief Get PID gains for the controller.
+     * \return gains A struct of the PID gain values
+     */
+    Pid::Gains getGains();
 
-  /*!
-   * \brief Set PID gains for the controller.
-   * \param p The proportional gain.
-   * \param i The integral gain.
-   * \param d The derivative gain.
-   * \param i_max The max integral windup.
-   * \param i_min The min integral windup.
-   * \param antiwindup antiwindup.
-   */
-  void setGains(double p, double i, double d, double i_max, double i_min, bool antiwindup = false);
+    /*!
+     * \brief Set PID gains for the controller.
+     * \param p The proportional gain.
+     * \param i The integral gain.
+     * \param d The derivative gain.
+     * \param i_max The max integral windup.
+     * \param i_min The min integral windup.
+     * \param antiwindup antiwindup.
+     */
+    void setGains(double p, double i, double d, double i_max, double i_min, bool antiwindup = false);
 
-  /*!
-   * \brief Set PID gains for the controller.
-   * \param gains A struct of the PID gain values
-   */
-  void setGains(const Pid::Gains & gains);
+    /*!
+     * \brief Set PID gains for the controller.
+     * \param gains A struct of the PID gain values
+     */
+    void setGains(const Pid::Gains& gains);
 
-  /*!
-   * \brief Set current command for this PID controller
-   * \param cmd command to set
-   */
-  void setCurrentCmd(double cmd);
+    /*!
+     * \brief Set current command for this PID controller
+     * \param cmd command to set
+     */
+    void setCurrentCmd(double cmd);
 
-  /*!
-   * \brief Return current command for this PID controller
-   * \return current cmd
-   */
-  double getCurrentCmd();
+    /*!
+     * \brief Return current command for this PID controller
+     * \return current cmd
+     */
+    double getCurrentCmd();
 
-  /*!
-   * \brief Return PID state publisher
-   * \return shared_ptr to the PID state publisher
-   */
-  std::shared_ptr<rclcpp::Publisher<control_msgs::msg::PidState>>
-  getPidStatePublisher();
+    /*!
+     * \brief Return PID state publisher
+     * \return shared_ptr to the PID state publisher
+     */
+    std::shared_ptr<rclcpp::Publisher<control_msgs::msg::PidState>> getPidStatePublisher();
 
-  /*!
-   * \brief Return PID error terms for the controller.
-   * \param pe[out] The proportional error.
-   * \param ie[out] The integral error.
-   * \param de[out] The derivative error.
-   */
-  void getCurrentPIDErrors(double & pe, double & ie, double & de);
+    /*!
+     * \brief Return PID error terms for the controller.
+     * \param pe[out] The proportional error.
+     * \param ie[out] The integral error.
+     * \param de[out] The derivative error.
+     */
+    void getCurrentPIDErrors(double& pe, double& ie, double& de);
 
-  /*!
-   * \brief Print to console the current parameters
-   */
-  void printValues();
+    /*!
+     * \brief Print to console the current parameters
+     */
+    void printValues();
 
-  /*!
-   * \brief Return PID parameters callback handle
-   * \return shared_ptr to the PID parameters callback handle
-   */
-  inline rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr
-  getParametersCallbackHandle()
-  {
-    return parameter_callback_;
-  }
+    /*!
+     * \brief Return PID parameters callback handle
+     * \return shared_ptr to the PID parameters callback handle
+     */
+    inline rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr getParametersCallbackHandle()
+    {
+        return parameter_callback_;
+    }
 
 private:
-  void setParameterEventCallback();
+    void setParameterEventCallback();
 
-  void publishPIDState(double cmd, double error, rclcpp::Duration dt);
+    void publishPIDState(double cmd, double error, rclcpp::Duration dt);
 
-  void declareParam(const std::string & param_name, rclcpp::ParameterValue param_value);
+    void declareParam(const std::string& param_name, rclcpp::ParameterValue param_value);
 
-  bool getDoubleParam(const std::string & param_name, double & value);
+    bool getDoubleParam(const std::string& param_name, double& value);
 
-  bool getBooleanParam(const std::string & param_name, bool & value);
+    bool getBooleanParam(const std::string& param_name, bool& value);
 
-  void initialize(std::string topic_prefix);
+    void initialize(std::string topic_prefix);
 
-  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback_;
+    rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback_;
 
-  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_;
-  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_;
-  rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_params_;
-  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr topics_interface_;
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_;
+    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_;
+    rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_params_;
+    rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr topics_interface_;
 
-  std::shared_ptr<realtime_tools::RealtimePublisher<control_msgs::msg::PidState>> rt_state_pub_;
-  std::shared_ptr<rclcpp::Publisher<control_msgs::msg::PidState>> state_pub_;
+    std::shared_ptr<realtime_tools::RealtimePublisher<control_msgs::msg::PidState>> rt_state_pub_;
+    std::shared_ptr<rclcpp::Publisher<control_msgs::msg::PidState>> state_pub_;
 
-  Pid pid_;
-  std::string topic_prefix_;
+    Pid pid_;
+    std::string topic_prefix_;
 };
 
-}  // namespace control_toolbox
+} // namespace control_toolbox
 
-#endif  // CONTROL_TOOLBOX__PID_ROS_HPP_
+#endif // CONTROL_TOOLBOX__PID_ROS_HPP_
