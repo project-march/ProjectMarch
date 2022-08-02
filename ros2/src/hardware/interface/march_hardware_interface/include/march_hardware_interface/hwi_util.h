@@ -133,7 +133,7 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
                                                         function_when_timeout = nullopt,
                                                     const chrono::nanoseconds sleep_between_tries
                                                         = std::chrono::seconds(1),
-                                                    const unsigned maximum_tries  = 10) {
+                                                    const unsigned maximum_tries  = 5) {
     vector<bool> is_ok;
     unsigned int amount_ok = 0;
     unsigned int amount_of_joints = joints.size();
@@ -148,8 +148,8 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
                 is_ok.at(i) = true;
                 if (amount_ok == amount_of_joints) { return; }
             }
-            rclcpp::sleep_for(sleep_between_tries);
         }
+        rclcpp::sleep_for(sleep_between_tries);
     }
 
     if (amount_ok != amount_of_joints) {
@@ -183,8 +183,8 @@ inline void call_function_and_wait_on_joints(const string &function_goal,
         max_sleep = max(max_sleep, function(*joint));
     }
     if (max_sleep.count() > 0) {
-        RCLCPP_INFO(logger, "%s Successful after %l nanoseconds'.",
-                    function_goal.c_str(), max_sleep.count());
+        RCLCPP_INFO(logger, "%s Successful after %.4f seconds.",
+                    function_goal.c_str(), max_sleep.count(), max_sleep.count() / 1000000000.0);
     }
     rclcpp::sleep_for(max_sleep);
 
