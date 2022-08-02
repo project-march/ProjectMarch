@@ -115,10 +115,12 @@ class DynamicStep:
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
-        setpoint_list = [self.starting_position_dict]
         desired_position = self._solve_desired_setpoint()
+        setpoint_list = [
+            self.starting_position_dict,
+            self._solve_middle_setpoint(self.middle_point_fraction - self._deviation, self._height),
+        ]
 
-        setpoint_list.append(self._solve_middle_setpoint(self.middle_point_fraction - self._deviation, self._height))
         if not self.stop:
             setpoint_list.append(
                 self._solve_middle_setpoint(self.middle_point_fraction + self._deviation, self._height)
