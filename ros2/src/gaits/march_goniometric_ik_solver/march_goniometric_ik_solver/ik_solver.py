@@ -721,7 +721,11 @@ class Pose:
         if self.fe_ankle1 > self._max_ankle_dorsi_flexion:
             self.reset_to_zero_pose()
             self.solve_end_position(
-                pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id, for_mid_point=True,
+                pos_ankle[0],
+                pos_ankle[1],
+                DEFAULT_FOOT_DISTANCE,
+                subgait_id,
+                for_mid_point=True,
             )
 
         # Apply the desired rotation of the upper body:
@@ -735,7 +739,7 @@ class Pose:
         self.reduce_hip_extension()
 
         # Lift toes of swing leg as much as possible:
-        self.fe_ankle2 = self._max_ankle_dorsi_flexion*0.8
+        self.fe_ankle2 = self._max_ankle_dorsi_flexion * 0.8
 
         # Add hip_swing or set hip_aa to average of start and end pose:
         if self._parameters.hip_swing and 0 < self._parameters.hip_swing_fraction < 1:

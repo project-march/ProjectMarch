@@ -228,7 +228,7 @@ class TrajectoryCommandFactory:
 
     def _get_foot_location_from_point_handler(self, start: bool) -> Optional[FootPosition]:
         """Returns a FootPosition message from the point handler, if available.
-        
+
         Arguments:
             start (bool): Whether it is a start gait.
 
