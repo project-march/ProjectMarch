@@ -20,8 +20,8 @@ using Point = pcl::PointXYZ;
  * @param destination reference of array where the result is stored
  */
 template <std::size_t K, std::size_t W, std::size_t H>
-void convolve2D(std::array<std::array<double, K>, K>& kernel,
-    std::array<std::array<double, W>, H>& source,
+void convolve2D(const std::array<std::array<double, K>, K>& kernel,
+    const std::array<std::array<double, W>, H>& source,
     std::array<std::array<double, W>, H>& destination)
 {
     for (int i = K / 2; i < H - K / 2; i++) {
@@ -44,7 +44,7 @@ void convolve2D(std::array<std::array<double, K>, K>& kernel,
  * @param destination reference of array where the result is stored
  */
 template <std::size_t W, std::size_t H>
-void convolveGaussianKernel(std::array<std::array<double, W>, H>& source,
+void convolveGaussianKernel(const std::array<std::array<double, W>, H>& source,
     std::array<std::array<double, W>, H>& destination)
 {
     std::array<std::array<double, 3>, 3> gaussian = {
@@ -62,7 +62,7 @@ void convolveGaussianKernel(std::array<std::array<double, W>, H>& source,
  * @param destination reference of array where the result is stored
  */
 template <std::size_t W, std::size_t H>
-void convolveLaplacianKernel(std::array<std::array<double, W>, H>& source,
+void convolveLaplacianKernel(const std::array<std::array<double, W>, H>& source,
     std::array<std::array<double, W>, H>& destination)
 {
     std::array<std::array<double, 3>, 3> laplacian
@@ -104,7 +104,7 @@ inline Point computeAveragePoint(const std::vector<Point>& points)
  * @param int n number of points in the domain
  * @return a vector of evenly spaced 3D points
  */
-inline std::vector<Point> linearDomain(Point a, Point b, int n)
+inline std::vector<Point> linearDomain(const Point& a, const Point& b, int n)
 {
     n--;
     std::vector<Point> points;
@@ -148,7 +148,7 @@ inline Point rotateLeft(const Point& p)
  * @param Point p2 second point
  * @return Point new point that is equivalent to p1 + p2
  */
-inline Point addPoints(const Point p1, const Point p2)
+inline Point addPoints(const Point& p1, const Point& p2)
 {
     Point sum(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
     return sum;
@@ -161,7 +161,7 @@ inline Point addPoints(const Point p1, const Point p2)
  * @param Point p2 second point
  * @return Point new point that is equivalent to p1 - p2
  */
-inline Point subtractPoints(const Point p1, const Point p2)
+inline Point subtractPoints(const Point& p1, const Point& p2)
 {
     Point difference(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
     return difference;
@@ -173,7 +173,7 @@ inline Point subtractPoints(const Point p1, const Point p2)
  * @param Point p point to check
  * @return bool whether the point can be published
  */
-inline bool validatePoint(const Point p)
+inline bool validatePoint(const Point& p)
 {
     return (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z)
         && std::abs(p.x) < 1.0 && std::abs(p.y) < 0.7 && std::abs(p.z) < 0.5);
