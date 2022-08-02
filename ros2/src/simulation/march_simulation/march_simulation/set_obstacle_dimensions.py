@@ -1,3 +1,4 @@
+"""Author: MVI."""
 from threading import Event
 import rclpy
 from rclpy.task import Future
@@ -13,33 +14,42 @@ import xacro
 # which accepts the parameters length, width and height with default values
 
 
-RESIZABLE_OBSTACLES = ['bench']
+RESIZABLE_OBSTACLES = ["bench"]
 
-NODE_NAME = 'set_obstacle_node'
+NODE_NAME = "set_obstacle_node"
 
 
 class ObstacleDimensionSetter(Node):
+    """Class to resize the obstacles loaded in gazebo."""
+
     def __init__(self):
         super().__init__(NODE_NAME)
 
-        self.spawn_entity_client = self.create_client(SpawnEntity, '/spawn_entity')
-        self.delete_entity_client = self.create_client(DeleteEntity, '/delete_entity')
-        self.get_model_list_client = self.create_client(GetModelList, '/get_model_list')
+        self.spawn_entity_client = self.create_client(SpawnEntity, "/spawn_entity")
+        self.delete_entity_client = self.create_client(DeleteEntity, "/delete_entity")
+        self.get_model_list_client = self.create_client(GetModelList, "/get_model_list")
 
         self.get_model_list_event = Event()
         self.spawn_entity_event = Event()
         self.delete_entity_event = Event()
 
-        self.create_service(SetObstacleSize, '/march/set_obstacle_size', self.set_size_callback, callback_group=ReentrantCallbackGroup())
+        self.create_service(
+            SetObstacleSize, "/march/set_obstacle_size", self.set_size_callback, callback_group=ReentrantCallbackGroup()
+        )
 
         self.models = []
 
     def set_size_callback(self, request, response):
+        """Callback function for the service /march/set_obstacle_size, to resize the loaded in obstacles."""
         if request.obstacle_name not in RESIZABLE_OBSTACLES:
             response.success = False
         else:
-            self.set_size(name=request.obstacle_name, length=request.new_length,
-                          width=request.new_width, height=request.new_height)
+            self.set_size(
+                name=request.obstacle_name,
+                length=request.new_length,
+                width=request.new_width,
+                height=request.new_height,
+            )
             response.success = True
         return response
 
@@ -49,26 +59,29 @@ class ObstacleDimensionSetter(Node):
         If the obstacle is a new obstacle it is spawned using the provided dimensions.
         If the obstacle already exists, it is first removed from gazebo.
 
-        :param name Name of the obstacle
-        :param length Length of the obstacle
-        :param width Width of the obstacle
-        :param height Height of the obstacle
+        Args:
+            name (str): Name of the obstacle.
+            length (float): Length of the obstacle.
+            width (float): Width of the obstacle.
+            height (float): Height of the obstacle.
         """
-        length = 'length="{length}"'.format(
-            length=length) if length != 0 else ''
-        width = 'width="{width}"'.format(width=width) if width != 0 else ''
-        height = 'height="{height}"'.format(
-            height=height) if height != 0 else ''
+        length = 'length="{length}"'.format(length=length) if length != 0 else ""
+        width = 'width="{width}"'.format(width=width) if width != 0 else ""
+        height = 'height="{height}"'.format(height=height) if height != 0 else ""
 
-        doc = xacro.parse('''<?xml version="1.0"?>
+        doc = xacro.parse(
+            """<?xml version="1.0"?>
                 <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
                     <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
                     <xacro:{name} {length} {width} {height}/>
                 </robot>
-                '''.format(name=name, length=length, width=width,
-                           height=height), None)
+                """.format(
+                name=name, length=length, width=width, height=height
+            ),
+            None,
+        )
         xacro.process_doc(doc)
-        new_obstacle = doc.toprettyxml(indent='  ')
+        new_obstacle = doc.toprettyxml(indent="  ")
 
         self.get_model_list()
 
@@ -94,8 +107,7 @@ class ObstacleDimensionSetter(Node):
     def delete_entity(self, name: str):
         """Delete an entity from gazebo."""
         self.delete_entity_event.clear()
-        future = self.delete_entity_client.call_async(
-            DeleteEntity.Request(name=name))
+        future = self.delete_entity_client.call_async(DeleteEntity.Request(name=name))
         future.add_done_callback(self.delete_entity_cb)
         self.delete_entity_event.wait()
 
@@ -103,7 +115,7 @@ class ObstacleDimensionSetter(Node):
         """Callback for when deleting an entity is done."""
         result = future.result()
         if not result.success:
-            self.get_logger().fatal('Unable to delete obstacle')
+            self.get_logger().fatal("Unable to delete obstacle")
         self.delete_entity_event.set()
 
     def spawn_entity(self, name: str, xml: str):
@@ -117,12 +129,17 @@ class ObstacleDimensionSetter(Node):
         """Callback for when spawning an entity is done."""
         result = future.result()
         if not result.success:
-            self.get_logger().fatal('Unable to spawn obstacle')
+            self.get_logger().fatal("Unable to spawn obstacle")
         self.spawn_entity_event.set()
 
 
 def main():
+    """The entry script function."""
     rclpy.init()
     executor = MultiThreadedExecutor()
     node = ObstacleDimensionSetter()
     rclpy.spin(node, executor)
+
+
+if __name__ == "__main__":
+    main()

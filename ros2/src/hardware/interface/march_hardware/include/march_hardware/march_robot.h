@@ -25,16 +25,14 @@ private:
 public:
     using iterator = std::vector<Joint>::iterator;
 
-    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-        ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
-
-    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-        std::vector<PressureSole> pressureSoles, ::std::string if_name,
+    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger, ::std::string if_name,
         int ecatCycleTime, int ecatSlaveTimeout);
 
     MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-        std::vector<PressureSole> pressureSoles, ::std::string if_name,
-        int ecatCycleTime, int ecatSlaveTimeout,
+        std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
+
+    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
+        std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
         std::optional<PowerDistributionBoard>);
 
     ~MarchRobot();
@@ -107,8 +105,7 @@ public:
     }
 
     /** @brief Override stream operator for clean printing */
-    friend ::std::ostream& operator<<(
-        std::ostream& os, const MarchRobot& marchRobot)
+    friend ::std::ostream& operator<<(std::ostream& os, const MarchRobot& marchRobot)
     {
         for (unsigned int i = 0; i < marchRobot.joint_list_.size(); i++) {
             os << marchRobot.joint_list_.at(i) << "\n";

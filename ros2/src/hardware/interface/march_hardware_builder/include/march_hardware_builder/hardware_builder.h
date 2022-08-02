@@ -29,9 +29,9 @@
 class HardwareBuilder {
 public:
     /**
-    * @brief Initialises with a robot name and URDF.
-    */
-    HardwareBuilder(const std::string &yaml_path, std::shared_ptr<march_logger::BaseLogger> logger);
+     * @brief Initialises with a robot name and URDF.
+     */
+    HardwareBuilder(const std::string& yaml_path, std::shared_ptr<march_logger::BaseLogger> logger);
 
     /**
      * @brief Creates a march::MarchRobot.
@@ -41,55 +41,52 @@ public:
      * @throws MissingKeyException When a required key is missing from the given
      * config
      */
-    std::unique_ptr<march::MarchRobot> createMarchRobot(const std::vector<std::string> &active_joint_names);
+    std::unique_ptr<march::MarchRobot> createMarchRobot(const std::vector<std::string>& active_joint_names);
 
     /**
-    * Returns all joints found in the given config.
-    * Warns when joints are defined as FIXED in the URDF and when a non-FIXED
-    * joint is not contained in the config.
-    * @param joints_config YAML node that contains a sequence of joint objects
-    * @return list of created joints
-    */
-    std::vector<march::Joint>
-    createJoints(const YAML::Node &joints_config, const std::vector<std::string> &active_joint_names) const;
+     * Returns all joints found in the given config.
+     * Warns when joints are defined as FIXED in the URDF and when a non-FIXED
+     * joint is not contained in the config.
+     * @param joints_config YAML node that contains a sequence of joint objects
+     * @return list of created joints
+     */
+    std::vector<march::Joint> createJoints(
+        const YAML::Node& joints_config, const std::vector<std::string>& active_joint_names) const;
 
-    std::map<std::string, YAML::Node> getMapOfActiveJointConfigs(const YAML::Node &joints_config,
-                                                                 std::vector<std::string> active_joint_names) const;
+    std::map<std::string, YAML::Node> getMapOfActiveJointConfigs(
+        const YAML::Node& joints_config, std::vector<std::string> active_joint_names) const;
 
     march::Joint createJoint(const std::string& joint_name, const YAML::Node& joint_config) const;
     std::unique_ptr<march::MotorController> createMotorController(const YAML::Node& config) const;
     std::unique_ptr<march::ODrive> createODrive(const YAML::Node& odrive_config, march::ActuationMode mode) const;
 
     static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
-            const YAML::Node &absolute_encoder_config,
-            const march::MotorControllerType motor_controller_type);
+        const YAML::Node& absolute_encoder_config, const march::MotorControllerType motor_controller_type);
     static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
-            const YAML::Node &incremental_encoder_config,
-            const march::MotorControllerType motor_controller_type);
-    static march::Encoder::Direction getEncoderDirection(const YAML::Node &encoder_config);
+        const YAML::Node& incremental_encoder_config, const march::MotorControllerType motor_controller_type);
+    static march::Encoder::Direction getEncoderDirection(const YAML::Node& encoder_config);
 
     std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config) const;
     std::vector<march::PressureSole> createPressureSoles(const YAML::Node& pressure_soles_config) const;
     march::PressureSole createPressureSole(const YAML::Node& pressure_sole_config) const;
-    std::optional<march::PowerDistributionBoard>createPowerDistributionBoard(const YAML::Node& power_distribution_config) const;
-
-
-    /**
-    * @brief Loops over all keys in the keyList and check if they exist in the
-    * config.
-    *
-    * @throws MissingKeyException when required keys are missing.
-    */
-    static void validateRequiredKeysExist(const YAML::Node& config,
-                                          const std::vector<std::string>& key_list,
-                                          const std::string& object_name);
+    std::optional<march::PowerDistributionBoard> createPowerDistributionBoard(
+        const YAML::Node& power_distribution_config) const;
 
     /**
-    * @brief Loops over all keys in the keyList and check if they exist in the
-    * config.
-    *
-    * @throws MissingKeyException when required keys are missing.
-    */
+     * @brief Loops over all keys in the keyList and check if they exist in the
+     * config.
+     *
+     * @throws MissingKeyException when required keys are missing.
+     */
+    static void validateRequiredKeysExist(
+        const YAML::Node& config, const std::vector<std::string>& key_list, const std::string& object_name);
+
+    /**
+     * @brief Loops over all keys in the keyList and check if they exist in the
+     * config.
+     *
+     * @throws MissingKeyException when required keys are missing.
+     */
     static size_t validate_and_get_counts_per_rotation(const YAML::Node& config);
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
@@ -100,11 +97,9 @@ public:
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;
     static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
     static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
-    static const std::vector<std::string>
-        POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
+    static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
 
 private:
-
     YAML::Node robot_config_;
     std::string if_name_;
     std::shared_ptr<march_logger::BaseLogger> logger_;

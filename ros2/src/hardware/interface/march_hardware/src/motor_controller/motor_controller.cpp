@@ -5,14 +5,12 @@
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/motor_controller/motor_controller_state.h"
-#include <memory>
 #include <algorithm>
+#include <memory>
 
 namespace march {
-MotorController::MotorController(const Slave& slave,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode,
+MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode,
     std::shared_ptr<march_logger::BaseLogger> logger)
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
@@ -28,8 +26,7 @@ MotorController::MotorController(const Slave& slave,
         /* The most precise encoder can encode more positions.
         This means that every Internal Unit represents less radians. */
         is_incremental_encoder_more_precise_
-            = incremental_encoder_->getRadiansPerIU()
-            < absolute_encoder_->getRadiansPerIU();
+            = incremental_encoder_->getRadiansPerIU() < absolute_encoder_->getRadiansPerIU();
     } else if (!absolute_encoder_ && incremental_encoder_) {
         is_incremental_encoder_more_precise_ = true;
     } else {
@@ -37,20 +34,16 @@ MotorController::MotorController(const Slave& slave,
     }
 }
 
-MotorController::MotorController(const Slave &slave,
-                                 std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                                 ActuationMode actuation_mode,
-                                 std::shared_ptr<march_logger::BaseLogger> logger)
-        : MotorController(
-        slave, std::move(absolute_encoder), nullptr, actuation_mode, std::move(logger)) {
+MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger)
+    : MotorController(slave, std::move(absolute_encoder), nullptr, actuation_mode, std::move(logger))
+{
 }
 
-MotorController::MotorController(const Slave &slave,
-                                 std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                                 ActuationMode actuation_mode,
-                                 std::shared_ptr<march_logger::BaseLogger> logger)
-        : MotorController(
-        slave, nullptr, std::move(incremental_encoder), actuation_mode, std::move(logger)) {
+MotorController::MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder,
+    ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger)
+    : MotorController(slave, nullptr, std::move(incremental_encoder), actuation_mode, std::move(logger))
+{
 }
 
 std::chrono::nanoseconds MotorController::reset()
@@ -115,7 +108,8 @@ float MotorController::getIncrementalVelocity()
     return getIncrementalVelocityUnchecked();
 }
 
-double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const {
+double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const
+{
     joint_effort_command = convertEffortToIUEffort(joint_effort_command);
     // Clamp effort to (-MAX_EFFORT, MAX_EFFORT)
     auto effort_limit = getEffortLimit();
@@ -145,8 +139,7 @@ bool MotorController::hasIncrementalEncoder() const
 std::unique_ptr<AbsoluteEncoder>& MotorController::getAbsoluteEncoder()
 {
     if (!hasAbsoluteEncoder()) {
-        throw error::HardwareException(
-            error::ErrorType::MISSING_ENCODER, "Cannot get absolute encoder");
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get absolute encoder");
     }
     return absolute_encoder_;
 }
@@ -166,13 +159,13 @@ void MotorController::actuate(float target)
     } else if (actuation_mode_ == march::ActuationMode::torque) {
         actuateTorque(target);
     } else {
-        throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-            "Actuation mode %s is not supported",
+        throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Actuation mode %s is not supported",
             actuation_mode_.toString().c_str());
     }
 }
 
-double MotorController::convertEffortToIUEffort(double joint_effort_command) const {
+double MotorController::convertEffortToIUEffort(double joint_effort_command) const
+{
     return joint_effort_command * effortMultiplicationConstant();
 }
 

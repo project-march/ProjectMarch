@@ -22,12 +22,10 @@ public:
             && lhs.temperature_byte_offset_ == rhs.temperature_byte_offset_;
     }
     /** @brief Override stream operator for clean printing */
-    friend ::std::ostream& operator<<(
-        std::ostream& os, const TemperatureGES& temperatureGes)
+    friend ::std::ostream& operator<<(std::ostream& os, const TemperatureGES& temperatureGes)
     {
         return os << "slaveIndex: " << temperatureGes.getSlaveIndex() << ", "
-                  << "temperatureByteOffset: "
-                  << temperatureGes.temperature_byte_offset_;
+                  << "temperatureByteOffset: " << temperatureGes.temperature_byte_offset_;
     }
 
 private:

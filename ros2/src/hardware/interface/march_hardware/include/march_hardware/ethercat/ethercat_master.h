@@ -23,8 +23,8 @@ namespace march {
  */
 class EthercatMaster {
 public:
-    EthercatMaster(std::string if_name, int max_slave_index, int cycle_time,
-        int slave_timeout, std::shared_ptr<march_logger::BaseLogger> logger);
+    EthercatMaster(std::string if_name, int max_slave_index, int cycle_time, int slave_timeout,
+        std::shared_ptr<march_logger::BaseLogger> logger);
     ~EthercatMaster();
 
     /* Delete copy constructor/assignment since the member thread can not be

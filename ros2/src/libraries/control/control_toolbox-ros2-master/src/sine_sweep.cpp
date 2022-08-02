@@ -36,52 +36,51 @@
 
 #include "control_toolbox/sine_sweep.hpp"
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 SineSweep::SineSweep()
-: amplitude_(0.0),
-  duration_(rclcpp::Duration(0, 0)),
-  start_angular_freq_(0.0),
-  end_angular_freq_(0.0),
-  K_(0.0),
-  L_(0.0),
-  cmd_(0.0)
+    : amplitude_(0.0)
+    , duration_(rclcpp::Duration(0, 0))
+    , start_angular_freq_(0.0)
+    , end_angular_freq_(0.0)
+    , K_(0.0)
+    , L_(0.0)
+    , cmd_(0.0)
 {
 }
 
 bool SineSweep::init(double start_freq, double end_freq, double duration, double amplitude)
 {
-  if (start_freq > end_freq) {
-    return false;
-  }
-  if (duration < 0 || amplitude < 0) {
-    return false;
-  }
+    if (start_freq > end_freq) {
+        return false;
+    }
+    if (duration < 0 || amplitude < 0) {
+        return false;
+    }
 
-  amplitude_ = amplitude;
-  duration_ = rclcpp::Duration::from_seconds(duration);
-  // calculate the angular fequencies
-  start_angular_freq_ = 2 * M_PI * start_freq;
-  end_angular_freq_ = 2 * M_PI * end_freq;
+    amplitude_ = amplitude;
+    duration_ = rclcpp::Duration::from_seconds(duration);
+    // calculate the angular fequencies
+    start_angular_freq_ = 2 * M_PI * start_freq;
+    end_angular_freq_ = 2 * M_PI * end_freq;
 
-  // calculate the constants
-  K_ = (start_angular_freq_ * duration) / log(end_angular_freq_ / start_angular_freq_);
-  L_ = (duration) / log(end_angular_freq_ / start_angular_freq_);
+    // calculate the constants
+    K_ = (start_angular_freq_ * duration) / log(end_angular_freq_ / start_angular_freq_);
+    L_ = (duration) / log(end_angular_freq_ / start_angular_freq_);
 
-  // zero out the command
-  cmd_ = 0.0;
+    // zero out the command
+    cmd_ = 0.0;
 
-  return true;
+    return true;
 }
 
 double SineSweep::update(rclcpp::Duration dt)
 {
-  if (dt <= duration_) {
-    cmd_ = amplitude_ * sin(K_ * (exp((dt.seconds()) / (L_)) - 1));
-  } else {
-    cmd_ = 0.0;
-  }
+    if (dt <= duration_) {
+        cmd_ = amplitude_ * sin(K_ * (exp((dt.seconds()) / (L_)) - 1));
+    } else {
+        cmd_ = 0.0;
+    }
 
-  return cmd_;
+    return cmd_;
 }
-}  // namespace control_toolbox
+} // namespace control_toolbox

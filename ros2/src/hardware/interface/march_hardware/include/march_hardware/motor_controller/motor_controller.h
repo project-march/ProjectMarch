@@ -7,28 +7,22 @@
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/motor_controller/motor_controller_state.h"
+#include <chrono>
 #include <memory>
 #include <string>
-#include <chrono>
 
 namespace march {
 class MotorController : public Slave {
 public:
-    MotorController(const Slave &slave,
-                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                    ActuationMode actuation_mode,
-                    std::shared_ptr<march_logger::BaseLogger> logger);
+    MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
-    MotorController(const Slave &slave,
-                    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                    ActuationMode actuation_mode,
-                    std::shared_ptr<march_logger::BaseLogger> logger);
+    MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder, ActuationMode actuation_mode,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
-    MotorController(const Slave &slave,
-                    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-                    ActuationMode actuation_mode,
-                    std::shared_ptr<march_logger::BaseLogger> logger);
+    MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder,
+        ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Get the most precise position or velocity
     float getPosition();
@@ -114,12 +108,10 @@ public:
     ~MotorController() override = default;
 
     // Override comparison operator
-    friend bool operator==(
-        const MotorController& lhs, const MotorController& rhs)
+    friend bool operator==(const MotorController& lhs, const MotorController& rhs)
     {
         return lhs.getSlaveIndex() == rhs.getSlaveIndex()
-            && ((lhs.absolute_encoder_ && rhs.absolute_encoder_
-                    && *lhs.absolute_encoder_ == *rhs.absolute_encoder_)
+            && ((lhs.absolute_encoder_ && rhs.absolute_encoder_ && *lhs.absolute_encoder_ == *rhs.absolute_encoder_)
                 || (!lhs.absolute_encoder_ && !rhs.absolute_encoder_))
             && ((lhs.incremental_encoder_ && rhs.incremental_encoder_
                     && *lhs.incremental_encoder_ == *rhs.incremental_encoder_)
@@ -127,8 +119,7 @@ public:
             && lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
     }
     // Override stream operator for clean printing
-    friend std::ostream& operator<<(
-        std::ostream& os, const MotorController& motor_controller)
+    friend std::ostream& operator<<(std::ostream& os, const MotorController& motor_controller)
     {
         os << "slave index: " << motor_controller.getSlaveIndex();
 
@@ -136,8 +127,7 @@ public:
             os << ", absolute encoder: " << *motor_controller.absolute_encoder_;
         }
         if (motor_controller.hasIncrementalEncoder()) {
-            os << ", incremental encoder: "
-               << *motor_controller.incremental_encoder_;
+            os << ", incremental encoder: " << *motor_controller.incremental_encoder_;
         }
         os << ", actuation mode" << motor_controller.actuation_mode_.toString();
         return os;
@@ -169,16 +159,14 @@ protected:
     std::shared_ptr<march_logger::BaseLogger> logger_;
 
 private:
-
     /**
-    * \brief This converts the effort from amper to the Internal Units the motor controller uses.
-    * \note This conversion rate is dictated by the `effortMultiplicationConstant` of the motor controller. When:
-    * `this->effortMultiplicationConstant()` = 1 => Internal Units = Ampere.
-    * @param joint_effort_command The joint effort command in Ampere.
-    * @return The joint effort command in IU.
-    */
+     * \brief This converts the effort from amper to the Internal Units the motor controller uses.
+     * \note This conversion rate is dictated by the `effortMultiplicationConstant` of the motor controller. When:
+     * `this->effortMultiplicationConstant()` = 1 => Internal Units = Ampere.
+     * @param joint_effort_command The joint effort command in Ampere.
+     * @return The joint effort command in IU.
+     */
     double convertEffortToIUEffort(double joint_effort_command) const;
-
 };
 
 } // namespace march

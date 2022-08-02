@@ -2,11 +2,11 @@
 #ifndef MARCH_HARDWARE_JOINT_H
 #define MARCH_HARDWARE_JOINT_H
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <chrono>
 
 #include <march_hardware/motor_controller/motor_controller.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
@@ -18,18 +18,15 @@ public:
     // Initialize a Joint with motor controller and without temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController.
-    Joint(std::string name, int net_number,
-        std::unique_ptr<MotorController> motor_controller,
-          std::shared_ptr<march_logger::BaseLogger> logger);
+    Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Initialize a Joint with motor controller and temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController. Temperature ges may be a nullptr, since a Joint may have
     // a Temperature ges.
-    Joint(std::string name, int net_number,
-        std::unique_ptr<MotorController> motor_controller,
-        std::unique_ptr<TemperatureGES> temperature_ges,
-          std::shared_ptr<march_logger::BaseLogger> logger);
+    Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+        std::unique_ptr<TemperatureGES> temperature_ges, std::shared_ptr<march_logger::BaseLogger> logger);
 
     virtual ~Joint() noexcept = default;
 
@@ -102,11 +99,9 @@ public:
     friend bool operator==(const Joint& lhs, const Joint& rhs)
     {
         return lhs.name_ == rhs.name_
-            && ((lhs.motor_controller_ && rhs.motor_controller_
-                    && *lhs.motor_controller_ == *rhs.motor_controller_)
+            && ((lhs.motor_controller_ && rhs.motor_controller_ && *lhs.motor_controller_ == *rhs.motor_controller_)
                 || (!lhs.motor_controller_ && !rhs.motor_controller_))
-            && ((lhs.temperature_ges_ && rhs.temperature_ges_
-                    && *lhs.temperature_ges_ == *rhs.temperature_ges_)
+            && ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_)
                 || (!lhs.temperature_ges_ && !rhs.temperature_ges_));
     }
 
@@ -136,19 +131,17 @@ private:
     // readEncoders()
     double initial_incremental_position_ = 0.0;
     double initial_absolute_position_ = 0.0;
-    double position_ = 0.0;  // In radians
+    double position_ = 0.0; // In radians
     double velocity_ = 0.0;
     std::chrono::steady_clock::time_point last_read_time_;
 
     // Keep track of the state of the MotorController
-    std::optional<std::unique_ptr<MotorControllerState>> previous_state_
-        = std::nullopt;
+    std::optional<std::unique_ptr<MotorControllerState>> previous_state_ = std::nullopt;
 
     // A joint must have a MotorController but may have a TemperatureGES
     std::unique_ptr<MotorController> motor_controller_;
     std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
     std::shared_ptr<march_logger::BaseLogger> logger_;
-
 };
 
 } // namespace march

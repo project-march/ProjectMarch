@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <chrono>
 #include <cstddef>
 #include <memory>
@@ -25,88 +24,86 @@
 #include "rclcpp/duration.hpp"
 #include "rclcpp/executors.hpp"
 #include "rclcpp/node.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "rclcpp/utilities.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 using PidStateMsg = control_msgs::msg::PidState;
 using rclcpp::executors::MultiThreadedExecutor;
 
 TEST(PidPublisherTest, PublishTest)
 {
-  const size_t ATTEMPTS = 100;
-  const std::chrono::milliseconds DELAY(250);
+    const size_t ATTEMPTS = 100;
+    const std::chrono::milliseconds DELAY(250);
 
-  auto node = std::make_shared<rclcpp::Node>("pid_publisher_test");
+    auto node = std::make_shared<rclcpp::Node>("pid_publisher_test");
 
-  control_toolbox::PidROS pid_ros = control_toolbox::PidROS(node);
+    control_toolbox::PidROS pid_ros = control_toolbox::PidROS(node);
 
-  pid_ros.initPid(1.0, 1.0, 1.0, 5.0, -5.0, false);
+    pid_ros.initPid(1.0, 1.0, 1.0, 5.0, -5.0, false);
 
-  bool callback_called = false;
-  control_msgs::msg::PidState::SharedPtr last_state_msg;
-  auto state_callback = [&](const control_msgs::msg::PidState::SharedPtr)
-    {
-      callback_called = true;
+    bool callback_called = false;
+    control_msgs::msg::PidState::SharedPtr last_state_msg;
+    auto state_callback = [&](const control_msgs::msg::PidState::SharedPtr) {
+        callback_called = true;
     };
 
-  auto state_sub = node->create_subscription<control_msgs::msg::PidState>(
-    "/pid_state", rclcpp::SensorDataQoS(), state_callback);
+    auto state_sub
+        = node->create_subscription<control_msgs::msg::PidState>("/pid_state", rclcpp::SensorDataQoS(), state_callback);
 
-  double command = pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
-  EXPECT_EQ(-1.5, command);
+    double command = pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
+    EXPECT_EQ(-1.5, command);
 
-  // wait for callback
-  for (size_t i = 0; i < ATTEMPTS && !callback_called; ++i) {
-    pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
-    rclcpp::spin_some(node);
-    std::this_thread::sleep_for(DELAY);
-  }
+    // wait for callback
+    for (size_t i = 0; i < ATTEMPTS && !callback_called; ++i) {
+        pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
+        rclcpp::spin_some(node);
+        std::this_thread::sleep_for(DELAY);
+    }
 
-  ASSERT_TRUE(callback_called);
+    ASSERT_TRUE(callback_called);
 }
 
 TEST(PidPublisherTest, PublishTestLifecycle)
 {
-  const size_t ATTEMPTS = 100;
-  const std::chrono::milliseconds DELAY(250);
+    const size_t ATTEMPTS = 100;
+    const std::chrono::milliseconds DELAY(250);
 
-  auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("pid_publisher_test");
+    auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("pid_publisher_test");
 
-  control_toolbox::PidROS pid_ros(node);
+    control_toolbox::PidROS pid_ros(node);
 
-  auto state_pub_lifecycle_ =
-    std::dynamic_pointer_cast<rclcpp_lifecycle::LifecyclePublisher<control_msgs::msg::PidState>>(
-    pid_ros.getPidStatePublisher());
-  // state_pub_lifecycle_->on_activate();
+    auto state_pub_lifecycle_
+        = std::dynamic_pointer_cast<rclcpp_lifecycle::LifecyclePublisher<control_msgs::msg::PidState>>(
+            pid_ros.getPidStatePublisher());
+    // state_pub_lifecycle_->on_activate();
 
-  pid_ros.initPid(1.0, 1.0, 1.0, 5.0, -5.0, false);
+    pid_ros.initPid(1.0, 1.0, 1.0, 5.0, -5.0, false);
 
-  bool callback_called = false;
-  control_msgs::msg::PidState::SharedPtr last_state_msg;
-  auto state_callback = [&](const control_msgs::msg::PidState::SharedPtr)
-    {
-      callback_called = true;
+    bool callback_called = false;
+    control_msgs::msg::PidState::SharedPtr last_state_msg;
+    auto state_callback = [&](const control_msgs::msg::PidState::SharedPtr) {
+        callback_called = true;
     };
 
-  auto state_sub = node->create_subscription<control_msgs::msg::PidState>(
-    "/pid_state", rclcpp::SensorDataQoS(), state_callback);
+    auto state_sub
+        = node->create_subscription<control_msgs::msg::PidState>("/pid_state", rclcpp::SensorDataQoS(), state_callback);
 
-  double command = pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
-  EXPECT_EQ(-1.5, command);
+    double command = pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
+    EXPECT_EQ(-1.5, command);
 
-  // wait for callback
-  for (size_t i = 0; i < ATTEMPTS && !callback_called; ++i) {
-    pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
-    rclcpp::spin_some(node->get_node_base_interface());
-    std::this_thread::sleep_for(DELAY);
-  }
+    // wait for callback
+    for (size_t i = 0; i < ATTEMPTS && !callback_called; ++i) {
+        pid_ros.computeCommand(-0.5, rclcpp::Duration(1, 0));
+        rclcpp::spin_some(node->get_node_base_interface());
+        std::this_thread::sleep_for(DELAY);
+    }
 
-  ASSERT_TRUE(callback_called);
+    ASSERT_TRUE(callback_called);
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
-  testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(0, nullptr);
-  return RUN_ALL_TESTS();
+    testing::InitGoogleTest(&argc, argv);
+    rclcpp::init(0, nullptr);
+    return RUN_ALL_TESTS();
 }

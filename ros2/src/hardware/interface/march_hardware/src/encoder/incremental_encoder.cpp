@@ -4,19 +4,17 @@
 #include "march_hardware/motor_controller/motor_controller_type.h"
 
 namespace march {
-IncrementalEncoder::IncrementalEncoder(size_t counts_per_rotation,
-    MotorControllerType motor_controller_type, Direction direction,
-    double transmission)
+IncrementalEncoder::IncrementalEncoder(
+    size_t counts_per_rotation, MotorControllerType motor_controller_type, Direction direction, double transmission)
     : Encoder(counts_per_rotation, motor_controller_type, direction)
     , transmission_(transmission)
 {
     radians_per_iu_ = calculateRadiansPerIU();
 }
 
-IncrementalEncoder::IncrementalEncoder(size_t counts_per_rotation,
-    MotorControllerType motor_controller_type, double transmission)
-    : IncrementalEncoder(
-        counts_per_rotation, motor_controller_type, Direction::Positive, transmission)
+IncrementalEncoder::IncrementalEncoder(
+    size_t counts_per_rotation, MotorControllerType motor_controller_type, double transmission)
+    : IncrementalEncoder(counts_per_rotation, motor_controller_type, Direction::Positive, transmission)
 {
 }
 
@@ -38,8 +36,7 @@ double IncrementalEncoder::velocityIUToRadians(double velocity) const
         case MotorControllerType::IMotionCube:
             return Encoder::velocityIUToRadians(velocity);
         default:
-            throw error::HardwareException(
-                error::ErrorType::INVALID_MOTOR_CONTROLLER);
+            throw error::HardwareException(error::ErrorType::INVALID_MOTOR_CONTROLLER);
     }
 }
 
@@ -51,8 +48,7 @@ double IncrementalEncoder::velocityRadiansToIU(double velocity) const
         case MotorControllerType::IMotionCube:
             return Encoder::velocityIUToRadians(velocity);
         default:
-            throw error::HardwareException(
-                error::ErrorType::INVALID_MOTOR_CONTROLLER);
+            throw error::HardwareException(error::ErrorType::INVALID_MOTOR_CONTROLLER);
     }
 }
 } //  namespace march

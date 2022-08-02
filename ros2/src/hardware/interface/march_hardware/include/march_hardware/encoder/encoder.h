@@ -31,7 +31,7 @@ public:
      * Conversion may be different if it is position or velocity.
      * These methods may be overridden by child classes.
      */
-    virtual double positionRadiansToIU(double position) const;
+    virtual int32_t positionRadiansToIU(double position) const;
     virtual double velocityRadiansToIU(double velocity) const;
 
     /**

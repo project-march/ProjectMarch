@@ -141,13 +141,13 @@ def generate_launch_description() -> LaunchDescription:
             name="control_yaml",
             default_value="effort_control/march7_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
         DeclareLaunchArgument(
             name="gazebo_control_yaml",
             default_value="gazebo/march7_control.yaml",
             description="The gazebo controller yaml file to use this is added in through the urdf published "
-                        "on /robot_description. Must be in: `march_control/config/`.",
+            "on /robot_description. Must be in: `march_control/config/`.",
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -528,10 +528,7 @@ def generate_launch_description() -> LaunchDescription:
                 "controllers.launch.py",
             )
         ),
-        launch_arguments=[
-            ("simulation", simulation),
-            ("control_yaml", control_yaml)
-        ],
+        launch_arguments=[("simulation", simulation), ("control_yaml", control_yaml)],
     )
     # endregion
 

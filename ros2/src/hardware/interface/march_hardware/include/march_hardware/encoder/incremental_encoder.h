@@ -24,15 +24,12 @@ public:
     double getTransmission() const;
 
     /** @brief Override comparison operator */
-    friend bool operator==(
-        const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
+    friend bool operator==(const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
     {
-        return lhs.getTotalPositions() == rhs.getTotalPositions()
-            && lhs.transmission_ == rhs.transmission_;
+        return lhs.getTotalPositions() == rhs.getTotalPositions() && lhs.transmission_ == rhs.transmission_;
     }
     /** @brief Override stream operator for clean printing */
-    friend std::ostream& operator<<(
-        std::ostream& os, const IncrementalEncoder& encoder)
+    friend std::ostream& operator<<(std::ostream& os, const IncrementalEncoder& encoder)
     {
         return os << "totalPositions: " << encoder.getTotalPositions() << ", "
                   << "transmission: " << encoder.transmission_;

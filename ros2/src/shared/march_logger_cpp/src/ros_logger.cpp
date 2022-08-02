@@ -55,4 +55,4 @@ void RosLogger::fatal(const std::string& msg) const
     RCLCPP_FATAL((*rcl_logger_), msg);
 }
 
-}  // namespace march_logger
+} // namespace march_logger

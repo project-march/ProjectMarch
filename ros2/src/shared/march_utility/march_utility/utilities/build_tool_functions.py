@@ -63,6 +63,20 @@ def copy_subdir(dir_path: str, file_extension: str, package_name: str) -> List[T
 def generate_robot_desc_command(
     robot_descr_file, ground_gait, realsense_simulation, simulation, jointless, gazebo_control_yaml
 ):
+    """Generates the robot description command to load in the xacro file with arguments.
+
+    Args:
+        robot_descr_file (str): The xacro to use. Must be located in `.../march_description/urdf/... .xacro`.
+        ground_gait (bool): Whether we want to have the exo on the ground or fixed to the world.
+        realsense_simulation (bool): Whether we want to use realsense in the simulation.
+        simulation (bool): True if we run it in rviz or gazebo.
+        jointless (bool): True if we run it without any joints at all.
+        gazebo_control_yaml (str): The file where the control parameters are located when running with gazebo.
+                                    Must be in `.../march_control/config/[gazebo_control_yaml]`
+
+    Returns:
+        str. The command that can be run to parse the xacro.
+    """
     return [
         PathJoinSubstitution([FindExecutable(name="xacro")]),
         " ",
@@ -84,4 +98,13 @@ def generate_robot_desc_command(
 
 
 def get_control_file_loc(control_yaml):
+    """To get the absolute path the control file.
+
+    Args:
+        control_yaml (str): The name of the control file looked for (Must contain file extension, e.g. '.yaml').
+                             Must be in `.../march_control/config/[gazebo_control_yaml]`
+
+    Returns:
+        str. The  absolute path the control file
+    """
     return PathJoinSubstitution([FindPackageShare("march_control"), "config", control_yaml])

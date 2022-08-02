@@ -74,4 +74,3 @@ class SteppingStonesStepAndClose(DynamicGaitStepAndClose):
             start=True,
         )
         return GaitUpdate.should_schedule_early(self._next_command)
-

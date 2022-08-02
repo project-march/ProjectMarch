@@ -83,7 +83,8 @@ def generate_launch_description() -> LaunchDescription:
         package="march_robot_state_publisher",
         executable="march_robot_state_publisher_node",
         name="robot_state_publisher",
-        # namespace="march",
+        # Might be nice to add march namespace later on but /robot description should then be remapped.
+        # namespace="march",  # noqa: E800
         output="screen",
         parameters=[
             {

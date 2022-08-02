@@ -23,15 +23,11 @@ EffortWarner::EffortWarner(Node& node, std::vector<std::string>& joint_names)
     , joint_names_(joint_names)
 {
     this->under_effort_timestamps_.resize(joint_names.size(), node.now());
-    this->last_warning_timestamp_.resize(joint_names.size(),
-        Time(/*seconds=*/0, /*nanoseconds=*/0, RCL_ROS_TIME));
+    this->last_warning_timestamp_.resize(joint_names.size(), Time(/*seconds=*/0, /*nanoseconds=*/0, RCL_ROS_TIME));
     this->max_time_ = node.get_parameter("max_effort_time_limit").as_double();
-    this->time_between_warnings_
-        = node.get_parameter("time_between_effort_warnings").as_double();
-    this->max_effort_
-        = node.get_parameter("max_effort_limit").get_value<float>();
-    this->subscription_ = node.create_subscription<JointStateMsg>(
-        "/march/joint_states", SystemDefaultsQoS(),
+    this->time_between_warnings_ = node.get_parameter("time_between_effort_warnings").as_double();
+    this->max_effort_ = node.get_parameter("max_effort_limit").get_value<float>();
+    this->subscription_ = node.create_subscription<JointStateMsg>("/march/joint_states", SystemDefaultsQoS(),
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
         [this](const JointStateMsg::SharedPtr msg_ptr) -> void {
             effortValueCallback(msg_ptr);
@@ -55,16 +51,14 @@ void EffortWarner::effortValueCallback(const JointStateMsg::SharedPtr& msg_ptr)
     int i = 0;
     Time current_time = Time(msg_ptr->header.stamp);
     for (const std::string& joint_name : joint_names_) {
-        double time_diff_sec
-            = (current_time - under_effort_timestamps_[i]).seconds();
+        double time_diff_sec = (current_time - under_effort_timestamps_[i]).seconds();
         if (std::abs(msg_ptr->effort[i]) >= max_effort_) {
-            bool msg_recently_published = time_between_warnings_
-                > ((current_time - last_warning_timestamp_[i]).seconds());
+            bool msg_recently_published
+                = time_between_warnings_ > ((current_time - last_warning_timestamp_[i]).seconds());
             if (time_diff_sec >= max_time_ && !msg_recently_published) {
                 last_warning_timestamp_[i] = current_time;
-                RCLCPP_WARN(logger_,
-                    "The %s gets an effort above %f for %f seconds",
-                    joint_name.c_str(), max_effort_, time_diff_sec);
+                RCLCPP_WARN(logger_, "The %s gets an effort above %f for %f seconds", joint_name.c_str(), max_effort_,
+                    time_diff_sec);
             }
         } else {
             under_effort_timestamps_[i] = current_time;

@@ -37,33 +37,39 @@
 
 #include "control_toolbox/sinusoid.hpp"
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 Sinusoid::Sinusoid(double offset, double amplitude, double frequency, double phase)
-: offset_(offset), amplitude_(amplitude), frequency_(frequency), phase_(phase)
+    : offset_(offset)
+    , amplitude_(amplitude)
+    , frequency_(frequency)
+    , phase_(phase)
 {
 }
 
-Sinusoid::~Sinusoid() {}
-
-Sinusoid::Sinusoid() {}
-
-double Sinusoid::update(double time, double & qd, double & qdd)
+Sinusoid::~Sinusoid()
 {
-  double angular_frequency = 2.0 * M_PI * frequency_;
-  double p = phase_ + angular_frequency * time;
-  double sin_p = sin(p);
-  double cos_p = cos(p);
-  double q = offset_ + amplitude_ * sin_p;
-  qd = angular_frequency * amplitude_ * cos_p;
-  qdd = -angular_frequency * angular_frequency * amplitude_ * sin_p;
-  return q;
+}
+
+Sinusoid::Sinusoid()
+{
+}
+
+double Sinusoid::update(double time, double& qd, double& qdd)
+{
+    double angular_frequency = 2.0 * M_PI * frequency_;
+    double p = phase_ + angular_frequency * time;
+    double sin_p = sin(p);
+    double cos_p = cos(p);
+    double q = offset_ + amplitude_ * sin_p;
+    qd = angular_frequency * amplitude_ * cos_p;
+    qdd = -angular_frequency * angular_frequency * amplitude_ * sin_p;
+    return q;
 }
 
 void Sinusoid::debug()
 {
-  std::cout << "offset=" << offset_ << " amplitude=" << amplitude_ << " phase=" << phase_ <<
-    " frequency=" << frequency_ << std::endl;
+    std::cout << "offset=" << offset_ << " amplitude=" << amplitude_ << " phase=" << phase_
+              << " frequency=" << frequency_ << std::endl;
 }
 
-}  // namespace control_toolbox
+} // namespace control_toolbox

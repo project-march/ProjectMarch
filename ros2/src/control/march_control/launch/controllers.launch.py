@@ -1,3 +1,4 @@
+"""Author: George Vegelien, MVII."""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler
 from launch.conditions import UnlessCondition, IfCondition
@@ -8,7 +9,7 @@ from launch.substitutions import (
     PathJoinSubstitution,
     FindExecutable,
     PythonExpression,
-    EnvironmentVariable
+    EnvironmentVariable,
 )
 
 from launch_ros.actions import Node
@@ -18,6 +19,7 @@ from march_utility.utilities.build_tool_functions import get_control_file_loc
 
 
 def generate_launch_description():
+    """Launch file to start up the controllers, controller_manager, hardware_interface and rviz."""
     # Whether the exoskeleton is ran physically or in simulation.
     simulation = LaunchConfiguration("simulation")
     rviz = LaunchConfiguration("rviz")
@@ -30,41 +32,38 @@ def generate_launch_description():
             name="simulation",
             default_value="true",
             description="Whether the exoskeleton is ran physically or in simulation.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
-            name="rviz",
-            default_value="true",
-            description="Whether we should startup rviz.",
-            choices=["true", "false"]
+            name="rviz", default_value="true", description="Whether we should startup rviz.", choices=["true", "false"]
         ),
         DeclareLaunchArgument(
             name="actuating",
             default_value="true",
             description="Whether we should only read the values of the joints (thus not send actuation commands).",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         # region set control type. (This section set the control types for either gazebo, exo, or rviz control)
         DeclareLaunchArgument(
             name="control_type",
             default_value="effort",
             description="Decides which controller is being used. "
-                        "'Effort' when you are running either gazebo or the real exo",
+            "'Effort' when you are running either gazebo or the real exo",
             choices=["rviz", "effort"],
-            condition=UnlessCondition(PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])),
+            condition=UnlessCondition(
+                PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])
+            ),
         ),
         DeclareLaunchArgument(
             name="control_type",
             default_value="rviz",
             description="Decides which controller is being used. "
-                        "'Rviz' when you are not running either gazebo or the real exo",
+            "'Rviz' when you are not running either gazebo or the real exo",
             choices=["rviz", "effort"],
-            # condition=[launch.conditions.IfCondition(simulation), launch.conditions.UnlessCondition(gazebo)],
             condition=IfCondition(PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])),
         )
         # endregion
     ]
-
 
     # region Starts Controllers
     joint_state_broadcaster_spawner = Node(
@@ -126,7 +125,7 @@ def generate_launch_description():
         },
         condition=UnlessCondition(gazebo),
     )
-    nodes.append(control_node)
+    nodes.append(control_node)  # noqa: PIE799 As this way is more readable, and easier to uncomment.
     # endregion
 
     # region Launch RViz
@@ -139,7 +138,7 @@ def generate_launch_description():
         name="rviz2",
         output="log",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(rviz)
+        condition=IfCondition(rviz),
     )
     rviz_node_after_broadcast_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(

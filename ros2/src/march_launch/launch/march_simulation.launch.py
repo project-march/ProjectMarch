@@ -103,7 +103,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="control_yaml",
             default_value="rviz/march7_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -177,13 +177,13 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="gazebo",
             default_value="false",
             description="Whether gazebo should be launched.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="simulation",
             default_value="true",
             description="Whether simulation is used.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         # GAIT SELECTION ARGUMENTS
         DeclareLaunchArgument(
@@ -237,7 +237,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="add_push_off",
             default_value="true",
             description="Whether to add a push off setpoint for the ankle.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="amount_of_steps",
@@ -249,7 +249,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="false",
             description="Uses the values in position_queue.yaml for the half step if true, otherwise uses "
             "points given by (simulated) covid.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="add_cybathlon_gaits",
@@ -371,7 +371,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("location_y", location_y),
             ("location_z", location_z),
             ("gazebo", gazebo),
-            ("control_yaml", control_yaml)
+            ("control_yaml", control_yaml),
         ],
     )
     # endregion

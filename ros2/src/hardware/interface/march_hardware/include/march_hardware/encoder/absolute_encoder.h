@@ -5,8 +5,8 @@
 #include "march_hardware/encoder/encoder.h"
 #include "march_hardware/motor_controller/motor_controller_type.h"
 
-#include <ostream>
 #include <march_logger_cpp/base_logger.hpp>
+#include <ostream>
 
 namespace march {
 class AbsoluteEncoder : public Encoder {
@@ -14,23 +14,20 @@ public:
     /**
      * Construct AbsoluteEncoder with both hard and soft limits.
      */
-    AbsoluteEncoder(size_t counts_per_rotation,
-        MotorControllerType motor_controller_type, Direction direction,
+    AbsoluteEncoder(size_t counts_per_rotation, MotorControllerType motor_controller_type, Direction direction,
         int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
         double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
         double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff);
-    AbsoluteEncoder(size_t counts_per_rotation,
-        MotorControllerType motor_controller_type,
-        int32_t lower_limit_iu, int32_t upper_limit_iu, int32_t zero_position_iu,
-        double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
-        double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff);
+    AbsoluteEncoder(size_t counts_per_rotation, MotorControllerType motor_controller_type, int32_t lower_limit_iu,
+        int32_t upper_limit_iu, int32_t zero_position_iu, double lower_error_soft_limit_rad_diff,
+        double upper_error_soft_limit_rad_diff, double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff);
 
     ~AbsoluteEncoder() noexcept override = default;
 
     // Inherited methods
     double calculateRadiansPerIU() const final;
     double positionIUToRadians(double position) const final;
-    double positionRadiansToIU(double position) const final;
+    int32_t positionRadiansToIU(double position) const final;
 
     bool isWithinHardLimitsIU(int32_t iu) const;
     bool isWithinHardLimitsRadians(double pos_in_radians) const;
@@ -48,8 +45,7 @@ public:
     int32_t getLowerHardLimitIU() const;
 
     /** @brief Override comparison operator */
-    friend bool operator==(
-        const AbsoluteEncoder& lhs, const AbsoluteEncoder& rhs)
+    friend bool operator==(const AbsoluteEncoder& lhs, const AbsoluteEncoder& rhs)
     {
         return lhs.getTotalPositions() == rhs.getTotalPositions()
             && lhs.upper_soft_limit_iu_ == rhs.upper_soft_limit_iu_
@@ -57,12 +53,10 @@ public:
             && lhs.lower_error_soft_limit_iu_ == rhs.lower_error_soft_limit_iu_
             && lhs.upper_error_soft_limit_iu_ == rhs.upper_error_soft_limit_iu_
             && lhs.upper_hard_limit_iu_ == rhs.upper_hard_limit_iu_
-            && lhs.lower_hard_limit_iu_ == rhs.lower_hard_limit_iu_
-            && lhs.zero_position_iu_ == rhs.zero_position_iu_;
+            && lhs.lower_hard_limit_iu_ == rhs.lower_hard_limit_iu_ && lhs.zero_position_iu_ == rhs.zero_position_iu_;
     }
     /** @brief Override stream operator for clean printing */
-    friend std::ostream& operator<<(
-        std::ostream& os, const AbsoluteEncoder& encoder)
+    friend std::ostream& operator<<(std::ostream& os, const AbsoluteEncoder& encoder)
     {
         return os << "totalPositions: " << encoder.getTotalPositions() << ", "
                   << "upperHardLimit: " << encoder.upper_hard_limit_iu_ << ", "
@@ -103,10 +97,10 @@ private:
      *              lower_soft_limit_iu_,
      *              upper_soft_limit_iu_.
      *
-    * @throws A HardwareException if the range of motion is not valid.
-    */
+     * @throws A HardwareException if the range of motion is not valid.
+     */
     void inputSanityCheck(double lower_error_soft_limit_rad_diff, double upper_error_soft_limit_rad_diff,
-                          double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff) const;
+        double lower_soft_limit_rad_diff, double upper_soft_limit_rad_diff) const;
 };
 } // namespace march
 

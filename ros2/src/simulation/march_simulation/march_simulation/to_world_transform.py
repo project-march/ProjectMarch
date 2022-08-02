@@ -1,3 +1,4 @@
+"""Author: MVI."""
 from typing import List
 
 import rclpy
@@ -6,14 +7,17 @@ import tf2_ros
 from geometry_msgs.msg import TransformStamped, Vector3
 from gazebo_msgs.srv import GetEntityState, GetModelList
 
-NODE_NAME = 'to_world_transform'
-MODEL_NAME = 'exo'
+NODE_NAME = "to_world_transform"
+MODEL_NAME = "exo"
 SERVICE_TIMEOUT = 2
 
 
 class WorldTransformer(Node):
-    """The WorldTransformer node gets the entity state of the march model
-    continuously, and publishes this information on the /tf topic."""
+    """Node to continuously get the entity state of the exo.
+
+    The WorldTransformer node gets the entity state of the march model continuously,
+    and publishes this information on the /tf topic.
+    """
 
     def __init__(self):
         super().__init__(NODE_NAME)
@@ -21,25 +25,26 @@ class WorldTransformer(Node):
         self.get_logger().info("Exoskeleton is mobile")
 
         self.transform = TransformStamped()
-        self.transform.header.frame_id = 'world'
-        self.transform.child_frame_id = 'base_link'
+        self.transform.header.frame_id = "world"
+        self.transform.child_frame_id = "base_link"
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
 
-        self.get_model_list_client = self.create_client(GetModelList, '/get_model_list')
-        self.get_entity_state_client = self.create_client(GetEntityState, '/get_entity_state')
+        self.get_model_list_client = self.create_client(GetModelList, "/get_model_list")
+        self.get_entity_state_client = self.create_client(GetEntityState, "/get_entity_state")
 
         # set this rate equal to the rate of the joint state publisher, such that the TF frames are updated at the same rate.
         self.rate = self.create_rate(50)
 
     def start(self):
+        """To start the node for listing."""
         while not self.get_model_list_client.wait_for_service(SERVICE_TIMEOUT):
-            self.get_logger().info('Waiting for /get_model_list to come online')
+            self.get_logger().info("Waiting for /get_model_list to come online")
 
         while rclpy.ok() and MODEL_NAME not in self.get_model_list():
-            self.get_logger().info(f'Waiting for model {MODEL_NAME} to appear in model list')
+            self.get_logger().info(f"Waiting for model {MODEL_NAME} to appear in model list")
 
         while not self.get_entity_state_client.wait_for_service(SERVICE_TIMEOUT):
-            self.get_logger().info('Waiting for /get_entity_state to come online')
+            self.get_logger().info("Waiting for /get_entity_state to come online")
 
         while rclpy.ok():
             result = self.get_entity_state(MODEL_NAME)
@@ -71,5 +76,6 @@ class WorldTransformer(Node):
 
 
 def main():
+    """The entry script function."""
     rclpy.init()
     WorldTransformer().start()

@@ -2,15 +2,13 @@
 
 namespace gazebo {
 // Called at simulation startup:
-void ComControllerPlugin::Load(
-    physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
+void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
     // Store the pointer to the model:
     model_ = _parent;
 
     // Bind function that should be called every simulation iteration:
-    update_connection_ = event::Events::ConnectWorldUpdateBegin(
-        std::bind(&ComControllerPlugin::onUpdate, this));
+    update_connection_ = event::Events::ConnectWorldUpdateBegin(std::bind(&ComControllerPlugin::onUpdate, this));
 
     // Default PD values:
     pd_values_["p_roll"] = 250;
@@ -33,18 +31,19 @@ void ComControllerPlugin::Load(
 // Update event to be called every simulation iteration:
 void ComControllerPlugin::onUpdate()
 {
-    if (! node_->balance_mode()){
-    ignition::math::v6::Vector3<double> torque_left;
-    ignition::math::v6::Vector3<double> torque_right;
+    if (!node_->balance_mode()) {
+        ignition::math::v6::Vector3<double> torque_left;
+        ignition::math::v6::Vector3<double> torque_right;
 
-    controller_->update(torque_left, torque_right);
+        controller_->update(torque_left, torque_right);
 
-    for (auto const& link : model_->GetLinks()) {
-        if (link->GetName().find(/*__s=*/"left") != std::string::npos) {
-            link->AddTorque(torque_left);
-        } else if (link->GetName().find(/*__s=*/"right") != std::string::npos) {
-            link->AddTorque(torque_right);
+        for (auto const& link : model_->GetLinks()) {
+            if (link->GetName().find(/*__s=*/"left") != std::string::npos) {
+                link->AddTorque(torque_left);
+            } else if (link->GetName().find(/*__s=*/"right") != std::string::npos) {
+                link->AddTorque(torque_right);
+            }
         }
     }
-}}
+}
 } // namespace gazebo

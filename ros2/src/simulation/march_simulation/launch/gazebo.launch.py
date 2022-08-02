@@ -1,4 +1,4 @@
-"""Atuhor: George Vegelien, MVII."""
+"""Author: George Vegelien, MVII."""
 import launch.conditions
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
@@ -11,6 +11,10 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    """Launch file to start up gazebo.
+
+    TODO: Fix and add startup of `toWorldTransform()`.
+    """
     obstacle = LaunchConfiguration("obstacle")
     gazebo_ui = LaunchConfiguration("gazebo_ui")
     debug = LaunchConfiguration("gazebo_debug")
@@ -25,53 +29,45 @@ def generate_launch_description():
             "obstacle",
             default_value="none",
             description="Obstacle to load in the simulation.",
-            choices=["none", "bench", "curb", "ramp", "rough_terrain", "stairs", "tilted_path"]
+            choices=["none", "bench", "curb", "ramp", "rough_terrain", "stairs", "tilted_path"],
         ),
         DeclareLaunchArgument(
-            "gazebo_ui",
-            default_value="true",
-            description="Launches the Gazebo UI.",
-            choices=["true", "false"]
+            "gazebo_ui", default_value="true", description="Launches the Gazebo UI.", choices=["true", "false"]
         ),
         DeclareLaunchArgument(
             "gazebo_debug",
             default_value="false",
             description="Starts gazebo debugging with gdb.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             "use_sim_time",
             default_value="true",
             description="Uses simulated time and publishes on /clock.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
-            name='fixed',
-            default_value='true',
-            description='Fixes the exoskeleton in the world. Transforms baselink to world if not fixed.',
-            choices=["true", "false"]
+            name="fixed",
+            default_value="true",
+            description="Fixes the exoskeleton in the world. Transforms baselink to world if not fixed.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
-            name='gazebo_verbose',
-            default_value='true',
-            description='If gazebo should print errors and logs.',
-            choices=["true", "false"]
+            name="gazebo_verbose",
+            default_value="true",
+            description="If gazebo should print errors and logs.",
+            choices=["true", "false"],
         ),
     ]
     # endregion
 
     # region Launch Gazebo
 
-    gazebo_world_file = PathJoinSubstitution([
-        get_package_share_directory('march_simulation'),
-        'worlds', 'march.world'
-    ])
+    gazebo_world_file = PathJoinSubstitution([get_package_share_directory("march_simulation"), "worlds", "march.world"])
 
     # The idea is that this should stop previously open gazebo processes. This is NOT EXTENSIVELY TESTED.
-    close_gazebo = ExecuteProcess(
-        cmd=[['killall', '-9', 'gzserver', 'gzclient']],
-        shell=True
-    )
+    close_gazebo = ExecuteProcess(cmd=[["killall", "-9", "gzserver", "gzclient"]], shell=True)  # noqa: S604
+    # noqa because it is generally unsafe to run a command in the shell but needed in this case.
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -101,29 +97,27 @@ def generate_launch_description():
 
     # region Spawn obstacle
     spawn_obstacle = Node(
-        package='march_simulation',
-        executable='spawn_obstacle',
-        parameters=[{'obstacle': obstacle}],
-        output='screen',
-        condition=launch.conditions.LaunchConfigurationNotEquals("obstacle", "none")
+        package="march_simulation",
+        executable="spawn_obstacle",
+        parameters=[{"obstacle": obstacle}],
+        output="screen",
+        condition=launch.conditions.LaunchConfigurationNotEquals("obstacle", "none"),
     )
     # endregion
 
     # region Spawn obstacle dimension setter
     obstacle_dimension_setter = Node(
-        name="march_set_obstacle_dimension_node",
-        package="march_simulation",
-        executable="set_obstacle_dimensions"
+        name="march_set_obstacle_dimension_node", package="march_simulation", executable="set_obstacle_dimensions"
     )
     # endregion
 
     # region Spawn node that transforms baselink to world
     base_link_to_world_transform = Node(
-        package='march_simulation',
-        executable='to_world_transform',
-        name='world_transformer',
-        output='screen',
-        condition=UnlessCondition(fixed)
+        package="march_simulation",
+        executable="to_world_transform",
+        name="world_transformer",
+        output="screen",
+        condition=UnlessCondition(fixed),
     )
     # endregion
 
@@ -133,7 +127,7 @@ def generate_launch_description():
         gazebo_spawn_entity,
         spawn_obstacle,
         obstacle_dimension_setter,
-        base_link_to_world_transform
+        base_link_to_world_transform,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

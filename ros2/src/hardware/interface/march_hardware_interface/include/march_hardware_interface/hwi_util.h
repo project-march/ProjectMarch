@@ -5,13 +5,13 @@
 #ifndef MARCH_HARDWARE_INTERFACE__HWI_UTIL_H
 #define MARCH_HARDWARE_INTERFACE__HWI_UTIL_H
 
+#include "march_hardware/march_robot.h"
+#include "march_utility/logger_colors.hpp"
 #include <algorithm>
 #include <hardware_interface/hardware_info.hpp>
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#include "march_hardware/march_robot.h"
-#include "march_utility/logger_colors.hpp"
 
 using namespace std;
 
@@ -85,8 +85,9 @@ inline bool joints_have_interface_types(const vector<hardware_interface::Compone
     return true;
 }
 
-inline string get_parameter(const hardware_interface::ComponentInfo& component, const string& parameter,
-                             const string& default_value ) {
+inline string get_parameter(
+    const hardware_interface::ComponentInfo& component, const string& parameter, const string& default_value)
+{
     const auto& params = component.parameters;
     auto pos_iterator = params.find(parameter);
     if (pos_iterator == params.end()) {
@@ -99,12 +100,13 @@ inline string get_parameter(const hardware_interface::ComponentInfo& component, 
 /// To switch path separators when on windows.
 inline static const char PATH_SEPARATOR =
 #ifdef _WIN32
-        '\\';
+    '\\';
 #else
-        '/';
+    '/';
 #endif
 
-inline string joint_vector_to_string(std::vector<march::Joint*>& joints) {
+inline string joint_vector_to_string(std::vector<march::Joint*>& joints)
+{
     std::stringstream joint_names_ss;
     joint_names_ss << "[ ";
     for (ulong i = 0; i < joints.size() - 1; i++) {
@@ -124,32 +126,30 @@ inline string joint_vector_to_string(std::vector<march::Joint*>& joints) {
  * @param function_when_timeout The function that is executed on all joints that did not succeed.
  * @param sleep_between_tries The time between retries.
  * @param maximum_tries The maximum number of retries.
- * \throws march::error::HardwareException if it did not succeed to execute for every joint in the given amount of tries.
+ * \throws march::error::HardwareException if it did not succeed to execute for every joint in the given amount of
+ * tries.
  */
-inline void repeat_function_on_joints_until_timeout(const string &function_goal,
-                                                    const function<bool(march::Joint &)> &function,
-                                                    const rclcpp::Logger &logger,
-                                                    std::vector<march::Joint*>& joints,
-                                                    const optional<std::function<void(march::Joint &)>> &
-                                                        function_when_timeout = nullopt,
-                                                    const chrono::nanoseconds sleep_between_tries
-                                                        = std::chrono::seconds(1),
-                                                    const unsigned maximum_tries  = 5) {
+inline void repeat_function_on_joints_until_timeout(const string& function_goal,
+    const function<bool(march::Joint&)>& function, const rclcpp::Logger& logger, std::vector<march::Joint*>& joints,
+    const optional<std::function<void(march::Joint&)>>& function_when_timeout = nullopt,
+    const chrono::nanoseconds sleep_between_tries = std::chrono::seconds(1), const unsigned maximum_tries = 5)
+{
     vector<bool> is_ok;
     unsigned int amount_ok = 0;
     unsigned int amount_of_joints = joints.size();
-    is_ok.resize(amount_of_joints, false);
+    is_ok.resize(amount_of_joints, /*__x=*/false);
     RCLCPP_INFO(logger, "Trying to perform %s'%s'%s on joints: '%s' in %i tries. %sMight take %f seconds.",
-                LColor::BOLD, function_goal.c_str(), LColor::END,
-                joint_vector_to_string(joints).c_str(), maximum_tries,
-                LColor::WARNING, sleep_between_tries.count() / 1000000000.0 * maximum_tries);
+        LColor::BOLD, function_goal.c_str(), LColor::END, joint_vector_to_string(joints).c_str(), maximum_tries,
+        LColor::WARNING, sleep_between_tries.count() / 1000000000.0 * maximum_tries);
     unsigned int num_tries = 0;
     for (; num_tries < maximum_tries; num_tries++) {
         for (unsigned int i = 0; i < amount_of_joints; i++) {
             if (!is_ok.at(i) && function(/*input_to_given_function=*/*joints[i])) {
                 amount_ok++;
                 is_ok.at(i) = true;
-                if (amount_ok == amount_of_joints) { return; }
+                if (amount_ok == amount_of_joints) {
+                    return;
+                }
             }
         }
         rclcpp::sleep_for(sleep_between_tries);
@@ -158,42 +158,41 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
     if (amount_ok != amount_of_joints) {
         for (unsigned int i = 0; i < amount_of_joints; i++) {
             if (!is_ok.at(i)) {
-                RCLCPP_ERROR(logger, "Couldn't perform '%s' on joint '%s' in %i tries.",
-                             function_goal.c_str(), joints[i]->getName().c_str(), num_tries);
+                RCLCPP_ERROR(logger, "Couldn't perform '%s' on joint '%s' in %i tries.", function_goal.c_str(),
+                    joints[i]->getName().c_str(), num_tries);
             }
         }
         if (function_when_timeout.has_value()) {
-            auto const &callable = function_when_timeout.value();
+            auto const& callable = function_when_timeout.value();
             for (unsigned int i = 0; i < amount_of_joints; i++) {
                 if (!is_ok.at(i)) {
                     callable(*joints[i]);
                 }
             }
         }
-        throw march::error::HardwareException(
-                march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
+        throw march::error::HardwareException(march::error::ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED);
     }
 }
 
-inline void call_function_and_wait_on_joints(const string &function_goal,
-                                             const function<const chrono::nanoseconds(march::Joint &)> &function,
-                                             const rclcpp::Logger &logger,
-                                             std::vector<march::Joint*>& joints) {
-    RCLCPP_INFO(logger, "Performing %s'%s'%s on joints: '%s'.",
-                LColor::BOLD, function_goal.c_str(), LColor::END, joint_vector_to_string(joints).c_str());
-    chrono::nanoseconds max_sleep {0};
+inline void call_function_and_wait_on_joints(const string& function_goal,
+    const function<const chrono::nanoseconds(march::Joint&)>& function, const rclcpp::Logger& logger,
+    std::vector<march::Joint*>& joints)
+{
+    RCLCPP_INFO(logger, "Performing %s'%s'%s on joints: '%s'.", LColor::BOLD, function_goal.c_str(), LColor::END,
+        joint_vector_to_string(joints).c_str());
+    chrono::nanoseconds max_sleep { 0 };
     for (auto joint : joints) {
         max_sleep = max(max_sleep, function(*joint));
     }
     if (max_sleep.count() > 0) {
-        RCLCPP_INFO(logger, "%s %s Successful after %.4f seconds.",
-                    LColor::BLUE, function_goal.c_str(), max_sleep.count(), max_sleep.count() / 1000000000.0);
+        RCLCPP_INFO(logger, "%s %s Successful after %.4f seconds.", LColor::BLUE, function_goal.c_str(),
+            max_sleep.count(), max_sleep.count() / 1000000000.0);
     }
     rclcpp::sleep_for(max_sleep);
-
 }
 
-inline bool is_ethercat_alive(std::exception_ptr exceptionPtr, const rclcpp::Logger &logger) {
+inline bool is_ethercat_alive(const std::exception_ptr& exceptionPtr, const rclcpp::Logger& logger)
+{
     if (exceptionPtr) {
         try {
             std::rethrow_exception(exceptionPtr);
@@ -205,19 +204,17 @@ inline bool is_ethercat_alive(std::exception_ptr exceptionPtr, const rclcpp::Log
     return true;
 }
 
-inline bool is_motor_controller_in_a_valid_state(march::Joint& joint, const rclcpp::Logger &logger)
+inline bool is_motor_controller_in_a_valid_state(march::Joint& joint, const rclcpp::Logger& logger)
 {
     auto motor_controller_state = joint.getMotorController()->getState();
     if (!motor_controller_state->isOperational()) {
         RCLCPP_ERROR(logger, "MotorController of joint %s is in fault state %s.\n Error Status: \n%s",
-                  joint.getName().c_str(),
-                  motor_controller_state->getOperationalState().c_str(),
-                  motor_controller_state->getErrorStatus()->c_str());
+            joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
+            motor_controller_state->getErrorStatus()->c_str());
         return false;
     }
     return true;
 }
-
 
 } // namespace march_hardware_interface_util
 

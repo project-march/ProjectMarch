@@ -1,3 +1,4 @@
+"""Author: George Vegelien, MVII."""
 import os
 
 from ament_index_python import get_package_share_directory
@@ -5,13 +6,13 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 DEFAULT_CONTROLLER_FILE = os.path.join("gazebo", "march6_control.yaml")
 
 
 def generate_launch_description():
+    """Launch file to load in the exo without starting the rest of the march code base (might be outdated)."""
     controller_file = LaunchConfiguration("controller_file")
     robot_description_file = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")
@@ -38,7 +39,7 @@ def generate_launch_description():
             "use_sim_time",
             default_value="true",
             description="Uses simulated time and publishes on /clock.",
-            choices=["true", "false"]
+            choices=["true", "false"],
         ),
     ]
 
@@ -50,7 +51,9 @@ def generate_launch_description():
     )
     # endregion
 
-    # robot_description_content = open("/home/george/repos/ros2_demo_test/ros2_control_demos/src/ros2_control_demo_description/rrbot_description/urdf/rrbot.urdf.xacro").read()
+    # To load the file directly to see if it parses correctly.
+    # robot_description_content = open("/home/george/repos/ros2_demo_test/ros2_control_demos/src/"
+    #                                 "ros2_control_demo_description/rrbot_description/urdf/rrbot.urdf.xacro").read()
 
     # region Launch Robot state publisher. Publishes the robot description on '/robot_description'
     robot_state_pub_node = IncludeLaunchDescription(
@@ -88,10 +91,6 @@ def generate_launch_description():
     )
     # endregion
 
-    nodes = [
-        robot_state_pub_node,
-        gazebo,
-        march_control
-    ]
+    nodes = [robot_state_pub_node, gazebo, march_control]
 
     return LaunchDescription(declared_arguments + nodes)

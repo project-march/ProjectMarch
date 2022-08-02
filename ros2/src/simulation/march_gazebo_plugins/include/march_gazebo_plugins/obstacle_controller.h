@@ -4,8 +4,8 @@
 
 #include "yaml-cpp/yaml.h"
 #include <gazebo/physics/physics.hh>
-#include <march_shared_msgs/msg/current_gait.hpp>
 #include <map>
+#include <march_shared_msgs/msg/current_gait.hpp>
 #include <string>
 
 namespace gazebo {
@@ -13,18 +13,13 @@ class ObstacleController {
 public:
     explicit ObstacleController(physics::ModelPtr model, std::map<std::string, int>& pd_values);
 
-    void newSubgait(
-        const march_shared_msgs::msg::CurrentGait::ConstSharedPtr& msg);
+    void newSubgait(const march_shared_msgs::msg::CurrentGait::ConstSharedPtr& msg);
     ignition::math::v6::Vector3<double> GetCom();
-    void update(ignition::math::v6::Vector3<double>& torque_all,
-        ignition::math::v6::Vector3<double>& torque_stable);
+    void update(ignition::math::v6::Vector3<double>& torque_all, ignition::math::v6::Vector3<double>& torque_stable);
     void getGoalPosition(double time_since_start);
-    void getSitGoalPositionX(
-        double time_since_start, double stable_foot_pose_x);
-    void getStandGoalPositionX(
-        double time_since_start, double stable_foot_pose_x);
-    void getWalkGoalPositionX(
-        double time_since_start, double stable_foot_pose_x);
+    void getSitGoalPositionX(double time_since_start, double stable_foot_pose_x);
+    void getStandGoalPositionX(double time_since_start, double stable_foot_pose_x);
+    void getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x);
 
 protected:
     physics::ModelPtr model_;

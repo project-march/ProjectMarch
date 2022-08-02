@@ -11,37 +11,32 @@
 #include <vector>
 
 namespace march {
-MarchRobot::MarchRobot(::std::vector<Joint> jointList,  std::shared_ptr<march_logger::BaseLogger> logger,
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
     ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : joint_list_(std::move(jointList))
-    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(),
-                       ecatCycleTime, ecatSlaveTimeout, logger)
-        , logger_(std::move(logger))
+    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger)
+    , logger_(std::move(logger))
 
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name,
-    int ecatCycleTime, int ecatSlaveTimeout)
+    std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : joint_list_(std::move(jointList))
-    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(),
-                       ecatCycleTime, ecatSlaveTimeout, logger)
+    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger)
     , pressure_soles_(std::move(pressureSoles))
-        , logger_(std::move(logger))
+    , logger_(std::move(logger))
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name,
-    int ecatCycleTime, int ecatSlaveTimeout,
+    std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
     std::optional<PowerDistributionBoard> power_distribution_board)
     : joint_list_(std::move(jointList))
-    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(),
-                       ecatCycleTime, ecatSlaveTimeout, logger)
+    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger)
     , pressure_soles_(std::move(pressureSoles))
     , power_distribution_board_(std::move(power_distribution_board))
-        , logger_(std::move(logger))
+    , logger_(std::move(logger))
 {
     for (const auto& joint : joint_list_) {
         logger_->info(logger_->fstring("Robot with joint: %s", joint.getName().c_str()));
@@ -51,8 +46,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_log
 void MarchRobot::startEtherCAT(bool reset_motor_controllers)
 {
     if (!hasValidSlaves()) {
-        throw error::HardwareException(
-            error::ErrorType::INVALID_SLAVE_CONFIGURATION);
+        throw error::HardwareException(error::ErrorType::INVALID_SLAVE_CONFIGURATION);
     }
     logger_->info("Slave configuration is non-conflicting");
 
@@ -62,12 +56,12 @@ void MarchRobot::startEtherCAT(bool reset_motor_controllers)
     }
 
     bool sw_reset = ethercat_master_.start(this->joint_list_);
-//    bool sw_reset = false;
+    //    bool sw_reset = false;
 
     if (reset_motor_controllers || sw_reset) {
-        logger_->debug(logger_->fstring(
-                "Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw file: %d",
-             reset_motor_controllers, sw_reset));
+        logger_->debug(
+            logger_->fstring("Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw file: %d",
+                reset_motor_controllers, sw_reset));
         resetMotorControllers();
 
         logger_->info("Restarting the EtherCAT Master");
@@ -99,11 +93,9 @@ int MarchRobot::getMaxSlaveIndex()
 
     for (Joint& joint : joint_list_) {
         if (joint.hasTemperatureGES()) {
-            maxSlaveIndex = std::max(
-                (int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
+            maxSlaveIndex = std::max((int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
         }
-        maxSlaveIndex = std::max(
-            (int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
+        maxSlaveIndex = std::max((int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
     }
     return maxSlaveIndex;
 }
@@ -116,13 +108,11 @@ bool MarchRobot::hasValidSlaves()
 
     for (auto& joint : joint_list_) {
         if (joint.hasTemperatureGES()) {
-            int temperatureSlaveIndex
-                = joint.getTemperatureGES()->getSlaveIndex();
+            int temperatureSlaveIndex = joint.getTemperatureGES()->getSlaveIndex();
             temperatureSlaveIndices.push_back(temperatureSlaveIndex);
         }
 
-        int motorControllerSlaveIndex
-            = joint.getMotorController()->getSlaveIndex();
+        int motorControllerSlaveIndex = joint.getMotorController()->getSlaveIndex();
         motorControllerIndices.push_back(motorControllerSlaveIndex);
     }
 
@@ -136,20 +126,15 @@ bool MarchRobot::hasValidSlaves()
     // duplicates later.
     sort(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
     temperatureSlaveIndices.erase(
-        unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()),
-        temperatureSlaveIndices.end());
+        unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()), temperatureSlaveIndices.end());
 
     // Merge the slave indices
     ::std::vector<int> slaveIndices;
 
-    slaveIndices.reserve(
-        motorControllerIndices.size() + temperatureSlaveIndices.size());
-    slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(),
-        motorControllerIndices.end());
-    slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
-        temperatureSlaveIndices.end());
-    slaveIndices.insert(
-        slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
+    slaveIndices.reserve(motorControllerIndices.size() + temperatureSlaveIndices.size());
+    slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
+    slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
+    slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
 
     logger_->info(logger_->fstring("Found configuration for %lu slaves.", slaveIndices.size()));
 
@@ -194,7 +179,7 @@ Joint& MarchRobot::getJoint(const ::std::string& jointName)
     logger_->info(logger_->fstring("Getting joint %s.", jointName.c_str()));
     if (!ethercat_master_.isOperational()) {
         logger_->warn("Trying to access joints while ethercat is not operational. "
-                     "This may lead to incorrect sensor data.");
+                      "This may lead to incorrect sensor data.");
     }
     for (auto& joint : joint_list_) {
         if (joint.getName() == jointName) {
@@ -210,7 +195,7 @@ Joint& MarchRobot::getJoint(size_t index)
     logger_->info(logger_->fstring("Getting joint by index with name %s.", joint_list_.at(index).getName().c_str()));
     if (!ethercat_master_.isOperational()) {
         logger_->warn("Trying to access joints while ethercat is not operational. "
-                     "This may lead to incorrect sensor data.");
+                      "This may lead to incorrect sensor data.");
     }
     return this->joint_list_.at(index);
 }
@@ -238,7 +223,7 @@ MarchRobot::iterator MarchRobot::begin()
 {
     if (!ethercat_master_.isOperational()) {
         logger_->warn("Trying to access joints while ethercat is not operational. "
-                     "This may lead to incorrect sensor data.");
+                      "This may lead to incorrect sensor data.");
     }
     return this->joint_list_.begin();
 }

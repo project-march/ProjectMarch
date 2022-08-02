@@ -28,20 +28,21 @@ namespace march_hardware_interface {
 
 const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
-MarchRvizSystemInterface::MarchRvizSystemInterface() :
-    logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
-    {}
+MarchRvizSystemInterface::MarchRvizSystemInterface()
+    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
+{
+}
 
 /** Configures the controller.
  * Checkout https://design.ros2.org/articles/node_lifecycle.html, for more information on the execution order.
  */
 hardware_interface::return_type MarchRvizSystemInterface::configure(const hardware_interface::HardwareInfo& info)
 {
-//    info.joints[0].parameters
+    //    info.joints[0].parameters
     if (configure_default(info) != hardware_interface::return_type::OK) {
         return hardware_interface::return_type::ERROR;
     }
-//    logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface"));
+    //    logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface"));
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
@@ -91,13 +92,13 @@ std::vector<hardware_interface::CommandInterface> MarchRvizSystemInterface::expo
     return command_interfaces;
 }
 
-hardware_interface::return_type
-MarchRvizSystemInterface::perform_command_mode_switch(const vector<std::string> &start_interfaces,
-                                                      const vector<std::string> &stop_interfaces) {
-    for (const auto& start: start_interfaces) {
+hardware_interface::return_type MarchRvizSystemInterface::perform_command_mode_switch(
+    const vector<std::string>& start_interfaces, const vector<std::string>& stop_interfaces)
+{
+    for (const auto& start : start_interfaces) {
         RCLCPP_INFO((*logger_), "Start interfaces: %s", start.c_str());
     }
-    for (const auto& stop: stop_interfaces) {
+    for (const auto& stop : stop_interfaces) {
         RCLCPP_INFO((*logger_), "Stop interfaces: %s", stop.c_str());
     }
     return hardware_interface::return_type::OK;
@@ -147,8 +148,6 @@ hardware_interface::return_type MarchRvizSystemInterface::write()
 {
     return hardware_interface::return_type::OK;
 }
-
-
 
 } // namespace march_hardware_interface
 

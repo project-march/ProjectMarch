@@ -38,39 +38,40 @@
 
 #include "control_toolbox/dither.hpp"
 
-namespace control_toolbox
-{
+namespace control_toolbox {
 Dither::Dither()
-: amplitude_(0), has_saved_value_(false) {}
+    : amplitude_(0)
+    , has_saved_value_(false)
+{
+}
 
 double Dither::update()
 {
-  if (has_saved_value_) {
-    has_saved_value_ = false;
-    return saved_value_;
-  }
-
-  // Generates gaussian random noise using the polar method.
-  double v1, v2, r;
-  // uniform distribution on the interval [-1.0, 1.0]
-  std::uniform_real_distribution<double> distribution(
-    -1.0, std::nextafter(1.0, std::numeric_limits<double>::max()));
-  for (int i = 0; i < 100; ++i) {
-    v1 = distribution(generator_);
-    v2 = distribution(generator_);
-    r = v1 * v1 + v2 * v2;
-    if (r <= 1.0) {
-      break;
+    if (has_saved_value_) {
+        has_saved_value_ = false;
+        return saved_value_;
     }
-  }
-  r = std::min(r, 1.0);
 
-  double f = sqrt(-2.0 * log(r) / r);
-  double current = amplitude_ * f * v1;
-  saved_value_ = amplitude_ * f * v2;
-  has_saved_value_ = true;
+    // Generates gaussian random noise using the polar method.
+    double v1, v2, r;
+    // uniform distribution on the interval [-1.0, 1.0]
+    std::uniform_real_distribution<double> distribution(-1.0, std::nextafter(1.0, std::numeric_limits<double>::max()));
+    for (int i = 0; i < 100; ++i) {
+        v1 = distribution(generator_);
+        v2 = distribution(generator_);
+        r = v1 * v1 + v2 * v2;
+        if (r <= 1.0) {
+            break;
+        }
+    }
+    r = std::min(r, 1.0);
 
-  return current;
+    double f = sqrt(-2.0 * log(r) / r);
+    double current = amplitude_ * f * v1;
+    saved_value_ = amplitude_ * f * v2;
+    has_saved_value_ = true;
+
+    return current;
 }
 
-}  // namespace control_toolbox
+} // namespace control_toolbox

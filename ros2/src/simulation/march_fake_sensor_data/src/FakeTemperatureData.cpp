@@ -18,12 +18,8 @@ using namespace std::chrono_literals;
 
 const int DEFAULT_MINIMUM_TEMPERATURE { 0 };
 const int DEFAULT_MAXIMUM_TEMPERATURE { 0 };
-const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME {
-    /*__s=*/"minimum_temperature"
-};
-const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME {
-    /*__s=*/"maximum_temperature"
-};
+const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME { /*__s=*/"minimum_temperature" };
+const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME { /*__s=*/"maximum_temperature" };
 const std::string LOGGER_NAME { /*__s=*/"fake_temperature" };
 
 /**
@@ -51,17 +47,14 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(
     , maximum_temperature { DEFAULT_MAXIMUM_TEMPERATURE }
     , distribution { minimum_temperature, maximum_temperature }
 {
-    this->get_parameter(
-        MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
-    this->get_parameter(
-        MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
+    this->get_parameter(MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
+    this->get_parameter(MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
     set_range(minimum_temperature, maximum_temperature);
     // Register a callback that will be called whenever the parameters of this
     // Node are updated. The callback changes the internal state to reflect the
     // new values of the parameters.
     parameter_callback = this->add_on_set_parameters_callback(
-        std::bind(&FakeTemperatureDataNode::update_parameters, this,
-            std::placeholders::_1));
+        std::bind(&FakeTemperatureDataNode::update_parameters, this, std::placeholders::_1));
 }
 
 void FakeTemperatureDataNode::initialize()
@@ -72,8 +65,7 @@ void FakeTemperatureDataNode::initialize()
     }
 
     // Ensure that new fake temperatures are published every 100 ms.
-    timer = this->create_wall_timer(
-        100ms, std::bind(&FakeTemperatureDataNode::timer_callback, this));
+    timer = this->create_wall_timer(100ms, std::bind(&FakeTemperatureDataNode::timer_callback, this));
 }
 
 /*
@@ -83,8 +75,7 @@ void FakeTemperatureDataNode::initialize()
  *          has native support for dynamically reconfiguring parameters, this
  *          is done like this.
  */
-rcl_interfaces::msg::SetParametersResult
-FakeTemperatureDataNode::update_parameters(
+rcl_interfaces::msg::SetParametersResult FakeTemperatureDataNode::update_parameters(
     const std::vector<rclcpp::Parameter>& parameters)
 {
     rcl_interfaces::msg::SetParametersResult result;
@@ -131,8 +122,7 @@ double FakeTemperatureDataNode::calculate_autoregression_temperature() const
  * @param minimum_temperature The minimum value (inclusive)
  * @param maximum_temperature The maximum value (inclusive)
  */
-void FakeTemperatureDataNode::set_range(
-    int minimum_temperature, int maximum_temperature)
+void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_temperature)
 {
     distribution.set_range(minimum_temperature, maximum_temperature);
 }
@@ -142,22 +132,19 @@ void FakeTemperatureDataNode::set_range(
  * "/march/temperature/<sensor_name>" topic.
  * @param sensor_name The name of the sensor.
  */
-void FakeTemperatureDataNode::add_temperature_publisher(
-    const std::string& sensor_name)
+void FakeTemperatureDataNode::add_temperature_publisher(const std::string& sensor_name)
 {
     if (sensor_name.empty()) {
         throw std::invalid_argument("Sensor name cannot be empty");
     }
-    std::string topic_name
-        = std::string(/*__s=*/"/march/temperature/") + sensor_name;
+    std::string topic_name = std::string(/*__s=*/"/march/temperature/") + sensor_name;
     // This is not an important topic, therefore it has lenient QoS settings:
     // - keep only the last sample
     // - attempt to deliver samples, but may lose them if the network is not
     // robust
     //   (best effort)
     // - no attempt is made to persist samples (volatile)
-    auto qos
-        = rclcpp::QoS(/*history_depth=*/1).best_effort().durability_volatile();
+    auto qos = rclcpp::QoS(/*history_depth=*/1).best_effort().durability_volatile();
     auto publisher = this->create_publisher<MessageType>(topic_name, qos);
     temperature_publishers.push_back(publisher);
 }

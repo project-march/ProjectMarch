@@ -2,7 +2,6 @@
 // Date: 24-06-2022
 // Created by: George Vegelien, M7.
 
-
 #ifndef MARCH_LOGGER_CPP_ROS_LOGGER_HPP
 #define MARCH_LOGGER_CPP_ROS_LOGGER_HPP
 
@@ -12,6 +11,7 @@
 namespace march_logger {
 class RosLogger : public BaseLogger {
 public:
+    //NOLINTNEXTLINE(hicpp-explicit-conversions) This is intended behavior.
     RosLogger(const std::shared_ptr<rclcpp::Logger>& rclcpp_logger);
 
     void debug(const std::string& msg) const override;
@@ -23,8 +23,6 @@ public:
 private:
     const std::shared_ptr<rclcpp::Logger> rcl_logger_;
 };
-}  // namespace march_logger
-
-
+} // namespace march_logger
 
 #endif // MARCH_LOGGER_CPP_ROS_LOGGER_HPP

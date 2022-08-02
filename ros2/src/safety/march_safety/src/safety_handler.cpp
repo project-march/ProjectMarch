@@ -19,8 +19,7 @@ SafetyHandler::SafetyHandler(std::shared_ptr<SafetyNode> node)
  * @param message Error message
  * @param error_type Type of the error
  */
-void SafetyHandler::publishErrorMessage(
-    const std::string& message, int8_t error_type)
+void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error_type)
 {
     ErrorMsg error_msg;
     std::ostringstream message_stream;

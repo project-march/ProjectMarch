@@ -2,8 +2,8 @@
 
 #ifndef MARCH_HARDWARE_ACTUATION_MODE_H
 #define MARCH_HARDWARE_ACTUATION_MODE_H
-#include <string>
 #include <march_logger_cpp/base_logger.hpp>
+#include <string>
 
 namespace march {
 class ActuationMode {
@@ -26,7 +26,7 @@ public:
     }
 
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
-    ActuationMode(const std::string& actuationMode,  const march_logger::BaseLogger& logger)
+    ActuationMode(const std::string& actuationMode, const march_logger::BaseLogger& logger)
     {
         if (actuationMode == "position") {
             this->value_ = position;
@@ -35,8 +35,8 @@ public:
         } else if (actuationMode == "torque") {
             this->value_ = torque;
         } else {
-            logger.warn(logger.fstring("Actuation mode (%s) is not recognized, setting to unknown mode",
-                                         actuationMode.c_str()));
+            logger.warn(logger.fstring(
+                "Actuation mode (%s) is not recognized, setting to unknown mode", actuationMode.c_str()));
             this->value_ = ActuationMode::unknown;
         }
     }

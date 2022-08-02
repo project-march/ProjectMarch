@@ -27,9 +27,5 @@ install(TARGETS ${PROJECT_NAME}
   DESTINATION lib
 )
 
-install(DIRECTORY config
-    DESTINATION share/${PROJECT_NAME}
-)
-
 ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp ament_index_cpp)
 ament_package()

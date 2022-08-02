@@ -1,9 +1,9 @@
 #ifndef MARCH_HARDWARE_SDO_INTERFACE_H
 #define MARCH_HARDWARE_SDO_INTERFACE_H
 #include <cstdint>
+#include <march_logger_cpp/base_logger.hpp>
 #include <memory>
 #include <utility>
-#include <march_logger_cpp/base_logger.hpp>
 
 namespace march {
 /**
@@ -22,8 +22,7 @@ public:
      * @return received working counter from the read operation. Returns 0 when
      * a failure occurred, positive otherwise.
      */
-    template <typename T>
-    int write(uint16_t slave, uint16_t index, uint8_t sub, T value)
+    template <typename T> int write(uint16_t slave, uint16_t index, uint8_t sub, T value)
     {
         return this->write(slave, index, sub, sizeof(T), &value);
     }
@@ -41,9 +40,7 @@ public:
      * @return received working counter from the read operation. Returns 0 when
      * a failure occurred, positive otherwise.
      */
-    template <typename T>
-    int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
-        T& value) const
+    template <typename T> int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, T& value) const
     {
         return this->read(slave, index, sub, val_size, &value);
     }
@@ -51,12 +48,9 @@ public:
     virtual ~SdoInterface() = default;
 
 protected:
-    virtual int write(uint16_t slave, uint16_t index, uint8_t sub,
-        std::size_t size, void* value)
-        = 0;
+    virtual int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) = 0;
 
-    virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
-        void* value) const = 0;
+    virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const = 0;
 };
 
 /**
@@ -80,11 +74,9 @@ public:
         return this->sdo_->write(this->slave_index_, index, sub, value);
     }
 
-    template <typename T>
-    int read(uint16_t index, uint8_t sub, int& val_size, T& value) const
+    template <typename T> int read(uint16_t index, uint8_t sub, int& val_size, T& value) const
     {
-        return this->sdo_->read(
-            this->slave_index_, index, sub, val_size, value);
+        return this->sdo_->read(this->slave_index_, index, sub, val_size, value);
     }
 
 private:
@@ -97,23 +89,21 @@ private:
  */
 class SdoInterfaceImpl : public SdoInterface {
 public:
-
-    explicit SdoInterfaceImpl(std::shared_ptr<march_logger::BaseLogger> logger): logger_(std::move(logger)) {};
+    explicit SdoInterfaceImpl(std::shared_ptr<march_logger::BaseLogger> logger)
+        : logger_(std::move(logger)) {};
     /**
      * Creates a new shared SdoInterfaceImpl.
      * @return Generic PdoInterface shared ptr
      */
     static SdoInterfacePtr create(std::shared_ptr<march_logger::BaseLogger> logger)
     {
-        return std::make_shared<SdoInterfaceImpl>(SdoInterfaceImpl{std::move(logger)});
+        return std::make_shared<SdoInterfaceImpl>(SdoInterfaceImpl { std::move(logger) });
     }
 
 protected:
-    int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size,
-        void* value) override;
+    int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) override;
 
-    int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
-        void* value) const override;
+    int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const override;
 
     std::shared_ptr<march_logger::BaseLogger> logger_;
 };
