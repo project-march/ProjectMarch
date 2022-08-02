@@ -11,6 +11,9 @@
 #include <tf2_eigen/tf2_eigen.h>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+using namespace marchPublishUtilities;
+using namespace marchMathUtilities;
+
 /**
  * Constructs an object that listens to simulated or real RealSense depth frames
  * and processes these frames with a PointFinder.

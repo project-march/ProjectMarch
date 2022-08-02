@@ -9,6 +9,8 @@
 #include <cmath>
 #include <pcl/point_types.h>
 
+namespace marchMathUtilities {
+
 using Point = pcl::PointXYZ;
 
 /**
@@ -178,5 +180,7 @@ inline bool validatePoint(const Point& p)
     return (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z)
         && std::abs(p.x) < 1.0 && std::abs(p.y) < 0.7 && std::abs(p.z) < 0.5);
 }
+
+} // namespace marchMathUtilities
 
 #endif // MARCH_MATH_UTILITIES

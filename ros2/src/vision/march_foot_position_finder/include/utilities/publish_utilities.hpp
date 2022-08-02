@@ -14,6 +14,8 @@
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+namespace marchPublishUtilities {
+
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
@@ -98,8 +100,9 @@ inline void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     publisher->publish(marker);
 }
 
-inline void publishPreviousDisplacement(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p1, Point& p2, std::string& left_or_right)
+inline void publishPreviousDisplacement(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -168,8 +171,9 @@ inline void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-inline void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+inline void publishRelativeSearchPoint(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -379,8 +383,9 @@ inline void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-inline void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
+inline void publishTrackMarkerPoints(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -414,8 +419,9 @@ inline void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher
  * @param publisher publisher to use
  * @param p point to publish
  */
-inline void publishOriginalMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+inline void publishOriginalMarkerPoint(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -484,5 +490,7 @@ inline void publishPoint(
 
     publisher->publish(msg);
 }
+
+} // namespace marchPublishUtilities
 
 #endif // MARCH_PUBLISH_UTILITIES
