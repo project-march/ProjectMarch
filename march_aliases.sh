@@ -132,3 +132,6 @@ alias pdb='snoe && sros1 && rostopic echo /march/pdb_data -n 1'
 alias export_asrock_master_uri='export ROS_MASTER_URI=http://192.168.1.177:11311/'
 alias asrock_ros1="snoe && sros1 && export_asrock_master_uri"
 alias asrock_ros2="sfox && sros2 && export_asrock_master_uri"
+
+FASTRTPS_DEFAULT_PROFILES_FILE=~/march/.fastrtps-profile.xml
+export FASTRTPS_DEFAULT_PROFILES_FILE
