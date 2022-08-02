@@ -9,6 +9,7 @@ from ament_index_python.packages import get_package_share_path
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from march_goniometric_ik_solver.ik_solver import DEFAULT_FOOT_DISTANCE
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError, GaitError
 from march_utility.utilities.duration import Duration
 from march_shared_msgs.msg import FootPosition
@@ -82,7 +83,7 @@ class TrajectoryCommandFactory:
         if self._stop:
             self.foot_location.processed_point.x = 0.0
             self.foot_location.processed_point.y = 0.0
-            self.foot_location.processed_point.z = 0.51
+            self.foot_location.processed_point.z = DEFAULT_FOOT_DISTANCE
             self.foot_location.relative_midpoint_height = 0.15
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
@@ -228,7 +229,7 @@ class TrajectoryCommandFactory:
 
     def _get_foot_location_from_point_handler(self, start: bool) -> Optional[FootPosition]:
         """Returns a FootPosition message from the point handler, if available.
-        
+
         Arguments:
             start (bool): Whether it is a start gait.
 

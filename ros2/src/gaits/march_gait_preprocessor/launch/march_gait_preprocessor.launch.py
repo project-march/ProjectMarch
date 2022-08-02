@@ -28,13 +28,13 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 name="use_sim_time",
-                default_value="True",
+                default_value="true",
                 description="Whether to use simulation time as published on the "
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
                 name="location_x",
-                default_value="0.5",
+                default_value="0.4",
                 description="x-location for fake covid topic, takes double'",
             ),
             DeclareLaunchArgument(
@@ -49,7 +49,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="offset_x",
-                default_value="0.0",
+                default_value="0.07",
                 description="X offset for covid points.",
             ),
             DeclareLaunchArgument(
@@ -68,9 +68,6 @@ def generate_launch_description():
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             DeclareLaunchArgument(
-                name="simulated_deviation", default_value="0.05", description="midpoint deviation for simulated points."
-            ),
-            DeclareLaunchArgument(
                 name="deviation_coefficient",
                 default_value="0.5",
                 description="Coefficient used to compute the deviation of two midpoints from a middle fraction",
@@ -81,9 +78,12 @@ def generate_launch_description():
                 description="Maximum allowed midpoint deviation from the standard midpoint fraction",
             ),
             DeclareLaunchArgument(
-                name="new_midpoint_method",
-                default_value="True",
-                description="Whether to use the new method of calculating mid points.",
+                name="use_simulated_deviation",
+                default_value="false",
+                description="Whether to use simulated, fixed, deviation for calculating mid points.",
+            ),
+            DeclareLaunchArgument(
+                name="simulated_deviation", default_value="0.05", description="midpoint deviation for simulated points."
             ),
             Node(
                 package="march_gait_preprocessor",
@@ -100,10 +100,10 @@ def generate_launch_description():
                     {"offset_y": LaunchConfiguration("offset_y")},
                     {"offset_z": LaunchConfiguration("offset_z")},
                     {"duration": LaunchConfiguration("duration")},
-                    {"simulated_deviation": LaunchConfiguration("simulated_deviation")},
                     {"deviation_coefficient": LaunchConfiguration("deviation_coefficient")},
                     {"max_deviation": LaunchConfiguration("max_deviation")},
-                    {"new_midpoint_method": LaunchConfiguration("new_midpoint_method")},
+                    {"use_simulated_deviation": LaunchConfiguration("use_simulated_deviation")},
+                    {"simulated_deviation": LaunchConfiguration("simulated_deviation")},
                 ],
                 on_exit=Shutdown(),
             ),

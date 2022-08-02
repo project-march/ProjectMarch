@@ -40,12 +40,10 @@ class GaitPreprocessor(Node):
         self._offset_x = self.get_parameter("offset_x").get_parameter_value().double_value
         self._offset_y = self.get_parameter("offset_y").get_parameter_value().double_value
         self._offset_z = self.get_parameter("offset_z").get_parameter_value().double_value
-        self._simulated_deviation = self.get_parameter("simulated_deviation").get_parameter_value().double_value
         self._deviation_coefficient = self.get_parameter("deviation_coefficient").get_parameter_value().double_value
         self._max_deviation = self.get_parameter("max_deviation").get_parameter_value().double_value
-
-        # Temporary parameter to test difference between old and new midpoint method
-        self._new_midpoint_method = self.get_parameter("new_midpoint_method").get_parameter_value().bool_value
+        self._simulated_deviation = self.get_parameter("simulated_deviation").get_parameter_value().double_value
+        self._use_simulated_deviation = self.get_parameter("use_simulated_deviation").get_parameter_value().bool_value
 
     def _create_subscribers(self) -> None:
         """Create subscribers to the topics on which covid publishes found points."""
@@ -197,10 +195,10 @@ class GaitPreprocessor(Node):
             midpoint_deviation = min(0.05 + self._deviation_coefficient * (abs(max_height) - 0.05), self._max_deviation)
 
         absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
-        if self._new_midpoint_method:
-            return midpoint_deviation, absolute_midpoint_height, absolute_max_height
-        else:
+        if self._use_simulated_deviation:
             return self._simulated_deviation, absolute_midpoint_height, absolute_max_height
+        else:
+            return midpoint_deviation, absolute_midpoint_height, absolute_max_height
 
     def _transform_point_to_gait_axes(self, point: Point) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.

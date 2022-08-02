@@ -95,17 +95,17 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="stop_mid2_fraction",
                 default_value="0.7",
-                description="Fraction at which the second midpoint will be set for a stop gait."
+                description="Fraction at which the second midpoint will be set for a stop gait.",
             ),
             DeclareLaunchArgument(
                 name="stop_mid2_x",
                 default_value="0.03",
-                description="X-location of the ankle for the second midpoint of a stop gait."
+                description="X-location of the ankle for the second midpoint of a stop gait.",
             ),
             DeclareLaunchArgument(
                 name="stop_mid2_y",
                 default_value="0.05",
-                description="Y-location of the ankle for the second midpoint of a stop gait."
+                description="Y-location of the ankle for the second midpoint of a stop gait.",
             ),
             # State machine parameters:
             DeclareLaunchArgument(
