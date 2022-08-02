@@ -24,13 +24,23 @@ find_package(march_shared_msgs REQUIRED)
 find_package(march_description REQUIRED)
 
 # Install cpp libraries
-add_library(${PROJECT_NAME}
+add_library(
+        ${PROJECT_NAME}
+        SHARED
         src/node_utils.cpp
-        )
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs march_description rclcpp)
+        include/march_utility/logger_colors.hpp
+)
+
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(
+        ${PROJECT_NAME}
+        march_shared_msgs
+        march_description
+        rclcpp
+)
 
 # Install python modules
 ament_python_install_package(${PROJECT_NAME})
@@ -43,14 +53,24 @@ if(BUILD_TESTING)
         DESTINATION share/${PROJECT_NAME}/test)
 endif()
 
-ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
+# EXPORT
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+
 ament_export_dependencies(
         march_shared_msgs
         std_msgs
 )
-install(DIRECTORY include/${PROJECT_NAME}
-        DESTINATION include/)
-install(TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION lib/${PROJECT_NAME})
+install(
+        DIRECTORY include/
+        DESTINATION include
+)
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
+
 ament_package()
