@@ -18,6 +18,7 @@ find_package(march_hardware_builder REQUIRED)
 find_package(march_logger_cpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(march_utility REQUIRED)
 
 add_library(
         ${PROJECT_NAME}
@@ -40,6 +41,7 @@ ament_target_dependencies(
         march_hardware_builder
         march_logger_cpp
         yaml-cpp
+        march_utility
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
@@ -55,6 +57,7 @@ ament_export_dependencies(
         march_hardware_builder
         march_logger_cpp
         yaml-cpp
+        march_utility
 )
 
 install(

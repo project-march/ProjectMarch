@@ -22,6 +22,7 @@
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_interface/hwi_util.h"
+#include "march_utility/logger_colors.hpp"
 
 namespace march_hardware_interface {
 
@@ -42,7 +43,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
     }
 //    logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface"));
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-    RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "-----Here!!---");
+    RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
         return hardware_interface::return_type::ERROR;

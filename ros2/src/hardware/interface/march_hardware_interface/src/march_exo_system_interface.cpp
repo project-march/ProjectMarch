@@ -25,6 +25,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_interface/hwi_util.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include "march_utility/logger_colors.hpp"
 
 using namespace march_hardware_interface_util;
 
@@ -185,7 +186,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
         throw;
     }
 
-    RCLCPP_INFO((*logger_), "All joints are ready for reading!");
+    RCLCPP_INFO((*logger_), "%sAll joints are ready for reading!", LColor::BLUE);
     status_ = hardware_interface::status::STARTED;
     
     return hardware_interface::return_type::OK;
@@ -214,7 +215,7 @@ MarchExoSystemInterface::perform_command_mode_switch(const std::vector<std::stri
         if (!start_interfaces.empty()) {
             make_joints_operational(march_robot_->getNotOperationalJoints());
             joints_ready_for_actuation_ = true;
-            RCLCPP_INFO((*logger_), "All joints ready for writing.");
+            RCLCPP_INFO((*logger_), "%sAll joints ready for writing.", LColor::GREEN);
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());

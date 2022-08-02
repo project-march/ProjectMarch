@@ -11,6 +11,7 @@
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include "march_hardware/march_robot.h"
+#include "march_utility/logger_colors.hpp"
 
 using namespace std;
 
@@ -138,8 +139,10 @@ inline void repeat_function_on_joints_until_timeout(const string &function_goal,
     unsigned int amount_ok = 0;
     unsigned int amount_of_joints = joints.size();
     is_ok.resize(amount_of_joints, false);
-    RCLCPP_INFO(logger, "Trying to perform '%s' on joints: '%s' in %i tries.",
-                function_goal.c_str(), joint_vector_to_string(joints).c_str(), maximum_tries);
+    RCLCPP_INFO(logger, "Trying to perform %s'%s'%s on joints: '%s' in %i tries. %sMight take %f seconds.",
+                LColor::BOLD, function_goal.c_str(), LColor::END,
+                joint_vector_to_string(joints).c_str(), maximum_tries,
+                LColor::WARNING, sleep_between_tries.count() / 1000000000.0 * maximum_tries);
     unsigned int num_tries = 0;
     for (; num_tries < maximum_tries; num_tries++) {
         for (unsigned int i = 0; i < amount_of_joints; i++) {
@@ -176,15 +179,15 @@ inline void call_function_and_wait_on_joints(const string &function_goal,
                                              const function<const chrono::nanoseconds(march::Joint &)> &function,
                                              const rclcpp::Logger &logger,
                                              std::vector<march::Joint*>& joints) {
-    RCLCPP_INFO(logger, "Performing '%s' on joints: '%s'.",
-                function_goal.c_str(), joint_vector_to_string(joints).c_str());
+    RCLCPP_INFO(logger, "Performing %s'%s'%s on joints: '%s'.",
+                LColor::BOLD, function_goal.c_str(), LColor::END, joint_vector_to_string(joints).c_str());
     chrono::nanoseconds max_sleep {0};
     for (auto joint : joints) {
         max_sleep = max(max_sleep, function(*joint));
     }
     if (max_sleep.count() > 0) {
-        RCLCPP_INFO(logger, "%s Successful after %.4f seconds.",
-                    function_goal.c_str(), max_sleep.count(), max_sleep.count() / 1000000000.0);
+        RCLCPP_INFO(logger, "%s %s Successful after %.4f seconds.",
+                    LColor::BLUE, function_goal.c_str(), max_sleep.count(), max_sleep.count() / 1000000000.0);
     }
     rclcpp::sleep_for(max_sleep);
 
