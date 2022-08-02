@@ -3,6 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include <iostream>
 #include <librealsense2/rs.hpp>
+#include <thread>
 
 class FootPositionFinderNode : public rclcpp::Node {
 public:
@@ -26,11 +27,16 @@ public:
     rcl_interfaces::msg::SetParametersResult parametersCallback(
         const std::vector<rclcpp::Parameter>& parameters)
     {
-        left->readParameters(parameters);
-        right->readParameters(parameters);
+        std::thread thread_left(
+            &FootPositionFinder::readParameters, left, parameters);
+        thread_left.detach();
+        std::thread thread_right(
+            &FootPositionFinder::readParameters, right, parameters);
+        thread_right.detach();
 
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = true;
+        result.reason = "success";
         return result;
     }
 };

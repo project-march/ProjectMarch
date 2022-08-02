@@ -5,17 +5,21 @@
 #ifndef MARCH_POINT_FINDER_H
 #define MARCH_POINT_FINDER_H
 
-#define RES 80
+#define WIDTH_RES 40
+#define HEIGHT_RES 80
 
 #include "rclcpp/rclcpp.hpp"
 #include "utilities/math_utilities.hpp"
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <string>
+#include <thread>
 #include <vector>
 
+using namespace marchMathUtilities;
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -32,24 +36,30 @@ public:
         const std::vector<rclcpp::Parameter>& parameters);
 
     std::vector<Point> retrieveTrackPoints(
-        const Point& start, const Point& end);
+        const Point& start, const Point& end, int num_points);
 
     std::vector<double> getDisplacements();
 
     void readParameters(const std::vector<rclcpp::Parameter>& parameters);
+
+    Point getOriginalPoint(int index);
+
+    int getObstaclePenalty(int index);
 
 protected:
     rclcpp::Node* n_;
     std::vector<double> search_dimensions_;
     std::string left_or_right_;
 
-    int grid_resolution_ = RES;
-    double cell_width_ = 1.0 / grid_resolution_;
+    int grid_height_resolution_ = HEIGHT_RES;
+    int grid_width_resolution_ = WIDTH_RES;
+    double cell_width_ = 1.0 / grid_height_resolution_;
+    Point ORIGIN;
 
-    std::array<std::array<double, RES>, RES> height_map_;
-    std::array<std::array<double, RES>, RES> height_map_temp_;
-    std::array<std::array<double, RES>, RES> derivatives_;
-    std::array<std::array<double, RES>, RES> derivatives_temp_;
+    std::array<std::array<double, HEIGHT_RES>, WIDTH_RES> height_map_;
+    std::array<std::array<double, HEIGHT_RES>, WIDTH_RES> height_map_temp_;
+    std::array<std::array<double, HEIGHT_RES>, WIDTH_RES> derivatives_;
+    std::array<std::array<double, HEIGHT_RES>, WIDTH_RES> derivatives_temp_;
 
     double derivative_threshold_;
 
@@ -81,6 +91,12 @@ protected:
     double max_z_distance_;
     double available_points_ratio_;
     int num_track_points_;
+
+    std::vector<Point> original_position_queue_;
+    std::vector<bool> obstacles_found_;
+
+    bool locked_;
+    bool update_arrays_;
 
     void initializeValues();
 

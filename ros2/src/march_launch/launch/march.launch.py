@@ -130,7 +130,7 @@ def generate_launch_description() -> LaunchDescription:
             # COMPUTER VISION ARGUMENTS
             DeclareLaunchArgument(
                 name="realsense_simulation",
-                default_value="False",
+                default_value="false",
                 description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
@@ -451,9 +451,9 @@ def generate_launch_description() -> LaunchDescription:
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(
-                        get_package_share_directory("march_aligned_frame_publisher"),
+                        get_package_share_directory("march_frame_publisher"),
                         "launch",
-                        "march_aligned_frame_publisher.launch.py",
+                        "march_frame_publisher.launch.py",
                     )
                 ),
             ),

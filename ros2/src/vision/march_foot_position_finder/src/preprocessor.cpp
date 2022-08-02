@@ -35,6 +35,7 @@ Preprocessor::Preprocessor(rclcpp::Node* n, std::string& left_or_right,
     , tf_listener_ { listener }
 {
     base_frame_ = "toes_" + left_or_right + "_aligned";
+    pointcloud_frame_id_ = "camera_front_" + left_or_right + "_virtual_rotated";
 }
 
 /**
@@ -72,7 +73,6 @@ void Preprocessor::voxelDownSample(
 void Preprocessor::transformPointCloudToBaseframe(
     const PointCloud::Ptr& pointcloud)
 {
-    pointcloud_frame_id_ = pointcloud->header.frame_id.c_str();
     try {
         transform_ = tf_buffer_->lookupTransform(
             base_frame_, pointcloud_frame_id_, tf2::TimePointZero);

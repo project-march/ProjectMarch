@@ -131,8 +131,7 @@ class GaitPreprocessor(Node):
             duration=scaled_duration,
         )
 
-    @staticmethod
-    def _get_foot_position_in_gait_axes(foot_position: FootPosition) -> Point:
+    def _get_foot_position_in_gait_axes(self, foot_position: FootPosition) -> Point:
         """Transforms the point found by covid from the covid axes to the gait axes.
 
         Args:
@@ -141,12 +140,11 @@ class GaitPreprocessor(Node):
         Returns:
             Point: Foot location transformed to ik solver axes.
         """
-        temp_y = foot_position.displacement.y
         point = Point()
 
         point.x = -foot_position.displacement.x + X_OFFSET
         point.y = foot_position.displacement.z + Y_OFFSET
-        point.z = temp_y
+        point.z = self._location_z
 
         return point
 
@@ -176,8 +174,4 @@ class GaitPreprocessor(Node):
 
     def _validate_point(self, point: FootPosition) -> None:
         """Validates if the point sent by covid if valid."""
-        return (
-            0.15 < abs(point.processed_point.x) < 0.7
-            and abs(point.processed_point.y) < 0.25
-            and 0.35 < abs(point.processed_point.z) < 0.7
-        )
+        return 0.15 < abs(point.processed_point.x) < 0.7 and abs(point.processed_point.y) < 0.25
