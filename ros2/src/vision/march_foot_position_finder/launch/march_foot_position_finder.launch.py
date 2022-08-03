@@ -61,7 +61,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="num_track_points",
-                default_value="5",
+                default_value="30",
             ),
             DeclareLaunchArgument(
                 name="displacements_outside",

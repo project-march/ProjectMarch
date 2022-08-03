@@ -113,7 +113,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="wireless_ipd",
-                default_value="False",
+                default_value="false",
                 description="If this argument is false, the wireless input device will not be launched.",
             ),
             DeclareLaunchArgument(
@@ -135,12 +135,12 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="point_finder",
-                default_value="False",
+                default_value="false",
                 description="Whether to run the point finding algorithm",
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
-                default_value="False",
+                default_value="false",
                 description="Whether to use the camera imu to know the real orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
