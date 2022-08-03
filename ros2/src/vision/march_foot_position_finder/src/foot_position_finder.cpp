@@ -11,6 +11,9 @@
 #include <tf2_eigen/tf2_eigen.h>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+using namespace marchPublishUtilities;
+using namespace marchMathUtilities;
+
 /**
  * Constructs an object that listens to simulated or real RealSense depth frames
  * and processes these frames with a PointFinder.
@@ -326,7 +329,7 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Publish cloud for visualization:
-    preprocessor_->voxelDownSample(pointcloud, 0.035);
+    preprocessor_->voxelDownSample(pointcloud, /*voxel_size=*/0.035);
     publishCloud(
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
@@ -399,7 +402,7 @@ Point FootPositionFinder::retrieveOptimalPoint(
     Point optimal_point = *position_queue->begin();
     double optimal_distance_height_tradeoff = -10000;
     int count = 0;
-    int index;
+    int index = 0;
 
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x))
