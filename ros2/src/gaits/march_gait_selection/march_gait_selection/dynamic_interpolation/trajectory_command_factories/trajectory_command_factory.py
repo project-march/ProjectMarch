@@ -247,7 +247,7 @@ class TrajectoryCommandFactory:
             if is_point_too_old:
                 self._gait._end = True
                 if start:
-                    raise GaitError(msg)
+                    raise GaitError(error_msg)
                 self._stop = True
                 self._logger.error(error_msg)
             return self.foot_location
