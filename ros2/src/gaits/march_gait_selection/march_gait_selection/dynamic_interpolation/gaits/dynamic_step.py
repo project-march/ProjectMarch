@@ -228,9 +228,7 @@ class DynamicStep:
 
         self.joint_trajectory_list = []
         for name in self.actuating_joint_names:
-            setpoint_list = []
-            for setpoint_dicts in dict_list:
-                setpoint_list.append(setpoint_dicts[name])
+            setpoint_list = [setpoint_dicts[name] for setpoint_dicts in dict_list]
 
             # Add an extra setpoint to the ankle to create a push off, except for a start gait:
             if (
