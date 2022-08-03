@@ -89,7 +89,8 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="fixed_midpoint_velocity",
-                default_value="False",
+                default_value="false",
+                choices=["true", "false"],
                 description="Will give all setpoints a velocity of zero if true.",
             ),
             DeclareLaunchArgument(
