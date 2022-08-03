@@ -189,7 +189,7 @@ class LiveWidget:
                     self.sliders[pose],
                     self.poses[pose].get_ankle_location_from_ankle_trajectory(
                         self.poses["next"], self.sliders[pose], MIDPOINT_HEIGHT, TRAJECTORY_SAMPLES
-                    ),
+                    )[1],
                     "",
                 )
             else:

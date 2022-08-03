@@ -219,7 +219,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="middle_point_fraction",
-                default_value="0.45",
+                default_value="0.5",
                 description="Fraction of the step at which the middle point of the dynamic gait will take place.",
             ),
             DeclareLaunchArgument(
@@ -303,7 +303,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="location_y",
-                default_value="0.03",
+                default_value="0.0",
                 description="y-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
@@ -313,7 +313,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="duration",
-                default_value="1.5",
+                default_value="1.3",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             # Launch rqt input device if not rqt_input:=false

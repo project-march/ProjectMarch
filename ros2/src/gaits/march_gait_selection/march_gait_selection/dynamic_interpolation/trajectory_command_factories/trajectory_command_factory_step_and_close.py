@@ -4,7 +4,7 @@ from typing import Optional
 from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
     TrajectoryCommandFactory,
 )
-from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError
+from march_utility.exceptions.gait_exceptions import GaitError, PositionSoftLimitError, VelocitySoftLimitError
 from march_shared_msgs.msg import FootPosition
 
 
@@ -37,11 +37,12 @@ class TrajectoryCommandFactoryStepAndClose(TrajectoryCommandFactory):
         Returns:
             bool: true if second step close gait can be made.
         """
+        if self._stop:
+            return True
         start_position = self.dynamic_step.get_final_position()
         subgait_id = "right_swing" if self.subgait_id == "left_swing" else "left_swing"
         try:
-            self._create_trajectory_command(start_position, subgait_id, start=False, stop=False)
+            self._create_trajectory_command(start_position, subgait_id, start=False, stop=True)
         except (PositionSoftLimitError, VelocitySoftLimitError, ValueError) as e:
-            self._logger.error(f"Second step is not possible. {e}")
-            return False
+            raise GaitError(f"Second step is not possible. {e}")
         return True

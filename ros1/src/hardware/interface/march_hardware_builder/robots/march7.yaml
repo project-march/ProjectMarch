@@ -19,8 +19,8 @@ march7:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 3606
-            maxPositionIU: 5938
+            minPositionIU: 3607
+            maxPositionIU: 5957
           incrementalEncoder:
             resolution: 13
             transmission: 236
@@ -73,8 +73,8 @@ march7:
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 617952
-            maxPositionIU: 967504
+            minPositionIU: 616064
+            maxPositionIU: 965360
           incrementalEncoder:
             direction: -1
             resolution: 12
@@ -91,8 +91,8 @@ march7:
           absoluteEncoder:
             resolution: 14
             direction: -1
-            minPositionIU: 5752
-            maxPositionIU: 8054
+            minPositionIU: 5772
+            maxPositionIU: 7988
           incrementalEncoder:
             resolution: 13
             transmission: 236
