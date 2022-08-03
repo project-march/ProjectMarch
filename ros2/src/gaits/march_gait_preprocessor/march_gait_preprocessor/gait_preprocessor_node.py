@@ -49,14 +49,23 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._location_y = param.get_parameter_value().double_value
         elif param.name == "location_z":
             gait_preprocessor._location_z = param.get_parameter_value().double_value
+        elif param.name == "offset_x":
+            gait_preprocessor._offset_x = param.get_parameter_value().double_value
+        elif param.name == "offset_y":
+            gait_preprocessor._offset_y = param.get_parameter_value().double_value
+        elif param.name == "offset_z":
+            gait_preprocessor._offset_z = param.get_parameter_value().double_value
         elif param.name == "duration":
             gait_preprocessor._duration = param.get_parameter_value().double_value
+        elif param.name == "simulated_deviation":
+            gait_preprocessor._simulated_deviation = param.get_parameter_value().double_value
+        elif param.name == "deviation_coefficient":
+            gait_preprocessor._deviation_coefficient = param.get_parameter_value().double_value
+        elif param.name == "max_deviation":
+            gait_preprocessor._max_deviation = param.get_parameter_value().double_value
+        elif param.name == "use_simulated_deviation":
+            gait_preprocessor._use_simulated_deviation = param.get_parameter_value().bool_value
 
-        parameter_updated_logger(gait_preprocessor, param)
+        gait_preprocessor._logger.info(f"{param.name} set to {param.value}")
 
     return SetParametersResult(successful=True)
-
-
-def parameter_updated_logger(gait_preprocessor: GaitPreprocessor, param: Parameter):
-    """Log which param has been updated to which value."""
-    gait_preprocessor.get_logger().info(f"{param.name} set to {param.value}")

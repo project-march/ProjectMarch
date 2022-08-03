@@ -21,7 +21,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="step_distance",
-                default_value="0.50",
+                default_value="0.40",
             ),
             DeclareLaunchArgument(
                 name="outlier_distance",
@@ -33,7 +33,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="height_zero_threshold",
-                default_value="0.027",
+                default_value="0.04",
             ),
             DeclareLaunchArgument(
                 name="foot_width",

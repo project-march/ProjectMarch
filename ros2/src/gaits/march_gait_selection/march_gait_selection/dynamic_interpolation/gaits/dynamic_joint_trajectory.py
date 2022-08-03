@@ -26,9 +26,7 @@ class DynamicJointTrajectory:
         self.fixed_midpoint_velocity = fixed_midpoint_velocity
         self._interpolate_setpoints()
 
-    def _get_setpoints_unzipped(
-        self,
-    ) -> Tuple[List[Duration], List[float], List[float]]:
+    def _get_setpoints_unzipped(self) -> Tuple[List[Duration], List[float], List[float]]:
         """Returns a list of time, position and velocity.
 
         Returns:

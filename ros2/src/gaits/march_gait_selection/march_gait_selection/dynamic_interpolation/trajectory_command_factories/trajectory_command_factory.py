@@ -10,6 +10,7 @@ from copy import copy
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from march_goniometric_ik_solver.ik_solver import DEFAULT_FOOT_DISTANCE
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError, VelocitySoftLimitError, GaitError
 from march_utility.utilities.duration import Duration
 from march_shared_msgs.msg import FootPosition
@@ -81,23 +82,26 @@ class TrajectoryCommandFactory:
         self.start_position_all_joints = start_position_all_joints
 
         if self._stop:
+            self.foot_location.processed_point.x = 0.0
+            self.foot_location.processed_point.y = 0.0
+            self.foot_location.processed_point.z = DEFAULT_FOOT_DISTANCE
+            self.foot_location.relative_midpoint_height = 0.15
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
         else:
             if self._use_position_queue:
                 self.foot_location = self._check_if_queue_is_not_empty_and_get_foot_location()
             else:
-                self.foot_location = self._get_foot_location_from_point_handler()
+                self.foot_location = self._get_foot_location_from_point_handler(start)
 
         if self.foot_location is None:
             return None if start else self._get_stop_gait()
 
-        if not self._stop:
-            self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
-            self._logger.info(
-                f"Stepping to location ({self.foot_location.processed_point.x}, "
-                f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
-            )
+        self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
+        self._logger.info(
+            f"Stepping to location ({self.foot_location.processed_point.x}, "
+            f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+        )
 
         return self._create_and_validate_trajectory_command(start, self._stop)
 
@@ -229,13 +233,22 @@ class TrajectoryCommandFactory:
         else:
             return self._get_foot_location_from_queue()
 
-    def _get_foot_location_from_point_handler(self) -> Optional[FootPosition]:
-        """Returns a FootPosition message from the point handler, if available."""
+    def _get_foot_location_from_point_handler(self, start: bool) -> Optional[FootPosition]:
+        """Returns a FootPosition message from the point handler, if available.
+
+        Arguments:
+            start (bool): Whether it is a start gait.
+
+        Raises:
+            GaitError: Raised when foot location is too old and it is a start gait, so it will not try to get a close.
+        """
         try:
             self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
             is_point_too_old, error_msg = self._point_handler.is_foot_location_too_old(self.foot_location)
             if is_point_too_old:
                 self._gait._end = True
+                if start:
+                    raise GaitError(error_msg)
                 self._stop = True
                 self._logger.error(error_msg)
             return self.foot_location

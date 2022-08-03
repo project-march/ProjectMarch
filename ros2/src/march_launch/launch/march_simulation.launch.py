@@ -79,12 +79,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
-
-    # Gait Preprocessor
-    location_x = LaunchConfiguration("location_x")
-    location_y = LaunchConfiguration("location_y")
-    duration = LaunchConfiguration("duration")
-    location_z = LaunchConfiguration("location_z")
     # endregion
 
     declared_arguments = [
@@ -198,7 +192,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="middle_point_fraction",
-            default_value="0.45",
+            default_value="0.5",
             description="Fraction of the step at which the middle point of the dynamic gait will take place.",
         ),
         DeclareLaunchArgument(
@@ -288,27 +282,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="30",
             description="Upper bound to generate fake temperatures from.",
         ),
-        # GAIT PREPROCESSOR ARGUMENTS
-        DeclareLaunchArgument(
-            name="location_x",
-            default_value="0.5",
-            description="x-location for fake covid topic, takes double or 'random'.",
-        ),
-        DeclareLaunchArgument(
-            name="location_y",
-            default_value="0.03",
-            description="y-location for fake covid topic, takes double or 'random'.",
-        ),
-        DeclareLaunchArgument(
-            name="location_z",
-            default_value=str(DEFAULT_FEET_DISTANCE),
-            description="z-location for fake covid topic, takes double or 'random'.",
-        ),
-        DeclareLaunchArgument(
-            name="duration",
-            default_value="1.5",
-            description="Base duration of dynamic gait, may be scaled depending on step height.",
-        ),
     ]
 
     # region Use normal launch file with different launch_arguments
@@ -337,7 +310,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("gait_directory", gait_directory),
             ("balance", balance),
             ("dynamic_gait", dynamic_gait),
-            ("duration", duration),
             ("middle_point_fraction", middle_point_fraction),
             ("middle_point_height", middle_point_height),
             ("minimum_stair_height", minimum_stair_height),
@@ -355,9 +327,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("maximum_fake_temperature", maximum_fake_temperature),
             ("simulation", simulation),
             ("jointless", jointless),
-            ("location_x", location_x),
-            ("location_y", location_y),
-            ("location_z", location_z),
             ("gazebo", gazebo),
             ("control_yaml", control_yaml),
         ],

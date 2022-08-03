@@ -38,7 +38,7 @@ for name in JOINT_NAMES:
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
-DEFAULT_FOOT_DISTANCE = 0.55  # m
+DEFAULT_FOOT_DISTANCE = 0.47  # m
 
 ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
@@ -58,7 +58,9 @@ class Pose:
     Positive defined are: ankle dorsi-flexion, hip abduction, hip flexion, knee flexion.
 
     Args:
+        parameters (IKSolverParameters): dataclass containing reconfigurable parameters
         pose (List[float]): List of the joint angles for the pose.
+        leg1 (str): Leg that is the stance leg (leg1) of the starting position. For a right_swing, should be 'left'.
 
     Attributes:
         fe_ankle1 (float): dorsi-flexion (flexion) or plantar-flexion (extension) of the ankle of the hip on the stance leg.
@@ -76,6 +78,7 @@ class Pose:
         self,
         parameters: IKSolverParameters = DEFAULT_PARAMETERS,
         pose: Union[List[float], None] = None,
+        leg1: str = "left",
     ) -> None:
         self._parameters = parameters
 
@@ -107,16 +110,30 @@ class Pose:
             self.fe_knee1 = self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee
             self.aa_hip1 = self.aa_hip2 = 0
         else:
-            (
-                self.fe_ankle1,
-                self.aa_hip1,
-                self.fe_hip1,
-                self.fe_knee1,
-                self.fe_ankle2,
-                self.aa_hip2,
-                self.fe_hip2,
-                self.fe_knee2,
-            ) = pose
+            if leg1 == "left":
+                (
+                    self.fe_ankle1,
+                    self.aa_hip1,
+                    self.fe_hip1,
+                    self.fe_knee1,
+                    self.fe_ankle2,
+                    self.aa_hip2,
+                    self.fe_hip2,
+                    self.fe_knee2,
+                ) = pose
+            elif leg1 == "right":
+                (
+                    self.fe_ankle2,
+                    self.aa_hip2,
+                    self.fe_hip2,
+                    self.fe_knee2,
+                    self.fe_ankle1,
+                    self.aa_hip1,
+                    self.fe_hip1,
+                    self.fe_knee1,
+                ) = pose
+            else:
+                raise ValueError(f"Invalid input {leg1}, should be 'right' or 'left'.")
         self.rot_foot1 = 0
 
     def reset_to_zero_pose(self) -> None:
@@ -655,7 +672,7 @@ class Pose:
         self,
         next_pose: "Pose",
         frac: float,
-        pos_ankle: np.ndarray,
+        ankle_y: float,
         subgait_id: str,
     ) -> List[float]:
         """Solves inverse kinematics for the middle position.
@@ -667,12 +684,14 @@ class Pose:
         Args:
             next_pose (Pose): the next pose to move to.
             frac (float): the fraction of the step at which the mid position should be.
-            pos_ankle (np.ndarray[float]) the desired position of the ankle for the mid position.
+            ankle_y (float): the desired height  of the ankle for the mid position.
             subgait_id (str): either 'left_swing' or 'right_swing', defines which leg is the swing leg.
 
         Returns:
             List[float]: a list of all the joint angles to perform the desired mid position.
         """
+        pos_ankle = np.array([self.get_ankle_mid_x(frac, next_pose), ankle_y])
+
         # Store current hip_aa to calculate hip_aa of midpoint later:
         current_hip_aa_1, current_hip_aa_2 = self.aa_hip1, self.aa_hip2
 
@@ -696,7 +715,12 @@ class Pose:
         # If the dorsi flexion limition is exceeded, the end position is used:
         if self.fe_ankle1 > self._max_ankle_dorsi_flexion:
             self.reset_to_zero_pose()
-            self.solve_end_position(pos_ankle[0], pos_ankle[1], DEFAULT_FOOT_DISTANCE, subgait_id)
+            self.solve_end_position(
+                pos_ankle[0],
+                pos_ankle[1],
+                DEFAULT_FOOT_DISTANCE,
+                subgait_id,
+            )
 
         # Apply the desired rotation of the upper body:
         self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
@@ -712,10 +736,9 @@ class Pose:
         self.fe_ankle2 = self._max_ankle_dorsi_flexion
 
         # Add hip_swing or set hip_aa to average of start and end pose:
-        if self._parameters.hip_swing:
+        if self._parameters.hip_swing and 0 < self._parameters.hip_swing_fraction < 1:
             max_hip_swing = min(abs(self._max_hip_abduction), abs(self._max_hip_adduction))
-            self.aa_hip1 = max_hip_swing
-            self.aa_hip2 = -max_hip_swing
+            self.aa_hip1 = -max_hip_swing * self._parameters.hip_swing_fraction
         else:
             self.aa_hip1 = current_hip_aa_1 * (1 - frac) + next_pose.aa_hip1 * frac
             self.aa_hip2 = current_hip_aa_2 * (1 - frac) + next_pose.aa_hip2 * frac
@@ -728,6 +751,29 @@ class Pose:
 
         # return pose as list:
         return pose_list
+
+    def get_ankle_mid_x(self, hip_frac: float, next_pose: "Pose"):
+        """Calculates the ankle x position relative to the stance leg.
+
+        Arguments:
+            hip_frac: fraction of the step at which the hip is placed
+            next_pose (Pose): pose of the end position
+
+        Returns:
+            float: swing leg ankle x position relative to the stance leg
+        """
+        frac_relative_to_stance_leg = (
+            hip_frac - self._parameters.middle_point_fraction
+        ) / self._parameters.middle_point_fraction
+        shift_ankle_x_relative_to_stance_leg = (-self.pos_ankle2[0] + next_pose.pos_ankle2[0]) / 2
+        step_length = self.pos_ankle2[0] + next_pose.pos_ankle2[0]
+        relative_fraction = 1 - (1 - self._parameters.base_number ** (1 - abs(frac_relative_to_stance_leg))) / (
+            1 - self._parameters.base_number
+        )
+        return (
+            np.sign(frac_relative_to_stance_leg) * relative_fraction * (step_length / 2)
+            + shift_ankle_x_relative_to_stance_leg
+        )
 
     def step_with_flat_stance_foot(self) -> None:
         """Solves the required pose for a step small enough to keep the stance foot flat on the ground."""
