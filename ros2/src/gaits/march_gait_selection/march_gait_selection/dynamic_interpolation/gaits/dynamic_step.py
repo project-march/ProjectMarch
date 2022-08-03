@@ -193,7 +193,6 @@ class DynamicStep:
             height,
             0.51,
             self.subgait_id,
-            for_mid_point=True,
         )
 
         return self._from_list_to_setpoint(self.all_joint_names, middle_position, None, fraction * self._duration)

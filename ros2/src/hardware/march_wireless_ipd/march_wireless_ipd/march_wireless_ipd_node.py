@@ -19,7 +19,8 @@ def sys_exit(*_):
 def main():
     """Initialize wireless IPD node."""
     rclpy.init()
-    node = rclpy.create_node(NODE_NAME, automatically_declare_parameters_from_overrides=True)
+    node = rclpy.create_node(NODE_NAME)
+    node.declare_parameter("ip_address")
     logger = node.get_logger()
     controller = WirelessInputDeviceController(node, logger)
     ip = node.get_parameter("ip_address").get_parameter_value().string_value

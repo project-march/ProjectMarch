@@ -6,6 +6,7 @@ import yaml
 from typing import Optional, Dict, Tuple
 from queue import Queue
 from ament_index_python.packages import get_package_share_path
+from copy import copy
 
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_step import DynamicStep
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
@@ -59,7 +60,7 @@ class TrajectoryCommandFactory:
     @property
     def final_position(self) -> Dict[str, float]:
         """Returns the position that the gait ends in."""
-        return self._final_position
+        return copy(self._final_position)
 
     def get_trajectory_command(
         self, subgait_id: str, start_position_all_joints: Dict[str, float], start=False, stop=False
@@ -118,7 +119,12 @@ class TrajectoryCommandFactory:
         trajectory_command, success = self._get_first_step(start, stop)
         is_second_step_possible = self._can_get_second_step() if success else True
 
-        return trajectory_command if is_second_step_possible else (self._get_stop_gait() if not start else None)
+        if is_second_step_possible:
+            return trajectory_command
+        elif start:
+            return None
+        else:
+            return self._get_stop_gait()
 
     def _get_first_step(self, start: bool, stop: bool) -> Tuple[Optional[TrajectoryCommand], bool]:
         """Tries to create the subgait for the given foot position.
@@ -237,13 +243,13 @@ class TrajectoryCommandFactory:
         """
         try:
             self.foot_location = self._point_handler.get_foot_location(self.subgait_id)
-            msg_too_old, msg = self._point_handler.is_foot_location_too_old(self.foot_location)
-            if msg_too_old:
+            is_point_too_old, error_msg = self._point_handler.is_foot_location_too_old(self.foot_location)
+            if is_point_too_old:
                 self._gait._end = True
                 if start:
                     raise GaitError(msg)
                 self._stop = True
-                self._logger.error(msg)
+                self._logger.error(error_msg)
             return self.foot_location
         except AttributeError:
             self._logger.warn("No FootLocation found. Connect the camera or use a gait with a fixed step size.")
