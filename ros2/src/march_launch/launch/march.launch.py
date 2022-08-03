@@ -198,6 +198,10 @@ def generate_launch_description() -> LaunchDescription:
             description="Whether to enable the head-up display for the pilot, such as an AR headset or smartglasses",
         ),
         DeclareLaunchArgument(
+            name="point_finder",
+            default_value="false",
+        ),
+        DeclareLaunchArgument(
             name="use_imu_data",
             default_value=point_finder,
             description="Whether to use the camera imu to know the real orientation of the exoskeleton",

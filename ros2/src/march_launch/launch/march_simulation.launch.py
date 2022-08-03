@@ -47,7 +47,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
     robot_description = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")
-    use_imu_data = LaunchConfiguration("use_imu_data")
     imu_to_use = LaunchConfiguration("imu_to_use")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
@@ -157,11 +156,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             description="Whether a transform from the world to base_link is "
             "necessary, this is the case when you are "
             "groundgaiting in rviz.",
-        ),
-        DeclareLaunchArgument(
-            name="use_imu_data",
-            default_value=realsense,
-            description="Whether to use the camera imu to know the real orientation of the exoskeleton.",
         ),
         DeclareLaunchArgument(name="imu_to_use", default_value="back", description="Which imu to use"),
         DeclareLaunchArgument(
@@ -333,7 +327,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("layout", layout),
             ("robot", robot),
             ("robot_state_publisher", robot_state_publisher),
-            ("use_imu_data", use_imu_data),
             ("imu_topic", imu_topic),
             ("imu_to_use", imu_to_use),
             ("robot_description", robot_description),
