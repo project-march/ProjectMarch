@@ -171,6 +171,10 @@ class GaitPreprocessor(Node):
 
         Computes their deviations from a middle fraction and relative heights to the final point.
 
+        TODO:
+            * Update docs of this method.
+            * Fix magic numbers.
+
         Args:
             track_points (List[Point]): A list of track points from the start and end point of a foot.
             final_point (Point): The final point to step to.
