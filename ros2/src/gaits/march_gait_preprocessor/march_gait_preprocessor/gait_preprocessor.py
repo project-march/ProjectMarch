@@ -77,13 +77,13 @@ class GaitPreprocessor(Node):
             CurrentGait,
             "/march/gait_selection/current_gait",
             self._reset_previous_step_height_after_close,
-            1,
+            DEFAULT_HISTORY_DEPTH,
         )
         self.create_subscription(
             GaitInstruction,
             "/march/input_device/instruction",
             self._reset_previous_step_height_after_force_unknown,
-            1,
+            DEFAULT_HISTORY_DEPTH,
         )
 
     def _create_publishers(self) -> None:
@@ -183,11 +183,11 @@ class GaitPreprocessor(Node):
             Tuple[float, float]: A tuple containing the deviation and the relative height of the midpoints.
         """
         absolute_max_height = abs(final_point.y)
-        max_height = final_point.y if final_point.y > 0 else 0
+        max_height = max(final_point.y, 0)
 
         if len(track_points) != 0:
             track_points_transformed_heights = np.asarray([point.z for point in track_points])
-            max_height = 0 if max(track_points_transformed_heights) < 0 else max(track_points_transformed_heights)
+            max_height = max(max(track_points_transformed_heights), 0)
 
         relative_midpoint_height = 0.15
         if 0.14 < max_height < 0.19:
@@ -198,7 +198,9 @@ class GaitPreprocessor(Node):
         if max_height < 0.05:
             midpoint_deviation = 0.05
         else:
-            midpoint_deviation = min(0.05 + self._deviation_coefficient * (abs(max_height) - 0.05), self._max_deviation)
+            midpoint_deviation = (
+                 min(0.05 + self._deviation_coefficient * (absolute_max_height - 0.05), self._max_deviation)
+            )
 
         absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height
         if self._new_midpoint_method:

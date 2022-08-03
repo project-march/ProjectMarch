@@ -85,11 +85,8 @@ class DynamicStep:
         self.joint_soft_limits = joint_soft_limits
 
         if self.subgait_id == "right_swing":
-            self._start_pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()), "right")
             self._end_pose = Pose(self._ik_solver_parameters, list(self.home_stand_position.values()), "left")
-
         else:
-            self._start_pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()), "left")
             self._end_pose = Pose(self._ik_solver_parameters, list(self.home_stand_position.values()), "right")
 
         self.starting_position_dict = self._from_list_to_setpoint(
@@ -106,6 +103,14 @@ class DynamicStep:
         self.start = start
         self.stop = stop
         self.hold_subgait = hold_subgait
+
+    @property
+    def start_pose(self) -> Pose:
+        """Returns a clean pose object with the correct stance leg."""
+        if self.subgait_id == "right_swing":
+            return Pose(self._ik_solver_parameters, list(self.starting_position.values()), "right")
+        else:
+            return Pose(self._ik_solver_parameters, list(self.starting_position.values()), "left")
 
     def get_joint_trajectory_msg(self, push_off: bool) -> JointTrajectory:
         """Return a joint_trajectory_msg containing the interpolated trajectories for each joint.
@@ -167,9 +172,8 @@ class DynamicStep:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
         fraction = self.middle_point_fraction if fraction is None else fraction
         height = self.middle_point_height if height is None else height
-        pose = copy.deepcopy(self._start_pose)
 
-        middle_position = pose.solve_mid_position(
+        middle_position = self.start_pose.solve_mid_position(
             next_pose=self._end_pose,
             frac=fraction,
             ankle_y=height,
@@ -184,9 +188,8 @@ class DynamicStep:
         )
 
     def _solve_middle_setpoint_for_close(self, fraction, height) -> Dict[str, Setpoint]:
-        pose = copy.deepcopy(self._start_pose)
-
-        middle_position = pose.solve_end_position(
+        """Gets a middle setpoint for a close gait that is slightly in front of the end pose."""
+        middle_position = self.start_pose.solve_end_position(
             self._stop_mid2_x,
             height,
             0.51,
