@@ -14,7 +14,7 @@ from march_utility.exceptions.gait_exceptions import (
     PositionSoftLimitError,
     VelocitySoftLimitError,
 )
-from march_goniometric_ik_solver.ik_solver import Pose
+from march_goniometric_ik_solver.ik_solver import Pose, DEFAULT_FOOT_DISTANCE
 
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from march_shared_msgs.msg import FootPosition
@@ -191,7 +191,7 @@ class DynamicStep:
         middle_position = self.start_pose.solve_end_position(
             self._stop_mid2_x,
             height,
-            0.51,
+            DEFAULT_FOOT_DISTANCE,
             self.subgait_id,
         )
 

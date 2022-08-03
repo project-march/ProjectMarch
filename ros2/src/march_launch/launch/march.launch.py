@@ -89,12 +89,6 @@ def generate_launch_description() -> LaunchDescription:
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
-    # Gait Preprocessor
-    location_x = LaunchConfiguration("location_x")
-    location_y = LaunchConfiguration("location_y")
-    duration = LaunchConfiguration("duration")
-    location_z = LaunchConfiguration("location_z")
-
     return LaunchDescription(
         [
             # GENERAL ARGUMENTS
@@ -246,7 +240,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="add_push_off",
-                default_value="False",
+                default_value="false",
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
@@ -294,27 +288,6 @@ def generate_launch_description() -> LaunchDescription:
                 "maximum_fake_temperature",
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
-            ),
-            # GAIT PREPROCESSOR ARGUMENTS
-            DeclareLaunchArgument(
-                name="location_x",
-                default_value="0.5",
-                description="x-location for fake covid topic, takes double or 'random'",
-            ),
-            DeclareLaunchArgument(
-                name="location_y",
-                default_value="0.0",
-                description="y-location for fake covid topic, takes double or 'random'",
-            ),
-            DeclareLaunchArgument(
-                name="location_z",
-                default_value=str(DEFAULT_FEET_DISTANCE),
-                description="z-location for fake covid topic, takes double or 'random'",
-            ),
-            DeclareLaunchArgument(
-                name="duration",
-                default_value="1.3",
-                description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
@@ -427,14 +400,7 @@ def generate_launch_description() -> LaunchDescription:
                         "launch",
                         "march_gait_preprocessor.launch.py",
                     )
-                ),
-                launch_arguments=[
-                    ("use_sim_time", use_sim_time),
-                    ("location_x", location_x),
-                    ("location_y", location_y),
-                    ("location_z", location_z),
-                    ("duration", duration),
-                ],
+                )
             ),
             # Safety
             IncludeLaunchDescription(
