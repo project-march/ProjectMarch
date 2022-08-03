@@ -1,7 +1,7 @@
 """Author: Marten Haitjema, MVII."""
 
-import numpy as np
 import copy
+import numpy as np
 
 from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import (
@@ -191,7 +191,6 @@ class DynamicStep:
             height,
             DEFAULT_FOOT_DISTANCE,
             self.subgait_id,
-            for_mid_point=True,
         )
 
         return self._from_list_to_setpoint(self.all_joint_names, middle_position, None, fraction * self._duration)

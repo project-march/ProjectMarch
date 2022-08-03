@@ -14,6 +14,8 @@
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+namespace marchPublishUtilities {
+
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
@@ -42,7 +44,7 @@ inline geometry_msgs::msg::Point to_geometry(Point p)
  * @param publisher publisher to use
  * @param cloud cloud to publish
  */
-void publishCloud(const PointCloudPublisher::SharedPtr& publisher,
+inline void publishCloud(const PointCloudPublisher::SharedPtr& publisher,
     rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
 {
     cloud.width = 1;
@@ -64,7 +66,7 @@ void publishCloud(const PointCloudPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
+inline void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -98,8 +100,9 @@ void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     publisher->publish(marker);
 }
 
-void publishPreviousDisplacement(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p1, Point& p2, std::string& left_or_right)
+inline void publishPreviousDisplacement(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -130,7 +133,7 @@ void publishPreviousDisplacement(const MarkerPublisher::SharedPtr& publisher,
     publisher->publish(marker);
 }
 
-void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
+inline void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, const Point& p1, Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -168,8 +171,9 @@ void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+inline void publishRelativeSearchPoint(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -208,7 +212,7 @@ void publishRelativeSearchPoint(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
+inline void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -251,7 +255,7 @@ void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
  * @param p3 vertex of rectangle
  * @param p4 vertex of rectangle
  */
-void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
+inline void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, Point& p, std::vector<double> dis,
     const std::string& left_or_right)
 {
@@ -302,7 +306,7 @@ void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
  * Publishes a rectangle around the foot point.
  *
  */
-void publishFootRectangle(const MarkerPublisher::SharedPtr& publisher,
+inline void publishFootRectangle(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, Point& p, const std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -344,7 +348,7 @@ void publishFootRectangle(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
+inline void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
     rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -379,8 +383,9 @@ void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
+inline void publishTrackMarkerPoints(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -414,8 +419,9 @@ void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-void publishOriginalMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+inline void publishOriginalMarkerPoint(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -456,7 +462,7 @@ void publishOriginalMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
  * @param track_points vector of points between start and end position of this
  * step
  */
-void publishPoint(
+inline void publishPoint(
     const rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr&
         publisher,
     rclcpp::Node* n, Point& p, Point& p_world, Point& displacement,
@@ -484,5 +490,7 @@ void publishPoint(
 
     publisher->publish(msg);
 }
+
+} // namespace marchPublishUtilities
 
 #endif // MARCH_PUBLISH_UTILITIES

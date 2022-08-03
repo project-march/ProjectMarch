@@ -19,6 +19,7 @@
 #include <thread>
 #include <vector>
 
+using namespace marchMathUtilities;
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 

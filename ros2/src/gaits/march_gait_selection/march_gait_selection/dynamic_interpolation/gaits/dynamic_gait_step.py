@@ -106,17 +106,13 @@ class DynamicGaitStep(DynamicGaitWalk):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if self.subgait_id == "right_swing":
-            self.subgait_id = "left_swing"
-        elif self.subgait_id == "left_swing":
-            self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             self.subgait_id = "right_swing"
 
         return GaitUpdate.finished()
 
-    def set_state_to_unknown(self) -> None:
+    def reset_start_position_to_home_stand(self) -> None:
         """Resets the subgait_id, and position_queue after a force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"

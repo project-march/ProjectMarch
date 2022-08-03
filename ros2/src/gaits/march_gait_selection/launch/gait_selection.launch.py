@@ -30,12 +30,12 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "balance",
-                default_value="False",
+                default_value="false",
                 description="Whether balance is being used.",
             ),
             DeclareLaunchArgument(
                 "dynamic_gait",
-                default_value="False",
+                default_value="false",
                 description="Whether dynamic_setpoint_gait is enabled",
             ),
             # Dynamic gait parameters:
@@ -78,13 +78,13 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="use_position_queue",
-                default_value="False",
+                default_value="false",
                 description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
                 "points given by (simulated) covid.",
             ),
             DeclareLaunchArgument(
                 name="add_cybathlon_gaits",
-                default_value="False",
+                default_value="false",
                 description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
             ),
             DeclareLaunchArgument(
