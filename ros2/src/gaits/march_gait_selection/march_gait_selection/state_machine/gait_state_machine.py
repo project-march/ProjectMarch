@@ -235,7 +235,7 @@ class GaitStateMachine:
             self._trajectory_scheduler.cancel_active_goals()
 
         if isinstance(self._current_gait, DynamicGaitWalk):
-            self._current_gait.set_state_to_unknown()
+            self._current_gait.reset_start_position_to_home_stand()
 
         self._last_end_position = UnknownEdgePosition()
         self._reset_attributes()
@@ -349,11 +349,15 @@ class GaitStateMachine:
         response.gaits = possible_gaits
         return response
 
-    def update_parameters(self, gait_name: str) -> None:
+    def update_parameters(self, gait_name: str = None) -> None:
         """Update dynamic reconfigure parameters in gait classes.
 
         Args:
-            gait_name (str): Name of the gait of which the parameters should be updated.
+            gait_name (Optional[str]): Optional name of the gait of which the parameters should be updated.
         """
-        if gait_name in self._gaits:
+        if gait_name is None:
+            for gait_name in self._gaits.keys():
+                if isinstance(self._gaits[gait_name], DynamicGaitWalk):
+                    self._gaits[gait_name].update_parameters()
+        elif gait_name in self._gaits and isinstance(self._gaits[gait_name], DynamicGaitWalk):
             self._gaits[gait_name].update_parameters()

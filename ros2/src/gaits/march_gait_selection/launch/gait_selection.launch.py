@@ -4,6 +4,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 
 
 def generate_launch_description():
@@ -29,12 +30,12 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "balance",
-                default_value="False",
+                default_value="false",
                 description="Whether balance is being used.",
             ),
             DeclareLaunchArgument(
                 "dynamic_gait",
-                default_value="False",
+                default_value="false",
                 description="Whether dynamic_setpoint_gait is enabled",
             ),
             # Dynamic gait parameters:
@@ -67,7 +68,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="add_push_off",
-                default_value="True",
+                default_value="false",
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
@@ -77,13 +78,13 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="use_position_queue",
-                default_value="False",
+                default_value="false",
                 description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
                 "points given by (simulated) covid.",
             ),
             DeclareLaunchArgument(
                 name="add_cybathlon_gaits",
-                default_value="False",
+                default_value="false",
                 description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
             ),
             # State machine parameters:
@@ -96,11 +97,48 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
-                default_value="0.3",
+                default_value="0.2",
                 description="Duration to schedule next subgait early. If 0 then the"
                 "next subgait is never scheduled early.",
             ),
             DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
+            # IK solver parameters
+            DeclareLaunchArgument(
+                name="ankle_buffer",
+                default_value=str(IKSolverParameters.ankle_buffer),
+                description="buffer between dorsiflexion soft limit and allowed dorsiflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_buffer",
+                default_value=str(IKSolverParameters.hip_buffer),
+                description="buffer between retroflexion soft limit and allowed retroflexion in the ik solver, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="default_knee_bend",
+                default_value=str(IKSolverParameters.default_knee_bend),
+                description="efault knee flexion angle, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="hip_x_fraction",
+                default_value=str(IKSolverParameters.hip_x_fraction),
+                description="fraction of step at which hip is located",
+            ),
+            DeclareLaunchArgument(
+                name="upper_body_front_rotation",
+                default_value=str(IKSolverParameters.upper_body_front_rotation),
+                description="forward tilt of the backpack, in deg",
+            ),
+            DeclareLaunchArgument(
+                name="dorsiflexion_at_end_position",
+                default_value=str(IKSolverParameters.dorsiflexion_at_end_position),
+                description="Amount of dorsiflexion of swing leg ankle at end position. Takes regular ik solution "
+                "if it is set to zero.",
+            ),
+            DeclareLaunchArgument(
+                name="hip_swing",
+                default_value=str(IKSolverParameters.hip_swing),
+                description="Whether hip swing is enabled during walking.",
+            ),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -125,6 +163,13 @@ def generate_launch_description():
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
                     {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
                     {"timer_period": LaunchConfiguration("timer_period")},
+                    {"ankle_buffer": LaunchConfiguration("ankle_buffer")},
+                    {"hip_buffer": LaunchConfiguration("hip_buffer")},
+                    {"default_knee_bend": LaunchConfiguration("default_knee_bend")},
+                    {"hip_x_fraction": LaunchConfiguration("hip_x_fraction")},
+                    {"upper_body_front_rotation": LaunchConfiguration("upper_body_front_rotation")},
+                    {"dorsiflexion_at_end_position": LaunchConfiguration("dorsiflexion_at_end_position")},
+                    {"hip_swing": LaunchConfiguration("hip_swing")},
                 ],
                 on_exit=Shutdown(),
             ),

@@ -69,9 +69,10 @@ def generate_launch_description() -> LaunchDescription:
     # HUD arguments
     use_hud = LaunchConfiguration("use_hud")
 
-    # region RealSense arguments
-    realsense = LaunchConfiguration("realsense")
+    # RealSense/simulation arguments
+    ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
+    point_finder = LaunchConfiguration("point_finder")
     # endregion
 
     # region Simulation arguments
@@ -187,11 +188,6 @@ def generate_launch_description() -> LaunchDescription:
             "This file must be available in the march_desrciption/urdf/ folder",
         ),
         DeclareLaunchArgument(
-            name="realsense",
-            default_value="true",
-            description="Whether to start up everything for working with the realsense",
-        ),
-        DeclareLaunchArgument(
             name="realsense_simulation",
             default_value="false",
             description="Whether the simulation camera or the physical camera should be used",
@@ -203,7 +199,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="use_imu_data",
-            default_value=realsense,
+            default_value=point_finder,
             description="Whether to use the camera imu to know the real orientation of the exoskeleton",
         ),
         DeclareLaunchArgument(
@@ -436,6 +432,36 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+
+    # region Launch computer vision algorithms
+    point_finder_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_foot_position_finder"),
+                "launch",
+                "march_foot_position_finder.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("realsense_simulation", realsense_simulation),
+        ],
+        condition=IfCondition(point_finder),
+    )
+    # endregion
+
+    # region Aligned frame publisher for computer vision with 2 cameras
+    camera_aligned_frame_pub_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_frame_publisher"),
+                "launch",
+                "march_frame_publisher.launch.py",
+            )
+        ),
+        condition=IfCondition(point_finder)
+    )
+    # endregion
+
     # region Launch Gait preprocessor
     gait_preprocessor_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -464,7 +490,7 @@ def generate_launch_description() -> LaunchDescription:
                 "march_safety.launch.py",
             )
         ),
-        launch_arguments=[("use_sim_time", use_sim_time)],
+        launch_arguments=[("use_sim_time", use_sim_time), ("simulation", simulation)],
     )
     # endregion
 
@@ -544,6 +570,8 @@ def generate_launch_description() -> LaunchDescription:
         smartglass_bridge_node,
         gazebo_node,
         march_control,
+        point_finder_node,
+        camera_aligned_frame_pub_node
     ]
 
     return LaunchDescription(declared_arguments + nodes)

@@ -55,7 +55,6 @@ def generate_launch_description() -> launch.LaunchDescription:
 
     # Simulation arguments
     gazebo = LaunchConfiguration("gazebo")
-    realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 
@@ -141,19 +140,16 @@ def generate_launch_description() -> launch.LaunchDescription:
             "This file must be available in the `march_desrciption/urdf/` folder.",
         ),
         DeclareLaunchArgument(
-            name="realsense",
-            default_value="false",
-            description="Whether any realsense camera will be used.",
-        ),
-        DeclareLaunchArgument(
             name="realsense_simulation",
-            default_value=realsense,
+            default_value="false",
             description="Whether the simulation camera or the physical camera should be used.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="ground_gait",
-            default_value=realsense,
+            default_value="false",
             description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
+            choices=["true", "false"],
         ),
         DeclareLaunchArgument(
             name="to_world_transform",
@@ -235,7 +231,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="add_push_off",
-            default_value="true",
+            default_value="false",
             description="Whether to add a push off setpoint for the ankle.",
             choices=["true", "false"],
         ),
@@ -342,7 +338,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("imu_to_use", imu_to_use),
             ("robot_description", robot_description),
             ("ground_gait", ground_gait),
-            ("realsense", realsense),
             ("realsense_simulation", realsense_simulation),
             ("to_world_transform", to_world_transform),
             ("gait_package", gait_package),

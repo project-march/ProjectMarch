@@ -10,8 +10,8 @@ from march_gait_selection.dynamic_interpolation.point_handlers.point_handler imp
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
-from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_queue import (
-    TrajectoryCommandFactoryQueue,
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
+    TrajectoryCommandFactory,
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 
@@ -32,7 +32,7 @@ class DynamicGaitStep(DynamicGaitWalk):
     def __init__(self, name: str, node: Node, point_handler: PointHandler):
         super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, point_handler=self._point_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactory(gait=self, point_handler=self._point_handler)
         self.subgait_id = "right_swing"
         self.gait_name = name
 
@@ -93,7 +93,7 @@ class DynamicGaitStep(DynamicGaitWalk):
         elif current_time >= self.start_time_next_command and self._has_gait_started:
             self._scheduled_early = True
             self._final_position_pub.publish(
-                JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
+                JointState(position=self.trajectory_command_factory.final_position.values())
             )
             return self._update_state_machine()
 
@@ -106,21 +106,15 @@ class DynamicGaitStep(DynamicGaitWalk):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if not self.trajectory_command_factory.has_trajectory_failed():
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             self.subgait_id = "right_swing"
 
         return GaitUpdate.finished()
 
-    def set_state_to_unknown(self) -> None:
-        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown."""
+    def reset_start_position_to_home_stand(self) -> None:
+        """Resets the subgait_id, and position_queue after a force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"
-        self.trajectory_command_factory.set_trajectory_failed_false()
         self.position_queue = Queue()
         self.trajectory_command_factory.fill_queue()

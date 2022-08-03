@@ -38,3 +38,7 @@
 	path = ros2/src/libraries/soem_ros2
 	url = ../libraries/soem_ros2.git
 	branch = master
+[submodule "ros2/src/libraries/realsense_gazebo_plugin"]
+	path = ros2/src/libraries/realsense_gazebo_plugin
+	url = https://github.com/pal-robotics/realsense_gazebo_plugin.git
+	branch = foxy-devel

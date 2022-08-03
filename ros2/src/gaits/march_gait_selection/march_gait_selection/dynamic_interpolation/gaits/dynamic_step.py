@@ -1,11 +1,13 @@
 """Author: Marten Haitjema, MVII."""
 
+import copy
 import numpy as np
 
 from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import (
     DynamicJointTrajectory,
 )
+from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
@@ -85,7 +87,7 @@ class DynamicStep:
         self.all_joint_names = list(starting_position.keys())
         self.subgait_id = subgait_id
         self.joint_soft_limits = joint_soft_limits
-        self.pose = Pose(self.all_joint_names, list(self.starting_position.values()))
+        self.pose = Pose(self._ik_solver_parameters, list(self.starting_position.values()))
 
         self.time = [
             0,
@@ -110,8 +112,9 @@ class DynamicStep:
         Returns:
             JointTrajectory: message containing interpolated trajectories for each joint
         """
-        self._solve_middle_setpoint()
+        self.current_pose = copy.deepcopy(self.pose)
         self._solve_desired_setpoint()
+        self._solve_middle_setpoint()
 
         # Create joint_trajectory_msg
         self._to_joint_trajectory_class(push_off)
@@ -148,13 +151,11 @@ class DynamicStep:
 
     def _solve_middle_setpoint(self) -> None:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
-        middle_position = self.pose.solve_mid_position(
-            self.location.x,
-            max(0.0, self.location.y),
-            self.location.z,
-            self.middle_point_fraction,
-            self.middle_point_height,
-            self.subgait_id,
+        middle_position = self.current_pose.solve_mid_position(
+            next_pose=self.pose,
+            frac=self.middle_point_fraction,
+            pos_ankle=np.array([0.0, 0.10]),
+            subgait_id=self.subgait_id,
         )
 
         self.middle_setpoint_dict = self._from_list_to_setpoint(
@@ -276,6 +277,15 @@ class DynamicStep:
         self.middle_point_fraction = node.middle_point_fraction
         self.push_off_fraction = node.push_off_fraction
         self.push_off_position = node.push_off_position
+        self._ik_solver_parameters = IKSolverParameters(
+            node.ankle_buffer,
+            node.hip_buffer,
+            node.default_knee_bend,
+            node.hip_x_fraction,
+            node.upper_body_front_rotation,
+            node.dorsiflexion_at_end_position,
+            node.hip_swing,
+        )
 
     def _check_joint_limits(
         self,
