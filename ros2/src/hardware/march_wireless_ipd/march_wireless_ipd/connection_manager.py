@@ -13,12 +13,10 @@ from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
 from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_gait_selection.dynamic_interpolation.camera_point_handlers.camera_points_handler import (
-    FOOT_LOCATION_TIME_OUT,
-)
+from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import FOOT_LOCATION_TIME_OUT
 from rclpy.node import Node
 
-HEARTBEAT_TIMEOUT = Duration(0.5)
+HEARTBEAT_TIMEOUT = Duration(seconds=5)
 
 
 class ConnectionManager:
