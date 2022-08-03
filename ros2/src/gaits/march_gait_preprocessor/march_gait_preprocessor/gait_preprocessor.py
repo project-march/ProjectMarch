@@ -198,8 +198,8 @@ class GaitPreprocessor(Node):
         if max_height < 0.05:
             midpoint_deviation = 0.05
         else:
-            midpoint_deviation = (
-                 min(0.05 + self._deviation_coefficient * (absolute_max_height - 0.05), self._max_deviation)
+            midpoint_deviation = min(
+                0.05 + self._deviation_coefficient * (absolute_max_height - 0.05), self._max_deviation
             )
 
         absolute_midpoint_height = max(final_point.y, max_height) + relative_midpoint_height

@@ -1,7 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
 import numpy as np
-import copy
 
 from rclpy.node import Node
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import (
