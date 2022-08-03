@@ -204,7 +204,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="add_push_off",
-                default_value="False",
+                default_value="false",
                 description="Whether to add a push off setpoint for the ankle.",
             ),
             DeclareLaunchArgument(
