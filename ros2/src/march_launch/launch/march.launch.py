@@ -439,6 +439,20 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region RealSense ROS node for the back RealSense
+    back_sense_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_launch"),
+                "launch",
+                "back_realsense.launch.py",
+            )
+        ),
+        condition=IfCondition(use_imu_data),
+    )
+    # endregion
+
+
     # region Launch Gait preprocessor
     gait_preprocessor_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -541,7 +555,8 @@ def generate_launch_description() -> LaunchDescription:
         gazebo_node,
         march_control,
         point_finder_node,
-        camera_aligned_frame_pub_node
+        camera_aligned_frame_pub_node,
+        back_sense_node
     ]
 
     return LaunchDescription(declared_arguments + nodes)
