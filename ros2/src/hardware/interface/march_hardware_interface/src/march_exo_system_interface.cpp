@@ -356,7 +356,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
-    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) || !is_joint_in_limit(jointInfo);
+    if (jointInfo.position == 0) {
+        RCLCPP_WARN((*logger_), "The joint %s has position 0, the absolute encoder probably isn't working correctly.",
+            jointInfo.name.c_str());
+    }
+    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
 }
 
 bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
