@@ -55,7 +55,8 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/ { hardware_interface::HW_IF_EFFORT },
-            /*required_state_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
+            /*required_state_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
+                                             hardware_interface::HW_IF_EFFORT },
             /*logger=*/(*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
@@ -124,6 +125,9 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
+        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+                jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
@@ -178,6 +182,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.velocity = 0;
+            jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
         }
     } catch (const std::exception& e) {

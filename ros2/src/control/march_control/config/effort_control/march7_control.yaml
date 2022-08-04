@@ -26,6 +26,7 @@ joint_trajectory_controller:
     state_interfaces:
       - position
       - velocity
+      - effort
     gains:
         left_ankle: {p: 30.0, i: 0.0, d: 4.5, i_clamp: 100.0 }
         left_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0 }
