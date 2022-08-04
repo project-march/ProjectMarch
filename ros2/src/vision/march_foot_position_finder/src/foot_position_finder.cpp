@@ -54,6 +54,16 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
     locked_ = false;
+    
+    realsense_callback_group_ = n_->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+    point_callback_group_ = n_->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+
+    rclcpp::SubscriptionOptions realsense_callback_options_;
+    realsense_callback_options_.callback_group = realsense_callback_group_;
+    rclcpp::SubscriptionOptions point_callback_options_;
+    point_callback_options_.callback_group = point_callback_group_;
 
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
@@ -73,13 +83,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         = n_->create_publisher<visualization_msgs::msg::Marker>(
             "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
 
-    other_chosen_point_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
-            topic_other_chosen_point_,
-            /*qos=*/1,
-            std::bind(&FootPositionFinder::chosenOtherPointCallback, this,
-                std::placeholders::_1));
-
     std::function<void(
         const march_shared_msgs::msg::FootPosition::SharedPtr msg)>
         point_callback
@@ -88,7 +91,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     other_chosen_point_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
             topic_other_chosen_point_,
-            /*qos=*/1, point_callback);
+            /*qos=*/1, point_callback, point_callback_options_);
 
     std::function<void(
         const march_shared_msgs::msg::CurrentState::SharedPtr msg)>
@@ -97,7 +100,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     current_state_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::CurrentState>(
             "/march/gait_selection/current_state",
-            /*qos=*/1, state_callback);
+            /*qos=*/1, state_callback, point_callback_options_);
 
     foot_gap_ = n_->get_parameter("foot_gap").as_double();
     step_distance_ = n_->get_parameter("step_distance").as_double();
@@ -114,32 +117,32 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 
     // Connect the physical RealSense cameras
     if (!realsense_simulation_) {
-        while (true) {
-            try {
-                config_.enable_device(serial_number_);
-                config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
-                    /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
-                pipe_.start(config_);
-            } catch (const rs2::error& e) {
-                std::string error_message = e.what();
-                RCLCPP_WARN(n_->get_logger(),
-                    "Error while initializing %s RealSense camera: %s",
-                    left_or_right_.c_str(), error_message.c_str());
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                continue;
-            }
+        // while (true) {
+            // try {
+            //     config_.enable_device(serial_number_);
+            //     config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
+            //         /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
+            //     pipe_.start(config_);
+            // } catch (const rs2::error& e) {
+            //     std::string error_message = e.what();
+            //     RCLCPP_WARN(n_->get_logger(),
+            //         "Error while initializing %s RealSense camera: %s",
+            //         left_or_right_.c_str(), error_message.c_str());
+            //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            //     continue;
+            // }
 
             realsense_timer_ = n_->create_wall_timer(
                 std::chrono::milliseconds(30), [this]() -> void {
                     processRealSenseDepthFrames();
-                });
+                }, realsense_callback_group_);
 
             RCLCPP_INFO(n_->get_logger(),
                 "\033[1;36m%s RealSense connected (%s) \033[0m",
                 left_or_right_.c_str(), serial_number_.c_str());
 
-            break;
-        }
+        //     break;
+        // }
     } else {
         // Initialize the callback for the RealSense simulation plugin
         std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)>
@@ -149,7 +152,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         pointcloud_subscriber_
             = n_->create_subscription<sensor_msgs::msg::PointCloud2>(
                 topic_camera_front_,
-                /*qos=*/1, callback);
+                /*qos=*/1, callback, realsense_callback_options_);
 
         RCLCPP_INFO(n_->get_logger(),
             "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m",
@@ -233,7 +236,7 @@ void FootPositionFinder::currentStateCallback(
         initial_position_reset_timer_ = n_->create_wall_timer(
             std::chrono::milliseconds(200), [this]() -> void {
                 resetInitialPosition(/*stop_timer=*/true);
-            });
+            }, point_callback_group_);
     }
 }
 
@@ -269,23 +272,23 @@ void FootPositionFinder::processRealSenseDepthFrames()
             left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
     }
 
-    rs2::frameset frames = pipe_.wait_for_frames();
-    rs2::depth_frame depth = frames.get_depth_frame();
+    // rs2::frameset frames = pipe_.wait_for_frames();
+    // rs2::depth_frame depth = frames.get_depth_frame();
 
-    depth = dec_filter_.process(depth);
-    depth = spat_filter_.process(depth);
-    depth = temp_filter_.process(depth);
+    // depth = dec_filter_.process(depth);
+    // depth = spat_filter_.process(depth);
+    // depth = temp_filter_.process(depth);
 
-    // Allow default constructor for pc
-    // NOLINTNEXTLINE
-    rs2::pointcloud pc;
-    rs2::points points = pc.calculate(depth);
+    // // Allow default constructor for pc
+    // // NOLINTNEXTLINE
+    // rs2::pointcloud pc;
+    // rs2::points points = pc.calculate(depth);
 
-    PointCloud::Ptr pointcloud = points_to_pcl(points);
-    pointcloud->header.frame_id
-        = "camera_front_" + left_or_right_ + "_depth_optical_frame";
+    // PointCloud::Ptr pointcloud = points_to_pcl(points);
+    // pointcloud->header.frame_id
+    //     = "camera_front_" + left_or_right_ + "_depth_optical_frame";
 
-    processPointCloud(pointcloud);
+    // processPointCloud(pointcloud);
 }
 
 /**

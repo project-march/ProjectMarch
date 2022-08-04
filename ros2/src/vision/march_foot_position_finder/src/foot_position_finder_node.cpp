@@ -45,11 +45,17 @@ int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
 
-    rclcpp::executors::SingleThreadedExecutor exec;
+    rclcpp::executors::MultiThreadedExecutor exec;
     auto node = std::make_shared<FootPositionFinderNode>();
     exec.add_node(node);
     exec.spin();
 
+    // auto spinner = std::thread(
+    //     [&]() {
+    //         exec.spin();
+    //     });
+
     rclcpp::shutdown();
+    // spinner.join();
     return 0;
 }
