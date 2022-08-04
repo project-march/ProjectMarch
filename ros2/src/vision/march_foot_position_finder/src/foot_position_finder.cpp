@@ -117,20 +117,20 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
 
     // Connect the physical RealSense cameras
     if (!realsense_simulation_) {
-        // while (true) {
-            // try {
-            //     config_.enable_device(serial_number_);
-            //     config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
-            //         /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
-            //     pipe_.start(config_);
-            // } catch (const rs2::error& e) {
-            //     std::string error_message = e.what();
-            //     RCLCPP_WARN(n_->get_logger(),
-            //         "Error while initializing %s RealSense camera: %s",
-            //         left_or_right_.c_str(), error_message.c_str());
-            //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            //     continue;
-            // }
+        while (true) {
+            try {
+                config_.enable_device(serial_number_);
+                config_.enable_stream(RS2_STREAM_DEPTH, /*width=*/640,
+                    /*height=*/480, RS2_FORMAT_Z16, /*framerate=*/15);
+                pipe_.start(config_);
+            } catch (const rs2::error& e) {
+                std::string error_message = e.what();
+                RCLCPP_WARN(n_->get_logger(),
+                    "Error while initializing %s RealSense camera: %s",
+                    left_or_right_.c_str(), error_message.c_str());
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                continue;
+            }
 
             realsense_timer_ = n_->create_wall_timer(
                 std::chrono::milliseconds(30), [this]() -> void {
@@ -141,8 +141,8 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
                 "\033[1;36m%s RealSense connected (%s) \033[0m",
                 left_or_right_.c_str(), serial_number_.c_str());
 
-        //     break;
-        // }
+            break;
+        }
     } else {
         // Initialize the callback for the RealSense simulation plugin
         std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)>
@@ -272,23 +272,23 @@ void FootPositionFinder::processRealSenseDepthFrames()
             left_or_right_.c_str(), frame_wait_counter_ * (int)frame_timeout_);
     }
 
-    // rs2::frameset frames = pipe_.wait_for_frames();
-    // rs2::depth_frame depth = frames.get_depth_frame();
+    rs2::frameset frames = pipe_.wait_for_frames();
+    rs2::depth_frame depth = frames.get_depth_frame();
 
-    // depth = dec_filter_.process(depth);
-    // depth = spat_filter_.process(depth);
-    // depth = temp_filter_.process(depth);
+    depth = dec_filter_.process(depth);
+    depth = spat_filter_.process(depth);
+    depth = temp_filter_.process(depth);
 
-    // // Allow default constructor for pc
-    // // NOLINTNEXTLINE
-    // rs2::pointcloud pc;
-    // rs2::points points = pc.calculate(depth);
+    // Allow default constructor for pc
+    // NOLINTNEXTLINE
+    rs2::pointcloud pc;
+    rs2::points points = pc.calculate(depth);
 
-    // PointCloud::Ptr pointcloud = points_to_pcl(points);
-    // pointcloud->header.frame_id
-    //     = "camera_front_" + left_or_right_ + "_depth_optical_frame";
+    PointCloud::Ptr pointcloud = points_to_pcl(points);
+    pointcloud->header.frame_id
+        = "camera_front_" + left_or_right_ + "_depth_optical_frame";
 
-    // processPointCloud(pointcloud);
+    processPointCloud(pointcloud);
 }
 
 /**
