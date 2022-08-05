@@ -1,7 +1,6 @@
 """Author: Jelmer de Wolde, MVII."""
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 import march_goniometric_ik_solver.triangle_angle_solver as tas
 import march_goniometric_ik_solver.quadrilateral_angle_solver as qas
@@ -968,21 +967,3 @@ def check_on_limits(pose_list: List[float]) -> None:
             raise PositionSoftLimitError(
                 joint_name, joint_pose_dict[joint_name], JOINT_LIMITS[joint_name].lower, JOINT_LIMITS[joint_name].upper
             )
-
-
-def make_plot(pose: Pose):
-    """Makes a plot of the exo by first calculating the joint positions and then plotting them.
-
-    This method is only used for debugging reasons.
-
-    Args:
-        pose (Pose): The pose to plot.
-    """
-    positions = pose.calculate_joint_positions()
-    positions_x = [pos[0] for pos in positions]
-    positions_y = [pos[1] for pos in positions]
-
-    plt.figure(1)
-    plt.plot(positions_x, positions_y, ".-")
-    plt.gca().set_aspect("equal", adjustable="box")
-    plt.show()
