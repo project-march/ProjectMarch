@@ -127,7 +127,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
-                jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.effort_actual));
+                jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
@@ -223,6 +223,7 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
+        stop();
         throw;
     }
 
@@ -302,6 +303,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
 {
     if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
         // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
+        stop();
         throw runtime_error("Ethercat is not alive!");
         return hardware_interface::return_type::ERROR;
     }
@@ -340,6 +342,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //        RCLCPP_INFO((*logger_), "The sending effort is %g. (state: %g)", jointInfo.effort_command,
         //        jointInfo.position);
         if (!is_joint_in_valid_state(jointInfo)) {
+            stop();
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
             return hardware_interface::return_type::ERROR;
@@ -361,6 +364,12 @@ hardware_interface::return_type MarchExoSystemInterface::write()
                 converted_effort);
         }
         jointInfo.effort_command_converted = converted_effort;
+
+        if (jointInfo.name == "left_ankle") {
+            
+            // RCLCPP_INFO_THROTTLE((*logger_), clock_, jointInfo.limit.soft_limit_warning_throttle_msec, "The effort of the left ankle is: %g", jointInfo.effort_command_converted);
+        }
+
         jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
     }
 
