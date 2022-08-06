@@ -12,7 +12,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 2
+          slaveIndex: 3
           axis: 1
           motorKV: 355
 #          indexFound: true
@@ -35,7 +35,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 3
+          slaveIndex: 4
           axis: 1
           motorKV: 355
 #          indexFound: true
@@ -58,7 +58,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 3
+          slaveIndex: 4
           axis: 0
           motorKV: 95
 #          indexFound: true
@@ -81,7 +81,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 2
+          slaveIndex: 3
           axis: 0
           motorKV: 95
 #          indexFound: true
@@ -104,7 +104,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
+          slaveIndex: 2
           axis: 1
           motorKV: 355
 #          indexFound: true
@@ -127,7 +127,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 5
           axis: 1
           motorKV: 355
 #          indexFound: true
@@ -150,7 +150,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 4
+          slaveIndex: 5
           axis: 0
           motorKV: 95
 #          indexFound: true
@@ -173,7 +173,7 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 1
+          slaveIndex: 2
           axis: 0
           preCalibrated: false
           motorKV: 95
@@ -193,5 +193,5 @@ march7:
             resolution: 12
             transmission: 121
   power_distribution_board:
-      slaveIndex: 5
+      slaveIndex: 1
       byteOffset: 0
