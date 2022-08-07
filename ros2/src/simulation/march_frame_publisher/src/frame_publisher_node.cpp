@@ -31,10 +31,10 @@ public:
         tf_broadcaster_
             = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
-        timer_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
-        callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
+        timer_group_
+            = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+        callback_group_
+            = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(5),
@@ -329,101 +329,124 @@ private:
         }
     }
 
-    /**
-     * Align the left camera.
-     */
-    void alignLeftCamera()
+    double computeLeftHeight(double angle)
     {
-        double optimal_left_angle = 0.0;
-        double closest_left_height_to_zero = 1000;
+        RCLCPP_INFO(this->get_logger(), "Checking left angle %lf", angle);
 
-        // NOLINTNEXTLINE, double is useful in this loop
-        for (double angle = min_check_angle_; angle <= max_check_angle_;
-             // NOLINTNEXTLINE
-             angle += angle_offset_) {
+        double avg_left_height = 0.0;
+        int start_left_index = last_left_point_count_;
+        rotation_camera_left_ = angle;
+        int skip_points = 0;
 
-            RCLCPP_INFO(this->get_logger(), "Checking left angle %lf", angle);
-
-            double avg_left_height = 0.0;
-            int start_left_index;
-
-            rotation_camera_left_ = angle;
-            start_left_index = last_left_point_count_;
-
-            int skip_points = 0;
-            while (skip_points < skip_point_num_) {
-                if (last_left_point_count_ != start_left_index) {
-                    last_left_point_count_ = start_left_index;
-                    skip_points++;
-                }
-            }
-
-            for (int i = 0; i < average_count_; i++) {
-                while (last_left_point_count_ == start_left_index) {
-                }
-                avg_left_height += last_left_point_.z;
-                start_left_index = last_left_point_count_;
-            }
-
-            avg_left_height /= average_count_;
-
-            if (abs(avg_left_height) < abs(closest_left_height_to_zero)) {
-                closest_left_height_to_zero = avg_left_height;
-                optimal_left_angle = angle;
+        while (skip_points < skip_point_num_) {
+            if (last_left_point_count_ != start_left_index) {
+                last_left_point_count_ = start_left_index;
+                skip_points++;
             }
         }
 
-        this->set_parameter(
-            rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
+        for (int i = 0; i < average_count_; i++) {
+            while (last_left_point_count_ == start_left_index) {
+            }
+            avg_left_height += last_left_point_.z;
+            start_left_index = last_left_point_count_;
+        }
+
+        avg_left_height /= average_count_;
+
+        return std::abs(avg_left_height);
     }
 
+    double computeRightHeight(double angle)
+    {
+        RCLCPP_INFO(this->get_logger(), "Checking right angle %lf", angle);
+
+        double avg_right_height = 0.0;
+        int start_right_index = last_right_point_count_;
+        rotation_camera_right_ = angle;
+        int skip_points = 0;
+
+        while (skip_points < skip_point_num_) {
+            if (last_right_point_count_ != start_right_index) {
+                last_right_point_count_ = start_right_index;
+                skip_points++;
+            }
+        }
+
+        for (int i = 0; i < average_count_; i++) {
+            while (last_right_point_count_ == start_right_index) {
+            }
+            avg_right_height += last_right_point_.z;
+            start_right_index = last_right_point_count_;
+        }
+
+        avg_right_height /= average_count_;
+
+        return std::abs(avg_right_height);
+    }
+
+    /**
+     * Align the left camera.
+     */
+    double alignLeftCamera()
+    {
+        double bounds[3] = { min_check_angle_,
+            0.5 * (min_check_angle_ + max_check_angle_), max_check_angle_ };
+        double heights[3] = { computeLeftHeight(bounds[0]),
+            computeLeftHeight(bounds[1]), computeLeftHeight(bounds[2]) };
+
+        for (int i = 0; i < 10; i++) {
+            if ((heights[1] < 0 && heights[2] > 0)
+                || (heights[1] > 0 && heights[2] < 0)) {
+                bounds[0] = bounds[1];
+                heights[1] = heights[0];
+                bounds[1] = 0.5 * (bounds[0] + bounds[2]);
+                heights[1] = computeLeftHeight(bounds[1]);
+            } else if ((heights[1] > 0 && heights[0] < 0)
+                || (heights[1] < 0 && heights[0] > 0)) {
+                bounds[2] = bounds[1];
+                heights[2] = heights[1];
+                bounds[1] = 0.5 * (bounds[0] + bounds[2]);
+                heights[1] = computeLeftHeight(bounds[1]);
+            }
+        }
+
+        return bounds[1];
+
+        this->set_parameter(
+            rclcpp::Parameter("rotation_camera_left", bounds[1]));
+    }
 
     /**
      * Align the right camera.
      */
-    void alignRightCamera()
+    double alignRightCamera()
     {
-        double optimal_right_angle = 0.0;
-        double closest_right_height_to_zero = 1000;
+        double bounds[3] = { min_check_angle_,
+            0.5 * (min_check_angle_ + max_check_angle_), max_check_angle_ };
+        double heights[3] = { computeRightHeight(bounds[0]),
+            computeRightHeight(bounds[1]), computeRightHeight(bounds[2]) };
 
-        // NOLINTNEXTLINE, double is useful in this loop
-        for (double angle = min_check_angle_; angle <= max_check_angle_;
-             // NOLINTNEXTLINE
-             angle += angle_offset_) {
-
-            RCLCPP_INFO(this->get_logger(), "Checking right angle %lf", angle);
-
-            double avg_right_height = 0.0;
-            int start_right_index;
-
-            rotation_camera_right_ = angle;
-            start_right_index = last_right_point_count_;
-
-            int skip_points = 0;
-            while (skip_points < skip_point_num_) {
-                if (last_right_point_count_ != start_right_index) {
-                    last_right_point_count_ = start_right_index;
-                    skip_points++;
-                }
-            }
-
-            for (int i = 0; i < average_count_; i++) {
-                while (last_right_point_count_ == start_right_index) {
-                }
-                avg_right_height += last_right_point_.z;
-                start_right_index = last_right_point_count_;
-            }
-
-            avg_right_height /= average_count_;
-
-            if (abs(avg_right_height) < abs(closest_right_height_to_zero)) {
-                closest_right_height_to_zero = avg_right_height;
-                optimal_right_angle = angle;
+        for (int i = 0; i < 10; i++) {
+            if ((heights[1] < 0 && heights[2] > 0)
+                || (heights[1] > 0 && heights[2] < 0)) {
+                bounds[0] = bounds[1];
+                heights[1] = heights[0];
+                bounds[1] = 0.5 * (bounds[0] + bounds[2]);
+                heights[1] = computeRightHeight(bounds[1]);
+            } else if ((heights[1] > 0 && heights[0] < 0)
+                || (heights[1] < 0 && heights[0] > 0)) {
+                bounds[2] = bounds[1];
+                heights[2] = heights[1];
+                bounds[1] = 0.5 * (bounds[0] + bounds[2]);
+                heights[1] = computeRightHeight(bounds[1]);
             }
         }
 
+        return bounds[1];
+
         this->set_parameter(
-            rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
+            rclcpp::Parameter("rotation_camera_right", bounds[1]));
     }
 
     /**
