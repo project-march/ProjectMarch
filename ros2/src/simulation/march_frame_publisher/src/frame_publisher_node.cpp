@@ -32,9 +32,9 @@ public:
             = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
         timer_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive);
+            rclcpp::CallbackGroupType::Reentrant);
         callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive);
+            rclcpp::CallbackGroupType::Reentrant);
 
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(5),
@@ -330,36 +330,25 @@ private:
     }
 
     /**
-     * Align the pointclouds of the two cameras by rotating them around a
-     * variable angle. For both the left and right camera an optimal rotation
-     * angle is chosen so that points on the ground have a observed height as
-     * close as possible to 0.
+     * Align the left camera.
      */
-    void alignCamerasCallback()
+    void alignLeftCamera()
     {
-        double original_threshold = getHeightZeroThreshold();
-        setHeightZeroThreshold(/*threshold=*/0.0);
+        double optimal_left_angle = 0.0;
+        double closest_left_height_to_zero = 1000;
 
-        double optimal_left_angle = 0.0, optimal_right_angle = 0.0;
-        double closest_left_height_to_zero = 1000,
-               closest_right_height_to_zero = 1000;
-
-        // double is useful in this loop, so turn off 'should be int' lint
-        // NOLINTNEXTLINE
+        // NOLINTNEXTLINE, double is useful in this loop
         for (double angle = min_check_angle_; angle <= max_check_angle_;
              // NOLINTNEXTLINE
              angle += angle_offset_) {
 
-            RCLCPP_INFO(this->get_logger(), "Checking angle %lf", angle);
+            RCLCPP_INFO(this->get_logger(), "Checking left angle %lf", angle);
 
-            double avg_left_height = 0.0, avg_right_height = 0.0;
-            int start_left_index, start_right_index;
+            double avg_left_height = 0.0;
+            int start_left_index;
 
             rotation_camera_left_ = angle;
             start_left_index = last_left_point_count_;
-
-            rotation_camera_right_ = angle;
-            start_right_index = last_right_point_count_;
 
             int skip_points = 0;
             while (skip_points < skip_point_num_) {
@@ -376,6 +365,48 @@ private:
                 start_left_index = last_left_point_count_;
             }
 
+            avg_left_height /= average_count_;
+
+            if (abs(avg_left_height) < abs(closest_left_height_to_zero)) {
+                closest_left_height_to_zero = avg_left_height;
+                optimal_left_angle = angle;
+            }
+        }
+
+        this->set_parameter(
+            rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
+    }
+
+
+    /**
+     * Align the right camera.
+     */
+    void alignRightCamera()
+    {
+        double optimal_right_angle = 0.0;
+        double closest_right_height_to_zero = 1000;
+
+        // NOLINTNEXTLINE, double is useful in this loop
+        for (double angle = min_check_angle_; angle <= max_check_angle_;
+             // NOLINTNEXTLINE
+             angle += angle_offset_) {
+
+            RCLCPP_INFO(this->get_logger(), "Checking right angle %lf", angle);
+
+            double avg_right_height = 0.0;
+            int start_right_index;
+
+            rotation_camera_right_ = angle;
+            start_right_index = last_right_point_count_;
+
+            int skip_points = 0;
+            while (skip_points < skip_point_num_) {
+                if (last_right_point_count_ != start_right_index) {
+                    last_right_point_count_ = start_right_index;
+                    skip_points++;
+                }
+            }
+
             for (int i = 0; i < average_count_; i++) {
                 while (last_right_point_count_ == start_right_index) {
                 }
@@ -384,12 +415,6 @@ private:
             }
 
             avg_right_height /= average_count_;
-            avg_left_height /= average_count_;
-
-            if (abs(avg_left_height) < abs(closest_left_height_to_zero)) {
-                closest_left_height_to_zero = avg_left_height;
-                optimal_left_angle = angle;
-            }
 
             if (abs(avg_right_height) < abs(closest_right_height_to_zero)) {
                 closest_right_height_to_zero = avg_right_height;
@@ -398,9 +423,24 @@ private:
         }
 
         this->set_parameter(
-            rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
-        this->set_parameter(
             rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
+    }
+
+    /**
+     * Align the pointclouds of the two cameras by rotating them around a
+     * variable angle. For both the left and right camera an optimal rotation
+     * angle is chosen so that points on the ground have a observed height as
+     * close as possible to 0.
+     */
+    void alignCamerasCallback()
+    {
+        double original_threshold = getHeightZeroThreshold();
+        setHeightZeroThreshold(/*threshold=*/0.0);
+
+        std::thread left_thread(&FramePublisherNode::alignLeftCamera, this);
+        std::thread right_thread(&FramePublisherNode::alignRightCamera, this);
+        left_thread.join();
+        right_thread.join();
 
         setHeightZeroThreshold(original_threshold);
     }
