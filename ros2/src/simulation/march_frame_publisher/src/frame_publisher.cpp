@@ -212,10 +212,6 @@ void FramePublisher::alignCamerasCallback()
         right_aligner_->alignPointCloud();
     });
 
-    // std::thread thread_left(&PointCloudAligner::alignPointCloud,
-    // left_aligner_); std::thread
-    // thread_right(&PointCloudAligner::alignPointCloud, right_aligner_);
-
     thread_left.join();
     thread_right.join();
 
@@ -300,11 +296,21 @@ void FramePublisher::setHeightZeroThreshold(double threshold)
     };
 }
 
+/**
+ * Set the left camera rotation.
+ *
+ * @param angle Angle to set.
+ */
 void FramePublisher::setLeftCameraRotation(double angle)
 {
     rotation_camera_left_ = angle;
 }
 
+/**
+ * Set the right camera rotation.
+ *
+ * @param angle Angle to set.
+ */
 void FramePublisher::setRightCameraRotation(double angle)
 {
     rotation_camera_right_ = angle;

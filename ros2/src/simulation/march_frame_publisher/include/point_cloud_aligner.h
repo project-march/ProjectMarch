@@ -32,10 +32,8 @@ protected:
     rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr
         point_subscriber_;
 
-    bool binary_search_;
-
     geometry_msgs::msg::Point last_point_;
-    int last_point_count_;
+    int point_count_;
 
     double min_check_angle_;
     double max_check_angle_;
@@ -43,6 +41,8 @@ protected:
     int avg_sample_size_;
     int num_skip_points_;
     int binary_steps_;
+
+    bool binary_search_;
 
     double linearSearchOptimalAngle();
 

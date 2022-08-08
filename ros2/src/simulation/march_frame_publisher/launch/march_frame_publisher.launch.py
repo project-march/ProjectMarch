@@ -61,6 +61,8 @@ def generate_launch_description() -> LaunchDescription:
                 respawn=True,
                 parameters=[
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
+                    {"rotation_camera_left": LaunchConfiguration("rotation_camera_left")},
+                    {"rotation_camera_right": LaunchConfiguration("rotation_camera_right")},
                     {"min_check_angle": LaunchConfiguration("min_check_angle")},
                     {"max_check_angle": LaunchConfiguration("max_check_angle")},
                     {"angle_offset": LaunchConfiguration("angle_offset")},

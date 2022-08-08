@@ -54,7 +54,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     frame_wait_counter_ = 0;
     frame_timeout_ = 5.0;
     locked_ = false;
-    
+
     realsense_callback_group_ = n_->create_callback_group(
         rclcpp::CallbackGroupType::MutuallyExclusive);
     point_callback_group_ = n_->create_callback_group(
@@ -133,9 +133,11 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
             }
 
             realsense_timer_ = n_->create_wall_timer(
-                std::chrono::milliseconds(30), [this]() -> void {
+                std::chrono::milliseconds(30),
+                [this]() -> void {
                     processRealSenseDepthFrames();
-                }, realsense_callback_group_);
+                },
+                realsense_callback_group_);
 
             RCLCPP_INFO(n_->get_logger(),
                 "\033[1;36m%s RealSense connected (%s) \033[0m",
@@ -234,9 +236,11 @@ void FootPositionFinder::currentStateCallback(
 {
     if (msg->state == "stand") {
         initial_position_reset_timer_ = n_->create_wall_timer(
-            std::chrono::milliseconds(200), [this]() -> void {
+            std::chrono::milliseconds(200),
+            [this]() -> void {
                 resetInitialPosition(/*stop_timer=*/true);
-            }, point_callback_group_);
+            },
+            point_callback_group_);
     }
 }
 
@@ -332,7 +336,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Publish cloud for visualization:
-    preprocessor_->voxelDownSample(pointcloud, /*voxel_size=*/0.035);
     publishCloud(
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 

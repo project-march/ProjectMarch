@@ -9,7 +9,7 @@ PointCloudAligner::PointCloudAligner(
     : n_ { n }
     , left_or_right_ { std::move(left_or_right) }
 {
-    last_point_count_ = 0;
+    point_count_ = 0;
 
     min_check_angle_ = n_->get_parameter("min_check_angle").as_double();
     max_check_angle_ = n_->get_parameter("max_check_angle").as_double();
@@ -34,7 +34,8 @@ PointCloudAligner::PointCloudAligner(
             options);
 }
 /**
- * @brief Store the latest found left camera foot position.
+ * @brief Store the latest found camera foot position, and keep track of the
+ * total number of found points.
  *
  * @param msg Message containing the foot position.
  */
@@ -42,10 +43,14 @@ void PointCloudAligner::pointCallback(
     const march_shared_msgs::msg::FootPosition::SharedPtr
         msg) // NOLINT, binding does not expect reference
 {
-    last_point_count_++;
+    point_count_++;
     last_point_ = msg->displacement;
 }
 
+/**
+ * Align the left or right pointcloud by rotating them around a certain angle.
+ * The optimal angle is found with a linear or binary search.
+ */
 void PointCloudAligner::alignPointCloud()
 {
     double optimal_angle = 0.0;
@@ -64,6 +69,12 @@ void PointCloudAligner::alignPointCloud()
     }
 }
 
+/**
+ * Try a range of rotation angles with a binary search algorithm to find the
+ * angle for which the found points have a height (z-value) closest to zero.
+ *
+ * @return double Optimal angle to find points with zero height.
+ */
 double PointCloudAligner::binarySearchOptimalAngle()
 {
     double bounds[3] = { min_check_angle_,
@@ -75,11 +86,8 @@ double PointCloudAligner::binarySearchOptimalAngle()
     double optimal_height = std::abs(heights[1]);
 
     for (int i = 0; i < binary_steps_; i++) {
-
-        for (int j = 0; j < 3; j++) {
-            std::cout << heights[j] << " " << bounds[j] << std::endl;
-        }
-        std::cout << "" << std::endl;
+        RCLCPP_INFO(n_->get_logger(), "Step %d of %d of binary search (%s)",
+            i + 1, binary_steps_, left_or_right_.c_str());
 
         if ((heights[1] < 0 && 0 < heights[2])
             || (heights[1] > 0 && 0 > heights[2])) {
@@ -102,19 +110,19 @@ double PointCloudAligner::binarySearchOptimalAngle()
         }
     }
 
-    if (left_or_right_ == "left") {
-        RCLCPP_INFO(n_->get_logger(),
-            "Zero height found using binary search: %lf (left)",
-            optimal_height);
-    } else {
-        RCLCPP_INFO(n_->get_logger(),
-            "Zero height found using binary search: %lf (right)",
-            optimal_height);
-    }
+    RCLCPP_INFO(n_->get_logger(),
+        "Zero height found using binary search: %lf (%s)", optimal_height,
+        left_or_right_.c_str());
 
     return optimal_angle;
 }
 
+/**
+ * Try a range of rotation angles in a linear fashion, and compute for which
+ * angle the found points have a height (z-value) closest to zero.
+ *
+ * @return double Optimal angle to find points with zero height.
+ */
 double PointCloudAligner::linearSearchOptimalAngle()
 {
 
@@ -127,6 +135,9 @@ double PointCloudAligner::linearSearchOptimalAngle()
          // NOLINTNEXTLINE
          angle += angle_offset_) {
 
+        RCLCPP_INFO(n_->get_logger(), "Checking angle %lf (%s)", angle,
+            left_or_right_.c_str());
+
         double height = computeAverageHeight(angle);
 
         if (abs(height) < abs(optimal_height)) {
@@ -135,25 +146,20 @@ double PointCloudAligner::linearSearchOptimalAngle()
         }
     }
 
-    if (left_or_right_ == "left") {
-        RCLCPP_INFO(n_->get_logger(),
-            "Zero height found using linear search: %lf (left)",
-            optimal_height);
-    } else {
-        RCLCPP_INFO(n_->get_logger(),
-            "Zero height found using linear search: %lf (right)",
-            optimal_height);
-    }
+    RCLCPP_INFO(n_->get_logger(),
+        "Zero height found using linear search: %lf (%s)", optimal_height,
+        left_or_right_.c_str());
 
     return optimal_angle;
 }
 
+/**
+ * Update parameter with dynamic reconfigure.
+ */
 double PointCloudAligner::computeAverageHeight(double angle)
 {
-    RCLCPP_INFO(n_->get_logger(), "Checking angle %lf", angle);
-
     double avg_height = 0.0;
-    int start_index = last_point_count_;
+    int start_index = point_count_;
     if (left_or_right_ == "left") {
         n_->setLeftCameraRotation(angle);
     } else {
@@ -163,26 +169,24 @@ double PointCloudAligner::computeAverageHeight(double angle)
     int skip_points = 0;
 
     while (skip_points < num_skip_points_) {
-        if (last_point_count_ != start_index) {
-            last_point_count_ = start_index;
+        if (point_count_ != start_index) {
+            point_count_ = start_index;
             skip_points++;
         }
     }
 
     for (int i = 0; i < avg_sample_size_; i++) {
-        while (last_point_count_ == start_index) {
+        while (point_count_ == start_index) {
         }
         avg_height += last_point_.z;
-        start_index = last_point_count_;
+        start_index = point_count_;
     }
 
-    avg_height /= avg_sample_size_;
-
-    return avg_height;
+    return avg_height / avg_sample_size_;
 }
 
 /**
- * Update parameter with dynamic reconfigure.
+ * Update parameters with dynamic reconfigure.
  */
 rcl_interfaces::msg::SetParametersResult PointCloudAligner::parametersCallback(
     const std::vector<rclcpp::Parameter>& parameters)
