@@ -1,5 +1,6 @@
 """Author: Jelmer de Wolde, MVII."""
 
+from typing import List
 import pyqtgraph as pg
 import numpy as np
 import copy
@@ -9,6 +10,9 @@ from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushBu
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
 from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
+from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import DynamicJointTrajectory
+from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.duration import Duration
 
 X_MIN = 0.0
 X_MAX = 0.7
@@ -18,6 +22,8 @@ Y_MAX = 0.35
 MIDPOINT_HEIGHT = 0.15
 TRAJECTORY_SAMPLES = 99
 IK_SOLVER_PARAMTERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
+DURATION = 2.0
+NUMBER_OF_JOINTS = 8
 
 
 class LiveWidget:
@@ -32,10 +38,11 @@ class LiveWidget:
 
     def __init__(self) -> None:
         self.sliders = {
-            "last": {"x": 0, "y": 0},
-            "next": {"x": 0, "y": 0},
-            "mid": {"fraction": 0, "deviation": 0, "height": MIDPOINT_HEIGHT},
+            "last": {"x": 0.0, "y": 0.0},
+            "next": {"x": 0.0, "y": 0.0},
+            "mid": {"fraction": 0.0, "deviation": 0.0, "height": MIDPOINT_HEIGHT},
         }
+        self.joint_trajectories: List[DynamicJointTrajectory] = []
         self.reduce_df_front = True
 
         self.create_window()
@@ -44,6 +51,11 @@ class LiveWidget:
         self.create_buttons()
         self.create_table()
         self.fill_layout()
+
+    @property
+    def midpoint_height(self):
+        """Returns the midpoint hegiht based on foot locations and midpoint height slider."""
+        return self.sliders["mid"]["height"] + max(-self.sliders["last"]["y"], self.sliders["next"]["y"])
 
     def create_window(self):
         """Creates a QT window."""
@@ -62,9 +74,9 @@ class LiveWidget:
 
         self.poses = {
             "last": Pose(IK_SOLVER_PARAMTERS),
-            "next": Pose(IK_SOLVER_PARAMTERS),
             "mid_pre": Pose(IK_SOLVER_PARAMTERS),
             "mid_post": Pose(IK_SOLVER_PARAMTERS),
+            "next": Pose(IK_SOLVER_PARAMTERS),
         }
         self.plots = {
             "mid": plot.plot(pen="g", symbol="o", symbolSize=6),
@@ -163,6 +175,7 @@ class LiveWidget:
         """Update the x value of last pose."""
         self.sliders["last"]["x"] = (1 - (value / 99)) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("last")
+        self.reset_midpoint_fraction()
         self.update_pose("mid_pre")
         self.update_pose("mid_post")
         self.update_tables()
@@ -171,6 +184,7 @@ class LiveWidget:
         """Update the x value of next pose."""
         self.sliders["next"]["x"] = (value / 99) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("next")
+        self.reset_midpoint_fraction()
         self.update_pose("mid_pre")
         self.update_pose("mid_post")
         self.update_tables()
@@ -179,6 +193,7 @@ class LiveWidget:
         """Update the y value of last pose."""
         self.sliders["last"]["y"] = (1 - (value / 99)) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("last")
+        self.reset_midpoint_fraction()
         self.update_pose("mid_pre")
         self.update_pose("mid_post")
         self.update_tables()
@@ -187,6 +202,7 @@ class LiveWidget:
         """Update the y value of next pose."""
         self.sliders["next"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("next")
+        self.reset_midpoint_fraction()
         self.update_pose("mid_pre")
         self.update_pose("mid_post")
         self.update_tables()
@@ -194,8 +210,8 @@ class LiveWidget:
     def update_midpoint_fraction(self, value):
         """Update the fraction of the step at which we want to show a midpoint."""
         self.sliders["mid"]["fraction"] = value / 100
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
+        if self.increasing_setpoint_times():
+            self.plot_pose("mid", self.pose_from_dynamic_joint_trajectory())
 
     def update_midpoint_deviation(self, value):
         """Update the deviation used to create the midpoints."""
@@ -219,7 +235,18 @@ class LiveWidget:
             for axis in ["x", "y"]:
                 self.sliders[pose][axis] = 0
         self.update_poses()
+        self.reset_midpoint_poses()
         self.update_tables()
+
+    def reset_midpoint_fraction(self):
+        """Resets the slider and clears the plot."""
+        self.slider_midpoint_fraction.setValue(0)
+        self.plots["mid"].setData(x=[], y=[])
+
+    def reset_midpoint_poses(self):
+        """Clears the plots for the midpoint poses."""
+        for pose_name in ["mid_pre", "mid_post"]:
+            self.plots[pose_name].setData(x=[], y=[])
 
     def toggle_df_front(self):
         """Toggle dorsiflexion reduction of front lef."""
@@ -236,36 +263,85 @@ class LiveWidget:
         else:
             return 0.5
 
-    def update_pose(self, pose):
+    def setpoint_time(self, pose_name: str):
+        """Returns the setpoint time for the given pose."""
+        if pose_name == "last":
+            return 0.0
+        elif pose_name == "next":
+            return DURATION
+        else:
+            return DURATION * self.get_midpoint_fraction_based_on_deviation(pose_name)
+
+    def increasing_setpoint_times(self):
+        """Returns true if the setpoint times for all succesive poses are increasing."""
+        is_increasing = 1
+        for n in range(1, len(self.poses)):
+            if self.setpoint_time(list(self.poses.keys())[n]) > self.setpoint_time(list(self.poses.keys())[n - 1]):
+                is_increasing += 1
+        return is_increasing == len(self.poses)
+
+    def interpolate_trough_points(self):
+        """Interpolates setpoints to joint trajectory for every joint."""
+        if self.increasing_setpoint_times():
+            self.joint_trajectories = []
+            for n in range(NUMBER_OF_JOINTS):
+                setpoint_list = []
+                for pose_name in self.poses.keys():
+                    time = Duration(self.setpoint_time(pose_name))
+                    position = (
+                        self.poses[pose_name].pose_left[n]
+                        if pose_name == "last"
+                        else self.poses[pose_name].pose_right[n]
+                    )
+                    setpoint_list.append(Setpoint(time, position, 0.0))
+                self.joint_trajectories.append(DynamicJointTrajectory(setpoint_list))
+
+    def pose_from_dynamic_joint_trajectory(self):
+        """Creates a pose from all joints dynamic joint trajectories, on time given by the fraction slider."""
+        pose_list = []
+        for n in range(NUMBER_OF_JOINTS):
+            pose_list.append(
+                self.joint_trajectories[n]
+                .get_interpolated_setpoint(self.sliders["mid"]["fraction"] * DURATION)
+                .position
+            )
+        return Pose(IK_SOLVER_PARAMTERS, pose_list)
+
+    def update_pose(self, pose_name: str):
         """Update the given pose."""
         try:
-            if pose in ["mid_pre", "mid_post"]:
-                fraction = self.get_midpoint_fraction_based_on_deviation(pose)
-                self.poses[pose] = copy.deepcopy(self.poses["last"])
-                self.poses[pose].solve_mid_position(self.poses["next"], fraction, self.sliders["mid"]["height"], "")
+            if pose_name in ["mid_pre", "mid_post"]:
+                fraction = self.get_midpoint_fraction_based_on_deviation(pose_name)
+                self.poses[pose_name] = copy.deepcopy(self.poses["last"])
+                self.poses[pose_name].solve_mid_position(self.poses["next"], fraction, self.midpoint_height, "")
             else:
-                self.poses[pose].solve_end_position(
-                    self.sliders[pose]["x"],
-                    self.sliders[pose]["y"],
+                self.poses[pose_name].solve_end_position(
+                    self.sliders[pose_name]["x"],
+                    self.sliders[pose_name]["y"],
                     LENGTH_HIP,
                     "",
                 )
         except (PositionSoftLimitError) as value_error:
             print(value_error)
 
-        positions = list(self.poses[pose].calculate_joint_positions().values())
+        self.plot_pose(pose_name, self.poses[pose_name])
+
+    def plot_pose(self, pose_name: str, pose: Pose):
+        """Plots the given pose."""
+        positions = list(pose.calculate_joint_positions().values())
 
         # shift positions to have toes of stand leg at (0,0):
-        if pose == "last":
+        if pose_name == "last":
             positions = [pos - positions[-1] for pos in positions]
         else:
             positions = [pos - positions[0] for pos in positions]
 
         positions_x = [pos[0] for pos in positions]
         positions_y = [pos[1] for pos in positions]
-        self.plots[pose].setData(x=positions_x, y=positions_y)
+        self.plots[pose_name].setData(x=positions_x, y=positions_y)
         self.update_mid_of_step()
         self.update_midpoint_ankle_postions()
+        self.interpolate_trough_points()
 
     def update_poses(self):
         """Update all poses."""
@@ -286,7 +362,7 @@ class LiveWidget:
             fraction = self.get_midpoint_fraction_based_on_deviation(pose)
             x = self.poses["last"].get_ankle_mid_x(fraction, self.poses["next"])
             x -= self.poses["next"].pos_toes1[0]  # Shift since we center around toes.
-            y = self.sliders["mid"]["height"]
+            y = self.midpoint_height
             self.plots[pose + "_ankle"].setData(x=[x], y=[y])
 
     def update_tables(self):
