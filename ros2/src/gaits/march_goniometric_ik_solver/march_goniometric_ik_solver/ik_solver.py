@@ -611,63 +611,6 @@ class Pose:
             self.aa_hip1 = hip_aa_long
             self.aa_hip2 = hip_aa_short
 
-    def create_ankle_trajectory(self, next_pose: "Pose", midpoint_height, trajectory_samples):
-        """Create an ankle trajectory from current pose (self) to given next_pose.
-
-        Used to debug the midpoint_solver with the live_widget tool.
-
-        Args:
-            next_pose (Pose): the next pose we want to move to.
-            midpoint_height (float): the height of the midpoint.
-            trajectory_samples (float): the number of samples creating the full trajectory.
-
-        Returns:
-            x (np.ndarray[float]): the x values of the ankle trajectory.
-            y (np.ndarray[float]): the y values of the ankle trajectory.
-        """
-        # Get ankle positions via the static toes:
-        ankle_start = self.pos_ankle1
-        toes_static = self.pos_toes2
-        ankle_end = toes_static + (next_pose.pos_ankle2 - next_pose.pos_toes1)
-
-        # Calculate step size and height:
-        step_size = ankle_end[0] - ankle_start[0]
-        step_height = ankle_end[1] - ankle_start[1]
-
-        # Determine the parabola function:
-        if step_size != 0:
-            c = midpoint_height
-            a = -4 * (c / step_size ** 2)
-            x = np.linspace(0, 1, trajectory_samples) * step_size - step_size / 2
-            y_parabola = a * x ** 2 + c
-        else:
-            y_parabola = 0
-
-        # Define trajectory:
-        x = np.linspace(0, 1, trajectory_samples) * step_size
-        y = np.linspace(0, 1, trajectory_samples) * step_height + y_parabola
-
-        return x, y
-
-    def get_ankle_location_from_ankle_trajectory(
-        self, next_pose: "Pose", frac: float, midpoint_height: float, trajectory_samples: float
-    ):
-        """Gets the location of the ankle for a midpoint from the generated ankle_trajectory.
-
-        Args:
-            next_pose (Pose): the next pose to move to.
-            frac (float): the fraction of the step at which the mid position should be.
-            midpoint_height (float): the height of the midpoint.
-            trajectory_samples (float): the number of samples creating the full trajectory.
-
-        Returns:
-            pos_ankle (np.ndarray[float]): the desired position of the ankle at the given fraction of a step.
-        """
-        ankle_trajectory = np.array(self.create_ankle_trajectory(next_pose, midpoint_height, trajectory_samples))
-        index = round(np.shape(ankle_trajectory)[1] * frac)
-        ankle_current = self.pos_ankle1 - self.pos_ankle2
-        return ankle_current + ankle_trajectory[:, index]
-
     def solve_mid_position(
         self,
         next_pose: "Pose",
