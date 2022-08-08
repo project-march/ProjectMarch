@@ -40,9 +40,9 @@ protected:
     double min_check_angle_;
     double max_check_angle_;
     double angle_offset_;
-
-    int average_count_ = 4;
-    int skip_point_num_ = 2;
+    int avg_sample_size_;
+    int num_skip_points_;
+    int binary_steps_;
 
     double linearSearchOptimalAngle();
 
@@ -52,6 +52,8 @@ protected:
 
     void pointCallback(
         const march_shared_msgs::msg::FootPosition::SharedPtr msg);
+
+    void parameterUpdatedLogger(const rclcpp::Parameter& param);
 };
 
 #endif // MARCH_POINT_CLOUD_ALIGNER_H

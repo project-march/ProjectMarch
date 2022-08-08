@@ -46,12 +46,10 @@ FramePublisher::FramePublisher()
         = client_node_->create_client<rcl_interfaces::srv::SetParameters>(
             "/march/march_foot_position_finder/set_parameters");
 
-    range_.set__from_value(-10.0).set__to_value(10.0).set__step(0.1);
-    descriptor_.floating_point_range = { range_ };
-    this->declare_parameter<double>(
-        "rotation_camera_left", rotation_camera_left_, descriptor_);
-    this->declare_parameter<double>(
-        "rotation_camera_right", rotation_camera_right_, descriptor_);
+    rotation_camera_left_
+        = this->get_parameter("rotation_camera_left").as_double();
+    rotation_camera_right_
+        = this->get_parameter("rotation_camera_right").as_double();
 }
 
 /**
@@ -66,12 +64,11 @@ rcl_interfaces::msg::SetParametersResult FramePublisher::parametersCallback(
     for (const rclcpp::Parameter& param : parameters) {
         if (param.get_name() == "rotation_camera_left") {
             rotation_camera_left_ = param.as_double();
-            parameterUpdatedLogger(param);
         }
         if (param.get_name() == "rotation_camera_right") {
             rotation_camera_right_ = param.as_double();
-            parameterUpdatedLogger(param);
         }
+        parameterUpdatedLogger(param);
     }
     left_aligner_->parametersCallback(parameters);
     right_aligner_->parametersCallback(parameters);
@@ -208,11 +205,16 @@ void FramePublisher::alignCamerasCallback()
     double original_threshold = getHeightZeroThreshold();
     setHeightZeroThreshold(/*threshold=*/0.0);
 
-    std::thread thread_left( [this] { left_aligner_->alignPointCloud(); } );
-    std::thread thread_right( [this] { left_aligner_->alignPointCloud(); } );
+    std::thread thread_left([this] {
+        left_aligner_->alignPointCloud();
+    });
+    std::thread thread_right([this] {
+        right_aligner_->alignPointCloud();
+    });
 
-    // std::thread thread_left(&PointCloudAligner::alignPointCloud, left_aligner_);
-    // std::thread thread_right(&PointCloudAligner::alignPointCloud, right_aligner_);
+    // std::thread thread_left(&PointCloudAligner::alignPointCloud,
+    // left_aligner_); std::thread
+    // thread_right(&PointCloudAligner::alignPointCloud, right_aligner_);
 
     thread_left.join();
     thread_right.join();
