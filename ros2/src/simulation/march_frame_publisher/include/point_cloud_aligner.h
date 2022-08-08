@@ -7,6 +7,7 @@
 
 #include "march_shared_msgs/msg/foot_position.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include <array>
 #include <frame_publisher.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 

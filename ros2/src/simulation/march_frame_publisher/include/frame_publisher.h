@@ -31,8 +31,6 @@ class FramePublisher : public rclcpp::Node {
 public:
     explicit FramePublisher();
 
-    ~FramePublisher() = default;
-
     void setLeftCameraRotation(double angle);
 
     void setRightCameraRotation(double angle);

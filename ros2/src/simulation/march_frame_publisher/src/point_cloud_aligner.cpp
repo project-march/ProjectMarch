@@ -77,9 +77,9 @@ void PointCloudAligner::alignPointCloud()
  */
 double PointCloudAligner::binarySearchOptimalAngle()
 {
-    double bounds[3] = { min_check_angle_,
+    std::array<double, 3> bounds = { min_check_angle_,
         0.5 * (min_check_angle_ + max_check_angle_), max_check_angle_ };
-    double heights[3] = { computeAverageHeight(bounds[0]),
+    std::array<double, 3> heights = { computeAverageHeight(bounds[0]),
         computeAverageHeight(bounds[1]), computeAverageHeight(bounds[2]) };
 
     double optimal_angle = bounds[0];
