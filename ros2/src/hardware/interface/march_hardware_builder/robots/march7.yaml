@@ -90,9 +90,9 @@ march7:
           absoluteEncoder:
             direction: -1
             resolution: 20 
-            minPositionIU: 616064  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 965360  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 627152
+            minPositionIU: 485856  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 836080  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 502976
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -183,9 +183,9 @@ march7:
           absoluteEncoder:
             direction: 1
             resolution: 20
-            minPositionIU: 271120  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 621184  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 286624
+            minPositionIU: 531696  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 882560  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 548304
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -194,6 +194,6 @@ march7:
             direction: 1
             resolution: 12
             transmission: 121
-  # power_distribution_board:
-  #     slaveIndex: 1
-  #     byteOffset: 0
+  power_distribution_board:
+      slaveIndex: 1
+      byteOffset: 0
