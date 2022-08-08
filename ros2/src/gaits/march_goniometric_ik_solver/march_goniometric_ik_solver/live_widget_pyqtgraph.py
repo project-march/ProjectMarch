@@ -20,7 +20,6 @@ Y_MIN = -0.35
 Y_MAX = 0.35
 
 MIDPOINT_HEIGHT = 0.15
-TRAJECTORY_SAMPLES = 99
 IK_SOLVER_PARAMTERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
 DURATION = 2.0
 NUMBER_OF_JOINTS = 8
@@ -29,11 +28,8 @@ NUMBER_OF_JOINTS = 8
 class LiveWidget:
     """A widget to easily check the solutions of the IK solver for a given x,y location of the ankle.
 
-    This widget has been made for debugging purposes, to evaluate poses the IK solver provides as solution for a given goal location. This widget can be executed by sourcing ROS2, March ROS2 and running this script with python: sfox && sros2 && python3 live_widget_pyqtgraph.py
-
-    Attributes:
-        default_hip_fraction (float): the default fraction between the two feet (forward) at which the hip is desired.
-        default_knee_bend (float): the default bending of the knee for a straight leg.
+    This widget has been made for debugging purposes, to evaluate poses the IK solver provides as solution for a given goal location.
+    This widget can be executed by sourcing ROS2, March ROS2 and running this script with python: sfox && sros2 && python3 live_widget_pyqtgraph.py
     """
 
     def __init__(self) -> None:
@@ -42,8 +38,14 @@ class LiveWidget:
             "next": {"x": 0.0, "y": 0.0},
             "mid": {"fraction": 0.0, "deviation": 0.0, "height": MIDPOINT_HEIGHT},
         }
+        self.poses = {
+            "last": Pose(IK_SOLVER_PARAMTERS),
+            "mid_pre": Pose(IK_SOLVER_PARAMTERS),
+            "mid_post": Pose(IK_SOLVER_PARAMTERS),
+            "next": Pose(IK_SOLVER_PARAMTERS),
+        }
         self.joint_trajectories: List[DynamicJointTrajectory] = []
-        self.reduce_df_front = True
+        self.show_midpoints = True
 
         self.create_window()
         self.create_plot()
@@ -52,19 +54,14 @@ class LiveWidget:
         self.create_table()
         self.fill_layout()
 
-    @property
-    def midpoint_height(self):
-        """Returns the midpoint hegiht based on foot locations and midpoint height slider."""
-        return self.sliders["mid"]["height"] + max(-self.sliders["last"]["y"], self.sliders["next"]["y"])
-
-    def create_window(self):
+    def create_window(self) -> None:
         """Creates a QT window."""
         self.window = QWidget()
         self.window.setWindowTitle("IK Solver - Widget")
         self.layout = QGridLayout(self.window)
         pg.setConfigOptions(antialias=True)
 
-    def create_plot(self):
+    def create_plot(self) -> None:
         """Creates a plot where we can visualize a pose."""
         self.plot_window = pg.GraphicsWindow()
         self.plot_window.setBackground("w")
@@ -72,12 +69,6 @@ class LiveWidget:
         plot.setAspectLocked()
         plot.showGrid(x=True, y=True)
 
-        self.poses = {
-            "last": Pose(IK_SOLVER_PARAMTERS),
-            "mid_pre": Pose(IK_SOLVER_PARAMTERS),
-            "mid_post": Pose(IK_SOLVER_PARAMTERS),
-            "next": Pose(IK_SOLVER_PARAMTERS),
-        }
         self.plots = {
             "mid": plot.plot(pen="g", symbol="o", symbolSize=6),
             "mid_pre": plot.plot(pen=0.8, symbol="o", symbolSize=6),
@@ -90,8 +81,8 @@ class LiveWidget:
         }
         self.update_poses()
 
-    def create_sliders(self):
-        """Creates sliders to control the x and y positions of the poses."""
+    def create_sliders(self) -> None:
+        """Creates sliders to control all the poses."""
         self.slider_last_x = QSlider()
         self.slider_last_x.setOrientation(Qt.Horizontal)
         self.slider_last_x.setValue(99)
@@ -142,20 +133,20 @@ class LiveWidget:
         self.vertical_sliders.addWidget(self.slider_last_y, 0, 0)
         self.vertical_sliders.addWidget(self.slider_next_y, 0, 1)
 
-    def create_buttons(self):
-        """Create buttons to reset pose and turn dorsiflexion reduction on or off."""
+    def create_buttons(self) -> None:
+        """Create buttons to reset pose and toggle view of midpoints."""
         self.reset_button = QPushButton("Reset")
         self.reset_button.clicked.connect(self.reset)
 
-        self.df_front_button = QCheckBox("DF front")
+        self.df_front_button = QCheckBox("Show midpoints")
         self.df_front_button.setChecked(True)
-        self.df_front_button.clicked.connect(self.toggle_df_front)
+        self.df_front_button.clicked.connect(self.toggle_show_midpoint)
 
         self.buttons = QGridLayout()
         self.buttons.addWidget(self.reset_button, 0, 0)
         self.buttons.addWidget(self.df_front_button, 0, 1)
 
-    def create_table(self):
+    def create_table(self) -> None:
         """Create a table where we write the angles of all joints."""
         self.table = QGridLayout()
         self.tables = {"last": pg.TableWidget(), "next": pg.TableWidget()}
@@ -163,7 +154,7 @@ class LiveWidget:
         for pose in ["last", "next"]:
             self.table.addWidget(self.tables[pose], list(self.tables.keys()).index(pose), 0)
 
-    def fill_layout(self):
+    def fill_layout(self) -> None:
         """Fill the layout of the window with all the created elements."""
         self.layout.addLayout(self.vertical_sliders, 0, 0)
         self.layout.addWidget(self.plot_window, 0, 1)
@@ -171,62 +162,68 @@ class LiveWidget:
         self.layout.addLayout(self.table, 0, 2)
         self.layout.addLayout(self.buttons, 1, 2)
 
-    def update_last_x(self, value):
+    @property
+    def midpoint_height(self) -> float:
+        """Returns the midpoint hegiht based on foot locations and midpoint height slider.
+
+        Returns:
+            float: the midpoint height.
+        """
+        return self.sliders["mid"]["height"] + max(-self.sliders["last"]["y"], self.sliders["next"]["y"])
+
+    def update_last_x(self, value) -> None:
         """Update the x value of last pose."""
         self.sliders["last"]["x"] = (1 - (value / 99)) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("last")
-        self.reset_midpoint_fraction()
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
-        self.update_tables()
+        self.update_midpoints_and_tables()
 
-    def update_next_x(self, value):
+    def update_next_x(self, value) -> None:
         """Update the x value of next pose."""
         self.sliders["next"]["x"] = (value / 99) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("next")
-        self.reset_midpoint_fraction()
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
-        self.update_tables()
+        self.update_midpoints_and_tables()
 
-    def update_last_y(self, value):
+    def update_last_y(self, value) -> None:
         """Update the y value of last pose."""
         self.sliders["last"]["y"] = (1 - (value / 99)) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("last")
-        self.reset_midpoint_fraction()
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
-        self.update_tables()
+        self.update_midpoints_and_tables()
 
-    def update_next_y(self, value):
+    def update_next_y(self, value) -> None:
         """Update the y value of next pose."""
         self.sliders["next"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("next")
+        self.update_midpoints_and_tables()
+
+    def update_midpoints(self) -> None:
+        """Calls the methods to update the midpoints."""
+        if self.show_midpoints:
+            self.update_pose("mid_pre")
+            self.update_pose("mid_post")
+
+    def update_midpoints_and_tables(self) -> None:
+        """Calls the methods to update the midpoints and the tables."""
         self.reset_midpoint_fraction()
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
+        self.update_midpoints()
         self.update_tables()
 
-    def update_midpoint_fraction(self, value):
-        """Update the fraction of the step at which we want to show a midpoint."""
+    def update_midpoint_fraction(self, value) -> None:
+        """Update the fraction of the step at which we want to show a pose."""
         self.sliders["mid"]["fraction"] = value / 100
-        if self.increasing_setpoint_times():
-            self.plot_pose("mid", self.pose_from_dynamic_joint_trajectory())
+        self.plot_pose("mid", self.pose_from_dynamic_joint_trajectory())
 
-    def update_midpoint_deviation(self, value):
+    def update_midpoint_deviation(self, value) -> None:
         """Update the deviation used to create the midpoints."""
         self.sliders["mid"]["deviation"] = value / 100
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
+        self.update_midpoints()
 
-    def update_midpoint_height(self, value):
+    def update_midpoint_height(self, value) -> None:
         """Update the height used to create the midpoints."""
         self.sliders["mid"]["height"] = value / 100 * MIDPOINT_HEIGHT
-        self.update_pose("mid_pre")
-        self.update_pose("mid_post")
+        self.update_midpoints()
 
-    def reset(self):
-        """Reset to default pose."""
+    def reset(self) -> None:
+        """Reset poses and corresponding sliders."""
         self.slider_last_x.setValue(99)
         self.slider_next_x.setValue(0)
         self.slider_last_y.setValue(50)
@@ -238,33 +235,51 @@ class LiveWidget:
         self.reset_midpoint_poses()
         self.update_tables()
 
-    def reset_midpoint_fraction(self):
+    def reset_midpoint_fraction(self) -> None:
         """Resets the slider and clears the plot."""
         self.slider_midpoint_fraction.setValue(0)
         self.plots["mid"].setData(x=[], y=[])
 
-    def reset_midpoint_poses(self):
+    def reset_midpoint_poses(self) -> None:
         """Clears the plots for the midpoint poses."""
         for pose_name in ["mid_pre", "mid_post"]:
             self.plots[pose_name].setData(x=[], y=[])
 
-    def toggle_df_front(self):
-        """Toggle dorsiflexion reduction of front lef."""
-        self.reduce_df_front = not self.reduce_df_front
-        self.update_poses()
-        self.update_tables()
+    def toggle_show_midpoint(self) -> None:
+        """Toggles whether midpoints are shown."""
+        self.show_midpoints = not self.show_midpoints
+        if not self.show_midpoints:
+            for plot in ["mid_pre", "mid_post", "mid_of_step", "mid_pre_ankle", "mid_post_ankle"]:
+                self.plots[plot].setData(x=[], y=[])
+        else:
+            for pose in ["mid_pre", "mid_post"]:
+                self.update_pose(pose)
 
-    def get_midpoint_fraction_based_on_deviation(self, pose: str):
-        """Get the midpoint fraction based on the deviation."""
-        if pose == "mid_pre":
+    def get_midpoint_fraction_based_on_deviation(self, pose_name: str) -> float:
+        """Get the midpoint fraction based on the deviation.
+
+        Args:
+            pose_name (str): the name of the pose.
+
+        Returns:
+            float: the fraction of the midpoint.
+        """
+        if pose_name == "mid_pre":
             return 0.5 * (1 - self.sliders["mid"]["deviation"])
-        elif pose == "mid_post":
+        elif pose_name == "mid_post":
             return 0.5 * (1 + self.sliders["mid"]["deviation"])
         else:
             return 0.5
 
-    def setpoint_time(self, pose_name: str):
-        """Returns the setpoint time for the given pose."""
+    def setpoint_time(self, pose_name: str) -> float:
+        """Returns the setpoint time for the given pose.
+
+        Args:
+            pose_name (str): the name of the pose.
+
+        Returns:
+            float: the setpoint time for the given pose.
+        """
         if pose_name == "last":
             return 0.0
         elif pose_name == "next":
@@ -272,32 +287,30 @@ class LiveWidget:
         else:
             return DURATION * self.get_midpoint_fraction_based_on_deviation(pose_name)
 
-    def increasing_setpoint_times(self):
-        """Returns true if the setpoint times for all succesive poses are increasing."""
-        is_increasing = 1
-        for n in range(1, len(self.poses)):
-            if self.setpoint_time(list(self.poses.keys())[n]) > self.setpoint_time(list(self.poses.keys())[n - 1]):
-                is_increasing += 1
-        return is_increasing == len(self.poses)
-
-    def interpolate_trough_points(self):
+    def interpolate_trough_points(self) -> None:
         """Interpolates setpoints to joint trajectory for every joint."""
-        if self.increasing_setpoint_times():
-            self.joint_trajectories = []
-            for n in range(NUMBER_OF_JOINTS):
-                setpoint_list = []
-                for pose_name in self.poses.keys():
-                    time = Duration(self.setpoint_time(pose_name))
-                    position = (
-                        self.poses[pose_name].pose_left[n]
-                        if pose_name == "last"
-                        else self.poses[pose_name].pose_right[n]
-                    )
-                    setpoint_list.append(Setpoint(time, position, 0.0))
-                self.joint_trajectories.append(DynamicJointTrajectory(setpoint_list))
+        self.joint_trajectories = []
+        for n in range(NUMBER_OF_JOINTS):
+            setpoint_list = []
 
-    def pose_from_dynamic_joint_trajectory(self):
-        """Creates a pose from all joints dynamic joint trajectories, on time given by the fraction slider."""
+            pose_names = list(self.poses.keys())
+            if self.sliders["mid"]["deviation"] == 0:
+                pose_names.remove("mid_post")
+
+            for pose_name in pose_names:
+                time = Duration(self.setpoint_time(pose_name))
+                position = (
+                    self.poses[pose_name].pose_left[n] if pose_name == "last" else self.poses[pose_name].pose_right[n]
+                )
+                setpoint_list.append(Setpoint(time, position, 0.0))
+            self.joint_trajectories.append(DynamicJointTrajectory(setpoint_list))
+
+    def pose_from_dynamic_joint_trajectory(self) -> Pose:
+        """Creates a pose from all joints dynamic joint trajectories, on time given by the fraction slider.
+
+        Returns:
+            Pose: a pose object created form the joint_trajectories and the fraction slider.
+        """
         pose_list = []
         for n in range(NUMBER_OF_JOINTS):
             pose_list.append(
@@ -307,8 +320,12 @@ class LiveWidget:
             )
         return Pose(IK_SOLVER_PARAMTERS, pose_list)
 
-    def update_pose(self, pose_name: str):
-        """Update the given pose."""
+    def update_pose(self, pose_name: str) -> None:
+        """Update the given pose.
+
+        Args:
+            pose_name (str): name of the pose.
+        """
         try:
             if pose_name in ["mid_pre", "mid_post"]:
                 fraction = self.get_midpoint_fraction_based_on_deviation(pose_name)
@@ -326,8 +343,13 @@ class LiveWidget:
 
         self.plot_pose(pose_name, self.poses[pose_name])
 
-    def plot_pose(self, pose_name: str, pose: Pose):
-        """Plots the given pose."""
+    def plot_pose(self, pose_name: str, pose: Pose) -> None:
+        """Plots the given pose.
+
+        Args:
+            pose_name (str): name of the pose.
+            pose (Pose): the pose to plot.
+        """
         positions = list(pose.calculate_joint_positions().values())
 
         # shift positions to have toes of stand leg at (0,0):
@@ -339,16 +361,18 @@ class LiveWidget:
         positions_x = [pos[0] for pos in positions]
         positions_y = [pos[1] for pos in positions]
         self.plots[pose_name].setData(x=positions_x, y=positions_y)
-        self.update_mid_of_step()
-        self.update_midpoint_ankle_postions()
+
+        if self.show_midpoints:
+            self.update_mid_of_step()
+            self.update_midpoint_ankle_postions()
         self.interpolate_trough_points()
 
-    def update_poses(self):
-        """Update all poses."""
+    def update_poses(self) -> None:
+        """Update the start and end poses."""
         for pose in ["last", "next"]:
             self.update_pose(pose)
 
-    def update_mid_of_step(self):
+    def update_mid_of_step(self) -> None:
         """Update the point that is in the middle of the step."""
         step_size_last = self.poses["last"].pos_ankle2[0]
         step_size_next = self.poses["next"].pos_ankle2[0]
@@ -356,7 +380,7 @@ class LiveWidget:
         mid_of_step -= self.poses["next"].pos_toes1[0]  # Shift since we center around toes
         self.plots["mid_of_step"].setData(x=[mid_of_step], y=[0])
 
-    def update_midpoint_ankle_postions(self):
+    def update_midpoint_ankle_postions(self) -> None:
         """Update the two points at which the ankle is desired for the two midpoints."""
         for pose in ["mid_pre", "mid_post"]:
             fraction = self.get_midpoint_fraction_based_on_deviation(pose)
@@ -365,7 +389,7 @@ class LiveWidget:
             y = self.midpoint_height
             self.plots[pose + "_ankle"].setData(x=[x], y=[y])
 
-    def update_tables(self):
+    def update_tables(self) -> None:
         """Update the tables."""
         for pose in ["last", "next"]:
             joint_angles = self.poses[pose].pose_left
@@ -383,7 +407,7 @@ class LiveWidget:
             self.tables[pose].setHorizontalHeaderLabels(["", "rad", "deg"])
             self.tables[pose].verticalHeader().hide()
 
-    def show(self):
+    def show(self) -> None:
         """Show the tool."""
         self.window.show()
 
