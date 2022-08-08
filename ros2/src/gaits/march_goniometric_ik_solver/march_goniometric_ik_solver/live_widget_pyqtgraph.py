@@ -216,11 +216,13 @@ class LiveWidget:
         """Update the deviation used to create the midpoints."""
         self.sliders["mid"]["deviation"] = value / 100
         self.update_midpoints()
+        self.reset_midpoint_fraction()
 
     def update_midpoint_height(self, value) -> None:
         """Update the height used to create the midpoints."""
         self.sliders["mid"]["height"] = value / 100 * MIDPOINT_HEIGHT
         self.update_midpoints()
+        self.reset_midpoint_fraction()
 
     def reset(self) -> None:
         """Reset poses and corresponding sliders."""
@@ -288,9 +290,9 @@ class LiveWidget:
             return DURATION * self.get_midpoint_fraction_based_on_deviation(pose_name)
 
     def interpolate_trough_points(self) -> None:
-        """Interpolates setpoints to joint trajectory for every joint."""
+        """Interpolates setpoints to joint trajectory for every joint and the foot rotation."""
         self.joint_trajectories = []
-        for n in range(NUMBER_OF_JOINTS):
+        for n in range(NUMBER_OF_JOINTS + 1):
             setpoint_list = []
 
             pose_names = list(self.poses.keys())
@@ -299,9 +301,14 @@ class LiveWidget:
 
             for pose_name in pose_names:
                 time = Duration(self.setpoint_time(pose_name))
-                position = (
-                    self.poses[pose_name].pose_left[n] if pose_name == "last" else self.poses[pose_name].pose_right[n]
-                )
+                if n < NUMBER_OF_JOINTS:
+                    position = (
+                        self.poses[pose_name].pose_left[n]
+                        if pose_name == "last"
+                        else self.poses[pose_name].pose_right[n]
+                    )
+                else:
+                    position = 0.0 if pose_name == "last" else self.poses[pose_name].rot_foot1
                 setpoint_list.append(Setpoint(time, position, 0.0))
             self.joint_trajectories.append(DynamicJointTrajectory(setpoint_list))
 
@@ -318,7 +325,12 @@ class LiveWidget:
                 .get_interpolated_setpoint(self.sliders["mid"]["fraction"] * DURATION)
                 .position
             )
-        return Pose(IK_SOLVER_PARAMTERS, pose_list)
+        pose = Pose(IK_SOLVER_PARAMTERS, pose_list)
+        pose.rot_foot1 = max(
+            self.joint_trajectories[-1].get_interpolated_setpoint(self.sliders["mid"]["fraction"] * DURATION).position,
+            0.0,  # Since negative foot rotation is not possible.
+        )
+        return pose
 
     def update_pose(self, pose_name: str) -> None:
         """Update the given pose.
