@@ -409,7 +409,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-
     # region Launch computer vision algorithms
     point_finder_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -435,7 +434,7 @@ def generate_launch_description() -> LaunchDescription:
                 "march_frame_publisher.launch.py",
             )
         ),
-        condition=IfCondition(point_finder)
+        condition=IfCondition(point_finder),
     )
     # endregion
 
@@ -451,7 +450,6 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(use_imu_data),
     )
     # endregion
-
 
     # region Launch Gait preprocessor
     gait_preprocessor_node = IncludeLaunchDescription(
@@ -556,7 +554,7 @@ def generate_launch_description() -> LaunchDescription:
         march_control,
         point_finder_node,
         camera_aligned_frame_pub_node,
-        back_sense_node
+        back_sense_node,
     ]
 
     return LaunchDescription(declared_arguments + nodes)
