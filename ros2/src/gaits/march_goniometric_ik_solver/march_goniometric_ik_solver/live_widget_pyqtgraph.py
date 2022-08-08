@@ -7,6 +7,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
 from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
+from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 
 X_MIN = 0.0
@@ -16,6 +17,7 @@ Y_MAX = 0.35
 
 MIDPOINT_HEIGHT = 0.15
 TRAJECTORY_SAMPLES = 99
+IK_SOLVER_PARAMTERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
 
 
 class LiveWidget:
@@ -29,7 +31,11 @@ class LiveWidget:
     """
 
     def __init__(self) -> None:
-        self.sliders = {"last": {"x": 0, "y": 0}, "next": {"x": 0, "y": 0}, "mid": 0}
+        self.sliders = {
+            "last": {"x": 0, "y": 0},
+            "next": {"x": 0, "y": 0},
+            "mid": {"fraction": 0, "deviation": 0, "height": MIDPOINT_HEIGHT},
+        }
         self.reduce_df_front = True
 
         self.create_window()
@@ -54,13 +60,21 @@ class LiveWidget:
         plot.setAspectLocked()
         plot.showGrid(x=True, y=True)
 
-        self.poses = {"last": Pose(), "next": Pose(), "mid": Pose()}
+        self.poses = {
+            "last": Pose(IK_SOLVER_PARAMTERS),
+            "next": Pose(IK_SOLVER_PARAMTERS),
+            "mid_pre": Pose(IK_SOLVER_PARAMTERS),
+            "mid_post": Pose(IK_SOLVER_PARAMTERS),
+        }
         self.plots = {
+            "mid": plot.plot(pen="g", symbol="o", symbolSize=6),
+            "mid_pre": plot.plot(pen=0.8, symbol="o", symbolSize=6),
+            "mid_post": plot.plot(pen=0.8, symbol="o", symbolSize=6),
             "last": plot.plot(pen="b", symbol="o", symbolSize=6),
             "next": plot.plot(pen="k", symbol="o", symbolSize=6),
-            "mid": plot.plot(pen="g", symbol="o", symbolSize=6),
-            "mid_point": plot.plot(pen="k", symbol="o", symbolSize=6),
-            "trajectory": plot.plot(pen="r"),
+            "mid_of_step": plot.plot(symbolPen="r", symbol="o", symbolSize=6),
+            "mid_pre_ankle": plot.plot(symbolPen="b", symbol="o", symbolSize=6),
+            "mid_post_ankle": plot.plot(symbolPen="k", symbol="o", symbolSize=6),
         }
         self.update_poses()
 
@@ -75,18 +89,32 @@ class LiveWidget:
         self.slider_next_x.setOrientation(Qt.Horizontal)
         self.slider_next_x.valueChanged.connect(self.update_next_x)
 
-        self.midpoint_slider = QSlider()
-        self.midpoint_slider.setOrientation(Qt.Horizontal)
-        self.midpoint_slider.valueChanged.connect(self.update_midpoint)
+        self.slider_midpoint_fraction = QSlider()
+        self.slider_midpoint_fraction.setOrientation(Qt.Horizontal)
+        self.slider_midpoint_fraction.valueChanged.connect(self.update_midpoint_fraction)
+
+        self.slider_midpoint_deviation = QSlider()
+        self.slider_midpoint_deviation.setOrientation(Qt.Horizontal)
+        self.slider_midpoint_deviation.valueChanged.connect(self.update_midpoint_deviation)
+
+        self.slider_midpoint_height = QSlider()
+        self.slider_midpoint_height.setOrientation(Qt.Horizontal)
+        self.slider_midpoint_height.setValue(99)
+        self.slider_midpoint_height.valueChanged.connect(self.update_midpoint_height)
 
         self.horizontal_sliders = QGridLayout()
         self.horizontal_sliders_top = QGridLayout()
+        self.horizontal_sliders_bottom = QGridLayout()
 
         self.horizontal_sliders_top.addWidget(self.slider_last_x, 0, 0)
         self.horizontal_sliders_top.addWidget(self.slider_next_x, 0, 1)
 
+        self.horizontal_sliders_bottom.addWidget(self.slider_midpoint_deviation, 0, 0)
+        self.horizontal_sliders_bottom.addWidget(self.slider_midpoint_height, 0, 1)
+
         self.horizontal_sliders.addLayout(self.horizontal_sliders_top, 0, 0)
-        self.horizontal_sliders.addWidget(self.midpoint_slider, 1, 0)
+        self.horizontal_sliders.addWidget(self.slider_midpoint_fraction, 1, 0)
+        self.horizontal_sliders.addLayout(self.horizontal_sliders_bottom, 2, 0)
 
         self.slider_last_y = QSlider()
         self.slider_last_y.setValue(50)
@@ -135,31 +163,51 @@ class LiveWidget:
         """Update the x value of last pose."""
         self.sliders["last"]["x"] = (1 - (value / 99)) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("last")
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
         self.update_tables()
 
     def update_next_x(self, value):
         """Update the x value of next pose."""
         self.sliders["next"]["x"] = (value / 99) * (X_MAX - X_MIN) + X_MIN
         self.update_pose("next")
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
         self.update_tables()
 
     def update_last_y(self, value):
         """Update the y value of last pose."""
         self.sliders["last"]["y"] = (1 - (value / 99)) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("last")
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
         self.update_tables()
 
     def update_next_y(self, value):
         """Update the y value of next pose."""
         self.sliders["next"]["y"] = (value / 99) * (Y_MAX - Y_MIN) + Y_MIN
         self.update_pose("next")
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
         self.update_tables()
 
-    def update_midpoint(self, value):
+    def update_midpoint_fraction(self, value):
         """Update the fraction of the step at which we want to show a midpoint."""
-        self.sliders["mid"] = value / 100
-        self.update_trajectory()
-        self.update_pose("mid")
+        self.sliders["mid"]["fraction"] = value / 100
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
+
+    def update_midpoint_deviation(self, value):
+        """Update the deviation used to create the midpoints."""
+        self.sliders["mid"]["deviation"] = value / 100
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
+
+    def update_midpoint_height(self, value):
+        """Update the height used to create the midpoints."""
+        self.sliders["mid"]["height"] = value / 100 * MIDPOINT_HEIGHT
+        self.update_pose("mid_pre")
+        self.update_pose("mid_post")
 
     def reset(self):
         """Reset to default pose."""
@@ -179,19 +227,22 @@ class LiveWidget:
         self.update_poses()
         self.update_tables()
 
+    def get_midpoint_fraction_based_on_deviation(self, pose: str):
+        """Get the midpoint fraction based on the deviation."""
+        if pose == "mid_pre":
+            return 0.5 * (1 - self.sliders["mid"]["deviation"])
+        elif pose == "mid_post":
+            return 0.5 * (1 + self.sliders["mid"]["deviation"])
+        else:
+            return 0.5
+
     def update_pose(self, pose):
         """Update the given pose."""
         try:
-            if pose == "mid":
+            if pose in ["mid_pre", "mid_post"]:
+                fraction = self.get_midpoint_fraction_based_on_deviation(pose)
                 self.poses[pose] = copy.deepcopy(self.poses["last"])
-                self.poses[pose].solve_mid_position(
-                    self.poses["next"],
-                    self.sliders[pose],
-                    self.poses[pose].get_ankle_location_from_ankle_trajectory(
-                        self.poses["next"], self.sliders[pose], MIDPOINT_HEIGHT, TRAJECTORY_SAMPLES
-                    )[1],
-                    "",
-                )
+                self.poses[pose].solve_mid_position(self.poses["next"], fraction, self.sliders["mid"]["height"], "")
             else:
                 self.poses[pose].solve_end_position(
                     self.sliders[pose]["x"],
@@ -213,29 +264,30 @@ class LiveWidget:
         positions_x = [pos[0] for pos in positions]
         positions_y = [pos[1] for pos in positions]
         self.plots[pose].setData(x=positions_x, y=positions_y)
-        self.update_trajectory()
+        self.update_mid_of_step()
+        self.update_midpoint_ankle_postions()
 
     def update_poses(self):
         """Update all poses."""
         for pose in ["last", "next"]:
             self.update_pose(pose)
 
-    def update_trajectory(self):
-        """Update the ankle trajectory line that is plotted."""
-        x, y = self.poses["last"].create_ankle_trajectory(self.poses["next"], MIDPOINT_HEIGHT, TRAJECTORY_SAMPLES)
+    def update_mid_of_step(self):
+        """Update the point that is in the middle of the step."""
+        step_size_last = self.poses["last"].pos_ankle2[0]
+        step_size_next = self.poses["next"].pos_ankle2[0]
+        mid_of_step = (-step_size_last + step_size_next) / 2
+        mid_of_step -= self.poses["next"].pos_toes1[0]  # Shift since we center around toes
+        self.plots["mid_of_step"].setData(x=[mid_of_step], y=[0])
 
-        # shift positions to let trajectory start in ankle:
-        x -= self.poses["last"].pos_toes2[0] - self.poses["last"].pos_ankle1[0]
-        y -= self.poses["last"].pos_toes2[1] - self.poses["last"].pos_ankle1[1]
-
-        # plot trajectory:
-        self.plots["trajectory"].setData(x=x, y=y)
-
-        # plot current mid_point:
-        if len(x) > 0 and len(y) > 0:
-            point_x = x[round(len(x) * self.sliders["mid"])]
-            point_y = y[round(len(y) * self.sliders["mid"])]
-            self.plots["mid_point"].setData(x=[point_x], y=[point_y])
+    def update_midpoint_ankle_postions(self):
+        """Update the two points at which the ankle is desired for the two midpoints."""
+        for pose in ["mid_pre", "mid_post"]:
+            fraction = self.get_midpoint_fraction_based_on_deviation(pose)
+            x = self.poses["last"].get_ankle_mid_x(fraction, self.poses["next"])
+            x -= self.poses["next"].pos_toes1[0]  # Shift since we center around toes.
+            y = self.sliders["mid"]["height"]
+            self.plots[pose + "_ankle"].setData(x=[x], y=[y])
 
     def update_tables(self):
         """Update the tables."""
