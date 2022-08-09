@@ -26,15 +26,30 @@
 #include "march_logger_cpp/ros_logger.hpp"
 #include "march_utility/logger_colors.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <csignal>
 
 using namespace march_hardware_interface_util;
 
 namespace march_hardware_interface {
 
+/** \brief This is done because the ros2 code doesn't yet correctly go to the teardown state.
+  * \note This only works if there is one instance alive of this object.
+  */
+MarchExoSystemInterface *instance;
+void teardown_state_cb(int signum) {
+    instance->stop();
+    exit(signum);
+}
+
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
     , clock_(rclcpp::Clock())
 {
+    instance = this;
+    signal(SIGINT, teardown_state_cb);  // For user interrupt.
+    signal(SIGTERM, teardown_state_cb);  // For termination request, sent to the program.
+    signal(SIGABRT, teardown_state_cb);  // For abnormal termination condition, (e.g. thrown exceptions).
+
 }
 
 /** Configures the controller.
