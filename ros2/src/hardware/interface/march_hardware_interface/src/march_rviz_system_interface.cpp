@@ -26,22 +26,22 @@
 #include <csignal>
 
 namespace march_hardware_interface {
-MarchRvizSystemInterface* instance;
-
-void teardown_state_cb(int signum){
-    instance->stop();
-    exit(signum);
-}
+//MarchRvizSystemInterface* instance;
+//
+//void teardown_state_cb(int signum){
+//    instance->stop();
+//    exit(signum);
+//}
 
 const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
 MarchRvizSystemInterface::MarchRvizSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
 {
-    instance = this;
-    signal(SIGINT, teardown_state_cb);  // For user interrupt.
-    signal(SIGTERM, teardown_state_cb);  // For termination request, sent to the program.
-    signal(SIGABRT, teardown_state_cb);  // For abnormal termination condition, (e.g. thrown exceptions).
+//    instance = this;
+//    signal(SIGINT, teardown_state_cb);  // For user interrupt.
+//    signal(SIGTERM, teardown_state_cb);  // For termination request, sent to the program.
+//    signal(SIGABRT, teardown_state_cb);  // For abnormal termination condition, (e.g. thrown exceptions).
 }
 
 /** Configures the controller.
