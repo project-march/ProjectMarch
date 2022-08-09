@@ -51,7 +51,7 @@ class LiveWidget:
         self.create_plot()
         self.create_sliders()
         self.create_buttons()
-        self.create_table()
+        self.create_tables()
         self.fill_layout()
 
     def create_window(self) -> None:
@@ -146,13 +146,13 @@ class LiveWidget:
         self.buttons.addWidget(self.reset_button, 0, 0)
         self.buttons.addWidget(self.df_front_button, 0, 1)
 
-    def create_table(self) -> None:
-        """Create a table where we write the angles of all joints."""
+    def create_tables(self) -> None:
+        """Create tables where we write the angles of all joints and the current settings."""
         self.table = QGridLayout()
-        self.tables = {"last": pg.TableWidget(), "next": pg.TableWidget()}
-        self.update_tables()
-        for pose in ["last", "next"]:
-            self.table.addWidget(self.tables[pose], list(self.tables.keys()).index(pose), 0)
+        self.tables = {"last": pg.TableWidget(), "next": pg.TableWidget(), "settings": pg.TableWidget()}
+        self.update_all_tables()
+        for name in self.tables.keys():
+            self.table.addWidget(self.tables[name], list(self.tables.keys()).index(name), 0)
 
     def fill_layout(self) -> None:
         """Fill the layout of the window with all the created elements."""
@@ -205,24 +205,27 @@ class LiveWidget:
         """Calls the methods to update the midpoints and the tables."""
         self.reset_midpoint_fraction()
         self.update_midpoints()
-        self.update_tables()
+        self.update_all_tables()
 
     def update_midpoint_fraction(self, value) -> None:
         """Update the fraction of the step at which we want to show a pose."""
         self.sliders["mid"]["fraction"] = value / 100
         self.plot_pose("mid", self.pose_from_dynamic_joint_trajectory())
+        self.update_all_tables()
 
     def update_midpoint_deviation(self, value) -> None:
         """Update the deviation used to create the midpoints."""
         self.sliders["mid"]["deviation"] = value / 100
         self.update_midpoints()
         self.reset_midpoint_fraction()
+        self.update_all_tables()
 
     def update_midpoint_height(self, value) -> None:
         """Update the height used to create the midpoints."""
         self.sliders["mid"]["height"] = value / 100 * MIDPOINT_HEIGHT
         self.update_midpoints()
         self.reset_midpoint_fraction()
+        self.update_all_tables()
 
     def reset(self) -> None:
         """Reset poses and corresponding sliders."""
@@ -235,7 +238,7 @@ class LiveWidget:
                 self.sliders[pose][axis] = 0
         self.update_poses()
         self.reset_midpoint_poses()
-        self.update_tables()
+        self.update_all_tables()
 
     def reset_midpoint_fraction(self) -> None:
         """Resets the slider and clears the plot."""
@@ -401,8 +404,8 @@ class LiveWidget:
             y = self.midpoint_height
             self.plots[pose + "_ankle"].setData(x=[x], y=[y])
 
-    def update_tables(self) -> None:
-        """Update the tables."""
+    def update_table_joint_angles(self) -> None:
+        """Update the tables that show the joint angles."""
         for pose in ["last", "next"]:
             joint_angles = self.poses[pose].pose_left
             joint_angles_degrees = [np.rad2deg(angle) for angle in joint_angles]
@@ -418,6 +421,18 @@ class LiveWidget:
             self.tables[pose].setData(data)
             self.tables[pose].setHorizontalHeaderLabels(["", "rad", "deg"])
             self.tables[pose].verticalHeader().hide()
+
+    def update_table_settings(self) -> None:
+        """Update the table that shows the current settings."""
+        data = [list(self.sliders["mid"].values())]
+        self.tables["settings"].setData(data)
+        self.tables["settings"].setHorizontalHeaderLabels(["frac", "dev", "height"])
+        self.tables["settings"].verticalHeader().hide()
+
+    def update_all_tables(self) -> None:
+        """Updates all tables."""
+        self.update_table_joint_angles()
+        self.update_table_settings()
 
     def show(self) -> None:
         """Show the tool."""
