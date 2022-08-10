@@ -7,7 +7,7 @@ import copy
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
-from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES
+from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES, check_on_limits
 from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import DynamicJointTrajectory
@@ -44,6 +44,13 @@ class LiveWidget:
             "mid_post": Pose(IK_SOLVER_PARAMTERS),
             "next": Pose(IK_SOLVER_PARAMTERS),
         }
+        self.pose_colours = {
+            "mid": "g",
+            "mid_pre": 0.8,
+            "mid_post": 0.8,
+            "last": "b",
+            "next": "k",
+        }
         self.joint_trajectories: List[DynamicJointTrajectory] = []
         self.show_midpoints = True
 
@@ -65,7 +72,7 @@ class LiveWidget:
         """Creates a plot where we can visualize a pose."""
         self.plot_window = pg.GraphicsWindow()
         self.plot_window.setBackground("w")
-        plot = self.plot_window.addPlot()
+        plot: pg.PlotItem = self.plot_window.addPlot()
         plot.setAspectLocked()
         plot.showGrid(x=True, y=True)
 
@@ -366,6 +373,14 @@ class LiveWidget:
             pose (Pose): the pose to plot.
         """
         positions = list(pose.calculate_joint_positions().values())
+
+        # select color based on limit check:
+        try:
+            check_on_limits(pose.pose_left)
+            self.plots[pose_name].setPen(self.pose_colours[pose_name])
+        except (PositionSoftLimitError) as value_error:
+            print(value_error)
+            self.plots[pose_name].setPen("r")
 
         # shift positions to have toes of stand leg at (0,0):
         if pose_name == "last":
