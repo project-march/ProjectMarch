@@ -23,14 +23,25 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_interface/hwi_util.h"
 #include "march_utility/logger_colors.hpp"
+#include <csignal>
 
 namespace march_hardware_interface {
+//MarchRvizSystemInterface* instance;
+//
+//void teardown_state_cb(int signum){
+//    instance->stop();
+//    exit(signum);
+//}
 
 const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
 MarchRvizSystemInterface::MarchRvizSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
 {
+//    instance = this;
+//    signal(SIGINT, teardown_state_cb);  // For user interrupt.
+//    signal(SIGTERM, teardown_state_cb);  // For termination request, sent to the program.
+//    signal(SIGABRT, teardown_state_cb);  // For abnormal termination condition, (e.g. thrown exceptions).
 }
 
 /** Configures the controller.
@@ -49,7 +60,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
-
+    throw runtime_error("Ethercat is not alive!");
     status_ = hardware_interface::status::CONFIGURED;
     return hardware_interface::return_type::OK;
 }

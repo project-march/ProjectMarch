@@ -26,15 +26,30 @@
 #include "march_logger_cpp/ros_logger.hpp"
 #include "march_utility/logger_colors.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <csignal>
 
 using namespace march_hardware_interface_util;
 
 namespace march_hardware_interface {
 
+/** \brief This is done because the ros2 code doesn't yet correctly go to the teardown state.
+  * \note This only works if there is one instance alive of this object.
+  */
+MarchExoSystemInterface *instance;
+void teardown_state_cb(int signum) {
+    instance->stop();
+    exit(signum);
+}
+
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
     , clock_(rclcpp::Clock())
 {
+    instance = this;
+    signal(SIGINT, teardown_state_cb);  // For user interrupt.
+    signal(SIGTERM, teardown_state_cb);  // For termination request, sent to the program.
+    signal(SIGABRT, teardown_state_cb);  // For abnormal termination condition, (e.g. thrown exceptions).
+
 }
 
 /** Configures the controller.
@@ -127,7 +142,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
-                jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.effort_actual));
+                jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
@@ -223,6 +238,7 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
+        stop();
         throw;
     }
 
@@ -302,19 +318,20 @@ hardware_interface::return_type MarchExoSystemInterface::read()
 {
     if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
         // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
+        stop();
         throw runtime_error("Ethercat is not alive!");
         return hardware_interface::return_type::ERROR;
     }
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
     // Battery
-    auto pdb_current = march_robot_->getPowerDistributionBoard().read().pdb_current.f;
-    if (pdb_current < 43) {
-        RCLCPP_ERROR_THROTTLE((*logger_), clock_, 50, "Current is less then 43, it is: %g.", pdb_current);
-    } else if (pdb_current < 45) {
-        RCLCPP_WARN_THROTTLE((*logger_), clock_, 50, "Current is less then 45, it is: %g.", pdb_current);
-    }
-    RCLCPP_INFO_THROTTLE((*logger_), clock_, 100, "Current is %g.", pdb_current);
+     auto pdb_current = march_robot_->getPowerDistributionBoard().read().pdb_current.f;
+     if (pdb_current < 43) {
+         RCLCPP_ERROR_THROTTLE((*logger_), clock_, 500, "Current is less then 43, it is: %g.", pdb_current);
+     } else if (pdb_current < 45) {
+         RCLCPP_WARN_THROTTLE((*logger_), clock_, 500, "Current is less then 45, it is: %g.", pdb_current);
+     }
+     RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Current is %g.", pdb_current);
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
@@ -340,6 +357,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //        RCLCPP_INFO((*logger_), "The sending effort is %g. (state: %g)", jointInfo.effort_command,
         //        jointInfo.position);
         if (!is_joint_in_valid_state(jointInfo)) {
+            stop();
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
             return hardware_interface::return_type::ERROR;
@@ -361,6 +379,12 @@ hardware_interface::return_type MarchExoSystemInterface::write()
                 converted_effort);
         }
         jointInfo.effort_command_converted = converted_effort;
+
+        if (jointInfo.name == "left_ankle") {
+            
+            // RCLCPP_INFO_THROTTLE((*logger_), clock_, jointInfo.limit.soft_limit_warning_throttle_msec, "The effort of the left ankle is: %g", jointInfo.effort_command_converted);
+        }
+
         jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
     }
 

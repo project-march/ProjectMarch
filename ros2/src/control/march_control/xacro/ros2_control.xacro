@@ -16,6 +16,7 @@
     <joint name="${name}">
       <command_interface name="position"/>
       <state_interface name="position"/>
+      <state_interface name="effort"/>
     </joint>
   </xacro:macro>
 
