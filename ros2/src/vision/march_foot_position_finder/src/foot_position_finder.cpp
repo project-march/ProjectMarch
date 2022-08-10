@@ -128,8 +128,9 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
                 RCLCPP_WARN(n_->get_logger(),
                     "Error while initializing %s RealSense camera: %s",
                     left_or_right_.c_str(), error_message.c_str());
-                rclcpp::sleep_for(/*nanoseconds=*/1000000000) // 1 second
-                    continue;
+                rclcpp::sleep_for(/*nanoseconds=*/std::chrono::nanoseconds(
+                    1000000000)); // 1 second
+                continue;
             }
 
             realsense_timer_ = n_->create_wall_timer(
@@ -324,7 +325,8 @@ void FootPositionFinder::processSimulatedDepthFrames(
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
     while (locked_) {
-        rclcpp::sleep_for(/*nanoseconds=*/10000000); // 10 ms
+        rclcpp::sleep_for(
+            /*nanoseconds=*/std::chrono::nanoseconds(10000000)); // 10 ms
     }
     locked_ = true;
 
