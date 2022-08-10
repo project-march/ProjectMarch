@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 // Copyright 2020 Project March.
 #include "march_hardware/encoder/incremental_encoder.h"
 #include "march_hardware/motor_controller/motor_controller_type.h"
@@ -26,3 +27,4 @@ TEST_F(IncrementalEncoderTest, CorrectToRad)
     const double expected = iu * 2.0 * M_PI / (this->counts_per_rotation * this->transmission);
     ASSERT_DOUBLE_EQ(expected, this->encoder.positionIUToRadians(iu));
 }
+// NOLINTEND

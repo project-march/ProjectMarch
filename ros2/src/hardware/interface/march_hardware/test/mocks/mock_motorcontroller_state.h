@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 #pragma once
 #include "march_hardware/motor_controller/motor_controller_state.h"
 #include <gmock/gmock.h>
@@ -34,3 +35,4 @@ public:
         return "";
     };
 };
+// NOLINTEND

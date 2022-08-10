@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 #pragma once
 #include "march_hardware/ethercat/sdo_interface.h"
 
@@ -16,3 +17,4 @@ protected:
 };
 
 using MockSdoInterfacePtr = std::shared_ptr<MockSdoInterface>;
+// NOLINTEND

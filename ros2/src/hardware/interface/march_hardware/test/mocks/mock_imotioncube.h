@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 #pragma once
 #include "mock_absolute_encoder.h"
 #include "mock_incremental_encoder.h"
@@ -40,3 +41,4 @@ public:
     MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
     MOCK_METHOD1(resetSlave, void(march::SdoSlaveInterface&));
 };
+// NOLINTEND

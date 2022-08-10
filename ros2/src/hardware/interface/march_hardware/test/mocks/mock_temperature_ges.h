@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 #pragma once
 #include "mock_slave.h"
 
@@ -16,3 +17,4 @@ public:
 
     MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
 };
+// NOLINTEND

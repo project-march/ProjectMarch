@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/joint.h"
@@ -236,3 +237,4 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
     ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
     ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 }
+// NOLINTEND

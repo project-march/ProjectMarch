@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "../mocks/mock_sdo_interface.h"
 #include "march_hardware/ethercat/imotioncube_pdo_map.h"
@@ -77,3 +78,4 @@ TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
     ASSERT_EQ(2U, ((combined_address >> 8U) & 0xFFU));
     ASSERT_EQ(0x6060U, ((combined_address >> 16U) & 0xFFFFU));
 }
+// NOLINTEND

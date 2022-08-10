@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 #pragma once
 #include "mock_pdo_interface.h"
 #include "mock_sdo_interface.h"
@@ -13,3 +14,4 @@ public:
     MockSlave(const MockPdoInterfacePtr& mock_pdo, const MockSdoInterfacePtr& mock_sdo)
         : Slave(/*slave_index=*/1, mock_pdo, mock_sdo) {};
 };
+// NOLINTEND

@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 #pragma once
 #include "march_hardware/encoder/incremental_encoder.h"
 #include "march_hardware/motor_controller/motor_controller_type.h"
@@ -12,3 +13,4 @@ public:
     {
     }
 };
+// NOLINTEND
