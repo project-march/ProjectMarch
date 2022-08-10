@@ -26,7 +26,7 @@ class InputDeviceController:
     # Format of the identifier for the alive message
     ID_FORMAT = "rqt@{machine}@{user}ros2"
 
-    def __init__(self, node):
+    def __init__(self, node: Node):
         self._node = node
 
         self._ping = self._node.get_parameter("ping_safety_node").get_parameter_value().bool_value
@@ -45,6 +45,12 @@ class InputDeviceController:
             msg_type=String,
             topic="/march/step_and_hold/start_side",
             qos_profile=10,
+        )
+        self._node.create_subscription(
+            msg_type=Bool,
+            topic="/march/eeg/on_off",
+            qos_profile=1,
+            callback=self._update_eeg_on_off,
         )
         self._eeg_on_off_pub = self._node.create_publisher(
             msg_type=Bool,
@@ -255,8 +261,8 @@ class InputDeviceController:
 
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""
-        self._eeg_on_off_pub.publish(Bool(data=(not self.eeg)))
-        self.eeg = not self.eeg
+        # self.eeg = not self.eeg
+        self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
 
     def publish_small_narrow(self) -> None:
         """Publish a small_narrow gait on the step_and_hold topic."""
@@ -281,3 +287,7 @@ class InputDeviceController:
     def publish_start_with_right(self) -> None:
         """Publish that a step_and_hold starts from right_swing."""
         self._step_and_hold_start_side_pub.publish(String(data="right_swing"))
+
+    def _update_eeg_on_off(self, msg: Bool) -> None:
+        """Update eeg value for when it is changed in the state machine."""
+        self.eeg = msg.data
