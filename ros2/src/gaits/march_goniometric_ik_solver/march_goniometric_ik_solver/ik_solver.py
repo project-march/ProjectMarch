@@ -611,6 +611,26 @@ class Pose:
             self.aa_hip1 = hip_aa_long
             self.aa_hip2 = hip_aa_short
 
+    def solve_mid_position_with_flat_stance_foot(self, hip_mid_x: float, pos_ankle: np.ndarray):
+        """Solves the required pose for a midpoint location small enough to keep the stance foot flat on the ground."""
+        max_height_swing_leg = pos_ankle[1] + np.sqrt(self.max_leg_length ** 2 - (pos_ankle[0] - hip_mid_x) ** 2)
+        max_height_stance_leg = np.sqrt(self.max_leg_length ** 2 - (hip_mid_x) ** 2)
+        hip_mid_y = min(max_height_swing_leg, max_height_stance_leg)
+        hip_mid = np.array([hip_mid_x, hip_mid_y])
+        self.solve_leg(hip_mid, self.pos_ankle1, "rear")
+        self.solve_leg(hip_mid, pos_ankle, "front")
+
+    def solve_mid_position_with_rotated_stance_foot(self, hip_mid_x: float, pos_ankle: np.ndarray):
+        """Solves the required pose for midpoint location that requires foot rotation of the stance foot to reach the desired location."""
+        hip_mid_y = np.sqrt(self.ankle_limit_toes_hip_distance ** 2 - (hip_mid_x - self.pos_toes1[0]) ** 2)
+        hip_mid = np.array([hip_mid_x, hip_mid_y])
+        self.rot_foot1 = qas.get_angle_between_points([self.ankle_limit_pos_hip, self.pos_toes1, hip_mid])
+        self.fe_ankle1 = self._max_ankle_dorsi_flexion
+        self.fe_hip1 = np.sign(self.pos_knee1[0] - self.pos_hip[0]) * qas.get_angle_between_points(
+            [self.pos_knee1, self.pos_hip, self.point_below_hip]
+        )
+        self.solve_leg(hip_mid, pos_ankle, "front")
+
     def solve_mid_position(
         self,
         next_pose: "Pose",
@@ -644,39 +664,22 @@ class Pose:
         # Define hip_mid_x as the given fraction between current hip location and the hip location in next pose:
         hip_mid_x = (1 - frac) * hip_current[0] + frac * next_pose.pos_hip[0]
 
-        # Define hip_mid_y as the minimum of the heights both legs can reach:
-        max_height_swing_leg = pos_ankle[1] + np.sqrt(self.max_leg_length ** 2 - (pos_ankle[0] - hip_mid_x) ** 2)
-        max_height_stance_leg = np.sqrt(self.max_leg_length ** 2 - (hip_mid_x) ** 2)
-        hip_mid_y = min(max_height_swing_leg, max_height_stance_leg)
-        hip_mid = np.array([hip_mid_x, hip_mid_y])
-
-        # Solve the mid pose with the define hip and ankle positions:
+        # Solve the mid pose:
         self.reset_to_zero_pose()
-        self.solve_leg(hip_mid, self.pos_ankle1, "rear")
-        self.solve_leg(hip_mid, pos_ankle, "front")
-
-        # If the dorsi flexion limition is exceeded, the end position is used:
-        if self.fe_ankle1 > self._max_ankle_dorsi_flexion:
-            self.reset_to_zero_pose()
-            self.solve_end_position(
-                pos_ankle[0],
-                pos_ankle[1],
-                DEFAULT_FOOT_DISTANCE,
-                subgait_id,
-            )
+        if hip_mid_x <= self.ankle_limit_pos_hip[0]:
+            self.solve_mid_position_with_flat_stance_foot(hip_mid_x, pos_ankle)
+        else:
+            self.solve_mid_position_with_rotated_stance_foot(hip_mid_x, pos_ankle)
 
         # Apply the desired rotation of the upper body:
         self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
         self.fe_hip1 += self._parameters.upper_body_front_rotation_radians
 
-        # Reduce ankle1 flexion and hip extension to meet constraints:
-        if self.fe_ankle1 < self._max_ankle_plantar_flexion:
-            self.fe_ankle1 = self._max_ankle_plantar_flexion
-
-        self.reduce_hip_extension()
-
         # Lift toes of swing leg as much as possible:
         self.fe_ankle2 = self._max_ankle_dorsi_flexion
+
+        # Reduce hip extension if necessary:
+        self.reduce_hip_extension()
 
         # Add hip_swing or set hip_aa to average of start and end pose:
         if self._parameters.hip_swing and 0 < self._parameters.hip_swing_fraction < 1:
@@ -894,7 +897,7 @@ class Pose:
         self.fe_hip2 += self._parameters.upper_body_front_rotation_radians
         self.fe_hip1 += self._parameters.upper_body_front_rotation_radians
 
-        # Reduce ankle2 dorsi flexion and hip extension to meet constraints:
+        # Reduce ankle2 dorsi flexion to meet constraints:
         if reduce_df_front and self.fe_ankle2 > self._max_ankle_dorsi_flexion:
             self.reduce_swing_dorsi_flexion()
 
@@ -904,6 +907,7 @@ class Pose:
         if self.fe_ankle2 < self._max_ankle_plantar_flexion:
             self.fe_ankle2 = self._max_ankle_plantar_flexion
 
+        # Reduce hip extension if necessary:
         self.reduce_hip_extension()
 
         # Apply side_step, hard_coded to default feet distance for now:

@@ -169,7 +169,7 @@ class LiveWidget:
         Returns:
             float: the midpoint height.
         """
-        return self.sliders["mid"]["height"] + max(-self.sliders["last"]["y"], self.sliders["next"]["y"])
+        return self.sliders["mid"]["height"] + max(-self.sliders["last"]["y"], self.sliders["next"]["y"], 0.0)
 
     def update_last_x(self, value) -> None:
         """Update the x value of last pose."""
