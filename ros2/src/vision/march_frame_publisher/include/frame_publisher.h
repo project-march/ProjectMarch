@@ -2,8 +2,8 @@
  * @author Jelmer de Wolde, Tuhin Das - MARCH 7
  */
 
-#ifndef MARCH_FRAME_PUBLISHER_H
-#define MARCH_FRAME_PUBLISHER_H
+#ifndef MARCH_FRAME_PUBLISHER__FRAME_PUBLISHER_H
+#define MARCH_FRAME_PUBLISHER__FRAME_PUBLISHER_H
 
 #include "march_shared_msgs/msg/foot_position.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -56,7 +56,7 @@ private:
 
     std::string robot_properties_path
         = ament_index_cpp::get_package_share_directory("march_description")
-        + "/urdf/properties/march7.yaml";
+        + "/urdf/properties/properties_march7.yaml";
     YAML::Node robot_properties = YAML::LoadFile(robot_properties_path);
     const double TRANS_X
         = -robot_properties["dimensions"]["foot"]["height_forward"]
@@ -103,4 +103,4 @@ private:
     void setHeightZeroThreshold(double threshold);
 };
 
-#endif // MARCH_FRAME_PUBLISHER_H
+#endif // MARCH_FRAME_PUBLISHER__FRAME_PUBLISHER_H

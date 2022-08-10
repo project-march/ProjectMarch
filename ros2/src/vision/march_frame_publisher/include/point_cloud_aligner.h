@@ -2,8 +2,8 @@
  * @author Tuhin Das - MARCH 7
  */
 
-#ifndef MARCH_POINT_CLOUD_ALIGNER_H
-#define MARCH_POINT_CLOUD_ALIGNER_H
+#ifndef MARCH_FRAME_PUBLISHER__POINT_CLOUD_ALIGNER_H
+#define MARCH_FRAME_PUBLISHER__POINT_CLOUD_ALIGNER_H
 
 #include "march_shared_msgs/msg/foot_position.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -57,4 +57,4 @@ protected:
     void parameterUpdatedLogger(const rclcpp::Parameter& param);
 };
 
-#endif // MARCH_POINT_CLOUD_ALIGNER_H
+#endif // MARCH_FRAME_PUBLISHER__POINT_CLOUD_ALIGNER_H

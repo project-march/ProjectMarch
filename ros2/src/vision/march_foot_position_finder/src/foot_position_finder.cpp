@@ -128,8 +128,8 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
                 RCLCPP_WARN(n_->get_logger(),
                     "Error while initializing %s RealSense camera: %s",
                     left_or_right_.c_str(), error_message.c_str());
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                continue;
+                rclcpp::sleep_for(/*nanoseconds=*/1000000000) // 1 second
+                    continue;
             }
 
             realsense_timer_ = n_->create_wall_timer(
@@ -235,8 +235,11 @@ void FootPositionFinder::currentStateCallback(
     const march_shared_msgs::msg::CurrentState::SharedPtr msg) // NOLINT
 {
     if (msg->state == "stand") {
+        // This wall timer simulates a one-shot action in the future. The
+        // exoskeleton has some time to end up in a stable stand position before
+        // the initial position is reset.
         initial_position_reset_timer_ = n_->create_wall_timer(
-            std::chrono::milliseconds(200),
+            std::chrono::milliseconds(300),
             [this]() -> void {
                 resetInitialPosition(/*stop_timer=*/true);
             },
@@ -321,7 +324,7 @@ void FootPositionFinder::processSimulatedDepthFrames(
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
     while (locked_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        rclcpp::sleep_for(/*nanoseconds=*/10000000); // 10 ms
     }
     locked_ = true;
 
