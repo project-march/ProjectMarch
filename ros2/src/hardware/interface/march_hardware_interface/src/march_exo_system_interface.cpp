@@ -127,7 +127,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
-                jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.effort_actual));
+                jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
