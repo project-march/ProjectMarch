@@ -259,7 +259,7 @@ class TrajectoryCommandFactory:
 
     def _close_gait_and_reset_queue(self) -> None:
         """Closes the gait and reset the queue after the queue is empty."""
-        self.fill_queue()
+        self._create_position_queue()
         self._logger.warn(f"Queue is empty. Closing the gait. Resetting queue to {list(self.position_queue.queue)}")
         self._stop = True
         self._gait._end = True
