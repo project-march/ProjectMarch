@@ -33,8 +33,7 @@ private:
     // has been created, the arguments for the process call and, if relevant,
     // the requested pointcloud file name
     bool publishTestDatasetCallback(
-        march_shared_msgs::PublishTestDataset::Request& req,
-        march_shared_msgs::PublishTestDataset::Response& res);
+        march_shared_msgs::PublishTestDataset::Request& req, march_shared_msgs::PublishTestDataset::Response& res);
 
     // Sets the right cloud as the pointcloud to publish based on the file name
     bool loadPointcloudToPublishFromFilename();
@@ -46,8 +45,7 @@ private:
     bool publishNextPointcloud();
 
     // Publish the right pointcloud based on the latest service call
-    void updatePublishLoop(
-        march_shared_msgs::PublishTestDataset::Response& res);
+    void updatePublishLoop(march_shared_msgs::PublishTestDataset::Response& res);
 
     // flips the sign of the z coordinates of the cloud, necessary because of a
     // weird inconsistency between the coordinate systems in the realsense

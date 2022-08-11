@@ -33,37 +33,31 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     , save_camera_back(false)
     , realsense_category(-1)
 {
-    if (ros::console::set_logger_level(
-            ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
         ros::console::notifyLoggerLevelsChanged();
     }
 
-    path directory_path
-        = ros::package::getPath("march_realsense_test_publisher");
+    path directory_path = ros::package::getPath("march_realsense_test_publisher");
     path relative_data_path(/*__source*/ "config/datasets/");
 
     // The source directory should be two steps behind this source file
     path source_file_path(__FILE__);
-    write_path
-        = source_file_path.parent_path().parent_path() / relative_data_path;
+    write_path = source_file_path.parent_path().parent_path() / relative_data_path;
 
     updateFileNamesVector();
 
     if (file_names.size() == 0) {
-        ROS_ERROR_STREAM("There are no .ply files present under path "
-            << write_path << ". Shutting down the test publisher.");
+        ROS_ERROR_STREAM(
+            "There are no .ply files present under path " << write_path << ". Shutting down the test publisher.");
         ros::shutdown();
     }
-    publish_test_cloud_service
-        = n_->advertiseService(/*service=*/"/camera/publish_test_cloud",
-            &RealsenseTestPublisher::publishTestDatasetCallback, this);
+    publish_test_cloud_service = n_->advertiseService(
+        /*service=*/"/camera/publish_test_cloud", &RealsenseTestPublisher::publishTestDatasetCallback, this);
 
-    test_cloud_publisher
-        = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
+    test_cloud_publisher = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
     process_pointcloud_service_client
-        = n_->serviceClient<march_shared_msgs::GetGaitParameters>(
-            PROCESS_POINTCLOUD_SERVICE_NAME);
+        = n_->serviceClient<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_SERVICE_NAME);
 
     config_tree = loadConfig(DATASET_CONFIGURATION_NAME);
 }
@@ -71,8 +65,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
 void RealsenseTestPublisher::updateFileNamesVector()
 {
     for (const auto& entry : std::filesystem::directory_iterator(write_path)) {
-        if (std::filesystem::is_regular_file(entry)
-            && entry.path().extension() == POINTCLOUD_EXTENSION) {
+        if (std::filesystem::is_regular_file(entry) && entry.path().extension() == POINTCLOUD_EXTENSION) {
             file_names.push_back(entry.path().filename().string());
         }
     }
@@ -81,8 +74,7 @@ void RealsenseTestPublisher::updateFileNamesVector()
 YAML::Node RealsenseTestPublisher::loadConfig(const std::string& config_file)
 {
     YAML::Node config_tree;
-    std::string path = ros::package::getPath("march_realsense_test_publisher")
-        + "/config/" + config_file;
+    std::string path = ros::package::getPath("march_realsense_test_publisher") + "/config/" + config_file;
     try {
         config_tree = YAML::LoadFile(path);
     } catch (YAML::Exception& e) {
@@ -97,8 +89,7 @@ YAML::Node RealsenseTestPublisher::loadConfig(const std::string& config_file)
 // been created, the arguments for the process call and, if relevant, the
 // requested pointcloud file name
 bool RealsenseTestPublisher::publishTestDatasetCallback(
-    march_shared_msgs::PublishTestDataset::Request& req,
-    march_shared_msgs::PublishTestDataset::Response& res)
+    march_shared_msgs::PublishTestDataset::Request& req, march_shared_msgs::PublishTestDataset::Response& res)
 {
     selected_mode = (SelectedMode)req.selected_mode;
     // Only update the pointcloud file name from the service if it is relevant
@@ -116,21 +107,12 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 void RealsenseTestPublisher::getProcessPointcloudInputs()
 {
     if (YAML::Node pointcloud_config = config_tree[pointcloud_file_name]) {
-        realsense_category = yaml_utilities::grabParameter<int>(
-            pointcloud_config, "realsense_category")
-                                 .value();
-        from_back_camera = yaml_utilities::grabParameter<bool>(
-            pointcloud_config, "from_back_camera")
-                               .value();
-        subgait_name = yaml_utilities::grabParameter<std::string>(
-            pointcloud_config, "subgait_name")
-                           .value();
-        from_realsense_viewer = yaml_utilities::grabParameter<bool>(
-            pointcloud_config, "from_realsense_viewer")
-                                    .value();
+        realsense_category = yaml_utilities::grabParameter<int>(pointcloud_config, "realsense_category").value();
+        from_back_camera = yaml_utilities::grabParameter<bool>(pointcloud_config, "from_back_camera").value();
+        subgait_name = yaml_utilities::grabParameter<std::string>(pointcloud_config, "subgait_name").value();
+        from_realsense_viewer = yaml_utilities::grabParameter<bool>(pointcloud_config, "from_realsense_viewer").value();
     } else {
-        ROS_WARN_STREAM(
-            "No configuration specified for pointcloud file with name "
+        ROS_WARN_STREAM("No configuration specified for pointcloud file with name "
             << pointcloud_file_name << ". Continuing with default parameters");
         realsense_category = 0;
         from_back_camera = false;
@@ -145,12 +127,9 @@ bool RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
     getProcessPointcloudInputs();
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
-    if (pcl::io::loadPLYFile<pcl::PointXYZ>(
-            write_path.string() + pointcloud_file_name, *pointcloud_to_publish)
-        == -1) {
-        ROS_WARN_STREAM("Couldn't find file at "
-            << write_path.string() + pointcloud_file_name
-            << ". file name must be one of " << getFileNamesString());
+    if (pcl::io::loadPLYFile<pcl::PointXYZ>(write_path.string() + pointcloud_file_name, *pointcloud_to_publish) == -1) {
+        ROS_WARN_STREAM("Couldn't find file at " << write_path.string() + pointcloud_file_name
+                                                 << ". file name must be one of " << getFileNamesString());
         return false;
     }
 
@@ -168,12 +147,10 @@ bool RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
 }
 
 // Publish the current pointcloud to publish
-void RealsenseTestPublisher::publishTestCloud(
-    const ros::TimerEvent& timer_event)
+void RealsenseTestPublisher::publishTestCloud(const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
-        pcl_conversions::toPCL(
-            ros::Time::now(), pointcloud_to_publish->header.stamp);
+        pcl_conversions::toPCL(ros::Time::now(), pointcloud_to_publish->header.stamp);
         test_cloud_publisher.publish(pointcloud_to_publish);
     }
 }
@@ -205,16 +182,14 @@ bool RealsenseTestPublisher::publishNextPointcloud()
     // Otherwise, start publishing
     if (should_publish) {
         // find the current pointcloud filename
-        auto filename_iterator = std::find(
-            file_names.begin(), file_names.end(), pointcloud_file_name);
+        auto filename_iterator = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
 
         // Set the current pointcloud file name to the next name in the list, if
         // the old name is the last in the list, set the new name to the first
         // in the list
         if (filename_iterator == file_names.end()) {
-            ROS_WARN_STREAM(
-                "The old pointcloud file name could not be found in "
-                "the file name vector. Unable to find next pointcloud.");
+            ROS_WARN_STREAM("The old pointcloud file name could not be found in "
+                            "the file name vector. Unable to find next pointcloud.");
             return false;
         } else if (filename_iterator == file_names.end() - 1) {
             pointcloud_file_name = file_names[0];
@@ -236,8 +211,7 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
     } else {
         pointcloud_topic = TOPIC_CAMERA_FRONT;
     }
-    if (save_pointcloud_name.compare(
-            save_pointcloud_name.length() - POINTCLOUD_EXTENSION.length(),
+    if (save_pointcloud_name.compare(save_pointcloud_name.length() - POINTCLOUD_EXTENSION.length(),
             POINTCLOUD_EXTENSION.length(), POINTCLOUD_EXTENSION)
         != 0) {
         ROS_WARN_STREAM("The name under which to save the pointcloud should "
@@ -247,24 +221,19 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
     }
     // get the next pointcloud from the topic
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
-        = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            pointcloud_topic, *n_, POINTCLOUD_TIMEOUT);
+        = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(pointcloud_topic, *n_, POINTCLOUD_TIMEOUT);
 
     if (input_cloud == nullptr) {
-        ROS_WARN_STREAM("No pointcloud published within timeout on topic "
-            << pointcloud_topic
-            << ", so "
-               "no saving could be done.");
+        ROS_WARN_STREAM("No pointcloud published within timeout on topic " << pointcloud_topic
+                                                                           << ", so "
+                                                                              "no saving could be done.");
         return false;
     }
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
-    PointCloud::Ptr point_cloud
-        = boost::make_shared<PointCloud>(converted_cloud);
+    PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-    if (pcl::io::savePLYFileBinary(
-            write_path.string() + save_pointcloud_name, *point_cloud)
-        == -1) {
+    if (pcl::io::savePLYFileBinary(write_path.string() + save_pointcloud_name, *point_cloud) == -1) {
         return false;
     }
     updateFileNamesVector();
@@ -272,8 +241,7 @@ bool RealsenseTestPublisher::saveCurrentPointcloud()
 }
 
 // Publish the right pointcloud based on the latest service call
-void RealsenseTestPublisher::updatePublishLoop(
-    march_shared_msgs::PublishTestDataset::Response& res)
+void RealsenseTestPublisher::updatePublishLoop(march_shared_msgs::PublishTestDataset::Response& res)
 {
     // The update is successful by default until something goes wrong
     bool success = true;
@@ -283,24 +251,22 @@ void RealsenseTestPublisher::updatePublishLoop(
     switch (selected_mode) {
         case SelectedMode::next: {
             if (should_publish = publishNextPointcloud()) {
-                info_message = "Now publishing a pointcloud with file name "
-                    + pointcloud_file_name + " and processing the cloud.";
+                info_message = "Now publishing a pointcloud with file name " + pointcloud_file_name
+                    + " and processing the cloud.";
                 makeProcessPointcloudCall();
             } else {
-                warn_message = "failed to publish a pointcloud with file name "
-                    + pointcloud_file_name;
+                warn_message = "failed to publish a pointcloud with file name " + pointcloud_file_name;
             }
             success = should_publish;
             break;
         }
         case SelectedMode::custom: {
             if (should_publish = loadPointcloudToPublishFromFilename()) {
-                info_message = "Now publishing a pointcloud with file name "
-                    + pointcloud_file_name + " and processing the cloud.";
+                info_message = "Now publishing a pointcloud with file name " + pointcloud_file_name
+                    + " and processing the cloud.";
                 makeProcessPointcloudCall();
             } else {
-                warn_message = "failed to publish a pointcloud with file name "
-                    + pointcloud_file_name;
+                warn_message = "failed to publish a pointcloud with file name " + pointcloud_file_name;
             }
             success = should_publish;
             break;
@@ -313,8 +279,7 @@ void RealsenseTestPublisher::updatePublishLoop(
         }
         case SelectedMode::save: {
             if (success = saveCurrentPointcloud()) {
-                info_message = "Succesfully saved pointcloud as "
-                    + write_path.string() + save_pointcloud_name;
+                info_message = "Succesfully saved pointcloud as " + write_path.string() + save_pointcloud_name;
             } else {
                 warn_message = "Failed to save pointcloud";
             }
@@ -330,8 +295,7 @@ void RealsenseTestPublisher::updatePublishLoop(
         res.message = info_message;
         ROS_DEBUG_STREAM(info_message);
     } else {
-        res.message
-            = warn_message + ". See the ros1 terminal for more information.";
+        res.message = warn_message + ". See the ros1 terminal for more information.";
         ROS_WARN_STREAM(warn_message);
     }
     res.success = success;

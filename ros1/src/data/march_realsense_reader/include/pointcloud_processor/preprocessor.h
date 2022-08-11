@@ -16,26 +16,20 @@ public:
     explicit Preprocessor(bool debugging);
 
     // This function is required to be implemented by any preprocessor
-    virtual bool preprocess(PointCloud::Ptr pointcloud,
-        Normals::Ptr normal_pointcloud,
-        RealSenseCategory const realsense_category,
-        std::string frame_id_to_transform_to_)
+    virtual bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
+        RealSenseCategory const realsense_category, std::string frame_id_to_transform_to_)
         = 0;
 
     virtual ~Preprocessor() = default;
 
     // Removes points from a pointcloud (and optionally the corresponding
     // pointcloud_normals as well) at given indices
-    void removePointsFromIndices(
-        const pcl::PointIndices::Ptr& indices_to_remove,
-        const bool& remove_normals);
+    void removePointsFromIndices(const pcl::PointIndices::Ptr& indices_to_remove, const bool& remove_normals);
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
      */
-    virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
-        = 0;
+    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig& config) = 0;
 
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
@@ -54,8 +48,7 @@ public:
 
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
-        RealSenseCategory const realsense_category,
-        std::string frame_id_to_transform_to = "foot_left") override;
+        RealSenseCategory const realsense_category, std::string frame_id_to_transform_to = "foot_left") override;
 
 protected:
     /** Calls the tf listener, to know transform at current time and transforms
@@ -78,11 +71,9 @@ public:
     // Calls all subsequent methods to preprocess a pointlcoud using normal
     // vectors
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
-        RealSenseCategory const realsense_category,
-        std::string frame_id_to_transform_to = "foot_left") override;
+        RealSenseCategory const realsense_category, std::string frame_id_to_transform_to = "foot_left") override;
 
-    void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig& config) override;
 
 protected:
     // Removes points from the pointcloud such that there is only one point left
@@ -90,16 +81,14 @@ protected:
     bool downsample();
 
     // Transform the pointcloud based on the data found on the /tf topic,
-    bool transformPointCloudFromUrdf(
-        geometry_msgs::TransformStamped& transform_stamped);
+    bool transformPointCloudFromUrdf(geometry_msgs::TransformStamped& transform_stamped);
 
     // Remove all points which are too far or too close to the origin
     bool filterOnDistanceFromOrigin();
 
     // Estimates the normals of the pointcloud and fills the pointcloud_normals_
     // cloud with those
-    bool fillNormalCloud(
-        const geometry_msgs::TransformStamped& transform_stamped);
+    bool fillNormalCloud(const geometry_msgs::TransformStamped& transform_stamped);
 
     // Removes all points which do not roughly have a normal in a certain
     // direction (specified in the parameter file)

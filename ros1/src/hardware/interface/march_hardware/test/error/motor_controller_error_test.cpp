@@ -5,16 +5,13 @@
 
 TEST(MotionErrorTest, ParseNoMotionError)
 {
-    ASSERT_EQ(march::error::parseError((uint16_t)0,
-                  march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR),
-        "None. ");
+    ASSERT_EQ(march::error::parseError((uint16_t)0, march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR), "None. ");
 }
 
 TEST(MotionErrorTest, ParseCorrectMotionError)
 {
     const uint16_t error = 1;
-    ASSERT_EQ(march::error::parseError(
-                  error, march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR),
+    ASSERT_EQ(march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR),
         march::error::IMOTIONCUBE_MOTION_ERRORS[0]);
 }
 
@@ -25,25 +22,19 @@ TEST(MotionErrorTest, ParseMultipleErrors)
     expected += march::error::IMOTIONCUBE_MOTION_ERRORS[2];
     expected += march::error::IMOTIONCUBE_MOTION_ERRORS[3];
     expected += march::error::IMOTIONCUBE_MOTION_ERRORS[15];
-    ASSERT_EQ(march::error::parseError(
-                  error, march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR),
-        expected);
+    ASSERT_EQ(march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR), expected);
 }
 
 TEST(TestDetailedMotionError, ParseNoDetailedMotionError)
 {
-    ASSERT_EQ(
-        march::error::parseError((uint16_t)0,
-            march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR),
+    ASSERT_EQ(march::error::parseError((uint16_t)0, march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR),
         "None. ");
 }
 
 TEST(TestDetailedMotionError, ParseCorrectDetailedMotionError)
 {
     const uint16_t error = 1;
-    ASSERT_EQ(
-        march::error::parseError(error,
-            march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR),
+    ASSERT_EQ(march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR),
         march::error::IMOTIONCUBE_DETAILED_MOTION_ERRORS[0]);
 }
 
@@ -55,25 +46,20 @@ TEST(TestDetailedMotionError, ParseMultipleDetailedErrors)
     expected += march::error::IMOTIONCUBE_DETAILED_MOTION_ERRORS[3];
     expected += march::error::IMOTIONCUBE_DETAILED_MOTION_ERRORS[8];
     ASSERT_EQ(
-        march::error::parseError(error,
-            march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR),
-        expected);
+        march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR), expected);
 }
 
 TEST(TestSecondDetailedMotionError, ParseNoSecondDetailedMotionError)
 {
-    ASSERT_EQ(march::error::parseError((uint16_t)0,
-                  march::error::ErrorRegister::
-                      IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
+    ASSERT_EQ(
+        march::error::parseError((uint16_t)0, march::error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
         "None. ");
 }
 
 TEST(TestSecondDetailedMotionError, ParseCorrectSecondDetailedMotionError)
 {
     const uint16_t error = 1;
-    ASSERT_EQ(march::error::parseError(error,
-                  march::error::ErrorRegister::
-                      IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
+    ASSERT_EQ(march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
         march::error::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[0]);
 }
 
@@ -83,8 +69,6 @@ TEST(TestSecondDetailedMotionError, ParseMultipleSecondDetailedErrors)
     std::string expected;
     expected += march::error::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[2];
     expected += march::error::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[3];
-    ASSERT_EQ(march::error::parseError(error,
-                  march::error::ErrorRegister::
-                      IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
+    ASSERT_EQ(march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
         expected);
 }

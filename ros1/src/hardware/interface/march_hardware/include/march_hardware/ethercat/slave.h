@@ -13,20 +13,17 @@
 namespace march {
 class Slave : public PdoSlaveInterface {
 public:
-    Slave(uint16_t slave_index, const PdoInterfacePtr& pdo_interface,
-        const SdoInterfacePtr& sdo_interface)
+    Slave(uint16_t slave_index, const PdoInterfacePtr& pdo_interface, const SdoInterfacePtr& sdo_interface)
         : PdoSlaveInterface(slave_index, pdo_interface)
         , slave_index_(slave_index)
         , sdo_interface_(sdo_interface)
     {
         if (pdo_interface == nullptr || sdo_interface == nullptr) {
-            throw std::invalid_argument(
-                "SDO and PDO interface cannot be nullptr");
+            throw std::invalid_argument("SDO and PDO interface cannot be nullptr");
         }
         if (this->slave_index_ < 1) {
             throw error::HardwareException(
-                error::ErrorType::INVALID_SLAVE_INDEX,
-                "Slave index %d is smaller than 1", this->slave_index_);
+                error::ErrorType::INVALID_SLAVE_INDEX, "Slave index %d is smaller than 1", this->slave_index_);
         }
     };
 
@@ -39,15 +36,13 @@ public:
 
     bool initSdo(int cycle_time)
     {
-        SdoSlaveInterface sdo_slave_interface(
-            this->slave_index_, this->sdo_interface_);
+        SdoSlaveInterface sdo_slave_interface(this->slave_index_, this->sdo_interface_);
         return this->initSdo(sdo_slave_interface, cycle_time);
     }
 
     void resetSlave()
     {
-        SdoSlaveInterface sdo_slave_interface(
-            this->slave_index_, this->sdo_interface_);
+        SdoSlaveInterface sdo_slave_interface(this->slave_index_, this->sdo_interface_);
         this->resetSlave(sdo_slave_interface);
     }
 
