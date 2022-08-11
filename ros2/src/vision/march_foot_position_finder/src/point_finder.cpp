@@ -125,7 +125,7 @@ void PointFinder::initializeValues()
     horizontal_displacements_.clear();
     vertical_displacements_.clear();
 
-    for (int i = 0; i < actual_rect_height_ / 2.5; i += 2) {
+    for (int i = 0; i <= ceil((actual_foot_length_ - foot_length_)/ cell_width_); i += 2) {
         flipping_displacements_.push_back(-i);
     }
 
@@ -286,7 +286,8 @@ void PointFinder::computeFootPlateDisplacement(int x, int y, double height, std:
     }
 
     // Do not shift foot if the height difference is positive
-    if (height >= 0 && !obstacle_found && validatePoint(original)) {
+    // if (height >= 0 && !obstacle_found && validatePoint(original)) {
+    if (true) {
         position_queue->push_back(original);
         original_position_queue_.push_back(original);
         obstacles_found_.push_back(obstacle_found);
