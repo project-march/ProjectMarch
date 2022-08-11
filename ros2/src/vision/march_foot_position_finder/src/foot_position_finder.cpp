@@ -55,6 +55,16 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     frame_timeout_ = 5.0;
     locked_ = false;
 
+    realsense_callback_group_ = n_->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+    point_callback_group_ = n_->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+
+    rclcpp::SubscriptionOptions realsense_callback_options_;
+    realsense_callback_options_.callback_group = realsense_callback_group_;
+    rclcpp::SubscriptionOptions point_callback_options_;
+    point_callback_options_.callback_group = point_callback_group_;
+
     topic_camera_front_
         = "/camera_front_" + left_or_right + "/depth/color/points";
     topic_other_chosen_point_
@@ -73,13 +83,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         = n_->create_publisher<visualization_msgs::msg::Marker>(
             "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
 
-    other_chosen_point_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
-            topic_other_chosen_point_,
-            /*qos=*/1,
-            std::bind(&FootPositionFinder::chosenOtherPointCallback, this,
-                std::placeholders::_1));
-
     std::function<void(
         const march_shared_msgs::msg::FootPosition::SharedPtr msg)>
         point_callback
@@ -88,7 +91,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     other_chosen_point_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
             topic_other_chosen_point_,
-            /*qos=*/1, point_callback);
+            /*qos=*/1, point_callback, point_callback_options_);
 
     std::function<void(
         const march_shared_msgs::msg::CurrentState::SharedPtr msg)>
@@ -97,7 +100,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     current_state_subscriber_
         = n_->create_subscription<march_shared_msgs::msg::CurrentState>(
             "/march/gait_selection/current_state",
-            /*qos=*/1, state_callback);
+            /*qos=*/1, state_callback, point_callback_options_);
 
     foot_gap_ = n_->get_parameter("foot_gap").as_double();
     step_distance_ = n_->get_parameter("step_distance").as_double();
@@ -125,14 +128,17 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
                 RCLCPP_WARN(n_->get_logger(),
                     "Error while initializing %s RealSense camera: %s",
                     left_or_right_.c_str(), error_message.c_str());
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                rclcpp::sleep_for(/*nanoseconds=*/std::chrono::nanoseconds(
+                    1000000000)); // 1 second
                 continue;
             }
 
             realsense_timer_ = n_->create_wall_timer(
-                std::chrono::milliseconds(30), [this]() -> void {
+                std::chrono::milliseconds(30),
+                [this]() -> void {
                     processRealSenseDepthFrames();
-                });
+                },
+                realsense_callback_group_);
 
             RCLCPP_INFO(n_->get_logger(),
                 "\033[1;36m%s RealSense connected (%s) \033[0m",
@@ -149,7 +155,7 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         pointcloud_subscriber_
             = n_->create_subscription<sensor_msgs::msg::PointCloud2>(
                 topic_camera_front_,
-                /*qos=*/1, callback);
+                /*qos=*/1, callback, realsense_callback_options_);
 
         RCLCPP_INFO(n_->get_logger(),
             "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m",
@@ -230,10 +236,15 @@ void FootPositionFinder::currentStateCallback(
     const march_shared_msgs::msg::CurrentState::SharedPtr msg) // NOLINT
 {
     if (msg->state == "stand") {
+        // This wall timer simulates a one-shot action in the future. The
+        // exoskeleton has some time to end up in a stable stand position before
+        // the initial position is reset.
         initial_position_reset_timer_ = n_->create_wall_timer(
-            std::chrono::milliseconds(200), [this]() -> void {
+            std::chrono::milliseconds(300),
+            [this]() -> void {
                 resetInitialPosition(/*stop_timer=*/true);
-            });
+            },
+            point_callback_group_);
     }
 }
 
@@ -314,7 +325,8 @@ void FootPositionFinder::processSimulatedDepthFrames(
 void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 {
     while (locked_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        rclcpp::sleep_for(
+            /*nanoseconds=*/std::chrono::nanoseconds(10000000)); // 10 ms
     }
     locked_ = true;
 
@@ -329,7 +341,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Publish cloud for visualization:
-    preprocessor_->voxelDownSample(pointcloud, /*voxel_size=*/0.035);
     publishCloud(
         preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
