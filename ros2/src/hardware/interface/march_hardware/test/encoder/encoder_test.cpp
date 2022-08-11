@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2020 Project March.
 #include "../mocks/mock_encoder.h"
@@ -40,3 +41,4 @@ TEST_F(EncoderTest, CorrectTotalPositions)
     ASSERT_EQ(counts_per_rotation, encoder.getTotalPositions());
 }
 // NOLINTEND
+#endif

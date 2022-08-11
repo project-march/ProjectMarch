@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 #pragma once
 #include "mock_pdo_interface.h"
@@ -15,3 +16,4 @@ public:
         : Slave(/*slave_index=*/1, mock_pdo, mock_sdo) {};
 };
 // NOLINTEND
+#endif

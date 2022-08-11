@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "march_hardware/error/hardware_exception.h"
@@ -238,3 +239,4 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
     ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 }
 // NOLINTEND
+#endif

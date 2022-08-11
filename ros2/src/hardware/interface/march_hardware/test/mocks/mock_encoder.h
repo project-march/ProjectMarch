@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 #pragma once
 #include "march_hardware/encoder/encoder.h"
@@ -23,3 +24,4 @@ public:
     MOCK_CONST_METHOD1(velocityRadiansToIU, double(double));
 };
 // NOLINTEND
+#endif

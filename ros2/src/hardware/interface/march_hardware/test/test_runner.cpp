@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2018 Project March.
 
@@ -13,3 +14,4 @@ int main(int argc, char** argv)
     return RUN_ALL_TESTS();
 }
 // NOLINTEND
+#endif

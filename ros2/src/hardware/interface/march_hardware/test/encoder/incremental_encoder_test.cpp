@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2020 Project March.
 #include "march_hardware/encoder/incremental_encoder.h"
@@ -28,3 +29,4 @@ TEST_F(IncrementalEncoderTest, CorrectToRad)
     ASSERT_DOUBLE_EQ(expected, this->encoder.positionIUToRadians(iu));
 }
 // NOLINTEND
+#endif

@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "../mocks/mock_absolute_encoder.h"
@@ -80,3 +81,4 @@ TEST_F(IMotionCubeTest, OperationEnabledWithoutActuationMode)
     ASSERT_THROW(imc.prepareActuation(), march::error::HardwareException);
 }
 // NOLINTEND
+#endif

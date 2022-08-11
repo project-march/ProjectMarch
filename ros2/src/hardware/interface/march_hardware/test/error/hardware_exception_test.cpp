@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2020 Project March.
 #include <march_hardware/error/hardware_exception.h>
@@ -72,3 +73,4 @@ TEST(HardwareExceptionTest, TestFormat)
     ASSERT_EQ(ss.str(), expected_ss.str());
 }
 // NOLINTEND
+#endif

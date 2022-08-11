@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 #pragma once
 #include "mock_absolute_encoder.h"
@@ -42,3 +43,4 @@ public:
     MOCK_METHOD1(resetSlave, void(march::SdoSlaveInterface&));
 };
 // NOLINTEND
+#endif

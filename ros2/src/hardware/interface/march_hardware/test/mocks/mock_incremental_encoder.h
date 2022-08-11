@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 #pragma once
 #include "march_hardware/encoder/incremental_encoder.h"
@@ -14,3 +15,4 @@ public:
     }
 };
 // NOLINTEND
+#endif

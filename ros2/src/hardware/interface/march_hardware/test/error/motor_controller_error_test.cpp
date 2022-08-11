@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2020 Project March.
 #include <march_hardware/error/motor_controller_error.h>
@@ -74,3 +75,4 @@ TEST(TestSecondDetailedMotionError, ParseMultipleSecondDetailedErrors)
         expected);
 }
 // NOLINTEND
+#endif

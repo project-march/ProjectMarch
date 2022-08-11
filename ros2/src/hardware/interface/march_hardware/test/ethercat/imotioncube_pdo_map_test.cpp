@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "../mocks/mock_sdo_interface.h"
@@ -79,3 +80,4 @@ TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
     ASSERT_EQ(0x6060U, ((combined_address >> 16U) & 0xFFFFU));
 }
 // NOLINTEND
+#endif

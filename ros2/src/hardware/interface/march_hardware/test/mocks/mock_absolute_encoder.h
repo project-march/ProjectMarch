@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // NOLINTBEGIN
 #pragma once
 #include "march_hardware/encoder/absolute_encoder.h"
@@ -17,3 +18,4 @@ public:
     }
 };
 // NOLINTEND
+#endif
