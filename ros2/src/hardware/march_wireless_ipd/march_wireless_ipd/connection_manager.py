@@ -8,6 +8,7 @@ from functools import partial
 
 from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
 
+from std_msgs.msg import String
 from march_shared_msgs.msg import CurrentGait, CurrentState
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
@@ -73,6 +74,7 @@ class ConnectionManager:
         self._stopped = False
         self._last_left_point = [0, 0, 0]
         self._last_right_point = [0, 0, 0]
+        self._eeg_command = None
         self._last_left_point_timestamp = self._node.get_clock().now()
         self._last_right_point_timestamp = self._node.get_clock().now()
         self._controller.accepted_cb = partial(self._send_message_till_confirm, "Accepted", True)
@@ -91,6 +93,18 @@ class ConnectionManager:
             "/march/foot_position/right",
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
+        )
+        self._eeg_command_sub = self._node.create_subscription(
+            String,
+            "/march/march_eeg_node/command",
+            self._eeg_callback,
+            DEFAULT_HISTORY_DEPTH,
+        )
+
+        self._start_side_pub = self._node.create_publisher(
+            msg_type=String,
+            topic="/march/step_and_hold/start_side",
+            qos_profile=DEFAULT_HISTORY_DEPTH,
         )
 
     def _current_gait_cb(self, msg: CurrentGait):
@@ -115,6 +129,10 @@ class ConnectionManager:
         """Callback when a new right foot position is found."""
         self._last_right_point = [msg.displacement.x, msg.displacement.y, msg.displacement.z]
         self._last_right_point_timestamp = self._node.get_clock().now()
+
+    def _eeg_callback(self, msg: String):
+        """Callback when an EEG command is published."""
+        self._eeg_command = msg.data
 
     def _validate_received_data(self, msg: str):
         """Check if a received message is valid or is empty, meaning the connection is broken.
@@ -263,7 +281,10 @@ class ConnectionManager:
             "seq": self._seq,
             "point_left": point_left,
             "point_right": point_right,
+            "eeg_command": self._eeg_command,
         }
+
+        self._eeg_command = None
 
         while True:
             try:
