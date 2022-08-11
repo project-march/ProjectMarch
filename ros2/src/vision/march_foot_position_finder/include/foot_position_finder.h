@@ -74,6 +74,9 @@ protected:
     rclcpp::TimerBase::SharedPtr realsense_timer_;
     rclcpp::TimerBase::SharedPtr initial_position_reset_timer_;
 
+    rclcpp::CallbackGroup::SharedPtr realsense_callback_group_;
+    rclcpp::CallbackGroup::SharedPtr point_callback_group_;
+
     clock_t last_frame_time_;
     int frame_wait_counter_;
     float frame_timeout_;

@@ -26,10 +26,22 @@ find_package(std_srvs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 
+add_library(${PROJECT_NAME}
+    src/point_cloud_aligner.cpp
+    src/frame_publisher.cpp
+)
+
 add_executable(${PROJECT_NAME}_node src/frame_publisher_node.cpp)
 ament_target_dependencies(${PROJECT_NAME}_node tf2 tf2_ros rclcpp geometry_msgs std_srvs rcl_interfaces march_shared_msgs)
 
-target_include_directories(${PROJECT_NAME}_node PRIVATE
+ament_target_dependencies(${PROJECT_NAME} tf2 tf2_ros rclcpp geometry_msgs std_srvs rcl_interfaces march_shared_msgs)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
@@ -41,4 +53,3 @@ install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()
-
