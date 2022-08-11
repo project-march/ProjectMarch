@@ -23,18 +23,13 @@ public:
     FramePublisherNode()
         : Node("march_frame_publisher")
     {
-        client_node_
-            = std::make_shared<rclcpp::Node>("frame_publisher_client_node");
+        client_node_ = std::make_shared<rclcpp::Node>("frame_publisher_client_node");
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
-        transform_listener_
-            = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
-        tf_broadcaster_
-            = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+        transform_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
-        timer_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive);
-        callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive);
+        timer_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+        callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(5),
@@ -49,43 +44,28 @@ public:
         options.callback_group = callback_group_;
 
         callback_handle_ = this->add_on_set_parameters_callback(
-            std::bind(&FramePublisherNode::parametersCallback, this,
-                std::placeholders::_1));
+            std::bind(&FramePublisherNode::parametersCallback, this, std::placeholders::_1));
 
-        align_service_
-            = this->create_service<std_srvs::srv::Trigger>("~/align_cameras",
-                std::bind(&FramePublisherNode::alignCameras, this,
-                    std::placeholders::_1, std::placeholders::_2));
+        align_service_ = this->create_service<std_srvs::srv::Trigger>("~/align_cameras",
+            std::bind(&FramePublisherNode::alignCameras, this, std::placeholders::_1, std::placeholders::_2));
 
-        get_threshold_client_
-            = client_node_->create_client<rcl_interfaces::srv::GetParameters>(
-                "/march/march_foot_position_finder/get_parameters");
-        set_threshold_client_
-            = client_node_->create_client<rcl_interfaces::srv::SetParameters>(
-                "/march/march_foot_position_finder/set_parameters");
+        get_threshold_client_ = client_node_->create_client<rcl_interfaces::srv::GetParameters>(
+            "/march/march_foot_position_finder/get_parameters");
+        set_threshold_client_ = client_node_->create_client<rcl_interfaces::srv::SetParameters>(
+            "/march/march_foot_position_finder/set_parameters");
 
         left_point_subscriber_
-            = this->create_subscription<march_shared_msgs::msg::FootPosition>(
-                "/march/foot_position/left",
-                /*qos=*/1,
-                std::bind(&FramePublisherNode::leftPointCallback, this,
-                    std::placeholders::_1),
-                options);
+            = this->create_subscription<march_shared_msgs::msg::FootPosition>("/march/foot_position/left",
+                /*qos=*/1, std::bind(&FramePublisherNode::leftPointCallback, this, std::placeholders::_1), options);
 
         right_point_subscriber_
-            = this->create_subscription<march_shared_msgs::msg::FootPosition>(
-                "/march/foot_position/right",
-                /*qos=*/1,
-                std::bind(&FramePublisherNode::rightPointCallback, this,
-                    std::placeholders::_1),
-                options);
+            = this->create_subscription<march_shared_msgs::msg::FootPosition>("/march/foot_position/right",
+                /*qos=*/1, std::bind(&FramePublisherNode::rightPointCallback, this, std::placeholders::_1), options);
 
         range_.set__from_value(-10.0).set__to_value(10.0).set__step(0.1);
         descriptor_.floating_point_range = { range_ };
-        this->declare_parameter<double>(
-            "rotation_camera_left", rotation_camera_left_, descriptor_);
-        this->declare_parameter<double>(
-            "rotation_camera_right", rotation_camera_right_, descriptor_);
+        this->declare_parameter<double>("rotation_camera_left", rotation_camera_left_, descriptor_);
+        this->declare_parameter<double>("rotation_camera_right", rotation_camera_right_, descriptor_);
         this->declare_parameter<double>("angle_offset", angle_offset_);
         this->declare_parameter<double>("min_check_angle", min_check_angle_);
         this->declare_parameter<double>("max_check_angle", max_check_angle_);
@@ -100,25 +80,18 @@ private:
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr align_service_;
     std::shared_ptr<rclcpp::SyncParametersClient> vision_parameter_client_;
 
-    rclcpp::Client<rcl_interfaces::srv::GetParameters>::SharedPtr
-        get_threshold_client_;
-    rclcpp::Client<rcl_interfaces::srv::SetParameters>::SharedPtr
-        set_threshold_client_;
+    rclcpp::Client<rcl_interfaces::srv::GetParameters>::SharedPtr get_threshold_client_;
+    rclcpp::Client<rcl_interfaces::srv::SetParameters>::SharedPtr set_threshold_client_;
 
-    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr
-        left_point_subscriber_;
-    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr
-        right_point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr left_point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr right_point_subscriber_;
 
     rclcpp::TimerBase::SharedPtr publish_timer_;
 
     std::string robot_properties_path
-        = ament_index_cpp::get_package_share_directory("march_description")
-        + "/urdf/properties/properties_march7.yaml";
+        = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/properties/properties_march7.yaml";
     YAML::Node robot_properties = YAML::LoadFile(robot_properties_path);
-    const double TRANS_X
-        = -robot_properties["dimensions"]["foot"]["height_forward"]
-               .as<double>();
+    const double TRANS_X = -robot_properties["dimensions"]["foot"]["height_forward"].as<double>();
     const double TRANS_Z = -0.025;
 
     TransformStamped trans_left_;
@@ -156,8 +129,7 @@ private:
     /**
      * Update parameter with dynamic reconfigure.
      */
-    rcl_interfaces::msg::SetParametersResult parametersCallback(
-        const std::vector<rclcpp::Parameter>& parameters)
+    rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters)
     {
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = true;
@@ -188,8 +160,8 @@ private:
      *
      * @param msg Message containing the foot position.
      */
-    void leftPointCallback(const march_shared_msgs::msg::FootPosition::SharedPtr
-            msg) // NOLINT, binding does not expect reference
+    void leftPointCallback(
+        const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT, binding does not expect reference
     {
         last_left_point_ = msg->displacement;
         last_left_point_count_++;
@@ -201,8 +173,7 @@ private:
      * @param msg Message containing the foot position.
      */
     void rightPointCallback(
-        const march_shared_msgs::msg::FootPosition::SharedPtr
-            msg) // NOLINT, binding does not expect reference
+        const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT, binding does not expect reference
     {
         last_right_point_ = msg->displacement;
         last_right_point_count_++;
@@ -215,8 +186,7 @@ private:
      */
     void parameterUpdatedLogger(const rclcpp::Parameter& param)
     {
-        RCLCPP_INFO(this->get_logger(),
-            param.get_name() + " set to " + param.value_to_string());
+        RCLCPP_INFO(this->get_logger(), param.get_name() + " set to " + param.value_to_string());
     }
 
     /**
@@ -228,23 +198,16 @@ private:
     void publishCameraFrame(const std::string& left_or_right)
     {
         tr.header.stamp = this->get_clock()->now();
-        if ((left_or_right == "left"
-                && rclcpp::Time(tr.header.stamp) > last_published_camera_left_)
-            || (left_or_right == "right"
-                && rclcpp::Time(tr.header.stamp)
-                    > last_published_camera_right_)) {
-            tr.header.frame_id
-                = "camera_front_" + left_or_right + "_depth_optical_frame";
-            tr.child_frame_id
-                = "camera_front_" + left_or_right + "_virtual_rotated";
+        if ((left_or_right == "left" && rclcpp::Time(tr.header.stamp) > last_published_camera_left_)
+            || (left_or_right == "right" && rclcpp::Time(tr.header.stamp) > last_published_camera_right_)) {
+            tr.header.frame_id = "camera_front_" + left_or_right + "_depth_optical_frame";
+            tr.child_frame_id = "camera_front_" + left_or_right + "_virtual_rotated";
             tf2::Quaternion tf2_quaternion;
             if (left_or_right == "left") {
-                tf2_quaternion.setRPY(
-                    rotation_camera_left_ / 180 * M_PI, 0.0, 0.0);
+                tf2_quaternion.setRPY(rotation_camera_left_ / 180 * M_PI, 0.0, 0.0);
                 last_published_camera_left_ = rclcpp::Time(tr.header.stamp);
             } else if (left_or_right == "right") {
-                tf2_quaternion.setRPY(
-                    rotation_camera_right_ / 180 * M_PI, 0.0, 0.0);
+                tf2_quaternion.setRPY(rotation_camera_right_ / 180 * M_PI, 0.0, 0.0);
                 last_published_camera_right_ = rclcpp::Time(tr.header.stamp);
             } else {
                 tf2_quaternion.setRPY(0.0, 0.0, 0.0);
@@ -265,10 +228,8 @@ private:
         using namespace geometry_msgs::msg;
 
         try {
-            trans_left_ = tf_buffer_->lookupTransform(
-                "foot_left", "world", tf2::TimePointZero);
-            trans_right_ = tf_buffer_->lookupTransform(
-                "foot_right", "world", tf2::TimePointZero);
+            trans_left_ = tf_buffer_->lookupTransform("foot_left", "world", tf2::TimePointZero);
+            trans_right_ = tf_buffer_->lookupTransform("foot_right", "world", tf2::TimePointZero);
 
             if (!start_time_initialized_) {
                 last_published_left_ = trans_left_.header.stamp;
@@ -280,8 +241,7 @@ private:
             return;
         }
 
-        if (rclcpp::Time(trans_left_.header.stamp)
-            > rclcpp::Time(last_published_left_)) {
+        if (rclcpp::Time(trans_left_.header.stamp) > rclcpp::Time(last_published_left_)) {
             // Transformation from left foot to left toes
             TransformStamped tr1;
             tr1.header.stamp = trans_left_.header.stamp;
@@ -304,8 +264,7 @@ private:
             last_published_left_ = trans_left_.header.stamp;
         }
 
-        if (rclcpp::Time(trans_right_.header.stamp)
-            > rclcpp::Time(last_published_right_)) {
+        if (rclcpp::Time(trans_right_.header.stamp) > rclcpp::Time(last_published_right_)) {
             // Transformation from right foot to right toes
             TransformStamped tr3;
             tr3.header.stamp = trans_right_.header.stamp;
@@ -341,8 +300,7 @@ private:
         setHeightZeroThreshold(/*threshold=*/0.0);
 
         double optimal_left_angle = 0.0, optimal_right_angle = 0.0;
-        double closest_left_height_to_zero = 1000,
-               closest_right_height_to_zero = 1000;
+        double closest_left_height_to_zero = 1000, closest_right_height_to_zero = 1000;
 
         // double is useful in this loop, so turn off 'should be int' lint
         // NOLINTNEXTLINE
@@ -370,15 +328,13 @@ private:
             }
 
             for (int i = 0; i < average_count_; i++) {
-                while (last_left_point_count_ == start_left_index) {
-                }
+                while (last_left_point_count_ == start_left_index) { }
                 avg_left_height += last_left_point_.z;
                 start_left_index = last_left_point_count_;
             }
 
             for (int i = 0; i < average_count_; i++) {
-                while (last_right_point_count_ == start_right_index) {
-                }
+                while (last_right_point_count_ == start_right_index) { }
                 avg_right_height += last_right_point_.z;
                 start_right_index = last_right_point_count_;
             }
@@ -397,10 +353,8 @@ private:
             }
         }
 
-        this->set_parameter(
-            rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
-        this->set_parameter(
-            rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
+        this->set_parameter(rclcpp::Parameter("rotation_camera_left", optimal_left_angle));
+        this->set_parameter(rclcpp::Parameter("rotation_camera_right", optimal_right_angle));
 
         setHeightZeroThreshold(original_threshold);
     }
@@ -412,10 +366,9 @@ private:
      * @param request Service request message.
      * @param response Service response message.
      */
-    void alignCameras(const std::shared_ptr<std_srvs::srv::Trigger::Request>
-                          request, // NOLINT, binding does not expect reference
-        const std::shared_ptr<std_srvs::srv::Trigger::Response>
-            response) // NOLINT, binding does not expect reference
+    void alignCameras(
+        const std::shared_ptr<std_srvs::srv::Trigger::Request> request, // NOLINT, binding does not expect reference
+        const std::shared_ptr<std_srvs::srv::Trigger::Response> response) // NOLINT, binding does not expect reference
     {
         (void)request; // Silence unused warning. Request has no data.
         std::thread thread(&FramePublisherNode::alignCamerasCallback, this);
@@ -432,22 +385,17 @@ private:
     double getHeightZeroThreshold()
     {
         double threshold = 0.0;
-        auto get_request
-            = std::make_shared<rcl_interfaces::srv::GetParameters::Request>();
+        auto get_request = std::make_shared<rcl_interfaces::srv::GetParameters::Request>();
         get_request->names.push_back("height_zero_threshold");
-        while (!get_threshold_client_->wait_for_service(1s)) {
-        }
+        while (!get_threshold_client_->wait_for_service(1s)) { }
 
-        auto get_result
-            = get_threshold_client_->async_send_request(get_request);
+        auto get_result = get_threshold_client_->async_send_request(get_request);
 
-        if (rclcpp::spin_until_future_complete(
-                client_node_->get_node_base_interface(), get_result)
+        if (rclcpp::spin_until_future_complete(client_node_->get_node_base_interface(), get_result)
             == rclcpp::FutureReturnCode::SUCCESS) {
             threshold = get_result.get()->values[0].double_value;
         } else {
-            RCLCPP_ERROR(this->get_logger(),
-                "Failed to get original zero height threshold.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to get original zero height threshold.");
         }
         return threshold;
     }
@@ -460,8 +408,7 @@ private:
      */
     void setHeightZeroThreshold(double threshold)
     {
-        auto set_request
-            = std::make_shared<rcl_interfaces::srv::SetParameters::Request>();
+        auto set_request = std::make_shared<rcl_interfaces::srv::SetParameters::Request>();
 
         rcl_interfaces::msg::ParameterValue value;
         value.type = 3;
@@ -472,15 +419,11 @@ private:
         param.value = value;
         set_request->parameters.push_back(param);
 
-        while (!set_threshold_client_->wait_for_service(1s)) {
-        }
-        auto set_result
-            = set_threshold_client_->async_send_request(set_request);
-        if (rclcpp::spin_until_future_complete(
-                client_node_->get_node_base_interface(), set_result)
+        while (!set_threshold_client_->wait_for_service(1s)) { }
+        auto set_result = set_threshold_client_->async_send_request(set_request);
+        if (rclcpp::spin_until_future_complete(client_node_->get_node_base_interface(), set_result)
             != rclcpp::FutureReturnCode::SUCCESS) {
-            RCLCPP_ERROR(this->get_logger(),
-                "Failed to automatically set zero height threshold.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to automatically set zero height threshold.");
         };
     }
 };

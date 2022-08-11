@@ -29,14 +29,11 @@ public:
 
     ~PointFinder() = default;
 
-    void findPoints(const PointCloud::Ptr& pointcloud, Point& step_point,
-        std::vector<Point>* position_queue);
+    void findPoints(const PointCloud::Ptr& pointcloud, Point& step_point, std::vector<Point>* position_queue);
 
-    void startParameterCallback(
-        const std::vector<rclcpp::Parameter>& parameters);
+    void startParameterCallback(const std::vector<rclcpp::Parameter>& parameters);
 
-    std::vector<Point> retrieveTrackPoints(
-        const Point& start, const Point& end, int num_points);
+    std::vector<Point> retrieveTrackPoints(const Point& start, const Point& end, int num_points);
 
     std::vector<double> getDisplacements();
 
@@ -110,8 +107,7 @@ protected:
 
     void findFeasibleFootPlacements(std::vector<Point>* position_queue);
 
-    void computeFootPlateDisplacement(
-        int x, int y, double height, std::vector<Point>* position_queue);
+    void computeFootPlateDisplacement(int x, int y, double height, std::vector<Point>* position_queue);
 
     int xCoordinateToIndex(double x);
 

@@ -37,8 +37,10 @@ MarchRvizSystemInterface::MarchRvizSystemInterface()
  *  \note This doesn't work for thrown exceptions this is why we still call
  *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
  */
-MarchRvizSystemInterface::~MarchRvizSystemInterface() {
-    stop();
+MarchRvizSystemInterface::~MarchRvizSystemInterface()
+{
+    // NOLINT because this is intended. It needs to calls its own implementation, not that from its child class.
+    stop(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
 }
 
 /** Configures the controller.

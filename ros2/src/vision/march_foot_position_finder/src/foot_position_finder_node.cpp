@@ -12,26 +12,21 @@ public:
 
     FootPositionFinderNode()
         : Node("march_foot_position_finder",
-            rclcpp::NodeOptions()
-                .automatically_declare_parameters_from_overrides(
-                    /*automatically_declare_parameters_from_overrides=*/true))
+            rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
+                /*automatically_declare_parameters_from_overrides=*/true))
     {
         left = new FootPositionFinder(this, "left");
         right = new FootPositionFinder(this, "right");
 
         this->set_on_parameters_set_callback(
-            std::bind(&FootPositionFinderNode::parametersCallback, this,
-                std::placeholders::_1));
+            std::bind(&FootPositionFinderNode::parametersCallback, this, std::placeholders::_1));
     }
 
-    rcl_interfaces::msg::SetParametersResult parametersCallback(
-        const std::vector<rclcpp::Parameter>& parameters)
+    rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters)
     {
-        std::thread thread_left(
-            &FootPositionFinder::readParameters, left, parameters);
+        std::thread thread_left(&FootPositionFinder::readParameters, left, parameters);
         thread_left.detach();
-        std::thread thread_right(
-            &FootPositionFinder::readParameters, right, parameters);
+        std::thread thread_right(&FootPositionFinder::readParameters, right, parameters);
         thread_right.detach();
 
         rcl_interfaces::msg::SetParametersResult result;

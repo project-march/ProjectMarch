@@ -7,15 +7,14 @@ ComControllerNode::ComControllerNode(
     , pd_values_(pd_values)
     , balance_(false)
 {
-    // NOLINTBEGIN
-    // bugprone-argument-comment: message_queue_length is more accurate then qos.
-    // performance-unnecessary-value-param: This is needed the way ros is set up.
+
     subscription_ = this->create_subscription<march_shared_msgs::msg::CurrentGait>(
+        // NOLINTNEXTLINE(bugprone-argument-comment) message_queue_length is more accurate then qos.
         /*topic_name=*/"/march/gait_selection/current_gait", /*message_queue_length=*/1,
+        // NOLINTNEXTLINE(performance-unnecessary-value-param) This is needed the way ros is set up.
         /*callback=*/[this](const march_shared_msgs::msg::CurrentGait::SharedPtr msg) {
             controller_->newSubgait(msg);
         });
-    // NOLINTEND
 
     for (auto const& [key, val] : pd_values_) {
         this->declare_parameter<int>(key, val);

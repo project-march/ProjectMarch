@@ -8,13 +8,13 @@
 #include "march_hardware/march_robot.h"
 #include "march_utility/logger_colors.hpp"
 #include <algorithm>
+#include <csignal>
+#include <hardware_interface/base_interface.hpp>
 #include <hardware_interface/hardware_info.hpp>
+#include <hardware_interface/system_interface.hpp>
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#include <csignal>
-#include <hardware_interface/base_interface.hpp>
-#include <hardware_interface/system_interface.hpp>
 
 using namespace std;
 
@@ -219,14 +219,13 @@ inline bool is_motor_controller_in_a_valid_state(march::Joint& joint, const rclc
     return true;
 }
 
-
-
 /** \brief This is done because the ros2 code doesn't yet correctly go to the teardown state.
-  * \note This only works if there is one instance alive of this object.
-  * \attention Because this is global, this code can only be ran once within this namespace.
+ * \note This only works if there is one instance alive of this object.
+ * \attention Because this is global, this code can only be ran once within this namespace.
  */
 inline hardware_interface::BaseInterface<hardware_interface::SystemInterface>* glob_instance;
-inline void teardown_state_cb(int signum) {
+inline void teardown_state_cb(int signum)
+{
     glob_instance->stop();
     exit(signum);
 }
@@ -236,11 +235,12 @@ inline void teardown_state_cb(int signum) {
  * the `stop` state (aka the stop method).
  * @param instance The hardware interface instance that should go ot the stop state.
  */
-inline void go_to_stop_state_on_crash(hardware_interface::BaseInterface<hardware_interface::SystemInterface>* instance){
+inline void go_to_stop_state_on_crash(hardware_interface::BaseInterface<hardware_interface::SystemInterface>* instance)
+{
     glob_instance = instance;
-    signal(SIGINT, teardown_state_cb);  // For user interrupt.
-    signal(SIGTERM, teardown_state_cb);  // For termination request, sent to the program.
-    signal(SIGABRT, teardown_state_cb);  // For abnormal termination condition, (e.g. thrown exceptions).
+    signal(SIGINT, teardown_state_cb); // For user interrupt.
+    signal(SIGTERM, teardown_state_cb); // For termination request, sent to the program.
+    signal(SIGABRT, teardown_state_cb); // For abnormal termination condition, (e.g. thrown exceptions).
 }
 
 } // namespace march_hardware_interface_util
