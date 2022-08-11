@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // Copyright 2019 Project March.
 #include "march_hardware_builder/hardware_builder.h"
 
@@ -45,3 +46,4 @@ TEST(AllowedRobotTest, TestTestRotationalSetupCreation)
     urdf.initFile(ros::package::getPath("march_description").append(/*__s=*/"/urdf/test_joint_rotational.urdf"));
     ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational, urdf).createMarchRobot());
 }
+#endif
