@@ -220,7 +220,7 @@ class GaitPreprocessor(Node):
 
         transformed.x = -point.x + self._offset_x
         transformed.y = point.z + self._offset_y
-        transformed.z = temp_y + np.sign(temp_y) * self._offset_z
+        transformed.z = 0.47
 
         return transformed
 

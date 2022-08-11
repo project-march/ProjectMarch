@@ -160,7 +160,7 @@ class TrajectoryScheduler:
         """
         result: FollowJointTrajectoryResult = future.result().result
         if result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            self._logger.warning(f"Failed to execute trajectory: {result.error_string}")
+            self._logger.error(f"Failed to execute trajectory: {result.error_string}")
             self._failed = True
 
     def cancel_active_goals(self) -> None:

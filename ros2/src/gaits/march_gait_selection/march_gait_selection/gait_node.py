@@ -107,6 +107,10 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.stop_mid2_x = param.get_parameter_value().double_value
         elif param.name == "stop_mid2_y":
             node.stop_mid2_y = param.get_parameter_value().double_value
+        elif param.name == "early_schedule_duration":
+            node.early_schedule_duration = Duration(param.get_parameter_value().double_value)
+        elif param.name == "first_subgait_delay":
+            node.first_subgait_delay = Duration(param.get_parameter_value().double_value)
 
     gait_state_machine.update_parameters()
     node._logger.info(f"{param.name} set to {param.value}.")
