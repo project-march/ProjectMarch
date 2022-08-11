@@ -298,7 +298,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="early_schedule_duration",
-            default_value="0.3",
+            default_value="0.070",
             description="Duration to schedule next subgait early. If 0 then the"
             "next subgait is never scheduled early.",
         ),
