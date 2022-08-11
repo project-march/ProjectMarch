@@ -24,6 +24,9 @@ IK_SOLVER_PARAMTERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
 DURATION = 2.0
 NUMBER_OF_JOINTS = 8
 
+MIN_MIDPOINT_FRACTION = 0.1
+MAX_MIDPOINT_FRACTION = 0.99
+
 
 class LiveWidget:
     """A widget to easily check the solutions of the IK solver for a given x,y location of the ankle.
@@ -36,7 +39,7 @@ class LiveWidget:
         self.sliders = {
             "last": {"x": 0.0, "y": 0.0},
             "next": {"x": 0.0, "y": 0.0},
-            "mid": {"fraction": 0.0, "deviation": 0.0, "height": MIDPOINT_HEIGHT},
+            "mid": {"fraction": 0.0, "deviation": 0.0, "shift": 0.0, "height": MIDPOINT_HEIGHT},
         }
         self.poses = {
             "last": Pose(IK_SOLVER_PARAMTERS),
@@ -107,6 +110,11 @@ class LiveWidget:
         self.slider_midpoint_deviation.setOrientation(Qt.Horizontal)
         self.slider_midpoint_deviation.valueChanged.connect(self.update_midpoint_deviation)
 
+        self.slider_midpoint_shift = QSlider()
+        self.slider_midpoint_shift.setOrientation(Qt.Horizontal)
+        self.slider_midpoint_shift.setValue(50)
+        self.slider_midpoint_shift.valueChanged.connect(self.update_midpoint_shift)
+
         self.slider_midpoint_height = QSlider()
         self.slider_midpoint_height.setOrientation(Qt.Horizontal)
         self.slider_midpoint_height.setValue(99)
@@ -120,7 +128,8 @@ class LiveWidget:
         self.horizontal_sliders_top.addWidget(self.slider_next_x, 0, 1)
 
         self.horizontal_sliders_bottom.addWidget(self.slider_midpoint_deviation, 0, 0)
-        self.horizontal_sliders_bottom.addWidget(self.slider_midpoint_height, 0, 1)
+        self.horizontal_sliders_bottom.addWidget(self.slider_midpoint_shift, 0, 1)
+        self.horizontal_sliders_bottom.addWidget(self.slider_midpoint_height, 0, 2)
 
         self.horizontal_sliders.addLayout(self.horizontal_sliders_top, 0, 0)
         self.horizontal_sliders.addWidget(self.slider_midpoint_fraction, 1, 0)
@@ -227,6 +236,13 @@ class LiveWidget:
         self.reset_midpoint_fraction()
         self.update_all_tables()
 
+    def update_midpoint_shift(self, value) -> None:
+        """Update the shift of the point where the midpoints are created around."""
+        self.sliders["mid"]["shift"] = (value - 50) / 100
+        self.update_midpoints()
+        self.reset_midpoint_fraction()
+        self.update_all_tables()
+
     def update_midpoint_height(self, value) -> None:
         """Update the height used to create the midpoints."""
         self.sliders["mid"]["height"] = value / 100 * MIDPOINT_HEIGHT
@@ -240,6 +256,7 @@ class LiveWidget:
         self.slider_next_x.setValue(0)
         self.slider_last_y.setValue(50)
         self.slider_next_y.setValue(50)
+        self.slider_midpoint_shift.setValue(50)
         for pose in ["last", "next"]:
             for axis in ["x", "y"]:
                 self.sliders[pose][axis] = 0
@@ -277,11 +294,17 @@ class LiveWidget:
             float: the fraction of the midpoint.
         """
         if pose_name == "mid_pre":
-            return 0.5 * (1 - self.sliders["mid"]["deviation"])
+            return min(
+                max(0.5 * (1 - self.sliders["mid"]["deviation"]) + self.sliders["mid"]["shift"], MIN_MIDPOINT_FRACTION),
+                MAX_MIDPOINT_FRACTION,
+            )
         elif pose_name == "mid_post":
-            return 0.5 * (1 + self.sliders["mid"]["deviation"])
+            return max(
+                min(0.5 * (1 + self.sliders["mid"]["deviation"]) + self.sliders["mid"]["shift"], MAX_MIDPOINT_FRACTION),
+                MIN_MIDPOINT_FRACTION,
+            )
         else:
-            return 0.5
+            return 0.5 + self.sliders["mid"]["shift"]
 
     def setpoint_time(self, pose_name: str) -> float:
         """Returns the setpoint time for the given pose.
@@ -306,7 +329,9 @@ class LiveWidget:
             setpoint_list = []
 
             pose_names = list(self.poses.keys())
-            if self.sliders["mid"]["deviation"] == 0:
+            if self.get_midpoint_fraction_based_on_deviation(
+                "mid_pre"
+            ) >= self.get_midpoint_fraction_based_on_deviation("mid_post"):
                 pose_names.remove("mid_post")
 
             for pose_name in pose_names:
@@ -393,7 +418,6 @@ class LiveWidget:
         self.plots[pose_name].setData(x=positions_x, y=positions_y)
 
         if self.show_midpoints:
-            self.update_mid_of_step()
             self.update_midpoint_ankle_postions()
         self.interpolate_trough_points()
 
@@ -402,22 +426,19 @@ class LiveWidget:
         for pose in ["last", "next"]:
             self.update_pose(pose)
 
-    def update_mid_of_step(self) -> None:
-        """Update the point that is in the middle of the step."""
-        step_size_last = self.poses["last"].pos_ankle2[0]
-        step_size_next = self.poses["next"].pos_ankle2[0]
-        mid_of_step = (-step_size_last + step_size_next) / 2
-        mid_of_step -= self.poses["next"].pos_toes1[0]  # Shift since we center around toes
-        self.plots["mid_of_step"].setData(x=[mid_of_step], y=[0])
-
     def update_midpoint_ankle_postions(self) -> None:
         """Update the two points at which the ankle is desired for the two midpoints."""
+        ankle_x_positions = []
         for pose in ["mid_pre", "mid_post"]:
             fraction = self.get_midpoint_fraction_based_on_deviation(pose)
             x = self.poses["last"].get_ankle_mid_x(fraction, self.poses["next"])
             x -= self.poses["next"].pos_toes1[0]  # Shift since we center around toes.
+            ankle_x_positions.append(x)
             y = self.midpoint_height
             self.plots[pose + "_ankle"].setData(x=[x], y=[y])
+
+        mid_of_step = sum(ankle_x_positions) / len(ankle_x_positions)
+        self.plots["mid_of_step"].setData(x=[mid_of_step], y=[0])
 
     def update_table_joint_angles(self) -> None:
         """Update the tables that show the joint angles."""
@@ -441,7 +462,7 @@ class LiveWidget:
         """Update the table that shows the current settings."""
         data = [list(self.sliders["mid"].values())]
         self.tables["settings"].setData(data)
-        self.tables["settings"].setHorizontalHeaderLabels(["frac", "dev", "height"])
+        self.tables["settings"].setHorizontalHeaderLabels(["frac", "dev", "shift", "height"])
         self.tables["settings"].verticalHeader().hide()
 
     def update_all_tables(self) -> None:
