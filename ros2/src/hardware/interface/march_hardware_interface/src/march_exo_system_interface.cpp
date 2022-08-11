@@ -94,9 +94,21 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     return hardware_interface::return_type::OK;
 }
 
-/// Builds a JointInfo object uses parameters for some value.
+/** \brief Builds a JointInfo object uses parameters for some value.
+  * \note Most of the defaults param values are set in the ros2_control xacro in package `march_control`.
+  */
 JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::ComponentInfo& joint)
 {
+
+    string stop_hardl_param =  get_parameter(joint, "stop_when_outside_hard_limits", "true");
+    bool stop_when_outside_hard_limits = !(stop_hardl_param == "false" or stop_hardl_param == "0"
+            or stop_hardl_param == "False");
+    if (stop_when_outside_hard_limits
+        and !(stop_hardl_param == "true" or stop_hardl_param == "1" or stop_hardl_param == "True")) {
+        RCLCPP_WARN((*logger_), "Joint: %s, got param '%s' for `stop_when_outside_hard_limits` but expected "
+                                "['true', 'false', '0', '1', 'True', 'False']. Defaulting to True.",
+                                joint.name.c_str(), stop_hardl_param.c_str());
+    }
     return { /*name=*/joint.name.c_str(),
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
@@ -106,13 +118,14 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
-            /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "200")),
+            /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
             /*last_time_not_in_soft_error_limit=*/std::chrono::steady_clock::now(),
             /*msec_until_error_when_in_error_soft_limits=*/
-            std::chrono::milliseconds { stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "0")) },
+            std::chrono::milliseconds { stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "1000")) },
             /*soft_error_limit_warning_throttle_msec=*/
-            stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "50")),
-            /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10")) } };
+            stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "300")),
+            /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10")),
+            /*stop_when_outside_hard_limits=*/stop_when_outside_hard_limits } };
 }
 
 /** Returns a vector of the StateInterfaces.
@@ -229,6 +242,9 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
             make_joints_operational(march_robot_->getNotOperationalJoints());
             joints_ready_for_actuation_ = true;
             RCLCPP_INFO((*logger_), "%sAll joints ready for writing.", LColor::GREEN);
+            for (JointInfo& jointInfo : joints_info_) {
+                jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
+            }
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
@@ -394,6 +410,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
 {
     // SOFT Limit check.
     if (jointInfo.joint.isWithinSoftLimits()) {
+        jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
         return false;
     }
     const auto& abs_encoder = jointInfo.joint.getMotorController()->getAbsoluteEncoder();
@@ -409,8 +426,9 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
         jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
         return false;
     }
-    auto time_in_error_limits = (jointInfo.limit.last_time_not_in_soft_error_limit - std::chrono::steady_clock::now());
-    if (time_in_error_limits > jointInfo.limit.msec_until_error_when_in_error_soft_limits) {
+    auto time_in_error_limits = (std::chrono::steady_clock::now() - jointInfo.limit.last_time_not_in_soft_error_limit);
+    if (jointInfo.limit.msec_until_error_when_in_error_soft_limits > 0s &&
+        time_in_error_limits > jointInfo.limit.msec_until_error_when_in_error_soft_limits) {
         RCLCPP_FATAL((*logger_),
             "Joint %s (%g rad; %i IU) is outside its soft ERROR limits [%i, %i], for %d "
             "milliseconds. REACHED its max allowed time of %i milliseconds, STOPPING ROS...",
@@ -425,7 +443,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
         abs_encoder->getUpperErrorSoftLimitIU(), time_in_error_limits.count());
 
     // HARD limit check.
-    if (!jointInfo.joint.isWithinHardLimits()) {
+    if (jointInfo.limit.stop_when_outside_hard_limits && !jointInfo.joint.isWithinHardLimits()) {
         RCLCPP_FATAL((*logger_),
             "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
             "\n\tposition: %g rad; %i IU."
