@@ -79,11 +79,18 @@ def generate_launch_description():
         condition=IfCondition(actuating),
     )
 
+    pdb_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=["pdb_state_broadcaster", "-t", "pdb_state_broadcaster/PdbStateBroadcaster", "--controller-manager", "/controller_manager"]
+    )
+
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
         joint_trajectory_controller_spawner,
+        pdb_state_broadcaster_spawner,
     ]
 
     # region Launch Controller manager, Extra configuration if simulation is `false`

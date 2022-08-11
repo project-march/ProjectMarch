@@ -1,7 +1,7 @@
 std_msgs/Header header
-uint32 emergency_button_state
+bool emergency_button_pressed
 float32 pdb_current
 march_shared_msgs/HighVoltageState hv_state
-uint32 stop_button_state
+bool stop_button_pressed
 march_shared_msgs/LowVoltageState lv_state
 march_shared_msgs/BatteryState battery_state
