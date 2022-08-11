@@ -25,12 +25,20 @@
 #include "march_utility/logger_colors.hpp"
 
 namespace march_hardware_interface {
-
 const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
 MarchRvizSystemInterface::MarchRvizSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
 {
+    march_hardware_interface_util::go_to_stop_state_on_crash(this);
+}
+
+/** \brief This should ensure that it goes to the stop state when the instance is being deleted.
+ *  \note This doesn't work for thrown exceptions this is why we still call
+ *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
+ */
+MarchRvizSystemInterface::~MarchRvizSystemInterface() {
+    stop();
 }
 
 /** Configures the controller.

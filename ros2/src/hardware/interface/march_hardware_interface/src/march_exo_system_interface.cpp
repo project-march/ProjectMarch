@@ -35,6 +35,15 @@ MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
     , clock_(rclcpp::Clock())
 {
+    go_to_stop_state_on_crash(this); //Note this doesn't work if the ethercat connection is lost.
+}
+
+/** \brief This should ensure that it goes to the stop state when the instance is being deleted.
+ *  \note This doesn't work for thrown exceptions this is why we still call
+ *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
+ */
+MarchExoSystemInterface::~MarchExoSystemInterface() {
+    stop();
 }
 
 /** Configures the controller.
