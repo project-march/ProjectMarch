@@ -76,10 +76,12 @@ class TrajectoryCommandFactory:
             TrajectoryCommand: command with the current subgait and start time. Returns None if the location found by
                 CoViD is too old.
         """
+        self._stop = stop
         if start:
             self._create_position_queue()
+        elif self.position_queue.empty():
+            self._stop = True
 
-        self._stop = stop
         self.subgait_id = subgait_id
         self.start_position_all_joints = start_position_all_joints
 
@@ -92,7 +94,7 @@ class TrajectoryCommandFactory:
             self._logger.info("Stopping dynamic gait.")
         else:
             if self._use_position_queue:
-                self.foot_location = self._get_foot_location_from_queue()()
+                self.foot_location = self._get_foot_location_from_queue()
             else:
                 self.foot_location = self._get_foot_location_from_point_handler(start)
 
@@ -259,9 +261,14 @@ class TrajectoryCommandFactory:
         """
         header = Header(stamp=self._gait.node.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
-        point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
-        return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
+        return FootPosition(
+            header=header,
+            processed_point=Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"]),
+            duration=point_from_queue["duration"],
+            midpoint_deviation=point_from_queue["midpoint_deviation"],
+            relative_midpoint_height=point_from_queue["midpoint_height"],
+        )
 
     def update_parameter(self) -> None:
         """Updates '_use_position_queue' to the newest value in gait_node."""
@@ -277,7 +284,6 @@ class TrajectoryCommandFactory:
         except OSError as e:
             self._logger.error(f"Position queue file does not exist. {e}")
 
-        self.duration_from_yaml = position_queue_yaml["duration"]
         self.points_from_yaml = position_queue_yaml["points"]
         self.position_queue = Queue()
         for point in self.points_from_yaml:
