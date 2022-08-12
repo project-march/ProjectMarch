@@ -14,21 +14,18 @@
 #include <utility>
 
 namespace march {
-Joint::Joint(std::string name, int net_number,
-    std::unique_ptr<MotorController> motor_controller)
+Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller)
     : name_(std::move(name))
     , net_number_(net_number)
     , motor_controller_(std::move(motor_controller))
 {
     if (!motor_controller_) {
         throw error::HardwareException(
-            error::ErrorType::MISSING_MOTOR_CONTROLLER,
-            "A Joint must have a MotorController");
+            error::ErrorType::MISSING_MOTOR_CONTROLLER, "A Joint must have a MotorController");
     }
 }
 
-Joint::Joint(std::string name, int net_number,
-    std::unique_ptr<MotorController> motor_controller,
+Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
     std::unique_ptr<TemperatureGES> temperature_ges)
     : name_(std::move(name))
     , net_number_(net_number)
@@ -73,36 +70,26 @@ void Joint::readFirstEncoderValues(bool operational_check)
     if (operational_check) {
         auto motor_controller_state = motor_controller_->getState();
         if (!motor_controller_state->isOperational()) {
-            ROS_FATAL("[%s]: %s", this->name_.c_str(),
-                motor_controller_state->getErrorStatus().value().c_str());
-            throw error::HardwareException(
-                error::ErrorType::PREPARE_ACTUATION_ERROR);
+            ROS_FATAL("[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().value().c_str());
+            throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
     }
 
     if (motor_controller_->hasIncrementalEncoder()) {
-        initial_incremental_position_
-            = motor_controller_->getIncrementalPosition();
+        initial_incremental_position_ = motor_controller_->getIncrementalPosition();
     }
     if (motor_controller_->hasAbsoluteEncoder()) {
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
-        uint32_t position_iu
-            = motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(
-                initial_absolute_position_);
+        uint32_t position_iu = motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(initial_absolute_position_);
 
         if (operational_check) {
-            if (!motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsIU(
-                    position_iu)) {
-                throw error::HardwareException(
-                    error::ErrorType::OUTSIDE_HARD_LIMITS,
+            if (!motor_controller_->getAbsoluteEncoder()->isWithinHardLimitsIU(position_iu)) {
+                throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
                     "Joint %s is outside hard limits, value is %d, limits are "
                     "[%d, "
                     "%d]",
-                    name_.c_str(), position_iu,
-                    motor_controller_->getAbsoluteEncoder()
-                        ->getLowerHardLimitIU(),
-                    motor_controller_->getAbsoluteEncoder()
-                        ->getUpperHardLimitIU());
+                    name_.c_str(), position_iu, motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
+                    motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
             }
         }
         position_ = initial_absolute_position_;
@@ -141,17 +128,14 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
          * use that value This would give us a new joint position of 0.25
          */
         if (motor_controller_->isIncrementalEncoderMorePrecise()) {
-            double new_incremental_position
-                = motor_controller_->getIncrementalPosition();
-            position_ = initial_absolute_position_
-                + (new_incremental_position - initial_incremental_position_);
+            double new_incremental_position = motor_controller_->getIncrementalPosition();
+            position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
         } else {
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
     } else {
-        ROS_WARN("Data was not updated within %.3fs, using old data",
-            elapsed_time.toSec());
+        ROS_WARN("Data was not updated within %.3fs, using old data", elapsed_time.toSec());
     }
 }
 
@@ -204,8 +188,7 @@ std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
     if (hasTemperatureGES()) {
         return temperature_ges_;
     } else {
-        throw error::HardwareException(
-            error::ErrorType::MISSING_TEMPERATURE_GES,
+        throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
             "Cannot get TemperatureGES of a Joint that does not have a "
             "TemperatureGES");
     }

@@ -32,8 +32,7 @@ typedef typename Segment::State State;
 // Create the HardwareInterfaceAdapter class that handles the initializing,
 // starting, updating and stopping of the controller
 template <>
-class HardwareInterfaceAdapter<hardware_interface::EffortJointInterface,
-    joint_trajectory_controller::State> {
+class HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State> {
 public:
     HardwareInterfaceAdapter()
         : joint_handles_ptr_(nullptr)
@@ -44,8 +43,7 @@ public:
      * \brief Initialize the controller by establishing the pointer to the
      * joints
      */
-    bool init(std::vector<hardware_interface::JointHandle>& joint_handles,
-        ros::NodeHandle& nh);
+    bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh);
 
     /**
      * \brief Starts the controller by checking if the joint handle pointer is
@@ -60,8 +58,7 @@ public:
      * topic
      */
     void updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-        const std::vector<
-            joint_trajectory_controller::State>& /*desired_states*/,
+        const std::vector<joint_trajectory_controller::State>& /*desired_states*/,
         const joint_trajectory_controller::State& state_error);
 
     /** old updatecommand from mpc things
@@ -88,8 +85,7 @@ private:
 };
 
 // Assign an alias to the class definition
-typedef HardwareInterfaceAdapter<hardware_interface::EffortJointInterface,
-    joint_trajectory_controller::State>
+typedef HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State>
     TemplateControllerInterface;
 
 #endif // MARCH_HARDWARE_TRAJECTORY_TEMPLATE_H

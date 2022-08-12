@@ -9,9 +9,7 @@
 class MockSlave : public march::Slave {
 public:
     MockSlave()
-        : Slave(/*slave_index=*/1, std::make_shared<MockPdoInterface>(),
-            std::make_shared<MockSdoInterface>()) {};
-    MockSlave(const MockPdoInterfacePtr& mock_pdo,
-        const MockSdoInterfacePtr& mock_sdo)
+        : Slave(/*slave_index=*/1, std::make_shared<MockPdoInterface>(), std::make_shared<MockSdoInterface>()) {};
+    MockSlave(const MockPdoInterfacePtr& mock_pdo, const MockSdoInterfacePtr& mock_sdo)
         : Slave(/*slave_index=*/1, mock_pdo, mock_sdo) {};
 };

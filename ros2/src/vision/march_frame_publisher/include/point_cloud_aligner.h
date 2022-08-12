@@ -21,8 +21,7 @@ public:
 
     void alignPointCloud();
 
-    rcl_interfaces::msg::SetParametersResult parametersCallback(
-        const std::vector<rclcpp::Parameter>& parameters);
+    rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters);
 
 protected:
     FramePublisher* n_;
@@ -30,8 +29,7 @@ protected:
 
     rclcpp::CallbackGroup::SharedPtr callback_group_;
 
-    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr
-        point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr point_subscriber_;
 
     geometry_msgs::msg::Point last_point_;
     int point_count_;
@@ -51,8 +49,7 @@ protected:
 
     double computeAverageHeight(double angle);
 
-    void pointCallback(
-        const march_shared_msgs::msg::FootPosition::SharedPtr msg);
+    void pointCallback(const march_shared_msgs::msg::FootPosition::SharedPtr msg);
 
     void parameterUpdatedLogger(const rclcpp::Parameter& param);
 };

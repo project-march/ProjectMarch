@@ -22,8 +22,7 @@ using Point = pcl::PointXYZ;
  * @param destination reference of array where the result is stored
  */
 template <std::size_t K, std::size_t W, std::size_t H>
-void convolve2D(const std::array<std::array<double, K>, K>& kernel,
-    const std::array<std::array<double, W>, H>& source,
+void convolve2D(const std::array<std::array<double, K>, K>& kernel, const std::array<std::array<double, W>, H>& source,
     std::array<std::array<double, W>, H>& destination)
 {
     for (int i = K / 2; i < H - K / 2; i++) {
@@ -46,13 +45,11 @@ void convolve2D(const std::array<std::array<double, K>, K>& kernel,
  * @param destination reference of array where the result is stored
  */
 template <std::size_t W, std::size_t H>
-void convolveGaussianKernel(const std::array<std::array<double, W>, H>& source,
-    std::array<std::array<double, W>, H>& destination)
+void convolveGaussianKernel(
+    const std::array<std::array<double, W>, H>& source, std::array<std::array<double, W>, H>& destination)
 {
-    std::array<std::array<double, 3>, 3> gaussian = {
-        { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 },
-            { 1.0 / 16, 2.0 / 16, 1.0 / 16 } }
-    };
+    std::array<std::array<double, 3>, 3> gaussian
+        = { { { 1.0 / 16, 2.0 / 16, 1.0 / 16 }, { 2.0 / 16, 4.0 / 16, 2.0 / 16 }, { 1.0 / 16, 2.0 / 16, 1.0 / 16 } } };
 
     convolve2D(gaussian, source, destination);
 }
@@ -64,12 +61,11 @@ void convolveGaussianKernel(const std::array<std::array<double, W>, H>& source,
  * @param destination reference of array where the result is stored
  */
 template <std::size_t W, std::size_t H>
-void convolveLaplacianKernel(const std::array<std::array<double, W>, H>& source,
-    std::array<std::array<double, W>, H>& destination)
+void convolveLaplacianKernel(
+    const std::array<std::array<double, W>, H>& source, std::array<std::array<double, W>, H>& destination)
 {
     std::array<std::array<double, 3>, 3> laplacian
-        = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 },
-            { 1 / 6.0, 4 / 6.0, 1 / 6.0 } } };
+        = { { { 1 / 6.0, 4 / 6.0, 1 / 6.0 }, { 4 / 6.0, -20 / 6.0, 4 / 6.0 }, { 1 / 6.0, 4 / 6.0, 1 / 6.0 } } };
 
     convolve2D(laplacian, source, destination);
 }
@@ -177,8 +173,8 @@ inline Point subtractPoints(const Point& p1, const Point& p2)
  */
 inline bool validatePoint(const Point& p)
 {
-    return (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z)
-        && std::abs(p.x) < 1.0 && std::abs(p.y) < 0.7 && std::abs(p.z) < 0.5);
+    return (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z) && std::abs(p.x) < 1.0 && std::abs(p.y) < 0.7
+        && std::abs(p.z) < 0.5);
 }
 
 } // namespace marchMathUtilities

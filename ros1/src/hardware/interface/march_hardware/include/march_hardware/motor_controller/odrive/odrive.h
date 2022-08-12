@@ -38,10 +38,9 @@ public:
      * operate
      * @throws error::HardwareException When an absolute encoder is nullptr.
      */
-    ODrive(const Slave& slave, ODriveAxis axis,
-        std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        ActuationMode actuation_mode, bool index_found, unsigned int motor_kv);
+    ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode, bool index_found,
+        unsigned int motor_kv);
 
     ~ODrive() noexcept override = default;
 

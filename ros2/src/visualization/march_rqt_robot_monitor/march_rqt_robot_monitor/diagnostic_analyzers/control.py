@@ -5,7 +5,7 @@ from typing import Optional, List
 from diagnostic_msgs.msg import DiagnosticStatus
 from rclpy.node import Node
 
-from march_utility.utilities.node_utils import get_robot_urdf_from_service
+from march_utility.utilities.node_utils import on_urdf_online
 from rclpy.time import Time
 from sensor_msgs.msg import JointState
 from urdf_parser_py import urdf
@@ -32,9 +32,11 @@ class CheckJointValues:
         self._velocity_limits = {}
         self._effort_limits = {}
 
-        robot = get_robot_urdf_from_service(node)
-        for joint in robot.joints:
-            self.set_joint_limits(joint)
+        def update_joint_limits(robot):
+            for joint in robot.joints:
+                self.set_joint_limits(joint)
+
+        on_urdf_online(node, update_joint_limits)
 
     def set_joint_limits(self, joint: urdf.Joint):
         """Set the joint limits for a joint.

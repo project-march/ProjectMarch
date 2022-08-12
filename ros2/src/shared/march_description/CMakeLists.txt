@@ -30,6 +30,9 @@ set(XACRO_FILES
     urdf/march7.xacro
 )
 
+# Without this the package link of stl files in gazebo doesn't work
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/env-hooks/${PROJECT_NAME}.dsv.in")
+
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 
 build_and_install_xacro_files(${XACRO_FILES})

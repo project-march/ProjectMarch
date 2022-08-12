@@ -14,8 +14,7 @@ const double DEFAULT_TEMPERATURE_THRESHOLD { 40.0 };
 const int DEFAULT_SEND_ERRORS_INTERVAL { 1000 };
 
 const std::map<ThresholdType, std::string> THRESHOLD_NAMES
-    = { { FATAL, /*__y=*/"fatal" }, { NON_FATAL, /*__y=*/"non_fatal" },
-          { WARNING, /*__y=*/"warning" } };
+    = { { FATAL, /*__y=*/"fatal" }, { NON_FATAL, /*__y=*/"non_fatal" }, { WARNING, /*__y=*/"warning" } };
 
 // TODO(@Tim) Throw an exception when no temperatures are published.
 /**
@@ -25,21 +24,18 @@ const std::map<ThresholdType, std::string> THRESHOLD_NAMES
  *          Set all temperature thresholds.
  *          Create temperature subscribers.
  */
-TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node,
-    std::shared_ptr<SafetyHandler> safety_handler)
+TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler)
     : node_(std::move(node))
     , safety_handler_(std::move(safety_handler))
     , send_errors_interval_(/*nanoseconds=*/0)
     , default_temperature_threshold_(DEFAULT_TEMPERATURE_THRESHOLD)
 {
-    node_->get_parameter_or("default_temperature_threshold",
-        default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);
+    node_->get_parameter_or(
+        "default_temperature_threshold", default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);
 
     int send_errors_interval_ms;
-    node_->get_parameter_or("send_errors_interval", send_errors_interval_ms,
-        DEFAULT_SEND_ERRORS_INTERVAL);
-    send_errors_interval_
-        = rclcpp::Duration(std::chrono::milliseconds(send_errors_interval_ms));
+    node_->get_parameter_or("send_errors_interval", send_errors_interval_ms, DEFAULT_SEND_ERRORS_INTERVAL);
+    send_errors_interval_ = rclcpp::Duration(std::chrono::milliseconds(send_errors_interval_ms));
 
     time_last_send_error_ = node_->get_clock()->now() - send_errors_interval_;
 
@@ -56,16 +52,14 @@ void TemperatureSafety::setTemperatureThresholds()
         ThresholdHoldsMap thresholds_map;
         for (const std::string& joint : node_->joint_names) {
             double threshold_value;
-            std::string parameter_name
-                = "temperature_thresholds_" + type.second + "." + joint;
+            std::string parameter_name = "temperature_thresholds_" + type.second + "." + joint;
 
-            bool parameter_is_set = node_->get_parameter_or(parameter_name,
-                threshold_value, default_temperature_threshold_);
+            bool parameter_is_set
+                = node_->get_parameter_or(parameter_name, threshold_value, default_temperature_threshold_);
             thresholds_map.insert({ joint, threshold_value });
 
             if (!parameter_is_set) {
-                node_->declare_parameter(
-                    parameter_name, default_temperature_threshold_);
+                node_->declare_parameter(parameter_name, default_temperature_threshold_);
             }
         }
         thresholds_maps_.insert({ type.first, thresholds_map });
@@ -79,18 +73,15 @@ void TemperatureSafety::setTemperatureThresholds()
  * @details This callback checks if the temperature values do not exceed the
  * defined threshold.
  */
-void TemperatureSafety::temperatureCallback(
-    const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name)
+void TemperatureSafety::temperatureCallback(const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name)
 {
     // Send at most an error every 'send_errors_interval_'
-    if (node_->get_clock()->now()
-        <= (time_last_send_error_ + send_errors_interval_)) {
+    if (node_->get_clock()->now() <= (time_last_send_error_ + send_errors_interval_)) {
         return;
     }
 
     double temperature = msg->temperature;
-    if (temperature
-        <= getThreshold(sensor_name, thresholds_maps_.at(WARNING))) {
+    if (temperature <= getThreshold(sensor_name, thresholds_maps_.at(WARNING))) {
         return;
     }
 
@@ -107,11 +98,9 @@ void TemperatureSafety::temperatureCallback(
     // If the threshold is exceeded raise an error
     if (temperature > getThreshold(sensor_name, thresholds_maps_.at(FATAL))) {
         safety_handler_->publishFatal(error_message);
-    } else if (temperature
-        > getThreshold(sensor_name, thresholds_maps_.at(NON_FATAL))) {
+    } else if (temperature > getThreshold(sensor_name, thresholds_maps_.at(NON_FATAL))) {
         safety_handler_->publishNonFatal(error_message);
-    } else if (temperature
-        > getThreshold(sensor_name, thresholds_maps_.at(WARNING))) {
+    } else if (temperature > getThreshold(sensor_name, thresholds_maps_.at(WARNING))) {
         RCLCPP_WARN(node_->get_logger(), "%s", error_message.c_str());
     }
 }
@@ -121,8 +110,7 @@ void TemperatureSafety::temperatureCallback(
  * @param temperature Temperature that is published.
  * @param sensor_name Joint to which the temperature belongs.
  */
-std::string TemperatureSafety::getErrorMessage(
-    double temperature, const std::string& sensor_name)
+std::string TemperatureSafety::getErrorMessage(double temperature, const std::string& sensor_name)
 {
     std::ostringstream message_stream;
     message_stream << sensor_name << " temperature too high: " << temperature;
@@ -136,17 +124,14 @@ std::string TemperatureSafety::getErrorMessage(
  * @param sensor_name Joint to get temperature threshold of.
  * @param temperature_thresholds_map thresholdsmap to look for joint name.
  */
-double TemperatureSafety::getThreshold(const std::string& sensor_name,
-    ThresholdHoldsMap temperature_thresholds_map)
+double TemperatureSafety::getThreshold(const std::string& sensor_name, ThresholdHoldsMap temperature_thresholds_map)
 {
-    if (temperature_thresholds_map.find(sensor_name)
-        != temperature_thresholds_map.end()) {
+    if (temperature_thresholds_map.find(sensor_name) != temperature_thresholds_map.end()) {
         // Return specific defined threshold for this sensor
         return temperature_thresholds_map[sensor_name];
     } else {
         // Fall back to default if there is no defined threshold
-        RCLCPP_WARN_ONCE(node_->get_logger(),
-            "There is a specific temperature threshold missing for %s sensor",
+        RCLCPP_WARN_ONCE(node_->get_logger(), "There is a specific temperature threshold missing for %s sensor",
             sensor_name.c_str());
         return default_temperature_threshold_;
     }
@@ -167,8 +152,7 @@ void TemperatureSafety::createSubscribers()
                   temperatureCallback(msg, joint_name);
               };
         auto subscriber_temperature
-            = node_->create_subscription<TemperatureMsg>(
-                "/march/temperature/" + joint_name, 1000, callback);
+            = node_->create_subscription<TemperatureMsg>("/march/temperature/" + joint_name, 1000, callback);
 
         temperature_subscribers_.push_back(subscriber_temperature);
     }

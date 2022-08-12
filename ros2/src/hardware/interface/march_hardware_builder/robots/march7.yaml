@@ -1,0 +1,199 @@
+# For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
+# TODO: Add pressure soles to this .yaml file
+# TODO: Add PDB to this .yaml files
+# TODO: Make sure slaveIndexes are correct
+# TODO: Update netNumbers if necessary
+# linear: 16384
+# rotational: 1048576
+march7:
+  if_name: enp2s0f0
+  ecatCycleTime: 8
+  ecatSlaveTimeout: 200
+  joints:
+    - left_ankle:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 3
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 3607  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 5957  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 4992
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
+
+    - left_hip_aa:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 4
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 9360  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 10392  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 9864
+            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            countsPerRotation: 6400
+            transmission: 240
+            direction: 1
+
+    - left_hip_fe:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 4
+          axis: 0
+          motorKV: 95
+#          indexFound: true
+          absoluteEncoder:
+            direction: 1
+            resolution: 20
+            minPositionIU: 90080  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 453920  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 153088
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 121
+
+    - left_knee:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 3
+          axis: 0
+          motorKV: 95
+#          indexFound: true
+          absoluteEncoder:
+            direction: -1
+            resolution: 20
+            minPositionIU: 485856  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 836080  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 502976
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            direction: -1
+            resolution: 12
+            transmission: 121
+
+    - right_ankle:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 2
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: -1
+            minPositionIU: 5772  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 7988  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 7179 #9205
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            resolution: 13
+            transmission: 236
+            direction: -1
+
+    - right_hip_aa:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 5
+          axis: 1
+          motorKV: 355
+#          indexFound: true
+          absoluteEncoder:
+            resolution: 14
+            direction: -1
+            minPositionIU: 3973  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 5009  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 4418
+            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            countsPerRotation: 6400
+            transmission: 240
+            direction: 1
+
+    - right_hip_fe:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 5
+          axis: 0
+          motorKV: 95
+#          indexFound: true
+          absoluteEncoder:
+            direction: -1
+            resolution: 20
+            minPositionIU: 426704  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 798624  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 495792
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            direction: -1
+            resolution: 12
+            transmission: 121
+
+    - right_knee:
+        motor_controller:
+          type: odrive
+          actuationMode: torque
+          slaveIndex: 2
+          axis: 0
+          preCalibrated: false
+          motorKV: 95
+#          indexFound: true
+          absoluteEncoder:
+            direction: 1
+            resolution: 20
+            minPositionIU: 531696  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            maxPositionIU: 882560  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 548304
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 121
+  power_distribution_board:
+    slaveIndex: 1
+    byteOffset: 0

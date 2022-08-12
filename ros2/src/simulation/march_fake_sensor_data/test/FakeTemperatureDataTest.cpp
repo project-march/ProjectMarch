@@ -10,8 +10,7 @@ protected:
     {
         rclcpp::init(/*argc=*/0, /*argv=*/nullptr);
         std::vector<float> weights = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
-        node = new FakeTemperatureDataNode { "march_fake_temperature_node",
-            std::move(weights) };
+        node = new FakeTemperatureDataNode { "march_fake_temperature_node", std::move(weights) };
     }
 
     void TearDown() override
@@ -75,20 +74,16 @@ TEST_F(FakeTemperatureDataNodeTest, test_autoregression)
         EXPECT_GE((*node).calculate_autoregression_temperature(), 0.4 * -bound);
         (*node).generate_new_temperature();
         EXPECT_LE((*node).calculate_autoregression_temperature(), 0.55 * bound);
-        EXPECT_GE(
-            (*node).calculate_autoregression_temperature(), 0.55 * -bound);
+        EXPECT_GE((*node).calculate_autoregression_temperature(), 0.55 * -bound);
         (*node).generate_new_temperature();
         EXPECT_LE((*node).calculate_autoregression_temperature(), 0.70 * bound);
-        EXPECT_GE(
-            (*node).calculate_autoregression_temperature(), 0.70 * -bound);
+        EXPECT_GE((*node).calculate_autoregression_temperature(), 0.70 * -bound);
         (*node).generate_new_temperature();
         EXPECT_LE((*node).calculate_autoregression_temperature(), 0.80 * bound);
-        EXPECT_GE(
-            (*node).calculate_autoregression_temperature(), 0.80 * -bound);
+        EXPECT_GE((*node).calculate_autoregression_temperature(), 0.80 * -bound);
         (*node).generate_new_temperature();
         EXPECT_LE((*node).calculate_autoregression_temperature(), 0.90 * bound);
-        EXPECT_GE(
-            (*node).calculate_autoregression_temperature(), 0.90 * -bound);
+        EXPECT_GE((*node).calculate_autoregression_temperature(), 0.90 * -bound);
         (*node).generate_new_temperature();
         EXPECT_LE((*node).calculate_autoregression_temperature(), bound);
         EXPECT_GE((*node).calculate_autoregression_temperature(), -bound);

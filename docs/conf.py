@@ -77,7 +77,7 @@ extlinks = {
     "input-device": (gitlab_root + "input-device/-/tree/main/%s", ""),
     "march": (gitlab_root + ros1_src + "%s", ""),
     "monitor": (gitlab_root + ros1_src + "march_monitor/%s", ""),
-    "simulation": (gitlab_root + ros1_src + "march_simulation/%s", ""),
+    "simulation": (gitlab_root + ros1_src + "march_simulation_cpp/%s", ""),
     "gait-files": (gitlab_root + ros1_src + "march_gait_files/%s", ""),
     "ethercat-slaves": (gitlab_root + "ethercat-slaves/-/tree/main/%s", ""),
     "gait-generation": (gitlab_root + ros1_src + "march_rqt_gait_generator/%s", ""),

@@ -24,12 +24,9 @@ class HullFinder {
 public:
     explicit HullFinder(bool debugging);
     // This function is required to be implemented by any plane finder
-    virtual bool findHulls(PointCloud::Ptr pointcloud,
-        Normals::Ptr normal_pointcloud,
-        boost::shared_ptr<PointsVector> points_vector,
-        boost::shared_ptr<NormalsVector> normals_vector,
-        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
-        boost::shared_ptr<HullVector> hull_vector,
+    virtual bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
+        boost::shared_ptr<PointsVector> points_vector, boost::shared_ptr<NormalsVector> normals_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector, boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector)
         = 0;
 
@@ -38,9 +35,7 @@ public:
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
      */
-    virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
-        = 0;
+    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig& config) = 0;
 
 protected:
     PointCloud::Ptr pointcloud_;
@@ -60,17 +55,14 @@ public:
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
     bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
-        boost::shared_ptr<PointsVector> points_vector,
-        boost::shared_ptr<NormalsVector> normals_vector,
-        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
-        boost::shared_ptr<HullVector> hull_vector,
+        boost::shared_ptr<PointsVector> points_vector, boost::shared_ptr<NormalsVector> normals_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector, boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector) override;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
      */
-    void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig& config) override;
 
 protected:
     // Convert a region into a convex or concave hull
@@ -93,8 +85,7 @@ protected:
     void addCHullToVector();
 
     // Calculate the average normal and point of a region
-    bool getAveragePointAndNormal(std::vector<double>& average_point,
-        std::vector<double>& average_normal);
+    bool getAveragePointAndNormal(std::vector<double>& average_point, std::vector<double>& average_normal);
 
     bool convex {};
     double alpha {};

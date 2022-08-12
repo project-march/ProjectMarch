@@ -47,20 +47,15 @@ private:
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr align_service_;
     std::shared_ptr<rclcpp::SyncParametersClient> vision_parameter_client_;
 
-    rclcpp::Client<rcl_interfaces::srv::GetParameters>::SharedPtr
-        get_threshold_client_;
-    rclcpp::Client<rcl_interfaces::srv::SetParameters>::SharedPtr
-        set_threshold_client_;
+    rclcpp::Client<rcl_interfaces::srv::GetParameters>::SharedPtr get_threshold_client_;
+    rclcpp::Client<rcl_interfaces::srv::SetParameters>::SharedPtr set_threshold_client_;
 
     rclcpp::TimerBase::SharedPtr publish_timer_;
 
     std::string robot_properties_path
-        = ament_index_cpp::get_package_share_directory("march_description")
-        + "/urdf/properties/properties_march7.yaml";
+        = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/properties/properties_march7.yaml";
     YAML::Node robot_properties = YAML::LoadFile(robot_properties_path);
-    const double TRANS_X
-        = -robot_properties["dimensions"]["foot"]["height_forward"]
-               .as<double>();
+    const double TRANS_X = -robot_properties["dimensions"]["foot"]["height_forward"].as<double>();
     const double TRANS_Z = -0.025;
 
     geometry_msgs::msg::TransformStamped trans_left_;
@@ -83,8 +78,7 @@ private:
 
     OnSetParametersCallbackHandle::SharedPtr callback_handle_;
 
-    rcl_interfaces::msg::SetParametersResult parametersCallback(
-        const std::vector<rclcpp::Parameter>& parameters);
+    rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters);
 
     void parameterUpdatedLogger(const rclcpp::Parameter& param);
 
@@ -94,8 +88,7 @@ private:
 
     void alignCamerasCallback();
 
-    void alignCameras(
-        const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+    void alignCameras(const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
         const std::shared_ptr<std_srvs::srv::Trigger::Response> response);
 
     double getHeightZeroThreshold();

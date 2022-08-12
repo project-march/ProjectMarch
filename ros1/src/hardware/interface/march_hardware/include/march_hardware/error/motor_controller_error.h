@@ -22,45 +22,34 @@ namespace error {
     };
 
     const size_t IMOTIONCUBE_MOTION_ERRORS_SIZE = 16;
-    extern const std::array<std::string, IMOTIONCUBE_MOTION_ERRORS_SIZE>
-        IMOTIONCUBE_MOTION_ERRORS;
+    extern const std::array<std::string, IMOTIONCUBE_MOTION_ERRORS_SIZE> IMOTIONCUBE_MOTION_ERRORS;
 
     const size_t IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE = 9;
-    extern const std::array<std::string,
-        IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE>
-        IMOTIONCUBE_DETAILED_MOTION_ERRORS;
+    extern const std::array<std::string, IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE> IMOTIONCUBE_DETAILED_MOTION_ERRORS;
 
     const size_t IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE = 7;
-    extern const std::array<std::string,
-        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE>
+    extern const std::array<std::string, IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE>
         IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS;
 
     const size_t ODRIVE_AXIS_ERRORS_SIZE = 8;
-    extern const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE>
-        ODRIVE_AXIS_ERRORS;
+    extern const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE> ODRIVE_AXIS_ERRORS;
 
     const size_t ODRIVE_MOTOR_ERRORS_SIZE = 27;
-    extern const std::array<std::string, ODRIVE_MOTOR_ERRORS_SIZE>
-        ODRIVE_MOTOR_ERRORS;
+    extern const std::array<std::string, ODRIVE_MOTOR_ERRORS_SIZE> ODRIVE_MOTOR_ERRORS;
 
     const size_t ODRIVE_ENCODER_ERRORS_SIZE = 10;
-    extern const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE>
-        ODRIVE_ENCODER_ERRORS;
+    extern const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE> ODRIVE_ENCODER_ERRORS;
 
     const size_t ODRIVE_DIEBOSLAVE_ERRORS_SIZE = 9;
-    extern const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE>
-        ODRIVE_DIEBOSLAVE_ERRORS;
+    extern const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE> ODRIVE_DIEBOSLAVE_ERRORS;
 
     const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 8;
-    extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE>
-        ODRIVE_CONTROLLER_ERRORS;
+    extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS;
 
     // Add an error type to the description
-    void addErrorToDescription(
-        size_t index, ErrorRegister error_register, std::string& description);
+    void addErrorToDescription(size_t index, ErrorRegister error_register, std::string& description);
 
-    template <typename T>
-    std::string parseError(T error, ErrorRegister error_register)
+    template <typename T> std::string parseError(T error, ErrorRegister error_register)
     {
         // TODO: constraint template types
         // https://gitlab.com/project-march/march/-/issues/982

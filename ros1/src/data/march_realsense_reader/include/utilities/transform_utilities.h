@@ -15,8 +15,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class Transformer {
 public:
-    explicit Transformer(std::shared_ptr<tf2_ros::Buffer> tfBuffer,
-        std::string frame_id_to_transform_to,
+    explicit Transformer(std::shared_ptr<tf2_ros::Buffer> tfBuffer, std::string frame_id_to_transform_to,
         std::string fixed_frame = "world");
 
     void transformPointCloud(const PointCloud::Ptr& cloud);

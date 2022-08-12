@@ -19,33 +19,28 @@ enum ThresholdType { FATAL, NON_FATAL, WARNING };
 
 class TemperatureSafety : public SafetyType {
     using TemperatureMsg = sensor_msgs::msg::Temperature;
-    using TemperatureSubscription
-        = rclcpp::Subscription<TemperatureMsg>::SharedPtr;
+    using TemperatureSubscription = rclcpp::Subscription<TemperatureMsg>::SharedPtr;
     using ThresholdHoldsMap = std::map<std::string, double>;
 
 public:
-    TemperatureSafety(std::shared_ptr<SafetyNode> node,
-        std::shared_ptr<SafetyHandler> safety_handler);
+    TemperatureSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler);
 
     void update() override {};
 
 private:
     // Callback for when a temperature is published.
-    void temperatureCallback(
-        const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name);
+    void temperatureCallback(const TemperatureMsg::SharedPtr& msg, const std::string& sensor_name);
 
     // Create a subscriber for each joint on the /march/temperature/<joint>
     // topic
     void createSubscribers();
 
     // Create an error string for when a temperature is too high.
-    std::string getErrorMessage(
-        double temperature, const std::string& sensor_name);
+    std::string getErrorMessage(double temperature, const std::string& sensor_name);
 
     // Get the threshold of a joint in a thresholdsmap. If there is none, fall
     // back to the default.
-    double getThreshold(const std::string& sensor_name,
-        ThresholdHoldsMap temperature_thresholds_map);
+    double getThreshold(const std::string& sensor_name, ThresholdHoldsMap temperature_thresholds_map);
 
     // Set all temperature thresholds.
     void setTemperatureThresholds();

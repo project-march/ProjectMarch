@@ -59,32 +59,26 @@ void ModelPredictiveController::setInitialState(std::vector<double>& x0)
     std::copy(x0.begin(), x0.end(), std::begin(acadoVariables.x0));
 }
 
-void ModelPredictiveController::setRunningReference(
-    const std::vector<double>& reference)
+void ModelPredictiveController::setRunningReference(const std::vector<double>& reference)
 {
     // check if size of reference is equal to the size of acadoVariables.y
-    if (reference.size()
-        != sizeof(acadoVariables.y) / sizeof(acadoVariables.y[0])) {
-        ROS_WARN_STREAM_ONCE(
-            "The \"running\" reference vector has an incorrect size");
+    if (reference.size() != sizeof(acadoVariables.y) / sizeof(acadoVariables.y[0])) {
+        ROS_WARN_STREAM_ONCE("The \"running\" reference vector has an incorrect size");
     }
 
     // copy the reference vector to the acadoVariables.y array
     std::copy(reference.begin(), reference.end(), std::begin(acadoVariables.y));
 }
 
-void ModelPredictiveController::setEndReference(
-    const std::vector<double>& end_reference)
+void ModelPredictiveController::setEndReference(const std::vector<double>& end_reference)
 {
     // check if size of end_reference is equal to the size of acadoVariables.yN
     if (end_reference.size() != ACADO_NYN) {
-        ROS_WARN_STREAM_ONCE(
-            "The \"end\" reference vector has an incorrect size");
+        ROS_WARN_STREAM_ONCE("The \"end\" reference vector has an incorrect size");
     }
 
     // copy the end_reference vector to the acadoVariables.yN array
-    std::copy(end_reference.begin(), end_reference.end(),
-        std::begin(acadoVariables.yN));
+    std::copy(end_reference.begin(), end_reference.end(), std::begin(acadoVariables.yN));
 }
 
 void ModelPredictiveController::shiftStatesAndControl()
@@ -109,12 +103,10 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
 void ModelPredictiveController::controllerDiagnosis()
 {
     // Check acado_preparationStep() status code
-    ROS_WARN_STREAM_COND(preparationStepStatus != 0,
-        "MPC_PREP, " << acado_getErrorString(preparationStepStatus));
+    ROS_WARN_STREAM_COND(preparationStepStatus != 0, "MPC_PREP, " << acado_getErrorString(preparationStepStatus));
 
     // Check acado_feedbackStep() status code
-    ROS_WARN_STREAM_COND(feedbackStepStatus != 0,
-        "MPC_FEEDBACK, " << acado_getErrorString(feedbackStepStatus));
+    ROS_WARN_STREAM_COND(feedbackStepStatus != 0, "MPC_FEEDBACK, " << acado_getErrorString(feedbackStepStatus));
 }
 
 std::vector<double> ModelPredictiveController::calculateControlInput()
@@ -136,8 +128,7 @@ std::vector<double> ModelPredictiveController::calculateControlInput()
     controllerDiagnosis();
 
     // get command
-    command.assign(
-        std::begin(acadoVariables.u), std::begin(acadoVariables.u) + ACADO_NU);
+    command.assign(std::begin(acadoVariables.u), std::begin(acadoVariables.u) + ACADO_NU);
 
     // return command
     return command;

@@ -28,8 +28,7 @@ using NormalCloud = pcl::PointCloud<Normal>;
  * @param buffer ROS transform buffer.
  */
 Preprocessor::Preprocessor(rclcpp::Node* n, std::string& left_or_right,
-    std::shared_ptr<tf2_ros::TransformListener>& listener,
-    std::shared_ptr<tf2_ros::Buffer>& buffer)
+    std::shared_ptr<tf2_ros::TransformListener>& listener, std::shared_ptr<tf2_ros::Buffer>& buffer)
     : n_ { n }
     , tf_buffer_ { buffer }
     , tf_listener_ { listener }
@@ -55,8 +54,7 @@ void Preprocessor::preprocess(const PointCloud::Ptr& pointcloud)
  * @param pointcloud Pointcloud to downsample.
  * @param voxel_size cell size of the voxel grid
  */
-void Preprocessor::voxelDownSample(
-    const PointCloud::Ptr& pointcloud, float voxel_size)
+void Preprocessor::voxelDownSample(const PointCloud::Ptr& pointcloud, float voxel_size)
 {
     pcl::VoxelGrid<Point> voxel_grid;
     voxel_grid.setInputCloud(pointcloud);
@@ -70,12 +68,10 @@ void Preprocessor::voxelDownSample(
  *
  * @param pointcloud Pointcloud to transform.
  */
-void Preprocessor::transformPointCloudToBaseframe(
-    const PointCloud::Ptr& pointcloud)
+void Preprocessor::transformPointCloudToBaseframe(const PointCloud::Ptr& pointcloud)
 {
     try {
-        transform_ = tf_buffer_->lookupTransform(
-            base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
+        transform_ = tf_buffer_->lookupTransform(base_frame_, pointcloud_frame_id_, tf2::TimePointZero);
 
         Eigen::Matrix<double, 3, 1> translation;
         Eigen::Quaternion<double> rotation;
@@ -83,13 +79,11 @@ void Preprocessor::transformPointCloudToBaseframe(
         tf2::fromMsg(transform_.transform.translation, translation);
         tf2::fromMsg(transform_.transform.rotation, rotation);
 
-        pcl::transformPointCloud(
-            *pointcloud, *pointcloud, translation, rotation);
+        pcl::transformPointCloud(*pointcloud, *pointcloud, translation, rotation);
         pointcloud->header.frame_id = base_frame_;
 
     } catch (tf2::TransformException& ex) {
         rclcpp::Clock steady_clock(RCL_STEADY_TIME);
-        RCLCPP_WARN_THROTTLE(n_->get_logger(), steady_clock, 4000,
-            "Could not transform pointcloud: %s", ex.what());
+        RCLCPP_WARN_THROTTLE(n_->get_logger(), steady_clock, 4000, "Could not transform pointcloud: %s", ex.what());
     }
 }

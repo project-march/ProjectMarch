@@ -47,8 +47,7 @@ NormalsPreprocessor::NormalsPreprocessor(bool debugging)
 
 // Removes points from a pointcloud (and optionally the corresponding
 // pointcloud_normals as well) at given indices
-void Preprocessor::removePointsFromIndices(
-    const pcl::PointIndices::Ptr& indices_to_remove, const bool& remove_normals)
+void Preprocessor::removePointsFromIndices(const pcl::PointIndices::Ptr& indices_to_remove, const bool& remove_normals)
 {
     pcl::ExtractIndices<pcl::PointXYZ> extract_points;
     extract_points.setInputCloud(pointcloud_);
@@ -64,17 +63,15 @@ void Preprocessor::removePointsFromIndices(
     }
 }
 
-bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals, RealSenseCategory const realsense_category,
-    std::string frame_id_to_transform_to)
+bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+    RealSenseCategory const realsense_category, std::string frame_id_to_transform_to)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
     realsense_category_.emplace(realsense_category);
 
-    ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: "
-        << pointcloud_->points.size());
+    ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 
     clock_t start_preprocess = clock();
 
@@ -101,25 +98,20 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
         ROS_ERROR_STREAM("The number of points in pointcloud and "
                          "pointcloud_normals is not equal after preprocessing. "
             << "Points in pointcloud: " << pointcloud_->points.size()
-            << " Points in pointcloud_normals: "
-            << pointcloud_normals_->points.size());
+            << " Points in pointcloud_normals: " << pointcloud_normals_->points.size());
         return false;
     }
 
-    double time_taken
-        = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
-    ROS_DEBUG_STREAM("Time taken by pointcloud pre-processor is : "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
-        << std::endl);
+    double time_taken = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
+    ROS_DEBUG_STREAM("Time taken by pointcloud pre-processor is : " << std::fixed << time_taken << std::setprecision(5)
+                                                                    << " sec " << std::endl);
 
-    ROS_DEBUG_STREAM("Finished preprocessing. Pointcloud size: "
-        << pointcloud_->points.size());
+    ROS_DEBUG_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
 
     return success;
 }
 
-void NormalsPreprocessor::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig& config)
 {
     // Downsampling parameters
     voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
@@ -129,18 +121,13 @@ void NormalsPreprocessor::readParameters(
 
     // Distance Filter parameters
     maximum_distance_threshold = config.preprocessor_maximum_distance_threshold;
-    minimum_distance_threshold_x
-        = config.preprocessor_minimum_distance_threshold_x;
-    minimum_distance_threshold_y
-        = config.preprocessor_minimum_distance_threshold_y;
-    minimum_distance_threshold_z
-        = config.preprocessor_minimum_distance_threshold_z;
+    minimum_distance_threshold_x = config.preprocessor_minimum_distance_threshold_x;
+    minimum_distance_threshold_y = config.preprocessor_minimum_distance_threshold_y;
+    minimum_distance_threshold_z = config.preprocessor_minimum_distance_threshold_z;
 
     // Normal Estimation parameters
-    use_tree_search_method
-        = config.preprocessor_normal_estimation_use_tree_search_method;
-    number_of_neighbours
-        = config.preprocessor_normal_estimation_number_of_neighbours;
+    use_tree_search_method = config.preprocessor_normal_estimation_use_tree_search_method;
+    number_of_neighbours = config.preprocessor_normal_estimation_number_of_neighbours;
     search_radius = config.preprocessor_normal_estimation_search_radius;
 
     // Normal filter parameters
@@ -150,10 +137,8 @@ void NormalsPreprocessor::readParameters(
 
     // Transformation parameters
     YAML::Node robot_properties
-        = YAML::LoadFile(ros::package::getPath("march_description")
-            + "/urdf/properties/march6.yaml");
-    foot_height
-        = robot_properties["dimensions"]["general"]["width"].as<double>();
+        = YAML::LoadFile(ros::package::getPath("march_description") + "/urdf/properties/properties_march6.yaml");
+    foot_height = robot_properties["dimensions"]["general"]["width"].as<double>();
     debugging_ = config.debug;
 }
 
@@ -178,30 +163,23 @@ bool NormalsPreprocessor::downsample()
 
 // Transform the pointcloud based on the data found on the /tf topic, this is
 // necessary to know the height and distance to the wanted step from the foot.
-bool NormalsPreprocessor::transformPointCloudFromUrdf(
-    geometry_msgs::TransformStamped& transform_stamped)
+bool NormalsPreprocessor::transformPointCloudFromUrdf(geometry_msgs::TransformStamped& transform_stamped)
 {
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-        if (tfBuffer->canTransform("world", pointcloud_frame_id, ros::Time(),
-                ros::Duration(/*t=*/1.0))) {
-            transform_stamped = tfBuffer->lookupTransform(
-                "world", pointcloud_frame_id, ros::Time(/*t=*/0));
+        if (tfBuffer->canTransform("world", pointcloud_frame_id, ros::Time(), ros::Duration(/*t=*/1.0))) {
+            transform_stamped = tfBuffer->lookupTransform("world", pointcloud_frame_id, ros::Time(/*t=*/0));
         }
-        pcl_ros::transformPointCloud(
-            *pointcloud_, *pointcloud_, transform_stamped.transform);
+        pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_, transform_stamped.transform);
     } catch (tf2::TransformException& ex) {
-        ROS_WARN_STREAM(
-            "Something went wrong when transforming the pointcloud: "
-            << ex.what());
+        ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: " << ex.what());
         return false;
     }
     // When transforming to the foot, raise the pointcloud up a bit so that the
     // origin is on the ground If not, assume that the frame id to transform
     // chosen differently on purpose (for example to be the pressure sole which
     // is already on the ground) and do as expected.
-    if (frame_id_to_transform_to_ == "foot_left"
-        || frame_id_to_transform_to_ == "foot_right") {
+    if (frame_id_to_transform_to_ == "foot_left" || frame_id_to_transform_to_ == "foot_right") {
         Eigen::Affine3f transform_matrix = Eigen::Affine3f::Identity();
 
         // Define a translation up of half the height of the foot.
@@ -217,24 +195,19 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
 // Remove all points which are too far or too close to the origin
 bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
-    pcl::PointIndices::Ptr indices_to_remove
-        = boost::make_shared<pcl::PointIndices>();
+    pcl::PointIndices::Ptr indices_to_remove = boost::make_shared<pcl::PointIndices>();
 
     // Removed any point too far from the origin
-    for (int point_index = 0; point_index < pointcloud_->points.size();
-         ++point_index) {
+    for (int point_index = 0; point_index < pointcloud_->points.size(); ++point_index) {
         pcl::PointXYZ point = pointcloud_->points[point_index];
 
         // find the squared distance from the origin
-        float point_distance = sqrt(
-            (point.x * point.x) + (point.y * point.y) + (point.z * point.z));
+        float point_distance = sqrt((point.x * point.x) + (point.y * point.y) + (point.z * point.z));
 
         // remove point if it's outside the threshold distance
         if (point_distance > maximum_distance_threshold
-            || (realsense_category_.value() != RealSenseCategory::sit
-                && abs(point.x) < minimum_distance_threshold_x
-                && abs(point.y) < minimum_distance_threshold_y
-                && abs(point.z) < minimum_distance_threshold_z)) {
+            || (realsense_category_.value() != RealSenseCategory::sit && abs(point.x) < minimum_distance_threshold_x
+                && abs(point.y) < minimum_distance_threshold_y && abs(point.z) < minimum_distance_threshold_z)) {
             indices_to_remove->indices.push_back(point_index);
         }
     }
@@ -247,19 +220,16 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 // Fill the pointcloud_normals_ object with estimated normals from the current
 // pointcloud_ object The normals are oriented to the origin from before the
 // transformation
-bool NormalsPreprocessor::fillNormalCloud(
-    const geometry_msgs::TransformStamped& transform_stamped)
+bool NormalsPreprocessor::fillNormalCloud(const geometry_msgs::TransformStamped& transform_stamped)
 {
-    geometry_msgs::Vector3 translation
-        = transform_stamped.transform.translation;
+    geometry_msgs::Vector3 translation = transform_stamped.transform.translation;
     //  Fill the normal estimation object and estimate the normals
     pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normal_estimator;
     normal_estimator.setInputCloud(pointcloud_);
     normal_estimator.setViewPoint(translation.x, translation.y, translation.z);
 
     if (use_tree_search_method) {
-        pcl::search::Search<pcl::PointXYZ>::Ptr search_method(
-            new pcl::search::KdTree<pcl::PointXYZ>);
+        pcl::search::Search<pcl::PointXYZ>::Ptr search_method(new pcl::search::KdTree<pcl::PointXYZ>);
         normal_estimator.setSearchMethod(search_method);
         normal_estimator.setKSearch(number_of_neighbours);
     } else {
@@ -275,22 +245,17 @@ bool NormalsPreprocessor::fillNormalCloud(
 // point. This can work because the normals are of unit length.
 bool NormalsPreprocessor::filterOnNormalOrientation()
 {
-    pcl::PointIndices::Ptr indices_to_remove
-        = boost::make_shared<pcl::PointIndices>();
+    pcl::PointIndices::Ptr indices_to_remove = boost::make_shared<pcl::PointIndices>();
 
     // Remove any point who's normal does not fall into the desired region
     if (pointcloud_->points.size() == pointcloud_normals_->points.size()) {
-        for (int point_index = 0; point_index < pointcloud_->points.size();
-             ++point_index) {
+        for (int point_index = 0; point_index < pointcloud_->points.size(); ++point_index) {
             // remove point if its normal is too far from what is desired
-            if (pointcloud_normals_->points[point_index].normal_x
-                        * pointcloud_normals_->points[point_index].normal_x
+            if (pointcloud_normals_->points[point_index].normal_x * pointcloud_normals_->points[point_index].normal_x
                     > allowed_length_x
-                || pointcloud_normals_->points[point_index].normal_y
-                        * pointcloud_normals_->points[point_index].normal_y
+                || pointcloud_normals_->points[point_index].normal_y * pointcloud_normals_->points[point_index].normal_y
                     > allowed_length_y
-                || pointcloud_normals_->points[point_index].normal_z
-                        * pointcloud_normals_->points[point_index].normal_z
+                || pointcloud_normals_->points[point_index].normal_z * pointcloud_normals_->points[point_index].normal_z
                     > allowed_length_z) {
                 indices_to_remove->indices.push_back(point_index);
             }
@@ -307,9 +272,8 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 
 // Preprocess the pointcloud, this means only transforming for the simple
 // preprocessor
-bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-    Normals::Ptr pointcloud_normals, RealSenseCategory const realsense_category,
-    std::string frame_id_to_transform_to)
+bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+    RealSenseCategory const realsense_category, std::string frame_id_to_transform_to)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
@@ -327,14 +291,11 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
     geometry_msgs::TransformStamped transformStamped;
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-        transformStamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
-        pcl_ros::transformPointCloud(
-            *pointcloud_, *pointcloud_, transformStamped.transform);
+        transformStamped = tfBuffer->lookupTransform(
+            frame_id_to_transform_to_, pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
+        pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_, transformStamped.transform);
     } catch (tf2::TransformException& ex) {
-        ROS_WARN_STREAM(
-            "Something went wrong when transforming the pointcloud: "
-            << ex.what());
+        ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: " << ex.what());
         return;
     }
 }

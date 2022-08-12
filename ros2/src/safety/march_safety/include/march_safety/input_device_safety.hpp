@@ -21,8 +21,7 @@ class InputDeviceSafety : public SafetyType {
     using AliveSubscription = rclcpp::Subscription<AliveMsg>::SharedPtr;
 
 public:
-    InputDeviceSafety(std::shared_ptr<SafetyNode> node,
-        std::shared_ptr<SafetyHandler> safety_handler);
+    InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler);
 
     // Update the input device safety checker.
     void update() override;
@@ -33,8 +32,7 @@ private:
     void inputDeviceAliveCallback(const AliveMsg::SharedPtr& msg);
 
     // Check the last alive stamp of an input device.
-    void check_last_alive_stamp(
-        const std::string& id, const rclcpp::Time& last_alive);
+    void check_last_alive_stamp(const std::string& id, const rclcpp::Time& last_alive);
 
     // Node to use for logging and getting time
     std::shared_ptr<SafetyNode> node_;

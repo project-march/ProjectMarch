@@ -4,8 +4,7 @@
 
 #include <point_cloud_aligner.h>
 
-PointCloudAligner::PointCloudAligner(
-    FramePublisher* n, std::string left_or_right)
+PointCloudAligner::PointCloudAligner(FramePublisher* n, std::string left_or_right)
     : n_ { n }
     , left_or_right_ { std::move(left_or_right) }
 {
@@ -19,19 +18,14 @@ PointCloudAligner::PointCloudAligner(
     binary_steps_ = n_->get_parameter("binary_steps").as_int();
     binary_search_ = n_->get_parameter("binary_search").as_bool();
 
-    callback_group_
-        = n_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+    callback_group_ = n_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 
     rclcpp::SubscriptionOptions options;
     options.callback_group = callback_group_;
 
     point_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::FootPosition>(
-            "/march/foot_position/" + left_or_right_,
-            /*qos=*/1,
-            std::bind(
-                &PointCloudAligner::pointCallback, this, std::placeholders::_1),
-            options);
+        = n_->create_subscription<march_shared_msgs::msg::FootPosition>("/march/foot_position/" + left_or_right_,
+            /*qos=*/1, std::bind(&PointCloudAligner::pointCallback, this, std::placeholders::_1), options);
 }
 /**
  * @brief Store the latest found camera foot position, and keep track of the
@@ -40,8 +34,7 @@ PointCloudAligner::PointCloudAligner(
  * @param msg Message containing the foot position.
  */
 void PointCloudAligner::pointCallback(
-    const march_shared_msgs::msg::FootPosition::SharedPtr
-        msg) // NOLINT, binding does not expect reference
+    const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT, binding does not expect reference
 {
     point_count_++;
     last_point_ = msg->displacement;
@@ -61,11 +54,9 @@ void PointCloudAligner::alignPointCloud()
     }
 
     if (left_or_right_ == "left") {
-        n_->set_parameter(
-            rclcpp::Parameter("rotation_camera_left", optimal_angle));
+        n_->set_parameter(rclcpp::Parameter("rotation_camera_left", optimal_angle));
     } else {
-        n_->set_parameter(
-            rclcpp::Parameter("rotation_camera_right", optimal_angle));
+        n_->set_parameter(rclcpp::Parameter("rotation_camera_right", optimal_angle));
     }
 }
 
@@ -77,24 +68,21 @@ void PointCloudAligner::alignPointCloud()
  */
 double PointCloudAligner::binarySearchOptimalAngle()
 {
-    std::array<double, 3> bounds = { min_check_angle_,
-        0.5 * (min_check_angle_ + max_check_angle_), max_check_angle_ };
-    std::array<double, 3> heights = { computeAverageHeight(bounds[0]),
-        computeAverageHeight(bounds[1]), computeAverageHeight(bounds[2]) };
+    std::array<double, 3> bounds = { min_check_angle_, 0.5 * (min_check_angle_ + max_check_angle_), max_check_angle_ };
+    std::array<double, 3> heights
+        = { computeAverageHeight(bounds[0]), computeAverageHeight(bounds[1]), computeAverageHeight(bounds[2]) };
 
     double optimal_angle = bounds[0];
     double optimal_height = std::abs(heights[1]);
 
     for (int i = 0; i < binary_steps_; i++) {
-        RCLCPP_INFO(n_->get_logger(), "Step %d of %d of binary search (%s)",
-            i + 1, binary_steps_, left_or_right_.c_str());
+        RCLCPP_INFO(
+            n_->get_logger(), "Step %d of %d of binary search (%s)", i + 1, binary_steps_, left_or_right_.c_str());
 
-        if ((heights[1] < 0 && 0 < heights[2])
-            || (heights[1] > 0 && 0 > heights[2])) {
+        if ((heights[1] < 0 && 0 < heights[2]) || (heights[1] > 0 && 0 > heights[2])) {
             bounds[0] = bounds[1];
             heights[0] = heights[1];
-        } else if ((heights[1] > 0 && 0 > heights[0])
-            || (heights[1] < 0 && 0 < heights[0])) {
+        } else if ((heights[1] > 0 && 0 > heights[0]) || (heights[1] < 0 && 0 < heights[0])) {
             bounds[2] = bounds[1];
             heights[2] = heights[1];
         } else {
@@ -110,9 +98,8 @@ double PointCloudAligner::binarySearchOptimalAngle()
         }
     }
 
-    RCLCPP_INFO(n_->get_logger(),
-        "Zero height found using binary search: %lf (%s)", optimal_height,
-        left_or_right_.c_str());
+    RCLCPP_INFO(
+        n_->get_logger(), "Zero height found using binary search: %lf (%s)", optimal_height, left_or_right_.c_str());
 
     return optimal_angle;
 }
@@ -135,8 +122,7 @@ double PointCloudAligner::linearSearchOptimalAngle()
          // NOLINTNEXTLINE
          angle += angle_offset_) {
 
-        RCLCPP_INFO(n_->get_logger(), "Checking angle %lf (%s)", angle,
-            left_or_right_.c_str());
+        RCLCPP_INFO(n_->get_logger(), "Checking angle %lf (%s)", angle, left_or_right_.c_str());
 
         double height = computeAverageHeight(angle);
 
@@ -146,9 +132,8 @@ double PointCloudAligner::linearSearchOptimalAngle()
         }
     }
 
-    RCLCPP_INFO(n_->get_logger(),
-        "Zero height found using linear search: %lf (%s)", optimal_height,
-        left_or_right_.c_str());
+    RCLCPP_INFO(
+        n_->get_logger(), "Zero height found using linear search: %lf (%s)", optimal_height, left_or_right_.c_str());
 
     return optimal_angle;
 }
@@ -176,8 +161,7 @@ double PointCloudAligner::computeAverageHeight(double angle)
     }
 
     for (int i = 0; i < avg_sample_size_; i++) {
-        while (point_count_ == start_index) {
-        }
+        while (point_count_ == start_index) { }
         avg_height += last_point_.z;
         start_index = point_count_;
     }
@@ -227,6 +211,5 @@ rcl_interfaces::msg::SetParametersResult PointCloudAligner::parametersCallback(
  */
 void PointCloudAligner::parameterUpdatedLogger(const rclcpp::Parameter& param)
 {
-    RCLCPP_INFO(n_->get_logger(),
-        param.get_name() + " set to " + param.value_to_string());
+    RCLCPP_INFO(n_->get_logger(), param.get_name() + " set to " + param.value_to_string());
 }

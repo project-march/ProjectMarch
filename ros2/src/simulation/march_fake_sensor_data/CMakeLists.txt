@@ -25,6 +25,7 @@ find_package(march_utility REQUIRED)
 
 # the library that contains the logic
 add_library(${PROJECT_NAME}
+        SHARED
     src/FakeTemperatureData.cpp
     src/UniformDistribution.cpp
 )

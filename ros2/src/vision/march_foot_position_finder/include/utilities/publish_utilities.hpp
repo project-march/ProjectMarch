@@ -44,8 +44,8 @@ inline geometry_msgs::msg::Point to_geometry(Point p)
  * @param publisher publisher to use
  * @param cloud cloud to publish
  */
-inline void publishCloud(const PointCloudPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
+inline void publishCloud(
+    const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
 {
     cloud.width = 1;
     cloud.height = cloud.points.size();
@@ -66,8 +66,8 @@ inline void publishCloud(const PointCloudPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param p point to publish
  */
-inline void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+inline void publishMarkerPoint(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -100,9 +100,8 @@ inline void publishMarkerPoint(const MarkerPublisher::SharedPtr& publisher,
     publisher->publish(marker);
 }
 
-inline void publishPreviousDisplacement(
-    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
-    const Point& p1, Point& p2, std::string& left_or_right)
+inline void publishPreviousDisplacement(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p1,
+    Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -133,8 +132,8 @@ inline void publishPreviousDisplacement(
     publisher->publish(marker);
 }
 
-inline void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p1, Point& p2, std::string& left_or_right)
+inline void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p1,
+    Point& p2, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -172,8 +171,7 @@ inline void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher,
  * @param p point to publish
  */
 inline void publishRelativeSearchPoint(
-    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
-    const Point& p, std::string& left_or_right)
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -212,8 +210,8 @@ inline void publishRelativeSearchPoint(
  * @param publisher publisher to use
  * @param p point to publish
  */
-inline void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, const Point& p, std::string& left_or_right)
+inline void publishDesiredPosition(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -255,9 +253,8 @@ inline void publishDesiredPosition(const MarkerPublisher::SharedPtr& publisher,
  * @param p3 vertex of rectangle
  * @param p4 vertex of rectangle
  */
-inline void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, Point& p, std::vector<double> dis,
-    const std::string& left_or_right)
+inline void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, Point& p,
+    std::vector<double> dis, const std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -306,8 +303,8 @@ inline void publishSearchRectangle(const MarkerPublisher::SharedPtr& publisher,
  * Publishes a rectangle around the foot point.
  *
  */
-inline void publishFootRectangle(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, Point& p, const std::string& left_or_right)
+inline void publishFootRectangle(
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, Point& p, const std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -348,8 +345,8 @@ inline void publishFootRectangle(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-inline void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
-    rclcpp::Node* n, std::vector<Point>& points, std::string& left_or_right)
+inline void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+    std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -383,8 +380,7 @@ inline void publishPossiblePoints(const MarkerPublisher::SharedPtr& publisher,
  * @param publisher publisher to use
  * @param points points to visualize
  */
-inline void publishTrackMarkerPoints(
-    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
+inline void publishTrackMarkerPoints(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
     std::vector<Point>& points, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
@@ -420,8 +416,7 @@ inline void publishTrackMarkerPoints(
  * @param p point to publish
  */
 inline void publishOriginalMarkerPoint(
-    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n,
-    const Point& p, std::string& left_or_right)
+    const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p, std::string& left_or_right)
 {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "toes_" + left_or_right + "_aligned";
@@ -462,11 +457,8 @@ inline void publishOriginalMarkerPoint(
  * @param track_points vector of points between start and end position of this
  * step
  */
-inline void publishPoint(
-    const rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr&
-        publisher,
-    rclcpp::Node* n, Point& p, Point& p_world, Point& displacement,
-    const std::vector<Point>& track_points)
+inline void publishPoint(const rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr& publisher,
+    rclcpp::Node* n, Point& p, Point& p_world, Point& displacement, const std::vector<Point>& track_points)
 {
     march_shared_msgs::msg::FootPosition msg;
 
