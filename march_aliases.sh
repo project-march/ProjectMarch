@@ -149,3 +149,6 @@ alias asrock_ros2="sfox && sros2 && export_asrock_master_uri"
 
 FASTRTPS_DEFAULT_PROFILES_FILE=~/march/.fastrtps-profile.xml
 export FASTRTPS_DEFAULT_PROFILES_FILE
+
+# Alias for telling a joke when Koen has to wait for a long time
+alias joke='curl -H "Accept: text/plain" https://icanhazdadjoke.com/ && echo' 
