@@ -329,6 +329,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("jointless", jointless),
             ("gazebo", gazebo),
             ("control_yaml", control_yaml),
+            ("rosbags", "false"),
         ],
     )
     # endregion

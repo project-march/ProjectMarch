@@ -2,7 +2,7 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
@@ -51,6 +51,7 @@ def generate_launch_description() -> LaunchDescription:
     robot = LaunchConfiguration("robot")
     control_yaml = LaunchConfiguration("control_yaml")
     gazebo_control_yaml = LaunchConfiguration("gazebo_control_yaml")
+    rosbags = LaunchConfiguration("rosbags")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
@@ -143,6 +144,12 @@ def generate_launch_description() -> LaunchDescription:
             default_value="gazebo/march7_control.yaml",
             description="The gazebo controller yaml file to use this is added in through the urdf published "
             "on /robot_description. Must be in: `march_control/config/`.",
+        ),
+        DeclareLaunchArgument(
+            name="rosbags",
+            default_value="true",
+            description="Whether the rosbags should stored.",
+            choices=["true", "false"],
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -540,6 +547,28 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region rosbags
+    # Make sure you have build the ros bags from the library not the ones from foxy!
+    record_rosbags_action = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "bag",
+            "record",
+            "-o",
+            '~/rosbags2/$(date -d "today" +"%Y-%m-%d-%H-%M-%S")',
+            "-a",
+            "-x",
+            "'.*camera_(front|back).*'",
+        ],
+        output={
+            "stdout": "log",
+            "stderr": "log",
+        },
+        shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
+        condition=IfCondition(rosbags),
+    )
+    # endregion
+
     nodes = [
         rqt_input_device,
         wireless_ipd_node,
@@ -555,6 +584,7 @@ def generate_launch_description() -> LaunchDescription:
         point_finder_node,
         camera_aligned_frame_pub_node,
         back_sense_node,
+        record_rosbags_action,
     ]
 
     return LaunchDescription(declared_arguments + nodes)
