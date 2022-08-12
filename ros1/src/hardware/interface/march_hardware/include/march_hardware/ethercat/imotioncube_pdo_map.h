@@ -78,8 +78,7 @@ public:
      */
     void addObject(IMCObjectName object_name);
 
-    std::unordered_map<IMCObjectName, uint8_t> map(
-        SdoSlaveInterface& sdo, DataDirection direction);
+    std::unordered_map<IMCObjectName, uint8_t> map(SdoSlaveInterface& sdo, DataDirection direction);
 
     static std::unordered_map<IMCObjectName, IMCObject> all_objects;
 

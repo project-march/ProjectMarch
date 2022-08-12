@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 // Copyright 2020 Project March.
 #include "../mocks/mock_pdo_interface.h"
 #include "../mocks/mock_sdo_interface.h"
@@ -34,3 +36,5 @@ TEST_F(SlaveTest, InvalidSlaveIndex)
 {
     ASSERT_THROW(march::Slave(0, this->mock_pdo, this->mock_sdo), march::error::HardwareException);
 }
+// NOLINTEND
+#endif

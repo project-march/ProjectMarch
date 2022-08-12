@@ -69,8 +69,7 @@ public:
         } else if (this->value == AllowedRobot::pressure_soles) {
             return base_path.append(/*__s=*/"/robots/pressure_soles.yaml");
         }
-        ROS_ERROR(
-            "Robotname not implemented. Using test_joint_rotational.yaml...");
+        ROS_ERROR("Robotname not implemented. Using test_joint_rotational.yaml...");
         return base_path.append(/*__s=*/"/robots/test_joint_rotational.yaml");
     }
 

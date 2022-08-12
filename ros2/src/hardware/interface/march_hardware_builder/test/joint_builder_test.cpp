@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // Copyright 2019 Project March.
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
@@ -141,3 +142,4 @@ TEST_F(JointBuilderTest, NoUrdfJoint)
     ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr, this->pdo_interface, this->sdo_interface),
         march::error::HardwareException);
 }
+#endif

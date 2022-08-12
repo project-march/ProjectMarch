@@ -45,30 +45,20 @@ HullParameterDeterminer::HullParameterDeterminer(bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-void HullParameterDeterminer::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+void HullParameterDeterminer::readParameters(march_realsense_reader::pointcloud_parametersConfig& config)
 {
-    number_of_optional_foot_locations
-        = config.parameter_determiner_foot_locations;
+    number_of_optional_foot_locations = config.parameter_determiner_foot_locations;
     hull_dimension = config.hull_dimension;
 
-    min_x_stairs_up
-        = (float)config.parameter_determiner_stairs_up_locations_min_x;
-    max_x_stairs_up
-        = (float)config.parameter_determiner_stairs_up_locations_max_x;
-    min_z_stairs_up
-        = (float)config.parameter_determiner_stairs_up_locations_min_z;
-    max_z_stairs_up
-        = (float)config.parameter_determiner_stairs_up_locations_max_z;
+    min_x_stairs_up = (float)config.parameter_determiner_stairs_up_locations_min_x;
+    max_x_stairs_up = (float)config.parameter_determiner_stairs_up_locations_max_x;
+    min_z_stairs_up = (float)config.parameter_determiner_stairs_up_locations_min_z;
+    max_z_stairs_up = (float)config.parameter_determiner_stairs_up_locations_max_z;
 
-    allowed_deviation_from_reachable_stair
-        = (float)config
-              .parameter_determiner_allowed_deviation_from_reachable_stair;
+    allowed_deviation_from_reachable_stair = (float)config.parameter_determiner_allowed_deviation_from_reachable_stair;
 
-    general_most_desirable_location_is_mid
-        = config.parameter_determiner_most_desirable_loc_is_mid;
-    general_most_desirable_location_is_small
-        = config.parameter_determiner_most_desirable_loc_is_small;
+    general_most_desirable_location_is_mid = config.parameter_determiner_most_desirable_loc_is_mid;
+    general_most_desirable_location_is_small = config.parameter_determiner_most_desirable_loc_is_small;
 
     foot_length_back = (float)config.parameter_determiner_foot_length_back;
     foot_length_front = (float)config.parameter_determiner_foot_length_front;
@@ -78,35 +68,25 @@ void HullParameterDeterminer::readParameters(
     max_ramp_search = (float)config.parameter_determiner_ramp_max_search_area;
     min_ramp_search = (float)config.parameter_determiner_ramp_min_search_area;
 
-    allowed_deviation_from_reachable_ramp
-        = (float)
-              config.parameter_determiner_allowed_deviation_from_reachable_ramp;
+    allowed_deviation_from_reachable_ramp = (float)config.parameter_determiner_allowed_deviation_from_reachable_ramp;
     min_slope = (float)config.parameter_determiner_min_slope;
     max_slope = (float)config.parameter_determiner_max_slope;
 
-    y_deviation_right_foot
-        = (float)config.parameter_determiner_y_deviation_right_foot;
+    y_deviation_right_foot = (float)config.parameter_determiner_y_deviation_right_foot;
 
     min_sit_height = (float)config.parameter_determiner_min_sit_height;
     max_sit_height = (float)config.parameter_determiner_max_sit_height;
-    allowed_deviation_from_reachable_bench
-        = (float)config
-              .parameter_determiner_allowed_deviation_from_reachable_bench;
+    allowed_deviation_from_reachable_bench = (float)config.parameter_determiner_allowed_deviation_from_reachable_bench;
     min_x_search_sit = (float)config.parameter_determiner_min_x_search_sit;
     max_x_search_sit = (float)config.parameter_determiner_max_x_search_sit;
-    search_y_deviation_sit
-        = (float)config.parameter_determiner_search_y_deviation_sit;
-    minimal_needed_support_sit
-        = (float)config.parameter_determiner_minimal_needed_support_sit;
+    search_y_deviation_sit = (float)config.parameter_determiner_search_y_deviation_sit;
+    minimal_needed_support_sit = (float)config.parameter_determiner_minimal_needed_support_sit;
     sit_grid_size = (float)config.parameter_determiner_sit_grid_size;
-    max_allowed_z_deviation_foot
-        = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
+    max_allowed_z_deviation_foot = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
 
     min_curb_up_height = (float)config.parameter_determiner_min_curb_height;
     max_curb_up_height = (float)config.parameter_determiner_max_curb_height;
-    allowed_deviation_from_reachable_curb
-        = (float)
-              config.parameter_determiner_allowed_deviation_from_reachable_curb;
+    allowed_deviation_from_reachable_curb = (float)config.parameter_determiner_allowed_deviation_from_reachable_curb;
     min_curb_search = (float)config.parameter_determiner_min_curb_search;
     max_curb_search = (float)config.parameter_determiner_max_curb_search;
 
@@ -118,10 +98,8 @@ void HullParameterDeterminer::readParameters(
  * from this location, gaits parameters are made. **/
 bool HullParameterDeterminer::determineParameters(
     boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
-    boost::shared_ptr<HullVector> const hull_vector,
-    boost::shared_ptr<PolygonVector> const polygon_vector,
-    RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters,
+    boost::shared_ptr<HullVector> const hull_vector, boost::shared_ptr<PolygonVector> const polygon_vector,
+    RealSenseCategory const realsense_category, boost::shared_ptr<GaitParameters> gait_parameters,
     std::string frame_id_to_transform_to, std::string subgait_name)
 {
     time_t start_determine_parameters = clock();
@@ -153,8 +131,7 @@ bool HullParameterDeterminer::determineParameters(
     // relevant (up or down) value and continue treating ramp up and ramp down
     // the same
     initializeGaitDimensions();
-    transformer_
-        = std::make_unique<Transformer>(tfBuffer, frame_id_to_transform_to);
+    transformer_ = std::make_unique<Transformer>(tfBuffer, frame_id_to_transform_to);
     most_desirable_foot_location_ = std::make_shared<pcl::PointXYZ>();
 
     success &= transformGaitInformation();
@@ -179,49 +156,38 @@ bool HullParameterDeterminer::determineParameters(
             case RealSenseCategory::stairs_down:
             case RealSenseCategory::stairs_up: {
                 ROS_INFO_STREAM(" --- The optimal foot location is "
-                    << output_utilities::pointToString(optimal_foot_location)
-                    << " --- ");
+                    << output_utilities::pointToString(optimal_foot_location) << " --- ");
                 break;
             }
             case RealSenseCategory::curb_up:
             case RealSenseCategory::curb_down: {
-                ROS_INFO_STREAM(
-                    " --- The curb height is " << curb_height << " --- ");
+                ROS_INFO_STREAM(" --- The curb height is " << curb_height << " --- ");
                 break;
             }
             case RealSenseCategory::ramp_down:
             case RealSenseCategory::ramp_up: {
-                ROS_INFO_STREAM(
-                    " --- The slope of the ramp is " << ramp_slope << " --- ");
+                ROS_INFO_STREAM(" --- The slope of the ramp is " << ramp_slope << " --- ");
                 break;
             }
             case RealSenseCategory::sit: {
-                ROS_INFO_STREAM(
-                    " --- The sit height is " << sit_height << " --- ");
+                ROS_INFO_STREAM(" --- The sit height is " << sit_height << " --- ");
                 break;
             }
         }
-        if (gait_parameters_->first_parameter == 0
-            || gait_parameters_->first_parameter == 1
-            || gait_parameters_->second_parameter == 0
-            || gait_parameters_->second_parameter == 1) {
+        if (gait_parameters_->first_parameter == 0 || gait_parameters_->first_parameter == 1
+            || gait_parameters_->second_parameter == 0 || gait_parameters_->second_parameter == 1) {
             ROS_WARN_STREAM("The found dimensions are outside the gait limits, "
                             "but inside the allowed deviation from them.");
         }
-        ROS_INFO_STREAM(
-            " --- With corresponding parameters (size, height, side) ("
-            << gait_parameters_->first_parameter << ", "
-            << gait_parameters_->second_parameter << ", "
+        ROS_INFO_STREAM(" --- With corresponding parameters (size, height, side) ("
+            << gait_parameters_->first_parameter << ", " << gait_parameters_->second_parameter << ", "
             << gait_parameters_->side_step_parameter << ") --- ");
     }
 
     time_t end_determine_parameters = clock();
-    double time_taken
-        = double(end_determine_parameters - start_determine_parameters)
-        / double(CLOCKS_PER_SEC);
+    double time_taken = double(end_determine_parameters - start_determine_parameters) / double(CLOCKS_PER_SEC);
     ROS_DEBUG_STREAM("Time taken by the hull parameter determiner,   is : "
-        << std::fixed << time_taken << std::setprecision(5) << " sec "
-        << std::endl);
+        << std::fixed << time_taken << std::setprecision(5) << " sec " << std::endl);
 
     return success;
 };
@@ -251,9 +217,8 @@ bool HullParameterDeterminer::getObstacleInformation()
             break;
         }
         default: {
-            ROS_ERROR_STREAM(
-                "No way to get obstacle information for realsense category "
-                << realsense_category_.value() << " has been implemented.");
+            ROS_ERROR_STREAM("No way to get obstacle information for realsense category " << realsense_category_.value()
+                                                                                          << " has been implemented.");
             return false;
         }
     }
@@ -285,12 +250,9 @@ bool HullParameterDeterminer::getRampSlope()
 
             // Color the point based on the orientation
             double grey_scale = 1.0
-                - fmin(
-                    (acos(point_on_ramp.normal_z) * 180.0 / M_PI) / max_slope,
+                - fmin((acos(point_on_ramp.normal_z) * 180.0 / M_PI) / max_slope,
                     /*__y=*/1.0);
-            std_msgs::ColorRGBA marker_color
-                = color_utilities::colorRGBAInitRGBA(
-                    grey_scale, grey_scale, grey_scale);
+            std_msgs::ColorRGBA marker_color = color_utilities::colorRGBAInitRGBA(grey_scale, grey_scale, grey_scale);
 
             possible_foot_locations_marker_list.points.push_back(marker_point);
             possible_foot_locations_marker_list.colors.push_back(marker_color);
@@ -323,8 +285,7 @@ void HullParameterDeterminer::initializeDebugOutput()
     gait_information_marker_list = initializeMarkerListWithId(id);
 }
 
-visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(
-    int id)
+visualization_msgs::Marker HullParameterDeterminer::initializeMarkerListWithId(int id)
 {
     visualization_msgs::Marker marker_list;
     marker_list.id = id;
@@ -347,8 +308,7 @@ void HullParameterDeterminer::addDebugGaitInformation()
         case RealSenseCategory::stairs_up: {
             geometry_msgs::Point marker_point;
 
-            for (pcl::PointXYZ gait_information_point :
-                *gait_information_cloud) {
+            for (pcl::PointXYZ gait_information_point : *gait_information_cloud) {
                 marker_point.x = gait_information_point.x;
                 marker_point.y = gait_information_point.y;
                 marker_point.z = gait_information_point.z;
@@ -444,8 +404,7 @@ void HullParameterDeterminer::initializeGaitDimensions()
     // an open or close subgait
     // Do the same when the gait name is left open as this subgait
     // also traverses twice the distance of a normal open gait
-    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing"
-        || subgait_name_ == "left_open") {
+    if (subgait_name_.substr(subgait_name_.size() - 5) == "swing" || subgait_name_ == "left_open") {
         min_x_stairs *= 2;
         max_x_stairs *= 2;
         min_z_stairs *= 2;
@@ -459,10 +418,9 @@ void HullParameterDeterminer::initializeGaitDimensions()
     } else if (frame_id_to_transform_to_ == "foot_left") {
         y_deviation_foot = 0;
     } else {
-        ROS_WARN_STREAM("The frame id "
-            << frame_id_to_transform_to_
-            << " should be either foot_right or foot_left. Unable to interpret "
-               "the y_deviation_foot, setting it to 0");
+        ROS_WARN_STREAM("The frame id " << frame_id_to_transform_to_
+                                        << " should be either foot_right or foot_left. Unable to interpret "
+                                           "the y_deviation_foot, setting it to 0");
         y_deviation_foot = 0;
     }
 }
@@ -478,17 +436,13 @@ bool HullParameterDeterminer::transformGaitInformation()
         case RealSenseCategory::stairs_up: {
             // Create the points, in frame_id_to_transform_to frame,
             // with the min and max gait dimensions,
-            point = point_utilities::makePointXYZ(
-                min_x_stairs, y_deviation_foot, min_z_stairs);
+            point = point_utilities::makePointXYZ(min_x_stairs, y_deviation_foot, min_z_stairs);
             gait_information_cloud->push_back(point);
-            point = point_utilities::makePointXYZ(
-                max_x_stairs, y_deviation_foot, min_z_stairs);
+            point = point_utilities::makePointXYZ(max_x_stairs, y_deviation_foot, min_z_stairs);
             gait_information_cloud->push_back(point);
-            point = point_utilities::makePointXYZ(
-                min_x_stairs, y_deviation_foot, max_z_stairs);
+            point = point_utilities::makePointXYZ(min_x_stairs, y_deviation_foot, max_z_stairs);
             gait_information_cloud->push_back(point);
-            point = point_utilities::makePointXYZ(
-                max_x_stairs, y_deviation_foot, max_z_stairs);
+            point = point_utilities::makePointXYZ(max_x_stairs, y_deviation_foot, max_z_stairs);
             gait_information_cloud->push_back(point);
 
             // Transform to the fixed frame
@@ -505,12 +459,10 @@ bool HullParameterDeterminer::transformGaitInformation()
         case RealSenseCategory::curb_up:
         case RealSenseCategory::curb_down: {
             point = point_utilities::makePointXYZ(
-                (min_curb_search + max_curb_search) / 2.0F, y_deviation_foot,
-                min_curb_height);
+                (min_curb_search + max_curb_search) / 2.0F, y_deviation_foot, min_curb_height);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                (min_curb_search + max_curb_search) / 2.0F, y_deviation_foot,
-                max_curb_height);
+                (min_curb_search + max_curb_search) / 2.0F, y_deviation_foot, max_curb_height);
             gait_information_cloud->push_back(point);
 
             // Transform to the fixed frame
@@ -526,12 +478,10 @@ bool HullParameterDeterminer::transformGaitInformation()
 
         case RealSenseCategory::sit: {
             point = point_utilities::makePointXYZ(
-                (min_x_search_sit + max_x_search_sit) / 2.0F,
-                search_y_deviation_sit / 2.0F, min_sit_height);
+                (min_x_search_sit + max_x_search_sit) / 2.0F, search_y_deviation_sit / 2.0F, min_sit_height);
             gait_information_cloud->push_back(point);
             point = point_utilities::makePointXYZ(
-                (min_x_search_sit + max_x_search_sit) / 2.0F,
-                search_y_deviation_sit / 2.0F, max_sit_height);
+                (min_x_search_sit + max_x_search_sit) / 2.0F, search_y_deviation_sit / 2.0F, max_sit_height);
             gait_information_cloud->push_back(point);
 
             // Transform to the fixed frame
@@ -591,9 +541,8 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
             break;
         }
         default: {
-            ROS_ERROR_STREAM(
-                "No way to transform a foot location to parameters "
-                "is implemented yet for obstacle "
+            ROS_ERROR_STREAM("No way to transform a foot location to parameters "
+                             "is implemented yet for obstacle "
                 << realsense_category_.value());
             return false;
         }
@@ -604,25 +553,21 @@ bool HullParameterDeterminer::getGaitParametersFromLocation()
 // Find the curb parameter from the curb height
 bool HullParameterDeterminer::getGaitParametersFromCurbHeight()
 {
-    if (curb_height
-            > max_curb_height_world + allowed_deviation_from_reachable_curb
-        || curb_height
-            < min_curb_height_world - allowed_deviation_from_reachable_curb) {
+    if (curb_height > max_curb_height_world + allowed_deviation_from_reachable_curb
+        || curb_height < min_curb_height_world - allowed_deviation_from_reachable_curb) {
         ROS_ERROR_STREAM("The found curb height should be between "
-            << min_curb_height_world << " ( -"
-            << allowed_deviation_from_reachable_curb << " ) and "
-            << max_curb_height_world << " ( +"
-            << allowed_deviation_from_reachable_curb << " ) but was "
+            << min_curb_height_world << " ( -" << allowed_deviation_from_reachable_curb << " ) and "
+            << max_curb_height_world << " ( +" << allowed_deviation_from_reachable_curb << " ) but was "
             << curb_height);
         return false;
     }
 
     if (realsense_category_.value() == RealSenseCategory::curb_down) {
-        gait_parameters_->first_parameter = calculateParameter(
-            curb_height, max_curb_height_world, min_curb_height_world);
+        gait_parameters_->first_parameter
+            = calculateParameter(curb_height, max_curb_height_world, min_curb_height_world);
     } else {
-        gait_parameters_->first_parameter = calculateParameter(
-            curb_height, min_curb_height_world, max_curb_height_world);
+        gait_parameters_->first_parameter
+            = calculateParameter(curb_height, min_curb_height_world, max_curb_height_world);
     }
 
     // The step height and side step parameter are unused for the sit
@@ -636,22 +581,16 @@ bool HullParameterDeterminer::getGaitParametersFromCurbHeight()
 // Find the sit parameter from the sit height
 bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 {
-    if (sit_height
-            > max_sit_height_world + allowed_deviation_from_reachable_bench
-        || sit_height
-            < min_sit_height_world - allowed_deviation_from_reachable_bench) {
+    if (sit_height > max_sit_height_world + allowed_deviation_from_reachable_bench
+        || sit_height < min_sit_height_world - allowed_deviation_from_reachable_bench) {
         gait_parameters_->first_parameter = -1;
         ROS_ERROR_STREAM("The found sit height should be between "
-            << min_sit_height_world << " ( -"
-            << allowed_deviation_from_reachable_bench << " ) and "
-            << max_sit_height_world << " ( +"
-            << allowed_deviation_from_reachable_bench << " ) but was "
-            << ramp_slope);
+            << min_sit_height_world << " ( -" << allowed_deviation_from_reachable_bench << " ) and "
+            << max_sit_height_world << " ( +" << allowed_deviation_from_reachable_bench << " ) but was " << ramp_slope);
         return false;
     }
 
-    gait_parameters_->first_parameter = calculateParameter(
-        sit_height, min_sit_height_world, max_sit_height_world);
+    gait_parameters_->first_parameter = calculateParameter(sit_height, min_sit_height_world, max_sit_height_world);
 
     // The step height and side step parameter are unused for the sit
     // gait, so they are set to -1
@@ -663,39 +602,29 @@ bool HullParameterDeterminer::getGaitParametersFromSitHeight()
 
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
 {
-    if (optimal_foot_location.x
-            < max_x_stairs_world - allowed_deviation_from_reachable_stair
-        || optimal_foot_location.x
-            > min_x_stairs_world + allowed_deviation_from_reachable_stair) {
+    if (optimal_foot_location.x < max_x_stairs_world - allowed_deviation_from_reachable_stair
+        || optimal_foot_location.x > min_x_stairs_world + allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair depth should be between "
-            << min_x_stairs_world << " ( -"
-            << allowed_deviation_from_reachable_stair << " ) and "
-            << max_x_stairs_world << " ( +"
-            << allowed_deviation_from_reachable_stair << " ) but was "
-            << optimal_foot_location.x);
+            << min_x_stairs_world << " ( -" << allowed_deviation_from_reachable_stair << " ) and " << max_x_stairs_world
+            << " ( +" << allowed_deviation_from_reachable_stair << " ) but was " << optimal_foot_location.x);
         return false;
     }
-    if (optimal_foot_location.z
-            > max_z_stairs_world + allowed_deviation_from_reachable_stair
-        || optimal_foot_location.z
-            < min_z_stairs_world - allowed_deviation_from_reachable_stair) {
+    if (optimal_foot_location.z > max_z_stairs_world + allowed_deviation_from_reachable_stair
+        || optimal_foot_location.z < min_z_stairs_world - allowed_deviation_from_reachable_stair) {
         ROS_ERROR_STREAM("The found stair height should be between "
-            << min_z_stairs_world << " ( -"
-            << allowed_deviation_from_reachable_stair << " ) and "
-            << max_z_stairs_world << " ( +"
-            << allowed_deviation_from_reachable_stair << " ) but was "
-            << optimal_foot_location.z);
+            << min_z_stairs_world << " ( -" << allowed_deviation_from_reachable_stair << " ) and " << max_z_stairs_world
+            << " ( +" << allowed_deviation_from_reachable_stair << " ) but was " << optimal_foot_location.z);
         return false;
     }
 
-    gait_parameters_->first_parameter = calculateParameter(
-        optimal_foot_location.x, min_x_stairs_world, max_x_stairs_world);
+    gait_parameters_->first_parameter
+        = calculateParameter(optimal_foot_location.x, min_x_stairs_world, max_x_stairs_world);
     if (realsense_category_.value() == RealSenseCategory::stairs_down) {
-        gait_parameters_->second_parameter = calculateParameter(
-            optimal_foot_location.z, max_z_stairs_world, min_z_stairs_world);
+        gait_parameters_->second_parameter
+            = calculateParameter(optimal_foot_location.z, max_z_stairs_world, min_z_stairs_world);
     } else {
-        gait_parameters_->second_parameter = calculateParameter(
-            optimal_foot_location.z, min_z_stairs_world, max_z_stairs_world);
+        gait_parameters_->second_parameter
+            = calculateParameter(optimal_foot_location.z, min_z_stairs_world, max_z_stairs_world);
     }
 
     // The side step parameter is unused for the stairs
@@ -706,28 +635,22 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationStairs()
     // stair is steep, flip it for the stairs down gait as it is one when
     // the optimal location is close to the highest (not absolute) value.
     if (realsense_category_.value() == RealSenseCategory::ramp_down) {
-        gait_parameters_->second_parameter
-            = 1 - gait_parameters_->second_parameter;
+        gait_parameters_->second_parameter = 1 - gait_parameters_->second_parameter;
     }
     return true;
 }
 
 bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 {
-    if (std::abs(ramp_slope)
-            > std::abs(max_slope) + allowed_deviation_from_reachable_ramp
-        || std::abs(ramp_slope)
-            < std::abs(min_slope) - allowed_deviation_from_reachable_ramp) {
+    if (std::abs(ramp_slope) > std::abs(max_slope) + allowed_deviation_from_reachable_ramp
+        || std::abs(ramp_slope) < std::abs(min_slope) - allowed_deviation_from_reachable_ramp) {
         ROS_ERROR_STREAM("The found ramp slope should be between "
-            << min_slope << "( -" << allowed_deviation_from_reachable_ramp
-            << " ) and " << max_slope << "( +"
-            << allowed_deviation_from_reachable_ramp << " ) but was "
-            << ramp_slope);
+            << min_slope << "( -" << allowed_deviation_from_reachable_ramp << " ) and " << max_slope << "( +"
+            << allowed_deviation_from_reachable_ramp << " ) but was " << ramp_slope);
         return false;
     }
 
-    gait_parameters_->first_parameter
-        = calculateParameter(std::abs(ramp_slope), min_slope, max_slope);
+    gait_parameters_->first_parameter = calculateParameter(std::abs(ramp_slope), min_slope, max_slope);
 
     // The step height and side step parameter are unused for the ramp
     // gait, so they are set to -1
@@ -737,11 +660,10 @@ bool HullParameterDeterminer::getGaitParametersFromRampSlope()
 }
 
 // Transform valid gait information into a parameter
-float HullParameterDeterminer::calculateParameter(const float& valid_value,
-    const float& minimum_value, const float& maximum_value)
+float HullParameterDeterminer::calculateParameter(
+    const float& valid_value, const float& minimum_value, const float& maximum_value)
 {
-    float parameter
-        = (valid_value - minimum_value) / (maximum_value - minimum_value);
+    float parameter = (valid_value - minimum_value) / (maximum_value - minimum_value);
     // Always return a value between 0 and 1
     return fmax(fmin(parameter, /*__y=*/1.0F), /*__y=*/0.0F);
 }
@@ -759,18 +681,14 @@ bool HullParameterDeterminer::getSitHeight()
 
     // Crop those locations to find where there is support for the
     // exoskeleton
-    PointNormalCloud::Ptr potential_exo_support_points
-        = boost::make_shared<PointNormalCloud>();
-    success
-        &= cropCloudToHullVectorUnique(sit_grid, potential_exo_support_points);
+    PointNormalCloud::Ptr potential_exo_support_points = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVectorUnique(sit_grid, potential_exo_support_points);
 
     // Trim exo support cloud to only contain reachable points
-    PointNormalCloud::Ptr exo_support_points
-        = boost::make_shared<PointNormalCloud>();
+    PointNormalCloud::Ptr exo_support_points = boost::make_shared<PointNormalCloud>();
     getValidExoSupport(potential_exo_support_points, exo_support_points);
 
-    if ((float)exo_support_points->size() / (float)sit_grid->size()
-        < minimal_needed_support_sit) {
+    if ((float)exo_support_points->size() / (float)sit_grid->size() < minimal_needed_support_sit) {
         ROS_ERROR_STREAM("Not enough support for the exoskeleton is found, "
                          "unable to find parameters for sit category.");
         return false;
@@ -796,18 +714,14 @@ bool HullParameterDeterminer::getSitHeight()
 
 // Trim exo support cloud to only contain reachable points
 void HullParameterDeterminer::getValidExoSupport(
-    const PointNormalCloud::Ptr& potential_exo_support_points,
-    PointNormalCloud::Ptr& exo_support_points)
+    const PointNormalCloud::Ptr& potential_exo_support_points, PointNormalCloud::Ptr& exo_support_points)
 {
-    for (pcl::PointNormal& potential_exo_support_point :
-        *potential_exo_support_points) {
+    for (pcl::PointNormal& potential_exo_support_point : *potential_exo_support_points) {
 
         std_msgs::ColorRGBA marker_color;
 
-        if (potential_exo_support_point.z
-                < max_sit_height_world + allowed_deviation_from_reachable_bench
-            && potential_exo_support_point.z > min_sit_height_world
-                    - allowed_deviation_from_reachable_bench) {
+        if (potential_exo_support_point.z < max_sit_height_world + allowed_deviation_from_reachable_bench
+            && potential_exo_support_point.z > min_sit_height_world - allowed_deviation_from_reachable_bench) {
             exo_support_points->push_back(potential_exo_support_point);
             if (debugging_) {
                 marker_color = color_utilities::GREEN;
@@ -829,18 +743,15 @@ void HullParameterDeterminer::getValidExoSupport(
 }
 
 // Get the median height value of a point cloud
-bool HullParameterDeterminer::getMedianHeightCloud(
-    const PointNormalCloud::Ptr& cloud, float& median_height)
+bool HullParameterDeterminer::getMedianHeightCloud(const PointNormalCloud::Ptr& cloud, float& median_height)
 {
     int pointcloud_size = cloud->size();
     if (pointcloud_size == 0) {
-        ROS_ERROR_STREAM(
-            "Pointcloud to retrieve median from contains no points.");
+        ROS_ERROR_STREAM("Pointcloud to retrieve median from contains no points.");
         return false;
     }
     // Sort only the part of the array relevant for the median
-    std::nth_element(cloud->points.begin(),
-        cloud->points.begin() + pointcloud_size / 2, cloud->points.end(),
+    std::nth_element(cloud->points.begin(), cloud->points.begin() + pointcloud_size / 2, cloud->points.end(),
         linear_algebra_utilities::pointIsLower);
 
     if (pointcloud_size % 2 == 0) {
@@ -862,8 +773,7 @@ bool HullParameterDeterminer::fillSitGrid(PointCloud::Ptr& sit_grid)
             << sit_grid_size << " but should be larger then " << EPSILON);
         return false;
     }
-    int x_points
-        = int(round((max_x_search_sit - min_x_search_sit) / sit_grid_size)) + 1;
+    int x_points = int(round((max_x_search_sit - min_x_search_sit) / sit_grid_size)) + 1;
     int y_points = int(round((search_y_deviation_sit) / sit_grid_size)) + 1;
 
     for (int x_index = 0; x_index < x_points; ++x_index) {
@@ -906,8 +816,7 @@ bool HullParameterDeterminer::getCurbHeight()
     // Crop those locations to only be left with locations where it is
     // possible to place the foot
     points_on_curb = boost::make_shared<PointNormalCloud>();
-    success
-        &= cropCloudToHullVectorUnique(foot_locations_to_try, points_on_curb);
+    success &= cropCloudToHullVectorUnique(foot_locations_to_try, points_on_curb);
 
     if (points_on_curb->points.size() == 0) {
         ROS_ERROR_STREAM("The computed points on curb cloud is empty. "
@@ -915,8 +824,7 @@ bool HullParameterDeterminer::getCurbHeight()
         return false;
     }
 
-    PointNormalCloud::Ptr valid_points_on_curb
-        = boost::make_shared<PointNormalCloud>();
+    PointNormalCloud::Ptr valid_points_on_curb = boost::make_shared<PointNormalCloud>();
 
     getValidPointsOnCurb(points_on_curb, valid_points_on_curb);
 
@@ -946,8 +854,7 @@ bool HullParameterDeterminer::getCurbHeight()
 
 // Check which points on the curb are reachable and give foot support
 void HullParameterDeterminer::getValidPointsOnCurb(
-    const PointNormalCloud::Ptr& points_on_curb,
-    PointNormalCloud::Ptr& valid_points_on_curb)
+    const PointNormalCloud::Ptr& points_on_curb, PointNormalCloud::Ptr& valid_points_on_curb)
 {
     for (pcl::PointNormal point_on_curb : *points_on_curb) {
         if (isValidLocation(point_on_curb)) {
@@ -968,12 +875,10 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     // Crop those locations to only be left with locations where it is
     // possible to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(
-        foot_locations_to_try, possible_foot_locations);
+    success &= cropCloudToHullVectorUnique(foot_locations_to_try, possible_foot_locations);
     if (possible_foot_locations->points.size() == 0) {
-        ROS_ERROR_STREAM(
-            "The computed possible foot locations cloud is empty. "
-            "Unable to compute corresponding possible foot locations");
+        ROS_ERROR_STREAM("The computed possible foot locations cloud is empty. "
+                         "Unable to compute corresponding possible foot locations");
         return false;
     }
 
@@ -1034,8 +939,7 @@ bool HullParameterDeterminer::calculateRampSlope()
 }
 
 bool HullParameterDeterminer::getAverageNormal(
-    const PointNormalCloud::Ptr& possible_foot_locations,
-    pcl::Normal& average_normal)
+    const PointNormalCloud::Ptr& possible_foot_locations, pcl::Normal& average_normal)
 {
     for (pcl::PointNormal& current_pointnormal : *possible_foot_locations) {
         average_normal.normal_x += current_pointnormal.normal_x;
@@ -1045,8 +949,7 @@ bool HullParameterDeterminer::getAverageNormal(
     return linear_algebra_utilities::normalizeNormal(average_normal);
 }
 
-bool HullParameterDeterminer::getSlopeFromNormals(
-    const pcl::Normal& normal, float& slope)
+bool HullParameterDeterminer::getSlopeFromNormals(const pcl::Normal& normal, float& slope)
 {
     // We want to find the angle with respect to the positive z direction as
     // a flat surface has a normal of {0, 0, 1} Make use of dot(a, b) =
@@ -1078,8 +981,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
             continue;
         }
 
-        success
-            &= getDistanceToObject(possible_foot_location, distance_to_object);
+        success &= getDistanceToObject(possible_foot_location, distance_to_object);
 
         if (distance_to_object < min_distance_to_object) {
             min_distance_to_object = distance_to_object;
@@ -1087,8 +989,8 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
         }
     }
     if (min_distance_to_object != std::numeric_limits<double>::max()) {
-        ROS_DEBUG_STREAM("The optimal foot location is "
-            << min_distance_to_object << " removed from its ideal location");
+        ROS_DEBUG_STREAM(
+            "The optimal foot location is " << min_distance_to_object << " removed from its ideal location");
         return success;
     } else {
         ROS_ERROR_STREAM("No valid foot location could be found for the "
@@ -1099,8 +1001,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 }
 
 // get the distance from a location to some object depending on the obstacle
-bool HullParameterDeterminer::getDistanceToObject(
-    pcl::PointNormal possible_foot_location, double& distance)
+bool HullParameterDeterminer::getDistanceToObject(pcl::PointNormal possible_foot_location, double& distance)
 {
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_up:
@@ -1123,8 +1024,7 @@ bool HullParameterDeterminer::getDistanceToObject(
 }
 
 // Verify that the found location is valid for the requested gait
-bool HullParameterDeterminer::isValidLocation(
-    pcl::PointNormal possible_foot_location)
+bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_location)
 {
     // Less and larger than signs are swapped for the x coordinate as the
     // positive x axis points in the backwards direction of the exoskeleton
@@ -1139,37 +1039,27 @@ bool HullParameterDeterminer::isValidLocation(
                 marker_point.z = possible_foot_location.z;
 
                 std_msgs::ColorRGBA marker_color;
-                if (!(possible_foot_location.x < min_x_stairs_world
-                                + allowed_deviation_from_reachable_stair
-                        && possible_foot_location.x > max_x_stairs_world
-                                - allowed_deviation_from_reachable_stair
-                        && possible_foot_location.z > min_z_stairs_world
-                                - allowed_deviation_from_reachable_stair
-                        && possible_foot_location.z < max_z_stairs_world
-                                + allowed_deviation_from_reachable_stair)) {
+                if (!(possible_foot_location.x < min_x_stairs_world + allowed_deviation_from_reachable_stair
+                        && possible_foot_location.x > max_x_stairs_world - allowed_deviation_from_reachable_stair
+                        && possible_foot_location.z > min_z_stairs_world - allowed_deviation_from_reachable_stair
+                        && possible_foot_location.z < max_z_stairs_world + allowed_deviation_from_reachable_stair)) {
                     marker_color = color_utilities::YELLOW;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
                     marker_color = color_utilities::PURPLE;
                 } else {
                     marker_color = color_utilities::GREEN;
                 }
-                possible_foot_locations_marker_list.points.push_back(
-                    marker_point);
-                possible_foot_locations_marker_list.colors.push_back(
-                    marker_color);
+                possible_foot_locations_marker_list.points.push_back(marker_point);
+                possible_foot_locations_marker_list.colors.push_back(marker_color);
             }
 
             // A possible foot location for the stairs gait is valid if it
             // is reachable by the stairs gait and the location offers
             // support for the entire foot
-            return (possible_foot_location.x < min_x_stairs_world
-                        + allowed_deviation_from_reachable_stair
-                && possible_foot_location.x > max_x_stairs_world
-                        - allowed_deviation_from_reachable_stair
-                && possible_foot_location.z > min_z_stairs_world
-                        - allowed_deviation_from_reachable_stair
-                && possible_foot_location.z < max_z_stairs_world
-                        + allowed_deviation_from_reachable_stair
+            return (possible_foot_location.x < min_x_stairs_world + allowed_deviation_from_reachable_stair
+                && possible_foot_location.x > max_x_stairs_world - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z > min_z_stairs_world - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z < max_z_stairs_world + allowed_deviation_from_reachable_stair
                 && entireFootCanBePlaced(possible_foot_location));
         }
         case RealSenseCategory::curb_up:
@@ -1182,29 +1072,23 @@ bool HullParameterDeterminer::isValidLocation(
                 marker_point.z = possible_foot_location.z;
 
                 std_msgs::ColorRGBA marker_color;
-                if (!(possible_foot_location.z > min_curb_height_world
-                                - allowed_deviation_from_reachable_stair
-                        && possible_foot_location.z < max_curb_height_world
-                                + allowed_deviation_from_reachable_stair)) {
+                if (!(possible_foot_location.z > min_curb_height_world - allowed_deviation_from_reachable_stair
+                        && possible_foot_location.z < max_curb_height_world + allowed_deviation_from_reachable_stair)) {
                     marker_color = color_utilities::YELLOW;
                 } else if (!entireFootCanBePlaced(possible_foot_location)) {
                     marker_color = color_utilities::PURPLE;
                 } else {
                     marker_color = color_utilities::GREEN;
                 }
-                possible_foot_locations_marker_list.points.push_back(
-                    marker_point);
-                possible_foot_locations_marker_list.colors.push_back(
-                    marker_color);
+                possible_foot_locations_marker_list.points.push_back(marker_point);
+                possible_foot_locations_marker_list.colors.push_back(marker_color);
             }
 
             // A possible foot location for the stairs gait is valid if it
             // is reachable by the stairs gait and the location offers
             // support for the entire foot
-            return (possible_foot_location.z > min_curb_height_world
-                        - allowed_deviation_from_reachable_stair
-                && possible_foot_location.z < max_curb_height_world
-                        + allowed_deviation_from_reachable_stair
+            return (possible_foot_location.z > min_curb_height_world - allowed_deviation_from_reachable_stair
+                && possible_foot_location.z < max_curb_height_world + allowed_deviation_from_reachable_stair
                 && entireFootCanBePlaced(possible_foot_location));
         }
         default: {
@@ -1218,8 +1102,7 @@ bool HullParameterDeterminer::isValidLocation(
 
 // Verify if there is support for the entire foot around the possible foot
 // location
-bool HullParameterDeterminer::entireFootCanBePlaced(
-    pcl::PointNormal possible_foot_location)
+bool HullParameterDeterminer::entireFootCanBePlaced(pcl::PointNormal possible_foot_location)
 {
     bool success = true;
     // First create a pointcloud containing the edge points (vertices) of the
@@ -1228,21 +1111,16 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     fillFootPointCloud(foot_pointcloud, possible_foot_location);
 
     // Then find possible foot locations associated with the foot vertices
-    PointNormalCloud::Ptr potential_foot_support_cloud
-        = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVectorUnique(
-        foot_pointcloud, potential_foot_support_cloud);
+    PointNormalCloud::Ptr potential_foot_support_cloud = boost::make_shared<PointNormalCloud>();
+    success &= cropCloudToHullVectorUnique(foot_pointcloud, potential_foot_support_cloud);
 
     // The location is only valid if all foot vertices can be placed
-    success
-        &= (potential_foot_support_cloud->size() == foot_pointcloud->size());
+    success &= (potential_foot_support_cloud->size() == foot_pointcloud->size());
 
     // The location is only valid if the foot vertices have a z value close
     // enough to the locations z value
-    for (pcl::PointNormal potential_foot_support :
-        *potential_foot_support_cloud) {
-        success &= (abs(potential_foot_support.z - possible_foot_location.z)
-            < max_allowed_z_deviation_foot);
+    for (pcl::PointNormal potential_foot_support : *potential_foot_support_cloud) {
+        success &= (abs(potential_foot_support.z - possible_foot_location.z) < max_allowed_z_deviation_foot);
     }
     return success;
 }
@@ -1250,8 +1128,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
 // Fill a point cloud with vertices of the foot on the ground around a
 // possible foot location
 void HullParameterDeterminer::fillFootPointCloud(
-    const PointCloud::Ptr& foot_pointcloud,
-    pcl::PointNormal possible_foot_location)
+    const PointCloud::Ptr& foot_pointcloud, pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(/*__new_size=*/4);
 
@@ -1287,8 +1164,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
         ROS_ERROR_STREAM("No method for finding the general most desirable "
                          "foot location "
                          "is implemented for realsense category: "
-            << realsense_category_.value()
-            << ". Unable to compute general most desirable foot location.");
+            << realsense_category_.value() << ". Unable to compute general most desirable foot location.");
         return false;
     }
     transformer_->transformPoint(most_desirable_foot_location_);
@@ -1308,38 +1184,33 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 
 // Create a point cloud with points on the ground where the points represent
 // where it should be checked if there is a valid foot location
-bool HullParameterDeterminer::getOptionalFootLocations(
-    const PointCloud::Ptr& cloud_to_fill)
+bool HullParameterDeterminer::getOptionalFootLocations(const PointCloud::Ptr& cloud_to_fill)
 {
     bool success = true;
     cloud_to_fill->points.resize(number_of_optional_foot_locations);
     switch (realsense_category_.value()) {
         case RealSenseCategory::stairs_down:
         case RealSenseCategory::stairs_up: {
-            success &= fillOptionalFootLocationCloud(
-                cloud_to_fill, min_x_stairs, max_x_stairs);
+            success &= fillOptionalFootLocationCloud(cloud_to_fill, min_x_stairs, max_x_stairs);
             break;
         }
         case RealSenseCategory::curb_up:
         case RealSenseCategory::curb_down: {
-            success &= fillOptionalFootLocationCloud(
-                cloud_to_fill, min_curb_search, max_curb_search);
+            success &= fillOptionalFootLocationCloud(cloud_to_fill, min_curb_search, max_curb_search);
             break;
         }
         case RealSenseCategory::ramp_down:
         case RealSenseCategory::ramp_up: {
             // Look at a region in between the min and max x value of the
             // step to find the average slope at
-            success &= fillOptionalFootLocationCloud(
-                cloud_to_fill, min_ramp_search, max_ramp_search);
+            success &= fillOptionalFootLocationCloud(cloud_to_fill, min_ramp_search, max_ramp_search);
             break;
         }
         default: {
-            ROS_ERROR_STREAM("The selected obstacle "
-                << realsense_category_.value()
-                << " does not have a way to create the optional foot "
-                   "locations "
-                   "to try cloud");
+            ROS_ERROR_STREAM("The selected obstacle " << realsense_category_.value()
+                                                      << " does not have a way to create the optional foot "
+                                                         "locations "
+                                                         "to try cloud");
             return false;
         }
     }
@@ -1352,15 +1223,12 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
     const PointCloud::Ptr& cloud_to_fill, float start, float end)
 {
     if (number_of_optional_foot_locations == 0) {
-        ROS_ERROR_STREAM(
-            "The number of optional foot locations parameter is set to 0, "
-            "not filling the foot_locations_to_try cloud");
+        ROS_ERROR_STREAM("The number of optional foot locations parameter is set to 0, "
+                         "not filling the foot_locations_to_try cloud");
         return false;
     }
     for (int i = 0; i < number_of_optional_foot_locations; i++) {
-        float x_location = start
-            + (end - start) * (float)i
-                / ((float)number_of_optional_foot_locations - 1.0F);
+        float x_location = start + (end - start) * (float)i / ((float)number_of_optional_foot_locations - 1.0F);
         cloud_to_fill->points[i].x = x_location;
         cloud_to_fill->points[i].y = y_deviation_foot;
         cloud_to_fill->points[i].z = 0;
@@ -1388,8 +1256,7 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
  * with the normal of the plane This process is repeated for each hull.
  * Returns whether the calculations were executed successfully **/
 bool HullParameterDeterminer::cropCloudToHullVector(
-    PointCloud::Ptr const& input_cloud,
-    const PointNormalCloud::Ptr& output_cloud)
+    PointCloud::Ptr const& input_cloud, const PointNormalCloud::Ptr& output_cloud)
 {
     if (input_cloud->points.size() == 0) {
         ROS_WARN_STREAM("cropCloudToHullVector method called with an input "
@@ -1397,25 +1264,21 @@ bool HullParameterDeterminer::cropCloudToHullVector(
                         "No cropping can be done, returning.");
         return false;
     } else if (hull_vector_->size() == 0) {
-        ROS_ERROR_STREAM(
-            "cropCloudToHull method called with emtpy hull_vector_. "
-            "No cropping can be done, returning.");
+        ROS_ERROR_STREAM("cropCloudToHull method called with emtpy hull_vector_. "
+                         "No cropping can be done, returning.");
         return false;
     }
     bool success = true;
     for (int hull_index = 0; hull_index < hull_vector_->size(); hull_index++) {
         PointCloud::Ptr elevated_cloud = boost::make_shared<PointCloud>();
-        success &= addZCoordinateToCloudFromPlaneCoefficients(input_cloud,
-            plane_coefficients_vector_->at(hull_index), elevated_cloud);
+        success &= addZCoordinateToCloudFromPlaneCoefficients(
+            input_cloud, plane_coefficients_vector_->at(hull_index), elevated_cloud);
 
-        success &= cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index),
-            polygon_vector_->at(hull_index));
+        success &= cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index), polygon_vector_->at(hull_index));
 
-        PointNormalCloud::Ptr elevated_cloud_with_normals
-            = boost::make_shared<PointNormalCloud>();
-        success &= addNormalToCloudFromPlaneCoefficients(elevated_cloud,
-            plane_coefficients_vector_->at(hull_index),
-            elevated_cloud_with_normals);
+        PointNormalCloud::Ptr elevated_cloud_with_normals = boost::make_shared<PointNormalCloud>();
+        success &= addNormalToCloudFromPlaneCoefficients(
+            elevated_cloud, plane_coefficients_vector_->at(hull_index), elevated_cloud_with_normals);
 
         *output_cloud += *elevated_cloud_with_normals;
     }
@@ -1436,23 +1299,18 @@ bool HullParameterDeterminer::cropPointToHullVector(
 // Crops a cloud to a hull vector, but only puts each input point in
 // the highest hull it falls into
 bool HullParameterDeterminer::cropCloudToHullVectorUnique(
-    PointCloud::Ptr const& input_cloud,
-    const PointNormalCloud::Ptr& output_cloud)
+    PointCloud::Ptr const& input_cloud, const PointNormalCloud::Ptr& output_cloud)
 {
     bool success = true;
 
     for (pcl::PointXYZ ground_point : *input_cloud) {
 
-        PointNormalCloud::Ptr potential_foot_locations_of_point
-            = boost::make_shared<PointNormalCloud>();
-        success &= HullParameterDeterminer::cropPointToHullVector(
-            ground_point, potential_foot_locations_of_point);
+        PointNormalCloud::Ptr potential_foot_locations_of_point = boost::make_shared<PointNormalCloud>();
+        success &= HullParameterDeterminer::cropPointToHullVector(ground_point, potential_foot_locations_of_point);
 
         if (potential_foot_locations_of_point->points.size() != 0) {
-            auto result
-                = std::max_element(potential_foot_locations_of_point->begin(),
-                    potential_foot_locations_of_point->end(),
-                    linear_algebra_utilities::pointIsLower);
+            auto result = std::max_element(potential_foot_locations_of_point->begin(),
+                potential_foot_locations_of_point->end(), linear_algebra_utilities::pointIsLower);
             output_cloud->push_back(*result);
         }
     }
@@ -1461,10 +1319,8 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
 
 // Elevate the 2D points so they have z coordinate as if they lie on the
 // plane of the hull
-bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
-    PointCloud::Ptr const& input_cloud,
-    PlaneCoefficients::Ptr const& plane_coefficients,
-    const PointCloud::Ptr& elevated_cloud)
+bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(PointCloud::Ptr const& input_cloud,
+    PlaneCoefficients::Ptr const& plane_coefficients, const PointCloud::Ptr& elevated_cloud)
 {
     elevated_cloud->points.resize(input_cloud->points.size());
 
@@ -1475,11 +1331,9 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
         pcl::PointXYZ input_point = input_cloud->points[point_index];
         elevated_point.x = input_point.x;
         elevated_point.y = input_point.y;
-        elevated_point.z = -(plane_coefficients->values[3]
-                               + plane_coefficients->values[1]
-                                   * input_cloud->points[point_index].y
-                               + plane_coefficients->values[0]
-                                   * input_cloud->points[point_index].x)
+        elevated_point.z
+            = -(plane_coefficients->values[3] + plane_coefficients->values[1] * input_cloud->points[point_index].y
+                  + plane_coefficients->values[0] * input_cloud->points[point_index].x)
             / plane_coefficients->values[2];
 
         point_index++;
@@ -1489,8 +1343,7 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
 
 // Remove all points from a cloud which do not fall in the hull
 bool HullParameterDeterminer::cropCloudToHull(
-    const PointCloud::Ptr& elevated_cloud, const Hull::Ptr& hull,
-    const Polygon& polygon)
+    const PointCloud::Ptr& elevated_cloud, const Hull::Ptr& hull, const Polygon& polygon)
 {
     if (elevated_cloud->points.size() == 0) {
         ROS_WARN_STREAM("The cloud to be cropped in the "
@@ -1508,19 +1361,16 @@ bool HullParameterDeterminer::cropCloudToHull(
 
 // Add normals to the elevated cloud which correspond to the normal vector
 // of the plane
-bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
-    PointCloud::Ptr const& elevated_cloud,
-    PlaneCoefficients::Ptr const& plane_coefficients,
-    const PointNormalCloud::Ptr& elevated_cloud_with_normals)
+bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr const& elevated_cloud,
+    PlaneCoefficients::Ptr const& plane_coefficients, const PointNormalCloud::Ptr& elevated_cloud_with_normals)
 {
     elevated_cloud_with_normals->width = elevated_cloud->width;
     elevated_cloud_with_normals->height = elevated_cloud->height;
     elevated_cloud_with_normals->points.resize(elevated_cloud->points.size());
 
-    float normalising_constant
-        = sqrt(plane_coefficients->values[0] * plane_coefficients->values[0]
-            + plane_coefficients->values[1] * plane_coefficients->values[1]
-            + plane_coefficients->values[2] * plane_coefficients->values[2]);
+    float normalising_constant = sqrt(plane_coefficients->values[0] * plane_coefficients->values[0]
+        + plane_coefficients->values[1] * plane_coefficients->values[1]
+        + plane_coefficients->values[2] * plane_coefficients->values[2]);
 
     if (normalising_constant < std::numeric_limits<double>::epsilon()) {
         ROS_ERROR_STREAM("The normal vector of the current plane is too close "
@@ -1529,8 +1379,7 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
     }
 
     int point_index = 0;
-    for (pcl::PointNormal& elevated_point_with_normal :
-        *elevated_cloud_with_normals) {
+    for (pcl::PointNormal& elevated_point_with_normal : *elevated_cloud_with_normals) {
         pcl::PointXYZ elevated_point = elevated_cloud->points[point_index];
         elevated_point_with_normal.x = elevated_point.x;
         elevated_point_with_normal.y = elevated_point.y;
@@ -1538,12 +1387,9 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
 
         // using that [a b c]^T is perpendicular to the plane in plane
         // equation ax + by + cz + d = 0
-        elevated_point_with_normal.normal_x
-            = plane_coefficients->values[0] / normalising_constant;
-        elevated_point_with_normal.normal_y
-            = plane_coefficients->values[1] / normalising_constant;
-        elevated_point_with_normal.normal_z
-            = plane_coefficients->values[2] / normalising_constant;
+        elevated_point_with_normal.normal_x = plane_coefficients->values[0] / normalising_constant;
+        elevated_point_with_normal.normal_y = plane_coefficients->values[1] / normalising_constant;
+        elevated_point_with_normal.normal_z = plane_coefficients->values[2] / normalising_constant;
         point_index++;
     }
     return true;
@@ -1551,10 +1397,8 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
 
 bool SimpleParameterDeterminer::determineParameters(
     boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
-    boost::shared_ptr<HullVector> const hull_vector,
-    boost::shared_ptr<PolygonVector> const polygon_vector,
-    RealSenseCategory const realsense_category,
-    boost::shared_ptr<GaitParameters> gait_parameters,
+    boost::shared_ptr<HullVector> const hull_vector, boost::shared_ptr<PolygonVector> const polygon_vector,
+    RealSenseCategory const realsense_category, boost::shared_ptr<GaitParameters> gait_parameters,
     std::string frame_id_to_transform_to, std::string subgait_name)
 {
     ROS_DEBUG("Determining parameters with simple parameter determiner");

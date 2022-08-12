@@ -20,8 +20,7 @@ void scrollReference(vector<vector<double>>& reference);
  * @param N
  * @param dt
  */
-void sinRef(vector<vector<double>>& reference, double freq, double amplitude,
-    int N, double dt);
+void sinRef(vector<vector<double>>& reference, double freq, double amplitude, int N, double dt);
 
 /**
  * \brief Add a step reference to the existing reference vector with the

@@ -77,8 +77,7 @@ public:
             case torque:
                 return "torque";
             default:
-                ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position",
-                    this->value_);
+                ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position", this->value_);
                 return "unknown";
         }
     }

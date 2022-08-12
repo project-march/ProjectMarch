@@ -14,8 +14,7 @@
 // least as long as the lifetime of this object. Otherwise,
 // undefined behavior WILL happen.
 bool ModelPredictiveControllerInterface::init(
-    std::vector<hardware_interface::JointHandle>& joint_handles,
-    ros::NodeHandle& nh)
+    std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
     // Get joint handles and the amount of joints to control
     joint_handles_ptr_ = &joint_handles;
@@ -48,9 +47,7 @@ bool ModelPredictiveControllerInterface::init(
     // Determine which joints use mpc and which use pid
     joint_uses_mpc_.resize(joint_names.size());
     for (unsigned int i = 0; i < joint_names.size(); ++i) {
-        if (std::find(
-                pid_joint_names.begin(), pid_joint_names.end(), joint_names[i])
-            != pid_joint_names.end()) {
+        if (std::find(pid_joint_names.begin(), pid_joint_names.end(), joint_names[i]) != pid_joint_names.end()) {
             // Is a pid joint
             joint_uses_mpc_[i] = false;
         } else {
@@ -71,28 +68,23 @@ bool ModelPredictiveControllerInterface::init(
     end_reference.reserve(ACADO_NYN);
 
     // Initialize the place where the MPC message will be published
-    mpc_pub_ = std::make_unique<
-        realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(
-        nh, "/march/mpc/", 10);
+    mpc_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/", 10);
     mpc_pub_->msg_.joint.resize(num_mpc_joints_);
 
     // Initialize the model predictive controller
-    model_predictive_controller_ = std::make_unique<ModelPredictiveController>(
-        getWeights(mpc_joint_names, nh));
+    model_predictive_controller_ = std::make_unique<ModelPredictiveController>(getWeights(mpc_joint_names, nh));
     model_predictive_controller_->init();
 
     // Initialize PIDs
     pids_.resize(pid_joint_names.size());
     for (unsigned int i = 0; i < pids_.size(); ++i) {
         // Node handle to PID gains
-        ros::NodeHandle joint_nh(
-            nh, std::string(/*__s=*/"gains/") + pid_joint_names[i]);
+        ros::NodeHandle joint_nh(nh, std::string(/*__s=*/"gains/") + pid_joint_names[i]);
 
         // Init PID gains from ROS parameter server
         pids_[i].reset(new control_toolbox::Pid());
         if (!pids_[i]->init(joint_nh)) {
-            ROS_WARN_STREAM(
-                "Failed to initialize PID gains from ROS parameter server.");
+            ROS_WARN_STREAM("Failed to initialize PID gains from ROS parameter server.");
             return false;
         }
     }
@@ -135,27 +127,20 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(
         JOINT_NU.push_back(R_temp.size());
 
         // Check for validity of the weighting arrays
-        ROS_ERROR_STREAM_COND(Q_temp.empty(),
-            mpc_joint_names[i]
-                << ", Q array has not been supplied or is empty");
-        ROS_ERROR_STREAM_COND(R_temp.empty(),
-            mpc_joint_names[i]
-                << ", R array has not been supplied or is empty");
+        ROS_ERROR_STREAM_COND(Q_temp.empty(), mpc_joint_names[i] << ", Q array has not been supplied or is empty");
+        ROS_ERROR_STREAM_COND(R_temp.empty(), mpc_joint_names[i] << ", R array has not been supplied or is empty");
 
         // Set Q and R for the mpc msg
-        mpc_pub_->msg_.joint[i].tuning.q_weights.assign(
-            Q_temp.begin(), Q_temp.end());
-        mpc_pub_->msg_.joint[i].tuning.r_weights.assign(
-            R_temp.begin(), R_temp.end());
+        mpc_pub_->msg_.joint[i].tuning.q_weights.assign(Q_temp.begin(), Q_temp.end());
+        mpc_pub_->msg_.joint[i].tuning.r_weights.assign(R_temp.begin(), R_temp.end());
     }
 
     // Add Q and R to W
     W.insert(W.end(), Q.begin(), Q.end());
     W.insert(W.end(), R.begin(), R.end());
 
-    ROS_ERROR_STREAM_COND(W.size() != ACADO_NY,
-        "Incorrect weighting array size, size should be "
-            << ACADO_NY << " but is " << W.size());
+    ROS_ERROR_STREAM_COND(
+        W.size() != ACADO_NY, "Incorrect weighting array size, size should be " << ACADO_NY << " but is " << W.size());
 
     return W;
 }
@@ -188,13 +173,11 @@ void ModelPredictiveControllerInterface::initMpcMsg()
 
         // Loop trough the states
         for (unsigned int j = 0; j < JOINT_NX[i]; j++) {
-            mpc_pub_->msg_.joint[i].estimation.states[j].array.resize(
-                ACADO_N + 1);
+            mpc_pub_->msg_.joint[i].estimation.states[j].array.resize(ACADO_N + 1);
         }
         // Loop trough all the outputs
         for (unsigned int j = 0; j < JOINT_NX[i]; j++) {
-            mpc_pub_->msg_.joint[i].reference.states[j].array.resize(
-                ACADO_N + 1);
+            mpc_pub_->msg_.joint[i].reference.states[j].array.resize(ACADO_N + 1);
         }
 
         // Loop trough all the inputs
@@ -215,10 +198,8 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
     // Get the starting column indices for the current joint (states, inputs,
     // estimation and reference) required because we can't be certain that the
     // amount of states and inputs are equal for all joints
-    int col_joint_state
-        = std::accumulate(JOINT_NX.begin(), JOINT_NX.begin() + i, /*init=*/0.0);
-    int col_joint_input
-        = std::accumulate(JOINT_NU.begin(), JOINT_NU.begin() + i, /*init=*/0.0);
+    int col_joint_state = std::accumulate(JOINT_NX.begin(), JOINT_NX.begin() + i, /*init=*/0.0);
+    int col_joint_input = std::accumulate(JOINT_NU.begin(), JOINT_NU.begin() + i, /*init=*/0.0);
 
     // Variables that only have to be set once
     if (joint_number == 0) {
@@ -226,19 +207,14 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
         mpc_pub_->msg_.header.stamp = ros::Time::now();
 
         // Acado solver time diagnostics
-        mpc_pub_->msg_.diagnostics.preparation_time
-            = model_predictive_controller_->t_preparation;
-        mpc_pub_->msg_.diagnostics.feedback_time
-            = model_predictive_controller_->t_feedback;
+        mpc_pub_->msg_.diagnostics.preparation_time = model_predictive_controller_->t_preparation;
+        mpc_pub_->msg_.diagnostics.feedback_time = model_predictive_controller_->t_feedback;
         mpc_pub_->msg_.diagnostics.total_time
-            = model_predictive_controller_->t_preparation
-            + model_predictive_controller_->t_feedback;
+            = model_predictive_controller_->t_preparation + model_predictive_controller_->t_feedback;
 
         // Acado & QPoasis error diagnostics
-        mpc_pub_->msg_.diagnostics.preparation_status
-            = model_predictive_controller_->preparationStepStatus;
-        mpc_pub_->msg_.diagnostics.feedback_status
-            = model_predictive_controller_->feedbackStepStatus;
+        mpc_pub_->msg_.diagnostics.preparation_status = model_predictive_controller_->preparationStepStatus;
+        mpc_pub_->msg_.diagnostics.feedback_status = model_predictive_controller_->feedbackStepStatus;
 
         // Objective function cost
         mpc_pub_->msg_.diagnostics.cost = model_predictive_controller_->cost;
@@ -267,8 +243,7 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
 
             // Set input reference
             mpc_pub_->msg_.joint[i].reference.inputs[u_i].array[n_i]
-                = acadoVariables
-                      .y[u_i + ACADO_NYN + n_i * ACADO_NY + col_joint_input];
+                = acadoVariables.y[u_i + ACADO_NYN + n_i * ACADO_NY + col_joint_input];
         }
     }
 
@@ -279,14 +254,12 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
             = acadoVariables.x[x_i + ACADO_NX * ACADO_N + col_joint_state];
 
         // set state reference
-        mpc_pub_->msg_.joint[i].reference.states[x_i].array[ACADO_N]
-            = acadoVariables.yN[x_i + col_joint_state];
+        mpc_pub_->msg_.joint[i].reference.states[x_i].array[ACADO_N] = acadoVariables.yN[x_i + col_joint_state];
     }
 }
 
 // Function that calculates the command that needs to be send to each joint
-void ModelPredictiveControllerInterface::updateCommand(
-    const ros::Time& /*time*/, const ros::Duration& period,
+void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
     const std::vector<joint_trajectory_controller::State>& desired_states,
     const joint_trajectory_controller::State& state_error)
 {
@@ -301,8 +274,7 @@ void ModelPredictiveControllerInterface::updateCommand(
     for (int i = 0; i < num_joints_; ++i) {
         if (joint_uses_mpc_[i]) {
             initial_state.insert(initial_state.end(),
-                { (*joint_handles_ptr_)[i].getPosition(),
-                    (*joint_handles_ptr_)[i].getVelocity() });
+                { (*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity() });
         }
     }
 
@@ -310,21 +282,17 @@ void ModelPredictiveControllerInterface::updateCommand(
     for (int n = 0; n < ACADO_N; ++n) {
         for (int i = 0; i < num_joints_; ++i) {
             if (joint_uses_mpc_[i]) {
-                reference.insert(reference.end(),
-                    { desired_states[n].position[i],
-                        desired_states[n].velocity[i] });
+                reference.insert(reference.end(), { desired_states[n].position[i], desired_states[n].velocity[i] });
             }
         }
-        reference.insert(
-            reference.end(), desired_inputs.begin(), desired_inputs.end());
+        reference.insert(reference.end(), desired_inputs.begin(), desired_inputs.end());
     }
 
     // Get "end" reference of each joint combined
     for (int i = 0; i < num_joints_; ++i) {
         if (joint_uses_mpc_[i]) {
-            end_reference.insert(end_reference.end(),
-                { desired_states[ACADO_N].position[i],
-                    desired_states[ACADO_N].velocity[i] });
+            end_reference.insert(
+                end_reference.end(), { desired_states[ACADO_N].position[i], desired_states[ACADO_N].velocity[i] });
         }
     }
 
@@ -349,8 +317,8 @@ void ModelPredictiveControllerInterface::updateCommand(
     int pid_index = 0;
     for (int i = 0; i < num_joints_; ++i) {
         if (!joint_uses_mpc_[i]) {
-            pid_command_[pid_index] = pids_[pid_index]->computeCommand(
-                state_error.position[i], state_error.velocity[i], period);
+            pid_command_[pid_index]
+                = pids_[pid_index]->computeCommand(state_error.position[i], state_error.velocity[i], period);
             pid_index++;
         }
     }
@@ -392,8 +360,7 @@ void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 
 // Exporting the controller plugin
 namespace model_predictive_trajectory_controller {
-typedef joint_trajectory_controller::JointTrajectoryController<
-    trajectory_interface::QuinticSplineSegment<double>,
+typedef joint_trajectory_controller::JointTrajectoryController<trajectory_interface::QuinticSplineSegment<double>,
     hardware_interface::EffortJointInterface>
 
     JointTrajectoryController;
@@ -401,5 +368,4 @@ typedef joint_trajectory_controller::JointTrajectoryController<
 } // namespace model_predictive_trajectory_controller
 
 PLUGINLIB_EXPORT_CLASS(
-    model_predictive_trajectory_controller::JointTrajectoryController,
-    controller_interface::ControllerBase);
+    model_predictive_trajectory_controller::JointTrajectoryController, controller_interface::ControllerBase);

@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "../mocks/mock_absolute_encoder.h"
 #include "../mocks/mock_incremental_encoder.h"
@@ -78,3 +80,5 @@ TEST_F(IMotionCubeTest, OperationEnabledWithoutActuationMode)
         std::move(this->mock_incremental_encoder), march::ActuationMode::unknown);
     ASSERT_THROW(imc.prepareActuation(), march::error::HardwareException);
 }
+// NOLINTEND
+#endif

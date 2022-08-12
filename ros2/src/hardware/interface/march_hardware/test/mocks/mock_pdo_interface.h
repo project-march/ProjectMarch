@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 #pragma once
 #include "march_hardware/ethercat/pdo_interface.h"
 #include "march_hardware/ethercat/pdo_types.h"
@@ -20,3 +22,5 @@ public:
 };
 
 using MockPdoInterfacePtr = std::shared_ptr<MockPdoInterface>;
+// NOLINTEND
+#endif

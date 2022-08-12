@@ -22,12 +22,10 @@
 //#define DEBUG_EFFORT
 
 namespace march {
-ODrive::ODrive(const Slave& slave, ODriveAxis axis,
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    std::unique_ptr<IncrementalEncoder> incremental_encoder,
-    ActuationMode actuation_mode, bool index_found, unsigned int motor_kv)
-    : MotorController(slave, std::move(absolute_encoder),
-        std::move(incremental_encoder), actuation_mode)
+ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+    std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode, bool index_found,
+    unsigned int motor_kv)
+    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
     , axis_(axis)
     , index_found_(index_found)
 {
@@ -43,8 +41,7 @@ std::optional<ros::Duration> ODrive::reset()
 
 std::optional<ros::Duration> ODrive::prepareActuation()
 {
-    if (!index_found_
-        && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+    if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
         return ros::Duration(/*t=*/10);
     } else {
@@ -66,8 +63,8 @@ void ODrive::waitForState(ODriveAxisState target_state)
 {
     auto current_state = getAxisState();
     while (current_state != target_state) {
-        ROS_INFO("Waiting for '%s', currently in '%s'",
-            target_state.toString().c_str(), current_state.toString().c_str());
+        ROS_INFO(
+            "Waiting for '%s', currently in '%s'", target_state.toString().c_str(), current_state.toString().c_str());
 
         ros::Duration(/*t=*/1).sleep();
         current_state = getAxisState();
@@ -77,22 +74,17 @@ void ODrive::waitForState(ODriveAxisState target_state)
 void ODrive::actuateTorque(float target_effort)
 {
     if (target_effort > EFFORT_LIMIT || target_effort < -EFFORT_LIMIT) {
-        throw error::HardwareException(
-            error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-            "Target effort of %f exceeds effort limit of %f", target_effort,
-            EFFORT_LIMIT);
+        throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+            "Target effort of %f exceeds effort limit of %f", target_effort, EFFORT_LIMIT);
     }
 
-    float target_torque
-        = target_effort * torque_constant_ * (float)getMotorDirection();
+    float target_torque = target_effort * torque_constant_ * (float)getMotorDirection();
 #ifdef DEBUG_EFFORT
     ROS_INFO("Effort: %f", target_effort);
     ROS_INFO("Torque: %f", target_torque);
 #endif
     bit32 write_torque = { .f = target_torque };
-    this->write32(
-        ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_),
-        write_torque);
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
 }
 
 int ODrive::getActuationModeNumber() const
@@ -157,25 +149,17 @@ float ODrive::getTorque()
 
 float ODrive::getTemperature()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::Temperature, axis_))
-        .f;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Temperature, axis_)).f;
 }
 
 ODriveAxisState ODrive::getAxisState()
 {
-    return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(
-                                            ODriveObjectName::AxisState, axis_))
-                               .ui);
+    return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
 }
 
 int32_t ODrive::getAbsolutePositionIU()
 {
-    int32_t iu_value
-        = this->read32(ODrivePDOmap::getMISOByteOffset(
-                           ODriveObjectName::ActualPosition, axis_))
-              .i;
+    int32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualPosition, axis_)).i;
 
     switch (absolute_encoder_->getDirection()) {
         case Encoder::Direction::Positive:
@@ -183,31 +167,25 @@ int32_t ODrive::getAbsolutePositionIU()
         case Encoder::Direction::Negative:
             return this->absolute_encoder_->getTotalPositions() - iu_value;
         default:
-            throw error::HardwareException(
-                error::ErrorType::INVALID_ENCODER_DIRECTION);
+            throw error::HardwareException(error::ErrorType::INVALID_ENCODER_DIRECTION);
     }
 }
 
 int32_t ODrive::getIncrementalPositionIU()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::MotorPosition, axis_))
-               .i
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorPosition, axis_)).i
         * incremental_encoder_->getDirection();
 }
 
 float ODrive::getIncrementalVelocityIU()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::ActualVelocity, axis_))
-               .f
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualVelocity, axis_)).f
         * (float)incremental_encoder_->getDirection();
 }
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return (float)this->getAbsoluteEncoder()->positionIUToRadians(
-        getAbsolutePositionIU());
+    return (float)this->getAbsoluteEncoder()->positionIUToRadians(getAbsolutePositionIU());
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
@@ -218,21 +196,17 @@ float ODrive::getAbsoluteVelocityUnchecked()
 
 float ODrive::getIncrementalPositionUnchecked()
 {
-    return (float)this->getIncrementalEncoder()->positionIUToRadians(
-        getIncrementalPositionIU());
+    return (float)this->getIncrementalEncoder()->positionIUToRadians(getIncrementalPositionIU());
 }
 
 float ODrive::getIncrementalVelocityUnchecked()
 {
-    return (float)this->getIncrementalEncoder()->velocityIUToRadians(
-        getIncrementalVelocityIU());
+    return (float)this->getIncrementalEncoder()->velocityIUToRadians(getIncrementalVelocityIU());
 }
 
 float ODrive::getMotorCurrent()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(
-                            ODriveObjectName::ActualCurrent, axis_))
-               .f
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualCurrent, axis_)).f
         * (float)getMotorDirection();
 }
 
@@ -243,42 +217,27 @@ float ODrive::getActualEffort()
 
 uint32_t ODrive::getAxisError()
 {
-    return this
-        ->read32(
-            ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_))
-        .ui;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
 }
 
 uint32_t ODrive::getMotorError()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::MotorError, axis_))
-        .ui;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
 }
 
 uint32_t ODrive::getDieBOSlaveError()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::DieBOSlaveError, axis_))
-        .ui;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::DieBOSlaveError, axis_)).ui;
 }
 
 uint32_t ODrive::getEncoderError()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::EncoderError, axis_))
-        .ui;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
 }
 
 uint32_t ODrive::getControllerError()
 {
-    return this
-        ->read32(ODrivePDOmap::getMISOByteOffset(
-            ODriveObjectName::ControllerError, axis_))
-        .ui;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
 }
 
 Encoder::Direction ODrive::getMotorDirection() const
@@ -290,9 +249,7 @@ Encoder::Direction ODrive::getMotorDirection() const
 void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct = { .ui = state.value_ };
-    this->write32(ODrivePDOmap::getMOSIByteOffset(
-                      ODriveObjectName::RequestedState, axis_),
-        write_struct);
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 
 double ODrive::getEffortLimit()

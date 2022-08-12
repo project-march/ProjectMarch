@@ -26,17 +26,14 @@ private:
 public:
     using iterator = std::vector<Joint>::iterator;
 
-    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string if_name, int ecatCycleTime,
+        int ecatSlaveTimeout);
+
+    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, std::vector<PressureSole> pressureSoles,
         ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
 
-    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-        std::vector<PressureSole> pressureSoles, ::std::string if_name,
-        int ecatCycleTime, int ecatSlaveTimeout);
-
-    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-        std::vector<PressureSole> pressureSoles, ::std::string if_name,
-        int ecatCycleTime, int ecatSlaveTimeout,
-        std::optional<PowerDistributionBoard>);
+    MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, std::vector<PressureSole> pressureSoles,
+        ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout, std::optional<PowerDistributionBoard>);
 
     ~MarchRobot();
 
@@ -108,8 +105,7 @@ public:
     }
 
     /** @brief Override stream operator for clean printing */
-    friend ::std::ostream& operator<<(
-        std::ostream& os, const MarchRobot& marchRobot)
+    friend ::std::ostream& operator<<(std::ostream& os, const MarchRobot& marchRobot)
     {
         for (unsigned int i = 0; i < marchRobot.jointList.size(); i++) {
             os << marchRobot.jointList.at(i) << "\n";

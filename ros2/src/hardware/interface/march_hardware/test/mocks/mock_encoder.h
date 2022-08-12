@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 #pragma once
 #include "march_hardware/encoder/encoder.h"
 #include "march_hardware/motor_controller/motor_controller_type.h"
@@ -21,3 +23,5 @@ public:
     MOCK_CONST_METHOD1(positionRadiansToIU, double(double));
     MOCK_CONST_METHOD1(velocityRadiansToIU, double(double));
 };
+// NOLINTEND
+#endif

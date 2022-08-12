@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "../mocks/mock_slave.h"
 #include "march_hardware/temperature/temperature_ges.h"
@@ -36,3 +38,5 @@ TEST_F(TemperatureGESTest, GetTemperature)
 
     ASSERT_FLOAT_EQ(ges.getTemperature(), temperature);
 }
+// NOLINTEND
+#endif

@@ -35,6 +35,17 @@ MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
     , clock_(rclcpp::Clock())
 {
+    go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
+}
+
+/** \brief This should ensure that it goes to the stop state when the instance is being deleted.
+ *  \note This doesn't work for thrown exceptions this is why we still call
+ *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
+ */
+MarchExoSystemInterface::~MarchExoSystemInterface()
+{
+    // NOLINT because this is intended. It needs to calls its own implementation, not that from its child class.
+    stop(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
 }
 
 /** Configures the controller.
@@ -55,8 +66,9 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/ { hardware_interface::HW_IF_EFFORT },
-            /*required_state_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
-                                             hardware_interface::HW_IF_EFFORT },
+            /*required_state_interfaces=*/
+            { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
+                hardware_interface::HW_IF_EFFORT },
             /*logger=*/(*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
@@ -85,9 +97,22 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     return hardware_interface::return_type::OK;
 }
 
-/// Builds a JointInfo object uses parameters for some value.
+/** \brief Builds a JointInfo object uses parameters for some value.
+ * \note Most of the defaults param values are set in the ros2_control xacro in package `march_control`.
+ */
 JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::ComponentInfo& joint)
 {
+
+    string stop_hardl_param = get_parameter(joint, "stop_when_outside_hard_limits", "true");
+    bool stop_when_outside_hard_limits
+        = !(stop_hardl_param == "false" or stop_hardl_param == "0" or stop_hardl_param == "False");
+    if (stop_when_outside_hard_limits
+        and !(stop_hardl_param == "true" or stop_hardl_param == "1" or stop_hardl_param == "True")) {
+        RCLCPP_WARN((*logger_),
+            "Joint: %s, got param '%s' for `stop_when_outside_hard_limits` but expected "
+            "['true', 'false', '0', '1', 'True', 'False']. Defaulting to True.",
+            joint.name.c_str(), stop_hardl_param.c_str());
+    }
     return { /*name=*/joint.name.c_str(),
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
@@ -97,13 +122,15 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
-            /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "200")),
+            /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
             /*last_time_not_in_soft_error_limit=*/std::chrono::steady_clock::now(),
             /*msec_until_error_when_in_error_soft_limits=*/
-            std::chrono::milliseconds { stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "0")) },
+            std::chrono::milliseconds {
+                stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "1000")) },
             /*soft_error_limit_warning_throttle_msec=*/
-            stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "50")),
-            /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10")) } };
+            stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "300")),
+            /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10")),
+            /*stop_when_outside_hard_limits=*/stop_when_outside_hard_limits } };
 }
 
 /** Returns a vector of the StateInterfaces.
@@ -127,7 +154,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
-                jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.effort_actual));
+            jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
     }
     return state_interfaces;
 }
@@ -220,6 +247,9 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
             make_joints_operational(march_robot_->getNotOperationalJoints());
             joints_ready_for_actuation_ = true;
             RCLCPP_INFO((*logger_), "%sAll joints ready for writing.", LColor::GREEN);
+            for (JointInfo& jointInfo : joints_info_) {
+                jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
+            }
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
@@ -308,6 +338,19 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
+    // Battery, TODO: Change this to a broadcaster.
+    auto battery_voltage = march_robot_->getPowerDistributionBoard().read().battery_voltage.f;
+    if (battery_voltage != 0) {
+        if (battery_voltage < 43) {
+            RCLCPP_ERROR_THROTTLE(
+                (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", battery_voltage);
+        } else if (battery_voltage < 45) {
+            RCLCPP_WARN_THROTTLE(
+                (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", battery_voltage);
+        }
+        RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Battery voltage is %gV.", battery_voltage);
+    }
+
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
@@ -372,6 +415,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
 {
     // SOFT Limit check.
     if (jointInfo.joint.isWithinSoftLimits()) {
+        jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
         return false;
     }
     const auto& abs_encoder = jointInfo.joint.getMotorController()->getAbsoluteEncoder();
@@ -387,8 +431,9 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
         jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
         return false;
     }
-    auto time_in_error_limits = (jointInfo.limit.last_time_not_in_soft_error_limit - std::chrono::steady_clock::now());
-    if (time_in_error_limits > jointInfo.limit.msec_until_error_when_in_error_soft_limits) {
+    auto time_in_error_limits = (std::chrono::steady_clock::now() - jointInfo.limit.last_time_not_in_soft_error_limit);
+    if (jointInfo.limit.msec_until_error_when_in_error_soft_limits > 0s
+        && time_in_error_limits > jointInfo.limit.msec_until_error_when_in_error_soft_limits) {
         RCLCPP_FATAL((*logger_),
             "Joint %s (%g rad; %i IU) is outside its soft ERROR limits [%i, %i], for %d "
             "milliseconds. REACHED its max allowed time of %i milliseconds, STOPPING ROS...",
@@ -403,7 +448,7 @@ bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
         abs_encoder->getUpperErrorSoftLimitIU(), time_in_error_limits.count());
 
     // HARD limit check.
-    if (!jointInfo.joint.isWithinHardLimits()) {
+    if (jointInfo.limit.stop_when_outside_hard_limits && !jointInfo.joint.isWithinHardLimits()) {
         RCLCPP_FATAL((*logger_),
             "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
             "\n\tposition: %g rad; %i IU."

@@ -32,6 +32,9 @@ public:
     MARCH_HARDWARE_INTERFACE_PUBLIC ~MarchRvizSystemInterface();
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
+    ~MarchRvizSystemInterface() override;
+
+    MARCH_HARDWARE_INTERFACE_PUBLIC
     hardware_interface::return_type configure(const hardware_interface::HardwareInfo& info) override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC

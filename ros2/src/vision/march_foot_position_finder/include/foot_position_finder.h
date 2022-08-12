@@ -31,26 +31,22 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class FootPositionFinder {
 public:
-    explicit FootPositionFinder(
-        rclcpp::Node* n, const std::string& left_or_right);
+    explicit FootPositionFinder(rclcpp::Node* n, const std::string& left_or_right);
 
     void readParameters(const std::vector<rclcpp::Parameter>& parameters);
 
     ~FootPositionFinder() = default;
 
 protected:
-    void currentStateCallback(
-        const march_shared_msgs::msg::CurrentState::SharedPtr msg);
+    void currentStateCallback(const march_shared_msgs::msg::CurrentState::SharedPtr msg);
 
     void resetInitialPosition(bool stop_timer);
 
-    void chosenOtherPointCallback(
-        const march_shared_msgs::msg::FootPosition::SharedPtr msg);
+    void chosenOtherPointCallback(const march_shared_msgs::msg::FootPosition::SharedPtr msg);
 
     void processRealSenseDepthFrames();
 
-    void processSimulatedDepthFrames(
-        const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
+    void processSimulatedDepthFrames(const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
 
     void processPointCloud(const PointCloud::Ptr& pointcloud);
 
@@ -58,8 +54,7 @@ protected:
 
     Point computeTemporalAveragePoint(const Point& new_point);
 
-    Point transformPoint(Point point, const std::string& frame_from,
-        const std::string& frame_to);
+    Point transformPoint(Point point, const std::string& frame_from, const std::string& frame_to);
 
     rclcpp::Node* n_;
     std::unique_ptr<Preprocessor> preprocessor_ { nullptr };
@@ -68,22 +63,19 @@ protected:
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_ { nullptr };
     std::shared_ptr<tf2_ros::Buffer> tf_buffer_ { nullptr };
 
-    rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr
-        point_publisher_;
-    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr
-        pointcloud_subscriber_;
+    rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr point_publisher_;
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_subscriber_;
 
-    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr
-        preprocessed_pointcloud_publisher_;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr
-        point_marker_publisher_;
-    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr
-        other_chosen_point_subscriber_;
-    rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr
-        current_state_subscriber_;
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr preprocessed_pointcloud_publisher_;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr point_marker_publisher_;
+    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr other_chosen_point_subscriber_;
+    rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr current_state_subscriber_;
 
     rclcpp::TimerBase::SharedPtr realsense_timer_;
     rclcpp::TimerBase::SharedPtr initial_position_reset_timer_;
+
+    rclcpp::CallbackGroup::SharedPtr realsense_callback_group_;
+    rclcpp::CallbackGroup::SharedPtr point_callback_group_;
 
     clock_t last_frame_time_;
     int frame_wait_counter_;
