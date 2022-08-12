@@ -1,6 +1,4 @@
-//
-// Created by march on 8-8-22.
-//
+/// @author George Vegelien - M7
 
 #ifndef MARCH_PDB_STATE_BROADCASTER__PDB_STATE_BROADCASTER_HPP_
 #define MARCH_PDB_STATE_BROADCASTER__PDB_STATE_BROADCASTER_HPP_

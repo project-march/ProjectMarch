@@ -1,6 +1,4 @@
-//
-// Created by march on 8-8-22.
-//
+/// @author George Vegelien - M7
 
 #include "pdb_state_broadcaster/pdb_state_broadcaster.hpp"
 
