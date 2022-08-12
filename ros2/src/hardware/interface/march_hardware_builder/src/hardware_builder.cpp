@@ -74,9 +74,11 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     std::stringstream ss;
     for (auto& entry : joint_configs_map) {
         const std::string joint_name = entry.first;
-        const YAML::Node joint_config = entry.second;
-        joints.push_back(HardwareBuilder::createJoint(joint_name, joint_config));
-        ss << joint_name << ", ";
+        if(std::find(active_joint_names.begin(), active_joint_names.end(), joint_name) != active_joint_names.end()) {
+            const YAML::Node joint_config = entry.second;
+            joints.push_back(HardwareBuilder::createJoint(joint_name, joint_config));
+            ss << joint_name << ", ";
+        }
     }
     logger_->info(logger_->fstring("Sorted actuating joints are: [%s]", ss.str().c_str()));
 
