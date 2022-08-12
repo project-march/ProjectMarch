@@ -136,4 +136,4 @@ alias asrock_ros1="snoe && sros1 && export_asrock_master_uri"
 alias asrock_ros2="sfox && sros2 && export_asrock_master_uri"
 
 # Alias for telling a joke when Koen has to wait for a long time
-alias joke='curl -H "Accept: text/plain" https://icanhazdadjoke.com/'
+alias joke='curl -H "Accept: text/plain" https://icanhazdadjoke.com/ && echo' 
