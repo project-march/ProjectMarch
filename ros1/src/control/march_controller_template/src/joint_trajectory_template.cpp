@@ -11,9 +11,7 @@
 // that both `joint_handles` and `nh` have a lifetime that is at
 // least as long as the lifetime of this object. Otherwise,
 // undefined behavior WILL happen.
-bool TemplateControllerInterface::init(
-    std::vector<hardware_interface::JointHandle>& joint_handles,
-    ros::NodeHandle& nh)
+bool TemplateControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
     // Get joint handles and the amount of joints to control
     joint_handles_ptr_ = &joint_handles;
@@ -43,8 +41,7 @@ void TemplateControllerInterface::starting(const ros::Time& /*time*/)
 }
 
 // Function that calculates the command that needs to be send to each joint
-void TemplateControllerInterface::updateCommand(const ros::Time& /*time*/,
-    const ros::Duration& period,
+void TemplateControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
     const std::vector<joint_trajectory_controller::State>& /*desired_states*/,
     const joint_trajectory_controller::State& state_error)
 {
@@ -75,14 +72,11 @@ void TemplateControllerInterface::stopping(const ros::Time& /*time*/)
 
 // Exporting the controller plugin
 namespace template_trajectory_controller {
-typedef joint_trajectory_controller::JointTrajectoryController<
-    trajectory_interface::QuinticSplineSegment<double>,
+typedef joint_trajectory_controller::JointTrajectoryController<trajectory_interface::QuinticSplineSegment<double>,
     hardware_interface::EffortJointInterface>
 
     JointTrajectoryController;
 
 } // namespace template_trajectory_controller
 
-PLUGINLIB_EXPORT_CLASS(
-    template_trajectory_controller::JointTrajectoryController,
-    controller_interface::ControllerBase);
+PLUGINLIB_EXPORT_CLASS(template_trajectory_controller::JointTrajectoryController, controller_interface::ControllerBase);

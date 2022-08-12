@@ -17,11 +17,10 @@ class ComControllerPlugin : public ModelPlugin {
 public:
     void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
     void onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg);
-    bool onChangeComLevel(march_shared_msgs::ChangeComLevel::Request& req,
-        march_shared_msgs::ChangeComLevel::Response& res);
+    bool onChangeComLevel(
+        march_shared_msgs::ChangeComLevel::Request& req, march_shared_msgs::ChangeComLevel::Response& res);
     bool onGetPossibleComLevels(
-        march_shared_msgs::GetPossibleComLevels::Request& req,
-        march_shared_msgs::GetPossibleComLevels::Response& res);
+        march_shared_msgs::GetPossibleComLevels::Request& req, march_shared_msgs::GetPossibleComLevels::Response& res);
 
     // Called by the world update start event
     void onUpdate();

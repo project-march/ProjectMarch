@@ -44,7 +44,7 @@
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"
-                    value="properties/march7.yaml"/>
+                    value="properties/properties_march7.yaml"/>
     <xacro:property name="properties" value="${load_yaml(config_yaml_file)}"/>
     <xacro:property name="joint_limits" value="${properties['joint_limits']}"/>
     <xacro:property name="safety_values"
@@ -149,8 +149,6 @@
     <xacro:property name="foot_com_z"
                     value="${upper_leg_height + lower_leg_height + ankle_plate_height - 0.789788}"/>
 
-    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="march.gazebo"/>
 
     <material name="visuals_material">
         <color rgba="1.0 1.0 1.0 1"/>
@@ -456,7 +454,6 @@
         <child link="foot_right"/>
         <origin xyz="0 ${-ankle_plate_collision_offset} ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
-
 
     <xacro:include filename="camera/_d435.urdf.xacro"/>
 

@@ -29,8 +29,7 @@ TEST_F(TemperatureGESTest, GetTemperature)
 {
     const uint8_t expected_offset = 3;
     const float temperature = 1.0;
-    EXPECT_CALL(*this->mock_pdo,
-        read32(Eq(this->mock_slave.getSlaveIndex()), Eq(expected_offset)))
+    EXPECT_CALL(*this->mock_pdo, read32(Eq(this->mock_slave.getSlaveIndex()), Eq(expected_offset)))
         .WillOnce(Return(march::bit32 { .f = temperature }));
 
     const march::TemperatureGES ges(this->mock_slave, expected_offset);

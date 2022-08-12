@@ -13,15 +13,11 @@ public:
 
     void newSubgait(const march_shared_msgs::CurrentGaitConstPtr& msg);
     ignition::math::v6::Vector3<double> GetCom();
-    void update(ignition::math::v6::Vector3<double>& torque_all,
-        ignition::math::v6::Vector3<double>& torque_stable);
+    void update(ignition::math::v6::Vector3<double>& torque_all, ignition::math::v6::Vector3<double>& torque_stable);
     void getGoalPosition(double time_since_start);
-    void getSitGoalPositionX(
-        double time_since_start, double stable_foot_pose_x);
-    void getStandGoalPositionX(
-        double time_since_start, double stable_foot_pose_x);
-    void getWalkGoalPositionX(
-        double time_since_start, double stable_foot_pose_x);
+    void getSitGoalPositionX(double time_since_start, double stable_foot_pose_x);
+    void getStandGoalPositionX(double time_since_start, double stable_foot_pose_x);
+    void getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x);
     bool changeComLevel(const std::string&);
 
     std::vector<std::string> com_levels;

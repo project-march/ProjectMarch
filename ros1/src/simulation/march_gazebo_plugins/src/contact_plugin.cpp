@@ -22,12 +22,10 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     // Create a named topic, and subscribe to it.
     std::ostringstream topic_name;
     topic_name << "/march/contact/" << name;
-    ros_pub_ = ros_node_->advertise<std_msgs::Bool>(
-        topic_name.str(), /*queue_size=*/10);
+    ros_pub_ = ros_node_->advertise<std_msgs::Bool>(topic_name.str(), /*queue_size=*/10);
 
     // Connect to the sensor update event.
-    updateConnection = parentSensor->ConnectUpdated(
-        std::bind(&ContactPlugin::OnUpdate, this));
+    updateConnection = parentSensor->ConnectUpdated(std::bind(&ContactPlugin::OnUpdate, this));
 
     // Make sure the parent sensor is active.
     parentSensor->SetActive(/*_value=*/true);

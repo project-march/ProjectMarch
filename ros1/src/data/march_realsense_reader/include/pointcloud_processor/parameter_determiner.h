@@ -27,13 +27,9 @@ class ParameterDeterminer {
 public:
     explicit ParameterDeterminer(bool debugging);
     /** This function is required to be implemented by any plane finder **/
-    virtual bool determineParameters(
-        boost::shared_ptr<PlaneCoefficientsVector> const
-            plane_coefficients_vector,
-        boost::shared_ptr<HullVector> const hull_vector,
-        boost::shared_ptr<PolygonVector> const polygon_vector,
-        RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters,
+    virtual bool determineParameters(boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
+        boost::shared_ptr<HullVector> const hull_vector, boost::shared_ptr<PolygonVector> const polygon_vector,
+        RealSenseCategory const realsense_category, boost::shared_ptr<GaitParameters> gait_parameters,
         std::string frame_id_to_transform_to, std::string subgait_name)
         = 0;
 
@@ -42,9 +38,7 @@ public:
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
      */
-    virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
-        = 0;
+    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig& config) = 0;
 
     visualization_msgs::MarkerArray debug_marker_array;
 
@@ -69,27 +63,21 @@ public:
     /** This function should take in a pointcloud with matching normals and
      * hulls, and turn this into a location where the foot can be placed,
      * from this location, gaits parameters should be made. **/
-    bool determineParameters(boost::shared_ptr<PlaneCoefficientsVector> const
-                                 plane_coefficients_vector,
-        boost::shared_ptr<HullVector> const hull_vector,
-        boost::shared_ptr<PolygonVector> const polygon_vector,
-        RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters,
-        std::string frame_id_to_transform_to,
-        std::string subgait_name) override;
+    bool determineParameters(boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
+        boost::shared_ptr<HullVector> const hull_vector, boost::shared_ptr<PolygonVector> const polygon_vector,
+        RealSenseCategory const realsense_category, boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to, std::string subgait_name) override;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
      */
-    void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig& config) override;
 
     /** Takes a point cloud, with an expected z = 0, of potential foot locations
      * and returns the valid foot locations with associated height and normal
      * vector. Result indicates whether every original point ends up being
      * valid.**/
-    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud,
-        const PointNormalCloud::Ptr& output_cloud);
+    bool cropCloudToHullVector(PointCloud::Ptr const& input_cloud, const PointNormalCloud::Ptr& output_cloud);
 
 protected:
     // Get relevant information from the environment for the current category
@@ -116,31 +104,24 @@ protected:
     bool getOptionalFootLocations(const PointCloud::Ptr& cloud_to_fill);
 
     // Crops a single point to a hull vector.
-    bool cropPointToHullVector(pcl::PointXYZ const input_point,
-        const PointNormalCloud::Ptr& output_cloud);
+    bool cropPointToHullVector(pcl::PointXYZ const input_point, const PointNormalCloud::Ptr& output_cloud);
 
     // Crops a cloud to a hull vector, but only puts each input point in
     // the highest hull it falls into
-    bool cropCloudToHullVectorUnique(PointCloud::Ptr const& input_cloud,
-        const PointNormalCloud::Ptr& output_cloud);
+    bool cropCloudToHullVectorUnique(PointCloud::Ptr const& input_cloud, const PointNormalCloud::Ptr& output_cloud);
 
     // Elevate the points so they have z coordinate as if they lie on the
     // plane of the hull
-    bool addZCoordinateToCloudFromPlaneCoefficients(
-        const PointCloud::Ptr& input_cloud,
-        const PlaneCoefficients::Ptr& plane_coefficients,
-        const PointCloud::Ptr& elevated_cloud);
+    bool addZCoordinateToCloudFromPlaneCoefficients(const PointCloud::Ptr& input_cloud,
+        const PlaneCoefficients::Ptr& plane_coefficients, const PointCloud::Ptr& elevated_cloud);
 
     // Remove all points from a cloud which do not fall in the hull
-    bool cropCloudToHull(const PointCloud::Ptr& elevated_cloud,
-        const Hull::Ptr& hull, const Polygon& polygon);
+    bool cropCloudToHull(const PointCloud::Ptr& elevated_cloud, const Hull::Ptr& hull, const Polygon& polygon);
 
     // Add normals to the elevated cloud which correspond to the normal vector
     // of the plane
-    bool addNormalToCloudFromPlaneCoefficients(
-        const PointCloud::Ptr& elevated_cloud,
-        const PlaneCoefficients::Ptr& plane_coefficients,
-        const PointNormalCloud::Ptr& elevated_cloud_with_normals);
+    bool addNormalToCloudFromPlaneCoefficients(const PointCloud::Ptr& elevated_cloud,
+        const PlaneCoefficients::Ptr& plane_coefficients, const PointNormalCloud::Ptr& elevated_cloud_with_normals);
 
     // Find the parameters from the foot location by finding at what percentage
     // of the end points it is
@@ -152,15 +133,13 @@ protected:
 
     // Fill a point cloud with vertices of the foot on the ground around a
     // possible foot location
-    void fillFootPointCloud(const PointCloud::Ptr& foot_pointcloud,
-        pcl::PointNormal possible_foot_location);
+    void fillFootPointCloud(const PointCloud::Ptr& foot_pointcloud, pcl::PointNormal possible_foot_location);
 
     // Verify that a possible foot location is valid for the requested gait
     bool isValidLocation(pcl::PointNormal possible_foot_location);
 
     // get the distance from a location to some object depending on the obstacle
-    bool getDistanceToObject(
-        pcl::PointNormal possible_foot_location, double& distance);
+    bool getDistanceToObject(pcl::PointNormal possible_foot_location, double& distance);
 
     // Find the stairs up parameters from the foot locations
     bool getGaitParametersFromFootLocationStairs();
@@ -176,8 +155,7 @@ protected:
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
-    bool fillOptionalFootLocationCloud(
-        const PointCloud::Ptr& cloud_to_fill, float start, float end);
+    bool fillOptionalFootLocationCloud(const PointCloud::Ptr& cloud_to_fill, float start, float end);
 
     // Set the gait dimension variables to the relevant value
     void initializeGaitDimensions();
@@ -203,8 +181,7 @@ protected:
     bool calculateRampSlope();
 
     // Computes the average normal of a given input cloud
-    bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations,
-        pcl::Normal& average_normal);
+    bool getAverageNormal(const PointNormalCloud::Ptr& possible_foot_locations, pcl::Normal& average_normal);
 
     // Computes the slope in the x direction in degrees from a normal vector
     bool getSlopeFromNormals(const pcl::Normal& normal, float& slope);
@@ -220,21 +197,17 @@ protected:
     bool fillSitGrid(PointCloud::Ptr& sit_grid);
 
     // Get the median height value of a point cloud
-    bool getMedianHeightCloud(
-        const PointNormalCloud::Ptr& cloud, float& median_height);
+    bool getMedianHeightCloud(const PointNormalCloud::Ptr& cloud, float& median_height);
 
     // Transform valid gait information into a parameter
-    float calculateParameter(const float& valid_value,
-        const float& minimum_value, const float& maximum_val);
+    float calculateParameter(const float& valid_value, const float& minimum_value, const float& maximum_val);
 
     // Trim exo support cloud to only contain reachable points
     void getValidExoSupport(
-        const PointNormalCloud::Ptr& potential_exo_support_points,
-        PointNormalCloud::Ptr& exo_support_points);
+        const PointNormalCloud::Ptr& potential_exo_support_points, PointNormalCloud::Ptr& exo_support_points);
 
     // Check which points on the curb are reachable and give foot support
-    void getValidPointsOnCurb(const PointNormalCloud::Ptr& points_on_curb,
-        PointNormalCloud::Ptr& valid_points_on_curb);
+    void getValidPointsOnCurb(const PointNormalCloud::Ptr& points_on_curb, PointNormalCloud::Ptr& valid_points_on_curb);
 
     // Updates the gait information limits after calling a transform to the
     // fixed frame
@@ -326,14 +299,10 @@ public:
     /** Use the constructors defined in the super class **/
     using ParameterDeterminer::ParameterDeterminer;
     /** A Simple implementation which return parameters of 0.5 **/
-    bool determineParameters(boost::shared_ptr<PlaneCoefficientsVector> const
-                                 plane_coefficients_vector,
-        boost::shared_ptr<HullVector> const hull_vector,
-        boost::shared_ptr<PolygonVector> const polygon_vector,
-        RealSenseCategory const realsense_category,
-        boost::shared_ptr<GaitParameters> gait_parameters,
-        std::string frame_id_to_transform_to,
-        std::string subgait_name) override;
+    bool determineParameters(boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
+        boost::shared_ptr<HullVector> const hull_vector, boost::shared_ptr<PolygonVector> const polygon_vector,
+        RealSenseCategory const realsense_category, boost::shared_ptr<GaitParameters> gait_parameters,
+        std::string frame_id_to_transform_to, std::string subgait_name) override;
 };
 
 #endif // MARCH_PARAMETER_DETERMINER_H

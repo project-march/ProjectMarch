@@ -43,8 +43,6 @@
     <xacro:property name="camera_link" value="0.05"/> <!-- Size of square 'camera' box -->
     <xacro:property name="axel_offset" value="0.05"/> <!-- Space btw top of beam and the each joint -->
 
-    <xacro:include filename="march.gazebo"/>
-
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
         <robotNamespace>/march</robotNamespace>
     </plugin>

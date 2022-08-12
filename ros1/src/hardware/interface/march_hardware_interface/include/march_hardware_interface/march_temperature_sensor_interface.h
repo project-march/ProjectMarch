@@ -9,8 +9,7 @@
 class MarchTemperatureSensorHandle {
 public:
     MarchTemperatureSensorHandle(const std::string& name, ///< The name of joint
-        const double*
-            temperature, ///< A pointer of the temperature in degrees celsius.
+        const double* temperature, ///< A pointer of the temperature in degrees celsius.
         const double* variance ///< A pointer to the storage of the temperature
                                ///< covariance.
         )
@@ -43,8 +42,7 @@ private:
 };
 
 class MarchTemperatureSensorInterface
-    : public hardware_interface::HardwareResourceManager<
-          MarchTemperatureSensorHandle> {
+    : public hardware_interface::HardwareResourceManager<MarchTemperatureSensorHandle> {
 };
 
 #endif // MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H

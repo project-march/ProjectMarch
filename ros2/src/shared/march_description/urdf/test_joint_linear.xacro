@@ -17,8 +17,6 @@
 
     <xacro:property name="hover_height" value="0.5"/>
 
-    <xacro:include filename="march.gazebo"/>
-
     <xacro:arg name="configuration" default="exoskeleton"/>
     <xacro:property name="configuration" value="$(arg configuration)"/>
 

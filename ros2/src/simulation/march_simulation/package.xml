@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_simulation</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="georgevegelien@gmail.com">march</maintainer>
+  <license>TODO: License declaration</license>
+
+  <exec_depend>gazebo_msgs</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <depend>xacro</depend>
+
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

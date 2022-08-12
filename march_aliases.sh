@@ -25,8 +25,16 @@ alias march_run_ros1_training='march_run_ros1_groundgait gain_tuning:=training'
 
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
-alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
-alias march_run_ros2_training='sfox && sros2 && ros2 launch march_launch march.launch.py rqt_input:=false'
+alias march_run_ros2_sim='sudo -v && sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
+alias march_run_ros2_training='sudo -v && sfox && sros2 && ros2 launch march_launch march.launch.py rqt_input:=false'
+
+alias march_build_all='sfox && cm2 && colcon build --symlink-install'
+alias march_build='march_build_all --packages-skip control_msgs control_toolbox \
+controller_interface controller_manager controller_manager_msgs diagnostic_updater diff_drive_controller effort_controllers \
+force_torque_sensor_broadcaster forward_command_controller gazebo_ros2_control gazebo_ros2_control_demos gripper_controllers \
+hardware_interface imu_sensor_broadcaster joint_state_broadcaster joint_state_controller joint_trajectory_controller \
+position_controllers realsense_gazebo_plugin realtime_tools ros2_control ros2_control_test_assets ros2_controllers \
+ros2controlcli soem transmission_interface velocity_controllers'
 
 
 # Build and run the bridge
@@ -37,10 +45,14 @@ alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && so
 # Shorter aliases
 alias mb1='march_build_ros1'
 alias mb2='march_build_ros2'
+alias mb='march_build'
+alias mba='march_build_all'
 alias sim1='march_run_ros1_sim'
 alias sim2='march_run_ros2_sim'
+alias sim='march_run_ros2_sim'
 alias bridge='march_run_bridge'
 alias b='march_run_bridge'
+alias gits='git status'
 
 
 # Training aliases
@@ -59,7 +71,7 @@ alias gg2='ag2'
 # Tools for during monitor sessions 
 alias march_run_monitor='sfox && sros2 && ros2 launch march_monitor monitor.launch.py'
 alias monitor="march_run_monitor"
-alias multiplot="asrock_ros1 && rqt_multiplot"
+alias multiplot="sfox && sros2 && ros2 launch march_plotjuggler_launcher plotjuggler.launch.py"
 alias recon1="snoe && sros1 && rosrun rqt_reconfigure rqt_reconfigure"
 alias recon2="sfox && sros2 && ros2 run rqt_reconfigure rqt_reconfigure"
 alias left="sfox && sros2 && ros2 topic echo /march/foot_position/left | grep -A 3 'displacement'"
@@ -134,3 +146,6 @@ alias pdb='snoe && sros1 && rostopic echo /march/pdb_data -n 1'
 alias export_asrock_master_uri='export ROS_MASTER_URI=http://192.168.1.177:11311/'
 alias asrock_ros1="snoe && sros1 && export_asrock_master_uri"
 alias asrock_ros2="sfox && sros2 && export_asrock_master_uri"
+
+FASTRTPS_DEFAULT_PROFILES_FILE=~/march/.fastrtps-profile.xml
+export FASTRTPS_DEFAULT_PROFILES_FILE

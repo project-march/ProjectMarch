@@ -21,8 +21,7 @@ public:
      * @return received working counter from the read operation. Returns 0 when
      * a failure occurred, positive otherwise.
      */
-    template <typename T>
-    int write(uint16_t slave, uint16_t index, uint8_t sub, T value)
+    template <typename T> int write(uint16_t slave, uint16_t index, uint8_t sub, T value)
     {
         return this->write(slave, index, sub, sizeof(T), &value);
     }
@@ -40,9 +39,7 @@ public:
      * @return received working counter from the read operation. Returns 0 when
      * a failure occurred, positive otherwise.
      */
-    template <typename T>
-    int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
-        T& value) const
+    template <typename T> int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, T& value) const
     {
         return this->read(slave, index, sub, val_size, &value);
     }
@@ -51,12 +48,9 @@ public:
     ;
 
 protected:
-    virtual int write(uint16_t slave, uint16_t index, uint8_t sub,
-        std::size_t size, void* value)
-        = 0;
+    virtual int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) = 0;
 
-    virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
-        void* value) const = 0;
+    virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const = 0;
 };
 
 /**
@@ -80,11 +74,9 @@ public:
         return this->sdo_->write(this->slave_index_, index, sub, value);
     }
 
-    template <typename T>
-    int read(uint16_t index, uint8_t sub, int& val_size, T& value) const
+    template <typename T> int read(uint16_t index, uint8_t sub, int& val_size, T& value) const
     {
-        return this->sdo_->read(
-            this->slave_index_, index, sub, val_size, value);
+        return this->sdo_->read(this->slave_index_, index, sub, val_size, value);
     }
 
 private:
@@ -107,11 +99,9 @@ public:
     }
 
 protected:
-    int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size,
-        void* value) override;
+    int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) override;
 
-    int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size,
-        void* value) const override;
+    int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const override;
 };
 } // namespace march
 #endif // MARCH_HARDWARE_SDO_INTERFACE_H
