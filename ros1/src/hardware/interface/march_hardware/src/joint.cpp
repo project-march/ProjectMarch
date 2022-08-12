@@ -127,12 +127,12 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
          *  If the absolute encoder of the joint is more precise, then we should
          * use that value This would give us a new joint position of 0.25
          */
-        if (motor_controller_->isIncrementalEncoderMorePrecise()) {
-            double new_incremental_position = motor_controller_->getIncrementalPosition();
-            position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
-        } else {
-            position_ = motor_controller_->getAbsolutePosition();
-        }
+        // if (motor_controller_->isIncrementalEncoderMorePrecise()) {
+        //     double new_incremental_position = motor_controller_->getIncrementalPosition();
+        //     position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
+        // } else {
+        position_ = motor_controller_->getAbsolutePosition();
+        // }
         velocity_ = motor_controller_->getVelocity();
     } else {
         ROS_WARN("Data was not updated within %.3fs, using old data", elapsed_time.toSec());
