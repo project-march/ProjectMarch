@@ -94,11 +94,7 @@ class DynamicStep:
             None,
             0,
         )
-        self._logger.warn(
-            f"Duration: {self._duration}, "
-            f"deviation: {location.midpoint_deviation}, "
-            f"height: {location.relative_midpoint_height}"
-        )
+
         self.start = start
         self.stop = stop
         self.hold_subgait = hold_subgait

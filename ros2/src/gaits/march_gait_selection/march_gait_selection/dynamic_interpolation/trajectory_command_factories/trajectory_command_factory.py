@@ -103,8 +103,11 @@ class TrajectoryCommandFactory:
 
         self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
         self._logger.info(
-            f"Stepping to location ({self.foot_location.processed_point.x}, "
-            f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+            f"Stepping to location ({round(self.foot_location.processed_point.x, 3)}, "
+            f"{round(self.foot_location.processed_point.y, 3)}, {round(self.foot_location.processed_point.z, 3)}) "
+            f"with duration {round(self.foot_location.duration, 3)}, "
+            f"deviation {round(self.foot_location.midpoint_deviation, 3)} "
+            f"and mid point height {round(self.foot_location.relative_midpoint_height, 3)}."
         )
 
         return self._create_and_validate_trajectory_command(start, self._stop)
