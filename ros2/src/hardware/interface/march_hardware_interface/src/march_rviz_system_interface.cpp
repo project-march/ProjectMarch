@@ -24,10 +24,10 @@
 #include "march_hardware_interface/hwi_util.h"
 #include "march_utility/logger_colors.hpp"
 
-
 namespace march_hardware_interface {
 const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
+// NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
 MarchRvizSystemInterface::MarchRvizSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
 {
@@ -44,11 +44,6 @@ MarchRvizSystemInterface::~MarchRvizSystemInterface()
     stop(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
 }
 
-MarchRvizSystemInterface::~MarchRvizSystemInterface() {
-    RCLCPP_INFO((*logger_), "Destructor call works!");
-    stop();
-}
-
 /** Configures the controller.
  * Checkout https://design.ros2.org/articles/node_lifecycle.html, for more information on the execution order.
  */
@@ -60,7 +55,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
     }
     //    logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface"));
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-    pdb_current_ = std::numeric_limits<double>::quiet_NaN();
+    pdb_data_ = {};
     RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
@@ -86,7 +81,11 @@ std::vector<hardware_interface::StateInterface> MarchRvizSystemInterface::export
         state_interfaces.emplace_back(
             hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
     }
-    state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", "pdb_current", &pdb_current_));
+
+    // For the PDB broadcaster.
+    for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
+        state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
+    }
     return state_interfaces;
 }
 
@@ -130,7 +129,6 @@ hardware_interface::return_type MarchRvizSystemInterface::start()
     for (uint i = 0; i < hw_positions_.size(); i++) {
         if (std::isnan(hw_positions_[i])) {
             hw_positions_[i] = 0;
-            pdb_current_ = 0;
         }
     }
     status_ = hardware_interface::status::STARTED;
@@ -154,7 +152,7 @@ hardware_interface::return_type MarchRvizSystemInterface::stop()
  */
 hardware_interface::return_type MarchRvizSystemInterface::read()
 {
-    pdb_current_ = hw_positions_[0];
+    //    pdb_data_.pdb_current = ... Update the pdb data to something you like to test.
     return hardware_interface::return_type::OK;
 }
 

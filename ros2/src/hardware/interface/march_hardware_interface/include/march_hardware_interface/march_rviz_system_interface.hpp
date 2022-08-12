@@ -6,6 +6,7 @@
 #define MARCH_HARDWARE_INTERFACE__MARCH_RVIZ_SYSTEM_INTERFACE_HPP_
 
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
+#include <march_hardware/power_distribution_board/power_distribution_board.h>
 #include <memory>
 #include <rclcpp/logger.hpp>
 #include <string>
@@ -17,9 +18,9 @@
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
+#include "iostream"
 #include "march_hardware_interface/visibility_control.h"
 #include "rclcpp/macros.hpp"
-#include "iostream"
 
 namespace march_hardware_interface {
 class MarchRvizSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {
@@ -28,8 +29,6 @@ public:
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
     MarchRvizSystemInterface();
-
-    MARCH_HARDWARE_INTERFACE_PUBLIC ~MarchRvizSystemInterface();
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
     ~MarchRvizSystemInterface() override;
@@ -59,13 +58,10 @@ public:
     hardware_interface::return_type write() override;
 
 private:
-
     const std::shared_ptr<rclcpp::Logger> logger_;
     static const std::string COMMAND_AND_STATE_TYPE; // = hardware_interface::HW_IF_POSITION
     std::vector<double> hw_positions_;
-    double pdb_current_;
-
-
+    march::PowerDistributionBoardData pdb_data_;
 };
 
 } // namespace march_hardware_interface
