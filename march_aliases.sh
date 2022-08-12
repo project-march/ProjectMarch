@@ -38,7 +38,6 @@ ros2bag rosbag2 rosbag2_compression rosbag2_compression_zstd rosbag2_cpp rosbag2
 rosbag2_storage rosbag2_storage_default_plugins rosbag2_test_common rosbag2_tests rosbag2_transport shared_queues_vendor \
 ros2controlcli soem transmission_interface velocity_controllers'
 
-
 # Build and run the bridge
 alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure --symlink-install && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
 alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge parameter_bridge'
@@ -94,6 +93,7 @@ confirm() {
 }
 alias march_clean_ros1='confirm rm -rf ~/march/ros1/build ~/march/ros1/log ~/march/ros1/install'
 alias march_clean_ros2='confirm rm -rf ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install'
+alias march_clean='find ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install -maxdepth 1 -name "march*" -type d -print0 | xargs -0 rm -r --'
 alias march_clean_bridge='confirm rm -rf ~/ros1_bridge/build ~/ros1_bridge/log ~/ros1_bridge/install'
 alias march_clean_all='march_clean_ros1 && march_clean_ros2 && march_clean_bridge'
 
