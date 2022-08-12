@@ -193,7 +193,7 @@ class GaitPreprocessor(Node):
         elif max_height > 0.19:
             relative_midpoint_height = 0.1
 
-        if max_height < 0.05:
+        if absolute_max_height < 0.05:
             midpoint_deviation = 0.05
         else:
             midpoint_deviation = min(
