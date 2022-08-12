@@ -47,7 +47,7 @@ However, this still fixes one file. In order to fix all C++ header and source fi
 
 .. code::
 
-    find . -name '*.h' -or -name '*.cpp' | xargs clang-format -i -style=file
+    cd ~/march && find ./ros2/src -name '*.h' -or -name '*.cpp' -or -name '*.hpp' | grep -v "src/libraries" | xargs clang-format -i -style=file
 
 This will recursively search for header and source files and format them using clang-format.
 See the official `clang-format documentation <https://clang.llvm.org/docs/ClangFormat.html>`_
@@ -75,8 +75,8 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
     alias march_static_analysis_ros1='echo "Running analysis, this can take 77 seconds" && find ~/march/ros1/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros1/build {} 2> /dev/null; true && echo -e "\n----done---"'
     alias march_static_analysis_ros1_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros1/build {} 2> /dev/null; true && echo -e "\n----done---"'
 
-    alias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
-    alias march_static_analysis_ros2_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+    alias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+    alias march_static_analysis_ros2_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
 
 Now you can run the analysis with a couple of very simple commands.
 Keep in mind that, when using the '..._here' commands, you choose to use the ros1 command for ros1 code and the ros2 command for ros2 code. The clang-tidy code checks for some violations, but can't thoroughly check your code if can't find your build folder.
