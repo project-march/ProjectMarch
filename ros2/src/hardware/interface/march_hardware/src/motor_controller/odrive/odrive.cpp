@@ -22,14 +22,13 @@
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode, bool index_found,
-    unsigned int motor_kv, std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(
-        slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode, std::move(logger))
+    unsigned int motor_kv, bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
+    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode,
+        is_incremental_encoder_more_precise, std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
     , torque_constant_(KV_TO_TORQUE_CONSTANT / (float)motor_kv)
 {
-    this->is_incremental_encoder_more_precise_ = true;
 }
 
 std::chrono::nanoseconds ODrive::reset()

@@ -29,18 +29,19 @@ public:
     /**
      * Constructs an ODrive with an incremental and absolute encoder.
      *
-     * @param slave slave of the ODrive
-     * @param absolute_encoder pointer to absolute encoder, required so cannot
-     * be nullptr
-     * @param incremental_encoder pointer to incremental encoder, required so
-     * cannot be nullptr
-     * @param actuation_mode actuation mode in which the ODrive must
-     * operate
+     * @param slave slave of the ODrive.
+     * @param absolute_encoder pointer to absolute encoder, required so cannot be nullptr.
+     * @param incremental_encoder pointer to incremental encoder, required so cannot be nullptr.
+     * @param actuation_mode actuation mode in which the ODrive must operate.
+     * @param is_incremental_encoder_more_precise whether to use the incremental or absolute encoder at every 'relative'
+     * update.
+     * @param logger The logger to print warning or info to the terminal.
      * @throws error::HardwareException When an absolute encoder is nullptr.
      */
     ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode, bool index_found,
-        unsigned int motor_kv, std::shared_ptr<march_logger::BaseLogger> logger);
+        unsigned int motor_kv, bool is_incremental_encoder_more_precise,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
     ~ODrive() noexcept override = default;
 

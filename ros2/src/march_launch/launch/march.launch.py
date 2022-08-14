@@ -52,6 +52,7 @@ def generate_launch_description() -> LaunchDescription:
     control_yaml = LaunchConfiguration("control_yaml")
     gazebo_control_yaml = LaunchConfiguration("gazebo_control_yaml")
     rosbags = LaunchConfiguration("rosbags")
+    rviz = LaunchConfiguration("rviz")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
@@ -150,6 +151,9 @@ def generate_launch_description() -> LaunchDescription:
             default_value="true",
             description="Whether the rosbags should stored.",
             choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="rviz", default_value="false", description="Whether we should startup rviz.", choices=["true", "false"]
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -543,7 +547,7 @@ def generate_launch_description() -> LaunchDescription:
                 "controllers.launch.py",
             )
         ),
-        launch_arguments=[("simulation", simulation), ("control_yaml", control_yaml)],
+        launch_arguments=[("simulation", simulation), ("control_yaml", control_yaml), ("rviz", rviz)],
     )
     # endregion
 
