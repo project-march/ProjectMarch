@@ -1,0 +1,9 @@
+<library path="march_pdb_state_broadcaster">
+    <class name="pdb_state_broadcaster/PdbStateBroadcaster"
+           type="march_pdb_state_broadcaster::PdbStateBroadcaster"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            The pdb state broadcaster publishes the current states from the march pdb hardware.
+        </description>
+    </class>
+</library>

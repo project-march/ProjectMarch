@@ -6,6 +6,7 @@
 #define MARCH_HARDWARE_INTERFACE__MARCH_RVIZ_SYSTEM_INTERFACE_HPP_
 
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
+#include <march_hardware/power_distribution_board/power_distribution_board.h>
 #include <memory>
 #include <rclcpp/logger.hpp>
 #include <string>
@@ -59,6 +60,7 @@ private:
     const std::shared_ptr<rclcpp::Logger> logger_;
     static const std::string COMMAND_AND_STATE_TYPE; // = hardware_interface::HW_IF_POSITION
     std::vector<double> hw_positions_;
+    march::PowerDistributionBoardData pdb_data_;
 };
 
 } // namespace march_hardware_interface
