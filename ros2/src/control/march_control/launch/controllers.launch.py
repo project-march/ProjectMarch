@@ -105,7 +105,7 @@ def generate_launch_description():
     robot_desc_dict = {"robot_description": robot_desc_xacro}
 
     # This node couples the HW interface with control.
-    control_node = Node(
+    control_node_exo = Node(
         package="controller_manager",
         prefix=[  # Sudo command cause need to be sudoer when we do this node cause it real time
             "sudo -s -E env PATH=",
@@ -123,9 +123,21 @@ def generate_launch_description():
             "stdout": "screen",
             "stderr": "screen",
         },
-        condition=UnlessCondition(gazebo),
+        condition=IfCondition(PythonExpression(["'", control_type, "' == 'effort'", " and '", gazebo, "' == 'false'"])),
     )
-    nodes.append(control_node)  # noqa: PIE799 As this way is more readable, and easier to uncomment.
+    # This should be the same control node as the one above only that the prefix for sudo is not needed in simulation.
+    control_node_rviz = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        # The robot description is loaded in and the controller yaml.
+        parameters=[robot_desc_dict, get_control_file_loc(control_yaml)],
+        output={
+            "stdout": "screen",
+            "stderr": "screen",
+        },
+        condition=IfCondition(PythonExpression(["'", control_type, "' == 'rviz'", " and '", gazebo, "' == 'false'"])),
+    )
+    nodes.extend([control_node_rviz, control_node_exo])  # noqa: PIE799 This way is more readable.
     # endregion
 
     # region Launch RViz
@@ -146,7 +158,7 @@ def generate_launch_description():
             on_exit=[rviz_node],
         )
     )
-    nodes.append(rviz_node_after_broadcast_spawner)
+    nodes.append(rviz_node_after_broadcast_spawner)  # noqa: PIE799 This way is more readable and easier to uncomment.
     # endregion
 
     return LaunchDescription(declared_arguments + nodes)

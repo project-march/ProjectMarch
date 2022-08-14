@@ -29,11 +29,11 @@ joint_trajectory_controller:
       - effort
     gains:
         left_ankle: {p: 30.0, i: 0.0, d: 4.5, i_clamp: 100.0 }
-        left_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0, ff_effort: 0.5}
+        left_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0, ff_effort: 0.5 }
         left_hip_fe: {p: 75.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
         left_knee: {p: 75.0, i: 0.0, d: 15.0, i_clamp: 100.0 }
         right_ankle: {p: 30.0, i: 0.0, d: 4.5, i_clamp: 100.0 }
-        right_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0, ff_effort: 0.5}
+        right_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0, ff_effort: 0.5 }
         right_hip_fe: {p: 75.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
         right_knee: {p: 75.0, i: 0.0, d: 15.0, i_clamp: 100.0 }
 

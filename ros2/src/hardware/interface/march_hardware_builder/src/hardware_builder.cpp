@@ -74,7 +74,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     std::stringstream ss;
     for (auto& entry : joint_configs_map) {
         const std::string joint_name = entry.first;
-        if(std::find(active_joint_names.begin(), active_joint_names.end(), joint_name) != active_joint_names.end()) {
+        if (std::find(active_joint_names.begin(), active_joint_names.end(), joint_name) != active_joint_names.end()) {
             const YAML::Node joint_config = entry.second;
             joints.push_back(HardwareBuilder::createJoint(joint_name, joint_config));
             ss << joint_name << ", ";

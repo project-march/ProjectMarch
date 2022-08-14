@@ -42,3 +42,8 @@
 	path = ros2/src/libraries/realsense_gazebo_plugin
 	url = https://github.com/pal-robotics/realsense_gazebo_plugin.git
 	branch = foxy-devel
+# We add this because the most up to date foxy rosbag doesn't allow for excluding topics.
+[submodule "ros2/src/libraries/rosbag2"]
+	path = ros2/src/libraries/rosbag2
+	url = https://github.com/ros2/rosbag2.git
+    branch = foxy-future
