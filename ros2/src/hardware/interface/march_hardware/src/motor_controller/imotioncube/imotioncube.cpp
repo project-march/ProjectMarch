@@ -19,9 +19,9 @@
 namespace march {
 IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode,
-    std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(
-        slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode, std::move(logger))
+    bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
+    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode,
+        is_incremental_encoder_more_precise, std::move(logger))
     , sw_string_(/*__s=*/"empty")
 {
     if (!absolute_encoder_ || !incremental_encoder_) {
@@ -33,8 +33,9 @@ IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> ab
 
 IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream, ActuationMode actuation_mode,
-    std::shared_ptr<march_logger::BaseLogger> logger)
-    : IMotionCube(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode, std::move(logger))
+    bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
+    : IMotionCube(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode,
+        is_incremental_encoder_more_precise, std::move(logger))
 {
     this->sw_string_ = std::move(sw_stream);
 }

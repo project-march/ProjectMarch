@@ -11,38 +11,40 @@
 namespace march {
 MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode,
-    std::shared_ptr<march_logger::BaseLogger> logger)
+    bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
     , incremental_encoder_(std::move(incremental_encoder))
     , actuation_mode_(actuation_mode)
+    , is_incremental_encoder_more_precise_(is_incremental_encoder_more_precise)
     , logger_(std::move(logger))
 {
     if (!absolute_encoder_ && !incremental_encoder_) {
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
             "A MotorController needs at least an incremental or an absolute "
             "encoder");
-    } else if (absolute_encoder_ && incremental_encoder_) {
-        /* The most precise encoder can encode more positions.
-        This means that every Internal Unit represents less radians. */
-        is_incremental_encoder_more_precise_
-            = incremental_encoder_->getRadiansPerIU() < absolute_encoder_->getRadiansPerIU();
-    } else if (!absolute_encoder_ && incremental_encoder_) {
-        is_incremental_encoder_more_precise_ = true;
-    } else {
-        is_incremental_encoder_more_precise_ = false;
+    }
+    if (is_incremental_encoder_more_precise_ && !incremental_encoder_) {
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
+            "A MotorController needs an incremental encoder if you say it is more precise.");
+    }
+    if (!is_incremental_encoder_more_precise_ && !absolute_encoder_) {
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
+            "A MotorController needs an absolute encoder if you say incremental is not more precise.");
     }
 }
 
 MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(slave, std::move(absolute_encoder), nullptr, actuation_mode, std::move(logger))
+    : MotorController(slave, std::move(absolute_encoder), nullptr, actuation_mode,
+        /*is_incremental_encoder_more_precise=*/false, std::move(logger))
 {
 }
 
 MotorController::MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder,
     ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(slave, nullptr, std::move(incremental_encoder), actuation_mode, std::move(logger))
+    : MotorController(slave, nullptr, std::move(incremental_encoder), actuation_mode,
+        /*is_incremental_encoder_more_precise=*/true, std::move(logger))
 {
 }
 

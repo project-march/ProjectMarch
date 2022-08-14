@@ -183,6 +183,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     if (odrive_config["indexFound"]) {
         index_found = odrive_config["indexFound"].as<bool>();
     }
+    auto use_incremental_encoder = odrive_config["useIncrementalEncoder"].as<bool>();
     auto motor_kv = odrive_config["motorKV"].as<unsigned int>();
     //    auto incremental_encoder =
     //    std::unique_ptr<march::AbsoluteEncoder>* absolute_encoder = nullptr;
@@ -198,6 +199,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             /*actuation_mode=*/mode,
             /*index_found=*/index_found,
             /*motor_kv=*/motor_kv,
+            /*is_incremental_encoder_more_precise=*/use_incremental_encoder,
             /*logger=*/logger_);
     } else {
         return std::make_unique<march::ODrive>(
@@ -209,6 +211,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             /*actuation_mode=*/mode,
             /*index_found=*/index_found,
             /*motor_kv=*/motor_kv,
+            /*is_incremental_encoder_more_precise=*/use_incremental_encoder,
             /*logger=*/logger_);
     }
 }
