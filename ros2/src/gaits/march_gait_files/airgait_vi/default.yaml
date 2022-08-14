@@ -13,11 +13,11 @@ positions:
     # use v6 for sit and v7 for stand
     gait_type: walk_like
     joints:
-      left_ankle: 0.07
+      left_ankle: 0.14
       left_hip_aa: -0.025
       left_hip_fe: 0.09
       left_knee: 0.0
-      right_ankle: 0.07
+      right_ankle: 0.14
       right_hip_aa: -0.025
       right_hip_fe: 0.09
       right_knee: 0.0
