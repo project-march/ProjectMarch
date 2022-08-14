@@ -37,6 +37,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")
     control_yaml = LaunchConfiguration("control_yaml")
+    rviz = LaunchConfiguration("rviz")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
@@ -96,6 +97,9 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="rviz/march7_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
             "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+        ),
+        DeclareLaunchArgument(
+            name="rviz", default_value="true", description="Whether we should startup rviz.", choices=["true", "false"]
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -296,6 +300,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         launch_arguments=[
             ("use_sim_time", use_sim_time),
             ("rqt_input", rqt_input),
+            ("rviz", rviz),
             ("ping_safety_node", ping_safety_node),
             ("layout", layout),
             ("robot", robot),
