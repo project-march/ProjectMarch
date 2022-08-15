@@ -154,7 +154,7 @@ float ODrive::getMotorTemperature()
 
 float ODrive::getOdriveTemperature()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveTemperature, ODriveAxis::None)).f;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveTemperature, axis_)).f;
 }
 
 ODriveAxisState ODrive::getAxisState()
