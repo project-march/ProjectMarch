@@ -65,7 +65,7 @@ march7:
           slaveIndex: 4
           axis: 0
           motorKV: 95
-          useIncrementalEncoder: true
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: 1
@@ -89,7 +89,7 @@ march7:
           slaveIndex: 3
           axis: 0
           motorKV: 95
-          useIncrementalEncoder: true
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: -1
@@ -161,14 +161,14 @@ march7:
           slaveIndex: 1
           axis: 0
           motorKV: 95
-          useIncrementalEncoder: true
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
             minPositionIU: 426704  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 798624  # Ros kills itself if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 485856
+            zeroPositionIU: 497904
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -186,7 +186,7 @@ march7:
           axis: 0
           preCalibrated: false
           motorKV: 95
-          useIncrementalEncoder: true
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: 1
