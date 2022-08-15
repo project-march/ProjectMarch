@@ -1,9 +1,11 @@
-// Copyright 2020 Project March.
+/** Copyright 2020 Project March.
+ *  These errors are based on the odrive errors check:
+ *  https://gitlab.com/project-march/hardware/ODrive/-/blob/devel-0.5.2/tools/odrive/enums.py
+ */
 #include "march_hardware/error/motor_controller_error.h"
 
 namespace march {
 namespace error {
-
     const std::array<std::string, IMOTIONCUBE_MOTION_ERRORS_SIZE> IMOTIONCUBE_MOTION_ERRORS = {
         "EtherCAT communication error. ",
         "Short-circuit. ",
@@ -46,6 +48,17 @@ namespace error {
             "Position wraparound. The position 2^31 was exceeded. ",
         };
 
+    const std::array<std::string, ODRIVE_ERRORS_SIZE> ODRIVE_ERRORS = {
+        "Control iteration missed. ",
+        "DC bus under voltage. ",
+        "DC bus over voltage (replace resistor).",
+        "DC bus over regen current. ",
+        "DC bus over current. ",
+        "Break deadtime violation. ",
+        "Break duty cycle nan. ",
+        "Invalid Brake resistance. ",
+    };
+
     const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE> ODRIVE_AXIS_ERRORS = {
         "Invalid state. ",
         "Watchdog timer expired. ",
@@ -64,7 +77,7 @@ namespace error {
         "Control deadline missed. ",
         "Modulation magnitude. ",
         "Current sense saturation. ",
-        "Current limit violation. ",
+        "Current limit violation (replace/check incremental encoder cable + recalibrate). ",
         "Modulation is NaN. ",
         "Motor thermistor over temperature. ",
         "FET thermistor over temperature. ",
@@ -89,7 +102,7 @@ namespace error {
 
     const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE> ODRIVE_ENCODER_ERRORS = {
         "Unstable gain. ",
-        "CPR polepairs mismatch. ",
+        "CPR polepairs mismatch (calibrate, or replace encoder). ",
         "No response. ",
         "Unsupported encoder mode. ",
         "Illegal hall state. ",
@@ -120,7 +133,7 @@ namespace error {
         "Invalid load encoder. ",
         "Invalid estimate. ",
         "Invalid circular range. ",
-        "Spinout detected. ",
+        "Spinout detected (recalibrate, or replacing motor cable + recalibrate). ",
     };
 
     void addErrorToDescription(size_t index, ErrorRegister error_register, std::string& description)
@@ -141,6 +154,11 @@ namespace error {
                     description += IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[index];
                 }
                 break;
+            case ErrorRegister::ODRIVE_ERROR:
+                if (index < ODRIVE_ERRORS.size()) {
+                    description += ODRIVE_ERRORS[index];
+                }
+                break;
             case ErrorRegister::ODRIVE_AXIS_ERROR:
                 if (index < ODRIVE_AXIS_ERRORS.size()) {
                     description += ODRIVE_AXIS_ERRORS[index];
@@ -152,7 +170,7 @@ namespace error {
                 }
                 break;
             case ErrorRegister::ODRIVE_ENCODER_ERROR:
-                if (index < ODRIVE_MOTOR_ERRORS.size()) {
+                if (index < ODRIVE_ENCODER_ERRORS.size()) {
                     description += ODRIVE_ENCODER_ERRORS[index];
                 }
                 break;

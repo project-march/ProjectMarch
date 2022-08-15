@@ -131,6 +131,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
+    state->odrive_error_ = getOdriveError();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();
     state->dieboslave_error_ = getDieBOSlaveError();
@@ -211,6 +212,11 @@ float ODrive::getMotorCurrent()
 float ODrive::getActualEffort()
 {
     return getMotorCurrent();
+}
+
+uint32_t ODrive::getOdriveError()
+{
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveError, ODriveAxis::None)).ui;
 }
 
 uint32_t ODrive::getAxisError()

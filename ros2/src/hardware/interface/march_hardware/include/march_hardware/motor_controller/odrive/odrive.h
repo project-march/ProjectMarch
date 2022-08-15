@@ -90,6 +90,7 @@ private:
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
 
+    uint32_t getOdriveError();
     uint32_t getAxisError();
     uint32_t getMotorError();
     uint32_t getDieBOSlaveError();

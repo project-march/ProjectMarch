@@ -25,6 +25,7 @@ enum class ODriveObjectName {
     ActualPosition,
     ActualCurrent,
     ActualVelocity,
+    OdriveError,
     AxisError,
     MotorError,
     DieBOSlaveError,
@@ -55,6 +56,7 @@ public:
     static ObjectMap mosi_objects_axis_0;
     static ObjectMap miso_objects_axis_1;
     static ObjectMap mosi_objects_axis_1;
+    static ObjectMap miso_objects_axis_none;
 
     // Get the byte offset for an ODriveObject of an axis
     static int8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
