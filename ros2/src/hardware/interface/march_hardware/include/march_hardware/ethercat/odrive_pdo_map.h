@@ -22,9 +22,9 @@ struct ODriveObject {
 
 enum class ODriveObjectName {
     // Read objects
-    ActualPosition,
-    ActualCurrent,
-    ActualVelocity,
+    AbsolutePosition,
+    Current,
+    MotorVelocity,
     OdriveError,
     AxisError,
     MotorError,
@@ -32,8 +32,9 @@ enum class ODriveObjectName {
     EncoderError,
     ControllerError,
     AxisState,
-    Temperature,
-    MotorPosition,
+    OdriveTemperature,
+    MotorTemperature,
+    ShadowCount,
 
     // Write objects
     TargetTorque,

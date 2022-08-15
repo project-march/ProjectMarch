@@ -68,7 +68,8 @@ public:
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
     float getActualEffort() override;
-    float getTemperature();
+    float getMotorTemperature();
+    float getOdriveTemperature();
 
     double getEffortLimit() const override;
     static constexpr double EFFORT_LIMIT = 30.0; // [A]
