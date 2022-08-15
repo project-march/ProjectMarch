@@ -32,7 +32,7 @@ using namespace march_hardware_interface_util;
 namespace march_hardware_interface {
 
 MarchExoSystemInterface::MarchExoSystemInterface()
-    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
+    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("HardwareInterface")))
     , clock_(rclcpp::Clock())
 {
     go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
@@ -475,8 +475,7 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
 
     RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 
-    HardwareBuilder hw_builder { /*yaml_path=*/robot_config_file_path,
-        /*logger=*/shared_ptr<march_logger::RosLogger>(new march_logger::RosLogger(logger_)) };
+    HardwareBuilder hw_builder { /*yaml_path=*/robot_config_file_path };
 
     std::vector<std::string> joint_names;
     joint_names.reserve(info.joints.size());

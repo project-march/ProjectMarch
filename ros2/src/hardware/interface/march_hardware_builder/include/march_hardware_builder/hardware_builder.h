@@ -31,7 +31,7 @@ public:
     /**
      * @brief Initialises with a robot name and URDF.
      */
-    HardwareBuilder(const std::string& yaml_path, std::shared_ptr<march_logger::BaseLogger> logger);
+    explicit HardwareBuilder(const std::string& yaml_path);
 
     /**
      * @brief Creates a march::MarchRobot.
@@ -57,8 +57,10 @@ public:
         const YAML::Node& joints_config, std::vector<std::string> active_joint_names) const;
 
     march::Joint createJoint(const std::string& joint_name, const YAML::Node& joint_config) const;
-    std::unique_ptr<march::MotorController> createMotorController(const YAML::Node& config) const;
-    std::unique_ptr<march::ODrive> createODrive(const YAML::Node& odrive_config, march::ActuationMode mode) const;
+    std::unique_ptr<march::MotorController> createMotorController(
+        const march_logger::BaseLogger& parent_joint_name, const YAML::Node& config) const;
+    std::unique_ptr<march::ODrive> createODrive(
+        const march_logger::BaseLogger& logger, const YAML::Node& odrive_config, march::ActuationMode mode) const;
 
     static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
         const YAML::Node& absolute_encoder_config, const march::MotorControllerType motor_controller_type);

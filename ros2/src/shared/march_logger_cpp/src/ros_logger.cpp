@@ -1,12 +1,17 @@
-// ROS2 implementation of the logger.
-// Date: 24-06-2022
-// Created by: George Vegelien, M7.
-
+/** @brief ROS2 implementation of the logger.
+ *  @date 24-06-2022
+ *  @author George Vegelien, M7.
+ */
 #include "../include/march_logger_cpp/ros_logger.hpp"
 #include <rclcpp/logging.hpp>
 namespace march_logger {
 RosLogger::RosLogger(const std::shared_ptr<rclcpp::Logger>& rclcpp_logger)
     : rcl_logger_(rclcpp_logger)
+{
+}
+
+RosLogger::RosLogger(const std::string& name)
+    : rcl_logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger(name)))
 {
 }
 
@@ -53,6 +58,11 @@ void RosLogger::error(const std::string& msg) const
 void RosLogger::fatal(const std::string& msg) const
 {
     RCLCPP_FATAL((*rcl_logger_), msg);
+}
+
+BaseLogger* RosLogger::get_logger_append_suffix(const std::string& suffix) const
+{
+    return new RosLogger { std::make_shared<rclcpp::Logger>(rcl_logger_->get_child(suffix)) };
 }
 
 } // namespace march_logger

@@ -44,6 +44,8 @@ public:
      */
     virtual void fatal(const std::string& msg) const = 0;
 
+    virtual BaseLogger* get_logger_append_suffix(const std::string& suffix) const = 0;
+
     /**
      * \brief Generates an f string based on random length of arguments.
      * \author iFreilicht, https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf

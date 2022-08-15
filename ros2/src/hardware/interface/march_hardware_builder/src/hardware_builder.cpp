@@ -29,9 +29,9 @@ const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS =
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS = { "slaveIndex", "byteOffset", "side" };
 const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 
-HardwareBuilder::HardwareBuilder(const std::string& yaml_path, std::shared_ptr<march_logger::BaseLogger> logger)
+HardwareBuilder::HardwareBuilder(const std::string& yaml_path)
     : robot_config_(YAML::LoadFile(yaml_path))
-    , logger_(std::move(logger))
+    , logger_(std::make_shared<march_logger::RosLogger>("march_hardware_builder"))
     , pdo_interface_(march::PdoInterfaceImpl::create())
     , sdo_interface_(march::SdoInterfaceImpl::create(logger_))
 {
@@ -40,7 +40,7 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, std::shared_ptr<m
 
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot(const std::vector<std::string>& active_joint_names)
 {
-    logger_->info("Starting march_hardware_builder...");
+    logger_->info("Starting...");
     const auto robot_name = this->robot_config_.begin()->first.as<std::string>();
 
     // Remove top level robot name key
@@ -53,9 +53,10 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot(const std::
     logger_->info("Finished creating joints.");
     auto pressure_soles = createPressureSoles(config["pressure_soles"]);
     auto power_distribution_board = createPowerDistributionBoard(config["power_distribution_board"]);
+    logger_->info("Finished.");
     return std::make_unique<march::MarchRobot>(
         /*joint_list_=*/std::move(joints),
-        /*logger=*/logger_,
+        /*logger=*/std::make_shared<march_logger::RosLogger>("march_robot"),
         /*pressure_soles_=*/std::move(pressure_soles),
         /*if_name=*/if_name_,
         /*ecatCycleTime=*/config["ecatCycleTime"].as<int>(),
@@ -99,14 +100,15 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
 
     int slaveIndex = joint_config["motor_controller"]["slaveIndex"].as<int>();
     logger_->info(logger_->fstring("Joint %s will be actuated with slave index %i", joint_name.c_str(), slaveIndex));
+    auto logger = std::make_shared<march_logger::RosLogger>(joint_name);
 
-    auto motor_controller = HardwareBuilder::createMotorController(joint_config["motor_controller"]);
+    auto motor_controller = HardwareBuilder::createMotorController(*logger, joint_config["motor_controller"]);
 
     if (joint_config["temperatureges"]) {
         auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"]);
-        return { joint_name, net_number, std::move(motor_controller), std::move(ges), logger_ };
+        return { joint_name, net_number, std::move(motor_controller), std::move(ges), logger };
     } else {
-        return { joint_name, net_number, std::move(motor_controller), logger_ };
+        return { joint_name, net_number, std::move(motor_controller), logger };
     }
 }
 
@@ -140,14 +142,16 @@ std::map<std::string, YAML::Node> HardwareBuilder::getMapOfActiveJointConfigs(
     return joint_configs_map;
 }
 
-std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(const YAML::Node& config) const
+std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
+    const march_logger::BaseLogger& logger, const YAML::Node& config) const
 {
     HardwareBuilder::validateRequiredKeysExist(
         config, HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
 
     march::ActuationMode mode;
     if (config["actuationMode"]) {
-        mode = march::ActuationMode(config["actuationMode"].as<std::string>(), (*logger_.get()));
+        mode = march::ActuationMode(
+            config["actuationMode"].as<std::string>(), *logger.get_logger_append_suffix("actuation_mode"));
     }
 
     std::unique_ptr<march::MotorController> motor_controller;
@@ -157,7 +161,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(c
             march::error::ErrorType::INVALID_MOTOR_CONTROLLER, "Imotioncube is not supported anymore.");
     } else if (type == "odrive") {
         logger_->info("Creating Odrive.");
-        motor_controller = createODrive(config, mode);
+        motor_controller = createODrive(logger, config, mode);
     } else {
         throw march::error::HardwareException(
             march::error::ErrorType::INVALID_MOTOR_CONTROLLER, "Motorcontroller %s not valid", type);
@@ -166,7 +170,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(c
 }
 
 std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
-    const YAML::Node& odrive_config, march::ActuationMode mode) const
+    const march_logger::BaseLogger& logger, const YAML::Node& odrive_config, march::ActuationMode mode) const
 {
     if (!odrive_config) {
         return nullptr;
@@ -187,6 +191,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     auto motor_kv = odrive_config["motorKV"].as<unsigned int>();
     //    auto incremental_encoder =
     //    std::unique_ptr<march::AbsoluteEncoder>* absolute_encoder = nullptr;
+    auto loggerPtr = std::shared_ptr<march_logger::BaseLogger>(logger.get_logger_append_suffix(".Odrive"));
     if (odrive_config["absoluteEncoder"]) {
         YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
         return std::make_unique<march::ODrive>(
@@ -200,7 +205,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             /*index_found=*/index_found,
             /*motor_kv=*/motor_kv,
             /*is_incremental_encoder_more_precise=*/use_incremental_encoder,
-            /*logger=*/logger_);
+            /*logger=*/loggerPtr);
     } else {
         return std::make_unique<march::ODrive>(
             /*slave=*/march::Slave(slave_index, pdo_interface_, sdo_interface_),
@@ -212,7 +217,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             /*index_found=*/index_found,
             /*motor_kv=*/motor_kv,
             /*is_incremental_encoder_more_precise=*/use_incremental_encoder,
-            /*logger=*/logger_);
+            /*logger=*/loggerPtr);
     }
 }
 
