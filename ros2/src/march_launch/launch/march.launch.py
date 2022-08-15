@@ -562,7 +562,7 @@ def generate_launch_description() -> LaunchDescription:
             '~/rosbags2/$(date -d "today" +"%Y-%m-%d-%H-%M-%S")',
             "-a",
             "-x",
-            "'.*camera_(front|back).*'",
+            "'.*camera_.*'",
         ],
         output={
             "stdout": "log",
