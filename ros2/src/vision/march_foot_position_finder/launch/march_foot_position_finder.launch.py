@@ -41,7 +41,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="foot_length",
-                default_value="0.32",
+                default_value="0.3",
             ),
             DeclareLaunchArgument(
                 name="actual_foot_length",
@@ -49,11 +49,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="derivative_threshold",
-                default_value="0.02",
+                default_value="0.01",
             ),
             DeclareLaunchArgument(
                 name="available_points_ratio",
-                default_value="0.96",
+                default_value="0.94",
             ),
             DeclareLaunchArgument(
                 name="max_z_distance",
