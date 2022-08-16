@@ -71,7 +71,7 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
     std::map<std::string, YAML::Node> joint_configs_map = getMapOfActiveJointConfigs(joints_config, active_joint_names);
 
     std::vector<march::Joint> joints;
-    joints.reserve(active_joint_names.size());  
+    joints.reserve(active_joint_names.size());
     std::stringstream ss;
     for (auto& entry : joint_configs_map) {
         const std::string joint_name = entry.first;
