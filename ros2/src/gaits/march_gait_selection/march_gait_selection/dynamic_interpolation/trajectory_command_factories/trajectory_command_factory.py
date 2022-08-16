@@ -85,6 +85,11 @@ class TrajectoryCommandFactory:
         self.subgait_id = subgait_id
         self.start_position_all_joints = start_position_all_joints
 
+        if self._use_position_queue and not self._stop:
+            self.foot_location = self._get_foot_location_from_queue()
+        elif not self._use_position_queue:
+            self.foot_location = self._get_foot_location_from_point_handler(start)
+        
         if self._stop:
             self.foot_location.processed_point.x = 0.0
             self.foot_location.processed_point.y = 0.0
@@ -92,11 +97,6 @@ class TrajectoryCommandFactory:
             self.foot_location.relative_midpoint_height = 0.15
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
-        else:
-            if self._use_position_queue:
-                self.foot_location = self._get_foot_location_from_queue()
-            else:
-                self.foot_location = self._get_foot_location_from_point_handler(start)
 
         if self.foot_location is None:
             return None if start else self._get_stop_gait()
