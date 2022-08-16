@@ -913,10 +913,11 @@ class Pose:
         self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
 
         # Raise the toes when desired:
-        self.fe_ankle2 = min(
-            max(self._parameters.dorsiflexion_at_end_position_radians, self.fe_ankle2),
-            self._max_ankle_dorsi_flexion
-        )
+        if self._parameters.dorsiflexion_at_end_position_radians != 0:
+            self.fe_ankle2 = min(
+                max(self._parameters.dorsiflexion_at_end_position_radians, self.fe_ankle2),
+                self._max_ankle_dorsi_flexion,
+            )
 
         # Create a list of the pose:
         pose_list = self.pose_left if (subgait_id == "left_swing") else self.pose_right

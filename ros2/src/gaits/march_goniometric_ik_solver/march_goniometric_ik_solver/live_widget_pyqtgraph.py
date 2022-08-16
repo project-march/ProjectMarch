@@ -11,6 +11,7 @@ from march_goniometric_ik_solver.ik_solver import Pose, LENGTH_HIP, JOINT_NAMES,
 from march_goniometric_ik_solver.ik_solver_parameters import IKSolverParameters
 from march_utility.exceptions.gait_exceptions import PositionSoftLimitError
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_joint_trajectory import DynamicJointTrajectory
+from march_gait_preprocessor.gait_preprocessor import GaitPreprocessor
 from march_utility.gait.setpoint import Setpoint
 from march_utility.utilities.duration import Duration
 
@@ -20,8 +21,8 @@ Y_MIN = -0.35
 Y_MAX = 0.35
 
 MIDPOINT_HEIGHT = 0.15
-IK_SOLVER_PARAMTERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
-DURATION = 2.0
+IK_SOLVER_PARAMETERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
+DEFAULT_DURATION = 2.0
 NUMBER_OF_JOINTS = 8
 
 MIN_MIDPOINT_FRACTION = 0.1
@@ -42,10 +43,10 @@ class LiveWidget:
             "mid": {"fraction": 0.0, "deviation": 0.0, "shift": 0.0, "height": MIDPOINT_HEIGHT},
         }
         self.poses = {
-            "last": Pose(IK_SOLVER_PARAMTERS),
-            "mid_pre": Pose(IK_SOLVER_PARAMTERS),
-            "mid_post": Pose(IK_SOLVER_PARAMTERS),
-            "next": Pose(IK_SOLVER_PARAMTERS),
+            "last": Pose(IK_SOLVER_PARAMETERS),
+            "mid_pre": Pose(IK_SOLVER_PARAMETERS),
+            "mid_post": Pose(IK_SOLVER_PARAMETERS),
+            "next": Pose(IK_SOLVER_PARAMETERS),
         }
         self.pose_colours = {
             "mid": "g",
@@ -318,9 +319,16 @@ class LiveWidget:
         if pose_name == "last":
             return 0.0
         elif pose_name == "next":
-            return DURATION
+            return self.duration
         else:
-            return DURATION * self.get_midpoint_fraction_based_on_deviation(pose_name)
+            return self.duration * self.get_midpoint_fraction_based_on_deviation(pose_name)
+
+    @property
+    def duration(self):
+        """Returns the duration, scaled to height by GaitPreprocessor method."""
+        return GaitPreprocessor.get_duration_scaled_to_height(
+            DEFAULT_DURATION, self.sliders["last"]["y"], self.sliders["next"]["y"]
+        )
 
     def interpolate_trough_points(self) -> None:
         """Interpolates setpoints to joint trajectory for every joint and the foot rotation."""
@@ -357,12 +365,14 @@ class LiveWidget:
         for n in range(NUMBER_OF_JOINTS):
             pose_list.append(
                 self.joint_trajectories[n]
-                .get_interpolated_setpoint(self.sliders["mid"]["fraction"] * DURATION)
+                .get_interpolated_setpoint(self.sliders["mid"]["fraction"] * self.duration)
                 .position
             )
-        pose = Pose(IK_SOLVER_PARAMTERS, pose_list)
+        pose = Pose(IK_SOLVER_PARAMETERS, pose_list)
         pose.rot_foot1 = max(
-            self.joint_trajectories[-1].get_interpolated_setpoint(self.sliders["mid"]["fraction"] * DURATION).position,
+            self.joint_trajectories[-1]
+            .get_interpolated_setpoint(self.sliders["mid"]["fraction"] * self.duration)
+            .position,
             0.0,  # Since negative foot rotation is not possible.
         )
         return pose
