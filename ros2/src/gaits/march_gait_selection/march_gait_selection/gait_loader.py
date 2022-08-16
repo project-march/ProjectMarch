@@ -90,7 +90,8 @@ class GaitLoader:
     def _load_gaits(self) -> None:
         """Load all gaits."""
         self._load_named_positions()
-        self._load_dynamic_gaits()
+        if not "test" in self._gait_directory:
+            self._load_dynamic_gaits()
         self._load_home_gaits()
         self._load_sit_and_stand_gaits()
 

@@ -224,6 +224,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_switch(
     const std::vector<std::string>& start_interfaces, const std::vector<std::string>& stop_interfaces)
 {
+        RCLCPP_INFO((*logger_), "%sStart writing on!", LColor::BLUE);
     for (const auto& start : start_interfaces) {
         RCLCPP_INFO((*logger_), "Starting interfaces: %s", start.c_str());
     }
@@ -325,13 +326,13 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
     // Battery
-     auto pdb_current = march_robot_->getPowerDistributionBoard().read().pdb_current.f;
-     if (pdb_current < 43) {
-         RCLCPP_ERROR_THROTTLE((*logger_), clock_, 500, "Current is less then 43, it is: %g.", pdb_current);
-     } else if (pdb_current < 45) {
-         RCLCPP_WARN_THROTTLE((*logger_), clock_, 500, "Current is less then 45, it is: %g.", pdb_current);
-     }
-     RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Current is %g.", pdb_current);
+    //  auto pdb_current = march_robot_->getPowerDistributionBoard().read().pdb_current.f;
+    //  if (pdb_current < 43) {
+    //      RCLCPP_ERROR_THROTTLE((*logger_), clock_, 500, "Current is less then 43, it is: %g.", pdb_current);
+    //  } else if (pdb_current < 45) {
+    //      RCLCPP_WARN_THROTTLE((*logger_), clock_, 500, "Current is less then 45, it is: %g.", pdb_current);
+    //  }
+    //  RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Current is %g.", pdb_current);
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();

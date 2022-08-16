@@ -55,19 +55,12 @@
         </xacro:if>
         <xacro:unless value="$(arg gazebo)">
           <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
-          <param name="robot">march7</param>
+          <param name="robot">test_joint_rotational</param>
         </xacro:unless>
       </xacro:if>
     </hardware>
 
-    <xacro:march_joint name="left_ankle"/>
-    <xacro:march_joint name="left_hip_aa"/>
-    <xacro:march_joint name="left_hip_fe"/>
-    <xacro:march_joint name="left_knee"/>
-    <xacro:march_joint name="right_ankle"/>
-    <xacro:march_joint name="right_hip_aa"/>
-    <xacro:march_joint name="right_hip_fe"/>
-    <xacro:march_joint name="right_knee"/>
+    <xacro:march_joint name="rotational_joint"/>
 
   </ros2_control>
 
