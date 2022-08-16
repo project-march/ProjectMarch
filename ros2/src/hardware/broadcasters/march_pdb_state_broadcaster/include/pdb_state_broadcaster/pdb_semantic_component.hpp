@@ -138,7 +138,7 @@ public:
         emergency_button_pressed_ = static_cast<bool>(state_interface::get(index, state_interfaces_));
         pdb_current_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         hv_state_.update(index, state_interfaces_);
-        stop_button_state = static_cast<bool>(state_interfaces_[index].get().get_value());
+        stop_button_state = static_cast<bool>(state_interface::get(index, state_interfaces_));
         lv_state_.update(index, state_interfaces_);
         battery_state_.update(index, state_interfaces_);
     }
