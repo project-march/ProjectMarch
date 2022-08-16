@@ -209,7 +209,7 @@ void FootPositionFinder::currentStateCallback(const march_shared_msgs::msg::Curr
         // exoskeleton has some time to end up in a stable stand position before
         // the initial position is reset.
         initial_position_reset_timer_ = n_->create_wall_timer(
-            std::chrono::milliseconds(100),
+            std::chrono::milliseconds(300),
             [this]() -> void {
                 resetInitialPosition(/*stop_timer=*/true);
             },
@@ -321,13 +321,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     }
 
     if (position_queue.size() > 0) {
-
-        for (Point& p : position_queue) {
-            std::cout << p << ", ";
-        }
-
-        std::cout << "" << std::endl;
-
         Point optimal_point = retrieveOptimalPoint(&position_queue);
 
         // Take the first point of the point queue returned by the point finder
@@ -385,7 +378,7 @@ Point FootPositionFinder::retrieveOptimalPoint(std::vector<Point>* position_queu
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x)) - height_distance_coefficient_ * std::abs(p->z)
             - point_finder_->getObstaclePenalty(index);
-        if (std::abs(p->x) > 0.50 && p.z > 0.065) {
+        if (std::abs(p->x) > 0.55 && p->z > 0.10) {
             continue;
         }
         if (new_tradeoff > optimal_distance_height_tradeoff) {

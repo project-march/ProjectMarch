@@ -84,6 +84,14 @@ def generate_launch_description() -> LaunchDescription:
                 default_value="20.0",
             ),
             DeclareLaunchArgument(
+                name="toe_space",
+                default_value="0.04",
+            ),
+            DeclareLaunchArgument(
+                name="floating_foot_ratio",
+                default_value="0.25",
+            ),
+            DeclareLaunchArgument(
                 "realsense_simulation",
                 default_value="false",
                 choices=["true", "false"],
@@ -115,6 +123,8 @@ def generate_launch_description() -> LaunchDescription:
                     {"displacements_near": LaunchConfiguration("displacements_near")},
                     {"displacements_far": LaunchConfiguration("displacements_far")},
                     {"height_distance_coefficient": LaunchConfiguration("height_distance_coefficient")},
+                    {"toe_space": LaunchConfiguration("toe_space")},
+                    {"floating_foot_ratio": LaunchConfiguration("floating_foot_ratio")},
                     {"realsense_simulation": LaunchConfiguration("realsense_simulation")},
                 ],
             ),
