@@ -135,13 +135,13 @@ class GaitPreprocessor(Node):
 
         if foot_position.processed_point.x == 0:
             self._beep(3)
-            self.publisher_chosen_point_feedback(String(data="stop"))
+            self.publisher_chosen_point_feedback.publish(String(data="stop"))
         elif foot_position.processed_point.x > 0.45:
             self._beep(2)
-            self.publisher_chosen_point_feedback(String(data="long"))
+            self.publisher_chosen_point_feedback.publish(String(data="long"))
         elif foot_position.processed_point.x < 0.35:
             self._beep(1)
-            self.publisher_chosen_point_feedback(String(data="short"))
+            self.publisher_chosen_point_feedback.publish(String(data="short"))
 
     def _beep(self, beeps: int):
         """Plays a beep as feedback, based on the step size."""
@@ -211,9 +211,9 @@ class GaitPreprocessor(Node):
             max_height = max(max(track_points_transformed_heights), 0)
 
         relative_midpoint_height = 0.15
-        if 0.14 < max_height < 0.19:
-            relative_midpoint_height = 0.15 - (max_height - 0.14)
-        elif max_height > 0.19:
+        if 0.14 < absolute_max_height <= 0.17:
+            relative_midpoint_height = 0.15 - (absolute_max_height - 0.14)
+        elif max_height > 0.17:
             relative_midpoint_height = 0.1
 
         if absolute_max_height < 0.05:
