@@ -103,7 +103,7 @@ class ConnectionManager:
         self._covid_feedback_subscription = self._node.create_subscription(
             String,
             "/march/chosen_foot_position/feedback",
-            self._covid_feedback,
+            self._position_feedback_callback,
             DEFAULT_HISTORY_DEPTH,
         )
 
