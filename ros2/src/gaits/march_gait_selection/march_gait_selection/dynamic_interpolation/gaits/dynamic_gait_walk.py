@@ -218,7 +218,7 @@ class DynamicGaitWalk(GaitInterface):
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
+        delay: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
@@ -233,18 +233,12 @@ class DynamicGaitWalk(GaitInterface):
         """
         if current_time >= self.start_time_next_command and not self._has_gait_started:
             self._has_gait_started = True
-            return self._update_start_subgait()
+            return self._update_start_subgait(delay)
 
-        elif (
-            current_time >= self.start_time_next_command - early_schedule_duration
-            and not self._scheduled_early
-            and self._has_gait_started
+        if (
+            current_time >= self.start_time_next_command
         ):
-            self._scheduled_early = True
-            return self._update_next_subgait_early()
-
-        elif current_time >= self.start_time_next_command:
-            return self._update_state_machine()
+            return self._update_next_subgait(delay)
 
         else:
             return GaitUpdate.empty()
@@ -258,41 +252,28 @@ class DynamicGaitWalk(GaitInterface):
         """Called when the gait is finished."""
         self._next_command = None
 
-    def _update_start_subgait(self) -> GaitUpdate:
+    def _update_start_subgait(self, delay: float) -> GaitUpdate:
         """Update the state machine that the start gait has begun. Updates the time stamps for the next subgait.
 
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._update_time_stamps(self._next_command.duration)
+        self._update_time_stamps(self._next_command.duration, delay)
         return GaitUpdate.subgait_updated()
 
-    def _update_next_subgait_early(self) -> GaitUpdate:
+    def _update_next_subgait(self, delay: float) -> GaitUpdate:
         """Already schedule the next subgait with the end time of the current subgait as the start time.
 
         Returns:
             GaitUpdate: a GaitUpdate that is empty or contains a trajectory command
         """
         self._next_command = self._set_and_get_next_command()
-
-        if self._next_command is None:
-            return GaitUpdate.empty()
-
-        return GaitUpdate.should_schedule_early(self._next_command)
-
-    def _update_state_machine(self) -> GaitUpdate:
-        """Update the state machine that the new subgait has begun. Also updates time stamps for the next subgait.
-
-        Returns:
-            GaitUpdate: a GaitUpdate for the state machine
-        """
         if self._next_command is None:
             return GaitUpdate.finished()
 
-        self._update_time_stamps(self._next_command.duration)
-        self._scheduled_early = False
+        self._update_time_stamps(self._next_command.duration, delay)
 
-        return GaitUpdate.subgait_updated()
+        return GaitUpdate.should_schedule(self._next_command)
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Get the next command, based on what the current subgait is.
@@ -350,14 +331,14 @@ class DynamicGaitWalk(GaitInterface):
         self._step_counter += 1
         return False
 
-    def _update_time_stamps(self, next_command_duration: Duration) -> None:
+    def _update_time_stamps(self, next_command_duration: Duration, delay: float = 0.0) -> None:
         """Update the starting and end time.
 
         Args:
             next_command_duration (Duration): duration of the next command to be scheduled
         """
         start_time_previous_command = self.start_time_next_command
-        self.start_time_next_command = start_time_previous_command + next_command_duration
+        self.start_time_next_command = start_time_previous_command + next_command_duration + delay
 
     def update_parameters(self) -> None:
         """Callback for gait_node when the parameters have been updated."""
