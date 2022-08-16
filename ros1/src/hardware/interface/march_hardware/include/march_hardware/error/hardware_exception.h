@@ -29,8 +29,7 @@ namespace error {
         }
 
         template <typename... Args>
-        HardwareException(
-            ErrorType type, const std::string& format, Args... args)
+        HardwareException(ErrorType type, const std::string& format, Args... args)
             : type_(type)
             , m(this->createDescription(format, args...))
         {
@@ -48,8 +47,7 @@ namespace error {
             return this->type_;
         }
 
-        friend std::ostream& operator<<(
-            std::ostream& s, const HardwareException& e)
+        friend std::ostream& operator<<(std::ostream& s, const HardwareException& e)
         {
             s << e.what();
             return s;
@@ -66,8 +64,7 @@ namespace error {
             }
             return ss.str();
         }
-        template <typename... Args>
-        std::string createDescription(const std::string& format, Args... args)
+        template <typename... Args> std::string createDescription(const std::string& format, Args... args)
         {
             const size_t size = std::snprintf(
                 /*__s=*/nullptr, /*__maxlen=*/0, format.c_str(), args...);
@@ -81,11 +78,9 @@ namespace error {
     class NotImplemented : public std::logic_error {
     public:
         explicit NotImplemented(const std::string& function_name)
-            : std::logic_error(
-                "Function " + function_name + " is not implemented") {};
+            : std::logic_error("Function " + function_name + " is not implemented") {};
 
-        NotImplemented(
-            const std::string& function_name, const std::string& context)
+        NotImplemented(const std::string& function_name, const std::string& context)
             : std::logic_error(std::string(/*s=*/"Function ")
                                    .append(function_name)
                                    .append(/*s=*/" is not implemented for ")

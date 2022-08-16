@@ -13,12 +13,10 @@ WalkController::WalkController(physics::ModelPtr model)
     swing_step_size_ = 0.7; // This estimate will be adjusted every step
 
     // Get the values from the configuration file
-    std::string path = ros::package::getPath("march_gazebo_plugins")
-        + "/config/com_levels.yaml";
+    std::string path = ros::package::getPath("march_gazebo_plugins") + "/config/com_levels.yaml";
     com_levels_tree = YAML::LoadFile(path);
 
-    for (YAML::const_iterator it = com_levels_tree.begin();
-         it != com_levels_tree.end(); ++it) {
+    for (YAML::const_iterator it = com_levels_tree.begin(); it != com_levels_tree.end(); ++it) {
         auto key = it->first.as<std::string>();
         com_levels.push_back(key);
     }

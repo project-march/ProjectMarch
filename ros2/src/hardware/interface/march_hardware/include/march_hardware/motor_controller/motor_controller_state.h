@@ -13,7 +13,8 @@ public:
     float motor_current_ {};
     float motor_voltage_ {};
     float motor_controller_voltage_ {};
-    float temperature_ {};
+    float motor_temperature_ {};
+    float motor_controller_temperature_ {};
     float absolute_position_iu_ {};
     float incremental_position_iu_ {};
     float absolute_velocity_iu_ {};
@@ -26,7 +27,9 @@ public:
     friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
         return lhs.motor_current_ == rhs.motor_current_ && lhs.motor_voltage_ == rhs.motor_voltage_
-            && lhs.motor_controller_voltage_ == rhs.motor_controller_voltage_ && lhs.temperature_ == rhs.temperature_
+            && lhs.motor_controller_voltage_ == rhs.motor_controller_voltage_
+            && lhs.motor_temperature_ == rhs.motor_temperature_
+            && lhs.motor_controller_temperature_ == rhs.motor_controller_temperature_
             && lhs.absolute_position_iu_ == rhs.absolute_position_iu_
             && lhs.incremental_position_iu_ == rhs.incremental_position_iu_
             && lhs.absolute_velocity_iu_ == rhs.absolute_velocity_iu_

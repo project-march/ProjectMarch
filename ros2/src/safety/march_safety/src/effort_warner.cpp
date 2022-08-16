@@ -27,7 +27,7 @@ EffortWarner::EffortWarner(Node& node, std::vector<std::string>& joint_names)
     this->max_time_ = node.get_parameter("max_effort_time_limit").as_double();
     this->time_between_warnings_ = node.get_parameter("time_between_effort_warnings").as_double();
     this->max_effort_ = node.get_parameter("max_effort_limit").get_value<float>();
-     if (!node.get_parameter("simulation").as_bool()) {
+    if (!node.get_parameter("simulation").as_bool()) {
         this->subscription_ = node.create_subscription<JointStateMsg>("/march/joint_states", SystemDefaultsQoS(),
             // NOLINTNEXTLINE(performance-unnecessary-value-param)
             [this](const JointStateMsg::SharedPtr msg_ptr) -> void {

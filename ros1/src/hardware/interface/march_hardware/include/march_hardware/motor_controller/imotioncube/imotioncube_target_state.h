@@ -19,8 +19,7 @@ private:
     uint16_t state;
 
 private:
-    IMotionCubeTargetState(const ::std::string& description,
-        uint16_t controlWord, uint16_t stateMask, uint16_t state)
+    IMotionCubeTargetState(const ::std::string& description, uint16_t controlWord, uint16_t stateMask, uint16_t state)
         : description(description)
         , controlWord(controlWord)
         , stateMask(stateMask)

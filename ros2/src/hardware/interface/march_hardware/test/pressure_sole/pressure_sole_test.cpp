@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 // Copyright 2018 Project March.
 #include "../mocks/mock_slave.h"
 #include "march_hardware/pressure_sole/pressure_sole.h"
@@ -51,3 +53,5 @@ TEST_F(PressureSoleTest, Read)
 
     ASSERT_EQ(expected_data, pressure_sole.read());
 }
+// NOLINTEND
+#endif

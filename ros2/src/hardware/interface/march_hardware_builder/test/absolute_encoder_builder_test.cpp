@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 // Copyright 2019 Project March.
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
@@ -77,3 +78,4 @@ TEST_F(AbsoluteEncoderBuilderTest, NoMaxPosition)
     ASSERT_THROW(
         HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type, this->joint), MissingKeyException);
 }
+#endif

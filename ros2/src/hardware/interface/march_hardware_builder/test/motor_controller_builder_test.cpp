@@ -1,3 +1,4 @@
+#ifndef __clang_analyzer__
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
@@ -79,3 +80,4 @@ TEST_F(MotorControllerBuilderTest, RemoveFixedJointsTest)
     auto robot = builder.createMarchRobot();
     ASSERT_EQ(robot->size(), 1);
 }
+#endif

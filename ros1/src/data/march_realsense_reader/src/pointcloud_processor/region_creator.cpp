@@ -36,10 +36,8 @@ RegionGrower::RegionGrower(bool debugging)
 {
 }
 
-bool RegionGrower::createRegions(const PointCloud::Ptr pointcloud,
-    const Normals::Ptr pointcloud_normals,
-    const RealSenseCategory realsense_category,
-    boost::shared_ptr<PointsVector> points_vector,
+bool RegionGrower::createRegions(const PointCloud::Ptr pointcloud, const Normals::Ptr pointcloud_normals,
+    const RealSenseCategory realsense_category, boost::shared_ptr<PointsVector> points_vector,
     boost::shared_ptr<NormalsVector> normals_vector)
 {
     pointcloud_ = pointcloud;
@@ -61,15 +59,13 @@ bool RegionGrower::createRegions(const PointCloud::Ptr pointcloud,
         // start of the recursive call
         region_grower = pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal>();
         setupRecursiveRegionGrower();
-        success &= recursiveRegionGrower(region_vector_, pointcloud_,
-            pointcloud_normals_, smoothness_threshold);
+        success &= recursiveRegionGrower(region_vector_, pointcloud_, pointcloud_normals_, smoothness_threshold);
     }
 
     clock_t end_region_grow = clock();
 
     if (debugging_) {
-        ROS_DEBUG(
-            "Total number of clusters found: %lu", points_vector_->size());
+        ROS_DEBUG("Total number of clusters found: %lu", points_vector_->size());
         std::vector<int> length_vector(points_vector_->size());
         int right_size_regions_count = 0;
         int too_small_regions_count = 0;
@@ -86,64 +82,40 @@ bool RegionGrower::createRegions(const PointCloud::Ptr pointcloud,
                 }
             }
         }
-        ROS_DEBUG_STREAM(
-            "All the lengths of the regions are in the following vector: "
+        ROS_DEBUG_STREAM("All the lengths of the regions are in the following vector: "
             << output_utilities::vectorToString(length_vector));
 
         if (use_recursive_growing) {
-            ROS_DEBUG_STREAM("The number of recursive calls made is: "
-                << number_of_recursive_calls);
-            ROS_DEBUG_STREAM("There were "
-                << right_size_regions_count << " regions with the right size, "
-                << too_small_regions_count << " to small regions and "
-                << too_large_regions_count << " too large regions");
+            ROS_DEBUG_STREAM("The number of recursive calls made is: " << number_of_recursive_calls);
+            ROS_DEBUG_STREAM("There were " << right_size_regions_count << " regions with the right size, "
+                                           << too_small_regions_count << " to small regions and "
+                                           << too_large_regions_count << " too large regions");
         }
 
-        double time_taken = double(end_region_grow - start_region_grow)
-            / double(CLOCKS_PER_SEC);
-        ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
-            << std::fixed << time_taken << std::setprecision(5) << " sec "
-            << std::endl);
+        double time_taken = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
+        ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : " << std::fixed << time_taken
+                                                                       << std::setprecision(5) << " sec " << std::endl);
     }
 
     return success;
 }
 
-void RegionGrower::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+void RegionGrower::readParameters(march_realsense_reader::pointcloud_parametersConfig& config)
 {
-    number_of_neighbours
-        = config.region_creator_region_growing_number_of_neighbours;
-    number_of_neighbours_no_seeds
-        = config.region_creator_region_growing_number_of_neighbours_no_seeds;
-    min_valid_cluster_size
-        = config.region_creator_region_growing_min_valid_cluster_size;
-    max_valid_cluster_size
-        = config.region_creator_region_growing_max_valid_cluster_size;
-    min_desired_cluster_size
-        = config.region_creator_region_growing_min_desired_cluster_size;
-    max_desired_cluster_size
-        = config.region_creator_region_growing_max_desired_cluster_size;
-    smoothness_threshold
-        = (float)config.region_creator_region_growing_smoothness_threshold;
-    smoothness_threshold_lower_bound
-        = (float)config
-              .region_creator_region_growing_smoothness_threshold_lower_bound;
-    smoothness_threshold_upper_bound
-        = (float)config
-              .region_creator_region_growing_smoothness_threshold_upper_bound;
-    curvature_threshold
-        = (float)config.region_creator_region_growing_curvature_threshold;
-    use_recursive_growing
-        = config.region_creator_region_growing_use_recursive_growing;
-    tolerance_change_factor_increase
-        = (float)config
-              .region_creator_region_growing_tolerance_change_factor_increase;
-    tolerance_change_factor_decrease
-        = (float)config
-              .region_creator_region_growing_tolerance_change_factor_decrease;
-    use_no_seed_growing
-        = config.region_creator_region_growing_use_no_seed_growing;
+    number_of_neighbours = config.region_creator_region_growing_number_of_neighbours;
+    number_of_neighbours_no_seeds = config.region_creator_region_growing_number_of_neighbours_no_seeds;
+    min_valid_cluster_size = config.region_creator_region_growing_min_valid_cluster_size;
+    max_valid_cluster_size = config.region_creator_region_growing_max_valid_cluster_size;
+    min_desired_cluster_size = config.region_creator_region_growing_min_desired_cluster_size;
+    max_desired_cluster_size = config.region_creator_region_growing_max_desired_cluster_size;
+    smoothness_threshold = (float)config.region_creator_region_growing_smoothness_threshold;
+    smoothness_threshold_lower_bound = (float)config.region_creator_region_growing_smoothness_threshold_lower_bound;
+    smoothness_threshold_upper_bound = (float)config.region_creator_region_growing_smoothness_threshold_upper_bound;
+    curvature_threshold = (float)config.region_creator_region_growing_curvature_threshold;
+    use_recursive_growing = config.region_creator_region_growing_use_recursive_growing;
+    tolerance_change_factor_increase = (float)config.region_creator_region_growing_tolerance_change_factor_increase;
+    tolerance_change_factor_decrease = (float)config.region_creator_region_growing_tolerance_change_factor_decrease;
+    use_no_seed_growing = config.region_creator_region_growing_use_no_seed_growing;
 
     debugging_ = config.debug;
 }
@@ -151,8 +123,7 @@ void RegionGrower::readParameters(
 bool RegionGrower::setupRegionGrower()
 {
     if (pointcloud_->size() == pointcloud_normals_->size()) {
-        pcl::search::Search<pcl::PointXYZ>::Ptr tree(
-            new pcl::search::KdTree<pcl::PointXYZ>);
+        pcl::search::Search<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
         region_grower.setSearchMethod(tree);
         region_grower.setInputCloud(pointcloud_);
         region_grower.setInputNormals(pointcloud_normals_);
@@ -190,8 +161,7 @@ bool RegionGrower::extractRegions()
         points_vector_->reserve(region_vector_->size());
         normals_vector_->reserve(region_vector_->size());
 
-        addRegionsToPointAndNormalVectors(
-            region_vector_, pointcloud_, pointcloud_normals_);
+        addRegionsToPointAndNormalVectors(region_vector_, pointcloud_, pointcloud_normals_);
     }
 
     return true;
@@ -237,8 +207,7 @@ void RegionGrower::setupRecursiveRegionGrower()
 {
     number_of_recursive_calls = 0;
 
-    pcl::search::Search<pcl::PointXYZ>::Ptr tree(
-        new pcl::search::KdTree<pcl::PointXYZ>);
+    pcl::search::Search<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
     region_grower.setSearchMethod(tree);
     // Set the number of neighbours smaller then teh min valid cluster size to
     // avoid combining small regions which are far apart
@@ -248,39 +217,30 @@ void RegionGrower::setupRecursiveRegionGrower()
 
 // Implements the region growing algorithm and recursively improves on too small
 // or too large regions
-bool RegionGrower::recursiveRegionGrower(
-    const std::unique_ptr<RegionVector>& last_region_vector,
-    const PointCloud::Ptr& last_pointcloud,
-    const Normals::Ptr& last_pointcloud_normals, const float& last_tolerance)
+bool RegionGrower::recursiveRegionGrower(const std::unique_ptr<RegionVector>& last_region_vector,
+    const PointCloud::Ptr& last_pointcloud, const Normals::Ptr& last_pointcloud_normals, const float& last_tolerance)
 {
     number_of_recursive_calls++;
 
     bool success = true;
-    std::unique_ptr<RegionVector> too_small_regions
-        = std::make_unique<RegionVector>();
-    std::unique_ptr<RegionVector> too_large_regions
-        = std::make_unique<RegionVector>();
-    std::unique_ptr<RegionVector> right_size_regions
-        = std::make_unique<RegionVector>();
+    std::unique_ptr<RegionVector> too_small_regions = std::make_unique<RegionVector>();
+    std::unique_ptr<RegionVector> too_large_regions = std::make_unique<RegionVector>();
+    std::unique_ptr<RegionVector> right_size_regions = std::make_unique<RegionVector>();
     PointCloud::Ptr too_small_pointcloud = boost::make_shared<PointCloud>();
     Normals::Ptr too_small_pointcloud_normals = boost::make_shared<Normals>();
     PointCloud::Ptr too_large_pointcloud = boost::make_shared<PointCloud>();
     Normals::Ptr too_large_pointcloud_normals = boost::make_shared<Normals>();
 
     // Segment the region grower into small, good, and large regions
-    segmentRegionVector(last_region_vector, too_small_regions,
-        too_large_regions, right_size_regions);
+    segmentRegionVector(last_region_vector, too_small_regions, too_large_regions, right_size_regions);
 
     // Add the right regions to the region points and region normals vectors
-    addRegionsToPointAndNormalVectors(
-        right_size_regions, last_pointcloud, last_pointcloud_normals);
+    addRegionsToPointAndNormalVectors(right_size_regions, last_pointcloud, last_pointcloud_normals);
 
     // Extract the invalid regions into their point clouds
-    fillInvalidClouds(too_small_regions, last_pointcloud,
-        last_pointcloud_normals, too_small_pointcloud,
+    fillInvalidClouds(too_small_regions, last_pointcloud, last_pointcloud_normals, too_small_pointcloud,
         too_small_pointcloud_normals);
-    fillInvalidClouds(too_large_regions, last_pointcloud,
-        last_pointcloud_normals, too_large_pointcloud,
+    fillInvalidClouds(too_large_regions, last_pointcloud, last_pointcloud_normals, too_large_pointcloud,
         too_large_pointcloud_normals);
 
     // Compute the new tolerances with which to do the next region growing step
@@ -291,60 +251,48 @@ bool RegionGrower::recursiveRegionGrower(
     // The processInvalidRegions method makes a call to the
     // recursiveRegionGrower method if the invalid region is large enough and
     // the tolerance is within limits
-    success &= processInvalidRegions(large_tolerance, too_small_pointcloud,
-        too_small_pointcloud_normals, too_small_regions, last_pointcloud,
-        last_pointcloud_normals);
+    success &= processInvalidRegions(large_tolerance, too_small_pointcloud, too_small_pointcloud_normals,
+        too_small_regions, last_pointcloud, last_pointcloud_normals);
 
-    success &= processInvalidRegions(small_tolerance, too_large_pointcloud,
-        too_large_pointcloud_normals, too_large_regions, last_pointcloud,
-        last_pointcloud_normals);
+    success &= processInvalidRegions(small_tolerance, too_large_pointcloud, too_large_pointcloud_normals,
+        too_large_regions, last_pointcloud, last_pointcloud_normals);
 
     return success;
 }
 
-bool RegionGrower::processInvalidRegions(const float& next_tolerance,
-    const PointCloud::Ptr& invalid_pointcloud,
-    const Normals::Ptr& invalid_pointcloud_normals,
-    const std::unique_ptr<RegionVector>& invalid_regions,
-    const PointCloud::Ptr& last_pointcloud,
-    const Normals::Ptr& last_pointcloud_normals)
+bool RegionGrower::processInvalidRegions(const float& next_tolerance, const PointCloud::Ptr& invalid_pointcloud,
+    const Normals::Ptr& invalid_pointcloud_normals, const std::unique_ptr<RegionVector>& invalid_regions,
+    const PointCloud::Ptr& last_pointcloud, const Normals::Ptr& last_pointcloud_normals)
 {
     // If the invalid pointcloud size is large enough and the next tolerance is
     // reasonable, grow new regions on the invalid pointcloud
-    if (invalid_pointcloud->size() > min_desired_cluster_size
-        && next_tolerance < smoothness_threshold_upper_bound
+    if (invalid_pointcloud->size() > min_desired_cluster_size && next_tolerance < smoothness_threshold_upper_bound
         && next_tolerance < smoothness_threshold_upper_bound) {
         // Try region growing on the invalid regions with a new tolerance
-        std::unique_ptr<RegionVector> potential_region_vector
-            = std::make_unique<RegionVector>();
-        bool success = getRegionVectorFromTolerance(invalid_pointcloud,
-            invalid_pointcloud_normals, next_tolerance,
-            potential_region_vector);
+        std::unique_ptr<RegionVector> potential_region_vector = std::make_unique<RegionVector>();
+        bool success = getRegionVectorFromTolerance(
+            invalid_pointcloud, invalid_pointcloud_normals, next_tolerance, potential_region_vector);
         if (success) {
             // Investigate if the newly found region vector has valid
             // regions and process its invalid regions again
-            success &= recursiveRegionGrower(potential_region_vector,
-                invalid_pointcloud, invalid_pointcloud_normals, next_tolerance);
+            success &= recursiveRegionGrower(
+                potential_region_vector, invalid_pointcloud, invalid_pointcloud_normals, next_tolerance);
         }
         return success;
     } else {
-        addRegionsToPointAndNormalVectors(
-            invalid_regions, last_pointcloud, last_pointcloud_normals);
+        addRegionsToPointAndNormalVectors(invalid_regions, last_pointcloud, last_pointcloud_normals);
         return true;
     }
 }
 
 // Add the right regions to the region points and region normals vectors
-void RegionGrower::addRegionsToPointAndNormalVectors(
-    const std::unique_ptr<RegionVector>& right_size_regions,
+void RegionGrower::addRegionsToPointAndNormalVectors(const std::unique_ptr<RegionVector>& right_size_regions,
     const PointCloud::Ptr& pointcloud, const Normals::Ptr& pointcloud_normals)
 {
 
     for (pcl::PointIndices& region : *right_size_regions) {
-        if (region.indices.size() > min_valid_cluster_size
-            && region.indices.size() < max_valid_cluster_size) {
-            PointCloud::Ptr region_pointcloud
-                = boost::make_shared<PointCloud>();
+        if (region.indices.size() > min_valid_cluster_size && region.indices.size() < max_valid_cluster_size) {
+            PointCloud::Ptr region_pointcloud = boost::make_shared<PointCloud>();
             Normals::Ptr region_normals = boost::make_shared<Normals>();
             pcl::copyPointCloud(*pointcloud, region, *region_pointcloud);
             pcl::copyPointCloud(*pointcloud_normals, region, *region_normals);
@@ -356,25 +304,19 @@ void RegionGrower::addRegionsToPointAndNormalVectors(
 }
 
 // Fill a pointcloud with all the points in invalid regions
-void RegionGrower::fillInvalidClouds(
-    const std::unique_ptr<RegionVector>& invalid_region_vector,
-    const PointCloud::Ptr& last_pointcloud,
-    const Normals::Ptr& last_pointcloud_normals,
-    PointCloud::Ptr& invalid_pointcloud,
-    Normals::Ptr& invalid_pointcloud_normals)
+void RegionGrower::fillInvalidClouds(const std::unique_ptr<RegionVector>& invalid_region_vector,
+    const PointCloud::Ptr& last_pointcloud, const Normals::Ptr& last_pointcloud_normals,
+    PointCloud::Ptr& invalid_pointcloud, Normals::Ptr& invalid_pointcloud_normals)
 {
     // Initialize the clouds corresponding to the regions
-    PointCloud::Ptr invalid_region_pointcloud
-        = boost::make_shared<PointCloud>();
+    PointCloud::Ptr invalid_region_pointcloud = boost::make_shared<PointCloud>();
     Normals::Ptr invalid_region_normals = boost::make_shared<Normals>();
 
     for (pcl::PointIndices& invalid_region : *invalid_region_vector) {
         // Extract the points and normals of the last cloud which were
         // invalid into the region clouds
-        pcl::copyPointCloud(
-            *last_pointcloud, invalid_region, *invalid_region_pointcloud);
-        pcl::copyPointCloud(
-            *last_pointcloud_normals, invalid_region, *invalid_region_normals);
+        pcl::copyPointCloud(*last_pointcloud, invalid_region, *invalid_region_pointcloud);
+        pcl::copyPointCloud(*last_pointcloud_normals, invalid_region, *invalid_region_normals);
 
         // Add the region clouds together in a cloud containing all invalid
         // points on which region growing can be executed again
@@ -389,10 +331,8 @@ void RegionGrower::fillInvalidClouds(
 
 // Splits a region Vector into the regions considered too large, just right,
 // and too small
-void RegionGrower::segmentRegionVector(
-    const std::unique_ptr<RegionVector>& region_vector,
-    std::unique_ptr<RegionVector>& too_small_regions,
-    std::unique_ptr<RegionVector>& too_large_regions,
+void RegionGrower::segmentRegionVector(const std::unique_ptr<RegionVector>& region_vector,
+    std::unique_ptr<RegionVector>& too_small_regions, std::unique_ptr<RegionVector>& too_large_regions,
     std::unique_ptr<RegionVector>& right_size_regions)
 {
     for (pcl::PointIndices& region : *region_vector) {
@@ -408,9 +348,8 @@ void RegionGrower::segmentRegionVector(
 
 // Creates a potential region vector from a pointcloud with a certain
 // tolerance
-bool RegionGrower::getRegionVectorFromTolerance(
-    const PointCloud::Ptr& pointcloud, const Normals::Ptr& pointcloud_normals,
-    const float& tolerance, std::unique_ptr<RegionVector>& region_vector)
+bool RegionGrower::getRegionVectorFromTolerance(const PointCloud::Ptr& pointcloud,
+    const Normals::Ptr& pointcloud_normals, const float& tolerance, std::unique_ptr<RegionVector>& region_vector)
 {
     if (pointcloud->size() == pointcloud_normals->size()) {
         region_grower.setInputCloud(pointcloud);

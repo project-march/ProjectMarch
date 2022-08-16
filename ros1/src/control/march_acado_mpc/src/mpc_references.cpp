@@ -11,8 +11,7 @@ void scrollReference(vector<vector<double>>& reference)
     reference.push_back(reference[0]);
 }
 
-void sinRef(vector<vector<double>>& reference, double freq, double amplitude,
-    int N, double dt)
+void sinRef(vector<vector<double>>& reference, double freq, double amplitude, int N, double dt)
 {
 
     // calculate the amount of time steps required for one period

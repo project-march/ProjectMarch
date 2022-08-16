@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 #pragma once
 #include "march_hardware/motor_controller/motor_controller_state.h"
 #include <gmock/gmock.h>
@@ -34,3 +36,5 @@ public:
         return "";
     };
 };
+// NOLINTEND
+#endif

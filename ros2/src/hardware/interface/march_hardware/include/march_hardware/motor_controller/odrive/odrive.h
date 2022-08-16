@@ -68,7 +68,8 @@ public:
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
     float getActualEffort() override;
-    float getTemperature();
+    float getMotorTemperature();
+    float getOdriveTemperature();
 
     double getEffortLimit() const override;
     static constexpr double EFFORT_LIMIT = 30.0; // [A]
@@ -90,6 +91,7 @@ private:
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
 
+    uint32_t getOdriveError();
     uint32_t getAxisError();
     uint32_t getMotorError();
     uint32_t getDieBOSlaveError();

@@ -89,7 +89,7 @@ march7:
 #          indexFound: true
           absoluteEncoder:
             direction: -1
-            resolution: 20 
+            resolution: 20
             minPositionIU: 485856  # Ros doesn't start if it is in its hard limits (same as encode limits).
             maxPositionIU: 836080  # Ros doesn't start if it is in its hard limits (same as encode limits).
             zeroPositionIU: 502976
@@ -195,5 +195,5 @@ march7:
             resolution: 12
             transmission: 121
   power_distribution_board:
-      slaveIndex: 1
-      byteOffset: 0
+    slaveIndex: 1
+    byteOffset: 0

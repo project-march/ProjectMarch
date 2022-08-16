@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 #pragma once
 #include "mock_slave.h"
 
@@ -16,3 +18,5 @@ public:
 
     MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
 };
+// NOLINTEND
+#endif

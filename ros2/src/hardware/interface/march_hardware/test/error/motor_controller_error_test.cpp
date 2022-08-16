@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 // Copyright 2020 Project March.
 #include <march_hardware/error/motor_controller_error.h>
 
@@ -72,3 +74,5 @@ TEST(TestSecondDetailedMotionError, ParseMultipleSecondDetailedErrors)
     ASSERT_EQ(march::error::parseError(error, march::error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR),
         expected);
 }
+// NOLINTEND
+#endif

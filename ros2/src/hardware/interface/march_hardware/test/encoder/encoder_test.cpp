@@ -1,3 +1,5 @@
+#ifndef __clang_analyzer__
+// NOLINTBEGIN
 // Copyright 2020 Project March.
 #include "../mocks/mock_encoder.h"
 #include "../mocks/mock_pdo_interface.h"
@@ -38,3 +40,5 @@ TEST_F(EncoderTest, CorrectTotalPositions)
     MockEncoder encoder(this->counts_per_rotation);
     ASSERT_EQ(counts_per_rotation, encoder.getTotalPositions());
 }
+// NOLINTEND
+#endif

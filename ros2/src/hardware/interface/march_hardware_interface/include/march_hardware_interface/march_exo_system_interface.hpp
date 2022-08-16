@@ -30,6 +30,7 @@ struct JointLimit {
     std::chrono::milliseconds msec_until_error_when_in_error_soft_limits;
     int soft_error_limit_warning_throttle_msec;
     double max_effort_differance;
+    bool stop_when_outside_hard_limits;
 };
 /// Contains all the needed information for the Hardware Interface for a Joint.
 struct JointInfo {
@@ -48,6 +49,8 @@ public:
     RCLCPP_SHARED_PTR_DEFINITIONS(MarchExoSystemInterface);
 
     MARCH_HARDWARE_INTERFACE_PUBLIC MarchExoSystemInterface();
+
+    MARCH_HARDWARE_INTERFACE_PUBLIC ~MarchExoSystemInterface() override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
     hardware_interface::return_type configure(const hardware_interface::HardwareInfo& info) override;

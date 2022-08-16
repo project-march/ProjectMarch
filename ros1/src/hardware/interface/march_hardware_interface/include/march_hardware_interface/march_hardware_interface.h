@@ -23,8 +23,7 @@
 #include <march_shared_msgs/PowerDistributionBoardData.h>
 #include <march_shared_msgs/PressureSolesData.h>
 
-template <typename T>
-using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
+template <typename T> using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 
 /**
  * @brief HardwareInterface to allow ros_control to actuate our hardware.
@@ -33,8 +32,8 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
  */
 class MarchHardwareInterface : public hardware_interface::RobotHW {
 public:
-    MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot,
-        bool reset_motor_controllers, bool enable_safety_controller);
+    MarchHardwareInterface(
+        std::unique_ptr<march::MarchRobot> robot, bool reset_motor_controllers, bool enable_safety_controller);
 
     /**
      * @brief Initialize the HardwareInterface by registering position
@@ -48,8 +47,7 @@ public:
      * @param time Current time
      * @param elapsed_time Duration since last write action
      */
-    void read(
-        const ros::Time& time, const ros::Duration& elapsed_time) override;
+    void read(const ros::Time& time, const ros::Duration& elapsed_time) override;
 
     /**
      * @brief Perform all safety checks that might crash the exoskeleton.
@@ -63,8 +61,7 @@ public:
      * @param time Current time
      * @param elapsed_time Duration since last write action
      */
-    void write(
-        const ros::Time& time, const ros::Duration& elapsed_time) override;
+    void write(const ros::Time& time, const ros::Duration& elapsed_time) override;
 
     /**
      * Perform the start up sequence of all joints
@@ -93,16 +90,14 @@ private:
     void updatePowerDistributionBoardData();
     void outsideLimitsCheck(size_t joint_index);
     bool MotorControllerStateCheck(size_t joint_index);
-    static void getSoftJointLimitsError(const std::string& name,
-        const urdf::JointConstSharedPtr& urdf_joint,
+    static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
         joint_limits_interface::SoftJointLimits& error_soft_limits);
 
     /**
      * Call a function that returns an optional sleeping duration for each joint
      * @param f Function to call
      */
-    void call_and_wait_once_for_each_joint(
-        std::function<std::optional<ros::Duration>(march::Joint&)> const& f);
+    void call_and_wait_once_for_each_joint(std::function<std::optional<ros::Duration>(march::Joint&)> const& f);
 
     /**
      * Call a function that returns true when successful for each joint
@@ -111,11 +106,9 @@ private:
      * @param maximum_tries_debug_f Function to call after maximum tries has
      * been reached
      */
-    void call_and_wait_while_checking_for_each_joint(
-        std::function<bool(march::Joint&)> const& f,
-        std::optional<std::function<void(march::Joint&)>> const&
-            maximum_tries_debug_f,
-        const ros::Duration, const unsigned maximum_tries);
+    void call_and_wait_while_checking_for_each_joint(std::function<bool(march::Joint&)> const& f,
+        std::optional<std::function<void(march::Joint&)>> const& maximum_tries_debug_f, const ros::Duration,
+        const unsigned maximum_tries);
 
     /* Limit of the change in effort command over one cycle, can be overridden
      * by safety controller */
@@ -130,10 +123,8 @@ private:
     hardware_interface::VelocityJointInterface velocity_joint_interface_;
     hardware_interface::EffortJointInterface effort_joint_interface_;
 
-    joint_limits_interface::PositionJointSoftLimitsInterface
-        position_joint_soft_limits_interface_;
-    joint_limits_interface::EffortJointSoftLimitsInterface
-        effort_joint_soft_limits_interface_;
+    joint_limits_interface::PositionJointSoftLimitsInterface position_joint_soft_limits_interface_;
+    joint_limits_interface::EffortJointSoftLimitsInterface effort_joint_soft_limits_interface_;
 
     MarchTemperatureSensorInterface march_temperature_interface_;
 
@@ -168,14 +159,10 @@ private:
     bool has_actuated_ = false;
 
     /* Real time safe publishers */
-    RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand>
-        after_limit_joint_command_pub_;
-    RtPublisherPtr<march_shared_msgs::MotorControllerState>
-        motor_controller_state_pub_;
-    RtPublisherPtr<march_shared_msgs::PressureSolesData>
-        pressure_sole_data_pub_;
-    RtPublisherPtr<march_shared_msgs::PowerDistributionBoardData>
-        power_distribution_board_data_pub_;
+    RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand> after_limit_joint_command_pub_;
+    RtPublisherPtr<march_shared_msgs::MotorControllerState> motor_controller_state_pub_;
+    RtPublisherPtr<march_shared_msgs::PressureSolesData> pressure_sole_data_pub_;
+    RtPublisherPtr<march_shared_msgs::PowerDistributionBoardData> power_distribution_board_data_pub_;
 };
 
 #endif // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

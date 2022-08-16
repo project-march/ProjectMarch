@@ -52,8 +52,7 @@ public:
             this->value_ = IMCStateOfOperation::OPERATION_ENABLED;
         } else if (six_bit_masked == IMCStateOfOperation::QUICK_STOP_ACTIVE) {
             this->value_ = IMCStateOfOperation::QUICK_STOP_ACTIVE;
-        } else if (five_bit_masked
-            == IMCStateOfOperation::FAULT_REACTION_ACTIVE) {
+        } else if (five_bit_masked == IMCStateOfOperation::FAULT_REACTION_ACTIVE) {
             this->value_ = IMCStateOfOperation::FAULT_REACTION_ACTIVE;
         } else if (five_bit_masked == IMCStateOfOperation::FAULT) {
             this->value_ = IMCStateOfOperation::FAULT;
@@ -107,40 +106,34 @@ public:
 
     bool dataIsValid() const override
     {
-        return state_of_operation_.value_
-            != march::IMCStateOfOperation::UNKNOWN;
+        return state_of_operation_.value_ != march::IMCStateOfOperation::UNKNOWN;
     }
 
     bool isOperational() const override
     {
-        return state_of_operation_.value_
-            != march::IMCStateOfOperation::OPERATION_ENABLED;
+        return state_of_operation_.value_ != march::IMCStateOfOperation::OPERATION_ENABLED;
     }
 
     bool hasError() const override
     {
-        return state_of_operation_.value_ == march::IMCStateOfOperation::FAULT
-            || motion_error_ || detailed_error_ || second_detailed_error_;
+        return state_of_operation_.value_ == march::IMCStateOfOperation::FAULT || motion_error_ || detailed_error_
+            || second_detailed_error_;
     }
 
     std::optional<std::string> getErrorStatus() const override
     {
         if (hasError()) {
             std::ostringstream error_stream;
-            error_stream
-                << "Motion Error: "
-                << error::parseError(motion_error_,
-                       error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
-                << " (" << std::bitset<16>(motion_error_).to_string() << ")"
-                << "\nDetailed Error: "
-                << error::parseError(detailed_error_,
-                       error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
-                << " (" << std::bitset<16>(motion_error_).to_string() << ")"
-                << "\nSecond Detailed Error: "
-                << error::parseError(second_detailed_error_,
-                       error::ErrorRegister::
-                           IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
-                << " (" << std::bitset<16>(motion_error_).to_string() << ")";
+            error_stream << "Motion Error: "
+                         << error::parseError(motion_error_, error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR) << " ("
+                         << std::bitset<16>(motion_error_).to_string() << ")"
+                         << "\nDetailed Error: "
+                         << error::parseError(detailed_error_, error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
+                         << " (" << std::bitset<16>(motion_error_).to_string() << ")"
+                         << "\nSecond Detailed Error: "
+                         << error::parseError(
+                                second_detailed_error_, error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
+                         << " (" << std::bitset<16>(motion_error_).to_string() << ")";
             return error_stream.str();
         } else {
             return std::nullopt;
