@@ -16,6 +16,7 @@ from march_shared_msgs.msg import FootPosition
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import FOOT_LOCATION_TIME_OUT
 from rclpy.node import Node
+from std_msgs.msg import String
 
 HEARTBEAT_TIMEOUT = Duration(seconds=5)
 
@@ -75,6 +76,7 @@ class ConnectionManager:
         self._last_left_point = [0, 0, 0]
         self._last_right_point = [0, 0, 0]
         self._eeg_command = None
+        self._covid_feedback = None
         self._last_left_point_timestamp = self._node.get_clock().now()
         self._last_right_point_timestamp = self._node.get_clock().now()
         self._controller.accepted_cb = partial(self._send_message_till_confirm, "Accepted", True)
@@ -94,17 +96,17 @@ class ConnectionManager:
             self._callback_right,
             DEFAULT_HISTORY_DEPTH,
         )
-        self._eeg_command_sub = self._node.create_subscription(
+        self._eeg_subscription = self._node.create_subscription(
             String,
-            "/march/march_eeg_node/command",
+            "/march/march_eeg_node/eeg_command",
             self._eeg_callback,
             DEFAULT_HISTORY_DEPTH,
         )
-
-        self._start_side_pub = self._node.create_publisher(
-            msg_type=String,
-            topic="/march/step_and_hold/start_side",
-            qos_profile=DEFAULT_HISTORY_DEPTH,
+        self._covid_feedback_subscription = self._node.create_subscription(
+            String,
+            "/march/march_gait_selection/point_feedback",
+            self._covid_feedback,
+            DEFAULT_HISTORY_DEPTH,
         )
 
     def _current_gait_cb(self, msg: CurrentGait):
@@ -131,8 +133,12 @@ class ConnectionManager:
         self._last_right_point_timestamp = self._node.get_clock().now()
 
     def _eeg_callback(self, msg: String):
-        """Callback when an EEG command is published."""
+        """Callback when a new EEG command is sent."""
         self._eeg_command = msg.data
+
+    def _position_feedback_callback(self, msg: String):
+        """Callback when feedback information is given about a selected covid point."""
+        self._covid_feedback = msg.data
 
     def _validate_received_data(self, msg: str):
         """Check if a received message is valid or is empty, meaning the connection is broken.
@@ -282,9 +288,11 @@ class ConnectionManager:
             "point_left": point_left,
             "point_right": point_right,
             "eeg_command": self._eeg_command,
+            "covid_feedback": self._covid_feedback,
         }
 
         self._eeg_command = None
+        self._covid_feedback = None
 
         while True:
             try:

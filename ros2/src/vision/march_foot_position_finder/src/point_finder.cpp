@@ -307,7 +307,7 @@ void PointFinder::computeFootPlateDisplacement(
         position_queue->push_back(original);
         original_position_queue_.push_back(original);
         obstacles_found_.push_back(obstacle_found);
-        return;
+        // return;
     }
 
     // Make the minimum height map value equal to the found point z-value
@@ -344,7 +344,7 @@ void PointFinder::computeFootPlateDisplacement(
                 position_queue->push_back(p);
                 original_position_queue_.push_back(original);
                 obstacles_found_.push_back(obstacle_found);
-                return;
+                // return;
             }
         }
     }
