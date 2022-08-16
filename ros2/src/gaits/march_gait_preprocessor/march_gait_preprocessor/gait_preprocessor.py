@@ -1,10 +1,10 @@
 """Author: Marten Haitjema, MVII."""
 
-import subprocess # noqa
 from typing import List, Tuple
 import numpy as np
 from rclpy.node import Node
 from geometry_msgs.msg import Point
+from std_msgs.msg import String
 from march_shared_msgs.msg import FootPosition, CurrentGait, GaitInstruction
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -102,6 +102,11 @@ class GaitPreprocessor(Node):
             "/march/fixed_foot_position",
             DEFAULT_HISTORY_DEPTH,
         )
+        self.publisher_chosen_point_feedback = self.create_publisher(
+            String,
+            "/march/chosen_foot_position/feedback",
+            DEFAULT_HISTORY_DEPTH,
+        )
 
     def _callback_left(self, foot_position: FootPosition) -> None:
         """Callback for new left point from covid. Makes the point usable for the gait.
@@ -126,18 +131,13 @@ class GaitPreprocessor(Node):
     def _update_step_height_previous(self, foot_position: FootPosition) -> None:
         """Update the _step_height_previous attribute with the height of the last chosen foot position."""
         self._step_height_previous = foot_position.processed_point.y
-        if foot_position.processed_point.x == 0:
-            self._beep(3)
-        elif foot_position.processed_point.x > 0.45:
-            self._beep(2)
-        elif foot_position.processed_point.x < 0.35:
-            self._beep(1)
 
-    def _beep(self, beeps: int):
-        """Plays a beep as feedback, based on the step size."""
-        cmd = ["play", "-n", "synth", "0.1", "sine", "880", "vol", "1.0"]
-        for _n in range(beeps):
-            subprocess.run(cmd, capture_output=True) # noqa
+        if foot_position.processed_point.x == 0:
+            self.publisher_chosen_point_feedback(String(data="stop"))
+        elif foot_position.processed_point.x > 0.45:
+            self.publisher_chosen_point_feedback(String(data="long"))
+        elif foot_position.processed_point.x < 0.35:
+            self.publisher_chosen_point_feedback(String(data="short"))
 
     def _reset_previous_step_height_after_close(self, current_gait: CurrentGait) -> None:
         """Resets the _step_height_previous attribute after a close gait."""
