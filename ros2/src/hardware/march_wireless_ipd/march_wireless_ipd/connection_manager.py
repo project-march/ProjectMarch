@@ -7,8 +7,6 @@ import time
 from functools import partial
 
 from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
-
-from std_msgs.msg import String
 from march_shared_msgs.msg import CurrentGait, CurrentState
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
