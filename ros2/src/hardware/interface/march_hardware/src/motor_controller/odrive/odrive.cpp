@@ -157,7 +157,9 @@ ODriveAxisState ODrive::getAxisState()
 int32_t ODrive::getAbsolutePositionIU()
 {
     int32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualPosition, axis_)).i;
-
+    if (iu_value == 0) {
+        logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
+    }
     switch (absolute_encoder_->getDirection()) {
         case Encoder::Direction::Positive:
             return iu_value;
