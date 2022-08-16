@@ -1,5 +1,6 @@
 """Author: Marten Haitjema, MVII."""
 
+import subprocess # noqa
 from typing import List, Tuple
 import numpy as np
 from rclpy.node import Node
@@ -133,11 +134,20 @@ class GaitPreprocessor(Node):
         self._step_height_previous = foot_position.processed_point.y
 
         if foot_position.processed_point.x == 0:
+            self._beep(3)
             self.publisher_chosen_point_feedback(String(data="stop"))
         elif foot_position.processed_point.x > 0.45:
+            self._beep(2)
             self.publisher_chosen_point_feedback(String(data="long"))
         elif foot_position.processed_point.x < 0.35:
+            self._beep(1)
             self.publisher_chosen_point_feedback(String(data="short"))
+
+    def _beep(self, beeps: int):
+        """Plays a beep as feedback, based on the step size."""
+        cmd = ["play", "-n", "synth", "0.1", "sine", "880", "vol", "1.0"]
+        for _n in range(beeps):
+            subprocess.run(cmd, capture_output=True) # noqa
 
     def _reset_previous_step_height_after_close(self, current_gait: CurrentGait) -> None:
         """Resets the _step_height_previous attribute after a close gait."""
@@ -163,7 +173,7 @@ class GaitPreprocessor(Node):
             foot_position.track_points, transformed_foot_position
         )
 
-        scaled_duration = self.get_duration_scaled_to_height(self._duration, self._step_height_previous, max_height)
+        scaled_duration = self._get_duration_scaled_to_height(self._duration, max_height)
 
         return FootPosition(
             header=foot_position.header,
@@ -237,8 +247,7 @@ class GaitPreprocessor(Node):
 
         return transformed
 
-    @staticmethod
-    def get_duration_scaled_to_height(duration: float, step_height_previous: float, step_height_current: float) -> float:
+    def _get_duration_scaled_to_height(self, duration: float, step_height_current: float) -> float:
         """Scales the duration based on the maximum absolute step height of previous or current step.
 
         Args:
@@ -248,7 +257,7 @@ class GaitPreprocessor(Node):
         Returns:
             float: Scaled duration in seconds.
         """
-        return duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(step_height_previous))
+        return duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(self._step_height_previous))
 
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations."""
@@ -264,7 +273,7 @@ class GaitPreprocessor(Node):
             point_msg.processed_point,
         )
 
-        point_msg.duration = self.get_duration_scaled_to_height(self._duration, self._step_height_previous, max_height)
+        point_msg.duration = self._get_duration_scaled_to_height(self._duration, max_height)
         point_msg.midpoint_deviation = midpoint_deviation
         point_msg.relative_midpoint_height = absolute_midpoint_height
 
