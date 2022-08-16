@@ -9,7 +9,7 @@
 
 namespace march {
 
-enum class ODriveAxis { Zero = 0, One = 1 };
+enum class ODriveAxis { None = -1, Zero = 0, One = 1 };
 
 class ODriveAxisState {
 public:
@@ -134,6 +134,8 @@ public:
         if (hasError()) {
             std::ostringstream error_stream;
             error_stream << "State: " << axis_state_.toString() << " (" << axis_state_.value_ << ")" << std::endl
+                         << "System: " << error::parseError(odrive_error_, error::ErrorRegister::ODRIVE_ERROR)
+                         << std::endl
                          << "Axis: " << error::parseError(axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
                          << std::endl
                          << "Motor: " << error::parseError(motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR)
@@ -157,6 +159,7 @@ public:
     }
 
     ODriveAxisState axis_state_;
+    uint32_t odrive_error_ {};
     uint32_t axis_error_ {};
     uint32_t motor_error_ {};
     uint32_t encoder_error_ {};

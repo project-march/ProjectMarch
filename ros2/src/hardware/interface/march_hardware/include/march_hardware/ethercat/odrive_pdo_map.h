@@ -22,17 +22,19 @@ struct ODriveObject {
 
 enum class ODriveObjectName {
     // Read objects
-    ActualPosition,
-    ActualCurrent,
-    ActualVelocity,
+    AbsolutePosition,
+    Current,
+    MotorVelocity,
+    OdriveError,
     AxisError,
     MotorError,
     DieBOSlaveError,
     EncoderError,
     ControllerError,
     AxisState,
-    Temperature,
-    MotorPosition,
+    OdriveTemperature,
+    MotorTemperature,
+    ShadowCount,
 
     // Write objects
     TargetTorque,
@@ -55,6 +57,7 @@ public:
     static ObjectMap mosi_objects_axis_0;
     static ObjectMap miso_objects_axis_1;
     static ObjectMap mosi_objects_axis_1;
+    static ObjectMap miso_objects_axis_none;
 
     // Get the byte offset for an ODriveObject of an axis
     static int8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
