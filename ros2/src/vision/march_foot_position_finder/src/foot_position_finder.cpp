@@ -184,15 +184,15 @@ void FootPositionFinder::readParameters(const std::vector<rclcpp::Parameter>& pa
 void FootPositionFinder::chosenOtherPointCallback(const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT
 {
     // Start point in current frame is equal to the previous displacement:
-    start_point_ = Point(msg->displacement.x, msg->displacement.y, msg->displacement.z);
+    // start_point_ = Point(msg->displacement.x, msg->displacement.y, msg->displacement.z);
 
     // previous_start_point_ is the current origin:
-    previous_start_point_ = ORIGIN;
+    // previous_start_point_ = ORIGIN;
 
     // Compute desired point:
-    desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-            /*_z=*/0));
+    // desired_point_ = addPoints(start_point_,
+    //     Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+    //         /*_z=*/0));
 }
 
 /**
@@ -204,17 +204,17 @@ void FootPositionFinder::chosenOtherPointCallback(const march_shared_msgs::msg::
 // Suppress lint error "make reference of argument" as it breaks the callback
 void FootPositionFinder::currentStateCallback(const march_shared_msgs::msg::CurrentState::SharedPtr msg) // NOLINT
 {
-    if (msg->state == "stand") {
-        // This wall timer simulates a one-shot action in the future. The
-        // exoskeleton has some time to end up in a stable stand position before
-        // the initial position is reset.
-        initial_position_reset_timer_ = n_->create_wall_timer(
-            std::chrono::milliseconds(300),
-            [this]() -> void {
-                resetInitialPosition(/*stop_timer=*/true);
-            },
-            point_callback_group_);
-    }
+    // if (msg->state == "stand") {
+    //     // This wall timer simulates a one-shot action in the future. The
+    //     // exoskeleton has some time to end up in a stable stand position before
+    //     // the initial position is reset.
+    //     initial_position_reset_timer_ = n_->create_wall_timer(
+    //         std::chrono::milliseconds(300),
+    //         [this]() -> void {
+    //             resetInitialPosition(/*stop_timer=*/true);
+    //         },
+    //         point_callback_group_);
+    // }
 }
 
 /**
@@ -224,14 +224,14 @@ void FootPositionFinder::currentStateCallback(const march_shared_msgs::msg::Curr
  */
 void FootPositionFinder::resetInitialPosition(bool stop_timer)
 {
-    previous_start_point_ = start_point_ = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
-    desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-            /*_z=*/0));
+    // previous_start_point_ = start_point_ = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
+    // desired_point_ = addPoints(start_point_,
+    //     Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+    //         /*_z=*/0));
 
-    if (stop_timer) {
-        initial_position_reset_timer_->cancel();
-    }
+    // if (stop_timer) {
+    //     initial_position_reset_timer_->cancel();
+    // }
 }
 
 /**
@@ -303,6 +303,12 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Find possible points around the desired point determined earlier:
     std::vector<Point> position_queue;
+
+    start_point_ = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
+    desired_point_ = addPoints(start_point_,
+        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+            /*_z=*/0));
+
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Publish cloud for visualization:
@@ -312,12 +318,12 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     if (validatePoint(desired_point_) && validatePoint(start_point_)) {
         // publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
         //     displacements_, left_or_right_); // Cyan
-        publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
-            left_or_right_); // Green
-        publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
-            left_or_right_); // Purple
-        publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN, start_point_,
-            left_or_right_); // Blue
+        // publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
+        //     left_or_right_); // Green
+        // publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
+        //     left_or_right_); // Purple
+        // publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN, start_point_,
+        //     left_or_right_); // Blue
     }
 
     if (position_queue.size() > 0) {
@@ -344,9 +350,9 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         // Visualize new displacement
         // publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
         //     left_or_right_); // Orange
-        publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
-            left_or_right_); // Red
-        publishFootRectangle(point_marker_publisher_, n_, found_covid_point_, left_or_right_);
+        // publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
+        //     left_or_right_); // Red
+        // publishFootRectangle(point_marker_publisher_, n_, found_covid_point_, left_or_right_);
         // publishPossiblePoints(
         //     point_marker_publisher_, n_, position_queue, left_or_right_);
         // publishNewDisplacement(point_marker_publisher_, n_, start_point_,
