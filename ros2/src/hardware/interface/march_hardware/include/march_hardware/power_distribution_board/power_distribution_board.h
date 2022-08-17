@@ -45,6 +45,13 @@ struct PowerDistributionBoardData {
     double battery_voltage;
     double battery_temperature;
 
+    /**
+     * @brief Gives a pointer to the member variables so that the hardware interface can couple it back to the
+     * broadcaster.
+     * @attention The order of the pairs must be the same as the order in
+     * `march_pdb_state_broadcaster/.../pdb_semantic_component.hpp`
+     * @returns A pair of interface_names and pointers to the member variables.
+     */
     inline std::array<std::pair<std::string, double*>, pdb::DATA_LENGTH> get_pointers()
     {
         return { std::make_pair(/*__x=*/"emergency_button_pressed", &emergency_button_state),
@@ -63,6 +70,14 @@ struct PowerDistributionBoardData {
             std::make_pair(/*__x=*/"battery_state.temperature", &battery_temperature) };
     }
 
+    /**
+     * @brief Updates the member variables based on the input array.
+     * @attention This 0 to 14 should be in the same order as it is send in the ethercat.
+     * This method is used with the output from the read method of the `PowerDistributionBoard`.
+     * Make sure that the order, types (.ui or .f) and the offset for the read corresponds with position order seen via
+     * the `ethercat-sdk`.
+     * @param data The input array in order.
+     */
     inline void update_values(std::array<bit32, pdb::DATA_LENGTH> data)
     {
         emergency_button_state = data[0].ui;
