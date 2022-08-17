@@ -231,13 +231,14 @@ class DynamicGaitWalk(GaitInterface):
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
+        if "fixed" in self.name:
+            delay = 0
+
         if current_time >= self.start_time_next_command and not self._has_gait_started:
             self._has_gait_started = True
             return self._update_start_subgait(delay)
 
-        if (
-            current_time >= self.start_time_next_command
-        ):
+        if current_time >= self.start_time_next_command:
             return self._update_next_subgait(delay)
 
         else:

@@ -64,7 +64,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="duration",
-                default_value="1.3",
+                default_value="1.5",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             DeclareLaunchArgument(
