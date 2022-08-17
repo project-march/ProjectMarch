@@ -242,12 +242,19 @@ class GaitPreprocessor(Node):
         temp_y = point.y
         transformed = Point()
 
-        if point.z > 0.0:
+        if point.z != 0.0:
             point.x -= min(
-                ((self._max_offset_x - self._offset_x) / 0.2) * point.z, self._max_offset_x
+                ((self._max_offset_x - self._offset_x) / 0.2) * abs(point.z), self._max_offset_x
             )
 
-        transformed.x = -point.x + self._offset_x
+        # 1. kleinere offset als stap klein is
+        # 2. offset ook naar beneden
+
+        if abs(point.x) < 0.30:
+            transformed.x = -point.x + self._offset_x / 2
+        else:
+            transformed.x = -point.x + self._offset_x
+
         transformed.y = point.z + self._offset_y
         transformed.z = 0.47
 
