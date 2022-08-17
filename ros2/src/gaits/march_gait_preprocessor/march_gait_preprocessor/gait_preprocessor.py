@@ -1,6 +1,5 @@
 """Author: Marten Haitjema, MVII."""
 
-import subprocess # noqa
 from typing import List, Tuple
 import numpy as np
 from rclpy.node import Node
@@ -135,20 +134,11 @@ class GaitPreprocessor(Node):
         # self._step_height_previous = foot_position.processed_point.y
 
         if foot_position.processed_point.x == 0:
-            self._beep(3)
             self.publisher_chosen_point_feedback.publish(String(data="stop"))
         elif foot_position.processed_point.x > 0.45:
-            self._beep(2)
             self.publisher_chosen_point_feedback.publish(String(data="long"))
         elif foot_position.processed_point.x < 0.35:
-            self._beep(1)
             self.publisher_chosen_point_feedback.publish(String(data="short"))
-
-    def _beep(self, beeps: int):
-        """Plays a beep as feedback, based on the step size."""
-        cmd = ["play", "-n", "synth", "0.1", "sine", "880", "vol", "1.0"]
-        for _n in range(beeps):
-            subprocess.run(cmd, capture_output=True) # noqa
 
     def _reset_previous_step_height_after_close(self, current_gait: CurrentGait) -> None:
         """Resets the _step_height_previous attribute after a close gait."""
