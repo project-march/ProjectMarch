@@ -27,6 +27,8 @@ def generate_launch_description():
     control_type = LaunchConfiguration("control_type")
     actuating = LaunchConfiguration("actuating")
 
+    rviz_condition = PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])
+
     declared_arguments = [
         DeclareLaunchArgument(
             name="simulation",
@@ -50,9 +52,7 @@ def generate_launch_description():
             description="Decides which controller is being used. "
             "'Effort' when you are running either gazebo or the real exo",
             choices=["rviz", "effort"],
-            condition=UnlessCondition(
-                PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])
-            ),
+            condition=UnlessCondition(rviz_condition),
         ),
         DeclareLaunchArgument(
             name="control_type",
@@ -60,7 +60,7 @@ def generate_launch_description():
             description="Decides which controller is being used. "
             "'Rviz' when you are not running either gazebo or the real exo",
             choices=["rviz", "effort"],
-            condition=IfCondition(PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])),
+            condition=IfCondition(rviz_condition),
         )
         # endregion
     ]
@@ -78,7 +78,9 @@ def generate_launch_description():
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
         condition=IfCondition(actuating),
     )
+    # endregion
 
+    # region Start broadcasters
     pdb_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
@@ -89,14 +91,28 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
+        condition=UnlessCondition(simulation),
     )
 
+    motor_controller_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=[
+            "march_motor_controller_state_broadcaster",
+            "-t",
+            "march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        condition=UnlessCondition(simulation),
+    )
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
         joint_trajectory_controller_spawner,
         pdb_state_broadcaster_spawner,
+        motor_controller_state_broadcaster_spawner,
     ]
 
     # region Launch Controller manager, Extra configuration if simulation is `false`

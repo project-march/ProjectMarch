@@ -2,6 +2,7 @@
 #ifndef MARCH_HARDWARE_MOTOR_CONTROLLER_STATES_H
 #define MARCH_HARDWARE_MOTOR_CONTROLLER_STATES_H
 
+#include <array>
 #include <optional>
 #include <string>
 
@@ -10,19 +11,19 @@ class MotorControllerState {
 public:
     MotorControllerState() = default;
 
-    float motor_current_ {};
-    float motor_voltage_ {};
-    float motor_controller_voltage_ {};
-    float motor_temperature_ {};
-    float motor_controller_temperature_ {};
-    float absolute_position_iu_ {};
-    float incremental_position_iu_ {};
-    float absolute_velocity_iu_ {};
-    float incremental_velocity_iu_ {};
-    float absolute_position_ {};
-    float incremental_position_ {};
-    float absolute_velocity_ {};
-    float incremental_velocity_ {};
+    double motor_current_ = 0;
+    double motor_voltage_ = 0;
+    double motor_controller_voltage_ = 0;
+    double motor_temperature_ = 0;
+    double motor_controller_temperature_ = 0;
+    double absolute_position_iu_ = 0;
+    double incremental_position_iu_ = 0;
+    double absolute_velocity_iu_ = 0;
+    double incremental_velocity_iu_ = 0;
+    double absolute_position_ = 0;
+    double incremental_position_ = 0;
+    double absolute_velocity_ = 0;
+    double incremental_velocity_ = 0;
 
     friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
@@ -75,6 +76,51 @@ public:
      * @return string describing the operational state
      */
     virtual std::string getOperationalState() const = 0;
+
+    /**
+     * @brief Gives a pointer to the member variables so that the hardware interface can couple it back to the
+     * broadcaster.
+     * @attention Should contain exactly the same interface_names as expected by the
+     * `march_motor_controller_state_broadcaster/.../motor_controller_semantic_component.hpp`
+     * @return A pair of interface_names and pointers to the member variables.
+     */
+    inline std::array<std::pair<std::string, double*>, 12> get_pointers()
+    {
+        return {
+            std::make_pair(/*__x=*/"motor_current", &motor_current_),
+            std::make_pair(/*__x=*/"motor_voltage", &motor_voltage_),
+            std::make_pair(/*__x=*/"motor_temperature", &motor_temperature_),
+            std::make_pair(/*__x=*/"motor_controller_temperature", &motor_controller_temperature_),
+            std::make_pair(/*__x=*/"absolute_position_iu", &absolute_position_iu_),
+            std::make_pair(/*__x=*/"incremental_position_iu", &incremental_position_iu_),
+            std::make_pair(/*__x=*/"absolute_velocity_iu", &absolute_velocity_iu_),
+            std::make_pair(/*__x=*/"incremental_velocity_iu", &incremental_velocity_iu_),
+            std::make_pair(/*__x=*/"absolute_position", &absolute_position_),
+            std::make_pair(/*__x=*/"incremental_position", &incremental_position_),
+            std::make_pair(/*__x=*/"absolute_velocity", &absolute_velocity_),
+            std::make_pair(/*__x=*/"incremental_velocity", &incremental_velocity_),
+        };
+    }
+
+    /**
+     * @brief Updates the member variables based on the input array.E
+     * @param other The other motor controller state of which all values need to be copied over from.
+     */
+    inline void update_values(MotorControllerState* other)
+    {
+        motor_current_ = other->motor_current_;
+        motor_voltage_ = other->motor_voltage_;
+        motor_temperature_ = other->motor_temperature_;
+        motor_controller_temperature_ = other->motor_controller_temperature_;
+        absolute_position_iu_ = other->absolute_position_iu_;
+        incremental_position_iu_ = other->incremental_position_iu_;
+        absolute_velocity_iu_ = other->absolute_velocity_iu_;
+        incremental_velocity_iu_ = other->incremental_velocity_iu_;
+        absolute_position_ = other->absolute_position_;
+        incremental_position_ = other->incremental_position_;
+        absolute_velocity_ = other->absolute_velocity_;
+        incremental_velocity_ = other->incremental_velocity_;
+    }
 };
 
 } // namespace march
