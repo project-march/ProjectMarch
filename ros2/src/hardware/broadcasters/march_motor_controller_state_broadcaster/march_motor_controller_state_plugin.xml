@@ -1,0 +1,9 @@
+<library path="march_motor_controller_state_broadcaster">
+    <class name="march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster"
+           type="march_motor_controller_state_broadcaster::MotorControllerStateBroadcaster"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            The motor controller state broadcaster publishes the current states from joints and motor controllers.
+        </description>
+    </class>
+</library>

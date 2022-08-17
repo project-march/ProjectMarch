@@ -48,7 +48,7 @@ struct PowerDistributionBoardData {
     /**
      * @brief Gives a pointer to the member variables so that the hardware interface can couple it back to the
      * broadcaster.
-     * @attention The order of the pairs must be the same as the order in
+     * @attention Should contain exactly the same interface_names as expected by the
      * `march_pdb_state_broadcaster/.../pdb_semantic_component.hpp`
      * @returns A pair of interface_names and pointers to the member variables.
      */

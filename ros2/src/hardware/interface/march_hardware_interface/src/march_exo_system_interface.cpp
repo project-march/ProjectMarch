@@ -117,6 +117,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
     }
     return { /*name=*/joint.name.c_str(),
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
+        /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
@@ -157,6 +158,12 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
+        // For motor controller state broadcasting.
+        for (std::pair<std::string, double*>& motor_controller_pointer :
+            jointInfo.motor_controller_data.get_pointers()) {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
+        }
     }
 
     // For the PDB broadcaster.
@@ -352,6 +359,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
+        jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }
     return hardware_interface::return_type::OK;
 }
