@@ -41,7 +41,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="foot_length",
-                default_value="0.3",
+                default_value="0.27",
             ),
             DeclareLaunchArgument(
                 name="actual_foot_length",
@@ -73,11 +73,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="displacements_near",
-                default_value="0.15",
+                default_value="0.25",
             ),
             DeclareLaunchArgument(
                 name="displacements_far",
-                default_value="0.2",
+                default_value="0.1",
             ),
             DeclareLaunchArgument(
                 name="height_distance_coefficient",
