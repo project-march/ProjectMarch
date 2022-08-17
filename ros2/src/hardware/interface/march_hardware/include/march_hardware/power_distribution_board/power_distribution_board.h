@@ -94,7 +94,7 @@ struct PowerDistributionBoardData {
         lv2_ok = data[11].ui;
         battery_percentage = data[12].f;
         battery_voltage = data[13].f;
-        battery_voltage = data[14].f;
+        battery_temperature = data[14].f;
     }
 };
 
