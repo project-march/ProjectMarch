@@ -373,12 +373,12 @@ void MarchExoSystemInterface::pdb_read()
 {
     march_robot_->getPowerDistributionBoard().read(pdb_data_);
     if (pdb_data_.battery_voltage != 0) {
-        if (pdb_data_.battery_voltage < 43) {
+        if (pdb_data_.battery_voltage < 40) {
             RCLCPP_ERROR_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", pdb_data_.battery_voltage);
+                (*logger_), clock_, 500, "Battery voltage is less then 40V, it is: %gV.", pdb_data_.battery_voltage);
         } else if (pdb_data_.battery_voltage < 45) {
             RCLCPP_WARN_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
+                (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
         }
     }
 };
