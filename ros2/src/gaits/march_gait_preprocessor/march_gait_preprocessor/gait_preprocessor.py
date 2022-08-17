@@ -46,6 +46,7 @@ class GaitPreprocessor(Node):
         self._max_deviation = self.get_parameter("max_deviation").get_parameter_value().double_value
         self._simulated_deviation = self.get_parameter("simulated_deviation").get_parameter_value().double_value
         self._use_simulated_deviation = self.get_parameter("use_simulated_deviation").get_parameter_value().bool_value
+        self._max_offset_x = self.get_parameter("max_offset_x").get_parameter_value().double_value
 
     def _create_subscribers(self) -> None:
         """Create subscribers to the topics on which covid publishes found points."""
@@ -240,6 +241,11 @@ class GaitPreprocessor(Node):
         """
         temp_y = point.y
         transformed = Point()
+
+        if point.z > 0.0:
+            point.x -= min(
+                ((self._max_offset_x - self._offset_x) / 0.2) * point.z, self._max_offset_x
+            )
 
         transformed.x = -point.x + self._offset_x
         transformed.y = point.z + self._offset_y
