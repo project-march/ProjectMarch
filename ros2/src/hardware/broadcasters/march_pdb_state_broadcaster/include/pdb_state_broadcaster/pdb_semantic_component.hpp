@@ -130,7 +130,8 @@ public:
     virtual ~PdbSemanticComponent() = default;
 
     /** @brief Updates the local variables with the values retrieved from the borrowed state interface.
-     *  @attention Make sure this happens in the same order as they are placed in the constructor!
+     *  @attention Make sure this happens in the same order as they are placed in the constructor, and in the
+     *  `march_hardware/.../power_distribution_board.h::get_pointers()`.
      */
     void update()
     {
@@ -138,7 +139,7 @@ public:
         emergency_button_pressed_ = static_cast<bool>(state_interface::get(index, state_interfaces_));
         pdb_current_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         hv_state_.update(index, state_interfaces_);
-        stop_button_state = static_cast<bool>(state_interfaces_[index].get().get_value());
+        stop_button_state = static_cast<bool>(state_interface::get(index, state_interfaces_));
         lv_state_.update(index, state_interfaces_);
         battery_state_.update(index, state_interfaces_);
     }
