@@ -10,7 +10,7 @@ from march_shared_msgs.msg import FootPosition, CurrentGait, GaitInstruction
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
 NODE_NAME = "gait_preprocessor_node"
-DURATION_SCALING_FACTOR = 5
+DURATION_SCALING_FACTOR = 3
 
 
 class GaitPreprocessor(Node):
@@ -131,7 +131,7 @@ class GaitPreprocessor(Node):
 
     def _update_step_height_previous(self, foot_position: FootPosition) -> None:
         """Update the _step_height_previous attribute with the height of the last chosen foot position."""
-        self._step_height_previous = foot_position.processed_point.y
+        # self._step_height_previous = foot_position.processed_point.y
 
         if foot_position.processed_point.x == 0:
             self._beep(3)
