@@ -205,5 +205,3 @@ march7:
   power_distribution_board:
     slaveIndex: 5
     byteOffset: 16
-    slaveIndex: 1
-    byteOffset: 16
