@@ -232,7 +232,7 @@ class DynamicGaitWalk(GaitInterface):
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
         if "fixed" in self.name:
-            delay = 0
+            delay = Duration(0.0)
 
         if current_time >= self.start_time_next_command and not self._has_gait_started:
             self._has_gait_started = True
