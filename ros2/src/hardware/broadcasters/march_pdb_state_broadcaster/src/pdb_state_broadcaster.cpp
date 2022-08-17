@@ -26,7 +26,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PdbSta
     pdb_component_ = std::make_unique<PdbSemanticComponent>();
     try {
         // register pdb data publisher
-        pdb_state_publisher_ = node_->create_publisher<PDB_MSG>("march/pdb_data", rclcpp::SystemDefaultsQoS());
+        pdb_state_publisher_ = node_->create_publisher<PDB_MSG>("/march/pdb_data", rclcpp::SystemDefaultsQoS());
         realtime_pdb_publisher_ = std::make_unique<PdbRTPublisher>(pdb_state_publisher_);
     } catch (const std::exception& e) {
         RCLCPP_FATAL(

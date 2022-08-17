@@ -130,7 +130,8 @@ public:
     virtual ~PdbSemanticComponent() = default;
 
     /** @brief Updates the local variables with the values retrieved from the borrowed state interface.
-     *  @attention Make sure this happens in the same order as they are placed in the constructor!
+     *  @attention Make sure this happens in the same order as they are placed in the constructor, and in the
+     *  `march_hardware/.../power_distribution_board.h::get_pointers()`.
      */
     void update()
     {
