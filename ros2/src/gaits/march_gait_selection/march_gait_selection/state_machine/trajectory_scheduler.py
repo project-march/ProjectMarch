@@ -112,7 +112,7 @@ class TrajectoryScheduler:
         """
         self._failed = False
         goal_msg = FollowJointTrajectory.Goal()
-        command.trajectory.header.stamp = command.start_time.to_msg()  # To set early scheduling.
+        # command.trajectory.header.stamp = command.start_time.to_msg()  # To set early scheduling.
         goal_msg.trajectory = command.trajectory
         if not self._action_client_to_controller.wait_for_server(self._schedule_timeout):
             self._logger.warn(f"Failed to schedule trajectory {command} within {self._schedule_timeout} seconds")
