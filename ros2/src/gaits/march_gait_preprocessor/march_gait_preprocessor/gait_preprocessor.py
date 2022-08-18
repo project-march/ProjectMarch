@@ -200,6 +200,8 @@ class GaitPreprocessor(Node):
         if len(track_points) != 0:
             track_points_transformed_heights = np.asarray([point.z for point in track_points])
             max_height = max(max(track_points_transformed_heights), 0)
+            if max_height > absolute_max_height:
+                absolute_max_height = max_height
 
         relative_midpoint_height = 0.15
         if 0.14 < absolute_max_height <= 0.17:
