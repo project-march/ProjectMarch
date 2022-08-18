@@ -252,7 +252,7 @@ void FootPositionFinder::processRealSenseDepthFrames()
 
     depth = dec_filter_.process(depth);
     depth = spat_filter_.process(depth);
-    // depth = temp_filter_.process(depth);
+    depth = temp_filter_.process(depth);
 
     // Allow default constructor for pc
     // NOLINTNEXTLINE
