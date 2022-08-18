@@ -462,14 +462,14 @@
             topics_ns="camera_front_right"
             parent="upper_leg_right"
             plugin="$(arg realsense_simulation)">
-        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${54/180 * pi} ${pi}"/>
+        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${53.5/180 * pi} ${pi}"/>
     </xacro:sensor_d435>
     <xacro:sensor_d435 
             name="camera_front_left"
             topics_ns="camera_front_left"
             parent="upper_leg_left"
             plugin="$(arg realsense_simulation)">
-        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 54) / 180 * pi} ${0 * pi}"/>
+        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 52) / 180 * pi} ${0 * pi}"/>
     </xacro:sensor_d435>
     <xacro:sensor_d435 
             name="camera_back"
