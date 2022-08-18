@@ -262,7 +262,7 @@ class GaitStateMachine:
         if self._current_gait is not None:
             self._trajectory_scheduler.cancel_active_goals()
 
-        for gait in self._gaits.items():
+        for gait in self._gaits.values():
             if isinstance(gait, DynamicGaitWalk):
                 gait.reset_start_position_to_home_stand()
 
@@ -389,7 +389,7 @@ class GaitStateMachine:
             gait_name (Optional[str]): Optional name of the gait of which the parameters should be updated.
         """
         if gait_name is None:
-            for gait in self._gaits.items():
+            for gait in self._gaits.values():
                 if isinstance(gait, DynamicGaitWalk):
                     gait.update_parameters()
         elif gait_name in self._gaits and isinstance(self._gaits[gait_name], DynamicGaitWalk):
