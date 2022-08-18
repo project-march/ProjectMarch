@@ -45,4 +45,7 @@ def _beep(beeps: int, length: float = 0.1):
     """Plays the given amount of beeps with the given length."""
     cmd = ["play", "-n", "synth", str(length), "sine", "880", "vol", "1.0"]
     for _n in range(beeps):
-        subprocess.run(cmd, capture_output=True)  # noqa
+        try:
+            subprocess.run(cmd, capture_output=True)  # noqa
+        except FileNotFoundError:
+            continue
