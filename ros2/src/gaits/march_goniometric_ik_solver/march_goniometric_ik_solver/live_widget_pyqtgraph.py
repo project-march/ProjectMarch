@@ -22,7 +22,7 @@ Y_MAX = 0.35
 
 MIDPOINT_HEIGHT = 0.15
 IK_SOLVER_PARAMETERS = IKSolverParameters(dorsiflexion_at_end_position=0.0)
-DEFAULT_DURATION = 2.0
+DEFAULT_DURATION = 1.3
 NUMBER_OF_JOINTS = 8
 
 MIN_MIDPOINT_FRACTION = 0.1
@@ -327,7 +327,7 @@ class LiveWidget:
     def duration(self):
         """Returns the duration, scaled to height by GaitPreprocessor method."""
         return GaitPreprocessor.get_duration_scaled_to_height(
-            DEFAULT_DURATION, self.sliders["last"]["y"], self.sliders["next"]["y"]
+            DEFAULT_DURATION, self.sliders["next"]["y"]
         )
 
     def interpolate_trough_points(self) -> None:
