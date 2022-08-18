@@ -74,17 +74,17 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     point_marker_publisher_ = n_->create_publisher<visualization_msgs::msg::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
 
-    std::function<void(const march_shared_msgs::msg::FootPosition::SharedPtr msg)> point_callback
-        = std::bind(&FootPositionFinder::chosenOtherPointCallback, this, std::placeholders::_1);
-    other_chosen_point_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::FootPosition>(topic_other_chosen_point_,
-            /*qos=*/1, point_callback, point_callback_options_);
+    // std::function<void(const march_shared_msgs::msg::FootPosition::SharedPtr msg)> point_callback
+    //     = std::bind(&FootPositionFinder::chosenOtherPointCallback, this, std::placeholders::_1);
+    // other_chosen_point_subscriber_
+    //     = n_->create_subscription<march_shared_msgs::msg::FootPosition>(topic_other_chosen_point_,
+    //         /*qos=*/1, point_callback, point_callback_options_);
 
-    std::function<void(const march_shared_msgs::msg::CurrentState::SharedPtr msg)> state_callback
-        = std::bind(&FootPositionFinder::currentStateCallback, this, std::placeholders::_1);
-    current_state_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::CurrentState>("/march/gait_selection/current_state",
-            /*qos=*/1, state_callback, point_callback_options_);
+    // std::function<void(const march_shared_msgs::msg::CurrentState::SharedPtr msg)> state_callback
+    //     = std::bind(&FootPositionFinder::currentStateCallback, this, std::placeholders::_1);
+    // current_state_subscriber_
+    //     = n_->create_subscription<march_shared_msgs::msg::CurrentState>("/march/gait_selection/current_state",
+    //         /*qos=*/1, state_callback, point_callback_options_);
 
     foot_gap_ = n_->get_parameter("foot_gap").as_double();
     step_distance_ = n_->get_parameter("step_distance").as_double();
@@ -252,7 +252,7 @@ void FootPositionFinder::processRealSenseDepthFrames()
 
     depth = dec_filter_.process(depth);
     depth = spat_filter_.process(depth);
-    depth = temp_filter_.process(depth);
+    // depth = temp_filter_.process(depth);
 
     // Allow default constructor for pc
     // NOLINTNEXTLINE
@@ -348,8 +348,8 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         }
 
         // Visualize new displacement
-        // publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
-        //     left_or_right_); // Orange
+        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
+            left_or_right_); // Orange
         // publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
         //     left_or_right_); // Red
         // publishFootRectangle(point_marker_publisher_, n_, found_covid_point_, left_or_right_);
