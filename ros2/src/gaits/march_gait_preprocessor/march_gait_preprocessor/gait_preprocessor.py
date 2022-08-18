@@ -164,7 +164,7 @@ class GaitPreprocessor(Node):
             foot_position.track_points, transformed_foot_position
         )
 
-        scaled_duration = self._get_duration_scaled_to_height(self._duration, max_height)
+        scaled_duration = self.get_duration_scaled_to_height(self._duration, max_height)
 
         return FootPosition(
             header=foot_position.header,
@@ -208,6 +208,8 @@ class GaitPreprocessor(Node):
             relative_midpoint_height = 0.15 - (absolute_max_height - 0.14)
         elif max_height > 0.17:
             relative_midpoint_height = 0.1
+        elif max_height > 0.2:
+            relative_midpoint_height = 0.08
 
         if absolute_max_height < 0.05:
             midpoint_deviation = 0.05
@@ -252,7 +254,8 @@ class GaitPreprocessor(Node):
 
         return transformed
 
-    def _get_duration_scaled_to_height(self, duration: float, step_height_current: float) -> float:
+    @staticmethod
+    def get_duration_scaled_to_height(duration: float, step_height_current: float) -> float:
         """Scales the duration based on the maximum absolute step height of previous or current step.
 
         Args:
@@ -262,7 +265,7 @@ class GaitPreprocessor(Node):
         Returns:
             float: Scaled duration in seconds.
         """
-        return duration + DURATION_SCALING_FACTOR * max(abs(step_height_current), abs(self._step_height_previous))
+        return duration + DURATION_SCALING_FACTOR * abs(step_height_current)
 
     def _publish_simulated_locations(self) -> None:
         """Publishes simulated foot locations."""
@@ -278,7 +281,7 @@ class GaitPreprocessor(Node):
             point_msg.processed_point,
         )
 
-        point_msg.duration = self._get_duration_scaled_to_height(self._duration, max_height)
+        point_msg.duration = self.get_duration_scaled_to_height(self._duration, max_height)
         point_msg.midpoint_deviation = midpoint_deviation
         point_msg.relative_midpoint_height = absolute_midpoint_height
 
