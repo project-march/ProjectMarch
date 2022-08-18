@@ -119,6 +119,8 @@ class ConnectionManager:
         """Callback when the exoskeleton state is updated."""
         if msg.state == "unknown" or "home" in msg.state:
             self._current_gait = msg.state
+        elif "unnamed" in msg.state:
+            self._current_gait = "unknown"
 
     def _callback_left(self, msg: FootPosition):
         """Callback when a new left foot position is found."""
