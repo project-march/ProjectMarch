@@ -85,10 +85,11 @@ class TrajectoryCommandFactory:
         self.subgait_id = subgait_id
         self.start_position_all_joints = start_position_all_joints
 
-        if self._use_position_queue and not self._stop:
-            self.foot_location = self._get_foot_location_from_queue()
-        elif not self._use_position_queue:
-            self.foot_location = self._get_foot_location_from_point_handler(start)
+        if not self._stop:
+            if self._use_position_queue:
+                self.foot_location = self._get_foot_location_from_queue()
+            elif not self._use_position_queue:
+                self.foot_location = self._get_foot_location_from_point_handler(start)
         
         if self._stop:
             self.foot_location.processed_point.x = 0.0
