@@ -31,6 +31,7 @@ using namespace march_hardware_interface_util;
 
 namespace march_hardware_interface {
 
+// NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
     , clock_(rclcpp::Clock())
@@ -83,6 +84,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     }
 
     joints_info_.reserve(info_.joints.size());
+    pdb_data_ = {};
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -155,6 +157,11 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
+    }
+
+    // For the PDB broadcaster.
+    for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
+        state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
     return state_interfaces;
 }
@@ -338,18 +345,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    // Battery, TODO: Change this to a broadcaster.
-    auto battery_voltage = march_robot_->getPowerDistributionBoard().read().battery_voltage.f;
-    if (battery_voltage != 0) {
-        if (battery_voltage < 43) {
-            RCLCPP_ERROR_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", battery_voltage);
-        } else if (battery_voltage < 45) {
-            RCLCPP_WARN_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", battery_voltage);
-        }
-        RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Battery voltage is %gV.", battery_voltage);
-    }
+    pdb_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
@@ -359,6 +355,25 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     }
     return hardware_interface::return_type::OK;
 }
+
+/**
+ * @brief Reads the pdb data from the hardware and updates it so that the broadcaster can publish it.
+ * Raises warnings if the voltage goes below a certain value.
+ * The data is published on `/march/pdb_data`.
+ */
+void MarchExoSystemInterface::pdb_read()
+{
+    march_robot_->getPowerDistributionBoard().read(pdb_data_);
+    if (pdb_data_.battery_voltage != 0) {
+        if (pdb_data_.battery_voltage < 43) {
+            RCLCPP_ERROR_THROTTLE(
+                (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", pdb_data_.battery_voltage);
+        } else if (pdb_data_.battery_voltage < 45) {
+            RCLCPP_WARN_THROTTLE(
+                (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
+        }
+    }
+};
 
 /** This is the update loop of the command interface.
  *

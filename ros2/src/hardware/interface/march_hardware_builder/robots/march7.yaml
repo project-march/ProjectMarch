@@ -196,4 +196,4 @@ march7:
             transmission: 121
   power_distribution_board:
     slaveIndex: 1
-    byteOffset: 0
+    byteOffset: 16
