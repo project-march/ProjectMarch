@@ -1,5 +1,5 @@
 testsetup:
-  if_name: enp0s31f6
+  if_name: enp2s0
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
