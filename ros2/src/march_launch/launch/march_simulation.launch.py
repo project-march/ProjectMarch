@@ -73,7 +73,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     use_position_queue = LaunchConfiguration("use_position_queue")
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
-    early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    scheduling_delay = LaunchConfiguration("scheduling_delay")
     timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
@@ -253,8 +253,8 @@ def generate_launch_description() -> launch.LaunchDescription:
             "dropping the first setpoint in the process.",
         ),
         DeclareLaunchArgument(
-            name="early_schedule_duration",
-            default_value="0.077",
+            name="scheduling_delay",
+            default_value="0.15",
             description="Duration to schedule next subgait early. If 0 then the"
             "next subgait is never scheduled early.",
         ),
@@ -325,7 +325,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("use_position_queue", use_position_queue),
             ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
-            ("early_schedule_duration", early_schedule_duration),
+            ("scheduling_delay", scheduling_delay),
             ("timer_period", timer_period),
             ("fake_sensor_data", fake_sensor_data),
             ("minimum_fake_temperature", minimum_fake_temperature),

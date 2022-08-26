@@ -107,8 +107,8 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.stop_mid2_x = param.get_parameter_value().double_value
         elif param.name == "stop_mid2_y":
             node.stop_mid2_y = param.get_parameter_value().double_value
-        elif param.name == "early_schedule_duration":
-            node.early_schedule_duration = Duration(param.get_parameter_value().double_value)
+        elif param.name == "scheduling_delay":
+            node.scheduling_delay = Duration(param.get_parameter_value().double_value)
         elif param.name == "first_subgait_delay":
             node.first_subgait_delay = Duration(param.get_parameter_value().double_value)
 
@@ -131,7 +131,7 @@ class GaitNode(Node):
         try:
             self.gait_package = self.get_parameter("gait_package").get_parameter_value().string_value
             self.directory_name = self.get_parameter("gait_directory").get_parameter_value().string_value
-            self.early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
+            self.scheduling_delay = self._parse_duration_parameter("scheduling_delay")
             self.first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
 
             # Dynamic gait parameters

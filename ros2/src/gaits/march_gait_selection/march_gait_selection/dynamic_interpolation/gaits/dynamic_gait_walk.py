@@ -186,14 +186,11 @@ class DynamicGaitWalk(GaitInterface):
 
         self._set_start_position_to_home_stand()
 
-    DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
-
     def start(
         self,
         current_time: Time,
-        first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> Optional[GaitUpdate]:
-        """Starts the gait. The subgait will be scheduled with the delay given by first_subgait_delay.
+        """Starts the gait. The subgait will be scheduled at the current time.
 
         Args:
             current_time (Time): Time at which the subgait will start
@@ -207,42 +204,35 @@ class DynamicGaitWalk(GaitInterface):
             self._logger.error(f"{e}")
             return None
         self.update_parameters()
-        self.start_time_next_command = current_time + first_subgait_delay
+        self.start_time_next_command = current_time
         self._next_command = self.trajectory_command_factory.get_trajectory_command(
             self.subgait_id, self.start_position_all_joints, start=True
         )
         return GaitUpdate.should_schedule_early(self._next_command)
 
-    DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
-
     def update(
         self,
         current_time: Time,
-        delay: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
+        delay: Duration,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Starts scheduling subsequent subgaits when the previous
-        subgait is within early scheduling duration and updates the state machine when the next subgait is started.
+        Schedules the next subgait if the start time for that subgait has passed.
 
         Args:
             current_time (Time): Current time
-            early_schedule_duration (Duration): Duration that determines how long ahead the next subgait is planned
+            delay (Duration): Delay with which the next subgait is scheduled.
+
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        if "fixed" in self.name:
-            delay = Duration(0.0)
-
-        if current_time >= self.start_time_next_command and not self._has_gait_started:
-            self._has_gait_started = True
-            return self._update_start_subgait(delay)
-
         if current_time >= self.start_time_next_command:
-            return self._update_next_subgait(delay)
+            if not self._has_gait_started:
+                return self._update_start_subgait(delay)
+            else:
+                return self._update_next_subgait(delay)
 
-        else:
-            return GaitUpdate.empty()
+        return GaitUpdate.empty()
 
     def stop(self) -> bool:
         """Called when the current gait should be stopped."""
@@ -259,6 +249,7 @@ class DynamicGaitWalk(GaitInterface):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
+        self._has_gait_started = True
         self._update_time_stamps(self._next_command.duration, delay)
         return GaitUpdate.subgait_updated()
 
@@ -273,7 +264,6 @@ class DynamicGaitWalk(GaitInterface):
             return GaitUpdate.finished()
 
         self._update_time_stamps(self._next_command.duration, delay)
-
         return GaitUpdate.should_schedule(self._next_command)
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
@@ -296,7 +286,9 @@ class DynamicGaitWalk(GaitInterface):
             )
         else:
             return self.trajectory_command_factory.get_trajectory_command(
-                self.subgait_id, self.start_position_all_joints, stop=self._check_step_count()
+                self.subgait_id,
+                self.start_position_all_joints,
+                stop=self._check_step_count(),
             )
 
     def _set_subgait_id(self) -> None:
@@ -337,6 +329,7 @@ class DynamicGaitWalk(GaitInterface):
 
         Args:
             next_command_duration (Duration): duration of the next command to be scheduled
+            delay (float): delay with which to schedule the next command.
         """
         start_time_previous_command = self.start_time_next_command
         self.start_time_next_command = start_time_previous_command + next_command_duration + delay
