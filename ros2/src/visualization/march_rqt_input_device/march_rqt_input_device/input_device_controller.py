@@ -261,7 +261,6 @@ class InputDeviceController:
 
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""
-        # self.eeg = not self.eeg
         self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
 
     def publish_small_narrow(self) -> None:

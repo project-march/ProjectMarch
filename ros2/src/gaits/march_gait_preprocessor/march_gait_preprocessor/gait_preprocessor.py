@@ -7,6 +7,7 @@ from geometry_msgs.msg import Point
 from std_msgs.msg import String
 from march_shared_msgs.msg import FootPosition, CurrentGait, GaitInstruction
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
+from march_goniometric_ik_solver.ik_solver import DEFAULT_FOOT_DISTANCE
 
 NODE_NAME = "gait_preprocessor_node"
 DURATION_SCALING_FACTOR = 3
@@ -131,8 +132,6 @@ class GaitPreprocessor(Node):
 
     def _update_step_height_previous(self, foot_position: FootPosition) -> None:
         """Update the _step_height_previous attribute with the height of the last chosen foot position."""
-        # self._step_height_previous = foot_position.processed_point.y
-
         if foot_position.processed_point.x == 0:
             self.publisher_chosen_point_feedback.publish(String(data="stop"))
         elif foot_position.processed_point.x > 0.45:
@@ -233,13 +232,10 @@ class GaitPreprocessor(Node):
         Returns:
             Point: Foot location transformed to ik solver axes.
         """
-        temp_y = point.y
         transformed = Point()
 
         if point.z != 0.0:
-            point.x -= min(
-                ((self._max_offset_x - self._offset_x) / 0.2) * abs(point.z), self._max_offset_x
-            )
+            point.x -= min(((self._max_offset_x - self._offset_x) / 0.2) * abs(point.z), self._max_offset_x)
 
         # 1. kleinere offset als stap klein is
         # 2. offset ook naar beneden
@@ -250,7 +246,7 @@ class GaitPreprocessor(Node):
             transformed.x = -point.x + self._offset_x
 
         transformed.y = point.z + self._offset_y
-        transformed.z = 0.47
+        transformed.z = DEFAULT_FOOT_DISTANCE
 
         return transformed
 

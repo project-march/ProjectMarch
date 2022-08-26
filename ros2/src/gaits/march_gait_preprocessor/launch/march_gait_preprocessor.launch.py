@@ -83,10 +83,14 @@ def generate_launch_description():
                 description="Whether to use simulated, fixed, deviation for calculating mid points.",
             ),
             DeclareLaunchArgument(
-                name="simulated_deviation", default_value="0.05", description="midpoint deviation for simulated points."
+                name="simulated_deviation",
+                default_value="0.05",
+                description="midpoint deviation for simulated points.",
             ),
             DeclareLaunchArgument(
-                name="max_offset_x", default_value="0.125", description="Max offset_x"
+                name="max_offset_x",
+                default_value="0.125",
+                description="Max offset_x",
             ),
             Node(
                 package="march_gait_preprocessor",

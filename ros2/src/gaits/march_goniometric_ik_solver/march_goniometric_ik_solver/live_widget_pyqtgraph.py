@@ -326,9 +326,7 @@ class LiveWidget:
     @property
     def duration(self):
         """Returns the duration, scaled to height by GaitPreprocessor method."""
-        return GaitPreprocessor.get_duration_scaled_to_height(
-            DEFAULT_DURATION, self.sliders["next"]["y"]
-        )
+        return GaitPreprocessor.get_duration_scaled_to_height(DEFAULT_DURATION, self.sliders["next"]["y"])
 
     def interpolate_trough_points(self) -> None:
         """Interpolates setpoints to joint trajectory for every joint and the foot rotation."""
