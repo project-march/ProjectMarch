@@ -100,38 +100,6 @@ inline void publishMarkerPoint(
     publisher->publish(marker);
 }
 
-inline void publishPreviousDisplacement(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p1,
-    Point& p2, std::string& left_or_right)
-{
-    visualization_msgs::msg::Marker marker;
-    marker.header.frame_id = "toes_" + left_or_right + "_aligned";
-    marker.header.stamp = n->now();
-
-    marker.ns = "displacement";
-    marker.id = 1;
-    marker.type = visualization_msgs::msg::Marker::ARROW;
-    marker.action = visualization_msgs::msg::Marker::ADD;
-
-    marker.pose.orientation.x = 0.0;
-    marker.pose.orientation.y = 0.0;
-    marker.pose.orientation.z = 0.0;
-    marker.pose.orientation.w = 1.0;
-
-    marker.scale.x = 0.02;
-    marker.scale.y = 0.03;
-
-    marker.color.r = 0;
-    marker.color.g = 0.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
-    marker.lifetime = rclcpp::Duration::from_seconds(/*seconds=*/0.3);
-
-    marker.points.push_back(to_geometry(p1));
-    marker.points.push_back(to_geometry(p2));
-
-    publisher->publish(marker);
-}
-
 inline void publishNewDisplacement(const MarkerPublisher::SharedPtr& publisher, rclcpp::Node* n, const Point& p1,
     Point& p2, std::string& left_or_right)
 {
