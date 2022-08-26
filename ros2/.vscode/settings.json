@@ -32,5 +32,8 @@
         "/home/marten/march/ros2/install/march_gait_preprocessor/lib/python3.8/site-packages",
         "/home/marten/march/ros2/install/diagnostic_updater/lib/python3.8/site-packages",
         "/opt/ros/foxy/lib/python3.8/site-packages"
-    ]
+    ],
+    "files.associations": {
+        "*.idl": "cpp"
+    }
 }

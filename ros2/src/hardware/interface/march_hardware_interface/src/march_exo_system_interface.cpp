@@ -365,17 +365,19 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     //  RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Current is %g.", pdb_current);
 
     // Battery, TODO: Change this to a broadcaster.
-    auto battery_voltage = march_robot_->getPowerDistributionBoard().read().battery_voltage.f;
-    if (battery_voltage != 0) {
-        if (battery_voltage < 43) {
-            RCLCPP_ERROR_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", battery_voltage);
-        } else if (battery_voltage < 45) {
-            RCLCPP_WARN_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", battery_voltage);
-        }
-        RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Battery voltage is %gV.", battery_voltage);
-    }
+    // march::ODrive* temp = static_cast<march::ODrive*>(joints_info_[0].joint.getMotorController().get());
+    // RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Odrive temp is %g *C. Motor temp is: %g *C.", temp->getMotorTemperature(), temp->getOdriveTemperature());
+    // auto battery_voltage = march_robot_->getPowerDistributionBoard().read().battery_voltage.f;
+    // if (battery_voltage != 0) {
+    //     if (battery_voltage < 43) {
+    //         RCLCPP_ERROR_THROTTLE(
+    //             (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", battery_voltage);
+    //     } else if (battery_voltage < 45) {
+    //         RCLCPP_WARN_THROTTLE(
+    //             (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", battery_voltage);
+    //     }
+    //     RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Battery voltage is %gV.", battery_voltage);
+    // }
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();

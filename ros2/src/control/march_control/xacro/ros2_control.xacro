@@ -66,14 +66,14 @@
     </hardware>
 
     <xacro:march_joint name="rotational_joint"/>
-    <xacro:march_joint name="left_ankle" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
+    <!-- <xacro:march_joint name="left_ankle" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
     <xacro:march_joint name="left_hip_aa"/>
     <xacro:march_joint name="left_hip_fe"/>
     <xacro:march_joint name="left_knee"/>
     <xacro:march_joint name="right_ankle" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
     <xacro:march_joint name="right_hip_aa"/>
     <xacro:march_joint name="right_hip_fe"/>
-    <xacro:march_joint name="right_knee"/>
+    <xacro:march_joint name="right_knee"/> -->
 
   </ros2_control>
 
