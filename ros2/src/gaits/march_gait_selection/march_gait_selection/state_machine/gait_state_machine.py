@@ -14,6 +14,7 @@ from march_utility.gait.edge_position import UnknownEdgePosition, EdgePosition, 
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.exceptions.gait_exceptions import GaitError
+from march_utility.utilities.duration import Duration
 
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
@@ -180,8 +181,7 @@ class GaitStateMachine:
     def _process_gait_state(self) -> None:
         """Processes the current state when there is a gait happening.
 
-        Schedules the next subgait if there is no trajectory happening or
-        finishes the gait if it is done.
+        Schedules the next subgait if there is no trajectory happening or finishes the gait if it is done.
         """
         self._handle_stop_input()
         if self._trajectory_scheduler.failed():
@@ -190,16 +190,16 @@ class GaitStateMachine:
             return
 
         now = self._node.get_clock().now()
+        delay = Duration(0.0) if "fixed" in self._current_gait.name else self._node.scheduling_delay
         if not self._executing_gait:
             try:
-                gait_update = self._current_gait.start(now, self._node.first_subgait_delay)
+                gait_update = self._current_gait.start(now)
+                self._executing_gait = True
             except (AttributeError, ValueError, GaitError) as e:
                 self._logger.error(f"Gait cannot be started due to an error: {e} Transitioning to unknown state.")
                 self._input.gait_finished()
                 self._handle_unknown_requested()
                 return
-
-            self._executing_gait = True
 
             if gait_update == GaitUpdate.empty():
                 self._input.gait_finished()
@@ -211,7 +211,7 @@ class GaitStateMachine:
                 return
         else:
             try:
-                gait_update = self._current_gait.update(now, self._node.early_schedule_duration)
+                gait_update = self._current_gait.update(now, delay)
             except (AttributeError, ValueError, GaitError) as e:
                 self._logger.error(f"Calling update of gait failed: {e} Transitioning to unknown state.")
                 self._input.gait_finished()

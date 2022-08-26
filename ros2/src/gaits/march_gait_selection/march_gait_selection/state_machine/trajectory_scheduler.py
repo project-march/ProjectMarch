@@ -21,6 +21,8 @@ from march_shared_msgs.msg import (
 )
 from trajectory_msgs.msg import JointTrajectory
 
+SCHEDULE_TIMEOUT = 0.1
+
 
 @dataclass
 class TrajectoryCommand:
@@ -76,8 +78,6 @@ class TrajectoryScheduler:
         _messages_in_transit (Set[Future]): An set of future object of messages containing a request to start
             a trajectory. These messages should be canceled if stopped. Otherwise, a message that is in transit can
             still arrive after all goals are canceled.
-        _schedule_timeout (double): How long (in seconds) this object should wait before it can send a trajectory
-            goal request to the controller. The value is based on the parameter `early_schedule_duration`.
         _action_client_to_controller (ActionClient): The client that send the initial connection request with the
             controller server to send goals. Over the Action topic
             `/joint_trajectory_controller/follow_joint_trajectory`.
@@ -94,7 +94,6 @@ class TrajectoryScheduler:
         self._failed = False
         self._active_goals = LifoQueue()
         self._messages_in_transit: Set[Future] = set()
-        self._schedule_timeout = node.get_parameter("early_schedule_duration").get_parameter_value().double_value
         self._action_client_to_controller = ActionClient(
             self._node, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
         )
@@ -112,10 +111,9 @@ class TrajectoryScheduler:
         """
         self._failed = False
         goal_msg = FollowJointTrajectory.Goal()
-        # command.trajectory.header.stamp = command.start_time.to_msg()  # To set early scheduling.
         goal_msg.trajectory = command.trajectory
-        if not self._action_client_to_controller.wait_for_server(self._schedule_timeout):
-            self._logger.warn(f"Failed to schedule trajectory {command} within {self._schedule_timeout} seconds")
+        if not self._action_client_to_controller.wait_for_server(SCHEDULE_TIMEOUT):
+            self._logger.warn(f"Failed to schedule trajectory {command} within {SCHEDULE_TIMEOUT} seconds")
             return
 
         goal_future: Future = self._action_client_to_controller.send_goal_async(goal_msg)

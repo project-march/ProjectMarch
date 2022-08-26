@@ -1,6 +1,5 @@
 """Author: Marten Haitjema, MVII."""
 
-from queue import Queue
 from rclpy.node import Node
 from rclpy.time import Time
 from typing import Optional
@@ -69,38 +68,34 @@ class DynamicGaitStep(DynamicGaitWalk):
         self._has_gait_started = False
         self._scheduled_early = False
 
-    DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
-
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
+        delay: Duration,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Stops after the single single step is finished.
+        Schedules the next subgait if the start time for that subgait has passed.
 
         Args:
             current_time (Time): Current time
-            early_schedule_duration (Duration): Duration that determines how long ahead the next subgait is planned
+            delay (Duration): Delay with which the next subgait is scheduled.
+
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        if current_time >= self.start_time_next_command and not self._has_gait_started:
-            self._has_gait_started = True
-            return self._update_start_subgait()
+        if current_time >= self.start_time_next_command:
+            if not self._has_gait_started:
+                return self._update_start_subgait()
+            else:
+                self._final_position_pub.publish(
+                    JointState(position=self.trajectory_command_factory.final_position.values())
+                )
+                return self._update_next_subgait()
 
-        elif current_time >= self.start_time_next_command and self._has_gait_started:
-            self._scheduled_early = True
-            self._final_position_pub.publish(
-                JointState(position=self.trajectory_command_factory.final_position.values())
-            )
-            return self._update_state_machine()
+        return GaitUpdate.empty()
 
-        else:
-            return GaitUpdate.empty()
-
-    def _update_state_machine(self) -> GaitUpdate:
+    def _update_next_subgait(self) -> GaitUpdate:
         """Update the state machine that the single single step has finished. Also switches the subgait_id.
 
         Returns:

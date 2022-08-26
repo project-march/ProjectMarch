@@ -110,17 +110,9 @@ def generate_launch_description():
             ),
             # State machine parameters:
             DeclareLaunchArgument(
-                name="first_subgait_delay",
-                default_value="0.0",
-                description="Duration to wait before starting first subgait."
-                "If 0 then the first subgait is started immediately,"
-                "dropping the first setpoint in the process.",
-            ),
-            DeclareLaunchArgument(
-                name="early_schedule_duration",
-                default_value="0.077",
-                description="Duration to schedule next subgait early. If 0 then the"
-                "next subgait is never scheduled early.",
+                name="scheduling_delay",
+                default_value="0.15",
+                description="Duration to delay the scheduling of the gait. If 0, the gait is scheduled ASAP.",
             ),
             DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
             # IK solver parameters
@@ -196,8 +188,7 @@ def generate_launch_description():
                     {"stop_mid2_x": LaunchConfiguration("stop_mid2_x")},
                     {"stop_mid2_y": LaunchConfiguration("stop_mid2_y")},
                     {"base_number": LaunchConfiguration("base_number")},
-                    {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
-                    {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
+                    {"scheduling_delay": LaunchConfiguration("scheduling_delay")},
                     {"timer_period": LaunchConfiguration("timer_period")},
                     {"ankle_buffer": LaunchConfiguration("ankle_buffer")},
                     {"hip_buffer": LaunchConfiguration("hip_buffer")},
