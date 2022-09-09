@@ -23,8 +23,8 @@ joint_trajectory_controller:
 
     gains:
       linear_joint: {p: 150.0, i: 0.0, d: 10.0, i_clamp: 100.0}
-    constraints:
-      linear_joint:
-        margin_soft_limit_error: 0.5
-        trajectory: 0.305
-        goal: 0.305
+  #  constraints:
+  #    linear_joint:
+  #      margin_soft_limit_error: 0.5
+  #      trajectory: 0.305
+  #      goal: 0.305

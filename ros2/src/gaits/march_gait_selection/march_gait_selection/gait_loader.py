@@ -59,9 +59,11 @@ class GaitLoader:
         self._robot = robot
         self._logger = node.get_logger().get_child(__class__.__name__)
         self._actuating_joint_names = get_joint_names_from_urdf()
+        self._logger.warn(f"{self._actuating_joint_names}")
 
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
+        self._logger.warn(f"gait directory {self._gait_directory}")
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
         self._loaded_gaits = {}
         self._named_positions = {}
@@ -123,7 +125,6 @@ class GaitLoader:
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         self._gait_version_map = default_config["gaits"]
-
         for position_name, position_values in default_config["positions"].items():
             edge_position = StaticEdgePosition(
                 [position_values["joints"][joint_name] for joint_name in self._actuating_joint_names]
