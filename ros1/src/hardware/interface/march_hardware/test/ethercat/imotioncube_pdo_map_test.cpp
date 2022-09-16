@@ -7,8 +7,7 @@
 class IMCPDOTest : public ::testing::Test {
 protected:
     MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
-    march::SdoSlaveInterface sdo
-        = march::SdoSlaveInterface(/*slave_index=*/1, mock_sdo);
+    march::SdoSlaveInterface sdo = march::SdoSlaveInterface(/*slave_index=*/1, mock_sdo);
 };
 
 TEST_F(IMCPDOTest, sortPDOmap)
@@ -58,8 +57,7 @@ TEST_F(IMCPDOTest, CombinedAddressConstruct)
 {
     march::IMCPDOmap pdoMap;
 
-    auto status_word
-        = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
+    auto status_word = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
     uint32_t combined_address = status_word->second.combined_address;
 
     ASSERT_EQ(16U, (combined_address & 0xFFU));

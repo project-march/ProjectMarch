@@ -50,7 +50,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GaitInstructionResponse.msg"
   "msg/GaitParameters.msg"
   "msg/HighVoltageState.msg"
+  "msg/JointMotorControllerState.msg"
   "msg/MotorControllerState.msg"
+  "msg/MotorControllerStates.msg"
   "msg/LowVoltageState.msg"
   "msg/PowerDistributionBoardData.msg"
   "msg/PressureSole.msg"
@@ -72,6 +74,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetGaitParameters.srv"
   "srv/GetMoveItTrajectory.srv"
   "srv/GetJointNames.srv"
+  "srv/SetObstacleSize.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs
         trajectory_msgs control_msgs actionlib_msgs sensor_msgs
  )

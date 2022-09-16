@@ -13,34 +13,29 @@
 #include <ros/ros.h>
 
 namespace march {
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
+MarchRobot::MarchRobot(
+    ::std::vector<Joint> jointList, urdf::Model urdf, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
-    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name,
-    int ecatCycleTime, int ecatSlaveTimeout)
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, std::vector<PressureSole> pressureSoles,
+    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
-    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
     , pressureSoles(std::move(pressureSoles))
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name,
-    int ecatCycleTime, int ecatSlaveTimeout,
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, std::vector<PressureSole> pressureSoles,
+    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
     std::optional<PowerDistributionBoard> power_distribution_board)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
-    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(),
-          ecatCycleTime, ecatSlaveTimeout)
+    , ethercatMaster(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
     , pressureSoles(std::move(pressureSoles))
     , powerDistributionBoard(std::move(power_distribution_board))
 {
@@ -49,8 +44,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
 void MarchRobot::startEtherCAT(bool reset_motor_controllers)
 {
     if (!hasValidSlaves()) {
-        throw error::HardwareException(
-            error::ErrorType::INVALID_SLAVE_CONFIGURATION);
+        throw error::HardwareException(error::ErrorType::INVALID_SLAVE_CONFIGURATION);
     }
 
     ROS_INFO("Slave configuration is non-conflicting");
@@ -97,11 +91,9 @@ int MarchRobot::getMaxSlaveIndex()
 
     for (Joint& joint : jointList) {
         if (joint.hasTemperatureGES()) {
-            maxSlaveIndex = std::max(
-                (int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
+            maxSlaveIndex = std::max((int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
         }
-        maxSlaveIndex = std::max(
-            (int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
+        maxSlaveIndex = std::max((int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
     }
     return maxSlaveIndex;
 }
@@ -114,13 +106,11 @@ bool MarchRobot::hasValidSlaves()
 
     for (auto& joint : jointList) {
         if (joint.hasTemperatureGES()) {
-            int temperatureSlaveIndex
-                = joint.getTemperatureGES()->getSlaveIndex();
+            int temperatureSlaveIndex = joint.getTemperatureGES()->getSlaveIndex();
             temperatureSlaveIndices.push_back(temperatureSlaveIndex);
         }
 
-        int motorControllerSlaveIndex
-            = joint.getMotorController()->getSlaveIndex();
+        int motorControllerSlaveIndex = joint.getMotorController()->getSlaveIndex();
         motorControllerIndices.push_back(motorControllerSlaveIndex);
     }
 
@@ -134,20 +124,15 @@ bool MarchRobot::hasValidSlaves()
     // duplicates later.
     sort(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
     temperatureSlaveIndices.erase(
-        unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()),
-        temperatureSlaveIndices.end());
+        unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()), temperatureSlaveIndices.end());
 
     // Merge the slave indices
     ::std::vector<int> slaveIndices;
 
-    slaveIndices.reserve(
-        motorControllerIndices.size() + temperatureSlaveIndices.size());
-    slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(),
-        motorControllerIndices.end());
-    slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
-        temperatureSlaveIndices.end());
-    slaveIndices.insert(
-        slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
+    slaveIndices.reserve(motorControllerIndices.size() + temperatureSlaveIndices.size());
+    slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
+    slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
+    slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
 
     if (slaveIndices.size() == 1) {
         ROS_INFO("Found configuration for 1 slave.");
@@ -191,9 +176,8 @@ int MarchRobot::getEthercatCycleTime() const
 Joint& MarchRobot::getJoint(const ::std::string& jointName)
 {
     if (!ethercatMaster.isOperational()) {
-        ROS_WARN(
-            "Trying to access joints while ethercat is not operational. This "
-            "may lead to incorrect sensor data.");
+        ROS_WARN("Trying to access joints while ethercat is not operational. This "
+                 "may lead to incorrect sensor data.");
     }
     for (auto& joint : jointList) {
         if (joint.getName() == jointName) {
@@ -207,9 +191,8 @@ Joint& MarchRobot::getJoint(const ::std::string& jointName)
 Joint& MarchRobot::getJoint(size_t index)
 {
     if (!ethercatMaster.isOperational()) {
-        ROS_WARN(
-            "Trying to access joints while ethercat is not operational. This "
-            "may lead to incorrect sensor data.");
+        ROS_WARN("Trying to access joints while ethercat is not operational. This "
+                 "may lead to incorrect sensor data.");
     }
     return this->jointList.at(index);
 }
@@ -222,9 +205,8 @@ size_t MarchRobot::size() const
 MarchRobot::iterator MarchRobot::begin()
 {
     if (!ethercatMaster.isOperational()) {
-        ROS_WARN(
-            "Trying to access joints while ethercat is not operational. This "
-            "may lead to incorrect sensor data.");
+        ROS_WARN("Trying to access joints while ethercat is not operational. This "
+                 "may lead to incorrect sensor data.");
     }
     return this->jointList.begin();
 }
@@ -269,8 +251,7 @@ std::vector<bool> MarchRobot::areJointsOperational()
     std::vector<bool> is_operational;
     is_operational.resize(jointList.size());
     for (size_t i = 0; i < jointList.size(); ++i) {
-        is_operational[i]
-            = jointList[i].getMotorController()->getState()->isOperational();
+        is_operational[i] = jointList[i].getMotorController()->getState()->isOperational();
     }
     return is_operational;
 }

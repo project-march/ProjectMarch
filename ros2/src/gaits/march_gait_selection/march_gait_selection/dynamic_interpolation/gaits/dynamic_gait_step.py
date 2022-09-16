@@ -1,6 +1,5 @@
 """Author: Marten Haitjema, MVII."""
 
-from queue import Queue
 from rclpy.node import Node
 from rclpy.time import Time
 from typing import Optional
@@ -10,8 +9,8 @@ from march_gait_selection.dynamic_interpolation.point_handlers.point_handler imp
 from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_walk import (
     DynamicGaitWalk,
 )
-from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory_queue import (
-    TrajectoryCommandFactoryQueue,
+from march_gait_selection.dynamic_interpolation.trajectory_command_factories.trajectory_command_factory import (
+    TrajectoryCommandFactory,
 )
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 
@@ -32,7 +31,7 @@ class DynamicGaitStep(DynamicGaitWalk):
     def __init__(self, name: str, node: Node, point_handler: PointHandler):
         super().__init__(name, node, point_handler)
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self.trajectory_command_factory = TrajectoryCommandFactoryQueue(gait=self, point_handler=self._point_handler)
+        self.trajectory_command_factory = TrajectoryCommandFactory(gait=self, point_handler=self._point_handler)
         self.subgait_id = "right_swing"
         self.gait_name = name
 
@@ -69,58 +68,41 @@ class DynamicGaitStep(DynamicGaitWalk):
         self._has_gait_started = False
         self._scheduled_early = False
 
-    DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
-
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
+        delay: Duration,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Stops after the single single step is finished.
+        Schedules the next subgait if the start time for that subgait has passed.
 
         Args:
             current_time (Time): Current time
-            early_schedule_duration (Duration): Duration that determines how long ahead the next subgait is planned
+            delay (Duration): Delay with which the next subgait is scheduled.
+
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        if current_time >= self.start_time_next_command and not self._has_gait_started:
-            self._has_gait_started = True
-            return self._update_start_subgait()
+        if current_time >= self.start_time_next_command:
+            if not self._has_gait_started:
+                return self._update_start_subgait()
+            else:
+                self._final_position_pub.publish(
+                    JointState(position=self.trajectory_command_factory.final_position.values())
+                )
+                return self._update_next_subgait()
 
-        elif current_time >= self.start_time_next_command and self._has_gait_started:
-            self._scheduled_early = True
-            self._final_position_pub.publish(
-                JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
-            )
-            return self._update_state_machine()
+        return GaitUpdate.empty()
 
-        else:
-            return GaitUpdate.empty()
-
-    def _update_state_machine(self) -> GaitUpdate:
+    def _update_next_subgait(self) -> GaitUpdate:
         """Update the state machine that the single single step has finished. Also switches the subgait_id.
 
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        if not self.trajectory_command_factory.has_trajectory_failed():
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             self.subgait_id = "right_swing"
 
         return GaitUpdate.finished()
-
-    def set_state_to_unknown(self) -> None:
-        """Resets the subgait_id, _trajectory_failed and position_queue after a force unknown."""
-        self._set_start_position_to_home_stand()
-        self.subgait_id = "right_swing"
-        self.trajectory_command_factory.set_trajectory_failed_false()
-        self.position_queue = Queue()
-        self.trajectory_command_factory.fill_queue()

@@ -58,8 +58,7 @@ TEST_F(JointTest, ActuatePosition)
     EXPECT_CALL(*this->imc, actuateRadians(Eq(expected_rad))).Times(/*n=*/1);
 
     march::Joint joint("actuate_false", /*net_number=*/0, std::move(this->imc));
-    joint.getMotorController()->setActuationMode(
-        march::ActuationMode::position);
+    joint.getMotorController()->setActuationMode(march::ActuationMode::position);
     ASSERT_NO_THROW(joint.actuate(expected_rad));
 }
 
@@ -83,16 +82,14 @@ TEST_F(JointTest, PrepareForActuationAllowed)
 
 TEST_F(JointTest, hasTemperatureGes)
 {
-    march::Joint joint(
-        "get_temperature", /*net_number=*/0, std::move(this->imc));
+    march::Joint joint("get_temperature", /*net_number=*/0, std::move(this->imc));
     ASSERT_FALSE(joint.hasTemperatureGES());
 }
 
 TEST_F(JointTest, ResetController)
 {
     EXPECT_CALL(*this->imc, resetSlave(_)).Times(/*n=*/1);
-    march::Joint joint(
-        "reset_controller", /*net_number=*/0, std::move(this->imc));
+    march::Joint joint("reset_controller", /*net_number=*/0, std::move(this->imc));
     ASSERT_NO_THROW(joint.getMotorController()->resetSlave());
 }
 
@@ -133,119 +130,4 @@ TEST_F(JointTest, TestReceivedDataUpdateFalse)
     march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
     ASSERT_TRUE(joint.receivedDataUpdate());
     ASSERT_FALSE(joint.receivedDataUpdate());
-}
-
-TEST_F(JointTest, TestReadEncodersOnce)
-{
-    ros::Duration elapsed_time(/*t=*/0.2);
-    double velocity = 0.5;
-    double initial_absolute_position = 3;
-    double initial_incremental_position = 5;
-    double new_incremental_position = 4;
-
-    EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise())
-        .WillRepeatedly(Return(/*value=*/true));
-    EXPECT_CALL(*this->imc, getState()).Times(/*n=*/1);
-    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
-        .WillOnce(Return(/*value=*/initial_incremental_position))
-        .WillOnce(Return(/*value=*/new_incremental_position));
-    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
-        .WillOnce(Return(/*value=*/initial_absolute_position));
-
-    EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
-        .WillOnce(Return(/*value=*/velocity));
-
-    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
-    joint.prepareActuation();
-    joint.readFirstEncoderValues(/*operational_check=*/false);
-    joint.readEncoders(elapsed_time);
-
-    double expected_position = initial_absolute_position
-        + (new_incremental_position - initial_incremental_position);
-
-    ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
-    ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
-}
-
-TEST_F(JointTest, TestReadEncodersTwice)
-{
-    ros::Duration elapsed_time(/*t=*/0.2);
-    double first_velocity = 10;
-    double second_velocity = 8;
-    double initial_absolute_position = 2;
-    double first_incremental_position = 5;
-    double second_incremental_position = 4;
-    double third_incremental_position = 6;
-
-    // receivedDataUpdate should return true
-    auto basic_state = std::make_unique<MockMotorControllerState>();
-    auto new_state = std::make_unique<MockMotorControllerState>();
-    new_state->motor_current_ = 11;
-    EXPECT_CALL(*this->imc, getState())
-        .WillOnce(Return(ByMove(std::move(basic_state))))
-        .WillOnce(Return(ByMove(std::move(new_state))));
-
-    EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise())
-        .WillRepeatedly(Return(/*value=*/true));
-
-    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
-        .WillOnce(Return(first_incremental_position))
-        .WillOnce(Return(second_incremental_position))
-        .WillOnce(Return(third_incremental_position));
-    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
-        .WillOnce(Return(initial_absolute_position));
-
-    EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
-        .WillOnce(Return(first_velocity))
-        .WillOnce(Return(second_velocity));
-
-    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
-    joint.prepareActuation();
-    joint.readFirstEncoderValues(/*operational_check=*/false);
-    joint.readEncoders(elapsed_time);
-    joint.readEncoders(elapsed_time);
-
-    double expected_position = initial_absolute_position
-        + (third_incremental_position - second_incremental_position)
-        + (second_incremental_position - first_incremental_position);
-
-    ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
-    ASSERT_DOUBLE_EQ(joint.getVelocity(), second_velocity);
-}
-
-TEST_F(JointTest, TestReadEncodersNoUpdate)
-{
-    ros::Duration elapsed_time(/*t=*/0.2);
-
-    double velocity = 0.5;
-    double first_incremental_position = 5;
-    double second_incremental_position = 4;
-    double initial_absolute_position = 3;
-
-    // receivedDataUpdate should return false
-    auto basic_state = std::make_unique<MockMotorControllerState>();
-    auto new_state = std::make_unique<MockMotorControllerState>();
-    EXPECT_CALL(*this->imc, getState())
-        .WillOnce(Return(ByMove(std::move(basic_state))))
-        .WillOnce(Return(ByMove(std::move(new_state))));
-
-    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
-        .WillOnce(Return(first_incremental_position))
-        .WillOnce(Return(second_incremental_position));
-    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
-        .WillOnce(Return(initial_absolute_position));
-    EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
-        .WillOnce(Return(velocity));
-
-    march::Joint joint("actuate_true", /*net_number=*/0, std::move(this->imc));
-    joint.prepareActuation();
-    joint.readFirstEncoderValues(/*operational_check=*/false);
-    joint.readEncoders(elapsed_time);
-    joint.readEncoders(elapsed_time);
-
-    double expected_position = initial_absolute_position
-        + (second_incremental_position - first_incremental_position);
-
-    ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
-    ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 }

@@ -44,7 +44,7 @@
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"
-                    value="properties/march7.yaml"/>
+                    value="properties/properties_march7.yaml"/>
     <xacro:property name="properties" value="${load_yaml(config_yaml_file)}"/>
     <xacro:property name="joint_limits" value="${properties['joint_limits']}"/>
     <xacro:property name="safety_values"
@@ -149,8 +149,6 @@
     <xacro:property name="foot_com_z"
                     value="${upper_leg_height + lower_leg_height + ankle_plate_height - 0.789788}"/>
 
-    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="march.gazebo"/>
 
     <material name="visuals_material">
         <color rgba="1.0 1.0 1.0 1"/>
@@ -457,7 +455,6 @@
         <origin xyz="0 ${-ankle_plate_collision_offset} ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
-
     <xacro:include filename="camera/_d435.urdf.xacro"/>
 
     <xacro:sensor_d435 
@@ -465,14 +462,14 @@
             topics_ns="camera_front_right"
             parent="upper_leg_right"
             plugin="$(arg realsense_simulation)">
-        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${61/180 * pi} ${pi}"/>
+        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${54/180 * pi} ${pi}"/>
     </xacro:sensor_d435>
     <xacro:sensor_d435 
             name="camera_front_left"
             topics_ns="camera_front_left"
             parent="upper_leg_left"
             plugin="$(arg realsense_simulation)">
-        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 61) / 180 * pi} ${0 * pi}"/>
+        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 54) / 180 * pi} ${0 * pi}"/>
     </xacro:sensor_d435>
     <xacro:sensor_d435 
             name="camera_back"

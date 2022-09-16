@@ -143,10 +143,7 @@ class DynamicGaitWalk(GaitInterface):
         """Returns the final position of the subgait as an EdgePosition."""
         try:
             return StaticEdgePosition(
-                {
-                    name: self.trajectory_command_factory.dynamic_step.get_final_position()[name]
-                    for name in self.actuating_joint_names
-                }
+                {name: self.trajectory_command_factory.final_position[name] for name in self.actuating_joint_names}
             )
         except AttributeError:
             return StaticEdgePosition(self.home_stand_position_actuating_joints)
@@ -178,7 +175,6 @@ class DynamicGaitWalk(GaitInterface):
 
         self._should_stop = False
         self._end = False
-        self.trajectory_command_factory.set_trajectory_failed_false()
 
         self.start_time_next_command = None
         self._next_command = None
@@ -190,14 +186,11 @@ class DynamicGaitWalk(GaitInterface):
 
         self._set_start_position_to_home_stand()
 
-    DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
-
     def start(
         self,
         current_time: Time,
-        first_subgait_delay: Duration = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> Optional[GaitUpdate]:
-        """Starts the gait. The subgait will be scheduled with the delay given by first_subgait_delay.
+        """Starts the gait. The subgait will be scheduled at the current time.
 
         Args:
             current_time (Time): Time at which the subgait will start
@@ -208,50 +201,38 @@ class DynamicGaitWalk(GaitInterface):
         try:
             self._reset()
         except WrongStartPositionError as e:
-            self._logger.error(e)
+            self._logger.error(f"{e}")
             return None
         self.update_parameters()
-        self.start_time_next_command = current_time + first_subgait_delay
+        self.start_time_next_command = current_time
         self._next_command = self.trajectory_command_factory.get_trajectory_command(
             self.subgait_id, self.start_position_all_joints, start=True
         )
         return GaitUpdate.should_schedule_early(self._next_command)
 
-    DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
-
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Duration = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
+        delay: Duration,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait. This function is called every cycle of the gait_state_machine.
 
-        Schedules the first subgait when the delay has passed. Starts scheduling subsequent subgaits when the previous
-        subgait is within early scheduling duration and updates the state machine when the next subgait is started.
+        Schedules the next subgait if the start time for that subgait has passed.
 
         Args:
             current_time (Time): Current time
-            early_schedule_duration (Duration): Duration that determines how long ahead the next subgait is planned
+            delay (Duration): Delay with which the next subgait is scheduled.
+
         Returns:
             GaitUpdate: GaitUpdate containing TrajectoryCommand when finished, else empty GaitUpdate
         """
-        if current_time >= self.start_time_next_command and not self._has_gait_started:
-            self._has_gait_started = True
-            return self._update_start_subgait()
+        if current_time >= self.start_time_next_command:
+            if not self._has_gait_started:
+                return self._update_start_subgait(delay)
+            else:
+                return self._update_next_subgait(delay)
 
-        elif (
-            current_time >= self.start_time_next_command - early_schedule_duration
-            and not self._scheduled_early
-            and self._has_gait_started
-        ):
-            self._scheduled_early = True
-            return self._update_next_subgait_early()
-
-        elif current_time >= self.start_time_next_command:
-            return self._update_state_machine()
-
-        else:
-            return GaitUpdate.empty()
+        return GaitUpdate.empty()
 
     def stop(self) -> bool:
         """Called when the current gait should be stopped."""
@@ -262,41 +243,28 @@ class DynamicGaitWalk(GaitInterface):
         """Called when the gait is finished."""
         self._next_command = None
 
-    def _update_start_subgait(self) -> GaitUpdate:
+    def _update_start_subgait(self, delay: float) -> GaitUpdate:
         """Update the state machine that the start gait has begun. Updates the time stamps for the next subgait.
 
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._update_time_stamps(self._next_command.duration)
+        self._has_gait_started = True
+        self._update_time_stamps(self._next_command.duration, delay)
         return GaitUpdate.subgait_updated()
 
-    def _update_next_subgait_early(self) -> GaitUpdate:
+    def _update_next_subgait(self, delay: float) -> GaitUpdate:
         """Already schedule the next subgait with the end time of the current subgait as the start time.
 
         Returns:
             GaitUpdate: a GaitUpdate that is empty or contains a trajectory command
         """
         self._next_command = self._set_and_get_next_command()
-
-        if self._next_command is None:
-            return GaitUpdate.empty()
-
-        return GaitUpdate.should_schedule_early(self._next_command)
-
-    def _update_state_machine(self) -> GaitUpdate:
-        """Update the state machine that the new subgait has begun. Also updates time stamps for the next subgait.
-
-        Returns:
-            GaitUpdate: a GaitUpdate for the state machine
-        """
         if self._next_command is None:
             return GaitUpdate.finished()
 
-        self._update_time_stamps(self._next_command.duration)
-        self._scheduled_early = False
-
-        return GaitUpdate.subgait_updated()
+        self._update_time_stamps(self._next_command.duration, delay)
+        return GaitUpdate.should_schedule(self._next_command)
 
     def _set_and_get_next_command(self) -> Optional[TrajectoryCommand]:
         """Get the next command, based on what the current subgait is.
@@ -306,12 +274,7 @@ class DynamicGaitWalk(GaitInterface):
         Returns:
             TrajectoryCommand: A TrajectoryCommand for the next subgait
         """
-        if not self.trajectory_command_factory.has_trajectory_failed():
-            if self.subgait_id == "right_swing":
-                self.subgait_id = "left_swing"
-            elif self.subgait_id == "left_swing":
-                self.subgait_id = "right_swing"
-
+        self._set_subgait_id()
         if self._end:
             # If the gait has ended, the next command should be None
             return None
@@ -323,12 +286,21 @@ class DynamicGaitWalk(GaitInterface):
             )
         else:
             return self.trajectory_command_factory.get_trajectory_command(
-                self.subgait_id, self.start_position_all_joints, stop=self._check_step_count()
+                self.subgait_id,
+                self.start_position_all_joints,
+                stop=self._check_step_count(),
             )
+
+    def _set_subgait_id(self) -> None:
+        """Switch subgait id to the opposite side."""
+        if self.subgait_id == "right_swing":
+            self.subgait_id = "left_swing"
+        elif self.subgait_id == "left_swing":
+            self.subgait_id = "right_swing"
 
     def update_start_position_gait_state(self) -> None:
         """Update the start position of the next subgait to be the last position of the previous subgait."""
-        self.start_position_all_joints = self.trajectory_command_factory.dynamic_step.get_final_position()
+        self.start_position_all_joints = self.trajectory_command_factory.final_position
         self.start_position_actuating_joints = {
             name: self.start_position_all_joints[name] for name in self.actuating_joint_names
         }
@@ -352,17 +324,19 @@ class DynamicGaitWalk(GaitInterface):
         self._step_counter += 1
         return False
 
-    def _update_time_stamps(self, next_command_duration: Duration) -> None:
+    def _update_time_stamps(self, next_command_duration: Duration, delay: float = 0.0) -> None:
         """Update the starting and end time.
 
         Args:
             next_command_duration (Duration): duration of the next command to be scheduled
+            delay (float): delay with which to schedule the next command.
         """
         start_time_previous_command = self.start_time_next_command
-        self.start_time_next_command = start_time_previous_command + next_command_duration
+        self.start_time_next_command = start_time_previous_command + next_command_duration + delay
 
     def update_parameters(self) -> None:
         """Callback for gait_node when the parameters have been updated."""
+        self.trajectory_command_factory.update_parameter()
         self.minimum_stair_height = self.node.minimum_stair_height
         self.add_push_off = self.node.add_push_off
         self.amount_of_steps = self.node.amount_of_steps
@@ -373,11 +347,10 @@ class DynamicGaitWalk(GaitInterface):
         for joint_name in self.actuating_joint_names:
             self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
 
-    def set_state_to_unknown(self) -> None:
+    def reset_start_position_to_home_stand(self) -> None:
         """Reset start position to home stand after force unknown."""
         self._set_start_position_to_home_stand()
         self.subgait_id = "right_swing"
-        self.trajectory_command_factory.set_trajectory_failed_false()
 
     def _set_start_position_to_home_stand(self) -> None:
         """Sets the starting position to home_stand."""

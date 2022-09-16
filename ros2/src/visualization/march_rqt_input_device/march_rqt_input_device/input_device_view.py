@@ -15,6 +15,7 @@ from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
+from std_msgs.msg import Bool
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
@@ -38,6 +39,13 @@ class InputDeviceView(QWidget):
         self._controller.rejected_cb = self._rejected_cb
         self._controller.current_gait_cb = self._current_gait_cb
         self.possible_gaits_future = None
+
+        self._controller._node.create_subscription(
+            msg_type=Bool,
+            topic="/march/eeg/on_off",
+            callback=self._eeg_cb,
+            qos_profile=1,
+        )
 
         self._always_enabled_buttons = []
 
@@ -92,6 +100,10 @@ class InputDeviceView(QWidget):
     def _current_gait_cb(self, gait_name: str) -> None:
         """Show the current gait and update possible gaits."""
         self.gait_label.setText(gait_name)
+
+    def _eeg_cb(self, data) -> None:
+        """Update the possible gaits when eeg is turned on or off."""
+        self._update_possible_gaits()
 
     def _update_possible_gaits(self) -> None:
         """Updates the gaits based on the possible gaits according to the controller.

@@ -12,23 +12,18 @@
 
 namespace march_temperature_sensor_controller {
 // this controller gets access to the MarchTemperatureSensorInterface
-class MarchTemperatureSensorController
-    : public controller_interface::Controller<MarchTemperatureSensorInterface> {
+class MarchTemperatureSensorController : public controller_interface::Controller<MarchTemperatureSensorInterface> {
 public:
     MarchTemperatureSensorController() = default;
 
-    bool init(MarchTemperatureSensorInterface* hw, ros::NodeHandle& root_nh,
-        ros::NodeHandle& controller_nh) override;
+    bool init(MarchTemperatureSensorInterface* hw, ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh) override;
     void starting(const ros::Time& time) override;
-    void update(
-        const ros::Time& time, const ros::Duration& /*period*/) override;
+    void update(const ros::Time& time, const ros::Duration& /*period*/) override;
     void stopping(const ros::Time& /*time*/) override;
 
 private:
     std::vector<MarchTemperatureSensorHandle> temperature_sensors_;
-    typedef boost::shared_ptr<
-        realtime_tools::RealtimePublisher<sensor_msgs::Temperature>>
-        RtPublisherPtr;
+    typedef boost::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::Temperature>> RtPublisherPtr;
     std::vector<RtPublisherPtr> realtime_pubs_;
     std::vector<ros::Time> last_publish_times_;
     double publish_rate_ {};

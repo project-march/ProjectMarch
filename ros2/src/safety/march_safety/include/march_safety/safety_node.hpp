@@ -21,8 +21,7 @@ class SafetyNode : public rclcpp::Node {
     using ErrorMsg = march_shared_msgs::msg::Error;
     using ErrorPublisher = rclcpp::Publisher<ErrorMsg>::SharedPtr;
     using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
-    using GaitInstructionPublisher
-        = rclcpp::Publisher<GaitInstruction>::SharedPtr;
+    using GaitInstructionPublisher = rclcpp::Publisher<GaitInstruction>::SharedPtr;
 
 public:
     SafetyNode();

@@ -13,10 +13,8 @@ namespace march {
 class Encoder {
 public:
     enum Direction { Positive = 1, Negative = -1 };
-    Encoder(size_t counts_per_rotation,
-        MotorControllerType motor_controller_type, Direction direction);
-    Encoder(
-        size_t counts_per_rotation, MotorControllerType motor_controller_type);
+    Encoder(size_t counts_per_rotation, MotorControllerType motor_controller_type, Direction direction);
+    Encoder(size_t counts_per_rotation, MotorControllerType motor_controller_type);
 
     virtual ~Encoder() noexcept = default;
 

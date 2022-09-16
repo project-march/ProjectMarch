@@ -13,11 +13,6 @@
   <test_depend>python3-pytest</test_depend>
   
   <exec_depend>python3-numpy</exec_depend>
-  <exec_depend>python3-matplotlib</exec_depend>
-
-{# Both depends are for matplotlib debuging in ik solver at line 448 of 'ik_solver.py' #}
-  <depend>python3-tk</depend>
-  <depend>python3-tz</depend>
 
   <export>
     <build_type>ament_python</build_type>

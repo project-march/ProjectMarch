@@ -10,12 +10,6 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                "use_sim_time",
-                default_value="true",
-                description="Whether to use simulation time as published on the "
-                "/clock topic by gazebo instead of system time.",
-            ),
-            DeclareLaunchArgument(
                 name="joint_names",
                 default_value="None",
                 description="Names of the joints. If an empty list (None) is given"
@@ -29,7 +23,6 @@ def generate_launch_description():
                 name="robot_information",
                 namespace="march",
                 parameters=[
-                    {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"joint_names": LaunchConfiguration("joint_names")},
                 ],
             ),

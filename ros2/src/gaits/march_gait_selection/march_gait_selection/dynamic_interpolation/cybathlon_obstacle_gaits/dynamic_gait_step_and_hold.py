@@ -81,9 +81,7 @@ class DynamicGaitStepAndHold(DynamicGaitStepAndClose):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._final_position_pub.publish(
-            JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
-        )
+        self._final_position_pub.publish(JointState(position=self.trajectory_command_factory.final_position.values()))
         if self._next_command is None:
             return GaitUpdate.finished()
 
@@ -102,4 +100,3 @@ class DynamicGaitStepAndHold(DynamicGaitStepAndClose):
             self._set_start_position_to_home_stand()
             self.use_predetermined_foot_location = False
             self.subgait_id = "right_swing"
-            self.trajectory_command_factory.set_trajectory_failed_false()

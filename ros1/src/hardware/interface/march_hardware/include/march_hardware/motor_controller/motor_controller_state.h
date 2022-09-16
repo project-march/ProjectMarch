@@ -24,8 +24,7 @@ public:
     float absolute_velocity_ {};
     float incremental_velocity_ {};
 
-    friend bool operator==(
-        const MotorControllerState& lhs, const MotorControllerState& rhs)
+    friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
         return lhs.motor_current_ == rhs.motor_current_
             && lhs.motor_voltage_ == rhs.motor_voltage_
@@ -39,8 +38,7 @@ public:
             && lhs.absolute_position_ == rhs.absolute_position_
             && lhs.incremental_position_ == rhs.incremental_position_
             && lhs.absolute_velocity_ == rhs.absolute_velocity_
-            && lhs.incremental_velocity_ == rhs.incremental_velocity_
-            && lhs.isOperational() == rhs.isOperational()
+            && lhs.incremental_velocity_ == rhs.incremental_velocity_ && lhs.isOperational() == rhs.isOperational()
             && lhs.hasError() == rhs.hasError();
     }
 

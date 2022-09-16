@@ -45,15 +45,12 @@ private:
     void timer_callback();
 
     // Callback function that is called whenever the parameters are changed
-    rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr
-        parameter_callback;
-    rcl_interfaces::msg::SetParametersResult update_parameters(
-        const std::vector<rclcpp::Parameter>& parameters);
+    rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback;
+    rcl_interfaces::msg::SetParametersResult update_parameters(const std::vector<rclcpp::Parameter>& parameters);
 
 public:
     // Constructor that moves the predefined auto regression values into itself.
-    FakeTemperatureDataNode(const std::string& node_name,
-        std::vector<float>&& autoregression_weights);
+    FakeTemperatureDataNode(const std::string& node_name, std::vector<float>&& autoregression_weights);
 
     void add_temperature_publisher(const std::string& sensor_name);
 

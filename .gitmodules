@@ -1,13 +1,49 @@
 [submodule "ros1/src/libraries/realsense_gazebo_plugin"]
 	path = ros1/src/libraries/realsense_gazebo_plugin
 	url = ../libraries/realsense_gazebo_plugin.git
+	branch = optimize-realsense
 [submodule "ros2/src/libraries/diagnostic_updater"]
 	path = ros2/src/libraries/diagnostic_updater
 	url = ../libraries/diagnostic-updater.git
+	branch = master
 [submodule "ros2/src/libraries/march_robot_state_publisher"]
 	path = ros2/src/libraries/march_robot_state_publisher
 	url = ../libraries/robot-state-publisher.git
-	branch = 2-rename-to-march_robot_state_publisher-and-fix-tests
+	branch = main
 [submodule "ros1/src/libraries/joint_trajectory_controller"]
 	path = ros1/src/libraries/joint_trajectory_controller
 	url = ../libraries/joint-trajectory-controller.git
+	branch = main
+[submodule "ros2/src/libraries/control/control_msgs"]
+	path = ros2/src/libraries/control/control_msgs
+	url = ../libraries/control/control_msgs.git
+	branch = main
+[submodule "ros2/src/libraries/control/gazebo_ros2_control"]
+	path = ros2/src/libraries/control/gazebo_ros2_control
+	url = ../libraries/control/gazebo_ros2_control.git
+	branch = main
+[submodule "ros2/src/libraries/control/realtime_tools"]
+	path = ros2/src/libraries/control/realtime_tools
+	url = ../libraries/control/realtime_tools.git
+	branch = main
+[submodule "ros2/src/libraries/control/ros2_control"]
+	path = ros2/src/libraries/control/ros2_control
+	url = ../libraries/control/ros2_control.git
+	branch = main
+[submodule "ros2/src/libraries/control/ros2_controllers"]
+	path = ros2/src/libraries/control/ros2_controllers
+	url = ../libraries/control/ros2_controllers.git
+	branch = mergify/bp/foxy/pr-225
+[submodule "ros2/src/libraries/soem_ros2"]
+	path = ros2/src/libraries/soem_ros2
+	url = ../libraries/soem_ros2.git
+	branch = master
+[submodule "ros2/src/libraries/realsense_gazebo_plugin"]
+	path = ros2/src/libraries/realsense_gazebo_plugin
+	url = https://github.com/pal-robotics/realsense_gazebo_plugin.git
+	branch = foxy-devel
+# We add this because the most up to date foxy rosbag doesn't allow for excluding topics.
+[submodule "ros2/src/libraries/rosbag2"]
+	path = ros2/src/libraries/rosbag2
+	url = https://github.com/ros2/rosbag2.git
+    branch = foxy-future

@@ -116,9 +116,7 @@ class DynamicGaitClose(DynamicGaitWalk):
         Returns:
             GaitUpdate: a GaitUpdate for the state machine
         """
-        self._final_position_pub.publish(
-            JointState(position=self.trajectory_command_factory.dynamic_step.get_final_position().values())
-        )
+        self._final_position_pub.publish(JointState(position=self.trajectory_command_factory.final_position.values()))
         if self._next_command is None:
             return GaitUpdate.finished()
 

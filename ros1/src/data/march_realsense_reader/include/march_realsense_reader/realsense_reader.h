@@ -28,15 +28,13 @@ public:
      * gait parameters, these parameters are put into the response,
      * returns whether the processing was successful.
      */
-    void processPointcloud(const PointCloud::Ptr& input_cloud,
-        march_shared_msgs::GetGaitParameters::Response& res);
+    void processPointcloud(const PointCloud::Ptr& input_cloud, march_shared_msgs::GetGaitParameters::Response& res);
 
     /** A callback that starts the entire pointcloud processing when the
      * /camera/process_pointcloud service is called.
      */
     bool processPointcloudCallback(
-        march_shared_msgs::GetGaitParameters::Request& req,
-        march_shared_msgs::GetGaitParameters::Response& res);
+        march_shared_msgs::GetGaitParameters::Request& req, march_shared_msgs::GetGaitParameters::Response& res);
 
     /** Pointcloud callback, empty since we are not processing all pointclouds,
      * this gives a speedup when you need a single pointcloud.
@@ -44,20 +42,15 @@ public:
     // NOLINTNEXTLINE(performance-unnecessary-value-param)
     void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
 
-    void readConfigCb(
-        march_realsense_reader::pointcloud_parametersConfig& config,
-        uint32_t level);
+    void readConfigCb(march_realsense_reader::pointcloud_parametersConfig& config, uint32_t level);
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter
     // use
-    template <typename T>
-    void publishCloud(
-        const ros::Publisher& publisher, pcl::PointCloud<T> cloud);
+    template <typename T> void publishCloud(const ros::Publisher& publisher, pcl::PointCloud<T> cloud);
 
     // Turn a HullVector into a marker with a list of points and publish for
     // visualization
-    void publishHullMarkerArray(
-        const boost::shared_ptr<HullVector>& hull_vector);
+    void publishHullMarkerArray(const boost::shared_ptr<HullVector>& hull_vector);
 
     // Create markers from the parameter determiner and publish them for
     // visualization
@@ -66,15 +59,12 @@ public:
     // Create a marker from the optimal foot location and publish it and publish
     // for visualization
     void fillOptimalFootLocationMarker(
-        pcl::PointNormal const optimal_foot_location,
-        visualization_msgs::Marker& marker);
+        pcl::PointNormal const optimal_foot_location, visualization_msgs::Marker& marker);
 
     // Create a marker list from the 'foot locations to try' and publish it and
     // publish for visualization
-    void fillPossibleFootLocationsMarker(
-        PointNormalCloud::Ptr const& possible_foot_locations,
-        pcl::PointNormal const optimal_foot_location,
-        visualization_msgs::Marker& marker_list);
+    void fillPossibleFootLocationsMarker(PointNormalCloud::Ptr const& possible_foot_locations,
+        pcl::PointNormal const optimal_foot_location, visualization_msgs::Marker& marker_list);
 
     // Give an idea of the area of the hulls by cropping a large input grid to
     // the hull vector

@@ -1,0 +1,20 @@
+march:
+  controller:
+    joint_state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 50
+    temperature_sensor:
+      type: march_temperature_sensor_controller/MarchTemperatureSensorController
+      publish_rate: 50
+    pdb_state:
+      type: march_pdb_state_controller/MarchPdbStateController
+      publish_rate: 50
+    trajectory:
+      type: position_controllers/JointTrajectoryController
+      joints:
+        - right_hip
+        - left_hip
+        - right_knee
+        - left_knee
+        - right_ankle
+        - left_ankle
