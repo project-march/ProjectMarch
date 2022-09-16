@@ -94,11 +94,7 @@ class DynamicStep:
             None,
             0,
         )
-        self._logger.warn(
-            f"Duration: {self._duration}, "
-            f"deviation: {location.midpoint_deviation}, "
-            f"height: {location.relative_midpoint_height}"
-        )
+
         self.start = start
         self.stop = stop
         self.hold_subgait = hold_subgait
@@ -243,6 +239,7 @@ class DynamicStep:
                 (name == "right_knee" and self.subgait_id == "left_swing")
                 or (name == "left_knee" and self.subgait_id == "right_swing")
                 or (self.stop and self.hold_subgait)
+                or ("knee" in name and self.location.y > 0.15)
             ):
                 self.joint_trajectory_list.append(DynamicJointTrajectory(setpoint_list, fixed_midpoint_velocity=True))
             else:

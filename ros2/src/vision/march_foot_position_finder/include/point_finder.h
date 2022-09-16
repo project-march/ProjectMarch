@@ -70,6 +70,8 @@ protected:
     int rect_width_;
     int rect_height_;
     int actual_rect_height_;
+    double toe_space_;
+    double floating_foot_ratio_;
 
     double displacements_outside_;
     double displacements_inside_;

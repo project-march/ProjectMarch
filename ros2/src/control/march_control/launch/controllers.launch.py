@@ -27,6 +27,8 @@ def generate_launch_description():
     control_type = LaunchConfiguration("control_type")
     actuating = LaunchConfiguration("actuating")
 
+    rviz_condition = PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])
+
     declared_arguments = [
         DeclareLaunchArgument(
             name="simulation",
@@ -50,9 +52,7 @@ def generate_launch_description():
             description="Decides which controller is being used. "
             "'Effort' when you are running either gazebo or the real exo",
             choices=["rviz", "effort"],
-            condition=UnlessCondition(
-                PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])
-            ),
+            condition=UnlessCondition(rviz_condition),
         ),
         DeclareLaunchArgument(
             name="control_type",
@@ -60,7 +60,7 @@ def generate_launch_description():
             description="Decides which controller is being used. "
             "'Rviz' when you are not running either gazebo or the real exo",
             choices=["rviz", "effort"],
-            condition=IfCondition(PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])),
+            condition=IfCondition(rviz_condition),
         )
         # endregion
     ]
@@ -78,7 +78,9 @@ def generate_launch_description():
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
         condition=IfCondition(actuating),
     )
+    # endregion
 
+    # region Start broadcasters
     pdb_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
@@ -89,14 +91,28 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
+        condition=UnlessCondition(simulation),
     )
 
+    motor_controller_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=[
+            "march_motor_controller_state_broadcaster",
+            "-t",
+            "march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        condition=UnlessCondition(simulation),
+    )
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
         joint_trajectory_controller_spawner,
         pdb_state_broadcaster_spawner,
+        motor_controller_state_broadcaster_spawner,
     ]
 
     # region Launch Controller manager, Extra configuration if simulation is `false`
@@ -118,7 +134,7 @@ def generate_launch_description():
     robot_desc_dict = {"robot_description": robot_desc_xacro}
 
     # This node couples the HW interface with control.
-    control_node = Node(
+    control_node_exo = Node(
         package="controller_manager",
         prefix=[  # Sudo command cause need to be sudoer when we do this node cause it real time
             "sudo -s -E env PATH=",
@@ -136,9 +152,21 @@ def generate_launch_description():
             "stdout": "screen",
             "stderr": "screen",
         },
-        condition=UnlessCondition(gazebo),
+        condition=IfCondition(PythonExpression(["'", control_type, "' == 'effort'", " and '", gazebo, "' == 'false'"])),
     )
-    nodes.append(control_node)  # noqa: PIE799 As this way is more readable, and easier to uncomment.
+    # This should be the same control node as the one above only that the prefix for sudo is not needed in simulation.
+    control_node_rviz = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        # The robot description is loaded in and the controller yaml.
+        parameters=[robot_desc_dict, get_control_file_loc(control_yaml)],
+        output={
+            "stdout": "screen",
+            "stderr": "screen",
+        },
+        condition=IfCondition(PythonExpression(["'", control_type, "' == 'rviz'", " and '", gazebo, "' == 'false'"])),
+    )
+    nodes.extend([control_node_rviz, control_node_exo])  # noqa: PIE799 This way is more readable.
     # endregion
 
     # region Launch RViz
@@ -159,7 +187,7 @@ def generate_launch_description():
             on_exit=[rviz_node],
         )
     )
-    nodes.append(rviz_node_after_broadcast_spawner)
+    nodes.append(rviz_node_after_broadcast_spawner)  # noqa: PIE799 This way is more readable and easier to uncomment.
     # endregion
 
     return LaunchDescription(declared_arguments + nodes)

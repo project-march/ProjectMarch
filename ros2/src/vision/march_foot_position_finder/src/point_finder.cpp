@@ -91,6 +91,10 @@ void PointFinder::readParameters(const std::vector<rclcpp::Parameter>& parameter
             max_z_distance_ = param.as_double();
         } else if (param.get_name() == "num_track_points") {
             num_track_points_ = param.as_int();
+        } else if (param.get_name() == "floating_foot_ratio") {
+            floating_foot_ratio_ = param.as_double();
+        } else if (param.get_name() == "toe_space") {
+            toe_space_ = param.as_double();
         }
         // RCLCPP_INFO(n_->get_logger(),
         //     "\033[92mParameter %s updated in %s Point Finder\033[0m",
@@ -125,7 +129,7 @@ void PointFinder::initializeValues()
     horizontal_displacements_.clear();
     vertical_displacements_.clear();
 
-    for (int i = 0; i < actual_rect_height_ / 2.5; i += 2) {
+    for (int i = 0; i <= ceil((floating_foot_ratio_ * actual_foot_length_ + toe_space_) / cell_width_); i += 2) {
         flipping_displacements_.push_back(-i);
     }
 
@@ -239,24 +243,25 @@ void PointFinder::findFeasibleFootPlacements(std::vector<Point>* position_queue)
             int num_free_cells = 0;
             int x_opt = xCoordinateToIndex(optimal_foot_x_) + x_shift;
             int y_opt = yCoordinateToIndex(optimal_foot_y_) + y_shift;
+            int toe_space_cells = ceil(toe_space_ / cell_width_);
 
-            for (int x = x_opt; x < x_opt + rect_height_; x++) {
+            for (int x = x_opt - toe_space_cells; x < x_opt + rect_height_; x++) {
+                int row_cell_count = 0;
                 for (int y = y_opt - rect_width_ / 2; y < y_opt + rect_width_ / 2.0; y++) {
                     if (std::abs(derivatives_[y][x]) < derivative_threshold_) {
+                        row_cell_count++;
                         num_free_cells++;
                     }
                 }
             }
-
-            if (num_free_cells >= rect_height_ * rect_width_ * available_points_ratio_) {
-
+            if (num_free_cells >= (rect_height_ + toe_space_cells) * rect_width_ * available_points_ratio_) {
                 double height = height_map_[y_opt][x_opt];
-                if (std::abs(height - current_foot_z_) <= 0.30) {
+                if (std::abs(height - current_foot_z_) <= 0.28) {
                     computeFootPlateDisplacement(x_opt, y_opt, height, position_queue);
                 }
             }
 
-            if (position_queue->size() > 0 && (position_queue->back()).z < 0.05) {
+            if (position_queue->size() > 0 && std::abs((position_queue->back()).z) < 0.05) {
                 return;
             }
         }
@@ -285,8 +290,9 @@ void PointFinder::computeFootPlateDisplacement(int x, int y, double height, std:
         }
     }
 
-    // Do not shift foot if the height difference is positive
-    if (height >= 0 && !obstacle_found && validatePoint(original)) {
+    // Do not shift foot if not stepping down a stairs
+    // if (height >= 0 && !obstacle_found && validatePoint(original)) {
+    if (height > -0.17 && validatePoint(original)) {
         position_queue->push_back(original);
         original_position_queue_.push_back(original);
         obstacles_found_.push_back(obstacle_found);

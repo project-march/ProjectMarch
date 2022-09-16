@@ -47,11 +47,11 @@
   <ros2_control name="march" type="system">
     <hardware>
       <xacro:if value="${type == 'rviz'}">
-<!--        <plugin>fake_components/GenericSystem</plugin>-->
+        <plugin>fake_components/GenericSystem</plugin>
         <!-- Switch the 'fake_components/GenericSystem' with 'march_hardware_interface/MarchRvizSystemInterface' -->
         <!-- If you whish to debug and play around with a very simple hardware interface, -->
         <!-- They practically work the same -->
-        <plugin>march_hardware_interface/MarchRvizSystemInterface</plugin>
+<!--        <plugin>march_hardware_interface/MarchRvizSystemInterface</plugin>-->
       </xacro:if>
       <xacro:if value="${type == 'effort'}">
         <xacro:if value="$(arg gazebo)">
@@ -65,11 +65,11 @@
     </hardware>
 
     <xacro:march_joint name="left_ankle" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
-    <xacro:march_joint name="left_hip_aa"/>
+    <xacro:march_joint name="left_hip_aa" stop_when_outside_hard_limits="false"  msec_until_error_when_in_error_soft_limits="0"/>
     <xacro:march_joint name="left_hip_fe"/>
     <xacro:march_joint name="left_knee"/>
     <xacro:march_joint name="right_ankle" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
-    <xacro:march_joint name="right_hip_aa"/>
+    <xacro:march_joint name="right_hip_aa" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
     <xacro:march_joint name="right_hip_fe"/>
     <xacro:march_joint name="right_knee"/>
 

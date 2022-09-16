@@ -37,6 +37,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")
     control_yaml = LaunchConfiguration("control_yaml")
+    rviz = LaunchConfiguration("rviz")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
@@ -72,7 +73,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     use_position_queue = LaunchConfiguration("use_position_queue")
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
-    early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    scheduling_delay = LaunchConfiguration("scheduling_delay")
     timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
@@ -96,6 +97,9 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="rviz/march7_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
             "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+        ),
+        DeclareLaunchArgument(
+            name="rviz", default_value="true", description="Whether we should startup rviz.", choices=["true", "false"]
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -243,14 +247,14 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="first_subgait_delay",
-            default_value="0.2",
+            default_value="0.0",
             description="Duration to wait before starting first subgait."
             "If 0 then the first subgait is started immediately,"
             "dropping the first setpoint in the process.",
         ),
         DeclareLaunchArgument(
-            name="early_schedule_duration",
-            default_value="0.3",
+            name="scheduling_delay",
+            default_value="0.15",
             description="Duration to schedule next subgait early. If 0 then the"
             "next subgait is never scheduled early.",
         ),
@@ -296,6 +300,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         launch_arguments=[
             ("use_sim_time", use_sim_time),
             ("rqt_input", rqt_input),
+            ("rviz", rviz),
             ("ping_safety_node", ping_safety_node),
             ("layout", layout),
             ("robot", robot),
@@ -320,7 +325,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("use_position_queue", use_position_queue),
             ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
-            ("early_schedule_duration", early_schedule_duration),
+            ("scheduling_delay", scheduling_delay),
             ("timer_period", timer_period),
             ("fake_sensor_data", fake_sensor_data),
             ("minimum_fake_temperature", minimum_fake_temperature),
@@ -329,6 +334,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("jointless", jointless),
             ("gazebo", gazebo),
             ("control_yaml", control_yaml),
+            ("rosbags", "false"),
         ],
     )
     # endregion

@@ -33,7 +33,7 @@ namespace march_hardware_interface {
 
 // NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
 MarchExoSystemInterface::MarchExoSystemInterface()
-    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchExoSystemInterface")))
+    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("HardwareInterface")))
     , clock_(rclcpp::Clock())
 {
     go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
@@ -117,6 +117,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
     }
     return { /*name=*/joint.name.c_str(),
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
+        /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
@@ -157,6 +158,12 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
+        // For motor controller state broadcasting.
+        for (std::pair<std::string, double*>& motor_controller_pointer :
+            jointInfo.motor_controller_data.get_pointers()) {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
+        }
     }
 
     // For the PDB broadcaster.
@@ -352,6 +359,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
+        jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }
     return hardware_interface::return_type::OK;
 }
@@ -365,12 +373,12 @@ void MarchExoSystemInterface::pdb_read()
 {
     march_robot_->getPowerDistributionBoard().read(pdb_data_);
     if (pdb_data_.battery_voltage != 0) {
-        if (pdb_data_.battery_voltage < 43) {
+        if (pdb_data_.battery_voltage < 40) {
             RCLCPP_ERROR_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 43V, it is: %gV.", pdb_data_.battery_voltage);
+                (*logger_), clock_, 500, "Battery voltage is less then 40V, it is: %gV.", pdb_data_.battery_voltage);
         } else if (pdb_data_.battery_voltage < 45) {
             RCLCPP_WARN_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
+                (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
         }
     }
 };
@@ -419,10 +427,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
-    if (jointInfo.position == 0) {
-        RCLCPP_WARN((*logger_), "The joint %s has position 0, the absolute encoder probably isn't working correctly.",
-            jointInfo.name.c_str());
-    }
     return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
 }
 
@@ -490,8 +494,7 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
 
     RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 
-    HardwareBuilder hw_builder { /*yaml_path=*/robot_config_file_path,
-        /*logger=*/shared_ptr<march_logger::RosLogger>(new march_logger::RosLogger(logger_)) };
+    HardwareBuilder hw_builder { /*yaml_path=*/robot_config_file_path };
 
     std::vector<std::string> joint_names;
     joint_names.reserve(info.joints.size());

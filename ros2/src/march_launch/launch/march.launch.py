@@ -2,7 +2,7 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
@@ -51,6 +51,8 @@ def generate_launch_description() -> LaunchDescription:
     robot = LaunchConfiguration("robot")
     control_yaml = LaunchConfiguration("control_yaml")
     gazebo_control_yaml = LaunchConfiguration("gazebo_control_yaml")
+    rosbags = LaunchConfiguration("rosbags")
+    rviz = LaunchConfiguration("rviz")
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
@@ -114,7 +116,7 @@ def generate_launch_description() -> LaunchDescription:
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     amount_of_steps = LaunchConfiguration("amount_of_steps")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
-    early_schedule_duration = LaunchConfiguration("early_schedule_duration")
+    scheduling_delay = LaunchConfiguration("scheduling_delay")
     timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
@@ -143,6 +145,15 @@ def generate_launch_description() -> LaunchDescription:
             default_value="gazebo/march7_control.yaml",
             description="The gazebo controller yaml file to use this is added in through the urdf published "
             "on /robot_description. Must be in: `march_control/config/`.",
+        ),
+        DeclareLaunchArgument(
+            name="rosbags",
+            default_value="true",
+            description="Whether the rosbags should stored.",
+            choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="rviz", default_value="false", description="Whether we should startup rviz.", choices=["true", "false"]
         ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
@@ -291,14 +302,14 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="first_subgait_delay",
-            default_value="0.2",
+            default_value="0.0",
             description="Duration to wait before starting first subgait."
             "If 0 then the first subgait is started immediately,"
             "dropping the first setpoint in the process.",
         ),
         DeclareLaunchArgument(
-            name="early_schedule_duration",
-            default_value="0.3",
+            name="scheduling_delay",
+            default_value="0.15",
             description="Duration to schedule next subgait early. If 0 then the"
             "next subgait is never scheduled early.",
         ),
@@ -402,7 +413,7 @@ def generate_launch_description() -> LaunchDescription:
             ("amount_of_steps", amount_of_steps),
             ("use_position_queue", use_position_queue),
             ("add_cybathlon_gaits", add_cybathlon_gaits),
-            ("early_schedule_duration", early_schedule_duration),
+            ("scheduling_delay", scheduling_delay),
             ("first_subgait_delay", first_subgait_delay),
             ("timer_period", timer_period),
         ],
@@ -536,7 +547,29 @@ def generate_launch_description() -> LaunchDescription:
                 "controllers.launch.py",
             )
         ),
-        launch_arguments=[("simulation", simulation), ("control_yaml", control_yaml)],
+        launch_arguments=[("simulation", simulation), ("control_yaml", control_yaml), ("rviz", rviz)],
+    )
+    # endregion
+
+    # region rosbags
+    # Make sure you have build the ros bags from the library not the ones from foxy!
+    record_rosbags_action = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "bag",
+            "record",
+            "-o",
+            '~/rosbags2/$(date -d "today" +"%Y-%m-%d-%H-%M-%S")',
+            "-a",
+            "-x",
+            "'.*camera_.*'",
+        ],
+        output={
+            "stdout": "log",
+            "stderr": "log",
+        },
+        shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
+        condition=IfCondition(rosbags),
     )
     # endregion
 
@@ -555,6 +588,7 @@ def generate_launch_description() -> LaunchDescription:
         point_finder_node,
         camera_aligned_frame_pub_node,
         back_sense_node,
+        record_rosbags_action,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

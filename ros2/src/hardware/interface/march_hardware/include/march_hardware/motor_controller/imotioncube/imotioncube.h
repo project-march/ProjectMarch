@@ -46,10 +46,10 @@ public:
      */
     IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode,
-        std::shared_ptr<march_logger::BaseLogger> logger);
+        bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger);
     IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream, ActuationMode actuation_mode,
-        std::shared_ptr<march_logger::BaseLogger> logger);
+        bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger);
 
     ~IMotionCube() noexcept override = default;
 

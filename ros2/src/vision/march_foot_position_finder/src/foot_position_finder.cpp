@@ -74,18 +74,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
     point_marker_publisher_ = n_->create_publisher<visualization_msgs::msg::Marker>(
         "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
 
-    std::function<void(const march_shared_msgs::msg::FootPosition::SharedPtr msg)> point_callback
-        = std::bind(&FootPositionFinder::chosenOtherPointCallback, this, std::placeholders::_1);
-    other_chosen_point_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::FootPosition>(topic_other_chosen_point_,
-            /*qos=*/1, point_callback, point_callback_options_);
-
-    std::function<void(const march_shared_msgs::msg::CurrentState::SharedPtr msg)> state_callback
-        = std::bind(&FootPositionFinder::currentStateCallback, this, std::placeholders::_1);
-    current_state_subscriber_
-        = n_->create_subscription<march_shared_msgs::msg::CurrentState>("/march/gait_selection/current_state",
-            /*qos=*/1, state_callback, point_callback_options_);
-
     foot_gap_ = n_->get_parameter("foot_gap").as_double();
     step_distance_ = n_->get_parameter("step_distance").as_double();
     sample_size_ = n_->get_parameter("sample_size").as_int();
@@ -135,8 +123,6 @@ FootPositionFinder::FootPositionFinder(rclcpp::Node* n,
         RCLCPP_INFO(
             n_->get_logger(), "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m", left_or_right_.c_str());
     }
-
-    resetInitialPosition(/*stop_timer=*/false);
 }
 
 /**
@@ -169,69 +155,8 @@ void FootPositionFinder::readParameters(const std::vector<rclcpp::Parameter>& pa
     }
 
     found_points_.resize(sample_size_);
-    resetInitialPosition(/*stop_timer=*/false);
     point_finder_->readParameters(parameters);
     // displacements_ = point_finder_->getDisplacements();
-}
-
-/**
- * Callback function for when the gait selection node selects a point for the
- * other leg.
- *
- * @param msg FootPosition message from the callback.
- */
-// Suppress lint error "make reference of argument" as it breaks callback
-void FootPositionFinder::chosenOtherPointCallback(const march_shared_msgs::msg::FootPosition::SharedPtr msg) // NOLINT
-{
-    // Start point in current frame is equal to the previous displacement:
-    start_point_ = Point(msg->displacement.x, msg->displacement.y, msg->displacement.z);
-
-    // previous_start_point_ is the current origin:
-    previous_start_point_ = ORIGIN;
-
-    // Compute desired point:
-    desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-            /*_z=*/0));
-}
-
-/**
- * Callback function to reset the position values when the exoskeleton enters
- * the "stand" state.
- *
- * @param msg CurrentState message from the callback.
- */
-// Suppress lint error "make reference of argument" as it breaks the callback
-void FootPositionFinder::currentStateCallback(const march_shared_msgs::msg::CurrentState::SharedPtr msg) // NOLINT
-{
-    if (msg->state == "stand") {
-        // This wall timer simulates a one-shot action in the future. The
-        // exoskeleton has some time to end up in a stable stand position before
-        // the initial position is reset.
-        initial_position_reset_timer_ = n_->create_wall_timer(
-            std::chrono::milliseconds(300),
-            [this]() -> void {
-                resetInitialPosition(/*stop_timer=*/true);
-            },
-            point_callback_group_);
-    }
-}
-
-/**
- * Reset initial position, relative to which points are found.
- *
- * @param stop_timer Whether to stop a ROS timer that scheduled this callback.
- */
-void FootPositionFinder::resetInitialPosition(bool stop_timer)
-{
-    previous_start_point_ = start_point_ = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
-    desired_point_ = addPoints(start_point_,
-        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
-            /*_z=*/0));
-
-    if (stop_timer) {
-        initial_position_reset_timer_->cancel();
-    }
 }
 
 /**
@@ -303,6 +228,12 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
 
     // Find possible points around the desired point determined earlier:
     std::vector<Point> position_queue;
+
+    start_point_ = transformPoint(ORIGIN, other_frame_id_, current_frame_id_);
+    desired_point_ = addPoints(start_point_,
+        Point(-(float)step_distance_, (float)(switch_factor_ * foot_gap_),
+            /*_z=*/0));
+
     point_finder_->findPoints(pointcloud, desired_point_, &position_queue);
 
     // Publish cloud for visualization:
@@ -312,12 +243,10 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
     if (validatePoint(desired_point_) && validatePoint(start_point_)) {
         // publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
         //     displacements_, left_or_right_); // Cyan
-        publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
-            left_or_right_); // Green
-        publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
-            left_or_right_); // Purple
-        publishPreviousDisplacement(point_marker_publisher_, n_, ORIGIN, start_point_,
-            left_or_right_); // Blue
+        // publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
+        //     left_or_right_); // Green
+        // publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
+        //     left_or_right_); // Purple
     }
 
     if (position_queue.size() > 0) {
@@ -331,8 +260,6 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         std::vector<Point> track_points
             = point_finder_->retrieveTrackPoints(ORIGIN, found_covid_point_, /*num_points=*/0);
 
-        // Visualization
-
         // Compute new foot displacement for gait computation
         new_displacement_ = subtractPoints(found_covid_point_, start_point_);
 
@@ -342,11 +269,11 @@ void FootPositionFinder::processPointCloud(const PointCloud::Ptr& pointcloud)
         }
 
         // Visualize new displacement
-        // publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
-        //     left_or_right_); // Orange
-        publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
-            left_or_right_); // Red
-        publishFootRectangle(point_marker_publisher_, n_, found_covid_point_, left_or_right_);
+        publishTrackMarkerPoints(point_marker_publisher_, n_, track_points,
+            left_or_right_); // Orange
+        // publishMarkerPoint(point_marker_publisher_, n_, found_covid_point_,
+        //     left_or_right_); // Red
+        // publishFootRectangle(point_marker_publisher_, n_, found_covid_point_, left_or_right_);
         // publishPossiblePoints(
         //     point_marker_publisher_, n_, position_queue, left_or_right_);
         // publishNewDisplacement(point_marker_publisher_, n_, start_point_,
@@ -378,6 +305,9 @@ Point FootPositionFinder::retrieveOptimalPoint(std::vector<Point>* position_queu
     for (auto p = position_queue->begin(); p != position_queue->end(); ++p) {
         double new_tradeoff = -std::abs(step_distance_ - std::abs(p->x)) - height_distance_coefficient_ * std::abs(p->z)
             - point_finder_->getObstaclePenalty(index);
+        if (std::abs(p->x) > 0.55 && p->z > 0.10) {
+            continue;
+        }
         if (new_tradeoff > optimal_distance_height_tradeoff) {
             optimal_point = (*p);
             optimal_distance_height_tradeoff = new_tradeoff;

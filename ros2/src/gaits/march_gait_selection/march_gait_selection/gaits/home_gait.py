@@ -138,13 +138,13 @@ class HomeGait(GaitInterface):
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Optional[Duration] = ZERO_DURATION,
+        delay: float,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
 
          Args:
             current_time (Time): The current time.
-            early_schedule_duration (:obj: Duration, optional): Optional duration to schedule early.
+            delay (float): delay with which to schedule the next subgait.
 
         Returns:
             GaitUpdate: GaitUpdate that may contain a TrajectoryCommand, and any of the

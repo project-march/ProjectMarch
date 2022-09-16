@@ -12,50 +12,6 @@ import copy
 
 old_stand_position_start = {
     "left_ankle": {
-        "position": 0.05,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "left_hip_aa": {
-        "position": -0.05,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "left_hip_fe": {
-        "position": 0.09,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "left_knee": {
-        "position": 0.0,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "right_ankle": {
-        "position": 0.05,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "right_hip_aa": {
-        "position": -0.05,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "right_hip_fe": {
-        "position": 0.09,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-    "right_knee": {
-        "position": 0.0,
-        "time_from_start": 0,
-        "velocity": 0.0,
-    },
-}
-old_stand_position_end = copy.deepcopy(old_stand_position_start)
-
-new_stand_position_start = {
-    "left_ankle": {
         "position": 0.07,
         "time_from_start": 0,
         "velocity": 0.0,
@@ -77,6 +33,50 @@ new_stand_position_start = {
     },
     "right_ankle": {
         "position": 0.07,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_hip_aa": {
+        "position": -0.025,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_hip_fe": {
+        "position": 0.09,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_knee": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+}
+old_stand_position_end = copy.deepcopy(old_stand_position_start)
+
+new_stand_position_start = {
+    "left_ankle": {
+        "position": 0.14,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_hip_aa": {
+        "position": -0.025,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_hip_fe": {
+        "position": 0.09,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "left_knee": {
+        "position": 0.0,
+        "time_from_start": 0,
+        "velocity": 0.0,
+    },
+    "right_ankle": {
+        "position": 0.14,
         "time_from_start": 0,
         "velocity": 0.0,
     },

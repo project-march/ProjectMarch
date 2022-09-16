@@ -54,7 +54,6 @@ class TrajectoryCommandFactory:
         self._gait = gait
         self._point_handler = point_handler
         self._logger = gait.node.get_logger().get_child(__class__.__name__)
-        self._create_position_queue()
         self.update_parameter()
         self._is_second_step_possible = False
 
@@ -78,8 +77,19 @@ class TrajectoryCommandFactory:
                 CoViD is too old.
         """
         self._stop = stop
+        if start:
+            self._create_position_queue()
+        elif self.position_queue.empty():
+            self._stop = True
+
         self.subgait_id = subgait_id
         self.start_position_all_joints = start_position_all_joints
+
+        if not self._stop:
+            if self._use_position_queue:
+                self.foot_location = self._get_foot_location_from_queue()
+            elif not self._use_position_queue:
+                self.foot_location = self._get_foot_location_from_point_handler(start)
 
         if self._stop:
             self.foot_location.processed_point.x = 0.0
@@ -88,19 +98,17 @@ class TrajectoryCommandFactory:
             self.foot_location.relative_midpoint_height = 0.15
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
-        else:
-            if self._use_position_queue:
-                self.foot_location = self._check_if_queue_is_not_empty_and_get_foot_location()
-            else:
-                self.foot_location = self._get_foot_location_from_point_handler(start)
 
         if self.foot_location is None:
             return None if start else self._get_stop_gait()
 
         self._point_handler.publish_chosen_foot_position(self.subgait_id, self.foot_location)
         self._logger.info(
-            f"Stepping to location ({self.foot_location.processed_point.x}, "
-            f"{self.foot_location.processed_point.y}, {self.foot_location.processed_point.z})"
+            f"Stepping to location ({round(self.foot_location.processed_point.x, 3)}, "
+            f"{round(self.foot_location.processed_point.y, 3)}, {round(self.foot_location.processed_point.z, 3)}) "
+            f"with duration {round(self.foot_location.duration, 3)}, "
+            f"deviation {round(self.foot_location.midpoint_deviation, 3)} "
+            f"and mid point height {round(self.foot_location.relative_midpoint_height, 3)}."
         )
 
         return self._create_and_validate_trajectory_command(start, self._stop)
@@ -225,14 +233,6 @@ class TrajectoryCommandFactory:
             self._gait.start_time_next_command,
         )
 
-    def _check_if_queue_is_not_empty_and_get_foot_location(self) -> Optional[FootPosition]:
-        """If the queue is empty, the gait is closed and the queue is reset. Else, gets location from queue."""
-        if self.position_queue.empty():
-            self._close_gait_and_reset_queue()
-            return self.foot_location
-        else:
-            return self._get_foot_location_from_queue()
-
     def _get_foot_location_from_point_handler(self, start: bool) -> Optional[FootPosition]:
         """Returns a FootPosition message from the point handler, if available.
 
@@ -257,13 +257,6 @@ class TrajectoryCommandFactory:
             self._gait._end = True
             return None
 
-    def _close_gait_and_reset_queue(self) -> None:
-        """Closes the gait and reset the queue after the queue is empty."""
-        self.fill_queue()
-        self._logger.warn(f"Queue is empty. Closing the gait. Resetting queue to {list(self.position_queue.queue)}")
-        self._stop = True
-        self._gait._end = True
-
     def _get_foot_location_from_queue(self) -> FootPosition:
         """Get FootPosition message from the position queue.
 
@@ -272,9 +265,14 @@ class TrajectoryCommandFactory:
         """
         header = Header(stamp=self._gait.node.get_clock().now().to_msg())
         point_from_queue = self.position_queue.get()
-        point = Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"])
 
-        return FootPosition(header=header, processed_point=point, duration=self.duration_from_yaml)
+        return FootPosition(
+            header=header,
+            processed_point=Point(x=point_from_queue["x"], y=point_from_queue["y"], z=point_from_queue["z"]),
+            duration=point_from_queue["duration"],
+            midpoint_deviation=point_from_queue["midpoint_deviation"],
+            relative_midpoint_height=point_from_queue["midpoint_height"],
+        )
 
     def update_parameter(self) -> None:
         """Updates '_use_position_queue' to the newest value in gait_node."""
@@ -290,12 +288,7 @@ class TrajectoryCommandFactory:
         except OSError as e:
             self._logger.error(f"Position queue file does not exist. {e}")
 
-        self.duration_from_yaml = position_queue_yaml["duration"]
         self.points_from_yaml = position_queue_yaml["points"]
         self.position_queue = Queue()
-        self.fill_queue()
-
-    def fill_queue(self) -> None:
-        """Fills the position queue with the values specified in position_queue.yaml."""
         for point in self.points_from_yaml:
             self.position_queue.put(point)

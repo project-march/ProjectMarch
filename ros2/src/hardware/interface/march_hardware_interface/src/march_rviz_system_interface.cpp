@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "march_hardware_interface/march_rviz_system_interface.hpp"
+#include "march_hardware/motor_controller/odrive/odrive_state.h"
 
 #include <chrono>
 #include <cmath>
@@ -55,6 +56,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
     }
     //    logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface"));
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
     pdb_data_ = {};
     RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
@@ -80,6 +82,10 @@ std::vector<hardware_interface::StateInterface> MarchRvizSystemInterface::export
     for (uint i = 0; i < info_.joints.size(); i++) {
         state_interfaces.emplace_back(
             hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
+        for (std::pair<std::string, double*>& motor_controller_pointer : motor_controllers_data_[i].get_pointers()) {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, motor_controller_pointer.first, motor_controller_pointer.second));
+        }
     }
 
     // For the PDB broadcaster.

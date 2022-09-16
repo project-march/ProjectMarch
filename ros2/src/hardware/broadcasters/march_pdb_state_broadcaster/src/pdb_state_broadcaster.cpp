@@ -38,7 +38,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PdbSta
 
 controller_interface::InterfaceConfiguration PdbStateBroadcaster::command_interface_configuration() const
 {
-    return controller_interface::InterfaceConfiguration { controller_interface::interface_configuration_type::NONE };
+    return { controller_interface::interface_configuration_type::NONE };
 }
 
 controller_interface::InterfaceConfiguration PdbStateBroadcaster::state_interface_configuration() const

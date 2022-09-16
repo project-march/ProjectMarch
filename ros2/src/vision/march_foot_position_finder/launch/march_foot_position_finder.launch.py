@@ -33,7 +33,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="height_zero_threshold",
-                default_value="0.04",
+                default_value="0.045",
             ),
             DeclareLaunchArgument(
                 name="foot_width",
@@ -41,7 +41,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="foot_length",
-                default_value="0.20",
+                default_value="0.27",
             ),
             DeclareLaunchArgument(
                 name="actual_foot_length",
@@ -49,11 +49,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="derivative_threshold",
-                default_value="0.02",
+                default_value="0.01",
             ),
             DeclareLaunchArgument(
                 name="available_points_ratio",
-                default_value="0.96",
+                default_value="0.94",
             ),
             DeclareLaunchArgument(
                 name="max_z_distance",
@@ -61,7 +61,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="num_track_points",
-                default_value="30",
+                default_value="0",
             ),
             DeclareLaunchArgument(
                 name="displacements_outside",
@@ -73,15 +73,23 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="displacements_near",
-                default_value="0.20",
+                default_value="0.25",
             ),
             DeclareLaunchArgument(
                 name="displacements_far",
-                default_value="0.00",
+                default_value="0.1",
             ),
             DeclareLaunchArgument(
                 name="height_distance_coefficient",
-                default_value="10.0",
+                default_value="20.0",
+            ),
+            DeclareLaunchArgument(
+                name="toe_space",
+                default_value="0.04",
+            ),
+            DeclareLaunchArgument(
+                name="floating_foot_ratio",
+                default_value="0.25",
             ),
             DeclareLaunchArgument(
                 "realsense_simulation",
@@ -115,6 +123,8 @@ def generate_launch_description() -> LaunchDescription:
                     {"displacements_near": LaunchConfiguration("displacements_near")},
                     {"displacements_far": LaunchConfiguration("displacements_far")},
                     {"height_distance_coefficient": LaunchConfiguration("height_distance_coefficient")},
+                    {"toe_space": LaunchConfiguration("toe_space")},
+                    {"floating_foot_ratio": LaunchConfiguration("floating_foot_ratio")},
                     {"realsense_simulation": LaunchConfiguration("realsense_simulation")},
                 ],
             ),

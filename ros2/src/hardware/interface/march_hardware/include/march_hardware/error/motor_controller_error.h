@@ -13,6 +13,7 @@ namespace error {
         IMOTIONCUBE_MOTION_ERROR,
         IMOTIONCUBE_DETAILED_MOTION_ERROR,
         IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR,
+        ODRIVE_ERROR,
         ODRIVE_AXIS_ERROR,
         ODRIVE_MOTOR_ERROR,
         ODRIVE_ENCODER_ERROR,
@@ -29,6 +30,9 @@ namespace error {
     const size_t IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE = 7;
     extern const std::array<std::string, IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE>
         IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS;
+
+    const size_t ODRIVE_ERRORS_SIZE = 8;
+    extern const std::array<std::string, ODRIVE_ERRORS_SIZE> ODRIVE_ERRORS;
 
     const size_t ODRIVE_AXIS_ERRORS_SIZE = 8;
     extern const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE> ODRIVE_AXIS_ERRORS;

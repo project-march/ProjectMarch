@@ -21,6 +21,7 @@
 #include "rclcpp/macros.hpp"
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
+#include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <rclcpp/clock.hpp>
 
 namespace march_hardware_interface {
@@ -36,6 +37,7 @@ struct JointLimit {
 struct JointInfo {
     const std::string name;
     march::Joint& joint;
+    march::ODriveState motor_controller_data;
     double position;
     double velocity;
     double effort_actual;

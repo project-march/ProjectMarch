@@ -65,6 +65,8 @@ def parameter_callback(gait_preprocessor: GaitPreprocessor, parameters: List[Par
             gait_preprocessor._max_deviation = param.get_parameter_value().double_value
         elif param.name == "use_simulated_deviation":
             gait_preprocessor._use_simulated_deviation = param.get_parameter_value().bool_value
+        elif param.name == "_max_offset_x":
+            gait_preprocessor._max_offset_x = param.get_parameter_value().double_value
 
         gait_preprocessor._logger.info(f"{param.name} set to {param.value}")
 

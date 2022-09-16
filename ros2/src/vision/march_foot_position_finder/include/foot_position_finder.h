@@ -38,12 +38,6 @@ public:
     ~FootPositionFinder() = default;
 
 protected:
-    void currentStateCallback(const march_shared_msgs::msg::CurrentState::SharedPtr msg);
-
-    void resetInitialPosition(bool stop_timer);
-
-    void chosenOtherPointCallback(const march_shared_msgs::msg::FootPosition::SharedPtr msg);
-
     void processRealSenseDepthFrames();
 
     void processSimulatedDepthFrames(const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);

@@ -64,7 +64,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="duration",
-                default_value="1.3",
+                default_value="1.5",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             DeclareLaunchArgument(
@@ -83,7 +83,14 @@ def generate_launch_description():
                 description="Whether to use simulated, fixed, deviation for calculating mid points.",
             ),
             DeclareLaunchArgument(
-                name="simulated_deviation", default_value="0.05", description="midpoint deviation for simulated points."
+                name="simulated_deviation",
+                default_value="0.05",
+                description="midpoint deviation for simulated points.",
+            ),
+            DeclareLaunchArgument(
+                name="max_offset_x",
+                default_value="0.125",
+                description="Max offset_x",
             ),
             Node(
                 package="march_gait_preprocessor",
@@ -104,6 +111,7 @@ def generate_launch_description():
                     {"max_deviation": LaunchConfiguration("max_deviation")},
                     {"use_simulated_deviation": LaunchConfiguration("use_simulated_deviation")},
                     {"simulated_deviation": LaunchConfiguration("simulated_deviation")},
+                    {"max_offset_x": LaunchConfiguration("max_offset_x")},
                 ],
                 on_exit=Shutdown(),
             ),

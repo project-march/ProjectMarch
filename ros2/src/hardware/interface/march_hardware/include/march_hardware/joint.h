@@ -23,8 +23,8 @@ public:
 
     // Initialize a Joint with motor controller and temperature slave.
     // MotorController cannot be a nullptr, since a Joint should always have a
-    // MotorController. Temperature ges may be a nullptr, since a Joint may have
-    // a Temperature ges.
+    // MotorController. OdriveTemperature ges may be a nullptr, since a Joint may have
+    // a OdriveTemperature ges.
     Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
         std::unique_ptr<TemperatureGES> temperature_ges, std::shared_ptr<march_logger::BaseLogger> logger);
 

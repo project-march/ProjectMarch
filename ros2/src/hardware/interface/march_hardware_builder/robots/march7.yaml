@@ -17,13 +17,14 @@ march7:
           slaveIndex: 3
           axis: 1
           motorKV: 355
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 3607  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 5957  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 4992
+            minPositionIU: 3607  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 5957  # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 4910
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -40,13 +41,14 @@ march7:
           slaveIndex: 4
           axis: 1
           motorKV: 355
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 9360  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 10392  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 9864
+            minPositionIU: 9378  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 10403  # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 9786
             lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
@@ -63,12 +65,13 @@ march7:
           slaveIndex: 4
           axis: 0
           motorKV: 95
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
-            minPositionIU: 90080  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 453920  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            minPositionIU: 90080  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 453920  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 153088
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
@@ -86,12 +89,13 @@ march7:
           slaveIndex: 3
           axis: 0
           motorKV: 95
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 485856  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 836080  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            minPositionIU: 485856  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 836080  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 502976
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
@@ -109,13 +113,14 @@ march7:
           slaveIndex: 2
           axis: 1
           motorKV: 355
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: -1
-            minPositionIU: 5772  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 7988  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 7179 #9205
+            minPositionIU: 5772  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 7988  # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 7092 #9205
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -129,16 +134,17 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 5
+          slaveIndex: 1
           axis: 1
           motorKV: 355
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             resolution: 14
             direction: -1
-            minPositionIU: 3973  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 5009  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 4418
+            minPositionIU: 4108  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 5153  # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 4592
             lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
@@ -152,16 +158,17 @@ march7:
         motor_controller:
           type: odrive
           actuationMode: torque
-          slaveIndex: 5
+          slaveIndex: 1
           axis: 0
           motorKV: 95
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 426704  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 798624  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 495792
+            minPositionIU: 426704  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 798624  # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 497904
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -179,12 +186,13 @@ march7:
           axis: 0
           preCalibrated: false
           motorKV: 95
+          useIncrementalEncoder: false
 #          indexFound: true
           absoluteEncoder:
             direction: 1
             resolution: 20
-            minPositionIU: 531696  # Ros doesn't start if it is in its hard limits (same as encode limits).
-            maxPositionIU: 882560  # Ros doesn't start if it is in its hard limits (same as encode limits).
+            minPositionIU: 531696  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 882560  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 548304
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
@@ -195,5 +203,5 @@ march7:
             resolution: 12
             transmission: 121
   power_distribution_board:
-    slaveIndex: 1
-    byteOffset: 16
+    slaveIndex: 5
+    byteOffset: 0

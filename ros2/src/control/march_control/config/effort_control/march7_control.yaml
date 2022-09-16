@@ -11,6 +11,24 @@ controller_manager:
     march_pdb_state_broadcaster:
       type: pdb_state_broadcaster/PdbStateBroadcaster
 
+    march_motor_controller_state_broadcaster:
+      type: march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster
+
+
+march_motor_controller_state_broadcaster:
+  ros__parameters:
+    # If the one of the following joint names is in the xacro than the pdb will broadcast its motor controller info.
+    possible_joints:
+      - left_ankle
+      - left_hip_aa
+      - left_hip_fe
+      - left_knee
+      - right_ankle
+      - right_hip_aa
+      - right_hip_fe
+      - right_knee
+
+
 joint_trajectory_controller:
   ros__parameters:
     update_rate: 125
@@ -32,11 +50,11 @@ joint_trajectory_controller:
       - effort
     gains:
         left_ankle: {p: 30.0, i: 0.0, d: 4.5, i_clamp: 100.0 }
-        left_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0 }
+        left_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0, ff_effort: 1.5 }
         left_hip_fe: {p: 75.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
         left_knee: {p: 75.0, i: 0.0, d: 15.0, i_clamp: 100.0 }
         right_ankle: {p: 30.0, i: 0.0, d: 4.5, i_clamp: 100.0 }
-        right_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0 }
+        right_hip_aa: {p: 50.0, i: 0.0, d: 2.0, i_clamp: 2.0, ff_effort: 1.5 }
         right_hip_fe: {p: 75.0, i: 0.0, d: 10.0, i_clamp: 100.0 }
         right_knee: {p: 75.0, i: 0.0, d: 15.0, i_clamp: 100.0 }
 
