@@ -8,12 +8,12 @@ testsetup:
           type: odrive
           actuationMode: torque
           slaveIndex: 1
-          axis: 1
+          axis: 0
           motorKV: 95
           absoluteEncoder:
             resolution: 20
-            minPositionIU: 294481
-            maxPositionIU: 565958
+            minPositionIU: 258288
+            maxPositionIU: 561200
             direction: 1
           incrementalEncoder:
             resolution: 12
