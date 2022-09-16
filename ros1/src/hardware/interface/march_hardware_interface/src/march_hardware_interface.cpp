@@ -465,31 +465,19 @@ void MarchHardwareInterface::updateMotorControllerState()
             motor_controller_state_pub_->msg_.error_status[i] = "";
         }
 
-        motor_controller_state_pub_->msg_.motor_current[i]
-            = motor_controller_state->motor_current_;
-        motor_controller_state_pub_->msg_.motor_voltage[i]
-            = motor_controller_state->motor_voltage_;
-        motor_controller_state_pub_->msg_.fet_temperature[i]
-            = motor_controller_state->fet_temperature_;
-        motor_controller_state_pub_->msg_.motor_temperature[i]
-            = motor_controller_state->motor_temperature_;
-        motor_controller_state_pub_->msg_.absolute_position_iu[i]
-            = motor_controller_state->absolute_position_iu_;
-        motor_controller_state_pub_->msg_.incremental_position_iu[i]
-            = motor_controller_state->incremental_position_iu_;
-        motor_controller_state_pub_->msg_.absolute_velocity_iu[i]
-            = motor_controller_state->absolute_velocity_iu_;
-        motor_controller_state_pub_->msg_.incremental_velocity_iu[i]
-            = motor_controller_state->incremental_velocity_iu_;
+        motor_controller_state_pub_->msg_.motor_current[i] = motor_controller_state->motor_current_;
+        motor_controller_state_pub_->msg_.motor_voltage[i] = motor_controller_state->motor_voltage_;
+        motor_controller_state_pub_->msg_.fet_temperature[i] = motor_controller_state->fet_temperature_;
+        motor_controller_state_pub_->msg_.motor_temperature[i] = motor_controller_state->motor_temperature_;
+        motor_controller_state_pub_->msg_.absolute_position_iu[i] = motor_controller_state->absolute_position_iu_;
+        motor_controller_state_pub_->msg_.incremental_position_iu[i] = motor_controller_state->incremental_position_iu_;
+        motor_controller_state_pub_->msg_.absolute_velocity_iu[i] = motor_controller_state->absolute_velocity_iu_;
+        motor_controller_state_pub_->msg_.incremental_velocity_iu[i] = motor_controller_state->incremental_velocity_iu_;
 
-        motor_controller_state_pub_->msg_.absolute_position[i]
-            = motor_controller_state->absolute_position_;
-        motor_controller_state_pub_->msg_.incremental_position[i]
-            = motor_controller_state->incremental_position_;
-        motor_controller_state_pub_->msg_.absolute_velocity[i]
-            = motor_controller_state->absolute_velocity_;
-        motor_controller_state_pub_->msg_.incremental_velocity[i]
-            = motor_controller_state->incremental_velocity_;
+        motor_controller_state_pub_->msg_.absolute_position[i] = motor_controller_state->absolute_position_;
+        motor_controller_state_pub_->msg_.incremental_position[i] = motor_controller_state->incremental_position_;
+        motor_controller_state_pub_->msg_.absolute_velocity[i] = motor_controller_state->absolute_velocity_;
+        motor_controller_state_pub_->msg_.incremental_velocity[i] = motor_controller_state->incremental_velocity_;
     }
 
     motor_controller_state_pub_->unlockAndPublish();

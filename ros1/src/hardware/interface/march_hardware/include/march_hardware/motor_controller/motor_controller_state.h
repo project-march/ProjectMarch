@@ -26,11 +26,9 @@ public:
 
     friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
-        return lhs.motor_current_ == rhs.motor_current_
-            && lhs.motor_voltage_ == rhs.motor_voltage_
+        return lhs.motor_current_ == rhs.motor_current_ && lhs.motor_voltage_ == rhs.motor_voltage_
             && lhs.motor_controller_voltage_ == rhs.motor_controller_voltage_
-            && lhs.fet_temperature_ == rhs.fet_temperature_
-            && lhs.motor_temperature_ == rhs.motor_temperature_
+            && lhs.fet_temperature_ == rhs.fet_temperature_ && lhs.motor_temperature_ == rhs.motor_temperature_
             && lhs.absolute_position_iu_ == rhs.absolute_position_iu_
             && lhs.incremental_position_iu_ == rhs.incremental_position_iu_
             && lhs.absolute_velocity_iu_ == rhs.absolute_velocity_iu_
