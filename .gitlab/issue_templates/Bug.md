@@ -1,27 +1,29 @@
-### Summary
 
-<!-- Summarize the bug encountered concisely. -->
+## Describe the bug
 
-### Steps to reproduce
+A clear and concise description of what the bug is.
 
-<!-- Describe how one can reproduce the issue - this is very important. Please use an ordered list. -->
+## To Reproduce
 
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-### What is the current *bug* behavior?
+## Expected behavior
 
-<!-- Describe what actually happens. -->
+A clear and concise description of what you expected to happen.
 
-### What is the expected *correct* behavior?
+## Possible fix
 
-<!-- Describe what you should see instead. -->
+Link to code: ...
 
-### Relevant logs and/or screenshots
+Add any attempt tried to fix the bug.
 
-<!-- Paste any relevant logs - please use code blocks (```) to format console output, logs, and code
- as it's tough to read otherwise. -->
+## Additional notes
 
+Add any other context about the problem here.
 
-### Possible fixes
-
-<!-- If you can, link to the line of code that might be responsible for the problem. -->
-
+/label ~Bug
+/assign @name

@@ -1,31 +1,38 @@
-<!--
-To streamline the process of creating and reviewing pull requests, we have created a template.
-It is not required to follow this template perfectly, but we encourage you to think about each header.
-Before you publish a pull request think about the definition of done for the issue you are trying to resolve.
--->
+# Description
+<!---
+Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
+Include following information in the summary when possible:
+What is the feature?
+How you implemented the solution?
+Does it impact any other area of the project?
+How to test the feature (A test scenario or any new setup)?
 
-<!--
-Provide the key for the issue this PR resolves.
--->
+Fixes #  (issue)
+--->
+## Type of change
+<!---
+Please delete options that are not relevant.
+--->
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] This change requires a documentation update
 
-Closes #x
+# How Has This Been Tested?
+<!---
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
 
-## Description
-<!--
-Provide a concise description on the feature/fix your pull request implements.
--->
+- [ ] Test A
 
-## Changes
-<!--
-Provide a list of important changes.
-e.g.
-* Added tests
-* Renamed variable
-* Added topic
--->
+--->
 
-## Testing
+# Checklist before merge:
 
-<!-- Provide additional information necessary for testing this PR. This includes details like branches in other repos, launch arguments or gait directories. In the case of a bug fix, provide the steps to reproduce the bug.-->
-
-<!-- Reviews are automatically requested after the pull request has been created. Only request for a review if you want a specific person to review your changes.-->
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
