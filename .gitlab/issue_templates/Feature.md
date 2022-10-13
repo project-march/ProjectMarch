@@ -9,11 +9,15 @@
 ### Possible solutions
 <!-- possible provide suggestions on solutions. If multiple solutions are possible consider listing them all -->
 
-### Definition of done
+### Acceptance Criteria
 <!-- Define when this feature is considered done. Be very concrete so everybody knows when task is finished -->
+
 
 ## Action plan
 
-<!-- Suggest next steps -->
+<!-- Steps to be taken to implement the feature -->
+
+/label ~Issues
+/assign @name 
 
 
