@@ -1,7 +1,0 @@
-<launch>
-    <node name="march_stone_finder"
-          pkg="march_stone_finder"
-          type="march_stone_finder"
-          output="screen">
-    </node>
-</launch>
