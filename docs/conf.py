@@ -61,7 +61,6 @@ rst_prolog = """
 """
 
 gitlab_root = html_context["gitlab_url"] + html_context["gitlab_user"] + "/"
-ros1_src = "march/-/blob/main/ros1/src/"
 
 # Links
 extlinks = {

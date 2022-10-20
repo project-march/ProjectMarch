@@ -48,28 +48,7 @@ x-gui:
           - capabilities: [ gpu ]
 
 services:
-  ros1-service: &ros1-service
-    << : *gui-standard
-    container_name: ros1
-    image: ros1
-    environment:
-      - USER=${USER}
-      - DISPLAY=${DISPLAY}
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=all
-      - __NV_PRIME_RENDER_OFFLOAD=1
-      - __GLX_VENDOR_LIBRARY_NAME=nvidia
-      - ROS_MASTER_URI=http://ros1-service:11311
-      - ROS_DOCKER_TYPE="ros1"
-      - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
-      - ROS_ARGS
-      - ROS1_ARGS
-    working_dir: /home/${USER}/march/ros1
-    ipc: host # The reason 'host' is chosen instead of 'shareable' is so that the containers can run in isolation of each other.
-    ports: ["11311"] # Needed for rviz visualization
-    command: ["bash",  "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros1.bash"]
-
-  ros2-service:
+   ros2-service:
     << : *gui-standard
     container_name: ros2
     image: ros2
@@ -88,26 +67,4 @@ services:
     working_dir: /home/${USER}/march/ros2
     ipc: host # The reason 'host' is chosen instead of the usual 'container:ros1' is so that the containers can run in isolation of each other.
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros2.bash"]
-
-  bridge-service:
-    << : *gui-standard
-    container_name: bridge
-    image: bridge
-    environment:
-      - USER=${USER}
-      - DISPLAY=${DISPLAY}
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=all
-      - __NV_PRIME_RENDER_OFFLOAD=1
-      - __GLX_VENDOR_LIBRARY_NAME=nvidia
-      - ROS_MASTER_URI=http://ros1-service:11311
-      - ROS_DOCKER_TYPE="bridge"
-      - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
-    working_dir: /home/${USER}/ros1_bridge
-    ipc: host # The reason 'host' is chosen instead of the usual 'container:ros1' is so that the containers can run in isolation of each other.
-    depends_on:
-      - ros1-service
-    command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/bridge.bash"]
-
-
 
