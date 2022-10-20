@@ -79,6 +79,7 @@ alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-
 # Format code
 alias format_cpp='cm && python3 .scripts/run-clang-format.py -r ros2/src --style=file -i'
 alias format_py='cm && black .'
+alias format='format_cpp && format_py'
 
 # Static analysis shortcuts (needs clang-tidy: `sudo apt-get install -y clang-tidy`)
 alias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'

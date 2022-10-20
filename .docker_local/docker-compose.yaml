@@ -1,5 +1,5 @@
 version: "3.9"
-# This docker-compose file is to start up ros1, ros2 and the bridge with gui support.
+# This docker-compose file is to start up ros2 with gui support.
 # For more information on how:
 #   • to use it: checkout https://docs.projectmarch.nl/doc/getting_started/setting_up_docker.html
 #   • this file is made: checkout https://docs.docker.com/compose/compose-file/compose-file-v3/
@@ -19,7 +19,6 @@ x-gui:
   environment:
     - USER=${USER}
     - DISPLAY=${DISPLAY}
-    - ROS_MASTER_URI=http://ros1-service:11311
   volumes:
     # This makes the container mount your home directory.
     - /home/$USER:/home/$USER:rw
@@ -44,12 +43,11 @@ services:
     environment:
       - USER=${USER}
       - DISPLAY=${DISPLAY}
-      - ROS_MASTER_URI=http://ros1-service:11311
       - ROS_DOCKER_TYPE="ros2"
       - ROS_DOCKER_START_TYPE=${ROS_DOCKER_START_TYPE}
       - ROS_ARGS
       - ROS2_ARGS
     working_dir: /home/${USER}/march/ros2
-    ipc: host  # The reason 'host' is chosen (and not 'container:ros1') is so that the containers can run in isolation of each other.
+    ipc: host
     command: ["bash", "${HOME}/march/.docker_local/start_scripts/${ROS_DOCKER_START_TYPE:-bash}/ros2.bash"]
 

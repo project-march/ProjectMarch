@@ -66,7 +66,7 @@
       variables:
         TAG: $CI_COMMIT_BRANCH
 
-# Define the values of the ROS1 and ROS2 specific instances of
+# Define the values of the ROS2 specific instances of
 # the ".base_builder" job
 
 foxy:build:
