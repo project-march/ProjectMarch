@@ -37,7 +37,7 @@ In effort mode you can only actuate using a target torque using ``actuateTorque(
 This error was caused by mixing the actuate methods and actuation modes. See
 the detailed description for which mode the controller was actually in.
 
-**Fix:** Check if the actuation mode defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Fix:** Check if the actuation mode defined in the `robots yaml <march_hardware_builder/robots>`
 you use is consistent with the methods you are using to actuate the joint.
 
 
@@ -49,7 +49,7 @@ Invalid IU position command.
 
 **Cause:** The position you are trying to actuate to is not a valid target within the range of the joint.
 
-**Fix:** Check that the IU limits defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Fix:** Check that the IU limits defined in the `robots yaml <march_hardware_builder/robots>`
 under ``joints/<joint_name>/imotioncube/encoder`` match the actual limits of the joint.
 
 
@@ -73,9 +73,9 @@ been fixed.
 A joint is outside its defined hard limits.
 
 **Cause:** A joint was found to be outside its defined hard limits in the
-:hardware-interface:`robots yaml <march_hardware_builder/robots>`.
+`robots yaml <march_hardware_builder/robots>`.
 
-**Fix:** Check that the IU limits defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Fix:** Check that the IU limits defined in the `robots yaml <march_hardware_builder/robots>`
 under ``joints/<joint_name>/imotioncube/encoder`` match the actual limits of the joint and recalibrate if necessary.
 
 
@@ -116,7 +116,7 @@ The to be added PDO object was not defined.
 **Cause:** The PDO that is being mapped does not have a defined address and size.
 
 **Fix:** Check that the PDO is defined in the ``all_objects`` map in the
-:hardware-interface:`PDOmap <march_hardware/src/ethercat/pdo_map.cpp>` class.
+`PDOmap <march_hardware/src/ethercat/pdo_map.cpp>` class.
 
 
 .. _e107:
