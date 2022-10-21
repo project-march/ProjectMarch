@@ -16,8 +16,6 @@ Before running al test you first need to **build** and **source** your workspace
 
 .. code::
 
-  march_build_ros1 && sros1
-  # or
   march_build_ros2 && sros2
 
 Afterwards you can run the following command to run all tests in the current directory:

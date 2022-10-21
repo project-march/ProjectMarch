@@ -78,11 +78,11 @@ Process Data Objects (PDOs) are the cyclic and continuous type of messages of
 EtherCAT, and the main form of exchanging data with the slaves. Reading and
 writing EtherCAT PDO messages is possible through the other classes in the
 march_hardware package (e.g. Joint, IMotionCube, Encoder, PowerDistributionBoard).
-For example, the :hardware-interface:`Encoder class <march_hardware/include/march_hardware/encoder/encoder.h>`
+For example, the `Encoder class <march_hardware/include/march_hardware/encoder/encoder.h>`
 ``getAngleIU()`` function reads and returns the latest encoder value that was
 received by the EthercatMaster. Functions such as ``getAngleIU()`` all call the
 same generic interface for reading from and writing to slaves. The generic
-interface is defined in :hardware-interface:`pdo_interface.cpp <march_hardware/include/march_hardware/ethercat/pdo_interface.h>`.
+interface is defined in `pdo_interface.cpp <march_hardware/include/march_hardware/ethercat/pdo_interface.h>`.
 
 .. note::
   When reading or writing PDO messages over EtherCAT via SOEM, you need three
@@ -100,7 +100,7 @@ SDO messages
 ************
 Service Data Objects (SDOs) are non-cyclic EtherCAT messages. They are used for
 sending one-time messages, for example when initializing an IMotionCube.
-The generic SDO interface can be found in :hardware-interface:`sdo_interface.h <march_hardware/include/march_hardware/ethercat/sdo_interface.h>`.
+The generic SDO interface can be found in `sdo_interface.h <march_hardware/include/march_hardware/ethercat/sdo_interface.h>`.
 
 Power Distribution Board
 ------------------------
@@ -125,14 +125,14 @@ controlling the high voltage and low voltage nets.
 .. note::
   The functionality of the PowerDistributionBoard is highly dependent on the
   software running on the LPC1768 of the Power Distribution Board. See the
-  :ethercat-slaves:`ethercat-slaves repository <src/pdb>` for the LPC1768 code.
+  `ethercat-slaves repository <src/pdb>` for the LPC1768 code.
 
 Exceptions
 ----------
 Because safety is very important, the march_hardware package will throw an
 exception whenever it encounters something that should not happen. The
 march_hardware package implements custom exceptions in the
-:hardware-interface:`error module <march_hardware/include/march_hardware/error>`
+`error module <march_hardware/include/march_hardware/error>`
 with error types for different situations. See :ref:`error-codes` for all types
 of errors and how to possibly fix them. When such an exception occurs, the high
 voltage is turned off and the exoskeleton will stop moving.

@@ -33,7 +33,7 @@ Event Stream Processing
 At March we use the `Event Stream Processing` engine from `SAS <https://www.sas.com/nl_nl/home.html>`_.
 Here we will just describe the integration in the `march_data_collector`, but more information on `ESP` and how we use it can be found at :ref:`event stream processing <event-stream-processing-label>`.
 The engine allows for real-time data analysis and processing. With the installation also comes a module to inject events, which is used in this package.
-The :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>` functions as the interface between our software and ESP. This ROS node subscribes to
+The `esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>` functions as the interface between our software and ESP. This ROS node subscribes to
 ROS topics containing interesting data. It converts the ROS messages into csv strings and injects the data into the correct window of the ESP engine.
 Injecting data can only happen into a source window.
 
@@ -41,11 +41,11 @@ Injecting data can only happen into a source window.
 Adding a publisher into `ESP`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 1.
-    Add a source window to the :march:`model <march_data_collector/esp_models/project_march.xml>`.
+    Add a source window to the `model <march_data_collector/esp_models/project_march.xml>`.
 
 2.
     Create a callback function that takes a ROS message and calls the ``send_to_esp`` function with the msgs as csv
-    string in :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>`.
+    string in `esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>`.
 
 3.
     In the same file add a call to ``configure_source`` to the ``__init__``.

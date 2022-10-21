@@ -8,7 +8,7 @@ URDF is an xml format and is preferred to be written using `xacro <https://wiki.
 an xml macro language. This enables us to write shorter and more readable robot descriptions.
 
 Since the ROS ``urdf`` package can only parse the URDF format, we must first process the xacro files.
-This is done at build time and is described in the :march:`CMakeLists.txt <march_description/CMakeLists.txt>`.
+This is done at build time and is described in the `CMakeLists.txt <march_description/CMakeLists.txt>`.
 Both the ``*.urdf`` and ``*.xacro`` files are installed into the ``march_description`` package.
 In the launch files these files can be uploaded to the parameter server at ``/robot_description``,
 so that they are available for all nodes.
@@ -18,7 +18,7 @@ so that they are available for all nodes.
   <param name="robot_description" textfile="$(find march_description)/urdf/march4.urdf"/>
 
 The ``*.xacro`` files are also installed since xacro allows for file arguments.
-This is used in the :simulation:`march_world.launch <march_simulation/launch/march_world.launch>`.
+This is used in the `march_world.launch <march_simulation/launch/march_world.launch>`.
 
 .. code::
 

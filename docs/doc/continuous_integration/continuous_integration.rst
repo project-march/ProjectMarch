@@ -61,11 +61,11 @@ The template uses the ``UPSTREAM_WORKSPACE``. This workspace contains packages
 necessary to build the current package. So it downloads the repositories
 defined in ``dependencies.rosinstall`` file and builds the current package
 against those. This type of workspace is used for example by
-:gait-generation:`gait-generation <.travis.yml>` and :simulation:`simulation <.travis.yml>`.
+`gait-generation <.travis.yml>` and `simulation <.travis.yml>`.
 The other type of workspace that can be used is the ``DOWNSTREAM_WORKSPACE``.
 The downstream workspace contains packages that depend on the current package.
 It builds and runs tests on downstream packages to check if there are any
-breaking changes. This is currently only used in :march:`march <.travis.yml>`.
+breaking changes. This is currently only used in `march <.travis.yml>`.
 
 Finally, there is the ``AFTER_SCRIPT`` option. This runs the given script after
 all the default tests. Currently, it is set in the template to run roslint on

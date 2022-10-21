@@ -103,14 +103,14 @@ Nodes
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
-*/march/error* (:march:`march_shared_resources/msg/Error <march_shared_resources/msg/Error.msg>`)
+*/march/error* (`march_shared_resources/msg/Error <march_shared_resources/msg/Error.msg>`)
   Listens for errors and shuts down when a fatal is thrown.
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/gait_selection/current_state* (:march:`march_shared_resources/msg/CurrentState <march_shared_resources/msg/CurrentState.msg>`)
+*/march/gait_selection/current_state* (`march_shared_resources/msg/CurrentState <march_shared_resources/msg/CurrentState.msg>`)
   Publishes the current state of the state machine
-*/march/gait_selection/current_gait* (:march:`march_shared_resources/msg/CurrentGait <march_shared_resources/msg/CurrentGait.msg>`)
+*/march/gait_selection/current_gait* (`march_shared_resources/msg/CurrentGait <march_shared_resources/msg/CurrentGait.msg>`)
   Sends details about the current gait being performed
 
 Services
@@ -118,7 +118,7 @@ Services
 */march/gait_selection/get_version_map* (`std_srvs/srv/Trigger <https://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Returns the current loaded gait version map.
 
-*/march/gait_selection/set_gait_version* (:march:`march_shared_resources/srv/SetGaitVersion <march_shared_resources/srv/SetGaitVersion.srv>`)
+*/march/gait_selection/set_gait_version* (`march_shared_resources/srv/SetGaitVersion <march_shared_resources/srv/SetGaitVersion.srv>`)
   Sets a new gait version map in the gait_selection.
 
 */march/gait_selection/get_directory_structure* (`std_srvs/srv/Trigger <https://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
@@ -127,10 +127,10 @@ Services
 */march/gait_selection/update_default_versions* (`std_srvs/srv/Trigger <https://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Calls the update_default_versions function of the gait_selection.
 
-*/march/gait_selection/contains_gait* (:march:`march_shared_resources/srv/ContainsGait <march_shared_resources/srv/ContainsGait.srv>`)
+*/march/gait_selection/contains_gait* (`march_shared_resources/srv/ContainsGait <march_shared_resources/srv/ContainsGait.srv>`)
   Checks if gait is in parsed gaits in the gait selection module.
 
-*/march/gait_selection/get_possible_gaits* (:march:`march_shared_resources/srv/PossibleGaits <march_shared_resources/srv/PossibleGaits.srv>`)
+*/march/gait_selection/get_possible_gaits* (`march_shared_resources/srv/PossibleGaits <march_shared_resources/srv/PossibleGaits.srv>`)
   Checks if gait is in parsed gaits in the gait selection module.
 
 Parameters
