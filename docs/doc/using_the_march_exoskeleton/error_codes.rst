@@ -251,7 +251,7 @@ sensors can be connected to a slave.
 A joint is not allowed to actuate, yet it's trying to actuate.
 
 **Cause:** A joint must have enabled actuation in order to actuate. This value can be set in the
-:hardware-interface:`robots yaml <march_hardware_builder/robots>`.
+`robots yaml <march_hardware_builder/robots>`.
 
 **Fix:** Check that the joints that you are trying to actuate are actually allowed to actuate.
 
@@ -265,7 +265,7 @@ Slave index has an invalid value.
 **Cause:** When slaves are created with a slave index, it is made sure that the indices are not lower than 1.
 Since index 0 is the master itself and values lower than 0 are not valid indices.
 
-**Fix:** If you are using a :hardware-interface:`robots yaml <march_hardware_builder/robots>`, make sure that all
+**Fix:** If you are using a `robots yaml <march_hardware_builder/robots>`, make sure that all
 slave indices are defined as integers higher than 0.
 
 
@@ -280,8 +280,8 @@ yaml for building a March robot. The joints defined in the URDF are required for
 soft and hard limits of the joint and the builder cannot continue without them.
 
 **Fix:** Check that all the joints defined in the
-:hardware-interface:`robots yaml <march_hardware_builder/robots>` are defined
-in the URDF that you are using from :march:`march_description/urdf <march_description/urdf>`.
+`robots yaml <march_hardware_builder/robots>` are defined
+in the URDF that you are using from `march_description/urdf <march_description/urdf>`.
 
 
 .. _e119:
@@ -290,7 +290,7 @@ in the URDF that you are using from :march:`march_description/urdf <march_descri
 ------------------------------
 A required robot config key from the robots yaml was not defined.
 
-**Cause:** Some keys in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Cause:** Some keys in the `robots yaml <march_hardware_builder/robots>`
 are required to build a functional robot and the build cannot be finished without
 these keys.
 

@@ -32,7 +32,7 @@ Currently, the hardware interface can use two types of controllers: position
 and effort controllers. Effort control is currently the default. The
 march_hardware_interface package is also responsible for launching the
 controllers and providing their configurations. These configurations are stored
-in the :hardware-interface:`config <march_hardware_interface/config>` directory.
+in the `config <march_hardware_interface/config>` directory.
 These contain settings for the PID controllers and the joint trajectory action
 server. See the `Controllers`_ section on the ros_control wiki for more info on
 what type of controllers exists and how to configure them.
@@ -88,14 +88,14 @@ march_hardware_interface_node
 
     ./march_hardware_interface_node march4
 
-  The :hardware-interface:`hardware.launch <march_hardware_interface/launch/hardware.launch>`
+  The `hardware.launch <march_hardware_interface/launch/hardware.launch>`
   file has a launch argument, which it passes to the node.
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/imc_states* (:march:`march_shared_resources/ImcState <march_shared_resources/msg/ImcState.msg>`)
+*/march/imc_states* (`march_shared_resources/ImcState <march_shared_resources/msg/ImcState.msg>`)
   Publishes statuses of all iMotionCubes every control loop.
 
-*/march/controller/after_limit_joint_command* (:march:`march_shared_resources/AfterLimitJointCommand <march_shared_resources/msg/AfterLimitJointCommand.msg>`)
+*/march/controller/after_limit_joint_command* (`march_shared_resources/AfterLimitJointCommand <march_shared_resources/msg/AfterLimitJointCommand.msg>`)
   Publishes joint commands after they have been limited by the joint safety
   limit controller.

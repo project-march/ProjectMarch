@@ -17,7 +17,7 @@ Each graph represents a single joint of the exoskeleton and displays the traject
 
 .. tip::
   If you want to change the amount of joints you are working with,
-  edit the ``<robot>.xacro`` specified in the :gait-generation:`launch file <march_rqt_gait_generator/launch/march_rqt_gait_generator.launch>`
+  edit the ``<robot>.xacro`` specified in the `launch file <march_rqt_gait_generator/launch/march_rqt_gait_generator.launch>`
 
 On the y-axes of the graphs the joint angles in degrees are shown. On the x-axes the time in seconds is shown.
 The trajectory is defined by several setpoints which are shown as small red circles.

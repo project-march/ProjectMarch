@@ -56,10 +56,10 @@ Subscribed Topics
 Published Topics
 ^^^^^^^^^^^^^^^^
 
-*/march/error* (:march:`march_shared_resources/Error <march_shared_resources/msg/Error.msg>`)
+*/march/error* (`march_shared_resources/Error <march_shared_resources/msg/Error.msg>`)
   Publish error for other packages to make it able to respond to errors. This error message is also logged.
 
-*/march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
+*/march/input_device/instruction* (`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
   Send instructions to the state machine. This topic is only used to send an stop instruction.
 
 
@@ -76,7 +76,7 @@ This is pretty straightforward to do. This tutorial will mostly give remarks and
 * Add your new rule to the most suited ``SafetyType``, if no ``SafetyType`` implementations are suited,
   create a new one (see :ref:`march-safety-add-new-rule-label`).
 * When using values that are probably going to change in the future place them as parameter in the
-  :march:`safety_settings.yaml <march_safety/launch/safety_settings.yaml>` file. Definitely do this
+  `safety_settings.yaml <march_safety/launch/safety_settings.yaml>` file. Definitely do this
   with values that are probably going to be changed by other team members, by placing the value in the
   settings file you make it much easier for them.
 * It's possible that the new rule is automatically called, for example because it's a callback. However, when this is not the case
@@ -88,7 +88,7 @@ Create new SafetyType
 ^^^^^^^^^^^^^^^^^^^^^
 For this example we will create a safety type which checks the temperature.
 
-* Set temperature threshold in the :march:`safety_settings.yaml <march_safety/launch/safety_settings.yaml>` file, this way the threshold is easy to adjust.
+* Set temperature threshold in the `safety_settings.yaml <march_safety/launch/safety_settings.yaml>` file, this way the threshold is easy to adjust.
 * Create a class ``TemperatureSafety`` which extends ``SafetyType``
 * In the constructor of this class you probably want to:
 
@@ -132,7 +132,7 @@ For this example we will create a safety type which checks the temperature.
     {
     }
 
-* Finally you need to add the ``TemperatureSafety`` to the ``safety_list`` in the :march:`safety_node.cpp <march_safety/src/safety_node.cpp>`:
+* Finally you need to add the ``TemperatureSafety`` to the ``safety_list`` in the `safety_node.cpp <march_safety/src/safety_node.cpp>`:
 
 .. code:: cpp
 
