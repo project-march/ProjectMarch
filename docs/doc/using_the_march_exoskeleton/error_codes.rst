@@ -161,7 +161,7 @@ The ethercat master failed to open a raw network socket.
 3. The ethernet port on the machine is not connected.
 
 **Fix:** First, make sure that you connected your machine to a slave.
-Next, check if the ``ifname`` defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+Next, check if the ``ifname`` defined in the `robots yaml <march_hardware_builder/robots>`
 has an existing socket name. You can list available sockets with
 
 .. code::
@@ -180,11 +180,11 @@ So this should not be an issue unless you changed something very specific.
 The ethercat master was not able to find all configured slaves during initialization.
 
 **Cause:** The ethercat master was not able to establish a connection with the configured amount of slaves
-in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, because a cable is not connected or the
+in the `robots yaml <march_hardware_builder/robots>`, because a cable is not connected or the
 configuration contains more slaves than actually connected.
 
 **Fix:** Check if all ethernet cables are correctly connected to the in- and outputs of the slaves you want to
-connect to. Finally, check if the slaves configured in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+connect to. Finally, check if the slaves configured in the `robots yaml <march_hardware_builder/robots>`
 have the correct slave indices.
 
 
@@ -208,9 +208,9 @@ verify that those are correct.
 The encoder CPR (counts per rotation) is outside the allowed range.
 
 **Cause:** The given encoder CPR to construct an encoder are outside its allowed limits defined in
-:hardware-interface:`encoder.h <march_hardware/include/march_hardware/encoder/encoder.h>`.
+`encoder.h <march_hardware/include/march_hardware/encoder/encoder.h>`.
 
-**Fix:** Check if the CPR specified in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are
+**Fix:** Check if the CPR specified in the `robots yaml <march_hardware_builder/robots>` are
 within this range.
 
 
@@ -224,9 +224,9 @@ The lower and upper limits of an encoder are conflicting.
 limits. Furthermore, it checks if the soft limits are within the defined hard limits. This is to make sure that the
 joints can safely actuate.
 
-**Fix:** The encoder limits are defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so
+**Fix:** The encoder limits are defined in the `robots yaml <march_hardware_builder/robots>`, so
 make sure that the lower limit is lower than the upper limit in incremental units. If the encoder is built from the
-``march_hardware_builder`` then the soft limits are extracted from the :march:`URDF <march_description/urdf>` of the used robot.
+``march_hardware_builder`` then the soft limits are extracted from the `URDF <march_description/urdf>` of the used robot.
 Make sure that the limits in the URDF are also non-conflicting.
 
 
@@ -239,7 +239,7 @@ The slave configuration contains duplicate slave indices
 **Cause:** Before the ethercat train is started, the configured slaves indices are checked for duplicate indices.
 This makes sure that no two controllers will write to the same slave.
 
-**Fix:** Check the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so that it does not contain
+**Fix:** Check the `robots yaml <march_hardware_builder/robots>`, so that it does not contain
 duplicate indices on iMOTIONCUBES. Temperature sensors can have duplicate slave indices, since multiple temperature
 sensors can be connected to a slave.
 
