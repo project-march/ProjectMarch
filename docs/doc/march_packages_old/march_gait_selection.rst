@@ -87,8 +87,7 @@ the one introducing the principle is this `paper <https://ieeexplore-ieee-org.tu
 A capture point is calculated in the :ref:`march-data-collector-label` based on the inverted pendulum model and the movement of the center of mass.
 We use the motion planning framework MoveIt to calculate a trajectory for the swing leg towards this point. For the stance leg, the regular
 gait file is used to determine the endpoint and MoveIt is then used to calculate a trajectory towards this point.
-The balance gait class then uses the `python moveIt commander Interface <https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html>`_ to plan. More information on MoveIt and
-the integration can be found at :ref:`march-moveit-label`.
+The balance gait class then uses the `python moveIt commander Interface <https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html>`_ to plan.
 
 .. note:: Improved versions of the balance walk gait are continuously researched and developed.
     The above description is likely slightly outdated.
