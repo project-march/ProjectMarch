@@ -7,7 +7,7 @@ Overview
 --------
 The march_input_device is the software running on the |march| input device. The input device is used
 to give input to the software running on the |march|. See the
-:input-device:`project-march/input-device <>` repository for more info.
+`project-march/input-device <>` repository for more info.
 
 
 ROS API
@@ -17,7 +17,7 @@ This can be run wired via usb cable or wireless via wifi connection.
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
+*/march/input_device/instruction* (`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
   Sends instructions to execute
 
 */march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
@@ -25,7 +25,7 @@ Published Topics
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
-*/march/input_device/instruction_response* (:march:`march_shared_resources/GaitInstructionResponse <march_shared_resources/msg/GaitInstructionResponse.msg>`)
+*/march/input_device/instruction_response* (`march_shared_resources/GaitInstructionResponse <march_shared_resources/msg/GaitInstructionResponse.msg>`)
   Receives responses to instructions executed on */march/input_device/instruction*
 
 
@@ -57,7 +57,7 @@ How to run wired
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Skip this section if the correct code for running wired is already on the input device.
-For more detailed information on how to run and upload the code see the :input-device:`README <>`.
+For more detailed information on how to run and upload the code see the `README <>`.
 
 .. code::
 
@@ -82,11 +82,11 @@ How to run wireless
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Skip this section if the correct code for running wireless is already on the input device.
-For more detailed information on how to run and upload the code see the :input-device:`README <>`.
+For more detailed information on how to run and upload the code see the `README <>`.
 
 - Uncomment ``#define USE_WIRELESS`` in the *main.cpp*.
 - Type in terminal: ``hostname -I``, this is your IP address.
-- Open :input-device:`wireless_connection.h <include/wireless_connection.h>`
+- Open `wireless_connection.h <include/wireless_connection.h>`
 
   - at ``IPAddress server(x, x, x, x)`` fill the xs with the four numbers
     of your IP address from the previous step.
@@ -158,5 +158,5 @@ How to add a gait
 
   This creates a connection between the new_gait and walk screens. From new_gait
   we can move right to walk and from walk we can move left to new_gait. See the
-  :input-device:`state.h <include/state.h>` header file for more methods to
+  `state.h <include/state.h>` header file for more methods to
   connect states.

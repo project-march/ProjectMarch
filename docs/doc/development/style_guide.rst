@@ -23,7 +23,7 @@ Running style checkers
 In order to make checking for style guides easier we use tools to automatically check the code.
 We use `clang-format <https://clang.llvm.org/docs/ClangFormat.html>`_ for C++ and
 `flake8 <https://flake8.pycqa.org/en/latest/>`_ for Python. These are configured in ``.clang-format``
-and ``.flake8`` files in the root of a repository. See the :march:`march repo <>` for examples of these files.
+and ``.flake8`` files in the root of a repository. See the`march repo <>` for examples of these files.
 The ``.clang-format`` files are based on the one from https://github.com/davetcoleman/roscpp_code_format.
 
 clang-format

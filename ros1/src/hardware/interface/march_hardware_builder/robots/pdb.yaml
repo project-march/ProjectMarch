@@ -1,7 +1,0 @@
-power_distribution_board:
-  if_name: enp7s0
-  ecatCycleTime: 4
-  ecatSlaveTimeout: 50
-  power_distribution_board:
-      slaveIndex: 1
-      byteOffset: 0

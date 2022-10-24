@@ -1,6 +1,0 @@
-<!-- This will reference to libmarch_controller_template.so file in the install directory that is created during build -->
-<library path="lib/libmarch_controller_template">
-    <class name="template_trajectory_controller/JointTrajectoryController"
-           type="template_trajectory_controller::JointTrajectoryController"
-           base_class_type="controller_interface::ControllerBase" />
-</library>

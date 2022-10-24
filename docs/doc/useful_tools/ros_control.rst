@@ -8,5 +8,5 @@ some standard controllers, for example, a position controller and an effort cont
 `ros_controllers <https://wiki.ros.org/ros_controllers>`_.
 
 The hardware interface for the |march| is contained in
-:hardware-interface:`march_hardware_interface </march_hardware_interface>` package.
+`march_hardware_interface </march_hardware_interface>` package.
 See also the :ref:`march-hardware-interface-label` page.

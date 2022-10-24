@@ -21,4 +21,4 @@ WORKDIR /home/march
 
 ENTRYPOINT ["flake8", "--config", "/.flake8"]
 
-CMD ["ros1/src", "ros2/src", "utility_scripts/"]
+CMD ["", "ros2/src", "utility_scripts/"]

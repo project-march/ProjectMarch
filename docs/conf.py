@@ -61,7 +61,6 @@ rst_prolog = """
 """
 
 gitlab_root = html_context["gitlab_url"] + html_context["gitlab_user"] + "/"
-ros1_src = "march/-/blob/main/ros1/src/"
 
 # Links
 extlinks = {
@@ -73,14 +72,14 @@ extlinks = {
         gitlab_root + "march/tree/" + html_context["gitlab_version"] + "/%s",
         "",
     ),
-    "hardware-interface": (gitlab_root + ros1_src + "march_hardware_interface/%s", ""),
-    "input-device": (gitlab_root + "input-device/-/tree/main/%s", ""),
-    "march": (gitlab_root + ros1_src + "%s", ""),
-    "monitor": (gitlab_root + ros1_src + "march_monitor/%s", ""),
-    "simulation": (gitlab_root + ros1_src + "march_simulation_cpp/%s", ""),
-    "gait-files": (gitlab_root + ros1_src + "march_gait_files/%s", ""),
-    "ethercat-slaves": (gitlab_root + "ethercat-slaves/-/tree/main/%s", ""),
-    "gait-generation": (gitlab_root + ros1_src + "march_rqt_gait_generator/%s", ""),
+    # "hardware-interface": (gitlab_root + ros1_src + "march_hardware_interface/%s", ""),
+    # "input-device": (gitlab_root + "input-device/-/tree/main/%s", ""),
+    # "march": (gitlab_root + ros1_src + "%s", ""),
+    # "monitor": (gitlab_root + ros1_src + "march_monitor/%s", ""),
+    # "simulation": (gitlab_root + ros1_src + "march_simulation_cpp/%s", ""),
+    # "gait-files": (gitlab_root + ros1_src + "march_gait_files/%s", ""),
+    # "ethercat-slaves": (gitlab_root + "ethercat-slaves/-/tree/main/%s", ""),
+    # "gait-generation": (gitlab_root + ros1_src + "march_rqt_gait_generator/%s", ""),
     "march_website": ("https://projectmarch.nl", ""),
 }
 

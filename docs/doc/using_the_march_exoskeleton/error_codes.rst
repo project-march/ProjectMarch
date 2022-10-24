@@ -37,7 +37,7 @@ In effort mode you can only actuate using a target torque using ``actuateTorque(
 This error was caused by mixing the actuate methods and actuation modes. See
 the detailed description for which mode the controller was actually in.
 
-**Fix:** Check if the actuation mode defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Fix:** Check if the actuation mode defined in the `robots yaml <march_hardware_builder/robots>`
 you use is consistent with the methods you are using to actuate the joint.
 
 
@@ -49,7 +49,7 @@ Invalid IU position command.
 
 **Cause:** The position you are trying to actuate to is not a valid target within the range of the joint.
 
-**Fix:** Check that the IU limits defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Fix:** Check that the IU limits defined in the `robots yaml <march_hardware_builder/robots>`
 under ``joints/<joint_name>/imotioncube/encoder`` match the actual limits of the joint.
 
 
@@ -73,9 +73,9 @@ been fixed.
 A joint is outside its defined hard limits.
 
 **Cause:** A joint was found to be outside its defined hard limits in the
-:hardware-interface:`robots yaml <march_hardware_builder/robots>`.
+`robots yaml <march_hardware_builder/robots>`.
 
-**Fix:** Check that the IU limits defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Fix:** Check that the IU limits defined in the `robots yaml <march_hardware_builder/robots>`
 under ``joints/<joint_name>/imotioncube/encoder`` match the actual limits of the joint and recalibrate if necessary.
 
 
@@ -116,7 +116,7 @@ The to be added PDO object was not defined.
 **Cause:** The PDO that is being mapped does not have a defined address and size.
 
 **Fix:** Check that the PDO is defined in the ``all_objects`` map in the
-:hardware-interface:`PDOmap <march_hardware/src/ethercat/pdo_map.cpp>` class.
+`PDOmap <march_hardware/src/ethercat/pdo_map.cpp>` class.
 
 
 .. _e107:
@@ -161,7 +161,7 @@ The ethercat master failed to open a raw network socket.
 3. The ethernet port on the machine is not connected.
 
 **Fix:** First, make sure that you connected your machine to a slave.
-Next, check if the ``ifname`` defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+Next, check if the ``ifname`` defined in the `robots yaml <march_hardware_builder/robots>`
 has an existing socket name. You can list available sockets with
 
 .. code::
@@ -180,11 +180,11 @@ So this should not be an issue unless you changed something very specific.
 The ethercat master was not able to find all configured slaves during initialization.
 
 **Cause:** The ethercat master was not able to establish a connection with the configured amount of slaves
-in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, because a cable is not connected or the
+in the `robots yaml <march_hardware_builder/robots>`, because a cable is not connected or the
 configuration contains more slaves than actually connected.
 
 **Fix:** Check if all ethernet cables are correctly connected to the in- and outputs of the slaves you want to
-connect to. Finally, check if the slaves configured in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+connect to. Finally, check if the slaves configured in the `robots yaml <march_hardware_builder/robots>`
 have the correct slave indices.
 
 
@@ -208,9 +208,9 @@ verify that those are correct.
 The encoder CPR (counts per rotation) is outside the allowed range.
 
 **Cause:** The given encoder CPR to construct an encoder are outside its allowed limits defined in
-:hardware-interface:`encoder.h <march_hardware/include/march_hardware/encoder/encoder.h>`.
+`encoder.h <march_hardware/include/march_hardware/encoder/encoder.h>`.
 
-**Fix:** Check if the CPR specified in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are
+**Fix:** Check if the CPR specified in the `robots yaml <march_hardware_builder/robots>` are
 within this range.
 
 
@@ -224,9 +224,9 @@ The lower and upper limits of an encoder are conflicting.
 limits. Furthermore, it checks if the soft limits are within the defined hard limits. This is to make sure that the
 joints can safely actuate.
 
-**Fix:** The encoder limits are defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so
+**Fix:** The encoder limits are defined in the `robots yaml <march_hardware_builder/robots>`, so
 make sure that the lower limit is lower than the upper limit in incremental units. If the encoder is built from the
-``march_hardware_builder`` then the soft limits are extracted from the :march:`URDF <march_description/urdf>` of the used robot.
+``march_hardware_builder`` then the soft limits are extracted from the `URDF <march_description/urdf>` of the used robot.
 Make sure that the limits in the URDF are also non-conflicting.
 
 
@@ -239,7 +239,7 @@ The slave configuration contains duplicate slave indices
 **Cause:** Before the ethercat train is started, the configured slaves indices are checked for duplicate indices.
 This makes sure that no two controllers will write to the same slave.
 
-**Fix:** Check the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so that it does not contain
+**Fix:** Check the `robots yaml <march_hardware_builder/robots>`, so that it does not contain
 duplicate indices on iMOTIONCUBES. Temperature sensors can have duplicate slave indices, since multiple temperature
 sensors can be connected to a slave.
 
@@ -251,7 +251,7 @@ sensors can be connected to a slave.
 A joint is not allowed to actuate, yet it's trying to actuate.
 
 **Cause:** A joint must have enabled actuation in order to actuate. This value can be set in the
-:hardware-interface:`robots yaml <march_hardware_builder/robots>`.
+`robots yaml <march_hardware_builder/robots>`.
 
 **Fix:** Check that the joints that you are trying to actuate are actually allowed to actuate.
 
@@ -265,7 +265,7 @@ Slave index has an invalid value.
 **Cause:** When slaves are created with a slave index, it is made sure that the indices are not lower than 1.
 Since index 0 is the master itself and values lower than 0 are not valid indices.
 
-**Fix:** If you are using a :hardware-interface:`robots yaml <march_hardware_builder/robots>`, make sure that all
+**Fix:** If you are using a `robots yaml <march_hardware_builder/robots>`, make sure that all
 slave indices are defined as integers higher than 0.
 
 
@@ -280,8 +280,8 @@ yaml for building a March robot. The joints defined in the URDF are required for
 soft and hard limits of the joint and the builder cannot continue without them.
 
 **Fix:** Check that all the joints defined in the
-:hardware-interface:`robots yaml <march_hardware_builder/robots>` are defined
-in the URDF that you are using from :march:`march_description/urdf <march_description/urdf>`.
+`robots yaml <march_hardware_builder/robots>` are defined
+in the URDF that you are using from `march_description/urdf <march_description/urdf>`.
 
 
 .. _e119:
@@ -290,7 +290,7 @@ in the URDF that you are using from :march:`march_description/urdf <march_descri
 ------------------------------
 A required robot config key from the robots yaml was not defined.
 
-**Cause:** Some keys in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Cause:** Some keys in the `robots yaml <march_hardware_builder/robots>`
 are required to build a functional robot and the build cannot be finished without
 these keys.
 

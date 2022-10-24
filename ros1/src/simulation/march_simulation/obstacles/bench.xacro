@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<robot name="bench" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:include filename="bench_macro.xacro"/>
-    <xacro:bench/>
-</robot>

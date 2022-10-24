@@ -134,7 +134,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages_old/march_imu_manager
   doc/march_packages_old/march_input_device
   doc/march_packages_old/march_launch
-  doc/march_packages_old/march_moveit
   doc/march_packages_old/march_realsense_reader
   doc/march_packages_old/march_realsense_test_publisher
   doc/march_packages_old/march_rqt_input_device

@@ -10,7 +10,7 @@ ems-projects repository contain old projects which you will hopefully never need
 contains the projects you can open in EasyMotionStudio. The sw_files folder contains the corresponding sw_files; this
 is the format in which the project is saved on the iMC. At startup, we check whether the sw file on the iMC still
 Matches that on the master, and if not, we rewrite the sw file via ethercat. See IMotionCube::verifySetup in
-:hardware-interface:`imotioncube.cpp </march_hardware/src/imotioncube/imotioncube.cpp>`.
+`imotioncube.cpp </march_hardware/src/imotioncube/imotioncube.cpp>`.
 
 Creating an sw-file
 -------------------

@@ -20,7 +20,7 @@ flake8:
     # a valid JSON array.
     # Note that the following command doesn't use the default entrypoint defined in the dockerfile 'flake8'.
     - >
-      flake8 --config .flake8 --format=codeclimate ros1/src ros2/src utility_scripts/ |
+      flake8 --config .flake8 --format=codeclimate ros2/src utility_scripts/ |
       sed '1s;^;[;' | sed 's/$/,/g' | sed '$ s/.$//' | sed '$ a ]' | tee codeclimate.json
     # If the above statement succeeds, then codeclimate.json will be empty. We add an empty
     # array to ensure that the codeclimate.json file still has a valid json syntax
@@ -84,7 +84,7 @@ clang-format:
   variables:
       DOCKER_FILE: ".gitlab/dockerfiles/clang_format"
   script:
-    - run-clang-format.py -r ros1/src ros2/src --style=file
+    - run-clang-format.py -r ros2/src --style=file
   needs:
     - job: "clang_format container build"
       optional: true
@@ -116,7 +116,6 @@ clang-format:
         TAG: $CI_COMMIT_BRANCH
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - "ros1/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - "ros2/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - ".clang-format"
         - ".clang-format-ignore"
@@ -125,7 +124,6 @@ clang-format:
     # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
     - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
       changes:
-        - "ros1/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - "ros2/src/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
         - ".clang-format"
         - ".clang-format-ignore"

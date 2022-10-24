@@ -25,30 +25,15 @@ Dockerfile @ThijsRay @George_Vegelien
 [Movement]
 /ros1/src/gaits/march_gait_files @floorheijs @wnederpel
 /ros2/src/gaits/march_gait_files @floorheijs @wnederpel
-/ros1/src/gaits/march_rqt_gait_generator @wnederpel
 
 [Balance]
 /ros1/src/balance/ @kschmahl @wnederpel @ttveen
 
 [Control]
-/ros1/src/control/ @MZZRD @Hvaneven @ttveen @BasVolkers
-/ros1/src/control/march_acado_mpc/ @MZZRD
-/ros1/src/bridge/march_dynamic_reconfigure_parameters @George_Vegelien
 /ros2/src/control/ @George_Vegelien
-
-
-[Depth camera]
-/ros1/src/data/march_realsense_reader/ @kschmahl @ttveen @wnederpel
-/ros1/src/data/march_realsense_test_publisher/ @wnederpel
 
 [Data visualizations]
 /ros2/src/visualization/march_mpc_visualization @ttveen
-
-[Hardware]
-/ros1/src/hardware/ @BasVolkers @George_Vegelien
-
-[Simulation]
-/ros1/src/simulation @kschmahl
 
 [ROS2 transition]
 /ros2/src/simulation/march_fake_sensor_data @ThijsRay
@@ -62,10 +47,7 @@ Dockerfile @ThijsRay @George_Vegelien
 /ros2/src/shared/march_description @kschmahl @ttveen
 /ros2/src/gait/march_gait_selection @kschmahl BasVolkers
 
-[CoViD]
-/ros1/src/vision @2hindas
-
 [Gaits]
 /ros2/src/gaits/march_goniometric_ik_solver @jsdewolde
 /ros2/src/gaits/march_gait_preprocessor @martenhaitjema
-ros2/src/gaits/march_gait_selection/march_gait_selection/dynamic_interpolation @martenhaitjema
+/ros2/src/gaits/march_gait_selection/march_gait_selection/dynamic_interpolation @martenhaitjema

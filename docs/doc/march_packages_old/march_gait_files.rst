@@ -20,13 +20,13 @@ setpoints. The file is named ``<version>.subgait``.
 ``Gait folder``: A folder containing a gait file and the subgait folders that constitute the gait.
 
 ``Gait file``: A text file defining the gait's transitions from subgait to subgait.
-:gait-files:`Example <march_gait_files/airgait-v/walk/walk.gait>`
+`Example <march_gait_files/airgait-v/walk/walk.gait>`
 
 ``<gait_directory>`` is a folder used to group gaits together, some gaits are ready for a training, while some are only for airgaiting.
-:gait-files:`Example <march_gait_files/airgait-v>`
+Example <march_gait_files/airgait-v>`
 
 ``default.yaml`` is required for each gait_directory. It specifies which versions of gaits are loaded by default when loading this gait_directory.
-:gait-files:`Example <march_gait_files/airgait-v/default.yaml>`
+`Example <march_gait_files/airgait-v/default.yaml>`
 
 Example:
 
