@@ -81,6 +81,7 @@ def generate_launch_description() -> LaunchDescription:
     ground_gait = LaunchConfiguration("ground_gait")
     to_world_transform = LaunchConfiguration("to_world_transform")
     gazebo = LaunchConfiguration("gazebo")
+    mujoco = LaunchConfiguration("mujoco")
     simulation_arguments = [
         DeclareLaunchArgument(
             name="ground_gait",
@@ -98,6 +99,12 @@ def generate_launch_description() -> LaunchDescription:
             default_value="false",
             description="Whether we want to run it in simulation with Gazebo control.",
         ),
+        DeclareLaunchArgument(
+            name="mujoco",
+            default_value="false",
+            description="If Mujoco simulation should be started or not",
+            choices=["true", "false"],
+        )
     ]
     # endregion
 
@@ -538,6 +545,15 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch Gazebo
+    mujoco_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
+        ),
+        condition=IfCondition(mujoco),
+    )
+    # endregion
+
     # region Launch march control
     march_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -584,6 +600,7 @@ def generate_launch_description() -> LaunchDescription:
         fake_sensor_data_node,
         smartglass_bridge_node,
         gazebo_node,
+        mujoco_node,
         march_control,
         point_finder_node,
         camera_aligned_frame_pub_node,

@@ -1,0 +1,8 @@
+build/
+log/
+install/
+.vscode/
+MUJOCO_LOG.TXT
+.idea/
+
+/src/acados_solver/cmake-build-debug/
