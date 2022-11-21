@@ -60,14 +60,14 @@
         </xacro:if>
         <xacro:unless value="$(arg gazebo)">
           <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
-          <param name="robot">test_joint_linear</param>  <!-- change this to 'test_joint_linear' or 'test_joint_rotational' -->
+          <param name="robot">test_joint_rotational</param>  <!-- change this to 'test_joint_linear' or 'test_joint_rotational' -->
         </xacro:unless>
       </xacro:if>
     </hardware>
 
     <!-- Uncomment one of the following two. -->
-    <!-- <xacro:march_joint name="rotational_joint"/> -->
-    <xacro:march_joint name="linear_joint"/> 
+    <xacro:march_joint name="rotational_joint"/>
+    <!-- <xacro:march_joint name="linear_joint"/>  -->
 
     <!-- <xacro:march_joint name="left_ankle" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
     <xacro:march_joint name="left_hip_aa"/>

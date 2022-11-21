@@ -18,7 +18,7 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/test_joint_linear.urdf" #Change for differnt tests
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/test_joint_rotational.urdf" #Change for differnt tests
 MODE_READING = "r"
 
 
