@@ -10,6 +10,9 @@ from mujoco_interfaces.msg import MujocoSetControl
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoDataControl
+from sensor_msgs.msg import JointState
+from control_msgs.msg import JointTrajectoryControllerState
+import collections
 
 
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
@@ -37,16 +40,17 @@ class Mujoco_simNode(Node):
         self.file_path = get_package_share_directory('robot_description') + "/urdf/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
+
         self.data = mujoco.MjData(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.0001
         self.model.opt.timestep = self.TIME_STEP_MJC
-        self.get_logger().info(str(self.model.opt.timestep))
+        # self.get_logger().info(str(self.model.opt.timestep))
         # Create a service so the mujoco_reader node can obtain data from mujoco
         self.serv_read = self.create_service(ReadMujoco, 'read_mujoco', self.read_mujoco)
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(MujocoSetControl, 'mujoco_input', self.writer_callback, 10)
+        self.writer_subscriber = self.create_subscription(JointTrajectoryControllerState, 'mujoco_input', self.writer_callback, 10)
 
         # Initialize the low-level controller
         self.declare_parameters(
@@ -62,6 +66,8 @@ class Mujoco_simNode(Node):
         self.controller=[]
         self.controller.append(PositionController(self, self.model, self.data, self.get_parameter("position.P").value, self.get_parameter("position.D").value))
         self.controller.append(TorqueController(self, self.model, self.data, self.get_parameter("torque.P").value, self.get_parameter("torque.D").value))
+        # create a dict with {actuator_name: array_index} to match later to give the correct input to the actuators.
+
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
 
         # Create the visualizer and visualization timer
@@ -76,10 +82,18 @@ class Mujoco_simNode(Node):
         Args:
             msg (MujocoControl message): Contains the inputs to be changed
         """
-        for i, ref in enumerate(msg.reference_control):
-            for j in range(len(self.controller)):
-                self.controller[j].joint_ref[i] = ref
-        self.controller_mode = msg.mode
+        # for i in msg:
+        #     print(str(i) + "\n")
+        # self.get_logger().info(str(msg))
+        self.get_logger().info(str(msg.desired.positions))
+        self.get_logger().info(str(msg.joint_names))
+        refs = msg.desired.positions
+        joint_names = msg.joint_names
+        joint_pos = dict(zip(joint_names, refs))
+        sorted_joints = dict(sorted(joint_pos.items()))
+        for j in range(len(self.controller)):
+            self.controller[j].joint_ref_dict = sorted_joints
+        # self.controller_mode = msg.mode
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
 
     def sim_step(self):

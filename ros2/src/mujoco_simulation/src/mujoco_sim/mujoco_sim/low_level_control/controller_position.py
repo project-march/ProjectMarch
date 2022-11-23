@@ -34,11 +34,16 @@ class PositionController(LowLvlController):
         """
 
         # update the control inputs based on PID
-        for count in range(self.actuator_amount):
+
+        # origin.actuator_dict to march to correct array indices.
+        # self.joint_ref_dict has the joint name and the ref_pos for that joint
+        # To get the correct ref pos loop though keys, get idex from actuator[key_ref_pos] and change that index accoringly.
+        # count is
+        for count,  joint in enumerate(self.joint_ref_dict):
             dt = 0.001  # TEMP VARIABLE, REMOVE IN NEXT SPRINT
             index = self.joint_to_qpos[model.actuator_trnid[count, 0]]
             joint_val = data.qpos[index]
-            e = self.joint_ref[count] - joint_val
+            e = self.joint_ref_dict[joint] - joint_val
             de_prev = (e - self.e_prev[count]) / dt
 
             new_ctrl_input = self.p[count] * e + self.d[count] * de_prev
