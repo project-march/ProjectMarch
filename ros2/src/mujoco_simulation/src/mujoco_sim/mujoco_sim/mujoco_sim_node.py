@@ -5,6 +5,8 @@ import rclpy
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 
+from queue import Queue, Empty
+
 from mujoco_interfaces.srv import ReadMujoco
 from mujoco_interfaces.msg import MujocoSetControl
 from mujoco_interfaces.msg import MujocoDataState
@@ -12,8 +14,6 @@ from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoDataControl
 from sensor_msgs.msg import JointState
 from control_msgs.msg import JointTrajectoryControllerState
-import collections
-
 
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 
@@ -31,7 +31,7 @@ class Mujoco_simNode(Node):
         super().__init__("mujoco_sim")
         self.declare_parameter('model_toload')
 
-        self.SIM_TIMESTEP_ROS = 0.1;
+        self.SIM_TIMESTEP_ROS = 0.1
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
@@ -46,11 +46,11 @@ class Mujoco_simNode(Node):
         # Set timestep options
         self.TIME_STEP_MJC = 0.0001
         self.model.opt.timestep = self.TIME_STEP_MJC
-        # self.get_logger().info(str(self.model.opt.timestep))
         # Create a service so the mujoco_reader node can obtain data from mujoco
         self.serv_read = self.create_service(ReadMujoco, 'read_mujoco', self.read_mujoco)
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(JointTrajectoryControllerState, 'mujoco_input', self.writer_callback, 10)
+        self.writer_subscriber = self.create_subscription(JointTrajectoryControllerState, 'mujoco_input',
+                                                          self.writer_callback, 10)
 
         # Initialize the low-level controller
         self.declare_parameters(
@@ -61,14 +61,17 @@ class Mujoco_simNode(Node):
                 ('torque.P', None),
                 ('torque.D', None),
             ])
-        #This list of controllers contains all active controllers
+        # This list of controllers contains all active controllers
         self.controller_mode = 0
-        self.controller=[]
-        self.controller.append(PositionController(self, self.model, self.data, self.get_parameter("position.P").value, self.get_parameter("position.D").value))
-        self.controller.append(TorqueController(self, self.model, self.data, self.get_parameter("torque.P").value, self.get_parameter("torque.D").value))
-        # create a dict with {actuator_name: array_index} to match later to give the correct input to the actuators.
-
+        self.controller = []
+        self.controller.append(PositionController(self, self.model, self.data, self.get_parameter("position.P").value,
+                                                  self.get_parameter("position.D").value))
+        self.controller.append(TorqueController(self, self.model, self.data, self.get_parameter("torque.P").value,
+                                                self.get_parameter("torque.D").value))
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
+
+        # Create a queue to store all incoming messages or correctly timed simulation
+        self.msg_queue = Queue()
 
         # Create the visualizer and visualization timer
         SIM_WINDOW_FPS = 60
@@ -82,19 +85,13 @@ class Mujoco_simNode(Node):
         Args:
             msg (MujocoControl message): Contains the inputs to be changed
         """
-        # for i in msg:
-        #     print(str(i) + "\n")
-        # self.get_logger().info(str(msg))
-        self.get_logger().info(str(msg.desired.positions))
-        self.get_logger().info(str(msg.joint_names))
-        refs = msg.desired.positions
-        joint_names = msg.joint_names
-        joint_pos = dict(zip(joint_names, refs))
-        sorted_joints = dict(sorted(joint_pos.items()))
-        for j in range(len(self.controller)):
-            self.controller[j].joint_ref_dict = sorted_joints
-        # self.controller_mode = msg.mode
-        mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
+        self.msg_queue.put(msg)
+        # refs = msg.desired.positions
+        # joint_names = msg.joint_names
+        # joint_pos = dict(zip(joint_names, refs))
+        # for j in range(len(self.controller)):
+        #     self.controller[j].joint_ref_dict = joint_pos
+
 
     def sim_step(self):
         """This function performs the simulation update.
@@ -107,13 +104,13 @@ class Mujoco_simNode(Node):
         time_difference = (time_current - self.time_last_updated).to_msg()
         mj_time_current = self.data.time
 
+
         time_difference_withseconds = time_difference.nanosec / 1e9 + time_difference.sec
 
         while self.data.time - mj_time_current <= time_difference_withseconds:
             mujoco.mj_step(self.model, self.data)
 
         time_error = abs(time_difference_withseconds - (self.data.time - mj_time_current))
-        self.get_logger().debug(str(time_error))
         self.time_last_updated = self.get_clock().now()
 
     def sim_update_timer_callback(self):
@@ -121,6 +118,17 @@ class Mujoco_simNode(Node):
         This function is separated from the actual simstep function
         to ensure a nice divide between ROS systems and Mujoco functionality.
         """
+        try:
+            msg = self.msg_queue.get_nowait()
+            self.get_logger().info(str(msg.header.stamp) + "\n")
+            refs = msg.desired.positions
+            joint_names = msg.joint_names
+            joint_pos = dict(zip(joint_names, refs))
+            for j in range(len(self.controller)):
+                self.controller[j].joint_ref_dict = joint_pos
+
+        except Empty:
+            pass
         self.sim_step()
 
     def sim_visualizer_timer_callback(self):
@@ -140,26 +148,26 @@ class Mujoco_simNode(Node):
         Returns:
             ROS message: the response to be sent to the client. 
         """
-        if request.mujoco_info_type.request == 0:    #If the request was for an exo state
+        if request.mujoco_info_type.request == 0:  # If the request was for an exo state
             response.exo_state = MujocoDataState()
             for data in self.data.qpos:
                 response.exo_state.qpos.append(data)
-            
+
             for data in self.data.qvel:
                 response.exo_state.qvel.append(data)
 
             for data in self.data.qacc:
                 response.exo_state.qacc.append(data)
-            
+
             for data in self.data.act:
                 response.exo_state.act.append(data)
-        
-        if request.mujoco_info_type.request == 1:    #If the request was for a sensor state
-            response.sensor_state = MujocoDataSensing()
-            #NOTE: FOR NOW, PASS NOTHING AS WE DONT HAVE SENSORS YET/
-            #WE SHOULD FIGURE OUT SOON WHAT E WANT TO ADD HERE
 
-        if request.mujoco_info_type.request == 2:    #If the request was for a control state
+        if request.mujoco_info_type.request == 1:  # If the request was for a sensor state
+            response.sensor_state = MujocoDataSensing()
+            # NOTE: FOR NOW, PASS NOTHING AS WE DONT HAVE SENSORS YET/
+            # WE SHOULD FIGURE OUT SOON WHAT E WANT TO ADD HERE
+
+        if request.mujoco_info_type.request == 2:  # If the request was for a control state
             response.control_state = MujocoDataControl()
             for data in self.data.ctrl:
                 response.control_state.ctrl.append(data)

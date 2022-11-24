@@ -34,7 +34,7 @@ class SubgaitTest(unittest.TestCase):
             subgait=self.subgait_name,
             version=self.version,
         )
-        self.subgait = Subgait.from_file(self.robot, self.subgait_path)
+        self.subgait = Subgait
 
     # Subgait.from_file tests
     def test_from_file_valid_path(self):

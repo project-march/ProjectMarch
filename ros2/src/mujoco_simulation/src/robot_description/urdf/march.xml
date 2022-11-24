@@ -64,8 +64,8 @@
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="1.1 -1.1 0.1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
       <camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
-      <freejoint name="root"/>
-      <geom name="butt" fromto="-.02 -.04 0 -.02 .04 0" size=".09"/>
+      <geom name="butt" fromto="
+      -.02 -.04 0 -.02 .04 0" size=".09"/>
       <body name="right_hip" pos="0 -.075 -.09">
         <joint name="R_HAA" axis="1 0 0" range="-25 5" class="big_joint"/>
         <geom name="right_hip" fromto="0 0 0 0 -.1 0" size=".049"/>
@@ -100,15 +100,16 @@
       </body>
     </body>
   </worldbody>
-
+{#    Acuator naming convention vor March achtuators#}
+{#    ['left_ankle', 'left_hip_aa', 'left_hip_fe', 'left_knee', 'right_ankle', 'right_hip_aa', 'right_hip_fe', 'right_knee']#}
   <actuator>
-    <motor name="R_HAA"     gear="40"  joint="R_HAA"/>
-    <motor name="R_HFE"     gear="120" joint="R_HFE"/>
-    <motor name="R_KFE"      gear="80"  joint="R_KFE"/>
-    <motor name="R_ADPF"   gear="20"  joint="R_ADPF"/>
-    <motor name="L_HAA"      gear="40"  joint="L_HAA"/>
-    <motor name="L_HFE"      gear="120" joint="L_HFE"/>
-    <motor name="L_KFE"       gear="80"  joint="L_KFE"/>
-    <motor name="L_ADPF"    gear="20"  joint="L_ADPF"/>
+    <motor name="right_hip_aa"     gear="40"  joint="R_HAA"/>
+    <motor name="right_hip_fe"     gear="120" joint="R_HFE"/>
+    <motor name="right_knee"      gear="80"  joint="R_KFE"/>
+    <motor name="right_ankle"   gear="20"  joint="R_ADPF"/>
+    <motor name="left_hip_aa"      gear="40"  joint="L_HAA"/>
+    <motor name="left_hip_fe"      gear="120" joint="L_HFE"/>
+    <motor name="left_knee"       gear="80"  joint="L_KFE"/>
+    <motor name="left_ankle"    gear="20"  joint="L_ADPF"/>
   </actuator>
 </mujoco>

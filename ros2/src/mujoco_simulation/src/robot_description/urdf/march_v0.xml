@@ -1,0 +1,158 @@
+<!-- Copyright 2021 DeepMind Technologies Limited
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<mujoco model="exoskeleton">
+  <compiler meshdir="meshes" angle="degree" autolimits="true"/>
+<!-- Degree of Freedom: 27
+     Actuators: 21
+
+     This simplified pilotoid model, introduced in [1], is designed for bipedal locomotion
+     behaviours. While several variants of it exist in the wild, this version is based on the model
+     in the DeepMind Control Suite [2], which has fairly realistic actuator gains.
+     [1] Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization.
+           https://doi.org/10.1109/IROS.2012.6386025
+     [2] DeepMind Control Suite, Tassa et al. https://arxiv.org/abs/1801.00690
+-->
+  <option timestep="0.005"/>
+  <!-- Timestep is set to X because the high level control runs at X kHz -->
+  
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="512" height="512"/>
+    <texture name="body" type="cube" builtin="flat" mark="cross" width="127" height="1278"
+             rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
+    <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
+    <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
+    <material name="march_grey" rgba=".87 .89 .91 1"/>
+    <mesh name="backpack"    file="HipBase.stl"/>
+    <mesh name="L_foot"      file="FootLeft.stl"/>
+    <mesh name="L_hip"       file="HipLeft.stl"/>
+    <mesh name="L_thigh"     file="UpperLegLeft.stl"/>
+    <mesh name="L_shin"      file="LowerLegLeft.stl"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.stl"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.stl"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.stl"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.stl"/>
+  </asset>
+
+  <default>
+    <motor ctrlrange="-1 1" ctrllimited="true"/>
+    <geom contype="0" conaffinity="0" condim="1" solref="0.005 1"/>
+    <equality solref="0.005 1"/>
+    <default class="exoskeleton">
+      <geom material="march_grey" group="2"/>
+    </default>
+    <default class="collision">
+      <geom contype="1" group="3" type="capsule" density="2710"/>
+      <default class="L_collision">
+        <geom contype="2" conaffinity="4"/>
+      </default>
+      <default class="R_collision">
+        <geom contype="4" conaffinity="2"/>
+      </default>
+    </default>
+    <default class="ballast">
+      <geom contype="0" material="mujoco_orange" conaffinity="0" group="2" type="capsule" density="985"/>
+    </default>
+    <default class="linear_joint">
+        <joint damping="50" frictionloss="18" stiffness="0"/>
+    </default>
+    <default class="rotational_joint">
+        <joint damping="50"  frictionloss="18" stiffness="0"/>
+    </default>
+  </default>
+
+  <visual>
+    <map force="0.1" zfar="30"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <quality shadowsize="4096"/>
+    <global offwidth="800" offheight="800"/>
+  </visual>
+
+  <worldbody>
+    <geom name="floor" size="0 0 .05" type="plane" material="grid" conaffinity="15" condim="3"/>
+    <light name="spotlight" mode="targetbodycom" target="march_pelvis"
+           diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
+<!--    Body is .954 m high, so place at 1 m-->
+    <body name="march_pelvis" pos="0 0 1" childclass="exoskeleton">
+      <light name="top" pos="0 0 2" mode="trackcom"/>
+      <camera name="diag" pos="1.1 -1.1 0.1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
+      <camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
+      <!-- <freejoint/> -->
+      <!-- <freejoint/> -->
+      <geom type="mesh" mesh="backpack" euler="0 0 180"/>
+      <geom name="backpack" type="box" size=".051 .189 .165" pos="-.02 0 .13" class="collision"/>
+      <geom name="pilot_torso" fromto=".147 0 .056 .190 0 .465" size=".141" class="ballast"/>
+      <body name="L_hip" pos=".005 .065 0">
+        <joint name="L_HAA" axis="-1 0 0" range="-10 5" class="linear_joint"/>
+        <geom type="mesh" mesh="L_hip" euler="0 0 180"/>
+        <geom name="L_hip" fromto="0 0 0 .184 .197 .002" size=".032" class="L_collision"/>
+        <body name="L_thigh" pos=".184 .197 .002">
+          <joint name="L_HFE" axis="0 1 0" range="-115 12" class="rotational_joint"/>
+          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" euler="0 0 180"/>
+          <geom name="L_thigh" fromto="0 0 0 0 -.033 -.423" size=".069" class="L_collision"/>
+          <geom name="L_pilot_thigh" fromto="0 -.166 -.05 0 -.149 -.423" size=".069" class="ballast"/>
+          <body name="L_shin" pos="0 -.033 -.423">
+            <joint name="L_KFE" axis="0 -1 0" range="-112 1" class="rotational_joint"/>
+            <geom type="mesh" mesh="L_shin" pos="0 -.026 0" euler="0 0 180"/>
+            <geom name="L_shin" fromto="0 0 0 0 -.018 -.401"  size=".047" class="L_collision"/>
+            <geom name="L_pilot_shin" fromto="0 -.116 0 0 -.124 -.399"  size=".047" class="ballast"/>
+            <body name="L_foot" pos="0 -.018 -.401">
+              <joint name="L_ADPF" axis="0 1 0" range="-1 25" class="linear_joint"/>
+              <geom type="mesh" mesh="L_foot" pos="0 -.019 0" euler="0 0 180"/>
+              <geom name="L_foot" type="box" pos=".069 -.086 -.118" size=".159 .057 .007" class="L_collision"
+                    friction=".33"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="R_hip" pos=".005 -.065 0">
+        <joint name="R_HAA" axis="1 0 0" range="-10 5" class="linear_joint"/>
+        <geom type="mesh" mesh="R_hip" euler="0 0 180"/>
+        <geom name="R_hip" fromto="0 0 0 .184 -.197 .002" size=".032" class="R_collision"/>
+        <body name="R_thigh" pos=".184 -.197 .002">
+          <joint name="R_HFE" axis="0 1 0" range="-115 12" class="rotational_joint"/>
+          <geom type="mesh" mesh="R_thigh" pos="0 -.013 0" euler="0 0 180"/>
+          <geom name="R_thigh" fromto="0 0 0 0 .033 -.423" size=".069" class="R_collision"/>
+          <geom name="R_pilot_thigh" fromto="0 .166 -.05 0 .149 -.423" size=".069" class="ballast"/>
+          <body name="R_shin" pos="0 .033 -.423">
+            <joint name="R_KFE" axis="0 -1 0" range="-112 1" class="rotational_joint"/>
+            <geom type="mesh" mesh="R_shin" pos="0 .026 0" euler="0 0 180"/>
+            <geom name="R_shin" fromto="0 0 0 0 .018 -.401"  size=".047" class="R_collision"/>
+            <geom name="R_pilot_shin" fromto="0 .116 0 0 .124 -.399"  size=".047" class="ballast"/>
+            <body name="R_foot" pos="0 .018 -.401">
+              <joint name="R_ADPF" axis="0 1 0" range="-1 25" class="linear_joint"/>
+              <geom type="mesh" mesh="R_foot" pos="0 .019 0" euler="0 0 180"/>
+              <geom name="R_foot" type="box" pos=".069 .086 -.118" size=".159 .057 .007" class="R_collision"
+                    friction=".33"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- User parameter is the maximum no-load motor RPM -->
+    <motor name="left_hip_aa"     gear="300"  joint="L_HAA"   user="15" />
+    <motor name="left_hip_fe"     gear="340" joint="L_HFE"    user="27"/>
+    <motor name="left_knee"     gear="340"  joint="L_KFE"   user="27"/>
+    <motor name="left_ankle"    gear="160"  joint="L_ADPF"  user="29"/>
+    <motor name="right_hip_aa"     gear="300"  joint="R_HAA"   user="15"/>
+    <motor name="right_hip_fe"     gear="340" joint="R_HFE"    user="27"/>
+    <motor name="right_knee"     gear="340"  joint="R_KFE"   user="27"/>
+    <motor name="right_ankle"    gear="160"  joint="R_ADPF"  user="29"/>
+  </actuator>
+</mujoco>

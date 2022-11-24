@@ -35,21 +35,28 @@ class PositionController(LowLvlController):
 
         # update the control inputs based on PID
 
-        # origin.actuator_dict to march to correct array indices.
-        # self.joint_ref_dict has the joint name and the ref_pos for that joint
-        # To get the correct ref pos loop though keys, get idex from actuator[key_ref_pos] and change that index accoringly.
-        # count is
-        for count,  joint in enumerate(self.joint_ref_dict):
-            dt = 0.001  # TEMP VARIABLE, REMOVE IN NEXT SPRINT
+        # origin.actuator_dict to march to correct array indices. self.joint_ref_dict has the joint name and the
+        # ref_pos for that joint To get the correct ref pos loop though keys, get index from actuator[key_ref_pos] and
+        # change that index accordingly. count is
+
+        # self.origin.get_logger().info("Joint ref dict")
+
+        # self.origin.get_logger().info(str(self.joint_ref_dict) + '\n')
+        for count, act_name in enumerate(self.act_names):
+            dt = self.origin.TIME_STEP_MJC
             index = self.joint_to_qpos[model.actuator_trnid[count, 0]]
             joint_val = data.qpos[index]
-            e = self.joint_ref_dict[joint] - joint_val
+            try:
+                ref_dict = self.joint_ref_dict[act_name]
+            except KeyError:
+                ref_dict = 0
+            e = float(ref_dict) - joint_val
+            # e = self.joint_ref[count] - joint_val
             de_prev = (e - self.e_prev[count]) / dt
 
             new_ctrl_input = self.p[count] * e + self.d[count] * de_prev
             self.ctrl[count] = new_ctrl_input
             self.e_prev[count] = e
-
             data.ctrl[count] += self.ctrl[count]
 
         # NOTE:CHANGE THE WAY WE UPDATE THE MUJOCO UPDATE LATER
