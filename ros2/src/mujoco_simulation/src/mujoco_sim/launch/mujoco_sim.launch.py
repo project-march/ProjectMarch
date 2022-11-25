@@ -20,7 +20,7 @@ def generate_launch_description():
             name='mujoco_sim',
             parameters = [
                 config,
-                {"model_toload": "march.xml"}
+                {"model_toload": "march_v0.xml"}
             ]
         ),
         Node(

@@ -72,6 +72,7 @@ class Mujoco_simNode(Node):
 
         # Create a queue to store all incoming messages or correctly timed simulation
         self.msg_queue = Queue()
+        self.current_msg = None
 
         # Create the visualizer and visualization timer
         SIM_WINDOW_FPS = 60
@@ -120,7 +121,8 @@ class Mujoco_simNode(Node):
         """
         try:
             msg = self.msg_queue.get_nowait()
-            self.get_logger().info(str(msg.header.stamp) + "\n")
+            self.current_msg = msg
+            # self.get_logger().info(str(msg) + "\n")
             refs = msg.desired.positions
             joint_names = msg.joint_names
             joint_pos = dict(zip(joint_names, refs))
@@ -134,7 +136,7 @@ class Mujoco_simNode(Node):
     def sim_visualizer_timer_callback(self):
 
         self.visualizer.update_window(self.model, self.data)
-        self.get_logger().debug(str(self.visualizer.cam))
+        # self.get_logger().debug(str(self.visualizer.cam))
 
     def read_mujoco(self, request, response):
         """Server callback function which sends the requested data

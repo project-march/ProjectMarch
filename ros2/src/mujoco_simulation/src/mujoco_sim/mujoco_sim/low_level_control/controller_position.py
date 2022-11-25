@@ -1,6 +1,10 @@
 from low_level_controller import LowLvlController
 import numpy as np
 
+from control_msgs.msg import JointTrajectoryControllerState
+
+
+
 
 class PositionController(LowLvlController):
 
@@ -42,9 +46,21 @@ class PositionController(LowLvlController):
         # self.origin.get_logger().info("Joint ref dict")
 
         # self.origin.get_logger().info(str(self.joint_ref_dict) + '\n')
+        pos = []
+        for i in data.qpos:
+            pos.append(float(i))
+        try:
+            self.origin.current_msg.actual.positions = pos
+            publisher = self.origin.create_publisher(
+                JointTrajectoryControllerState, 'mytopic', 10)
+            publisher.publish(self.origin.current_msg)
+        except AttributeError:
+            pass
+
         for count, act_name in enumerate(self.act_names):
             dt = self.origin.TIME_STEP_MJC
             index = self.joint_to_qpos[model.actuator_trnid[count, 0]]
+
             joint_val = data.qpos[index]
             try:
                 ref_dict = self.joint_ref_dict[act_name]

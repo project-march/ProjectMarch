@@ -16,6 +16,7 @@ class MujocoVisualizer():
         #Initialize the camera and other relevant variables needed for
         #the visualization
         self.cam = mujoco.MjvCamera()
+        self.cam.type = 1
         self.opt = mujoco.MjvOption()
 
         mujoco.glfw.glfw.init()

@@ -31,6 +31,7 @@ alias mb='march_build'
 alias mba='march_build_all'
 alias sim2='march_run_ros2_sim'
 alias sim='march_run_ros2_sim'
+alias mujoco='sim mujoco:=true rviz:=false'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
