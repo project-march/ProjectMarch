@@ -92,26 +92,21 @@
       <camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
       <!-- <freejoint/> -->
       <!-- <freejoint/> -->
-      <geom type="mesh" mesh="backpack" euler="0 0 180"/>
       <geom name="backpack" type="box" size=".051 .189 .165" pos="-.02 0 .13" class="collision"/>
       <geom name="pilot_torso" fromto=".147 0 .056 .190 0 .465" size=".141" class="ballast"/>
       <body name="L_hip" pos=".005 .065 0">
         <joint name="L_HAA" axis="-1 0 0" range="-10 5" class="linear_joint"/>
-        <geom type="mesh" mesh="L_hip" euler="0 0 180"/>
         <geom name="L_hip" fromto="0 0 0 .184 .197 .002" size=".032" class="L_collision"/>
         <body name="L_thigh" pos=".184 .197 .002">
           <joint name="L_HFE" axis="0 1 0" range="-115 12" class="rotational_joint"/>
-          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" euler="0 0 180"/>
           <geom name="L_thigh" fromto="0 0 0 0 -.033 -.423" size=".069" class="L_collision"/>
           <geom name="L_pilot_thigh" fromto="0 -.166 -.05 0 -.149 -.423" size=".069" class="ballast"/>
           <body name="L_shin" pos="0 -.033 -.423">
             <joint name="L_KFE" axis="0 -1 0" range="-112 1" class="rotational_joint"/>
-            <geom type="mesh" mesh="L_shin" pos="0 -.026 0" euler="0 0 180"/>
             <geom name="L_shin" fromto="0 0 0 0 -.018 -.401"  size=".047" class="L_collision"/>
             <geom name="L_pilot_shin" fromto="0 -.116 0 0 -.124 -.399"  size=".047" class="ballast"/>
             <body name="L_foot" pos="0 -.018 -.401">
               <joint name="L_ADPF" axis="0 1 0" range="-1 25" class="linear_joint"/>
-              <geom type="mesh" mesh="L_foot" pos="0 -.019 0" euler="0 0 180"/>
               <geom name="L_foot" type="box" pos=".069 -.086 -.118" size=".159 .057 .007" class="L_collision"
                     friction=".33"/>
             </body>
@@ -120,21 +115,17 @@
       </body>
       <body name="R_hip" pos=".005 -.065 0">
         <joint name="R_HAA" axis="1 0 0" range="-10 5" class="linear_joint"/>
-        <geom type="mesh" mesh="R_hip" euler="0 0 180"/>
         <geom name="R_hip" fromto="0 0 0 .184 -.197 .002" size=".032" class="R_collision"/>
         <body name="R_thigh" pos=".184 -.197 .002">
           <joint name="R_HFE" axis="0 1 0" range="-115 12" class="rotational_joint"/>
-          <geom type="mesh" mesh="R_thigh" pos="0 -.013 0" euler="0 0 180"/>
           <geom name="R_thigh" fromto="0 0 0 0 .033 -.423" size=".069" class="R_collision"/>
           <geom name="R_pilot_thigh" fromto="0 .166 -.05 0 .149 -.423" size=".069" class="ballast"/>
           <body name="R_shin" pos="0 .033 -.423">
             <joint name="R_KFE" axis="0 -1 0" range="-112 1" class="rotational_joint"/>
-            <geom type="mesh" mesh="R_shin" pos="0 .026 0" euler="0 0 180"/>
             <geom name="R_shin" fromto="0 0 0 0 .018 -.401"  size=".047" class="R_collision"/>
             <geom name="R_pilot_shin" fromto="0 .116 0 0 .124 -.399"  size=".047" class="ballast"/>
             <body name="R_foot" pos="0 .018 -.401">
               <joint name="R_ADPF" axis="0 1 0" range="-1 25" class="linear_joint"/>
-              <geom type="mesh" mesh="R_foot" pos="0 .019 0" euler="0 0 180"/>
               <geom name="R_foot" type="box" pos=".069 .086 -.118" size=".159 .057 .007" class="R_collision"
                     friction=".33"/>
             </body>
