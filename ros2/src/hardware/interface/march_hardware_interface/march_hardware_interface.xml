@@ -15,5 +15,14 @@
         </description>
     </class>
 
+    <class name="march_hardware_interface/MarchMujocoSystemInterface"
+           type="march_hardware_interface::MarchMujocoSystemInterface"
+           base_class_type="hardware_interface::SystemInterface">
+        <description>
+            The HW Interface to use the mujoco simulation with ros2 control.
+        </description>
+    </class>
+
+
 
 </library>

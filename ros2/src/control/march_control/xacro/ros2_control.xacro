@@ -42,22 +42,26 @@
   <!-- You have 2 types 'effort' or 'rviz' if you do rviz you should only open rviz (not gazebo!). -->
   <!-- Has no effect if type is rviz.-->
   <!-- Default is 'true' because this makes easier bc gazebo control is activated through the urdf on published on the '/robot_description' -->
-  <xacro:arg name="gazebo" default="true"/>
+  <xacro:arg name="mujoco" default="true"/>
 
   <ros2_control name="march" type="system">
     <hardware>
       <xacro:if value="${type == 'rviz'}">
-        <plugin>fake_components/GenericSystem</plugin>
+<!--        <plugin>fake_components/GenericSystem</plugin>-->
         <!-- Switch the 'fake_components/GenericSystem' with 'march_hardware_interface/MarchRvizSystemInterface' -->
         <!-- If you whish to debug and play around with a very simple hardware interface, -->
         <!-- They practically work the same -->
-<!--        <plugin>march_hardware_interface/MarchRvizSystemInterface</plugin>-->
+        <plugin>march_hardware_interface/MarchRvizSystemInterface</plugin>
       </xacro:if>
       <xacro:if value="${type == 'effort'}">
-        <xacro:if value="$(arg gazebo)">
-          <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+<!--        <xacro:if value="$(arg gazebo)">-->
+<!--          <plugin>gazebo_ros2_control/GazeboSystem</plugin>-->
+<!--        </xacro:if>-->
+        <xacro:if value="$(arg mujoco)">
+          <plugin>march_hardware_interface/MarchMujocoSystemInterface</plugin>
+          <param name="robot">march7</param>
         </xacro:if>
-        <xacro:unless value="$(arg gazebo)">
+        <xacro:unless value="$(arg mujoco)">
           <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
           <param name="robot">march7</param>
         </xacro:unless>

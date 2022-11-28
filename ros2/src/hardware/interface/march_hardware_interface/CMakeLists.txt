@@ -26,7 +26,7 @@ add_library(
         src/march_rviz_system_interface.cpp
         src/march_exo_system_interface.cpp
         include/march_hardware_interface/hwi_util.h
-)
+        src/march_mujoco_system_interface.cpp include/march_hardware_interface/march_mujoco_system_interface.hpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

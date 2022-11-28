@@ -545,7 +545,7 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch Gazebo
+    # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
