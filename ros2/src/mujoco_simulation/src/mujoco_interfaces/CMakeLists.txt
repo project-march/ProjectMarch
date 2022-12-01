@@ -25,7 +25,6 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MujocoSetControl.msg"
-  "msg/MujocoDataControl.msg"
   "msg/MujocoDataSensing.msg"
   "msg/MujocoDataState.msg"
   "msg/MujocoDataRequest.msg"

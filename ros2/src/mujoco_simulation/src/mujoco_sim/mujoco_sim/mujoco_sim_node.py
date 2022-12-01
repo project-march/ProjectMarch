@@ -11,7 +11,6 @@ from mujoco_interfaces.srv import ReadMujoco
 from mujoco_interfaces.msg import MujocoSetControl
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
-from mujoco_interfaces.msg import MujocoDataControl
 from sensor_msgs.msg import JointState
 from control_msgs.msg import JointTrajectoryControllerState
 
@@ -46,6 +45,7 @@ class Mujoco_simNode(Node):
         # Set timestep options
         self.TIME_STEP_MJC = 0.0001
         self.model.opt.timestep = self.TIME_STEP_MJC
+
         # Create a service so the mujoco_reader node can obtain data from mujoco
         self.serv_read = self.create_service(ReadMujoco, 'read_mujoco', self.read_mujoco)
         # Create a subscriber for the writing-to-mujoco action
@@ -128,9 +128,32 @@ class Mujoco_simNode(Node):
             joint_pos = dict(zip(joint_names, refs))
             for j in range(len(self.controller)):
                 self.controller[j].joint_ref_dict = joint_pos
-
         except Empty:
             pass
+
+        # Publish data, will be put into different functions later on
+        state_msg = MujocoDataState()
+        for data in self.data.qpos:
+            state_msg.qpos.append(data)
+
+        for data in self.data.qvel:
+            state_msg.qvel.append(data)
+
+        for data in self.data.qacc:
+            state_msg.qacc.append(data)
+
+        for data in self.data.act:
+            state_msg.act.append(data)
+
+        publisher = self.create_publisher(
+            MujocoDataState, 'mujoco_state_output', 10)
+        publisher.publish(state_msg)
+
+        sensor_msg = MujocoDataSensing()
+        publisher = self.create_publisher(
+            MujocoDataSensing, 'mujoco_sensor_output', 10)
+        publisher.publish(sensor_msg)
+
         self.sim_step()
 
     def sim_visualizer_timer_callback(self):
@@ -150,32 +173,10 @@ class Mujoco_simNode(Node):
         Returns:
             ROS message: the response to be sent to the client. 
         """
-        if request.mujoco_info_type.request == 0:  # If the request was for an exo state
-            response.exo_state = MujocoDataState()
-            for data in self.data.qpos:
-                response.exo_state.qpos.append(data)
-
-            for data in self.data.qvel:
-                response.exo_state.qvel.append(data)
-
-            for data in self.data.qacc:
-                response.exo_state.qacc.append(data)
-
-            for data in self.data.act:
-                response.exo_state.act.append(data)
-
         if request.mujoco_info_type.request == 1:  # If the request was for a sensor state
             response.sensor_state = MujocoDataSensing()
             # NOTE: FOR NOW, PASS NOTHING AS WE DONT HAVE SENSORS YET/
             # WE SHOULD FIGURE OUT SOON WHAT E WANT TO ADD HERE
-
-        if request.mujoco_info_type.request == 2:  # If the request was for a control state
-            response.control_state = MujocoDataControl()
-            for data in self.data.ctrl:
-                response.control_state.ctrl.append(data)
-
-            for data in self.data.qfrc_applied:
-                response.control_state.qfrc_applied.append(data)
         return response
 
 

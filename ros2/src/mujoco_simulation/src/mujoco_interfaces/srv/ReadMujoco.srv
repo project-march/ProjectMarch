@@ -2,4 +2,3 @@ MujocoDataRequest mujoco_info_type
 ---
 MujocoDataState     exo_state
 MujocoDataSensing   sensor_state
-MujocoDataControl   control_state   

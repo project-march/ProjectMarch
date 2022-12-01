@@ -63,7 +63,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
-
+    RCLCPP_INFO((*logger_), "Info: %s ", info_);
     status_ = hardware_interface::status::CONFIGURED;
     return hardware_interface::return_type::OK;
 }
@@ -86,11 +86,6 @@ std::vector<hardware_interface::StateInterface> MarchRvizSystemInterface::export
             state_interfaces.emplace_back(hardware_interface::StateInterface(
                 info_.joints[i].name, motor_controller_pointer.first, motor_controller_pointer.second));
         }
-    }
-
-    // For the PDB broadcaster.
-    for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
-        state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
     return state_interfaces;
 }
