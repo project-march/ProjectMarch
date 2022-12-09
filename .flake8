@@ -14,6 +14,7 @@ exclude =
     .venv_march,
     .scripts,
     test
+    acados
 enable-extensions =
     B901,
     B902,
@@ -44,6 +45,7 @@ per-file-ignores =
 
     ros2/src/visualization/march_rqt_gait_version_tool/march_rqt_gait_version_tool/gait_version_tool_errors.py:D,
     ros2/src/visualization/march_rqt_gait_version_tool/march_rqt_gait_version_tool/parametric_same_versions_pop_up.py:D,
+
 
 
 
