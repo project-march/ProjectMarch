@@ -49,9 +49,6 @@ public:
 
     std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-    hardware_interface::return_type perform_command_mode_switch(
-        const std::vector<std::string>& start_interfaces, const std::vector<std::string>& stop_interfaces) override;
-
     hardware_interface::return_type start() override;
 
     hardware_interface::return_type stop() override;
@@ -64,7 +61,6 @@ private:
     const std::shared_ptr<rclcpp::Logger> logger_;
     static const std::string COMMAND_AND_STATE_TYPE; // = hardware_interface::HW_IF_POSITION
     std::vector<HwStateInfo> hw_state_info_;
-    std::vector<HwStateInfo> mjc_state_info_;
     std::vector<double> hw_positions_;
 
     march::PowerDistributionBoardData pdb_data_;

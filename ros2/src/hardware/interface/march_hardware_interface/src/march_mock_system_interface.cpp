@@ -29,7 +29,7 @@ namespace march_hardware_interface {
 
 const std::string MarchMockSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
-// NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
+// NOLINTNEXTLINE(hicpp-member-init).
 MarchMockSystemInterface::MarchMockSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchMockSystemInterface")))
 {
@@ -68,7 +68,7 @@ hardware_interface::return_type MarchMockSystemInterface::configure(const hardwa
 
 /** Returns a vector of the StateInterfaces.
  *
- * This method is implemented so that the joint_state_broadcaster controller can publish joint positions.
+ * This method is implemented so that the mujoco reader node can publish joint positions.
  * It does this by getting a pointer to the vector containing the positions.
  *
  * In this case this is the same as the vector containing the position_command. Meaning that the broadcaster controller
@@ -81,20 +81,15 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
         state_interfaces.emplace_back(
             hardware_interface::StateInterface(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
+
+//        [TO DO] For now only a position state interface is created, later when more control types are added, this should be expanded.
+
 //        // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
 //        state_interfaces.emplace_back(hardware_interface::StateInterface(
 //            info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &HwStateInfo.hw_velocity));
 //        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
 //        state_interfaces.emplace_back(hardware_interface::StateInterface(
 //            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &HwStateInfo.hw_effort));
-
-//        state_interfaces.emplace_back(
-//            hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
-
-        for (std::pair<std::string, double*>& motor_controller_pointer : motor_controllers_data_[i].get_pointers()) {
-            state_interfaces.emplace_back(hardware_interface::StateInterface(
-                info_.joints[i].name, motor_controller_pointer.first, motor_controller_pointer.second));
-        }
     }
     return state_interfaces;
 }
@@ -114,35 +109,22 @@ std::vector<hardware_interface::CommandInterface> MarchMockSystemInterface::expo
         command_interfaces.emplace_back(
             hardware_interface::CommandInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
     }
-
     return command_interfaces;
-}
-
-hardware_interface::return_type MarchMockSystemInterface::perform_command_mode_switch(
-    const vector<std::string>& start_interfaces, const vector<std::string>& stop_interfaces)
-{
-    for (const auto& start : start_interfaces) {
-        RCLCPP_INFO((*logger_), "Start interfaces: %s", start.c_str());
-    }
-    for (const auto& stop : stop_interfaces) {
-        RCLCPP_INFO((*logger_), "Stop interfaces: %s", stop.c_str());
-    }
-    return hardware_interface::return_type::OK;
 }
 
 /// This method is ran when you start the controller, (configure is ran earlier).
 hardware_interface::return_type MarchMockSystemInterface::start()
 {
-    RCLCPP_INFO((*logger_), "HW Rviz System interface Starting ...please wait...");
+    RCLCPP_INFO((*logger_), "Mock System interface Starting ...please wait...");
 
-    // set some default values Wwhen starting the first time
+    // set some default values when starting the first time
     for (uint i = 0; i < hw_positions_.size(); i++) {
         if (std::isnan(hw_positions_[i])) {
             hw_positions_[i] = 0;
         }
     }
     status_ = hardware_interface::status::STARTED;
-    RCLCPP_INFO((*logger_), "HW Rviz System interface successfully started!, This should go wel");
+    RCLCPP_INFO((*logger_), "Mock System interface successfully started!, This should go wel");
 
     return hardware_interface::return_type::OK;
 }
@@ -151,27 +133,23 @@ hardware_interface::return_type MarchMockSystemInterface::start()
 hardware_interface::return_type MarchMockSystemInterface::stop()
 {
     status_ = hardware_interface::status::STOPPED;
-    RCLCPP_INFO((*logger_), "HW Rviz System interface successfully stopped!");
+    RCLCPP_INFO((*logger_), "Mock System interface successfully stopped!");
     return hardware_interface::return_type::OK;
 }
 
 /** This is the update loop of the state interface.
  *
- *  This method is empty in this case as we directly set the state interface to read from the command controller.
+ *  This method is empty in this case as we directly set the state interface to read from the mujoco reader node.
  *  See: export_state_interfaces and export_command_interfaces().
  */
 hardware_interface::return_type MarchMockSystemInterface::read()
 {
-//    // Here the hw_positions should be updated
-//    for (uint i = 0; i < hw_positions_.size(); i++) {
-//        hw_positions_[i] = 1;
-//    }
     return hardware_interface::return_type::OK;
 }
 
 /** This is the update loop of the command interface.
  *
- *  This method is empty in this case as we directly set the state interface to read from the command controller.
+ *  This method is empty in this case as we directly set the state interface to read from the mujoco reader node.
  *  See: export_state_interfaces and export_command_interfaces().
  */
 hardware_interface::return_type MarchMockSystemInterface::write()

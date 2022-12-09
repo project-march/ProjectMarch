@@ -10,35 +10,24 @@ class Mujoco_writerNode(Node):
 
     def __init__(self):
         """This node is responsible for sending any commands from
-        our ROS systems to the Mujoco Sim node. it sends periodic
-        commands to update the low level controller
-        NOTE: Right now, it sends only a period command update.
-        Later, we will update this to be a publisher which
-        sends any commands obtained from another topic,
-        with which the ROS control systems can interact
+        our ROS systems to the Mujoco Sim node.
+        This node subscribes to the joint_trajectory_state/state topic.
+        On this topic, the MARCH Ros system publishes the actual and desired states,
+        that the low level controllers should work with.
+        This node is a passthrough from the MARCH state messages to the Mujoco sim node.
         """
         super().__init__("mujoco_writer")
         self.publisher = self.create_publisher(JointTrajectoryControllerState, 'mujoco_input', 10)
-        CONTROL_PUBLISH_RATE = 0.5
         self.subscription = self.create_subscription(
             JointTrajectoryControllerState,
             'joint_trajectory_controller/state',
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
-        # self.timer = self.create_timer(CONTROL_PUBLISH_RATE, self.timer_callback)
     
     def listener_callback(self, msg):
-        """NOTE: we will replace this timer callback with a subscriber
-        callback once we fully intergrate this with other packages.
+        """ This listener callback publishes all the messages from the MARCH code to the topic Mujoco sim subscribes to.
         """
-        # msg = MujocoSetControl()
-        # msg.stamp = self.get_clock().now().to_msg()
-        #This data is a placeholder, just for testing purposes
-        # msg.reference_control = [0.0,0.0,0.0,5.0,0.0]
-        # msg.mode = 1
-        # self.get_logger().info('Listener callback triggered!')
-        # self.get_logger().info(str(msg) + "\n")
         self.publisher.publish(msg)
 
 

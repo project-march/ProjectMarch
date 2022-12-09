@@ -12,14 +12,10 @@ class Mujoco_readerNode(Node):
 
     def __init__(self):
         """This node is responsible for obtaining data from Mujoco.
-        NOTE: Right now, it only obtains Pose() type messages, but we
-        can extend this to be more universal/modular in what data we want
-        to obtain.
         """
         super().__init__("mujoco_reader")
         self.state_publisher = self.create_publisher(JointState, 'joint_states', 10)
         self.sensor_publisher = self.create_publisher(MujocoDataSensing, 'mjc_exo_sensing', 10)
-        CONTROL_PUBLISH_RATE = 0.5
         self.state_subscription = self.create_subscription(
             MujocoDataState,
             'mujoco_state_output',

@@ -21,6 +21,10 @@ from controller_position import PositionController
 
 
 def get_actuator_names(model):
+    """ This function returns an string array containing the actuator names defined in the mujoco model.
+    The names are stored in an array with all other model objet names, with lined addresses.
+    To retrieve the names, a loop from the starting address to the terminating char is used.
+    """
     names = []
     for i in range(model.nu):
         name = ""
@@ -30,6 +34,8 @@ def get_actuator_names(model):
             j = j + 1
         names.append(name)
     return names
+
+
 class Mujoco_simNode(Node):
 
     def __init__(self):
@@ -58,8 +64,6 @@ class Mujoco_simNode(Node):
         self.TIME_STEP_MJC = 0.0001
         self.model.opt.timestep = self.TIME_STEP_MJC
 
-        # Create a service so the mujoco_reader node can obtain data from mujoco
-        self.serv_read = self.create_service(ReadMujoco, 'read_mujoco', self.read_mujoco)
         # Create a subscriber for the writing-to-mujoco action
         self.writer_subscriber = self.create_subscription(JointTrajectoryControllerState, 'mujoco_input',
                                                           self.writer_callback, 10)
@@ -82,7 +86,7 @@ class Mujoco_simNode(Node):
                                                 self.get_parameter("torque.D").value))
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
 
-        # Create a queue to store all incoming messages or correctly timed simulation
+        # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
         self.current_msg = None
 
@@ -93,18 +97,13 @@ class Mujoco_simNode(Node):
 
     def writer_callback(self, msg):
         """Callback function for the writing service.
-        This function updates the low-level controller reference angles.
+        This function enqueues all incomming messages in hte message queue.
+        With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
 
         Args:
             msg (MujocoControl message): Contains the inputs to be changed
         """
         self.msg_queue.put(msg)
-        # refs = msg.desired.positions
-        # joint_names = msg.joint_names
-        # joint_pos = dict(zip(joint_names, refs))
-        # for j in range(len(self.controller)):
-        #     self.controller[j].joint_ref_dict = joint_pos
-
 
     def sim_step(self):
         """This function performs the simulation update.
@@ -116,7 +115,6 @@ class Mujoco_simNode(Node):
         time_current = self.get_clock().now()
         time_difference = (time_current - self.time_last_updated).to_msg()
         mj_time_current = self.data.time
-
 
         time_difference_withseconds = time_difference.nanosec / 1e9 + time_difference.sec
 
@@ -131,10 +129,13 @@ class Mujoco_simNode(Node):
         This function is separated from the actual simstep function
         to ensure a nice divide between ROS systems and Mujoco functionality.
         """
+
+        # set joint ref to next trajectory point from the queue
+        # NOTE: the try catch is needed because at startup the node might run before a trajectory is send,
+        # in that case the queue is still empty throwing an exception
         try:
             msg = self.msg_queue.get_nowait()
             self.current_msg = msg
-            # self.get_logger().info(str(msg) + "\n")
             refs = msg.desired.positions
             joint_names = msg.joint_names
             joint_pos = dict(zip(joint_names, refs))
@@ -143,29 +144,8 @@ class Mujoco_simNode(Node):
         except Empty:
             pass
 
-        # Publish data, will be put into different functions later on
-        state_msg = MujocoDataState()
-        state_msg.names = self.actuator_names
-        for data in self.data.qpos:
-            state_msg.qpos.append(data)
-
-        for data in self.data.qvel:
-            state_msg.qvel.append(data)
-
-        for data in self.data.qacc:
-            state_msg.qacc.append(data)
-
-        for data in self.data.act:
-            state_msg.act.append(data)
-
-        publisher = self.create_publisher(
-            MujocoDataState, 'mujoco_state_output', 10)
-        publisher.publish(state_msg)
-
-        sensor_msg = MujocoDataSensing()
-        publisher = self.create_publisher(
-            MujocoDataSensing, 'mujoco_sensor_output', 10)
-        publisher.publish(sensor_msg)
+        self.publish_state_msg()
+        self.publish_sensor_msg()
 
         self.sim_step()
 
@@ -174,23 +154,39 @@ class Mujoco_simNode(Node):
         self.visualizer.update_window(self.model, self.data)
         # self.get_logger().debug(str(self.visualizer.cam))
 
-    def read_mujoco(self, request, response):
-        """Server callback function which sends the requested data
-        from Mujoco to the client. Only the message type is filled in for the specific request
-
-
-        Args:
-            request (ROS service): ReadMujoco message type(Mujoco_interfaces)
-            response (ROS message): Message response depending on the message type
-
-        Returns:
-            ROS message: the response to be sent to the client. 
+    def publish_state_msg(self):
         """
-        if request.mujoco_info_type.request == 1:  # If the request was for a sensor state
-            response.sensor_state = MujocoDataSensing()
-            # NOTE: FOR NOW, PASS NOTHING AS WE DONT HAVE SENSORS YET/
-            # WE SHOULD FIGURE OUT SOON WHAT E WANT TO ADD HERE
-        return response
+        This function creates and publishes the state message.
+        The state message is published on mujoco_state_output.
+        The message contains the name, position, velocity, acceleration and act of actuators of the model.
+        :return: None
+        """
+        state_msg = MujocoDataState()
+        state_msg.names = self.actuator_names
+        for data in self.data.qpos:
+            state_msg.qpos.append(data)
+        for data in self.data.qvel:
+            state_msg.qvel.append(data)
+        for data in self.data.qacc:
+            state_msg.qacc.append(data)
+        for data in self.data.act:
+            state_msg.act.append(data)
+
+        publisher = self.create_publisher(
+            MujocoDataState, 'mujoco_state_output', 10)
+        publisher.publish(state_msg)
+
+    def publish_sensor_msg(self):
+        """
+        This function creates and publishes the sensor message.
+        The state message is published on mujoco_sensor_output.
+        NOTE: Since it is still unsure what sensors will be used, this function does not retrieve sensor data yet.
+        :return: None
+        """
+        sensor_msg = MujocoDataSensing()
+        publisher = self.create_publisher(
+            MujocoDataSensing, 'mujoco_sensor_output', 10)
+        publisher.publish(sensor_msg)
 
 
 def main(args=None):
