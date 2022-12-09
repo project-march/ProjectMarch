@@ -22,7 +22,7 @@ class LowLvlController():
         self.e_prev = []  # previous error value for derivative action calculation
         self.ctrl = []  # The control values to be sent to mujoco
 
-        self.act_names = self.get_actuator_names(model)
+        self.act_names = origin.actuator_names
         name_dict = {}
 
         for i in range(self.actuator_amount):
@@ -35,14 +35,3 @@ class LowLvlController():
 
     def low_level_update(self, model, data):
         pass
-
-    def get_actuator_names(self, model):
-        names = []
-        for i in range(model.nu):
-            name = ""
-            j = model.name_actuatoradr[i]
-            while model.names[j] != 0:
-                name = name + chr(model.names[j])
-                j = j + 1
-            names.append(name)
-        return names

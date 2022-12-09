@@ -20,6 +20,16 @@ from controller_torque import TorqueController
 from controller_position import PositionController
 
 
+def get_actuator_names(model):
+    names = []
+    for i in range(model.nu):
+        name = ""
+        j = model.name_actuatoradr[i]
+        while model.names[j] != 0:
+            name = name + chr(model.names[j])
+            j = j + 1
+        names.append(name)
+    return names
 class Mujoco_simNode(Node):
 
     def __init__(self):
@@ -41,6 +51,8 @@ class Mujoco_simNode(Node):
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
 
         self.data = mujoco.MjData(self.model)
+
+        self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.0001
@@ -133,6 +145,7 @@ class Mujoco_simNode(Node):
 
         # Publish data, will be put into different functions later on
         state_msg = MujocoDataState()
+        state_msg.names = self.actuator_names
         for data in self.data.qpos:
             state_msg.qpos.append(data)
 

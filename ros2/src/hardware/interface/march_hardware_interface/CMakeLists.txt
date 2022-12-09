@@ -19,14 +19,37 @@ find_package(march_logger_cpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_utility REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 add_library(
         ${PROJECT_NAME}
         SHARED
         src/march_rviz_system_interface.cpp
+        include/march_hardware_interface/march_rviz_system_interface.hpp
         src/march_exo_system_interface.cpp
         include/march_hardware_interface/hwi_util.h
-        src/march_mujoco_system_interface.cpp include/march_hardware_interface/march_mujoco_system_interface.hpp)
+        src/march_mujoco_system_interface.cpp
+        include/march_hardware_interface/march_mujoco_system_interface.hpp
+        src/read_mujoco_info_node.cpp
+        include/march_hardware_interface/read_mujoco_info_node.hpp)
+
+add_executable(read_mujoco_info_node src/read_mujoco_info_node.cpp)
+target_include_directories(read_mujoco_info_node PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(
+        read_mujoco_info_node
+        hardware_interface
+        pluginlib
+        rclcpp
+        march_hardware
+        march_hardware_builder
+        march_logger_cpp
+        yaml-cpp
+        march_utility
+        sensor_msgs
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -42,6 +65,7 @@ ament_target_dependencies(
         march_logger_cpp
         yaml-cpp
         march_utility
+        sensor_msgs
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
@@ -58,6 +82,7 @@ ament_export_dependencies(
         march_logger_cpp
         yaml-cpp
         march_utility
+        sensor_msg
 )
 
 install(
@@ -72,6 +97,11 @@ install(
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
+)
+
+install(
+        TARGETS read_mujoco_info_node
+        DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "march_hardware_interface/march_rviz_system_interface.hpp"
 #include "march_hardware/motor_controller/odrive/odrive_state.h"
 
 #include <chrono>
@@ -21,12 +20,33 @@
 #include <memory>
 #include <vector>
 
+#include "march_hardware_interface/march_rviz_system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_interface/hwi_util.h"
 #include "march_utility/logger_colors.hpp"
 
 namespace march_hardware_interface {
+
 const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
+
+void MarchRvizSystemInterface::initSim(std::vector<MjcStateInfo> mjc_state_info){
+    RCLCPP_INFO((*logger_), "Hardware interface starts communication with mujoco!", LColor::GREEN);
+    std::vector<MjcStateInfo> vec = mjc_state_info;
+    for (int i = 0; i < static_cast<int>(vec.size()); i++ ){
+        hw_state_info_[i].mjc_state_info = vec[i];
+    }
+    updateHwState();
+}
+
+void MarchRvizSystemInterface::updateHwState(){
+    for (int i; i < static_cast<int>(hw_state_info_.size()); i++){
+        auto mjc_info = hw_state_info_[i].mjc_state_info;
+        hw_state_info_[i].name = mjc_info.name;
+        hw_state_info_[i].hw_position = mjc_info.mjc_position;
+        hw_state_info_[i].hw_velocity = mjc_info.mjc_velocity;
+        hw_state_info_[i].hw_effort = mjc_info.mjc_effort;
+    }
+}
 
 // NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
 MarchRvizSystemInterface::MarchRvizSystemInterface()
@@ -54,16 +74,13 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
     if (configure_default(info) != hardware_interface::return_type::OK) {
         return hardware_interface::return_type::ERROR;
     }
-    //    logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface"));
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
-    pdb_data_ = {};
     RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
-    RCLCPP_INFO((*logger_), "Info: %s ", info_);
     status_ = hardware_interface::status::CONFIGURED;
     return hardware_interface::return_type::OK;
 }
@@ -80,8 +97,19 @@ std::vector<hardware_interface::StateInterface> MarchRvizSystemInterface::export
 {
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (uint i = 0; i < info_.joints.size(); i++) {
+        // Position: Couples the state controller to the value jointInfo.position through a pointer.
         state_interfaces.emplace_back(
-            hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
+            hardware_interface::StateInterface(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
+//        // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
+//        state_interfaces.emplace_back(hardware_interface::StateInterface(
+//            info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &HwStateInfo.hw_velocity));
+//        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
+//        state_interfaces.emplace_back(hardware_interface::StateInterface(
+//            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &HwStateInfo.hw_effort));
+
+//        state_interfaces.emplace_back(
+//            hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
+
         for (std::pair<std::string, double*>& motor_controller_pointer : motor_controllers_data_[i].get_pointers()) {
             state_interfaces.emplace_back(hardware_interface::StateInterface(
                 info_.joints[i].name, motor_controller_pointer.first, motor_controller_pointer.second));
@@ -153,7 +181,10 @@ hardware_interface::return_type MarchRvizSystemInterface::stop()
  */
 hardware_interface::return_type MarchRvizSystemInterface::read()
 {
-    //    pdb_data_.pdb_current = ... Update the pdb data to something you like to test.
+//    // Here the hw_positions should be updated
+//    for (uint i = 0; i < hw_positions_.size(); i++) {
+//        hw_positions_[i] = 1;
+//    }
     return hardware_interface::return_type::OK;
 }
 
@@ -164,6 +195,7 @@ hardware_interface::return_type MarchRvizSystemInterface::read()
  */
 hardware_interface::return_type MarchRvizSystemInterface::write()
 {
+    updateHwState();
     return hardware_interface::return_type::OK;
 }
 

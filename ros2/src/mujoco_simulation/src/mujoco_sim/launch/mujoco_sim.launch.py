@@ -36,5 +36,10 @@ def generate_launch_description():
             package='mujoco_writer',
             executable='mujoco_writer_node',
             name='mujoco_writer',
-        )
+        ),
+        # Node(
+        #     package='march_hardware_interface',
+        #     executable='read_mujoco_info_node',
+        #     name='mjc_hwi_node',
+        # ),
     ])
