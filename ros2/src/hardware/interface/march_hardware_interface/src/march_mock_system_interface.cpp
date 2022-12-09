@@ -20,37 +20,18 @@
 #include <memory>
 #include <vector>
 
-#include "march_hardware_interface/march_rviz_system_interface.hpp"
+#include "march_hardware_interface/march_mock_system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_interface/hwi_util.h"
 #include "march_utility/logger_colors.hpp"
 
 namespace march_hardware_interface {
 
-const std::string MarchRvizSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
-
-void MarchRvizSystemInterface::initSim(std::vector<MjcStateInfo> mjc_state_info){
-    RCLCPP_INFO((*logger_), "Hardware interface starts communication with mujoco!", LColor::GREEN);
-    std::vector<MjcStateInfo> vec = mjc_state_info;
-    for (int i = 0; i < static_cast<int>(vec.size()); i++ ){
-        hw_state_info_[i].mjc_state_info = vec[i];
-    }
-    updateHwState();
-}
-
-void MarchRvizSystemInterface::updateHwState(){
-    for (int i; i < static_cast<int>(hw_state_info_.size()); i++){
-        auto mjc_info = hw_state_info_[i].mjc_state_info;
-        hw_state_info_[i].name = mjc_info.name;
-        hw_state_info_[i].hw_position = mjc_info.mjc_position;
-        hw_state_info_[i].hw_velocity = mjc_info.mjc_velocity;
-        hw_state_info_[i].hw_effort = mjc_info.mjc_effort;
-    }
-}
+const std::string MarchMockSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
 // NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
-MarchRvizSystemInterface::MarchRvizSystemInterface()
-    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchRvizSystemInterface")))
+MarchMockSystemInterface::MarchMockSystemInterface()
+    : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchMockSystemInterface")))
 {
     march_hardware_interface_util::go_to_stop_state_on_crash(this);
 }
@@ -59,7 +40,7 @@ MarchRvizSystemInterface::MarchRvizSystemInterface()
  *  \note This doesn't work for thrown exceptions this is why we still call
  *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
  */
-MarchRvizSystemInterface::~MarchRvizSystemInterface()
+MarchMockSystemInterface::~MarchMockSystemInterface()
 {
     // NOLINT because this is intended. It needs to calls its own implementation, not that from its child class.
     stop(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
@@ -68,7 +49,7 @@ MarchRvizSystemInterface::~MarchRvizSystemInterface()
 /** Configures the controller.
  * Checkout https://design.ros2.org/articles/node_lifecycle.html, for more information on the execution order.
  */
-hardware_interface::return_type MarchRvizSystemInterface::configure(const hardware_interface::HardwareInfo& info)
+hardware_interface::return_type MarchMockSystemInterface::configure(const hardware_interface::HardwareInfo& info)
 {
     //    info.joints[0].parameters
     if (configure_default(info) != hardware_interface::return_type::OK) {
@@ -76,7 +57,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
     }
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
-    RCLCPP_INFO(rclcpp::get_logger("MarchRvizSystemInterface"), "%s-----Here!!---", LColor::BLUE);
+    RCLCPP_INFO(rclcpp::get_logger("MarchMockSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
         return hardware_interface::return_type::ERROR;
@@ -93,7 +74,7 @@ hardware_interface::return_type MarchRvizSystemInterface::configure(const hardwa
  * In this case this is the same as the vector containing the position_command. Meaning that the broadcaster controller
  * will say that the joints are in the exact positions position controller wants them to be.
  */
-std::vector<hardware_interface::StateInterface> MarchRvizSystemInterface::export_state_interfaces()
+std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export_state_interfaces()
 {
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (uint i = 0; i < info_.joints.size(); i++) {
@@ -126,7 +107,7 @@ std::vector<hardware_interface::StateInterface> MarchRvizSystemInterface::export
  * In this case this is the same as the vector containing the position state. Meaning that the broadcaster controller
  * will say that the joints are in the exact positions position controller wants them to be.
  */
-std::vector<hardware_interface::CommandInterface> MarchRvizSystemInterface::export_command_interfaces()
+std::vector<hardware_interface::CommandInterface> MarchMockSystemInterface::export_command_interfaces()
 {
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (uint i = 0; i < info_.joints.size(); i++) {
@@ -137,7 +118,7 @@ std::vector<hardware_interface::CommandInterface> MarchRvizSystemInterface::expo
     return command_interfaces;
 }
 
-hardware_interface::return_type MarchRvizSystemInterface::perform_command_mode_switch(
+hardware_interface::return_type MarchMockSystemInterface::perform_command_mode_switch(
     const vector<std::string>& start_interfaces, const vector<std::string>& stop_interfaces)
 {
     for (const auto& start : start_interfaces) {
@@ -150,7 +131,7 @@ hardware_interface::return_type MarchRvizSystemInterface::perform_command_mode_s
 }
 
 /// This method is ran when you start the controller, (configure is ran earlier).
-hardware_interface::return_type MarchRvizSystemInterface::start()
+hardware_interface::return_type MarchMockSystemInterface::start()
 {
     RCLCPP_INFO((*logger_), "HW Rviz System interface Starting ...please wait...");
 
@@ -167,7 +148,7 @@ hardware_interface::return_type MarchRvizSystemInterface::start()
 }
 
 /// This method is ran when you stop the controller, (start is ran earlier).
-hardware_interface::return_type MarchRvizSystemInterface::stop()
+hardware_interface::return_type MarchMockSystemInterface::stop()
 {
     status_ = hardware_interface::status::STOPPED;
     RCLCPP_INFO((*logger_), "HW Rviz System interface successfully stopped!");
@@ -179,7 +160,7 @@ hardware_interface::return_type MarchRvizSystemInterface::stop()
  *  This method is empty in this case as we directly set the state interface to read from the command controller.
  *  See: export_state_interfaces and export_command_interfaces().
  */
-hardware_interface::return_type MarchRvizSystemInterface::read()
+hardware_interface::return_type MarchMockSystemInterface::read()
 {
 //    // Here the hw_positions should be updated
 //    for (uint i = 0; i < hw_positions_.size(); i++) {
@@ -193,9 +174,8 @@ hardware_interface::return_type MarchRvizSystemInterface::read()
  *  This method is empty in this case as we directly set the state interface to read from the command controller.
  *  See: export_state_interfaces and export_command_interfaces().
  */
-hardware_interface::return_type MarchRvizSystemInterface::write()
+hardware_interface::return_type MarchMockSystemInterface::write()
 {
-    updateHwState();
     return hardware_interface::return_type::OK;
 }
 
@@ -203,4 +183,4 @@ hardware_interface::return_type MarchRvizSystemInterface::write()
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(march_hardware_interface::MarchRvizSystemInterface, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(march_hardware_interface::MarchMockSystemInterface, hardware_interface::SystemInterface)

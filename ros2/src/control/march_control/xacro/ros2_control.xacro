@@ -48,10 +48,10 @@
     <hardware>
       <xacro:if value="${type == 'rviz'}">
 <!--        <plugin>fake_components/GenericSystem</plugin>-->
-        <!-- Switch the 'fake_components/GenericSystem' with 'march_hardware_interface/MarchRvizSystemInterface' -->
+        <!-- Switch the 'fake_components/GenericSystem' with 'march_hardware_interface/MarchMockSystemInterface' -->
         <!-- If you whish to debug and play around with a very simple hardware interface, -->
         <!-- They practically work the same -->
-        <plugin>march_hardware_interface/MarchRvizSystemInterface</plugin>
+        <plugin>march_hardware_interface/MarchMockSystemInterface</plugin>
       </xacro:if>
       <xacro:if value="${type == 'effort'}">
 <!--        <xacro:if value="$(arg gazebo)">-->

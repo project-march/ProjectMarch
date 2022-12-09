@@ -1,6 +1,6 @@
 <library path="march_hardware_interface">
-    <class name="march_hardware_interface/MarchRvizSystemInterface"
-           type="march_hardware_interface::MarchRvizSystemInterface"
+    <class name="march_hardware_interface/MarchMockSystemInterface"
+           type="march_hardware_interface::MarchMockSystemInterface"
            base_class_type="hardware_interface::SystemInterface">
         <description>
             A dumped down version of the HW Interface to use in rviz, with position control.
@@ -14,15 +14,4 @@
             The HW Interface to use the exo with ros2 effort control.
         </description>
     </class>
-
-    <class name="march_hardware_interface/MarchMujocoSystemInterface"
-           type="march_hardware_interface::MarchMujocoSystemInterface"
-           base_class_type="hardware_interface::SystemInterface">
-        <description>
-            The HW Interface to use the mujoco simulation with ros2 control.
-        </description>
-    </class>
-
-
-
 </library>
