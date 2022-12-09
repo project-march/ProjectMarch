@@ -20,9 +20,9 @@
 #include <memory>
 #include <vector>
 
-#include "march_hardware_interface/march_mock_system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_interface/hwi_util.h"
+#include "march_hardware_interface/march_mock_system_interface.hpp"
 #include "march_utility/logger_colors.hpp"
 
 namespace march_hardware_interface {
@@ -79,17 +79,18 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (uint i = 0; i < info_.joints.size(); i++) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
-        state_interfaces.emplace_back(
-            hardware_interface::StateInterface(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+            info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
 
-//        [TO DO] For now only a position state interface is created, later when more control types are added, this should be expanded.
+        //      [TO DO] For now only a position state interface is created, later when more control types are added,
+        //      this should be expanded.
 
-//        // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
-//        state_interfaces.emplace_back(hardware_interface::StateInterface(
-//            info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &HwStateInfo.hw_velocity));
-//        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
-//        state_interfaces.emplace_back(hardware_interface::StateInterface(
-//            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &HwStateInfo.hw_effort));
+        //        // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
+        //        state_interfaces.emplace_back(hardware_interface::StateInterface(
+        //            info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &HwStateInfo.hw_velocity));
+        //        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
+        //        state_interfaces.emplace_back(hardware_interface::StateInterface(
+        //            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &HwStateInfo.hw_effort));
     }
     return state_interfaces;
 }

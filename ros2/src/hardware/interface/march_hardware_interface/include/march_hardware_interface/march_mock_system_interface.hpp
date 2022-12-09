@@ -19,8 +19,8 @@
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
-#include "march_hardware_interface/visibility_control.h"
 #include "march_hardware_interface/march_mock_system_interface.hpp"
+#include "march_hardware_interface/visibility_control.h"
 #include "rclcpp/macros.hpp"
 
 namespace march_hardware_interface {
