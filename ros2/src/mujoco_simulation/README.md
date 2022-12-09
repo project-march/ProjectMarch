@@ -1,14 +1,14 @@
-# Mujoco Simulation
-</p>
-This repository is a sub-repository of the <b><a href="https://gitlab.com/project-march/march">Project March repository</h></b>.
+## Mujoco Simulation
+
+This repository is a sub-repository of the <b><a href="https://gitlab.com/project-march/march">Project March repository</a></b>.
 It contains the ROS2 workspace for running the <b>Mujoco simulation-to-High level control</b> loop. It is mainly used for testing high-level controllers on a simulated exoskeleton in Mujoco. This allows for rapid prototyping of these controllers before the physical exoskeleton is operational.
 
 <b>Please note that once this repository is deemed feature-complete, it will be integrated into the main March repository as a mock for the hardware interface.</b>
 
 ## How to Build
-</p>
 
-- To install required ROS enviroment, please follow the [Install ROS and tools](https://docs.projectmarch.nl/doc/getting_started/install_ros_and_tools.html) instructions.
+
+- To install required ROS environment, please follow the [Installation ROS and tools](https://docs.projectmarch.nl/doc/getting_started/install_ros_and_tools.html) instructions.
 
 - Then, to set up the workspace, copy-paste the following instructions line by line:
 
@@ -104,4 +104,4 @@ The package containing the node which performs the Mujoco simulation loop.
 The package containing the node which  writes data to the Mujoco simulation.
 
 ### <b>📦 robot_description</b>
-The package containnig the models to be used in the Mujoco simulation.
+The package containing the models to be used in the Mujoco simulation.
