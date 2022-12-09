@@ -1,5 +1,4 @@
 from low_level_controller import LowLvlController
-import numpy as np
 
 
 class TorqueController(LowLvlController):

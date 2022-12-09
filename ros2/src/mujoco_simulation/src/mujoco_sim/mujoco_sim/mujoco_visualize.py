@@ -1,5 +1,6 @@
 import mujoco
 
+
 class MujocoVisualizer():
 
     def __init__(self, model, data):
@@ -13,8 +14,8 @@ class MujocoVisualizer():
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
 
-        #Initialize the camera and other relevant variables needed for
-        #the visualization
+        # Initialize the camera and other relevant variables needed for
+        # the visualization
         self.cam = mujoco.MjvCamera()
         self.cam.type = 1
         self.opt = mujoco.MjvOption()
@@ -26,12 +27,12 @@ class MujocoVisualizer():
 
         mujoco.mjv_defaultCamera(self.cam)
         mujoco.mjv_defaultOption(self.opt)
-        #Manually adjust the base camera distance to make the entire model visible
+        # Manually adjust the base camera distance to make the entire model visible
         self.cam.distance = 5.0
 
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
-        #Collect the time when the simulation has been started
+        # Collect the time when the simulation has been started
         self.simstart = data.time
 
     def update_window(self, model, data):
@@ -41,6 +42,7 @@ class MujocoVisualizer():
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
+
         viewport = mujoco.MjrRect(0, 0, 1200, 900)
 
         mujoco.mjv_updateScene(model, data, self.opt, None, self.cam, mujoco.mjtCatBit.mjCAT_ALL.value, self.scene)
@@ -48,8 +50,3 @@ class MujocoVisualizer():
 
         mujoco.glfw.glfw.swap_buffers(self.window)
         mujoco.glfw.glfw.poll_events()
-
-
-
-
-    

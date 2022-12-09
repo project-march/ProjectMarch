@@ -1,18 +1,14 @@
-import numpy as np
-from mujoco_interfaces.srv import ReadMujoco
-from mujoco_interfaces.msg import MujocoDataRequest
-
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState
 import rclpy
 from rclpy.node import Node
 
-class Mujoco_readerNode(Node):
+
+class MujocoReaderNode(Node):
 
     def __init__(self):
-        """This node is responsible for obtaining data from Mujoco.
-        """
+        """ This node is responsible for obtaining data from Mujoco. """
         super().__init__("mujoco_reader")
         self.state_publisher = self.create_publisher(JointState, 'joint_states', 10)
         self.sensor_publisher = self.create_publisher(MujocoDataSensing, 'mjc_exo_sensing', 10)
@@ -32,6 +28,12 @@ class Mujoco_readerNode(Node):
     # Now the callback just plainly passes through the message, later on it might be the case that it has to be
     # converted to another message type
     def state_listener_callback(self, msg):
+        """
+        Listens to mujoco_state_output topic, and retrieves all newly published messages.
+        These messages are converted to a joint_state msg, an published on hte joint_state topic
+        :param msg: a msg of mujoco_state_output type
+        :return: None
+        """
         joint_state = JointState()
         joint_state.name = msg.names
         joint_state.position = msg.qpos
@@ -42,15 +44,26 @@ class Mujoco_readerNode(Node):
     # Now the callback just plainly passes through the message, later on it might be the case that it has to be
     # converted to another message type
     def sensor_listener_callback(self, msg):
+        """
+        Listens to mujoco_sensor_output topic, and retrieves all newly published messages.
+        These messages are converted to a MujocoDataSensing msg, an published on hte mjc_exo_sensing topic
+        :param msg: a msg of MujocoDataSensing type
+        :return: None
+        """
         self.sensor_publisher.publish(msg)
 
 
-
 def main(args=None):
+    """
+    Main function of the node
+    :param args:
+    :return:
+    """
     rclpy.init(args=args)
-    node = Mujoco_readerNode()
+    node = MujocoReaderNode()
     rclpy.spin(node)
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

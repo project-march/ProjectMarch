@@ -1,7 +1,6 @@
-import numpy as np
-from collections import OrderedDict
 
-class LowLvlController():
+
+class LowLvlController:
 
     def __init__(self, origin, model, data):
         """A class which imitates the low-level control of the robot.

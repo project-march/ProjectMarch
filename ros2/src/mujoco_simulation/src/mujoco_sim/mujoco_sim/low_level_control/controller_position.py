@@ -1,7 +1,4 @@
 from low_level_controller import LowLvlController
-import numpy as np
-
-from control_msgs.msg import JointTrajectoryControllerState
 
 
 class PositionController(LowLvlController):

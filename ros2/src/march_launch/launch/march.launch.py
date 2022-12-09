@@ -104,7 +104,7 @@ def generate_launch_description() -> LaunchDescription:
             default_value="false",
             description="If Mujoco simulation should be started or not",
             choices=["true", "false"],
-        )
+        ),
     ]
     # endregion
 

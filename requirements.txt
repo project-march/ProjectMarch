@@ -11,3 +11,10 @@ parameterized==0.8.1
 numpy==1.21.2
 pyrealsense2==2.50.0.3812
 opencv-python==4.5.5.64
+setuptools~=45.2.0
+attrs~=19.3.0
+PyYAML~=5.3.1
+PyQt5~=5.14.1
+matplotlib~=3.1.2
+Jinja2~=3.1.2
+mujoco~=2.3.0

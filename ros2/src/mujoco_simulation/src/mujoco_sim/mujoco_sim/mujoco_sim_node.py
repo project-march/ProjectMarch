@@ -1,5 +1,3 @@
-import os
-import numpy as np
 import mujoco
 import rclpy
 from rclpy.node import Node
@@ -7,8 +5,6 @@ from ament_index_python.packages import get_package_share_directory
 
 from queue import Queue, Empty
 
-from mujoco_interfaces.srv import ReadMujoco
-from mujoco_interfaces.msg import MujocoSetControl
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState
@@ -25,6 +21,7 @@ def get_actuator_names(model):
     The names are stored in an array with all other model objet names, with lined addresses.
     To retrieve the names, a loop from the starting address to the terminating char is used.
     """
+
     names = []
     for i in range(model.nu):
         name = ""
@@ -36,13 +33,15 @@ def get_actuator_names(model):
     return names
 
 
-class Mujoco_simNode(Node):
+class MujocoSimNode(Node):
 
     def __init__(self):
-        """his Class is responsible for running the Mujoco simulation.
+        """
+        This Class is responsible for running the Mujoco simulation.
         A timer is created to update the simulation at a certain rate using
         the sim_step function.
         """
+
         super().__init__("mujoco_sim")
         self.declare_parameter('model_toload')
 
@@ -103,15 +102,18 @@ class Mujoco_simNode(Node):
         Args:
             msg (MujocoControl message): Contains the inputs to be changed
         """
+
         self.msg_queue.put(msg)
 
     def sim_step(self):
-        """This function performs the simulation update.
+        """
+        This function performs the simulation update.
         NOTE: As Mujoco is expected to run faster than ros 2's refresh
         rate limit, modify this so it will repeat multiple time steps
         per rosnode spin event. Also keep track of the time in Mujoco
         vs the time in ROS, so we can update the control inputs on time
         """
+
         time_current = self.get_clock().now()
         time_difference = (time_current - self.time_last_updated).to_msg()
         mj_time_current = self.data.time
@@ -121,7 +123,6 @@ class Mujoco_simNode(Node):
         while self.data.time - mj_time_current <= time_difference_withseconds:
             mujoco.mj_step(self.model, self.data)
 
-        time_error = abs(time_difference_withseconds - (self.data.time - mj_time_current))
         self.time_last_updated = self.get_clock().now()
 
     def sim_update_timer_callback(self):
@@ -150,9 +151,12 @@ class Mujoco_simNode(Node):
         self.sim_step()
 
     def sim_visualizer_timer_callback(self):
+        """
+        Callback for the visualization of mujoco
+        :return: None
+        """
 
         self.visualizer.update_window(self.model, self.data)
-        # self.get_logger().debug(str(self.visualizer.cam))
 
     def publish_state_msg(self):
         """
@@ -161,6 +165,7 @@ class Mujoco_simNode(Node):
         The message contains the name, position, velocity, acceleration and act of actuators of the model.
         :return: None
         """
+
         state_msg = MujocoDataState()
         state_msg.names = self.actuator_names
         for data in self.data.qpos:
@@ -183,6 +188,7 @@ class Mujoco_simNode(Node):
         NOTE: Since it is still unsure what sensors will be used, this function does not retrieve sensor data yet.
         :return: None
         """
+
         sensor_msg = MujocoDataSensing()
         publisher = self.create_publisher(
             MujocoDataSensing, 'mujoco_sensor_output', 10)
@@ -190,8 +196,14 @@ class Mujoco_simNode(Node):
 
 
 def main(args=None):
+    """
+    Main function for lyfe cycle of the node
+    :param args:
+    :return:
+    """
+
     rclpy.init(args=args)
-    node = Mujoco_simNode()
+    node = MujocoSimNode()
     rclpy.spin(node)
     node.sim_step()
     rclpy.shutdown()

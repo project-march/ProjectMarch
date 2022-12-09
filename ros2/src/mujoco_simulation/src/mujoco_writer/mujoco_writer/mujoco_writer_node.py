@@ -6,16 +6,18 @@ from sensor_msgs.msg import JointState
 from control_msgs.msg import JointTrajectoryControllerState
 
 
-class Mujoco_writerNode(Node):
+class MujocoWriterNode(Node):
 
     def __init__(self):
-        """This node is responsible for sending any commands from
+        """
+        This node is responsible for sending any commands from
         our ROS systems to the Mujoco Sim node.
         This node subscribes to the joint_trajectory_state/state topic.
         On this topic, the MARCH Ros system publishes the actual and desired states,
         that the low level controllers should work with.
         This node is a passthrough from the MARCH state messages to the Mujoco sim node.
         """
+
         super().__init__("mujoco_writer")
         self.publisher = self.create_publisher(JointTrajectoryControllerState, 'mujoco_input', 10)
         self.subscription = self.create_subscription(
@@ -24,16 +26,18 @@ class Mujoco_writerNode(Node):
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
-    
+
     def listener_callback(self, msg):
-        """ This listener callback publishes all the messages from the MARCH code to the topic Mujoco sim subscribes to.
         """
+        This listener callback publishes all the messages from the MARCH code to the topic Mujoco sim subscribes to.
+        """
+
         self.publisher.publish(msg)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = Mujoco_writerNode()
+    node = MujocoWriterNode()
     rclpy.spin(node)
     rclpy.shutdown()
 

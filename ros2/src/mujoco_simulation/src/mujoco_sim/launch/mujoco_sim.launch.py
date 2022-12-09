@@ -4,12 +4,12 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-def generate_launch_description():
 
+def generate_launch_description():
     config = os.path.join(
-    get_package_share_directory('mujoco_sim'),
-    'config',
-    'low_level_controller_tunings.yaml'
+        get_package_share_directory('mujoco_sim'),
+        'config',
+        'low_level_controller_tunings.yaml'
     )
 
     return LaunchDescription([
@@ -18,7 +18,7 @@ def generate_launch_description():
             namespace='',
             executable='mujoco_sim_node',
             name='mujoco_sim',
-            parameters = [
+            parameters=[
                 config,
                 {"model_toload": "march.xml"}
             ]
@@ -28,7 +28,7 @@ def generate_launch_description():
             namespace='',
             executable='mujoco_reader_node',
             name='mujoco_reader',
-            parameters = [
+            parameters=[
                 {"reader_data_type": 0}
             ]
         ),
@@ -37,9 +37,4 @@ def generate_launch_description():
             executable='mujoco_writer_node',
             name='mujoco_writer',
         ),
-        # Node(
-        #     package='march_hardware_interface',
-        #     executable='read_mujoco_info_node',
-        #     name='mjc_hwi_node',
-        # ),
     ])
