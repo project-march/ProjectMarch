@@ -9,10 +9,9 @@ class LowLvlController:
 
         Functions as a PID right now which directly applies control to the Mujoco simulation.
         Args:
-            origin (object ID): the id of the simulation node
-            data (Mujoco Struct): Refers to the data struct from Mujoco
-            p (float): Proportional-value of a PD controller
-            d (float): Derivative-value of a PD controller
+        :param origin: (object ID): the id of the simulation node.
+        :param model: (Mujoco Struct): Refers to the model struct from Mujoco.
+        :param data: (Mujoco Struct): Refers to the data struct from Mujoco.
         """
         # Define the amount of controllable joints based on
         # the generalized coordinates generated within Mujoco
@@ -38,4 +37,3 @@ class LowLvlController:
 
         Makes sure that a controller actually updates the model values.
         """
-

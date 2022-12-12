@@ -162,8 +162,8 @@ class MujocoSimNode(Node):
 
     def publish_state_msg(self):
         """This function creates and publishes the state message.
-        The state message is published on mujoco_state_output.
 
+        The state message is published on mujoco_state_output.
         The message contains the name, position, velocity, acceleration and act of actuators of the model.
         :return: None
         """
@@ -184,8 +184,8 @@ class MujocoSimNode(Node):
 
     def publish_sensor_msg(self):
         """This function creates and publishes the sensor message.
-        The state message is published on mujoco_sensor_output.
 
+        The state message is published on mujoco_sensor_output.
         NOTE: Since it is still unsure what sensors will be used, this function does not retrieve sensor data yet.
         :return: None
         """

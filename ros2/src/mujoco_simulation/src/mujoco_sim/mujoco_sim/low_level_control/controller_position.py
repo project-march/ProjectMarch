@@ -7,12 +7,13 @@ class PositionController(LowLvlController):
     """This class implements the low level position control used by the mujoco simulation.
 
     When the simulation receives a position command from the MARCH code, this class is called.
-    For the control a PD controller is used."""
+    For the control a PD controller is used.
+    """
 
     def __init__(self, origin, model, data, p, d):
         """A class which imitates the low-level control of the robot.
 
-        Functions as a PID right now which directly applies control 
+        Functions as a PID right now which directly applies control
         to the Mujoco simulation
         Args:
             origin (object ID): the id of the simulation node
@@ -37,7 +38,6 @@ class PositionController(LowLvlController):
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
-
         # update the control inputs based on PID
 
         for count, act_name in enumerate(self.act_names):
