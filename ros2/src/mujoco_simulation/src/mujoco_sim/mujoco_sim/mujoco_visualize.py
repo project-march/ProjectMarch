@@ -3,19 +3,22 @@
 import mujoco
 
 
-class MujocoVisualizer():
+class MujocoVisualizer:
+    """This class handles the visualisation of mujoco
+
+    The class calls the api from mujoco to open a window and show the model moving.
+    """
 
     def __init__(self, model, data):
         """This visualizer class handles the window in which Mujoco is rendered.
         We can later decide to turn it on or off by simply turning off the timer.
+
         Other functionalities, such as camera moving etc can also be added to this
         class.
-
         Args:
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
-
         # Initialize the camera and other relevant variables needed for
         # the visualization
         self.cam = mujoco.MjvCamera()
@@ -44,7 +47,6 @@ class MujocoVisualizer():
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
-
         viewport = mujoco.MjrRect(0, 0, 1200, 900)
 
         mujoco.mjv_updateScene(model, data, self.opt, None, self.cam, mujoco.mjtCatBit.mjCAT_ALL.value, self.scene)

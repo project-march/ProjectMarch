@@ -2,13 +2,13 @@
 
 
 class LowLvlController:
-    """The base controller class for the Mujoco simulation low level trajectory control"""
+    """The base controller class for the Mujoco simulation low level trajectory control."""
 
     def __init__(self, origin, model, data):
         """A class which imitates the low-level control of the robot.
-        Functions as a PID right now which directly applies control 
-        to the Mujoco simulation
 
+        Functions as a PID right now which directly applies control 
+        to the Mujoco simulation.
         Args:
             origin (object ID): the id of the simulation node
             data (Mujoco Struct): Refers to the data struct from Mujoco
@@ -35,4 +35,8 @@ class LowLvlController:
         self.origin = origin
 
     def low_level_update(self, model, data):
+        """Function that should be implemented by the inheriting classes.
+
+        Makes sure that a controller actually updates the model values.
+        """
         pass
