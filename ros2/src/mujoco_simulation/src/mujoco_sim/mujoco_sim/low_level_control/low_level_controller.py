@@ -1,6 +1,8 @@
+"""Author: MVIII."""
 
 
 class LowLvlController:
+    """The base controller class for the Mujoco simulation low level trajectory control"""
 
     def __init__(self, origin, model, data):
         """A class which imitates the low-level control of the robot.

@@ -1,3 +1,5 @@
+"""Author: MVIII."""
+
 import mujoco
 
 

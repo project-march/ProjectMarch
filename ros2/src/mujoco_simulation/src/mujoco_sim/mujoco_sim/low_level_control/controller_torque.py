@@ -1,7 +1,13 @@
+"""Author: MVIII."""
+
 from low_level_controller import LowLvlController
 
 
 class TorqueController(LowLvlController):
+    """This class implements the low level torque control used by the mujoco simulation.
+    When the simulation receives a torque command from the MARCH code, this class is called.
+    For the control a PD controller is used.
+    """
 
     def __init__(self, origin, model, data, p, d):
         """A class which imitates the low-level control of the robot.

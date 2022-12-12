@@ -1,3 +1,5 @@
+"""Author: MVIII."""
+
 import mujoco
 import rclpy
 from rclpy.node import Node
@@ -34,6 +36,10 @@ def get_actuator_names(model):
 
 
 class MujocoSimNode(Node):
+    """This node is the base simulation node.
+    In this node the simulation is started, adn the model and data are manipulated.
+    Both the reader and writer node communicate with this node to retrieve the data from simulation.
+    """
 
     def __init__(self):
         """

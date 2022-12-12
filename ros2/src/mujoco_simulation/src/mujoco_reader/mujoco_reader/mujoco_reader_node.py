@@ -1,3 +1,5 @@
+"""Author: MVIII."""
+
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState
@@ -6,6 +8,9 @@ from rclpy.node import Node
 
 
 class MujocoReaderNode(Node):
+    """This node read all the state and sensor data from the Mujoco sim,
+    then that data is published on a topic that the March HWI can access.
+    """
 
     def __init__(self):
         """ This node is responsible for obtaining data from Mujoco. """
@@ -28,8 +33,7 @@ class MujocoReaderNode(Node):
     # Now the callback just plainly passes through the message, later on it might be the case that it has to be
     # converted to another message type
     def state_listener_callback(self, msg):
-        """
-        Listens to mujoco_state_output topic, and retrieves all newly published messages.
+        """Listens to mujoco_state_output topic, and retrieves all newly published messages.
         These messages are converted to a joint_state msg, an published on hte joint_state topic
         :param msg: a msg of mujoco_state_output type
         :return: None
@@ -44,8 +48,7 @@ class MujocoReaderNode(Node):
     # Now the callback just plainly passes through the message, later on it might be the case that it has to be
     # converted to another message type
     def sensor_listener_callback(self, msg):
-        """
-        Listens to mujoco_sensor_output topic, and retrieves all newly published messages.
+        """Listens to mujoco_sensor_output topic, and retrieves all newly published messages.
         These messages are converted to a MujocoDataSensing msg, an published on hte mjc_exo_sensing topic
         :param msg: a msg of MujocoDataSensing type
         :return: None
@@ -54,8 +57,7 @@ class MujocoReaderNode(Node):
 
 
 def main(args=None):
-    """
-    Main function of the node
+    """Main function of the node
     :param args:
     :return:
     """
