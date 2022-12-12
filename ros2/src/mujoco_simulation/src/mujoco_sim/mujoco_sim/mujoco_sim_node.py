@@ -9,7 +9,6 @@ from queue import Queue, Empty
 
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
-from sensor_msgs.msg import JointState
 from control_msgs.msg import JointTrajectoryControllerState
 
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
@@ -19,12 +18,11 @@ from controller_position import PositionController
 
 
 def get_actuator_names(model):
-    """ This function returns an string array containing the actuator names defined in the mujoco model.
+    """This function returns an string array containing the actuator names defined in the mujoco model.
 
     The names are stored in an array with all other model objet names, with lined addresses.
     To retrieve the names, a loop from the starting address to the terminating char is used.
     """
-
     names = []
     for i in range(model.nu):
         name = ""
@@ -165,8 +163,8 @@ class MujocoSimNode(Node):
     def publish_state_msg(self):
         """This function creates and publishes the state message.
         The state message is published on mujoco_state_output.
-        The message contains the name, position, velocity, acceleration and act of actuators of the model.
 
+        The message contains the name, position, velocity, acceleration and act of actuators of the model.
         :return: None
         """
         state_msg = MujocoDataState()

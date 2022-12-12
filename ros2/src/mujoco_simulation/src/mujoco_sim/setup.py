@@ -13,8 +13,7 @@ setup(
              'mujoco_sim/low_level_control/low_level_controller.py',
              'mujoco_sim/low_level_control/controller_torque.py'],
     data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name), glob('urdf/*')),
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),

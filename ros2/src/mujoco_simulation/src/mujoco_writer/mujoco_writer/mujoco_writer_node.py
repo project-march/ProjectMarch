@@ -19,7 +19,6 @@ class MujocoWriterNode(Node):
         that the low level controllers should work with.
         This node is a passthrough from the MARCH state messages to the Mujoco sim node.
         """
-
         super().__init__("mujoco_writer")
         self.publisher = self.create_publisher(JointTrajectoryControllerState, 'mujoco_input', 10)
         self.subscription = self.create_subscription(
@@ -34,7 +33,6 @@ class MujocoWriterNode(Node):
 
         This callback is just a simple passthrough to keep the flow clear.
         """
-
         self.publisher.publish(msg)
 
 

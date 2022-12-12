@@ -4,15 +4,15 @@ import mujoco
 
 
 class MujocoVisualizer:
-    """This class handles the visualisation of mujoco
+    """This class handles the visualisation of mujoco.
 
     The class calls the api from mujoco to open a window and show the model moving.
     """
 
     def __init__(self, model, data):
         """This visualizer class handles the window in which Mujoco is rendered.
-        We can later decide to turn it on or off by simply turning off the timer.
 
+        We can later decide to turn it on or off by simply turning off the timer.
         Other functionalities, such as camera moving etc can also be added to this
         class.
         Args:

@@ -29,9 +29,9 @@ class TorqueController(LowLvlController):
         self.d = d
 
     def low_level_update(self, model, data):
-        """The low-level control update callback function. This function
-        is called by Mujoco at the start of every simulation step.
+        """The low-level control update callback function.
 
+        This function is called by Mujoco at the start of every simulation step.
         While model isn't used as a variable, the callback function has
         to have this as an argument by Mujoco standards.
         Args:
