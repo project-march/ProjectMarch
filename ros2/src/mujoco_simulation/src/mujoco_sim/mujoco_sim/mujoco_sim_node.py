@@ -104,7 +104,6 @@ class MujocoSimNode(Node):
 
         This function enqueues all incomming messages in hte message queue.
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
-        Args:
             msg (MujocoControl message): Contains the inputs to be changed
         """
         self.msg_queue.put(msg)

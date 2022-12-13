@@ -15,7 +15,6 @@ class MujocoVisualizer:
         We can later decide to turn it on or off by simply turning off the timer.
         Other functionalities, such as camera moving etc can also be added to this
         class.
-        Args:
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """

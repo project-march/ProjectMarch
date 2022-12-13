@@ -34,7 +34,6 @@ class TorqueController(LowLvlController):
         This function is called by Mujoco at the start of every simulation step.
         While model isn't used as a variable, the callback function has
         to have this as an argument by Mujoco standards.
-        Args:
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
