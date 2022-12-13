@@ -110,11 +110,11 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/development/add_a_new_gait
    doc/development/index_ros_for_cpp_in_jetbrains.rst
 
-.. toctree::
-    :caption: MARCH packages
-    :glob:
-
-    doc/march_packages/**/README
+# .. toctree::
+#     :caption: MARCH packages
+#     :glob:
+#
+#     doc/march_packages/**/README
 
 .. toctree::
   :caption: March Packages (Semi-outdated)
