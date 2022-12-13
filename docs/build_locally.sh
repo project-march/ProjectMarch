@@ -61,7 +61,8 @@ function readmes_to_sphinx ()
     echo "Successfully converted READMEs to reStructuredText!"
 }
 
-readmes_to_sphinx "../ros1/src ../ros2/src" "doc/march_packages/"
+readmes_to_sphinx "doc/march_packages/"
+#readmes_to_sphinx "../ros2/src" "doc/march_packages/"
 
 # Build the sphinx documentation while catching warnings and errors
 sphinx-build -W -b html . build
