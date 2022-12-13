@@ -38,7 +38,8 @@ ignore =
     D107,       # Requires docstring to be init, but we document it at class level.
     T002,       # We don't need an author after TODO tags.
     T003,       # We don't need a link to an issue after TODO tags.
-    BLK100      # Gives unclear error msgs, where everything looks good
+    BLK100      # Gives unclear error msgs, where everything looks good.
+    SIM115
 # The following are ignored due to missing docstring in old code.
 per-file-ignores =
     ros2/*/setup.py:D100,

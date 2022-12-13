@@ -95,9 +95,9 @@ class MujocoSimNode(Node):
         self.current_msg = None
 
         # Create the visualizer and visualization timer
-        SIM_WINDOW_FPS = 60
+        sim_window_fps = 60
         self.visualizer = MujocoVisualizer(self.model, self.data)
-        self.create_timer(1 / SIM_WINDOW_FPS, self.sim_visualizer_timer_callback)
+        self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
     def writer_callback(self, msg):
         """Callback function for the writing service.
