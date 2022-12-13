@@ -16,12 +16,11 @@ class TorqueController(LowLvlController):
         Functions as a PID right now which directly applies control
         to the Mujoco simulation.
         Args:
-
-        :param origin: (object ID): the id of the simulation node.
-        :param model: (Mujoco Struct): Refers to the model struct from Mujoco.
-        :param data: (Mujoco Struct): Refers to the data struct from Mujoco.
-        :param p: (float): Proportional-value of a PD controller.
-        :param d: (float): Derivative-value of a PD controller.
+        :param origin: (object ID): the id of the simulation node
+        :param model: (Mujoco Struct): Refers to the model struct from Mujoco
+        :param data: (Mujoco Struct): Refers to the data struct from Mujoco
+        :param p: (float): Proportional-value of a PD controller
+        :param d: (float): Derivative-value of a PD controller
         """
         # Define the amount of controllable joints based on
         # the generalized coordinates generated within Mujoco
@@ -41,7 +40,6 @@ class TorqueController(LowLvlController):
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
         # update the control inputs based on PID
-
         for i in range(self.actuator_amount):
             dt = self.origin.TIME_STEP_MJC  # TEMP VARIABLE, REMOVE IN NEXT SPRINT
             joint_val = data.qfrc_actuator[i]
