@@ -22,7 +22,7 @@ workflow:
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
-  GIT_SUBMODULE_PATHS: (exclude)ros2/src/mujoco_simulation/src/acados
+  GIT_SUBMODULE_PATHS: (exclude)../mujoco_simulation/src/acados.git
 
 # The different stages of the pipeline. They will occur in this order.
 # See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
