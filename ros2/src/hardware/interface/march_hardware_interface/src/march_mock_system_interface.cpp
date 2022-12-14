@@ -125,7 +125,7 @@ hardware_interface::return_type MarchMockSystemInterface::start()
         }
     }
     status_ = hardware_interface::status::STARTED;
-    RCLCPP_INFO((*logger_), "Mock System interface successfully started!, This should go wel");
+    RCLCPP_INFO((*logger_), "Mock System interface successfully started!, This should go well");
 
     return hardware_interface::return_type::OK;
 }

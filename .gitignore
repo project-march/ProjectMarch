@@ -197,3 +197,6 @@ codequality.json
 
 **/.vscode/**
 .DS_Store
+
+# Mujuco stuff
+*.MUJOCO_LOG.TXT
