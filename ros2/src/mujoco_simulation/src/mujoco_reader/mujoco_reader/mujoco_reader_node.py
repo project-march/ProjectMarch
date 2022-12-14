@@ -7,6 +7,16 @@ import rclpy
 from rclpy.node import Node
 
 
+def convert_mujoco_data_state_to_joint_state(msg):
+    """converts the MojocoDataState to a JointState message"""
+    joint_state = JointState()
+    joint_state.name = msg.names
+    joint_state.position = msg.qpos
+    joint_state.velocity = msg.qvel
+    joint_state.effort = msg.qacc
+    return joint_state
+
+
 class MujocoReaderNode(Node):
     """This node read all the state and sensor data from the Mujoco sim.
 
@@ -43,12 +53,7 @@ class MujocoReaderNode(Node):
         :param msg: a msg of mujoco_state_output type
         :return: None
         """
-        joint_state = JointState()
-        joint_state.name = msg.names
-        joint_state.position = msg.qpos
-        joint_state.velocity = msg.qvel
-        joint_state.effort = msg.qacc
-        self.state_publisher.publish(joint_state)
+        self.state_publisher.publish(convert_mujoco_data_state_to_joint_state(msg))
 
     # Now the callback just plainly passes through the message, later on it might be the case that it has to be
     # converted to another message type

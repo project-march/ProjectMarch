@@ -34,6 +34,29 @@ def get_actuator_names(model):
     return names
 
 
+def get_controller_data(msg):
+    """get correct joint positions, linked to the joint name, form the incoming message"""
+    refs = msg.desired.positions
+    joint_names = msg.joint_names
+    joint_pos = dict(zip(joint_names, refs))
+    return joint_pos
+
+
+def get_data_state_msg(actuator_names, data):
+    """create a state message from the mujoco data, where the data is linked to the correct joint name"""
+    state_msg = MujocoDataState()
+    state_msg.names = actuator_names
+    for data in data.qpos:
+        state_msg.qpos.append(data)
+    for data in data.qvel:
+        state_msg.qvel.append(data)
+    for data in data.qacc:
+        state_msg.qacc.append(data)
+    for data in data.act:
+        state_msg.act.append(data)
+    return state_msg
+
+
 class MujocoSimNode(Node):
     """This node is the base simulation node.
 
@@ -92,7 +115,6 @@ class MujocoSimNode(Node):
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
-        self.current_msg = None
 
         # Create the visualizer and visualization timer
         sim_window_fps = 60
@@ -136,12 +158,10 @@ class MujocoSimNode(Node):
         # set joint ref to next trajectory point from the queue
         # NOTE: the try catch is needed because at startup the node might run before a trajectory is send,
         # in that case the queue is still empty throwing an exception
+
         try:
             msg = self.msg_queue.get_nowait()
-            self.current_msg = msg
-            refs = msg.desired.positions
-            joint_names = msg.joint_names
-            joint_pos = dict(zip(joint_names, refs))
+            joint_pos = self.get_contoller_data(msg)
             for j in range(len(self.controller)):
                 self.controller[j].joint_ref_dict = joint_pos
         except Empty:
@@ -166,17 +186,7 @@ class MujocoSimNode(Node):
         The message contains the name, position, velocity, acceleration and act of actuators of the model.
         :return: None
         """
-        state_msg = MujocoDataState()
-        state_msg.names = self.actuator_names
-        for data in self.data.qpos:
-            state_msg.qpos.append(data)
-        for data in self.data.qvel:
-            state_msg.qvel.append(data)
-        for data in self.data.qacc:
-            state_msg.qacc.append(data)
-        for data in self.data.act:
-            state_msg.act.append(data)
-
+        state_msg = get_data_state_msg(self.actuator_names, self.data)
         publisher = self.create_publisher(
             MujocoDataState, 'mujoco_state_output', 10)
         publisher.publish(state_msg)

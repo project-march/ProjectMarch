@@ -41,8 +41,6 @@ flake8:
       codequality: codeclimate.json
   variables:
     DOCKER_FILE: ".gitlab/dockerfiles/flake8"
-    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
-    GIT_SUBMODULE_STRATEGY: none
   needs:
     - job: "flake8 container build"
       optional: true

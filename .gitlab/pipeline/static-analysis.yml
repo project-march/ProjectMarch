@@ -8,14 +8,11 @@
 .clang_tidy_base:
   stage: Static analysis on code
   image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
-  variables:
-    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
-    GIT_SUBMODULE_STRATEGY: none
   script:
     - cd $ROS_VERSION/
     # Find all C and C++ related files, filter all files that are not part of the march code
     # and run clang-tidy on the files
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p build {} 2> /dev/null
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "src/mujoco_simulation/acados" | xargs -L1 -P4 -I{} -- clang-tidy -p build {} 2> /dev/null
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:

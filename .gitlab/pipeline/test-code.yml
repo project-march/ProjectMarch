@@ -9,9 +9,6 @@
   # In most cases, this will just be `main`, unless the Dockerfile has
   # changed.
   image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
-  variables:
-    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
-    GIT_SUBMODULE_STRATEGY: normal
   script:
     - cd $ROS_VERSION/
     - source /opt/ros/$ROS_CODENAME/local_setup.bash && source install/local_setup.bash
