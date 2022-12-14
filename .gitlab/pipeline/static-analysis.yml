@@ -8,6 +8,9 @@
 .clang_tidy_base:
   stage: Static analysis on code
   image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
+  variables:
+    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     - cd $ROS_VERSION/
     # Find all C and C++ related files, filter all files that are not part of the march code

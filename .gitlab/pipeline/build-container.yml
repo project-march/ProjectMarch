@@ -23,6 +23,8 @@
 
 .ros_container_builder:
   variables:
+    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
+    GIT_SUBMODULE_STRATEGY: recursive
     CACHE: "true"
     REGISTRY_IMAGE: "$CI_REGISTRY_IMAGE/$ROS_CODENAME"
   rules:
@@ -54,6 +56,7 @@
          TAG: $CI_COMMIT_BRANCH
   extends:
     - .container_builder
+
 
 .ci_tool_container_builder:
   variables:
