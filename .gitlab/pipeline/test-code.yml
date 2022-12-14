@@ -12,7 +12,7 @@
   script:
     - cd $ROS_VERSION/
     - source /opt/ros/$ROS_CODENAME/local_setup.bash && source install/local_setup.bash
-    - colcon test --event-handlers console_direct+ --packages-skip joint_state_broadcaster
+    - colcon test --event-handlers console_direct+ --packages-skip joint_state_broadcaster rosbag2 rosbag2_test_common rosbag2_tests rosbag2_transport
     - colcon test-result --verbose
   rules:
     # These rules are checking if certain values have the correct values.
