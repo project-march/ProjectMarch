@@ -35,15 +35,14 @@ def get_actuator_names(model):
 
 
 def get_controller_data(msg):
-    """get correct joint positions, linked to the joint name, form the incoming message"""
+    """Get correct joint positions, linked to the joint name, form the incoming message."""
     refs = msg.desired.positions
     joint_names = msg.joint_names
-    joint_pos = dict(zip(joint_names, refs))
-    return joint_pos
+    return dict(zip(joint_names, refs))
 
 
 def get_data_state_msg(actuator_names, data):
-    """create a state message from the mujoco data, where the data is linked to the correct joint name"""
+    """Create a state message from the mujoco data, where the data is linked to the correct joint name."""
     state_msg = MujocoDataState()
     state_msg.names = actuator_names
     for data in data.qpos:
@@ -124,7 +123,7 @@ class MujocoSimNode(Node):
     def writer_callback(self, msg):
         """Callback function for the writing service.
 
-        This function enqueues all incomming messages in hte message queue.
+        This function enqueues all incoming messages in hte message queue.
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """

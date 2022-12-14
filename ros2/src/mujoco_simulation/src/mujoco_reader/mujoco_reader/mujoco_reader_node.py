@@ -8,7 +8,7 @@ from rclpy.node import Node
 
 
 def convert_mujoco_data_state_to_joint_state(msg):
-    """converts the MojocoDataState to a JointState message"""
+    """Converts the MojocoDataState to a JointState message."""
     joint_state = JointState()
     joint_state.name = msg.names
     joint_state.position = msg.qpos
