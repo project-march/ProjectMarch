@@ -41,17 +41,17 @@ def get_controller_data(msg):
     return dict(zip(joint_names, refs))
 
 
-def get_data_state_msg(actuator_names, data):
+def get_data_state_msg(actuator_names, mjc_data):
     """Create a state message from the mujoco data, where the data is linked to the correct joint name."""
     state_msg = MujocoDataState()
     state_msg.names = actuator_names
-    for data in data.qpos:
+    for data in mjc_data.qpos:
         state_msg.qpos.append(data)
-    for data in data.qvel:
+    for data in mjc_data.qvel:
         state_msg.qvel.append(data)
-    for data in data.qacc:
+    for data in mjc_data.qacc:
         state_msg.qacc.append(data)
-    for data in data.act:
+    for data in mjc_data.act:
         state_msg.act.append(data)
     return state_msg
 
