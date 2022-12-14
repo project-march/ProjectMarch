@@ -33,9 +33,9 @@
     - colcon build --packages-select acados
     - colcon build --packages-select acados_solver
     - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
-#  variables:
-#    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
-#    GIT_SUBMODULE_STRATEGY: recursive
+  variables:
+    # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
+    GIT_SUBMODULE_STRATEGY: recursive
   rules:
     # These rules are checking if certain values have the correct values.
     # These variables are predefined by GitLab and their definitions
