@@ -36,7 +36,7 @@
 	branch = foxy-devel
 [submodule "ros2/src/mujoco_simulation/src/acados"]
 	path = ros2/src/mujoco_simulation/src/acados
-	url = https://github.com/acados/acados.git
+	url = ../libraries/acados.git
 	branch = master
 # We add this because the most up to date foxy rosbag doesn't allow for excluding topics.
 [submodule "ros2/src/libraries/rosbag2"]
