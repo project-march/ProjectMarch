@@ -19,11 +19,13 @@ find_package(march_logger_cpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_utility REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 add_library(
         ${PROJECT_NAME}
         SHARED
-        src/march_rviz_system_interface.cpp
+        src/march_mock_system_interface.cpp
+        include/march_hardware_interface/march_mock_system_interface.hpp
         src/march_exo_system_interface.cpp
         include/march_hardware_interface/hwi_util.h
 )
@@ -42,6 +44,7 @@ ament_target_dependencies(
         march_logger_cpp
         yaml-cpp
         march_utility
+        sensor_msgs
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
@@ -58,6 +61,7 @@ ament_export_dependencies(
         march_logger_cpp
         yaml-cpp
         march_utility
+        sensor_msg
 )
 
 install(

@@ -55,6 +55,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
     # Simulation arguments
     gazebo = LaunchConfiguration("gazebo")
+    mujoco = LaunchConfiguration("mujoco")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 
@@ -165,6 +166,12 @@ def generate_launch_description() -> launch.LaunchDescription:
             name="gazebo",
             default_value="false",
             description="Whether gazebo should be launched.",
+            choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="mujoco",
+            default_value="false",
+            description="Whether mujoco should be launched.",
             choices=["true", "false"],
         ),
         DeclareLaunchArgument(
@@ -333,6 +340,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("simulation", simulation),
             ("jointless", jointless),
             ("gazebo", gazebo),
+            ("mujoco", mujoco),
             ("control_yaml", control_yaml),
             ("rosbags", "false"),
         ],

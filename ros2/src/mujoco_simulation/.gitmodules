@@ -1,0 +1,3 @@
+[submodule "src/acados"]
+	path = src/acados
+	url = https://github.com/acados/acados

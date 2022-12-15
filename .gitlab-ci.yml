@@ -22,7 +22,6 @@ workflow:
 variables:
   # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
-
 # The different stages of the pipeline. They will occur in this order.
 # See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
 # on how this should be interpreted.

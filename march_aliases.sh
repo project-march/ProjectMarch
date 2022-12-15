@@ -31,6 +31,7 @@ alias mb='march_build'
 alias mba='march_build_all'
 alias sim2='march_run_ros2_sim'
 alias sim='march_run_ros2_sim'
+alias mujoco='sim mujoco:=true rviz:=false'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
@@ -82,7 +83,7 @@ alias format_py='cm && black .'
 alias format='format_cpp && format_py'
 
 # Static analysis shortcuts (needs clang-tidy: `sudo apt-get install -y clang-tidy`)
-alias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+alias march_static_analysis_ros2='echo "Running analysis, this can take 88 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
 alias march_static_analysis_ros2_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
 # Flake8 shortcuts (python code style checker)
 alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:dev" && \
