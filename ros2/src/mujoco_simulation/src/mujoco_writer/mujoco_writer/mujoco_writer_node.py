@@ -33,6 +33,7 @@ class MujocoWriterNode(Node):
 
         This callback is just a simple passthrough to keep the flow clear.
         """
+        self.get_logger().info(msg)
         self.publisher.publish(msg)
 
 

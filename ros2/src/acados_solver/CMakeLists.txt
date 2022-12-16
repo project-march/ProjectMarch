@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(high_level_controller)
+project(acados_solver)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -17,8 +17,34 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-# find_package(acados REQUIRED)
+find_package(pluginlib REQUIRED)
+
+set(acados_include "${PROJECT_SOURCE_DIR}/../libraries/acados/include")
+set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
+
+add_executable(solver_node src/solver_node.cpp)
+target_include_directories(solver_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(
+  solver_node
+  "pluginlib"
+)
+
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+include_directories(
+        ${catkin_INCLUDE_DIRS}
+        ${full_model_build}
+        ${acados_include}
+        ${acados_include}/blasfeo/include/
+        ${acados_include}/hpipm/include/
+        ${acados_include}/acados/
+        ${acados_include}/qpOASES_e/
+)
+
+install(TARGETS solver_node
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
 #  find_package(ament_lint_auto REQUIRED)

@@ -127,6 +127,7 @@ class MujocoSimNode(Node):
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
+
         self.msg_queue.put(msg)
 
     def sim_step(self):
