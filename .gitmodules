@@ -34,12 +34,11 @@
 	path = ros2/src/libraries/realsense_gazebo_plugin
 	url = https://github.com/pal-robotics/realsense_gazebo_plugin.git
 	branch = foxy-devel
-[submodule "ros2/src/mujoco_simulation/src/acados"]
-	path = ros2/src/mujoco_simulation/src/acados
-	url = ../libraries/acados.git
-	branch = master
 # We add this because the most up to date foxy rosbag doesn't allow for excluding topics.
 [submodule "ros2/src/libraries/rosbag2"]
 	path = ros2/src/libraries/rosbag2
 	url = https://github.com/ros2/rosbag2.git
     branch = foxy-future
+[submodule "ros2/src/libraries/acados"]
+	path = ros2/src/libraries/acados
+	url = ../libraries/acados.git
