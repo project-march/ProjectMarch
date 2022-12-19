@@ -56,6 +56,14 @@ hardware_interface::return_type MarchMockSystemInterface::configure(const hardwa
         return hardware_interface::return_type::ERROR;
     }
     hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    for (const auto& joint : info.joints) {
+        HwStateInfo hw_info;
+        hw_info.name = joint.name.c_str();
+        hw_info.hw_position = std::numeric_limits<double>::quiet_NaN();
+        hw_info.hw_velocity = std::numeric_limits<double>::quiet_NaN();
+        hw_info.hw_effort = std::numeric_limits<double>::quiet_NaN();
+        hw_state_info_.push_back(hw_info);
+    }
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
     RCLCPP_INFO(rclcpp::get_logger("MarchMockSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
@@ -92,6 +100,10 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
         //        state_interfaces.emplace_back(hardware_interface::StateInterface(
         //            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &HwStateInfo.hw_effort));
     }
+//    for (uint i = 0; i < info_.joints.size(); i++) {
+//        state_interfaces.emplace_back(
+//                hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
+//    }
     return state_interfaces;
 }
 
@@ -122,6 +134,17 @@ hardware_interface::return_type MarchMockSystemInterface::start()
     for (uint i = 0; i < hw_positions_.size(); i++) {
         if (std::isnan(hw_positions_[i])) {
             hw_positions_[i] = 0;
+        }
+    }
+    for (auto hw_info : hw_state_info_) {
+        if (std::isnan(hw_info.hw_position)) {
+            hw_info.hw_position = 0;
+        }
+        if (std::isnan(hw_info.hw_velocity)) {
+            hw_info.hw_velocity = 0;
+        }
+        if (std::isnan(hw_info.hw_effort)) {
+            hw_info.hw_effort = 0;
         }
     }
     status_ = hardware_interface::status::STARTED;

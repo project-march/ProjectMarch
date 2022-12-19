@@ -160,7 +160,7 @@ class MujocoSimNode(Node):
 
         try:
             msg = self.msg_queue.get_nowait()
-            joint_pos = self.get_contoller_data(msg)
+            joint_pos = get_controller_data(msg)
             for j in range(len(self.controller)):
                 self.controller[j].joint_ref_dict = joint_pos
         except Empty:
