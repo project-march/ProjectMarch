@@ -100,10 +100,11 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
         //        state_interfaces.emplace_back(hardware_interface::StateInterface(
         //            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &HwStateInfo.hw_effort));
     }
-//    for (uint i = 0; i < info_.joints.size(); i++) {
-//        state_interfaces.emplace_back(
-//                hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
-//    }
+    //    for (uint i = 0; i < info_.joints.size(); i++) {
+    //        state_interfaces.emplace_back(
+    //                hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE,
+    //                &hw_positions_[i]));
+    //    }
     return state_interfaces;
 }
 
