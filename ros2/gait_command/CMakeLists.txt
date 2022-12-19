@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(state_estimator)
+project(gait_command)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -17,19 +17,16 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(march_shared_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(rclcpp REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-add_executable(state_estimator_node src/state_estimator_node.cpp)
-target_include_directories(state_estimator_node PUBLIC
+add_executable(gait_command_node src/gait_command_node.cpp)
+target_include_directories(gait_command_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS state_estimator_node
+install(TARGETS gait_command_node
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
