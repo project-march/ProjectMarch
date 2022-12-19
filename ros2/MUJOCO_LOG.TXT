@@ -1,3 +1,0 @@
-Mon Dec 19 14:13:37 2022
-WARNING: Nan, Inf or huge value in CTRL at ACTUATOR 0. The simulation is unstable. Time = 14.9175.
-
