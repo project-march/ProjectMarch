@@ -17,11 +17,15 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(mujoco_interfaces REQUIRED)
+find_package(march_shared_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
 add_executable(gait_command_node src/gait_command_node.cpp)
+ament_target_dependencies(gait_command_node rclcpp mujoco_interfaces march_shared_msgs)
 target_include_directories(gait_command_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)

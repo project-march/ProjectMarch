@@ -65,6 +65,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcJoint.msg"
   "msg/MpcMsg.msg"
   "msg/RobotState.msg"
+  "msg/GaitType.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PublishTestDataset.srv"
@@ -76,6 +77,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetMoveItTrajectory.srv"
   "srv/GetJointNames.srv"
   "srv/SetObstacleSize.srv"
+  "srv/GaitCommand.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs
         trajectory_msgs control_msgs actionlib_msgs sensor_msgs
  )

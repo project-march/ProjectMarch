@@ -21,12 +21,13 @@ find_package(rclcpp REQUIRED)
 find_package(mujoco_interfaces REQUIRED)
 find_package(gait_library REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(march_shared_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
 add_executable(gait_loader_node src/gait_loader_node.cpp)
-ament_target_dependencies(gait_loader_node rclcpp gait_library mujoco_interfaces trajectory_msgs)
+ament_target_dependencies(gait_loader_node rclcpp gait_library mujoco_interfaces trajectory_msgs march_shared_msgs)
 target_include_directories(gait_loader_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)

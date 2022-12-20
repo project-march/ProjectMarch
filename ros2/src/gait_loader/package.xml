@@ -10,6 +10,7 @@
   <depend>robot_description</depend>
   <depend>mujoco_interfaces</depend>
   <depend>trajectory_msgs</depend>
+  <depend>march_shared_msgs</depend>
   <depend>gait_library</depend>
   <depend>rclrcpp</depend>
   <test_depend>ament_lint_auto</test_depend>
