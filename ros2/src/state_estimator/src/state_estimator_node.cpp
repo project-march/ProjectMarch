@@ -5,6 +5,7 @@
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+
 using std::placeholders::_1;
 
 class StateEstimator:public rclcpp::Node {
@@ -18,22 +19,22 @@ public:
             std::bind(&StateEstimator::state_callback, this, _1));
     };
 private:
-    void sensor_callback(sensor_msgs::msg::Imu msg){
+    void sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg){
     };
 
-    void state_callback(sensor_msgs::msg::JointState msg){
+    void state_callback(sensor_msgs::msg::JointState::SharedPtr msg){
     };
 
     void publish_robot_state(){
         auto msg = march_shared_msgs::msg::RobotState();
-        message.header.stamp = this->get_clock()->now();
+        msg.stamp = this->get_clock()->now();
         msg.joint_names.push_back("");
         msg.joint_pos.push_back(0);
         msg.joint_vel.push_back(0);
-        msg.sensor_name.push_back("");
+        msg.sensor_names.push_back("");
         msg.sensor_data.push_back(0);
 
-        state_publisher->publish(msg)
+        state_publisher->publish(msg);
     };
 
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr state_publisher;
@@ -47,7 +48,7 @@ int main(int argc, char ** argv)
     printf("state_estimator node started!\n");
 
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<GaitLoader>());
+    rclcpp::spin(std::make_shared<StateEstimator>());
     rclcpp::shutdown();
     return 0;
 }

@@ -64,6 +64,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcTuning.msg"
   "msg/MpcJoint.msg"
   "msg/MpcMsg.msg"
+  "msg/RobotState.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PublishTestDataset.srv"

@@ -25,6 +25,7 @@ find_package(rclcpp REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 add_executable(state_estimator_node src/state_estimator_node.cpp)
+ament_target_dependencies(state_estimator_node rclcpp sensor_msgs march_shared_msgs)
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
