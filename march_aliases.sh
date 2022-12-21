@@ -35,6 +35,9 @@ alias mujoco='sim mujoco:=true rviz:=false'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
+# Alias to build one package, appended with specified pakage
+alias mbp='mba --packages-select'
+
 
 # Training aliases
 export URDF6='robot:=march6_three_cameras'
