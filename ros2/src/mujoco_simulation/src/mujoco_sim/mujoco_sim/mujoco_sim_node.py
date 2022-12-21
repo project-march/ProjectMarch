@@ -10,7 +10,6 @@ from queue import Queue, Empty
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
-from control_msgs.msg import JointTrajectoryControllerState
 
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 
