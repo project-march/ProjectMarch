@@ -106,10 +106,13 @@ class MujocoSimNode(Node):
         # This list of controllers contains all active controllers
         self.controller_mode = 0
         self.controller = []
-        self.controller.append(PositionController(self, self.model, self.data, self.get_parameter("position.P").value,
+        self.controller.append(PositionController(self, self.model, self.get_parameter("position.P").value,
                                                   self.get_parameter("position.D").value))
-        self.controller.append(TorqueController(self, self.model, self.data, self.get_parameter("torque.P").value,
+        self.controller.append(TorqueController(self, self.model, self.get_parameter("torque.P").value,
                                                 self.get_parameter("torque.D").value))
+        # set the sensor mappings(which control signal for which reference?)
+        self.controller[0].set_sensor_map([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.controller[1].set_sensor_map([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
 
         # Create a queue to store all incoming messages for a correctly timed simulation
