@@ -18,11 +18,15 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+find_package(march_shared_msgs REQUIRED)
 
 set(acados_include "${PROJECT_SOURCE_DIR}/../libraries/acados/include")
 set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
 
 add_executable(solver_node src/solver_node.cpp)
+ament_target_dependencies(solver_node rclcpp trajectory_msgs march_shared_msgs)
 target_include_directories(solver_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
