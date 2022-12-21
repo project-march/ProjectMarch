@@ -3,6 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from control_msgs.msg import JointTrajectoryControllerState
+from mujoco_interfaces.msg import MujocoInput
 
 
 class MujocoWriterNode(Node):
@@ -20,10 +21,10 @@ class MujocoWriterNode(Node):
         This node is a passthrough from the MARCH state messages to the Mujoco sim node.
         """
         super().__init__("mujoco_writer")
-        self.publisher = self.create_publisher(JointTrajectoryControllerState, 'mujoco_input', 10)
+        self.publisher = self.create_publisher(MujocoInput, 'mujoco_input', 10)
         self.subscription = self.create_subscription(
             JointTrajectoryControllerState,
-            'joint_trajectory_controller/state',
+            'joint_trajectory_controller/joint_state',
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
@@ -33,6 +34,9 @@ class MujocoWriterNode(Node):
 
         This callback is just a simple passthrough to keep the flow clear.
         """
+        msg_tosend = MujocoInput()
+        msg_tosend.trajectory = msg
+        msg_tosend.reset = 0
         self.publisher.publish(msg)
 
 

@@ -9,6 +9,7 @@ from queue import Queue, Empty
 
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
+from mujoco_interfaces.msg import MujocoInput
 from control_msgs.msg import JointTrajectoryControllerState
 
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
@@ -91,7 +92,7 @@ class MujocoSimNode(Node):
         self.model.opt.timestep = self.TIME_STEP_MJC
 
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(JointTrajectoryControllerState, 'mujoco_input',
+        self.writer_subscriber = self.create_subscription(MujocoInput, 'mujoco_input',
                                                           self.writer_callback, 10)
 
         # Initialize the low-level controller
@@ -127,6 +128,8 @@ class MujocoSimNode(Node):
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
+        if (msg.reset == 1):
+            self.msgs_queue.clear()
         self.msg_queue.put(msg)
 
     def sim_step(self):
