@@ -45,7 +45,7 @@ march7:
 #          indexFound: true
           absoluteEncoder:
             resolution: 14
-            direction: 1joint
+            direction: 1
             minPositionIU: 9378  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 10403  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 9786

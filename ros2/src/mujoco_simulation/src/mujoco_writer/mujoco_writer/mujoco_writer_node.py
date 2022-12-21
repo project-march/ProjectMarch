@@ -36,8 +36,9 @@ class MujocoWriterNode(Node):
         """
         msg_tosend = MujocoInput()
         msg_tosend.trajectory = msg
-        msg_tosend.reset = 0
-        self.publisher.publish(msg)
+        msg_tosend.reset = 1
+        self._get_logger().info("I work beep boop")
+        self.publisher.publish(msg_tosend)
 
 
 def main(args=None):

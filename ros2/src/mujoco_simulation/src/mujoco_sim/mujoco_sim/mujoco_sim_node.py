@@ -129,6 +129,7 @@ class MujocoSimNode(Node):
         """
         if (msg.reset == 1):
             self.msgs_queue.clear()
+            self.get_logger().info(str(self.msgs_queue))
         self.msg_queue.put(msg)
 
     def sim_step(self):
