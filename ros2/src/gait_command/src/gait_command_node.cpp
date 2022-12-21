@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <memory>
 using std::placeholders::_1;
+using std::placeholders::_2;
+using namespace std::chrono_literals;
 
 class GaitCommand:public rclcpp::Node {
 public:
@@ -17,6 +19,12 @@ public:
         ipd_subscriber = this->create_subscription<mujoco_interfaces::msg::IpdInput>("ipd_command", 10,
             std::bind(&GaitCommand::ipd_callback, this, _1));
         gait_type_publisher = this->create_publisher<march_shared_msgs::msg::GaitType>("gait_type", 10);
+        while (!client->wait_for_service(1s)) {
+            if (!rclcpp::ok()) {
+                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            }
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+        }
     };
 
 private:
@@ -25,31 +33,27 @@ private:
     };
 
     void send_request(int input_cmd){
-        auto request = std::make_shared<march_shared_msgs::srv::GaitCommand::Request>();
         request->gait_type = input_cmd;
+        future = client->async_send_request(request, std::bind(&GaitCommand::publish_gait_type, this, _1));
+    }
 
-        while (!client->wait_for_service(1)) {
-            if (!rclcpp::ok()) {
-                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-            }
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
-        }
-
-        auto result = client->async_send_request(request);
-        // Wait for the result.
-        if (rclcpp::spin_until_future_complete(result) == rclcpp::FutureReturnCode::SUCCESS)
+    void publish_gait_type(rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture response)
+    {
+        if (response.get()->success)
         {
-            auto message = march_shared_msgs::msg::GaitType();
-            message.gait_type = request->gait_type;
-            gait_type_publisher->publish(message);
-        } else {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service with gait_command");
+            auto msg = march_shared_msgs::msg::GaitType();
+            msg.gait_type = request->gait_type;
+            gait_type_publisher->publish(msg);
+        } else{
+            RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "Request was not a success");
         }
     }
 
     rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedPtr client;
     rclcpp::Subscription<mujoco_interfaces::msg::IpdInput>::SharedPtr ipd_subscriber;
     rclcpp::Publisher<march_shared_msgs::msg::GaitType>::SharedPtr gait_type_publisher;
+    rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture future;
+    march_shared_msgs::srv::GaitCommand::Request::SharedPtr request;
 
 };
 
