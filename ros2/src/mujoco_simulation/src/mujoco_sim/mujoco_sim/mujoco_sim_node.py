@@ -128,9 +128,9 @@ class MujocoSimNode(Node):
             msg (MujocoControl message): Contains the inputs to be changed
         """
         if (msg.reset == 1):
-            self.msgs_queue.clear()
-            self.get_logger().info(str(self.msgs_queue))
-        self.msg_queue.put(msg)
+            self.msg_queue.queue.clear()
+        self.get_logger().info(str(list(self.msg_queue.queue)))
+        self.msg_queue.put(msg.trajectory)
 
     def sim_step(self):
         """This function performs the simulation update.

@@ -24,10 +24,10 @@ class MujocoWriterNode(Node):
         self.publisher = self.create_publisher(MujocoInput, 'mujoco_input', 10)
         self.subscription = self.create_subscription(
             JointTrajectoryControllerState,
-            'joint_trajectory_controller/joint_state',
+            'joint_trajectory_controller/state',
             self.listener_callback,
             10)
-        self.subscription  # prevent unused variable warning
+        # self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
         """This listener callback publishes all the messages from the MARCH code to the topic Mujoco sim subscribes to.
@@ -36,8 +36,7 @@ class MujocoWriterNode(Node):
         """
         msg_tosend = MujocoInput()
         msg_tosend.trajectory = msg
-        msg_tosend.reset = 1
-        self._get_logger().info("I work beep boop")
+        msg_tosend.reset = 0
         self.publisher.publish(msg_tosend)
 
 
