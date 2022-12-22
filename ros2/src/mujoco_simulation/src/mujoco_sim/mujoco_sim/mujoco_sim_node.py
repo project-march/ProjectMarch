@@ -120,16 +120,43 @@ class MujocoSimNode(Node):
         self.visualizer = MujocoVisualizer(self.model, self.data)
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
+        # Create time variables to check when the last trajectory point has been sent. We assume const DT
+        self.TIME_STEP_TRAJECTORY = 0.01
+        self.trajectory_last_updated = self.get_clock().now()
+    
+    def check_for_new_reference_update(self, time_current):
+        """This checks if the new trajectory command should be sent.
+
+        The time step is assumed as a constant DT
+        Args:
+            time_current (Rclpy timee object): The current time
+        """
+        time_difference = (time_current-self.trajectory_last_updated).to_msg()
+        if time_difference.nanosec / 1e9 + time_difference.sec > self.TIME_STEP_TRAJECTORY:
+            self.update_trajectory()
+    
+    def update_trajectory(self):
+        """Updates the trajectory if possible.
+        """
+        try:
+            msg = self.msg_queue.get_nowait()
+            joint_pos = get_controller_data(msg)
+            for j in range(len(self.controller)):
+                self.controller[j].joint_ref_dict = joint_pos
+            self.trajectory_last_updated = self.get_clock().now()
+            self.get_logger().info("Trajectory updated!!!!")
+        except Empty:
+            self.get_logger().warn("NO NEW TRAJECTORY FOUND")
+
     def writer_callback(self, msg):
         """Callback function for the writing service.
 
-        This function enqueues all incoming messages in hte message queue.
+        This function enqueues all incoming messages in the message queue.
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
         if (msg.reset == 1):
             self.msg_queue.queue.clear()
-        self.get_logger().info(str(list(self.msg_queue.queue)))
         self.msg_queue.put(msg.trajectory)
 
     def sim_step(self):
@@ -161,13 +188,7 @@ class MujocoSimNode(Node):
         # NOTE: the try catch is needed because at startup the node might run before a trajectory is send,
         # in that case the queue is still empty throwing an exception
 
-        try:
-            msg = self.msg_queue.get_nowait()
-            joint_pos = get_controller_data(msg)
-            for j in range(len(self.controller)):
-                self.controller[j].joint_ref_dict = joint_pos
-        except Empty:
-            pass
+        self.check_for_new_reference_update(self.get_clock().now())
 
         self.publish_state_msg()
         self.publish_sensor_msg()
