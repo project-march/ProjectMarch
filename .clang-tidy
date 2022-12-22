@@ -13,6 +13,7 @@ Checks:     -*,
             -hicpp-avoid-goto,
             concurrency-*,
             performance-*
+            -performance-unnecessary-value-param
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
@@ -42,7 +43,5 @@ CheckOptions:
     - key:      hicpp-signed-bitwise.IgnorePositiveIntegerLiterals 
       value:    '1'
     - key:      performance-inefficient-string-concatenation.StrictMode
-      value:    '1'
-    - key:      performance-unnecessary-value-param.AllowedTypes
       value:    '1'
 ...
