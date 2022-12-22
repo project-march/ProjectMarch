@@ -30,7 +30,7 @@ private:
         response->success = true;
     };
 
-    void publish_gait_msg(int gait_type)
+    void publish_gait_msg(const int gait_type)
     {
         // TODO: Select gait based on gait command type, and enum for the gait_commands should be created
         auto message = trajectory_msgs::msg::JointTrajectory();
@@ -51,9 +51,6 @@ private:
 
 int main(int argc, char** argv)
 {
-
-    printf("hello world gait_loader package\n");
-
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<GaitLoader>());
 

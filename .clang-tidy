@@ -43,4 +43,6 @@ CheckOptions:
       value:    '1'
     - key:      performance-inefficient-string-concatenation.StrictMode
       value:    '1'
+    - key:      performance-unnecessary-value-param.AllowedTypes
+      value:    '1'
 ...
