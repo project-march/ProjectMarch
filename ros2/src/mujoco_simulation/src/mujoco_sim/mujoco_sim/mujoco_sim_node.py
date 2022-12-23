@@ -134,10 +134,9 @@ class MujocoSimNode(Node):
         time_difference = (time_current-self.trajectory_last_updated).to_msg()
         if time_difference.nanosec / 1e9 + time_difference.sec > self.TIME_STEP_TRAJECTORY:
             self.update_trajectory()
-    
+
     def update_trajectory(self):
-        """Updates the trajectory if possible.
-        """
+        """Updates the trajectory if possible."""
         try:
             msg = self.msg_queue.get_nowait()
             joint_pos = get_controller_data(msg)
