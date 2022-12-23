@@ -123,7 +123,7 @@ class MujocoSimNode(Node):
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
         self.TIME_STEP_TRAJECTORY = 0.01
         self.trajectory_last_updated = self.get_clock().now()
-    
+
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
 
@@ -131,7 +131,7 @@ class MujocoSimNode(Node):
         Args:
             time_current (Rclpy timee object): The current time
         """
-        time_difference = (time_current-self.trajectory_last_updated).to_msg()
+        time_difference = (time_current - self.trajectory_last_updated).to_msg()
         if time_difference.nanosec / 1e9 + time_difference.sec > self.TIME_STEP_TRAJECTORY:
             self.update_trajectory()
 
