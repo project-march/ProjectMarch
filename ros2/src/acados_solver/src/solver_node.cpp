@@ -27,7 +27,8 @@ public:
             //     "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
             // gait_subscriber = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
             //     "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
-            // trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
+            // trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
+            // 10);
         };
 
 private:
