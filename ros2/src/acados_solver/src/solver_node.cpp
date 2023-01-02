@@ -28,7 +28,7 @@ public:
         gait_subscriber = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
             "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
         trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
-    }
+    };
 
 private:
     void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
