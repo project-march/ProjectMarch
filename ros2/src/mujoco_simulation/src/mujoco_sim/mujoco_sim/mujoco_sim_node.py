@@ -183,10 +183,6 @@ class MujocoSimNode(Node):
         This function is separated from the actual simstep function
         to ensure a nice divide between ROS systems and Mujoco functionality.
         """
-        # set joint ref to next trajectory point from the queue
-        # NOTE: the try catch is needed because at startup the node might run before a trajectory is send,
-        # in that case the queue is still empty throwing an exception
-
         self.check_for_new_reference_update(self.get_clock().now())
 
         self.publish_state_msg()
