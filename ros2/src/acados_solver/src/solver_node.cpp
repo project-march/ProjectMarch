@@ -21,7 +21,7 @@ class SolverNode : public rclcpp::Node {
     // This needs to be changed when the MPC is implemented more.
 public:
     SolverNode()
-        : Node("solver_node")
+        : Node("solver_node"), robot_state_subscriber(), gait_subscriber(), trajectory_publisher()
     {
         robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
             "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
