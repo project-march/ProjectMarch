@@ -80,9 +80,9 @@ void ODrive::actuateTorque(float target_effort)
     float target_torque = target_effort * torque_constant_;
     logger_->debug(logger_->fstring("Effort: %f", target_effort));
     logger_->debug(logger_->fstring("Torque: %f", target_torque));
-    bit32 write_torque {};
-    write_torque.f = target_torque;
-    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
+    // bit32 write_torque {};
+    // write_torque.f = target_torque;
+    // this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
 }
 
 int ODrive::getActuationModeNumber() const
@@ -268,9 +268,9 @@ double ODrive::getEffortLimit() const
 void ODrive::actuateRadians(float target_position)
 {   
     logger_->info(logger_->fstring("Position: %f", target_position));
-    // bit32 write_pos {};
-    // write_pos.f = target_position;
-    // this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_pos);
+    bit32 write_pos {};
+    write_pos.f = target_position;
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_pos);
     // throw error::NotImplemented("actuateRadians", "ODrive");
 }
 
