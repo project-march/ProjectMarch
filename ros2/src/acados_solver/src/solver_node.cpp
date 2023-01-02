@@ -20,7 +20,6 @@ class SolverNode : public rclcpp::Node {
     // TODO The solver node now only passes the given trajectory to without modification.
     // This needs to be changed when the MPC is implemented more.
 public:
-
     SolverNode()
         : Node("solver_node") {
             // robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
