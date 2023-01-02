@@ -45,8 +45,6 @@ private:
 
 int main(int argc, char** argv)
 {
-    printf("state_estimator node started!\n");
-
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<StateEstimator>());
     rclcpp::shutdown();

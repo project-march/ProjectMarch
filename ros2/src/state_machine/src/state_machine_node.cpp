@@ -18,9 +18,9 @@ public:
 private:
     void gait_command_callback(march_shared_msgs::msg::GaitType::SharedPtr msg)
     {
-        auto gait_command = msg->gait_type;
         // TODO Implement safety check for invalid gait type transition
-        //  and define a unified way to represent those transitions as ints.
+        //  and define a unified way to represent those transitions as ints.\
+        // auto gait_command = msg->gait_type;
     }
 
     rclcpp::Subscription<march_shared_msgs::msg::GaitType>::SharedPtr gait_command_subscriber;
