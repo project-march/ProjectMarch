@@ -23,12 +23,12 @@ public:
 
     SolverNode()
         : Node("solver_node") {
-        // robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
-        //     "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
-        // gait_subscriber = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
-        //     "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
-        // trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
-    };
+            // robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
+            //     "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
+            // gait_subscriber = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
+            //     "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
+            // trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
+        };
 
 private:
     void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
@@ -49,7 +49,6 @@ private:
             "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_publisher
         = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
-
 };
 
 int main(int argc, char** argv)
