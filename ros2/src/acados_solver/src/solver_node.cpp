@@ -34,12 +34,12 @@ private:
     void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
     {
         return;
-    }
+    };
 
     void gait_callback(trajectory_msgs::msg::JointTrajectory::SharedPtr msg)
     {
         trajectory_publisher->publish(*msg);
-    }
+    };
 
     rclcpp::Subscription<march_shared_msgs::msg::RobotState>::SharedPtr robot_state_subscriber;
     rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr gait_subscriber;
