@@ -37,6 +37,7 @@ struct JointInfo {
     const std::string name;
     march::Joint& joint;
     double position;
+    double position_command;
     double velocity;
     double effort_actual;
     double effort_command;

@@ -6,7 +6,7 @@ testsetup:
     - rotational_joint:
         motor_controller:
           type: odrive
-          actuationMode: torque
+          actuationMode: position
           slaveIndex: 1
           axis: 0
           motorKV: 95

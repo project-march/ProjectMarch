@@ -38,6 +38,7 @@ enum class ODriveObjectName {
 
     // Write objects
     TargetTorque,
+    TargetPosition,
     RequestedState
 };
 

@@ -80,7 +80,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_EFFORT },
+            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
             /*required_state_interfaces=*/
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
                 hardware_interface::HW_IF_EFFORT },
@@ -131,6 +131,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
     return { /*name=*/joint.name.c_str(),
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
+        /*position_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
@@ -190,6 +191,8 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
         // Effort: Couples the command controller to the value jointInfo.effort through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_command));
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(
+            jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.position_command));
     }
 
     return command_interfaces;
@@ -223,6 +226,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
+            jointInfo.position_command = 0;
             jointInfo.velocity = 0;
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
@@ -431,7 +435,8 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             // RCLCPP_INFO_THROTTLE((*logger_), clock_, jointInfo.limit.soft_limit_warning_throttle_msec, "The effort of the left ankle is: %g", jointInfo.effort_command_converted);
         }
 
-        jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
+        // jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
+        jointInfo.joint.actuate((float)jointInfo.position_command);
     }
 
     return hardware_interface::return_type::OK;
@@ -525,13 +530,13 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
 bool MarchExoSystemInterface::has_correct_actuation_mode(march::Joint& joint) const
 {
     const auto& actuation_mode = joint.getMotorController()->getActuationMode();
-    if (actuation_mode != march::ActuationMode::torque) {
-        RCLCPP_FATAL((*logger_),
-            "Actuation mode for joint %s is not torque, but is %s.\n "
-            "Check your `march_hardware_builder/robots/... .yaml`.",
-            joint.getName().c_str(), actuation_mode.toString().c_str());
-        return false;
-    }
+    // if (actuation_mode != march::ActuationMode::torque) {
+    //     RCLCPP_FATAL((*logger_),
+    //         "Actuation mode for joint %s is not torque, but is %s.\n "
+    //         "Check your `march_hardware_builder/robots/... .yaml`.",
+    //         joint.getName().c_str(), actuation_mode.toString().c_str());
+    //     return false;
+    // }
     return true;
 }
 

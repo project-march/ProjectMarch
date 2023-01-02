@@ -44,7 +44,8 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
     { ODriveObjectName::TargetTorque, ODriveObject(/*offset=*/0, /*length=*/32) },
-    { ODriveObjectName::RequestedState, ODriveObject(/*offset=*/4, /*length=*/32) },
+    { ODriveObjectName::TargetPosition, ODriveObject(/*offset=*/4, /*length=*/32) },
+    { ODriveObjectName::RequestedState, ODriveObject(/*offset=*/8, /*length=*/32) },
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {

@@ -15,7 +15,8 @@ joint_trajectory_controller:
       - rotational_joint
 
     command_interfaces:
-      - effort
+      # - effort
+      - position
     state_interfaces:
       - position
       - velocity

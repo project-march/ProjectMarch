@@ -265,9 +265,13 @@ double ODrive::getEffortLimit() const
 // Throw NotImplemented error by default for functions not part of the Minimum
 // Viable Product
 
-void ODrive::actuateRadians(float /*target_position*/)
-{
-    throw error::NotImplemented("actuateRadians", "ODrive");
+void ODrive::actuateRadians(float target_position)
+{   
+    logger_->info(logger_->fstring("Position: %f", target_position));
+    // bit32 write_pos {};
+    // write_pos.f = target_position;
+    // this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_pos);
+    // throw error::NotImplemented("actuateRadians", "ODrive");
 }
 
 float ODrive::getMotorControllerVoltage()
