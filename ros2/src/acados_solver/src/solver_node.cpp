@@ -22,7 +22,7 @@ class SolverNode : public rclcpp::Node {
 public:
 
     SolverNode()
-        : Node("solver_node")
+        : Node("solver_node"),
     {
         // robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
         //     "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
