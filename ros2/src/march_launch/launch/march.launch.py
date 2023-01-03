@@ -82,6 +82,8 @@ def generate_launch_description() -> LaunchDescription:
     to_world_transform = LaunchConfiguration("to_world_transform")
     gazebo = LaunchConfiguration("gazebo")
     mujoco = LaunchConfiguration("mujoco")
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march.xml')
+    tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation_arguments = [
         DeclareLaunchArgument(
             name="ground_gait",
@@ -104,6 +106,11 @@ def generate_launch_description() -> LaunchDescription:
             default_value="false",
             description="If Mujoco simulation should be started or not",
             choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="model_to_load_mujoco",
+            default_value="march.xml",
+            description="What model mujoco should load",
         ),
     ]
     # endregion
@@ -550,6 +557,7 @@ def generate_launch_description() -> LaunchDescription:
         PythonLaunchDescriptionSource(
             [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
         ),
+        launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution([get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
         condition=IfCondition(mujoco),
     )
     # endregion

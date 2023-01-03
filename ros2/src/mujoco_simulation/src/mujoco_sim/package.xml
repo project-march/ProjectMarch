@@ -8,7 +8,8 @@
   <license>TODO: License declaration</license>
 
   <depend>rclpy</depend>
-  <depend>robot_description</depend>
+  <depend>march_description</depend>
+  <depend>march_control</depend>
   <depend>mujoco_interfaces</depend>
   <depend>geometry_msgs</depend>
   <depend>march_hardware_interface</depend>
