@@ -1,10 +1,8 @@
 """Author: MVIII."""
 
-import os
-from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
@@ -12,11 +10,8 @@ def generate_launch_description():
 
     These nodes are started when the mujoco simulation has be run.
     """
-    config = os.path.join(
-        get_package_share_directory('mujoco_sim'),
-        'config',
-        'low_level_controller_tunings.yaml'
-    )
+    model_to_load = LaunchConfiguration('model_to_load', default='march.xml')
+    tunings_to_load = LaunchConfiguration('tunings_to_load_path')
 
     return LaunchDescription([
         Node(
@@ -25,8 +20,8 @@ def generate_launch_description():
             executable='mujoco_sim_node',
             name='mujoco_sim',
             parameters=[
-                config,
-                {"model_toload": "march.xml"}
+                tunings_to_load,
+                {"model_toload": model_to_load}
             ]
         ),
         Node(
