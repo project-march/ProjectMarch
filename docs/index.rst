@@ -115,7 +115,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
         :caption: MARCH packages
         :glob:
 ..
-    doc/march_packages/**/README
+    doc/march_packages/**/README.rst
 
 .. toctree::
   :caption: March Packages (Semi-outdated)
