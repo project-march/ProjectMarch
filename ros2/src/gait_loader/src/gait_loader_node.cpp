@@ -18,6 +18,7 @@ public:
         service = this->create_service<march_shared_msgs::srv::GaitCommand>(
             "gait_command", std::bind(&GaitLoader::publish_gait_command, this, _1, _2));
         m_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("gait", 10);
+        // For now the joint names are hard-coded, because it is unsure how they will be retrieved in the future.
         m_joint_names = { "Joint1", "joint2", "joint3", "joint4", "joint5", "join6", "joint7", "joint8" };
     };
 
