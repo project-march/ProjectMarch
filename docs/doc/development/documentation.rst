@@ -2,20 +2,23 @@ Documentation
 =============
 .. inclusion-introduction-start
 
-This tutorial will teach you how to build the documentation locally and contribute to its development.
+This tutorial will explain how to build the documentation locally,
+allowing for easy contribution to the development of the documentation of the Project MARCH software.
 
 .. inclusion-introduction-end
 
 Introduction
 ^^^^^^^^^^^^
-These tutorials are written in `rst <https://docutils.sourceforge.io/rst.html>`_, an easy-to-understand plaintext markup language.
-It is then build by `Sphinx <https://www.sphinx-doc.org/en/master/>`_. 
-You can either build the documentation locally when following the tutorials or
-deploy it to `Gitlab pages <https://docs.gitlab.com/ee/user/project/pages/>`_ with the help of the GitLab CI.
+The MARCH Documentation is written in `rst <https://docutils.sourceforge.io/rst.html>`_, an easy-to-understand plaintext markup language.
+It is then build by `Sphinx <https://www.sphinx-doc.org/en/master/>`_.
+
+The documentation can either be locally after following this tutorials or it can be deployed to `Gitlab pages <https://docs.gitlab.com/ee/user/project/pages/>`_ with the help of the GitLab CI.
+
+It is advised to always check your changes locally before deploying it to gitlab, to make sure that the changes are correct.
 
 Building locally
 ^^^^^^^^^^^^^^^^
-Follow these steps to be able to build the documentation locally.
+After following these steps you should be able to build the docs locally.
 
 Clone the repository
 --------------------
@@ -24,13 +27,13 @@ Clone the repository with either ssh or https:
 
 **ssh:**
 
-.. code:: bash
+.. code::
 
     git clone git@gitlab.com:project-march/march.git
 
 **https:**
 
-.. code:: bash
+.. code::
 
     git clone https://gitlab.com/project-march/march.git
 
@@ -38,7 +41,7 @@ Install Sphinx
 --------------
 We use the Sphinx to generate the documentation
 
-.. code:: bash
+.. code::
 
   sudo apt install sphinx-doc
 
@@ -48,14 +51,34 @@ Install Gem and html-proofer
 Gem is a package manager for Ruby, we will use it to install `html-proofer <https://github.com/gjtorikian/html-proofer>`_.
 html-proofer is a tool that can validate your generated html for mistakes like broken links or missing images.
 
+To do that Ruby should first be downloaded through `chruby <https://github.com/postmodern/chruby#readme>`_ using the following commands:
+
 .. code::
 
-  sudo apt update
-  sudo apt install ruby-full
+    wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+    tar -xzvf chruby-0.3.9.tar.gz
+    cd chruby-0.3.9/
+    sudo make install
 
-  # Check if ruby and gem got installed correctly
+After that ruby can be installed through `ruby-install <https://github.com/postmodern/ruby-install#readme>`_ :
+
+.. code::
+
+    wget -O ruby-install-0.8.5.tar.gz https://github.com/postmodern/ruby-install/archive/v0.8.5.tar.gz
+    tar -xzvf ruby-install-0.8.5.tar.gz
+    cd ruby-install-0.8.5/
+    sudo make install
+
+To check if ruby is installed correctly use:
+
+.. code::
+
   ruby --version
   gem --version
+
+Lastly do:
+
+.. code::
 
   sudo gem update --system
   sudo gem install html-proofer
