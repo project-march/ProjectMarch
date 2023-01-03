@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(mujoco_interfaces)
+project(ik_solver)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -17,30 +17,17 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-
-#creating the service
-find_package(geometry_msgs REQUIRED)
-find_package(control_msgs REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/IpdInput.msg"
-  "msg/MujocoSetControl.msg"
-  "msg/MujocoDataSensing.msg"
-  "msg/MujocoDataState.msg"
-  "msg/MujocoDataRequest.msg"
-  "msg/MujocoInput.msg"
-
-  "srv/ReadMujoco.srv"
-	DEPENDENCIES geometry_msgs control_msgs
- )
-
-ament_export_dependencies(rosidl_default_runtime)
-
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+add_executable(ik_solver_node src/ik_solver_node.cpp)
+target_include_directories(ik_solver_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+install(TARGETS ik_solver_node
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
 #  find_package(ament_lint_auto REQUIRED)

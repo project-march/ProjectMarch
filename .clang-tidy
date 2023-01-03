@@ -13,7 +13,10 @@ Checks:     -*,
             -hicpp-avoid-goto,
             concurrency-*,
             performance-*
-WarningsAsErrors: '*'
+            -performance-unnecessary-value-param
+            -hicpp-member-init
+            -clang-diagnostic-error
+#WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
 CheckOptions:

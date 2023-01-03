@@ -35,6 +35,9 @@ alias mujoco='sim mujoco:=true model_to_load_mujoco:="march.xml" tunings_to_load
 alias training='march_run_ros2_training'
 alias gits='git status'
 
+# Alias to build one package, appended with specified pakage
+alias mbp='mba --packages-select'
+
 
 # Training aliases
 export URDF6='robot:=march6_three_cameras'
@@ -78,12 +81,13 @@ alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-
 
 
 # Format code
+# 'sudo apt install clang-format' should be run for format_cpp
 alias format_cpp='cm && python3 .scripts/run-clang-format.py -r ros2/src --style=file -i'
 alias format_py='cm && black .'
 alias format='format_cpp && format_py'
 
 # Static analysis shortcuts (needs clang-tidy: `sudo apt-get install -y clang-tidy`)
-alias march_static_analysis_ros2='echo "Running analysis, this can take 88 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+alias march_static_analysis_ros2='echo "Running analysis, this can take 88 seconds" && find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p build {} 2> /dev/null && echo -e "\n----done---"'
 alias march_static_analysis_ros2_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
 # Flake8 shortcuts (python code style checker)
 alias march_flake8_update='FLAKE8_GIT="registry.gitlab.com/project-march/march/flake8:dev" && \

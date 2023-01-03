@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(mujoco_interfaces)
+project(state_machine)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -17,30 +17,20 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-
-#creating the service
-find_package(geometry_msgs REQUIRED)
-find_package(control_msgs REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/IpdInput.msg"
-  "msg/MujocoSetControl.msg"
-  "msg/MujocoDataSensing.msg"
-  "msg/MujocoDataState.msg"
-  "msg/MujocoDataRequest.msg"
-  "msg/MujocoInput.msg"
-
-  "srv/ReadMujoco.srv"
-	DEPENDENCIES geometry_msgs control_msgs
- )
-
-ament_export_dependencies(rosidl_default_runtime)
-
+find_package(rclcpp REQUIRED)
+find_package(march_shared_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+add_executable(state_machine_node src/state_machine_node.cpp)
+ament_target_dependencies(state_machine_node rclcpp march_shared_msgs)
+target_include_directories(state_machine_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+install(TARGETS state_machine_node
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
 #  find_package(ament_lint_auto REQUIRED)
