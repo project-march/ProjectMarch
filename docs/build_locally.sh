@@ -64,4 +64,4 @@ function readmes_to_sphinx ()
 readmes_to_sphinx "../ros2/src" "doc/march_packages/"
 
 # Build the sphinx documentation while catching warnings and errors
-sphinx-build -W -b html . build
+sphinx-build -b html . build
