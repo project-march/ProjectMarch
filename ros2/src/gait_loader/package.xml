@@ -7,7 +7,7 @@
   <maintainer email="sahandwagemakers@gmail.com">sahand</maintainer>
   <license>TODO: License declaration</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>robot_description</depend>
+  <depend>march_description</depend>
   <depend>mujoco_interfaces</depend>
   <depend>trajectory_msgs</depend>
   <depend>march_shared_msgs</depend>
