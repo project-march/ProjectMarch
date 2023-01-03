@@ -53,14 +53,8 @@
         <plugin>march_hardware_interface/MarchMockSystemInterface</plugin>
       </xacro:if>
       <xacro:if value="${type == 'effort'}">
-        <xacro:if value="$(arg mujoco)">
-          <plugin>march_hardware_interface/MarchMujocoSystemInterface</plugin>
-          <param name="robot">march7</param>
-        </xacro:if>
-        <xacro:unless value="$(arg mujoco)">
           <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
           <param name="robot">march7</param>
-        </xacro:unless>
       </xacro:if>
     </hardware>
 

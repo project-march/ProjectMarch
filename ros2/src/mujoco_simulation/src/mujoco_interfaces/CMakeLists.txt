@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 
 #creating the service
 find_package(geometry_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 
@@ -29,9 +30,10 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MujocoDataSensing.msg"
   "msg/MujocoDataState.msg"
   "msg/MujocoDataRequest.msg"
+  "msg/MujocoInput.msg"
 
   "srv/ReadMujoco.srv"
-	DEPENDENCIES geometry_msgs
+	DEPENDENCIES geometry_msgs control_msgs
  )
 
 ament_export_dependencies(rosidl_default_runtime)

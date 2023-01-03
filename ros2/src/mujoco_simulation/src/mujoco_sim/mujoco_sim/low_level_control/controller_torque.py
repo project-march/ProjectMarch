@@ -10,7 +10,7 @@ class TorqueController(LowLvlController):
     For the control a PD controller is used.
     """
 
-    def __init__(self, origin, model, data, p, d):
+    def __init__(self, origin, model, p, d):
         """A class which imitates the low-level control of the robot.
 
         Functions as a PID right now which directly applies control
@@ -21,14 +21,12 @@ class TorqueController(LowLvlController):
         :param p: (float): Proportional-value of a PD controller
         :param d: (float): Derivative-value of a PD controller
         """
-        # Define the amount of controllable joints based on
-        # the generalized coordinates generated within Mujoco
-        super().__init__(origin, model, data)
-        # Define the PD
+        super().__init__(origin, model)
+# Define the PD
         self.p = p
         self.d = d
 
-    def low_level_update(self, model, data):
+    def low_level_update(self, model, data) -> None:
         """The low-level control update callback function.
 
         This function is called by Mujoco at the start of every simulation step.
@@ -37,17 +35,15 @@ class TorqueController(LowLvlController):
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
-        # update the control inputs based on PID
-        for i in range(self.actuator_amount):
-            dt = self.origin.TIME_STEP_MJC  # TEMP VARIABLE, REMOVE IN NEXT SPRINT
-            joint_val = data.qfrc_actuator[i]
-            e = self.joint_ref[i] - joint_val
-            de_prev = (e - self.e_prev[i]) / dt
+        dt = self.origin.TIME_STEP_MJC
+# update the control inputs based on PID
+        for index in range(self.actuator_amount):
+            joint_val = data.qfrc_actuator[index]
 
-            new_ctrl_input = self.p[i] * e + self.d[i] * de_prev
-            self.ctrl[i] = new_ctrl_input
-            self.e_prev[i] = e
+            e = self.joint_desired[index] - joint_val
+            de_prev = (e - self.e_prev[index]) / dt
 
-            data.ctrl[i] += self.ctrl[i]
+            ctrl_input = self.p[index] * e + self.d[index] * de_prev
+            data.ctrl[index] += ctrl_input
 
-        # NOTE:CHANGE THE WAY WE UPDATE THE MUJOCO UPDATE LATER
+            self.e_prev[index] = e

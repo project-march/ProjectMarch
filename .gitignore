@@ -200,3 +200,4 @@ codequality.json
 
 # Mujuco stuff
 *.MUJOCO_LOG.TXT
+MUJOCO_LOG.TXT
