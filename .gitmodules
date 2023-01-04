@@ -42,3 +42,4 @@
 [submodule "ros2/src/libraries/acados"]
 	path = ros2/src/libraries/acados
 	url = ../libraries/acados.git
+	branch = master
