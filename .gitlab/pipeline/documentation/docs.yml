@@ -18,7 +18,6 @@ Build, test and publish documentation:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - $DOCKER_FILE
-        - "ros1/src/**/README.md"
         - "ros2/src/**/README.md"
         - "docs/**/*" # To check if any file in the docs folder has changed.
 
@@ -37,7 +36,6 @@ Build, test and publish documentation:
     #       otherwise the server would send out to many GET requests.
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        - "ros1/src/**/README.md"
         - "ros2/src/**/README.md"
         - "docs/**/*" # To check if any file in the docs folder has changed.
       variables:

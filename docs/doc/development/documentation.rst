@@ -51,23 +51,22 @@ Install Gem and html-proofer
 Gem is a package manager for Ruby, we will use it to install `html-proofer <https://github.com/gjtorikian/html-proofer>`_.
 html-proofer is a tool that can validate your generated html for mistakes like broken links or missing images.
 
-To do that Ruby should first be downloaded through `chruby <https://github.com/postmodern/chruby#readme>`_ using the following commands:
+To do that Ruby should first be downloaded through `rvm <https://github.com/rvm/ubuntu_rvm>`_ using the following commands:
 
 .. code::
 
-    wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
-    tar -xzvf chruby-0.3.9.tar.gz
-    cd chruby-0.3.9/
-    sudo make install
+    sudo apt-add-repository -y ppa:rael-gc/rvm
+    sudo apt-get update
+    sudo apt-get install rvm
+    sudo usermod -a -G rvm $USER
+    echo 'source "/etc/profile.d/rvm.sh"' >> ~/.bashrc
+    reboot
 
-After that ruby can be installed through `ruby-install <https://github.com/postmodern/ruby-install#readme>`_ :
+After that ruby can be installed through:
 
 .. code::
 
-    wget -O ruby-install-0.8.5.tar.gz https://github.com/postmodern/ruby-install/archive/v0.8.5.tar.gz
-    tar -xzvf ruby-install-0.8.5.tar.gz
-    cd ruby-install-0.8.5/
-    sudo make install
+    rvm install ruby-3.1.3
 
 To check if ruby is installed correctly use:
 
@@ -80,8 +79,8 @@ Lastly do:
 
 .. code::
 
-  sudo gem update --system
-  sudo gem install html-proofer
+  gem update --system
+  gem install html-proofer
 
 Install Additional dependencies
 -------------------------------
