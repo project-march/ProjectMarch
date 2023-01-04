@@ -13,16 +13,16 @@ todo_include_todos = True
 master_doc = "index"
 
 project = "Project MARCH"
-copyright = "2021, Project MARCH"  # noqa: A001, VNE003
+copyright = "2022, Project MARCH"  # noqa: A001, VNE003
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = "VI"
+version = "VIII"
 # The full version, including alpha/beta/rc tags.
-release = "VI"
+release = "VIII"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "default"

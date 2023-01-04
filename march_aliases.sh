@@ -79,7 +79,6 @@ export RCUTILS_COLORIZED_OUTPUT=1
 # Install dependencies
 alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-src -y --rosdistro foxy'
 
-
 # Format code
 # 'sudo apt install clang-format' should be run for format_cpp
 alias format_cpp='cm && python3 .scripts/run-clang-format.py -r ros2/src --style=file -i'
@@ -101,6 +100,10 @@ alias march_py_auto_format_check='docker run --rm -v ~/march:/home/march:ro --en
 --check --diff --color ros2/src utility_scripts/'
 alias march_py_auto_format_here="docker run --rm -v `pwd`:`pwd` --entrypoint black march/flake8 `pwd` -l 120 --extend-exclude '^/.*/libraries/'"
 alias march_py_auto_format_check_here="docker run --rm -v `pwd`:`pwd`:ro --entrypoint black march/flake8 -l 120 --extend-exclude '^/.*/libraries/' --check --diff --color `pwd`"
+
+# Docs shortcuts
+alias build_docs='cd ~/march/docs && bash ./build_locally.sh'
+alias proof_docs='cd ~/march/docs && htmlproofer build --check-sri --enforce-https --only-4xx --ignore-files "build/search.html" --ignore-urls '#''
 
 # Start Clion & PyCharm with no consol output
 alias pycharm_no_out='pycharm-professional > /dev/null 2> /dev/null & disown'
