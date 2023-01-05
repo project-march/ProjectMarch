@@ -1,2 +1,5 @@
 ros2/src/libraries/*
 ros2/src/mujoco_simulation/*
+ros2/src/acados_solver/src/old_c_code/*
+ros2/src/acados_solver/src/c_generated_code/*
+

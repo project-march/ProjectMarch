@@ -28,7 +28,7 @@ lib/
 .catkin_workspace
 
 # Binary libraries
-*.so
+
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
