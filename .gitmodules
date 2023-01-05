@@ -10,10 +10,6 @@
 	path = ros2/src/libraries/control/control_msgs
 	url = ../libraries/control/control_msgs.git
 	branch = main
-[submodule "ros2/src/libraries/control/gazebo_ros2_control"]
-	path = ros2/src/libraries/control/gazebo_ros2_control
-	url = ../libraries/control/gazebo_ros2_control.git
-	branch = main
 [submodule "ros2/src/libraries/control/realtime_tools"]
 	path = ros2/src/libraries/control/realtime_tools
 	url = ../libraries/control/realtime_tools.git
@@ -30,10 +26,6 @@
 	path = ros2/src/libraries/soem_ros2
 	url = ../libraries/soem_ros2.git
 	branch = master
-[submodule "ros2/src/libraries/realsense_gazebo_plugin"]
-	path = ros2/src/libraries/realsense_gazebo_plugin
-	url = https://github.com/pal-robotics/realsense_gazebo_plugin.git
-	branch = foxy-devel
 # We add this because the most up to date foxy rosbag doesn't allow for excluding topics.
 [submodule "ros2/src/libraries/rosbag2"]
 	path = ros2/src/libraries/rosbag2
