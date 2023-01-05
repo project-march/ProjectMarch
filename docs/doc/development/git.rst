@@ -2,7 +2,7 @@ How to git
 ==========
 .. inclusion-introduction-start
 
-This tutorial will describe the current git based workflow we adhere to.
+This tutorial will describe the current git based workflow that is followed during the MARXH code development.
 
 .. inclusion-introduction-end
 
@@ -20,6 +20,8 @@ Before following the following steps make sure you:
     * :code:`git config --global user.name "[Your name]"`
     * :code:`git config --global user.email "[Your email]"`
 * Have cloned the march repo.
+
+    * :code:`git clone https://gitlab.com/project-march/march.git --recurse-submodules`
 
 Roadmap for adding something to the repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -44,7 +46,7 @@ Roadmap for adding something to the repository
 #. Checkout/switch to your new branch
     * :code:`git checkout [issue_number]-[issue_name]` (e.g. :code:`git checkout 1103-fix-docs-bug`)
     * :code:`git switch [issue_number]-[issue_name]` (e.g. :code:`git switch 1103-fix-docs-bug`)
-#. Start adding code. :) #code_knallen
+#. Start adding code. #code_knallen
 #. Commit your code.
     **Note: Make sure your code is still runnable after every commit. If this is not the case for some reason
     make sure you add "draft:" at the start of your commit message.**
@@ -66,9 +68,6 @@ Roadmap for adding something to the repository
     #. Write a detailed overview of what this commit does.
     #. Assign at least 2 reviewers,
         * One (or more) of the software architects.
-            * George Vegelien
-            * Jelmer de Wolde
-            * Tuhin Das
         * Someone from semi-software that has knowledge of the issue.
     #. (Default) Leave "Delete source branch when merge request is accepted." checked.
         Only uncheck this one if you wish to keep working on the feature.
