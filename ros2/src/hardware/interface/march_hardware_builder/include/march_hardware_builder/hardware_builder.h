@@ -15,7 +15,6 @@
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
 #include <march_hardware/motor_controller/actuation_mode.h>
-#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive.h>
 #include <march_hardware/power_distribution_board/power_distribution_board.h>
@@ -93,7 +92,6 @@ public:
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
-    static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
     static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
     static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;

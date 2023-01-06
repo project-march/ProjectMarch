@@ -60,7 +60,7 @@ void MarchRobot::startEtherCAT(bool reset_motor_controllers)
 
     if (reset_motor_controllers || sw_reset) {
         logger_->debug(
-            logger_->fstring("Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw file: %d",
+            logger_->fstring("Resetting all ODrives due to either: reset arg: %d or downloading of .sw file: %d",
                 reset_motor_controllers, sw_reset));
         resetMotorControllers();
 

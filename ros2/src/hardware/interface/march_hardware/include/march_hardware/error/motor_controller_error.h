@@ -10,9 +10,6 @@
 namespace march {
 namespace error {
     enum class ErrorRegister {
-        IMOTIONCUBE_MOTION_ERROR,
-        IMOTIONCUBE_DETAILED_MOTION_ERROR,
-        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR,
         ODRIVE_ERROR,
         ODRIVE_AXIS_ERROR,
         ODRIVE_MOTOR_ERROR,
@@ -20,16 +17,6 @@ namespace error {
         ODRIVE_DIEBOSLAVE_ERROR,
         ODRIVE_CONTROLLER_ERROR,
     };
-
-    const size_t IMOTIONCUBE_MOTION_ERRORS_SIZE = 16;
-    extern const std::array<std::string, IMOTIONCUBE_MOTION_ERRORS_SIZE> IMOTIONCUBE_MOTION_ERRORS;
-
-    const size_t IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE = 9;
-    extern const std::array<std::string, IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE> IMOTIONCUBE_DETAILED_MOTION_ERRORS;
-
-    const size_t IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE = 7;
-    extern const std::array<std::string, IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE>
-        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS;
 
     const size_t ODRIVE_ERRORS_SIZE = 8;
     extern const std::array<std::string, ODRIVE_ERRORS_SIZE> ODRIVE_ERRORS;
