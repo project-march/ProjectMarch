@@ -9,7 +9,7 @@ window can include multiple RQT plugins. For example, if you run
 
 .. code::
 
-    rqt  # a ro process has to be running
+    rqt  # a ros process has to be running
 
 You can select multiple plugins from the ``Plugins`` menu in the top left. Once you have
 selected a few plugins, you can save the current 'perspective'. A perspective is a combination

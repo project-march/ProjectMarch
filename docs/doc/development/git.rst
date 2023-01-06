@@ -2,7 +2,7 @@ How to git
 ==========
 .. inclusion-introduction-start
 
-This tutorial will describe the current git based workflow that is followed during the MARXH code development.
+This tutorial will describe the current git based workflow that is followed during the MARCH code development.
 
 .. inclusion-introduction-end
 
