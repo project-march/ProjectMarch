@@ -121,7 +121,7 @@ or check out `this link <https://docs.docker.com/engine/install/ubuntu/>`_:
     without prepending 'sudo'.
 
 
-Here are some aliases that can be found in the 'march_aliases.sh' file in the repo
+Here are some aliases that can be found in the `march_aliases.sh` file in the repo
 
 ..
     The 'dev' in the code block below might be changed to 'main' to keep the flake8 more consistent but slower to adapt.
