@@ -2,7 +2,7 @@
 .. _connecting-to-the-exoskeleton-ethercat-label:
 
 Connecting to the exoskeleton with ethercat
-===================================
+===========================================
 .. inclusion-introduction-start
 
 This tutorial will help you set up a wired connection with the exoskeleton.

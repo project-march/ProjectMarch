@@ -45,14 +45,14 @@ First-time setup steps:
 #. Open PyCharm with :code:`pycharm-professional`. (Important: **Do this in the same terminal as step 3**).
  * Tip: you can type :code:`pycharm-professional > /dev/null 2> /dev/null & disown` to be able to close the terminal, and not output any information to the terminal.
 #. Select folder for ROS2.
-#. Exclude parts of the built march code to prevent duplicate code fragment errors
-    #. Go to File | Settings | Project: ros2 | Project Structure
-        #. Click on "File" in the top left of pycharm.
-        #. Click on "Settings" in the dropdown menu of "File".
-        #. Go to "Project: [name of project]" -> "project settings".
-    #. Select "build", "log", "install" and click on "Excluded".
+#. Exclude parts of the built march code to prevent duplicate code fragment errors:
+    #. Go to File | Settings | Project: ros2 | Project Structure:
+        #. Click on *File* in the top left of pycharm.
+        #. Click on *Settings* in the dropdown menu of *File*.
+        #. Go to *Project: [name of project]" -> "project settings*.
+    #. Select "build", "log", "install" and click on *Excluded*.
         Now on the left you will see these folders as excluded,
-        and you will also see some files in the install folder listed as "source"
+        and you will also see some files in the install folder listed as *source*.
 
 For everyday startup, start the pycharm up as in step 3 & 4.
 

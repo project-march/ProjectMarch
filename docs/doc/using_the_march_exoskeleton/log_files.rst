@@ -2,7 +2,7 @@ Log files
 =========
 
 Rosbag2
-^^^^^^
+^^^^^^^
 
 The log files are recorded with a tool called rosbag2.
 Please check the `official documentation`_ or :ref:`ros-bag-label`.
