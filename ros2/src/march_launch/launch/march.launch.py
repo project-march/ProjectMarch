@@ -67,9 +67,6 @@ def generate_launch_description() -> LaunchDescription:
     simulation = LaunchConfiguration("simulation")
     jointless = LaunchConfiguration("jointless")
 
-    # HUD arguments
-    use_hud = LaunchConfiguration("use_hud")
-
     # RealSense/simulation arguments
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
@@ -592,7 +589,6 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         robot_information_node,
         fake_sensor_data_node,
-        smartglass_bridge_node,
         gazebo_node,
         mujoco_node,
         march_control,
