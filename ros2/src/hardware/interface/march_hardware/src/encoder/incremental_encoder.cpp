@@ -33,8 +33,6 @@ double IncrementalEncoder::velocityIUToRadians(double velocity) const
     switch (getMotorControllerType()) {
         case MotorControllerType::ODrive:
             return velocity * (PI_2 / transmission_);
-        case MotorControllerType::IMotionCube:
-            return Encoder::velocityIUToRadians(velocity);
         default:
             throw error::HardwareException(error::ErrorType::INVALID_MOTOR_CONTROLLER);
     }
@@ -45,8 +43,6 @@ double IncrementalEncoder::velocityRadiansToIU(double velocity) const
     switch (getMotorControllerType()) {
         case MotorControllerType::ODrive:
             return velocity / (PI_2 / transmission_);
-        case MotorControllerType::IMotionCube:
-            return Encoder::velocityIUToRadians(velocity);
         default:
             throw error::HardwareException(error::ErrorType::INVALID_MOTOR_CONTROLLER);
     }

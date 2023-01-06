@@ -6,47 +6,6 @@
 
 namespace march {
 namespace error {
-    const std::array<std::string, IMOTIONCUBE_MOTION_ERRORS_SIZE> IMOTIONCUBE_MOTION_ERRORS = {
-        "EtherCAT communication error. ",
-        "Short-circuit. ",
-        "Invalid setup (EEPROM) data. ",
-        "Control error (position/speed error too big). ",
-        "Communication error. ",
-        "Motor position wraps around. ",
-        "Positive limit switch. ",
-        "Negative limit switch. ",
-        "Over-current. ",
-        "I2T protection. ",
-        "Over-temperature motor. ",
-        "Over-temperature drive. ",
-        "Over-voltage. ",
-        "Under-voltage. ",
-        "Command error. ",
-        "Drive disabled (Emergency button connector not shorted). ",
-    };
-
-    const std::array<std::string, IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE> IMOTIONCUBE_DETAILED_MOTION_ERRORS = {
-        "TML stack overflow. ",
-        "TML stack underflow. ",
-        "Homing not available. ",
-        "Function not available. ",
-        "UPD ignored. ",
-        "Cancelable call ignored. ",
-        "Positive software limit switch is active. ",
-        "Negative software limit switch is active. ",
-        "Invalid S-curve profile. ",
-    };
-
-    const std::array<std::string, IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE>
-        IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS = {
-            "BiSS data CRC error. ",
-            "BiSS data warning bit is set. ",
-            "BiSS data error bit is set. ",
-            "BiSS sensor missing. ",
-            "Absolute Encoder Interface (AEI) interface error. ",
-            "Hall sensor missing. ",
-            "Position wraparound. The position 2^31 was exceeded. ",
-        };
 
     const std::array<std::string, ODRIVE_ERRORS_SIZE> ODRIVE_ERRORS = {
         "Control iteration missed. ",
@@ -139,21 +98,6 @@ namespace error {
     void addErrorToDescription(size_t index, ErrorRegister error_register, std::string& description)
     {
         switch (error_register) {
-            case ErrorRegister::IMOTIONCUBE_MOTION_ERROR:
-                if (index < IMOTIONCUBE_MOTION_ERRORS.size()) {
-                    description += IMOTIONCUBE_MOTION_ERRORS[index];
-                }
-                break;
-            case ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR:
-                if (index < IMOTIONCUBE_DETAILED_MOTION_ERRORS.size()) {
-                    description += IMOTIONCUBE_DETAILED_MOTION_ERRORS[index];
-                }
-                break;
-            case ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR:
-                if (index < IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS.size()) {
-                    description += IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[index];
-                }
-                break;
             case ErrorRegister::ODRIVE_ERROR:
                 if (index < ODRIVE_ERRORS.size()) {
                     description += ODRIVE_ERRORS[index];
