@@ -33,7 +33,6 @@ def generate_launch_description() -> LaunchDescription:
         - "[march_safety]/launch/march_safety.launch.py"
         - "[march_robot_information]/launch/robot_information.launch.py"
         - "[march_fake_sensor_data]/launch/march_fake_sensor_data.launch.py"
-        - "[march_smartglasses_bridge]/launch/smartglasses_bridge.launch.py"
 
     The settable ros parameters are:
         use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
@@ -527,19 +526,6 @@ def generate_launch_description() -> LaunchDescription:
             ("maximum_fake_temperature", maximum_fake_temperature),
         ],
         condition=IfCondition(fake_sensor_data),
-    )
-    # endregion
-
-    # region Launch Smartglass bridge
-    smartglass_bridge_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_smartglasses_bridge"),
-                "launch",
-                "smartglasses_bridge.launch.py",
-            )
-        ),
-        condition=IfCondition(use_hud),
     )
     # endregion
 
