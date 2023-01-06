@@ -69,18 +69,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/getting_started/setting_up_docker
 
 .. toctree::
-   :caption: Useful tools
-   :maxdepth: 2
-   :hidden:
-
-   doc/useful_tools/robot_model
-   doc/useful_tools/ros_control
-   doc/useful_tools/rqt
-   doc/useful_tools/ros_bag
-   doc/useful_tools/gazebo
-   doc/useful_tools/event_stream_processing
-
-.. toctree::
    :caption: Using the March Exoskeleton
    :maxdepth: 2
    :hidden:
@@ -119,6 +107,18 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_mpc_visualization/README
   doc/march_packages/mujoco_simulation/README
   doc/march_packages/march_smartglasses_bridge/README
+
+.. toctree::
+   :caption: Useful tools
+   :maxdepth: 2
+   :hidden:
+
+   doc/useful_tools/robot_model
+   doc/useful_tools/ros_control
+   doc/useful_tools/rqt
+   doc/useful_tools/ros_bag
+   doc/useful_tools/gazebo
+   doc/useful_tools/event_stream_processing
 
 .. toctree::
   :caption: March Packages (Semi-outdated)

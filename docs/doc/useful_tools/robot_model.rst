@@ -41,20 +41,6 @@ rviz
 The visualization combines the urdf and the tf frames to show the robot model.
 Please check the `official userguide <https://wiki.ros.org/rviz/UserGuide>`_ to start using it!
 
-Example
-^^^^^^^
-An example launchfile has been provided in :codedir:`robot_model.launch <useful_tools/launch/robot_model.launch>`.
-
-Inspect the file to see how the different nodes are launched, and try it out yourself with the following command!
-
-.. code::
-
-  roslaunch march_tutorials robot_model.launch
-
-If no robot shows up, make sure to add a ``RobotModel`` to the displays on the left.
-
-If your robot shows up but appears in white/red, make sure the global option for ``Fixed Frame`` is set to ``world`` instead of ``map``.
-
 See also
 ^^^^^^^^
 

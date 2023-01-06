@@ -9,7 +9,7 @@ window can include multiple RQT plugins. For example, if you run
 
 .. code::
 
-    rqt  # a roscore has to be running
+    rqt  # a ro process has to be running
 
 You can select multiple plugins from the ``Plugins`` menu in the top left. Once you have
 selected a few plugins, you can save the current 'perspective'. A perspective is a combination
@@ -22,10 +22,9 @@ input device and the gait selection tool next to each other in one window.
 
    Example rqt perspective
 
-The `project-march/monitor <>` repository contains RQT plugins used
-to monitor and control the |march| and the `gait generator <>` is also an RQT plugin.
+The `project-march/monitor` repository contains RQT plugins used
+to monitor and control the |march| and the is also an RQT plugin.
 
 See also
 ^^^^^^^^
 * :ref:`how-to-view-live-data-label`
-* :ref:`using-the-gait-generator-label`
