@@ -5,7 +5,7 @@ Connecting to the exoskeleton
 =============================
 .. inclusion-introduction-start
 
-This tutorial will help you set up a connection with the exoskeleton wirelessly.
+This tutorial will help you set up a wireless connection with the exoskeleton.
 If you are interested in connecting with an ethernet cable, take a look at :ref:`connecting-to-the-exoskeleton-ethercat-label`.
 
 .. inclusion-introduction-end

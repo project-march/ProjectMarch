@@ -46,7 +46,7 @@ First-time setup steps:
  * Tip: you can type :code:`pycharm-professional > /dev/null 2> /dev/null & disown` to be able to close the terminal, and not output any information to the terminal.
 #. Select folder for ROS2.
 #. Exclude parts of the built march code to prevent duplicate code fragment errors
-    #. Go to File | Settings | Project: docs | Project Structure
+    #. Go to File | Settings | Project: ros2 | Project Structure
         #. Click on "File" in the top left of pycharm.
         #. Click on "Settings" in the dropdown menu of "File".
         #. Go to "Project: [name of project]" -> "project settings".
