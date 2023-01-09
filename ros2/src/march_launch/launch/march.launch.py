@@ -33,7 +33,6 @@ def generate_launch_description() -> LaunchDescription:
         - "[march_safety]/launch/march_safety.launch.py"
         - "[march_robot_information]/launch/robot_information.launch.py"
         - "[march_fake_sensor_data]/launch/march_fake_sensor_data.launch.py"
-        - "[march_smartglasses_bridge]/launch/smartglasses_bridge.launch.py"
 
     The settable ros parameters are:
         use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
@@ -67,9 +66,6 @@ def generate_launch_description() -> LaunchDescription:
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
     jointless = LaunchConfiguration("jointless")
-
-    # HUD arguments
-    use_hud = LaunchConfiguration("use_hud")
 
     # RealSense/simulation arguments
     ground_gait = LaunchConfiguration("ground_gait")
@@ -530,19 +526,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch Smartglass bridge
-    smartglass_bridge_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_smartglasses_bridge"),
-                "launch",
-                "smartglasses_bridge.launch.py",
-            )
-        ),
-        condition=IfCondition(use_hud),
-    )
-    # endregion
-
     # region Launch Gazebo
     gazebo_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -606,7 +589,6 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         robot_information_node,
         fake_sensor_data_node,
-        smartglass_bridge_node,
         gazebo_node,
         mujoco_node,
         march_control,

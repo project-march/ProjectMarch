@@ -24,9 +24,9 @@ function readmes_to_sphinx ()
     # Append `.rst` to the end of the name
 
     # For example 
-    # /march/ros2/src/hardware/interface/march_smartglasses_bridge/README.md
+    # /march/ros2/src/mujoco_simulation/README.md
     # becomes
-    # march_smartglasses_bridge
+    # mujoco_simulation
     echo "Extract package name from README files"
     OUTPUT_DIR=$(readlink -f $2)
     OUTPUT_FILE=$(mktemp)

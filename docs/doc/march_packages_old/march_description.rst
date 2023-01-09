@@ -43,5 +43,4 @@ to visualize the robot.
 See also
 ^^^^^^^^
 * :ref:`robot-model-label`
-* :ref:`march-simulation-label`
 * :ref:`march-launch-label`

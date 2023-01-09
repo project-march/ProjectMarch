@@ -54,7 +54,7 @@ Here are some rules of thumb to follow when writing tests:
 #. Use one ``assert`` per test (i.e. only test one function)
 #. If possible, every method should have at least one unit test
 #. Make a test for every edge case!
-#. Usually, your test code is about as long as your normal code.
+#. Usually, your test code is about as long or longer as your normal code.
 
 Next to these rules there exist some conventions in structuring tests:
 

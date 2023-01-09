@@ -69,18 +69,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/getting_started/setting_up_docker
 
 .. toctree::
-   :caption: Useful tools
-   :maxdepth: 2
-   :hidden:
-
-   doc/useful_tools/robot_model
-   doc/useful_tools/ros_control
-   doc/useful_tools/rqt
-   doc/useful_tools/ros_bag
-   doc/useful_tools/gazebo
-   doc/useful_tools/event_stream_processing
-
-.. toctree::
    :caption: Using the March Exoskeleton
    :maxdepth: 2
    :hidden:
@@ -91,7 +79,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/using_the_march_exoskeleton/how_to_airgait
    doc/using_the_march_exoskeleton/how_to_view_live_data
    doc/using_the_march_exoskeleton/log_files
-   doc/using_the_march_exoskeleton/using_the_gait_generator
    doc/using_the_march_exoskeleton/error_codes
    doc/using_the_march_exoskeleton/using_the_pressure_soles
 
@@ -103,11 +90,9 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/development/documentation
    doc/development/adding_dependencies
    doc/development/git
-   doc/continuous_integration/continuous_integration
    doc/development/testing
    doc/development/style_guide
    doc/development/vscode_flake8
-   doc/development/add_a_new_gait
    doc/development/index_ros_for_cpp_in_jetbrains.rst
 
 .. toctree::
@@ -118,7 +103,16 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/doc/README
   doc/march_packages/march_mpc_visualization/README
   doc/march_packages/mujoco_simulation/README
-  doc/march_packages/march_smartglasses_bridge/README
+
+.. toctree::
+   :caption: Useful tools
+   :maxdepth: 2
+   :hidden:
+
+   doc/useful_tools/robot_model
+   doc/useful_tools/ros_control
+   doc/useful_tools/rqt
+   doc/useful_tools/ros_bag
 
 .. toctree::
   :caption: March Packages (Semi-outdated)
@@ -144,4 +138,4 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages_old/march_safety
   doc/march_packages_old/march_shared_classes
   doc/march_packages_old/march_shared_resources
-  doc/march_packages_old/march_simulation
+  doc/march_packages_old/event_stream_processing

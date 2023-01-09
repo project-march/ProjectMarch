@@ -21,13 +21,17 @@ The setup
 
 Start up
 ---------
-#. **High voltage:** Turn the high voltage on by releasing the emergency button and enabling power.
+#. **Prepare Exo:** Make sure that the exo is in approximately home stand or home sit.
+#. **Emergency stop off:** Make sure that on startup the emergency button is pressed.
+#. **Power exo:** Power on the exo by either turning on the power supply or the batteries.
+#. **Start the exoskeleton pc:** Keep the start button pressed until the blue light is continuously on.
+   The computer is now booting. The computer will automatically connect with the WiFi router.
+#. **Emergency stop on:** Turn the high voltage on by releasing the emergency button and enabling power.
 #. **Start the exoskeleton pc:** Keep the start button pressed until the blue light is continuously on.
    The computer is now booting. The display, mouse and keyboard should automatically connect.
-#. **Start the software:** Type in a sourced terminal :code:`roslaunch march_launch march.launch`.
-#. **Select launch settings:** You can select launch settings by appending launch options to the launch.
-   use :code:`roslaunch --ros-args march_launch march.launch` to see what options are available.
-   See the :ref:`march-launch-label` page for more info on how to launch the exoskeleton.
+#. **Start the software:** Type in a sourced terminal :code:`training`.
+#. **Input Device:** Type in a sourced terminal on your computer :code:`monitor`
+   to start the input device.
 
 Remote airgait
 ^^^^^^^^^^^^^^
@@ -37,21 +41,24 @@ Remote airgait
 
 The setup
 ---------
-- Your pc.
-- Exoskeleton hanging in the cage.
-- Tools needed to power the |march|.
-- WiFi Router
+- Monitor laptop.
+- Exoskeleton hanging in the stand.
+- Tools needed to power the |march| (Power supply or batteries).
+- Asus router and t-mobile router.
 
 
 Start up
 ---------
-#. **High voltage:** Turn the high voltage on by releasing the emergency button and enabling power.
+#. **Prepare Exo:** Make sure that the exo is in approximately home stand or home sit.
+#. **Emergency stop off:** Make sure that on startup the emergency button is pressed.
+#. **Power exo:** Power on the exo by either turning on the power supply or the batteries.
 #. **Start the exoskeleton pc:** Keep the start button pressed until the blue light is continuously on.
    The computer is now booting. The computer will automatically connect with the WiFi router.
+#. **Emergency stop on:** Turn the high voltage on by releasing the emergency button and enabling power.
 #. **Start your computer** Start your computer and connect with the WiFi router.
-#. **SSH:** Start a terminal to connect with the exoskeleton pc. Connect with :code:`ssh march@march`.
-#. **Start the software:** Type :code:`roslaunch march_launch march_headless.launch`.
-#. **Input Device:** Type in a sourced terminal on your computer :code:`roslaunch march_rqt_input_device march_rqt_input_device.launch`
+#. **SSH:** Start a terminal to connect with the exoskeleton pc. Connect with :code:`guus`.
+#. **Start the software:** Type :code:`training`.
+#. **Input Device:** Type in a sourced terminal on your computer :code:`monitor`
    to start the input device.
 
 

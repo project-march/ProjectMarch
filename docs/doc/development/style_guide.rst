@@ -71,20 +71,12 @@ Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :c
 
 .. code::
 
-    # static analysis shortcuts
-    alias march_static_analysis_ros1='echo "Running analysis, this can take 77 seconds" && find ~/march/ros1/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros1/build {} 2> /dev/null; true && echo -e "\n----done---"'
-    alias march_static_analysis_ros1_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros1/build {} 2> /dev/null; true && echo -e "\n----done---"'
-
-    alias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
+    # static analysis shortcutsalias march_static_analysis_ros2='echo "Running analysis, this can take 77 seconds" && find ~/march/ros2/src -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
     alias march_static_analysis_ros2_here='echo "Running analysis, on files in folder $(pwd)" && find . -name "*.hpp" -or -name "*.h" -or -name "*.cpp" -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "cmake-build-debug" | grep -v "cmake-build-debug" | xargs -L1 -P4 -I{} -- clang-tidy -p ~/march/ros2/build {} 2> /dev/null; true && echo -e "\n----done---"'
 
 Now you can run the analysis with a couple of very simple commands.
-Keep in mind that, when using the '..._here' commands, you choose to use the ros1 command for ros1 code and the ros2 command for ros2 code. The clang-tidy code checks for some violations, but can't thoroughly check your code if can't find your build folder.
 
 .. code::
-
-    march_static_analysis_ros1  # To run static analysis for the entire ros1/src folder.
-    march_static_analysis_ros1_here  # To run static analysis on the current directory (must be located in ros1).
 
     march_static_analysis_ros2 # To run static analysis for the entire ros2/src folder.
     march_static_analysis_ros2_here # To run static analysis on the current directory (must be located in ros2).
@@ -129,7 +121,7 @@ or check out `this link <https://docs.docker.com/engine/install/ubuntu/>`_:
     without prepending 'sudo'.
 
 
-Copy and paste the following aliases in your :code:`~/.march_bash_aliases` or :code:`~/.bashrc` file.
+Here are some aliases that can be found in the `march_aliases.sh` file in the repo
 
 ..
     The 'dev' in the code block below might be changed to 'main' to keep the flake8 more consistent but slower to adapt.
