@@ -25,6 +25,7 @@ public:
     // Publish a fatal error message to the /march/error topic
     void publishNonFatal(const std::string& message);
 
+private:
     // Publish an error message to the /march/error topic
     void publishErrorMessage(const std::string& message, int8_t error_type);
 
@@ -32,7 +33,6 @@ public:
     // /march/input_device/instruction topic
     void publishStopMessage();
 
-private:
     std::shared_ptr<SafetyNode> node_;
 };
 

@@ -91,7 +91,7 @@ void InputDeviceSafety::update()
  * device is actually no longer connected. The input device is then removed from
  * the connected_devices.
  *
- *          If the input device is not connected ye and also not timed out, then
+ *          If the input device is not connected yet and also not timed out, then
  * a new input device is connected and the input device is added to the set of
  * connected_devices
  */
