@@ -5,8 +5,8 @@
 
 #include <string>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <gtest/gtest.h>
-#include <ros/package.h>
 #include <urdf/model.h>
 
 #include <march_hardware/encoder/absolute_encoder.h>
@@ -25,7 +25,8 @@ protected:
 
     void SetUp() override
     {
-        this->base_path = ros::package::getPath("march_hardware_builder").append(/*__s=*/"/test/yaml/joint");
+        this->base_path = ament_index_cpp::get_package_share_directory("march_hardware_builder")
+                              .append(/*__s=*/"/robots/test_yamls/joint");
         this->joint = std::make_shared<urdf::Joint>();
         this->joint->limits = std::make_shared<urdf::JointLimits>();
         this->joint->safety = std::make_shared<urdf::JointSafety>();

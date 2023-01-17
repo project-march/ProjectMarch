@@ -58,9 +58,10 @@ public:
     // Actuate the joint
     void actuate(float target);
 
-    // Get the position and velocity of the joint
+    // Get the position, velocity and torque of the joint
     double getPosition() const;
     double getVelocity() const;
+    double getTorque() const;
 
     // Getters and setters for properties of the joint
     std::string getName() const;
@@ -131,8 +132,10 @@ private:
     // readEncoders()
     double initial_incremental_position_ = 0.0;
     double initial_absolute_position_ = 0.0;
+    double initial_torque_ = 0.0f;
     double position_ = 0.0; // In radians
     double velocity_ = 0.0;
+    double torque_ = 0.0f;
     std::chrono::steady_clock::time_point last_read_time_;
 
     // Keep track of the state of the MotorController

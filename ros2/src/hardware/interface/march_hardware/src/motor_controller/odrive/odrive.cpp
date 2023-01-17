@@ -141,11 +141,6 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     return state;
 }
 
-float ODrive::getTorque()
-{
-    return getMotorCurrent() * torque_constant_;
-}
-
 float ODrive::getMotorTemperature()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorTemperature, axis_)).f;
@@ -208,6 +203,12 @@ float ODrive::getIncrementalPositionUnchecked()
 float ODrive::getIncrementalVelocityUnchecked()
 {
     return (float)this->getIncrementalEncoder()->velocityIUToRadians(getIncrementalVelocityIU());
+}
+
+float ODrive::getTorqueUnchecked()
+{
+    int32_t measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).i;
+    return measured_torque;
 }
 
 float ODrive::getMotorCurrent()

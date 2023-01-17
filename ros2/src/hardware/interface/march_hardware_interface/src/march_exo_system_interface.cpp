@@ -120,6 +120,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
+        /*torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
@@ -223,6 +224,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.velocity = 0;
+            jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
         }
@@ -358,6 +360,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
+        jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }

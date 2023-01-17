@@ -10,13 +10,17 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -Werror -Wpedantic)
 endif()
 
+set(CMAKE_PREFIX_PATH "")
+
 find_package(ament_cmake REQUIRED)
 find_package(soem REQUIRED)
+find_package(urdf REQUIRED)
+find_package(march_safety REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(march_logger_cpp REQUIRED)
 
 ament_export_include_directories(include)
-ament_export_dependencies(soem march_logger_cpp)
+ament_export_dependencies(soem march_logger_cpp march_safety)
 ament_export_libraries(${PROJECT_NAME})
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
@@ -62,6 +66,7 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/march_robot.h
     include/${PROJECT_NAME}/temperature/temperature_ges.h
     include/${PROJECT_NAME}/temperature/temperature_sensor.h
+    include/${PROJECT_NAME}/torque_sensor/torque_sensor.h
     include/${PROJECT_NAME}/pressure_sole/pressure_sole.h
     include/${PROJECT_NAME}/power_distribution_board/power_distribution_board.h
     src/encoder/absolute_encoder.cpp
@@ -78,12 +83,13 @@ add_library(${PROJECT_NAME}
     src/joint.cpp
     src/march_robot.cpp
     src/temperature/temperature_ges.cpp
+    src/torque_sensor/torque_sensor.cpp
     src/pressure_sole/pressure_sole.cpp
     src/power_distribution_board/power_distribution_board.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} pthread)
-ament_target_dependencies(${PROJECT_NAME} soem march_logger_cpp)
+ament_target_dependencies(${PROJECT_NAME} soem march_logger_cpp march_safety)
 
 add_executable(slave_count_check check/slave_count.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})
@@ -108,36 +114,36 @@ install(DIRECTORY launch config
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 
-## Add gtest based cpp test target and link libraries
-# if(BUILD_TESTING)
-#     ament_add_gmock(${PROJECT_NAME}_test
+# Add gtest based cpp test target and link libraries
+ if(BUILD_TESTING)
+     ament_add_gmock(${PROJECT_NAME}_test
 #         test/encoder/absolute_encoder_test.cpp
 #         test/encoder/encoder_test.cpp
-#         test/encoder/incremental_encoder_test.cpp
-#         test/error/hardware_exception_test.cpp
-#         test/error/motor_controller_error_test.cpp
-#         test/ethercat/slave_test.cpp
+         test/encoder/incremental_encoder_test.cpp
+         test/error/hardware_exception_test.cpp
+         test/ethercat/slave_test.cpp
 #         test/joint_test.cpp
 #         test/mocks/mock_absolute_encoder.h
 #         test/mocks/mock_encoder.h
-#         test/mocks/mock_incremental_encoder.h
-#         test/mocks/mock_motorcontroller_state.h
-#         test/mocks/mock_pdo_interface.h
-#         test/mocks/mock_sdo_interface.h
-#         test/mocks/mock_slave.h
-#         test/mocks/mock_temperature_ges.h
+         test/mocks/mock_incremental_encoder.h
+         test/mocks/mock_motorcontroller_state.h
+         test/mocks/mock_pdo_interface.h
+         test/mocks/mock_sdo_interface.h
+         test/mocks/mock_slave.h
+         test/mocks/mock_temperature_ges.h
 #         test/temperature/temperature_ges_test.cpp
 #         test/pressure_sole/pressure_sole_test.cpp
-#         test/test_runner.cpp
-#     )
-#     target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
-#     ament_target_dependencies(${PROJECT_NAME}_test soem urdf)
+         test/torque_sensor/torque_sensor_test.cpp
+         test/test_runner.cpp
+     )
+     target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+     ament_target_dependencies(${PROJECT_NAME}_test soem urdf march_safety)
 
-#     if(ENABLE_COVERAGE_TESTING)
-#         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
-#         add_code_coverage(
-#             NAME coverage_report
-#             DEPENDENCIES ${PROJECT_NAME}_test
-#         )
-#     endif()
-# endif()
+     if(ENABLE_COVERAGE_TESTING)
+         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
+         add_code_coverage(
+             NAME coverage_report
+             DEPENDENCIES ${PROJECT_NAME}_test
+         )
+     endif()
+ endif()

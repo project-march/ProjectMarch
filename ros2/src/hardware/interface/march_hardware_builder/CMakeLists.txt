@@ -14,12 +14,15 @@ find_package(ament_cmake REQUIRED)
 find_package(march_hardware REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(march_logger_cpp REQUIRED)
+find_package(ament_cmake_gmock REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 
-#if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
-#    find_package(code_coverage REQUIRED)
-#    # Add compiler flags for coverage instrumentation before defining any targets
-#    append_coverage_compiler_flags()
-#endif()
+if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
+    find_package(code_coverage REQUIRED)
+    # Add compiler flags for coverage instrumentation before defining any targets
+    append_coverage_compiler_flags()
+endif()
+
 add_library(${PROJECT_NAME}
         SHARED
         src/hardware_builder.cpp
@@ -38,7 +41,9 @@ ament_target_dependencies(
 
 # This is needed for some reason otherwise you can get linker errors.
 # Normally this should have been done by ament_target_dependencies, .
-target_link_libraries(${PROJECT_NAME} ${YAML_CPP_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}
+        ament_index_cpp::ament_index_cpp
+        ${YAML_CPP_LIBRARIES})
 
 install(DIRECTORY robots
         DESTINATION share/${PROJECT_NAME}
@@ -68,25 +73,26 @@ install(
 )
 
 
-### Add gtest based cpp test target and link libraries
-#if(CATKIN_ENABLE_TESTING)
-#    catkin_add_gtest(${PROJECT_NAME}_test
+## Add gtest based cpp test target and link libraries
+if(BUILD_TESTING)
+    ament_add_gmock(${PROJECT_NAME}_test
 #        test/absolute_encoder_builder_test.cpp
 #        test/allowed_robot_test.cpp
 #        test/imc_builder_test.cpp
 #        test/motor_controller_builder_test.cpp
-#        test/incremental_encoder_builder_test.cpp
+        test/incremental_encoder_builder_test.cpp
 #        test/joint_builder_test.cpp
-#        test/test_runner.cpp
-#    )
-#    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
-#
-#    if(ENABLE_COVERAGE_TESTING)
-#        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
-#        add_code_coverage(
-#            NAME coverage_report
-#            DEPENDENCIES ${PROJECT_NAME}_test
-#        )
-#    endif()
-#endif()
+        test/torque_sensor_builder_test.cpp
+        test/test_runner.cpp
+    )
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+    if(ENABLE_COVERAGE_TESTING)
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
+        add_code_coverage(
+            NAME coverage_report
+            DEPENDENCIES ${PROJECT_NAME}_test
+        )
+    endif()
+endif()
 ament_package()
