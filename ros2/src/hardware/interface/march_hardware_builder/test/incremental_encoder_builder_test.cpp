@@ -5,8 +5,8 @@
 
 #include <string>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <gtest/gtest.h>
-#include <ros/package.h>
 
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/motor_controller/motor_controller_type.h>
@@ -18,7 +18,8 @@ protected:
 
     void SetUp() override
     {
-        this->base_path = ros::package::getPath("march_hardware_builder").append(/*__s=*/"/test/yaml/encoder");
+        this->base_path = ament_index_cpp::get_package_share_directory("march_hardware_builder")
+                              .append("/robots/test_yamls/encoder");
     }
 
     YAML::Node loadTestYaml(const std::string& relative_path)

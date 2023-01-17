@@ -7,6 +7,7 @@
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/motor_controller/motor_controller_state.h"
+#include "march_hardware/torque_sensor/torque_sensor.h"
 #include <chrono>
 #include <memory>
 #include <string>
@@ -35,6 +36,7 @@ public:
     float getAbsoluteVelocity();
     float getIncrementalPosition();
     float getIncrementalVelocity();
+    float getTorque();
 
     /**
      * \brief Applies an clamp, an motor-direction and Effort to IU Effort conversion transformation.
@@ -87,9 +89,12 @@ public:
     bool hasIncrementalEncoder() const;
     std::unique_ptr<IncrementalEncoder>& getIncrementalEncoder();
 
+    bool hasTorqueSensor() const;
+    std::unique_ptr<TorqueSensor>& getTorqueSensor();
+
     // Getters for specific information about the state of the motor and its
     // controller
-    virtual float getTorque() = 0;
+    // virtual float getTorque() = 0;
     virtual float getMotorCurrent() = 0;
     virtual float getMotorControllerVoltage() = 0;
     virtual float getMotorVoltage() = 0;
@@ -149,9 +154,11 @@ protected:
     virtual float getIncrementalPositionUnchecked() = 0;
     virtual float getAbsoluteVelocityUnchecked() = 0;
     virtual float getIncrementalVelocityUnchecked() = 0;
+    virtual float getTorqueUnchecked() = 0;
 
     std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
     std::unique_ptr<IncrementalEncoder> incremental_encoder_;
+    std::unique_ptr<TorqueSensor> torque_sensor_;
     ActuationMode actuation_mode_;
 
     bool is_incremental_encoder_more_precise_;

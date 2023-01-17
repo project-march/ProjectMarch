@@ -40,6 +40,7 @@ struct JointInfo {
     march::ODriveState motor_controller_data;
     double position;
     double velocity;
+    double torque;
     double effort_actual;
     double effort_command;
     double effort_command_converted;

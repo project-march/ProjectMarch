@@ -35,6 +35,7 @@ enum class ODriveObjectName {
     OdriveTemperature,
     MotorTemperature,
     ShadowCount,
+    Torque,
 
     // Write objects
     TargetTorque,

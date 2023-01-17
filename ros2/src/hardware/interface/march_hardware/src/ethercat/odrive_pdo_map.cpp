@@ -23,24 +23,26 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_0
           { ODriveObjectName::AxisState, ODriveObject(/*offset=*/32, /*length=*/32) },
           { ODriveObjectName::OdriveTemperature, ODriveObject(/*offset=*/36, /*length=*/32) },
           { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/40, /*length=*/32) },
-          { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/44, /*length=*/32) } };
+          { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/44, /*length=*/32) },
+          { ODriveObjectName::Torque, ODriveObject(/*offset=*/48, /*length=*/32) } };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1
-    = { { ODriveObjectName::AbsolutePosition, ODriveObject(/*offset=*/48, /*length=*/32) },
-          { ODriveObjectName::Current, ODriveObject(/*offset=*/52, /*length=*/32) },
-          { ODriveObjectName::MotorVelocity, ODriveObject(/*offset=*/56, /*length=*/32) },
-          { ODriveObjectName::AxisError, ODriveObject(/*offset=*/60, /*length=*/32) },
-          { ODriveObjectName::MotorError, ODriveObject(/*offset=*/64, /*length=*/32) },
-          { ODriveObjectName::DieBOSlaveError, ODriveObject(/*offset=*/68, /*length=*/32) },
-          { ODriveObjectName::EncoderError, ODriveObject(/*offset=*/72, /*length=*/32) },
-          { ODriveObjectName::ControllerError, ODriveObject(/*offset=*/76, /*length=*/32) },
-          { ODriveObjectName::AxisState, ODriveObject(/*offset=*/80, /*length=*/32) },
-          { ODriveObjectName::OdriveTemperature, ODriveObject(/*offset=*/84, /*length=*/32) },
-          { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/88, /*length=*/32) },
-          { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/92, /*length=*/32) } };
+    = { { ODriveObjectName::AbsolutePosition, ODriveObject(/*offset=*/52, /*length=*/32) },
+          { ODriveObjectName::Current, ODriveObject(/*offset=*/56, /*length=*/32) },
+          { ODriveObjectName::MotorVelocity, ODriveObject(/*offset=*/60, /*length=*/32) },
+          { ODriveObjectName::AxisError, ODriveObject(/*offset=*/64, /*length=*/32) },
+          { ODriveObjectName::MotorError, ODriveObject(/*offset=*/68, /*length=*/32) },
+          { ODriveObjectName::DieBOSlaveError, ODriveObject(/*offset=*/72, /*length=*/32) },
+          { ODriveObjectName::EncoderError, ODriveObject(/*offset=*/76, /*length=*/32) },
+          { ODriveObjectName::ControllerError, ODriveObject(/*offset=*/80, /*length=*/32) },
+          { ODriveObjectName::AxisState, ODriveObject(/*offset=*/84, /*length=*/32) },
+          { ODriveObjectName::OdriveTemperature, ODriveObject(/*offset=*/88, /*length=*/32) },
+          { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/92, /*length=*/32) },
+          { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/96, /*length=*/32) },
+          { ODriveObjectName::Torque, ODriveObject(/*offset=*/100, /*length=*/32) } };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none
-    = { { ODriveObjectName::OdriveError, ODriveObject(/*offset=*/96, /*length=*/32) } };
+    = { { ODriveObjectName::OdriveError, ODriveObject(/*offset=*/104, /*length=*/32) } };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
     { ODriveObjectName::TargetTorque, ODriveObject(/*offset=*/0, /*length=*/32) },

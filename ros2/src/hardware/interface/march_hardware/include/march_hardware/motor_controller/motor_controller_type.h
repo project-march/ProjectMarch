@@ -5,7 +5,7 @@
 
 namespace march {
 
-enum class MotorControllerType { ODrive };
+enum class MotorControllerType { IMotionCube, ODrive };
 
 } // namespace march
 #endif // MARCH_HARDWARE_MOTOR_CONTROLLER_TYPE_H

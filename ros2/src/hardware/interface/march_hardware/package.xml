@@ -14,11 +14,12 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>soem</depend>
+  <depend>march_safety</depend>
   <depend>march_logger_cpp</depend>
 
 <!--  <test_depend>rosunit</test_depend>-->
 <!--  <test_depend>code_coverage</test_depend>-->
-<!--  <test_depend>ament_cmake_gmock</test_depend>-->
+  <test_depend>ament_cmake_gmock</test_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

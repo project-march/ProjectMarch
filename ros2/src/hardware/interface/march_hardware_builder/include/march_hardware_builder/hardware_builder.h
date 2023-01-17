@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <yaml-cpp/yaml.h>
 
 #include <march_hardware/encoder/absolute_encoder.h>
@@ -20,6 +21,7 @@
 #include <march_hardware/power_distribution_board/power_distribution_board.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 #include <march_hardware/temperature/temperature_ges.h>
+#include <march_hardware/torque_sensor/torque_sensor.h>
 #include <march_logger_cpp/base_logger.hpp>
 
 /**
@@ -67,6 +69,9 @@ public:
         const YAML::Node& incremental_encoder_config, const march::MotorControllerType motor_controller_type);
     static march::Encoder::Direction getEncoderDirection(const YAML::Node& encoder_config);
 
+    static std::unique_ptr<march::TorqueSensor> createTorqueSensor(
+        const YAML::Node& torque_sensor_config, const march::MotorControllerType motor_controller_type);
+
     std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config) const;
     std::vector<march::PressureSole> createPressureSoles(const YAML::Node& pressure_soles_config) const;
     march::PressureSole createPressureSole(const YAML::Node& pressure_sole_config) const;
@@ -92,6 +97,7 @@ public:
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
+    static const std::vector<std::string> TORQUE_SENSOR_REQUIRED_KEYS;
     static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
     static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;

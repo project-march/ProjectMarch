@@ -64,7 +64,7 @@ public:
 
     // Getters for specific information about the state of the motor and the
     // ODrive
-    float getTorque() override;
+    //    float getTorque() override;
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
@@ -81,6 +81,7 @@ protected:
     float getIncrementalPositionUnchecked() override;
     float getAbsoluteVelocityUnchecked() override;
     float getIncrementalVelocityUnchecked() override;
+    float getTorqueUnchecked() override;
 
 private:
     // Getter and setter for the axis state

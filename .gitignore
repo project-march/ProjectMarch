@@ -180,6 +180,7 @@ qtcreator-*
 CATKIN_IGNORE
 COLCON_IGNORE
 
+*/install
 */install/*
 */install_isolated/*
 install/*
@@ -201,3 +202,4 @@ codequality.json
 # Mujuco stuff
 *.MUJOCO_LOG.TXT
 MUJOCO_LOG.TXT
+ros2/src/hardware/install/*

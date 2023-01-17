@@ -110,6 +110,15 @@ float MotorController::getIncrementalVelocity()
     return getIncrementalVelocityUnchecked();
 }
 
+float MotorController::getTorque()
+{
+    if (!hasTorqueSensor()) {
+        throw error::HardwareException(
+            error::ErrorType::MISSING_ENCODER, "Cannot get torque, the motor controller has no torque sensor");
+    }
+    return getTorqueUnchecked();
+}
+
 double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const
 {
     joint_effort_command = convertEffortToIUEffort(joint_effort_command);
@@ -138,6 +147,11 @@ bool MotorController::hasIncrementalEncoder() const
     return incremental_encoder_ != nullptr;
 }
 
+bool MotorController::hasTorqueSensor() const
+{
+    return torque_sensor_ != nullptr;
+}
+
 std::unique_ptr<AbsoluteEncoder>& MotorController::getAbsoluteEncoder()
 {
     if (!hasAbsoluteEncoder()) {
@@ -152,6 +166,14 @@ std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
         throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental encoder");
     }
     return incremental_encoder_;
+}
+
+std::unique_ptr<TorqueSensor>& MotorController::getTorqueSensor()
+{
+    if (!hasTorqueSensor()) {
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get torque sensor");
+    }
+    return torque_sensor_;
 }
 
 void MotorController::actuate(float target)
