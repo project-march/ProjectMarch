@@ -118,7 +118,7 @@ ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
  if(BUILD_TESTING)
      ament_add_gmock(${PROJECT_NAME}_test
          test/encoder/absolute_encoder_test.cpp
-#         test/encoder/encoder_test.cpp
+         test/encoder/encoder_test.cpp
          test/encoder/incremental_encoder_test.cpp
          test/error/hardware_exception_test.cpp
          test/ethercat/slave_test.cpp
