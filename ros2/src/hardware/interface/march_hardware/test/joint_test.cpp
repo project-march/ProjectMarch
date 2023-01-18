@@ -3,7 +3,7 @@
 // Copyright 2018 Project March.
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/joint.h"
-#include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
+#include "march_hardware/motor_controller/odrive/odrive_state.h"
 #include "mocks/mock_imotioncube.h"
 #include "mocks/mock_motorcontroller_state.h"
 #include "mocks/mock_temperature_ges.h"
