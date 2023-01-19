@@ -1,7 +1,7 @@
-#include "rclcpp/rclcpp.hpp"
-#include "march_shared_msgs/srv/request_footsteps.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
+#include "march_shared_msgs/srv/request_footsteps.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include <chrono>
 #include <cstdio>
 using namespace std::chrono_literals;
@@ -29,19 +29,18 @@ private:
 
     geometry_msgs::msg::PoseArray generate_foot_placements(int stance_leg)
     {
-       geometry_msgs::msg::PoseArray footstep_array;
-       int steps=8;
-       double vx = 1.0;
-       double vy = 1.0;
-       double l = 0.3;
-       double x = 0.0;
-       double y = stance_leg * l/2;
+        geometry_msgs::msg::PoseArray footstep_array;
+        int steps = 8;
+        double vx = 1.0;
+        double vy = 1.0;
+        double l = 0.3;
+        double x = 0.0;
+        double y = stance_leg * l / 2;
 
-       geometry_msgs::msg::Pose footstep;
-       for(int i = 0; i < steps; i++)
-       {
+        geometry_msgs::msg::Pose footstep;
+        for (int i = 0; i < steps; i++) {
             x += vx * i;
-            y += vy * i - stance_leg*l;
+            y += vy * i - stance_leg * l;
             stance_leg = -stance_leg;
 
             footstep.position.x = x;
@@ -49,8 +48,8 @@ private:
             footstep.position.z = 0;
 
             footstep_array.poses.push_back(footstep);
-       }
-       return footstep_array;
+        }
+        return footstep_array;
     };
 
     void publish_footsteps(const geometry_msgs::msg::PoseArray footsteps)
@@ -62,11 +61,11 @@ private:
     rclcpp::Service<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_service;
 };
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<FootstepGenerator>());
-    
+
     rclcpp::shutdown();
     return 0;
 }
