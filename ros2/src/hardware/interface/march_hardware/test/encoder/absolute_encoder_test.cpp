@@ -63,6 +63,24 @@ TEST_F(AbsoluteEncoderTest, CorrectUpperSoftLimits)
     ASSERT_EQ(this->encoder.getUpperSoftLimitIU(), this->upper_soft_limit);
 }
 
+TEST_F(AbsoluteEncoderTest, ZeroPositionNotWithingLiits)
+{
+    ASSERT_THROW(
+        march::AbsoluteEncoder(this->counts_per_rotation, motor_controller_type, this->upper_limit_iu,
+            this->lower_limit_iu, 531695, this->lower_error_soft_limit_rad_diff, this->upper_error_soft_limit_rad_diff,
+            this->lower_soft_limit_rad_diff, this->upper_soft_limit_rad_diff),
+        march::error::HardwareException);
+}
+
+TEST_F(AbsoluteEncoderTest, UpperSoftLimitsAboveUpperSoftErrorLimits)
+{
+    ASSERT_THROW(
+        march::AbsoluteEncoder(this->counts_per_rotation, motor_controller_type, this->upper_limit_iu,
+            this->lower_limit_iu, this->zero_position_iu, this->lower_error_soft_limit_rad_diff,
+            this->upper_soft_limit_rad_diff, this->lower_soft_limit_rad_diff, this->upper_error_soft_limit_rad_diff),
+        march::error::HardwareException);
+}
+
 TEST_F(AbsoluteEncoderTest, LowerSoftLimitAboveUpperSoftLimit)
 {
     ASSERT_THROW(
@@ -86,6 +104,91 @@ TEST_F(AbsoluteEncoderTest, UpperSoftLimitHigherThanUpperHardLimit)
                      this->upper_limit_iu, this->zero_position_iu, this->lower_error_soft_limit_rad_diff,
                      this->upper_error_soft_limit_rad_diff, this->lower_soft_limit_rad_diff, 5.0),
         march::error::HardwareException);
+}
+
+TEST_F(AbsoluteEncoderTest, IsWIthingHardlimitsTestTrue)
+{
+    ASSERT_TRUE(this->encoder.isWithinHardLimitsIU(540000));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWIthingHardlimitsTestFalse)
+{
+    ASSERT_FALSE(this->encoder.isWithinHardLimitsIU(531695));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWitinHardLimitsRadTrue)
+{
+    ASSERT_TRUE(this->encoder.isWithinHardLimitsRadians(1.0));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWitinHardLimitsRadFalse)
+{
+    ASSERT_FALSE(this->encoder.isWithinHardLimitsRadians(-2.0));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWithinSoftLimitsTestTrue)
+{
+    ASSERT_TRUE(this->encoder.isWithinSoftLimitsIU(540000));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWithinSoftLimitsTestFalse)
+{
+    ASSERT_FALSE(this->encoder.isWithinSoftLimitsIU(531695));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWitinSoftLimitsRadTrue)
+{
+    ASSERT_TRUE(this->encoder.isWithinSoftLimitsRadians(1.0));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWitinSoftLimitsRadFalse)
+{
+    ASSERT_FALSE(this->encoder.isWithinSoftLimitsRadians(-2.0));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWithinSoftErrorLimitsTestTrue)
+{
+    ASSERT_TRUE(this->encoder.isWithinErrorSoftLimitsIU(540000));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWithinSoftErrorLimitsTestFalse)
+{
+    ASSERT_FALSE(this->encoder.isWithinErrorSoftLimitsIU(531695));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWitinSoftErrorLimitsRadTrue)
+{
+    ASSERT_TRUE(this->encoder.isWithinErrorSoftLimitsRadians(1.0));
+}
+
+TEST_F(AbsoluteEncoderTest, IsWitinSoftErrorLimitsRadFasle)
+{
+    ASSERT_FALSE(this->encoder.isWithinErrorSoftLimitsRadians(-2.0));
+}
+
+TEST_F(AbsoluteEncoderTest, IsValidTargetIUCurrentLowerThenSoftLimitTrue)
+{
+    ASSERT_TRUE(this->encoder.isValidTargetIU(this->lower_soft_limit - 1000, this->lower_soft_limit - 500));
+}
+
+TEST_F(AbsoluteEncoderTest, IsValidTargetIUCurrentLowerThenSoftLimitFalse)
+{
+    ASSERT_FALSE(this->encoder.isValidTargetIU(this->lower_soft_limit - 1000, this->lower_soft_limit - 1500));
+}
+
+TEST_F(AbsoluteEncoderTest, IsValidTargetIUCurrentHigherThenSoftLimitTrue)
+{
+    ASSERT_TRUE(this->encoder.isValidTargetIU(this->upper_soft_limit + 1000, this->upper_soft_limit + 500));
+}
+
+TEST_F(AbsoluteEncoderTest, IsValidTargetIUCurrentHigherThenSoftLimitFalse)
+{
+    ASSERT_FALSE(this->encoder.isValidTargetIU(this->upper_soft_limit + 1000, this->upper_soft_limit + 1500));
+}
+
+TEST_F(AbsoluteEncoderTest, IsValidTargetIUTrue)
+{
+    ASSERT_TRUE(this->encoder.isValidTargetIU(this->zero_position_iu, this->zero_position_iu + 500));
 }
 
 TEST_F(AbsoluteEncoderTest, ZeroPositionRadToZeroPosition)

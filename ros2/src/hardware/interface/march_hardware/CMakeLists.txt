@@ -91,10 +91,6 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} pthread)
 ament_target_dependencies(${PROJECT_NAME} soem march_logger_cpp march_safety)
 
-add_executable(slave_count_check check/slave_count.cpp)
-target_link_libraries(slave_count_check ${PROJECT_NAME})
-ros_enable_rpath(slave_count_check)
-
 install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION include/${PROJECT_NAME}
 )
@@ -102,10 +98,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
-)
-
-install(TARGETS slave_count_check
-    RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY launch config
