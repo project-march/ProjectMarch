@@ -2,8 +2,8 @@
 // NOLINTBEGIN
 // Copyright 2018 Project March.
 
-#include <gtest/gtest.h>
 #include "rclcpp/rclcpp.hpp"
+#include <gtest/gtest.h>
 
 /**
  * The main method which runs all the tests
