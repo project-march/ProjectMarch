@@ -128,4 +128,9 @@ FASTRTPS_DEFAULT_PROFILES_FILE=~/march/.fastrtps-profile.xml
 export FASTRTPS_DEFAULT_PROFILES_FILE
 
 # Alias for telling a joke when Koen has to wait for a long time
-alias joke='curl -H "Accept: text/plain" https://icanhazdadjoke.com/ && echo' 
+alias joke='curl -H "Accept: text/plain" https://icanhazdadjoke.com/ && echo'
+#
+## Aliases for performing IMU debugs
+alias kernel_devboard="sudo /sbin/modprobe ftdi_sio && echo 2639 0300 | sudo tee /sys/bus/usb-serial/drivers/ftdi_sio/new_id"
+alias dialout_grp="sudo usermod -G dialout -a $USER && newgrp dialout"
+
