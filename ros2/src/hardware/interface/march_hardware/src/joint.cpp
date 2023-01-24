@@ -95,6 +95,14 @@ void Joint::readFirstEncoderValues(bool operational_check)
                 motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
         }
     }
+    if (motor_controller_->hasTorqueSensor()) {
+        initial_torque_ = motor_controller_->getTorque();
+        if (initial_torque_ != 0) {
+            throw error::HardwareException(error::ErrorType::INITIAL_TORQUE_NOT_ZERO,
+                "Joint %s has an initial torque of %d, while initial torque should be 0", name_.c_str(),
+                initial_torque_);
+        }
+    }
     logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));
 }
 
@@ -139,6 +147,12 @@ void Joint::readEncoders()
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
+        torque_ = motor_controller_->getTorque();
+        if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
+            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+                "Joint %s has an torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
+                motor_controller_->getTorqueSensor()->getMaxTorque());
+        }
     } else {
         if (time_between_last_update
             >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
@@ -157,6 +171,11 @@ double Joint::getPosition() const
 double Joint::getVelocity() const
 {
     return velocity_;
+}
+
+double Joint::getTorque() const
+{
+    return torque_;
 }
 
 int Joint::getNetNumber() const

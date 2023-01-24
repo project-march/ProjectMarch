@@ -4,14 +4,15 @@
 
 #include <vector>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <gtest/gtest.h>
-#include <ros/package.h>
 #include <urdf/model.h>
 
 TEST(AllowedRobotTest, TestMarch4Creation)
 {
     urdf::Model urdf;
-    urdf.initFile(ros::package::getPath("march_description").append(/*__s=*/"/urdf/march4.urdf"));
+    urdf.initFile(
+        ament_index_cpp::get_package_share_directory("march_description").append(/*__s=*/"/urdf/march4.urdf"));
     ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::march4, urdf).createMarchRobot());
 }
 
@@ -36,14 +37,16 @@ TEST(AllowedRobotTest, TestMarch4Creation)
 TEST(AllowedRobotTest, TestTestLinearSetupCreation)
 {
     urdf::Model urdf;
-    urdf.initFile(ros::package::getPath("march_description").append(/*__s=*/"/urdf/test_joint_linear.urdf"));
+    urdf.initFile(ament_index_cpp::get_package_share_directory("march_description")
+                      .append(/*__s=*/"/urdf/test_joint_linear.urdf"));
     ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear, urdf).createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestTestRotationalSetupCreation)
 {
     urdf::Model urdf;
-    urdf.initFile(ros::package::getPath("march_description").append(/*__s=*/"/urdf/test_joint_rotational.urdf"));
+    urdf.initFile(ament_index_cpp::get_package_share_directory("march_description")
+                      .append(/*__s=*/"/urdf/test_joint_rotational.urdf"));
     ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational, urdf).createMarchRobot());
 }
 #endif

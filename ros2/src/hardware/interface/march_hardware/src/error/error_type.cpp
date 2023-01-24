@@ -60,6 +60,10 @@ namespace error {
                 return "Encoder direction must be either -1 or 1";
             case ErrorType::BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED:
                 return "Busy waiting function reached maximum number of tries";
+            case ErrorType::INITIAL_TORQUE_NOT_ZERO:
+                return "Initial torque is not zero";
+            case ErrorType::MAX_TORQUE_EXCEEDED:
+                return "Max torque is exceeded";
             default:
                 return "Unknown error occurred. Please create/use a documented error";
         }

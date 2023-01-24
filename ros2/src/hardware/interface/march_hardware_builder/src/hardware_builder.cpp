@@ -21,6 +21,7 @@ const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
     = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad",
           "lowerErrorSoftLimitMarginRad", "upperErrorSoftLimitMarginRad" };
 const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "transmission" };
+const std::vector<std::string> HardwareBuilder::TORQUE_SENSOR_REQUIRED_KEYS = {};
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS = { "axis", "incrementalEncoder", "motorKV" };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "motor_controller" };
@@ -285,6 +286,22 @@ march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node&
     } else {
         return march::Encoder::Direction::Positive;
     }
+}
+
+// TODO add method for creation of torque sensor :)
+std::unique_ptr<march::TorqueSensor> HardwareBuilder::createTorqueSensor(
+    const YAML::Node& torque_sensor_config, const march::MotorControllerType motor_controller_type)
+{
+    if (!torque_sensor_config) {
+        return nullptr;
+    }
+    HardwareBuilder::validateRequiredKeysExist(
+        torque_sensor_config, HardwareBuilder::TORQUE_SENSOR_REQUIRED_KEYS, "torqueSensor");
+
+    const auto max_torque = torque_sensor_config["maxTorque"].as<float>();
+    return std::make_unique<march::TorqueSensor>(
+        /*motor_controller_type*/ motor_controller_type,
+        /*max_torque*/ max_torque);
 }
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
