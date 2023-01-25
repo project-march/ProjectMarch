@@ -88,7 +88,7 @@ coverage:
       ros2controlcli soem transmission_interface velocity_controllers'
     - lcov -q -c --directory build -o lcov.test
     - lcov -q -a lcov.base -a lcov.test -o lcov.total
-    - lcov --config-file .lcovrc -r lcov.total "*/opt/*" "*/usr/*" "*/build/*" "*/install/*" "*/libraries/*" "*/test/*" "*/include/*" "*/c_generated_code/*" -o lcov.filtered
+    - lcov --config-file .lcovrc -r lcov.total "*/opt/*" "*/usr/*" "*/build/*" "*/install/*" "*/libraries/*" "*/test/*" "*.hpp" "*.h" "*/c_generated_code/*" -o lcov.filtered
     - genhtml --legend --demangle-cpp lcov.filtered -o coverage
   artifacts:
     name: "$CI_JOB_NAME"
