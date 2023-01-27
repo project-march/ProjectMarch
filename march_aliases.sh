@@ -82,7 +82,7 @@ alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-
 # Format code
 # 'sudo apt install clang-format' should be run for format_cpp
 alias format_cpp='cm && python3 .scripts/run-clang-format.py -r ros2/src --style=file -i'
-alias format_py='cm && black .'
+alias format_py='cm && flake8 .'
 alias format='format_cpp && format_py'
 
 # Static analysis shortcuts (needs clang-tidy: `sudo apt-get install -y clang-tidy`)
