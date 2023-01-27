@@ -18,7 +18,6 @@ protected:
     urdf::JointSharedPtr joint;
     const march::MotorControllerType motor_controller_type = march::MotorControllerType::ODrive;
 
-
     void SetUp() override
     {
         this->base_path = ament_index_cpp::get_package_share_directory("march_hardware_builder")
@@ -45,8 +44,8 @@ TEST_F(AbsoluteEncoderBuilderTest, ValidEncoderHip)
     march::AbsoluteEncoder expected = march::AbsoluteEncoder(
         /*counts_per_rotation=*/(size_t)1 << 16, motor_controller_type,
         /*lower_limit_iu=*/22134,
-        /*upper_limit_iu=*/43436, 
-        /*zero_position_iu*/30000, this->joint->limits->lower, this->joint->limits->upper,
+        /*upper_limit_iu=*/43436,
+        /*zero_position_iu*/ 30000, this->joint->limits->lower, this->joint->limits->upper,
         this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
     auto created = HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type);
     ASSERT_EQ(expected, *created);
@@ -62,23 +61,20 @@ TEST_F(AbsoluteEncoderBuilderTest, NoResolutionOrCPR)
 {
     YAML::Node config = this->loadTestYaml("/absolute_encoder_no_resolution.yaml");
 
-    ASSERT_THROW(
-        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
+    ASSERT_THROW(HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 
 TEST_F(AbsoluteEncoderBuilderTest, NoMinPosition)
 {
     YAML::Node config = this->loadTestYaml("/absolute_encoder_no_min_position.yaml");
 
-    ASSERT_THROW(
-        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
+    ASSERT_THROW(HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 
 TEST_F(AbsoluteEncoderBuilderTest, NoMaxPosition)
 {
     YAML::Node config = this->loadTestYaml("/absolute_encoder_no_max_position.yaml");
 
-    ASSERT_THROW(
-        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
+    ASSERT_THROW(HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 #endif
