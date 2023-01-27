@@ -19,7 +19,7 @@ protected:
     MockSlave mock_slave = MockSlave(this->mock_pdo, this->mock_sdo);
 };
 
-//TEST_F(PowerDistributionBoardTest, Read)
+// TEST_F(PowerDistributionBoardTest, Read)
 //{
 //    uint8_t expected_offset = 4;
 //    march::PowerDistributionBoard distribution_board(mock_slave, /*byte_offset*/0);
