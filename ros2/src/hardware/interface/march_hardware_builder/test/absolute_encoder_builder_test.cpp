@@ -16,7 +16,8 @@ class AbsoluteEncoderBuilderTest : public ::testing::Test {
 protected:
     std::string base_path;
     urdf::JointSharedPtr joint;
-    const march::MotorControllerType motor_controller_type = march::MotorControllerType::IMotionCube;
+    const march::MotorControllerType motor_controller_type = march::MotorControllerType::ODrive;
+
 
     void SetUp() override
     {
@@ -37,23 +38,24 @@ TEST_F(AbsoluteEncoderBuilderTest, ValidEncoderHip)
 {
     YAML::Node config = this->loadTestYaml("/absolute_encoder_correct.yaml");
     this->joint->limits->lower = 0.0;
-    this->joint->limits->upper = 2.0;
-    this->joint->safety->soft_lower_limit = 0.1;
-    this->joint->safety->soft_upper_limit = 1.9;
+    this->joint->limits->upper = 1.9;
+    this->joint->safety->soft_lower_limit = 0.01;
+    this->joint->safety->soft_upper_limit = 2.0;
 
     march::AbsoluteEncoder expected = march::AbsoluteEncoder(
         /*counts_per_rotation=*/(size_t)1 << 16, motor_controller_type,
         /*lower_limit_iu=*/22134,
-        /*upper_limit_iu=*/43436, this->joint->limits->lower, this->joint->limits->upper,
+        /*upper_limit_iu=*/43436, 
+        /*zero_position_iu*/30000, this->joint->limits->lower, this->joint->limits->upper,
         this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-    auto created = HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type, this->joint);
+    auto created = HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type);
     ASSERT_EQ(expected, *created);
 }
 
 TEST_F(AbsoluteEncoderBuilderTest, NoConfig)
 {
     YAML::Node config;
-    ASSERT_EQ(nullptr, HardwareBuilder::createAbsoluteEncoder(config[""], motor_controller_type, this->joint));
+    ASSERT_EQ(nullptr, HardwareBuilder::createAbsoluteEncoder(config[""], motor_controller_type));
 }
 
 TEST_F(AbsoluteEncoderBuilderTest, NoResolutionOrCPR)
@@ -61,7 +63,7 @@ TEST_F(AbsoluteEncoderBuilderTest, NoResolutionOrCPR)
     YAML::Node config = this->loadTestYaml("/absolute_encoder_no_resolution.yaml");
 
     ASSERT_THROW(
-        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type, this->joint), MissingKeyException);
+        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 
 TEST_F(AbsoluteEncoderBuilderTest, NoMinPosition)
@@ -69,7 +71,7 @@ TEST_F(AbsoluteEncoderBuilderTest, NoMinPosition)
     YAML::Node config = this->loadTestYaml("/absolute_encoder_no_min_position.yaml");
 
     ASSERT_THROW(
-        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type, this->joint), MissingKeyException);
+        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 
 TEST_F(AbsoluteEncoderBuilderTest, NoMaxPosition)
@@ -77,6 +79,6 @@ TEST_F(AbsoluteEncoderBuilderTest, NoMaxPosition)
     YAML::Node config = this->loadTestYaml("/absolute_encoder_no_max_position.yaml");
 
     ASSERT_THROW(
-        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type, this->joint), MissingKeyException);
+        HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 #endif

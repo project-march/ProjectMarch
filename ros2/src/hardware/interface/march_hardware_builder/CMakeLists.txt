@@ -76,7 +76,7 @@ install(
 ## Add gtest based cpp test target and link libraries
 if(BUILD_TESTING)
     ament_add_gmock(${PROJECT_NAME}_test
-#        test/absolute_encoder_builder_test.cpp
+       test/absolute_encoder_builder_test.cpp
 #        test/allowed_robot_test.cpp
 #        test/imc_builder_test.cpp
 #        test/motor_controller_builder_test.cpp
