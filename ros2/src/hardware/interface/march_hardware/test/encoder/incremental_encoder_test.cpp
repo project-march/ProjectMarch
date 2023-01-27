@@ -3,6 +3,7 @@
 // Copyright 2020 Project March.
 #include "march_hardware/encoder/incremental_encoder.h"
 #include "march_hardware/motor_controller/motor_controller_type.h"
+#include "march_hardware/error/hardware_exception.h"
 
 #include <cmath>
 
@@ -46,6 +47,16 @@ TEST_F(IncrementalEncoderTest, velocityRadiansToIU)
     const double expected = 10;
     const double velocity = 0.62831853071795862;
     ASSERT_DOUBLE_EQ(expected, this->encoder.velocityRadiansToIU(velocity));
+}
+
+TEST_F(IncrementalEncoderTest, InvalidMotorControllerType)
+{
+    march::IncrementalEncoder bad_encoder
+        = march::IncrementalEncoder(this->counts_per_rotation, march::MotorControllerType::IMotionCube, this->transmission);
+    const double velocity = 0.62831853071795862;
+    ASSERT_THROW(bad_encoder.velocityRadiansToIU(velocity), march::error::HardwareException);
+    ASSERT_THROW(bad_encoder.velocityIUToRadians(velocity), march::error::HardwareException);
+
 }
 // NOLINTEND
 #endif
