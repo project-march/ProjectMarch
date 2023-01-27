@@ -63,6 +63,16 @@ TEST_F(AbsoluteEncoderTest, CorrectUpperSoftLimits)
     ASSERT_EQ(this->encoder.getUpperSoftLimitIU(), this->upper_soft_limit);
 }
 
+TEST_F(AbsoluteEncoderTest, CorrectLowerErrorSoftLimits)
+{
+    ASSERT_EQ(this->encoder.getLowerErrorSoftLimitIU(), this->lower_soft_limit);
+}
+
+TEST_F(AbsoluteEncoderTest, CorrectUpperErrooSoftLimits)
+{
+    ASSERT_EQ(this->encoder.getUpperErrorSoftLimitIU(), this->upper_soft_limit);
+}
+
 TEST_F(AbsoluteEncoderTest, ZeroPositionNotWithingLiits)
 {
     ASSERT_THROW(
