@@ -1,0 +1,160 @@
+"""Author: Marco Bak MVIII."""
+
+import math
+from mujoco import mjtSensor
+from geometry_msgs.msg import Vector3, Quaternion
+from sensor_msgs.msg import Imu
+
+
+class SensorDataExtraction:
+    """A class used to extract sensor data correctly from the Mujoco model and data.
+
+    This sensor data will be send to the Hardware interface to be used for sending gaits.
+    Also the sensors should receive incoming commands from the March gait follower
+    """
+
+    def __init__(self, sensordata, sensor_type, sensor_adr):
+        """A class that extracts and rewrites the sensor data from mujoco.
+
+        Args:
+            sensordata (array): array with the sensor data from the simulation
+            sensor_type (array): array with the sensors_types of the sensors in the simulation
+            sensor_adr (array): array with the sensor_adr of the sensor in the sensordata array
+            model (Mujoco struct): refers to the simulated body in Mujoco
+        """
+        self.sensordata = sensordata
+        self.sensor_type = sensor_type
+        self.sensor_adr = sensor_adr
+
+    def get_joint_pos(self):
+        """This class extracts the data from the position sensors on the joints of the model.
+
+        The data is retrieved from the sensordata array of the simulation.
+        To make sure that the data is correctly retrieved, the address of the pos sensors have to be retrieved from the
+        sensor_adr array.
+        """
+        joint_pos = []
+        joint_pos_sensor_adr = []
+        for i, sensor_type in enumerate(self.sensor_type):
+            if sensor_type == mjtSensor.mjSENS_JOINTPOS:
+                joint_pos_sensor_adr.append(self.sensor_adr[i])
+        for adr in joint_pos_sensor_adr:
+            joint_pos.append(self.sensordata[adr])
+        return joint_pos
+
+    def get_joint_vel(self):
+        """This class extracts the data from the velocity sensors on the joints of the model.
+
+        The data is retrieved from the sensordata array of the simulation.
+        To make sure that the data is correctly retrieved, the address of the vel sensors have to be retrieved from the
+        sensor_adr array.
+        """
+        joint_vel = []
+        joint_vel_sensor_adr = []
+        for i, sensor_type in enumerate(self.sensor_type):
+            if sensor_type == mjtSensor.mjSENS_JOINTVEL:
+                joint_vel_sensor_adr.append(self.sensor_adr[i])
+        for adr in joint_vel_sensor_adr:
+            joint_vel.append(self.sensordata[adr])
+        return joint_vel
+
+    def get_joint_acc(self):
+        """This class extracts the data from the torque sensors on the joints of the model.
+
+        The data is retrieved from the sensordata array of the simulation.
+        To make sure that the data is correctly retrieved, the address of the torque sensors should be retrieved
+        from the sensor_adr array.
+        Since the torque sensors give a 3d x y z output, this should be generalized using the following formula:
+        sqrt(x^ + y^2 + z^2)
+        """
+        joint_acc = []
+        joint_acc_sensor_adr = []
+        for i, sensor_type in enumerate(self.sensor_type):
+            if sensor_type == mjtSensor.mjSENS_TORQUE:
+                joint_acc_sensor_adr.append(self.sensor_adr[i])
+        for adr in joint_acc_sensor_adr:
+            torque_x = self.sensordata[adr]
+            torque_y = self.sensordata[adr + 1]
+            torque_z = self.sensordata[adr + 2]
+            torque_res = math.sqrt(torque_x**2 + torque_y**2 + torque_z**2)
+            joint_acc.append(torque_res)
+        return joint_acc
+
+    def get_pressure_sole_data(self):
+        """This class extracts the data from the pressure soles from the model.
+
+        The data is retrieved from the sensordata array of the simulation.
+        To make sure that the data is correctly retrieved, the address of the torque sensors should be retrieved
+        from the sensor_adr array.
+        Since the force sensors give a 3d x y z output, this should be generalized using the following formula:
+        sqrt(x^ + y^2 + z^2).
+
+        Each pressure sle has 8 sensors, so the function will return 1 arrays with the 8 sensor outputs.
+        """
+        pressure_sole_adr = []
+        left_pressure_sole = []
+        right_pressure_sole = []
+        for i, sensor_type in enumerate(self.sensor_type):
+            if sensor_type == mjtSensor.mjSENS_FORCE:
+                pressure_sole_adr.append(self.sensor_adr[i])
+        for i, adr in enumerate(pressure_sole_adr):
+            if i <= 7:
+                force_x = self.sensordata[adr]
+                force_y = self.sensordata[adr + 1]
+                force_z = self.sensordata[adr + 2]
+                force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
+                left_pressure_sole.append(force_res)
+            if 7 < i <= 15:
+                force_x = self.sensordata[adr]
+                force_y = self.sensordata[adr + 1]
+                force_z = self.sensordata[adr + 2]
+                force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
+                right_pressure_sole.append(force_res)
+        return left_pressure_sole, right_pressure_sole
+
+    def get_imu_data(self):
+        """This class extracts the data from the imus of the model.
+
+        In Mujoco there is no imu sensor, so gyro, accelerometer and magneto is used to simulate the IMU.
+        The data is retrieved from the sensordata array of the simulation.
+        Since the sensors give a 3d x y z output, this should be generalized using the following formula:
+        sqrt(x^ + y^2 + z^2)
+        """
+        gyro_adr = []
+        accelero_adr = []
+        quat_adr = []
+        for i, sensor_type in enumerate(self.sensor_type):
+            if sensor_type == mjtSensor.mjSENS_ACCELEROMETER:
+                accelero_adr.append(self.sensor_adr[i])
+            elif sensor_type == mjtSensor.mjSENS_GYRO:
+                gyro_adr.append(self.sensor_adr[i])
+            elif sensor_type == mjtSensor.mjSENS_FRAMEQUAT:
+                quat_adr.append(self.sensor_adr[i])
+        backpack_imu = Imu()
+        torso_imu = Imu()
+
+        for i in range(len(gyro_adr)):
+            gyro = Vector3()
+            accel = Vector3()
+            quat = Quaternion()
+            gyro.x = self.sensordata[gyro_adr[i]]
+            gyro.y = self.sensordata[gyro_adr[i] + 1]
+            gyro.z = self.sensordata[gyro_adr[i] + 2]
+            accel.x = self.sensordata[accelero_adr[i]]
+            accel.y = self.sensordata[accelero_adr[i] + 1]
+            accel.z = self.sensordata[accelero_adr[i] + 2]
+            quat.x = self.sensordata[quat_adr[i]]
+            quat.y = self.sensordata[quat_adr[i] + 1]
+            quat.z = self.sensordata[quat_adr[i] + 2]
+            quat.w = self.sensordata[quat_adr[i] + 3]
+
+            if i == 0:
+                backpack_imu.angular_velocity = gyro
+                backpack_imu.linear_acceleration = accel
+                backpack_imu.orientation = quat
+            else:
+                torso_imu.angular_velocity = gyro
+                torso_imu.linear_acceleration = accel
+                torso_imu.orientation = quat
+
+        return backpack_imu, torso_imu

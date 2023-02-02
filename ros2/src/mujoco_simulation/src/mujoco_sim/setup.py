@@ -10,8 +10,8 @@ setup(
     packages=[package_name],
     scripts=['mujoco_sim/low_level_control/low_level_controller.py',
              'mujoco_sim/low_level_control/controller_position.py',
-             'mujoco_sim/low_level_control/low_level_controller.py',
-             'mujoco_sim/low_level_control/controller_torque.py'],
+             'mujoco_sim/low_level_control/controller_torque.py',
+             'mujoco_sim/sensor_data_extraction.py'],
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
