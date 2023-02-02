@@ -22,8 +22,9 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(march_description REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-find_package(eigen3_cmake_module REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2 REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME}
@@ -40,7 +41,9 @@ ament_target_dependencies(
   "geometry_msgs"
   "march_description"
   "march_shared_msgs"
-  "Eigen3"
+  "geometry_msgs"
+  "tf2_ros"
+  "tf2"
 )
 
 add_executable(state_estimator_node 
@@ -61,7 +64,9 @@ ament_target_dependencies(
   "geometry_msgs"
   "march_description"
   "march_shared_msgs"
-  "Eigen3"
+  "geometry_msgs"
+  "tf2_ros"
+  "tf2"
 )
 
 install(TARGETS state_estimator_node
@@ -85,7 +90,9 @@ if(BUILD_TESTING)
     "rclcpp"
     "geometry_msgs" 
     "march_shared_msgs"
-    "Eigen3")
+    "geometry_msgs"
+    "tf2_ros"
+    "tf2")
 endif()
 
 ament_package()

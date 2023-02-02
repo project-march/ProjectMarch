@@ -17,12 +17,10 @@ StateEstimator::StateEstimator()
 
 void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
-
 }
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-
 }
 
 void StateEstimator::publish_robot_state()
@@ -36,4 +34,10 @@ void StateEstimator::publish_robot_state()
     msg.sensor_data.push_back(0);
 
     m_state_publisher->publish(msg);
+
+}
+
+void StateEstimator::publish_robot_frames()
+{
+
 }
