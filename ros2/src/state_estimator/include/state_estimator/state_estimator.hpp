@@ -5,10 +5,10 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "tf2_ros/transform_broadcaster.h"
+#include <array>
 #include <chrono>
 #include <cstdio>
 #include <string>
-#include <array>
 
 using std::placeholders::_1;
 

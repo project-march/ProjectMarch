@@ -34,10 +34,8 @@ void StateEstimator::publish_robot_state()
     msg.sensor_data.push_back(0);
 
     m_state_publisher->publish(msg);
-
 }
 
 void StateEstimator::publish_robot_frames()
 {
-
 }
