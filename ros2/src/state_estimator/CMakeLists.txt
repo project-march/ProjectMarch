@@ -33,6 +33,8 @@ add_library(${PROJECT_NAME}
   include/${PROJECT_NAME}/state_estimator.cpp
   include/${PROJECT_NAME}/joint_estimator.hpp
   include/${PROJECT_NAME}/joint_estimator.cpp
+  include/${PROJECT_NAME}/com_estimator.hpp
+  include/${PROJECT_NAME}/com_estimator.cpp
 )
 
 ament_target_dependencies(
@@ -52,6 +54,8 @@ add_executable(state_estimator_node
   include/${PROJECT_NAME}/state_estimator.hpp
   include/${PROJECT_NAME}/joint_estimator.cpp 
   include/${PROJECT_NAME}/joint_estimator.hpp
+  include/${PROJECT_NAME}/com_estimator.cpp 
+  include/${PROJECT_NAME}/com_estimator.hpp
   )
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
