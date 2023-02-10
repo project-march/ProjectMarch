@@ -1,3 +1,4 @@
+#include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
@@ -16,12 +17,15 @@
 #define JOINT_ESTIMATOR
 enum Rotation { X, Y, Z };
 
+struct CenterOfMass {
+    geometry_msgs::msg::PointStamped position;
+    double mass;
+};
+
 struct JointContainer {
     std::string name;
     geometry_msgs::msg::TransformStamped frame;
-    double com_x;
-    double com_y;
-    double com_z;
+    CenterOfMass com;
     double length_x;
     double length_y;
     double length_z;
@@ -37,6 +41,7 @@ public:
     void set_joint_states(sensor_msgs::msg::JointState);
     void set_individual_joint_state(std::string, double);
     const std::vector<geometry_msgs::msg::TransformStamped> get_joint_frames();
+    std::vector<CenterOfMass> get_joint_com_positions(std::string);
 
 private:
     // sensor_msgs::msg::JointState m_joint_states;

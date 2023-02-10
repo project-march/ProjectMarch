@@ -25,6 +25,8 @@ find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_kdl REQUIRED)
+find_package(visualization_msgs REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME}
@@ -46,6 +48,7 @@ ament_target_dependencies(
   "geometry_msgs"
   "tf2_ros"
   "tf2"
+  "tf2_kdl"
 )
 
 add_executable(state_estimator_node 
@@ -71,6 +74,7 @@ ament_target_dependencies(
   "geometry_msgs"
   "tf2_ros"
   "tf2"
+  "tf2_kdl"
 )
 
 install(TARGETS state_estimator_node
@@ -96,7 +100,8 @@ if(BUILD_TESTING)
     "march_shared_msgs"
     "geometry_msgs"
     "tf2_ros"
-    "tf2")
+    "tf2"
+    "tf2_kdl")
 endif()
 
 ament_package()
