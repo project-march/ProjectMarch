@@ -3,18 +3,25 @@
 
 ComEstimator::ComEstimator(StateEstimator* owner)
     : m_owner(owner)
-    , m_com_position(geometry_msgs::msg::Point())
 {
 }
 
-geometry_msgs::msg::PointStamped ComEstimator::get_com_state()
+void ComEstimator::set_com_state(std::vector<CenterOfMass> mass_list)
 {
-    geometry_msgs::msg::PointStamped com_state;
-    com_state.header.stamp = m_owner->get_clock()->now();
-    com_state.point = m_com_position;
-    return com_state;
+    m_center_of_mass.mass = 0;
+    for (auto i : mass_list) {
+        m_center_of_mass.mass += i.mass;
+        m_center_of_mass.position.point.x += i.position.point.x;
+        m_center_of_mass.position.point.y += i.position.point.y;
+        m_center_of_mass.position.point.z += i.position.point.z;
+    }
+
+    m_center_of_mass.position.point.x = m_center_of_mass.position.point.x / m_center_of_mass.mass;
+    m_center_of_mass.position.point.y = m_center_of_mass.position.point.y / m_center_of_mass.mass;
+    m_center_of_mass.position.point.z = m_center_of_mass.position.point.z / m_center_of_mass.mass;
 }
 
-void ComEstimator::set_com_state(std::vector<geometry_msgs::msg::TransformStamped> transforms)
+CenterOfMass ComEstimator::get_com_state()
 {
+    return m_center_of_mass;
 }

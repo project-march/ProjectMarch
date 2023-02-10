@@ -77,19 +77,17 @@ const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_join
 void JointEstimator::initialize_joints(sensor_msgs::msg::JointState initial_joint_states)
 {
     int joint_amount = initial_joint_states.name.size();
-    RCLCPP_INFO(m_owner->get_logger(), "JOINT AMOUNT %i", joint_amount);
     JointContainer joint_to_add;
     geometry_msgs::msg::TransformStamped joint_frame;
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
-    RCLCPP_INFO(m_owner->get_logger(), "Test 2");
     try {
         for (int i = 0; i < joint_amount; i++) {
             joint_to_add.name = initial_joint_states.name[i];
             // These need to be obtained from yaml parameters
-            joint_to_add.com_x = 1;
-            joint_to_add.com_y = 0;
-            joint_to_add.com_z = 0;
+            joint_to_add.com.position.point.x = 1;
+            joint_to_add.com.position.point.y = 0;
+            joint_to_add.com.position.point.z = 0;
             joint_to_add.length_x = 1;
             // end of TO BE REPLACED
             joint_frame.header.frame_id = joint_to_add.name;
@@ -119,4 +117,26 @@ void JointEstimator::initialize_joints(sensor_msgs::msg::JointState initial_join
     } catch (...) {
         RCLCPP_WARN(m_owner->get_logger(), "Couldn't initialize joints!\n Perhaps the message was passed wrongly?");
     }
+}
+
+std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string coordinate_frame)
+{
+    std::vector<CenterOfMass> com_positions;
+    CenterOfMass com_to_add;
+    geometry_msgs::msg::PointStamped joint_com_stamped;
+    geometry_msgs::msg::TransformStamped com_transform;
+
+    for (auto i : m_joints) {
+        try {
+            com_transform = m_owner->get_frame_transform(coordinate_frame, i.name);
+            joint_com_stamped.point = i.com.position.point;
+            joint_com_stamped.header.stamp = m_owner->get_clock()->now();
+            tf2::doTransform(joint_com_stamped, com_to_add.position, com_transform);
+            com_positions.push_back(com_to_add);
+        } catch (const tf2::TransformException& ex) {
+            RCLCPP_WARN(m_owner->get_logger(), "Error in get_joint_com_position: %s", ex.what());
+            return com_positions;
+        }
+    };
+    return com_positions;
 }
