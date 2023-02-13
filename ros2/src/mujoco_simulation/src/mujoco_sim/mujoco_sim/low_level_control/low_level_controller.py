@@ -15,15 +15,14 @@ class LowLvlController():
             model (Mujoco struct): refers to the simulated body in Mujoco
         """
         self.node = node
-# Define the amount of controllable joints based on
-# the generalized coordinates generated within Mujoco
+        # Define the amount of controllable joints based on
+        # the generalized coordinates generated within Mujoco
         self.actuator_amount = model.nu
         self.joint_desired = []
         self.e_prev = []
         for _i in range(self.actuator_amount):
-            self.joint_desired.append(0)
             self.e_prev.append(0)
-# The map fom sensor data to desired value
+        # The map fom sensor data to desired value
         self.sensor_map = []
 
     def low_level_update(self, model, data) -> None:

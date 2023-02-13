@@ -22,7 +22,7 @@ class TorqueController(LowLvlController):
         :param d: (float): Derivative-value of a PD controller
         """
         super().__init__(origin, model)
-# Define the PD
+        # Define the PD
         self.p = p
         self.d = d
 
@@ -36,7 +36,7 @@ class TorqueController(LowLvlController):
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
         dt = self.origin.TIME_STEP_MJC
-# update the control inputs based on PID
+        # update the control inputs based on PID
         for index in range(self.actuator_amount):
             joint_val = data.qfrc_actuator[index]
 
