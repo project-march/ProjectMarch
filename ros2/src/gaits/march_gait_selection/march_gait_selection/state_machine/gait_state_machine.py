@@ -115,6 +115,9 @@ class GaitStateMachine:
         )
         self._reset_attributes()
 
+        # Publisher that notifies the simulation when the queue with trajectory points has to be reset.
+        self.send_sim_reset = self._node.create_publisher(Bool, "mujoco_reset_trajectory", 10)
+
     def _reset_attributes(self) -> None:
         """Resets attributes."""
         self._current_gait = None
@@ -162,6 +165,12 @@ class GaitStateMachine:
             self._input.gait_accepted()
             self._publish_gait_state()
             self._accepted_gait = True
+
+            # Create and publish a message that the queue has to be reset.
+            reset_msg = Bool()
+            reset_msg.data = True
+            self._logger.info(str(reset_msg))
+            self.send_sim_reset.publish(reset_msg)
             self._logger.info(f"Accepted gait `{self._current_gait.name}`")
         else:
             self._input.gait_rejected()

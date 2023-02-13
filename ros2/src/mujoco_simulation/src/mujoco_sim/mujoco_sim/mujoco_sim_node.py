@@ -2,19 +2,16 @@
 
 import mujoco
 import rclpy
-from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
-
-from queue import Queue, Empty
-
+from controller_position import PositionController
+from controller_torque import TorqueController
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
-
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
-
-from controller_torque import TorqueController
-from controller_position import PositionController
+from mujoco_sim.sensor_data_extraction import SensorDataExtraction
+from queue import Queue, Empty
+from rclpy.node import Node
 
 
 def get_actuator_names(model):
@@ -70,16 +67,16 @@ class MujocoSimNode(Node):
         the sim_step function.
         """
         super().__init__("mujoco_sim")
-        self.declare_parameter('model_toload')
+        self.declare_parameter("model_toload")
 
         self.SIM_TIMESTEP_ROS = 0.1
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
         # The model can be found in the robot_description package.
-        self.model_name = self.get_parameter('model_toload')
+        self.model_name = self.get_parameter("model_toload")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
-        self.file_path = get_package_share_directory('march_description') + "/urdf/" + str(self.model_name.value)
+        self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
 
@@ -88,33 +85,40 @@ class MujocoSimNode(Node):
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.0001
+        self.TIME_STEP_MJC = 0.001
         self.model.opt.timestep = self.TIME_STEP_MJC
 
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(MujocoInput, 'mujoco_input',
-                                                          self.writer_callback, 10)
+        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
 
         # Initialize the low-level controller
         self.declare_parameters(
-            namespace='',
+            namespace="",
             parameters=[
-                ('position.P', None),
-                ('position.D', None),
-                ('torque.P', None),
-                ('torque.D', None),
-            ])
+                ("position.P", None),
+                ("position.D", None),
+                ("torque.P", None),
+                ("torque.D", None),
+            ],
+        )
         # This list of controllers contains all active controllers
         self.controller_mode = 0
         self.controller = []
-        self.controller.append(PositionController(self, self.model, self.get_parameter("position.P").value,
-                                                  self.get_parameter("position.D").value))
-        self.controller.append(TorqueController(self, self.model, self.get_parameter("torque.P").value,
-                                                self.get_parameter("torque.D").value))
-        # set the sensor mappings(which control signal for which reference?)
-        self.controller[0].set_sensor_map([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.controller[1].set_sensor_map([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.controller.append(
+            PositionController(
+                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value
+            )
+        )
+        self.controller.append(
+            TorqueController(
+                self, self.model, self.get_parameter("torque.P").value, self.get_parameter("torque.D").value
+            )
+        )
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
+
+        # Create an instance of that data extractor.
+        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
+                                                           self.model.sensor_adr)
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
@@ -143,11 +147,10 @@ class MujocoSimNode(Node):
         """Updates the trajectory if possible."""
         try:
             msg = self.msg_queue.get_nowait()
-            joint_pos = get_controller_data(msg)
+            joint_pos = msg.desired.positions
             for j in range(len(self.controller)):
-                self.controller[j].joint_ref_dict = joint_pos
+                self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
-            self.get_logger().info("Trajectory updated!!!!")
         except Empty:
             self.get_logger().warn("NO NEW TRAJECTORY FOUND")
 
@@ -158,8 +161,8 @@ class MujocoSimNode(Node):
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
-        if (msg.reset == 1):
-            self.msg_queue.queue.clear()
+        if msg.reset == 1:
+            self.msg_queue = Queue()
         self.msg_queue.put(msg.trajectory)
 
     def sim_step(self):
@@ -188,8 +191,6 @@ class MujocoSimNode(Node):
         to ensure a nice divide between ROS systems and Mujoco functionality.
         """
         self.check_for_new_reference_update(self.get_clock().now())
-
-        self.publish_state_msg()
         self.publish_sensor_msg()
 
         self.sim_step()
@@ -201,18 +202,6 @@ class MujocoSimNode(Node):
         """
         self.visualizer.update_window(self.model, self.data)
 
-    def publish_state_msg(self):
-        """This function creates and publishes the state message.
-
-        The state message is published on mujoco_state_output.
-        The message contains the name, position, velocity, acceleration and act of actuators of the model.
-        :return: None
-        """
-        state_msg = get_data_state_msg(self.actuator_names, self.data)
-        publisher = self.create_publisher(
-            MujocoDataState, 'mujoco_state_output', 10)
-        publisher.publish(state_msg)
-
     def publish_sensor_msg(self):
         """This function creates and publishes the sensor message.
 
@@ -221,8 +210,18 @@ class MujocoSimNode(Node):
         :return: None
         """
         sensor_msg = MujocoDataSensing()
-        publisher = self.create_publisher(
-            MujocoDataSensing, 'mujoco_sensor_output', 10)
+        state_msg = MujocoDataState()
+        state_msg.names = self.actuator_names
+        state_msg.qpos = self.sensor_data_extraction.get_joint_pos()
+        state_msg.qvel = self.sensor_data_extraction.get_joint_vel()
+        state_msg.qacc = self.sensor_data_extraction.get_joint_acc()
+
+        backpack_imu, torso_imu = self.sensor_data_extraction.get_imu_data()
+        sensor_msg.joint_state = state_msg
+        sensor_msg.backpack_imu = backpack_imu
+        sensor_msg.torso_imu = torso_imu
+
+        publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
         publisher.publish(sensor_msg)
 
 
@@ -240,5 +239,5 @@ def main(args=None):
     mujoco.glfw.glfw.terminate()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

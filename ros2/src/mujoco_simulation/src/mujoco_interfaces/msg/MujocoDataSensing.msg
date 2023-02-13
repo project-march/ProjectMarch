@@ -1,4 +1,5 @@
 builtin_interfaces/Time stamp
 
-float64[] qfrc_applied
-float64[] ctrl
+MujocoDataState joint_state
+sensor_msgs/Imu backpack_imu
+sensor_msgs/Imu torso_imu

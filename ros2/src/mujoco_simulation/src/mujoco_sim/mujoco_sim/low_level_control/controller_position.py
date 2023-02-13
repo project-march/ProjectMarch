@@ -24,10 +24,10 @@ class PositionController(LowLvlController):
             p (float): Proportional-value of a PD controller
             d (float): Derivative-value of a PD controller
         """
-# Define the amount of controllable joints based on
-# the generalized coordinates generated within Mujoco
+        # Define the amount of controllable joints based on
+        # the generalized coordinates generated within Mujoco
         super().__init__(node, model)
-# Define the PD - values
+        # Define the PD - values
         self.p = p
         self.d = d
 
@@ -43,14 +43,16 @@ class PositionController(LowLvlController):
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
         dt = self.node.TIME_STEP_MJC
-# update the control inputs based on PID
-        for index in range(self.actuator_amount):
-            joint_val = self.sensor_map[index]
+        # update the control inputs based on PID
+        try:
+            joint_val = self.node.sensor_data_extraction.get_joint_pos()
+            for index in range(self.actuator_amount):
+                e = self.joint_desired[index] - joint_val[index]
+                de_prev = (e - self.e_prev[index]) / dt
 
-            e = self.joint_desired[index] - joint_val
-            de_prev = (e - self.e_prev[index]) / dt
+                ctrl_input = self.p[index] * e + self.d[index] * de_prev
+                data.ctrl[index] += ctrl_input
 
-            ctrl_input = self.p[index] * e + self.d[index] * de_prev
-            data.ctrl[index] += ctrl_input
-
-            self.e_prev[index] = e
+                self.e_prev[index] = e
+        except IndexError:
+            pass
