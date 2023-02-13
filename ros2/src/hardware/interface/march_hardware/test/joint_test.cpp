@@ -4,8 +4,8 @@
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/joint.h"
 #include "march_hardware/motor_controller/odrive/odrive_state.h"
-#include "mocks/mock_odrive.h"
 #include "mocks/mock_motorcontroller_state.h"
+#include "mocks/mock_odrive.h"
 #include "mocks/mock_temperature_ges.h"
 
 #include <memory>
@@ -123,7 +123,7 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
     ASSERT_TRUE(joint.receivedDataUpdate());
 }
 
-//TEST_F(JointTest, TestReceivedDataUpdateFalse)
+// TEST_F(JointTest, TestReceivedDataUpdateFalse)
 //{
 //    auto basic_state = std::make_unique<MockMotorControllerState>();
 //    auto new_state = std::make_unique<MockMotorControllerState>();
@@ -135,7 +135,7 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
 //    ASSERT_FALSE(joint.receivedDataUpdate());
 //}
 
-//TEST_F(JointTest, TestReadEncodersOnce)
+// TEST_F(JointTest, TestReadEncodersOnce)
 //{
 //    double velocity = 0.5;
 //    double initial_absolute_position = 3;
@@ -162,7 +162,7 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
 //    ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 //}
 
-//TEST_F(JointTest, TestReadEncodersTwice)
+// TEST_F(JointTest, TestReadEncodersTwice)
 //{
 //    double first_velocity = 10;
 //    double second_velocity = 8;
@@ -204,7 +204,7 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
 //    ASSERT_DOUBLE_EQ(joint.getVelocity(), second_velocity);
 //}
 
-//TEST_F(JointTest, TestReadEncodersNoUpdate)
+// TEST_F(JointTest, TestReadEncodersNoUpdate)
 //{
 //    double velocity = 0.5;
 //    double first_incremental_position = 5;
