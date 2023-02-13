@@ -96,7 +96,7 @@ void JointEstimator::initialize_joints(sensor_msgs::msg::JointState initial_join
             joint_frame.transform.translation.y = joint_to_add.length_y;
             joint_frame.transform.translation.z = joint_to_add.length_z;
             // Add rotations here
-            joint_to_add.hinge_axis = X;
+            joint_to_add.hinge_axis = Y;
             switch (joint_to_add.hinge_axis) {
                 case X:
                     quaternion_math.setRPY(initial_joint_states.position[i], 0, 0);
