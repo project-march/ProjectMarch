@@ -1,10 +1,10 @@
 #ifndef __clang_analyzer__
 // NOLINTBEGIN
 #pragma once
-#include "rclcpp/rclcpp.hpp"
 #include "mock_absolute_encoder.h"
 #include "mock_incremental_encoder.h"
 #include "mock_slave.h"
+#include "rclcpp/rclcpp.hpp"
 
 #include "march_hardware/ethercat/sdo_interface.h"
 #include "march_hardware/motor_controller/odrive/odrive.h"
@@ -17,12 +17,12 @@
 
 class MockODrive : public march::ODrive {
 public:
-    std::shared_ptr<march_logger::BaseLogger> logger_ = std::make_shared<march_logger::RosLogger>("march_hardware_builder");
+    std::shared_ptr<march_logger::BaseLogger> logger_
+        = std::make_shared<march_logger::RosLogger>("march_hardware_builder");
 
     MockODrive()
-    : ODrive(MockSlave(), march::ODriveAxis::One, std::make_unique<MockAbsoluteEncoder>(),
-        std::make_unique<MockIncrementalEncoder>(),march::ActuationMode::unknown,
-        true, 100, true, logger_)
+        : ODrive(MockSlave(), march::ODriveAxis::One, std::make_unique<MockAbsoluteEncoder>(),
+            std::make_unique<MockIncrementalEncoder>(), march::ActuationMode::unknown, true, 100, true, logger_)
     {
     }
 
