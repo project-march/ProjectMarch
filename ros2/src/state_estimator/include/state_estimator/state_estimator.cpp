@@ -22,6 +22,10 @@ StateEstimator::StateEstimator()
 
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
+
+    // Declare parameters
+    // declare_parameter("joint_estimator.links", std::vector<std::string>(5, "default"));
+    // RCLCPP_INFO(get_logger(), "TEST: %s", get_parameter("joint_estimator.links").as_string_array()[0].c_str());
 }
 
 sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()

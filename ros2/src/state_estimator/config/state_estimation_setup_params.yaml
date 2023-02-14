@@ -1,0 +1,10 @@
+state_estimator:
+  ros__parameters:
+    joint_estimator:
+      links: ["left_origin", "left_ankle", "left_knee", "left_hip_fe"
+      , "left_hip_aa", "left_hip_fe", "right_hip_aa", "right_hip_fe"
+      ,"right_knee", "right_ankle", "right_origin"]
+      base_links: ["left_ankle", "left_knee", "left_hip_fe"
+      , "left_hip_aa", "left_hip_fe", "right_hip_aa", "right_hip_fe"
+      ,"right_knee", "right_ankle", "right_origin", "map"]
+
