@@ -62,6 +62,18 @@ void JointEstimator::set_individual_joint_state(std::string joint_name, double n
     tf2::convert(quaternion_math, it->frame.transform.rotation);
 }
 
+const JointContainer JointEstimator::get_individual_joint(std::string joint_name)
+{
+
+    // NOTE: This is not an efficient function, mainly use this for debugging purposes
+    std::vector<JointContainer>::iterator it
+        = std::find_if(m_joints.begin(), m_joints.end(), [joint_name](const JointContainer& joint) {
+              return joint.name == joint_name;
+          });
+
+    return *it;
+}
+
 const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_joint_frames()
 {
     std::vector<geometry_msgs::msg::TransformStamped> transform_frames;

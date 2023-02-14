@@ -38,6 +38,7 @@ class JointEstimator {
 public:
     JointEstimator(StateEstimator* owner, sensor_msgs::msg::JointState);
 
+    const JointContainer get_individual_joint(std::string);
     void set_joint_states(sensor_msgs::msg::JointState);
     void set_individual_joint_state(std::string, double);
     const std::vector<geometry_msgs::msg::TransformStamped> get_joint_frames();

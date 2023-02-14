@@ -84,7 +84,7 @@ install(TARGETS state_estimator_node
 
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
-  # test/footstep_gen_test.cpp
+  test/joint_estimator_test.cpp
   test/test_runner.cpp
   # include
   )
