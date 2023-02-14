@@ -1,4 +1,5 @@
 #include "com_estimator.hpp"
+#include "cop_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "joint_estimator.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
@@ -24,6 +25,8 @@ public:
 
     sensor_msgs::msg::JointState get_initial_joint_states();
 
+    std::vector<PressureSensor> get_pressure_sensors();
+
     geometry_msgs::msg::TransformStamped get_frame_transform(std::string&, std::string&);
 
     geometry_msgs::msg::Point transform_point(std::string&, std::string&, geometry_msgs::msg::Point&);
@@ -46,6 +49,7 @@ private:
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_joint_broadcaster;
     JointEstimator m_joint_estimator;
     ComEstimator m_com_estimator;
+    CopEstimator m_cop_estimator;
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_joint_listener;

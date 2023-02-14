@@ -26,6 +26,7 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_kdl REQUIRED)
+
 include_directories(include)
 
 add_library(${PROJECT_NAME}
@@ -36,6 +37,9 @@ add_library(${PROJECT_NAME}
   include/${PROJECT_NAME}/joint_estimator.cpp
   include/${PROJECT_NAME}/com_estimator.hpp
   include/${PROJECT_NAME}/com_estimator.cpp
+  include/${PROJECT_NAME}/cop_estimator.hpp
+  src/state_estimator_node.cpp
+  src/cop_estimator.cpp
 )
 
 ament_target_dependencies(
@@ -51,13 +55,15 @@ ament_target_dependencies(
 )
 
 add_executable(state_estimator_node 
-  src/state_estimator_node.cpp 
+  src/state_estimator_node.cpp
+  src/cop_estimator.cpp
   include/${PROJECT_NAME}/state_estimator.cpp 
   include/${PROJECT_NAME}/state_estimator.hpp
   include/${PROJECT_NAME}/joint_estimator.cpp 
   include/${PROJECT_NAME}/joint_estimator.hpp
   include/${PROJECT_NAME}/com_estimator.cpp 
   include/${PROJECT_NAME}/com_estimator.hpp
+  include/${PROJECT_NAME}/cop_estimator.hpp
   )
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
@@ -85,6 +91,7 @@ install(TARGETS state_estimator_node
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
   test/joint_estimator_test.cpp
+  test/cop_estimator_test.cpp
   test/test_runner.cpp
   # include
   )
