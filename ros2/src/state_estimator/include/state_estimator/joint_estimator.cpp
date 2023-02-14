@@ -2,14 +2,8 @@
 #include "state_estimator.hpp"
 JointEstimator::JointEstimator(StateEstimator* owner, sensor_msgs::msg::JointState initial_joint_states)
     : m_owner(owner)
+    , m_joint_child_link_map(interpret_joint_links())
 {
-    m_joint_child_link_map = { {
-                                   "left_origin",
-                                   "left_ankle",
-                               },
-        { "left_ankle", "left_knee" }, { "left_knee", "left_hip_fe" }, { "left_hip_fe", "left_hip_aa" },
-        { "left_hip_aa", "right_hip_aa" }, { "right_origin", "map" }, { "right_ankle", "right_origin" },
-        { "right_knee", "right_ankle" }, { "right_hip_fe", "right_knee" }, { "right_hip_aa", "right_hip_fe" } };
 
     initialize_joints(initial_joint_states);
 }
@@ -84,6 +78,21 @@ const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_join
     };
 
     return transform_frames;
+}
+
+std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_links()
+{
+
+    m_owner->declare_parameter("joint_estimator.links", std::vector<std::string>(5, "default"));
+    auto link_list = m_owner->get_parameter("joint_estimator.links").as_string_array();
+    auto child_link_list = m_owner->get_parameter("joint_estimator.links").as_string_array();
+
+    std::unordered_map<std::string, std::string> joint_link_map;
+    for (int i = 0; i < link_list.size(); i++) {
+        joint_link_map.insert(std::pair<std::string, std::string> { link_list[i], child_link_list[i] });
+    }
+
+    return joint_link_map;
 }
 
 void JointEstimator::initialize_joints(sensor_msgs::msg::JointState initial_joint_states)

@@ -50,6 +50,7 @@ private:
     std::unordered_map<std::string, std::string> m_joint_child_link_map;
     std::vector<JointContainer> m_joints;
 
+    std::unordered_map<std::string, std::string> interpret_joint_links();
     void initialize_joints(sensor_msgs::msg::JointState);
 };
 
