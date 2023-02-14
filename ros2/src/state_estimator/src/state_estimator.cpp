@@ -8,6 +8,7 @@ StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this, get_initial_joint_states())
     , m_com_estimator(this)
+    , m_cop_estimator(CopEstimator(get_pressure_sensors()))
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
     m_sensor_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
@@ -96,6 +97,21 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
         RCLCPP_WARN(this->get_logger(), "error in get_frame_transform: %s", ex.what());
         return frame_transform;
     }
+}
+
+std::vector<PressureSensor> StateEstimator::get_pressure_sensors()
+{
+    std::vector<PressureSensor> sensors;
+    // Read the pressure sensors from the hardware interface
+    PressureSensor mock_sensor;
+    mock_sensor.name = "mock_sensor";
+    CenterOfPressure cop;
+    cop.position.point.x = 0;
+    cop.position.point.y = 0;
+    cop.position.point.z = 0;
+    cop.pressure = 1;
+    sensors.push_back(mock_sensor);
+    return sensors;
 }
 
 geometry_msgs::msg::Point transform_point(
