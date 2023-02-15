@@ -2,9 +2,19 @@ state_estimator:
   ros__parameters:
     joint_estimator:
       links: ["left_origin", "left_ankle", "left_knee", "left_hip_fe"
-      , "left_hip_aa", "left_hip_fe", "right_hip_aa", "right_hip_fe"
+      , "left_hip_aa", "right_hip_aa", "right_hip_fe"
       ,"right_knee", "right_ankle", "right_origin"]
-      base_links: ["left_ankle", "left_knee", "left_hip_fe"
-      , "left_hip_aa", "left_hip_fe", "right_hip_aa", "right_hip_fe"
-      ,"right_knee", "right_ankle", "right_origin", "map"]
-
+      base_links: ["left_ankle", "left_knee", "left_hip_fe", "left_hip_aa"
+      , "right_hip_aa", "right_hip_fe","right_knee"
+      , "right_ankle", "right_origin", "map"]
+      #0: X
+      #1: Y
+      #2: Z
+      link_hinge_axis:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 
+      link_length_x:    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      link_length_y:    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
+      link_length_z:    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
+      link_mass:        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      link_com_x:       [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5]
+      link_com_y:       [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      link_com_z:       [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

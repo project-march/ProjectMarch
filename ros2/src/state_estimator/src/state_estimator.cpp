@@ -24,8 +24,15 @@ StateEstimator::StateEstimator()
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
     // Declare parameters
-    // declare_parameter("joint_estimator.links", std::vector<std::string>(5, "default"));
-    // RCLCPP_INFO(get_logger(), "TEST: %s", get_parameter("joint_estimator.links").as_string_array()[0].c_str());
+
+    // declare_parameter("joint_estimator.link_hinge_axis", std::vector<int64_t>(6, 1));
+    // declare_parameter("joint_estimator.link_length_x", std::vector<float>(5, 0.0));
+    // declare_parameter("joint_estimator.link_length_y", std::vector<double>(6, 0.0));
+    // declare_parameter("joint_estimator.link_length_z", std::vector<double>(6, 0.0));
+    // declare_parameter("joint_estimator.link_mass", std::vector<double>(6, 0.0));
+    // declare_parameter("joint_estimator.link_com_x", std::vector<double>(6, 0.0));
+    // declare_parameter("joint_estimator.link_com_y", std::vector<double>(6, 0.0));
+    // declare_parameter("joint_estimator.link_com_z", std::vector<double>(6, 0.0));
 }
 
 sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()
