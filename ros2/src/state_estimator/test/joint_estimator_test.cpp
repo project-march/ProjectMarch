@@ -4,8 +4,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "state_estimator.cpp"
-#include "state_estimator.hpp"
+#include "state_estimator/state_estimator.hpp"
 #include <cmath>
 #include <memory>
 #include <utility>

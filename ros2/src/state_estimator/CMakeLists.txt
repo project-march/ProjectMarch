@@ -31,11 +31,11 @@ include_directories(include)
 add_library(${PROJECT_NAME}
   STATIC
   include/${PROJECT_NAME}/state_estimator.hpp
-  include/${PROJECT_NAME}/state_estimator.cpp
+  src/state_estimator.cpp
   include/${PROJECT_NAME}/joint_estimator.hpp
-  include/${PROJECT_NAME}/joint_estimator.cpp
+  src/joint_estimator.cpp
   include/${PROJECT_NAME}/com_estimator.hpp
-  include/${PROJECT_NAME}/com_estimator.cpp
+  src/com_estimator.cpp
 )
 
 ament_target_dependencies(
@@ -52,11 +52,11 @@ ament_target_dependencies(
 
 add_executable(state_estimator_node 
   src/state_estimator_node.cpp 
-  include/${PROJECT_NAME}/state_estimator.cpp 
+  src/state_estimator.cpp 
   include/${PROJECT_NAME}/state_estimator.hpp
-  include/${PROJECT_NAME}/joint_estimator.cpp 
+  src/joint_estimator.cpp 
   include/${PROJECT_NAME}/joint_estimator.hpp
-  include/${PROJECT_NAME}/com_estimator.cpp 
+  src/com_estimator.cpp 
   include/${PROJECT_NAME}/com_estimator.hpp
   )
 target_include_directories(state_estimator_node PUBLIC
