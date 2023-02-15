@@ -1,5 +1,5 @@
-#include "com_estimator.hpp"
-#include "state_estimator.hpp"
+#include "state_estimator/com_estimator.hpp"
+#include "state_estimator/state_estimator.hpp"
 
 ComEstimator::ComEstimator(StateEstimator* owner)
     : m_owner(owner)
