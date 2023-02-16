@@ -3,7 +3,7 @@
            type="march_pressure_sole_broadcaster::PressureSoleBroadcaster"
            base_class_type="controller_interface::ControllerInterface">
         <description>
-            The pressure sole broadcaster publishes the current states from the pressure soles.
+            The pressure sole broadcaster publishes the current states from the pressure soles..
         </description>
     </class>
 </library>
