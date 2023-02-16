@@ -91,6 +91,7 @@ if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
   test/joint_estimator_test.cpp
   test/test_runner.cpp
+  test/mocks/mock_state_estimator.hpp
   # include
   )
   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
