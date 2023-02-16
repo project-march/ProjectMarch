@@ -36,7 +36,7 @@ add_library(${PROJECT_NAME}
   include/${PROJECT_NAME}/joint_estimator.hpp
   src/joint_estimator.cpp
   include/${PROJECT_NAME}/com_estimator.hpp
-  include/${PROJECT_NAME}/com_estimator.cpp
+  src/com_estimator.cpp
   include/${PROJECT_NAME}/cop_estimator.hpp
   src/state_estimator_node.cpp
   src/cop_estimator.cpp
@@ -61,6 +61,7 @@ add_executable(state_estimator_node
   src/joint_estimator.cpp 
   include/${PROJECT_NAME}/joint_estimator.hpp
   src/com_estimator.cpp 
+  src/cop_estimator.cpp 
   include/${PROJECT_NAME}/com_estimator.hpp
   include/${PROJECT_NAME}/cop_estimator.hpp
   )
