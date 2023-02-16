@@ -14,7 +14,7 @@ def generate_launch_description():
         get_package_share_directory('state_estimator'),
         'config',
         'state_estimation_setup_params.yaml'
-        )
+    )
 
     return LaunchDescription([
         Node(
