@@ -1,4 +1,4 @@
-#include "footstep_generator.hpp"
+#include "footstep_generator/footstep_generator.hpp"
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 using std::placeholders::_2;

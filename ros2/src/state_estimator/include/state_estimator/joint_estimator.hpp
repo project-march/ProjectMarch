@@ -20,6 +20,10 @@ enum Rotation { X, Y, Z };
 struct CenterOfMass {
     geometry_msgs::msg::PointStamped position;
     double mass;
+    friend bool operator==(CenterOfMass a, CenterOfMass b)
+    {
+        return (abs(a.mass - b.mass) < 1e-6 && (a.position == b.position));
+    };
 };
 
 struct JointContainer {
@@ -30,6 +34,13 @@ struct JointContainer {
     double length_y;
     double length_z;
     Rotation hinge_axis;
+    // Add this in for Testing
+    friend bool operator==(JointContainer a, JointContainer b)
+    {
+        return (abs(a.length_x - b.length_x) < 1e-6 && abs(a.length_y - b.length_y) < 1e-6
+            && abs(a.length_z - b.length_z) < 1e-6 && abs(a.length_z - b.length_z) < 1e-6
+            && (a.hinge_axis == b.hinge_axis) && (a.com == b.com));
+    };
 };
 
 class StateEstimator;
@@ -50,6 +61,7 @@ private:
     std::unordered_map<std::string, std::string> m_joint_child_link_map;
     std::vector<JointContainer> m_joints;
 
+    std::unordered_map<std::string, std::string> interpret_joint_links();
     void initialize_joints(sensor_msgs::msg::JointState);
 };
 

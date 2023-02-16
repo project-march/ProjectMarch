@@ -32,11 +32,11 @@ include_directories(include)
 add_library(${PROJECT_NAME}
   STATIC
   include/${PROJECT_NAME}/state_estimator.hpp
-  include/${PROJECT_NAME}/state_estimator.cpp
+  src/state_estimator.cpp
   include/${PROJECT_NAME}/joint_estimator.hpp
-  include/${PROJECT_NAME}/joint_estimator.cpp
+  src/joint_estimator.cpp
   include/${PROJECT_NAME}/com_estimator.hpp
-  include/${PROJECT_NAME}/com_estimator.cpp
+  src/com_estimator.cpp
   include/${PROJECT_NAME}/cop_estimator.hpp
   src/state_estimator_node.cpp
   src/cop_estimator.cpp
@@ -55,13 +55,13 @@ ament_target_dependencies(
 )
 
 add_executable(state_estimator_node 
-  src/state_estimator_node.cpp
-  src/cop_estimator.cpp
-  include/${PROJECT_NAME}/state_estimator.cpp 
+  src/state_estimator_node.cpp 
+  src/state_estimator.cpp 
   include/${PROJECT_NAME}/state_estimator.hpp
-  include/${PROJECT_NAME}/joint_estimator.cpp 
+  src/joint_estimator.cpp 
   include/${PROJECT_NAME}/joint_estimator.hpp
-  include/${PROJECT_NAME}/com_estimator.cpp 
+  src/com_estimator.cpp 
+  src/cop_estimator.cpp 
   include/${PROJECT_NAME}/com_estimator.hpp
   include/${PROJECT_NAME}/cop_estimator.hpp
   )
@@ -86,13 +86,19 @@ install(TARGETS state_estimator_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
-  
+# Install launch files.
+install(DIRECTORY
+launch
+config
+DESTINATION share/${PROJECT_NAME}/
+)
 
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
   test/joint_estimator_test.cpp
   test/cop_estimator_test.cpp
   test/test_runner.cpp
+  test/mocks/mock_state_estimator.hpp
   # include
   )
   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})

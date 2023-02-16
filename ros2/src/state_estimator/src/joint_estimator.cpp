@@ -1,15 +1,9 @@
-#include "joint_estimator.hpp"
-#include "state_estimator.hpp"
+#include "state_estimator/joint_estimator.hpp"
+#include "state_estimator/state_estimator.hpp"
 JointEstimator::JointEstimator(StateEstimator* owner, sensor_msgs::msg::JointState initial_joint_states)
     : m_owner(owner)
+    , m_joint_child_link_map(interpret_joint_links())
 {
-    m_joint_child_link_map = { {
-                                   "left_origin",
-                                   "left_ankle",
-                               },
-        { "left_ankle", "left_knee" }, { "left_knee", "left_hip_fe" }, { "left_hip_fe", "left_hip_aa" },
-        { "left_hip_aa", "right_hip_aa" }, { "right_origin", "map" }, { "right_ankle", "right_origin" },
-        { "right_knee", "right_ankle" }, { "right_hip_fe", "right_knee" }, { "right_hip_aa", "right_hip_fe" } };
 
     initialize_joints(initial_joint_states);
 }
@@ -86,9 +80,45 @@ const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_join
     return transform_frames;
 }
 
+std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_links()
+{
+    // We must declare these specific parameters here because they're called before the constructor
+    m_owner->declare_parameter("joint_estimator.links", std::vector<std::string>(5, "default"));
+    m_owner->declare_parameter("joint_estimator.base_links", std::vector<std::string>(5, "default"));
+    auto link_list = m_owner->get_parameter("joint_estimator.links").as_string_array();
+    auto child_link_list = m_owner->get_parameter("joint_estimator.base_links").as_string_array();
+
+    std::unordered_map<std::string, std::string> joint_link_map;
+    for (int i = 0; i < link_list.size(); i++) {
+        joint_link_map.insert(std::pair<std::string, std::string> { link_list[i], child_link_list[i] });
+    }
+
+    return joint_link_map;
+}
+
 void JointEstimator::initialize_joints(sensor_msgs::msg::JointState initial_joint_states)
 {
     int joint_amount = initial_joint_states.name.size();
+    // We must declare these specific parameters here because they're called before the constructor
+    // It's sadly a long list but it only happens once at initialization so it doesn't need a separate function
+    // It just looks very ugly but it's necessary because it's ROS2 :(
+    m_owner->declare_parameter("joint_estimator.link_hinge_axis", std::vector<int64_t>(6, 0));
+    m_owner->declare_parameter("joint_estimator.link_length_x", std::vector<double>(5, 0.0));
+    m_owner->declare_parameter("joint_estimator.link_length_y", std::vector<double>(6, 0.0));
+    m_owner->declare_parameter("joint_estimator.link_length_z", std::vector<double>(6, 0.0));
+    m_owner->declare_parameter("joint_estimator.link_mass", std::vector<double>(6, 0.0));
+    m_owner->declare_parameter("joint_estimator.link_com_x", std::vector<double>(6, 0.0));
+    m_owner->declare_parameter("joint_estimator.link_com_y", std::vector<double>(6, 0.0));
+    m_owner->declare_parameter("joint_estimator.link_com_z", std::vector<double>(6, 0.0));
+    auto link_hinges = m_owner->get_parameter("joint_estimator.link_hinge_axis").as_integer_array();
+    auto link_length_x = m_owner->get_parameter("joint_estimator.link_length_x").as_double_array();
+    auto link_length_y = m_owner->get_parameter("joint_estimator.link_length_y").as_double_array();
+    auto link_length_z = m_owner->get_parameter("joint_estimator.link_length_z").as_double_array();
+    auto link_com_mass = m_owner->get_parameter("joint_estimator.link_mass").as_double_array();
+    auto link_com_x = m_owner->get_parameter("joint_estimator.link_com_x").as_double_array();
+    auto link_com_y = m_owner->get_parameter("joint_estimator.link_com_y").as_double_array();
+    auto link_com_z = m_owner->get_parameter("joint_estimator.link_com_z").as_double_array();
+
     JointContainer joint_to_add;
     geometry_msgs::msg::TransformStamped joint_frame;
     tf2::Quaternion quaternion_math;
@@ -97,18 +127,21 @@ void JointEstimator::initialize_joints(sensor_msgs::msg::JointState initial_join
         for (int i = 0; i < joint_amount; i++) {
             joint_to_add.name = initial_joint_states.name[i];
             // These need to be obtained from yaml parameters
-            joint_to_add.com.position.point.x = 1;
-            joint_to_add.com.position.point.y = 0;
-            joint_to_add.com.position.point.z = 0;
-            joint_to_add.length_x = 1;
-            // end of TO BE REPLACED
+            joint_to_add.com.mass = link_com_mass[i];
+            joint_to_add.com.position.point.x = link_com_x[i];
+            joint_to_add.com.position.point.y = link_com_y[i];
+            joint_to_add.com.position.point.z = link_com_z[i];
+            joint_to_add.length_x = link_length_x[i];
+            joint_to_add.length_y = link_length_y[i];
+            joint_to_add.length_z = link_length_z[i];
+
             joint_frame.header.frame_id = joint_to_add.name;
             joint_frame.child_frame_id = m_joint_child_link_map.find(std::string(joint_to_add.name))->second;
             joint_frame.transform.translation.x = joint_to_add.length_x;
             joint_frame.transform.translation.y = joint_to_add.length_y;
             joint_frame.transform.translation.z = joint_to_add.length_z;
             // Add rotations here
-            joint_to_add.hinge_axis = Y;
+            joint_to_add.hinge_axis = static_cast<Rotation>(link_hinges[i]);
             switch (joint_to_add.hinge_axis) {
                 case X:
                     quaternion_math.setRPY(initial_joint_states.position[i], 0, 0);
