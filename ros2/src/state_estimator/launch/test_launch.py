@@ -5,9 +5,9 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Launch description of the mujoco simulation nodes.
+    """Launch description of the state estimator
 
-    These nodes are started when the mujoco simulation has be run.
+    This node is started when the state estimator is run
     """
     config = os.path.join(
     get_package_share_directory('state_estimator'),
