@@ -171,6 +171,12 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
+
+    // For the Pressure sole broadcaster.
+    for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data_.get_pointers()) {
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+            "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
+    }
     return state_interfaces;
 }
 
