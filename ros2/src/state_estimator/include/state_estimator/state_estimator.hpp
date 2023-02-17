@@ -23,8 +23,6 @@ class StateEstimator : public rclcpp::Node {
 public:
     StateEstimator();
 
-    sensor_msgs::msg::JointState get_initial_joint_states();
-
     std::vector<PressureSensor> get_pressure_sensors();
 
     geometry_msgs::msg::TransformStamped get_frame_transform(std::string&, std::string&);
