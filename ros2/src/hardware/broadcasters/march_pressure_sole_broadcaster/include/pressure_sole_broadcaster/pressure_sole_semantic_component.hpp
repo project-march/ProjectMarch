@@ -7,22 +7,20 @@
 #include <string>
 #include <vector>
 
-#include "semantic_components/semantic_component_interface.hpp"
 #include "march_shared_msgs/msg/pressure_soles_data.hpp"
+#include "semantic_components/semantic_component_interface.hpp"
 
 namespace march_pressure_sole_broadcaster {
 using StateInerfaces = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
 using PressureSoleMsg = march_shared_msgs::msg::PressureSoleData;
 
-class PressureSoleSemanticComponent : public semantic_componensts::SemanticComponentInterface<PressureSoleMsg>{
+class PressureSoleSemanticComponent : public semantic_components::SemanticComponentInterface<PressureSoleMsg> {
 public:
     explicit PressureSoleSemanticComponent()
-        : SemanticComponentInterface("PressureSoles", /*size*/16)
+        : SemanticComponentInterface("PressureSoles", /*size*/ 16)
     {
-        
     }
-
 };
-}
+} // namespace march_pressure_sole_broadcaster
 
-#endif //BUILD_PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP
+#endif // BUILD_PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP
