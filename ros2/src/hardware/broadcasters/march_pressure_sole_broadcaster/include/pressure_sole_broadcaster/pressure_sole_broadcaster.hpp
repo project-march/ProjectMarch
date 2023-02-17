@@ -5,7 +5,7 @@
 #include "controller_interface/controller_interface.hpp"
 #include "pressure_sole_broadcaster/pressure_sole_semantic_component.hpp"
 
-namespace march_pressure_sole_broadcaster{
+namespace march_pressure_sole_broadcaster {
 
 class PressureSoleBroadcaster : public controller_interface::ControllerInterface {
 public:
@@ -16,7 +16,6 @@ public:
 private:
     std::unique_ptr<PressureSoleSemanticComponent> pressure_sole_component;
     std::shared_ptr<rclcpp::Logger> logger_;
-
 };
-}
-#endif //BUILD_MARCH_PRESSURE_SOLE_BROADCASTER_HPP
+} // namespace march_pressure_sole_broadcaster
+#endif // BUILD_MARCH_PRESSURE_SOLE_BROADCASTER_HPP
