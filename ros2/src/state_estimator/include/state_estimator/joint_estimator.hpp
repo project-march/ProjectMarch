@@ -47,7 +47,7 @@ class StateEstimator;
 
 class JointEstimator {
 public:
-    JointEstimator(StateEstimator* owner, sensor_msgs::msg::JointState);
+    JointEstimator(StateEstimator* owner);
 
     const JointContainer get_individual_joint(std::string);
     void set_joint_states(sensor_msgs::msg::JointState::SharedPtr);
@@ -62,7 +62,7 @@ private:
     std::vector<JointContainer> m_joints;
 
     std::unordered_map<std::string, std::string> interpret_joint_links();
-    void initialize_joints(sensor_msgs::msg::JointState);
+    void initialize_joints();
 };
 
 #endif

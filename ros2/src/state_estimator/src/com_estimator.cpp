@@ -2,7 +2,6 @@
 #include "state_estimator/state_estimator.hpp"
 
 ComEstimator::ComEstimator()
-    : m_owner()
 {
 }
 

@@ -2,7 +2,6 @@
 #include "cop_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "joint_estimator.hpp"
-#include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"

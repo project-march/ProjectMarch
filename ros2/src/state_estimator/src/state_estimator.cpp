@@ -6,9 +6,9 @@ using std::placeholders::_2;
 
 StateEstimator::StateEstimator()
     : Node("state_estimator_node")
-    , m_joint_estimator(this, get_initial_joint_states())
+    , m_joint_estimator(this)
     , m_com_estimator()
-    , m_cop_estimator(CopEstimator(create_pressure_sensors()))
+    , m_cop_estimator()
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
 
@@ -42,15 +42,15 @@ StateEstimator::StateEstimator()
     // declare_parameter("joint_estimator.link_com_z", std::vector<double>(6, 0.0));
 }
 
-sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()
-{
-    sensor_msgs::msg::JointState initial_joint_state;
-    // change it so the names are obtained from the parameter
-    initial_joint_state.name = { "right_ankle", "right_knee", "right_hip_fe", "right_hip_aa", "left_ankle", "left_knee",
-        "left_hip_fe", "left_hip_aa", "right_origin", "left_origin" };
-    initial_joint_state.position = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    return initial_joint_state;
-}
+// sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()
+// {
+//     sensor_msgs::msg::JointState initial_joint_state;
+//     // change it so the names are obtained from the parameter
+//     initial_joint_state.name = { "right_ankle", "right_knee", "right_hip_fe", "right_hip_aa", "left_ankle", "left_knee",
+//         "left_hip_fe", "left_hip_aa", "right_origin", "left_origin" };
+//     initial_joint_state.position = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+//     return initial_joint_state;
+// }
 
 void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
@@ -82,18 +82,17 @@ void StateEstimator::publish_robot_state()
 
 void StateEstimator::publish_robot_frames()
 {
-    m_joint_estimator.set_individual_joint_state("right_ankle", 3.14);
-    RCLCPP_INFO(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
+    RCLCPP_DEBUG(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
     for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);
-        RCLCPP_INFO(this->get_logger(),
+        RCLCPP_DEBUG(this->get_logger(),
             ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
     std::vector<CenterOfMass> test = m_joint_estimator.get_joint_com_positions("right_knee");
     RCLCPP_INFO(this->get_logger(), "Array size is %i", test.size());
     for (auto com : test) {
-        RCLCPP_INFO(this->get_logger(), ("\n Publishing COM"));
-        RCLCPP_INFO(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
+        RCLCPP_DEBUG(this->get_logger(), ("\n Publishing COM"));
+        RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
         m_com_pos_publisher->publish(com.position);
     }
     // RCLCPP_INFO(this->get_logger(), "Test amount: %i", test[0].point.x);
@@ -107,6 +106,8 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
         frame_transform = m_tf_buffer->lookupTransform(target_frame, source_frame, tf2::TimePointZero);
         return frame_transform;
     } catch (const tf2::TransformException& ex) {
+        RCLCPP_WARN(this->get_logger(), "Source frame: %s", source_frame.c_str());
+        RCLCPP_WARN(this->get_logger(), "Target frame: %s", target_frame.c_str());
         RCLCPP_WARN(this->get_logger(), "error in get_frame_transform: %s", ex.what());
         return frame_transform;
     }
