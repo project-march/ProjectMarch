@@ -82,7 +82,6 @@ public:
 
 private:
     void pdb_read();
-    void pressure_sole_read();
     bool is_joint_in_valid_state(JointInfo& jointInfo);
     bool is_joint_in_limit(JointInfo& jointInfo);
     JointInfo build_joint_info(const hardware_interface::ComponentInfo& joint);
@@ -94,10 +93,10 @@ private:
     const std::shared_ptr<rclcpp::Logger> logger_;
     std::unique_ptr<march::MarchRobot> march_robot_;
     march::PowerDistributionBoardData pdb_data_;
-    std::vector<march::PressureSoleData> pressure_soles_data_;
-    march::PressureSoleData left_sole;
+    march::PressureSoleData pressure_sole_data_;
     std::vector<JointInfo> joints_info_;
     bool joints_ready_for_actuation_ = false;
+
     rclcpp::Clock clock_;
 };
 

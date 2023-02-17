@@ -2,8 +2,6 @@
 #define MARCH_HARDWARE_PRESSURE_SOLE_CONTROLLER_H
 
 #include <march_hardware/ethercat/slave.h>
-#include <optional>
-#include <rclcpp/rclcpp.hpp>
 #include <string>
 
 namespace march {
@@ -11,8 +9,6 @@ namespace march {
 namespace pressure_sole {
     inline constexpr static unsigned int DATA_LENGTH = 8;
 }
-
-enum pressure_sole_side { left, right };
 
 struct PressureSoleData {
     double heel_right;
@@ -24,18 +20,10 @@ struct PressureSoleData {
     double met5;
     double arch;
 
-    pressure_sole_side side;
-
-    pressure_sole_side get_side()
+    bool operator==(const PressureSoleData& rhs) const
     {
-        return side;
-    }
-
-    friend bool operator==(const PressureSoleData& lhs, const PressureSoleData& rhs)
-    {
-        return lhs.heel_right == rhs.heel_right && lhs.heel_left == rhs.heel_left && lhs.met1 == rhs.met1
-            && lhs.hallux == rhs.hallux && lhs.met3 == rhs.met3 && lhs.toes == rhs.toes && lhs.met5 == rhs.met5
-            && lhs.arch == rhs.arch;
+        return heel_right == rhs.heel_right && heel_left == rhs.heel_left && met1 == rhs.met1 && hallux == rhs.hallux
+            && met3 == rhs.met3 && toes == rhs.toes && met5 == rhs.met5 && arch == rhs.arch;
     }
 
     /**
@@ -62,14 +50,14 @@ struct PressureSoleData {
      */
     inline void update_values(std::array<bit32, pressure_sole::DATA_LENGTH> data)
     {
-        heel_right = data[0].f;
-        heel_left = data[1].f;
-        met1 = data[2].f;
-        hallux = data[3].f;
-        met3 = data[4].f;
-        toes = data[5].f;
-        met5 = data[6].f;
-        arch = data[7].f;
+        heel_right = data[0].ui;
+        heel_left = data[1].ui;
+        met1 = data[2].ui;
+        hallux = data[3].ui;
+        met3 = data[4].ui;
+        toes = data[5].ui;
+        met5 = data[6].ui;
+        arch = data[7].ui;
     }
 };
 
@@ -78,7 +66,7 @@ public:
     PressureSole(const Slave& slave, uint8_t byte_offset, std::string side);
 
     // Read the data in from ethercat
-    void read(PressureSoleData& pressure_sole_data) const;
+    PressureSoleData read();
 
     std::string getSide();
 

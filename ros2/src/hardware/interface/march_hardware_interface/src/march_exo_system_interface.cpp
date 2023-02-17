@@ -14,12 +14,10 @@
 
 #include "march_hardware_interface/march_exo_system_interface.hpp"
 
-#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <unistd.h>
 #include <vector>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
@@ -58,6 +56,7 @@ MarchExoSystemInterface::~MarchExoSystemInterface()
 hardware_interface::return_type MarchExoSystemInterface::configure(const hardware_interface::HardwareInfo& info)
 {
     RCLCPP_INFO((*logger_), "Configuring Hardware Interface...");
+
     // Default Check needs to be done for every hardware interface.
     if (configure_default(info) != hardware_interface::return_type::OK) {
         RCLCPP_FATAL((*logger_), "Configure default of Hardware Interface failed.");
@@ -86,17 +85,6 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
-
-    // Create pressure soles with side set to left and right.
-    // This is needed for data reading and updating for the pressure_sole_broadcaster.
-    march::PressureSoleData left_sole;
-    left_sole.side = march::pressure_sole_side::left;
-    pressure_soles_data_.push_back(left_sole);
-    march::PressureSoleData right_sole;
-    right_sole.side = march::pressure_sole_side::right;
-    pressure_soles_data_.push_back(right_sole);
-
-    RCLCPP_INFO((*logger_), "Finished creating march pressure sole data");
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -179,29 +167,16 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         }
     }
 
-    // // For the PDB broadcaster.
+    // For the PDB broadcaster.
     for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
 
     // For the Pressure sole broadcaster.
-    // Because the Broadcaster heeds a distinction between left and right,
-    // l_ is added for the left data pointers and r_ for the right data pointers.
-    for (auto& pressure_sole_data : pressure_soles_data_) {
-        for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
-            std::string name;
-            if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
-                name = "l_";
-            } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
-                name = "r_";
-            }
-            name.append(pressure_soles_pointer.first);
-            RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
-            state_interfaces.emplace_back(
-                hardware_interface::StateInterface("pressure_soles", name, pressure_soles_pointer.second));
-        }
+    for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data_.get_pointers()) {
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+            "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
     }
-    RCLCPP_INFO((*logger_), "Creating export state interface finished.");
     return state_interfaces;
 }
 
@@ -385,8 +360,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    // pdb_read();
-    pressure_sole_read();
+    pdb_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
@@ -415,19 +389,6 @@ void MarchExoSystemInterface::pdb_read()
             RCLCPP_WARN_THROTTLE(
                 (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
         }
-    }
-};
-
-/**
- * @brief Reads the pdb data from the hardware and updates it so that the broadcaster can publish it.
- * Raises warnings if the voltage goes below a certain value.
- * The data is published on `/march/pdb_data`.
- */
-void MarchExoSystemInterface::pressure_sole_read()
-{
-    auto pressure_soles = march_robot_->getPressureSoles();
-    for (size_t i = 0; i < pressure_soles.size(); i++) {
-        pressure_soles[i].read(pressure_soles_data_[i]);
     }
 };
 
