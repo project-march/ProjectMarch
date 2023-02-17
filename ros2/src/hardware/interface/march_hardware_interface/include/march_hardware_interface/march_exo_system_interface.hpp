@@ -93,6 +93,7 @@ private:
     const std::shared_ptr<rclcpp::Logger> logger_;
     std::unique_ptr<march::MarchRobot> march_robot_;
     march::PowerDistributionBoardData pdb_data_;
+    march::PressureSoleData pressure_sole_data_;
     std::vector<JointInfo> joints_info_;
     bool joints_ready_for_actuation_ = false;
 
