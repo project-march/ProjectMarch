@@ -173,9 +173,11 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     }
 
     // For the Pressure sole broadcaster.
-    for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data_.get_pointers()) {
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
+    for (auto pressure_sole_data : pressure_soles_data_) {
+        for (std::pair<std::string, double *> &pressure_soles_pointer: pressure_sole_data.get_pointers()) {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                    "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
+        }
     }
     return state_interfaces;
 }
@@ -389,6 +391,19 @@ void MarchExoSystemInterface::pdb_read()
             RCLCPP_WARN_THROTTLE(
                 (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
         }
+    }
+};
+
+/**
+ * @brief Reads the pdb data from the hardware and updates it so that the broadcaster can publish it.
+ * Raises warnings if the voltage goes below a certain value.
+ * The data is published on `/march/pdb_data`.
+ */
+void MarchExoSystemInterface::pressure_sole_read()
+{
+    auto pressure_soles = march_robot_->getPressureSoles();
+    for (size_t i = 0; i <= pressure_soles.size(); i++){
+        pressure_soles[i].read(pressure_soles_data_[i]);
     }
 };
 
