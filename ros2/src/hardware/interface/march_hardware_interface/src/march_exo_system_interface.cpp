@@ -85,6 +85,8 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
+    pressure_soles_data_.push_back({});
+    pressure_soles_data_.push_back({});
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -363,6 +365,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     this->march_robot_->waitForPdo();
 
     pdb_read();
+    pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
