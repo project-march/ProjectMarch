@@ -176,9 +176,9 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 
     // For the Pressure sole broadcaster.
     for (auto pressure_sole_data : pressure_soles_data_) {
-        for (std::pair<std::string, double *> &pressure_soles_pointer: pressure_sole_data.get_pointers()) {
+        for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
             state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
+                "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
         }
     }
     return state_interfaces;
@@ -405,7 +405,7 @@ void MarchExoSystemInterface::pdb_read()
 void MarchExoSystemInterface::pressure_sole_read()
 {
     auto pressure_soles = march_robot_->getPressureSoles();
-    for (size_t i = 0; i <= pressure_soles.size(); i++){
+    for (size_t i = 0; i <= pressure_soles.size(); i++) {
         pressure_soles[i].read(pressure_soles_data_[i]);
     }
 };
