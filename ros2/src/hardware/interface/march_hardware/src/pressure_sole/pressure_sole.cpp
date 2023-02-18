@@ -13,15 +13,15 @@ std::string PressureSole::getSide()
     return side_;
 }
 
-PressureSoleData PressureSole::read()
+void PressureSole::read(PressureSoleData& pressure_sole_data) const
 {
-    std::array<float, PRESSURE_SOLE_DATA_LENGTH> data {};
+    std::array<bit32, PRESSURE_SOLE_DATA_LENGTH> data {};
     for (unsigned int i = 0; i < data.size(); i++) {
         // Increment the offset by 4 bytes each iteration
-        data[i] = this->read32(byte_offset_ + i * sizeof(float)).f;
+        data[i] = this->read32(byte_offset_ + i * sizeof(float));
     }
 
     static_assert(PRESSURE_SOLE_DATA_LENGTH == 8);
-    return { data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7] };
+    pressure_sole_data.update_values(data);
 }
 } // namespace march

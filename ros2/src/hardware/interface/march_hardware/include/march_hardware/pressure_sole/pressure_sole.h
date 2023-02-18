@@ -66,7 +66,7 @@ public:
     PressureSole(const Slave& slave, uint8_t byte_offset, std::string side);
 
     // Read the data in from ethercat
-    PressureSoleData read();
+    void read(PressureSoleData& pressure_sole_data) const;
 
     std::string getSide();
 
