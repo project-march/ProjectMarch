@@ -72,22 +72,10 @@ public:
     bool get_values_as_message(PressureSolesMsg& msg)
     {
         update();
-        msg.l_heel_left = l_heel_left_;
-        msg.l_heel_right = l_heel_right_;
-        msg.l_met1 = l_met1_;
-        msg.l_hallux = l_hallux_;
-        msg.l_met3 = l_met3_;
-        msg.l_toes = l_toes_;
-        msg.l_met5 = l_met5_;
-        msg.l_arch = l_arch_;
-        msg.r_heel_left = r_heel_left_;
-        msg.r_heel_right = r_heel_right_;
-        msg.r_met1 = r_met1_;
-        msg.r_hallux = r_hallux_;
-        msg.r_met3 = r_met3_;
-        msg.r_toes = r_toes_;
-        msg.r_met5 = r_met5_;
-        msg.r_arch = r_arch_;
+        msg.names = { "l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
+            "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch" };
+        msg.pressure_values = { l_heel_right_, l_heel_left_, l_met1_, l_hallux_, l_met3_, l_toes_, l_met5_, l_arch_,
+            r_heel_right_, r_heel_left_, r_met1_, r_hallux_, r_met3_, r_toes_, r_met5_, r_arch_ };
         return true;
     }
 
