@@ -10,7 +10,10 @@ namespace pressure_sole {
     inline constexpr static unsigned int DATA_LENGTH = 8;
 }
 
+enum pressure_sole_side { left, right };
+
 struct PressureSoleData {
+    pressure_sole_side side;
     double heel_right;
     double heel_left;
     double met1;
@@ -24,6 +27,11 @@ struct PressureSoleData {
     {
         return heel_right == rhs.heel_right && heel_left == rhs.heel_left && met1 == rhs.met1 && hallux == rhs.hallux
             && met3 == rhs.met3 && toes == rhs.toes && met5 == rhs.met5 && arch == rhs.arch;
+    }
+
+    pressure_sole_side get_side()
+    {
+        return side;
     }
 
     /**

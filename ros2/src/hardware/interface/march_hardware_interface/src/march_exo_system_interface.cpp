@@ -85,8 +85,16 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
-    pressure_soles_data_.push_back({});
-    pressure_soles_data_.push_back({});
+
+    // Create pressure soles with side set to left and right.
+    // This is needed for data reading and updating for the pressure_sole_broadcaster.
+    march::PressureSoleData left_sole;
+    left_sole.side = march::pressure_sole_side::left;
+    pressure_soles_data_.push_back(left_sole);
+    march::PressureSoleData right_sole;
+    left_sole.side = march::pressure_sole_side::right;
+    pressure_soles_data_.push_back(right_sole);
+
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -177,8 +185,13 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     // For the Pressure sole broadcaster.
     for (auto pressure_sole_data : pressure_soles_data_) {
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
-            state_interfaces.emplace_back(hardware_interface::StateInterface(
-                "pressure_sole", pressure_soles_pointer.first, pressure_soles_pointer.second));
+            if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
+                state_interfaces.emplace_back(hardware_interface::StateInterface(
+                    "pressure_soles", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+            } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
+                state_interfaces.emplace_back(hardware_interface::StateInterface(
+                    "pressure_soles", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+            }
         }
     }
     return state_interfaces;
