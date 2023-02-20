@@ -2,6 +2,7 @@
 #include "cop_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "joint_estimator.hpp"
+#include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -25,7 +26,9 @@ public:
 
     sensor_msgs::msg::JointState get_initial_joint_states();
 
-    std::vector<PressureSensor> get_pressure_sensors();
+    std::vector<PressureSensor> create_pressure_sensors();
+
+    void update_pressure_sensors_data(std::vector<std::string> names, std::vector<double> pressure_values);
 
     geometry_msgs::msg::TransformStamped get_frame_transform(std::string&, std::string&);
 
@@ -36,12 +39,16 @@ private:
 
     void state_callback(sensor_msgs::msg::JointState::SharedPtr msg);
 
+    void pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg);
+
     void publish_robot_state();
 
     void publish_robot_frames();
 
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr m_state_publisher;
-    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_sensor_subscriber;
+    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_upper_imu_subscriber;
+    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_lower_imu_subscriber;
+    rclcpp::Subscription<march_shared_msgs::msg::PressureSolesData>::SharedPtr m_pressure_sole_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;

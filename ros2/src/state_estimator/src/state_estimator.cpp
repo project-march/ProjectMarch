@@ -8,13 +8,19 @@ StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this, get_initial_joint_states())
     , m_com_estimator(this)
-    , m_cop_estimator(CopEstimator(get_pressure_sensors()))
+    , m_cop_estimator(CopEstimator(create_pressure_sensors()))
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
-    m_sensor_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+
+    m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
+        "/upper_xsens_mti_node", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+    m_lower_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
+        "/lower_xsens_mti_node", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+    m_pressure_sole_subscriber = this->create_subscription<march_shared_msgs::msg::PressureSolesData>(
+        "/march/pressure_sole_data", 10, std::bind(&StateEstimator::pressure_sole_callback, this, _1));
     m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_state", 10, std::bind(&StateEstimator::state_callback, this, _1));
+
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
     m_com_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_com_position", 100);
@@ -52,6 +58,11 @@ void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+}
+
+void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg)
+{
+    update_pressure_sensors_data(msg->names, msg->pressure_values);
 }
 
 void StateEstimator::publish_robot_state()
@@ -99,19 +110,37 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
     }
 }
 
-std::vector<PressureSensor> StateEstimator::get_pressure_sensors()
+std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
 {
+    this->declare_parameter("cop_estimator.names", std::vector<std::string>(16, ""));
+    this->declare_parameter("cop_estimator.x_positions", std::vector<double>(16, 0.0));
+    this->declare_parameter("cop_estimator.y_positions", std::vector<double>(16, 0.0));
+    this->declare_parameter("cop_estimator.z_positions", std::vector<double>(16, 0.0));
+    auto names = this->get_parameter("cop_estimator.names").as_string_array();
+    auto x_positions = this->get_parameter("cop_estimator.x_positions").as_double_array();
+    auto y_positions = this->get_parameter("cop_estimator.y_positions").as_double_array();
+    auto z_positions = this->get_parameter("cop_estimator.z_positions").as_double_array();
     std::vector<PressureSensor> sensors;
+    for (size_t i = 0; i <= names.size(); i++) {
+        PressureSensor sensor;
+        sensor.name = names.at(i);
+        CenterOfPressure cop;
+        cop.position.point.x = x_positions.at(i);
+        cop.position.point.y = y_positions.at(i);
+        cop.position.point.z = z_positions.at(i);
+        sensors.push_back(sensor);
+    }
     // Read the pressure sensors from the hardware interface
-    PressureSensor mock_sensor;
-    mock_sensor.name = "mock_sensor";
-    CenterOfPressure cop;
-    cop.position.point.x = 0;
-    cop.position.point.y = 0;
-    cop.position.point.z = 0;
-    cop.pressure = 1;
-    sensors.push_back(mock_sensor);
     return sensors;
+}
+
+void StateEstimator::update_pressure_sensors_data(std::vector<std::string> names, std::vector<double> pressure_values)
+{
+    std::map<std::string, double> pressure_values_map;
+    for (size_t i = 0; i < names.size(); i++) {
+        pressure_values_map.emplace(names.at(i), pressure_values.at(i));
+    }
+    this->m_cop_estimator.update_sensor_pressures(pressure_values_map);
 }
 
 geometry_msgs::msg::Point transform_point(
