@@ -44,6 +44,13 @@ void CopEstimator::set_cop_state(std::vector<PressureSensor> sensors)
     }
 }
 
+void CopEstimator::update_sensor_pressures(std::map<std::string, double> pressure_values_map)
+{
+    for (auto& sensor : m_sensors) {
+        sensor.update_pressure(pressure_values_map.at(sensor.name));
+    }
+}
+
 /**
  * Returns the last calculated cop of the cop estimated
  * @return

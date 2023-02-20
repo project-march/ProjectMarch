@@ -19,6 +19,7 @@
 #define COP_ESTIMATOR
 
 struct CenterOfPressure {
+    std::string name;
     geometry_msgs::msg::PointStamped position;
     double pressure;
 
@@ -39,6 +40,11 @@ struct CenterOfPressure {
 struct PressureSensor {
     std::string name;
     CenterOfPressure centre_of_pressure;
+
+    void update_pressure(double pressure)
+    {
+        centre_of_pressure.pressure = pressure;
+    }
 };
 
 class StateEstimator;
@@ -47,6 +53,7 @@ class CopEstimator {
 public:
     CopEstimator(std::vector<PressureSensor> sensors);
     void set_cop_state(std::vector<PressureSensor> sensors);
+    void update_sensor_pressures(std::map<std::string, double> pressure_values_map);
     CenterOfPressure get_cop_state();
 
 private:
