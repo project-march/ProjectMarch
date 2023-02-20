@@ -183,6 +183,8 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     }
 
     // For the Pressure sole broadcaster.
+    // Because the Broadcaster heeds a distinction between left and right,
+    // l_ is added for the left data pointers and r_ for the right data pointers.
     for (auto pressure_sole_data : pressure_soles_data_) {
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
             if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
