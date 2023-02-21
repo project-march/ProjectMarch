@@ -8,7 +8,7 @@ JointEstimator::JointEstimator(StateEstimator* owner, sensor_msgs::msg::JointSta
     initialize_joints(initial_joint_states);
 }
 
-void JointEstimator::set_joint_states(sensor_msgs::msg::JointState new_joint_states)
+void JointEstimator::set_joint_states(sensor_msgs::msg::JointState::SharedPtr new_joint_states)
 {
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
@@ -16,19 +16,19 @@ void JointEstimator::set_joint_states(sensor_msgs::msg::JointState new_joint_sta
     for (auto i : m_joints) {
         switch (i.hinge_axis) {
             case X:
-                quaternion_math.setRPY(new_joint_states.position[counter], 0, 0);
+                quaternion_math.setRPY(new_joint_states->position[counter], 0, 0);
                 break;
             case Y:
-                quaternion_math.setRPY(0, new_joint_states.position[counter], 0);
+                quaternion_math.setRPY(0, new_joint_states->position[counter], 0);
                 break;
             case Z:
-                quaternion_math.setRPY(0, 0, new_joint_states.position[counter]);
+                quaternion_math.setRPY(0, 0, new_joint_states->position[counter]);
                 break;
         }
         quaternion_math.normalize();
         tf2::convert(quaternion_math, quaternion_joint);
         i.frame.transform.rotation = quaternion_joint;
-    };
+    }
 }
 
 void JointEstimator::set_individual_joint_state(std::string joint_name, double new_position)
