@@ -13,6 +13,9 @@
 #include <string>
 #include <vector>
 
+#include "state_machine/state_machine.hpp"
+
+#include "march_shared_msgs/msg/gait_type.hpp"
 #include <march_shared_msgs/msg/error.hpp>
 #include <march_shared_msgs/msg/gait_instruction.hpp>
 
@@ -37,6 +40,7 @@ public:
     std::vector<std::unique_ptr<SafetyType>> safety_list;
 
     ErrorPublisher error_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::GaitType>::SharedPtr state_publisher;
     GaitInstructionPublisher gait_instruction_publisher;
 
 private:

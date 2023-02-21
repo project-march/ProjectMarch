@@ -17,30 +17,81 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_gmock REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
+find_package(mujoco_interfaces REQUIRED)
 # find_package(<dependency> REQUIRED)
+include_directories(include)
 
-add_executable(state_machine_node src/state_machine_node.cpp)
-ament_target_dependencies(state_machine_node rclcpp march_shared_msgs)
+add_library(${PROJECT_NAME}
+  STATIC
+  include/${PROJECT_NAME}/state_machine.hpp
+  include/${PROJECT_NAME}/state_machine_node.hpp
+  src/state_machine_node.cpp
+  src/state_machine.cpp
+)
+
+ament_target_dependencies(
+  ${PROJECT_NAME}
+  "rclcpp"
+  "march_shared_msgs"
+  "mujoco_interfaces"
+)
+
+add_executable(state_machine_node src/state_machine_node.cpp src/state_machine.cpp include/${PROJECT_NAME}/state_machine.hpp
+        include/${PROJECT_NAME}/state_machine_node.hpp)
 target_include_directories(state_machine_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+ament_target_dependencies(
+        state_machine_node
+        "rclcpp"
+        "march_shared_msgs"
+        "mujoco_interfaces"
+)
+
 install(TARGETS state_machine_node
+  EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
-#  find_package(ament_lint_auto REQUIRED)
-#  # the following line skips the linter which checks for copyrights
-#  # uncomment the line when a copyright and license is not present in all source files
-#  #set(ament_cmake_copyright_FOUND TRUE)
-#  # the following line skips cpplint (only works in a git repo)
-#  # uncomment the line when this package is not in a git repo
-#  #set(ament_cmake_cpplint_FOUND TRUE)
-#  ament_lint_auto_find_test_dependencies()
+  ament_add_gmock(${PROJECT_NAME}_test
+    test/state_machine_test.cpp
+    test/test_runner.cpp
+    # include
+    )
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+    $<INSTALL_INTERFACE:include>)
+  ament_target_dependencies(
+    ${PROJECT_NAME}_test
+    "rclcpp"
+    "march_shared_msgs"
+    "mujoco_interfaces")
 endif()
+
+# EXPORT
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+
+ament_export_dependencies(
+        "rclcpp"
+        "march_shared_msgs"
+        "mujoco_interfaces"
+)
+install(
+        DIRECTORY include/
+        DESTINATION include
+)
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
 
 ament_package()
