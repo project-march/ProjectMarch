@@ -83,8 +83,8 @@ const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_join
 std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_links()
 {
     // We must declare these specific parameters here because they're called before the constructor
-    m_owner->declare_parameter("joint_estimator.links", std::vector<std::string>(5, "default"));
-    m_owner->declare_parameter("joint_estimator.base_links", std::vector<std::string>(5, "default"));
+    m_owner->declare_parameter("joint_estimator.links", std::vector<std::string>(11, "default"));
+    m_owner->declare_parameter("joint_estimator.base_links", std::vector<std::string>(11, "default"));
     auto link_list = m_owner->get_parameter("joint_estimator.links").as_string_array();
     auto child_link_list = m_owner->get_parameter("joint_estimator.base_links").as_string_array();
 

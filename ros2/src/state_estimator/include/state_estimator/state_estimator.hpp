@@ -2,6 +2,7 @@
 #include "cop_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "joint_estimator.hpp"
+#include "imu_estimator.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -38,6 +39,10 @@ private:
 
     void publish_robot_frames();
 
+    void initialize_imus();
+
+    void update_foot_frames();
+
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr m_state_publisher;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_sensor_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
@@ -48,6 +53,7 @@ private:
     JointEstimator m_joint_estimator;
     ComEstimator m_com_estimator;
     CopEstimator m_cop_estimator;
+    ImuEstimator m_imu_estimator;
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_joint_listener;

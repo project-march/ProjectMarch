@@ -8,11 +8,12 @@ StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this)
     , m_com_estimator()
+    , m_imu_estimator()
     , m_cop_estimator(CopEstimator(get_pressure_sensors()))
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
     m_sensor_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        "/lower_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
     m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_state", 10, std::bind(&StateEstimator::state_callback, this, _1));
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -25,7 +26,10 @@ StateEstimator::StateEstimator()
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
     // Declare parameters
-
+    //IMU parameters
+    declare_parameter("imu_estimator.IMU_exo_base_link", std::string("default"));
+    declare_parameter("imu_estimator.IMU_exo_position", std::vector<double>(3, 0.0));
+    declare_parameter("imu_estimator.IMU_exo_rotation", std::vector<double>(3, 0.0));
     // declare_parameter("joint_estimator.link_hinge_axis", std::vector<int64_t>(6, 1));
     // declare_parameter("joint_estimator.link_length_x", std::vector<float>(5, 0.0));
     // declare_parameter("joint_estimator.link_length_y", std::vector<double>(6, 0.0));
@@ -34,6 +38,8 @@ StateEstimator::StateEstimator()
     // declare_parameter("joint_estimator.link_com_x", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_com_y", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_com_z", std::vector<double>(6, 0.0));
+
+    initialize_imus();
 }
 
 // sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()
@@ -48,10 +54,58 @@ StateEstimator::StateEstimator()
 
 void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
+    m_imu_estimator.update_imu(*msg);
 }
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+}
+
+void StateEstimator::initialize_imus()
+{
+    IMU imu_to_set;
+    auto imu_base_link = get_parameter("imu_estimator.IMU_exo_base_link").as_string();
+    auto imu_position = get_parameter("imu_estimator.IMU_exo_position").as_double_array();
+    auto imu_rotation = get_parameter("imu_estimator.IMU_exo_rotation").as_double_array();
+    imu_to_set.data.header.frame_id = "lowerIMU";
+    imu_to_set.base_frame = imu_base_link;
+    imu_to_set.imu_location.translation.x = imu_position[0];
+    imu_to_set.imu_location.translation.x = imu_position[1];
+    imu_to_set.imu_location.translation.x = imu_position[2];
+    tf2::Quaternion tf2_imu_rotation;
+    tf2_imu_rotation.setRPY(imu_rotation[0],imu_rotation[1],imu_rotation[2]);
+    tf2_imu_rotation.normalize();
+    tf2::convert(tf2_imu_rotation, imu_to_set.imu_location.rotation);
+    m_imu_estimator.set_imu(imu_to_set);
+}
+
+void StateEstimator::update_foot_frames()
+{
+    //This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
+    //obtain the origin joint
+    IMU& imu =m_imu_estimator.get_imu(); 
+    try {
+    geometry_msgs::msg::TransformStamped measured_hip_base_angle = m_tf_buffer->lookupTransform(imu.get_imu_rotation().header.frame_id, "map", tf2::TimePointZero);
+    geometry_msgs::msg::TransformStamped expected_hip_base_angle = m_tf_buffer->lookupTransform("hip_base", "map",tf2::TimePointZero);
+    //
+    tf2::Quaternion tf2_measured_hip_base_angle(measured_hip_base_angle.transform.rotation.x, measured_hip_base_angle.transform.rotation.z, measured_hip_base_angle.transform.rotation.y, measured_hip_base_angle.transform.rotation.w);
+    tf2::Quaternion tf2_expected_hip_base_angle(expected_hip_base_angle.transform.rotation.x, expected_hip_base_angle.transform.rotation.y, expected_hip_base_angle.transform.rotation.z, measured_hip_base_angle.transform.rotation.w);
+    tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
+    tf2_angle_difference.normalize();
+    geometry_msgs::msg::Quaternion angle_difference;
+    // tf2::convert(tf2_angle_difference, angle_difference);
+    //testing
+    tf2::Matrix3x3 m(tf2_angle_difference);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+
+    RCLCPP_INFO(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
+
+    
+    }
+    catch(const tf2::TransformException& ex){
+        RCLCPP_WARN(this->get_logger(),"error in update_foot_frames: %s", ex.what());
+    }
 }
 
 void StateEstimator::publish_robot_state()
@@ -69,10 +123,15 @@ void StateEstimator::publish_robot_state()
 
 void StateEstimator::publish_robot_frames()
 {
-    RCLCPP_DEBUG(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
+    //publish IMU frames
+    IMU& imu =m_imu_estimator.get_imu(); 
+    m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
+    update_foot_frames();
+    //publish joint frames
+    RCLCPP_INFO(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
     for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);
-        RCLCPP_DEBUG(this->get_logger(),
+        RCLCPP_INFO(this->get_logger(),
             ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
     std::vector<CenterOfMass> test = m_joint_estimator.get_joint_com_positions("right_knee");
