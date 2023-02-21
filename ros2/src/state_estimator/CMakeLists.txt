@@ -64,6 +64,10 @@ add_executable(state_estimator_node
   include/${PROJECT_NAME}/joint_estimator.hpp
   include/${PROJECT_NAME}/com_estimator.hpp
   include/${PROJECT_NAME}/cop_estimator.hpp
+  include/${PROJECT_NAME}/zmp_estimator.hpp
+  src/zmp_estimator.cpp
+  include/${PROJECT_NAME}/imu_estimator.hpp
+  src/imu_estimator.cpp
   )
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
