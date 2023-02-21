@@ -26,7 +26,7 @@ StateEstimator::StateEstimator()
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
     // Declare parameters
-    //IMU parameters
+    // IMU parameters
     declare_parameter("imu_estimator.IMU_exo_base_link", std::string("default"));
     declare_parameter("imu_estimator.IMU_exo_position", std::vector<double>(3, 0.0));
     declare_parameter("imu_estimator.IMU_exo_rotation", std::vector<double>(3, 0.0));
@@ -46,7 +46,8 @@ StateEstimator::StateEstimator()
 // {
 //     sensor_msgs::msg::JointState initial_joint_state;
 //     // change it so the names are obtained from the parameter
-//     initial_joint_state.name = { "right_ankle", "right_knee", "right_hip_fe", "right_hip_aa", "left_ankle", "left_knee",
+//     initial_joint_state.name = { "right_ankle", "right_knee", "right_hip_fe", "right_hip_aa", "left_ankle",
+//     "left_knee",
 //         "left_hip_fe", "left_hip_aa", "right_origin", "left_origin" };
 //     initial_joint_state.position = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 //     return initial_joint_state;
@@ -73,7 +74,7 @@ void StateEstimator::initialize_imus()
     imu_to_set.imu_location.translation.x = imu_position[1];
     imu_to_set.imu_location.translation.x = imu_position[2];
     tf2::Quaternion tf2_imu_rotation;
-    tf2_imu_rotation.setRPY(imu_rotation[0],imu_rotation[1],imu_rotation[2]);
+    tf2_imu_rotation.setRPY(imu_rotation[0], imu_rotation[1], imu_rotation[2]);
     tf2_imu_rotation.normalize();
     tf2::convert(tf2_imu_rotation, imu_to_set.imu_location.rotation);
     m_imu_estimator.set_imu(imu_to_set);
@@ -81,30 +82,34 @@ void StateEstimator::initialize_imus()
 
 void StateEstimator::update_foot_frames()
 {
-    //This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
-    //obtain the origin joint
-    IMU& imu =m_imu_estimator.get_imu(); 
+    // This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
+    // obtain the origin joint
+    IMU& imu = m_imu_estimator.get_imu();
     try {
-    geometry_msgs::msg::TransformStamped measured_hip_base_angle = m_tf_buffer->lookupTransform(imu.get_imu_rotation().header.frame_id, "map", tf2::TimePointZero);
-    geometry_msgs::msg::TransformStamped expected_hip_base_angle = m_tf_buffer->lookupTransform("hip_base", "map",tf2::TimePointZero);
-    //
-    tf2::Quaternion tf2_measured_hip_base_angle(measured_hip_base_angle.transform.rotation.x, measured_hip_base_angle.transform.rotation.z, measured_hip_base_angle.transform.rotation.y, measured_hip_base_angle.transform.rotation.w);
-    tf2::Quaternion tf2_expected_hip_base_angle(expected_hip_base_angle.transform.rotation.x, expected_hip_base_angle.transform.rotation.y, expected_hip_base_angle.transform.rotation.z, measured_hip_base_angle.transform.rotation.w);
-    tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
-    tf2_angle_difference.normalize();
-    geometry_msgs::msg::Quaternion angle_difference;
-    // tf2::convert(tf2_angle_difference, angle_difference);
-    //testing
-    tf2::Matrix3x3 m(tf2_angle_difference);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
+        geometry_msgs::msg::TransformStamped measured_hip_base_angle
+            = m_tf_buffer->lookupTransform(imu.get_imu_rotation().header.frame_id, "map", tf2::TimePointZero);
+        geometry_msgs::msg::TransformStamped expected_hip_base_angle
+            = m_tf_buffer->lookupTransform("hip_base", "map", tf2::TimePointZero);
+        //
+        tf2::Quaternion tf2_measured_hip_base_angle(measured_hip_base_angle.transform.rotation.x,
+            measured_hip_base_angle.transform.rotation.z, measured_hip_base_angle.transform.rotation.y,
+            measured_hip_base_angle.transform.rotation.w);
+        tf2::Quaternion tf2_expected_hip_base_angle(expected_hip_base_angle.transform.rotation.x,
+            expected_hip_base_angle.transform.rotation.y, expected_hip_base_angle.transform.rotation.z,
+            measured_hip_base_angle.transform.rotation.w);
+        tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
+        tf2_angle_difference.normalize();
+        geometry_msgs::msg::Quaternion angle_difference;
+        // tf2::convert(tf2_angle_difference, angle_difference);
+        // testing
+        tf2::Matrix3x3 m(tf2_angle_difference);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
 
-    RCLCPP_INFO(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
+        RCLCPP_INFO(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
 
-    
-    }
-    catch(const tf2::TransformException& ex){
-        RCLCPP_WARN(this->get_logger(),"error in update_foot_frames: %s", ex.what());
+    } catch (const tf2::TransformException& ex) {
+        RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
 }
 
@@ -123,11 +128,11 @@ void StateEstimator::publish_robot_state()
 
 void StateEstimator::publish_robot_frames()
 {
-    //publish IMU frames
-    IMU& imu =m_imu_estimator.get_imu(); 
+    // publish IMU frames
+    IMU& imu = m_imu_estimator.get_imu();
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
     update_foot_frames();
-    //publish joint frames
+    // publish joint frames
     RCLCPP_INFO(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
     for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);

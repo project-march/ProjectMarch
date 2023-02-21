@@ -1,3 +1,4 @@
+#include "cop_estimator.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
@@ -14,17 +15,18 @@
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <unordered_map>
-#include "cop_estimator.hpp"
 #ifndef ZMP_ESTIMATOR
 #define ZMP_ESTIMATOR
 
-struct IMU{
+struct IMU {
     std::string name;
     std::string base_frame;
     sensor_msgs::msg::Imu data;
     geometry_msgs::msg::Transform imu_location;
-    public:
-    geometry_msgs::msg::TransformStamped to_transform(){
+
+public:
+    geometry_msgs::msg::TransformStamped to_transform()
+    {
         geometry_msgs::msg::TransformStamped transform_tosend;
         transform_tosend.header.frame_id = name;
         transform_tosend.child_frame_id = base_frame;
@@ -32,7 +34,8 @@ struct IMU{
         return geometry_msgs::msg::TransformStamped();
     };
 
-    geometry_msgs::msg::TransformStamped get_imu_rotation(){
+    geometry_msgs::msg::TransformStamped get_imu_rotation()
+    {
         geometry_msgs::msg::TransformStamped transform_tosend;
         transform_tosend.header = data.header;
         transform_tosend.header.frame_id = "map";
@@ -43,8 +46,6 @@ struct IMU{
         transform_tosend.transform.translation.z = 1.0;
         return transform_tosend;
     };
-
-
 };
 
 class ImuEstimator {
@@ -53,7 +54,6 @@ public:
     void set_imu(IMU&);
     void update_imu(sensor_msgs::msg::Imu);
     IMU& get_imu();
-    
 
 private:
     IMU m_imu;

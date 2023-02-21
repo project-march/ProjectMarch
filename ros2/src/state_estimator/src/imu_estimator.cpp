@@ -6,7 +6,7 @@ ImuEstimator::ImuEstimator()
 
 void ImuEstimator::set_imu(IMU& imu_to_set)
 {
-m_imu = imu_to_set;
+    m_imu = imu_to_set;
 }
 
 void ImuEstimator::update_imu(sensor_msgs::msg::Imu new_data)

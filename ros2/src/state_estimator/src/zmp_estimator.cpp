@@ -6,7 +6,6 @@ ZmpEstimator::ZmpEstimator()
 
 void ZmpEstimator::set_zmp(CenterOfMass com, CenterOfPressure cop)
 {
-
 }
 
 geometry_msgs::msg::PointStamped ZmpEstimator::get_zmp()

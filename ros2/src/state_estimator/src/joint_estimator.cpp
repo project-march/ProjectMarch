@@ -99,11 +99,11 @@ std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_lin
 
 void JointEstimator::initialize_joints()
 {
-    
+
     // We must declare these specific parameters here because they're called before the constructor
     // It's sadly a long list but it only happens once at initialization so it doesn't need a separate function
     // It just looks very ugly but it's necessary because it's ROS2 :(
-        
+
     m_owner->declare_parameter("joint_estimator.link_hinge_axis", std::vector<int64_t>(6, 0));
     m_owner->declare_parameter("joint_estimator.link_length_x", std::vector<double>(5, 0.0));
     m_owner->declare_parameter("joint_estimator.link_length_y", std::vector<double>(6, 0.0));

@@ -31,7 +31,7 @@ protected:
 TEST_F(StateEstimatorTest, SetterTest)
 {
     MockStateEstimator* mock_state_estimator;
-    // JointEstimator test_joint_estimator = JointEstimator(mock_state_estimator);    
+    // JointEstimator test_joint_estimator = JointEstimator(mock_state_estimator);
     // JointContainer test_joint;
     // tf2::Quaternion q;
     // geometry_msgs::msg::Quaternion q_joint;

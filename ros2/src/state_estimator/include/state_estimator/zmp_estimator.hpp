@@ -1,3 +1,4 @@
+#include "cop_estimator.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
@@ -14,17 +15,14 @@
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <unordered_map>
-#include "cop_estimator.hpp"
 #ifndef ZMP_ESTIMATOR
 #define ZMP_ESTIMATOR
-
 
 class ZmpEstimator {
 public:
     ZmpEstimator();
     void set_zmp(CenterOfMass, CenterOfPressure);
     geometry_msgs::msg::PointStamped get_zmp();
-    
 
 private:
     geometry_msgs::msg::PointStamped m_position;
