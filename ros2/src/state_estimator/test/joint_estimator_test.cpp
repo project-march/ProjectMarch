@@ -5,7 +5,7 @@
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "mocks/mock_state_estimator.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "state_estimator.hpp"
+#include "state_estimator/state_estimator.hpp"
 #include <cmath>
 #include <cstdio>
 #include <memory>
