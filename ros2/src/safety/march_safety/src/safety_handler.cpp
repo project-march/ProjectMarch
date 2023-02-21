@@ -3,6 +3,7 @@
 
 #include "march_safety/safety_handler.hpp"
 #include "march_safety/safety_node.hpp"
+#include "march_shared_msgs/msg/gait_type.hpp"
 #include <march_shared_msgs/msg/error.hpp>
 #include <march_shared_msgs/msg/gait_instruction.hpp>
 
@@ -27,6 +28,9 @@ void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error
     error_msg.error_message = message;
     error_msg.type = error_type;
     node_->error_publisher->publish(error_msg);
+    GaitMsg gait_msg;
+    gait_msg.gait_type = int(exoState::Error);
+    node_->state_publisher->publish(gait_msg);
 }
 
 /**
