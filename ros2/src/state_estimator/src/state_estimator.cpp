@@ -58,6 +58,7 @@ void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+    this->m_joint_estimator.set_joint_states(msg);
 }
 
 void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg)
