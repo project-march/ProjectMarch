@@ -13,7 +13,7 @@ StateEstimator::StateEstimator()
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
     m_sensor_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/lower_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        "/lower_xsens_mti_node", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
     m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_state", 10, std::bind(&StateEstimator::state_callback, this, _1));
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -87,7 +87,7 @@ void StateEstimator::update_foot_frames()
     IMU& imu = m_imu_estimator.get_imu();
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
-            = m_tf_buffer->lookupTransform(imu.get_imu_rotation().header.frame_id, "map", tf2::TimePointZero);
+            = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped expected_hip_base_angle
             = m_tf_buffer->lookupTransform("hip_base", "map", tf2::TimePointZero);
         //
@@ -106,7 +106,7 @@ void StateEstimator::update_foot_frames()
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-        RCLCPP_INFO(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
+        RCLCPP_DEBUG(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
