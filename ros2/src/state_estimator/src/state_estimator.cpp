@@ -7,7 +7,7 @@ using std::placeholders::_2;
 StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this, get_initial_joint_states())
-    , m_com_estimator(this)
+    , m_com_estimator()
     , m_cop_estimator(CopEstimator(create_pressure_sensors()))
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);

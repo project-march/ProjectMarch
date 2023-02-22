@@ -22,7 +22,7 @@ class StateEstimator;
 
 class ComEstimator {
 public:
-    ComEstimator(StateEstimator* owner);
+    ComEstimator();
     void set_com_state(std::vector<CenterOfMass>);
     CenterOfMass get_com_state();
 
