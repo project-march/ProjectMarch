@@ -123,7 +123,7 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
     auto y_positions = this->get_parameter("cop_estimator.y_positions").as_double_array();
     auto z_positions = this->get_parameter("cop_estimator.z_positions").as_double_array();
     std::vector<PressureSensor> sensors;
-    for (size_t i = 0; i <= names.size(); i++) {
+    for (size_t i = 0; i < names.size(); i++) {
         PressureSensor sensor;
         sensor.name = names.at(i);
         CenterOfPressure cop;
