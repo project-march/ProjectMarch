@@ -6,8 +6,8 @@
 // Copyright 2022 Project March.
 
 #include "com_estimator.hpp"
-#include "state_estimator.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "state_estimator.hpp"
 #include <memory>
 
 #include <gmock/gmock.h>
