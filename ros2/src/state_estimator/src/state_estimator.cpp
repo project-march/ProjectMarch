@@ -91,10 +91,10 @@ void StateEstimator::update_foot_frames()
         geometry_msgs::msg::TransformStamped expected_hip_base_angle
             = m_tf_buffer->lookupTransform("hip_base", "map", tf2::TimePointZero);
         //
-        tf2::Quaternion tf2_measured_hip_base_angle; 
+        tf2::Quaternion tf2_measured_hip_base_angle;
         tf2::Quaternion tf2_expected_hip_base_angle;
-        tf2::fromMsg(measured_hip_base_angle.transform.rotation,tf2_measured_hip_base_angle);
-        tf2::fromMsg(expected_hip_base_angle.transform.rotation,tf2_expected_hip_base_angle);
+        tf2::fromMsg(measured_hip_base_angle.transform.rotation, tf2_measured_hip_base_angle);
+        tf2::fromMsg(expected_hip_base_angle.transform.rotation, tf2_expected_hip_base_angle);
         tf2_measured_hip_base_angle.normalize();
         tf2_expected_hip_base_angle.normalize();
         tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
@@ -107,7 +107,7 @@ void StateEstimator::update_foot_frames()
         m.getRPY(roll, pitch, yaw);
 
         RCLCPP_INFO(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-        m_joint_estimator.set_individual_joint_state("right_origin", roll);
+        m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
@@ -128,8 +128,6 @@ void StateEstimator::publish_robot_state()
 
 void StateEstimator::publish_robot_frames()
 {
-    //debug function
-    m_joint_estimator.set_individual_joint_state("right_knee", 3.14);
     // publish IMU frames
     IMU& imu = m_imu_estimator.get_imu();
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());

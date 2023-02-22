@@ -149,16 +149,18 @@ void JointEstimator::initialize_joints()
             joint_frame.transform.translation.y = joint_to_add.length_y;
             joint_frame.transform.translation.z = joint_to_add.length_z;
             // Add rotations here
+            double nan_guard = 1e-8; // We add this value to every initial joint to avoid complete zeroes, which
+                                     // sometimes cause NaN errors
             joint_to_add.hinge_axis = static_cast<Rotation>(link_hinges[i]);
             switch (joint_to_add.hinge_axis) {
                 case X:
-                    quaternion_math.setRPY(link_position[i], 0, 0);
+                    quaternion_math.setRPY(link_position[i] + nan_guard, 0, 0);
                     break;
                 case Y:
-                    quaternion_math.setRPY(0, link_position[i], 0);
+                    quaternion_math.setRPY(0, link_position[i] + nan_guard, 0);
                     break;
                 case Z:
-                    quaternion_math.setRPY(0, 0, link_position[i]);
+                    quaternion_math.setRPY(0, 0, link_position[i] + nan_guard);
                     break;
             }
             quaternion_math.normalize();
