@@ -104,23 +104,23 @@ void StateEstimator::update_foot_frames()
         geometry_msgs::msg::TransformStamped expected_hip_base_angle
             = m_tf_buffer->lookupTransform("hip_base", "map", tf2::TimePointZero);
         //
-        tf2::Quaternion tf2_measured_hip_base_angle(measured_hip_base_angle.transform.rotation.x,
-            measured_hip_base_angle.transform.rotation.z, measured_hip_base_angle.transform.rotation.y,
-            measured_hip_base_angle.transform.rotation.w);
-        tf2::Quaternion tf2_expected_hip_base_angle(expected_hip_base_angle.transform.rotation.x,
-            expected_hip_base_angle.transform.rotation.y, expected_hip_base_angle.transform.rotation.z,
-            measured_hip_base_angle.transform.rotation.w);
+        tf2::Quaternion tf2_measured_hip_base_angle; 
+        tf2::Quaternion tf2_expected_hip_base_angle;
+        tf2::fromMsg(measured_hip_base_angle.transform.rotation,tf2_measured_hip_base_angle);
+        tf2::fromMsg(expected_hip_base_angle.transform.rotation,tf2_expected_hip_base_angle);
+        tf2_measured_hip_base_angle.normalize();
+        tf2_expected_hip_base_angle.normalize();
         tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
         tf2_angle_difference.normalize();
         geometry_msgs::msg::Quaternion angle_difference;
-        // tf2::convert(tf2_angle_difference, angle_difference);
+        tf2::convert(tf2_angle_difference, angle_difference);
         // testing
         tf2::Matrix3x3 m(tf2_angle_difference);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
         RCLCPP_INFO(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-
+        m_joint_estimator.set_individual_joint_state("right_origin", roll);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
@@ -141,19 +141,21 @@ void StateEstimator::publish_robot_state()
 
 void StateEstimator::publish_robot_frames()
 {
+    //debug function
+    m_joint_estimator.set_individual_joint_state("right_knee", 3.14);
     // publish IMU frames
     IMU& imu = m_imu_estimator.get_imu();
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
     update_foot_frames();
     // publish joint frames
-    RCLCPP_INFO(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
+    RCLCPP_DEBUG(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
     for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);
         RCLCPP_DEBUG(this->get_logger(),
             ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
     std::vector<CenterOfMass> test = m_joint_estimator.get_joint_com_positions("right_knee");
-    RCLCPP_INFO(this->get_logger(), "Array size is %i", test.size());
+    RCLCPP_DEBUG(this->get_logger(), "Array size is %i", test.size());
     for (auto com : test) {
         RCLCPP_DEBUG(this->get_logger(), ("\n Publishing COM"));
         RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
