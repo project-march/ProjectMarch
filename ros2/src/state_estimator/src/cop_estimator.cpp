@@ -59,3 +59,8 @@ CenterOfPressure CopEstimator::get_cop_state()
 {
     return m_center_of_pressure;
 }
+
+std::vector<PressureSensor> CopEstimator::get_sensors()
+{
+    return m_sensors;
+}
