@@ -76,5 +76,16 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
     ASSERT_THROW(cop_estimator->set_cop_state(sensors), std::runtime_error);
 }
 
+TEST_F(CopEstimatorTest, testUpdateSensorPressure)
+{
+    double pressure = 2;
+    std::map<std::string, double> update_map = { { "mock_sensor", pressure } };
+    cop_estimator->update_sensor_pressures(update_map);
+    auto updated_sensors = cop_estimator->get_sensors();
+    for (auto sensor : updated_sensors) {
+        ASSERT_EQ(sensor.centre_of_pressure.pressure, pressure);
+    }
+}
+
 // NOLINTEND
 #endif

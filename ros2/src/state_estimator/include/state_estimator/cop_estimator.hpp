@@ -53,6 +53,7 @@ class CopEstimator {
 public:
     CopEstimator(std::vector<PressureSensor> sensors);
     void set_cop_state(std::vector<PressureSensor> sensors);
+    std::vector<PressureSensor> get_sensors();
     void update_sensor_pressures(std::map<std::string, double> pressure_values_map);
     CenterOfPressure get_cop_state();
 
