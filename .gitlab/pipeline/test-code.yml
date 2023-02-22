@@ -97,3 +97,36 @@ coverage:
   variables:
     COVERAGE_FLAGS: "-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1"
   coverage: /\s*lines.*:\s(\d+\.\d+\%\s\(\d+\sof\s\d+.*\))/
+  rules:
+    # These rules are checking if certain values have the correct values.
+    # These variables are predefined by GitLab and their definitions
+    # can be found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+      variables:
+        TAG: $CI_COMMIT_REF_NAME
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "$DOCKER_FILE"
+        - "$ROS_VERSION/**/package.xml"
+        - "requirements.txt"
+      variables:
+        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - $DOCKER_FILE
+      variables:
+        TAG: $CI_COMMIT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "$ROS_VERSION/**/*"
+      variables:
+        TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "$ROS_VERSION/**/*"
+      variables:
+        TAG: $CI_COMMIT_BRANCH
