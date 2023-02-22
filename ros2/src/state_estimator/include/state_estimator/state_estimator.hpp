@@ -26,9 +26,8 @@ public:
 
     sensor_msgs::msg::JointState get_initial_joint_states();
 
-    std::vector<PressureSensor> create_pressure_sensors();
-
-    void update_pressure_sensors_data(std::vector<std::string> names, std::vector<double> pressure_values);
+    std::map<std::string, double> update_pressure_sensors_data(
+        std::vector<std::string> names, std::vector<double> pressure_values);
 
     geometry_msgs::msg::TransformStamped get_frame_transform(std::string&, std::string&);
 
@@ -40,6 +39,8 @@ private:
     void state_callback(sensor_msgs::msg::JointState::SharedPtr msg);
 
     void pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg);
+
+    std::vector<PressureSensor> create_pressure_sensors();
 
     void publish_robot_state();
 

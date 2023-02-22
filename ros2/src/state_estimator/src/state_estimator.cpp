@@ -63,7 +63,8 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 
 void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg)
 {
-    update_pressure_sensors_data(msg->names, msg->pressure_values);
+
+    this->m_cop_estimator.update_sensor_pressures(update_pressure_sensors_data(msg->names, msg->pressure_values));
 }
 
 void StateEstimator::publish_robot_state()
@@ -135,13 +136,14 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
     return sensors;
 }
 
-void StateEstimator::update_pressure_sensors_data(std::vector<std::string> names, std::vector<double> pressure_values)
+std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
+    std::vector<std::string> names, std::vector<double> pressure_values)
 {
     std::map<std::string, double> pressure_values_map;
     for (size_t i = 0; i < names.size(); i++) {
         pressure_values_map.emplace(names.at(i), pressure_values.at(i));
     }
-    this->m_cop_estimator.update_sensor_pressures(pressure_values_map);
+    return pressure_values_map;
 }
 
 geometry_msgs::msg::Point transform_point(
