@@ -1,33 +1,29 @@
 # The software department will always be marked as a CODEOWNER.
 [Software department]
-* @sahand_w @MarcoBak
+* @sahand_w @MarcoBak @RixtHellinga
 
 [Software license]
 LICENSE @ThijsRay @wnederpel
 LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel
 
 [CI/CD and Pipeline]
-.catkin_lint @ThijsRay @George_Vegelien
-.clang-format @ThijsRay @George_Vegelien
-.clang-format-ignore @ThijsRay @George_Vegelien
-.clang-tidy @ThijsRay @George_Vegelien
-.gitlab-ci.yml @ThijsRay @George_Vegelien
-Dockerfile @ThijsRay @George_Vegelien
-/.scripts/ @ThijsRay @George_Vegelien
-.flake8 @ThijsRay @George_Vegelien
+.catkin_lint @MarcoBak @George_Vegelien
+.clang-format @MarcoBak @George_Vegelien
+.clang-format-ignore @MarcoBak @George_Vegelien
+.clang-tidy @MarcoBak @George_Vegelien
+.gitlab-ci.yml @MarcoBak @George_Vegelien
+Dockerfile @MarcoBak @George_Vegelien
+/.scripts/ @MarcoBak @George_Vegelien
+.flake8 @MarcoBak @George_Vegelien
 
 ^[C/C++]
-*.cpp @ThijsRay @George_Vegelien
-*.hpp @ThijsRay @George_Vegelien
-*.c @ThijsRay @George_Vegelien
-*.h @ThijsRay @George_Vegelien
+*.cpp @sahand_w @MarcoBak @RixtHellinga
+*.hpp @sahand_w @MarcoBak @RixtHellinga
+*.c @sahand_w @MarcoBak @RixtHellinga
+*.h @sahand_w @MarcoBak @RixtHellinga
 
 [Movement]
-/ros1/src/gaits/march_gait_files @floorheijs @wnederpel
 /ros2/src/gaits/march_gait_files @floorheijs @wnederpel
-
-[Balance]
-/ros1/src/balance/ @kschmahl @wnederpel @ttveen
 
 [Control]
 /ros2/src/control/ @George_Vegelien
@@ -51,3 +47,22 @@ Dockerfile @ThijsRay @George_Vegelien
 /ros2/src/gaits/march_goniometric_ik_solver @jsdewolde
 /ros2/src/gaits/march_gait_preprocessor @martenhaitjema
 /ros2/src/gaits/march_gait_selection/march_gait_selection/dynamic_interpolation @martenhaitjema
+
+[Mujoco Simulation]
+/ros2/src/mujoco_simulation/src/mujoco_interfaces @sahand_w @MarcoBak
+/ros2/src/mujoco_simulation/src/mujoco_reader @sahand_w @MarcoBak
+/ros2/src/mujoco_simulation/src/mujoco_sim @sahand_w @MarcoBak
+/ros2/src/mujoco_simulation/src/mujoco_writer @sahand_w @MarcoBak
+
+[Hardware]
+/ros2/src/hardware/broadcasters @MarcoBak @George_Vegelien
+/ros2/src/hardware/interface @MarcoBak @George_Vegelien
+
+[State estimator]
+/ros2/src/state_estimator @sahand_w @MarcoBak
+
+[footstep_generator]
+/ros2/src/footstep_generator @sahand_w
+
+[State Machine]
+/ros2/src/state_machine @MarcoBak
