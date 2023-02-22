@@ -12,6 +12,7 @@ void ImuEstimator::set_imu(IMU& imu_to_set)
 void ImuEstimator::update_imu(sensor_msgs::msg::Imu new_data)
 {
     m_imu.data = new_data;
+    m_imu.data.header.frame_id = "map";
 }
 
 IMU& ImuEstimator::get_imu()
