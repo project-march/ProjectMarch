@@ -46,7 +46,8 @@ controller_interface::return_type PressureSoleBroadcaster::update()
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PressureSoleBroadcaster::on_configure(
     const rclcpp_lifecycle::State& previous_state)
 {
-    RCLCPP_DEBUG((*logger_), "March Pressure sole broadcaster configuring. Previous state = %s", previous_state.label().c_str());
+    RCLCPP_DEBUG(
+        (*logger_), "March Pressure sole broadcaster configuring. Previous state = %s", previous_state.label().c_str());
     pressure_sole_component = std::make_unique<PressureSoleSemanticComponent>();
     try {
         // register pressure sole data publisher
@@ -82,4 +83,5 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pressu
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(march_pressure_sole_broadcaster::PressureSoleBroadcaster, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(
+    march_pressure_sole_broadcaster::PressureSoleBroadcaster, controller_interface::ControllerInterface)
