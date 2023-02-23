@@ -51,15 +51,15 @@ public:
     void update()
     {
         int index = 0;
-        l_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_met3_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_toes_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_met5_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_arch_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        r_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         r_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         r_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         r_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
