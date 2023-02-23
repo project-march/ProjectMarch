@@ -15,6 +15,7 @@
 	<exec_depend>rosidl_default_runtime</exec_depend>
   <depend>mujoco_interfaces</depend>
   <depend>geometry_msgs</depend>
+  <depend>march_shared_msgs</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
