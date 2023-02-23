@@ -118,7 +118,7 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        # condition=UnlessCondition(simulation),
+        condition=UnlessCondition(simulation),
     )
     # endregion
 
