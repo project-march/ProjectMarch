@@ -42,7 +42,7 @@ TEST_F(CopEstimatorTest, setCopTest)
     expected_cop.position.point.x = 0;
     expected_cop.position.point.y = 0;
     expected_cop.position.point.z = 0;
-    expected_cop.pressure = 1;
+    expected_cop.pressure = 0;
     CenterOfPressure actual_cop = this->cop_estimator->get_cop_state();
     ASSERT_EQ(actual_cop.pressure, expected_cop.pressure);
     std::vector<PressureSensor> sensors;
@@ -74,6 +74,17 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
     mock_sensor.centre_of_pressure = cop;
     sensors.push_back(mock_sensor);
     ASSERT_THROW(cop_estimator->set_cop_state(sensors), std::runtime_error);
+}
+
+TEST_F(CopEstimatorTest, testUpdateSensorPressure)
+{
+    double pressure = 2;
+    std::map<std::string, double> update_map = { { "mock_sensor", pressure } };
+    cop_estimator->update_sensor_pressures(update_map);
+    auto updated_sensors = cop_estimator->get_sensors();
+    for (auto sensor : updated_sensors) {
+        ASSERT_EQ(sensor.centre_of_pressure.pressure, pressure);
+    }
 }
 
 // NOLINTEND

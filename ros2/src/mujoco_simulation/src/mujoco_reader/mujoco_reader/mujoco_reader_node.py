@@ -29,7 +29,6 @@ class MujocoReaderNode(Node):
         """
         super().__init__("mujoco_reader")
         self.state_publisher = self.create_publisher(JointState, "joint_states", 10)
-        self.sensor_publisher = self.create_publisher(MujocoDataSensing, "mjc_exo_sensing", 10)
         self.torso_imu_publisher = self.create_publisher(Imu, "upper_xsens_mti_node", 10)
         self.backpack_imu_publisher = self.create_publisher(Imu, "lower_xsens_mti_node", 10)
 

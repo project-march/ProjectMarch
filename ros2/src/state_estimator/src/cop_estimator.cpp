@@ -13,7 +13,6 @@
 CopEstimator::CopEstimator(std::vector<PressureSensor> sensors)
     : m_sensors(sensors)
 {
-    set_cop_state(sensors);
 }
 /**
  * This function updates the cop of the exo be recalculating the cop with new input data.
@@ -42,6 +41,16 @@ void CopEstimator::set_cop_state(std::vector<PressureSensor> sensors)
         RCLCPP_ERROR(rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure 0.");
         throw std::runtime_error("ERROR: The total measured pressure is 0.\n");
     }
+    RCLCPP_DEBUG(
+        rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure of %f", m_center_of_pressure.pressure);
+}
+
+void CopEstimator::update_sensor_pressures(std::map<std::string, double> pressure_values_map)
+{
+    for (auto& sensor : m_sensors) {
+        sensor.update_pressure(pressure_values_map.at(sensor.name));
+    }
+    set_cop_state(m_sensors);
 }
 
 /**
@@ -51,4 +60,9 @@ void CopEstimator::set_cop_state(std::vector<PressureSensor> sensors)
 CenterOfPressure CopEstimator::get_cop_state()
 {
     return m_center_of_pressure;
+}
+
+std::vector<PressureSensor> CopEstimator::get_sensors()
+{
+    return m_sensors;
 }

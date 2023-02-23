@@ -96,7 +96,9 @@ DESTINATION share/${PROJECT_NAME}/
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
   test/joint_estimator_test.cpp
+  test/com_estimator_test.cpp
   test/cop_estimator_test.cpp
+  test/state_estimator_test.cpp
   test/test_runner.cpp
   test/mocks/mock_state_estimator.hpp
   # include
