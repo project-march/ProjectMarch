@@ -19,7 +19,7 @@ StateEstimator::StateEstimator()
     m_pressure_sole_subscriber = this->create_subscription<march_shared_msgs::msg::PressureSolesData>(
         "/march/pressure_sole_data", 10, std::bind(&StateEstimator::pressure_sole_callback, this, _1));
     m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-        "/joint_state", 10, std::bind(&StateEstimator::state_callback, this, _1));
+        "/joint_states", 10, std::bind(&StateEstimator::state_callback, this, _1));
 
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
