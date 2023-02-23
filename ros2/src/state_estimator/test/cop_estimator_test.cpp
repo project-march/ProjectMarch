@@ -42,7 +42,7 @@ TEST_F(CopEstimatorTest, setCopTest)
     expected_cop.position.point.x = 0;
     expected_cop.position.point.y = 0;
     expected_cop.position.point.z = 0;
-    expected_cop.pressure = 1;
+    expected_cop.pressure = 0;
     CenterOfPressure actual_cop = this->cop_estimator->get_cop_state();
     ASSERT_EQ(actual_cop.pressure, expected_cop.pressure);
     std::vector<PressureSensor> sensors;
