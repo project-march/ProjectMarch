@@ -113,10 +113,10 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
             if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
                 state_interfaces.emplace_back(hardware_interface::StateInterface(
-                        "pressure_soles", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+                    "pressure_soles", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
             } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
                 state_interfaces.emplace_back(hardware_interface::StateInterface(
-                        "pressure_soles", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+                    "pressure_soles", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
             }
         }
     }
