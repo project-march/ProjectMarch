@@ -9,6 +9,12 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <build_depend>pluginlib</build_depend>
+  <build_depend>rcutils</build_depend>
+
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>rcutils</exec_depend>
+
   <depend>controller_interface</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>march_shared_msgs</depend>
@@ -16,6 +22,7 @@
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>controller_manager</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
