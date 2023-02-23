@@ -92,25 +92,17 @@ class SensorDataExtraction:
         Each pressure sle has 8 sensors, so the function will return 1 arrays with the 8 sensor outputs.
         """
         pressure_sole_adr = []
-        left_pressure_sole = []
-        right_pressure_sole = []
+        pressure_soles = []
         for i, sensor_type in enumerate(self.sensor_type):
             if sensor_type == mjtSensor.mjSENS_FORCE:
                 pressure_sole_adr.append(self.sensor_adr[i])
-        for i, adr in enumerate(pressure_sole_adr):
-            if i <= 7:
-                force_x = self.sensordata[adr]
-                force_y = self.sensordata[adr + 1]
-                force_z = self.sensordata[adr + 2]
-                force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
-                left_pressure_sole.append(force_res)
-            if 7 < i <= 15:
-                force_x = self.sensordata[adr]
-                force_y = self.sensordata[adr + 1]
-                force_z = self.sensordata[adr + 2]
-                force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
-                right_pressure_sole.append(force_res)
-        return left_pressure_sole, right_pressure_sole
+        for adr in pressure_sole_adr:
+            force_x = self.sensordata[adr]
+            force_y = self.sensordata[adr + 1]
+            force_z = self.sensordata[adr + 2]
+            force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
+            pressure_soles.append(force_res)
+        return pressure_soles
 
     def get_imu_data(self):
         """This class extracts the data from the imus of the model.
