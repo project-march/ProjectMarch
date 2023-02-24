@@ -3,6 +3,6 @@
 //
 #include "gait_command/gait_command.hpp"
 
-GaitCommand::GaitCommand(){
-
+GaitCommand::GaitCommand()
+{
 }

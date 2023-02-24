@@ -5,8 +5,8 @@
 #ifndef BUILD_STATE_MACHINE_NODE_H
 #define BUILD_STATE_MACHINE_NODE_H
 #include "march_shared_msgs/msg/gait_type.hpp"
-#include "march_shared_msgs/srv/gait_command.hpp"
 #include "march_shared_msgs/msg/ipd_input.hpp"
+#include "march_shared_msgs/srv/gait_command.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "state_machine/state_machine.hpp"
 #include <chrono>

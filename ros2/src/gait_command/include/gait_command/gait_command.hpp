@@ -13,17 +13,12 @@
 #include <cstdlib>
 #include <memory>
 
-enum class InputDevices{
-    Monitor,
-    Eeg,
-    Wireless_ipd
-};
+enum class InputDevices { Monitor, Eeg, Wireless_ipd };
 
 class GaitCommand {
 public:
     GaitCommand();
 
 private:
-
 };
-#endif //BUILD_GAIT_COMMAND_HPP
+#endif // BUILD_GAIT_COMMAND_HPP
