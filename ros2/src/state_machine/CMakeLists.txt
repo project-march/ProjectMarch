@@ -56,6 +56,12 @@ install(TARGETS state_machine_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
+
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
     test/state_machine_test.cpp

@@ -7,7 +7,6 @@
 
 #include "march_shared_msgs/msg/gait_type.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
-#include "mujoco_interfaces/msg/ipd_input.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
 #include <cstdio>

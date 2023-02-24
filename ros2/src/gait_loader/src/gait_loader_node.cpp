@@ -1,5 +1,4 @@
 #include "march_shared_msgs/srv/gait_command.hpp"
-#include "mujoco_interfaces/msg/ipd_input.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
