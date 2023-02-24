@@ -24,4 +24,4 @@ private:
     rclcpp::Publisher<march_shared_msgs::msg::GaitType>::SharedPtr m_gait_type_publisher;
 };
 
-#endif //BUILD_GAIT_COMMAND_NODE_HPP
+#endif // BUILD_GAIT_COMMAND_NODE_HPP
