@@ -5,7 +5,8 @@ import socket
 from rclpy import Future
 from std_msgs.msg import Header, String, Bool
 from rosgraph_msgs.msg import Clock
-from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
+from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, \
+    GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 
@@ -56,6 +57,17 @@ class InputDeviceController:
             msg_type=Bool,
             topic="/march/eeg/on_off",
             qos_profile=1,
+        )
+        self._send_gait_request = self._node.create_publisher(
+            msg_type=GaitRequest,
+            topic="/march/gait_request",
+            qos_profile=10,
+        )
+        self._gait_response_subscriber = self._node.create_subscription(
+            msg_type=GaitResponse,
+            topic="/march/gait_response",
+            callback=self._gait_response_callback,
+            qos_profile=10,
         )
         self._instruction_response_pub = self._node.create_subscription(
             msg_type=GaitInstructionResponse,
@@ -110,6 +122,10 @@ class InputDeviceController:
             self._alive_timer.shutdown()
             self._alive_timer.join()
             self._alive_pub.unregister()
+
+    def _gait_response_callback(self, msg: GaitResponse):
+        self.get_logger().info("Callback baby")
+
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
         """Callback for instruction response messages.
