@@ -75,7 +75,7 @@ bool StateMachine::isValidTransition(exoState desired_state)
  *
  * @return the current state.
  */
-exoState StateMachine::get_current_state()
+int StateMachine::get_current_state()
 {
-    return m_current_state;
+    return static_cast<int>(m_current_state);
 }
