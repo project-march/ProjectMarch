@@ -41,15 +41,17 @@ StateMachine::StateMachine()
  *
  * @param desired_state
  */
-void StateMachine::performTransition(exoState desired_state)
+bool StateMachine::performTransition(exoState desired_state)
 {
     if (isValidTransition(desired_state)) {
         RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Exo state transition succeeded!");
         m_current_state = desired_state;
+        return true;
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Invalid State transition!");
         // do ERROR Stuff
-        m_current_state = exoState::Error;
+        //        m_current_state = exoState::Error;
+        return false;
     }
 }
 

@@ -27,7 +27,7 @@ enum class exoState {
 class StateMachine {
 public:
     StateMachine();
-    void performTransition(exoState desired_state);
+    bool performTransition(exoState desired_state);
     exoState get_current_state();
 
 private:
