@@ -1,5 +1,6 @@
 #include "com_estimator.hpp"
 #include "cop_estimator.hpp"
+#include "zmp_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
@@ -26,7 +27,7 @@ public:
 
     std::vector<PressureSensor> get_pressure_sensors();
 
-    geometry_msgs::msg::TransformStamped get_frame_transform(std::string&, std::string&);
+    geometry_msgs::msg::TransformStamped get_frame_transform(const std::string&,const std::string&);
 
     geometry_msgs::msg::Point transform_point(std::string&, std::string&, geometry_msgs::msg::Point&);
 
@@ -41,6 +42,8 @@ private:
 
     void initialize_imus();
 
+    void publish_com_frame();
+
     void update_foot_frames();
 
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr m_state_publisher;
@@ -54,6 +57,7 @@ private:
     ComEstimator m_com_estimator;
     CopEstimator m_cop_estimator;
     ImuEstimator m_imu_estimator;
+    ZmpEstimator m_zmp_estimator;
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_joint_listener;

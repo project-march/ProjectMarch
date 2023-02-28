@@ -12,11 +12,14 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
+#include "geometry_msgs/msg/vector3.hpp"
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
 #include <unordered_map>
-#ifndef ZMP_ESTIMATOR
-#define ZMP_ESTIMATOR
+
+#ifndef IMU_ESTIMATOR
+#define IMU_ESTIMATOR
 
 struct IMU {
     std::string name;

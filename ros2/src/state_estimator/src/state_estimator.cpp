@@ -9,6 +9,7 @@ StateEstimator::StateEstimator()
     , m_joint_estimator(this)
     , m_com_estimator()
     , m_imu_estimator()
+    , m_zmp_estimator()
     , m_cop_estimator(CopEstimator(get_pressure_sensors()))
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
@@ -25,6 +26,7 @@ StateEstimator::StateEstimator()
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
+    m_zmp_estimator.set_time(this->get_clock()->now());
     // Declare parameters
     // IMU parameters
     declare_parameter("imu_estimator.IMU_exo_base_link", std::string("default"));
@@ -113,6 +115,27 @@ void StateEstimator::update_foot_frames()
     }
 }
 
+void StateEstimator::publish_com_frame()
+{
+    geometry_msgs::msg::TransformStamped com_transform;
+    //All center of mass calculations are already done in the base frame,
+    //So we simply update the headers and the translation component :)
+    com_transform.header.frame_id = "map";
+    com_transform.child_frame_id = "com";
+    CenterOfMass com = m_com_estimator.get_com_state();
+
+    com_transform.transform.translation.x = com.position.point.x;
+    com_transform.transform.translation.y = com.position.point.y;
+    com_transform.transform.translation.z = com.position.point.z;
+    // The unit quaternion
+    com_transform.transform.rotation.x = 0.0;
+    com_transform.transform.rotation.y = 0.0; 
+    com_transform.transform.rotation.z = 0.0;
+    com_transform.transform.rotation.w = 1.0;
+
+    m_tf_joint_broadcaster->sendTransform(com_transform);
+}
+
 void StateEstimator::publish_robot_state()
 {
     auto msg = march_shared_msgs::msg::RobotState();
@@ -139,18 +162,26 @@ void StateEstimator::publish_robot_frames()
         RCLCPP_DEBUG(this->get_logger(),
             ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
-    std::vector<CenterOfMass> test = m_joint_estimator.get_joint_com_positions("right_knee");
-    RCLCPP_DEBUG(this->get_logger(), "Array size is %i", test.size());
-    for (auto com : test) {
+    // Publish each joint center of mass
+    std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
+    RCLCPP_DEBUG(this->get_logger(), "Array size is %i", joint_com_positions.size());
+    for (auto com : joint_com_positions) {
         RCLCPP_DEBUG(this->get_logger(), ("\n Publishing COM"));
         RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
         m_com_pos_publisher->publish(com.position);
     }
-    // RCLCPP_INFO(this->get_logger(), "Test amount: %i", test[0].point.x);
+    //Update and publish the actual, full center of mass
+    m_com_estimator.set_com_state(joint_com_positions);
+    publish_com_frame();
+    // Update COP
+    m_cop_estimator.set_cop_state(get_pressure_sensors());
+    // Update ZMP
+    m_zmp_estimator.set_zmp(m_com_estimator.get_com_state(), m_imu_estimator.get_imu()
+        , this->get_clock()->now(), get_frame_transform("lowerIMU", "com"));
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
-    std::string& target_frame, std::string& source_frame)
+    const std::string& target_frame, const std::string& source_frame)
 {
     geometry_msgs::msg::TransformStamped frame_transform;
     try {
