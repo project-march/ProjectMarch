@@ -28,7 +28,7 @@ class StateMachine {
 public:
     StateMachine();
     bool performTransition(exoState desired_state);
-    exoState get_current_state();
+    int get_current_state();
 
 private:
     bool isValidTransition(exoState desired_state);

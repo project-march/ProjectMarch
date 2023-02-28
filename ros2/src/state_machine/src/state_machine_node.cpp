@@ -74,11 +74,11 @@ void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest
 {
     auto response_msg = march_shared_msgs::msg::GaitResponse();
     if (m_state_machine.performTransition((exoState)msg->gait_type)) {
-        response_msg.result = march_shared_msgs::msg::GaitResponse::GAIT_ACCEPTED;
+        response_msg.gait_type = msg->gait_type;
         m_gait_response_publisher->publish(response_msg);
-        send_request(m_state_machine.get_current_state());
+        send_request((exoState)m_state_machine.get_current_state());
     } else {
-        response_msg.result = march_shared_msgs::msg::GaitResponse::GAIT_REJECTED;
+        response_msg.gait_type = m_state_machine.get_current_state();
         m_gait_response_publisher->publish(response_msg);
     }
 }
