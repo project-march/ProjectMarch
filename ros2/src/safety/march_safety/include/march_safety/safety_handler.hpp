@@ -14,7 +14,7 @@
 
 class SafetyHandler {
     using ErrorMsg = march_shared_msgs::msg::Error;
-    using GaitMsg = march_shared_msgs::msg::GaitType;
+    using GaitMsg = march_shared_msgs::msg::GaitRequest;
     using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
 
 public:

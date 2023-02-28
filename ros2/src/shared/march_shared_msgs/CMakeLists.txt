@@ -70,6 +70,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GaitType.msg"
   "msg/IkSolverCommand.msg"
   "msg/PointStampedList.msg"
+  "msg/GaitRequest.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PublishTestDataset.srv"
