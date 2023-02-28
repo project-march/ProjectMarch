@@ -1,6 +1,5 @@
 #include "com_estimator.hpp"
 #include "cop_estimator.hpp"
-#include "zmp_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
@@ -12,6 +11,7 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
+#include "zmp_estimator.hpp"
 #include <array>
 #include <chrono>
 #include <cstdio>
@@ -30,7 +30,7 @@ public:
     std::map<std::string, double> update_pressure_sensors_data(
         std::vector<std::string> names, std::vector<double> pressure_values);
 
-    geometry_msgs::msg::TransformStamped get_frame_transform(const std::string&,const std::string&);
+    geometry_msgs::msg::TransformStamped get_frame_transform(const std::string&, const std::string&);
 
     geometry_msgs::msg::Point transform_point(std::string&, std::string&, geometry_msgs::msg::Point&);
 
