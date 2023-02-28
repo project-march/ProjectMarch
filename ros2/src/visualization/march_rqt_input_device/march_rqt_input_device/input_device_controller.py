@@ -5,8 +5,7 @@ import socket
 from rclpy import Future
 from std_msgs.msg import Header, String, Bool
 from rosgraph_msgs.msg import Clock
-from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, \
-    GaitRequest, GaitResponse
+from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 
@@ -125,7 +124,6 @@ class InputDeviceController:
 
     def _gait_response_callback(self, msg: GaitResponse):
         self.get_logger().info("Callback baby")
-
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
         """Callback for instruction response messages.
