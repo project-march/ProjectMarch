@@ -118,8 +118,8 @@ void StateEstimator::update_foot_frames()
 void StateEstimator::publish_com_frame()
 {
     geometry_msgs::msg::TransformStamped com_transform;
-    //All center of mass calculations are already done in the base frame,
-    //So we simply update the headers and the translation component :)
+    // All center of mass calculations are already done in the base frame,
+    // So we simply update the headers and the translation component :)
     com_transform.header.frame_id = "map";
     com_transform.child_frame_id = "com";
     CenterOfMass com = m_com_estimator.get_com_state();
@@ -129,7 +129,7 @@ void StateEstimator::publish_com_frame()
     com_transform.transform.translation.z = com.position.point.z;
     // The unit quaternion
     com_transform.transform.rotation.x = 0.0;
-    com_transform.transform.rotation.y = 0.0; 
+    com_transform.transform.rotation.y = 0.0;
     com_transform.transform.rotation.z = 0.0;
     com_transform.transform.rotation.w = 1.0;
 
@@ -170,14 +170,14 @@ void StateEstimator::publish_robot_frames()
         RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
         m_com_pos_publisher->publish(com.position);
     }
-    //Update and publish the actual, full center of mass
+    // Update and publish the actual, full center of mass
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
     // Update COP
     m_cop_estimator.set_cop_state(get_pressure_sensors());
     // Update ZMP
-    m_zmp_estimator.set_zmp(m_com_estimator.get_com_state(), m_imu_estimator.get_imu()
-        , this->get_clock()->now(), get_frame_transform("lowerIMU", "com"));
+    m_zmp_estimator.set_zmp(m_com_estimator.get_com_state(), m_imu_estimator.get_imu(), this->get_clock()->now(),
+        get_frame_transform("lowerIMU", "com"));
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
