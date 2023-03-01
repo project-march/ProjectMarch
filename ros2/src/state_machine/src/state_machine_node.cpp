@@ -72,7 +72,6 @@ bool StateMachineNode::send_request(exoState desired_state)
  */
 void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
 {
-    RCLCPP_INFO(rclcpp::get_logger("LOGG"), "LOGGGGGGGGGGGGGG");
     auto response_msg = march_shared_msgs::msg::GaitResponse();
     if (m_state_machine.performTransition((exoState)msg->gait_type)) {
         response_msg.gait_type = msg->gait_type;
