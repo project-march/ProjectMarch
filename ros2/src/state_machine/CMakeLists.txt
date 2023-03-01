@@ -63,6 +63,8 @@ DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)
+  find_package(launch_testing_ament_cmake)
+  add_launch_test(test/state_machine_launch_testing.py)
   ament_add_gmock(${PROJECT_NAME}_test
     test/state_machine_test.cpp
     test/test_runner.cpp

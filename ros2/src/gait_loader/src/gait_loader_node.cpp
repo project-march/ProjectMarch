@@ -19,6 +19,7 @@ public:
         m_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("gait", 10);
         // For now the joint names are hard-coded, because it is unsure how they will be retrieved in the future.
         m_joint_names = { "Joint1", "joint2", "joint3", "joint4", "joint5", "join6", "joint7", "joint8" };
+        RCLCPP_INFO(rclcpp::get_logger("GaitLoader"), "service started");
     };
 
 private:
