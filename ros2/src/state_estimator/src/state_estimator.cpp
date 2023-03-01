@@ -11,6 +11,7 @@ StateEstimator::StateEstimator()
     , m_imu_estimator()
     , m_zmp_estimator()
     , m_cop_estimator()
+    , m_footstep_estimator()
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
 
@@ -27,6 +28,8 @@ StateEstimator::StateEstimator()
 
     m_com_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_com_position", 100);
 
+    m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_feet_positions", 100);
+
     timer_ = this->create_wall_timer(1000ms, std::bind(&StateEstimator::publish_robot_frames, this));
 
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
@@ -38,14 +41,18 @@ StateEstimator::StateEstimator()
     declare_parameter("imu_estimator.IMU_exo_base_link", std::string("default"));
     declare_parameter("imu_estimator.IMU_exo_position", std::vector<double>(3, 0.0));
     declare_parameter("imu_estimator.IMU_exo_rotation", std::vector<double>(3, 0.0));
-    // declare_parameter("joint_estimator.link_hinge_axis", std::vector<int64_t>(6, 1));
-    // declare_parameter("joint_estimator.link_length_x", std::vector<float>(5, 0.0));
+    declare_parameter("footstep_estimator.left_foot.size", std::vector<double>(6, 2));
+    declare_parameter("footstep_estimator.right_foot.size", std::vector<double>(6, 2));
     // declare_parameter("joint_estimator.link_length_y", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_length_z", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_mass", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_com_x", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_com_y", std::vector<double>(6, 0.0));
     // declare_parameter("joint_estimator.link_com_z", std::vector<double>(6, 0.0));
+    auto left_foot_size = this->get_parameter("footstep_estimator.left_foot.size").as_double_array();
+    auto right_foot_size = this->get_parameter("footstep_estimator.right_foot.size").as_double_array();
+    m_footstep_estimator.set_foot_size(left_foot_size[0], left_foot_size[1], "l");
+    m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
 
     initialize_imus();
 }
@@ -191,6 +198,15 @@ void StateEstimator::publish_robot_frames()
     // Update ZMP
     m_zmp_estimator.set_zmp(m_com_estimator.get_com_state(), m_imu_estimator.get_imu(), this->get_clock()->now(),
         get_frame_transform("lowerIMU", "com"));
+    // Update the feet
+    m_footstep_estimator.update_feet(get_pressure_sensors());
+    // Publish the feet
+    if (m_footstep_estimator.get_foot_on_ground("l")) {
+        m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("l"));
+    }
+    if (m_footstep_estimator.get_foot_on_ground("r")) {
+        m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
+    }
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(

@@ -1,5 +1,6 @@
 #include "com_estimator.hpp"
 #include "cop_estimator.hpp"
+#include "footstep_estimator.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
@@ -60,13 +61,14 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;
-
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_foot_pos_publisher;
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_joint_broadcaster;
     JointEstimator m_joint_estimator;
     ComEstimator m_com_estimator;
     CopEstimator m_cop_estimator;
     ImuEstimator m_imu_estimator;
     ZmpEstimator m_zmp_estimator;
+    FootstepEstimator m_footstep_estimator;
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_joint_listener;
