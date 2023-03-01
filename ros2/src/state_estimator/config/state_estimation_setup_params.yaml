@@ -26,4 +26,11 @@ state_estimator:
         #POS: X, Y, Z
       IMU_exo_position: [0.0, 0.0, 0.0]
       IMU_exo_rotation: [0.0, 0.0, 0.0]
+    footstep_estimator:
+      left_foot:
+        #SIZE: WIDTH, HEIGHT
+        size: [1.0,1.0]
+      right_foot:
+        #SIZE: WIDTH, HEIGHT
+        size: [1.0,1.0]
       
