@@ -15,12 +15,9 @@
 
 enum class exoState {
     Sit = 0,
-    SitStand = 1,
     Stand = 2,
-    StandWalk = 3,
     Walk = 4,
     ForceUnknown = 5,
-    ForceUnknownStand = 6,
     Error = 7
 };
 
