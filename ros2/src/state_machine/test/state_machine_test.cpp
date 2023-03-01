@@ -29,10 +29,10 @@ TEST_F(StateMachineTest, performTransitionSucces)
     ASSERT_EQ(this->state_machine->get_current_state(), (int)expectedState);
 }
 
-TEST_F(StateMachineTest, performTransitionToError)
+TEST_F(StateMachineTest, performInvalidTansitionStateDontChange)
 {
     this->state_machine->performTransition(exoState::Walk);
-    exoState expectedState = exoState::Error;
+    exoState expectedState = exoState::ForceUnknown;
     ASSERT_EQ(this->state_machine->get_current_state(), (int)expectedState);
 }
 

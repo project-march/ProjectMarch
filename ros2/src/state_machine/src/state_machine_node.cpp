@@ -22,7 +22,7 @@ StateMachineNode::StateMachineNode()
         = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
         "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
-    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command_client");
+    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command");
 
     m_state_machine = StateMachine();
 
@@ -72,6 +72,7 @@ bool StateMachineNode::send_request(exoState desired_state)
  */
 void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
 {
+    RCLCPP_INFO(rclcpp::get_logger("LOGG"), "LOGGGGGGGGGGGGGG");
     auto response_msg = march_shared_msgs::msg::GaitResponse();
     if (m_state_machine.performTransition((exoState)msg->gait_type)) {
         response_msg.gait_type = msg->gait_type;
