@@ -85,6 +85,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
     model_to_load_mujoco = LaunchConfiguration("model_to_load_mujoco")
     tunings_to_load = LaunchConfiguration("tunings_to_load")
+    rosbags = LaunchConfiguration("rosbags")
 
     declared_arguments = [
         # GENERAL ARGUMENTS
@@ -306,6 +307,13 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="low_level_controller_tunings.xml",
             description="tunings for the low level controller in mujoco",
         ),
+
+        DeclareLaunchArgument(
+            name="rosbags",
+            default_value="false",
+            description="Whether to log simulation data or not.",
+            choices=["true", "false"],
+        ),
     ]
 
     # region Use normal launch file with different launch_arguments
@@ -357,7 +365,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("model_to_load_mujoco", model_to_load_mujoco),
             ("tunings_to_load", tunings_to_load),
             ("control_yaml", control_yaml),
-            ("rosbags", "false"),
+            ("rosbags", rosbags),
         ],
     )
     # endregion
