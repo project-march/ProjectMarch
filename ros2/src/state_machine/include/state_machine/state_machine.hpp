@@ -5,7 +5,6 @@
 #ifndef BUILD_STATE_MACHINE_HPP
 #define BUILD_STATE_MACHINE_HPP
 
-#include "march_shared_msgs/msg/gait_type.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
