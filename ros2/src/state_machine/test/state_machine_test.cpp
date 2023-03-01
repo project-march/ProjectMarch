@@ -24,8 +24,8 @@ TEST_F(StateMachineTest, getCurrentStateTest)
 
 TEST_F(StateMachineTest, performTransitionSucces)
 {
-    this->state_machine->performTransition(exoState::ForceUnknownStand);
-    exoState expectedState = exoState::ForceUnknownStand;
+    this->state_machine->performTransition(exoState::Stand);
+    exoState expectedState = exoState::Stand;
     ASSERT_EQ(this->state_machine->get_current_state(), (int)expectedState);
 }
 
