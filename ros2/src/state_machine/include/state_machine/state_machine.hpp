@@ -13,13 +13,7 @@
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
 
-enum class exoState {
-    Sit = 0,
-    Stand = 2,
-    Walk = 4,
-    ForceUnknown = 5,
-    Error = 7
-};
+enum class exoState { Sit = 0, Stand = 2, Walk = 4, ForceUnknown = 5, Error = 7 };
 
 class StateMachine {
 public:
