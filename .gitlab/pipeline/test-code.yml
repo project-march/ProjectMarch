@@ -68,7 +68,7 @@ foxy:test:
 
 coverage:
   stage: Test code
-  image: $CI_REGISTRY_IMAGE/foxy:dev
+  image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
   script:
     - cd ros2
     - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash
