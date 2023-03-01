@@ -2,17 +2,20 @@
 
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState, Imu
+from march_shared_msgs.msg import PressureSolesData
 import rclpy
 from rclpy.node import Node
 
 
 def convert_mujoco_data_state_to_joint_state(msg):
-    """Converts the MojocoDataState to a JointState message."""
+    """Converts the JointState to a JointState message."""
     joint_state = JointState()
-    joint_state.name = msg.names
-    joint_state.position = msg.qpos
-    joint_state.velocity = msg.qvel
-    joint_state.effort = msg.qacc
+    joint_state.header.stamp = rclpy.get_clock().now().to_msg()
+    joint_state.header.frame_id = "joint_link"
+    joint_state.name = msg.name
+    joint_state.position = msg.position
+    joint_state.velocity = msg.velocity
+    joint_state.effort = msg.effort
     return joint_state
 
 
@@ -44,9 +47,25 @@ class MujocoReaderNode(Node):
         :param msg: a msg of MujocoDataSensing type
         :return: None
         """
-        self.state_publisher.publish(convert_mujoco_data_state_to_joint_state(msg.joint_state))
-        self.backpack_imu_publisher.publish(msg.backpack_imu)
-        self.torso_imu_publisher.publish(msg.torso_imu)
+        self.state_publisher.publish(msg.joint_state)
+        backpack_imu = msg.backpack_imu
+        backpack_imu.header.stamp = self.get_clock().now().to_msg()
+        backpack_imu.header.frame_id = "imu_link"
+        self.backpack_imu_publisher.publish(backpack_imu)
+        torso_imu = msg.torso_imu
+        torso_imu.header.stamp = self.get_clock().now().to_msg()
+        torso_imu.header.frame_id = "imu_link"
+        self.torso_imu_publisher.publish(torso_imu)
+
+        names = ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
+                 "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
+        pressure_values = msg.pressure_soles
+        pressure_sole_msg = PressureSolesData()
+        pressure_sole_msg.header.stamp = self.get_clock().now().to_msg()
+        pressure_sole_msg.header.frame_id = "pressure_soles_link"
+        pressure_sole_msg.names = names
+        pressure_sole_msg.pressure_values = pressure_values
+        self.pressure_sole_publisher.publish(pressure_sole_msg)
 
 
 def main(args=None):

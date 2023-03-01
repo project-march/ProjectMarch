@@ -8,6 +8,7 @@ from controller_torque import TorqueController
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
+from sensor_msgs.msg import JointState
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -210,11 +211,16 @@ class MujocoSimNode(Node):
         :return: None
         """
         sensor_msg = MujocoDataSensing()
-        state_msg = MujocoDataState()
-        state_msg.names = self.actuator_names
-        state_msg.qpos = self.sensor_data_extraction.get_joint_pos()
-        state_msg.qvel = self.sensor_data_extraction.get_joint_vel()
-        state_msg.qacc = self.sensor_data_extraction.get_joint_acc()
+        state_msg = JointState()
+        state_msg.header.stamp = self.get_clock().now().to_msg()
+        state_msg.header.frame_id = "joint_link"
+        state_msg.name = self.actuator_names
+        state_msg.position = self.sensor_data_extraction.get_joint_pos()
+        state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
+        state_msg.effort = self.sensor_data_extraction.get_joint_acc()
+        self.get_logger().info(str(state_msg))
+
+        sensor_msg.pressure_soles = self.sensor_data_extraction.get_pressure_sole_data()
 
         backpack_imu, torso_imu = self.sensor_data_extraction.get_imu_data()
         sensor_msg.joint_state = state_msg
