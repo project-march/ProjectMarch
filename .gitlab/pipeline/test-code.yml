@@ -5,69 +5,6 @@
 # are not dependent on eachother. This enables extra parallelization.
 .base_tester:
   stage: Test code
-  # Depending on the rules below, `TAG` has a different value.
-  # In most cases, this will just be `main`, unless the Dockerfile has
-  # changed.
-  image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
-  script:
-    - cd $ROS_VERSION/
-    - source /opt/ros/$ROS_CODENAME/local_setup.bash && source install/local_setup.bash
-    - 'colcon test --event-handlers console_direct+ --packages-skip control_msgs control_toolbox \
-      controller_interface controller_manager controller_manager_msgs diagnostic_updater diff_drive_controller effort_controllers \
-      force_torque_sensor_broadcaster forward_command_controller gazebo_ros2_control gazebo_ros2_control_demos gripper_controllers \
-      hardware_interface imu_sensor_broadcaster joint_state_broadcaster joint_state_controller joint_trajectory_controller \
-      position_controllers realsense_gazebo_plugin realtime_tools ros2_control ros2_control_test_assets ros2_controllers \
-      ros2bag rosbag2 rosbag2_compression rosbag2_compression_zstd rosbag2_cpp rosbag2_performance_benchmarking rosbag2_py \
-      rosbag2_storage rosbag2_storage_default_plugins rosbag2_test_common rosbag2_tests rosbag2_transport shared_queues_vendor \
-      ros2controlcli soem transmission_interface velocity_controllers'
-    - colcon test-result --verbose
-  rules:
-    # These rules are checking if certain values have the correct values.
-    # These variables are predefined by GitLab and their definitions
-    # can be found on https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: always
-      variables:
-        TAG: $CI_COMMIT_REF_NAME
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - "$DOCKER_FILE"
-        - "$ROS_VERSION/**/package.xml"
-        - "requirements.txt"
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - $DOCKER_FILE
-      variables:
-        TAG: $CI_COMMIT_BRANCH
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - "$ROS_VERSION/**/*"
-      variables:
-        TAG: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    # The next if is for a MR goes through for a protected branch. (e.g. dev and main)
-    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - "$ROS_VERSION/**/*"
-      variables:
-        TAG: $CI_COMMIT_BRANCH
-
-foxy:test:
-  variables:
-    ROS_VERSION: "ros2"
-    ROS_CODENAME: "foxy"
-    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
-  needs:
-    - job: "foxy:build"
-      artifacts: true
-  extends:
-    - .base_tester
-
-coverage:
-  stage: Test code
   image: $CI_REGISTRY_IMAGE/$ROS_CODENAME:$TAG
   script:
     - cd ros2
@@ -130,3 +67,14 @@ coverage:
         - "$ROS_VERSION/**/*"
       variables:
         TAG: $CI_COMMIT_BRANCH
+
+foxy:test:
+  variables:
+    ROS_VERSION: "ros2"
+    ROS_CODENAME: "foxy"
+    DOCKER_FILE: ".gitlab/dockerfiles/foxy"
+  needs:
+    - job: "foxy:build"
+      artifacts: true
+  extends:
+    - .base_tester
