@@ -6,6 +6,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <rclcpp/rclcpp.hpp>
 
 #include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "semantic_components/semantic_component_interface.hpp"
@@ -50,8 +51,12 @@ public:
 
     void update()
     {
+
+        // RCLCPP_INFO(rclcpp::get_logger("test_loggger"), "Updating values");
         int index = 0;
+        // RCLCPP_INFO(rclcpp::get_logger("test_loggger"), "Updating values");
         l_heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_heel_right_ = 1.f;
         l_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         l_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
@@ -67,11 +72,14 @@ public:
         r_toes_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         r_met5_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         r_arch_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+
+        
     }
 
     bool get_values_as_message(PressureSolesMsg& msg)
     {
         update();
+        // RCLCPP_INFO(rclcpp::get_logger("test_loggger"), "l_heel_left pressure is: %f", l_heel_left_);
         msg.names = { "l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
             "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch" };
         msg.pressure_values = { l_heel_right_, l_heel_left_, l_met1_, l_hallux_, l_met3_, l_toes_, l_met5_, l_arch_,

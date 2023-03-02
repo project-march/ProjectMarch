@@ -94,7 +94,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     march::PressureSoleData right_sole;
     right_sole.side = march::pressure_sole_side::right;
     pressure_soles_data_.push_back(right_sole);
-
+    RCLCPP_INFO((*logger_), "Finished creating march pressure soel data"); 
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -177,7 +177,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         }
     }
 
-    // For the PDB broadcaster.
+    // // For the PDB broadcaster.
     for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
@@ -188,11 +188,17 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     for (auto pressure_sole_data : pressure_soles_data_) {
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
             if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
+                std::string name = "l_";
+                name.append(pressure_soles_pointer.first);
+                RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
                 state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles/", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+                    "pressure_soles", name, pressure_soles_pointer.second));
             } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
+                std::string name = "r_";
+                name.append(pressure_soles_pointer.first);
+                RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
                 state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles/", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+                    "pressure_soles", name, pressure_soles_pointer.second));
             }
         }
     }
@@ -379,7 +385,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    pdb_read();
+    // pdb_read();
     pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
@@ -420,7 +426,7 @@ void MarchExoSystemInterface::pdb_read()
 void MarchExoSystemInterface::pressure_sole_read()
 {
     auto pressure_soles = march_robot_->getPressureSoles();
-    for (size_t i = 0; i <= pressure_soles.size(); i++) {
+    for (size_t i = 0; i < pressure_soles.size(); i++) {
         pressure_soles[i].read(pressure_soles_data_[i]);
     }
 };
