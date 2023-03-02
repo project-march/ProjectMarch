@@ -267,7 +267,7 @@ double ODrive::getEffortLimit() const
 
 void ODrive::actuateRadians(float target_position)
 {   
-    logger_->info(logger_->fstring("Position: %f", target_position));
+    // logger_->info(logger_->fstring("Position: %f", target_position));
     bit32 write_pos {};
     write_pos.f = target_position;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_pos);

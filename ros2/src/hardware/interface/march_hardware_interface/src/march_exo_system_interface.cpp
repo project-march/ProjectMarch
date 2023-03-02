@@ -226,7 +226,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
-            jointInfo.position_command = 0;
+            jointInfo.position_command = jointInfo.position;
             jointInfo.velocity = 0;
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
@@ -238,6 +238,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
     RCLCPP_INFO((*logger_), "%sAll joints are ready for reading!", LColor::BLUE);
     status_ = hardware_interface::status::STARTED;
+
 
     return hardware_interface::return_type::OK;
 }
@@ -424,7 +425,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             RCLCPP_WARN((*logger_),
                 "Effort is increased with %g effort for %s, "
                 "which is more than %g effort in one iteration. "
-                "Clamped the effort difference. New total effort will be %g.",
+                "Clamped the effort difference. New total effort will sbe %g.",
                 effort_diff_with_previous, jointInfo.name.c_str(), jointInfo.limit.max_effort_differance,
                 converted_effort);
         }
