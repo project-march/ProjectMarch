@@ -29,7 +29,6 @@ StateEstimator::StateEstimator()
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
-    m_zmp_estimator.set_time(this->get_clock()->now());
     // Declare parameters
     // IMU parameters
     declare_parameter("imu_estimator.IMU_exo_base_link", std::string("default"));
@@ -183,8 +182,8 @@ void StateEstimator::publish_robot_frames()
     // Update COP
     m_cop_estimator.set_cop_state(get_pressure_sensors());
     // Update ZMP
-    m_zmp_estimator.set_zmp(m_com_estimator.get_com_state(), m_imu_estimator.get_imu(), this->get_clock()->now(),
-        get_frame_transform("lowerIMU", "com"));
+    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
+    m_zmp_estimator.set_zmp();
     // Update the feet
     m_footstep_estimator.update_feet(get_pressure_sensors());
     // Publish the feet
