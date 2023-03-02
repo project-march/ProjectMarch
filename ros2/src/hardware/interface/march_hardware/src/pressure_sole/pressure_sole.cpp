@@ -1,4 +1,7 @@
 #include <march_hardware/pressure_sole/pressure_sole.h>
+#include "march_hardware/ethercat/odrive_pdo_map.h"
+#include "march_hardware/ethercat/pdo_types.h"
+#include <rclcpp/rclcpp.hpp>
 
 namespace march {
 PressureSole::PressureSole(const Slave& slave, uint8_t byte_offset, std::string side)
@@ -16,10 +19,15 @@ std::string PressureSole::getSide()
 void PressureSole::read(PressureSoleData& pressure_sole_data) const
 {
     std::array<bit32, PRESSURE_SOLE_DATA_LENGTH> data {};
-    for (unsigned int i = 0; i < data.size(); i++) {
-        // Increment the offset by 4 bytes each iteration
-        data[i] = this->read32(byte_offset_ + i * sizeof(float));
-    }
+    data[0] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Heel_right, ODriveAxis::None));
+    data[1] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Heel_left, ODriveAxis::None));
+    data[2] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Met1, ODriveAxis::None));
+    data[3] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Hallux, ODriveAxis::None));
+    data[4] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Met3, ODriveAxis::None));
+    data[5] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Toes, ODriveAxis::None));
+    data[6] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Met5, ODriveAxis::None));
+    data[7] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Arch, ODriveAxis::None));
+    // RCLCPP_INFO(rclcpp::get_logger("test_logger"), "Data[0] is %f", data[0].f);
 
     static_assert(PRESSURE_SOLE_DATA_LENGTH == 8);
     pressure_sole_data.update_values(data);
