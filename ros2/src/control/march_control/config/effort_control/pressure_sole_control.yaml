@@ -1,6 +1,11 @@
-controller_manager:
-  ros__parameters:
-    update_rate: 60  # Hz
-    
+march:
+  controller:
+    temperature_sensor:
+      type: march_temperature_sensor_controller/MarchTemperatureSensorController
+      publish_rate: 1
+    pdb_state:
+      type: march_pdb_state_controller/MarchPdbStateController
+      publish_rate: 50
     march_pressure_sole_broadcaster:
-      type: march_pressure_sole_broadcaster::PressureSoleBroadcaster
+      type: pressure_sole_broadcaster/PressureSoleBroadcaster
+      publish_rate: 50
