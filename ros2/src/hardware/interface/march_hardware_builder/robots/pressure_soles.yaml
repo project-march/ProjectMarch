@@ -5,5 +5,5 @@ pressure_soles:
   pressure_soles:
     - left_side:
         slaveIndex: 1
-        byteOffset: 8
+        byteOffset: 4
         side: 'left'

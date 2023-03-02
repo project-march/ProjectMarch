@@ -34,7 +34,8 @@ controller_interface::InterfaceConfiguration PressureSoleBroadcaster::state_inte
 
 controller_interface::return_type PressureSoleBroadcaster::update()
 {
-
+    RCLCPP_INFO(
+        (*logger_), "Update called");
     if (realtime_pressure_sole_publisher_ && realtime_pressure_sole_publisher_->trylock()) {
         realtime_pressure_sole_publisher_->msg_.header.stamp = node_->now();
         pressure_sole_component->get_values_as_message(realtime_pressure_sole_publisher_->msg_);
@@ -46,7 +47,7 @@ controller_interface::return_type PressureSoleBroadcaster::update()
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PressureSoleBroadcaster::on_configure(
     const rclcpp_lifecycle::State& previous_state)
 {
-    RCLCPP_DEBUG(
+    RCLCPP_INFO(
         (*logger_), "March Pressure sole broadcaster configuring. Previous state = %s", previous_state.label().c_str());
     pressure_sole_component = std::make_unique<PressureSoleSemanticComponent>();
     try {
@@ -65,7 +66,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pressu
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PressureSoleBroadcaster::on_activate(
     const rclcpp_lifecycle::State& previous_state)
 {
-    RCLCPP_DEBUG(
+    RCLCPP_INFO(
         (*logger_), "March pressure sole broadcaster activating. Previous state = %s", previous_state.label().c_str());
     pressure_sole_component->assign_loaned_state_interfaces(state_interfaces_);
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
