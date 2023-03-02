@@ -92,7 +92,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     left_sole.side = march::pressure_sole_side::left;
     pressure_soles_data_.push_back(left_sole);
     march::PressureSoleData right_sole;
-    left_sole.side = march::pressure_sole_side::right;
+    right_sole.side = march::pressure_sole_side::right;
     pressure_soles_data_.push_back(right_sole);
 
     for (const auto& joint : info.joints) {
@@ -189,10 +189,10 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
             if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
                 state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+                    "pressure_soles/", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
             } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
                 state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
+                    "pressure_soles/", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
             }
         }
     }

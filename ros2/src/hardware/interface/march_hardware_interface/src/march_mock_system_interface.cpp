@@ -64,6 +64,16 @@ hardware_interface::return_type MarchMockSystemInterface::configure(const hardwa
         hw_info.hw_effort = std::numeric_limits<double>::quiet_NaN();
         hw_state_info_.push_back(hw_info);
     }
+
+    // Create pressure soles with side set to left and right.
+    // This is needed for data reading and updating for the pressure_sole_broadcaster.
+    march::PressureSoleData left_sole;
+    left_sole.side = march::pressure_sole_side::left;
+    pressure_soles_data_.push_back(left_sole);
+    march::PressureSoleData right_sole;
+    right_sole.side = march::pressure_sole_side::right;
+    pressure_soles_data_.push_back(right_sole);
+
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
     RCLCPP_INFO(rclcpp::get_logger("MarchMockSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
