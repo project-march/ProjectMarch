@@ -34,13 +34,16 @@ controller_interface::InterfaceConfiguration PressureSoleBroadcaster::state_inte
 
 controller_interface::return_type PressureSoleBroadcaster::update()
 {
-    RCLCPP_INFO(
-        (*logger_), "Update called");
+    // RCLCPP_INFO(
+        // (*logger_), "March Pressure sole broadcaster starts updating");
     if (realtime_pressure_sole_publisher_ && realtime_pressure_sole_publisher_->trylock()) {
         realtime_pressure_sole_publisher_->msg_.header.stamp = node_->now();
         pressure_sole_component->get_values_as_message(realtime_pressure_sole_publisher_->msg_);
         realtime_pressure_sole_publisher_->unlockAndPublish();
     }
+
+    // RCLCPP_INFO(
+    //     (*logger_), "March Pressure sole broadcaster updated succesfully");
     return controller_interface::return_type::OK;
 }
 
@@ -60,6 +63,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pressu
             (*logger_), "Exception thrown during publisher creation at configure stage with message : %s \n", e.what());
         return CallbackReturn::ERROR;
     }
+    RCLCPP_INFO(
+        (*logger_), "March Pressure sole broadcaster configured succesfully");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
