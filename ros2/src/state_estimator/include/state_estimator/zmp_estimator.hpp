@@ -26,15 +26,18 @@
 class ZmpEstimator {
 public:
     ZmpEstimator();
-    void set_zmp(CenterOfMass, IMU, rclcpp::Time, geometry_msgs::msg::TransformStamped);
+    void set_zmp();
     geometry_msgs::msg::PointStamped get_zmp();
-    void set_time(rclcpp::Time);
-    void set_previous_angular_velocity(IMU);
+    void set_com_states(CenterOfMass, rclcpp::Time);
 
 private:
     geometry_msgs::msg::PointStamped m_position;
-    rclcpp::Time m_last_updated_time;
-    tf2::Vector3 m_last_updated_angular_velocity;
+    std::array<geometry_msgs::msg::Point, 3> m_com_history;
+    std::array<rclcpp::Time, 3> m_com_time_history;
+    std::array<geometry_msgs::msg::Vector3, 3> m_com_velocity_history;
+
+    void set_com_velocity();
+    tf2::Vector3 get_com_acceleration();
 };
 
 #endif

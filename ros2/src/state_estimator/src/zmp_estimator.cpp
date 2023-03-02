@@ -4,32 +4,20 @@ ZmpEstimator::ZmpEstimator()
 {
 }
 
-void ZmpEstimator::set_zmp(
-    CenterOfMass com, IMU imu, rclcpp::Time current_time, geometry_msgs::msg::TransformStamped T_imu_com)
+void ZmpEstimator::set_zmp()
 {
     // obtain the necessary variables
     // This includes calculating imu acceleration :(
-    tf2::Vector3 acceleration_imu(
-        imu.data.linear_acceleration.x, imu.data.linear_acceleration.y, imu.data.linear_acceleration.z);
-    tf2::Vector3 com_pos(com.position.point.x, com.position.point.y, com.position.point.z);
-    tf2::Vector3 angular_velocity(
-        imu.data.angular_velocity.x, imu.data.angular_velocity.y, imu.data.angular_velocity.z);
-    double dt = (current_time - m_last_updated_time).nanoseconds() / 1e9;
-    tf2::Vector3 angular_acceleration = (angular_velocity - m_last_updated_angular_velocity) / dt;
-    // There might be something wrong here, not sure we have to check this
-    tf2::Vector3 imu_to_com(
-        T_imu_com.transform.translation.x, T_imu_com.transform.translation.y, T_imu_com.transform.translation.z);
-
-    tf2::Vector3 linear_acceleration_com = angular_velocity + angular_acceleration.cross(imu_to_com)
-        - (angular_velocity * angular_velocity) * imu_to_com;
+    // double dt = (current_time - m_last_updated_time).nanoseconds() / 1e9;
+    tf2::Vector3 linear_acceleration_com = get_com_acceleration();
     // calculate the actual zmp
     double g = 9.81;
     m_position.header.frame_id = "map";
-    m_position.point.x = com.position.point.x - linear_acceleration_com.getX() / g * linear_acceleration_com.getZ();
-    m_position.point.y = com.position.point.y - linear_acceleration_com.getY() / g * linear_acceleration_com.getZ();
+    m_position.point.x = m_com_history[0].x - linear_acceleration_com.getX() / g * linear_acceleration_com.getZ();
+    m_position.point.y = m_com_history[0].y - linear_acceleration_com.getY() / g * linear_acceleration_com.getZ();
     m_position.point.z = 0.0;
 
-    set_time(current_time);
+    // set_time(current_time);
 }
 
 geometry_msgs::msg::PointStamped ZmpEstimator::get_zmp()
@@ -37,13 +25,51 @@ geometry_msgs::msg::PointStamped ZmpEstimator::get_zmp()
     return m_position;
 }
 
-void ZmpEstimator::set_time(rclcpp::Time current_time)
+void ZmpEstimator::set_com_velocity()
 {
-    m_last_updated_time = current_time;
+    // We use a try to wait until the entire time has been filled
+
+    // Here, we calculate the velocity immediately.
+    // We do this to avoid doing this every time we want to set the zmp. Instead, we can just save old values
+    try {
+        double dt = (m_com_time_history[1] - m_com_time_history[2]).nanoseconds() / 1e9;
+        m_com_velocity_history[1].x = (m_com_history[1].x - m_com_history[2].x) / dt;
+        m_com_velocity_history[1].y = (m_com_history[1].y - m_com_history[2].y) / dt;
+        m_com_velocity_history[1].z = (m_com_history[1].z - m_com_history[2].z) / dt;
+
+        dt = (m_com_time_history[0] - m_com_time_history[1]).nanoseconds() / 1e9;
+        m_com_velocity_history[0].x = (m_com_history[0].x - m_com_history[1].x) / dt;
+        m_com_velocity_history[0].y = (m_com_history[0].y - m_com_history[1].y) / dt;
+        m_com_velocity_history[0].z = (m_com_history[0].z - m_com_history[1].z) / dt;
+    } catch (...) {
+    }
 }
 
-void ZmpEstimator::set_previous_angular_velocity(IMU imu)
+tf2::Vector3 ZmpEstimator::get_com_acceleration()
 {
-    m_last_updated_angular_velocity
-        = tf2::Vector3(imu.data.angular_velocity.x, imu.data.angular_velocity.y, imu.data.angular_velocity.z);
+    try {
+        double dt = (m_com_time_history[0] - m_com_time_history[1]).nanoseconds() / 1e9;
+        double acc_x = (m_com_velocity_history[0].x - m_com_velocity_history[1].x) / dt;
+        double acc_y = (m_com_velocity_history[0].y - m_com_velocity_history[1].y) / dt;
+        double acc_z = (m_com_velocity_history[0].z - m_com_velocity_history[1].z) / dt;
+        return tf2::Vector3(acc_x, acc_y, acc_z);
+    } catch (...) {
+        return tf2::Vector3(0.0, 0.0, 0.0);
+    }
+}
+
+void ZmpEstimator::set_com_states(CenterOfMass com, rclcpp::Time com_time)
+{
+    // We're doing this in a native way for efficiency and readability
+    // Since we always know the size is going to be 3, this is fine.
+    m_com_history[2] = m_com_history[1];
+    m_com_history[1] = m_com_history[0];
+    m_com_history[0] = com.position.point;
+
+    // We also shift the times
+    m_com_time_history[2] = m_com_time_history[1];
+    m_com_time_history[1] = m_com_time_history[0];
+    m_com_time_history[0] = com_time;
+
+    set_com_velocity();
 }
