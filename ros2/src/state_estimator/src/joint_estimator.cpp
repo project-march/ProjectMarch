@@ -87,9 +87,9 @@ std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_lin
     m_owner->declare_parameter("joint_estimator.base_links", std::vector<std::string>(11, "default"));
     auto link_list = m_owner->get_parameter("joint_estimator.links").as_string_array();
     auto child_link_list = m_owner->get_parameter("joint_estimator.base_links").as_string_array();
-
+    int joint_link_size = link_list.size();
     std::unordered_map<std::string, std::string> joint_link_map;
-    for (int i = 0; i < link_list.size(); i++) {
+    for (int i = 0; i < joint_link_size; i++) {
         joint_link_map.insert(std::pair<std::string, std::string> { link_list[i], child_link_list[i] });
         RCLCPP_INFO(m_owner->get_logger(), "match %s with %s", link_list[i].c_str(), child_link_list[i].c_str());
     }
@@ -132,7 +132,7 @@ void JointEstimator::initialize_joints()
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
     try {
-        for (int i = 0; i < joint_amount; i++) {
+        for (auto i = 0; i < joint_amount; i++) {
             joint_to_add.name = link_names[i];
             // These need to be obtained from yaml parameters
             joint_to_add.com.mass = link_com_mass[i];
@@ -195,4 +195,9 @@ std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string co
         }
     };
     return com_positions;
+}
+
+const std::vector<JointContainer> JointEstimator::get_joints()
+{
+    return m_joints;
 }

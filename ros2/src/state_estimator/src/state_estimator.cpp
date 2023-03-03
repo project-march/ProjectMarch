@@ -30,6 +30,10 @@ StateEstimator::StateEstimator()
 
     m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_feet_positions", 100);
 
+    m_zmp_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 100);
+
+    m_rviz_publisher = this->create_publisher<visualization_msgs::msg::Marker>("joint_visualizations", 100);
+
     timer_ = this->create_wall_timer(1000ms, std::bind(&StateEstimator::publish_robot_frames, this));
 
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
@@ -197,6 +201,8 @@ void StateEstimator::publish_robot_frames()
     // Update ZMP
     m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
     m_zmp_estimator.set_zmp();
+
+    m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
     // Update the feet
     m_footstep_estimator.update_feet(get_pressure_sensors());
     // Publish the feet
@@ -206,6 +212,8 @@ void StateEstimator::publish_robot_frames()
     if (m_footstep_estimator.get_foot_on_ground("r")) {
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
     }
+
+    visualize_joints();
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
@@ -248,6 +256,17 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
 }
 
 std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
+        std::vector<std::string> names, std::vector<double> pressure_values)
+{
+    std::map<std::string, double> pressure_values_map;
+    for (size_t i = 0; i < names.size(); i++) {
+        pressure_values_map.emplace(names.at(i), pressure_values.at(i));
+    }
+    return pressure_values_map;
+}
+
+void StateEstimator::visualize_joints()
+std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
     std::vector<std::string> names, std::vector<double> pressure_values)
 {
     std::map<std::string, double> pressure_values_map;
@@ -260,4 +279,55 @@ std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
 geometry_msgs::msg::Point transform_point(
     std::string& target_frame, std::string& source_frame, geometry_msgs::msg::Point& point_to_transform)
 {
+    visualization_msgs::msg::Marker joint_markers;
+    joint_markers.type = 5;
+    joint_markers.header.frame_id = "map";
+    int id = this->get_clock()->now().nanoseconds();
+    joint_markers.id = id;
+    std::vector<JointContainer> joints = m_joint_estimator.get_joints();
+    geometry_msgs::msg::TransformStamped joint_transform;
+    geometry_msgs::msg::Point marker_container;
+    tf2::Quaternion tf2_joint_rotation;
+    // Joint_endpoint is in local joint coordinates, we transform it to obtain global coordinates
+    tf2::Vector3 joint_endpoint;
+    try {
+        for (auto i : joints) {
+            joint_transform = m_tf_buffer->lookupTransform("map", i.frame.header.frame_id, tf2::TimePointZero);
+            marker_container.x = joint_transform.transform.translation.x;
+            marker_container.y = joint_transform.transform.translation.y;
+            marker_container.z = joint_transform.transform.translation.z;
+            joint_markers.points.push_back(marker_container);
+            // We have to set up the joint transform manually because none of the transform functions work >:(
+            tf2_joint_rotation
+                = tf2::Quaternion(joint_transform.transform.rotation.x, joint_transform.transform.rotation.y,
+                    joint_transform.transform.rotation.z, joint_transform.transform.rotation.w);
+            joint_endpoint = tf2::quatRotate(tf2_joint_rotation, tf2::Vector3(i.length_x, i.length_y, i.length_z));
+            marker_container.x += joint_endpoint.getX();
+            marker_container.y += joint_endpoint.getY();
+            marker_container.z += joint_endpoint.getZ();
+            joint_markers.points.push_back(marker_container);
+            RCLCPP_INFO(
+                this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
+        }
+
+    } catch (const tf2::TransformException& ex) {
+        RCLCPP_WARN(this->get_logger(), "error in visualize_joints: %s", ex.what());
+    }
+    RCLCPP_INFO(this->get_logger(), "Published %i markers", joint_markers.points.size());
+    joint_markers.action = 0;
+    joint_markers.frame_locked = 1;
+    joint_markers.scale.x = 0.2;
+    joint_markers.scale.y = 1.0;
+    joint_markers.scale.z = 1.0;
+    joint_markers.pose.position.x = 0.0;
+    joint_markers.pose.position.y = 0.0;
+    joint_markers.pose.position.z = 0.0;
+    joint_markers.pose.orientation.x = 0.0;
+    joint_markers.pose.orientation.y = 0.0;
+    joint_markers.pose.orientation.z = 0.0;
+    joint_markers.pose.orientation.w = 1.0;
+    joint_markers.ns = "exo_joint_visualization";
+    joint_markers.lifetime.sec = 1;
+    joint_markers.color.a = 1.0;
+    m_rviz_publisher->publish(joint_markers);
 }

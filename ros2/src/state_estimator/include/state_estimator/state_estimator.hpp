@@ -8,10 +8,14 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2/LinearMath/Transform.h"
+#include "tf2/LinearMath/Vector3.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
+#include "visualization_msgs/msg/marker.hpp"
 #include "zmp_estimator.hpp"
 #include <array>
 #include <chrono>
@@ -33,8 +37,6 @@ public:
 
     geometry_msgs::msg::TransformStamped get_frame_transform(const std::string&, const std::string&);
 
-    geometry_msgs::msg::Point transform_point(std::string&, std::string&, geometry_msgs::msg::Point&);
-
 private:
     void sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg);
 
@@ -54,6 +56,8 @@ private:
 
     void update_foot_frames();
 
+    void visualize_joints();
+
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr m_state_publisher;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_upper_imu_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_lower_imu_subscriber;
@@ -62,6 +66,10 @@ private:
 
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_foot_pos_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;
+
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_rviz_publisher;
+
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_joint_broadcaster;
     JointEstimator m_joint_estimator;
     ComEstimator m_com_estimator;
