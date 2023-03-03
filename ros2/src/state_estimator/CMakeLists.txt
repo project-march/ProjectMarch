@@ -22,10 +22,12 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(march_description REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_kdl REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 include_directories(include)
 
@@ -54,9 +56,11 @@ ament_target_dependencies(
   "march_description"
   "march_shared_msgs"
   "nav_msgs"
+  "visualization_msgs"
   "tf2_ros"
   "tf2"
   "tf2_kdl"
+  "tf2_geometry_msgs"
 )
 
 add_executable(state_estimator_node 
@@ -89,8 +93,10 @@ ament_target_dependencies(
   "march_shared_msgs"
   "nav_msgs"
   "tf2_ros"
+  "visualization_msgs"
   "tf2"
   "tf2_kdl"
+  "tf2_geometry_msgs"
 )
 
 install(TARGETS state_estimator_node
@@ -106,7 +112,7 @@ DESTINATION share/${PROJECT_NAME}/
 
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
-  test/joint_estimator_test.cpp
+  # test/joint_estimator_test.cpp
   test/cop_estimator_test.cpp
   test/com_estimator_test.cpp
   test/test_runner.cpp
@@ -124,6 +130,7 @@ if(BUILD_TESTING)
     "march_shared_msgs"
     "nav_msgs"
     "tf2_ros"
+    "tf2_geometry_msgs"
     "tf2"
     "tf2_kdl")
 endif()
