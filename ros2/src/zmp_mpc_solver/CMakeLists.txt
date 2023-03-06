@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(acados_solver)
+project(zmp_mpc_solver)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -22,18 +22,23 @@ find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+include_directories(include)
 
 
 set(acados_include "${PROJECT_SOURCE_DIR}/../libraries/acados/include")
 set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
 
-add_executable(solver_node src/solver_node.cpp)
-ament_target_dependencies(solver_node rclcpp march_shared_msgs trajectory_msgs std_msgs)
-target_include_directories(solver_node PUBLIC
+add_executable(zmp_mpc_solver
+src/zmp_mpc_solver_node.cpp
+src/zmp_mpc_solver.cpp
+include/${PROJECT_NAME}/zmp_mpc_solver.hpp
+)
+ament_target_dependencies(zmp_mpc_solver rclcpp march_shared_msgs trajectory_msgs std_msgs)
+target_include_directories(zmp_mpc_solver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(
-  solver_node
+  zmp_mpc_solver
   "pluginlib"
 )
 
@@ -49,19 +54,21 @@ include_directories(
         ${acados_include}/acados/
         ${acados_include}/qpOASES_e/
         ${acados_include}/acados_c/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/c_generated_code
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/
 
 )
 
 
-target_link_libraries(solver_node ${acados_lib}/libblasfeo.so)
-target_link_libraries(solver_node ${acados_lib}/libhpipm.so)
-target_link_libraries(solver_node ${acados_lib}/libqpOASES_e.so)
-target_link_libraries(solver_node ${acados_lib}/libqpOASES_e.so.3.1)
-target_link_libraries(solver_node ${acados_lib}/libacados.so)
-target_link_libraries(solver_node ${CMAKE_CURRENT_SOURCE_DIR}/src/c_generated_code/libacados_ocp_solver_pendulum_ode.so)
+target_link_libraries(zmp_mpc_solver ${acados_lib}/libblasfeo.so)
+target_link_libraries(zmp_mpc_solver ${acados_lib}/libhpipm.so)
+target_link_libraries(zmp_mpc_solver ${acados_lib}/libqpOASES_e.so)
+target_link_libraries(zmp_mpc_solver ${acados_lib}/libqpOASES_e.so.3.1)
+target_link_libraries(zmp_mpc_solver ${acados_lib}/libacados.so)
+target_link_libraries(zmp_mpc_solver 
+${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_pendulum_ode.so
+)
 
-install(TARGETS solver_node
+install(TARGETS zmp_mpc_solver
   DESTINATION lib/${PROJECT_NAME})
 
 install(FILES ${acados_lib}/libblasfeo.so
@@ -79,7 +86,7 @@ install(FILES ${acados_lib}/libqpOASES_e.so
 install(FILES ${acados_lib}/libhpipm.so
   DESTINATION lib)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/c_generated_code/libacados_ocp_solver_pendulum_ode.so
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_pendulum_ode.so
   DESTINATION lib)
 
 

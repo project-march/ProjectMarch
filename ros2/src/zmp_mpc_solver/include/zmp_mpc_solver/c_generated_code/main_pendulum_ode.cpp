@@ -46,6 +46,9 @@
 // blasfeo
 #include "blasfeo/include/blasfeo_d_aux_ext_dep.h"
 
+#ifndef C_GENERATED_MPC
+#define C_GENERATED_MPC
+
 #define NX     PENDULUM_ODE_NX
 #define NZ     PENDULUM_ODE_NZ
 #define NU     PENDULUM_ODE_NU
@@ -75,6 +78,8 @@
 #define NHN    PENDULUM_ODE_NHN
 #define NPHIN  PENDULUM_ODE_NPHIN
 #define NR     PENDULUM_ODE_NR
+
+
 
 //Initialize
 int solve_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU * PENDULUM_ODE_N)])
@@ -213,3 +218,5 @@ int solve_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU * PENDULUM_
 
     return status;
 }
+
+#endif
