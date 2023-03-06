@@ -279,11 +279,11 @@ std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
 geometry_msgs::msg::Point transform_point(
     std::string& target_frame, std::string& source_frame, geometry_msgs::msg::Point& point_to_transform)
 {
+    // Publish the joint visualizations
     visualization_msgs::msg::Marker joint_markers;
     joint_markers.type = 5;
     joint_markers.header.frame_id = "map";
-    int id = this->get_clock()->now().nanoseconds();
-    joint_markers.id = id;
+    joint_markers.id = 0;
     std::vector<JointContainer> joints = m_joint_estimator.get_joints();
     geometry_msgs::msg::TransformStamped joint_transform;
     geometry_msgs::msg::Point marker_container;
