@@ -39,7 +39,7 @@ void CopEstimator::set_cop_state(std::vector<PressureSensor> sensors)
         m_center_of_pressure.position.point.z = m_center_of_pressure.position.point.z / m_center_of_pressure.pressure;
     } else {
         RCLCPP_WARN(rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure 0.");
-//        throw std::runtime_error("ERROR: The total measured pressure is 0.\n");
+        //        throw std::runtime_error("ERROR: The total measured pressure is 0.\n");
     }
     RCLCPP_DEBUG(
         rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure of %f", m_center_of_pressure.pressure);
