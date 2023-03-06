@@ -6,8 +6,7 @@ import socket
 from rclpy import Future
 from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
 from std_msgs.msg import Header, String
-from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, GaitRequest, \
-    GaitResponse
+from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
@@ -103,7 +102,7 @@ class WirelessInputDeviceController:
 
     def _gait_response_callback(self, msg: GaitResponse):
         self.get_logger().info("Updating Wireless ipd state...")
-        # TODO Send message to IPD with the newly requested state.
+        # TODO: Send message to IPD with the newly requested state.
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
         """Callback for instruction response messages. Calls registered callbacks when the gait is accepted or rejected.

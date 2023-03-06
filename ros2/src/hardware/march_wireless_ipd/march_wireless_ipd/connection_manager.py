@@ -178,7 +178,7 @@ class ConnectionManager:
                         self._request_stop()
                     else:
                         self._request_gait(req)
-                # TODO Update for M8 accordingly
+                # TODO: Update for M8 accordingly
 
                 elif msg_type == "Heartbeat":
                     self._send_message_till_confirm(msg_type="Heartbeat")
@@ -294,7 +294,7 @@ class ConnectionManager:
             "covid_feedback": self._covid_feedback,
         }
 
-        # TODO Update msg accordingly with lena to m8 structure
+        # TODO: Update msg accordingly with lena to m8 structure
 
         self._eeg_command = None
         self._covid_feedback = None
