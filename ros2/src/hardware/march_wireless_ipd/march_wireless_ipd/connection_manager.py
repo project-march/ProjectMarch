@@ -232,6 +232,8 @@ class ConnectionManager:
             self._logger.warning("Failed gait: " + self._requested_gait)
             self._send_message_till_confirm(msg_type="Fail")
 
+        # Edit for M8
+
     def _wait_for_message(self, timeout: float):
         """Wait until a message is received on the socket connection, until the timeout is reached.
 
@@ -290,6 +292,8 @@ class ConnectionManager:
             "eeg_command": self._eeg_command,
             "covid_feedback": self._covid_feedback,
         }
+
+        # TODO Update msg accordingly with lena to m8 structure
 
         self._eeg_command = None
         self._covid_feedback = None
