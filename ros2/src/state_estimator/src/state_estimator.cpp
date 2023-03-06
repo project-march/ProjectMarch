@@ -10,7 +10,7 @@ StateEstimator::StateEstimator()
     , m_com_estimator()
     , m_imu_estimator()
     , m_zmp_estimator()
-    , m_cop_estimator()
+    , m_cop_estimator(create_pressure_sensors())
     , m_footstep_estimator()
 {
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
@@ -197,14 +197,14 @@ void StateEstimator::publish_robot_frames()
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
     // Update COP
-    m_cop_estimator.set_cop_state(get_pressure_sensors());
+    m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors());
     // Update ZMP
     m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
     m_zmp_estimator.set_zmp();
 
     m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
     // Update the feet
-    m_footstep_estimator.update_feet(get_pressure_sensors());
+    m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
     // Publish the feet
     if (m_footstep_estimator.get_foot_on_ground("l")) {
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("l"));
@@ -266,18 +266,6 @@ std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
 }
 
 void StateEstimator::visualize_joints()
-std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
-    std::vector<std::string> names, std::vector<double> pressure_values)
-{
-    std::map<std::string, double> pressure_values_map;
-    for (size_t i = 0; i < names.size(); i++) {
-        pressure_values_map.emplace(names.at(i), pressure_values.at(i));
-    }
-    return pressure_values_map;
-}
-
-geometry_msgs::msg::Point transform_point(
-    std::string& target_frame, std::string& source_frame, geometry_msgs::msg::Point& point_to_transform)
 {
     // Publish the joint visualizations
     visualization_msgs::msg::Marker joint_markers;
@@ -299,15 +287,15 @@ geometry_msgs::msg::Point transform_point(
             joint_markers.points.push_back(marker_container);
             // We have to set up the joint transform manually because none of the transform functions work >:(
             tf2_joint_rotation
-                = tf2::Quaternion(joint_transform.transform.rotation.x, joint_transform.transform.rotation.y,
-                    joint_transform.transform.rotation.z, joint_transform.transform.rotation.w);
+                    = tf2::Quaternion(joint_transform.transform.rotation.x, joint_transform.transform.rotation.y,
+                                      joint_transform.transform.rotation.z, joint_transform.transform.rotation.w);
             joint_endpoint = tf2::quatRotate(tf2_joint_rotation, tf2::Vector3(i.length_x, i.length_y, i.length_z));
             marker_container.x += joint_endpoint.getX();
             marker_container.y += joint_endpoint.getY();
             marker_container.z += joint_endpoint.getZ();
             joint_markers.points.push_back(marker_container);
             RCLCPP_INFO(
-                this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
+                    this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
         }
 
     } catch (const tf2::TransformException& ex) {
