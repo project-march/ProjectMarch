@@ -256,7 +256,7 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
 }
 
 std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
-        std::vector<std::string> names, std::vector<double> pressure_values)
+    std::vector<std::string> names, std::vector<double> pressure_values)
 {
     std::map<std::string, double> pressure_values_map;
     for (size_t i = 0; i < names.size(); i++) {
@@ -287,15 +287,15 @@ void StateEstimator::visualize_joints()
             joint_markers.points.push_back(marker_container);
             // We have to set up the joint transform manually because none of the transform functions work >:(
             tf2_joint_rotation
-                    = tf2::Quaternion(joint_transform.transform.rotation.x, joint_transform.transform.rotation.y,
-                                      joint_transform.transform.rotation.z, joint_transform.transform.rotation.w);
+                = tf2::Quaternion(joint_transform.transform.rotation.x, joint_transform.transform.rotation.y,
+                    joint_transform.transform.rotation.z, joint_transform.transform.rotation.w);
             joint_endpoint = tf2::quatRotate(tf2_joint_rotation, tf2::Vector3(i.length_x, i.length_y, i.length_z));
             marker_container.x += joint_endpoint.getX();
             marker_container.y += joint_endpoint.getY();
             marker_container.z += joint_endpoint.getZ();
             joint_markers.points.push_back(marker_container);
             RCLCPP_INFO(
-                    this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
+                this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
         }
 
     } catch (const tf2::TransformException& ex) {
