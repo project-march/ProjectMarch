@@ -178,6 +178,7 @@ class ConnectionManager:
                         self._request_stop()
                     else:
                         self._request_gait(req)
+                # TODO Update for M8 accordingly
 
                 elif msg_type == "Heartbeat":
                     self._send_message_till_confirm(msg_type="Heartbeat")
