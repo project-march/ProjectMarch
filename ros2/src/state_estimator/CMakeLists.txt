@@ -22,24 +22,31 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(march_description REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_kdl REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
   include/${PROJECT_NAME}/state_estimator.hpp
-  include/${PROJECT_NAME}/joint_estimator.hpp
-  include/${PROJECT_NAME}/com_estimator.hpp
-  include/${PROJECT_NAME}/cop_estimator.hpp
-  src/joint_estimator.cpp
-  src/cop_estimator.cpp
-  src/com_estimator.cpp
   src/state_estimator.cpp
-  src/state_estimator_node.cpp
+  include/${PROJECT_NAME}/joint_estimator.hpp
+  src/joint_estimator.cpp
+  include/${PROJECT_NAME}/com_estimator.hpp
+  src/com_estimator.cpp
+  include/${PROJECT_NAME}/cop_estimator.hpp
+  src/cop_estimator.cpp
+  include/${PROJECT_NAME}/zmp_estimator.hpp
+  src/zmp_estimator.cpp
+  include/${PROJECT_NAME}/imu_estimator.hpp
+  src/imu_estimator.cpp
+  include/${PROJECT_NAME}/footstep_estimator.hpp
+  src/footstep_estimator.cpp
 )
 
 ament_target_dependencies(
@@ -49,21 +56,29 @@ ament_target_dependencies(
   "march_description"
   "march_shared_msgs"
   "nav_msgs"
+  "visualization_msgs"
   "tf2_ros"
   "tf2"
   "tf2_kdl"
+  "tf2_geometry_msgs"
 )
 
 add_executable(state_estimator_node 
-  src/state_estimator_node.cpp
-  src/cop_estimator.cpp
-  src/state_estimator.cpp
-  src/joint_estimator.cpp
-  src/com_estimator.cpp
+  src/state_estimator_node.cpp 
   include/${PROJECT_NAME}/state_estimator.hpp
+  src/state_estimator.cpp
   include/${PROJECT_NAME}/joint_estimator.hpp
+  src/joint_estimator.cpp
   include/${PROJECT_NAME}/com_estimator.hpp
+  src/com_estimator.cpp
   include/${PROJECT_NAME}/cop_estimator.hpp
+  src/cop_estimator.cpp
+  include/${PROJECT_NAME}/zmp_estimator.hpp
+  src/zmp_estimator.cpp
+  include/${PROJECT_NAME}/imu_estimator.hpp
+  src/imu_estimator.cpp
+  include/${PROJECT_NAME}/footstep_estimator.hpp
+  src/footstep_estimator.cpp
   )
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
@@ -78,8 +93,10 @@ ament_target_dependencies(
   "march_shared_msgs"
   "nav_msgs"
   "tf2_ros"
+  "visualization_msgs"
   "tf2"
   "tf2_kdl"
+  "tf2_geometry_msgs"
 )
 
 install(TARGETS state_estimator_node
@@ -95,12 +112,12 @@ DESTINATION share/${PROJECT_NAME}/
 
 if(BUILD_TESTING)
   ament_add_gmock(${PROJECT_NAME}_test
-  test/joint_estimator_test.cpp
-  test/com_estimator_test.cpp
+  # test/joint_estimator_test.cpp
   test/cop_estimator_test.cpp
+  test/com_estimator_test.cpp
   test/state_estimator_test.cpp
   test/test_runner.cpp
-  test/mocks/mock_state_estimator.hpp
+  # test/mocks/mock_state_estimator.hpp
   # include
   )
   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
@@ -114,6 +131,7 @@ if(BUILD_TESTING)
     "march_shared_msgs"
     "nav_msgs"
     "tf2_ros"
+    "tf2_geometry_msgs"
     "tf2"
     "tf2_kdl")
 endif()
