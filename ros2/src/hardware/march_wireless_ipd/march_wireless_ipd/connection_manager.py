@@ -178,6 +178,7 @@ class ConnectionManager:
                         self._request_stop()
                     else:
                         self._request_gait(req)
+                    self._send_gait(req)
                 # TODO: Update for M8 accordingly
 
                 elif msg_type == "Heartbeat":
@@ -233,7 +234,16 @@ class ConnectionManager:
             self._logger.warning("Failed gait: " + self._requested_gait)
             self._send_message_till_confirm(msg_type="Fail")
 
-        # Edit for M8
+    def _send_gait(self, req: str):
+        """Check whether a gait requested on the wireless IPD is available, and publish it to the state machine if so.
+
+        Args:
+            req (str): Gait request message from the IPD.
+        """
+        self._pause_receiving_messages = True
+
+        self._requested_gait = req["gait"]["gaitName"]
+        self._controller.publish_gait(self._requested_gait)
 
     def _wait_for_message(self, timeout: float):
         """Wait until a message is received on the socket connection, until the timeout is reached.

@@ -163,6 +163,7 @@ class WirelessInputDeviceController:
         Args:
             string (str): Name of the gait.
         """
+        # Send gait to M7 gait selection code
         self._instruction_gait_pub.publish(
             GaitInstruction(
                 header=Header(stamp=self._node.get_clock().now().to_msg()),
@@ -171,6 +172,15 @@ class WirelessInputDeviceController:
                 id=str(self._id),
             )
         )
+        # Send gait to M8 gait selection code
+        # self._send_gait_request.publish(
+        #     GaitInstruction(
+        #         header=Header(stamp=self._node.get_clock().now().to_msg()),
+        #         gait_type=GaitRequest.GAIT,
+        #         gait_name=string,
+        #         id=str(self._id),
+        #     )
+        # )
 
     def publish_stop(self) -> None:
         """Publish a stop instruction to the gait state machine."""
