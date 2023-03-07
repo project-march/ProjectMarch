@@ -16,10 +16,9 @@ SolverNode::SolverNode()
             "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
     }
 
-int SolverNode::solve_step(double x_cur[], double ycur[])
+int SolverNode::solve_step(&double x_cur[], &double &u_cur[])
     {
-        // return solve_mpc(x_cur, u_cur);
-        return 0;
+        return solve_mpc(x_cur, u_cur);
     }
 
 void SolverNode::gait_callback(trajectory_msgs::msg::JointTrajectory::SharedPtr msg)
@@ -31,10 +30,10 @@ void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::Shared
 {
     x_current[0] = msg->joint_pos[0]; // set x position
     x_current[1] = msg->joint_vel[0]; // set theta position
-    int status = solve_step(x_current, u_current); // solve the mpc problem
-    if (status == 0) {
-        publish_control_msg();
-    }
+    // int status = solve_step(x_current, u_current); // solve the mpc problem
+    // if (status == 0) {
+        // publish_control_msg();
+    // }
 }
 
 void SolverNode::publish_control_msg()
