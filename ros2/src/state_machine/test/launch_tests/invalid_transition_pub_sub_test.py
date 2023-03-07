@@ -75,6 +75,18 @@ class TestProcessOutput(unittest.TestCase):
         # self.node.get_logger().info('Publishing: ' + str(msg))
 
 
+    def t2_callback(self):
+        """ Reads a file and publish the data from this file to ros2
+                :param -
+                :return -
+            """
+        # Read input data that is send to dut
+        msg = GaitRequest()
+        msg.gait_type = 2
+        self.publisher_.publish(msg)
+        # self.node.get_logger().info('Publishing: ' + str(msg))
+
+
     def test_dut_output_invalid_transition(self, dut, proc_output):
         """ Listen for a message published by dut and compare message to expected value
                 :param
@@ -91,7 +103,7 @@ class TestProcessOutput(unittest.TestCase):
         timer_period = 0.5  # seconds
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
-        #expected data for this test is the force unknown state or int num 5.
+        # Expected data for this test is the force unknown state or int num 5.
         expected_data = 5
 
         # Setup for listening to dut messages
@@ -120,7 +132,40 @@ class TestProcessOutput(unittest.TestCase):
 
             # test actual output for expected output
             self.assertEqual(test_data, expected_data)
+        finally:
+            self.node.destroy_subscription(sub)
 
+        self.timer = self.node.create_timer(timer_period, self.t2_callback)
+
+        # Expected data for this test is the force unknown state or int num 2.
+        expected_data = 2
+
+        # Setup for listening to dut messages
+        received_data = []
+        sub = self.node.create_subscription(
+            GaitResponse,
+            '/march/gait_response',
+            lambda msg: received_data.append(msg.gait_type),
+            10
+        )
+
+        try:
+            # Wait until the dut transmits a message over the ROS topic
+            end_time = time.time() + 1
+            while time.time() < end_time:
+                rclpy.spin_once(self.node, timeout_sec=0.1)
+
+            if received_data == []:
+                test_data = ""
+
+            else:
+
+                print (f"\n[{function_name}] [INFO] expected_data:\n"+ str(expected_data))
+                print (f"\n[{function_name}] [INFO] received_data:\n"+ str(received_data[0]))
+                test_data = received_data[0]
+
+            # test actual output for expected output
+            self.assertEqual(test_data, expected_data)
         finally:
             self.node.destroy_subscription(sub)
 
