@@ -87,7 +87,7 @@ class TestProcessOutput(unittest.TestCase):
         # Publish data to dut
         self.publisher_ = self.node.create_publisher(GaitRequest, "/march/gait_request", 10)
         timer_period = 0.4  # seconds
-        self.timer = self.node.create_timer(timer_period, self.timer_callback)
+        self.timer = self.node.create_timer(timer_period, self.t2_callback)
 
         #expected data for this test is the force unknown state or int num 2.
         expected_data = 2
