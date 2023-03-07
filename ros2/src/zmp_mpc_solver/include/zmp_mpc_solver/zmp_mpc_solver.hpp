@@ -1,5 +1,4 @@
 // standard
-#include "zmp_mpc_solver/c_generated_code/main_pendulum_ode.cpp"
 #include <chrono>
 #include <iostream>
 #include <stdio.h>
@@ -10,6 +9,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
+#include "zmp_mpc_solver/c_generated_code/main_pendulum_ode.cpp"
 
 #ifndef ZMP_MPC_H
 #define ZMP_MPC_H
@@ -24,7 +24,7 @@ public:
     double m_time_horizon;
 
 private:
-    int solve_step(double[], double[]);
+    int solve_step(&double[], &double[]);
 
     void gait_callback(trajectory_msgs::msg::JointTrajectory::SharedPtr);
 

@@ -82,7 +82,7 @@
 
 
 //Initialize
-int solve_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU * PENDULUM_ODE_N)])
+inline int solve_mpc(double (&x_init_input)[], double (&u_init_input)[])
 {
     // printf("test %g \n", u_init_input[0]);
     // printf("test %g \n", x_init_input[0]);
