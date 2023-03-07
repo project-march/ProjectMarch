@@ -61,6 +61,51 @@ TEST_F(CopEstimatorTest, setCopTest)
     ASSERT_EQ(this->cop_estimator->get_cop_state(), expected_cop);
 }
 
+TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
+{
+    CenterOfPressure expected_cop;
+    expected_cop.position.point.x = 1;
+    expected_cop.position.point.y = 1;
+    expected_cop.position.point.z = 0;
+    expected_cop.pressure = 6;
+    std::vector<PressureSensor> sensors;
+    PressureSensor mock_sensor1;
+    mock_sensor1.name = "mock_sensor1";
+    CenterOfPressure cop;
+    cop.position.point.x = 0;
+    cop.position.point.y = 0;
+    cop.position.point.z = 0;
+    cop.pressure = 3;
+    mock_sensor1.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor1);
+    PressureSensor mock_sensor2;
+    mock_sensor1.name = "mock_sensor2";
+    cop.position.point.x = 3;
+    cop.position.point.y = 0;
+    cop.position.point.z = 0;
+    cop.pressure = 1;
+    mock_sensor2.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor2);
+    PressureSensor mock_sensor3;
+    mock_sensor3.name = "mock_sensor3";
+    cop.position.point.x = 3;
+    cop.position.point.y = 3;
+    cop.position.point.z = 0;
+    cop.pressure = 1;
+    mock_sensor3.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor3);
+    PressureSensor mock_sensor4;
+    mock_sensor4.name = "mock_sensor4";
+    cop.position.point.x = 0;
+    cop.position.point.y = 3;
+    cop.position.point.z = 0;
+    cop.pressure = 1;
+    mock_sensor4.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor4);
+    cop_estimator->set_cop_state(sensors);
+    ASSERT_EQ(this->cop_estimator->get_cop_state(), expected_cop);
+}
+
 TEST_F(CopEstimatorTest, setZeroPressureCopTest)
 {
     std::vector<PressureSensor> sensors;
@@ -73,7 +118,9 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
     cop.pressure = 0;
     mock_sensor.centre_of_pressure = cop;
     sensors.push_back(mock_sensor);
-    ASSERT_THROW(cop_estimator->set_cop_state(sensors), std::runtime_error);
+    cop_estimator->set_cop_state(sensors);
+    double expected = 0.0;
+    ASSERT_EQ(cop_estimator->get_cop_state().pressure, expected);
 }
 
 TEST_F(CopEstimatorTest, testUpdateSensorPressure)
