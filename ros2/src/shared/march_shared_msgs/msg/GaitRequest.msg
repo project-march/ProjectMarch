@@ -13,5 +13,10 @@ int8 ERROR  = 7
 # If the type is a WALK this is the name of the WALK.
 string gait_name
 
+# All possible instruction gait_name.
+string STEP = "step"
+string STEP_CLOSE = "step_close"
+string CONTINUES = "continues"
+
 # Unique identifier for the input device sending this message. See `Alive`.
 string id
