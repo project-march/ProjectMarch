@@ -33,14 +33,14 @@
 
 #include <iostream>
 // standard
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cstring>
 // acados
-#include "acados/utils/print.h"
 #include "acados/utils/math.h"
-#include "acados_c/ocp_nlp_interface.h"
+#include "acados/utils/print.h"
 #include "acados_c/external_function_interface.h"
+#include "acados_c/ocp_nlp_interface.h"
 #include "acados_solver_pendulum_ode.h"
 
 // blasfeo
@@ -49,65 +49,62 @@
 #ifndef C_GENERATED_MPC
 #define C_GENERATED_MPC
 
-#define NX     PENDULUM_ODE_NX
-#define NZ     PENDULUM_ODE_NZ
-#define NU     PENDULUM_ODE_NU
-#define NP     PENDULUM_ODE_NP
-#define NBX    PENDULUM_ODE_NBX
-#define NBX0   PENDULUM_ODE_NBX0
-#define NBU    PENDULUM_ODE_NBU
-#define NSBX   PENDULUM_ODE_NSBX
-#define NSBU   PENDULUM_ODE_NSBU
-#define NSH    PENDULUM_ODE_NSH
-#define NSG    PENDULUM_ODE_NSG
-#define NSPHI  PENDULUM_ODE_NSPHI
-#define NSHN   PENDULUM_ODE_NSHN
-#define NSGN   PENDULUM_ODE_NSGN
+#define NX PENDULUM_ODE_NX
+#define NZ PENDULUM_ODE_NZ
+#define NU PENDULUM_ODE_NU
+#define NP PENDULUM_ODE_NP
+#define NBX PENDULUM_ODE_NBX
+#define NBX0 PENDULUM_ODE_NBX0
+#define NBU PENDULUM_ODE_NBU
+#define NSBX PENDULUM_ODE_NSBX
+#define NSBU PENDULUM_ODE_NSBU
+#define NSH PENDULUM_ODE_NSH
+#define NSG PENDULUM_ODE_NSG
+#define NSPHI PENDULUM_ODE_NSPHI
+#define NSHN PENDULUM_ODE_NSHN
+#define NSGN PENDULUM_ODE_NSGN
 #define NSPHIN PENDULUM_ODE_NSPHIN
-#define NSBXN  PENDULUM_ODE_NSBXN
-#define NS     PENDULUM_ODE_NS
-#define NSN    PENDULUM_ODE_NSN
-#define NG     PENDULUM_ODE_NG
-#define NBXN   PENDULUM_ODE_NBXN
-#define NGN    PENDULUM_ODE_NGN
-#define NY0    PENDULUM_ODE_NY0
-#define NY     PENDULUM_ODE_NY
-#define NYN    PENDULUM_ODE_NYN
-#define NH     PENDULUM_ODE_NH
-#define NPHI   PENDULUM_ODE_NPHI
-#define NHN    PENDULUM_ODE_NHN
-#define NPHIN  PENDULUM_ODE_NPHIN
-#define NR     PENDULUM_ODE_NR
+#define NSBXN PENDULUM_ODE_NSBXN
+#define NS PENDULUM_ODE_NS
+#define NSN PENDULUM_ODE_NSN
+#define NG PENDULUM_ODE_NG
+#define NBXN PENDULUM_ODE_NBXN
+#define NGN PENDULUM_ODE_NGN
+#define NY0 PENDULUM_ODE_NY0
+#define NY PENDULUM_ODE_NY
+#define NYN PENDULUM_ODE_NYN
+#define NH PENDULUM_ODE_NH
+#define NPHI PENDULUM_ODE_NPHI
+#define NHN PENDULUM_ODE_NHN
+#define NPHIN PENDULUM_ODE_NPHIN
+#define NR PENDULUM_ODE_NR
 
-
-
-//Initialize
-inline int solve_mpc(double (&x_init_input)[], double (&u_init_input)[])
+// Initialize
+inline int solve_mpc(std::array<double, NX>& x_init_input, std::array<double, NU * PENDULUM_ODE_N>& u_current)
 {
     // printf("test %g \n", u_init_input[0]);
     // printf("test %g \n", x_init_input[0]);
     // printf("test %g \n", x_init_input[1]);
     // printf("test %g \n", x_init_input[2]);
     // printf("test %g \n", x_init_input[3]);
-    pendulum_ode_solver_capsule *acados_ocp_capsule = pendulum_ode_acados_create_capsule();
+    pendulum_ode_solver_capsule* acados_ocp_capsule = pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = PENDULUM_ODE_N;
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
     int status = pendulum_ode_acados_create_with_discretization(acados_ocp_capsule, N, new_time_steps);
 
-    if (status)
-    {
+    if (status) {
         printf("pendulum_ode_acados_create() returned status %d. Exiting.\n", status);
         exit(1);
     }
 
-    ocp_nlp_config *nlp_config = pendulum_ode_acados_get_nlp_config(acados_ocp_capsule);
-    ocp_nlp_dims *nlp_dims = pendulum_ode_acados_get_nlp_dims(acados_ocp_capsule);
-    ocp_nlp_in *nlp_in = pendulum_ode_acados_get_nlp_in(acados_ocp_capsule);
-    ocp_nlp_out *nlp_out = pendulum_ode_acados_get_nlp_out(acados_ocp_capsule);
-    ocp_nlp_solver *nlp_solver = pendulum_ode_acados_get_nlp_solver(acados_ocp_capsule);
-    void *nlp_opts = pendulum_ode_acados_get_nlp_opts(acados_ocp_capsule);
+    ocp_nlp_config* nlp_config = pendulum_ode_acados_get_nlp_config(acados_ocp_capsule);
+    ocp_nlp_dims* nlp_dims = pendulum_ode_acados_get_nlp_dims(acados_ocp_capsule);
+    ocp_nlp_in* nlp_in = pendulum_ode_acados_get_nlp_in(acados_ocp_capsule);
+    ocp_nlp_out* nlp_out = pendulum_ode_acados_get_nlp_out(acados_ocp_capsule);
+    ocp_nlp_solver* nlp_solver = pendulum_ode_acados_get_nlp_solver(acados_ocp_capsule);
+    void* nlp_opts = pendulum_ode_acados_get_nlp_opts(acados_ocp_capsule);
 
     // initial condition
     int idxbx0[NBX0];
@@ -132,7 +129,7 @@ inline int solve_mpc(double (&x_init_input)[], double (&u_init_input)[])
 
     // initial value for control input
     double u0[NU];
-    u0[0] = 0.0; //u_init_input[1];
+    u0[0] = 0.0; // u_init_input[1];
 
     // prepare evaluation
     int NTIMINGS = 1;
@@ -141,18 +138,15 @@ inline int solve_mpc(double (&x_init_input)[], double (&u_init_input)[])
     double elapsed_time;
     int sqp_iter;
 
-    double xtraj[NX * (N+1)];
+    double xtraj[NX * (N + 1)];
     double utraj[NU * N];
-
 
     // solve ocp in loop
     int rti_phase = 0;
 
-    for (int ii = 0; ii < NTIMINGS; ii++)
-    {
+    for (int ii = 0; ii < NTIMINGS; ii++) {
         // initialize solution
-        for (int i = 0; i < N; i++)
-        {
+        for (int i = 0; i < N; i++) {
             ocp_nlp_out_set(nlp_config, nlp_dims, nlp_out, i, "x", x_init);
             ocp_nlp_out_set(nlp_config, nlp_dims, nlp_out, i, "u", u0);
         }
@@ -163,47 +157,24 @@ inline int solve_mpc(double (&x_init_input)[], double (&u_init_input)[])
         min_time = MIN(elapsed_time, min_time);
     }
 
-
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "x", &xtraj[0*NX]);
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 1, "x", &xtraj[1*NX]);
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 1, "u", &utraj[0*NU]);
+    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "x", &xtraj[0 * NX]);
+    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 1, "x", &xtraj[1 * NX]);
+    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 1, "u", &utraj[0 * NU]);
 
     /* print solution and statistics */
     for (int ii = 0; ii <= nlp_dims->N; ii++)
-        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii*NX]);
+        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii * NX]);
     for (int ii = 0; ii < nlp_dims->N; ii++)
-        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii*NU]);
+        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    memcpy(u_init_input, &utraj, sizeof(utraj));
-    x_init_input[0] = xtraj[NX + 0];
-    x_init_input[1] = xtraj[NX + 1];
-
-    printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat( NX, N+1, xtraj, NX);
-    printf("\n--- utraj ---\n");
-    d_print_exp_tran_mat( NU, N, utraj, NU );
-    // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
-
-    printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
-
-    if (status == ACADOS_SUCCESS)
-    {
-        printf("pendulum_ode_acados_solve(): SUCCESS!\n");
-    }
-    else
-    {
-        printf("pendulum_ode_acados_solve() failed with status %d.\n", status);
+    // here, we copy our array into the std::array
+    for (int ii = 0; ii < nlp_dims->N; ii++) {
+        u_current[ii] = utraj[ii];
     }
 
-    // get solution
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
-    ocp_nlp_get(nlp_config, nlp_solver, "sqp_iter", &sqp_iter);
-
-    // pendulum_ode_acados_print_stats(acados_ocp_capsule);
-
-    // printf("\nSolver info:\n");
-    // printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n",
-    //        sqp_iter, NTIMINGS, min_time*1000, kkt_norm_inf);
+    for (int ii = 0; ii < NX; ii++) {
+        x_init_input[ii] = xtraj[NX + ii];
+    }
 
     // free solver
     int status_2 = pendulum_ode_acados_free(acados_ocp_capsule);

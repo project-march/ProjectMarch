@@ -9,31 +9,25 @@
 #include "rclcpp/rclcpp.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-#include "zmp_mpc_solver/c_generated_code/main_pendulum_ode.cpp"
+#include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 
-#ifndef ZMP_MPC_H
-#define ZMP_MPC_H
+#ifndef ZMP_MPC
+#define ZMP_MPC
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-class SolverNode : public rclcpp::Node {
+class ZmpSolver {
 public:
-    SolverNode();
-    double x_current[NX];
-    double u_current[NU * PENDULUM_ODE_N];
+    ZmpSolver();
     double m_time_horizon;
+    void set_current_state(std::vector<double>);
+    int solve_step(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
+    std::array<double, NX> get_state();
+    std::array<double, NU * ZMP_PENDULUM_ODE_N> get_input_trajectory();
 
 private:
-    int solve_step(&double[], &double[]);
-
-    void gait_callback(trajectory_msgs::msg::JointTrajectory::SharedPtr);
-
-    void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
-
-    void publish_control_msg();
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_publisher;
-    rclcpp::Subscription<march_shared_msgs::msg::RobotState>::SharedPtr robot_state_subscriber;
-    rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr gait_subscriber;
+    std::array<double, NX> m_x_current;
+    std::array<double, NU * ZMP_PENDULUM_ODE_N> m_u_current;
 };
 
 #endif

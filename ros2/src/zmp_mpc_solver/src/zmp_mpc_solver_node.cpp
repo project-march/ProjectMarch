@@ -1,5 +1,48 @@
 // standard
-#include "zmp_mpc_solver/zmp_mpc_solver.hpp"
+#include "zmp_mpc_solver/zmp_mpc_solver_node.hpp"
+
+using namespace std::chrono_literals;
+using std::placeholders::_1;
+
+SolverNode::SolverNode()
+    : Node("mpc_solver_node")
+    , m_zmp_solver()
+{
+    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
+    m_robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
+        "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
+    m_gait_subscriber = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
+        "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
+}
+
+void SolverNode::gait_callback(trajectory_msgs::msg::JointTrajectory::SharedPtr msg)
+{
+    return;
+}
+
+void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
+{
+    m_zmp_solver.set_current_state({ msg->joint_pos[0] });
+    // int status = solve_step(x_current, u_current); // solve the mpc problem
+    // if (status == 0) {
+    // publish_control_msg();
+    // }
+}
+
+void SolverNode::publish_control_msg()
+{
+    // auto message = trajectory_msgs::msg::JointTrajectory();
+    // message.header.stamp = this->get_clock()->now();
+    // for (const double &control_input : u_current) {
+    //   std::cout << control_input << std::endl;
+    //   message.reference_control.push_back(control_input);
+    // };
+    // message.mode = 0;
+    // message.control_inputs = 1;
+    // message.dt = (m_time_horizon / PENDULUM_ODE_N);
+    // m_publisher->publish(message);
+    return;
+}
 
 int main(int argc, char** argv)
 {
