@@ -31,15 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.;
  */
 
-
 // standard
 #include <stdio.h>
 #include <stdlib.h>
 // acados
-#include "acados/utils/print.h"
 #include "acados/utils/math.h"
-#include "acados_c/ocp_nlp_interface.h"
+#include "acados/utils/print.h"
 #include "acados_c/external_function_interface.h"
+#include "acados_c/ocp_nlp_interface.h"
 #include "acados_solver_ZMP_pendulum_ode.h"
 
 // blasfeo
@@ -48,59 +47,57 @@
 #ifndef C_GENERATED_MPC
 #define C_GENERATED_MPC
 
-#define NX     ZMP_PENDULUM_ODE_NX
-#define NZ     ZMP_PENDULUM_ODE_NZ
-#define NU     ZMP_PENDULUM_ODE_NU
-#define NP     ZMP_PENDULUM_ODE_NP
-#define NBX    ZMP_PENDULUM_ODE_NBX
-#define NBX0   ZMP_PENDULUM_ODE_NBX0
-#define NBU    ZMP_PENDULUM_ODE_NBU
-#define NSBX   ZMP_PENDULUM_ODE_NSBX
-#define NSBU   ZMP_PENDULUM_ODE_NSBU
-#define NSH    ZMP_PENDULUM_ODE_NSH
-#define NSG    ZMP_PENDULUM_ODE_NSG
-#define NSPHI  ZMP_PENDULUM_ODE_NSPHI
-#define NSHN   ZMP_PENDULUM_ODE_NSHN
-#define NSGN   ZMP_PENDULUM_ODE_NSGN
+#define NX ZMP_PENDULUM_ODE_NX
+#define NZ ZMP_PENDULUM_ODE_NZ
+#define NU ZMP_PENDULUM_ODE_NU
+#define NP ZMP_PENDULUM_ODE_NP
+#define NBX ZMP_PENDULUM_ODE_NBX
+#define NBX0 ZMP_PENDULUM_ODE_NBX0
+#define NBU ZMP_PENDULUM_ODE_NBU
+#define NSBX ZMP_PENDULUM_ODE_NSBX
+#define NSBU ZMP_PENDULUM_ODE_NSBU
+#define NSH ZMP_PENDULUM_ODE_NSH
+#define NSG ZMP_PENDULUM_ODE_NSG
+#define NSPHI ZMP_PENDULUM_ODE_NSPHI
+#define NSHN ZMP_PENDULUM_ODE_NSHN
+#define NSGN ZMP_PENDULUM_ODE_NSGN
 #define NSPHIN ZMP_PENDULUM_ODE_NSPHIN
-#define NSBXN  ZMP_PENDULUM_ODE_NSBXN
-#define NS     ZMP_PENDULUM_ODE_NS
-#define NSN    ZMP_PENDULUM_ODE_NSN
-#define NG     ZMP_PENDULUM_ODE_NG
-#define NBXN   ZMP_PENDULUM_ODE_NBXN
-#define NGN    ZMP_PENDULUM_ODE_NGN
-#define NY0    ZMP_PENDULUM_ODE_NY0
-#define NY     ZMP_PENDULUM_ODE_NY
-#define NYN    ZMP_PENDULUM_ODE_NYN
-#define NH     ZMP_PENDULUM_ODE_NH
-#define NPHI   ZMP_PENDULUM_ODE_NPHI
-#define NHN    ZMP_PENDULUM_ODE_NHN
-#define NPHIN  ZMP_PENDULUM_ODE_NPHIN
-#define NR     ZMP_PENDULUM_ODE_NR
+#define NSBXN ZMP_PENDULUM_ODE_NSBXN
+#define NS ZMP_PENDULUM_ODE_NS
+#define NSN ZMP_PENDULUM_ODE_NSN
+#define NG ZMP_PENDULUM_ODE_NG
+#define NBXN ZMP_PENDULUM_ODE_NBXN
+#define NGN ZMP_PENDULUM_ODE_NGN
+#define NY0 ZMP_PENDULUM_ODE_NY0
+#define NY ZMP_PENDULUM_ODE_NY
+#define NYN ZMP_PENDULUM_ODE_NYN
+#define NH ZMP_PENDULUM_ODE_NH
+#define NPHI ZMP_PENDULUM_ODE_NPHI
+#define NHN ZMP_PENDULUM_ODE_NHN
+#define NPHIN ZMP_PENDULUM_ODE_NPHIN
+#define NR ZMP_PENDULUM_ODE_NR
 
-
-inline int solve_zmp_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU * ZMP_PENDULUM_ODE_N)])
+inline int solve_zmp_mpc(std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {
 
-    ZMP_pendulum_ode_solver_capsule *acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
+    ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
     int status = ZMP_pendulum_ode_acados_create_with_discretization(acados_ocp_capsule, N, new_time_steps);
 
-    if (status)
-    {
+    if (status) {
         printf("ZMP_pendulum_ode_acados_create() returned status %d. Exiting.\n", status);
         exit(1);
     }
 
-    ocp_nlp_config *nlp_config = ZMP_pendulum_ode_acados_get_nlp_config(acados_ocp_capsule);
-    ocp_nlp_dims *nlp_dims = ZMP_pendulum_ode_acados_get_nlp_dims(acados_ocp_capsule);
-    ocp_nlp_in *nlp_in = ZMP_pendulum_ode_acados_get_nlp_in(acados_ocp_capsule);
-    ocp_nlp_out *nlp_out = ZMP_pendulum_ode_acados_get_nlp_out(acados_ocp_capsule);
-    ocp_nlp_solver *nlp_solver = ZMP_pendulum_ode_acados_get_nlp_solver(acados_ocp_capsule);
-    void *nlp_opts = ZMP_pendulum_ode_acados_get_nlp_opts(acados_ocp_capsule);
+    ocp_nlp_config* nlp_config = ZMP_pendulum_ode_acados_get_nlp_config(acados_ocp_capsule);
+    ocp_nlp_dims* nlp_dims = ZMP_pendulum_ode_acados_get_nlp_dims(acados_ocp_capsule);
+    ocp_nlp_in* nlp_in = ZMP_pendulum_ode_acados_get_nlp_in(acados_ocp_capsule);
+    ocp_nlp_out* nlp_out = ZMP_pendulum_ode_acados_get_nlp_out(acados_ocp_capsule);
+    ocp_nlp_solver* nlp_solver = ZMP_pendulum_ode_acados_get_nlp_solver(acados_ocp_capsule);
+    void* nlp_opts = ZMP_pendulum_ode_acados_get_nlp_opts(acados_ocp_capsule);
 
     // initial condition
     int idxbx0[NBX0];
@@ -180,11 +177,9 @@ inline int solve_zmp_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU 
     p[5] = 0;
     p[6] = 0;
 
-    for (int ii = 0; ii <= N; ii++)
-    {
+    for (int ii = 0; ii <= N; ii++) {
         ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
     }
-  
 
     // prepare evaluation
     int NTIMINGS = 1;
@@ -193,18 +188,15 @@ inline int solve_zmp_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU 
     double elapsed_time;
     int sqp_iter;
 
-    double xtraj[NX * (N+1)];
+    double xtraj[NX * (N + 1)];
     double utraj[NU * N];
-
 
     // solve ocp in loop
     int rti_phase = 0;
 
-    for (int ii = 0; ii < NTIMINGS; ii++)
-    {
+    for (int ii = 0; ii < NTIMINGS; ii++) {
         // initialize solution
-        for (int i = 0; i < N; i++)
-        {
+        for (int i = 0; i < N; i++) {
             ocp_nlp_out_set(nlp_config, nlp_dims, nlp_out, i, "x", x_init);
             ocp_nlp_out_set(nlp_config, nlp_dims, nlp_out, i, "u", u0);
         }
@@ -217,36 +209,32 @@ inline int solve_zmp_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU 
 
     /* print solution and statistics */
     for (int ii = 0; ii <= nlp_dims->N; ii++)
-        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii*NX]);
+        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii * NX]);
     for (int ii = 0; ii < nlp_dims->N; ii++)
-        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii*NU]);
+        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
     printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat( NX, N+1, xtraj, NX);
+    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     printf("\n--- utraj ---\n");
-    d_print_exp_tran_mat( NU, N, utraj, NU );
+    d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
 
     printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
 
-    if (status == ACADOS_SUCCESS)
-    {
+    if (status == ACADOS_SUCCESS) {
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
-    }
-    else
-    {
+    } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
     }
 
-    // Get solution
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "x", &xtraj[0*NX]);
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 1, "x", &xtraj[1*NX]);
-    ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 1, "u", &utraj[0*NU]);
+    // here, we copy our array into the std::array
+    for (int ii = 0; ii < nlp_dims->N; ii++) {
+        u_current[ii] = utraj[ii];
+    }
 
-    // Set ROS values
-    memcpy(u_init_input, &utraj, sizeof(utraj));
-    x_init_input[0] = xtraj[NX + 0];
-    x_init_input[1] = xtraj[NX + 1];
+    for (int ii = 0; ii < NX; ii++) {
+        x_init_input[ii] = xtraj[NX + ii];
+    }
 
     // get solution
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
@@ -255,8 +243,8 @@ inline int solve_zmp_mpc(double (&x_init_input)[NX], double (&u_init_input)[(NU 
     ZMP_pendulum_ode_acados_print_stats(acados_ocp_capsule);
 
     printf("\nSolver info:\n");
-    printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n",
-           sqp_iter, NTIMINGS, min_time*1000, kkt_norm_inf);
+    printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n", sqp_iter, NTIMINGS, min_time * 1000,
+        kkt_norm_inf);
 
     // free solver
     status = ZMP_pendulum_ode_acados_free(acados_ocp_capsule);

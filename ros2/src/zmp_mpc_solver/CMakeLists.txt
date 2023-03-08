@@ -32,6 +32,7 @@ add_executable(zmp_mpc_solver
 src/zmp_mpc_solver_node.cpp
 src/zmp_mpc_solver.cpp
 include/${PROJECT_NAME}/zmp_mpc_solver.hpp
+include/${PROJECT_NAME}/zmp_mpc_solver_node.hpp
 )
 ament_target_dependencies(zmp_mpc_solver rclcpp march_shared_msgs trajectory_msgs std_msgs)
 target_include_directories(zmp_mpc_solver PUBLIC
@@ -65,7 +66,7 @@ target_link_libraries(zmp_mpc_solver ${acados_lib}/libqpOASES_e.so)
 target_link_libraries(zmp_mpc_solver ${acados_lib}/libqpOASES_e.so.3.1)
 target_link_libraries(zmp_mpc_solver ${acados_lib}/libacados.so)
 target_link_libraries(zmp_mpc_solver 
-${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_pendulum_ode.so
+${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_ZMP_pendulum_ode.so
 )
 
 install(TARGETS zmp_mpc_solver
@@ -86,7 +87,7 @@ install(FILES ${acados_lib}/libqpOASES_e.so
 install(FILES ${acados_lib}/libhpipm.so
   DESTINATION lib)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_pendulum_ode.so
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_ZMP_pendulum_ode.so
   DESTINATION lib)
 
 
