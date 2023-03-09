@@ -17,17 +17,25 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(Eigen3 3.3 REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-add_executable(ik_solver_node src/ik_solver_node.cpp)
+add_executable(ik_solver_node src/ik_solver_node.cpp include/ik_solver/ik_solver.hpp)
 target_include_directories(ik_solver_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+target_link_libraries (ik_solver_node Eigen3::Eigen)
+
+ament_target_dependencies(ik_solver_node Eigen3)
 
 install(TARGETS ik_solver_node
   DESTINATION lib/${PROJECT_NAME})
+
+#Export
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
 
 if(BUILD_TESTING)
 #  find_package(ament_lint_auto REQUIRED)
