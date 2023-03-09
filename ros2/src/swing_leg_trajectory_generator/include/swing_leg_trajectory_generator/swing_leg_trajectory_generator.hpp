@@ -9,15 +9,24 @@
 #include "rclcpp/rclcpp.hpp"
 using PointStamped = geometry_msgs::msg::PointStamped;
 
-struct BezierCurve{
+struct BezierCurve {
     PointStamped start_point;
+    PointStamped left_point;
+    PointStamped right_point;
     PointStamped end_point;
 
     // Define parameters
+    std::vector<PointStamped> trajectory;
 };
 
 class SwingLegTrajectoryGenerator {
 public:
     SwingLegTrajectoryGenerator();
+    PointStamped getPoint(double t);
+    BezierCurve getBezier();
+    void calculateCurve();
+
+private:
+    BezierCurve m_curve;
 };
-#endif //BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP
+#endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP

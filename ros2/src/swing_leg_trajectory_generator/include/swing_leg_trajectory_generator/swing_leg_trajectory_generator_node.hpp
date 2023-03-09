@@ -16,7 +16,5 @@ public:
     SwingLegTrajectoryGeneratorNode();
 
 private:
-
-
 };
-#endif //BUILD_SWING_LEG_TRAJECTORY_GENERATOR_NODE_HPP
+#endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_NODE_HPP
