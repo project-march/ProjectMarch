@@ -1,9 +1,6 @@
 // standard
 #include "zmp_mpc_solver/zmp_mpc_solver.hpp"
 
-using namespace std::chrono_literals;
-using std::placeholders::_1;
-
 ZmpSolver::ZmpSolver()
     : m_x_current({})
     , m_time_horizon(3.0)

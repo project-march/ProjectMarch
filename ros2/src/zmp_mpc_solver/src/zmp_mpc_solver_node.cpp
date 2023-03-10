@@ -9,15 +9,27 @@ SolverNode::SolverNode()
     , m_zmp_solver()
 {
     m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
-    m_robot_state_subscriber = this->create_subscription<march_shared_msgs::msg::RobotState>(
-        "robot_state", 10, std::bind(&SolverNode::robot_state_callback, this, _1));
-    m_gait_subscriber = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
-        "gait", 10, std::bind(&SolverNode::gait_callback, this, _1));
+    m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
+        "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
+    m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
+        "robot_feet_positions", 10, std::bind(&SolverNode::feet_callback, this, _1));
+    m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
+        "robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
 }
 
-void SolverNode::gait_callback(trajectory_msgs::msg::JointTrajectory::SharedPtr msg)
+void SolverNode::com_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-    return;
+    RCLCPP_DEBUG(this->get_logger(), "Com callback test");
+}
+
+void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "zmp callback test");
+}
+
+void SolverNode::feet_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "feet callback test");
 }
 
 void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
