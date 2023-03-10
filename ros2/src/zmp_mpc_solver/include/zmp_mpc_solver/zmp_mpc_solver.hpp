@@ -1,21 +1,15 @@
 // standard
+#include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
+#include <array>
 #include <chrono>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-
-#include "march_shared_msgs/msg/robot_state.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "trajectory_msgs/msg/joint_trajectory.hpp"
-#include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-#include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
+#include <vector>
 
 #ifndef ZMP_MPC
 #define ZMP_MPC
-using namespace std::chrono_literals;
-using std::placeholders::_1;
-
 class ZmpSolver {
 public:
     ZmpSolver();

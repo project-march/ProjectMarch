@@ -22,6 +22,8 @@ find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 include_directories(include)
 
 
@@ -41,6 +43,9 @@ target_include_directories(zmp_mpc_solver PUBLIC
 ament_target_dependencies(
   zmp_mpc_solver
   "pluginlib"
+  "rclcpp"
+  "geometry_msgs"
+  "nav_msgs"
 )
 
 
