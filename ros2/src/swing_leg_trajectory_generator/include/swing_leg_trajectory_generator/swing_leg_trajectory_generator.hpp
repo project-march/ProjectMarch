@@ -5,6 +5,7 @@
 #ifndef BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP
 #define BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP
 
+#include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
 using PointStamped = geometry_msgs::msg::PointStamped;
@@ -14,6 +15,7 @@ struct BezierCurve {
     PointStamped left_point;
     PointStamped right_point;
     PointStamped end_point;
+    std::vector<PointStamped> points;
 
     // Define parameters
     std::vector<PointStamped> trajectory;
@@ -25,6 +27,7 @@ public:
     PointStamped getPoint(double t);
     BezierCurve getBezier();
     void calculateCurve();
+    void setPoints(std::vector<PointStamped> points);
 
 private:
     BezierCurve m_curve;

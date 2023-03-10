@@ -30,7 +30,6 @@ add_library(${PROJECT_NAME}
         include/${PROJECT_NAME}/swing_leg_trajectory_generator_node.hpp
         src/swing_leg_trajectory_generator.cpp
         src/swing_leg_trajectory_generator_node.cpp
-        src/bezier_plotter_node.py
         )
 
 ament_target_dependencies(

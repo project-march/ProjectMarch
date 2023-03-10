@@ -101,7 +101,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
             <site name='imu_backpack' size='0.01' pos="0 0 0"/>
             <inertial pos="-0.02 0 0.16" mass="6.3"
                       fullinertia="0.121 0.06 0.077 0 -0.001 0.001"/>
-            <freejoint/>
+<!--            <freejoint/>-->
             <geom type="mesh" mesh="backpack" euler="0 0 180"/>
             <geom name="backpack" type="box"
                   size="0.051 0.189 0.165"

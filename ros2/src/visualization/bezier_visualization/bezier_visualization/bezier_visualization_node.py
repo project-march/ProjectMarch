@@ -1,11 +1,22 @@
 import sys
 import rclpy
+from rclpy.node import Node
+
+from typing import List
+import pyqtgraph as pg
+import numpy as np
+import copy
+import sys
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
 
 import math
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
+from march_shared_msgs.msg import PointStampedList
+from geometry_msgs.msg import PointStamped
 
 NODE_NAME = "bezier_plotter"
 
@@ -18,34 +29,35 @@ def sys_exit(*_):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_publisher = MinimalPublisher()
+    bezier_curve = BezierCurve()
 
-    rclpy.spin(minimal_publisher)
+    rclpy.spin(bezier_curve)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_publisher.destroy_node()
+    bezier_curve.destroy_node()
     rclpy.shutdown()
 
 class BezierCurve(Node):
-    def __init__(self, points):
-        super().__init__('NODE_NAME')
-        self.subscription = self.create_subscription(
-            String,
-            'bezier_points',
-            self.listener_callback,
-            10)
-        self.subscription  # prevent unused variable warning
+    def __init__(self):
+        super().__init__(NODE_NAME)
+
+        self.publish_points = self.create_publisher(
+            PointStampedList,
+            '/bezier_points',
+            10
+        )
+
+        self.plot_x = []
+        self.plot_y = []
 
         self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
         self.figure = plt.figure("Bezier Curve")
-        self.points = points
+        self.points = {1: 0, 25: 50, 75: 75, 99: 0}
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
 
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
     def _init_plot(self):
         # Set the initial figure with the axes
         self.axes.set_xlim(0, 100)
@@ -69,6 +81,7 @@ class BezierCurve(Node):
         self.figure.canvas.mpl_connect('button_release_event', self._on_release)
 
         # Show the plot
+        self.figure.canvas.draw()
         plt.show()
 
     def _on_click(self, event):
@@ -76,6 +89,8 @@ class BezierCurve(Node):
         :type event: MouseEvent
         """
         # Only respond to left click within the axes, right click is not relevant
+
+        self.get_logger().info("click")
         if event.button == 1 and event.inaxes in [self.axes]:
             # Check if the click is close to a point
             distance_threshold = 2.0
@@ -129,7 +144,44 @@ class BezierCurve(Node):
             callback method for mouse release event. Set the dragging point to None to stop the drag
             :param _: MouseEvent. Mandatory parameter for the callback method
         """
+
+        self.get_logger().info("release")
         self.dragging_point = None
+        self.get_logger().info("create msg")
+        plt.ion()
+        msg = PointStampedList()
+        for key in self.points:
+            self.get_logger().info("create p")
+            p = PointStamped()
+            self.get_logger().info("assign x")
+            p.point.x = float(key)
+            self.get_logger().info("assign y")
+            p.point.y = float(self.points[key])
+            self.get_logger().info("append point")
+            msg.points.append(p)
+
+        self.get_logger().info("start publish")
+        self.publish_points.publish(msg)
+        plt.ioff()
+        self.get_logger().info("published msg")
 
 
-plot = BezierCurve({1: 0, 25: 50, 75: 75, 99: 0})
+
+    def listener_callback(self, msg):
+
+        self.get_logger().info("Callback")
+        self.plot_x = []
+        self.plot_y = []
+        # for point in msg.trajectory:
+        #     self.plot_x.append(point.point.x)
+        #     self.plot_y.append(point.point.y)
+        # self.line.set_xdata(self.plot_x)
+        # self.line.set_ydata(self.plot_y)
+        # self.axes.relim()
+        # self.axes.autoscale_view()
+        # self.figure.canvas.draw()
+        # self.figure.canvas.flush_events()
+
+
+if __name__ == '__main__':
+    main()
