@@ -1,4 +1,4 @@
-"""Author Marco Bak - M8"""
+"""Author Marco Bak - M8."""
 import sys
 import rclpy
 from rclpy.node import Node
@@ -85,7 +85,7 @@ class BezierCurve(Node):
         plt.show()
 
     def _on_click(self, event):
-        """Callback method for mouse click event
+        """Callback method for mouse click event.
 
         :type event: MouseEvent
         """
@@ -107,7 +107,7 @@ class BezierCurve(Node):
                 self.dragging_point = nearest_point
 
     def _on_motion(self, event):
-        """Callback method for mouse motion event
+        """Callback method for mouse motion event.
 
         :type event: MouseEvent
         """
