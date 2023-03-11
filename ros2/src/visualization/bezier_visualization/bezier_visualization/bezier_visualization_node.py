@@ -19,6 +19,7 @@ def sys_exit(*_):
 
 
 def main(args=None):
+    """Lifecycle of the node."""
     rclpy.init(args=args)
 
     bezier_curve = BezierCurve()
@@ -33,6 +34,9 @@ def main(args=None):
 
 
 class BezierCurve(Node):
+    """This class visualizes the bezier curve of the swing-leg.
+
+    When the points are changed, the swing-leg is updated through the publisher."""
     def __init__(self):
         super().__init__(NODE_NAME)
 
@@ -52,6 +56,7 @@ class BezierCurve(Node):
         self._init_plot()
 
     def _init_plot(self):
+        """Start the plotting of the curve in matplotlib."""
         # Set the initial figure with the axes
         self.axes.set_xlim(0, 100)
         self.axes.set_ylim(0, 100)
@@ -78,7 +83,7 @@ class BezierCurve(Node):
         plt.show()
 
     def _on_click(self, event):
-        """ callback method for mouse click event
+        """Callback method for mouse click event
         :type event: MouseEvent
         """
         # Only respond to left click within the axes, right click is not relevant
@@ -99,7 +104,7 @@ class BezierCurve(Node):
                 self.dragging_point = nearest_point
 
     def _on_motion(self, event):
-        """ callback method for mouse motion event
+        """Callback method for mouse motion event
         :type event: MouseEvent
         """
         if not self.dragging_point:
@@ -133,9 +138,8 @@ class BezierCurve(Node):
         self.figure.canvas.draw()
 
     def _on_release(self, _):
-        """
-            callback method for mouse release event. Set the dragging point to None to stop the drag
-            :param _: MouseEvent. Mandatory parameter for the callback method
+        """Callback method for mouse release event. Set the dragging point to None to stop the drag
+           :param _: MouseEvent. Mandatory parameter for the callback method
         """
 
         self.get_logger().info("release")
