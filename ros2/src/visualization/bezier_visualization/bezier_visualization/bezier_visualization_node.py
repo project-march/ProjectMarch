@@ -1,3 +1,4 @@
+"""Author Marco Bak - M8"""
 import sys
 import rclpy
 from rclpy.node import Node
@@ -36,7 +37,8 @@ def main(args=None):
 class BezierCurve(Node):
     """This class visualizes the bezier curve of the swing-leg.
 
-    When the points are changed, the swing-leg is updated through the publisher."""
+    When the points are changed, the swing-leg is updated through the publisher.
+    """
     def __init__(self):
         super().__init__(NODE_NAME)
 
@@ -84,6 +86,7 @@ class BezierCurve(Node):
 
     def _on_click(self, event):
         """Callback method for mouse click event
+
         :type event: MouseEvent
         """
         # Only respond to left click within the axes, right click is not relevant
@@ -105,6 +108,7 @@ class BezierCurve(Node):
 
     def _on_motion(self, event):
         """Callback method for mouse motion event
+
         :type event: MouseEvent
         """
         if not self.dragging_point:
@@ -138,10 +142,11 @@ class BezierCurve(Node):
         self.figure.canvas.draw()
 
     def _on_release(self, _):
-        """Callback method for mouse release event. Set the dragging point to None to stop the drag
-           :param _: MouseEvent. Mandatory parameter for the callback method
-        """
+        """Callback method for mouse release event.
 
+        Set the dragging point to None to stop the drag.
+        :param _: MouseEvent. Mandatory parameter for the callback method
+        """
         self.get_logger().info("release")
         self.dragging_point = None
         self.get_logger().info("create msg")
