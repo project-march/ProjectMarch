@@ -2,14 +2,6 @@ import sys
 import rclpy
 from rclpy.node import Node
 
-from typing import List
-import pyqtgraph as pg
-import numpy as np
-import copy
-import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QSlider, QWidget, QGridLayout, QPushButton, QCheckBox
-
 import math
 from matplotlib.path import Path
 import matplotlib.patches as patches
@@ -38,6 +30,7 @@ def main(args=None):
     # when the garbage collector destroys the node object)
     bezier_curve.destroy_node()
     rclpy.shutdown()
+
 
 class BezierCurve(Node):
     def __init__(self):
@@ -164,23 +157,6 @@ class BezierCurve(Node):
         self.publish_points.publish(msg)
         plt.ioff()
         self.get_logger().info("published msg")
-
-
-
-    def listener_callback(self, msg):
-
-        self.get_logger().info("Callback")
-        self.plot_x = []
-        self.plot_y = []
-        # for point in msg.trajectory:
-        #     self.plot_x.append(point.point.x)
-        #     self.plot_y.append(point.point.y)
-        # self.line.set_xdata(self.plot_x)
-        # self.line.set_ydata(self.plot_y)
-        # self.axes.relim()
-        # self.axes.autoscale_view()
-        # self.figure.canvas.draw()
-        # self.figure.canvas.flush_events()
 
 
 if __name__ == '__main__':
