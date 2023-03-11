@@ -20,7 +20,7 @@ public:
 
 private:
     //    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_publish_curve;
-    rclcpp::Publisher<march_shared_msgs::msg::PointStampedList>::SharedPtr m_publish_curve;
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_publish_curve;
     rclcpp::Subscription<march_shared_msgs::msg::PointStampedList>::SharedPtr m_points_subscription;
 
     void subscriber_callback(march_shared_msgs::msg::PointStampedList::SharedPtr msg);

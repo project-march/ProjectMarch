@@ -11,7 +11,7 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
     : Node("swing_leg_trajectory_generator_node")
 {
     //    m_publish_curve = this->create_publisher<geometry_msgs::msg::PointStamped>("bezier_points", 10);
-    m_publish_curve = this->create_publisher<march_shared_msgs::msg::PointStampedList>("bezier_trajectory", 10);
+    m_publish_curve = this->create_publisher<geometry_msgs::msg::PointStamped>("bezier_trajectory", 10);
     m_points_subscription = this->create_subscription<march_shared_msgs::msg::PointStampedList>(
         "bezier_points", 10, std::bind(&SwingLegTrajectoryGeneratorNode::subscriber_callback, this, _1));
 
