@@ -10,6 +10,7 @@
 #include "zmp_mpc_solver/zmp_mpc_solver.hpp"
 
 #include "geometry_msgs/msg/point_stamped.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -28,17 +29,17 @@ public:
 private:
     ZmpSolver m_zmp_solver;
 
-    void com_callback(geometry_msgs::msg::PointStamped::SharedPtr);
+    void com_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr);
-    void feet_callback(geometry_msgs::msg::PointStamped::SharedPtr);
+    void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
 
     void publish_control_msg();
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
 
-    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_com_subscriber;
-    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_feet_pos_subscriber;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_com_subscriber;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
 };
 
