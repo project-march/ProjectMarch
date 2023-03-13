@@ -122,7 +122,7 @@ class BezierCurve(Node):
             self.points.pop(self.dragging_point[0]) if self.dragging_point[0] in self.points else None
             self.axes.patches.remove(self.patch)
         except ValueError:
-            raise ValueError(f'Don\'t drag the points to close to each other. Restart the visualisation.')
+            raise ValueError('Don\'t drag the points to close to each other. Restart the visualisation.')
 
         # Recalculate the points
         if isinstance(event, MouseEvent):
@@ -159,8 +159,8 @@ class BezierCurve(Node):
         plt.ioff()
 
 
-
     def listener_callback(self, msg):
+        """Callback for subscriber, not used for now, probably not needed"""
 
         self.get_logger().info("Callback")
         self.plot_x = []
