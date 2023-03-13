@@ -11,7 +11,7 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 {
     m_curve = BezierCurve();
     auto start_point = PointStamped();
-    start_point.point.x = 1;
+    start_point.point.x = 0;
     start_point.point.y = 0;
     start_point.point.z = 0;
 
@@ -22,11 +22,11 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 
     auto right_point = PointStamped();
     right_point.point.x = 75;
-    right_point.point.y = 75;
+    right_point.point.y = 50;
     right_point.point.z = 0;
 
     auto end_point = PointStamped();
-    end_point.point.x = 99;
+    end_point.point.x = 100;
     end_point.point.y = 0;
     end_point.point.z = 0;
 
@@ -34,46 +34,27 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
     m_curve.points.push_back(left_point);
     m_curve.points.push_back(right_point);
     m_curve.points.push_back(end_point);
-
-    m_curve.start_point = start_point;
-    m_curve.left_point = left_point;
-    m_curve.right_point = right_point;
-    m_curve.end_point = end_point;
-    calculateCurve();
 }
 
-PointStamped SwingLegTrajectoryGenerator::getPoint(double t)
+PointStamped SwingLegTrajectoryGenerator::getPoint(std::vector<PointStamped> points, double t)
 {
     PointStamped point;
-
-    point.point.x = std::pow((1 - t), 3) * m_curve.start_point.point.x
-        + 3 * std::pow((1 - t), 2) * t * m_curve.left_point.point.x
-        + 3 * std::pow((1 - t), 1) * std::pow(t, 2) * m_curve.right_point.point.x
-        + std::pow(t, 3) * m_curve.end_point.point.x;
-    point.point.y = std::pow((1 - t), 3) * m_curve.start_point.point.y
-        + 3 * std::pow((1 - t), 2) * t * m_curve.left_point.point.y
-        + 3 * std::pow((1 - t), 1) * std::pow(t, 2) * m_curve.right_point.point.y
-        + std::pow(t, 3) * m_curve.end_point.point.y;
-    point.point.z = std::pow((1 - t), 3) * m_curve.start_point.point.z
-        + 3 * std::pow((1 - t), 2) * t * m_curve.left_point.point.z
-        + 3 * std::pow((1 - t), 1) * std::pow(t, 2) * m_curve.right_point.point.z
-        + std::pow(t, 3) * m_curve.end_point.point.z;
-
-    return point;
-}
-
-BezierCurve SwingLegTrajectoryGenerator::getBezier()
-{
-    calculateCurve();
-    return m_curve;
-}
-void SwingLegTrajectoryGenerator::calculateCurve()
-{
-    std::vector<PointStamped> trajectory;
-    for (double t = 0.01; t <= 1; t += 0.01) {
-        trajectory.push_back(getPoint(t));
+    if (points.size() == 1) {
+        return points.at(0);
+    } else {
+        auto point1 = getPoint({ points.begin(), points.end() - 1 }, t);
+        auto point2 = getPoint({ points.begin() + 1, points.end() }, t);
+        double nt = 1. - t;
+        point.point.x = nt * point1.point.x + t * point2.point.x;
+        point.point.y = nt * point1.point.y + t * point2.point.y;
+        point.point.z = nt * point1.point.z + t * point2.point.z;
+        return point;
     }
-    m_curve.trajectory = trajectory;
+}
+
+BezierCurve SwingLegTrajectoryGenerator::getCurve()
+{
+    return m_curve;
 }
 
 void SwingLegTrajectoryGenerator::setPoints(std::vector<PointStamped> points)

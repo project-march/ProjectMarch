@@ -57,14 +57,20 @@ install(TARGETS swing_leg_trajectory_generator_node
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
-#  find_package(ament_lint_auto REQUIRED)
-#  # the following line skips the linter which checks for copyrights
-#  # uncomment the line when a copyright and license is not present in all source files
-#  #set(ament_cmake_copyright_FOUND TRUE)
-#  # the following line skips cpplint (only works in a git repo)
-#  # uncomment the line when this package is not in a git repo
-#  #set(ament_cmake_cpplint_FOUND TRUE)
-#  ament_lint_auto_find_test_dependencies()
+  ament_add_gmock(${PROJECT_NAME}_test
+          test/swing_leg_trajectory_generator_test.cpp
+          test/test_runner.cpp
+          # include
+          )
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+          $<INSTALL_INTERFACE:include>)
+  ament_target_dependencies(
+          ${PROJECT_NAME}_test
+          "rclcpp"
+          "march_shared_msgs"
+          "geometry_msgs")
 endif()
 
 ament_package()

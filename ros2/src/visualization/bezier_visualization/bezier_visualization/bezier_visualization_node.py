@@ -53,7 +53,7 @@ class BezierCurve(Node):
 
         self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
         self.figure = plt.figure("Bezier Curve")
-        self.points = {1: 0, 25: 50, 75: 75, 99: 0}
+        self.points = {1: 0, 25: 50, 75: 50, 99: 0}
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
 
@@ -122,7 +122,7 @@ class BezierCurve(Node):
             self.points.pop(self.dragging_point[0]) if self.dragging_point[0] in self.points else None
             self.axes.patches.remove(self.patch)
         except ValueError:
-            raise ValueError('Don\'t drag the points to close to each other. Restart the visualisation.')
+            raise ValueError(f'Don\'t drag the points to close to each other. Restart the visualisation.')
 
         # Recalculate the points
         if isinstance(event, MouseEvent):
@@ -147,25 +147,24 @@ class BezierCurve(Node):
         Set the dragging point to None to stop the drag.
         :param _: MouseEvent. Mandatory parameter for the callback method
         """
-        self.get_logger().info("release")
         self.dragging_point = None
-        self.get_logger().info("create msg")
         plt.ion()
         msg = PointStampedList()
         for key in self.points:
-            self.get_logger().info("create p")
             p = PointStamped()
-            self.get_logger().info("assign x")
             p.point.x = float(key)
-            self.get_logger().info("assign y")
             p.point.y = float(self.points[key])
-            self.get_logger().info("append point")
             msg.points.append(p)
-
-        self.get_logger().info("start publish")
         self.publish_points.publish(msg)
         plt.ioff()
-        self.get_logger().info("published msg")
+
+
+
+    def listener_callback(self, msg):
+
+        self.get_logger().info("Callback")
+        self.plot_x = []
+        self.plot_y = []
 
 
 if __name__ == '__main__':
