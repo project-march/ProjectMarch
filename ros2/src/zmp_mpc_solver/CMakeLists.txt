@@ -16,6 +16,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
+find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -30,6 +31,25 @@ include_directories(include)
 set(acados_include "${PROJECT_SOURCE_DIR}/../libraries/acados/include")
 set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
 
+# Necessary for testing
+add_library(${PROJECT_NAME}_testlib
+  STATIC
+  src/zmp_mpc_solver_node.cpp
+  src/zmp_mpc_solver.cpp
+  include/${PROJECT_NAME}/zmp_mpc_solver.hpp
+  include/${PROJECT_NAME}/zmp_mpc_solver_node.hpp
+)
+
+ament_target_dependencies(
+  ${PROJECT_NAME}_testlib
+  "pluginlib"
+  "rclcpp"
+  "geometry_msgs"
+  "nav_msgs"
+  "march_shared_msgs"
+)
+
+# 
 add_executable(zmp_mpc_solver
 src/zmp_mpc_solver_node.cpp
 src/zmp_mpc_solver.cpp
@@ -46,6 +66,7 @@ ament_target_dependencies(
   "rclcpp"
   "geometry_msgs"
   "nav_msgs"
+  "march_shared_msgs"
 )
 
 
@@ -74,6 +95,17 @@ target_link_libraries(zmp_mpc_solver
 ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_ZMP_pendulum_ode.so
 )
 
+# FOR TESTING
+target_link_libraries(${PROJECT_NAME}_testlib ${acados_lib}/libblasfeo.so)
+target_link_libraries(${PROJECT_NAME}_testlib ${acados_lib}/libhpipm.so)
+target_link_libraries(${PROJECT_NAME}_testlib ${acados_lib}/libqpOASES_e.so)
+target_link_libraries(${PROJECT_NAME}_testlib ${acados_lib}/libqpOASES_e.so.3.1)
+target_link_libraries(${PROJECT_NAME}_testlib ${acados_lib}/libacados.so)
+target_link_libraries(${PROJECT_NAME}_testlib 
+${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_ZMP_pendulum_ode.so
+)
+# 
+
 install(TARGETS zmp_mpc_solver
   DESTINATION lib/${PROJECT_NAME})
 
@@ -98,10 +130,23 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_co
 
 
 if(BUILD_TESTING)
+  set(ament_cmake_copyright_FOUND TRUE)  
   #find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  set(ament_cmake_copyright_FOUND TRUE)
+  ament_add_gmock(${PROJECT_NAME}_test
+    test/test_runner.cpp
+    # include
+    )
+  
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME}_testlib)
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+    $<INSTALL_INTERFACE:include>)
+  ament_target_dependencies(
+    ${PROJECT_NAME}_test
+    "pluginlib"
+    "rclcpp"
+    "geometry_msgs"
+    "nav_msgs")
   # the following line skips cpplint (only works in a git repo)
   # uncomment the line when this package is not in a git repo
   #set(ament_cmake_cpplint_FOUND TRUE)

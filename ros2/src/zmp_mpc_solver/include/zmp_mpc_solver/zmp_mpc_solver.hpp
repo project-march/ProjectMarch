@@ -1,5 +1,5 @@
 // standard
-// #include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
+#include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 #include <array>
 #include <chrono>
 #include <iostream>
