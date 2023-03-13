@@ -24,7 +24,6 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::PointStampedList>::SharedPtr m_points_subscription;
 
     void subscriber_callback(march_shared_msgs::msg::PointStampedList::SharedPtr msg);
-    rclcpp::TimerBase::SharedPtr timer_;
 
     SwingLegTrajectoryGenerator m_swing_leg_generator;
 };

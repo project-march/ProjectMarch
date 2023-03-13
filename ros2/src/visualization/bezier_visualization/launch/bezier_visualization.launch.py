@@ -5,9 +5,9 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Launch description of the mujoco simulation nodes.
+    """Launch description of the Bezier visualization nodes.
 
-    These nodes are started when the mujoco simulation has be run.
+    These nodes are started when the  Bezier visualization has be run.
     """
     return LaunchDescription([
         Node(

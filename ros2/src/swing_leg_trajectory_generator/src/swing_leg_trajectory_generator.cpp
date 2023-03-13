@@ -9,6 +9,7 @@ using PointStamped = geometry_msgs::msg::PointStamped;
 
 SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 {
+    // TODO: Check if these points are correct for the ik-solver, or if they have to be altered for a realistic step.
     m_curve = BezierCurve();
     auto start_point = PointStamped();
     start_point.point.x = 0;

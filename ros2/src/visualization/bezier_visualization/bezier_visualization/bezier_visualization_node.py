@@ -53,6 +53,7 @@ class BezierCurve(Node):
 
         self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
         self.figure = plt.figure("Bezier Curve")
+        # TODO: if these points have good values
         self.points = {1: 0, 25: 50, 75: 50, 99: 0}
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
