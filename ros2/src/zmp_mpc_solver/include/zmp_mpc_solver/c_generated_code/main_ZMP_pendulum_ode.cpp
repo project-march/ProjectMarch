@@ -32,6 +32,7 @@
  */
 
 // standard
+#include <array>
 #include <stdio.h>
 #include <stdlib.h>
 // acados
@@ -43,6 +44,9 @@
 
 // blasfeo
 #include "blasfeo/include/blasfeo_d_aux_ext_dep.h"
+
+// March
+#include "zmp_mpc_solver/zmp_mpc_solver.hpp"
 
 #ifndef C_GENERATED_MPC
 #define C_GENERATED_MPC
@@ -77,7 +81,8 @@
 #define NPHIN ZMP_PENDULUM_ODE_NPHIN
 #define NR ZMP_PENDULUM_ODE_NR
 
-inline int solve_zmp_mpc(std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
+inline int ZmpSolver::solve_zmp_mpc(
+    std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {
 
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();

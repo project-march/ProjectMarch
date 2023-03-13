@@ -11,15 +11,16 @@ SolverNode::SolverNode()
     m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
-    m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
+    m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "robot_feet_positions", 10, std::bind(&SolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
 }
 
-void SolverNode::com_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+void SolverNode::com_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    RCLCPP_DEBUG(this->get_logger(), "Com callback test");
+    m_zmp_solver.set_current_com(
+        msg->poses[0].position.x, msg->poses[0].position.y, msg->poses[1].position.x, msg->poses[1].position.y);
 }
 
 void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
@@ -27,9 +28,10 @@ void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
     RCLCPP_DEBUG(this->get_logger(), "zmp callback test");
 }
 
-void SolverNode::feet_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    RCLCPP_DEBUG(this->get_logger(), "feet callback test");
+    m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
+    m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
 }
 
 void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
