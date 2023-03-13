@@ -158,10 +158,8 @@ class BezierCurve(Node):
         self.publish_points.publish(msg)
         plt.ioff()
 
-
     def listener_callback(self, msg):
-        """Callback for subscriber, not used for now, probably not needed"""
-
+        """Callback for subscriber, not used for now, probably not needed."""
         self.get_logger().info("Callback")
         self.plot_x = []
         self.plot_y = []
