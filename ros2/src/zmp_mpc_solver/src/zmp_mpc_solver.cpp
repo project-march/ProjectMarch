@@ -2,19 +2,20 @@
 #include "zmp_mpc_solver/zmp_mpc_solver.hpp"
 
 ZmpSolver::ZmpSolver()
-    : m_x_current({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 })
-    , m_u_current({ 0, 0, 0, 0, 0, 0, 0 })
+    : m_x_current()
+    , m_u_current()
     , m_time_horizon(3.0)
     , m_gravity_const(9.81)
 {
     initialize_mpc_params();
-
-    solve_step(m_x_current, m_u_current);
+    m_x_current.fill(0);
+    m_u_current.fill(0);
+    // solve_step(m_x_current, m_u_current);
 }
 
-int ZmpSolver::solve_step(std::array<double, NX>& x_cur, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_cur)
+int ZmpSolver::solve_step()
 {
-    return solve_zmp_mpc(x_cur, u_cur);
+    return solve_zmp_mpc(m_x_current, m_u_current);
     // return 1;
 }
 
@@ -28,9 +29,27 @@ std::array<double, NU * ZMP_PENDULUM_ODE_N> ZmpSolver::get_input_trajectory()
     return m_u_current;
 }
 
-void ZmpSolver::set_current_state(std::vector<double> new_state)
+void ZmpSolver::set_current_state()
 {
-    std::copy(new_state.begin(), new_state.end(), m_x_current.begin());
+    // This is of course MPC dependent
+    m_x_current[0] = m_com_current[0];
+    m_x_current[1] = m_com_vel_current[0];
+
+    m_x_current[2] = m_zmp_current[0];
+
+    m_x_current[3] = m_com_current[1];
+    m_x_current[4] = m_com_vel_current[1];
+
+    m_x_current[5] = m_zmp_current[1];
+
+    m_x_current[6] = m_pos_foot_current[0];
+    m_x_current[7] = m_pos_foot_prev[0];
+
+    m_x_current[8] = m_pos_foot_current[1];
+    m_x_current[9] = m_pos_foot_prev[1];
+
+    m_x_current[10] = 0;
+    m_x_current[11] = 0;
 }
 
 void ZmpSolver::set_current_foot(double x, double y)
@@ -50,8 +69,8 @@ void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
     m_com_current[0] = x;
     m_com_current[1] = y;
 
-    m_com_vel_current[0] = x;
-    m_com_vel_current[1] = y;
+    m_com_vel_current[0] = dx;
+    m_com_vel_current[1] = dy;
 }
 
 void ZmpSolver::set_current_zmp(double x, double y)

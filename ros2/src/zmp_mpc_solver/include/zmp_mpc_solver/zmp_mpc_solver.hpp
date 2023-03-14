@@ -10,13 +10,15 @@
 
 #ifndef ZMP_MPC
 #define ZMP_MPC
+
+enum Gait_type { startup, continuous, stopping };
+
 class ZmpSolver {
 public:
     ZmpSolver();
     double m_time_horizon;
-    void set_current_state(std::vector<double>);
-    int solve_step(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
-    int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
+    void set_current_state();
+    int solve_step();
     std::array<double, NX> get_state();
     std::array<double, NU * ZMP_PENDULUM_ODE_N> get_input_trajectory();
 
@@ -27,6 +29,8 @@ public:
     void initialize_mpc_params();
 
 private:
+    int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
+
     std::array<double, NX> m_x_current;
     std::array<double, NU * ZMP_PENDULUM_ODE_N> m_u_current;
     std::array<double, 2> m_pos_foot_current;
