@@ -134,6 +134,7 @@ if(BUILD_TESTING)
   #find_package(ament_lint_auto REQUIRED)
   ament_add_gmock(${PROJECT_NAME}_test
     test/test_runner.cpp
+    test/zmp_mpc_test.cpp
     # include
     )
   

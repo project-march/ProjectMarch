@@ -36,7 +36,6 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 
 void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
 {
-    m_zmp_solver.set_current_state({ msg->joint_pos[0] });
     // int status = solve_step(x_current, u_current); // solve the mpc problem
     // if (status == 0) {
     // publish_control_msg();
