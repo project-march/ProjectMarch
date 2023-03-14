@@ -16,7 +16,7 @@ enum pressure_sole_side { left, right };
 
 struct PressureSoleData {
     double heel_left;
-    double heel_right = 2.0;
+    double heel_right;
     // double met1;
     // double hallux;
     // double met3;
@@ -52,9 +52,9 @@ struct PressureSoleData {
      */
     inline std::array<std::pair<std::string, double*>, pressure_sole::DATA_LENGTH> get_pointers()
     {
-        RCLCPP_INFO(rclcpp::get_logger("get_pointers_logger"), "heel_right %f", heel_right);
         return { 
-            std::make_pair("heel_right", &heel_right), std::make_pair("heel_left", &heel_left),
+            std::make_pair("heel_right", &heel_right), 
+            std::make_pair("heel_left", &heel_left),
             // std::make_pair("met1", &met1), std::make_pair("hallux", &hallux), std::make_pair("met3", &met3),
             // std::make_pair("toes", &toes), std::make_pair("met5", &met5), std::make_pair("arch", &arch) 
             };
@@ -78,7 +78,6 @@ struct PressureSoleData {
         // toes = data[5].f;
         // met5 = data[6].f;
         // arch = data[7].f;
-        RCLCPP_INFO(rclcpp::get_logger("update_values_logger"), "heel_right %f", heel_right);
         // get_pointers();
     }
 };
