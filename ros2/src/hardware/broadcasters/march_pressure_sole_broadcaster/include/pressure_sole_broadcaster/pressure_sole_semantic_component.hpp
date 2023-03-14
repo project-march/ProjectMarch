@@ -18,10 +18,13 @@ namespace state_interface {
     inline double get(int& index, const StateInerfaces& state_interfaces)
     {
         index++;
+        auto size = state_interfaces.size();
+        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "state_interfaces size is:  %d", size);
+        
         auto si = state_interfaces[index -1];
         double ret = si.get().get_value();
-        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "state_interface %s has value  %f", si.get().get_full_name().c_str(), ret);
-        return ret;
+        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "state_interface %s has value  %g", si.get().get_full_name().c_str(), ret);
+        return state_interfaces[index -1].get().get_value();
     }
 } // namespace state_interface
 
@@ -30,8 +33,8 @@ public:
     explicit PressureSoleSemanticComponent()
         : SemanticComponentInterface("pressure_soles", /*size*/ 2)
     {
-        interface_names_.emplace_back(name_ + "/" + "heel_right");
-        interface_names_.emplace_back(name_ + "/" + "heel_left");
+        interface_names_.emplace_back("pressure_soles/heel_right");
+        interface_names_.emplace_back("pressure_soles/heel_left");
         // interface_names_.emplace_back(name_ + "/" + "l_met1");
         // interface_names_.emplace_back(name_ + "/" + "l_hallux");
         // interface_names_.emplace_back(name_ + "/" + "l_met3");
@@ -46,6 +49,7 @@ public:
         // interface_names_.emplace_back(name_ + "/" + "r_toes");
         // interface_names_.emplace_back(name_ + "/" + "r_met5");
         // interface_names_.emplace_back(name_ + "/" + "r_arch");
+
     }
 
     virtual ~PressureSoleSemanticComponent() = default;
@@ -63,8 +67,8 @@ public:
     void update()
     {
         int index = 0;
-        heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         // l_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         // l_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         // l_met3_ = static_cast<float>(state_interface::get(index, state_interfaces_));

@@ -15,8 +15,8 @@ namespace pressure_sole {
 enum pressure_sole_side { left, right };
 
 struct PressureSoleData {
-    double heel_left;
-    double heel_right;
+    double heel_right = 0.0;
+    double heel_left = 0.0;
     // double met1;
     // double hallux;
     // double met3;
@@ -70,8 +70,8 @@ struct PressureSoleData {
      */
     inline void update_values(std::array<bit32, pressure_sole::DATA_LENGTH> data)
     {
-        heel_right = data[0].f;
-        heel_left = data[1].f;
+        heel_right = static_cast<double>(data[0].f);
+        heel_left = static_cast<double>(data[1].f);
         // met1 = data[2].f;
         // hallux = data[3].f;
         // met3 = data[4].f;

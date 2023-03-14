@@ -46,6 +46,7 @@ controller_interface::return_type PressureSoleBroadcaster::update()
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PressureSoleBroadcaster::on_configure(
     const rclcpp_lifecycle::State& previous_state)
 {    
+    RCLCPP_INFO((*logger_), "March pressure sole broadcaster configuring. Previous state = %s", previous_state.label().c_str());
     pressure_sole_component = std::make_unique<PressureSoleSemanticComponent>();
     try {
         // register pressure sole data publisher
@@ -77,7 +78,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pressu
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PressureSoleBroadcaster::on_deactivate(
     const rclcpp_lifecycle::State& previous_state)
 {
-    RCLCPP_DEBUG((*logger_), "March Pressure sole broadcaster deactivating. Previous state = %s",
+    RCLCPP_INFO((*logger_), "March Pressure sole broadcaster deactivating. Previous state = %s",
         previous_state.label().c_str());
     pressure_sole_component->release_interfaces();
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
