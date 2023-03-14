@@ -1,8 +1,10 @@
 /// @author Marco Bak - M8
-#ifndef BUILD_MARCH_PRESSURE_SOLE_BROADCASTER_HPP
-#define BUILD_MARCH_PRESSURE_SOLE_BROADCASTER_HPP
+
+#ifndef MARCH_PRESSURE_SOLE_BROADCASTER__MARCH_PRESSURE_SOLE_BROADCASTER_HPP_
+#define MARCH_PRESSURE_SOLE_BROADCASTER__MARCH_PRESSURE_SOLE_BROADCASTER_HPP_
 
 #include "controller_interface/controller_interface.hpp"
+#include "march_shared_msgs/msg/pressure_soles_data.h"
 #include "pressure_sole_broadcaster/pressure_sole_semantic_component.hpp"
 #include "pressure_sole_broadcaster/visibilitiy_control.h"
 #include <realtime_tools/realtime_publisher.h>
@@ -48,4 +50,5 @@ private:
     std::unique_ptr<PressureSoleRTPublisher> realtime_pressure_sole_publisher_;
 };
 } // namespace march_pressure_sole_broadcaster
-#endif // BUILD_MARCH_PRESSURE_SOLE_BROADCASTER_HPP
+
+#endif // MARCH_PRESSURE_SOLE_BROADCASTER__MARCH_PRESSURE_SOLE_BROADCASTER_HPP_

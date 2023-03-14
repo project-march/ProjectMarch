@@ -1,12 +1,11 @@
 /// @author Marco Bak - M8
 
-#ifndef BUILD_PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP
-#define BUILD_PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP
+#ifndef MARCH_PRESSURE_SOLE_BROADCASTER__PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP_
+#define MARCH_PRESSURE_SOLE_BROADCASTER__PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP_
 
 #include <limits>
 #include <string>
 #include <vector>
-#include <rclcpp/rclcpp.hpp>
 
 #include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "semantic_components/semantic_component_interface.hpp"
@@ -16,12 +15,12 @@ using StateInerfaces = std::vector<std::reference_wrapper<hardware_interface::Lo
 using PressureSolesMsg = march_shared_msgs::msg::PressureSolesData;
 
 namespace state_interface {
-    using StateInerfaces = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
     inline double get(int& index, const StateInerfaces& state_interfaces)
     {
         index++;
-        double ret = state_interfaces[index-1].get().get_value();
-        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "index state_interface value is: %f", ret);
+        auto si = state_interfaces[index -1];
+        double ret = si.get().get_value();
+        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "state_interface %s has value  %f", si.get().get_full_name().c_str(), ret);
         return ret;
     }
 } // namespace state_interface
@@ -31,8 +30,8 @@ public:
     explicit PressureSoleSemanticComponent()
         : SemanticComponentInterface("pressure_soles", /*size*/ 2)
     {
-        interface_names_.emplace_back(name_ + "/" + "heel_left");
         interface_names_.emplace_back(name_ + "/" + "heel_right");
+        interface_names_.emplace_back(name_ + "/" + "heel_left");
         // interface_names_.emplace_back(name_ + "/" + "l_met1");
         // interface_names_.emplace_back(name_ + "/" + "l_hallux");
         // interface_names_.emplace_back(name_ + "/" + "l_met3");
@@ -63,10 +62,7 @@ public:
      */
     void update()
     {
-
-        // RCLCPP_INFO(rclcpp::get_logger("test_loggger"), "Updating values");
         int index = 0;
-        // RCLCPP_INFO(rclcpp::get_logger("test_loggger"), "Updating values");
         heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         // l_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
@@ -99,23 +95,23 @@ public:
     }
 
 private:
-    float heel_right_ = 2.f;
-    float heel_left_ = 0.f;
-    float l_met1_ = 0.f;
-    float l_hallux_ = 0.f;
-    float l_met3_ = 0.f;
-    float l_toes_ = 0.f;
-    float l_met5_ = 0.f;
-    float l_arch_ = 0.f;
-    float r_heel_right_ = 0.f;
-    float r_heel_left_ = 0.f;
-    float r_met1_ = 0.f;
-    float r_hallux_ = 0.f;
-    float r_met3_ = 0.f;
-    float r_toes_ = 0.f;
-    float r_met5_ = 0.f;
-    float r_arch_ = 0.f;
+    float heel_right_ = 0.F;
+    float heel_left_ = 0.F;
+    float l_met1_ = 0.F;
+    float l_hallux_ = 0.F;
+    float l_met3_ = 0.F;
+    float l_toes_ = 0.F;
+    float l_met5_ = 0.F;
+    float l_arch_ = 0.F;
+    float r_heel_right_ = 0.F;
+    float r_heel_left_ = 0.F;
+    float r_met1_ = 0.F;
+    float r_hallux_ = 0.F;
+    float r_met3_ = 0.F;
+    float r_toes_ = 0.F;
+    float r_met5_ = 0.F;
+    float r_arch_ = 0.F;
 };
 } // namespace march_pressure_sole_broadcaster
 
-#endif // BUILD_PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP
+#endif // MARCH_PRESSURE_SOLE_BROADCASTER__PRESSURE_SOLE_SEMANTIC_COMPONENT_HPP_
