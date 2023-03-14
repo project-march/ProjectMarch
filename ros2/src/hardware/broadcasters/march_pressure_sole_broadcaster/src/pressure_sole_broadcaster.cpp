@@ -26,24 +26,20 @@ controller_interface::InterfaceConfiguration PressureSoleBroadcaster::command_in
 
 controller_interface::InterfaceConfiguration PressureSoleBroadcaster::state_interface_configuration() const
 {
-    controller_interface::InterfaceConfiguration state_interfaces_config;
-    state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-    state_interfaces_config.names = pressure_sole_component->get_state_interface_names();
-    return state_interfaces_config;
+    // controller_interface::InterfaceConfiguration state_interfaces_config;
+    // state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+    // state_interfaces_config.names = pressure_sole_component->get_state_interface_names();
+    // return state_interfaces_config;
+    return { controller_interface::interface_configuration_type::ALL };
 }
 
 controller_interface::return_type PressureSoleBroadcaster::update()
 {
-    // RCLCPP_INFO(
-        // (*logger_), "March Pressure sole broadcaster starts updating");
     if (realtime_pressure_sole_publisher_ && realtime_pressure_sole_publisher_->trylock()) {
         realtime_pressure_sole_publisher_->msg_.header.stamp = node_->now();
         pressure_sole_component->get_values_as_message(realtime_pressure_sole_publisher_->msg_);
         realtime_pressure_sole_publisher_->unlockAndPublish();
     }
-
-    // RCLCPP_INFO(
-    //     (*logger_), "March Pressure sole broadcaster updated succesfully");
     return controller_interface::return_type::OK;
 }
 
@@ -71,9 +67,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pressu
 {
     RCLCPP_INFO(
         (*logger_), "March pressure sole broadcaster activating. Previous state = %s", previous_state.label().c_str());
-    for (auto si = state_interfaces_.crbegin(); si != state_interfaces_.crend(); si++) {
-        RCLCPP_INFO((*logger_), "Got state interface %s", si->get_full_name().c_str());
-    }
+    // for (auto si = state_interfaces_.crbegin(); si != state_interfaces_.crend(); si++) {
+    //     RCLCPP_INFO((*logger_), "Got state interface %s", si->get_full_name().c_str());
+    // }
     pressure_sole_component->assign_loaned_state_interfaces(state_interfaces_);
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }

@@ -91,11 +91,11 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     march::PressureSoleData left_sole = {};
     // left_sole.side = march::pressure_sole_side::left;
     pressure_soles_data_.push_back(left_sole);
-    march::PressureSoleData right_sole = {};
-    // right_sole.side = march::pressure_sole_side::right;
-    pressure_soles_data_.push_back(right_sole);
+    // march::PressureSoleData right_sole = {};
+    // // right_sole.side = march::pressure_sole_side::right;
+    // pressure_soles_data_.push_back(right_sole);
 
-    RCLCPP_INFO((*logger_), "Finished creating march pressure soel data"); 
+    RCLCPP_INFO((*logger_), "Finished creating march pressure sole data"); 
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -196,10 +196,11 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             name.append(pressure_soles_pointer.first);
             RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
             if (name == "heel_right" || name == "heel_left"){
-                state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles", name, pressure_soles_pointer.second));
+                auto s_i = hardware_interface::StateInterface(
+                    "pressure_soles", name, pressure_soles_pointer.second);
+                state_interfaces.emplace_back(s_i);
                 RCLCPP_WARN((*logger_),
-                    "Gaat goed met %s en %f", name.c_str(), pressure_soles_pointer.second);
+                    "Gaat goed met %s en %f", s_i.get_full_name().c_str(), pressure_soles_pointer.second);
             }
         // } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
         //     std::string name = "r_";
@@ -432,7 +433,6 @@ void MarchExoSystemInterface::pdb_read()
  */
 void MarchExoSystemInterface::pressure_sole_read()
 {
-    RCLCPP_INFO((*logger_), "Pressure sole starts reading .........");
     auto pressure_soles = march_robot_->getPressureSoles();
     for (size_t i = 0; i < pressure_soles.size(); i++) {
         pressure_soles[i].read(pressure_soles_data_[i]);
@@ -441,8 +441,6 @@ void MarchExoSystemInterface::pressure_sole_read()
     for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
         RCLCPP_WARN((*logger_), "Pointer val of pressure_sole %s: %f", pressure_soles_pointer.first.c_str(), *pressure_soles_pointer.second);
     }
-    RCLCPP_INFO((*logger_), "Pressure sole done reading !!!!!!!!!!");
-    // RCLCPP_INFO((*logger_), "\n");
 
 };
 
