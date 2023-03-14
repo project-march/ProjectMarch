@@ -19,6 +19,8 @@
 #include <limits>
 #include <memory>
 #include <vector>
+#include <cassert>
+#include <unistd.h>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_builder/hardware_builder.h"
@@ -56,7 +58,6 @@ MarchExoSystemInterface::~MarchExoSystemInterface()
 hardware_interface::return_type MarchExoSystemInterface::configure(const hardware_interface::HardwareInfo& info)
 {
     RCLCPP_INFO((*logger_), "Configuring Hardware Interface...");
-
     // Default Check needs to be done for every hardware interface.
     if (configure_default(info) != hardware_interface::return_type::OK) {
         RCLCPP_FATAL((*logger_), "Configure default of Hardware Interface failed.");
@@ -196,8 +197,9 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             name.append(pressure_soles_pointer.first);
             RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
             if (name == "heel_right" || name == "heel_left"){
+                assert(pressure_soles_pointer.second != nullptr);
                 auto s_i = hardware_interface::StateInterface(
-                    "pressure_soles", name, pressure_soles_pointer.second);
+                    "pressure_soles", pressure_soles_pointer.first, pressure_soles_pointer.second);
                 state_interfaces.emplace_back(s_i);
                 RCLCPP_WARN((*logger_),
                     "Gaat goed met %s en %f", s_i.get_full_name().c_str(), pressure_soles_pointer.second);
