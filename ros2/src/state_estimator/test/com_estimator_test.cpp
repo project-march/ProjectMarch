@@ -78,10 +78,11 @@ TEST_F(ComEstimatorTest, setMultipleComTest)
     total.position.point.y = (com1.position.point.y*com1.mass+com2.position.point.y*com2.mass+com3.position.point.y*com3.mass)/(com1.mass+com2.mass+com3.mass);
     total.position.point.z = (com1.position.point.z*com1.mass+com2.position.point.z*com2.mass+com3.position.point.z*com3.mass)/(com1.mass+com2.mass+com3.mass);
     com_estimator->set_com_state(masses);
-    ASSERT_EQ(com_estimator->get_com_state().position.point.x, total.position.point.x);
-    ASSERT_EQ(com_estimator->get_com_state().position.point.y, total.position.point.y);
-    ASSERT_EQ(com_estimator->get_com_state().position.point.z, total.position.point.z);
-    ASSERT_EQ(com_estimator->get_com_state().mass, total.mass);
+//    ASSERT_EQ(com_estimator->get_com_state().position.point.x, total.position.point.x);
+//    ASSERT_EQ(com_estimator->get_com_state().position.point.y, total.position.point.y);
+//    ASSERT_EQ(com_estimator->get_com_state().position.point.z, total.position.point.z);
+//    ASSERT_EQ(com_estimator->get_com_state().mass, total.mass);
+    ASSERT_EQ(com_estimator->get_com_state(), total);
 }
 
 // NOLINTEND
