@@ -1,6 +1,3 @@
-//
-// Created by marco on 14-2-23.
-//
 #ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2022 Project March.
@@ -28,36 +25,87 @@ protected:
     std::unique_ptr<FootstepEstimator> footstep_estimator;
 };
 
-TEST_F(FootstepEstimator, feetOnGroundTest)
+TEST_F(FootstepEstimatorTest, feetOnGroundTest)
 {
-    const char prefixR = 'r';
-    const char prefixL = 'l';
     std::vector<PressureSensor> sensors;
-    PressureSensor mock_sensor;
-    mock_sensor.name = "mock_sensor";
+
     CenterOfPressure cop;
-    cop.pressure = 10;
-    mock_sensor.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor);
+    cop.pressure = 20;
+
+    const char prefixR = 'r';
+    PressureSensor mock_sensor_r;
+    mock_sensor_r.name = "r";
+    mock_sensor_r.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor_r);
+
+    const char prefixL = 'l';
+    PressureSensor mock_sensor_l;
+    mock_sensor_l.name = "l";
+    mock_sensor_l.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor_l);
+
     footstep_estimator->update_feet(sensors);
     ASSERT_TRUE(footstep_estimator->get_foot_on_ground(&prefixR));
     ASSERT_TRUE(footstep_estimator->get_foot_on_ground(&prefixL));
 }
 
-TEST_F(FootstepEstimator, feetOffGroundTest)
+TEST_F(FootstepEstimatorTest, feetOffGroundTest)
 {
-    const char prefixR = 'r';
-    const char prefixL = 'l';
     std::vector<PressureSensor> sensors;
-    PressureSensor mock_sensor;
-    mock_sensor.name = "mock_sensor";
+
     CenterOfPressure cop;
-    cop.pressure = 7;
-    mock_sensor.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor);
+    cop.pressure = 2;
+
+    const char prefixR = 'r';
+    PressureSensor mock_sensor_r;
+    mock_sensor_r.name = "r";
+    mock_sensor_r.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor_r);
+
+    const char prefixL = 'l';
+    PressureSensor mock_sensor_l;
+    mock_sensor_l.name = "l";
+    mock_sensor_l.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor_l);
+
     footstep_estimator->update_feet(sensors);
     ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));
     ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixL));
+}
+
+TEST_F(FootstepEstimatorTest, unknownFootTest)
+{
+    std::vector<PressureSensor> sensors;
+    const char prefixU = 'q';
+    footstep_estimator->update_feet(sensors);
+    ASSERT_EQ(footstep_estimator->get_foot_on_ground(&prefixU), 0);
+}
+
+TEST_F(FootstepEstimatorTest, getFeetPositionTest)
+{
+    geometry_msgs::msg::PointStamped right_position;
+    geometry_msgs::msg::PointStamped left_position;
+
+    right_position.point.x = 0;
+    right_position.point.y = 0;
+    right_position.point.z = 0;
+    left_position.point.x = 1;
+    left_position.point.y = 1;
+    left_position.point.z = 1;
+
+    const char prefixR = 'r';
+    const char prefixL = 'l';
+    Foot* rightF = footstep_estimator->get_foot(&prefixR);
+    Foot* leftF = footstep_estimator->get_foot(&prefixL);
+    rightF->position = right_position;
+    leftF->position = left_position;
+
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.x, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.y, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.z, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.x, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.y, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.z, 1);
 }
 
 // NOLINTEND

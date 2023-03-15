@@ -22,7 +22,7 @@ protected:
     {
         // Read the pressure sensors from the hardware interface
         PressureSensor mock_sensor;
-        mock_sensor.name = "mock_sensor";
+        mock_sensor.name = "l_mock_sensor";
         CenterOfPressure cop;
         cop.position.point.x = 0;
         cop.position.point.y = 0;
@@ -47,7 +47,7 @@ TEST_F(CopEstimatorTest, setCopTest)
     ASSERT_EQ(actual_cop.pressure, expected_cop.pressure);
     std::vector<PressureSensor> sensors;
     PressureSensor mock_sensor;
-    mock_sensor.name = "mock_sensor";
+    mock_sensor.name = "l_mock_sensor";
     CenterOfPressure cop;
     cop.position.point.x = 0;
     cop.position.point.y = 0;
@@ -70,7 +70,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     expected_cop.pressure = 6;
     std::vector<PressureSensor> sensors;
     PressureSensor mock_sensor1;
-    mock_sensor1.name = "mock_sensor1";
+    mock_sensor1.name = "l_mock_sensor1";
     CenterOfPressure cop;
     cop.position.point.x = 0;
     cop.position.point.y = 0;
@@ -79,7 +79,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_sensor1.centre_of_pressure = cop;
     sensors.push_back(mock_sensor1);
     PressureSensor mock_sensor2;
-    mock_sensor1.name = "mock_sensor2";
+    mock_sensor1.name = "l_mock_sensor2";
     cop.position.point.x = 3;
     cop.position.point.y = 0;
     cop.position.point.z = 0;
@@ -87,7 +87,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_sensor2.centre_of_pressure = cop;
     sensors.push_back(mock_sensor2);
     PressureSensor mock_sensor3;
-    mock_sensor3.name = "mock_sensor3";
+    mock_sensor3.name = "l_mock_sensor3";
     cop.position.point.x = 3;
     cop.position.point.y = 3;
     cop.position.point.z = 0;
@@ -95,7 +95,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_sensor3.centre_of_pressure = cop;
     sensors.push_back(mock_sensor3);
     PressureSensor mock_sensor4;
-    mock_sensor4.name = "mock_sensor4";
+    mock_sensor4.name = "l_mock_sensor4";
     cop.position.point.x = 0;
     cop.position.point.y = 3;
     cop.position.point.z = 0;
@@ -110,7 +110,7 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
 {
     std::vector<PressureSensor> sensors;
     PressureSensor mock_sensor;
-    mock_sensor.name = "mock_sensor";
+    mock_sensor.name = "l_mock_sensor";
     CenterOfPressure cop;
     cop.position.point.x = 0;
     cop.position.point.y = 0;
@@ -126,7 +126,7 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
 TEST_F(CopEstimatorTest, testUpdateSensorPressure)
 {
     double pressure = 2;
-    std::map<std::string, double> update_map = { { "mock_sensor", pressure } };
+    std::map<std::string, double> update_map = { { "l_mock_sensor", pressure } };
     cop_estimator->update_sensor_pressures(update_map);
     auto updated_sensors = cop_estimator->get_sensors();
     for (auto sensor : updated_sensors) {

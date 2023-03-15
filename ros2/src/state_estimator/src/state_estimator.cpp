@@ -244,7 +244,11 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
     std::vector<PressureSensor> sensors;
     for (size_t i = 0; i < names.size(); i++) {
         PressureSensor sensor;
-        sensor.name = names.at(i);
+        const char initial = names.at(i)[0];
+        if(initial!= 'l' && initial != 'r') {
+            RCLCPP_WARN(this->get_logger(), "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
+        }
+        sensor.name = initial;
         CenterOfPressure cop;
         cop.position.point.x = x_positions.at(i);
         cop.position.point.y = y_positions.at(i);

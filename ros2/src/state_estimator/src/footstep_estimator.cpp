@@ -52,6 +52,21 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
     }
 }
 
+Foot* FootstepEstimator::get_foot(const char* prefix)
+{
+    switch (*prefix) {
+        case * "l":
+            return &foot_left;
+            break;
+
+        case * "r":
+            return &foot_right;
+            break;
+        default:
+            return 0;
+    }
+}
+
 void FootstepEstimator::update_feet(const std::vector<PressureSensor> sensors)
 {
     foot_left.set_on_ground(sensors, "l");

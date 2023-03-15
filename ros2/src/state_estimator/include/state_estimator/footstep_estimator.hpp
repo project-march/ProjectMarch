@@ -50,6 +50,7 @@ public:
     void set_foot_size(double, double, const char*);
     void update_feet(const std::vector<PressureSensor>);
     bool get_foot_on_ground(const char*);
+    Foot* get_foot(const char*);
     // IMU& get_imu();
 
 private:

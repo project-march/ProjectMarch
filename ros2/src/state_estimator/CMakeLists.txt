@@ -116,6 +116,7 @@ if(BUILD_TESTING)
   test/cop_estimator_test.cpp
   test/com_estimator_test.cpp
   test/state_estimator_test.cpp
+  test/footstep_estimator_test.cpp
   test/test_runner.cpp
   # test/mocks/mock_state_estimator.hpp
   # include
