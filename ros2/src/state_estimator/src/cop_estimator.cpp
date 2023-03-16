@@ -20,18 +20,25 @@ CopEstimator::CopEstimator(std::vector<PressureSensor> sensors)
  * If no pressure is measured on all sensors, an error is thrown.
  * @param sensors
  */
-void CopEstimator::set_cop_state(std::vector<PressureSensor> sensors)
+void CopEstimator::set_cop_state(
+    std::vector<PressureSensor> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames)
 {
     m_center_of_pressure.pressure = 0;
     m_center_of_pressure.position.point.x = 0;
     m_center_of_pressure.position.point.y = 0;
     m_center_of_pressure.position.point.z = 0;
+
+    geometry_msgs::msg::PointStamped transformed_point;
+
     for (const auto& i : sensors) {
         auto pressure = i.centre_of_pressure.pressure;
         m_center_of_pressure.pressure += pressure;
-        m_center_of_pressure.position.point.x += i.centre_of_pressure.position.point.x * pressure;
-        m_center_of_pressure.position.point.y += i.centre_of_pressure.position.point.y * pressure;
-        m_center_of_pressure.position.point.z += i.centre_of_pressure.position.point.z * pressure;
+
+        tf2::doTransform(i.centre_of_pressure.position, transformed_point, reference_frames[(i.name[0] == *"l")]);
+
+        m_center_of_pressure.position.point.x += transformed_point.point.x * pressure;
+        m_center_of_pressure.position.point.y += transformed_point.point.y * pressure;
+        m_center_of_pressure.position.point.z += transformed_point.point.z * pressure;
     }
     if (m_center_of_pressure.pressure != 0) {
         m_center_of_pressure.position.point.x = m_center_of_pressure.position.point.x / m_center_of_pressure.pressure;
@@ -50,7 +57,7 @@ void CopEstimator::update_sensor_pressures(std::map<std::string, double> pressur
     for (auto& sensor : m_sensors) {
         sensor.update_pressure(pressure_values_map.at(sensor.name));
     }
-    set_cop_state(m_sensors);
+    // set_cop_state(m_sensors);
 }
 
 /**
