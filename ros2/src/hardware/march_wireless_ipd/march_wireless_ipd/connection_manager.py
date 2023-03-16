@@ -115,7 +115,6 @@ class ConnectionManager:
 
                 elif msg_type == "Fail":
                     self._send_gait("error")
-                    self._send_message_till_confirm(msg_type="Information", message=req["message"])
 
             except (json.JSONDecodeError, BlockingIOError):
                 continue
@@ -179,7 +178,7 @@ class ConnectionManager:
         except (BrokenPipeError, InterruptedError, socket.error):
             raise socket.error
 
-    def _send_message_till_confirm(self, msg_type: str, requested_gait: bool = False, message: str = None):
+    def _send_message_till_confirm(self, msg_type: str, requested_gait: str, message: str = None):
         """Send a message to the wireless IPD until confirmation is received.
 
         Args:
@@ -187,27 +186,15 @@ class ConnectionManager:
             requested_gait (bool): Whether this message is a response to a requested gait or not.
             message (str): Optional message to send.
         """
-        if requested_gait:
-            send_gait = self._requested_gait
-        else:
-            send_gait = self._current_gait
-
         if self._connection is None:
             return
 
-        point_left, point_right = self._update_points()
-
         msg = {
             "type": msg_type,
-            "currentGait": send_gait,
+            "currentGait": requested_gait,
             "message": message,
             "seq": self._seq,
         }
-
-        # TODO: Update msg accordingly with lena to m8 structure
-
-        self._eeg_command = None
-        self._covid_feedback = None
 
         while True:
             try:

@@ -49,6 +49,14 @@ class WirelessInputDeviceController:
 
     def _gait_response_callback(self, msg: GaitResponse):
         self.get_logger().info("Updating Wireless ipd state...")
+        if msg.gait_type is GaitResponse.SIT:
+            self._node.self._send_message_till_confirm(msg_type="GaitRequest", requested_gait="sit" )
+        if msg.gait_type is GaitResponse.STAND:
+            self._node.self._send_message_till_confirm(msg_type="GaitRequest", requested_gait="stand" )
+        if msg.gait_type is GaitResponse.WALK:
+            self._node.self._send_message_till_confirm(msg_type="GaitRequest", requested_gait="walk" )
+        if msg.gait_type is GaitResponse.ERROR:
+            self._node.self._send_message_till_confirm(msg_type="fail", requested_gait="" )
         # TODO: Send message to IPD with the newly requested state.
 
     def get_node(self) -> Node:
