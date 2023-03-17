@@ -33,13 +33,8 @@ struct PressureSoleData {
 
     friend bool operator==(const PressureSoleData& lhs, const PressureSoleData& rhs)
     {
-        return lhs.heel_right == rhs.heel_right 
-            && lhs.heel_left == rhs.heel_left
-            && lhs.met1 == rhs.met1 
-            && lhs.hallux == rhs.hallux
-            && lhs.met3 == rhs.met3 
-            && lhs.toes == rhs.toes 
-            && lhs.met5 == rhs.met5 
+        return lhs.heel_right == rhs.heel_right && lhs.heel_left == rhs.heel_left && lhs.met1 == rhs.met1
+            && lhs.hallux == rhs.hallux && lhs.met3 == rhs.met3 && lhs.toes == rhs.toes && lhs.met5 == rhs.met5
             && lhs.arch == rhs.arch;
     }
 
@@ -52,16 +47,9 @@ struct PressureSoleData {
      */
     inline std::array<std::pair<std::string, double*>, pressure_sole::DATA_LENGTH> get_pointers()
     {
-        return { 
-            std::make_pair("heel_right", &heel_right), 
-            std::make_pair("heel_left", &heel_left),
-            std::make_pair("met1", &met1), 
-            std::make_pair("hallux", &hallux), 
-            std::make_pair("met3", &met3),
-            std::make_pair("toes", &toes), 
-            std::make_pair("met5", &met5), 
-            std::make_pair("arch", &arch) 
-            };
+        return { std::make_pair("heel_right", &heel_right), std::make_pair("heel_left", &heel_left),
+            std::make_pair("met1", &met1), std::make_pair("hallux", &hallux), std::make_pair("met3", &met3),
+            std::make_pair("toes", &toes), std::make_pair("met5", &met5), std::make_pair("arch", &arch) };
     }
 
     /**

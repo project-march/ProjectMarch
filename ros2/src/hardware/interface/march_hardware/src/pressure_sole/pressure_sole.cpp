@@ -1,6 +1,6 @@
-#include <march_hardware/pressure_sole/pressure_sole.h>
 #include "march_hardware/ethercat/odrive_pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
+#include <march_hardware/pressure_sole/pressure_sole.h>
 #include <rclcpp/rclcpp.hpp>
 
 namespace march {
