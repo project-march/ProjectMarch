@@ -11,6 +11,8 @@ import unittest
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import Node
 from march_shared_msgs.msg import PressureSolesData
+from sensor_msgs.msg import JointState
+from geometry_msgs.msg import PointStamped
 
 
 @pytest.mark.launch_test
@@ -66,9 +68,11 @@ class TestProcessOutput(unittest.TestCase):
                 :return -
             """
         # Read input data that is send to dut
-        msg = PressureSolesData()
-        msg.names = ["test_pad"]
-        msg.pressure_values = [1]
+        msg = JointState()
+        msg.name = ["test_joint"]
+        msg.position = [0.3]
+        msg.velocity = [0.0]
+        msg.effort = [0.0]
         self.publisher_.publish(msg)
         # self.node.get_logger().info('Publishing: ' + str(msg))
 
@@ -84,19 +88,23 @@ class TestProcessOutput(unittest.TestCase):
         function_name = inspect.getframeinfo(frame).function
 
         # Publish data to dut
-        self.publisher_ = self.node.create_publisher(PressureSolesData, "/march/pressure_sole_data", 10)
+        self.publisher_ = self.node.create_publisher(JointState, "/joint_states", 10)
         timer_period = 0.5  # seconds
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
         # Setup for listening to dut messages
         received_data = []
-        # sub = self.node.create_subscription(
-        #     PressureSolesData,
-        #     '/march/gait_response',
-        #     lambda msg: received_data.append(msg.gait_type),
-        #     10
-        # )
-        dut
+        sub = self.node.create_subscription(
+            PointStamped,
+            '/robot_com_position',
+            lambda msg: received_data.append(msg.gait_type),
+            10
+        )
+
+        expected_data = PointStamped
+        expected_data.point.x = 0
+        expected_data.point.y = 0
+        expected_data.point.z = 0
 
         try:
             # Wait until the dut transmits a message over the ROS topic
