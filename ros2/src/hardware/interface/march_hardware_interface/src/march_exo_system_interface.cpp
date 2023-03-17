@@ -89,12 +89,13 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     // Create pressure soles with side set to left and right.
     // This is needed for data reading and updating for the pressure_sole_broadcaster.
-    march::PressureSoleData left_sole = {};
-    // left_sole.side = march::pressure_sole_side::left;
+    march::PressureSoleData left_sole;
+    left_sole.side = march::pressure_sole_side::left;
     pressure_soles_data_.push_back(left_sole);
-    // march::PressureSoleData right_sole = {};
-    // // right_sole.side = march::pressure_sole_side::right;
-    // pressure_soles_data_.push_back(right_sole);
+    march::PressureSoleData right_sole;
+    right_sole.side = march::pressure_sole_side::right;
+    pressure_soles_data_.push_back(right_sole);
+
 
     RCLCPP_INFO((*logger_), "Finished creating march pressure sole data"); 
     for (const auto& joint : info.joints) {
@@ -187,31 +188,27 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     // For the Pressure sole broadcaster.
     // Because the Broadcaster heeds a distinction between left and right,
     // l_ is added for the left data pointers and r_ for the right data pointers.
-    // auto pressure_soles = march_robot_->getPressureSoles();
-    // for (size_t i = 0; i < pressure_soles.size(); i++) {
-    //     pressure_soles[i].read(pressure_soles_data_[i]);
-    // }
-    for (auto pressure_sole_data : pressure_soles_data_) {
+    for (auto& pressure_sole_data : pressure_soles_data_) {
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
-            std::string name = "";
-            name.append(pressure_soles_pointer.first);
-            RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
-            if (name == "heel_right" || name == "heel_left"){
-                assert(pressure_soles_pointer.second != nullptr);
-                auto s_i = hardware_interface::StateInterface(
-                    "pressure_soles", pressure_soles_pointer.first, pressure_soles_pointer.second);
-                state_interfaces.emplace_back(s_i);
-                RCLCPP_WARN((*logger_),
-                    "Gaat goed met %s en %f", s_i.get_full_name().c_str(), pressure_soles_pointer.second);
+            if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
+                std::string name = "l_";
+                name.append(pressure_soles_pointer.first);
+                RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
+                state_interfaces.emplace_back(hardware_interface::StateInterface(
+                    "pressure_soles", name, pressure_soles_pointer.second));
             }
-        // } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
-        //     std::string name = "r_";
-        //     name.append(pressure_soles_pointer.first);
-        //     RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
-        //     state_interfaces.emplace_back(hardware_interface::StateInterface(
-        //         "pressure_soles", name, pressure_soles_pointer.second));
+            if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
+                std::string name = "r_";
+                name.append(pressure_soles_pointer.first);
+                RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
+                state_interfaces.emplace_back(hardware_interface::StateInterface(
+                    "pressure_soles", name, pressure_soles_pointer.second));
+            }
         }
     }
+    RCLCPP_INFO((*logger_), "Creating export state interface finished.");
+    auto pressure_sole_data = &pressure_soles_data_[0];
+    ps_test = pressure_sole_data->get_pointers();
     return state_interfaces;
 }
 
@@ -441,7 +438,10 @@ void MarchExoSystemInterface::pressure_sole_read()
     }
     auto pressure_sole_data = pressure_soles_data_[0];
     for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
-        RCLCPP_WARN((*logger_), "Pointer val of pressure_sole %s: %f", pressure_soles_pointer.first.c_str(), *pressure_soles_pointer.second);
+        RCLCPP_WARN((*logger_), "New p val of pressure_sole %s: %f", pressure_soles_pointer.first.c_str(), *pressure_soles_pointer.second);
+    }
+        for (std::pair<std::string, double*>& pressure_soles_pointer : ps_test) {
+        RCLCPP_WARN((*logger_), "Old p val of pressure_sole %s: %f", pressure_soles_pointer.first.c_str(), *pressure_soles_pointer.second);
     }
 
 };

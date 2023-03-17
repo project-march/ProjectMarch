@@ -23,7 +23,7 @@ namespace state_interface {
         
         auto si = state_interfaces[index -1];
         double ret = si.get().get_value();
-        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "state_interface %s has value  %g", si.get().get_full_name().c_str(), ret);
+        RCLCPP_INFO(rclcpp::get_logger("get_state_interfaces_loggger"), "state_interface %s has value  %f", si.get().get_full_name().c_str(), ret);
         return state_interfaces[index -1].get().get_value();
     }
 } // namespace state_interface
@@ -31,24 +31,33 @@ namespace state_interface {
 class PressureSoleSemanticComponent : public semantic_components::SemanticComponentInterface<PressureSolesMsg> {
 public:
     explicit PressureSoleSemanticComponent()
-        : SemanticComponentInterface("pressure_soles", /*size*/ 2)
+        : SemanticComponentInterface("pressure_soles", /*size*/ 16)
     {
-        interface_names_.emplace_back("pressure_soles/heel_right");
-        interface_names_.emplace_back("pressure_soles/heel_left");
-        // interface_names_.emplace_back(name_ + "/" + "l_met1");
-        // interface_names_.emplace_back(name_ + "/" + "l_hallux");
-        // interface_names_.emplace_back(name_ + "/" + "l_met3");
-        // interface_names_.emplace_back(name_ + "/" + "l_toes");
-        // interface_names_.emplace_back(name_ + "/" + "l_met5");
-        // interface_names_.emplace_back(name_ + "/" + "l_arch");
-        // interface_names_.emplace_back(name_ + "/" + "r_heel_right");
-        // interface_names_.emplace_back(name_ + "/" + "r_heel_left");
-        // interface_names_.emplace_back(name_ + "/" + "r_met1");
-        // interface_names_.emplace_back(name_ + "/" + "r_hallux");
-        // interface_names_.emplace_back(name_ + "/" + "r_met3");
-        // interface_names_.emplace_back(name_ + "/" + "r_toes");
-        // interface_names_.emplace_back(name_ + "/" + "r_met5");
-        // interface_names_.emplace_back(name_ + "/" + "r_arch");
+
+        // interface_names_.emplace_back(name_ + "/" + "heel_right");
+        // interface_names_.emplace_back(name_ + "/" + "heel_left");
+        // interface_names_.emplace_back(name_ + "/" + "met1");
+        // interface_names_.emplace_back(name_ + "/" + "hallux");
+        // interface_names_.emplace_back(name_ + "/" + "met3");
+        // interface_names_.emplace_back(name_ + "/" + "toes");
+        // interface_names_.emplace_back(name_ + "/" + "met5");
+        // interface_names_.emplace_back(name_ + "/" + "arch");
+        interface_names_.emplace_back(name_ + "/" + "l_heel_right");
+        interface_names_.emplace_back(name_ + "/" + "l_heel_left");
+        interface_names_.emplace_back(name_ + "/" + "l_met1");
+        interface_names_.emplace_back(name_ + "/" + "l_hallux");
+        interface_names_.emplace_back(name_ + "/" + "l_met3");
+        interface_names_.emplace_back(name_ + "/" + "l_toes");
+        interface_names_.emplace_back(name_ + "/" + "l_met5");
+        interface_names_.emplace_back(name_ + "/" + "l_arch");
+        interface_names_.emplace_back(name_ + "/" + "r_heel_right");
+        interface_names_.emplace_back(name_ + "/" + "r_heel_left");
+        interface_names_.emplace_back(name_ + "/" + "r_met1");
+        interface_names_.emplace_back(name_ + "/" + "r_hallux");
+        interface_names_.emplace_back(name_ + "/" + "r_met3");
+        interface_names_.emplace_back(name_ + "/" + "r_toes");
+        interface_names_.emplace_back(name_ + "/" + "r_met5");
+        interface_names_.emplace_back(name_ + "/" + "r_arch");
 
     }
 
@@ -67,22 +76,22 @@ public:
     void update()
     {
         int index = 0;
-        heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // l_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // l_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // l_met3_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // l_toes_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // l_met5_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // l_arch_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_met3_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_toes_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_met5_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        // r_arch_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_met3_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_toes_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_met5_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        l_arch_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_heel_right_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_heel_left_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_met1_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_hallux_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_met3_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_toes_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_met5_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        r_arch_ = static_cast<float>(state_interface::get(index, state_interfaces_));
 
         
     }
@@ -93,14 +102,14 @@ public:
         // RCLCPP_INFO(rclcpp::get_logger("test_loggger"), "l_heel_left pressure is: %f", l_heel_left_);
         msg.names = { "l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
             "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch" };
-        msg.pressure_values = { heel_right_, heel_left_, l_met1_, l_hallux_, l_met3_, l_toes_, l_met5_, l_arch_,
+        msg.pressure_values = { l_heel_right_, l_heel_left_, l_met1_, l_hallux_, l_met3_, l_toes_, l_met5_, l_arch_,
             r_heel_right_, r_heel_left_, r_met1_, r_hallux_, r_met3_, r_toes_, r_met5_, r_arch_ };
         return true;
     }
 
 private:
-    float heel_right_ = 0.F;
-    float heel_left_ = 0.F;
+    float l_heel_right_ = 0.F;
+    float l_heel_left_ = 0.F;
     float l_met1_ = 0.F;
     float l_hallux_ = 0.F;
     float l_met3_ = 0.F;
