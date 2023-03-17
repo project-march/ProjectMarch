@@ -64,7 +64,6 @@ private:
     std::vector<double> hw_positions_;
 
     march::PowerDistributionBoardData pdb_data_;
-    std::vector<march::PressureSoleData> pressure_soles_data_;
     std::vector<march::ODriveState> motor_controllers_data_;
 };
 
