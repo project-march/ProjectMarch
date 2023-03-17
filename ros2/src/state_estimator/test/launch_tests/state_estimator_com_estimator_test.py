@@ -97,14 +97,14 @@ class TestProcessOutput(unittest.TestCase):
         sub = self.node.create_subscription(
             PointStamped,
             '/robot_com_position',
-            lambda msg: received_data.append(msg.gait_type),
+            lambda msg: received_data.append(msg.point),
             10
         )
 
-        expected_data = PointStamped
-        expected_data.point.x = 0
-        expected_data.point.y = 0
-        expected_data.point.z = 0
+        expected_data = PointStamped()
+        expected_data.point.x = 0.5
+        expected_data.point.y = 0.0
+        expected_data.point.z = 0.0
 
         try:
             # Wait until the dut transmits a message over the ROS topic
@@ -122,7 +122,7 @@ class TestProcessOutput(unittest.TestCase):
                 test_data = received_data[0]
 
             # test actual output for expected output
-            self.assertEqual(test_data, expected_data)
+            self.assertEqual(test_data, expected_data.point)
 
         finally:
             self.node.destroy_subscription(sub)
