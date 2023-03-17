@@ -14,13 +14,13 @@
 
 #include "march_hardware_interface/march_exo_system_interface.hpp"
 
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <vector>
-#include <cassert>
 #include <unistd.h>
+#include <vector>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_builder/hardware_builder.h"
@@ -96,8 +96,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     right_sole.side = march::pressure_sole_side::right;
     pressure_soles_data_.push_back(right_sole);
 
-
-    RCLCPP_INFO((*logger_), "Finished creating march pressure sole data"); 
+    RCLCPP_INFO((*logger_), "Finished creating march pressure sole data");
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -190,25 +189,19 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     // l_ is added for the left data pointers and r_ for the right data pointers.
     for (auto& pressure_sole_data : pressure_soles_data_) {
         for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
+            std::string name;
             if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
-                std::string name = "l_";
-                name.append(pressure_soles_pointer.first);
-                RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
-                state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles", name, pressure_soles_pointer.second));
+                name = "l_";
+            } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
+                name = "r_";
             }
-            if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
-                std::string name = "r_";
-                name.append(pressure_soles_pointer.first);
-                RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
-                state_interfaces.emplace_back(hardware_interface::StateInterface(
-                    "pressure_soles", name, pressure_soles_pointer.second));
-            }
+            name.append(pressure_soles_pointer.first);
+            RCLCPP_INFO((*logger_), "state_interface name %s", name.c_str());
+            state_interfaces.emplace_back(
+                hardware_interface::StateInterface("pressure_soles", name, pressure_soles_pointer.second));
         }
     }
     RCLCPP_INFO((*logger_), "Creating export state interface finished.");
-    auto pressure_sole_data = &pressure_soles_data_[0];
-    ps_test = pressure_sole_data->get_pointers();
     return state_interfaces;
 }
 
@@ -436,14 +429,6 @@ void MarchExoSystemInterface::pressure_sole_read()
     for (size_t i = 0; i < pressure_soles.size(); i++) {
         pressure_soles[i].read(pressure_soles_data_[i]);
     }
-    auto pressure_sole_data = pressure_soles_data_[0];
-    for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
-        RCLCPP_WARN((*logger_), "New p val of pressure_sole %s: %f", pressure_soles_pointer.first.c_str(), *pressure_soles_pointer.second);
-    }
-        for (std::pair<std::string, double*>& pressure_soles_pointer : ps_test) {
-        RCLCPP_WARN((*logger_), "Old p val of pressure_sole %s: %f", pressure_soles_pointer.first.c_str(), *pressure_soles_pointer.second);
-    }
-
 };
 
 /** This is the update loop of the command interface.
