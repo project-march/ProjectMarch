@@ -123,12 +123,11 @@ bool MarchRobot::hasValidSlaves()
     }
 
     if (hasPressureSoles()) {
-        for(auto& pressure_sole: getPressureSoles()){
+        for (auto& pressure_sole : getPressureSoles()) {
             int index = pressure_sole.getSlaveIndex();
             pressureSolesSlaveIndices.push_back(index);
-        }      
+        }
     }
-
 
     // Multiple temperature sensors may be connected to the same slave.
     // Remove duplicate temperatureSlaveIndices so they don't trigger as

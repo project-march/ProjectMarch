@@ -45,8 +45,9 @@ controller_interface::return_type PressureSoleBroadcaster::update()
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn PressureSoleBroadcaster::on_configure(
     const rclcpp_lifecycle::State& previous_state)
-{    
-    RCLCPP_INFO((*logger_), "March pressure sole broadcaster configuring. Previous state = %s", previous_state.label().c_str());
+{
+    RCLCPP_INFO(
+        (*logger_), "March pressure sole broadcaster configuring. Previous state = %s", previous_state.label().c_str());
     pressure_sole_component = std::make_unique<PressureSoleSemanticComponent>();
     try {
         // register pressure sole data publisher
@@ -58,8 +59,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pressu
             (*logger_), "Exception thrown during publisher creation at configure stage with message : %s \n", e.what());
         return CallbackReturn::ERROR;
     }
-    RCLCPP_INFO(
-        (*logger_), "March Pressure sole broadcaster configured succesfully");
+    RCLCPP_INFO((*logger_), "March Pressure sole broadcaster configured succesfully");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
