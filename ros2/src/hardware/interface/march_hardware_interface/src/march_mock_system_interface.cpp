@@ -65,15 +65,6 @@ hardware_interface::return_type MarchMockSystemInterface::configure(const hardwa
         hw_state_info_.push_back(hw_info);
     }
 
-    // Create pressure soles with side set to left and right.
-    // This is needed for data reading and updating for the pressure_sole_broadcaster.
-    march::PressureSoleData left_sole;
-    // left_sole.side = march::pressure_sole_side::left;
-    pressure_soles_data_.push_back(left_sole);
-    march::PressureSoleData right_sole;
-    // right_sole.side = march::pressure_sole_side::right;
-    pressure_soles_data_.push_back(right_sole);
-
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
     RCLCPP_INFO(rclcpp::get_logger("MarchMockSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
@@ -115,21 +106,7 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
     //                hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE,
     //                &hw_positions_[i]));
     //    }
-
-    // For the Pressure sole broadcaster.
-    // Because the Broadcaster heeds a distinction between left and right,
-    // l_ is added for the left data pointers and r_ for the right data pointers.
-    // for (auto pressure_sole_data : pressure_soles_data_) {
-    //     for (std::pair<std::string, double*>& pressure_soles_pointer : pressure_sole_data.get_pointers()) {
-    //         if (pressure_sole_data.get_side() == march::pressure_sole_side::left) {
-    //             state_interfaces.emplace_back(hardware_interface::StateInterface(
-    //                 "pressure_soles", "l_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
-    //         } else if (pressure_sole_data.get_side() == march::pressure_sole_side::right) {
-    //             state_interfaces.emplace_back(hardware_interface::StateInterface(
-    //                 "pressure_soles", "r_" + pressure_soles_pointer.first, pressure_soles_pointer.second));
-    //         }
-    //     }
-    // }
+    
     return state_interfaces;
 }
 
