@@ -95,8 +95,10 @@ private:
     std::unique_ptr<march::MarchRobot> march_robot_;
     march::PowerDistributionBoardData pdb_data_;
     std::vector<march::PressureSoleData> pressure_soles_data_;
+    march::PressureSoleData left_sole;
     std::vector<JointInfo> joints_info_;
     bool joints_ready_for_actuation_ = false;
+    std::array<std::pair<std::string, double*>, 8> ps_test;
 
     rclcpp::Clock clock_;
 };
