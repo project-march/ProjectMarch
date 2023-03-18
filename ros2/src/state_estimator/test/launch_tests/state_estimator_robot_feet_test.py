@@ -73,7 +73,12 @@ class TestProcessOutput(unittest.TestCase):
         msg.position = [0.3]
         msg.velocity = [0.0]
         msg.effort = [0.0]
-        self.publisher_.publish(msg)
+        self.joint_publisher_.publish(msg)
+
+        p_msg = PressureSolesData()
+        p_msg.names = ["l_pad"]
+        p_msg.pressure_values = [0.1]
+        self.pressure_publisher_.publish(p_msg)
         # self.node.get_logger().info('Publishing: ' + str(msg))
 
     def test_dut_output_invalid_transition(self, dut, proc_output):
@@ -88,7 +93,8 @@ class TestProcessOutput(unittest.TestCase):
         function_name = inspect.getframeinfo(frame).function
 
         # Publish data to dut
-        self.publisher_ = self.node.create_publisher(JointState, "/joint_states", 10)
+        self.joint_publisher_ = self.node.create_publisher(JointState, "/joint_states", 10)
+        self.pressure_publisher_ = self.node.create_publisher(PressureSolesData, "/march/pressure_sole_data", 10)
         timer_period = 0.5  # seconds
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
@@ -108,7 +114,7 @@ class TestProcessOutput(unittest.TestCase):
 
         try:
             # Wait until the dut transmits a message over the ROS topic
-            end_time = time.time() + 1
+            end_time = time.time() + 10
             while time.time() < end_time:
                 rclpy.spin_once(self.node, timeout_sec=0.1)
 

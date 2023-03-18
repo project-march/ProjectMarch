@@ -10,7 +10,6 @@ import time
 import unittest
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import Node
-from march_shared_msgs.msg import PressureSolesData
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PointStamped
 
@@ -70,7 +69,7 @@ class TestProcessOutput(unittest.TestCase):
         # Read input data that is send to dut
         msg = JointState()
         msg.name = ["test_joint"]
-        msg.position = [0.3]
+        msg.position = [0.2]
         msg.velocity = [0.0]
         msg.effort = [0.0]
         self.publisher_.publish(msg)
