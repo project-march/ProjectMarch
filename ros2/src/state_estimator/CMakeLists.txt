@@ -113,6 +113,7 @@ DESTINATION share/${PROJECT_NAME}/
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake)
   add_launch_test(test/launch_tests/state_estimator_com_estimator_test.py)
+#  add_launch_test(test/launch_tests/state_estimator_robot_feet_test.py)
   #  add_launch_test(test/launch_tests/valid_transition_pub_sub_test.py)
   ament_add_gmock(${PROJECT_NAME}_test
   # test/joint_estimator_test.cpp
@@ -128,9 +129,9 @@ if(BUILD_TESTING)
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)
   ament_target_dependencies(
-    ${PROJECT_NAME}_test 
+    ${PROJECT_NAME}_test
     "rclcpp"
-    "geometry_msgs" 
+    "geometry_msgs"
     "march_shared_msgs"
     "nav_msgs"
     "tf2_ros"
