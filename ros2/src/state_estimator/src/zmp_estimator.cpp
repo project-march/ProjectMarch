@@ -54,7 +54,7 @@ tf2::Vector3 ZmpEstimator::get_com_acceleration()
         double acc_z = (m_com_velocity_history[0].z - m_com_velocity_history[1].z) / dt;
         return tf2::Vector3(acc_x, acc_y, acc_z);
     } catch (...) {
-        return tf2::Vector3(0.0, 0.0, 0.0);
+        return tf2::Vector3(std::nan("0"), std::nan("0"), std::nan("0"));
     }
 }
 
