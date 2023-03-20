@@ -30,7 +30,7 @@ public:
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
-
+    
     std::array<double, NX> m_x_current;
     std::array<double, NU * ZMP_PENDULUM_ODE_N> m_u_current;
     std::array<double, 2> m_pos_foot_current;
@@ -41,6 +41,9 @@ private:
 
     // Constraints for the ZMP MPC
     int m_number_of_footsteps;
+    double m_switch;
+    int m_current_shooting_node;
+    double m_timing_value;
 
     double m_admissible_region_x;
     double m_admissible_region_y;
