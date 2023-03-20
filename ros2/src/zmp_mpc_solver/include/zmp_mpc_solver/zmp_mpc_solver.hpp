@@ -30,7 +30,7 @@ public:
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
-    
+
     std::array<double, NX> m_x_current;
     std::array<double, NU * ZMP_PENDULUM_ODE_N> m_u_current;
     std::array<double, 2> m_pos_foot_current;

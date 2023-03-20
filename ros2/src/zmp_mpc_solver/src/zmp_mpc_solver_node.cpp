@@ -61,8 +61,6 @@ void SolverNode::publish_control_msg()
 int main(int argc, char** argv)
 {
     printf("hello world acados_solver package\n");
-    ZmpSolver test_solver = ZmpSolver();
-    // int test_result = test_solver.solve_step();
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<SolverNode>());
     rclcpp::shutdown();
