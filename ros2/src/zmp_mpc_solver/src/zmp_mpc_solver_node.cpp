@@ -15,6 +15,7 @@ SolverNode::SolverNode()
         "robot_feet_positions", 10, std::bind(&SolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
+    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
 void SolverNode::com_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -60,8 +61,11 @@ void SolverNode::publish_control_msg()
 int main(int argc, char** argv)
 {
     printf("hello world acados_solver package\n");
+    ZmpSolver test_solver = ZmpSolver();
+    // int test_result = test_solver.solve_step();
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<SolverNode>());
     rclcpp::shutdown();
+    printf("hello world acados_solver package\n");
     return 0;
 }
