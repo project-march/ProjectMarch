@@ -1,18 +1,25 @@
-import os
-import inspect
-import launch
-import launch_testing
-import launch_testing.actions
-import launch_testing.util
-import pytest
-import rclpy
+from lib2to3.pgen2.token import EQUAL
 import time
 import unittest
+import inspect
+import yaml
+
+import os
 from ament_index_python.packages import get_package_share_directory
-from launch_ros.actions import Node
+
+import rclpy
+from rclpy.node import Node
 from march_shared_msgs.msg import PressureSolesData
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PointStamped
+
+import launch
+from launch_ros.actions import Node
+import launch_testing
+import launch_testing.actions
+import launch_testing.util
+
+import pytest
 
 
 @pytest.mark.launch_test
@@ -114,7 +121,7 @@ class TestProcessOutput(unittest.TestCase):
 
         try:
             # Wait until the dut transmits a message over the ROS topic
-            end_time = time.time() + 10
+            end_time = time.time() + 1
             while time.time() < end_time:
                 rclpy.spin_once(self.node, timeout_sec=0.1)
 
@@ -123,12 +130,14 @@ class TestProcessOutput(unittest.TestCase):
 
             else:
 
-                print(f"\n[{function_name}] [INFO] expected_data:\n" + str(expected_data))
-                print(f"\n[{function_name}] [INFO] received_data:\n" + str(received_data[0]))
+                # print(f"\n[{function_name}] [INFO] expected_data:\n" + str(expected_data))
+                # print(f"\n[{function_name}] [INFO] received_data:\n" + str(received_data[0]))
                 test_data = received_data[0]
 
             # test actual output for expected output
-            self.assertEqual(test_data, expected_data.point)
+            self.assertEqual(test_data.x, expected_data.point.x)
+            self.assertEqual(test_data.y, expected_data.point.y)
+            self.assertEqual(test_data.z, expected_data.point.z)
 
         finally:
             self.node.destroy_subscription(sub)
