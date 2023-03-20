@@ -55,6 +55,7 @@ public:
         transform_tosend.header.frame_id = "map";
         transform_tosend.child_frame_id = "lowerIMU";
         transform_tosend.transform.rotation = data.orientation;
+        //TODO: change this to relative IMU position on body
         transform_tosend.transform.translation.x = 0.0;
         transform_tosend.transform.translation.y = 0.0;
         transform_tosend.transform.translation.z = 1.0;
