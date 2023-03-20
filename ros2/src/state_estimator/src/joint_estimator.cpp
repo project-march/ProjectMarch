@@ -28,6 +28,7 @@ void JointEstimator::set_joint_states(sensor_msgs::msg::JointState::SharedPtr ne
         quaternion_math.normalize();
         tf2::convert(quaternion_math, quaternion_joint);
         i.frame.transform.rotation = quaternion_joint;
+        counter++;
     }
 }
 

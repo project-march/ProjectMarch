@@ -73,6 +73,23 @@ TEST_F(FootstepEstimatorTest, feetOffGroundTest)
     ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixL));
 }
 
+TEST_F(FootstepEstimatorTest, updateFaultySensorTest)
+{
+    std::vector<PressureSensor> sensors;
+
+    CenterOfPressure cop;
+    cop.pressure = 20;
+
+    const char prefixR = 'r';
+    PressureSensor mock_sensor_faulty;
+    mock_sensor_faulty.name = "faulty";
+    mock_sensor_faulty.centre_of_pressure = cop;
+    sensors.push_back(mock_sensor_faulty);
+
+    footstep_estimator->update_feet(sensors);
+    ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));
+}
+
 TEST_F(FootstepEstimatorTest, unknownFootTest)
 {
     std::vector<PressureSensor> sensors;
@@ -80,6 +97,8 @@ TEST_F(FootstepEstimatorTest, unknownFootTest)
     footstep_estimator->update_feet(sensors);
     ASSERT_EQ(footstep_estimator->get_foot_on_ground(&prefixU), 0);
 }
+
+
 
 TEST_F(FootstepEstimatorTest, getFeetPositionTest)
 {
@@ -106,6 +125,17 @@ TEST_F(FootstepEstimatorTest, getFeetPositionTest)
     ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.x, 1);
     ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.y, 1);
     ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.z, 1);
+}
+
+TEST_F(FootstepEstimatorTest, setFootSizeTest)
+{
+    const char prefixR = 'r';
+    double width = 2.0;
+    double height = 3.0;
+
+    footstep_estimator->set_foot_size(width, height, &prefixR);
+    ASSERT_EQ(footstep_estimator->get_foot(&prefixR)->width, width);
+    ASSERT_EQ(footstep_estimator->get_foot(&prefixR)->height, height);
 }
 
 // NOLINTEND

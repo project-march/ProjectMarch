@@ -16,9 +16,9 @@ StateEstimator::StateEstimator()
     m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
 
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/upper_xsens_mti_node", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        "/upper_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
     m_lower_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/lower_xsens_mti_node", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        "/lower_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
     m_pressure_sole_subscriber = this->create_subscription<march_shared_msgs::msg::PressureSolesData>(
         "/march/pressure_sole_data", 10, std::bind(&StateEstimator::pressure_sole_callback, this, _1));
     m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
