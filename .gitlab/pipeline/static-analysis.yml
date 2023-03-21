@@ -12,7 +12,7 @@
     - cd $ROS_VERSION/
     # Find all C and C++ related files, filter all files that are not part of the march code
     # and run clang-tidy on the files
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "src/acados_solver" | xargs -L1 -P4 -I{} -- clang-tidy -p build {} 2> /dev/null
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' -or -name "*.c" | grep -v "src/libraries" | grep -v "xsens" | grep -v "src/zmp_mpc_solver" | xargs -L1 -P4 -I{} -- clang-tidy -p build {} 2> /dev/null
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
