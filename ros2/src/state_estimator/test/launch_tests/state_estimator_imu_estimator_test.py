@@ -124,52 +124,7 @@ class TestProcessOutput(unittest.TestCase):
         received_data = []
         sub = self.node.create_subscription(
             PointStamped,
-            '/robot_feet_positions',
-            lambda msg: received_data.append(msg.point),
-            10
-        )
-
-        try:
-            # Wait until the dut transmits a message over the ROS topic
-            end_time = time.time() + 1
-            while time.time() < end_time:
-                rclpy.spin_once(self.node, timeout_sec=0.1)
-
-            # test actual output for expected output
-            self.assertTrue(len(received_data) != 0)
-
-        finally:
-            self.node.destroy_subscription(sub)
-
-        # Test sub zmp pos
-        # Setup for listening to dut messages
-        received_data = []
-        sub = self.node.create_subscription(
-            PointStamped,
-            '/robot_zmp_position',
-            lambda msg: received_data.append(msg.point),
-            10
-        )
-
-        try:
-            # Wait until the dut transmits a message over the ROS topic
-            end_time = time.time() + 1
-            while time.time() < end_time:
-                rclpy.spin_once(self.node, timeout_sec=0.1)
-
-            # test actual output for expected output
-            self.assertTrue(len(received_data) != 0)
-
-        finally:
-            self.node.destroy_subscription(sub)
-
-
-        # Test sub COM Pos
-        # Setup for listening to dut messages
-        received_data = []
-        sub = self.node.create_subscription(
-            PointStamped,
-            '/robot_com_position',
+            '/robot_zmp_positions',
             lambda msg: received_data.append(msg.point),
             10
         )

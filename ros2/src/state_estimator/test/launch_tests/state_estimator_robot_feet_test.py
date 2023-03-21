@@ -10,7 +10,7 @@ from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.node import Node
 from march_shared_msgs.msg import PressureSolesData
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, Imu
 from geometry_msgs.msg import PointStamped
 
 import launch
@@ -86,6 +86,19 @@ class TestProcessOutput(unittest.TestCase):
         p_msg.names = ["l_pad"]
         p_msg.pressure_values = [1.0]
         self.pressure_publisher_.publish(p_msg)
+
+        i_msg = Imu()
+        i_msg.orientation.x = 0.0
+        i_msg.orientation.y = 0.0
+        i_msg.orientation.z = 0.0
+        i_msg.orientation.w = 0.0
+        i_msg.angular_velocity.x = 0.0
+        i_msg.angular_velocity.y = 0.0
+        i_msg.angular_velocity.z = 0.0
+        i_msg.linear_acceleration.x = 0.0
+        i_msg.linear_acceleration.y = 0.0
+        i_msg.linear_acceleration.z = 0.0
+        self.imu_publisher_.publish(i_msg)
         # self.node.get_logger().info('Publishing: ' + str(msg))
 
     def test_dut_output_invalid_transition(self, dut, proc_output):
@@ -102,6 +115,7 @@ class TestProcessOutput(unittest.TestCase):
         # Publish data to dut
         self.joint_publisher_ = self.node.create_publisher(JointState, "/joint_states", 10)
         self.pressure_publisher_ = self.node.create_publisher(PressureSolesData, "/march/pressure_sole_data", 10)
+        self.imu_publisher_ = self.node.create_publisher(Imu, "/upper_xsens_mti_node", 10)
         timer_period = 0.5  # seconds
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
@@ -109,7 +123,7 @@ class TestProcessOutput(unittest.TestCase):
         received_data = []
         sub = self.node.create_subscription(
             PointStamped,
-            '/robot_zmp_position',
+            '/robot_feet_positions',
             lambda msg: received_data.append(msg.point),
             10
         )
