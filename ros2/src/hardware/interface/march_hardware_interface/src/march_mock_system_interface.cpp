@@ -106,7 +106,7 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
     //                hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE,
     //                &hw_positions_[i]));
     //    }
-    
+
     return state_interfaces;
 }
 
