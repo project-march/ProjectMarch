@@ -17,6 +17,9 @@ controller_manager:
     march_pressure_sole_broadcaster:
       type: march_pressure_sole_broadcaster::PressureSoleBroadcaster
 
+    march_pressure_sole_broadcaster:
+      type: march_pressure_sole_broadcaster::PressureSoleBroadcaster
+
 march_motor_controller_state_broadcaster:
   ros__parameters:
     # If the one of the following joint names is in the xacro than the pdb will broadcast its motor controller info.
