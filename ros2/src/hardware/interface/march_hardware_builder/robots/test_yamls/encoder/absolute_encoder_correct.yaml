@@ -1,3 +1,8 @@
 resolution: 16
 minPositionIU: 22134
 maxPositionIU: 43436
+zeroPositionIU: 30000
+lowerSoftLimitMarginRad: 0.01
+upperSoftLimitMarginRad: 2.0
+lowerErrorSoftLimitMarginRad: 0.0
+upperErrorSoftLimitMarginRad: 1.9

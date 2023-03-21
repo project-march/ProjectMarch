@@ -10,10 +10,10 @@ class MockAbsoluteEncoder : public march::AbsoluteEncoder {
 public:
     MockAbsoluteEncoder()
         : AbsoluteEncoder(/*counts_per_rotation=*/1 << 10, march::MotorControllerType::ODrive,
-            /*lower_limit_iu=*/0,
-            /*upper_limit_iu=*/162, /*lower_limit_rad=*/0,
-            /*upper_limit_rad=*/1, /*lower_soft_limit_rad=*/
-            0.1, /*upper_soft_limit_rad=*/0.9)
+            /*lower_limit_iu=*/531696,
+            /*upper_limit_iu=*/882560, /*zero_position*/ 548304, /*lower_limit_rad=*/0.0174533,
+            /*upper_limit_rad=*/0.0174533, /*lower_soft_limit_rad=*/
+            0.0349066, /*upper_soft_limit_rad=*/0.0349066)
     {
     }
 };
