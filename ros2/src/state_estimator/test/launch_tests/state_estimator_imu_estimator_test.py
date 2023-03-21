@@ -115,7 +115,7 @@ class TestProcessOutput(unittest.TestCase):
         # Publish data to dut
         self.joint_publisher_ = self.node.create_publisher(JointState, "/joint_states", 10)
         self.pressure_publisher_ = self.node.create_publisher(PressureSolesData, "/march/pressure_sole_data", 10)
-        self.imu_publisher_ = self.node.create_publisher(Imu, "/upper_xsens_mti_node", 10)
+        self.imu_publisher_ = self.node.create_publisher(Imu, "/lower_xsens_mti_node", 10)
         timer_period = 0.5  # seconds
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
