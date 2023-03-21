@@ -1,8 +1,8 @@
 #include "ik_solver/ik_solver_node.hpp"
 
 IkSolverNode::IkSolverNode()
-: Node("ik_solver")
-, m_ik_solver()
+    : Node("ik_solver")
+    , m_ik_solver()
 {
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
