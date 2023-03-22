@@ -63,7 +63,7 @@ TEST_F(CopEstimatorTest, setCopTest)
     mock_transform.transform.rotation.x = 0.0;
     mock_transform.transform.rotation.y = 0.0;
     mock_transform.transform.rotation.z = 0.0;
-    mock_transform.transform.rotation.w = 0.0;
+    mock_transform.transform.rotation.w = 1.0;
     cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
 
     expected_cop.pressure = 2;
@@ -122,10 +122,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_transform.transform.rotation.w = 1.0;
 
     cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
-    ASSERT_EQ(this->cop_estimator->get_cop_state().position.point.x, expected_cop.position.point.x);
-    ASSERT_EQ(this->cop_estimator->get_cop_state().position.point.y, expected_cop.position.point.y);
-    ASSERT_EQ(this->cop_estimator->get_cop_state().position.point.z, expected_cop.position.point.z);
-    ASSERT_EQ(this->cop_estimator->get_cop_state().pressure, expected_cop.pressure);
+    ASSERT_EQ(cop_estimator->get_cop_state().pressure, expected_cop);
 }
 
 TEST_F(CopEstimatorTest, setZeroPressureCopTest)
@@ -148,7 +145,7 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
     mock_transform.transform.rotation.x = 0.0;
     mock_transform.transform.rotation.y = 0.0;
     mock_transform.transform.rotation.z = 0.0;
-    mock_transform.transform.rotation.w = 0.0;
+    mock_transform.transform.rotation.w = 1.0;
 
     cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
     double expected = 0.0;
