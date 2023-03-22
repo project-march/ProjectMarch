@@ -122,7 +122,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_transform.transform.rotation.w = 1.0;
 
     cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
-    ASSERT_EQ(cop_estimator->get_cop_state().pressure, expected_cop);
+    ASSERT_EQ(cop_estimator->get_cop_state(), expected_cop);
 }
 
 TEST_F(CopEstimatorTest, setZeroPressureCopTest)
