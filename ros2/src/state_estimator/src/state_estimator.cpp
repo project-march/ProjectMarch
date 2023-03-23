@@ -28,6 +28,8 @@ StateEstimator::StateEstimator()
 
     m_com_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_com_position", 100);
 
+    m_cop_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_cop_position", 100);
+
     m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_feet_positions", 100);
 
     m_zmp_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 100);
@@ -197,7 +199,11 @@ void StateEstimator::publish_robot_frames()
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
     // Update COP
-    m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors());
+    geometry_msgs::msg::TransformStamped left_foot_frame
+        = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
+    geometry_msgs::msg::TransformStamped right_foot_frame
+        = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
+    m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
     // Update ZMP
     m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
     m_zmp_estimator.set_zmp();
@@ -246,6 +252,13 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
         PressureSensor sensor;
         sensor.name = names.at(i);
         CenterOfPressure cop;
+        if (sensor.name.find("l_") != std::string::npos) {
+            cop.position.header.frame_id = "leftPressureSole";
+        }
+        if (sensor.name.find("r_") != std::string::npos) {
+            cop.position.header.frame_id = "rightPressureSole";
+        }
+
         cop.position.point.x = x_positions.at(i);
         cop.position.point.y = y_positions.at(i);
         cop.position.point.z = z_positions.at(i);
