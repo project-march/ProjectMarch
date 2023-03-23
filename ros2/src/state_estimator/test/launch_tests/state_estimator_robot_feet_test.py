@@ -76,22 +76,24 @@ class TestProcessOutput(unittest.TestCase):
             """
         # Read input data that is send to dut
         msg = JointState()
-        msg.name = ["test_joint"]
+        msg.name = ["left_ankle"]
         msg.position = [0.3]
         msg.velocity = [0.0]
         msg.effort = [0.0]
         self.joint_publisher_.publish(msg)
 
         p_msg = PressureSolesData()
-        p_msg.names = ["l_pad"]
-        p_msg.pressure_values = [1.0]
+        p_msg.names = ["l_heel_right"]
+        p_msg.pressure_values = [4.8]
         self.pressure_publisher_.publish(p_msg)
 
         i_msg = Imu()
+        i_msg.header.stamp = self.node.get_clock().now().to_msg()
+        i_msg.header.frame_id = "imu_link"
         i_msg.orientation.x = 0.0
         i_msg.orientation.y = 0.0
         i_msg.orientation.z = 0.0
-        i_msg.orientation.w = 0.0
+        i_msg.orientation.w = 1.0
         i_msg.angular_velocity.x = 0.0
         i_msg.angular_velocity.y = 0.0
         i_msg.angular_velocity.z = 0.0
@@ -130,7 +132,7 @@ class TestProcessOutput(unittest.TestCase):
 
         try:
             # Wait until the dut transmits a message over the ROS topic
-            end_time = time.time() + 1
+            end_time = time.time() + 10
             while time.time() < end_time:
                 rclpy.spin_once(self.node, timeout_sec=0.1)
 

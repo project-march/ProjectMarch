@@ -55,6 +55,7 @@ public:
     void set_cop_state(std::vector<PressureSensor> sensors);
     std::vector<PressureSensor> get_sensors();
     void update_sensor_pressures(std::map<std::string, double> pressure_values_map);
+    void update_individual_pressure_sensor(std::string name, double pressure);
     CenterOfPressure get_cop_state();
 
 private:

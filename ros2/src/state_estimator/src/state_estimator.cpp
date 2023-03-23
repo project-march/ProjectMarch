@@ -58,6 +58,7 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
 
     initialize_imus();
+    RCLCPP_INFO(this->get_logger(), "Done creating state estimator");
 }
 
 // sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()
@@ -78,6 +79,7 @@ void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+    RCLCPP_INFO(this->get_logger(), "Callback for joint_states:)");
     this->m_joint_estimator.set_joint_states(msg);
 }
 
@@ -179,30 +181,33 @@ void StateEstimator::publish_robot_frames()
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
     update_foot_frames();
     // publish joint frames
-    RCLCPP_DEBUG(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
+    RCLCPP_INFO(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
     for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);
-        RCLCPP_DEBUG(this->get_logger(),
+        RCLCPP_INFO(this->get_logger(),
             ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
     // Publish each joint center of mass
     std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
-    RCLCPP_DEBUG(this->get_logger(), "Array size is %i", joint_com_positions.size());
+    RCLCPP_INFO(this->get_logger(), "Array size is %i", joint_com_positions.size());
     for (auto com : joint_com_positions) {
-        RCLCPP_DEBUG(this->get_logger(), ("\n Publishing COM"));
-        RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
+        RCLCPP_INFO(this->get_logger(), ("\n Publishing COM"));
+        RCLCPP_INFO(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
         m_com_pos_publisher->publish(com.position);
     }
     // Update and publish the actual, full center of mass
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
+    RCLCPP_INFO(this->get_logger(), "Publsihed COM FROME AND MSG msgs");
     // Update COP
     m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors());
     // Update ZMP
-    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
+    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());\
     m_zmp_estimator.set_zmp();
-
     m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+
+    RCLCPP_INFO(this->get_logger(), "Publsihed ZMPP FROME AND MSG msgs");
+
     // Update the feet
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
     // Publish the feet
@@ -213,7 +218,8 @@ void StateEstimator::publish_robot_frames()
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
     }
 
-    visualize_joints();
+    RCLCPP_INFO(this->get_logger(), "Publsihed all msgs");
+//    visualize_joints();
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(

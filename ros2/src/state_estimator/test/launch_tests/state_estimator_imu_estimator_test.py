@@ -76,22 +76,24 @@ class TestProcessOutput(unittest.TestCase):
             """
         # Read input data that is send to dut
         msg = JointState()
-        msg.name = ["test_joint"]
+        msg.name = ["left_ankle"]
         msg.position = [0.3]
         msg.velocity = [0.0]
         msg.effort = [0.0]
         self.joint_publisher_.publish(msg)
 
         p_msg = PressureSolesData()
-        p_msg.names = ["l_pad"]
+        p_msg.names = ["l_heel_right"]
         p_msg.pressure_values = [1.0]
         self.pressure_publisher_.publish(p_msg)
 
         i_msg = Imu()
+        i_msg.header.stamp = self.node.get_clock().now().to_msg()
+        i_msg.header.frame_id = "imu_link"
         i_msg.orientation.x = 0.0
         i_msg.orientation.y = 0.0
         i_msg.orientation.z = 0.0
-        i_msg.orientation.w = 0.0
+        i_msg.orientation.w = 1.0
         i_msg.angular_velocity.x = 0.0
         i_msg.angular_velocity.y = 0.0
         i_msg.angular_velocity.z = 0.0
@@ -124,7 +126,7 @@ class TestProcessOutput(unittest.TestCase):
         received_data = []
         sub = self.node.create_subscription(
             PointStamped,
-            '/robot_zmp_positions',
+            '/robot_zmp_position',
             lambda msg: received_data.append(msg.point),
             10
         )
