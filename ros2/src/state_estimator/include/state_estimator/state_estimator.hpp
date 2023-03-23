@@ -47,8 +47,6 @@ private:
 
     std::vector<PressureSensor> create_pressure_sensors();
 
-    void publish_robot_state();
-
     void publish_robot_frames();
 
     void initialize_imus();

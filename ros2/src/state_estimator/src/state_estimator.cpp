@@ -13,8 +13,6 @@ StateEstimator::StateEstimator()
     , m_cop_estimator(create_pressure_sensors())
     , m_footstep_estimator()
 {
-    m_state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
-
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
         "/upper_xsens_mti_node", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
     m_lower_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
@@ -58,19 +56,7 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
 
     initialize_imus();
-    RCLCPP_INFO(this->get_logger(), "Done creating state estimator");
 }
-
-// sensor_msgs::msg::JointState StateEstimator::get_initial_joint_states()
-// {
-//     sensor_msgs::msg::JointState initial_joint_state;
-//     // change it so the names are obtained from the parameter
-//     initial_joint_state.name = { "right_ankle", "right_knee", "right_hip_fe", "right_hip_aa", "left_ankle",
-//     "left_knee",
-//         "left_hip_fe", "left_hip_aa", "right_origin", "left_origin" };
-//     initial_joint_state.position = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-//     return initial_joint_state;
-// }
 
 void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
@@ -79,7 +65,6 @@ void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    RCLCPP_INFO(this->get_logger(), "Callback for joint_states:)");
     this->m_joint_estimator.set_joint_states(msg);
 }
 
@@ -161,19 +146,6 @@ void StateEstimator::publish_com_frame()
     m_tf_joint_broadcaster->sendTransform(com_transform);
 }
 
-void StateEstimator::publish_robot_state()
-{
-    auto msg = march_shared_msgs::msg::RobotState();
-    msg.stamp = this->get_clock()->now();
-    msg.joint_names.push_back("");
-    msg.joint_pos.push_back(0);
-    msg.joint_vel.push_back(0);
-    msg.sensor_names.push_back("");
-    msg.sensor_data.push_back(0);
-
-    m_state_publisher->publish(msg);
-}
-
 void StateEstimator::publish_robot_frames()
 {
     // publish IMU frames
@@ -181,32 +153,29 @@ void StateEstimator::publish_robot_frames()
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
     update_foot_frames();
     // publish joint frames
-    RCLCPP_INFO(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
+    RCLCPP_DEBUG(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
     for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);
-        RCLCPP_INFO(this->get_logger(),
+        RCLCPP_DEBUG(this->get_logger(),
             ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
     // Publish each joint center of mass
     std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
-    RCLCPP_INFO(this->get_logger(), "Array size is %i", joint_com_positions.size());
+    RCLCPP_DEBUG(this->get_logger(), "Array size is %i", joint_com_positions.size());
     for (auto com : joint_com_positions) {
-        RCLCPP_INFO(this->get_logger(), ("\n Publishing COM"));
-        RCLCPP_INFO(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
+        RCLCPP_DEBUG(this->get_logger(), ("\n Publishing COM"));
+        RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
         m_com_pos_publisher->publish(com.position);
     }
     // Update and publish the actual, full center of mass
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
-    RCLCPP_INFO(this->get_logger(), "Publsihed COM FROME AND MSG msgs");
     // Update COP
     m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors());
     // Update ZMP
-    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());\
+    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
     m_zmp_estimator.set_zmp();
     m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
-
-    RCLCPP_INFO(this->get_logger(), "Publsihed ZMPP FROME AND MSG msgs");
 
     // Update the feet
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
@@ -217,9 +186,7 @@ void StateEstimator::publish_robot_frames()
     if (m_footstep_estimator.get_foot_on_ground("r")) {
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
     }
-
-    RCLCPP_INFO(this->get_logger(), "Publsihed all msgs");
-//    visualize_joints();
+    visualize_joints();
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
@@ -300,14 +267,14 @@ void StateEstimator::visualize_joints()
             marker_container.y += joint_endpoint.getY();
             marker_container.z += joint_endpoint.getZ();
             joint_markers.points.push_back(marker_container);
-            RCLCPP_INFO(
+            RCLCPP_DEBUG(
                 this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
         }
 
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in visualize_joints: %s", ex.what());
     }
-    RCLCPP_INFO(this->get_logger(), "Published %i markers", joint_markers.points.size());
+    RCLCPP_DEBUG(this->get_logger(), "Published %i markers", joint_markers.points.size());
     joint_markers.action = 0;
     joint_markers.frame_locked = 1;
     joint_markers.scale.x = 0.2;

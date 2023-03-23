@@ -53,11 +53,11 @@ void CopEstimator::update_sensor_pressures(std::map<std::string, double> pressur
     set_cop_state(m_sensors);
 }
 
-void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure){
-    std::vector<PressureSensor>::iterator it
-            = std::find_if(m_sensors.begin(), m_sensors.end(), [name](const PressureSensor& sensor) {
-                return sensor.name == name;
-            });
+void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure)
+{
+    auto it = std::find_if(m_sensors.begin(), m_sensors.end(), [name](const PressureSensor& sensor) {
+        return sensor.name == name;
+    });
     it->update_pressure(pressure);
 }
 
