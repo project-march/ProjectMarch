@@ -55,6 +55,7 @@ public:
     const std::vector<JointContainer> get_joints();
     const std::vector<geometry_msgs::msg::TransformStamped> get_joint_frames();
     std::vector<CenterOfMass> get_joint_com_positions(std::string);
+    std::vector<double> get_feet_height();
 
 private:
     // sensor_msgs::msg::JointState m_joint_states;

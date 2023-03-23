@@ -188,6 +188,26 @@ std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string co
     return com_positions;
 }
 
+std::vector<double> JointEstimator::get_feet_height()
+{
+    geometry_msgs::msg::PointStamped foot_point;
+    foot_point.point.x = 0;
+    foot_point.point.y = 0;
+    foot_point.point.z = 0;
+
+    // Get transform left foot.
+    geometry_msgs::msg::TransformStamped left_foot_transform = m_owner->get_frame_transform("map", "left_ankle");
+    geometry_msgs::msg::PointStamped left_transformed_point;
+    tf2::doTransform(foot_point, left_transformed_point, left_foot_transform);
+
+    // Get transform right foot.
+    geometry_msgs::msg::TransformStamped right_foot_transform = m_owner->get_frame_transform("map", "right_ankle");
+    geometry_msgs::msg::PointStamped right_transformed_point;
+    tf2::doTransform(foot_point, right_transformed_point, right_foot_transform);
+
+    return { left_transformed_point.point.z, right_transformed_point.point.z };
+}
+
 const std::vector<JointContainer> JointEstimator::get_joints()
 {
     return m_joints;
