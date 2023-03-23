@@ -55,7 +55,16 @@ TEST_F(CopEstimatorTest, setCopTest)
     cop.pressure = 2;
     mock_sensor.centre_of_pressure = cop;
     sensors.push_back(mock_sensor);
-    cop_estimator->set_cop_state(sensors);
+
+    geometry_msgs::msg::TransformStamped mock_transform;
+    mock_transform.transform.translation.x = 0.0;
+    mock_transform.transform.translation.y = 0.0;
+    mock_transform.transform.translation.z = 0.0;
+    mock_transform.transform.rotation.x = 0.0;
+    mock_transform.transform.rotation.y = 0.0;
+    mock_transform.transform.rotation.z = 0.0;
+    mock_transform.transform.rotation.w = 1.0;
+    cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
 
     expected_cop.pressure = 2;
     ASSERT_EQ(this->cop_estimator->get_cop_state(), expected_cop);
@@ -70,7 +79,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     expected_cop.pressure = 6;
     std::vector<PressureSensor> sensors;
     PressureSensor mock_sensor1;
-    mock_sensor1.name = "mock_sensor1";
+    mock_sensor1.name = "l_mock_sensor1";
     CenterOfPressure cop;
     cop.position.point.x = 0;
     cop.position.point.y = 0;
@@ -79,7 +88,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_sensor1.centre_of_pressure = cop;
     sensors.push_back(mock_sensor1);
     PressureSensor mock_sensor2;
-    mock_sensor1.name = "mock_sensor2";
+    mock_sensor1.name = "l_mock_sensor2";
     cop.position.point.x = 3;
     cop.position.point.y = 0;
     cop.position.point.z = 0;
@@ -87,7 +96,7 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_sensor2.centre_of_pressure = cop;
     sensors.push_back(mock_sensor2);
     PressureSensor mock_sensor3;
-    mock_sensor3.name = "mock_sensor3";
+    mock_sensor3.name = "l_mock_sensor3";
     cop.position.point.x = 3;
     cop.position.point.y = 3;
     cop.position.point.z = 0;
@@ -95,15 +104,25 @@ TEST_F(CopEstimatorTest, setCopMoreSensorsTest)
     mock_sensor3.centre_of_pressure = cop;
     sensors.push_back(mock_sensor3);
     PressureSensor mock_sensor4;
-    mock_sensor4.name = "mock_sensor4";
+    mock_sensor4.name = "l_mock_sensor4";
     cop.position.point.x = 0;
     cop.position.point.y = 3;
     cop.position.point.z = 0;
     cop.pressure = 1;
     mock_sensor4.centre_of_pressure = cop;
     sensors.push_back(mock_sensor4);
-    cop_estimator->set_cop_state(sensors);
-    ASSERT_EQ(this->cop_estimator->get_cop_state(), expected_cop);
+
+    geometry_msgs::msg::TransformStamped mock_transform;
+    mock_transform.transform.translation.x = 0.0;
+    mock_transform.transform.translation.y = 0.0;
+    mock_transform.transform.translation.z = 0.0;
+    mock_transform.transform.rotation.x = 0.0;
+    mock_transform.transform.rotation.y = 0.0;
+    mock_transform.transform.rotation.z = 0.0;
+    mock_transform.transform.rotation.w = 1.0;
+
+    cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
+    ASSERT_EQ(cop_estimator->get_cop_state(), expected_cop);
 }
 
 TEST_F(CopEstimatorTest, setZeroPressureCopTest)
@@ -118,7 +137,17 @@ TEST_F(CopEstimatorTest, setZeroPressureCopTest)
     cop.pressure = 0;
     mock_sensor.centre_of_pressure = cop;
     sensors.push_back(mock_sensor);
-    cop_estimator->set_cop_state(sensors);
+
+    geometry_msgs::msg::TransformStamped mock_transform;
+    mock_transform.transform.translation.x = 0.0;
+    mock_transform.transform.translation.y = 0.0;
+    mock_transform.transform.translation.z = 0.0;
+    mock_transform.transform.rotation.x = 0.0;
+    mock_transform.transform.rotation.y = 0.0;
+    mock_transform.transform.rotation.z = 0.0;
+    mock_transform.transform.rotation.w = 1.0;
+
+    cop_estimator->set_cop_state(sensors, { mock_transform, mock_transform });
     double expected = 0.0;
     ASSERT_EQ(cop_estimator->get_cop_state().pressure, expected);
 }
