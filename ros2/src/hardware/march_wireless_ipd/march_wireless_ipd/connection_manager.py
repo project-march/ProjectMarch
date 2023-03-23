@@ -61,6 +61,7 @@ class ConnectionManager:
         self._connection = None
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        node.get_logger().warn("Wireless ipd node starting up with ip: " + str(host) + " and port: " + str(port))
         self._socket.bind((host, port))
         self._socket.listen()
         self._node = node
@@ -74,8 +75,8 @@ class ConnectionManager:
         self._stopped = False
         self._controller.accepted_cb = partial(self._send_message_till_confirm, "Accepted", True)
         self._controller.rejected_cb = partial(self._send_message_till_confirm, "Reject")
-        self._controller.current_gait_cb = self._current_gait_cb
-        self._controller.current_state_cb = self._current_state_cb
+        # self._controller.current_gait_cb = self._current_gait_cb
+        # self._controller.current_state_cb = self._current_state_cb
 
 
     def _validate_received_data(self, msg: str):
@@ -104,6 +105,9 @@ class ConnectionManager:
                 req = self._wait_for_message(5.0)
 
                 req = json.loads(req)
+
+                self._logger.info("msg: " + str(req))
+                
                 self._seq = req["seq"]
                 msg_type = req["type"]
 
@@ -111,6 +115,7 @@ class ConnectionManager:
                     self._send_gait(req["gait"]["gaitName"])
 
                 elif msg_type == "Heartbeat":
+                    self._logger.info("Heartbeat received")
                     self._send_message_till_confirm(msg_type="Heartbeat")
 
                 elif msg_type == "Fail":
@@ -161,6 +166,7 @@ class ConnectionManager:
             self._connection.settimeout(timeout)
             data = self._connection.recv(1024).decode("utf-8")
             self._connection.settimeout(None)
+            self._logger.warning("waiting for message")
             self._validate_received_data(data)
         except (socket.error, ConnectionResetError, BlockingIOError) as e:
             raise e

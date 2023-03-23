@@ -35,6 +35,7 @@ class MujocoReaderNode(Node):
         self.sensor_publisher = self.create_publisher(MujocoDataSensing, "mjc_exo_sensing", 10)
         self.torso_imu_publisher = self.create_publisher(Imu, "upper_imu", 10)
         self.backpack_imu_publisher = self.create_publisher(Imu, "lower_imu", 10)
+        self.pressure_sole_publisher = self.create_publisher(PressureSolesData, "march/pressure_sole_data", 10)
 
         self.sensor_subscription = self.create_subscription(
             MujocoDataSensing, "mujoco_sensor_output", self.sensor_listener_callback, 10

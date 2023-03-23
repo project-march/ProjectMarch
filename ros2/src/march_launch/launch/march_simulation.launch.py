@@ -41,6 +41,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
+    wireless_ipd = LaunchConfiguration("wireless_ipd")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
     layout = LaunchConfiguration("layout")
 
@@ -112,6 +113,11 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="true",
             description="If this argument is false, the rqt input device will not be launched.",
             choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="wireless_ipd",
+            default_value="false",
+            description="If this argument is false, the wireless input device will not be launched.",
         ),
         DeclareLaunchArgument(
             name="layout",
@@ -328,6 +334,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         launch_arguments=[
             ("use_sim_time", use_sim_time),
             ("rqt_input", rqt_input),
+            ("wireless_ipd", wireless_ipd),
             ("rviz", rviz),
             ("ping_safety_node", ping_safety_node),
             ("layout", layout),
