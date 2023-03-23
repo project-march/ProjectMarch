@@ -54,10 +54,18 @@ void CopEstimator::set_cop_state(
 
 void CopEstimator::update_sensor_pressures(std::map<std::string, double> pressure_values_map)
 {
-    for (auto& sensor : m_sensors) {
-        sensor.update_pressure(pressure_values_map.at(sensor.name));
+    for (auto it = pressure_values_map.begin(); it != pressure_values_map.end(); ++it) {
+        update_individual_pressure_sensor(it->first, it->second);
     }
     // set_cop_state(m_sensors);
+}
+
+void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure)
+{
+    auto it = std::find_if(m_sensors.begin(), m_sensors.end(), [name](const PressureSensor& sensor) {
+        return sensor.name == name;
+    });
+    it->update_pressure(pressure);
 }
 
 /**

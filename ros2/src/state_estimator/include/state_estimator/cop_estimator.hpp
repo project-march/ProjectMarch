@@ -56,6 +56,7 @@ public:
         std::vector<PressureSensor> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
     std::vector<PressureSensor> get_sensors();
     void update_sensor_pressures(std::map<std::string, double> pressure_values_map);
+    void update_individual_pressure_sensor(std::string name, double pressure);
     CenterOfPressure get_cop_state();
 
 private:
