@@ -45,7 +45,7 @@ class WirelessInputDeviceController:
 
     def __del__(self):
         """Destroy node cleanly."""
-        self._node.destroy_publisher(self._instruction_gait_pub)
+        self._node.destroy_publisher(self._send_gait_request)
 
     def _gait_response_callback(self, msg: GaitResponse):
         self.get_logger().info("Updating Wireless ipd state...")
