@@ -32,6 +32,9 @@ StateEstimator::StateEstimator()
 
     m_zmp_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 100);
 
+    m_feet_height_publisher
+        = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
+
     m_rviz_publisher = this->create_publisher<visualization_msgs::msg::Marker>("joint_visualizations", 100);
 
     timer_ = this->create_wall_timer(1000ms, std::bind(&StateEstimator::publish_robot_frames, this));
@@ -212,6 +215,12 @@ void StateEstimator::publish_robot_frames()
     if (m_footstep_estimator.get_foot_on_ground("r")) {
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
     }
+
+    // Update and publish feet height
+    march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
+    feet_height_msg.header.frame_id = "map";
+    feet_height_msg.heights = m_joint_estimator.get_feet_height();
+    m_feet_height_publisher->publish(feet_height_msg);
 
     visualize_joints();
 }
