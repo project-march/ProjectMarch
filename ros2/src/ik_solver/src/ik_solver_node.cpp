@@ -6,14 +6,17 @@ IkSolverNode::IkSolverNode()
 {
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
-    RCLCPP_INFO(this->get_logger(), "urdf string: ", robot_description);
     m_ik_solver.load_urdf_model(robot_description);
-    RCLCPP_INFO(this->get_logger(), "URDF loaded successfully!");
-    m_ik_solver.set_joint_configuration();
-    int test = m_ik_solver.set_jacobian();
+    
+    pinocchio::Model test_model = m_ik_solver.get_model();
+    // for(pinocchio::FrameIndex i=0; i<static_cast<pinocchio::FrameIndex>(test_model.nframes); i++){
+    //     RCLCPP_INFO(this->get_logger(), test_model.frames[i].name);
+    // }
 
-    RCLCPP_INFO(this->get_logger(), "Result is %i", test);
-    RCLCPP_INFO(this->get_logger(), "Joint amount is %i", m_ik_solver.get_model_joints());
+
+    m_ik_solver.initialize_solver();
+    m_ik_solver.set_joint_configuration();
+    m_ik_solver.set_jacobian();
     auto jacobian = m_ik_solver.get_model_jacobian();
     std::stringstream ss;
     ss << jacobian.format(Eigen::IOFormat(4, 0, ", ", "\n", "", ""));

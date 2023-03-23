@@ -15,7 +15,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# We need the library locations from ACADOS, as they contain hpipm and blasfeo
+set(acados_include "${PROJECT_SOURCE_DIR}/../libraries/acados/include")
+set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
@@ -25,8 +28,10 @@ find_package(march_description REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_packagE(pluginlib REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(urdf REQUIRED)
+find_package(labrob_qpsolvers REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME}
@@ -43,6 +48,7 @@ ament_target_dependencies(
   "geometry_msgs"
   "march_description"
   "march_shared_msgs"
+  labrob_qpsolvers
   pinocchio
   urdf
   Eigen3
@@ -64,6 +70,7 @@ ament_target_dependencies(
   ik_solver_node
   pinocchio
   Eigen3
+  labrob_qpsolvers
   urdf
   "rclcpp"
   "geometry_msgs"
@@ -71,15 +78,39 @@ ament_target_dependencies(
   "march_shared_msgs"
 )
 
+# 
+include_directories(
+        ${acados_include}
+        ${acados_include}/blasfeo/include/
+        ${acados_include}/hpipm/include/
+        ${acados_include}/acados_c/
+)
+# Link libraries
+target_link_libraries(ik_solver_node ${acados_lib}/libblasfeo.so)
+target_link_libraries(ik_solver_node ${acados_lib}/libhpipm.so)
+
+target_link_libraries(${PROJECT_NAME} ${acados_lib}/libblasfeo.so)
+target_link_libraries(${PROJECT_NAME} ${acados_lib}/libhpipm.so)
+# 
+
 install(TARGETS ik_solver_node
 EXPORT export_${PROJECT_NAME}
 DESTINATION lib/${PROJECT_NAME})
+
+install(FILES ${acados_lib}/libblasfeo.so
+  DESTINATION lib)
+
+  install(FILES ${acados_lib}/libhpipm.so
+  DESTINATION lib)
 
 # Install launch files.
 install(DIRECTORY
 launch
 DESTINATION share/${PROJECT_NAME}/
 )
+
+
+
 
 #Export
 ament_export_dependencies(eigen3_cmake_module)
@@ -98,6 +129,7 @@ if(BUILD_TESTING)
     ${PROJECT_NAME}_test 
     pinocchio
     Eigen3
+    labrob_qpsolvers
     urdf
     "rclcpp"
     "geometry_msgs" 
