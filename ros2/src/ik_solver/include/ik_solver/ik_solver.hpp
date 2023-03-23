@@ -5,19 +5,24 @@
 // Largely based on Nicola Scianca's work and code:
 // https://ieeexplore.ieee.org/document/7803336
 
+#include "ik_solver/utils.hpp"
+#include "labrob_qpsolvers/qpsolvers.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
+#include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/jacobian.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
 #include "pinocchio/algorithm/kinematics-derivatives.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
 #include "pinocchio/algorithm/model.hpp"
 #include "pinocchio/fwd.hpp"
+#include "pinocchio/math/rpy.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "labrob_qpsolvers/qpsolvers.hpp"
-#include "pinocchio/algorithm/frames.hpp"
 #include <iostream>
 #include <memory>
 #include <vector>
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 // TEST
 // #include "pinocchio/parsers/sample-models.hpp"
@@ -25,9 +30,10 @@
 #ifndef IK_SOLVER_JACOBIAN_GENERATOR_HPP
 #define IK_SOLVER_JACOBIAN_GENERATOR_HPP
 
-struct state{
-    Eigen::Vector3d left_foot_pos;
-    Eigen::Vector3d right_foot_pos;
+struct state {
+    // Pose, in this case, is [POSITION, ANGLE]
+    Eigen::Matrix<double, 6, 1> left_foot_pose;
+    Eigen::Matrix<double, 6, 1> right_foot_pose;
     Eigen::Vector3d com_pos;
 };
 
@@ -41,10 +47,8 @@ public:
     void initialize_solver();
     Eigen::VectorXd solve_for_velocity(state, state);
     pinocchio::Data::Matrix6x get_model_jacobian();
-
-    double get_angle_difference(double, double);
     void set_current_state();
-
+    const state get_state();
     const pinocchio::Model get_model();
 
 private:
@@ -63,8 +67,6 @@ private:
 
     // Solver related variables
     std::shared_ptr<labrob::qpsolvers::QPSolverEigenWrapper<double>> m_qp_solver_ptr;
-
-
 };
 
 #endif // IK_SOLVER_JACOBIAN_GENERATOR_HPP

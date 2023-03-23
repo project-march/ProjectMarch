@@ -40,6 +40,7 @@ add_library(${PROJECT_NAME}
   src/ik_solver.cpp
   include/${PROJECT_NAME}/ik_solver_node.hpp
   src/ik_solver_node.cpp
+  include/${PROJECT_NAME}/utils.hpp
 )
 
 ament_target_dependencies(
@@ -60,6 +61,7 @@ ament_target_dependencies(
 add_executable(ik_solver_node 
 src/ik_solver_node.cpp 
 src/ik_solver.cpp 
+include/${PROJECT_NAME}/utils.hpp
 include/${PROJECT_NAME}/ik_solver.hpp
 include/${PROJECT_NAME}/ik_solver_node.hpp)
 target_include_directories(ik_solver_node PUBLIC
