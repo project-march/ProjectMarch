@@ -40,5 +40,11 @@ TEST_F(EncoderTest, CorrectTotalPositions)
     MockEncoder encoder(this->counts_per_rotation);
     ASSERT_EQ(counts_per_rotation, encoder.getTotalPositions());
 }
+
+TEST_F(EncoderTest, CorrectGetDirectionTest)
+{
+    MockEncoder encoder(this->counts_per_rotation);
+    ASSERT_EQ(march::Encoder::Direction::Positive, encoder.getDirection());
+}
 // NOLINTEND
 #endif
