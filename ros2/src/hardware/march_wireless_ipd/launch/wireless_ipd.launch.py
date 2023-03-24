@@ -11,6 +11,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     return launch.LaunchDescription(
         [
             DeclareLaunchArgument(
+                # The default value has to be changed for the IP adress of the asrock eventually
                 name="ip_address", default_value="192.168.43.137", description="IP address on which the IPD can connect."
             ),
             Node(

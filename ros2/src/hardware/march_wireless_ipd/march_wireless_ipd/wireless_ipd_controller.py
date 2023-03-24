@@ -48,16 +48,15 @@ class WirelessInputDeviceController:
         self._node.destroy_publisher(self._send_gait_request)
 
     def _gait_response_callback(self, msg: GaitResponse):
-        self.get_logger().info("Updating Wireless ipd state...")
+        self._node.get_logger().info("Updating Wireless ipd state...")
         if msg.gait_type is GaitResponse.SIT:
-            self._node.self._send_message_till_confirm(msg_type="GaitRequest", requested_gait="sit" )
+            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="sit" )
         if msg.gait_type is GaitResponse.STAND:
-            self._node.self._send_message_till_confirm(msg_type="GaitRequest", requested_gait="stand" )
+            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="stand" )
         if msg.gait_type is GaitResponse.WALK:
-            self._node.self._send_message_till_confirm(msg_type="GaitRequest", requested_gait="walk" )
+            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="walk" )
         if msg.gait_type is GaitResponse.ERROR:
-            self._node.self._send_message_till_confirm(msg_type="fail", requested_gait="" )
-        # TODO: Send message to IPD with the newly requested state.
+            self._node.manager.send_message_till_confirm(msg_type="fail", requested_gait="" )
 
     def get_node(self) -> Node:
         """Simple get function for the node.
