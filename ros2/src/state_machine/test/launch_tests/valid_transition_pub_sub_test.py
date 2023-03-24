@@ -63,7 +63,7 @@ class TestProcessOutput(unittest.TestCase):
         # Create a ROS node for tests
         self.node = rclpy.create_node('input_output_node')
 
-    def timer_callback(self):
+    def t1_callback(self):
         """ Reads a file and publish the data from this file to ros2
                 :param -
                 :return -
@@ -72,7 +72,7 @@ class TestProcessOutput(unittest.TestCase):
         msg = GaitRequest()
         msg.gait_type = 2
         self.publisher_.publish(msg)
-        # self.node.get_logger().info('Publishing: ' + str(msg))
+
     def test_dut_output_valid_transition(self, dut, proc_output):
         """ Listen for a message published by dut and compare message to expected value
                 :param
@@ -86,8 +86,8 @@ class TestProcessOutput(unittest.TestCase):
 
         # Publish data to dut
         self.publisher_ = self.node.create_publisher(GaitRequest, "/march/gait_request", 10)
-        timer_period = 0.4  # seconds
-        self.timer = self.node.create_timer(timer_period, self.t2_callback)
+        timer_period = 0.5  # seconds
+        self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
         #expected data for this test is the force unknown state or int num 2.
         expected_data = 2
