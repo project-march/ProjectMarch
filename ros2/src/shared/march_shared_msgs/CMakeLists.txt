@@ -68,7 +68,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/RobotState.msg"
   "msg/GaitRequest.msg"
   "msg/GaitResponse.msg"
-  "msg/GaitType.msg"
   "msg/PointStampedList.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
