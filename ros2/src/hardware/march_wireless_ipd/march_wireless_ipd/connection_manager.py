@@ -73,8 +73,8 @@ class ConnectionManager:
         self._current_gait = "unknown"
         self._last_heartbeat = self._node.get_clock().now()
         self._stopped = False
-        self._controller.accepted_cb = partial(self._send_message_till_confirm, "Accepted", True)
-        self._controller.rejected_cb = partial(self._send_message_till_confirm, "Reject")
+        self._controller.accepted_cb = partial(self.send_message_till_confirm, "Accepted", True)
+        self._controller.rejected_cb = partial(self.send_message_till_confirm, "Reject")
         # self._controller.current_gait_cb = self._current_gait_cb
         # self._controller.current_state_cb = self._current_state_cb
 
@@ -89,11 +89,13 @@ class ConnectionManager:
             self._logger.warning("Connection lost with wireless IPD (empty message)")
             raise socket.error
         else:
+            self._logger.warning("Heartbeat received")
             self._last_heartbeat = self._node.get_clock().now()
 
     def _wait_for_request(self):
         """Loop that receives heartbeat and gait request messages from the IPD and handles them."""
         while True:
+            self._logger.info("_wait_for_request called")
             try:
                 # Do not receive messages while a stop or gait has been requested and
                 # the manager waits for a receive confirmation from the IPD.
@@ -105,8 +107,6 @@ class ConnectionManager:
                 req = self._wait_for_message(5.0)
 
                 req = json.loads(req)
-
-                self._logger.info("msg: " + str(req))
                 
                 self._seq = req["seq"]
                 msg_type = req["type"]
@@ -116,7 +116,7 @@ class ConnectionManager:
 
                 elif msg_type == "Heartbeat":
                     self._logger.info("Heartbeat received")
-                    self._send_message_till_confirm(msg_type="Heartbeat")
+                    self.send_message_till_confirm(msg_type="Heartbeat")
 
                 elif msg_type == "Fail":
                     self._send_gait("error")
@@ -163,10 +163,10 @@ class ConnectionManager:
             str: Decoded message from the wireless IPD.
         """
         try:
+            self._logger.warning("waiting for message")
             self._connection.settimeout(timeout)
             data = self._connection.recv(1024).decode("utf-8")
             self._connection.settimeout(None)
-            self._logger.warning("waiting for message")
             self._validate_received_data(data)
         except (socket.error, ConnectionResetError, BlockingIOError) as e:
             raise e
@@ -184,7 +184,7 @@ class ConnectionManager:
         except (BrokenPipeError, InterruptedError, socket.error):
             raise socket.error
 
-    def _send_message_till_confirm(self, msg_type: str, requested_gait: str, message: str = None):
+    def send_message_till_confirm(self, msg_type: str, requested_gait: str, message: str = None):
         """Send a message to the wireless IPD until confirmation is received.
 
         Args:
