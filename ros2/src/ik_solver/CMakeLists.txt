@@ -119,7 +119,9 @@ ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 
 if(BUILD_TESTING)
+file(COPY test/urdf/march_test_urdf.urdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test/urdf)
   ament_add_gmock(${PROJECT_NAME}_test
+  test/ik_solver_test.cpp
   test/test_runner.cpp
   # include
   )
@@ -127,6 +129,8 @@ if(BUILD_TESTING)
   target_include_directories(${PROJECT_NAME}_test PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)
+
+  # target_include_directories(${TEST_MY_COOL_PKG} PRIVATE "test/include" "include")
   ament_target_dependencies(
     ${PROJECT_NAME}_test 
     pinocchio

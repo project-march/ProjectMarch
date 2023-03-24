@@ -25,6 +25,8 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
     m_joint_pos = pinocchio::neutral(m_model);
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
+
+    m_joint_pos = pinocchio::neutral(m_model);
 }
 
 void IkSolver::set_joint_configuration()
