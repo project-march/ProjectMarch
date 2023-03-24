@@ -9,7 +9,7 @@ from functools import partial
 from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
-from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, GaitRequest, GaitResponse
+from march_shared_msgs.msg import GaitRequest
 from rclpy.node import Node
 
 HEARTBEAT_TIMEOUT = Duration(seconds=5)
@@ -134,7 +134,6 @@ class ConnectionManager:
         """
         self._pause_receiving_messages = True
 
-        # self._requested_gait = req["gait"]["gaitName"]
         self._requested_gait = req
         if self._requested_gait == "stand" or self._requested_gait == "stop":
             self._controller.publish_gait(GaitRequest.STAND)
