@@ -3,11 +3,9 @@
 import getpass
 import socket
 
-from rclpy import Future
 from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
 from std_msgs.msg import Header, String
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, GaitRequest, GaitResponse
-from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 
@@ -50,13 +48,13 @@ class WirelessInputDeviceController:
     def _gait_response_callback(self, msg: GaitResponse):
         self._node.get_logger().info("Updating Wireless ipd state...")
         if msg.gait_type is GaitResponse.SIT:
-            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="sit" )
+            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="sit")
         if msg.gait_type is GaitResponse.STAND:
-            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="stand" )
+            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="stand")
         if msg.gait_type is GaitResponse.WALK:
-            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="walk" )
+            self._node.manager.send_message_till_confirm(msg_type="GaitRequest", requested_gait="walk")
         if msg.gait_type is GaitResponse.ERROR:
-            self._node.manager.send_message_till_confirm(msg_type="fail", requested_gait="" )
+            self._node.manager.send_message_till_confirm(msg_type="fail", requested_gait="")
 
     def get_node(self) -> Node:
         """Simple get function for the node.
@@ -70,7 +68,8 @@ class WirelessInputDeviceController:
         """Publish a gait instruction to the gait state machine.
 
         Args:
-            string (str): Name of the gait.
+            gait_type (str): Name of the gait.
+            walk_type (str): Name of walk type.
         """
         self._send_gait_request.publish(
             GaitRequest(

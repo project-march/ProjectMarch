@@ -7,15 +7,10 @@ import time
 from functools import partial
 
 from rclpy.impl.rcutils_logger import RcutilsLogger as Logger
-from march_shared_msgs.msg import CurrentGait, CurrentState
 from march_utility.utilities.duration import Duration
 from .wireless_ipd_controller import WirelessInputDeviceController
-from march_shared_msgs.msg import FootPosition
 from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse, CurrentGait, CurrentState, GaitRequest, GaitResponse
-from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
-from march_gait_selection.dynamic_interpolation.point_handlers.point_handler import FOOT_LOCATION_TIME_OUT
 from rclpy.node import Node
-from std_msgs.msg import String
 
 HEARTBEAT_TIMEOUT = Duration(seconds=5)
 
@@ -75,9 +70,6 @@ class ConnectionManager:
         self._stopped = False
         self._controller.accepted_cb = partial(self.send_message_till_confirm, "Accepted", True)
         self._controller.rejected_cb = partial(self.send_message_till_confirm, "Reject")
-        # self._controller.current_gait_cb = self._current_gait_cb
-        # self._controller.current_state_cb = self._current_state_cb
-
 
     def _validate_received_data(self, msg: str):
         """Check if a received message is valid or is empty, meaning the connection is broken.
@@ -107,7 +99,7 @@ class ConnectionManager:
                 req = self._wait_for_message(5.0)
 
                 req = json.loads(req)
-                
+
                 self._seq = req["seq"]
                 msg_type = req["type"]
 
