@@ -1,4 +1,4 @@
-#include "footstep_generator.hpp"
+#include "footstep_generator/footstep_generator.hpp"
 
 int main(int argc, char** argv)
 {
