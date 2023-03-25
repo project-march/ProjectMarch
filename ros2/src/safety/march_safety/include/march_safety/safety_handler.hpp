@@ -11,10 +11,11 @@
 
 #include <march_shared_msgs/msg/error.hpp>
 #include <march_shared_msgs/msg/gait_instruction.hpp>
+#include <march_shared_msgs/msg/gait_request.hpp>
 
 class SafetyHandler {
     using ErrorMsg = march_shared_msgs::msg::Error;
-    using GaitMsg = march_shared_msgs::msg::GaitType;
+    using GaitMsg = march_shared_msgs::msg::GaitRequest;
     using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
 
 public:

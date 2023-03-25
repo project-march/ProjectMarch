@@ -18,9 +18,11 @@ using namespace std::chrono_literals;
 StateMachineNode::StateMachineNode()
     : Node("state_machine_node")
 {
-    m_gait_command_subscriber = this->create_subscription<march_shared_msgs::msg::GaitType>(
-        "gait_type", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
-    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command_client");
+    m_gait_response_publisher
+        = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
+    m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
+        "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
+    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command");
 
     m_state_machine = StateMachine();
 
@@ -68,10 +70,17 @@ bool StateMachineNode::send_request(exoState desired_state)
  * then the request for the new gait is send.
  * @param msg
  */
-void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitType::SharedPtr msg)
+void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
 {
-    m_state_machine.performTransition((exoState)msg->gait_type);
-    send_request(m_state_machine.get_current_state());
+    auto response_msg = march_shared_msgs::msg::GaitResponse();
+    if (m_state_machine.performTransition((exoState)msg->gait_type)) {
+        response_msg.gait_type = msg->gait_type;
+        m_gait_response_publisher->publish(response_msg);
+        send_request((exoState)m_state_machine.get_current_state());
+    } else {
+        response_msg.gait_type = m_state_machine.get_current_state();
+        m_gait_response_publisher->publish(response_msg);
+    }
 }
 /**
  * Main function to run the node.

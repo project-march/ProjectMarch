@@ -46,7 +46,7 @@ SafetyNode::SafetyNode()
     // Create an error publisher to notify the system (state machine) if
     // something is wrong
     error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 1000);
-    state_publisher = this->create_publisher<march_shared_msgs::msg::GaitType>("gait_type", 10);
+    state_publisher = this->create_publisher<march_shared_msgs::msg::GaitRequest>("/march/gait_request", 10);
 
     // Create an instruction publisher to publish when a gait has to stop
     gait_instruction_publisher

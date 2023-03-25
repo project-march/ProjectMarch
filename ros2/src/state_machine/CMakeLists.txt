@@ -56,7 +56,16 @@ install(TARGETS state_machine_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
+
 if(BUILD_TESTING)
+  find_package(launch_testing_ament_cmake)
+  add_launch_test(test/launch_tests/invalid_transition_pub_sub_test.py )
+  add_launch_test(test/launch_tests/valid_transition_pub_sub_test.py)
   ament_add_gmock(${PROJECT_NAME}_test
     test/state_machine_test.cpp
     test/test_runner.cpp
