@@ -14,12 +14,20 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
     m_publish_curve = this->create_publisher<geometry_msgs::msg::PointStamped>("bezier_trajectory", 10);
     m_points_subscription = this->create_subscription<march_shared_msgs::msg::PointStampedList>(
         "bezier_points", 10, std::bind(&SwingLegTrajectoryGeneratorNode::subscriber_callback, this, _1));
-
+    m_final_feet_subscriber = this->create_subscription<march_shared_msgs::msg::PointStampedList>("final_feet_position", 10
+    std::bind(&SwingLegTrajectoryGeneratorNode::final_feet_callback, this, _1));
     m_swing_leg_generator = SwingLegTrajectoryGenerator();
 }
 
 void SwingLegTrajectoryGeneratorNode::subscriber_callback(march_shared_msgs::msg::PointStampedList::SharedPtr msg)
 {
+    m_swing_leg_generator.setPoints(msg->points);
+    RCLCPP_INFO((this->get_logger()), "points updated with x = %f", msg->points.at(1).point.x);
+}
+
+void SwingLegTrajectoryGeneratorNode::final_feet_callback(march_shared_msgs::msg::PointStampedList::SharedPtr msg)
+{
+    //TODO: update implementation
     m_swing_leg_generator.setPoints(msg->points);
     RCLCPP_INFO((this->get_logger()), "points updated with x = %f", msg->points.at(1).point.x);
 }
