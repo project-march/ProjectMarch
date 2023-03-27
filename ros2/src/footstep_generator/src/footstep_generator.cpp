@@ -13,7 +13,10 @@ FootstepGenerator::FootstepGenerator()
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("footsteps", 10);
-}
+    m_subscriber_joints = this->create_subscription<sensor_msgs::msg::JointState>(
+            "joint_state", 10, std::bind(&FootstepGenerator::joint_state_callback, this, _1));}
+    m_subscriber_imu = this->create_subscription<sensor_msgs::msg::Imu>(
+            "imu_state", 10, std::bind(&FootstepGenerator::imu_state_callback, this, _1));}
 
 void FootstepGenerator::publish_foot_placements(
     const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
@@ -22,6 +25,14 @@ void FootstepGenerator::publish_foot_placements(
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
     publish_footsteps(footsteps);
     response->status = 0;
+}
+
+void FootstepGenerator::joint_state_callback(sensor_msgs::msg::JointState::SharedPtr msg){
+    //TODO: implement
+}
+
+void FootstepGenerator::imu_state_callback(sensor_msgs::msg::ImuState::SharedPtr msg){
+    //TODO: implement
 }
 
 geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int stance_leg, int gait_type)
