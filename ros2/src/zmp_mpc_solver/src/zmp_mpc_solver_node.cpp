@@ -8,7 +8,7 @@ SolverNode::SolverNode()
     : Node("mpc_solver_node")
     , m_zmp_solver()
 {
-    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
+//    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
     m_final_feet_publisher = this->create_publisher<march_shared_msgs::msg::PointStampedList>("final_feet_position", 10);
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
