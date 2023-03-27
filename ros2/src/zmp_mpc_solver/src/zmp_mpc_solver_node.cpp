@@ -9,10 +9,11 @@ SolverNode::SolverNode()
     , m_zmp_solver()
 {
     m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
+    m_final_feet_publisher = this->create_publisher<march_shared_msgs::msg::PointStampedList>("final_feet_position", 10);
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "robot_feet_positions", 10, std::bind(&SolverNode::feet_callback, this, _1));
+        "footsteps", 10, std::bind(&SolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
