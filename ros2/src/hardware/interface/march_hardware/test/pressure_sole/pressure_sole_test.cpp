@@ -40,7 +40,7 @@ TEST_F(PressureSoleTest, PressureSoleDataEqFalse)
     ASSERT_FALSE(data_1 == data_2);
 }
 
-//TEST_F(PressureSoleTest, Read)
+// TEST_F(PressureSoleTest, Read)
 //{
 //    uint8_t expected_offset = 4;
 //    march::PressureSole pressure_sole(mock_slave, expected_offset, "left");
