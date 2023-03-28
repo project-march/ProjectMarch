@@ -117,7 +117,7 @@ ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
          test/joint_test.cpp
          test/mocks/mock_absolute_encoder.h
          test/mocks/mock_encoder.h
-             test/mocks/mock_odrive.h
+         test/mocks/mock_odrive.h
          test/mocks/mock_incremental_encoder.h
          test/mocks/mock_motorcontroller_state.h
          test/mocks/mock_pdo_interface.h
