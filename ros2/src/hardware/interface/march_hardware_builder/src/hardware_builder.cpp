@@ -322,6 +322,7 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
 
 std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML::Node& pressure_soles_config) const
 {
+    logger_->info("Createing pressure solesssss");
     std::vector<march::PressureSole> pressure_soles;
     if (!pressure_soles_config) {
         return pressure_soles;
@@ -335,6 +336,7 @@ std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML
 
 march::PressureSole HardwareBuilder::createPressureSole(const YAML::Node& pressure_sole_config) const
 {
+    logger_->info("Creating pressure soleeeee");
     HardwareBuilder::validateRequiredKeysExist(
         pressure_sole_config, HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");
 

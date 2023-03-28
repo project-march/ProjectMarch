@@ -42,7 +42,16 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1
           { ODriveObjectName::Torque, ODriveObject(/*offset=*/100, /*length=*/32) } };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none
-    = { { ODriveObjectName::OdriveError, ODriveObject(/*offset=*/104, /*length=*/32) } };
+    = { { ODriveObjectName::OdriveError, ODriveObject(/*offset=*/104, /*length=*/32) },
+          { ODriveObjectName::Heel_right, ODriveObject(/*offset=*/108, /*length=*/32) },
+          { ODriveObjectName::Heel_left, ODriveObject(/*offset=*/112, /*length=*/32) },
+          { ODriveObjectName::Met1, ODriveObject(/*offset=*/116, /*length=*/32) },
+          { ODriveObjectName::Hallux, ODriveObject(/*offset=*/120, /*length=*/32) },
+          { ODriveObjectName::Met3, ODriveObject(/*offset=*/124, /*length=*/32) },
+          { ODriveObjectName::Toes, ODriveObject(/*offset=*/128, /*length=*/32) },
+          { ODriveObjectName::Met5, ODriveObject(/*offset=*/132, /*length=*/32) },
+          { ODriveObjectName::Arch, ODriveObject(/*offset=*/136, /*length=*/32) },
+          { ODriveObjectName::Rfix, ODriveObject(/*offset=*/140, /*length=*/32) } };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
     { ODriveObjectName::TargetTorque, ODriveObject(/*offset=*/0, /*length=*/32) },

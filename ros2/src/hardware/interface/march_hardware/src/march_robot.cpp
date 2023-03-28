@@ -105,6 +105,7 @@ bool MarchRobot::hasValidSlaves()
     ::std::vector<int> motorControllerIndices;
     ::std::vector<int> temperatureSlaveIndices;
     ::std::vector<int> pdbSlaveIndices;
+    ::std::vector<int> pressureSolesSlaveIndices;
 
     for (auto& joint : joint_list_) {
         if (joint.hasTemperatureGES()) {
@@ -121,6 +122,13 @@ bool MarchRobot::hasValidSlaves()
         pdbSlaveIndices.push_back(index);
     }
 
+    if (hasPressureSoles()) {
+        for (auto& pressure_sole : getPressureSoles()) {
+            int index = pressure_sole.getSlaveIndex();
+            pressureSolesSlaveIndices.push_back(index);
+        }
+    }
+
     // Multiple temperature sensors may be connected to the same slave.
     // Remove duplicate temperatureSlaveIndices so they don't trigger as
     // duplicates later.
@@ -135,6 +143,7 @@ bool MarchRobot::hasValidSlaves()
     slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
     slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
     slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
+    slaveIndices.insert(slaveIndices.end(), pressureSolesSlaveIndices.begin(), pressureSolesSlaveIndices.end());
 
     logger_->info(logger_->fstring("Found configuration for %lu slaves.", slaveIndices.size()));
 

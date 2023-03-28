@@ -64,6 +64,7 @@ hardware_interface::return_type MarchMockSystemInterface::configure(const hardwa
         hw_info.hw_effort = std::numeric_limits<double>::quiet_NaN();
         hw_state_info_.push_back(hw_info);
     }
+
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
     RCLCPP_INFO(rclcpp::get_logger("MarchMockSystemInterface"), "%s-----Here!!---", LColor::BLUE);
     if (!march_hardware_interface_util::joints_have_interface_types(
@@ -105,6 +106,7 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
     //                hardware_interface::StateInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE,
     //                &hw_positions_[i]));
     //    }
+
     return state_interfaces;
 }
 
