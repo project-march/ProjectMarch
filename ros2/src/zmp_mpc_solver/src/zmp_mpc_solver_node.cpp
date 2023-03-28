@@ -21,10 +21,12 @@ SolverNode::SolverNode()
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
-void SolverNode::com_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
+void SolverNode::com_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-    m_zmp_solver.set_current_com(
-        msg->poses[0].position.x, msg->poses[0].position.y, msg->poses[1].position.x, msg->poses[1].position.y);
+//    m_zmp_solver.set_current_com(
+//        msg->poses[0].position.x, msg->poses[0].position.y, msg->poses[1].position.x, msg->poses[1].position.y);
+    RCLCPP_DEBUG(this->get_logger(), "com callback test");
+
 }
 
 void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
@@ -38,13 +40,13 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
     m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
 }
 
-void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
-{
-    // int status = solve_step(x_current, u_current); // solve the mpc problem
-    // if (status == 0) {
-    // publish_control_msg();
-    // }
-}
+//void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
+//{
+//    // int status = solve_step(x_current, u_current); // solve the mpc problem
+//    // if (status == 0) {
+//    // publish_control_msg();
+//    // }
+//}
 
 void SolverNode::publish_control_msg()
 {
