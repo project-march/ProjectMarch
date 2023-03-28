@@ -11,7 +11,7 @@
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
-#include "march_shared_msgs/msg/robot_state.hpp"
+//#include "march_shared_msgs/msg/robot_state.hpp"
 //#include "march_shared_msgs/msg/point_stamped_list.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -31,10 +31,10 @@ public:
 private:
     ZmpSolver m_zmp_solver;
 
-    void com_callback(geometry_msgs::msg::PoseArray::SharedPtr);
+    void com_callback(geometry_msgs::msg::PointStamped::SharedPtr);
     void zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr);
     void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
-    void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
+//    void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
 
     void publish_control_msg();
 
@@ -46,7 +46,7 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
 
-    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
+//    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 };
 
 #endif

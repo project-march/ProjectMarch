@@ -17,7 +17,7 @@ FootstepGenerator::FootstepGenerator()
             "joint_state", 10, std::bind(&FootstepGenerator::joint_state_callback, this, _1));
     m_subscriber_imu = this->create_subscription<sensor_msgs::msg::Imu>(
             "imu_state", 10, std::bind(&FootstepGenerator::imu_state_callback, this, _1));
-
+}
 void FootstepGenerator::publish_foot_placements(
     const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
     std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
