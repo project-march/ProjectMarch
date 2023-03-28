@@ -26,8 +26,8 @@ TEST_F(PressureSoleTest, GetSide)
 
 TEST_F(PressureSoleTest, PressureSoleDataEqTrue)
 {
-    march::PressureSoleData data_1 = { 0, 1, 2, 3, 4, 5, 6, 7 , march::left};
-    march::PressureSoleData data_2 = { 0, 1, 2, 3, 4, 5, 6, 7, march::left};
+    march::PressureSoleData data_1 = { 0, 1, 2, 3, 4, 5, 6, 7, march::left };
+    march::PressureSoleData data_2 = { 0, 1, 2, 3, 4, 5, 6, 7, march::left };
 
     ASSERT_EQ(data_1, data_2);
 }
