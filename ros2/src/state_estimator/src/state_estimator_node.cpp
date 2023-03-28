@@ -2,6 +2,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include <chrono>
 #include <cstdio>
 #include <string>
@@ -47,6 +48,12 @@ private:
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr state_publisher;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr sensor_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
+
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr com_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr zmp_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr foot_pos_publisher;
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_state_publisher;
 };
 
 int main(int argc, char** argv)

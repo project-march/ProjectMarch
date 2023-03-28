@@ -1,5 +1,7 @@
 // standard
 #include "zmp_mpc_solver/zmp_mpc_solver_node.hpp"
+//#include "march_shared_msgs/msg/point_stamped_list.hpp"
+
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
@@ -9,7 +11,7 @@ SolverNode::SolverNode()
     , m_zmp_solver()
 {
 //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
-    m_final_feet_publisher = this->create_publisher<march_shared_msgs::msg::PointStampedList>("final_feet_position", 10);
+    m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
