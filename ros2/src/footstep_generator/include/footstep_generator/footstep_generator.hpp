@@ -3,6 +3,10 @@
 
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
+#include "geometry_msgs/msg/point_stamped.hpp"
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
+
 #include "march_shared_msgs/srv/request_footsteps.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
@@ -20,6 +24,9 @@ public:
     double get_feet_spread();
 
 private:
+    void imu_state_callback(sensor_msgs::msg::Imu::SharedPtr);
+    void joint_state_callback(sensor_msgs::msg::JointState::SharedPtr);
+
     void publish_foot_placements(const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
         std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response);
 
@@ -27,6 +34,8 @@ private:
 
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_publisher;
     rclcpp::Service<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_service;
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_subscriber_joints;
+    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_subscriber_imu;
 
     int m_steps;
     const double m_vx;

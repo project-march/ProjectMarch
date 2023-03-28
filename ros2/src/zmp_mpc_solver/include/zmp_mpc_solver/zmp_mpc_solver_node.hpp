@@ -12,6 +12,8 @@
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
+//#include "march_shared_msgs/msg/point_stamped_list.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -37,10 +39,14 @@ private:
     void publish_control_msg();
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
 
-    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_com_subscriber;
+
+    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
+
+    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 };
 
 #endif

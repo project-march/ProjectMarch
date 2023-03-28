@@ -31,7 +31,7 @@ void FootstepGenerator::joint_state_callback(sensor_msgs::msg::JointState::Share
     //TODO: implement
 }
 
-void FootstepGenerator::imu_state_callback(sensor_msgs::msg::ImuState::SharedPtr msg){
+void FootstepGenerator::imu_state_callback(sensor_msgs::msg::Imu::SharedPtr msg){
     //TODO: implement
 }
 
