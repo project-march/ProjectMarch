@@ -132,7 +132,7 @@ ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
          test/mocks/mock_slave.h
          test/mocks/mock_temperature_ges.h
 #         test/temperature/temperature_ges_test.cpp
-#         test/pressure_sole/pressure_sole_test.cpp
+         test/pressure_sole/pressure_sole_test.cpp
          test/torque_sensor/torque_sensor_test.cpp
          test/test_runner.cpp
      )

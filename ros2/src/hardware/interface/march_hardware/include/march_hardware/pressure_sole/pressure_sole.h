@@ -35,7 +35,7 @@ struct PressureSoleData {
     {
         return lhs.heel_right == rhs.heel_right && lhs.heel_left == rhs.heel_left && lhs.met1 == rhs.met1
             && lhs.hallux == rhs.hallux && lhs.met3 == rhs.met3 && lhs.toes == rhs.toes && lhs.met5 == rhs.met5
-            && lhs.arch == rhs.arch;
+            && lhs.arch == rhs.arch && lhs.side == rhs.side;
     }
 
     /**
