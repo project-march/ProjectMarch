@@ -47,6 +47,8 @@ TEST_F(PressureSoleTest, Read)
     march::PressureSoleData expected_data = { 0, 1, 2, 3, 4, 5, 6, 7, march::left };
 
     for (int i = 0; i < 8; i++) {
+        //        march::bit32 bit;
+        //        bit.f = (float)i;
         EXPECT_CALL(*this->mock_pdo, read32(Eq(this->mock_slave.getSlaveIndex()), expected_offset + i * 4))
             .WillOnce(Return(march::bit32 { i }));
     }
