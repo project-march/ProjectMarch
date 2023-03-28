@@ -20,7 +20,7 @@ public:
 
     MOCK_CONST_METHOD1(positionIUToRadians, double(double));
     MOCK_CONST_METHOD1(velocityIUToRadians, double(double));
-    MOCK_CONST_METHOD1(positionRadiansToIU, double(double));
+    MOCK_CONST_METHOD1(positionRadiansToIU, int32_t(double));
     MOCK_CONST_METHOD1(velocityRadiansToIU, double(double));
 };
 // NOLINTEND

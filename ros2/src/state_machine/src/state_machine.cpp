@@ -20,13 +20,10 @@ StateMachine::StateMachine()
     // NOTE: Possible improvement is that the states and allowed transitions are loaded from a config file.
     m_exo_transitions = {
         /*{CurrentState, PossibleStates}*/
-        { exoState::Sit, { exoState::SitStand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::SitStand, { exoState::Sit, exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::Stand, { exoState::SitStand, exoState::StandWalk, exoState::ForceUnknown, exoState::Error } },
-        { exoState::StandWalk, { exoState::Stand, exoState::Walk, exoState::ForceUnknown, exoState::Error } },
-        { exoState::Walk, { exoState::StandWalk, exoState::ForceUnknown, exoState::Error } },
-        { exoState::ForceUnknown, { exoState::ForceUnknownStand, exoState::Error } },
-        { exoState::ForceUnknownStand, { exoState::Stand, exoState::Error } },
+        { exoState::Sit, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
+        { exoState::Stand, { exoState::Sit, exoState::Walk, exoState::ForceUnknown, exoState::Error } },
+        { exoState::Walk, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
+        { exoState::ForceUnknown, { exoState::Stand, exoState::Error } },
 
     };
 }
@@ -41,15 +38,17 @@ StateMachine::StateMachine()
  *
  * @param desired_state
  */
-void StateMachine::performTransition(exoState desired_state)
+bool StateMachine::performTransition(exoState desired_state)
 {
     if (isValidTransition(desired_state)) {
         RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Exo state transition succeeded!");
         m_current_state = desired_state;
+        return true;
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Invalid State transition!");
         // do ERROR Stuff
-        m_current_state = exoState::Error;
+        //        m_current_state = exoState::Error;
+        return false;
     }
 }
 
@@ -73,7 +72,7 @@ bool StateMachine::isValidTransition(exoState desired_state)
  *
  * @return the current state.
  */
-exoState StateMachine::get_current_state()
+int StateMachine::get_current_state()
 {
-    return m_current_state;
+    return static_cast<int>(m_current_state);
 }

@@ -91,10 +91,6 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} pthread)
 ament_target_dependencies(${PROJECT_NAME} soem march_logger_cpp march_safety)
 
-add_executable(slave_count_check check/slave_count.cpp)
-target_link_libraries(slave_count_check ${PROJECT_NAME})
-ros_enable_rpath(slave_count_check)
-
 install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION include/${PROJECT_NAME}
 )
@@ -102,10 +98,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
-)
-
-install(TARGETS slave_count_check
-    RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY launch config
@@ -117,21 +109,23 @@ ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 # Add gtest based cpp test target and link libraries
  if(BUILD_TESTING)
      ament_add_gmock(${PROJECT_NAME}_test
-#         test/encoder/absolute_encoder_test.cpp
-#         test/encoder/encoder_test.cpp
+         test/encoder/absolute_encoder_test.cpp
+         test/encoder/encoder_test.cpp
          test/encoder/incremental_encoder_test.cpp
          test/error/hardware_exception_test.cpp
          test/ethercat/slave_test.cpp
-#         test/joint_test.cpp
-#         test/mocks/mock_absolute_encoder.h
-#         test/mocks/mock_encoder.h
+         test/joint_test.cpp
+         test/mocks/mock_absolute_encoder.h
+         test/mocks/mock_encoder.h
+             test/mocks/mock_odrive.h
          test/mocks/mock_incremental_encoder.h
          test/mocks/mock_motorcontroller_state.h
          test/mocks/mock_pdo_interface.h
          test/mocks/mock_sdo_interface.h
          test/mocks/mock_slave.h
          test/mocks/mock_temperature_ges.h
-#         test/temperature/temperature_ges_test.cpp
+         test/power_distribution_board/power_distribution_board_test.cpp
+         test/temperature/temperature_ges_test.cpp
          test/pressure_sole/pressure_sole_test.cpp
          test/torque_sensor/torque_sensor_test.cpp
          test/test_runner.cpp
