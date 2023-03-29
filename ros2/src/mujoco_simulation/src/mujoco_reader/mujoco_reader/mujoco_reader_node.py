@@ -2,6 +2,7 @@
 
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState, Imu
+from control_msgs.msg import JointTrajectoryControllerState
 from march_shared_msgs.msg import PressureSolesData
 import rclpy
 from rclpy.node import Node
@@ -32,6 +33,8 @@ class MujocoReaderNode(Node):
         """
         super().__init__("mujoco_reader")
         self.state_publisher = self.create_publisher(JointState, "joint_states", 10)
+        # self.joint_trajectory_state_publisher = self.create_publisher(JointTrajectoryControllerState,
+        #                                                               "/joint_trajectory_controller/state", 10)
         self.pressure_sole_publisher = self.create_publisher(PressureSolesData, "march/pressure_sole_data", 10)
         self.torso_imu_publisher = self.create_publisher(Imu, "upper_xsens_mti_node", 10)
         self.backpack_imu_publisher = self.create_publisher(Imu, "lower_xsens_mti_node", 10)

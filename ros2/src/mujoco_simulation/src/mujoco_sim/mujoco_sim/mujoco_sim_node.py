@@ -218,7 +218,7 @@ class MujocoSimNode(Node):
         state_msg.position = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
-        self.get_logger().info(str(state_msg))
+        # self.get_logger().info(str(state_msg))
 
         sensor_msg.pressure_soles = self.sensor_data_extraction.get_pressure_sole_data()
 
