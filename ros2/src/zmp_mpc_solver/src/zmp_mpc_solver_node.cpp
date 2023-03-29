@@ -15,7 +15,7 @@ SolverNode::SolverNode()
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "footsteps", 10, std::bind(&SolverNode::feet_callback, this, _1));
+        "desired_footsteps", 10, std::bind(&SolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
