@@ -47,7 +47,7 @@ class MujocoWriterNode(Node):
                 skip = True
                 break
             else:
-                msg.desired.positions[i] *= -1
+                msg.desired.positions[i] *= 1
         if not skip:
             msg_tosend.trajectory = msg
             if self.reset:
