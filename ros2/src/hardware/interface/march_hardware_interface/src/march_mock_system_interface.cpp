@@ -181,9 +181,6 @@ hardware_interface::return_type MarchMockSystemInterface::read()
         RCLCPP_INFO(rclcpp::get_logger("test_logger"), "new position %d has value %f", i, new_pos.at(i));
         hw_state_info_[i].hw_position = new_pos.at(i);
     }
-    for (size_t i = 0; i < hw_state_info_.size(); i++) {
-        RCLCPP_INFO(rclcpp::get_logger("test_logger"), "hw position %d has value %f", i, hw_state_info_[i].hw_position);
-    }
     return hardware_interface::return_type::OK;
 }
 
