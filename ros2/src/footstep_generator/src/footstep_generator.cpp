@@ -12,7 +12,7 @@ FootstepGenerator::FootstepGenerator()
 {
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
-    m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("footsteps", 10);
+    m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("desired_footsteps", 10);
     m_subscriber_joints = this->create_subscription<sensor_msgs::msg::JointState>(
             "joint_state", 10, std::bind(&FootstepGenerator::joint_state_callback, this, _1));
     m_subscriber_imu = this->create_subscription<sensor_msgs::msg::Imu>(
