@@ -10,26 +10,14 @@ JointEstimator::JointEstimator(StateEstimator* owner)
 
 void JointEstimator::set_joint_states(sensor_msgs::msg::JointState::SharedPtr new_joint_states)
 {
+    RCLCPP_INFO(m_owner->get_logger(), "Set joint states :)");
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
-    int counter = 0;
-    for (auto i : m_joints) {
-        switch (i.hinge_axis) {
-            case X:
-                quaternion_math.setRPY(new_joint_states->position[counter], 0, 0);
-                break;
-            case Y:
-                quaternion_math.setRPY(0, new_joint_states->position[counter], 0);
-                break;
-            case Z:
-                quaternion_math.setRPY(0, 0, new_joint_states->position[counter]);
-                break;
-        }
-        quaternion_math.normalize();
-        tf2::convert(quaternion_math, quaternion_joint);
-        i.frame.transform.rotation = quaternion_joint;
-        counter++;
+    for (size_t i = 0; i < new_joint_states->name.size(); i++) {
+        RCLCPP_INFO(m_owner->get_logger(), "Loop :)");
+        set_individual_joint_state(new_joint_states->name.at(i), new_joint_states->position.at(i));
     }
+    RCLCPP_INFO(m_owner->get_logger(), "Done setting joint states :)");
 }
 
 void JointEstimator::set_individual_joint_state(std::string joint_name, double new_position)
@@ -55,6 +43,8 @@ void JointEstimator::set_individual_joint_state(std::string joint_name, double n
     }
     quaternion_math.normalize();
     tf2::convert(quaternion_math, it->frame.transform.rotation);
+
+    RCLCPP_INFO(m_owner->get_logger(), "settt state :)");
 }
 
 const JointContainer JointEstimator::get_individual_joint(std::string joint_name)
@@ -196,6 +186,26 @@ std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string co
         }
     };
     return com_positions;
+}
+
+std::vector<double> JointEstimator::get_feet_height()
+{
+    geometry_msgs::msg::PointStamped foot_point;
+    foot_point.point.x = 0;
+    foot_point.point.y = 0;
+    foot_point.point.z = 0;
+
+    // Get transform left foot.
+    geometry_msgs::msg::TransformStamped left_foot_transform = m_owner->get_frame_transform("map", "left_ankle");
+    geometry_msgs::msg::PointStamped left_transformed_point;
+    tf2::doTransform(foot_point, left_transformed_point, left_foot_transform);
+
+    // Get transform right foot.
+    geometry_msgs::msg::TransformStamped right_foot_transform = m_owner->get_frame_transform("map", "right_ankle");
+    geometry_msgs::msg::PointStamped right_transformed_point;
+    tf2::doTransform(foot_point, right_transformed_point, right_foot_transform);
+
+    return { left_transformed_point.point.z, right_transformed_point.point.z };
 }
 
 const std::vector<JointContainer> JointEstimator::get_joints()

@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(march_description REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -53,6 +54,7 @@ ament_target_dependencies(
   ${PROJECT_NAME}
   "rclcpp"
   "geometry_msgs"
+  "sensor_msgs"
   "march_description"
   "march_shared_msgs"
   "nav_msgs"
@@ -89,6 +91,7 @@ ament_target_dependencies(
   state_estimator_node
   "rclcpp"
   "geometry_msgs"
+  "sensor_msgs"
   "march_description"
   "march_shared_msgs"
   "nav_msgs"
@@ -111,6 +114,11 @@ DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)
+  find_package(launch_testing_ament_cmake)
+  add_launch_test(test/launch_tests/state_estimator_imu_estimator_test.py)
+  add_launch_test(test/launch_tests/state_estimator_com_estimator_test.py )
+  add_launch_test(test/launch_tests/state_estimator_robot_feet_test.py )
+
   ament_add_gmock(${PROJECT_NAME}_test
   # test/joint_estimator_test.cpp
   test/cop_estimator_test.cpp
@@ -128,9 +136,10 @@ if(BUILD_TESTING)
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)
   ament_target_dependencies(
-    ${PROJECT_NAME}_test 
+    ${PROJECT_NAME}_test
     "rclcpp"
-    "geometry_msgs" 
+    "geometry_msgs"
+    "sensor_msgs"
     "march_shared_msgs"
     "nav_msgs"
     "tf2_ros"
@@ -138,5 +147,33 @@ if(BUILD_TESTING)
     "tf2"
     "tf2_kdl")
 endif()
+
+
+# EXPORT
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+
+ament_export_dependencies(
+        "rclcpp"
+        "geometry_msgs"
+        "sensor_msgs"
+        "march_shared_msgs"
+        "nav_msgs"
+        "tf2_ros"
+        "tf2_geometry_msgs"
+        "tf2"
+        "tf2_kdl"
+)
+install(
+        DIRECTORY include/
+        DESTINATION include
+)
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
 
 ament_package()

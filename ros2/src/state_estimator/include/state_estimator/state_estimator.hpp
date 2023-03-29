@@ -4,6 +4,7 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
+#include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -47,8 +48,6 @@ private:
 
     std::vector<PressureSensor> create_pressure_sensors();
 
-    void publish_robot_state();
-
     void publish_robot_frames();
 
     void initialize_imus();
@@ -66,8 +65,10 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_cop_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_foot_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_publisher;
 
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_rviz_publisher;
 
