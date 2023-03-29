@@ -70,7 +70,7 @@ class MujocoSimNode(Node):
         super().__init__("mujoco_sim")
         self.declare_parameter("model_toload")
 
-        self.SIM_TIMESTEP_ROS = 0.1
+        self.SIM_TIMESTEP_ROS = 0.01
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
@@ -130,7 +130,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.01
+        self.TIME_STEP_TRAJECTORY = 0.001
         self.trajectory_last_updated = self.get_clock().now()
 
     def check_for_new_reference_update(self, time_current):
@@ -218,7 +218,6 @@ class MujocoSimNode(Node):
         state_msg.position = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
-        # self.get_logger().info(str(state_msg))
 
         sensor_msg.pressure_soles = self.sensor_data_extraction.get_pressure_sole_data()
 
