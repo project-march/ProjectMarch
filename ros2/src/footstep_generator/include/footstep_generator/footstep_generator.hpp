@@ -1,9 +1,9 @@
 #ifndef FOOTSTEP_GEN_H
 #define FOOTSTEP_GEN_H
 
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
-#include "geometry_msgs/msg/point_stamped.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 

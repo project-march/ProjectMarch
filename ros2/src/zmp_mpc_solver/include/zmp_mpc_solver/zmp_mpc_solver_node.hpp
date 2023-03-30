@@ -34,19 +34,18 @@ private:
     void com_callback(geometry_msgs::msg::PointStamped::SharedPtr);
     void zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr);
     void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
-//    void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
+    //    void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
 
     void publish_control_msg();
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
 
-
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
 
-//    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
+    //    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 };
 
 #endif

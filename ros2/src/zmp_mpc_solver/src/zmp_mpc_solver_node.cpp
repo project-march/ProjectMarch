@@ -2,7 +2,6 @@
 #include "zmp_mpc_solver/zmp_mpc_solver_node.hpp"
 //#include "march_shared_msgs/msg/point_stamped_list.hpp"
 
-
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
@@ -10,7 +9,8 @@ SolverNode::SolverNode()
     : Node("mpc_solver_node")
     , m_zmp_solver()
 {
-//    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory", 10);
+    //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
+    //    10);
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
@@ -23,10 +23,9 @@ SolverNode::SolverNode()
 
 void SolverNode::com_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-//    m_zmp_solver.set_current_com(
-//        msg->poses[0].position.x, msg->poses[0].position.y, msg->poses[1].position.x, msg->poses[1].position.y);
+    //    m_zmp_solver.set_current_com(
+    //        msg->poses[0].position.x, msg->poses[0].position.y, msg->poses[1].position.x, msg->poses[1].position.y);
     RCLCPP_DEBUG(this->get_logger(), "com callback test");
-
 }
 
 void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
@@ -40,7 +39,7 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
     m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
 }
 
-//void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
+// void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
 //{
 //    // int status = solve_step(x_current, u_current); // solve the mpc problem
 //    // if (status == 0) {
