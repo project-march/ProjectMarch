@@ -11,7 +11,7 @@
   <depend>rclcpp</depend>
   <depend>march_description</depend>
   <depend>march_shared_msgs</depend>
-  <depend>Eigen3</depend>
+  <depend>eigen</depend>
   <depend>labrob_qpsolvers</depend>
   <depend>pinocchio</depend>
   <depend>pluginlib</depend>
