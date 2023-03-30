@@ -11,6 +11,7 @@ SolverNode::SolverNode()
 {
     //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
     //    10);
+    m_com_trajectory_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("com_trajectory", 10);
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
@@ -49,25 +50,31 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 
 void SolverNode::publish_control_msg()
 {
-    // auto message = trajectory_msgs::msg::JointTrajectory();
-    // message.header.stamp = this->get_clock()->now();
-    // for (const double &control_input : u_current) {
-    //   std::cout << control_input << std::endl;
-    //   message.reference_control.push_back(control_input);
-    // };
+    auto message = geometry_msgs::msg::PoseArray();
+    message.header.stamp = this->get_clock()->now();
+    message.header.frame_id = "map";
+    geometry_msgs::msg::Pose pose_container;
+
+
+    std::array<double, NX * ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
+
+    for (int i = 0; i<(ZMP_PENDULUM_ODE_N); i++) {
+        pose_container.position.x = (*trajectory_pointer)[(i*NX + 0)];
+        pose_container.position.y = (*trajectory_pointer)[(i*NX + 3)];
+        pose_container.position.z = m_zmp_solver.get_com_height();
+      message.poses.push_back(pose_container);
+    };
     // message.mode = 0;
     // message.control_inputs = 1;
     // message.dt = (m_time_horizon / PENDULUM_ODE_N);
-    // m_publisher->publish(message);
+    m_com_trajectory_publisher->publish(message);
     return;
 }
 
 int main(int argc, char** argv)
 {
-    printf("hello world acados_solver package\n");
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<SolverNode>());
     rclcpp::shutdown();
-    printf("hello world acados_solver package\n");
     return 0;
 }

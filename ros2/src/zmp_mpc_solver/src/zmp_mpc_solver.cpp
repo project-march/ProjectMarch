@@ -12,10 +12,16 @@ ZmpSolver::ZmpSolver()
 {
     initialize_mpc_params();
     m_x_current.fill(0);
+    m_x_trajectory.fill(0);
     m_u_current.fill(0);
 
     // m_x_current = {0.0, 0.0, 0.0, 0.06, -0.1, 0.06, 0.0, 0.0, 0.1, 0.1, 0.0, 0.0};
     solve_step();
+}
+
+const double ZmpSolver::get_com_height()
+{
+    return m_com_height;
 }
 
 int ZmpSolver::solve_step()
@@ -27,6 +33,11 @@ int ZmpSolver::solve_step()
 std::array<double, NX> ZmpSolver::get_state()
 {
     return m_x_current;
+}
+
+std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
+{
+    return &m_x_trajectory;
 }
 
 std::array<double, NU * ZMP_PENDULUM_ODE_N> ZmpSolver::get_input_trajectory()
@@ -412,6 +423,10 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     for (int ii = 0; ii < NX; ii++) {
         x_init_input[ii] = xtraj[NX + ii];
+    }
+
+    for (int ii = 0; ii < NX*N; ii++) {
+        x_init_input[ii] = xtraj[ii];
     }
 
     // get solution

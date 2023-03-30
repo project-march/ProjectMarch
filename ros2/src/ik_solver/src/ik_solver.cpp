@@ -1,5 +1,5 @@
 //
-// Created by Tessel & Jack March 6th 2023
+// Created by Sahand March 6th 2023
 //
 #include "ik_solver/ik_solver.hpp"
 

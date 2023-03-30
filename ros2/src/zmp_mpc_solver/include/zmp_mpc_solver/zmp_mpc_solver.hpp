@@ -20,6 +20,7 @@ public:
     void set_current_state();
     int solve_step();
     std::array<double, NX> get_state();
+    std::array<double, NX * ZMP_PENDULUM_ODE_N>* get_state_trajectory();
     std::array<double, NU * ZMP_PENDULUM_ODE_N> get_input_trajectory();
 
     void set_current_foot(double, double);
@@ -27,11 +28,13 @@ public:
     void set_current_com(double, double, double, double);
     void set_current_zmp(double, double);
     void initialize_mpc_params();
+    const double get_com_height();
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
 
     std::array<double, NX> m_x_current;
+    std::array<double, NX * ZMP_PENDULUM_ODE_N> m_x_trajectory;
     std::array<double, NU * ZMP_PENDULUM_ODE_N> m_u_current;
     std::array<double, 2> m_pos_foot_current;
     std::array<double, 2> m_pos_foot_prev;
