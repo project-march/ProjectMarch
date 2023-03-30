@@ -8,7 +8,14 @@
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-
+  <depend>rclcpp</depend>
+  <depend>march_description</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>eigen</depend>
+  <depend>labrob_qpsolvers</depend>
+  <depend>pinocchio</depend>
+  <depend>pluginlib</depend>
+  <depend>urdf</depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
