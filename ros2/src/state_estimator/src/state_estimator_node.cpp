@@ -1,8 +1,8 @@
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "geometry_msgs/msg/point_stamped.hpp"
 #include <chrono>
 #include <cstdio>
 #include <string>
@@ -14,17 +14,17 @@ public:
     StateEstimator()
         : Node("state_estimator_node")
     {
-//        state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
+        //        state_publisher = this->create_publisher<march_shared_msgs::msg::RobotState>("robot_state", 10);
         com_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_com_position", 10);
         zmp_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 10);
         foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("est_foot_position", 10);
         joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_state", 10);
         imu_state_publisher = this->create_publisher<sensor_msgs::msg::Imu>("imu_state", 10);
 
-//        sensor_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-//            "/imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
-//        state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-//            "/joint_state", 10, std::bind(&StateEstimator::state_callback, this, _1));
+        //        sensor_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
+        //            "/imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        //        state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+        //            "/joint_state", 10, std::bind(&StateEstimator::state_callback, this, _1));
     };
 
 private:
