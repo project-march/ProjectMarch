@@ -97,8 +97,6 @@ class TrajectoryScheduler:
         self._action_client_to_controller = ActionClient(
             self._node, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
         )
-        # self._joint_trajectory_publisher = node.create_publisher(JointTrajectory,
-        #                                                          "/joint_trajectory_controller/joint_trajectory", 10)
 
     def schedule(self, command: TrajectoryCommand) -> None:
         """Sends a trajectory to the controller.
@@ -119,7 +117,6 @@ class TrajectoryScheduler:
             return
 
         goal_future: Future = self._action_client_to_controller.send_goal_async(goal_msg)
-        # self._joint_trajectory_publisher.publish(goal_msg.trajectory)
         goal_future.add_done_callback(self._controller_starts_trajectory_cb)
         self._messages_in_transit.add(goal_future)
 
