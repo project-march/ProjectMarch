@@ -9,6 +9,7 @@ from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from sensor_msgs.msg import JointState
+from control_msgs.msg import JointTrajectoryControllerState
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -129,6 +130,10 @@ class MujocoSimNode(Node):
         self.visualizer = MujocoVisualizer(self.model, self.data)
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
+        self.joint_trajectory_state_publisher = self.create_publisher(JointTrajectoryControllerState,
+                                                                      "/joint_trajectory_controller/state", 10)
+        self.joint_trajectory_state_msg = JointTrajectoryControllerState()
+
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
         self.TIME_STEP_TRAJECTORY = 0.008
         self.trajectory_last_updated = self.get_clock().now()
@@ -149,6 +154,10 @@ class MujocoSimNode(Node):
         try:
             msg = self.msg_queue.get_nowait()
             joint_pos = msg.positions
+
+            self.joint_trajectory_state_msg.header.stamp = self.get_clock().now().to_msg()
+            self.joint_trajectory_state_msg.desired = msg.positions
+
             for j in range(len(self.controller)):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
@@ -233,6 +242,9 @@ class MujocoSimNode(Node):
         sensor_msg.joint_state = state_msg
         sensor_msg.backpack_imu = backpack_imu
         sensor_msg.torso_imu = torso_imu
+
+        self.joint_trajectory_state_publisher.joint_names = self.actuator_names
+        self.joint_trajectory_state_publisher.actual = self.sensor_data_extraction.get_joint_pos()
 
         publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
         publisher.publish(sensor_msg)
