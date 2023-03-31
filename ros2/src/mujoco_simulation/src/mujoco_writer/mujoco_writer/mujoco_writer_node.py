@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from rclpy.action import ActionServer, GoalResponse
+from rclpy.action import ActionServer, GoalResponse, CancelResponse
 from control_msgs.msg import JointTrajectoryControllerState
 from control_msgs.action import FollowJointTrajectory
 from std_msgs.msg import Bool
@@ -40,30 +40,47 @@ class MujocoWriterNode(Node):
             FollowJointTrajectory,
             '/joint_trajectory_controller/follow_joint_trajectory',
             self.execute_callback)
-
+        # self._action_server.register_goal_callback(self.goal_callback)
         self.reset = False
         # self.subscription  # prevent unused variable warning
+
+    def goal_callback(self, goal):
+        if len(goal.trajectory.joint_names) == 0:
+            return GoalResponse.REJECT
+        self.get_logger().info("Accepted new action goal")
+        return GoalResponse.ACCEPT_AND_EXECUTE
+
+
+    def cancel_callback(self, goal_handle):
+        return CancelResponse.ACCEPT
 
     def execute_callback(self, goal_handle):
         self.get_logger().info('Executing goal...')
         trajectory = goal_handle.request.trajectory.points
-        for msg in trajectory:
-            msg_tosend = MujocoInput()
-            skip = False
-            for i, x in enumerate(msg.positions):
-                if x != x:
-                    skip = False
-                    break
-                else:
-                    msg.positions[i] *= 1
-            if not skip:
-                msg_tosend.trajectory = JointTrajectoryControllerState()
-                msg_tosend.trajectory.desired = msg
-                if self.reset:
-                    msg_tosend.reset = 1
-                    self.reset = False
-                self.publisher.publish(msg_tosend)
-        return GoalResponse.ACCEPT_AND_EXECUTE;
+        self.get_logger().info('amount of points: ' + str(len(trajectory)))
+        # for msg in trajectory:
+        #     msg_tosend = MujocoInput()
+        #     skip = False
+        #     for i, x in enumerate(msg.positions):
+        #         if x != x:
+        #             skip = False
+        #             break
+        #         else:
+        #             msg.positions[i] *= 1
+        #     if not skip:
+        #         msg_tosend.trajectory = JointTrajectoryControllerState()
+        #         msg_tosend.trajectory.desired = msg
+        #         if self.reset:
+        #             msg_tosend.reset = 1
+        #             self.reset = False
+        #         self.publisher.publish(msg_tosend)
+        msg_to_send = MujocoInput()
+        msg_to_send.points = trajectory
+        self.publisher.publish(msg_to_send)
+        goal_handle.succeed()
+        result = FollowJointTrajectory.Result()
+        return result
+
     def listener_callback(self, msg):
         """This listener callback publishes all the messages from the MARCH code to the topic Mujoco sim subscribes to.
 

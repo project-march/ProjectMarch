@@ -148,12 +148,12 @@ class MujocoSimNode(Node):
         """Updates the trajectory if possible."""
         try:
             msg = self.msg_queue.get_nowait()
-            joint_pos = msg.desired.positions
+            joint_pos = msg.positions
             for j in range(len(self.controller)):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
         except Empty:
-            self.get_logger().warn("NO NEW TRAJECTORY FOUND")
+            self.get_logger().debug("NO NEW TRAJECTORY FOUND")
 
     def writer_callback(self, msg):
         """Callback function for the writing service.
@@ -162,9 +162,17 @@ class MujocoSimNode(Node):
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
-        if msg.reset == 1:
-            self.msg_queue = Queue()
-        self.msg_queue.put(msg.trajectory)
+        # if msg.reset == 1:
+        #     self.msg_queue = Queue()
+        # self.msg_queue.put(msg.trajectory)
+        points = msg.points
+        for i in points:
+            self.msg_queue.put(i)
+
+        # joint_pos = msg.trajectory.desired.positions
+        # for j in range(len(self.controller)):
+        #     self.controller[j].joint_desired = joint_pos
+        # self.trajectory_last_updated = self.get_clock().now()
 
     def sim_step(self):
         """This function performs the simulation update.

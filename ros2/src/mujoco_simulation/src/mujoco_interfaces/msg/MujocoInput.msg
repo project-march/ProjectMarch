@@ -1,4 +1,5 @@
 control_msgs/JointTrajectoryControllerState trajectory
+trajectory_msgs/JointTrajectoryPoint[] points
 int8 reset
 
 
