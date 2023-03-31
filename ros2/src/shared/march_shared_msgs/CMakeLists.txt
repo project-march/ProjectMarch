@@ -66,6 +66,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcMsg.msg"
   "msg/RobotState.msg"
   "msg/GaitType.msg"
+  "msg/IkSolverCommand.msg"
   "msg/PointStampedList.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
