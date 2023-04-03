@@ -41,7 +41,6 @@ class MujocoWriterNode(Node):
             '/joint_trajectory_controller/follow_joint_trajectory',
             self.execute_callback)
         self.reset = False
-        # self.subscription  # prevent unused variable warning
 
     def execute_callback(self, goal_handle):
         self.get_logger().info('Executing goal...')
