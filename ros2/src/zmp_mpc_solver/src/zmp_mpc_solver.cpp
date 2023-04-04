@@ -123,7 +123,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     int N = ZMP_PENDULUM_ODE_N;
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
-
+    printf("Shooting nodes: %i\n", N);
     // First, we do some checks so the mpc works
     if ((N - 1) % m_number_of_footsteps != 0) {
         return 5;
