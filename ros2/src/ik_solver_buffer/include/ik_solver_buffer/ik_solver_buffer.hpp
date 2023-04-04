@@ -10,14 +10,17 @@
 class BufferNode : public rclcpp::Node {
 public:
     BufferNode();
+    void set_com_trajectory(geometry_msgs::msg::PoseArray::SharedPtr);
+    void set_swing_trajectory(geometry_msgs::msg::PoseArray::SharedPtr);
+    void set_foot_placement(geometry_msgs::msg::PointStamped::SharedPtr);
+
+    bool check_if_ready();
+    void publish_ik_trajectory();
 
 private:
     void com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void swing_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void foot_subscriber_callback(geometry_msgs::msg::PointStamped::SharedPtr);
-
-    bool check_if_ready();
-    void publish_ik_trajectory();
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_com_trajectory;
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_swing_trajectory;
     geometry_msgs::msg::PointStamped::SharedPtr m_latest_placed_foot;
