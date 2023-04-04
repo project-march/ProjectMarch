@@ -86,6 +86,22 @@ void ODrive::actuateTorque(float target_effort)
 
 void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
 {
+    auto offset = 0;// TODO:fix this with ODrivePDOMap.
+    for (double& i : pos_pid.get()-){
+        bit32 write_value {};
+        write_value.f = i;
+        this->write32(offset, write_value);
+        offset += 4;
+    }
+
+    offset = 0;  // TODO:fix this with ODrivePDOMap.
+    for (double& i : tor_pid.get()){
+        bit32 write_value {};
+        write_value.f = i;
+        this->write32(offset, write_value);
+        offset += 4;
+    }
+
     //TODO: write all 6 values to pdo map
 }
 
