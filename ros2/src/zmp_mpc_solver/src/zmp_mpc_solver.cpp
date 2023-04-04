@@ -425,7 +425,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         x_init_input[ii] = xtraj[NX + ii];
     }
 
-    for (int ii = 0; ii < NX*N; ii++) {
+    for (int ii = 0; ii < NX * N; ii++) {
         x_init_input[ii] = xtraj[ii];
     }
 
