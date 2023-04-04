@@ -75,7 +75,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
-    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -137,7 +136,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="robot_description",
-            default_value="march7_ros2",
+            default_value=robot,
             description="Which <robot_description>.xacro file to use. "
             "This file must be available in the `march_desrciption/urdf/` folder.",
         ),
@@ -269,17 +268,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             description="Duration to schedule next subgait early. If 0 then the"
             "next subgait is never scheduled early.",
         ),
-        DeclareLaunchArgument(
-            "timer_period",
-            default_value="0.004",
-            description="",
-        ),
-        DeclareLaunchArgument(
-            "jointless",
-            default_value="false",
-            description="If true, no joints will be actuated.",
-            choices=["true", "false"],
-        ),
         # FAKE SENSOR DATA ARGUMENTS
         DeclareLaunchArgument(
             name="fake_sensor_data",
@@ -354,12 +342,10 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
             ("scheduling_delay", scheduling_delay),
-            ("timer_period", timer_period),
             ("fake_sensor_data", fake_sensor_data),
             ("minimum_fake_temperature", minimum_fake_temperature),
             ("maximum_fake_temperature", maximum_fake_temperature),
             ("simulation", simulation),
-            ("jointless", jointless),
             ("gazebo", gazebo),
             ("mujoco", mujoco),
             ("model_to_load_mujoco", model_to_load_mujoco),
