@@ -171,7 +171,7 @@ void Joint::readEncoders()
 
 void Joint::sendPID()
 {
-    this->motor_controller_->sendPID(this->position_pid, this->torque_pid);
+    this->motor_controller_->sendPID(std::move(this->position_pid), std::move(this->torque_pid));
 }
 
 double Joint::getPosition() const
