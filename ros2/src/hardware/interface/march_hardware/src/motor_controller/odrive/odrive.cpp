@@ -84,6 +84,11 @@ void ODrive::actuateTorque(float target_effort)
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
 }
 
+void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
+{
+    //TODO: write all 6 values to pdo map
+}
+
 int ODrive::getActuationModeNumber() const
 {
     /* These values are used to set the control mode of the ODrive.

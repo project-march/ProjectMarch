@@ -50,6 +50,8 @@ public:
     virtual void actuateTorque(float target_effort) = 0;
     virtual void actuateRadians(float target_position) = 0;
 
+    virtual void sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid);
+
     // Getter and setter for the ActuationMode
     ActuationMode getActuationMode() const;
     void setActuationMode(ActuationMode actuation_mode);
