@@ -26,8 +26,8 @@ include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
-  include/${PROJECT_NAME}/ik_solver_buffer_node.hpp
-  src/ik_solver_buffer_node.cpp
+  include/${PROJECT_NAME}/ik_solver_buffer.hpp
+  src/ik_solver_buffer.cpp
 )
 
 ament_target_dependencies(
@@ -38,7 +38,10 @@ ament_target_dependencies(
   "march_shared_msgs"
 )
 
-add_executable(ik_solver_buffer_node src/ik_solver_buffer_node.cpp include/${PROJECT_NAME}/ik_solver_buffer_node.hpp)
+add_executable(ik_solver_buffer_node
+  src/ik_solver_buffer.cpp
+  include/${PROJECT_NAME}/ik_solver_buffer.hpp
+  src/ik_solver_buffer_node.cpp)
 target_include_directories(ik_solver_buffer_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -56,6 +59,7 @@ install(TARGETS ik_solver_buffer_node
   if(BUILD_TESTING)
     ament_add_gmock(${PROJECT_NAME}_test
     test/test_runner.cpp
+    test/ik_buffer_test.cpp
     # include
     )
     target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})

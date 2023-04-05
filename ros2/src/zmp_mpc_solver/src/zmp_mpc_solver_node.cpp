@@ -55,14 +55,13 @@ void SolverNode::publish_control_msg()
     message.header.frame_id = "map";
     geometry_msgs::msg::Pose pose_container;
 
+    std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
 
-    std::array<double, NX * ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
-
-    for (int i = 0; i<(ZMP_PENDULUM_ODE_N); i++) {
-        pose_container.position.x = (*trajectory_pointer)[(i*NX + 0)];
-        pose_container.position.y = (*trajectory_pointer)[(i*NX + 3)];
+    for (int i = 0; i < (ZMP_PENDULUM_ODE_N); i++) {
+        pose_container.position.x = (*trajectory_pointer)[(i * NX + 0)];
+        pose_container.position.y = (*trajectory_pointer)[(i * NX + 3)];
         pose_container.position.z = m_zmp_solver.get_com_height();
-      message.poses.push_back(pose_container);
+        message.poses.push_back(pose_container);
     };
     // message.mode = 0;
     // message.control_inputs = 1;
