@@ -4,14 +4,12 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
-from launch_ros.substitutions import FindPackageShare
+
 from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-
     ik_solver_launch_dir = os.path.join(
         get_package_share_directory('ik_solver'),
         'launch'
@@ -22,7 +20,6 @@ def generate_launch_description() -> LaunchDescription:
         'urdf',
         'march7_FROST.urdf'
     )
-
 
     return LaunchDescription([
         Node(
@@ -59,5 +56,4 @@ def generate_launch_description() -> LaunchDescription:
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
         launch_arguments={'robot_description': urdf_location}.items(),
         ),
-        
     ])
