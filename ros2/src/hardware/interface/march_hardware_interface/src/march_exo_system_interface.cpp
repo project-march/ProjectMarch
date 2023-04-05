@@ -252,6 +252,9 @@ hardware_interface::return_type MarchExoSystemInterface::start()
         for (JointInfo& jointInfo : joints_info_) {
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
 
+            // Send PID values to the joints to initialize them
+            jointInfo.joint.sendPID();
+
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.velocity = 0;

@@ -19,6 +19,7 @@ public:
     // MotorController cannot be a nullptr, since a Joint should always have a
     // MotorController.
     Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+        std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
         std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Initialize a Joint with motor controller and temperature slave.
@@ -26,6 +27,7 @@ public:
     // MotorController. OdriveTemperature ges may be a nullptr, since a Joint may have
     // a OdriveTemperature ges.
     Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+        std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
         std::unique_ptr<TemperatureGES> temperature_ges, std::shared_ptr<march_logger::BaseLogger> logger);
 
     virtual ~Joint() noexcept = default;
@@ -40,6 +42,9 @@ public:
     // Read the encoder data and store the position and velocity values in the
     // Joint
     void readEncoders();
+
+    // Function to send the PID values to the ODrives for the joint.
+    void sendPID();
 
     // Check whether the state of the MotorController has changed
     bool receivedDataUpdate();
@@ -143,6 +148,11 @@ private:
 
     // A joint must have a MotorController but may have a TemperatureGES
     std::unique_ptr<MotorController> motor_controller_;
+
+    // Array with the position PID and torque PID values of the joint
+    std::unique_ptr<std::array<double, 3>> position_pid;
+    std::unique_ptr<std::array<double, 3>> torque_pid;
+
     std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
     std::shared_ptr<march_logger::BaseLogger> logger_;
 };
