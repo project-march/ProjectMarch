@@ -47,8 +47,8 @@ public:
 
     // A MotorController should support both actuating by position (radians) or
     // by torque
-    virtual void actuateTorque(float target_effort) = 0;
-    virtual void actuateRadians(float target_position) = 0;
+    virtual void actuateTorque(float target_effort, float fuzzy_weight) = 0;
+    virtual void actuateRadians(float target_position, float fuzzy_weight) = 0;
 
     virtual void sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
         = 0;
@@ -57,8 +57,9 @@ public:
     ActuationMode getActuationMode() const;
     void setActuationMode(ActuationMode actuation_mode);
 
+    // TODO: Check if this method is really redundant.
     // Actuate based on the actuation mode of the motor controller
-    void actuate(float target);
+    //    void actuate(float target);
 
     /* Reset the MotorController
      * Can be overridden by child classes
@@ -111,7 +112,7 @@ public:
     virtual double effortMultiplicationConstant() const;
 
     // Get the effort limit of the motor controller
-    virtual double getEffortLimit() const = 0;
+    virtual double getTorqueLimit() const = 0;
 
     ~MotorController() override = default;
 

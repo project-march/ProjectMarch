@@ -61,7 +61,7 @@ public:
     void readFirstEncoderValues(bool operational_check);
 
     // Actuate the joint
-    void actuate(float target);
+    void actuate(float target_position, float target_torque, float fuzzy_position, float fuzzy_torque);
 
     // Get the position, velocity and torque of the joint
     double getPosition() const;

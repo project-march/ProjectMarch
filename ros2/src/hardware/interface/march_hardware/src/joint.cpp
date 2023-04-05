@@ -68,9 +68,24 @@ void Joint::enableActuation()
     motor_controller_->enableActuation();
 }
 
-void Joint::actuate(float target)
+/***
+ * This functions checks if the fuzzy control values are equal to one, when added together.
+ * When this is the case, the joints van be actuated, and the target torque and position can be send to the ethercat.
+ * @param target_position
+ * @param target_torque
+ * @param fuzzy_position
+ * @param fuzzy_torque
+ */
+void Joint::actuate(float target_position, float target_torque, float fuzzy_position, float fuzzy_torque)
 {
-    motor_controller_->actuate(target);
+    float total_fuzzy = fuzzy_torque + fuzzy_torque;
+    if (std::fabs(total_fuzzy - 1.0F) <= std::numeric_limits<float>::epsilon()) {
+        throw error::HardwareException(error::ErrorType::TOTAL_FUZZY_NOT_ONE,
+            "Total fuzzy exceeds value of one for fuzzy position: %f and fuzzy torque: %f: ", fuzzy_position,
+            fuzzy_torque);
+    }
+    motor_controller_->actuateTorque(target_torque, fuzzy_torque);
+    motor_controller_->actuateRadians(target_position, fuzzy_position);
 }
 
 void Joint::readFirstEncoderValues(bool operational_check)

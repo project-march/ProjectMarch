@@ -53,8 +53,9 @@ void ODrive::enableActuation()
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     }
 
+    // TODO: Check if this is needed.
     // Reset target torque
-    actuateTorque(/*target_effort=*/0.0);
+    //    actuateTorque(/*target_effort=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -69,19 +70,50 @@ void ODrive::waitForState(ODriveAxisState target_state)
     }
 }
 
-void ODrive::actuateTorque(float target_effort)
+/*** This method writes the desired torque to the ethercat, together with the corresponding fuzzy control weight.
+ *
+ * First there is a check to see if the torque limit is being surpassed.
+ * When this is not the case, the torque can be writen to the etherat.
+ * @param target_torque
+ * @param fuzzy_weight
+ */
+void ODrive::actuateTorque(float target_torque, float fuzzy_weight)
 {
-    if (target_effort > EFFORT_LIMIT || target_effort < -EFFORT_LIMIT) {
+    if (target_torque > TORQUE_LIMIT || target_torque < -TORQUE_LIMIT) {
         throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-            "Target effort of %f exceeds effort limit of %f", target_effort, EFFORT_LIMIT);
+            "Target torque of %f exceeds effort limit of %f", target_torque, TORQUE_LIMIT);
     }
 
-    float target_torque = target_effort * torque_constant_;
-    logger_->debug(logger_->fstring("Effort: %f", target_effort));
-    logger_->debug(logger_->fstring("Torque: %f", target_torque));
     bit32 write_torque {};
     write_torque.f = target_torque;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
+    bit32 write_fuzzy {};
+    write_fuzzy.f = fuzzy_weight;
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyTorque, axis_), write_fuzzy);
+}
+
+/*** This method writes the desired position to the ethercat, together with the corresponding fuzzy control weight.
+ *
+ * First there is a check to see if the position is within the joint limits.
+ * When this is not the case, the position can be writen to the etherat.
+ * @param target_position
+ * @param fuzzy_weight
+ */
+void ODrive::actuateRadians(float target_position, float fuzzy_weight)
+{
+    if (this->hasAbsoluteEncoder()
+        && !this->absolute_encoder_->isValidTargetIU(
+            this->getAbsolutePositionIU(), this->absolute_encoder_->positionRadiansToIU(target_position))) {
+        throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
+            "The requested position is outside the limits, for requested position %f: ", target_position);
+    }
+
+    bit32 write_position {};
+    write_position.f = target_position;
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
+    bit32 write_fuzzy {};
+    write_fuzzy.f = fuzzy_weight;
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
 }
 
 void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
@@ -278,19 +310,13 @@ void ODrive::setAxisState(ODriveAxisState state)
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 
-double ODrive::getEffortLimit() const
+double ODrive::getTorqueLimit() const
 {
-    return EFFORT_LIMIT;
+    return TORQUE_LIMIT;
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum
 // Viable Product
-
-void ODrive::actuateRadians(float /*target_position*/)
-{
-    throw error::NotImplemented("actuateRadians", "ODrive");
-}
-
 float ODrive::getMotorControllerVoltage()
 {
     throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
