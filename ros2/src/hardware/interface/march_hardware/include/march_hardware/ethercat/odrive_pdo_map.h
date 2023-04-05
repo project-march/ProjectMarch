@@ -48,7 +48,11 @@ enum class ODriveObjectName {
 
     // Write objects
     TargetTorque,
+    TargetPosition,
+    FuzzyTorque,
+    FuzzyPosition,
     RequestedState
+
 };
 
 class ODrivePDOmap {

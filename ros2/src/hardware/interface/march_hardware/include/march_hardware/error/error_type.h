@@ -39,6 +39,7 @@ namespace error {
         BUSY_WAITING_FUNCTION_MAXIMUM_TRIES_REACHED = 130,
         INITIAL_TORQUE_NOT_ZERO = 131,
         MAX_TORQUE_EXCEEDED = 132,
+        TOTAL_FUZZY_NOT_ONE = 133,
         UNKNOWN = 999,
     };
 

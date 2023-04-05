@@ -67,7 +67,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_EFFORT },
+            /*required_command_interfaces=*/ { hardware_interface::HW_IF_EFFORT, hardware_interface::HW_IF_POSITION },
             /*required_state_interfaces=*/
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
                 hardware_interface::HW_IF_EFFORT },
@@ -87,8 +87,6 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
 
-    // Create pressure soles with side set to left and right.
-    // This is needed for data reading and updating for the pressure_sole_broadcaster.
     march::PressureSoleData left_sole;
     left_sole.side = march::pressure_sole_side::left;
     pressure_soles_data_.push_back(left_sole);
@@ -96,7 +94,6 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     right_sole.side = march::pressure_sole_side::right;
     pressure_soles_data_.push_back(right_sole);
 
-    RCLCPP_INFO((*logger_), "Finished creating march pressure sole data");
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         if (!has_correct_actuation_mode(jointInfo.joint)) {
@@ -131,11 +128,15 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
         /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
+        /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
+        /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
+        /*fuzzy_position=*/std::numeric_limits<double>::quiet_NaN(),
+        /*fuzzy_torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
             /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
@@ -169,8 +170,8 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_actual));
+        state_interfaces.emplace_back(
+            hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
         // For motor controller state broadcasting.
         for (std::pair<std::string, double*>& motor_controller_pointer :
             jointInfo.motor_controller_data.get_pointers()) {
@@ -218,9 +219,12 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
-        // Effort: Couples the command controller to the value jointInfo.effort through a pointer.
+        // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
-            jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.effort_command));
+            jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
+        // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(
+            jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
     }
 
     return command_interfaces;
@@ -331,7 +335,6 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
         /*logger=*/(*logger_), /*joints=*/joints);
 
     // Tell every joint to enable actuation.
-    // TODO: Check if this needs be done for every joint or the non operational once.
     RCLCPP_INFO((*logger_), "Enabling every joint for actuation");
     for (auto joint : joints) {
         joint->enableActuation();
@@ -361,7 +364,8 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     // Stopping ethercat cycle in the hardware
     RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
-        jointInfo.joint.actuate(/*target=*/0);
+        // control on zero output torque when the exo shuts down.
+        jointInfo.joint.actuate(/*target=*/0, (float)jointInfo.position, 1, 0);
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
@@ -385,7 +389,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    // pdb_read();
+    pdb_read();
     pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
@@ -416,7 +420,7 @@ void MarchExoSystemInterface::pdb_read()
                 (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
         }
     }
-};
+}
 
 /**
  * @brief Reads the pdb data from the hardware and updates it so that the broadcaster can publish it.
@@ -429,7 +433,7 @@ void MarchExoSystemInterface::pressure_sole_read()
     for (size_t i = 0; i < pressure_soles.size(); i++) {
         pressure_soles[i].read(pressure_soles_data_[i]);
     }
-};
+}
 
 /** This is the update loop of the command interface.
  *
@@ -443,31 +447,34 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         return hardware_interface::return_type::OK;
     }
     for (JointInfo& jointInfo : joints_info_) {
-        //        RCLCPP_INFO((*logger_), "The sending effort is %g. (state: %g)", jointInfo.effort_command,
-        //        jointInfo.position);
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
-            return hardware_interface::return_type::ERROR;
         }
 
-        auto converted_effort
-            = jointInfo.joint.getMotorController()->getMotorControllerSpecificEffort(jointInfo.effort_command);
-        auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
-        if (abs(effort_diff_with_previous) > jointInfo.limit.max_effort_differance) {
-            // TODO: Change to better sign value.
-            converted_effort = jointInfo.effort_command_converted
-                + std::clamp(effort_diff_with_previous, -jointInfo.limit.max_effort_differance,
-                    jointInfo.limit.max_effort_differance);
-            RCLCPP_WARN((*logger_),
-                "Effort is increased with %g effort for %s, "
-                "which is more than %g effort in one iteration. "
-                "Clamped the effort difference. New total effort will be %g.",
-                effort_diff_with_previous, jointInfo.name.c_str(), jointInfo.limit.max_effort_differance,
-                converted_effort);
-        }
-        jointInfo.effort_command_converted = converted_effort;
-        jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
+        /*MARCH 7 code can be removed later */
+        //        auto converted_effort
+        //            =
+        //            jointInfo.joint.getMotorController()->getMotorControllerSpecificEffort(jointInfo.effort_command);
+        //        auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
+        //        if (abs(effort_diff_with_previous) > jointInfo.limit.max_effort_differance) {
+        //            // TODO: Change to better sign value.
+        //            converted_effort = jointInfo.effort_command_converted
+        //                + std::clamp(effort_diff_with_previous, -jointInfo.limit.max_effort_differance,
+        //                    jointInfo.limit.max_effort_differance);
+        //            RCLCPP_WARN((*logger_),
+        //                "Effort is increased with %g effort for %s, "
+        //                "which is more than %g effort in one iteration. "
+        //                "Clamped the effort difference. New total effort will be %g.",
+        //                effort_diff_with_previous, jointInfo.name.c_str(), jointInfo.limit.max_effort_differance,
+        //                converted_effort);
+        //        }
+        //        jointInfo.effort_command_converted = converted_effort;
+        //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
+
+        // Here the assumption is that the value that is send to the joint trajectory controller is the right one
+        jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
+            (float)jointInfo.fuzzy_torque, (float)jointInfo.fuzzy_position);
     }
 
     return hardware_interface::return_type::OK;

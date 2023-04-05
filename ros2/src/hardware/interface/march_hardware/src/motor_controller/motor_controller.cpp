@@ -176,17 +176,17 @@ std::unique_ptr<TorqueSensor>& MotorController::getTorqueSensor()
     return torque_sensor_;
 }
 
-void MotorController::actuate(float target)
-{
-    if (actuation_mode_ == march::ActuationMode::position) {
-        actuateRadians(target);
-    } else if (actuation_mode_ == march::ActuationMode::torque) {
-        actuateTorque(target);
-    } else {
-        throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Actuation mode %s is not supported",
-            actuation_mode_.toString().c_str());
-    }
-}
+// void MotorController::actuate(float target)
+//{
+//    if (actuation_mode_ == march::ActuationMode::position) {
+//        actuateRadians(target);
+//    } else if (actuation_mode_ == march::ActuationMode::torque) {
+//        actuateTorque(target);
+//    } else {
+//        throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Actuation mode %s is not supported",
+//            actuation_mode_.toString().c_str());
+//    }
+//}
 
 double MotorController::convertEffortToIUEffort(double joint_effort_command) const
 {

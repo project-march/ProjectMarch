@@ -48,8 +48,8 @@ public:
     // Override functions for actuating the ODrive
     std::chrono::nanoseconds prepareActuation() override;
     void enableActuation() override;
-    void actuateTorque(float target_effort) override;
-    void actuateRadians(float target_position) override;
+    void actuateTorque(float target_torque, float fuzzy_weight) override;
+    void actuateRadians(float target_position, float fuzzy_weight) override;
 
     // Override reset function
     std::chrono::nanoseconds reset() override;

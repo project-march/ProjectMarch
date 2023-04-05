@@ -47,15 +47,16 @@ public:
 
     // A MotorController should support both actuating by position (radians) or
     // by torque
-    virtual void actuateTorque(float target_effort) = 0;
-    virtual void actuateRadians(float target_position) = 0;
+    virtual void actuateTorque(float target_effort, float fuzzy_weight) = 0;
+    virtual void actuateRadians(float target_position, float fuzzy_weight) = 0;
 
     // Getter and setter for the ActuationMode
     ActuationMode getActuationMode() const;
     void setActuationMode(ActuationMode actuation_mode);
 
+    // TODO: Check if this method is really redundant.
     // Actuate based on the actuation mode of the motor controller
-    void actuate(float target);
+    //    void actuate(float target);
 
     /* Reset the MotorController
      * Can be overridden by child classes

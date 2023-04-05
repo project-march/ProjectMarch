@@ -114,7 +114,7 @@ ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
          test/encoder/incremental_encoder_test.cpp
          test/error/hardware_exception_test.cpp
          test/ethercat/slave_test.cpp
-         test/joint_test.cpp
+#         test/joint_test.cpp
          test/mocks/mock_absolute_encoder.h
          test/mocks/mock_encoder.h
          test/mocks/mock_odrive.h

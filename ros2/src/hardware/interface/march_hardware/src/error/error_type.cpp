@@ -64,6 +64,8 @@ namespace error {
                 return "Initial torque is not zero";
             case ErrorType::MAX_TORQUE_EXCEEDED:
                 return "Max torque is exceeded";
+            case ErrorType::TOTAL_FUZZY_NOT_ONE:
+                return "Fuzzy values do not add up to 1";
             default:
                 return "Unknown error occurred. Please create/use a documented error";
         }
