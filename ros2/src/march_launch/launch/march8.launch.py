@@ -54,6 +54,6 @@ def generate_launch_description() -> LaunchDescription:
         ),
         IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
-        launch_arguments={'robot_description': urdf_location}.items(),
-        ),
+            launch_arguments={'robot_description': urdf_location}.items(),
+            ),
     ])
