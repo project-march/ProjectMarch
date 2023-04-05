@@ -51,6 +51,12 @@ enum class ODriveObjectName {
     TargetPosition,
     FuzzyTorque,
     FuzzyPosition,
+    PositionP,
+    PositionI,
+    PositionD,
+    TorqueP,
+    TorqueI,
+    TorqueD,
     RequestedState
 
 };
