@@ -17,6 +17,7 @@
 #include "pinocchio/fwd.hpp"
 #include "pinocchio/math/rpy.hpp"
 #include "pinocchio/parsers/urdf.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 #include <iostream>
 #include <memory>
 #include <vector>

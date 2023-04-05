@@ -35,18 +35,15 @@ TEST_F(IkBufferTest, checkForReadyTest)
 {
     geometry_msgs::msg::PoseArray::SharedPtr mock_com_trajectory;
     geometry_msgs::msg::PoseArray::SharedPtr mock_swing_trajectory;
-    geometry_msgs::msg::PointStamped::SharedPtr mock_foot_placement;
 
     mock_com_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
     mock_swing_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
-    mock_foot_placement = std::make_shared<geometry_msgs::msg::PointStamped>();
 
     // before the setters, the check should return false
     ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
 
     this->ik_buffer->set_com_trajectory(mock_com_trajectory);
     this->ik_buffer->set_swing_trajectory(mock_swing_trajectory);
-    this->ik_buffer->set_foot_placement(mock_foot_placement);
 
     ASSERT_EQ(this->ik_buffer->check_if_ready(), true);
     // The check should fail after publishing, so we assert the false statement

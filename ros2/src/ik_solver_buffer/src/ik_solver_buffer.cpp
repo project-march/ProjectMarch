@@ -14,11 +14,9 @@ BufferNode::BufferNode()
     m_buffer_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_input", 10);
 
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/robot_com_position", 10, std::bind(&BufferNode::com_subscriber_callback, this, _1));
+        "/com_trajectory", 10, std::bind(&BufferNode::com_subscriber_callback, this, _1));
     m_swing_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/bezier_trajectory", 10, std::bind(&BufferNode::swing_subscriber_callback, this, _1));
-    m_foot_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
-        "/est_foot_position", 10, std::bind(&BufferNode::foot_subscriber_callback, this, _1));
 }
 
 void BufferNode::com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -37,14 +35,6 @@ void BufferNode::swing_subscriber_callback(geometry_msgs::msg::PoseArray::Shared
     }
 }
 
-void BufferNode::foot_subscriber_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
-{
-    set_foot_placement(msg);
-    if (check_if_ready()) {
-        publish_ik_trajectory();
-    }
-}
-
 void BufferNode::set_com_trajectory(geometry_msgs::msg::PoseArray::SharedPtr setter)
 {
     m_latest_com_trajectory = setter;
@@ -55,14 +45,9 @@ void BufferNode::set_swing_trajectory(geometry_msgs::msg::PoseArray::SharedPtr s
     m_latest_swing_trajectory = setter;
 }
 
-void BufferNode::set_foot_placement(geometry_msgs::msg::PointStamped::SharedPtr setter)
-{
-    m_latest_placed_foot = setter;
-}
-
 bool BufferNode::check_if_ready()
 {
-    return ((m_latest_com_trajectory) && (m_latest_swing_trajectory) && (m_latest_placed_foot));
+    return ((m_latest_com_trajectory) && (m_latest_swing_trajectory));
 }
 
 void BufferNode::publish_ik_trajectory()
@@ -76,11 +61,9 @@ void BufferNode::publish_ik_trajectory()
         ik_command_to_send.swing_trajectory.push_back(i.position);
     }
 
-    ik_command_to_send.foot_position = m_latest_placed_foot->point;
     m_buffer_publisher->publish(ik_command_to_send);
 
     // Reset all the pointers
     m_latest_com_trajectory.reset();
     m_latest_swing_trajectory.reset();
-    m_latest_placed_foot.reset();
 }

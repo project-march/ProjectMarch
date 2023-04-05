@@ -28,6 +28,7 @@ find_package(march_description REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_packagE(pluginlib REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(urdf REQUIRED)
@@ -47,6 +48,7 @@ ament_target_dependencies(
   ${PROJECT_NAME}
   "rclcpp"
   "geometry_msgs"
+  "sensor_msgs"
   "march_description"
   "march_shared_msgs"
   labrob_qpsolvers
@@ -73,6 +75,7 @@ ament_target_dependencies(
   pinocchio
   Eigen3
   labrob_qpsolvers
+  "sensor_msgs"
   urdf
   "rclcpp"
   "geometry_msgs"
@@ -138,6 +141,7 @@ file(COPY test/urdf/march_test_urdf.urdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
     labrob_qpsolvers
     urdf
     "rclcpp"
+    "sensor_msgs"
     "geometry_msgs" 
     "march_shared_msgs")
 endif()

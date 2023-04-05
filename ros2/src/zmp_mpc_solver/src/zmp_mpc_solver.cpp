@@ -16,7 +16,7 @@ ZmpSolver::ZmpSolver()
     m_u_current.fill(0);
 
     set_current_com(0.0, 0.06, 0.0, -0.1);
-    set_current_zmp(0.0 , 0.06);
+    set_current_zmp(0.0, 0.06);
     set_current_foot(0.0, 0.1);
     set_previous_foot(0.0, 0.1);
     set_current_state();
