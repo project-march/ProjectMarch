@@ -39,11 +39,18 @@ struct JointInfo {
     march::Joint& joint;
     march::ODriveState motor_controller_data;
     double position;
+    double target_position;
     double velocity;
     double torque;
+    double target_torque;
     double effort_actual;
     double effort_command;
     double effort_command_converted;
+
+    // Values for the fuzzy control on the ODrive
+    double fuzzy_position;
+    double fuzzy_torque;
+
     JointLimit limit;
 };
 
@@ -95,7 +102,6 @@ private:
     std::unique_ptr<march::MarchRobot> march_robot_;
     march::PowerDistributionBoardData pdb_data_;
     std::vector<march::PressureSoleData> pressure_soles_data_;
-    march::PressureSoleData left_sole;
     std::vector<JointInfo> joints_info_;
     bool joints_ready_for_actuation_ = false;
     rclcpp::Clock clock_;
