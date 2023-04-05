@@ -79,9 +79,9 @@ void ODrive::waitForState(ODriveAxisState target_state)
  */
 void ODrive::actuateTorque(float target_torque, float fuzzy_weight)
 {
-    if (target_torque > EFFORT_LIMIT || target_torque < -EFFORT_LIMIT) {
+    if (target_torque > TORQUE_LIMIT || target_torque < -TORQUE_LIMIT) {
         throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-            "Target effort of %f exceeds effort limit of %f", target_torque, EFFORT_LIMIT);
+            "Target torque of %f exceeds effort limit of %f", target_torque, TORQUE_LIMIT);
     }
 
     bit32 write_torque {};
@@ -310,9 +310,9 @@ void ODrive::setAxisState(ODriveAxisState state)
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 
-double ODrive::getEffortLimit() const
+double ODrive::getTorqueLimit() const
 {
-    return EFFORT_LIMIT;
+    return TORQUE_LIMIT;
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum

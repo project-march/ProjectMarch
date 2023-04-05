@@ -112,7 +112,7 @@ public:
     virtual double effortMultiplicationConstant() const;
 
     // Get the effort limit of the motor controller
-    virtual double getEffortLimit() const = 0;
+    virtual double getTorqueLimit() const = 0;
 
     ~MotorController() override = default;
 

@@ -75,8 +75,8 @@ public:
     float getMotorTemperature();
     float getOdriveTemperature();
 
-    double getEffortLimit() const override;
-    static constexpr double EFFORT_LIMIT = 30.0; // [A]
+    double getTorqueLimit() const override;
+    static constexpr double TORQUE_LIMIT = 30.0; // TODO: Determine a better value here
 
 protected:
     // Override protected functions from MotorController class
