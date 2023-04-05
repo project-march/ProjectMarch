@@ -123,7 +123,7 @@ double MotorController::getMotorControllerSpecificEffort(double joint_effort_com
 {
     joint_effort_command = convertEffortToIUEffort(joint_effort_command);
     // Clamp effort to (-MAX_EFFORT, MAX_EFFORT)
-    auto effort_limit = getEffortLimit();
+    auto effort_limit = getTorqueLimit();
     return std::clamp(joint_effort_command, -effort_limit, effort_limit) * getMotorDirection();
 }
 
