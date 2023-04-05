@@ -51,7 +51,8 @@ public:
     void actuateTorque(float target_effort) override;
     void actuateRadians(float target_position) override;
 
-    void sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid) override;
+    void sendPID(
+        std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid) override;
 
     // Override reset function
     std::chrono::nanoseconds reset() override;
@@ -105,7 +106,6 @@ private:
     ODriveAxis axis_;
     bool index_found_;
     float torque_constant_;
-
 };
 
 } // namespace march
