@@ -103,39 +103,6 @@ class InputDeviceController:
         )
         self._send_gait_request.publish(msg)
 
-    def publish_stop(self) -> None:
-        """Publish a message on `/march/input_device/instruction` to stop the gait."""
-        self._node.get_logger().debug("Mock input device published stop")
-        self._current_gait = GaitRequest.STAND
-        msg = GaitRequest(
-            header=Header(stamp=self._node.get_clock().now().to_msg()),
-            gait_type=GaitRequest.STAND,
-            id=str(self._id),
-        )
-        self._send_gait_request.publish(msg)
-
-    def publish_error(self) -> None:
-        """Publish a fake error message on `/march/error`."""
-        self._node.get_logger().debug("Mock Input Device published error")
-        self._current_gait = GaitRequest.ERROR
-        msg = GaitRequest(
-            header=Header(stamp=self._node.get_clock().now().to_msg()),
-            gait_type=GaitRequest.ERROR,
-            id=str(self._id),
-        )
-        self._send_gait_request.publish(msg)
-
-    def publish_sm_to_unknown(self) -> None:
-        """Publish a message on `/march/input_device/instruction` that has an unknown instruction."""
-        self._node.get_logger().debug("Mock Input Device published state machine to unknown")
-        self._current_gait = GaitRequest.FORCE_UNKNOWN
-        msg = GaitRequest(
-            header=Header(stamp=self._node.get_clock().now().to_msg()),
-            gait_type=GaitRequest.FORCE_UNKNOWN,
-            id=str(self._id),
-        )
-        self._send_gait_request.publish(msg)
-
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""
         self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
