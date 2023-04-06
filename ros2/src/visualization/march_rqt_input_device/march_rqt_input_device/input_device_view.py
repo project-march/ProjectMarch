@@ -40,7 +40,7 @@ class InputDeviceView(QWidget):
         self._controller.current_gait_cb = self._current_gait_cb
         self.possible_gaits_future = None
 
-        self._controller._node.create_subscription(
+        self._controller.node.create_subscription(
             msg_type=Bool,
             topic="/march/eeg/on_off",
             callback=self._eeg_cb,
@@ -51,9 +51,6 @@ class InputDeviceView(QWidget):
 
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
-
-        self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
-
         self.logger = logger
         self._layout_file = layout_file if layout_file != "" else DEFAULT_LAYOUT_FILE
         self._image_names = [
@@ -61,49 +58,11 @@ class InputDeviceView(QWidget):
             for file in Path(get_package_share_directory("march_rqt_input_device"), "resource", "img").glob("*.png")
         ]
         self._create_buttons()
-        self._update_possible_gaits()
-
-    def _create_buttons(self) -> None:
-        """Creates all the buttons, new buttons should be added here."""
-        with open(self._layout_file) as file:
-            json_content = json.loads(file.read())
-
-        button_layout = [[self.create_button(**button_dict) for button_dict in row] for row in json_content]
-
-        # Create the qt_layout from the button layout.
-        qt_layout = self.create_layout(button_layout)
-
-        # Apply the qt_layout to the top level widget.
-        self.content.setLayout(qt_layout)
-
-        # Make the frame as tight as possible with spacing between the buttons.
-        qt_layout.setSpacing(10)
-        self.content.adjustSize()
-
-    def _accepted_cb(self) -> None:
-        """Show the GaitInstructionResponse and update possible gaits."""
-        self.status_label.setText("Gait accepted")
-        self._update_possible_gaits()
-
-    def _finished_cb(self) -> None:
-        """Show the GaitInstructionResponse and update possible gaits."""
-        self.status_label.setText("Gait finished")
-        self.gait_label.setText("")
-        self._update_possible_gaits()
-
-    def _rejected_cb(self) -> None:
-        """Show the GaitInstructionResponse and update possible gaits."""
-        self.status_label.setText("Gait rejected")
-        self.gait_label.setText("")
-        self._update_possible_gaits()
-
-    def _current_gait_cb(self, gait_name: str) -> None:
-        """Show the current gait and update possible gaits."""
-        self.gait_label.setText(gait_name)
 
     def _eeg_cb(self, data) -> None:
         """Update the possible gaits when eeg is turned on or off."""
         self._update_possible_gaits()
+        self._controller.update_eeg_on_off(data)
 
     def _update_possible_gaits(self) -> None:
         """Updates the gaits based on the possible gaits according to the controller.
@@ -146,9 +105,27 @@ class InputDeviceView(QWidget):
         self.frame.setEnabled(True)
         self.frame.verticalScrollBar().setEnabled(True)
 
+    def _create_buttons(self) -> None:
+        """Creates all the buttons, new buttons should be added here."""
+        with open(self._layout_file) as file:
+            json_content = json.loads(file.read())
+
+        button_layout = [[self.create_button(**button_dict) for button_dict in row] for row in json_content]
+
+        # Create the qt_layout from the button layout.
+        qt_layout = self.create_layout(button_layout)
+
+        # Apply the qt_layout to the top level widget.
+        self.content.setLayout(qt_layout)
+
+        # Make the frame as tight as possible with spacing between the buttons.
+        qt_layout.setSpacing(10)
+        self.content.adjustSize()
+
     def create_button(
         self,
         name: str,
+        gait_type: int,
         callback: Optional[Union[str, Callable]] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
@@ -192,7 +169,7 @@ class InputDeviceView(QWidget):
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
         else:
-            qt_button.clicked.connect(lambda: self._controller.publish_gait(name))
+            qt_button.clicked.connect(lambda: self._controller.publish_gait(gait_type))
 
         return qt_button
 
