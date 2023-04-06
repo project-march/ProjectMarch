@@ -18,8 +18,10 @@
 #include "pinocchio/math/rpy.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include <algorithm>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <Eigen/Core>
@@ -33,16 +35,16 @@
 
 struct state {
     // Pose, in this case, is [POSITION, ANGLE]
-    Eigen::Matrix<double, 6, 1> left_foot_pose;
-    Eigen::Matrix<double, 6, 1> right_foot_pose;
-    Eigen::Vector3d com_pos;
+    Eigen::Matrix<double, 6, 1> left_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
+    Eigen::Matrix<double, 6, 1> right_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
+    Eigen::Vector3d com_pos = Eigen::Vector3d::Zero();
 };
 
 class IkSolver {
 public:
     IkSolver();
     void load_urdf_model(std::string);
-    void set_joint_configuration();
+    void set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr);
     int set_jacobian();
     int get_model_joints();
     void initialize_solver();

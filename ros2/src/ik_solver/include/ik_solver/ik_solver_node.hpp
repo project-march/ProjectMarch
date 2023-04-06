@@ -20,10 +20,20 @@ private:
     void joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr);
     void foot_subscriber_callback(geometry_msgs::msg::PointStamped::SharedPtr);
 
+    void timer_callback();
+
     geometry_msgs::msg::PointStamped::SharedPtr m_latest_placed_foot;
     rclcpp::Subscription<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_trajectory_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_foot_subscriber;
+
+    rclcpp::TimerBase::SharedPtr m_solving_timer;
+
+    march_shared_msgs::msg::IkSolverCommand::SharedPtr m_trajectory_container;
+
+    state m_desired_state;
+    bool m_right_foot_on_ground;
+    int m_trajectory_index;
 };
 
 #endif

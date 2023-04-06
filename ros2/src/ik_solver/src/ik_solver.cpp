@@ -29,9 +29,12 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
     m_joint_pos = pinocchio::neutral(m_model);
 }
 
-void IkSolver::set_joint_configuration()
+void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    m_joint_pos = pinocchio::randomConfiguration(m_model);
+    for (int i = 0; i < msg->name.size(); i++) {
+        pinocchio::FrameIndex index = m_model.getJointId(msg->name[i]);
+        m_model.joints[index].setIndexes(index, msg->position[i], msg->velocity[i]);
+    }
 }
 
 int IkSolver::set_jacobian()
