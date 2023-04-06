@@ -1,3 +1,9 @@
+int8 STAND = 0
+int8 STEP = 1
+int8 STEP_CLOSE = 2
+int8 WALK = 3
+
 int8 stance_leg
+int8 gait_type
 ---
 int8 status

@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>ik_solver</name>
+  <name>zmp_mpc_solver</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="marco2771@gmail.com">march</maintainer>
+  <maintainer email="sahandwagemakers@gmail.com">sahand</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>rclcpp</depend>
-  <depend>march_description</depend>
-  <depend>march_shared_msgs</depend>
-  <depend>eigen</depend>
-  <depend>labrob_qpsolvers</depend>
-  <depend>pinocchio</depend>
+
   <depend>pluginlib</depend>
-  <depend>sensor_msgs</depend>
-  <depend>urdf</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>trajectory_msgs</depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_gmock</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
