@@ -12,7 +12,7 @@ class FootstepGenerator : public rclcpp::Node {
 public:
     FootstepGenerator();
 
-    geometry_msgs::msg::PoseArray generate_foot_placements(int stance_leg);
+    geometry_msgs::msg::PoseArray generate_foot_placements(int stance_leg, int gait_type);
 
     int get_steps();
     double get_velocity_x();
@@ -21,7 +21,7 @@ public:
 
 private:
     void publish_foot_placements(const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
-        std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response);
+                                 std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response);
 
     void publish_footsteps(geometry_msgs::msg::PoseArray footsteps);
 

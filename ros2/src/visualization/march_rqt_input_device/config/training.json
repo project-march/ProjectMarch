@@ -25,17 +25,16 @@
     {
       "name": "step_and_close",
       "gait_type": 3
+    },
+    {
+      "name": "stop",
+      "gait_type": 1
     }
   ],
   [
     {
       "name": "error",
       "gait_type": 5,
-      "always_enabled": true
-    },
-    {
-      "name": "stop",
-      "gait_type": 1,
       "always_enabled": true
     },
     {

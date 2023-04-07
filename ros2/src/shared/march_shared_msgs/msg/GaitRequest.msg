@@ -1,7 +1,7 @@
 std_msgs/Header header
 #
 # The type of instruction.
-int8 gait_type
+int32 gait_type
 #
 # All possible instruction gait_types.
 int32 SIT = 0

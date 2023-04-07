@@ -34,11 +34,6 @@ class InputDeviceView(QWidget):
     def __init__(self, ui_file: str, layout_file: str, controller: InputDeviceController, logger):
         super(InputDeviceView, self).__init__()
         self._controller = controller
-        self._controller.accepted_cb = self._accepted_cb
-        self._controller.finished_cb = self._finished_cb
-        self._controller.rejected_cb = self._rejected_cb
-        self._controller.current_gait_cb = self._current_gait_cb
-        self.possible_gaits_future = None
 
         self._controller.node.create_subscription(
             msg_type=Bool,
@@ -58,11 +53,17 @@ class InputDeviceView(QWidget):
             for file in Path(get_package_share_directory("march_rqt_input_device"), "resource", "img").glob("*.png")
         ]
         self._create_buttons()
+        self._update_possible_gaits()
 
     def _eeg_cb(self, data) -> None:
         """Update the possible gaits when eeg is turned on or off."""
         self._update_possible_gaits()
         self._controller.update_eeg_on_off(data)
+
+    def publish_gait(self, gait_type: int):
+        self._controller.get_node().get_logger().info("Gait button clicked!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        self._controller.publish_gait(gait_type)
+        self._update_possible_gaits()
 
     def _update_possible_gaits(self) -> None:
         """Updates the gaits based on the possible gaits according to the controller.
@@ -70,16 +71,9 @@ class InputDeviceView(QWidget):
         First requests the controller to update the possible, then creates a timer to update the view if the possible
         gaits changed.
         """
-        self._controller.update_possible_gaits()
-        self.possible_gaits = []
-        self._update_gait_buttons([])
-        self._controller.gait_future.add_done_callback(self._update_possible_gaits_view)
-
-    def _update_possible_gaits_view(self, future) -> None:
-        """Update the buttons if the possible gaits have changed."""
-        new_possible_gaits = future.result().gaits
-        if set(self.possible_gaits) != set(new_possible_gaits):
-            self._update_gait_buttons(new_possible_gaits)
+        self.possible_gaits = self._controller.update_possible_gaits()
+        self._controller.get_node().get_logger().info("possible gaits: " + str(self.possible_gaits))
+        self._update_gait_buttons(self.possible_gaits)
 
     def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
         """Update which buttons are available to the given possible gaits list.
@@ -96,6 +90,9 @@ class InputDeviceView(QWidget):
             for i in range(layout.count()):
                 button = layout.itemAt(i).widget()
                 name = button.objectName()
+                if len(possible_gaits) == 0:
+                    button.setEnabled(False)
+                    continue
                 if name in self._always_enabled_buttons:
                     continue
                 if name in self.possible_gaits:
@@ -125,7 +122,7 @@ class InputDeviceView(QWidget):
     def create_button(
         self,
         name: str,
-        gait_type: int,
+        gait_type: Optional[int] = None,
         callback: Optional[Union[str, Callable]] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
@@ -133,17 +130,13 @@ class InputDeviceView(QWidget):
     ):
         """Create a push button which can be pressed to execute a gait instruction.
 
-        Args:
-            name (str): Name of the button.
-            callback (Union[str, Callable], Optional): The callback to attach to the button when pressed.
-            image_path (str, Optional): The name of the image file. Default is `None`.
-            size ((int,int)): Size of the button in pixels in format (width, height). Default is (w=125px, h=140px).
-            always_enabled (bool): Whether the button can be disabled. Default is False.
-                `True` if the button should never be disabled
-                `False` if the button should be disabled if it's not in possible gaits.
-
-        Returns:
-            QPushButton. The QPushButton contains the passed arguments and the same style.
+        :param name: name of button;
+        :param gait_type: int of gait type started by the button;
+        :param callback: callback linked to the button;
+        :param image_path: path to the button image;
+        :param size: size of the button;
+        :param always_enabled: if the button should always be visible.
+        :return:
         """
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
@@ -169,7 +162,7 @@ class InputDeviceView(QWidget):
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
         else:
-            qt_button.clicked.connect(lambda: self._controller.publish_gait(gait_type))
+            qt_button.clicked.connect(lambda: self.publish_gait(gait_type))
 
         return qt_button
 

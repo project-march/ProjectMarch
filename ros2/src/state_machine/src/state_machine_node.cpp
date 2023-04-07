@@ -22,7 +22,7 @@ StateMachineNode::StateMachineNode()
         = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
         "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
-    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command");
+    m_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
 
     m_state_machine = StateMachine();
 
@@ -42,9 +42,9 @@ StateMachineNode::StateMachineNode()
  * If something went wrong this is also logged and the safety node should be notified.
  * @param response
  */
-void StateMachineNode::response_callback(rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture response)
+void StateMachineNode::response_callback(rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture response)
 {
-    if (response.get()->success) {
+    if (response.get()->status) {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Request received successful!");
     } else {
         RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "Request was not a success!");
@@ -62,7 +62,7 @@ bool StateMachineNode::send_request(exoState desired_state)
 {
     m_request->gait_type = (int)desired_state;
     m_future = m_client->async_send_request(m_request, std::bind(&StateMachineNode::response_callback, this, _1));
-    return m_future.get()->success;
+    return m_future.get()->status;
 }
 
 /**
@@ -72,6 +72,7 @@ bool StateMachineNode::send_request(exoState desired_state)
  */
 void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
 {
+    RCLCPP_INFO(this->get_logger(), "CALLLLLLLLLLLLLLBACKKKKKKKKKK");
     auto response_msg = march_shared_msgs::msg::GaitResponse();
     if (m_state_machine.performTransition((exoState)msg->gait_type)) {
         response_msg.gait_type = msg->gait_type;
