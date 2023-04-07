@@ -61,6 +61,7 @@ class InputDeviceView(QWidget):
         self._controller.update_eeg_on_off(data)
 
     def publish_gait(self, gait_type: int):
+        """Publish gait to state_machine."""
         self._controller.publish_gait(gait_type)
         self._update_possible_gaits()
 
