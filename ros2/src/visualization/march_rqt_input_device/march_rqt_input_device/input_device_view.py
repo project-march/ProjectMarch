@@ -61,7 +61,6 @@ class InputDeviceView(QWidget):
         self._controller.update_eeg_on_off(data)
 
     def publish_gait(self, gait_type: int):
-        self._controller.get_node().get_logger().info("Gait button clicked!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         self._controller.publish_gait(gait_type)
         self._update_possible_gaits()
 
@@ -72,7 +71,7 @@ class InputDeviceView(QWidget):
         gaits changed.
         """
         self.possible_gaits = self._controller.update_possible_gaits()
-        self._controller.get_node().get_logger().info("possible gaits: " + str(self.possible_gaits))
+        self._controller.get_node().get_logger().debug("possible gaits: " + str(self.possible_gaits))
         self._update_gait_buttons(self.possible_gaits)
 
     def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
@@ -140,7 +139,7 @@ class InputDeviceView(QWidget):
         """
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        qt_button.setStyleSheet("QToolButton {background-color: lightgrey; font-size: 13px; font: 'Times New Roman'}")
+        qt_button.setStyleSheet("QToolButton {background-color: white; font-size: 13px; font: 'Montserat'}")
         qt_button.setIconSize(QSize(90, 90))
         qt_button.setText(check_string(name))
         if image_path is not None:
