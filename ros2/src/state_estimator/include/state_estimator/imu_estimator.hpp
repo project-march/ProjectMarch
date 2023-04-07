@@ -29,13 +29,24 @@ struct IMU {
 
     friend bool operator==(IMU a, IMU b)
     {
-        return (a.name == b.name && a.base_frame == b.base_frame &&
-        a.data.orientation.x == b.data.orientation.x && a.data.orientation.y == b.data.orientation.y && a.data.orientation.z == b.data.orientation.z && a.data.orientation.w == b.data.orientation.w &&
-        a.data.angular_velocity.x == b.data.angular_velocity.x && a.data.angular_velocity.y == b.data.angular_velocity.y && a.data.angular_velocity.z == b.data.angular_velocity.z &&
-        a.data.linear_acceleration.x == b.data.linear_acceleration.x && a.data.linear_acceleration.y == b.data.linear_acceleration.y && a.data.linear_acceleration.z == b.data.linear_acceleration.z &&
-        a.data.orientation_covariance == b.data.orientation_covariance && a.data.angular_velocity_covariance == b.data.angular_velocity_covariance && a.data.linear_acceleration_covariance == b.data.linear_acceleration_covariance &&
-        a.imu_location.rotation.x == b.imu_location.rotation.x && a.imu_location.rotation.y == b.imu_location.rotation.y && a.imu_location.rotation.z == b.imu_location.rotation.z && a.imu_location.rotation.w == b.imu_location.rotation.w &&
-        a.imu_location.translation.x == b.imu_location.translation.x && a.imu_location.translation.y == b.imu_location.translation.y && a.imu_location.translation.z == b.imu_location.translation.z);
+        return (a.name == b.name && a.base_frame == b.base_frame && a.data.orientation.x == b.data.orientation.x
+            && a.data.orientation.y == b.data.orientation.y && a.data.orientation.z == b.data.orientation.z
+            && a.data.orientation.w == b.data.orientation.w && a.data.angular_velocity.x == b.data.angular_velocity.x
+            && a.data.angular_velocity.y == b.data.angular_velocity.y
+            && a.data.angular_velocity.z == b.data.angular_velocity.z
+            && a.data.linear_acceleration.x == b.data.linear_acceleration.x
+            && a.data.linear_acceleration.y == b.data.linear_acceleration.y
+            && a.data.linear_acceleration.z == b.data.linear_acceleration.z
+            && a.data.orientation_covariance == b.data.orientation_covariance
+            && a.data.angular_velocity_covariance == b.data.angular_velocity_covariance
+            && a.data.linear_acceleration_covariance == b.data.linear_acceleration_covariance
+            && a.imu_location.rotation.x == b.imu_location.rotation.x
+            && a.imu_location.rotation.y == b.imu_location.rotation.y
+            && a.imu_location.rotation.z == b.imu_location.rotation.z
+            && a.imu_location.rotation.w == b.imu_location.rotation.w
+            && a.imu_location.translation.x == b.imu_location.translation.x
+            && a.imu_location.translation.y == b.imu_location.translation.y
+            && a.imu_location.translation.z == b.imu_location.translation.z);
     }
 
 public:
@@ -55,10 +66,10 @@ public:
         transform_tosend.header.frame_id = "map";
         transform_tosend.child_frame_id = "lowerIMU";
         transform_tosend.transform.rotation = data.orientation;
-        //TODO: change this to relative IMU position on body
-        transform_tosend.transform.translation.x = 0.0;
-        transform_tosend.transform.translation.y = 0.0;
-        transform_tosend.transform.translation.z = 1.0;
+        // TODO: change this to relative IMU position on body
+        transform_tosend.transform.translation.x = imu_location.translation.x;
+        transform_tosend.transform.translation.y = imu_location.translation.y;
+        transform_tosend.transform.translation.z = imu_location.translation.z;
         return transform_tosend;
     };
 };

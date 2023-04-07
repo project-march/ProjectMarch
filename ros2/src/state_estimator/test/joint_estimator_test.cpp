@@ -23,19 +23,19 @@ using testing::Return;
 
 class JointEstimatorTest : public testing::Test {
 protected:
-//    void SetUp() override
-//    {
-//        state_estimator = StateEstimator();
-//        JointEstimator je = state_estimator.get_joint_estimator();
-//        joint_estimator = std::make_unique<je>();
-////        joint_estimator = std::make_unique<JointEstimator>(&state_estimator);
-//    }
-//
-//    StateEstimator state_estimator;
-//    std::unique_ptr<JointEstimator> joint_estimator;
+    //    void SetUp() override
+    //    {
+    //        state_estimator = StateEstimator();
+    //        JointEstimator je = state_estimator.get_joint_estimator();
+    //        joint_estimator = std::make_unique<je>();
+    ////        joint_estimator = std::make_unique<JointEstimator>(&state_estimator);
+    //    }
+    //
+    //    StateEstimator state_estimator;
+    //    std::unique_ptr<JointEstimator> joint_estimator;
 };
 
-//TEST_F(JointEstimatorTest, setupTest)
+// TEST_F(JointEstimatorTest, setupTest)
 //{
 ////    std::vector<JointContainer> joints = joint_estimator->get_joints();
 ////    ASSERT_EQ(joints.size(), 0);
@@ -59,7 +59,8 @@ protected:
 //    //    // q.setRPY(1,1,1);
 //    //    // q.normalize();
 //    //    // tf2::convert(q, test_joint.frame.transform.rotation);
-//    //    // test_joint_estimator.set_individual_joint_state("right_origin", 1);    //    MockStateEstimator mock_state_estimator;
+//    //    // test_joint_estimator.set_individual_joint_state("right_origin", 1);    //    MockStateEstimator
+//    mock_state_estimator;
 //    //    // JointEstimator test_joint_estimator =
 //    //    // JointEstimator(state_estimator.get(),state_estimator->get_initial_joint_states()); JointContainer
 //    //    test_joint;
@@ -73,7 +74,8 @@ protected:
 //    //    ASSERT_EQ(1, 1);
 //    //    // ASSERT_EQ(test_joint.com.mass, test_joint.com.mass);
 //    //    //
-//    //    ASSERT_EQ(test_joint_estimator.get_individual_joint("right_origin"),test_joint_estimator.get_individual_joint("right_origin"));
+//    //
+//    ASSERT_EQ(test_joint_estimator.get_individual_joint("right_origin"),test_joint_estimator.get_individual_joint("right_origin"));
 //    //    // state_estimator->m_joint_estimator.set_individual_joint_state("left_origin", 1);
 //    //    // ASSERT_EQ(state_estimator->m_joint_estimator.get_individual_joint("left_origin"),1);
 //    //
@@ -85,7 +87,8 @@ protected:
 //    //    ASSERT_EQ(1, 1);
 //    //    // ASSERT_EQ(test_joint.com.mass, test_joint.com.mass);
 //    //    //
-//    //    ASSERT_EQ(test_joint_estimator.get_individual_joint("right_origin"),test_joint_estimator.get_individual_joint("right_origin"));
+//    //
+//    ASSERT_EQ(test_joint_estimator.get_individual_joint("right_origin"),test_joint_estimator.get_individual_joint("right_origin"));
 //    //    // state_estimator->m_joint_estimator.set_individual_joint_state("left_origin", 1);
 //    //    // ASSERT_EQ(state_estimator->m_joint_estimator.get_individual_joint("left_origin"),1);
 //    //

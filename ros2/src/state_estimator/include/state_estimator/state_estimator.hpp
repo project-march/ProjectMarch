@@ -1,6 +1,7 @@
 #include "com_estimator.hpp"
 #include "cop_estimator.hpp"
 #include "footstep_estimator.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
@@ -10,6 +11,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2/LinearMath/Transform.h"
 #include "tf2/LinearMath/Vector3.h"
@@ -64,9 +66,10 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::PressureSolesData>::SharedPtr m_pressure_sole_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_stance_foot_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_cop_pos_publisher;
-    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_foot_pos_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_foot_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_publisher;
 

@@ -1,6 +1,7 @@
 #include "cop_estimator.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
@@ -46,7 +47,7 @@ struct Foot {
 class FootstepEstimator {
 public:
     FootstepEstimator();
-    geometry_msgs::msg::PointStamped get_foot_position(const char*);
+    geometry_msgs::msg::Pose get_foot_position(const char*);
     void set_foot_size(double, double, const char*);
     void update_feet(const std::vector<PressureSensor>);
     bool get_foot_on_ground(const char*);

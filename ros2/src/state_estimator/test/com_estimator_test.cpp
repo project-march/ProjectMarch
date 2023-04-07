@@ -74,9 +74,15 @@ TEST_F(ComEstimatorTest, setMultipleComTest)
     masses.push_back(com3);
     CenterOfMass total;
     total.mass = com1.mass + com2.mass + com3.mass;
-    total.position.point.x = (com1.position.point.x*com1.mass+com2.position.point.x*com2.mass+com3.position.point.x*com3.mass)/(com1.mass+com2.mass+com3.mass);
-    total.position.point.y = (com1.position.point.y*com1.mass+com2.position.point.y*com2.mass+com3.position.point.y*com3.mass)/(com1.mass+com2.mass+com3.mass);
-    total.position.point.z = (com1.position.point.z*com1.mass+com2.position.point.z*com2.mass+com3.position.point.z*com3.mass)/(com1.mass+com2.mass+com3.mass);
+    total.position.point.x
+        = (com1.position.point.x * com1.mass + com2.position.point.x * com2.mass + com3.position.point.x * com3.mass)
+        / (com1.mass + com2.mass + com3.mass);
+    total.position.point.y
+        = (com1.position.point.y * com1.mass + com2.position.point.y * com2.mass + com3.position.point.y * com3.mass)
+        / (com1.mass + com2.mass + com3.mass);
+    total.position.point.z
+        = (com1.position.point.z * com1.mass + com2.position.point.z * com2.mass + com3.position.point.z * com3.mass)
+        / (com1.mass + com2.mass + com3.mass);
     com_estimator->set_com_state(masses);
     ASSERT_EQ(com_estimator->get_com_state(), total);
 }

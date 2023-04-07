@@ -6,8 +6,8 @@
 // NOLINTBEGIN
 // Copyright 2022 Project March.
 
-#include "zmp_estimator.hpp"
 #include "com_estimator.hpp"
+#include "zmp_estimator.hpp"
 
 //#include "mocks/mock_state_estimator.hpp"
 //#include "sensor_msgs/msg/joint_state.hpp"
@@ -26,7 +26,6 @@ protected:
     void SetUp() override
     {
         zmp_estimator = std::make_unique<ZmpEstimator>();
-
     }
     std::unique_ptr<ZmpEstimator> zmp_estimator;
 };
@@ -131,7 +130,6 @@ TEST_F(ZmpEstimatorTest, accelerateZmpTest)
     ASSERT_TRUE(abs(zmp_estimator->get_zmp().point.y - 2.898) < 0.001);
     ASSERT_EQ(zmp_estimator->get_zmp().point.z, 0);
 }
-
 
 // NOLINTEND
 #endif

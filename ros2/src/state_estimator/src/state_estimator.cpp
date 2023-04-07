@@ -28,9 +28,11 @@ StateEstimator::StateEstimator()
 
     m_cop_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_cop_position", 100);
 
-    m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_feet_positions", 100);
+    m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 100);
 
     m_zmp_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 100);
+
+    m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
 
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
@@ -166,12 +168,15 @@ void StateEstimator::publish_robot_frames()
     }
     // Publish each joint center of mass
     std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
-    RCLCPP_DEBUG(this->get_logger(), "Array size is %i", joint_com_positions.size());
+    // RCLCPP_INFO(this->get_logger(), "Array size is %i", joint_com_positions.size());
+    int i = 0;
     for (auto com : joint_com_positions) {
-        RCLCPP_DEBUG(this->get_logger(), ("\n Publishing COM"));
-        RCLCPP_DEBUG(this->get_logger(), "\n Publishing COM with pos x = %f", com.position.point.x);
-        m_com_pos_publisher->publish(com.position);
+        i++;
+        if (i == 6) {
+            m_com_pos_publisher->publish(com.position);
+        }
     }
+
     // Update and publish the actual, full center of mass
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
@@ -189,12 +194,19 @@ void StateEstimator::publish_robot_frames()
     // Update the feet
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
     // Publish the feet
-    if (m_footstep_estimator.get_foot_on_ground("l")) {
-        m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("l"));
-    }
-    if (m_footstep_estimator.get_foot_on_ground("r")) {
-        m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
-    }
+    // The first foot is always the right foot
+    // The second foot is always the left foot
+    geometry_msgs::msg::PoseArray foot_positions;
+    foot_positions.header.frame_id = "map";
+    foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
+    foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
+    m_foot_pos_publisher->publish(foot_positions);
+    // if (m_footstep_estimator.get_foot_on_ground("l")) {
+    //     m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("l"));
+    // }
+    // if (m_footstep_estimator.get_foot_on_ground("r")) {
+    //     m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
+    // }
 
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
@@ -234,8 +246,9 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
     for (size_t i = 0; i < names.size(); i++) {
         PressureSensor sensor;
         const char initial = names.at(i)[0];
-        if(initial!= 'l' && initial != 'r') {
-            RCLCPP_WARN(this->get_logger(), "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
+        if (initial != 'l' && initial != 'r') {
+            RCLCPP_WARN(this->get_logger(),
+                "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
         }
         sensor.name = initial;
         CenterOfPressure cop;

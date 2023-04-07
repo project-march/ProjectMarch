@@ -6,20 +6,24 @@ FootstepEstimator::FootstepEstimator()
     foot_right.position.header.frame_id = "right_ankle";
 }
 
-geometry_msgs::msg::PointStamped FootstepEstimator::get_foot_position(const char* prefix)
+geometry_msgs::msg::Pose FootstepEstimator::get_foot_position(const char* prefix)
 {
+    geometry_msgs::msg::Pose foot_pose;
+
     switch (*prefix) {
         case * "l":
-            return foot_left.position;
+            foot_pose.position = foot_left.position.point;
             break;
 
         case * "r":
-            return foot_right.position;
+            foot_pose.position = foot_right.position.point;
             break;
 
         default:
-            return geometry_msgs::msg::PointStamped();
+            return geometry_msgs::msg::Pose();
     }
+
+    return foot_pose;
 }
 
 void FootstepEstimator::set_foot_size(double width, double height, const char* prefix)

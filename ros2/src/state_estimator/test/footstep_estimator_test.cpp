@@ -20,7 +20,6 @@ protected:
     void SetUp() override
     {
         footstep_estimator = std::make_unique<FootstepEstimator>();
-
     }
     std::unique_ptr<FootstepEstimator> footstep_estimator;
 };
@@ -98,8 +97,6 @@ TEST_F(FootstepEstimatorTest, unknownFootTest)
     ASSERT_EQ(footstep_estimator->get_foot_on_ground(&prefixU), 0);
 }
 
-
-
 TEST_F(FootstepEstimatorTest, getFeetPositionTest)
 {
     geometry_msgs::msg::PointStamped right_position;
@@ -119,12 +116,12 @@ TEST_F(FootstepEstimatorTest, getFeetPositionTest)
     rightF->position = right_position;
     leftF->position = left_position;
 
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.x, 0);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.y, 0);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.z, 0);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.x, 1);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.y, 1);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.z, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).position.x, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).position.y, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).position.z, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).position.x, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).position.y, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).position.z, 1);
 }
 
 TEST_F(FootstepEstimatorTest, setFootSizeTest)

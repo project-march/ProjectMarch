@@ -15,6 +15,11 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
+    state_estimator_launch_dir = os.path.join(
+        get_package_share_directory('state_estimator'),
+        'launch'
+    )
+
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
@@ -41,12 +46,6 @@ def generate_launch_description() -> LaunchDescription:
             name='zmp_mpc_solver'
         ),
         Node(
-            package='state_estimator',
-            namespace='',
-            executable='state_estimator_node',
-            name='state_estimator'
-        ),
-        Node(
             package='ik_solver_buffer',
             namespace='',
             executable='ik_solver_buffer_node',
@@ -55,5 +54,8 @@ def generate_launch_description() -> LaunchDescription:
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
             launch_arguments={'robot_description': urdf_location}.items(),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         ),
     ])

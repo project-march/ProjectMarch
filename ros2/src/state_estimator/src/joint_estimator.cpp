@@ -10,14 +10,14 @@ JointEstimator::JointEstimator(StateEstimator* owner)
 
 void JointEstimator::set_joint_states(sensor_msgs::msg::JointState::SharedPtr new_joint_states)
 {
-    RCLCPP_INFO(m_owner->get_logger(), "Set joint states :)");
+    // RCLCPP_INFO(m_owner->get_logger(), "Set joint states :)");
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
     for (size_t i = 0; i < new_joint_states->name.size(); i++) {
-        RCLCPP_INFO(m_owner->get_logger(), "Loop :)");
+        // RCLCPP_INFO(m_owner->get_logger(), "Loop :)");
         set_individual_joint_state(new_joint_states->name.at(i), new_joint_states->position.at(i));
     }
-    RCLCPP_INFO(m_owner->get_logger(), "Done setting joint states :)");
+    // RCLCPP_INFO(m_owner->get_logger(), "Done setting joint states :)");
 }
 
 void JointEstimator::set_individual_joint_state(std::string joint_name, double new_position)
@@ -44,7 +44,7 @@ void JointEstimator::set_individual_joint_state(std::string joint_name, double n
     quaternion_math.normalize();
     tf2::convert(quaternion_math, it->frame.transform.rotation);
 
-    RCLCPP_INFO(m_owner->get_logger(), "settt state :)");
+    // RCLCPP_INFO(m_owner->get_logger(), "settt state :)");
 }
 
 const JointContainer JointEstimator::get_individual_joint(std::string joint_name)
@@ -139,6 +139,7 @@ void JointEstimator::initialize_joints()
             joint_frame.transform.translation.x = joint_to_add.length_x;
             joint_frame.transform.translation.y = joint_to_add.length_y;
             joint_frame.transform.translation.z = joint_to_add.length_z;
+
             // Add rotations here
             double nan_guard = 1e-8; // We add this value to every initial joint to avoid complete zeroes, which
                                      // sometimes cause NaN errors

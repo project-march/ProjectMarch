@@ -16,7 +16,7 @@ IkSolverNode::IkSolverNode()
     m_joint_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_state", 10, std::bind(&IkSolverNode::joint_state_subscriber_callback, this, _1));
 
-    m_foot_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
+    m_foot_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/est_foot_position", 10, std::bind(&IkSolverNode::foot_subscriber_callback, this, _1));
 
     m_solving_timer = this->create_wall_timer(8ms, std::bind(&IkSolverNode::timer_callback, this));
@@ -27,10 +27,10 @@ IkSolverNode::IkSolverNode()
     m_ik_solver.load_urdf_model(robot_description);
     m_ik_solver.initialize_solver();
 
-    // // pinocchio::Model test_model = m_ik_solver.get_model();
-    // // for(pinocchio::FrameIndex i=0; i<static_cast<pinocchio::FrameIndex>(test_model.nframes); i++){
-    // //     RCLCPP_INFO(this->get_logger(), test_model.frames[i].name);
-    // // }
+    pinocchio::Model test_model = m_ik_solver.get_model();
+    for (pinocchio::FrameIndex i = 0; i < static_cast<pinocchio::FrameIndex>(test_model.nframes); i++) {
+        RCLCPP_INFO(this->get_logger(), test_model.frames[i].name);
+    }
     // auto jacobian = m_ik_solver.get_model_jacobian();
     // std::stringstream ss;
     // ss << jacobian.format(Eigen::IOFormat(4, 0, ", ", "\n", "", ""));
@@ -59,14 +59,14 @@ void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState:
     m_ik_solver.set_jacobian();
 }
 
-void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     set_foot_placement(msg);
 }
 
-void IkSolverNode::set_foot_placement(geometry_msgs::msg::PointStamped::SharedPtr setter)
+void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr setter)
 {
-    m_latest_placed_foot = setter;
+    m_latest_foot_positions = setter;
 }
 
 void IkSolverNode::timer_callback()
@@ -74,14 +74,14 @@ void IkSolverNode::timer_callback()
     // Construct the state
     m_trajectory_index++;
 
-    if (!(m_latest_placed_foot) || !(m_trajectory_container)) {
+    if (!(m_latest_foot_positions) || !(m_trajectory_container)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
     } else {
-        m_desired_state.right_foot_pose << m_latest_placed_foot->point.x, m_latest_placed_foot->point.y,
-            m_latest_placed_foot->point.z, 0.0, 0.0, 0.0;
-        m_desired_state.left_foot_pose << m_trajectory_container->swing_trajectory[m_trajectory_index].x,
-            m_trajectory_container->swing_trajectory[m_trajectory_index].y,
-            m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        // m_desired_state.right_foot_pose << m_latest_placed_foot->point.x, m_latest_placed_foot->point.y,
+        // m_latest_placed_foot->point.z, 0.0, 0.0, 0.0;
+        // m_desired_state.left_foot_pose << m_trajectory_container->swing_trajectory[m_trajectory_index].x,
+        // m_trajectory_container->swing_trajectory[m_trajectory_index].y,
+        // m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
         m_desired_state.com_pos << m_trajectory_container->com_trajectory[m_trajectory_index].x,
             m_trajectory_container->com_trajectory[m_trajectory_index].y,
             m_trajectory_container->com_trajectory[m_trajectory_index].z;

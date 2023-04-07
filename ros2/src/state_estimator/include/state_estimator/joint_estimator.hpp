@@ -23,7 +23,7 @@ struct CenterOfMass {
     friend bool operator==(CenterOfMass a, CenterOfMass b)
     {
         return (a.position.point.x == b.position.point.x && a.position.point.y == b.position.point.y
-                && a.position.point.z == b.position.point.z && abs(a.mass - b.mass) < 1e-6 );
+            && a.position.point.z == b.position.point.z && abs(a.mass - b.mass) < 1e-6);
     };
 };
 
