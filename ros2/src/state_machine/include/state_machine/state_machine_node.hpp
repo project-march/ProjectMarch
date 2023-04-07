@@ -22,8 +22,8 @@ public:
 private:
     void gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg);
 
-    bool send_request(exoState desired_state);
-    void response_callback(rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture response);
+    void send_request(exoState desired_state);
+    void response_callback(const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
 
     rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
     rclcpp::Subscription<march_shared_msgs::msg::GaitRequest>::SharedPtr m_gait_request_subscriber;

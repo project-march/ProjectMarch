@@ -79,12 +79,12 @@ class InputDeviceController:
 
     def _gait_response_callback(self, msg: GaitResponse):
         """Update current node from the state machine."""
-        self._node.get_logger().info("Received new gait from other IPD.")
+        self._node.get_logger().debug("Received new gait from other IPD.")
         self._current_gait = msg.gait_type
 
     def publish_gait(self, gait_type: int) -> None:
         """Publish a message on `/march/gait_request` to publish the gait."""
-        self._node.get_logger().info("Mock Input Device published gait: " + str(gait_type))
+        self._node.get_logger().debug("Mock Input Device published gait: " + str(gait_type))
         self._current_gait = gait_type
         msg = GaitRequest(
             header=Header(stamp=self._node.get_clock().now().to_msg()),
