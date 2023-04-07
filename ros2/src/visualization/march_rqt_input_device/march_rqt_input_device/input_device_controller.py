@@ -1,4 +1,4 @@
-"""Author: Katja Schmal, MVI & Marco Bak, MVIII"""
+"""Author: Katja Schmal, MVI & Marco Bak, MVIII."""
 import getpass
 import socket
 
@@ -75,6 +75,7 @@ class InputDeviceController:
         self._current_gait = GaitRequest.FORCE_UNKNOWN
 
     def update_possible_gaits(self):
+        """Update the possible gait that can be selected by the IPD."""
         return self.POSSIBLE_TRANSITIONS[self._current_gait]
 
     def _gait_response_callback(self, msg: GaitResponse):
@@ -124,4 +125,5 @@ class InputDeviceController:
 
     @property
     def node(self):
+        """Define the node."""
         return self._node
