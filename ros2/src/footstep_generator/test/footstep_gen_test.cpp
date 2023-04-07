@@ -51,7 +51,7 @@ TEST_F(FootstepGeneratorTest, getAMountOfStepsTest)
 {
     geometry_msgs::msg::PoseArray footsteps = this->footstep_gen->generate_foot_placements(1, 3);
     ASSERT_LT(sizeof(footsteps.poses) / sizeof(geometry_msgs::msg::Pose),
-        static_cast<double>(this->footstep_gen->get_steps()));
+              static_cast<double>(this->footstep_gen->get_steps()));
 }
 // NOLINTEND
 #endif

@@ -7,6 +7,7 @@
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include "march_shared_msgs/msg/gait_response.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
+#include "march_shared_msgs/srv/request_footsteps.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "state_machine/state_machine.hpp"
 #include <chrono>
@@ -22,13 +23,13 @@ private:
     void gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg);
 
     bool send_request(exoState desired_state);
-    void response_callback(rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture response);
+    void response_callback(rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture response);
 
     rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
     rclcpp::Subscription<march_shared_msgs::msg::GaitRequest>::SharedPtr m_gait_request_subscriber;
-    rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedPtr m_client;
-    rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture m_future;
-    march_shared_msgs::srv::GaitCommand::Request::SharedPtr m_request;
+    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_client;
+    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture m_future;
+    march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_request;
 
     StateMachine m_state_machine;
 };

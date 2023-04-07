@@ -41,15 +41,16 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         Node(
+            package='footstep_generator',
+            namespace='',
+            executable='footstep_generator_node',
+            name='footstep_generator'
+        ),
+        Node(
             package='state_machine',
             namespace='',
             executable='state_machine_node',
             name='state_machine',
-        ),
-        Node(
-            package='gait_loader',
-            executable='gait_loader_node',
-            name='gait_loader',
         ),
         mujoco_node,
         rqt_input_device,
