@@ -135,8 +135,8 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
-        /*fuzzy_position=*/std::numeric_limits<double>::quiet_NaN(),
-        /*fuzzy_torque=*/std::numeric_limits<double>::quiet_NaN(),
+        /*position_weight=*/std::numeric_limits<double>::quiet_NaN(),
+        /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
             /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
@@ -470,11 +470,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //                converted_effort);
         //        }
         //        jointInfo.effort_command_converted = converted_effort;
-        //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
+        //                jointInfo.joint.actuate((float)joijointInfontInfo.effort_command_converted);
 
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
         jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
-            (float)jointInfo.fuzzy_torque, (float)jointInfo.fuzzy_position);
+            (float)jointInfo.torque_weight, (float)jointInfo.position_weight);
     }
 
     return hardware_interface::return_type::OK;

@@ -48,8 +48,8 @@ struct JointInfo {
     double effort_command_converted;
 
     // Values for the fuzzy control on the ODrive
-    double fuzzy_position;
-    double fuzzy_torque;
+    double position_weight;
+    double torque_weight;
 
     JointLimit limit;
 };
