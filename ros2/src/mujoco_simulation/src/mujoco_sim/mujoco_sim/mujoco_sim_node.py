@@ -153,7 +153,7 @@ class MujocoSimNode(Node):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
         except Empty:
-            self.get_logger().warn("NO NEW TRAJECTORY FOUND")
+            self.get_logger().debug("NO NEW TRAJECTORY FOUND")
 
     def writer_callback(self, msg):
         """Callback function for the writing service.

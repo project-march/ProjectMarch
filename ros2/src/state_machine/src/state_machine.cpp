@@ -21,9 +21,11 @@ StateMachine::StateMachine()
     m_exo_transitions = {
         /*{CurrentState, PossibleStates}*/
         { exoState::Sit, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::Stand, { exoState::Sit, exoState::Walk, exoState::ForceUnknown, exoState::Error } },
+        { exoState::Stand,
+            { exoState::Sit, exoState::Walk, exoState::StepClose, exoState::ForceUnknown, exoState::Error } },
         { exoState::Walk, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::ForceUnknown, { exoState::Stand, exoState::Error } },
+        { exoState::StepClose, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
+        { exoState::ForceUnknown, { exoState::Stand, exoState::Sit, exoState::Error } },
 
     };
 }

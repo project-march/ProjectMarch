@@ -22,17 +22,19 @@ StateMachineNode::StateMachineNode()
         = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
         "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
-    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command");
+    m_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
 
     m_state_machine = StateMachine();
+    m_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
 
     while (!m_client->wait_for_service(1s)) {
         if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "service not available, waiting again...");
     }
+    RCLCPP_INFO(rclcpp::get_logger("state_machine"), "service connected");
 }
 
 /**
@@ -42,13 +44,14 @@ StateMachineNode::StateMachineNode()
  * If something went wrong this is also logged and the safety node should be notified.
  * @param response
  */
-void StateMachineNode::response_callback(rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture response)
+void StateMachineNode::response_callback(
+    const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future)
 {
-    if (response.get()->success) {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Request received successful!");
+    RCLCPP_INFO(this->get_logger(), "response_callback");
+    if (future.get()->status) {
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Request received successful!");
     } else {
-        RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "Request was not a success!");
-        // do ERROR STUFF
+        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Request was not a success!");
     }
 }
 
@@ -58,11 +61,14 @@ void StateMachineNode::response_callback(rclcpp::Client<march_shared_msgs::srv::
  * @param desired_state
  * @return succes of failure
  */
-bool StateMachineNode::send_request(exoState desired_state)
+void StateMachineNode::send_request(exoState desired_state)
 {
+    RCLCPP_INFO(this->get_logger(), "send_request");
     m_request->gait_type = (int)desired_state;
-    m_future = m_client->async_send_request(m_request, std::bind(&StateMachineNode::response_callback, this, _1));
-    return m_future.get()->success;
+    if (m_client->service_is_ready()) {
+        RCLCPP_INFO(this->get_logger(), "service_is_ready");
+        m_future = m_client->async_send_request(m_request, std::bind(&StateMachineNode::response_callback, this, _1));
+    }
 }
 
 /**

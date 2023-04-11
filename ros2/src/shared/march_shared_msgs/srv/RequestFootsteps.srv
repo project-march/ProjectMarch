@@ -1,3 +1,8 @@
-int8 stance_leg
+int32 STAND = 1
+int32 WALK = 2
+int32 STEP_CLOSE = 3
+
+int32 stance_leg # 1 is right leg, -1 is left leg.
+int32 gait_type
 ---
-int8 status
+bool status
