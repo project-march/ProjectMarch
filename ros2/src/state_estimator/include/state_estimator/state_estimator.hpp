@@ -74,6 +74,7 @@ private:
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_publisher;
 
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_rviz_publisher;
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_publisher;
 
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_joint_broadcaster;
     JointEstimator m_joint_estimator;
@@ -82,6 +83,8 @@ private:
     ImuEstimator m_imu_estimator;
     ZmpEstimator m_zmp_estimator;
     FootstepEstimator m_footstep_estimator;
+
+    int m_current_stance_foot;
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_joint_listener;

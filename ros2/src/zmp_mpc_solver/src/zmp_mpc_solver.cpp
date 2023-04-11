@@ -9,6 +9,7 @@ ZmpSolver::ZmpSolver()
     , m_switch(0)
     , m_current_shooting_node(0)
     , m_timing_value(0)
+    , m_current_stance_foot(1)
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -118,6 +119,11 @@ void ZmpSolver::initialize_mpc_params()
     m_timing_value = 0;
 
     m_number_of_footsteps = 10;
+}
+
+void ZmpSolver::set_current_stance_foot(int stance_foot)
+{
+    m_current_stance_foot = stance_foot;
 }
 
 inline int ZmpSolver::solve_zmp_mpc(
@@ -251,7 +257,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     printf("%f \n", (10.0 / 61));
     double dt = 0.0 + (m_time_horizon) / N;
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
-    double count = -1;
+    double count = m_current_stance_foot;
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
     if ((m_current_shooting_node != 0) && (m_current_shooting_node < ((N - 1) / m_number_of_footsteps))) {
@@ -430,9 +436,6 @@ inline int ZmpSolver::solve_zmp_mpc(
         x_init_input[ii] = xtraj[NX + ii];
     }
 
-    for (int ii = 0; ii < NX * N; ii++) {
-        x_init_input[ii] = xtraj[ii];
-    }
 
     // get solution
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);

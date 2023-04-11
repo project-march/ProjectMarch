@@ -9,15 +9,19 @@ IkSolverNode::IkSolverNode()
     , m_trajectory_index(0)
     , m_right_foot_on_ground(true)
     , m_desired_state()
+    , m_stance_foot(0)
 {
     m_trajectory_subscriber = this->create_subscription<march_shared_msgs::msg::IkSolverCommand>(
         "/ik_solver_input", 10, std::bind(&IkSolverNode::trajectory_subscriber_callback, this, _1));
 
     m_joint_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-        "/joint_state", 10, std::bind(&IkSolverNode::joint_state_subscriber_callback, this, _1));
+        "/measured_joint_states", 10, std::bind(&IkSolverNode::joint_state_subscriber_callback, this, _1));
 
     m_foot_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/est_foot_position", 10, std::bind(&IkSolverNode::foot_subscriber_callback, this, _1));
+
+    m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
+        "/current_stance_foot", 10, std::bind(&IkSolverNode::stance_foot_callback, this, _1));
 
     m_solving_timer = this->create_wall_timer(8ms, std::bind(&IkSolverNode::timer_callback, this));
 
@@ -69,19 +73,36 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
     m_latest_foot_positions = setter;
 }
 
+void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
+{
+    m_stance_foot = msg->data;
+}
+
 void IkSolverNode::timer_callback()
 {
     // Construct the state
     m_trajectory_index++;
 
-    if (!(m_latest_foot_positions) || !(m_trajectory_container)) {
+    if (!(m_latest_foot_positions) || !(m_trajectory_container) || (m_stance_foot==0)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
     } else {
-        // m_desired_state.right_foot_pose << m_latest_placed_foot->point.x, m_latest_placed_foot->point.y,
-        // m_latest_placed_foot->point.z, 0.0, 0.0, 0.0;
-        // m_desired_state.left_foot_pose << m_trajectory_container->swing_trajectory[m_trajectory_index].x,
-        // m_trajectory_container->swing_trajectory[m_trajectory_index].y,
-        // m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        // IN THE POSE ARRAY, INDEX 0 IS RIGHT AND INDEX 1 IS LEFT
+        if (m_stance_foot==1){
+            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x, m_latest_foot_positions->poses[0].position.y,
+            m_latest_foot_positions->poses[0].position.z, 0.0, 0.0, 0.0;
+
+            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x+m_trajectory_container->swing_trajectory[m_trajectory_index].x,
+            m_latest_foot_positions->poses[1].position.y+m_trajectory_container->swing_trajectory[m_trajectory_index].y,
+            m_latest_foot_positions->poses[1].position.z+m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        }else{
+            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x, m_latest_foot_positions->poses[1].position.y,
+            m_latest_foot_positions->poses[1].position.z, 0.0, 0.0, 0.0;
+
+            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x+m_trajectory_container->swing_trajectory[m_trajectory_index].x,
+            m_latest_foot_positions->poses[0].position.y+m_trajectory_container->swing_trajectory[m_trajectory_index].y,
+            m_latest_foot_positions->poses[0].position.z+m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        }
+
         m_desired_state.com_pos << m_trajectory_container->com_trajectory[m_trajectory_index].x,
             m_trajectory_container->com_trajectory[m_trajectory_index].y,
             m_trajectory_container->com_trajectory[m_trajectory_index].z;

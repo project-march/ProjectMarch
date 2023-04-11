@@ -12,6 +12,7 @@ StateEstimator::StateEstimator()
     , m_zmp_estimator()
     , m_cop_estimator(create_pressure_sensors())
     , m_footstep_estimator()
+    , m_current_stance_foot(0)
 {
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
         "/upper_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
@@ -37,6 +38,8 @@ StateEstimator::StateEstimator()
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
 
+    m_joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("measured_joint_states", 100);
+
     m_rviz_publisher = this->create_publisher<visualization_msgs::msg::Marker>("joint_visualizations", 100);
 
     timer_ = this->create_wall_timer(1000ms, std::bind(&StateEstimator::publish_robot_frames, this));
@@ -51,12 +54,6 @@ StateEstimator::StateEstimator()
     declare_parameter("imu_estimator.IMU_exo_rotation", std::vector<double>(3, 0.0));
     declare_parameter("footstep_estimator.left_foot.size", std::vector<double>(6, 2));
     declare_parameter("footstep_estimator.right_foot.size", std::vector<double>(6, 2));
-    // declare_parameter("joint_estimator.link_length_y", std::vector<double>(6, 0.0));
-    // declare_parameter("joint_estimator.link_length_z", std::vector<double>(6, 0.0));
-    // declare_parameter("joint_estimator.link_mass", std::vector<double>(6, 0.0));
-    // declare_parameter("joint_estimator.link_com_x", std::vector<double>(6, 0.0));
-    // declare_parameter("joint_estimator.link_com_y", std::vector<double>(6, 0.0));
-    // declare_parameter("joint_estimator.link_com_z", std::vector<double>(6, 0.0));
     auto left_foot_size = this->get_parameter("footstep_estimator.left_foot.size").as_double_array();
     auto right_foot_size = this->get_parameter("footstep_estimator.right_foot.size").as_double_array();
     m_footstep_estimator.set_foot_size(left_foot_size[0], left_foot_size[1], "l");
@@ -73,6 +70,7 @@ void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
     this->m_joint_estimator.set_joint_states(msg);
+    m_joint_state_publisher->publish(*msg);
 }
 
 void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg)
@@ -201,12 +199,14 @@ void StateEstimator::publish_robot_frames()
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
     m_foot_pos_publisher->publish(foot_positions);
-    // if (m_footstep_estimator.get_foot_on_ground("l")) {
-    //     m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("l"));
-    // }
-    // if (m_footstep_estimator.get_foot_on_ground("r")) {
-    //     m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
-    // }
+    if (m_footstep_estimator.get_foot_on_ground("l") && m_current_stance_foot!=-1) {
+        m_foot_pos_publisher->publish(-1);
+        m_current_stance_foot = -1;
+    }
+    if (m_footstep_estimator.get_foot_on_ground("r") && m_current_stance_foot!=1) {
+        m_foot_pos_publisher->publish(1);
+        m_current_stance_foot = 1;
+    }
 
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;

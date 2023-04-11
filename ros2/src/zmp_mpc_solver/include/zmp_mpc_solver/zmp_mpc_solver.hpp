@@ -27,6 +27,7 @@ public:
     void set_previous_foot(double, double);
     void set_current_com(double, double, double, double);
     void set_current_zmp(double, double);
+    void set_current_stance_foot(int);
     void initialize_mpc_params();
     const double get_com_height();
 
@@ -47,6 +48,8 @@ private:
     double m_switch;
     int m_current_shooting_node;
     double m_timing_value;
+
+    int m_current_stance_foot;
 
     double m_admissible_region_x;
     double m_admissible_region_y;
