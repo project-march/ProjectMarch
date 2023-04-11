@@ -436,7 +436,6 @@ inline int ZmpSolver::solve_zmp_mpc(
         x_init_input[ii] = xtraj[NX + ii];
     }
 
-
     // get solution
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
     ocp_nlp_get(nlp_config, nlp_solver, "sqp_iter", &sqp_iter);

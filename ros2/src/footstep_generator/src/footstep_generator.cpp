@@ -16,8 +16,8 @@ FootstepGenerator::FootstepGenerator()
 }
 
 void FootstepGenerator::publish_foot_placements(
-        const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
-        std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
+    const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
+    std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
     publish_footsteps(footsteps);

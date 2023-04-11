@@ -199,11 +199,11 @@ void StateEstimator::publish_robot_frames()
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
     m_foot_pos_publisher->publish(foot_positions);
-    if (m_footstep_estimator.get_foot_on_ground("l") && m_current_stance_foot!=-1) {
+    if (m_footstep_estimator.get_foot_on_ground("l") && m_current_stance_foot != -1) {
         m_foot_pos_publisher->publish(-1);
         m_current_stance_foot = -1;
     }
-    if (m_footstep_estimator.get_foot_on_ground("r") && m_current_stance_foot!=1) {
+    if (m_footstep_estimator.get_foot_on_ground("r") && m_current_stance_foot != 1) {
         m_foot_pos_publisher->publish(1);
         m_current_stance_foot = 1;
     }

@@ -83,24 +83,34 @@ void IkSolverNode::timer_callback()
     // Construct the state
     m_trajectory_index++;
 
-    if (!(m_latest_foot_positions) || !(m_trajectory_container) || (m_stance_foot==0)) {
+    if (!(m_latest_foot_positions) || !(m_trajectory_container) || (m_stance_foot == 0)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
     } else {
         // IN THE POSE ARRAY, INDEX 0 IS RIGHT AND INDEX 1 IS LEFT
-        if (m_stance_foot==1){
-            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x, m_latest_foot_positions->poses[0].position.y,
-            m_latest_foot_positions->poses[0].position.z, 0.0, 0.0, 0.0;
+        if (m_stance_foot == 1) {
+            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x,
+                m_latest_foot_positions->poses[0].position.y, m_latest_foot_positions->poses[0].position.z, 0.0, 0.0,
+                0.0;
 
-            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x+m_trajectory_container->swing_trajectory[m_trajectory_index].x,
-            m_latest_foot_positions->poses[1].position.y+m_trajectory_container->swing_trajectory[m_trajectory_index].y,
-            m_latest_foot_positions->poses[1].position.z+m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
-        }else{
-            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x, m_latest_foot_positions->poses[1].position.y,
-            m_latest_foot_positions->poses[1].position.z, 0.0, 0.0, 0.0;
+            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x
+                    + m_trajectory_container->swing_trajectory[m_trajectory_index].x,
+                m_latest_foot_positions->poses[1].position.y
+                + m_trajectory_container->swing_trajectory[m_trajectory_index].y,
+                m_latest_foot_positions->poses[1].position.z
+                + m_trajectory_container->swing_trajectory[m_trajectory_index].z,
+                0.0, 0.0, 0.0;
+        } else {
+            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x,
+                m_latest_foot_positions->poses[1].position.y, m_latest_foot_positions->poses[1].position.z, 0.0, 0.0,
+                0.0;
 
-            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x+m_trajectory_container->swing_trajectory[m_trajectory_index].x,
-            m_latest_foot_positions->poses[0].position.y+m_trajectory_container->swing_trajectory[m_trajectory_index].y,
-            m_latest_foot_positions->poses[0].position.z+m_trajectory_container->swing_trajectory[m_trajectory_index].z, 0.0, 0.0, 0.0;
+            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x
+                    + m_trajectory_container->swing_trajectory[m_trajectory_index].x,
+                m_latest_foot_positions->poses[0].position.y
+                + m_trajectory_container->swing_trajectory[m_trajectory_index].y,
+                m_latest_foot_positions->poses[0].position.z
+                + m_trajectory_container->swing_trajectory[m_trajectory_index].z,
+                0.0, 0.0, 0.0;
         }
 
         m_desired_state.com_pos << m_trajectory_container->com_trajectory[m_trajectory_index].x,
