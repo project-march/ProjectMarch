@@ -19,7 +19,7 @@ FuzzyGenerator::FuzzyGenerator(){
 };
 
 void FuzzyGenerator::updateWeights(){
-    //TODO: implement fuzzy logic
+    //TODO(Sofie): implement fuzzy logic
 };
 
 // setters
@@ -75,16 +75,19 @@ void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
     switch(msg.data){
         case -1:{
             stance_leg = Left;
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground");
+            swing_leg = Right;
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
             break;
         }
         case 1:{
             stance_leg = Right;
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground");
+            swing_leg = Left;
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
             break;
         }
         case 0:{ //this is the case when both feet are on the ground
             stance_leg = Both;
+            swing_leg = None;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
             break;
         }
@@ -136,6 +139,7 @@ geometry_msgs::msg::Point FuzzyGenerator::getFootPosition(Leg leg){
             break;
     }
 };
+
 std_msgs::msg::Float32 FuzzyGenerator::getFootTorque(Leg leg){
     switch(leg){
         Left:

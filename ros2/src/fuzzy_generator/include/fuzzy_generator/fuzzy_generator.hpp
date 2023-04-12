@@ -23,6 +23,7 @@ class FuzzyGenerator {
 public:
     FuzzyGenerator();
 
+    // the function that will update the weights with the fuzzy logic
     void updateWeights();
 
     // setters
@@ -30,8 +31,8 @@ public:
     void setFootTorque(std_msgs::msg::Float32 msg, Leg leg); // set the torque of the passed leg
     void setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg); // set the height of both feet
     void setStanceLeg(std_msgs::msg::Int32 msg); // set the stance leg to the correct leg
-    void setTorqueWeight(float weight);
-    void setPositionWeight(float weight);
+    void setTorqueWeight(float weight); // set the weight for the torque (does not publish the weight yet)
+    void setPositionWeight(float weight); // set the weight for the position (does not publish the weight yet)
 
 
     // getters
@@ -46,8 +47,8 @@ public:
 
 
 private:
-    float torque_weight;
-    float position_weight;
+    float torque_weight; // holds the weight for the torque
+    float position_weight; // holds the weight for the position
 
     double distance_torque; // threshold for at what foot-height to START switching to torque
     double h_offset; // height at which to be COMPLETELY on torque
