@@ -12,10 +12,9 @@
 
 
 struct Foot {
-    char foot;
     geometry_msgs::msg::Point position;
     std_msgs::msg::Float32 torque;
-    double height;
+    double height = 0;
 };
 
 enum Leg {Left, Right, Both, None};
@@ -26,11 +25,13 @@ public:
 
     void decideWeights();
 
-    //getters and setters
-    void setFootPosition(geometry_msgs::msg::Point msg, Leg leg);
-    void setFootTorque(std_msgs::msg::Float32 msg, Leg leg);
-    void setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg);
-    void setStanceLeg(std_msgs::msg::Int32 msg);
+    // setters
+    void setFootPosition(geometry_msgs::msg::Point msg, Leg leg); // set the position of the passed leg
+    void setFootTorque(std_msgs::msg::Float32 msg, Leg leg); // set the torque of the passed leg
+    void setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg); // set the height of both feet
+    void setStanceLeg(std_msgs::msg::Int32 msg); // set the stance leg to the correct leg
+
+    // getters
     geometry_msgs::msg::Point getFootPosition(Leg leg);
     std_msgs::msg::Float32 getFootTorque(Leg leg);
     double getFootHeight(Leg leg);
@@ -42,11 +43,11 @@ private:
     double distance_torque; // threshold for at what foot-height to START switching to torque
     double h_offset; // height at which to be COMPLETELY on torque
 
-    Foot* left_foot;
-    Foot* right_foot;
+    Foot left_foot;
+    Foot right_foot;
 
-    Leg swing_leg;
-    Leg stance_leg;
+    Leg swing_leg = None; // which leg is the swing leg
+    Leg stance_leg = Both; // which leg is the stance leg
 };
 
 #endif //MARCH_FUZZY_GENERATOR_HPP

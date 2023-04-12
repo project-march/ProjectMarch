@@ -26,7 +26,7 @@ FuzzyNode::FuzzyNode()
 
 void FuzzyNode::position_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-    //the position being published is always that of the stance leg
+    // the position being published is always that of the stance leg
     m_fuzzy_generator.setFootPosition(msg->point, m_fuzzy_generator.getStanceLeg());
 }
 
