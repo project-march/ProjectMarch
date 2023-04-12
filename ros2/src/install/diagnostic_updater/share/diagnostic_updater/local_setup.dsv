@@ -1,3 +1,0 @@
-source;share/diagnostic_updater/environment/ament_prefix_path.sh
-source;share/diagnostic_updater/environment/path.sh
-source;share/diagnostic_updater/environment/pythonpath.sh

@@ -1,8 +1,0 @@
-source;share/realtime_tools/hook/cmake_prefix_path.ps1
-source;share/realtime_tools/hook/cmake_prefix_path.dsv
-source;share/realtime_tools/hook/cmake_prefix_path.sh
-source;share/realtime_tools/local_setup.bash
-source;share/realtime_tools/local_setup.dsv
-source;share/realtime_tools/local_setup.ps1
-source;share/realtime_tools/local_setup.sh
-source;share/realtime_tools/local_setup.zsh

@@ -1,9 +1,0 @@
-source;share/fuzzy_decider/hook/ros_package_path.ps1
-source;share/fuzzy_decider/hook/ros_package_path.dsv
-source;share/fuzzy_decider/hook/ros_package_path.sh
-source;share/fuzzy_decider/hook/pkg_config_path.ps1
-source;share/fuzzy_decider/hook/pkg_config_path.dsv
-source;share/fuzzy_decider/hook/pkg_config_path.sh
-source;share/fuzzy_decider/hook/pkg_config_path_multiarch.ps1
-source;share/fuzzy_decider/hook/pkg_config_path_multiarch.dsv
-source;share/fuzzy_decider/hook/pkg_config_path_multiarch.sh
