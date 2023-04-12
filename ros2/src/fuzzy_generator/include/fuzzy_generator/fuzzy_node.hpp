@@ -8,6 +8,7 @@
 #include "fuzzy_generator.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
+//#include "march_shared_msgs/msg/torque_stamped.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float32.hpp"
 
@@ -17,7 +18,7 @@ public:
 
 private:
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_position_subscription;
-    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_torque_subscription;
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_torque_subscription; //TODO: apply better message type
     rclcpp::Subscription<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_foot_height_subscription;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_leg_subscription;
 
