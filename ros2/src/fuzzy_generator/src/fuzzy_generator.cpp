@@ -18,26 +18,11 @@ FuzzyGenerator::FuzzyGenerator(){
     right_foot.torque.data = 0.0f;
 };
 
-void FuzzyGenerator::decideWeights(){
+void FuzzyGenerator::updateWeights(){
     //TODO: implement fuzzy logic
 };
 
-// getters and setters
-
-Foot* FuzzyGenerator::getFoot(Leg leg){
-    switch(leg){
-        Left:
-            return &left_foot;
-        Right:
-            return &right_foot;
-        Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both feet");
-            break;
-        None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none feet");
-            break;
-    }
-};
+// setters
 
 void FuzzyGenerator::setFootPosition(geometry_msgs::msg::Point point, Leg leg){
     switch(leg){
@@ -112,6 +97,31 @@ void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
 //    }
 }
 
+void FuzzyGenerator::setTorqueWeight(float weight){
+    torque_weight = weight;
+}
+
+void FuzzyGenerator::setPositionWeight(float weight){
+    position_weight = weight;
+}
+
+// getters
+
+Foot* FuzzyGenerator::getFoot(Leg leg){
+    switch(leg){
+        Left:
+            return &left_foot;
+        Right:
+            return &right_foot;
+        Both:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both feet");
+            break;
+        None:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none feet");
+            break;
+    }
+};
+
 geometry_msgs::msg::Point FuzzyGenerator::getFootPosition(Leg leg){
     switch(leg){
         Left:
@@ -161,3 +171,11 @@ Leg FuzzyGenerator::getStanceLeg(){
 Leg FuzzyGenerator::getSwingLeg(){
     return swing_leg;
 };
+
+float FuzzyGenerator::getTorqueWeight(){
+    return torque_weight;
+}
+
+float FuzzyGenerator::getPositionWeight(){
+    return torque_weight;
+}

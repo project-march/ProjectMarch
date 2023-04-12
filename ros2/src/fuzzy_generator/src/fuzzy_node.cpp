@@ -28,12 +28,18 @@ void FuzzyNode::position_callback(geometry_msgs::msg::PointStamped::SharedPtr ms
 {
     // the position being published is always that of the stance leg
     m_fuzzy_generator.setFootPosition(msg->point, m_fuzzy_generator.getStanceLeg());
+    m_fuzzy_generator.updateWeights();
+    m_publish_pos_weight->publish(m_fuzzy_generator.getPositionWeight());
+    m_publish_torque_weight->publish(m_fuzzy_generator.getTorqueWeight());
 }
 
 void FuzzyNode::torque_callback(std_msgs::msg::Float32::SharedPtr msg)
 {
     //TODO: there is no publisher on this topic yet so we don't know which leg it will update
     m_fuzzy_generator.setFootTorque(*msg.get(), m_fuzzy_generator.getStanceLeg());
+    m_fuzzy_generator.updateWeights();
+    m_publish_pos_weight->publish(m_fuzzy_generator.getPositionWeight());
+    m_publish_torque_weight->publish(m_fuzzy_generator.getTorqueWeight());
 }
 
 void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
