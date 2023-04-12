@@ -15,12 +15,14 @@ public:
 private:
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_position_subscription;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_torque_subscription;
+    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_swing_leg_subscription;
 
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_publish_pos_weight;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_publish_torque_weight;
 
     void position_callback(geometry_msgs::msg::PointStamped::SharedPtr msg);
     void torque_callback(geometry_msgs::msg::PointStamped::SharedPtr msg);
+    void swing_leg_callback(geometry_msgs::msg::PointStamped::SharedPtr msg);
 
     FuzzyDecider m_fuzzy_decider;
 };

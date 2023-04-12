@@ -16,6 +16,8 @@ FuzzyNode::FuzzyNode()
             "fuzzy_position", 10, std::bind(&FuzzyNode::position_callback, this, _1));
     m_torque_subscription = this->create_subscription<geometry_msgs::msg::PointStamped>(
             "fuzzy_torque", 10, std::bind(&FuzzyNode::torque_callback, this, _1));
+    m_swing_leg_subscription = this->create_subscription<geometry_msgs::msg::PointStamped>(
+            "fuzzy_torque", 10, std::bind(&FuzzyNode::swing_leg_callback, this, _1));
     m_publish_pos_weight = this->create_publisher<geometry_msgs::msg::PointStamped>("position_weight", 10);
     m_publish_torque_weight = this->create_publisher<geometry_msgs::msg::PointStamped>("torque_weight", 10);
 }
@@ -30,6 +32,11 @@ void FuzzyNode::torque_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
     m_fuzzy_decider.setTorque(msg->point);
     //TODO: decide on when to trigger a weight recalculation
+}
+
+void FuzzyNode::swing_leg_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+{
+    //TODO: implement a swing/stance leg determination
 }
 
 /**

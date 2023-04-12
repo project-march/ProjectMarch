@@ -14,6 +14,16 @@ void FuzzyDecider::decideWeights(){
 
 // getters and setters
 
+Foot* FuzzyDecider::getFoot(const char* prefix){
+    switch(*prefix){
+        case 'l':
+            return left_foot;
+        case 'r':
+            return right_foot;
+        //TODO: put in default warning with wrong prefix
+    }
+};
+
 void FuzzyDecider::setPosition(geometry_msgs::msg::Point point){
     m_position = point;
 };
