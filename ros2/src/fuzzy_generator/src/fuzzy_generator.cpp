@@ -14,69 +14,84 @@ void FuzzyGenerator::decideWeights(){
 
 // getters and setters
 
-Foot* FuzzyGenerator::getFoot(const char* prefix){
-    switch(*prefix){
-        case 'l':
+Foot* FuzzyGenerator::getFoot(Leg leg){
+    switch(leg){
+        Left:
             return left_foot;
-        case 'r':
+        Right:
             return right_foot;
-        default:
-            return 0;
+        Both:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both feet");
+            break;
+        None:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none feet");
+            break;
     }
 };
 
-
-void FuzzyGenerator::setFootPosition(geometry_msgs::msg::Point point, const char* prefix){
-    switch(*prefix){
-        case * "l":{
+void FuzzyGenerator::setFootPosition(geometry_msgs::msg::Point point, Leg leg){
+    switch(leg){
+        Left:{
             left_foot->position = point;
             break;
         }
-        case * "r":{
+        Right:{
             right_foot->position = point;
             break;
         }
-    }
-};
-void FuzzyGenerator::setFootTorque(geometry_msgs::msg::Point point, const char* prefix){
-    switch(*prefix){
-        case * "l":{
-            left_foot->torque = point;
+        Both:{
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set both foot positions");
             break;
         }
-        case * "r":{
-            right_foot->torque = point;
+        None:{
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set none foot positions");
             break;
         }
     }
 };
-void FuzzyGenerator::setFootHeight(march_shared_msgs::msg::FeetHeightStamped h, const char* prefix){
-    double height = 0.0;
-    switch(*prefix){
-        case * "l":{
-            left_foot->height = height;
-            break;
-        }
-        case * "r":{
-            right_foot->height = height;
-            break;
-        }
 
+void FuzzyGenerator::setFootTorque(std_msgs::msg::Float32 torque, Leg leg){
+    switch(leg){
+        Left:{
+            left_foot->torque = torque;
+            break;
+        }
+        Right:{
+            right_foot->torque = torque;
+            break;
+        }
+        Both:{
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set both foot torques");
+            break;
+        }
+        None:{
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set none foot torques");
+            break;
+        }
     }
 };
+
+void FuzzyGenerator::setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg){
+    left_foot->height = msg.heights[0];
+    right_foot->height = msg.heights[1];
+};
+
 void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
     switch(msg.data){
         case -1:{
-            stance_leg = "l";
+            stance_leg = Left;
             break;
         }
         case 1:{
-            stance_leg = "r";
+            stance_leg = Right;
             break;
         }
-        case 0:{
-            double_stance = true;
+        case 0:{ //this is the case when both feet are on the ground
+            stance_leg = Both;
             break;
+        }
+        default:{
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Invalid value %i was passed. Allowed values are -1,0,1", msg.data);
         }
     }
 //    if(prefix != 'l' and prefix != 'r' and !m_fuzzy_generator->double_stance){
@@ -84,28 +99,52 @@ void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
 //    }
 }
 
-geometry_msgs::msg::Point FuzzyGenerator::getFootPosition(const char* prefix){
-    switch(*prefix){
-        case * "l":
+geometry_msgs::msg::Point FuzzyGenerator::getFootPosition(Leg leg){
+    switch(leg){
+        Left:
             return left_foot->position;
-        case * "r":
+        Right:
             return right_foot->position;
+        Both:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both foot positions");
+            break;
+        None:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none foot positions");
+            break;
     }
 };
-geometry_msgs::msg::Point FuzzyGenerator::getFootTorque(const char* prefix){
-    switch(*prefix){
-        case * "l":
+std_msgs::msg::Float32 FuzzyGenerator::getFootTorque(Leg leg){
+    switch(leg){
+        Left:
             return left_foot->torque;
-        case * "r":
+        Right:
             return right_foot->torque;
+        Both:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both foot torques");
+            break;
+        None:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none foot torques");
+            break;
     }};
-double FuzzyGenerator::getFootHeight(const char* prefix){
-    switch(*prefix){
-        case * "l":
+
+double FuzzyGenerator::getFootHeight(Leg leg){
+    switch(leg){
+        Left:
             return left_foot->height;
-        case * "r":
+        Right:
             return right_foot->height;
+        Both:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both foot heights");
+            break;
+        None:
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none foot heights");
+            break;
     }};
-char* FuzzyGenerator::getStanceLeg(){
+
+Leg FuzzyGenerator::getStanceLeg(){
     return stance_leg;
+};
+
+Leg FuzzyGenerator::getSwingLeg(){
+    return swing_leg;
 };

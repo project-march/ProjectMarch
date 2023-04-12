@@ -15,6 +15,8 @@
 #include "tf2/LinearMath/Vector3.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "tf2_ros/buffer.h"
+#include "std_msgs/msg/float32.hpp"
+
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
 #include "visualization_msgs/msg/marker.hpp"
@@ -67,6 +69,7 @@ private:
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_cop_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_foot_pos_publisher;
+    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr m_foot_torque_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_publisher;
 
