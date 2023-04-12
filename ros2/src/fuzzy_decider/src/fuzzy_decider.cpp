@@ -5,9 +5,14 @@
 #include "fuzzy_decider/fuzzy_decider.hpp"
 
 FuzzyDecider::FuzzyDecider(){
-    //TODO: implement
+    //TODO: implement initialization
 };
 
+void FuzzyDecider::decideWeights(){
+    //TODO: implement fuzzy logic
+};
+
+// getters and setters
 
 void FuzzyDecider::setPosition(geometry_msgs::msg::Point point){
     m_position = point;
