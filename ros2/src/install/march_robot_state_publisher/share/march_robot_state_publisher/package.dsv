@@ -1,0 +1,8 @@
+source;share/march_robot_state_publisher/hook/cmake_prefix_path.ps1
+source;share/march_robot_state_publisher/hook/cmake_prefix_path.dsv
+source;share/march_robot_state_publisher/hook/cmake_prefix_path.sh
+source;share/march_robot_state_publisher/local_setup.bash
+source;share/march_robot_state_publisher/local_setup.dsv
+source;share/march_robot_state_publisher/local_setup.ps1
+source;share/march_robot_state_publisher/local_setup.sh
+source;share/march_robot_state_publisher/local_setup.zsh

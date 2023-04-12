@@ -1,0 +1,3 @@
+source;share/realtime_tools/environment/ament_prefix_path.sh
+source;share/realtime_tools/environment/library_path.sh
+source;share/realtime_tools/environment/path.sh

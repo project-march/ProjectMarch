@@ -1,0 +1,3 @@
+source;share/march_logger_cpp/environment/ament_prefix_path.sh
+source;share/march_logger_cpp/environment/library_path.sh
+source;share/march_logger_cpp/environment/path.sh

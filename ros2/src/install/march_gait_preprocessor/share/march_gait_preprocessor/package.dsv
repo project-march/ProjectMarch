@@ -1,0 +1,6 @@
+source;share/march_gait_preprocessor/hook/pythonpath.ps1
+source;share/march_gait_preprocessor/hook/pythonpath.dsv
+source;share/march_gait_preprocessor/hook/pythonpath.sh
+source;share/march_gait_preprocessor/hook/ament_prefix_path.ps1
+source;share/march_gait_preprocessor/hook/ament_prefix_path.dsv
+source;share/march_gait_preprocessor/hook/ament_prefix_path.sh
