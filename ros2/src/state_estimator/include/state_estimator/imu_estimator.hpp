@@ -21,6 +21,9 @@
 #ifndef IMU_ESTIMATOR
 #define IMU_ESTIMATOR
 
+#define LOWER 0
+#define UPPER 1
+
 struct IMU {
     std::string name;
     std::string base_frame;
@@ -77,12 +80,12 @@ public:
 class ImuEstimator {
 public:
     ImuEstimator();
-    void set_imu(IMU&);
-    void update_imu(sensor_msgs::msg::Imu);
-    IMU& get_imu();
+    void set_imu(IMU&, int);
+    void update_imu(sensor_msgs::msg::Imu, int);
+    IMU& get_imu(int);
 
 private:
-    IMU m_imu;
+    std::array<IMU, 2> m_imu;
 };
 
 #endif

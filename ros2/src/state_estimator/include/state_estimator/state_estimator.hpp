@@ -43,7 +43,8 @@ public:
     geometry_msgs::msg::TransformStamped get_frame_transform(const std::string&, const std::string&);
 
 private:
-    void sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg);
+    void lower_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg);
+    void upper_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg);
 
     void state_callback(sensor_msgs::msg::JointState::SharedPtr msg);
 

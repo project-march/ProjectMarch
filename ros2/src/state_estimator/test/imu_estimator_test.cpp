@@ -76,23 +76,23 @@ protected:
 
 TEST_F(ImuEstimatorTest, setIMUTest)
 {
-    imu_estimator->set_imu(imu);
+    imu_estimator->set_imu(imu, 0);
 
-    ASSERT_EQ(imu_estimator->get_imu(), imu);
+    ASSERT_EQ(imu_estimator->get_imu(0), imu);
 }
 
 TEST_F(ImuEstimatorTest, changeOrientationIMUTest)
 {
-    imu_estimator->set_imu(imu);
+    imu_estimator->set_imu(imu, 0);
 
     imu.data.linear_acceleration.x = 3.0;
 
-    ASSERT_FALSE(imu_estimator->get_imu() == imu);
+    ASSERT_FALSE(imu_estimator->get_imu(0) == imu);
 }
 
 TEST_F(ImuEstimatorTest, updateIMUTest)
 {
-    imu_estimator->set_imu(imu);
+    imu_estimator->set_imu(imu, 0);
 
     sensor_msgs::msg::Imu data_updated;
     geometry_msgs::msg::Quaternion q_updated;
@@ -119,11 +119,11 @@ TEST_F(ImuEstimatorTest, updateIMUTest)
     IMU imu_copy = imu;
     imu_copy.data = data_updated;
 
-    ASSERT_FALSE(imu_estimator->get_imu() == imu_copy);
+    ASSERT_FALSE(imu_estimator->get_imu(0) == imu_copy);
 
-    imu_estimator->update_imu(data_updated);
+    imu_estimator->update_imu(data_updated, 0);
 
-    ASSERT_EQ(imu_estimator->get_imu(), imu_copy);
+    ASSERT_EQ(imu_estimator->get_imu(0), imu_copy);
 }
 
 // NOLINTEND

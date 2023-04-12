@@ -152,12 +152,18 @@ void IkSolver::set_current_state()
     pinocchio::updateFramePlacements(m_model, m_model_data);
     pinocchio::FrameIndex left_foot_index = m_model.getFrameId("foot_left");
     pinocchio::FrameIndex right_foot_index = m_model.getFrameId("foot_left");
-    m_current_state.left_foot_pose << pinocchio::rpy::matrixToRpy(m_model.frames[left_foot_index].placement.rotation()),
-        m_model.frames[left_foot_index].placement.translation();
-    m_current_state.right_foot_pose << pinocchio::rpy::matrixToRpy(
-        m_model.frames[right_foot_index].placement.rotation()),
-        m_model.frames[right_foot_index].placement.translation();
-    m_current_state.com_pos << pinocchio::centerOfMass(m_model, m_model_data, m_joint_pos);
+
+    m_current_state.left_foot_pose << pinocchio::rpy::matrixToRpy(m_model_data.oMf[left_foot_index].rotation()),
+        m_model_data.oMf[left_foot_index].translation();
+    m_current_state.right_foot_pose << pinocchio::rpy::matrixToRpy(m_model_data.oMf[right_foot_index].rotation()),
+        m_model_data.oMf[right_foot_index].translation();
+    // m_current_state.com_pos << pinocchio::centerOfMass(m_model, m_model_data, m_joint_pos);
+    // m_current_state.left_foot_pose <<
+    // pinocchio::rpy::matrixToRpy(m_model.frames[left_foot_index].placement.rotation()),
+    //     m_model.frames[left_foot_index].placement.translation();
+    // m_current_state.right_foot_pose << pinocchio::rpy::matrixToRpy(
+    //     m_model.frames[right_foot_index].placement.rotation()),
+    //     m_model.frames[right_foot_index].placement.translation();
 }
 
 const state IkSolver::get_state()

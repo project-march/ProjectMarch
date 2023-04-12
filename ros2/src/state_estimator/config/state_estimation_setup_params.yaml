@@ -1,5 +1,8 @@
 state_estimator:
   ros__parameters:
+    state_estimator_config:
+      # in ms
+      refresh_rate : 1000
     joint_estimator:
       links: ["left_origin", "left_ankle", "left_knee", "left_hip_fe"
       , "left_hip_aa", "hip_base", "right_hip_aa", "right_hip_fe"
@@ -28,11 +31,17 @@ state_estimator:
       #In radians
       starting_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     imu_estimator:
-      #IMU stuff
-      IMU_exo_base_link: "hip_base"
-        #POS: X, Y, Z
-      IMU_exo_position: [0.0, 0.0, 0.0]
-      IMU_exo_rotation: [0.0, 0.0, 0.0]
+      lower_imu:
+        #IMU stuff
+        IMU_exo_base_link: "hip_base"
+          #POS: X, Y, Z
+        IMU_exo_position: [0.0, 0.0, 0.0]
+        IMU_exo_rotation: [0.0, 0.0, 0.0]
+      upper_imu:
+        IMU_exo_base_link: "hip_base"
+          #POS: X, Y, Z
+        IMU_exo_position: [0.0, 0.0, -0.5]
+        IMU_exo_rotation: [0.0, 0.0, 0.0]
     footstep_estimator:
       left_foot:
         #SIZE: WIDTH, HEIGHT
@@ -40,3 +49,4 @@ state_estimator:
       right_foot:
         #SIZE: WIDTH, HEIGHT
         size: [1.0,1.0]
+      on_ground_threshold: 0.5
