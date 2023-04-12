@@ -26,6 +26,7 @@ public:
     void set_current_foot(double, double);
     void set_previous_foot(double, double);
     void set_current_com(double, double, double, double);
+    void set_com_height(double);
     void set_current_zmp(double, double);
     void set_current_stance_foot(int);
     void initialize_mpc_params();

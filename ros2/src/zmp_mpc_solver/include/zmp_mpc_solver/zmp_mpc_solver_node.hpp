@@ -13,13 +13,13 @@
 #include "geometry_msgs/msg/pose_array.hpp"
 //#include "march_shared_msgs/msg/robot_state.hpp"
 //#include "march_shared_msgs/msg/point_stamped_list.hpp"
-#include "std_msgs/msg/int32.hpp"
+#include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-// #include "march_shared_msgs/msg/pressure_soles_data.hpp"
 
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
@@ -31,25 +31,23 @@ public:
 private:
     ZmpSolver m_zmp_solver;
 
-    void com_callback(geometry_msgs::msg::PointStamped::SharedPtr);
+    void com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr);
     void zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr);
     void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
-    //    void robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr);
 
-    void publish_control_msg();
-    
+    void timer_callback();
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_com_trajectory_publisher;
 
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
-    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_com_subscriber;
+    rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
 
-    //    RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
+    rclcpp::TimerBase::SharedPtr m_solving_timer;
 };
 
 #endif

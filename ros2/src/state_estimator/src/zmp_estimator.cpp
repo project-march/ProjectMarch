@@ -45,6 +45,11 @@ void ZmpEstimator::set_com_velocity()
     }
 }
 
+geometry_msgs::msg::Vector3 ZmpEstimator::get_com_velocity()
+{
+    return m_com_velocity_history[0];
+}
+
 tf2::Vector3 ZmpEstimator::get_com_acceleration()
 {
     try {

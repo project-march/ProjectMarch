@@ -25,7 +25,7 @@ StateEstimator::StateEstimator()
 
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
-    m_com_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_com_position", 100);
+    m_com_pos_publisher = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 100);
 
     m_cop_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_cop_position", 100);
 
@@ -149,6 +149,13 @@ void StateEstimator::publish_com_frame()
     com_transform.transform.rotation.w = 1.0;
 
     m_tf_joint_broadcaster->sendTransform(com_transform);
+
+    // Here, we also publish to the robot com position
+    march_shared_msgs::msg::CenterOfMass center_of_mass;
+    center_of_mass.position = com.position.point;
+    center_of_mass.velocity = m_zmp_estimator.get_com_velocity();
+
+    m_com_pos_publisher->publish(center_of_mass);
 }
 
 void StateEstimator::publish_robot_frames()
@@ -166,14 +173,6 @@ void StateEstimator::publish_robot_frames()
     }
     // Publish each joint center of mass
     std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
-    // RCLCPP_INFO(this->get_logger(), "Array size is %i", joint_com_positions.size());
-    int i = 0;
-    for (auto com : joint_com_positions) {
-        i++;
-        if (i == 6) {
-            m_com_pos_publisher->publish(com.position);
-        }
-    }
 
     // Update and publish the actual, full center of mass
     m_com_estimator.set_com_state(joint_com_positions);
@@ -199,11 +198,11 @@ void StateEstimator::publish_robot_frames()
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
     m_foot_pos_publisher->publish(foot_positions);
-    if (m_footstep_estimator.get_foot_on_ground("l") && m_current_stance_foot!=-1) {
+    if (m_footstep_estimator.get_foot_on_ground("l") && m_current_stance_foot != -1) {
         m_foot_pos_publisher->publish(-1);
         m_current_stance_foot = -1;
     }
-    if (m_footstep_estimator.get_foot_on_ground("r") && m_current_stance_foot!=1) {
+    if (m_footstep_estimator.get_foot_on_ground("r") && m_current_stance_foot != 1) {
         m_foot_pos_publisher->publish(1);
         m_current_stance_foot = 1;
     }

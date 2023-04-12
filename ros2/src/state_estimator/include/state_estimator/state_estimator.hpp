@@ -5,6 +5,7 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
+#include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
@@ -67,7 +68,7 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_stance_foot_publisher;
-    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_com_pos_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_cop_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_foot_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;

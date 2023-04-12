@@ -22,7 +22,7 @@ ZmpSolver::ZmpSolver()
     set_previous_foot(0.0, 0.1);
     set_current_state();
     // m_x_current = {0.0, 0.0, 0.0, 0.06, -0.1, 0.06, 0.0, 0.0, 0.1, 0.1, 0.0, 0.0};
-    solve_step();
+    // solve_step();
 }
 
 const double ZmpSolver::get_com_height()
@@ -93,6 +93,11 @@ void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 
     m_com_vel_current[0] = dx;
     m_com_vel_current[1] = dy;
+}
+
+void ZmpSolver::set_com_height(double height)
+{
+    m_com_height = height;
 }
 
 void ZmpSolver::set_current_zmp(double x, double y)
@@ -435,7 +440,6 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < NX; ii++) {
         x_init_input[ii] = xtraj[NX + ii];
     }
-
 
     // get solution
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
