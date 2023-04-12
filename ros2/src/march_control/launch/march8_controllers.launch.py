@@ -1,8 +1,7 @@
 """Author: Marco Bak, MVIII."""
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument
 from launch.conditions import UnlessCondition, IfCondition
-from launch.event_handlers import OnProcessExit
 from launch.substitutions import (
     Command,
     LaunchConfiguration,
@@ -26,7 +25,6 @@ def generate_launch_description():
     # region Launch Controller manager, Extra configuration if simulation is `false`
 
     control_yaml = LaunchConfiguration("control_yaml")
-
 
     declared_arguments = [
         DeclareLaunchArgument(
