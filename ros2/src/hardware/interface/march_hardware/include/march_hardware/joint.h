@@ -139,7 +139,7 @@ private:
     std::chrono::steady_clock::time_point last_read_time_;
 
     // Keep track of the state of the MotorController
-    std::optional<std::umarch\:\:Jointnique_ptr<MotorControllerState>> previous_state_ = std::nullopt;
+    std::optional<std::unique_ptr<MotorControllerState>> previous_state_ = std::nullopt;
 
     // A joint must have a MotorController but may have a TemperatureGES
     std::unique_ptr<MotorController> motor_controller_;

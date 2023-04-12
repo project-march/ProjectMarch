@@ -12,14 +12,14 @@ public:
     FuzzyDecider();
 
     //getters and setters
-    void setPosition(geometry_msgs::msg::PointStamped msg);
-    void setTorque(geometry_msgs::msg::PointStamped msg);
-    geometry_msgs::msg::PointStamped getPosition();
-    geometry_msgs::msg::PointStamped getTorque();
+    void setPosition(geometry_msgs::msg::Point msg);
+    void setTorque(geometry_msgs::msg::Point msg);
+    geometry_msgs::msg::Point getPosition();
+    geometry_msgs::msg::Point getTorque();
 
 private:
-    geometry_msgs::msg::PointStamped m_position;
-    geometry_msgs::msg::PointStamped m_torque;
+    geometry_msgs::msg::Point m_position;
+    geometry_msgs::msg::Point m_torque;
 };
 
 #endif //MARCH_FUZZY_DECIDER_HPP

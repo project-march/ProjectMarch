@@ -22,10 +22,12 @@ FuzzyNode::FuzzyNode()
 
 void FuzzyNode::position_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
+    m_fuzzy_decider.setPosition(msg->point);
 }
 
 void FuzzyNode::torque_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
+    m_fuzzy_decider.setTorque(msg->point);
 }
 
 /**
