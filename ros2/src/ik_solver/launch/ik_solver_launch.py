@@ -2,6 +2,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -16,6 +17,9 @@ def generate_launch_description():
         'march7_FROST.urdf'
     )
 
+    # parameters
+    # timestep = LaunchConfiguration("model_to_load_mujoco", default='march.xml')
+
     params = {'robot_description': urdf_location}
     return LaunchDescription([
         Node(
@@ -24,7 +28,8 @@ def generate_launch_description():
             executable='ik_solver_node',
             name='ik_solver',
             parameters=[
-                params
+                params,
+                # {"timestep", timestep},
             ]
         ),
     ])
