@@ -121,7 +121,7 @@ void IkSolverNode::timer_callback()
             m_trajectory_container->com_trajectory[m_trajectory_index].y,
             m_trajectory_container->com_trajectory[m_trajectory_index].z;
         // Get solution
-        Eigen::VectorXd solution = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state);
+        Eigen::VectorXd solution = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state, m_stance_foot);
     }
 }
 

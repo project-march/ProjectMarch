@@ -48,7 +48,8 @@ public:
     int set_jacobian();
     int get_model_joints();
     void initialize_solver();
-    Eigen::VectorXd solve_for_velocity(state, state);
+    Eigen::VectorXd solve_for_velocity(state, state, int);
+    Eigen::VectorXd velocity_to_pos(Eigen::VectorXd&, double);
     pinocchio::Data::Matrix6x get_model_jacobian();
     void set_current_state();
     const state get_state();
