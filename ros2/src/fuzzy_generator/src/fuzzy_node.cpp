@@ -26,20 +26,23 @@ FuzzyNode::FuzzyNode()
 
 void FuzzyNode::position_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
+    Leg* stance_leg = m_fuzzy_generator.getStanceLeg();
+//    m_fuzzy_generator.swing_leg->dummyFunction();
     // the position being published is always that of the stance leg
-    m_fuzzy_generator.setFootPosition(msg->point, m_fuzzy_generator.getStanceLeg());
-    m_fuzzy_generator.updateWeights();
-    m_publish_pos_weight->publish(m_fuzzy_generator.getPositionWeight());
-    m_publish_torque_weight->publish(m_fuzzy_generator.getTorqueWeight());
+    stance_leg->setPosition(msg->point);
+    m_fuzzy_generator.updateWeights(stance_leg);
+    m_publish_pos_weight->publish(stance_leg->getPositionWeight());
+    m_publish_torque_weight->publish(stance_leg->getTorqueWeight());
 }
 
 void FuzzyNode::torque_callback(std_msgs::msg::Float32::SharedPtr msg)
 {
+    Leg* stance_leg = m_fuzzy_generator.getStanceLeg();
     //TODO: there is no publisher on this topic yet so we don't know which leg it will update
-    m_fuzzy_generator.setFootTorque(*msg.get(), m_fuzzy_generator.getStanceLeg());
-    m_fuzzy_generator.updateWeights();
-    m_publish_pos_weight->publish(m_fuzzy_generator.getPositionWeight());
-    m_publish_torque_weight->publish(m_fuzzy_generator.getTorqueWeight());
+    stance_leg->setTorque(*msg.get());
+    m_fuzzy_generator.updateWeights(stance_leg);
+    m_publish_pos_weight->publish(stance_leg->getPositionWeight());
+    m_publish_torque_weight->publish(stance_leg->getTorqueWeight());
 }
 
 void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)

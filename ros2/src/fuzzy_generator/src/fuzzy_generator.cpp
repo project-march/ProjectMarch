@@ -7,87 +7,45 @@
 FuzzyGenerator::FuzzyGenerator(){
 
     // initialize both feet to 0
-    left_foot.position.x = 0.0;
-    left_foot.position.y = 0.0;
-    left_foot.position.z = 0.0;
-    left_foot.torque.data = 0.0f;
+    left_leg.position.x = 0.0;
+    left_leg.position.y = 0.0;
+    left_leg.position.z = 0.0;
+    left_leg.torque.data = 0.0f;
 
-    right_foot.position.x = 0.0;
-    right_foot.position.y = 0.0;
-    right_foot.position.z = 0.0;
-    right_foot.torque.data = 0.0f;
+    right_leg.position.x = 0.0;
+    right_leg.position.y = 0.0;
+    right_leg.position.z = 0.0;
+    right_leg.torque.data = 0.0f;
 };
 
-void FuzzyGenerator::updateWeights(){
+void FuzzyGenerator::updateWeights(Leg* leg){
     //TODO(Sofie): implement fuzzy logic
 };
 
 // setters
 
-void FuzzyGenerator::setFootPosition(geometry_msgs::msg::Point point, Leg leg){
-    switch(leg){
-        Left:{
-            left_foot.position = point;
-            break;
-        }
-        Right:{
-            right_foot.position = point;
-            break;
-        }
-        Both:{
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set both foot positions");
-            break;
-        }
-        None:{
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set none foot positions");
-            break;
-        }
-    }
-};
-
-void FuzzyGenerator::setFootTorque(std_msgs::msg::Float32 torque, Leg leg){
-    switch(leg){
-        Left:{
-            left_foot.torque = torque;
-            break;
-        }
-        Right:{
-            right_foot.torque = torque;
-            break;
-        }
-        Both:{
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set both foot torques");
-            break;
-        }
-        None:{
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot set none foot torques");
-            break;
-        }
-    }
-};
-
 void FuzzyGenerator::setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg){
-    left_foot.height = msg.heights[0];
-    right_foot.height = msg.heights[1];
+    left_leg.foot_height = msg.heights[0];
+    right_leg.foot_height = msg.heights[1];
 };
 
 void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
     switch(msg.data){
         case -1:{
-            stance_leg = Left;
-            swing_leg = Right;
+            stance_side = Left;
+            swing_side = Right;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
             break;
         }
         case 1:{
-            stance_leg = Right;
-            swing_leg = Left;
+            stance_side = Right;
+            swing_side = Left;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
             break;
         }
         case 0:{ //this is the case when both feet are on the ground
-            stance_leg = Both;
-            swing_leg = None;
+            stance_side = Both;
+            swing_side = None;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
             break;
         }
@@ -100,86 +58,35 @@ void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
 //    }
 }
 
-void FuzzyGenerator::setTorqueWeight(float weight){
-    torque_weight = weight;
-}
-
-void FuzzyGenerator::setPositionWeight(float weight){
-    position_weight = weight;
-}
-
 // getters
 
-Foot* FuzzyGenerator::getFoot(Leg leg){
-    switch(leg){
+Leg* FuzzyGenerator::getStanceLeg(){
+    Side side = stance_side;
+    switch(side){
         Left:
-            return &left_foot;
+            return &left_leg;
         Right:
-            return &right_foot;
+            return &right_leg;
         Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both feet");
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both legs are stance legs");
             break;
         None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none feet");
-            break;
-    }
-};
-
-geometry_msgs::msg::Point FuzzyGenerator::getFootPosition(Leg leg){
-    switch(leg){
-        Left:
-            return left_foot.position;
-        Right:
-            return right_foot.position;
-        Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both foot positions");
-            break;
-        None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none foot positions");
-            break;
-    }
-};
-
-std_msgs::msg::Float32 FuzzyGenerator::getFootTorque(Leg leg){
-    switch(leg){
-        Left:
-            return left_foot.torque;
-        Right:
-            return right_foot.torque;
-        Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both foot torques");
-            break;
-        None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none foot torques");
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), " Neither legs are stance legs");
             break;
     }};
 
-double FuzzyGenerator::getFootHeight(Leg leg){
-    switch(leg){
+Leg* FuzzyGenerator::getSwingLeg(){
+    Side side = swing_side;
+    switch(side){
         Left:
-            return left_foot.height;
+            return &left_leg;
         Right:
-            return right_foot.height;
+            return &right_leg;
         Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get both foot heights");
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both legs are swing legs");
             break;
         None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Cannot get none foot heights");
+            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), " Neither legs are swing legs");
             break;
-    }};
-
-Leg FuzzyGenerator::getStanceLeg(){
-    return stance_leg;
+    }
 };
-
-Leg FuzzyGenerator::getSwingLeg(){
-    return swing_leg;
-};
-
-float FuzzyGenerator::getTorqueWeight(){
-    return torque_weight;
-}
-
-float FuzzyGenerator::getPositionWeight(){
-    return torque_weight;
-}

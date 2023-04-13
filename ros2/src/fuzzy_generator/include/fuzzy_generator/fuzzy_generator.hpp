@@ -11,53 +11,56 @@
 #include "std_msgs/msg/float32.hpp"
 
 
-struct Foot {
+struct Leg {
     geometry_msgs::msg::Point position;
     std_msgs::msg::Float32 torque;
-    double height = 0;
+    double foot_height = 0;
+
+    float torque_weight = 0.5; // holds the weight for the torque
+    float position_weight = 0.5; // holds the weight for the position
+
+    // setters
+    void setPosition(geometry_msgs::msg::Point point){ position = point;}; // set the position of the passed leg
+    void setTorque(std_msgs::msg::Float32 point){ torque = point ;}; // set the torque of the passed leg
+    void setTorqueWeight(float weight){ torque_weight = weight; }; // set the weight for the torque (does not publish the weight yet)
+    void setPositionWeight(float weight){ position_weight = weight; }; // set the weight for the position (does not publish the weight yet)
+
+    // getters
+    geometry_msgs::msg::Point getPosition(){ return position; };
+    std_msgs::msg::Float32 getTorque(){ return torque; };
+    double getFootHeight(){ return foot_height; };
+    float getTorqueWeight(){ return torque_weight; };
+    float getPositionWeight(){ return position_weight; };
 };
 
-enum Leg {Left, Right, Both, None};
+enum Side {Left, Right, Both, None};
 
 class FuzzyGenerator {
 public:
     FuzzyGenerator();
 
     // the function that will update the weights with the fuzzy logic
-    void updateWeights();
+    void updateWeights(Leg* leg);
 
-    // setters
-    void setFootPosition(geometry_msgs::msg::Point msg, Leg leg); // set the position of the passed leg
-    void setFootTorque(std_msgs::msg::Float32 msg, Leg leg); // set the torque of the passed leg
     void setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg); // set the height of both feet
     void setStanceLeg(std_msgs::msg::Int32 msg); // set the stance leg to the correct leg
-    void setTorqueWeight(float weight); // set the weight for the torque (does not publish the weight yet)
-    void setPositionWeight(float weight); // set the weight for the position (does not publish the weight yet)
 
+    Leg* getStanceLeg();
+    Leg* getSwingLeg();
 
-    // getters
-    geometry_msgs::msg::Point getFootPosition(Leg leg);
-    std_msgs::msg::Float32 getFootTorque(Leg leg);
-    double getFootHeight(Leg leg);
-    Leg getStanceLeg();
-    Leg getSwingLeg();
-    Foot* getFoot(Leg leg);
-    float getTorqueWeight();
-    float getPositionWeight();
+    // the function that will update the weights with the fuzzy logic
+    void updateWeights(Leg leg);
 
 
 private:
-    float torque_weight; // holds the weight for the torque
-    float position_weight; // holds the weight for the position
-
     double distance_torque; // threshold for at what foot-height to START switching to torque
     double h_offset; // height at which to be COMPLETELY on torque
 
-    Foot left_foot;
-    Foot right_foot;
+    Leg left_leg;
+    Leg right_leg;
 
-    Leg swing_leg = None; // which leg is the swing leg
-    Leg stance_leg = Both; // which leg is the stance leg
+    Side swing_side = None; // which leg is the swing leg
+    Side stance_side = Both; // which leg is the stance leg
 };
 
 #endif //MARCH_FUZZY_GENERATOR_HPP
