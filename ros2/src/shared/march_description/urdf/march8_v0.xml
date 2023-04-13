@@ -93,7 +93,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
     <body name="backpack"
-          pos="0 0 0.95"
+          pos="0 0 1.2"
           childclass="exoskeleton">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -101,7 +101,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
       <inertial pos="0.013 0.001 0.24" mass="11.02"
                 fullinertia="0.379 0.245 0.173 0 -0.008 0.001"/>
-      <freejoint/>
+      <!-- <freejoint/> -->
       <geom type="mesh" mesh="backpack" />
       <geom name="backpack" type="box"
             size="0.051 0.189 0.165"
