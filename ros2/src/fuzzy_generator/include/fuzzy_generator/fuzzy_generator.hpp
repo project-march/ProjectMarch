@@ -11,11 +11,13 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 
+enum Side {Left, Right, Both, None};
 
 struct Leg {
     geometry_msgs::msg::Point position;
     march_shared_msgs::msg::TorqueStamped torque;
     double foot_height = 0;
+    Side side;
 
     float torque_weight = 0.5; // holds the weight for the torque
     float position_weight = 0.5; // holds the weight for the position
@@ -33,8 +35,6 @@ struct Leg {
     float getTorqueWeight(){ return torque_weight; };
     float getPositionWeight(){ return position_weight; };
 };
-
-enum Side {Left, Right, Both, None};
 
 class FuzzyGenerator {
 public:

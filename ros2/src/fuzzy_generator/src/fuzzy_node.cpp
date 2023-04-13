@@ -32,6 +32,7 @@ void FuzzyNode::position_callback(geometry_msgs::msg::PointStamped::SharedPtr ms
     march_shared_msgs::msg::WeightStamped fuzzy_weights;
     fuzzy_weights.torque_weight = stance_leg->getTorqueWeight();
     fuzzy_weights.position_weight = stance_leg->getPositionWeight();
+    fuzzy_weights.leg = stance_leg->side == Left ? 'l' : 'r';
     m_publish_weight->publish(fuzzy_weights);
 }
 
@@ -44,6 +45,7 @@ void FuzzyNode::torque_callback(march_shared_msgs::msg::TorqueStamped::SharedPtr
     march_shared_msgs::msg::WeightStamped fuzzy_weights;
     fuzzy_weights.torque_weight = stance_leg->getTorqueWeight();
     fuzzy_weights.position_weight = stance_leg->getPositionWeight();
+    fuzzy_weights.leg = stance_leg->side == Left ? 'l' : 'r';
     m_publish_weight->publish(fuzzy_weights);
 }
 

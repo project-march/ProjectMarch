@@ -190,7 +190,7 @@ void StateEstimator::publish_robot_frames()
 
     // Update the feet
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
-    // Publish the feet
+    // Publish the feet - Stance leg
     if (m_footstep_estimator.get_foot_on_ground("l")) {
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("l"));
     }
@@ -198,7 +198,7 @@ void StateEstimator::publish_robot_frames()
         m_foot_pos_publisher->publish(m_footstep_estimator.get_foot_position("r"));
     }
 
-    // Update and publish feet height
+    // Update and publish feet height - Both legs
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
     feet_height_msg.header.frame_id = "map";
     feet_height_msg.heights = m_joint_estimator.get_feet_height();

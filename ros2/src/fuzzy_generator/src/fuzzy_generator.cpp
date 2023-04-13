@@ -11,11 +11,13 @@ FuzzyGenerator::FuzzyGenerator(){
     left_leg.position.y = 0.0;
     left_leg.position.z = 0.0;
     left_leg.torque.torque = 0.0f;
+    left_leg.side = Left;
 
     right_leg.position.x = 0.0;
     right_leg.position.y = 0.0;
     right_leg.position.z = 0.0;
     right_leg.torque.torque = 0.0f;
+    right_leg.side = Right;
 };
 
 void FuzzyGenerator::updateWeights(Leg* leg){
