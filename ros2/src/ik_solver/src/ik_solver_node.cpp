@@ -23,13 +23,17 @@ IkSolverNode::IkSolverNode()
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&IkSolverNode::stance_foot_callback, this, _1));
 
-    m_solving_timer = this->create_wall_timer(8ms, std::bind(&IkSolverNode::timer_callback, this));
-
-    // Initialiing the IK solver
+    // Initializing the IK solver
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
     m_ik_solver.load_urdf_model(robot_description);
     m_ik_solver.initialize_solver();
+
+    // Initializing the timestep
+    declare_parameter("timestep", 1000);
+    auto timestep = this->get_parameter("timestep").as_int();
+
+    m_solving_timer = this->create_wall_timer(std::chrono::milliseconds(timestep), std::bind(&IkSolverNode::timer_callback, this));
 
     pinocchio::Model test_model = m_ik_solver.get_model();
     for (pinocchio::FrameIndex i = 0; i < static_cast<pinocchio::FrameIndex>(test_model.nframes); i++) {

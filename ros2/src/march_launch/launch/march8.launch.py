@@ -27,12 +27,8 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     # declare parameters
-    # trajectory_dt=0.008
-    # trajectory_timestep = DeclareLaunchArgument(
-        # name="timestep",
-        # default_value=trajectory_dt,
-        # description="timestep for the zmp and ik solver trajectory",
-    # )
+    # in ms
+    trajectory_dt=8
 
     return LaunchDescription([
         Node(
@@ -52,9 +48,6 @@ def generate_launch_description() -> LaunchDescription:
             namespace='',
             executable='zmp_mpc_solver',
             name='zmp_mpc_solver',
-            # parameters=[
-            #     # {"timestep": trajectory_dt}
-            # ],
         ),
         Node(
             package='ik_solver_buffer',
@@ -64,9 +57,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
-            launch_arguments={'robot_description': urdf_location}.items(),
-                # ("timestep", trajectory_timestep),
-            
+            launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),

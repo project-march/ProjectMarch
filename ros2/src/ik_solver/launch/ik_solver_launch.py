@@ -11,14 +11,15 @@ def generate_launch_description():
 
     This node is started when the ik solver is ran
     """
-    urdf_location = os.path.join(
+    urdf_default = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
         'march7_FROST.urdf'
     )
 
     # parameters
-    # timestep = LaunchConfiguration("model_to_load_mujoco", default='march.xml')
+    urdf_location = LaunchConfiguration("robot_description", default=urdf_default)
+    timestep = LaunchConfiguration("timestep", default='8')
 
     params = {'robot_description': urdf_location}
     return LaunchDescription([
@@ -29,7 +30,7 @@ def generate_launch_description():
             name='ik_solver',
             parameters=[
                 params,
-                # {"timestep", timestep},
+                {"timestep", timestep},
             ]
         ),
     ])
