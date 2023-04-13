@@ -72,6 +72,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GaitType.msg"
   "msg/PointStampedList.msg"
   "msg/TorqueStamped.msg"
+  "msg/WeightStamped.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PublishTestDataset.srv"

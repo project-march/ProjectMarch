@@ -30,7 +30,7 @@ StateEstimator::StateEstimator()
 
     m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_feet_positions", 100);
 
-    m_foot_torque_publisher = this->create_publisher<std_msgs::msg::Float32>("robot_feet_torque", 100); //TODO: implement this publishers functionality
+    m_foot_torque_publisher = this->create_publisher<march_shared_msgs::msg::TorqueStamped>("robot_feet_torque", 100); //TODO: implement this publishers functionality
 
     m_zmp_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 100);
 

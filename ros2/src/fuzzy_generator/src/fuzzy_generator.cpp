@@ -10,16 +10,18 @@ FuzzyGenerator::FuzzyGenerator(){
     left_leg.position.x = 0.0;
     left_leg.position.y = 0.0;
     left_leg.position.z = 0.0;
-    left_leg.torque.data = 0.0f;
+    left_leg.torque.torque = 0.0f;
 
     right_leg.position.x = 0.0;
     right_leg.position.y = 0.0;
     right_leg.position.z = 0.0;
-    right_leg.torque.data = 0.0f;
+    right_leg.torque.torque = 0.0f;
 };
 
 void FuzzyGenerator::updateWeights(Leg* leg){
     //TODO(Sofie): implement fuzzy logic
+
+    //output goes into leg.torque_weight and leg.position_weight
 };
 
 // setters
