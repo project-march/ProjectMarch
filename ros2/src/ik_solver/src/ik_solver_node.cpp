@@ -95,6 +95,8 @@ void IkSolverNode::timer_callback()
             m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x,
                 m_latest_foot_positions->poses[0].position.y, m_latest_foot_positions->poses[0].position.z, 0.0, 0.0,
                 0.0;
+            
+            m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x
                     + m_trajectory_container->swing_trajectory[m_trajectory_index].x,
@@ -103,10 +105,17 @@ void IkSolverNode::timer_callback()
                 m_latest_foot_positions->poses[1].position.z
                 + m_trajectory_container->swing_trajectory[m_trajectory_index].z,
                 0.0, 0.0, 0.0;
+            
+            m_desired_state.left_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
+                m_trajectory_container->swing_velocity[m_trajectory_index].y,
+                m_trajectory_container->swing_velocity[m_trajectory_index].z,
+                0.0, 0.0, 0.0;
         } else {
             m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x,
                 m_latest_foot_positions->poses[1].position.y, m_latest_foot_positions->poses[1].position.z, 0.0, 0.0,
                 0.0;
+            
+            m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x
                     + m_trajectory_container->swing_trajectory[m_trajectory_index].x,
@@ -115,11 +124,20 @@ void IkSolverNode::timer_callback()
                 m_latest_foot_positions->poses[0].position.z
                 + m_trajectory_container->swing_trajectory[m_trajectory_index].z,
                 0.0, 0.0, 0.0;
+            
+            m_desired_state.right_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
+                m_trajectory_container->swing_velocity[m_trajectory_index].y,
+                m_trajectory_container->swing_velocity[m_trajectory_index].z,
+                0.0, 0.0, 0.0;
         }
 
         m_desired_state.com_pos << m_trajectory_container->com_trajectory[m_trajectory_index].x,
             m_trajectory_container->com_trajectory[m_trajectory_index].y,
             m_trajectory_container->com_trajectory[m_trajectory_index].z;
+        
+        m_desired_state.com_vel << m_trajectory_container->com_velocity[m_trajectory_index].x,
+            m_trajectory_container->com_velocity[m_trajectory_index].y,
+            m_trajectory_container->com_velocity[m_trajectory_index].z;
         // Get solution
         Eigen::VectorXd solution = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state, m_stance_foot);
     }

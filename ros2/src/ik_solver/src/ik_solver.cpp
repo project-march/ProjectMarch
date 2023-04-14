@@ -89,6 +89,10 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     double left_gains = 1;
     double right_gains = 1;
 
+    Eigen::MatrixXd J_com_copy;
+    J_com_copy.resize(6, m_model.nv);
+    J_com_copy<< J_com, 0.0, 0.0, 0.0;
+
     // Get the error vectors
     // Here, we assume the jacobians have already been set
     Eigen::VectorXd left_foot_error = state_desired.left_foot_pose - state_current.left_foot_pose;
@@ -112,12 +116,14 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     // NOTE::: CONSIDER ADDING THE SINGULARITY ROBUST REGULARIZATION TERM
     // [NOTE]: ADD THE ILNEAR TERM USING COM VELOCITIES
-    cost_H += CoM_weight * J_com.transpose() * J_com;
-    // cost_F += CoM_weight * J_com.transpose() * (state_desired.com_velocity + CoM_gains*com_pos_error);
+    cost_H += CoM_weight * J_com_copy.transpose() * J_com_copy;
+    cost_F += CoM_weight * J_com_copy.transpose() * (state_desired.com_vel + CoM_gains*com_pos_error);
 
     cost_H += left_weight * J_left_foot.transpose() * J_left_foot;
+    cost_F += left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_weight*left_foot_error);
 
     cost_H += right_weight * J_right_foot.transpose() * J_right_foot;
+    cost_F += right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_weight*right_foot_error);
 
     // Add the constraints
     Eigen::MatrixXd constrained_joints = 0 * Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);

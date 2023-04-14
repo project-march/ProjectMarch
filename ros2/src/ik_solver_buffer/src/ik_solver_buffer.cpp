@@ -45,15 +45,25 @@ void BufferNode::set_com_trajectory(geometry_msgs::msg::PoseArray::SharedPtr set
 
 void BufferNode::set_velocity(std::vector<geometry_msgs::msg::Point>& position_vector, std::vector<geometry_msgs::msg::Point>& output_vector)
 {
-    geometry_msgs::msg::Point point_container;
-    geometry_msgs::msg::Point point_prev = position_vector[0];
-
-    for(auto it = std::begin(position_vector)+1; it!=std::end(position_vector); it++)
+    
+    if (position_vector.size()>1)
         {
-        point_container.x = (it->x - point_prev.x)/m_timestep;
-        point_container.y = (it->y - point_prev.y)/m_timestep;
-        point_container.z = (it->z - point_prev.z)/m_timestep;
+        geometry_msgs::msg::Point point_container;
+        geometry_msgs::msg::Point point_prev = position_vector[0];
+
+        for(auto it = std::begin(position_vector)+1; it!=std::end(position_vector); it++)
+            {
+            point_container.x = (it->x - point_prev.x)/m_timestep;
+            point_container.y = (it->y - point_prev.y)/m_timestep;
+            point_container.z = (it->z - point_prev.z)/m_timestep;
+            output_vector.push_back(point_container);
+            }
+
         output_vector.push_back(point_container);
+        }
+    else
+        {
+        RCLCPP_WARN(this->get_logger(), "trajectory not long enough, cannot determine velocity");
         }
 }
 
@@ -78,6 +88,9 @@ void BufferNode::publish_ik_trajectory()
     for (auto i : m_latest_swing_trajectory->poses) {
         ik_command_to_send.swing_trajectory.push_back(i.position);
     }
+
+    set_velocity(ik_command_to_send.com_trajectory, ik_command_to_send.com_velocity);
+    set_velocity(ik_command_to_send.swing_trajectory, ik_command_to_send.swing_velocity);
 
     m_buffer_publisher->publish(ik_command_to_send);
 
