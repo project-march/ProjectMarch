@@ -18,13 +18,16 @@ public:
 private:
     void com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void swing_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
+    void set_velocity(std::vector<geometry_msgs::msg::Point>&, std::vector<geometry_msgs::msg::Point>&);
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_com_trajectory;
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_swing_trajectory;
-
+    
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_swing_subscriber;
 
     rclcpp::Publisher<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_buffer_publisher;
+
+    int m_timestep;
 };
 
 #endif

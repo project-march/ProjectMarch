@@ -53,7 +53,8 @@ def generate_launch_description() -> LaunchDescription:
             package='ik_solver_buffer',
             namespace='',
             executable='ik_solver_buffer_node',
-            name='ik_solver_buffer'
+            name='ik_solver_buffer',
+            parameters=[('timestep', str(trajectory_dt))],
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
