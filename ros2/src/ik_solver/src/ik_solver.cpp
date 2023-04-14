@@ -25,7 +25,6 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
     m_joint_pos = pinocchio::neutral(m_model);
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
-
 }
 
 void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr msg)
@@ -91,7 +90,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     Eigen::MatrixXd J_com_copy;
     J_com_copy.resize(6, m_model.nv);
-    J_com_copy<< J_com, 0.0, 0.0, 0.0;
+    J_com_copy << J_com, 0.0, 0.0, 0.0;
 
     // Get the error vectors
     // Here, we assume the jacobians have already been set
@@ -117,13 +116,14 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // NOTE::: CONSIDER ADDING THE SINGULARITY ROBUST REGULARIZATION TERM
     // [NOTE]: ADD THE ILNEAR TERM USING COM VELOCITIES
     cost_H += CoM_weight * J_com_copy.transpose() * J_com_copy;
-    cost_F += CoM_weight * J_com_copy.transpose() * (state_desired.com_vel + CoM_gains*com_pos_error);
+    cost_F += CoM_weight * J_com_copy.transpose() * (state_desired.com_vel + CoM_gains * com_pos_error);
 
     cost_H += left_weight * J_left_foot.transpose() * J_left_foot;
-    cost_F += left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_weight*left_foot_error);
+    cost_F += left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_weight * left_foot_error);
 
     cost_H += right_weight * J_right_foot.transpose() * J_right_foot;
-    cost_F += right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_weight*right_foot_error);
+    cost_F
+        += right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_weight * right_foot_error);
 
     // Add the constraints
     Eigen::MatrixXd constrained_joints = 0 * Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);
@@ -138,14 +138,11 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     Eigen::VectorXd b_dummy = Eigen::VectorXd::Zero(6);
 
     // We now swap the dummy foot based on the fixed Jacobian.
-    if (stance_foot==1)
-        {
-            A_dummy = J_left_foot;
-        }
-    else
-        {
-            A_dummy = J_right_foot;
-        }
+    if (stance_foot == 1) {
+        A_dummy = J_left_foot;
+    } else {
+        A_dummy = J_right_foot;
+    }
     // if (walkState.supportFoot == Foot::LEFT) A_dummy = Jacobian_leftFoot;
     // else				     A_dummy = Jacobian_rightFoot;
 
@@ -159,10 +156,9 @@ Eigen::VectorXd IkSolver::velocity_to_pos(Eigen::VectorXd& velocity, double dt)
 {
     Eigen::VectorXd new_position;
     // We assume that the velocity vector is ordered the same way as the joint vector
-    for(int i=0 ; i<m_model.joints.size(); i++)
-        {
-        new_position[i] = m_model.joints[i].idx_q() + dt*velocity[i];
-        }
+    for (int i = 0; i < m_model.joints.size(); i++) {
+        new_position[i] = m_model.joints[i].idx_q() + dt * velocity[i];
+    }
     return new_position;
 }
 

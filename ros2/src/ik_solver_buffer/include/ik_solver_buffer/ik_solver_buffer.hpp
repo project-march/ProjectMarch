@@ -21,7 +21,7 @@ private:
     void set_velocity(std::vector<geometry_msgs::msg::Point>&, std::vector<geometry_msgs::msg::Point>&);
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_com_trajectory;
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_swing_trajectory;
-    
+
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_swing_subscriber;
 

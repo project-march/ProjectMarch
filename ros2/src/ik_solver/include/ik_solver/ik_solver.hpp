@@ -37,11 +37,11 @@ struct state {
     // Pose, in this case, is [POSITION, ANGLE]
     Eigen::Matrix<double, 6, 1> left_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
     Eigen::Matrix<double, 6, 1> right_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
-    Eigen::Matrix<double, 3, 1>  com_pos = Eigen::Vector3d::Zero();
+    Eigen::Matrix<double, 3, 1> com_pos = Eigen::Vector3d::Zero();
 
     Eigen::Matrix<double, 6, 1> left_foot_vel = Eigen::Matrix<double, 6, 1>::Zero();
     Eigen::Matrix<double, 6, 1> right_foot_vel = Eigen::Matrix<double, 6, 1>::Zero();
-    Eigen::Matrix<double, 3, 1>  com_vel = Eigen::Vector3d::Zero();
+    Eigen::Matrix<double, 3, 1> com_vel = Eigen::Vector3d::Zero();
 };
 
 class IkSolver {
