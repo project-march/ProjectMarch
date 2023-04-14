@@ -29,7 +29,7 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
 void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    for (int i = 0; i < msg->name.size(); i++) {
+    for (long unsigned int i = 0; i < msg->name.size(); i++) {
         pinocchio::FrameIndex index = m_model.getJointId(msg->name[i]);
         m_model.joints[index].setIndexes(index, msg->position[i], msg->velocity[i]);
     }
@@ -119,11 +119,10 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     cost_F += CoM_weight * J_com_copy.transpose() * (state_desired.com_vel + CoM_gains * com_pos_error);
 
     cost_H += left_weight * J_left_foot.transpose() * J_left_foot;
-    cost_F += left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_weight * left_foot_error);
+    cost_F += left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_gains * left_foot_error);
 
     cost_H += right_weight * J_right_foot.transpose() * J_right_foot;
-    cost_F
-        += right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_weight * right_foot_error);
+    cost_F += right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_gains * right_foot_error);
 
     // Add the constraints
     Eigen::MatrixXd constrained_joints = 0 * Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);
@@ -156,7 +155,7 @@ Eigen::VectorXd IkSolver::velocity_to_pos(Eigen::VectorXd& velocity, double dt)
 {
     Eigen::VectorXd new_position;
     // We assume that the velocity vector is ordered the same way as the joint vector
-    for (int i = 0; i < m_model.joints.size(); i++) {
+    for (long unsigned int i = 0; i < m_model.joints.size(); i++) {
         new_position[i] = m_model.joints[i].idx_q() + dt * velocity[i];
     }
     return new_position;
