@@ -14,23 +14,16 @@
 enum Side {Left, Right, Both, None};
 
 struct Leg {
-    geometry_msgs::msg::Point position;
-    march_shared_msgs::msg::TorqueStamped torque;
     double foot_height = 0;
-    Side side;
 
     float torque_weight = 0.5; // holds the weight for the torque
     float position_weight = 0.5; // holds the weight for the position
 
     // setters
-    void setPosition(geometry_msgs::msg::Point p){ position = p;}; // set the position of the passed leg
-    void setTorque(march_shared_msgs::msg::TorqueStamped t){ torque = t ;}; // set the torque of the passed leg
     void setTorqueWeight(float weight){ torque_weight = weight; }; // set the weight for the torque (does not publish the weight yet)
     void setPositionWeight(float weight){ position_weight = weight; }; // set the weight for the position (does not publish the weight yet)
 
     // getters
-    geometry_msgs::msg::Point getPosition(){ return position; };
-    march_shared_msgs::msg::TorqueStamped getTorque(){ return torque; };
     double getFootHeight(){ return foot_height; };
     float getTorqueWeight(){ return torque_weight; };
     float getPositionWeight(){ return position_weight; };
@@ -48,6 +41,8 @@ public:
 
     Leg* getStanceLeg();
     Leg* getSwingLeg();
+    Side getStanceSide();
+    Side getSwingSide();
 
     // the function that will update the weights with the fuzzy logic
     void updateWeights(Leg leg);

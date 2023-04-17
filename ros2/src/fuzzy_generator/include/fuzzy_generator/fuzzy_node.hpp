@@ -18,15 +18,11 @@ public:
     FuzzyNode();
 
 private:
-    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_position_subscription;
-    rclcpp::Subscription<march_shared_msgs::msg::TorqueStamped>::SharedPtr m_torque_subscription;
     rclcpp::Subscription<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_foot_height_subscription;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_leg_subscription;
 
     rclcpp::Publisher<march_shared_msgs::msg::WeightStamped>::SharedPtr m_publish_weight; //TODO: connect to HWI
 
-    void position_callback(geometry_msgs::msg::PointStamped::SharedPtr msg);
-    void torque_callback(march_shared_msgs::msg::TorqueStamped::SharedPtr msg);
     void stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg);
     void height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg);
 

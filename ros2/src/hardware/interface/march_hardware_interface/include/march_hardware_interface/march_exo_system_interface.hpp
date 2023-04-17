@@ -87,6 +87,9 @@ public:
     MARCH_HARDWARE_INTERFACE_PUBLIC
     hardware_interface::return_type write() override;
 
+    MARCH_HARDWARE_INTERFACE_PUBLIC
+    std::vector<JointInfo> getJointsInfo(){ return joints_info_ ;};
+
 private:
     void pdb_read();
     void pressure_sole_read();

@@ -20,6 +20,8 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_utility REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(march_shared_msgs REQUIRED)
+
 
 add_library(
         ${PROJECT_NAME}
@@ -45,6 +47,7 @@ ament_target_dependencies(
         yaml-cpp
         march_utility
         sensor_msgs
+        march_shared_msgs
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
@@ -62,6 +65,7 @@ ament_export_dependencies(
         yaml-cpp
         march_utility
         sensor_msg
+        march_shared_msgs
 )
 
 install(

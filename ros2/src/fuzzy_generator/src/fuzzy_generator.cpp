@@ -5,23 +5,10 @@
 #include "fuzzy_generator/fuzzy_generator.hpp"
 
 FuzzyGenerator::FuzzyGenerator(){
-
-    // initialize both feet to 0
-    left_leg.position.x = 0.0;
-    left_leg.position.y = 0.0;
-    left_leg.position.z = 0.0;
-    left_leg.torque.torque = 0.0f;
-    left_leg.side = Left;
-
-    right_leg.position.x = 0.0;
-    right_leg.position.y = 0.0;
-    right_leg.position.z = 0.0;
-    right_leg.torque.torque = 0.0f;
-    right_leg.side = Right;
 };
 
 void FuzzyGenerator::updateWeights(Leg* leg){
-    //TODO(Sofie): implement fuzzy logic
+    //TODO: implement fuzzy logic
 
     //output goes into leg.torque_weight and leg.position_weight
 };
@@ -93,4 +80,12 @@ Leg* FuzzyGenerator::getSwingLeg(){
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), " Neither legs are swing legs");
             break;
     }
+};
+
+Side FuzzyGenerator::getSwingSide(){
+    return swing_side;
+};
+
+Side FuzzyGenerator::getStanceSide(){
+    return stance_side;
 };
