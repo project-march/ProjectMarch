@@ -30,6 +30,8 @@ add_library(
         include/march_hardware_interface/march_mock_system_interface.hpp
         src/march_exo_system_interface.cpp
         include/march_hardware_interface/hwi_util.h
+        src/weight_node.cpp
+        include/march_hardware_interface/weight_node.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -51,6 +53,21 @@ ament_target_dependencies(
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
+
+add_executable(weight_node src/weight_node.cpp include/${PROJECT_NAME}/weight_node.h)
+ament_target_dependencies(
+        weight_node
+        hardware_interface
+        pluginlib
+        rclcpp
+        march_hardware
+        march_hardware_builder
+        march_logger_cpp
+        yaml-cpp
+        march_utility
+        sensor_msgs
+        march_shared_msgs
+)
 
 # EXPORT
 # These must be above the two installs otherwise can't be recognized by other packages.

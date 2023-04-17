@@ -10,11 +10,11 @@ using namespace std::chrono_literals;
 WeightNode::WeightNode()
         : Node("weight_node")
 {
-    m_position_subscription = this->create_subscription<march_shared_msgs::msg::WeightStamped>(
+    m_weight_subscription = this->create_subscription<march_shared_msgs::msg::WeightStamped>(
             "fuzzy_weight", 10, std::bind(&WeightNode::weight_callback, this, _1));
 }
 
-void FuzzyNode::weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
+void WeightNode::weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
 {
     //TODO: implement
 
