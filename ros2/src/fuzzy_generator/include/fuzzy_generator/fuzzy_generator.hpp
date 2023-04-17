@@ -49,8 +49,8 @@ public:
 
 
 private:
-    double distance_torque; // threshold for at what foot-height to START switching to torque
-    double h_offset; // height at which to be COMPLETELY on torque
+    double distance_torque;
+    double h_offset;
 
     Leg left_leg;
     Leg right_leg;

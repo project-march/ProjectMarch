@@ -8,9 +8,8 @@ FuzzyGenerator::FuzzyGenerator(){
 };
 
 void FuzzyGenerator::updateWeights(Leg* leg){
-    //TODO: implement fuzzy logic
-
-    //output goes into leg.torque_weight and leg.position_weight
+    leg->position_weight = (1 / h_offset) * (leg->getFootHeight() - distance_torque);
+    leg->torque_weight = 1 - leg->position_weight;
 };
 
 // setters
