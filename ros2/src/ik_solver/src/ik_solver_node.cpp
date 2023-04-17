@@ -31,10 +31,10 @@ IkSolverNode::IkSolverNode()
 
     // Initializing the timestep
     declare_parameter("timestep", 1000);
-    auto timestep = this->get_parameter("timestep").as_int();
+    m_timestep = this->get_parameter("timestep").as_int();
 
     m_solving_timer
-        = this->create_wall_timer(std::chrono::milliseconds(timestep), std::bind(&IkSolverNode::timer_callback, this));
+        = this->create_wall_timer(std::chrono::milliseconds(m_timestep), std::bind(&IkSolverNode::timer_callback, this));
 
     pinocchio::Model test_model = m_ik_solver.get_model();
     for (pinocchio::FrameIndex i = 0; i < static_cast<pinocchio::FrameIndex>(test_model.nframes); i++) {
@@ -138,8 +138,11 @@ void IkSolverNode::timer_callback()
             m_trajectory_container->com_velocity[m_trajectory_index].y,
             m_trajectory_container->com_velocity[m_trajectory_index].z;
         // Get solution
-        Eigen::VectorXd solution
+        Eigen::VectorXd solution_velocity
             = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state, m_stance_foot);
+
+        Eigen::VectorXd solution_position = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep)/1000.0);
+
     }
 }
 
