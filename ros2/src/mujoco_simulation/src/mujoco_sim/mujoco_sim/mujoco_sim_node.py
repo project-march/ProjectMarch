@@ -90,7 +90,8 @@ class MujocoSimNode(Node):
         # Set timestep options
         self.TIME_STEP_MJC = 0.001
         self.model.opt.timestep = self.TIME_STEP_MJC
-
+        # We need these options to compare mujoco and ros time, so they have the same reference starting point
+        self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
 
@@ -180,9 +181,11 @@ class MujocoSimNode(Node):
         time_difference = (time_current - self.time_last_updated).to_msg()
         mj_time_current = self.data.time
 
-        time_difference_withseconds = time_difference.nanosec / 1e9 + time_difference.sec
+        time_shifted = (time_current - self.ros_first_updated).to_msg()
 
-        while self.data.time - mj_time_current <= time_difference_withseconds:
+        time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
+
+        while self.data.time <= time_difference_withseconds:
             mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
