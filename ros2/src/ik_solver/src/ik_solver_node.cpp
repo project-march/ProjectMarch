@@ -6,9 +6,9 @@ using std::placeholders::_2;
 IkSolverNode::IkSolverNode()
     : Node("ik_solver")
     , m_ik_solver()
-    , m_trajectory_index(0)
-    , m_right_foot_on_ground(true)
     , m_desired_state()
+    , m_right_foot_on_ground(true)
+    , m_trajectory_index(0)
     , m_stance_foot(0)
 {
     m_trajectory_subscriber = this->create_subscription<march_shared_msgs::msg::IkSolverCommand>(
@@ -104,6 +104,7 @@ void IkSolverNode::timer_callback()
             m_desired_state.left_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
                 m_trajectory_container->swing_velocity[m_trajectory_index].y,
                 m_trajectory_container->swing_velocity[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        }
         if (m_stance_foot == -1){
             m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 

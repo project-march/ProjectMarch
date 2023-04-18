@@ -8,9 +8,9 @@ StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this)
     , m_com_estimator()
+    , m_cop_estimator(create_pressure_sensors())
     , m_imu_estimator()
     , m_zmp_estimator()
-    , m_cop_estimator(create_pressure_sensors())
     , m_footstep_estimator()
     , m_current_stance_foot(0)
 {
@@ -132,7 +132,7 @@ void StateEstimator::update_foot_frames()
 {
     // This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
     // obtain the origin joint
-    IMU& imu = m_imu_estimator.get_imu(LOWER);
+    // IMU& imu = m_imu_estimator.get_imu(LOWER);
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
             = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
@@ -231,10 +231,16 @@ void StateEstimator::publish_robot_frames()
     m_foot_pos_publisher->publish(foot_positions);
 
     // double stance
-    if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
-        && m_current_stance_foot != 0) {
-        m_current_stance_foot = 0;
-        m_foot_pos_publisher->publish(m_current_stance_foot);
+    if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
+
+        // We always take the front foot as the stance foot :)
+        if (foot_positions.poses[0].position.x>foot_positions.poses[1].position.x && m_current_stance_foot!=1){
+            m_current_stance_foot = 1;
+            m_foot_pos_publisher->publish(m_current_stance_foot);
+        }else if (foot_positions.poses[0].position.x<foot_positions.poses[1].position.x && m_current_stance_foot!=-1){
+            m_current_stance_foot = -1;
+            m_foot_pos_publisher->publish(m_current_stance_foot);
+        }
     }
     // left
     if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
