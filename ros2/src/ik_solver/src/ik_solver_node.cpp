@@ -104,7 +104,7 @@ void IkSolverNode::timer_callback()
             m_desired_state.left_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
                 m_trajectory_container->swing_velocity[m_trajectory_index].y,
                 m_trajectory_container->swing_velocity[m_trajectory_index].z, 0.0, 0.0, 0.0;
-        } else {
+        if (m_stance_foot == -1){
             m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -117,6 +117,15 @@ void IkSolverNode::timer_callback()
             m_desired_state.right_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
                 m_trajectory_container->swing_velocity[m_trajectory_index].y,
                 m_trajectory_container->swing_velocity[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        }
+        if (m_stance_foot == 0){
+            m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+            m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+            m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+            m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
         }
 
         m_desired_state.com_pos << m_trajectory_container->com_velocity[m_trajectory_index].x * (m_timestep*1e-6),
