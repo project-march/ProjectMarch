@@ -16,8 +16,9 @@ WeightNode::WeightNode()
 
 void WeightNode::weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
 {
+    std::vector<march_hardware_interface::JointInfo>* joints_info_ = m_hardware_interface->getJointsInfo();
     //TODO: implement
-
+    // get all the joints from either the left or the right, and apply the torque and position weights to the JointInfo
 }
 
 /**
