@@ -2,14 +2,14 @@
 #include "zmp_mpc_solver/zmp_mpc_solver.hpp"
 
 ZmpSolver::ZmpSolver()
-    : m_x_current()
+    : m_time_horizon(4.0)
+    , m_x_current()
     , m_u_current()
-    , m_time_horizon(4.0)
-    , m_gravity_const(9.81)
     , m_switch(0)
     , m_current_shooting_node(0)
     , m_timing_value(0)
     , m_current_stance_foot(1)
+    , m_gravity_const(9.81)
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -21,11 +21,9 @@ ZmpSolver::ZmpSolver()
     set_current_foot(0.0, 0.1);
     set_previous_foot(0.0, 0.1);
     set_current_state();
-    // m_x_current = {0.0, 0.0, 0.0, 0.03, -0.06, 0.08, 0.0 , 0.0, 0.1, 0.1, 0.0, 0.0};
-    solve_step();
 }
 
-const double ZmpSolver::get_com_height()
+double ZmpSolver::get_com_height()
 {
     return m_com_height;
 }

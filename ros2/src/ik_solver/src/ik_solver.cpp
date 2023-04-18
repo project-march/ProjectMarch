@@ -39,7 +39,7 @@ int IkSolver::set_jacobian()
 {
     try {
         pinocchio::FrameIndex left_foot_index = m_model.getFrameId("foot_left");
-        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("foot_left");
+        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("foot_right");
         pinocchio::computeJointJacobian(
             m_model, m_model_data, m_joint_pos, m_model.frames[left_foot_index].parent, J_left_foot);
         pinocchio::computeJointJacobian(
@@ -94,13 +94,14 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     // Get the error vectors
     // Here, we assume the jacobians have already been set
-    Eigen::VectorXd left_foot_error = state_desired.left_foot_pose - state_current.left_foot_pose;
-    left_foot_error.segment(0, 3)
-        = angleSignedDistance(state_desired.left_foot_pose.segment(0, 3), state_current.left_foot_pose.segment(0, 3));
-    Eigen::VectorXd right_foot_error = state_desired.right_foot_pose - state_current.right_foot_pose;
-    right_foot_error.segment(0, 3)
-        = angleSignedDistance(state_desired.left_foot_pose.segment(0, 3), state_current.left_foot_pose.segment(0, 3));
-    Eigen::VectorXd com_pos_error = state_desired.com_pos - state_current.com_pos;
+    // The error is equal to the desired state, as we express them in local coordinates
+    Eigen::VectorXd left_foot_error = state_desired.left_foot_pose;
+    left_foot_error.segment(3, 3)
+        = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
+    Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
+    right_foot_error.segment(3, 3)
+        = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
+    Eigen::VectorXd com_pos_error = state_desired.com_pos;
 
     // Set up the cost function
     // H: The quadratic term of the cost function
