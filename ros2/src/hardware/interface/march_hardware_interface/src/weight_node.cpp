@@ -16,9 +16,27 @@ WeightNode::WeightNode()
 
 void WeightNode::weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
 {
+    // get letter of msg
+    const char leg = msg->leg;
+    if(leg != 'l' and leg != 'r'){
+        RCLCPP_WARN(this->get_logger(), "Invalid character provided in weight message: %c! Provide either 'l' or 'r'.", leg);
+    }
+
+    // apply to all the joints of that leg
     std::vector<march_hardware_interface::JointInfo>* joints_info_ = m_hardware_interface->getJointsInfo();
-    //TODO: implement
-    // get all the joints from either the left or the right, and apply the torque and position weights to the JointInfo
+    for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+        if(leg == 'l' and jointInfo.name.find("left") != std::string::npos){
+            jointInfo.torque_weight = msg->torque_weight;
+            jointInfo.position_weight = msg->position_weight;
+        }
+        else if(leg == 'r' and jointInfo.name.find("right") != std::string::npos){
+            jointInfo.torque_weight = msg->torque_weight;
+            jointInfo.position_weight = msg->position_weight;
+        }
+        else{
+            RCLCPP_WARN(this->get_logger(), "Joint %s seems to be part of neither the right nor the left leg...", jointInfo.name);
+        }
+    }
 }
 
 /**
