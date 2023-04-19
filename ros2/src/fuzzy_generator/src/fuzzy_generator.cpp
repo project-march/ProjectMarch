@@ -8,7 +8,8 @@ FuzzyGenerator::FuzzyGenerator(){
 };
 
 void FuzzyGenerator::updateWeights(Leg* leg){
-    leg->position_weight = (1 / h_offset) * (leg->getFootHeight() - distance_torque);
+    //TODO: differentiate between logic for stance -> swing and swing -> stance
+    leg->position_weight = (1 / full_torque) * leg->getFootHeight() - full_position;
     leg->torque_weight = 1 - leg->position_weight;
 };
 
@@ -22,20 +23,20 @@ void FuzzyGenerator::setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg
 void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
     switch(msg.data){
         case -1:{
-            stance_side = Left;
-            swing_side = Right;
+            left_leg.status = Stance;
+            right_leg.status = Swing;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
             break;
         }
         case 1:{
-            stance_side = Right;
-            swing_side = Left;
+            left_leg.status = Swing;
+            right_leg.status = Stance;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
             break;
         }
         case 0:{ //this is the case when both feet are on the ground
-            stance_side = Both;
-            swing_side = None;
+            left_leg.status = Stance;
+            right_leg.status = Stance;
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
             break;
         }
@@ -43,48 +44,14 @@ void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
             RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Invalid value %i was passed. Allowed values are -1,0,1", msg.data);
         }
     }
-//    if(prefix != 'l' and prefix != 'r' and !m_fuzzy_generator->double_stance){
-//        RCLCPP_WARN(this->get_logger(), "Method getFoot was passed invalid initial character %s. Required: 'l' or 'r'", prefix);
-//    }
 }
 
 // getters
 
-Leg* FuzzyGenerator::getStanceLeg(){
-    Side side = stance_side;
-    switch(side){
-        Left:
-            return &left_leg;
-        Right:
-            return &right_leg;
-        Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both legs are stance legs");
-            break;
-        None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), " Neither legs are stance legs");
-            break;
-    }};
+Leg* FuzzyGenerator::getLeftLeg(){
+    return &left_leg;
+}
 
-Leg* FuzzyGenerator::getSwingLeg(){
-    Side side = swing_side;
-    switch(side){
-        Left:
-            return &left_leg;
-        Right:
-            return &right_leg;
-        Both:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both legs are swing legs");
-            break;
-        None:
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), " Neither legs are swing legs");
-            break;
-    }
-};
-
-Side FuzzyGenerator::getSwingSide(){
-    return swing_side;
-};
-
-Side FuzzyGenerator::getStanceSide(){
-    return stance_side;
-};
+Leg* FuzzyGenerator::getRightLeg(){
+    return &right_leg;
+}

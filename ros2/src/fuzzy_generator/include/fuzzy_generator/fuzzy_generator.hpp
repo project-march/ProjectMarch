@@ -11,9 +11,12 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 
-enum Side {Left, Right, Both, None};
+//enum Side {Left, Right, Both, None};
+enum Status {Stance, Swing};
 
 struct Leg {
+    Status status = Stance;
+
     double foot_height = 0;
 
     float torque_weight = 0.5; // holds the weight for the torque
@@ -39,24 +42,23 @@ public:
     void setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg); // set the height of both feet
     void setStanceLeg(std_msgs::msg::Int32 msg); // set the stance leg to the correct leg
 
-    Leg* getStanceLeg();
-    Leg* getSwingLeg();
-    Side getStanceSide();
-    Side getSwingSide();
+    Leg* getLeftLeg();
+    Leg* getRightLeg();
 
     // the function that will update the weights with the fuzzy logic
     void updateWeights(Leg leg);
 
 
 private:
-    double distance_torque;
-    double h_offset;
+    // above full_position height we use 100% position control
+    // below full_torque height we use 100% torque control
+    // and linearly decrease/increase in between
+    double full_position;
+    double full_torque;
 
     Leg left_leg;
     Leg right_leg;
 
-    Side swing_side = None; // which leg is the swing leg
-    Side stance_side = Both; // which leg is the stance leg
 };
 
 #endif //MARCH_FUZZY_GENERATOR_HPP

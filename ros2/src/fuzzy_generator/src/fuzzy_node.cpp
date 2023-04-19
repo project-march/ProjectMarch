@@ -21,27 +21,58 @@ FuzzyNode::FuzzyNode()
 
 void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
+    // set the stance leg
     m_fuzzy_generator.setStanceLeg(*msg.get());
-    Leg* swing_leg = m_fuzzy_generator.getSwingLeg();
-    m_fuzzy_generator.updateWeights(swing_leg);
 
-    march_shared_msgs::msg::WeightStamped fuzzy_weights;
-    fuzzy_weights.torque_weight = swing_leg->getTorqueWeight();
-    fuzzy_weights.position_weight = swing_leg->getPositionWeight();
-    fuzzy_weights.leg = m_fuzzy_generator.getSwingSide();
-    m_publish_weight->publish(fuzzy_weights);
+    // update the weights for the left leg
+    Leg* left_leg = m_fuzzy_generator.getLeftLeg();
+    m_fuzzy_generator.updateWeights(left_leg);
+
+    // send the weights for the left leg
+    march_shared_msgs::msg::WeightStamped left_weights;
+    left_weights.torque_weight = left_leg->getTorqueWeight();
+    left_weights.position_weight = left_leg->getPositionWeight();
+    left_weights.leg = 'l';
+    m_publish_weight->publish(left_weights);
+
+    // update the weights for the right leg
+    Leg* right_leg = m_fuzzy_generator.getRightLeg();
+    m_fuzzy_generator.updateWeights(right_leg);
+
+    // send the weights for the left leg
+    march_shared_msgs::msg::WeightStamped right_weights;
+    right_weights.torque_weight = right_leg->getTorqueWeight();
+    right_weights.position_weight = right_leg->getPositionWeight();
+    right_weights.leg = 'r';
+    m_publish_weight->publish(right_weights);
 }
 
 void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
-    m_fuzzy_generator.setFeetHeight(*msg.get());
-    Leg* swing_leg = m_fuzzy_generator.getSwingLeg();
-    m_fuzzy_generator.updateWeights(swing_leg);
 
-    march_shared_msgs::msg::WeightStamped fuzzy_weights;
-    fuzzy_weights.torque_weight = swing_leg->getTorqueWeight();
-    fuzzy_weights.position_weight = swing_leg->getPositionWeight();
-    fuzzy_weights.leg = m_fuzzy_generator.getSwingSide();
-    m_publish_weight->publish(fuzzy_weights);
+    // update the feet height
+    m_fuzzy_generator.setFeetHeight(*msg.get());
+
+    // update the weights for the left leg
+    Leg* left_leg = m_fuzzy_generator.getLeftLeg();
+    m_fuzzy_generator.updateWeights(left_leg);
+
+    // send the weights for the left leg
+    march_shared_msgs::msg::WeightStamped left_weights;
+    left_weights.torque_weight = left_leg->getTorqueWeight();
+    left_weights.position_weight = left_leg->getPositionWeight();
+    left_weights.leg = 'l';
+    m_publish_weight->publish(left_weights);
+
+    // update the weights for the right leg
+    Leg* right_leg = m_fuzzy_generator.getRightLeg();
+    m_fuzzy_generator.updateWeights(right_leg);
+
+    // send the weights for the left leg
+    march_shared_msgs::msg::WeightStamped right_weights;
+    right_weights.torque_weight = right_leg->getTorqueWeight();
+    right_weights.position_weight = right_leg->getPositionWeight();
+    right_weights.leg = 'r';
+    m_publish_weight->publish(right_weights);
 }
 
 /**
