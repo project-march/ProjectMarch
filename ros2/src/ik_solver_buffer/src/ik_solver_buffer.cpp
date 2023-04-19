@@ -9,8 +9,10 @@ using std::placeholders::_2;
 BufferNode::BufferNode()
     : Node("trajectory_buffer")
 {
-    m_com_trajectory_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_com_input", 10);
-    m_swing_trajectory_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_swing_input", 10);
+    m_com_trajectory_publisher
+        = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_com_input", 10);
+    m_swing_trajectory_publisher
+        = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_swing_input", 10);
 
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/com_trajectory", 10, std::bind(&BufferNode::com_subscriber_callback, this, _1));
