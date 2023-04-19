@@ -1,6 +1,6 @@
 """This module contain the JointTrajectory class.
 
-This is used for creating the positions that should be followed by the joints, and to check the safety limits.
+This is used for creating the positions that should be followed by the joints.
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ from march_utility.utilities.duration import Duration
 from scipy.interpolate import BPoly
 from urdf_parser_py import urdf
 
-from .limits import Limits
 from .setpoint import Setpoint
 
 ALLOWED_ERROR = 0.001
@@ -29,10 +28,9 @@ class JointTrajectory:
 
     setpoint_class = Setpoint
 
-    def __init__(self, name: str, limits: Limits, setpoints: List[Setpoint], duration: Duration) -> None:
+    def __init__(self, name: str, setpoints: List[Setpoint], duration: Duration) -> None:
         """Initialize a joint trajectory."""
         self.name = name
-        self.limits = limits
         self._setpoints = setpoints
         self._duration = round(duration, self.setpoint_class.digits)
         self.interpolated_position: Any = None
@@ -41,13 +39,12 @@ class JointTrajectory:
 
     @classmethod
     def from_setpoint_dict(
-        cls, name: str, limits: Limits, setpoint_dict: List[dict], duration: Duration
+        cls, name: str, setpoint_dict: List[dict], duration: Duration
     ) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
         Args:
             name (str): Name of the joint.
-            limits (Limits): Joint limits from the URDF.
             setpoint_dict (List[dict]): A list of setpoints from the subgait configuration.
             duration (Duration): The total duration of the trajectory.
         """
@@ -59,7 +56,7 @@ class JointTrajectory:
             )
             for setpoint in setpoint_dict
         ]
-        return cls(name, limits, setpoints, duration)
+        return cls(name, setpoints, duration)
 
     @staticmethod
     def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> Optional[urdf.Joint]:
@@ -260,13 +257,6 @@ class JointTrajectory:
                 * `base_trajectory`, if `parameter` == 0.
                 * `other_trajectory`, if `parameter` == 0.
         """
-        if base_trajectory.limits != other_trajectory.limits:
-            raise SubgaitInterpolationError(
-                f"Not able to safely interpolate because limits "
-                f"are not equal for joints {base_trajectory.name} "
-                f"and {other_trajectory.name}"
-            )
-
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
             raise SubgaitInterpolationError(
                 "The amount of setpoints do not match for joint {0}".format(base_trajectory.name)
@@ -280,7 +270,7 @@ class JointTrajectory:
             setpoints.append(interpolated_setpoint_to_add)
 
         duration = base_trajectory.duration.weighted_average(other_trajectory.duration, parameter)
-        return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
+        return JointTrajectory(base_trajectory.name, setpoints, duration)
 
     @staticmethod
     def check_joint_interpolation_is_safe(
@@ -300,9 +290,4 @@ class JointTrajectory:
                 f"{other_joint.name}"
             )
             # check whether each base joint as its corresponding other joint
-        if base_joint.limits != other_joint.limits:
-            raise SubgaitInterpolationError(
-                f"Not able to safely interpolate because limits are not equal for "
-                f"joints {base_joint.name} and {other_joint.name}"
-            )
         return True

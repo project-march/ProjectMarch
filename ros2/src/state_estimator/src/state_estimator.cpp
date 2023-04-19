@@ -209,15 +209,19 @@ void StateEstimator::publish_robot_frames()
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
     // Update COP
-    geometry_msgs::msg::TransformStamped left_foot_frame
-        = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
-    geometry_msgs::msg::TransformStamped right_foot_frame
-        = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
-    m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
-    // Update ZMP
-    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
-    m_zmp_estimator.set_zmp();
-    m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+    try {
+        geometry_msgs::msg::TransformStamped left_foot_frame
+            = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
+        geometry_msgs::msg::TransformStamped right_foot_frame
+            = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
+        m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
+        // Update ZMP
+        m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
+        m_zmp_estimator.set_zmp();
+        m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+    } catch (const tf2::TransformException& ex) {
+        RCLCPP_WARN(this->get_logger(), "Error during publishing of Center of Pressure: %s", ex.what());
+    }
 
     // Update the feet
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
@@ -234,10 +238,11 @@ void StateEstimator::publish_robot_frames()
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
 
         // We always take the front foot as the stance foot :)
-        if (foot_positions.poses[0].position.x>foot_positions.poses[1].position.x && m_current_stance_foot!=1){
+        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
             m_foot_pos_publisher->publish(m_current_stance_foot);
-        }else if (foot_positions.poses[0].position.x<foot_positions.poses[1].position.x && m_current_stance_foot!=-1){
+        } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
+            && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
             m_foot_pos_publisher->publish(m_current_stance_foot);
         }

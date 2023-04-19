@@ -123,7 +123,7 @@ double MotorController::getMotorControllerSpecificEffort(double joint_effort_com
 {
     joint_effort_command = convertEffortToIUEffort(joint_effort_command);
     // Clamp effort to (-MAX_EFFORT, MAX_EFFORT)
-    auto effort_limit = getEffortLimit();
+    auto effort_limit = getTorqueLimit();
     return std::clamp(joint_effort_command, -effort_limit, effort_limit) * getMotorDirection();
 }
 
@@ -176,17 +176,17 @@ std::unique_ptr<TorqueSensor>& MotorController::getTorqueSensor()
     return torque_sensor_;
 }
 
-void MotorController::actuate(float target)
-{
-    if (actuation_mode_ == march::ActuationMode::position) {
-        actuateRadians(target);
-    } else if (actuation_mode_ == march::ActuationMode::torque) {
-        actuateTorque(target);
-    } else {
-        throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Actuation mode %s is not supported",
-            actuation_mode_.toString().c_str());
-    }
-}
+// void MotorController::actuate(float target)
+//{
+//    if (actuation_mode_ == march::ActuationMode::position) {
+//        actuateRadians(target);
+//    } else if (actuation_mode_ == march::ActuationMode::torque) {
+//        actuateTorque(target);
+//    } else {
+//        throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Actuation mode %s is not supported",
+//            actuation_mode_.toString().c_str());
+//    }
+//}
 
 double MotorController::convertEffortToIUEffort(double joint_effort_command) const
 {
