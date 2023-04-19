@@ -13,7 +13,8 @@ public:
     void set_swing_trajectory(geometry_msgs::msg::PoseArray::SharedPtr);
 
     bool check_if_ready();
-    void publish_ik_trajectory();
+    void publish_com_trajectory();
+    void publish_swing_trajectory();
 
 private:
     void com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
@@ -25,7 +26,8 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_swing_subscriber;
 
-    rclcpp::Publisher<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_buffer_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_com_trajectory_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_swing_trajectory_publisher;
 
     int m_timestep;
 };
