@@ -189,17 +189,18 @@ void StateEstimator::publish_com_frame()
     m_com_pos_publisher->publish(center_of_mass);
 }
 
-void StateEstimator::publish_robot_frames() {
+void StateEstimator::publish_robot_frames()
+{
     // publish IMU frames
-    IMU &imu = m_imu_estimator.get_imu(LOWER);
+    IMU& imu = m_imu_estimator.get_imu(LOWER);
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
     update_foot_frames();
     // publish joint frames
     RCLCPP_DEBUG(this->get_logger(), "Number of frames is %i", m_joint_estimator.get_joint_frames().size());
-    for (auto i: m_joint_estimator.get_joint_frames()) {
+    for (auto i : m_joint_estimator.get_joint_frames()) {
         m_tf_joint_broadcaster->sendTransform(i);
         RCLCPP_DEBUG(this->get_logger(),
-                     ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
+            ("\n Set up link " + i.header.frame_id + "\n with child link " + i.child_frame_id).c_str());
     }
     // Publish each joint center of mass
     std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
@@ -210,10 +211,10 @@ void StateEstimator::publish_robot_frames() {
     // Update COP
     try {
         geometry_msgs::msg::TransformStamped left_foot_frame
-                = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
+            = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped right_foot_frame
-                = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
-        m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), {right_foot_frame, left_foot_frame});
+            = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
+        m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
         // Update ZMP
         m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
         m_zmp_estimator.set_zmp();
@@ -237,10 +238,11 @@ void StateEstimator::publish_robot_frames() {
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
 
         // We always take the front foot as the stance foot :)
-        if (foot_positions.poses[0].position.x>foot_positions.poses[1].position.x && m_current_stance_foot!=1){
+        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
             m_foot_pos_publisher->publish(m_current_stance_foot);
-        }else if (foot_positions.poses[0].position.x<foot_positions.poses[1].position.x && m_current_stance_foot!=-1){
+        } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
+            && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
             m_foot_pos_publisher->publish(m_current_stance_foot);
         }

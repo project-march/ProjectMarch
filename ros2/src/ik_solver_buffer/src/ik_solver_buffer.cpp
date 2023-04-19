@@ -50,9 +50,9 @@ void BufferNode::set_velocity(
         geometry_msgs::msg::Point point_prev = position_vector[0];
 
         for (auto it = std::begin(position_vector) + 1; it != std::end(position_vector); it++) {
-            point_container.x = (it->x - point_prev.x) / (m_timestep*1e-3);
-            point_container.y = (it->y - point_prev.y) / (m_timestep*1e-3);
-            point_container.z = (it->z - point_prev.z) / (m_timestep*1e-3);
+            point_container.x = (it->x - point_prev.x) / (m_timestep * 1e-3);
+            point_container.y = (it->y - point_prev.y) / (m_timestep * 1e-3);
+            point_container.z = (it->z - point_prev.z) / (m_timestep * 1e-3);
             output_vector.push_back(point_container);
         }
 

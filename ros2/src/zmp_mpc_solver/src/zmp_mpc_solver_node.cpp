@@ -60,10 +60,9 @@ void SolverNode::timer_callback()
 {
     m_zmp_solver.set_current_state();
     int solver_status = m_zmp_solver.solve_step();
-    if (solver_status != 0)
-        {
+    if (solver_status != 0) {
         RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
-        }
+    }
     auto com_msg = geometry_msgs::msg::PoseArray();
     com_msg.header.stamp = this->get_clock()->now();
     com_msg.header.frame_id = "map";

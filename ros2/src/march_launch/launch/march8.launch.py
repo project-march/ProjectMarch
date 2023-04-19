@@ -85,7 +85,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # declare parameters
     # in ms
-    trajectory_dt=8
+    trajectory_dt = 8
 
     return LaunchDescription([
         Node(
@@ -134,5 +134,5 @@ def generate_launch_description() -> LaunchDescription:
         ),
         mujoco_node,
         rqt_input_device,
-        # march_control,
+        march_control,
     ])

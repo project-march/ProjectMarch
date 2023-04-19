@@ -182,7 +182,7 @@ std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string co
             tf2::doTransform(joint_com_stamped, com_to_add.position, com_transform);
             com_positions.push_back(com_to_add);
         } catch (const tf2::TransformException& ex) {
-             RCLCPP_WARN(m_owner->get_logger(), "Error in get_joint_com_position: %s", ex.what());
+            RCLCPP_WARN(m_owner->get_logger(), "Error in get_joint_com_position: %s", ex.what());
             return com_positions;
         }
     };
