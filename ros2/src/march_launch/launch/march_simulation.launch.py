@@ -52,10 +52,8 @@ def generate_launch_description() -> launch.LaunchDescription:
     imu_to_use = LaunchConfiguration("imu_to_use")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
-    jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
-    gazebo = LaunchConfiguration("gazebo")
     mujoco = LaunchConfiguration("mujoco")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
@@ -76,7 +74,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
-    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -143,7 +140,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="robot_description",
-            default_value="march7_ros2",
+            default_value=robot,
             description="Which <robot_description>.xacro file to use. "
             "This file must be available in the `march_desrciption/urdf/` folder.",
         ),
@@ -198,7 +195,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="gait_directory",
-            default_value="airgait_vi",
+            default_value="sit_stand_m8",
             description="The directory in which the gait files to use are located, " "relative to the gait_package.",
         ),
         DeclareLaunchArgument(
@@ -275,17 +272,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             description="Duration to schedule next subgait early. If 0 then the"
             "next subgait is never scheduled early.",
         ),
-        DeclareLaunchArgument(
-            "timer_period",
-            default_value="0.004",
-            description="",
-        ),
-        DeclareLaunchArgument(
-            "jointless",
-            default_value="false",
-            description="If true, no joints will be actuated.",
-            choices=["true", "false"],
-        ),
         # FAKE SENSOR DATA ARGUMENTS
         DeclareLaunchArgument(
             name="fake_sensor_data",
@@ -305,7 +291,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             "model_to_load_mujoco",
-            default_value="march.xml",
+            default_value="march_v1.xml",
             description="What model to load into mujoco.",
         ),
         DeclareLaunchArgument(
@@ -316,7 +302,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="false",
+            default_value="true",
             description="Whether to log simulation data or not.",
             choices=["true", "false"],
         ),
@@ -361,13 +347,10 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
             ("scheduling_delay", scheduling_delay),
-            ("timer_period", timer_period),
             ("fake_sensor_data", fake_sensor_data),
             ("minimum_fake_temperature", minimum_fake_temperature),
             ("maximum_fake_temperature", maximum_fake_temperature),
             ("simulation", simulation),
-            ("jointless", jointless),
-            ("gazebo", gazebo),
             ("mujoco", mujoco),
             ("model_to_load_mujoco", model_to_load_mujoco),
             ("tunings_to_load", tunings_to_load),

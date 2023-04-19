@@ -18,7 +18,6 @@
     <exec_depend>march_wireless_ipd</exec_depend>
     <exec_depend>march_utility</exec_depend>
     <exec_depend>march_shared_msgs</exec_depend>
-    <exec_depend>march_fake_sensor_data</exec_depend>
     <exec_depend>march_rqt_input_device</exec_depend>
     <exec_depend>march_description</exec_depend>
     <exec_depend>ros2bag</exec_depend>

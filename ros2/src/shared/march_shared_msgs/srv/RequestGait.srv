@@ -1,0 +1,8 @@
+# All possible instruction gait_types.
+int32 SIT = 0
+int32 STAND = 1
+#
+# The type of instruction.
+int32 gait_type
+---
+bool status

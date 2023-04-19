@@ -1,5 +1,4 @@
 """Author: MVIII."""
-
 import mujoco
 import rclpy
 from ament_index_python.packages import get_package_share_directory
@@ -70,7 +69,7 @@ class MujocoSimNode(Node):
         super().__init__("mujoco_sim")
         self.declare_parameter("model_toload")
 
-        self.SIM_TIMESTEP_ROS = 0.1
+        self.SIM_TIMESTEP_ROS = 0.008
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
@@ -130,7 +129,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.01
+        self.TIME_STEP_TRAJECTORY = 0.0001
         self.trajectory_last_updated = self.get_clock().now()
 
     def check_for_new_reference_update(self, time_current):
@@ -148,7 +147,7 @@ class MujocoSimNode(Node):
         """Updates the trajectory if possible."""
         try:
             msg = self.msg_queue.get_nowait()
-            joint_pos = msg.desired.positions
+            joint_pos = msg.positions
             for j in range(len(self.controller)):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
@@ -162,9 +161,9 @@ class MujocoSimNode(Node):
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
-        if msg.reset == 1:
-            self.msg_queue = Queue()
-        self.msg_queue.put(msg.trajectory)
+        points = msg.points
+        for i in points:
+            self.msg_queue.put(i)
 
     def sim_step(self):
         """This function performs the simulation update.

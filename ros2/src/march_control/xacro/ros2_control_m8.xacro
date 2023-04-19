@@ -27,7 +27,7 @@
              params="name type:=^|effort
                stop_when_outside_hard_limits:=^|true
                msec_until_error_when_in_error_soft_limits:=^|1000">
-  <xacro:if value="${type == 'effort'}">
+  <xacro:if value="${type != 'simulation'}">
     <xacro:effort_joint name="${name}"/>
   </xacro:if>
   <xacro:if value="${type == 'simulation'}">
