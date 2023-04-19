@@ -9,8 +9,10 @@ using std::placeholders::_2;
 BufferNode::BufferNode()
     : Node("trajectory_buffer")
 {
-    m_com_trajectory_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_com_input", 10);
-    m_swing_trajectory_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_swing_input", 10);
+    m_com_trajectory_publisher
+        = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_com_input", 10);
+    m_swing_trajectory_publisher
+        = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_swing_input", 10);
 
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/com_trajectory", 10, std::bind(&BufferNode::com_subscriber_callback, this, _1));
@@ -47,9 +49,9 @@ void BufferNode::set_velocity(
         geometry_msgs::msg::Point point_prev = position_vector[0];
 
         for (auto it = std::begin(position_vector) + 1; it != std::end(position_vector); it++) {
-            point_container.x = (it->x - point_prev.x) / (m_timestep*1e-3);
-            point_container.y = (it->y - point_prev.y) / (m_timestep*1e-3);
-            point_container.z = (it->z - point_prev.z) / (m_timestep*1e-3);
+            point_container.x = (it->x - point_prev.x) / (m_timestep * 1e-3);
+            point_container.y = (it->y - point_prev.y) / (m_timestep * 1e-3);
+            point_container.z = (it->z - point_prev.z) / (m_timestep * 1e-3);
             output_vector.push_back(point_container);
         }
 

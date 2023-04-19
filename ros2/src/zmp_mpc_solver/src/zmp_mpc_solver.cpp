@@ -265,8 +265,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     m_switch = 1.0 / dt;
     // The step number
     int step_number = 0;
-    float step_duration = 0.6; //Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
-    float step_duration_factor = 1.0/step_duration;
+    float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
+    float step_duration_factor = 1.0 / step_duration;
 
     if ((m_current_shooting_node != 0) && (m_current_shooting_node < ((N - 1) / m_number_of_footsteps))) {
         m_timing_value = (m_current_shooting_node - 1) / ((N - 1) / m_number_of_footsteps);
@@ -290,8 +290,8 @@ inline int ZmpSolver::solve_zmp_mpc(
             uh[3] = m_foot_width_y / 2;
             //
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
-            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);    
-            step_number+=1;
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
+            step_number += 1;
             count = -count;
             m_timing_value = 1;
 
@@ -300,10 +300,10 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[2] = m_switch;
             p[3] = m_timing_value;
             p[4] = 0;
-            
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-            m_timing_value = -((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            m_timing_value = -((1 - step_duration) / step_duration)
+                / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
 
         } else if (ii + m_current_shooting_node == 0) {
             // STARTING SHOOTING NODE
@@ -328,12 +328,15 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[4] = 0;
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-            m_timing_value = -((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            m_timing_value = -((1 - step_duration) / step_duration)
+                / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
 
-        } else if (step_number*((N-1)/m_number_of_footsteps)<ii-m_current_shooting_node && ii-m_current_shooting_node <
-            ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps)/(2*step_duration_factor)){
+        } else if (step_number * ((N - 1) / m_number_of_footsteps) < ii - m_current_shooting_node
+            && ii - m_current_shooting_node
+                < ((N - 1) / m_number_of_footsteps) + ((N - 1) / m_number_of_footsteps) / (2 * step_duration_factor)) {
             // KEEP SHADOW FOOT ON THE STANCE LEG, keeps increase in timing factor small after just setting a footstep
-            m_timing_value += ((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            m_timing_value += ((1 - step_duration) / step_duration)
+                / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
             p[0] = 0;
             p[1] = 0;
             p[2] = 0;
@@ -355,10 +358,13 @@ inline int ZmpSolver::solve_zmp_mpc(
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
 
-        } else if ((step_number+1)*((N-1)/m_number_of_footsteps) - ((N-1)/m_number_of_footsteps)/(2*step_duration_factor)<ii-m_current_shooting_node && ii-m_current_shooting_node <
-            ((N-1)/m_number_of_footsteps)){
+        } else if ((step_number + 1) * ((N - 1) / m_number_of_footsteps)
+                    - ((N - 1) / m_number_of_footsteps) / (2 * step_duration_factor)
+                < ii - m_current_shooting_node
+            && ii - m_current_shooting_node < ((N - 1) / m_number_of_footsteps)) {
             // KEEP SHADOW FOOT ON THE STANCE LEG, keeps increase in timing factor small after just setting a footstep
-            m_timing_value += ((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            m_timing_value += ((1 - step_duration) / step_duration)
+                / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
             p[0] = 0;
             p[1] = 0;
             p[2] = 0;
@@ -380,10 +386,11 @@ inline int ZmpSolver::solve_zmp_mpc(
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
 
-        // for periodic tail constraint
+            // for periodic tail constraint
         } else if (ii + m_current_shooting_node
             == (2 * (m_current_shooting_node + (N - 1) / m_number_of_footsteps) - 1)) {
-            m_timing_value += (step_duration/(1-step_duration))/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            m_timing_value += (step_duration / (1 - step_duration))
+                / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
 
             // LOWER_CONSTRAINT
             lh[0] = -0.5 * m_admissible_region_x;
@@ -405,7 +412,7 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[4] = 1;
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-        // for step and close
+            // for step and close
         } else if (ii + m_current_shooting_node == 2 * ((N - 1) / m_number_of_footsteps)) {
             // LOWER_CONSTRAINT
             lh[0] = -0.5 * m_admissible_region_x;
@@ -430,7 +437,7 @@ inline int ZmpSolver::solve_zmp_mpc(
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
             m_timing_value = -1 / (((N)-m_number_of_footsteps) / m_number_of_footsteps);
 
-        // for step and close
+            // for step and close
         } else if ((ii + m_current_shooting_node) % ((N - 1) / m_number_of_footsteps) == 0
             && (ii + m_current_shooting_node) >= (2 * ((N - 1) / m_number_of_footsteps))) {
             // LOWER_CONSTRAINT
@@ -459,13 +466,14 @@ inline int ZmpSolver::solve_zmp_mpc(
         } else {
             // Standard weight shift
             // m_timing_value += 1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
-            m_timing_value += (step_duration/(1-step_duration))/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            m_timing_value += (step_duration / (1 - step_duration))
+                / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
 
             p[0] = 0;
             p[1] = 0;
             p[2] = 0;
             p[3] = m_timing_value;
-            p[4] = 0;   
+            p[4] = 0;
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
             // LOWER_CONSTRAINT
             lh[0] = -0.5 * m_admissible_region_x;
@@ -486,7 +494,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
 
     // Set terminal and initial constraints
-    
+
     //
     // lh[0] = -m_foot_width_x;
     // lh[1] = -m_foot_width_y;

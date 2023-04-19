@@ -20,8 +20,9 @@ void FootstepGenerator::publish_foot_placements(
     std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
-    publish_footsteps(footsteps);
-    response->status = 0;
+
+    (footsteps);
+    response->status = true;
 }
 
 geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int stance_leg, int gait_type)
@@ -34,29 +35,14 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
     // 1 is right leg
     // -1 is left leg
     double y = m_l / 2 - stance_leg * m_l / 2;
-    // int8 STAND = 0
-    // int8 STEP = 1
-    // int8 STEP_CLOSE = 2
-    // int8 WALK = 3
+    // STAND = 1
+    // WALK = 2
+    // STEP_CLOSE = 3
     switch (gait_type) {
-        case 0:
+        case 1:
 
             for (int i = 0; i < 1; i++) {
                 x += 0;
-                y += m_vy * 1.0 - stance_leg * m_l;
-                stance_leg = -stance_leg;
-
-                footstep.position.x = x;
-                footstep.position.y = y;
-                footstep.position.z = 0;
-
-                footstep_array.poses.push_back(footstep);
-            }
-            break;
-
-        case 1:
-            for (int i = 0; i < 1; i++) {
-                x += m_vx * 1.0;
                 y += m_vy * 1.0 - stance_leg * m_l;
                 stance_leg = -stance_leg;
 
@@ -80,15 +66,6 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
 
                 footstep_array.poses.push_back(footstep);
             }
-            // Then, add the closing step
-            y += m_vy * 1.0 - stance_leg * m_l;
-            stance_leg = -stance_leg;
-
-            footstep.position.x = x;
-            footstep.position.y = y;
-            footstep.position.z = 0;
-
-            footstep_array.poses.push_back(footstep);
             break;
 
         case 3:
@@ -103,6 +80,15 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
 
                 footstep_array.poses.push_back(footstep);
             }
+            // Then, add the closing step
+            y += m_vy * 1.0 - stance_leg * m_l;
+            stance_leg = -stance_leg;
+
+            footstep.position.x = x;
+            footstep.position.y = y;
+            footstep.position.z = 0;
+
+            footstep_array.poses.push_back(footstep);
             break;
     }
 

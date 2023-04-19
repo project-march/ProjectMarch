@@ -240,7 +240,7 @@ def get_position_from_yaml(position: str):
     """Gets a dictionary for default joint angles and given positions.
 
     Note:
-        Gets the position from the 'default.yaml` located in the "march_gait_files" package in "airgait_vi".
+        Gets the position from the 'default.yaml` located in the "march_gait_files" package in "sit_stand_m8".
 
     Args:
         position (str): Name of the position, e.g. "stand", for home stand.
@@ -251,7 +251,7 @@ def get_position_from_yaml(position: str):
     try:
         with open(
             os.path.join(
-                get_package_share_directory("march_gait_files"),
+                get_package_share_directory("gait_files"),
                 "airgait_vi",
                 "default.yaml",
             ),
