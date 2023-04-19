@@ -9,7 +9,8 @@ using std::placeholders::_2;
 BufferNode::BufferNode()
     : Node("trajectory_buffer")
 {
-    m_buffer_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_input", 10);
+    m_com_trajectory_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_com_input", 10);
+    m_swing_trajectory_publisher = this->create_publisher<march_shared_msgs::msg::IkSolverCommand>("ik_solver_swing_input", 10);
 
     m_com_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/com_trajectory", 10, std::bind(&BufferNode::com_subscriber_callback, this, _1));
@@ -23,17 +24,13 @@ BufferNode::BufferNode()
 void BufferNode::com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     set_com_trajectory(msg);
-    if (check_if_ready()) {
-        publish_ik_trajectory();
-    }
+    publish_com_trajectory();
 }
 
 void BufferNode::swing_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     set_swing_trajectory(msg);
-    if (check_if_ready()) {
-        publish_ik_trajectory();
-    }
+    publish_swing_trajectory();
 }
 
 void BufferNode::set_com_trajectory(geometry_msgs::msg::PoseArray::SharedPtr setter)
@@ -72,23 +69,33 @@ bool BufferNode::check_if_ready()
     return ((m_latest_com_trajectory) && (m_latest_swing_trajectory));
 }
 
-void BufferNode::publish_ik_trajectory()
+void BufferNode::publish_com_trajectory()
 {
     march_shared_msgs::msg::IkSolverCommand ik_command_to_send;
     for (auto i : m_latest_com_trajectory->poses) {
-        ik_command_to_send.com_trajectory.push_back(i.position);
+        ik_command_to_send.trajectory.push_back(i.position);
     }
 
-    for (auto i : m_latest_swing_trajectory->poses) {
-        ik_command_to_send.swing_trajectory.push_back(i.position);
-    }
+    set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity);
 
-    set_velocity(ik_command_to_send.com_trajectory, ik_command_to_send.com_velocity);
-    set_velocity(ik_command_to_send.swing_trajectory, ik_command_to_send.swing_velocity);
-
-    m_buffer_publisher->publish(ik_command_to_send);
+    m_com_trajectory_publisher->publish(ik_command_to_send);
 
     // Reset all the pointers
     m_latest_com_trajectory.reset();
+}
+
+void BufferNode::publish_swing_trajectory()
+{
+    march_shared_msgs::msg::IkSolverCommand ik_command_to_send;
+
+    for (auto i : m_latest_swing_trajectory->poses) {
+        ik_command_to_send.trajectory.push_back(i.position);
+    }
+
+    set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity);
+
+    m_swing_trajectory_publisher->publish(ik_command_to_send);
+
+    // Reset all the pointers
     m_latest_swing_trajectory.reset();
 }

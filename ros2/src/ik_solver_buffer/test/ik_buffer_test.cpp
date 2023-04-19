@@ -47,7 +47,7 @@ TEST_F(IkBufferTest, checkForReadyTest)
 
     ASSERT_EQ(this->ik_buffer->check_if_ready(), true);
     // The check should fail after publishing, so we assert the false statement
-    this->ik_buffer->publish_ik_trajectory();
+    this->ik_buffer->publish_com_trajectory();
     ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
 }
 
