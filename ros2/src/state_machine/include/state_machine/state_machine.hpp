@@ -20,9 +20,9 @@ public:
     bool performTransition(exoState desired_state);
     int get_current_state();
 
-private:
     bool isValidTransition(exoState desired_state);
 
+private:
     exoState m_current_state;
     std::map<exoState, std::set<exoState>> m_exo_transitions;
 };

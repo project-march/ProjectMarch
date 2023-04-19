@@ -50,7 +50,7 @@ def generate_launch_description():
             name="control_type",
             default_value="effort",
             description="Decides which controller is being used. "
-            "'Effort' when you are running either gazebo or the real exo",
+                        "'Effort' when you are running either gazebo or the real exo",
             choices=["rviz", "effort"],
             condition=UnlessCondition(rviz_condition),
         ),
@@ -58,7 +58,7 @@ def generate_launch_description():
             name="control_type",
             default_value="rviz",
             description="Decides which controller is being used. "
-            "'Rviz' when you are not running either gazebo or the real exo",
+                        "'Rviz' when you are not running either gazebo or the real exo",
             choices=["rviz", "effort"],
             condition=IfCondition(rviz_condition),
         )
@@ -106,20 +106,6 @@ def generate_launch_description():
         ],
         condition=UnlessCondition(simulation),
     )
-
-    # region Start broadcasters
-    pressure_sole_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner.py",
-        arguments=[
-            "pressure_sole_broadcaster",
-            "-t",
-            "pressure_sole_broadcaster/PressureSoleBroadcaster",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-        condition=UnlessCondition(simulation),
-    )
     # endregion
 
     nodes = [
@@ -127,7 +113,6 @@ def generate_launch_description():
         joint_trajectory_controller_spawner,
         pdb_state_broadcaster_spawner,
         motor_controller_state_broadcaster_spawner,
-        pressure_sole_state_broadcaster_spawner,
     ]
 
     # region Launch Controller manager, Extra configuration if simulation is `false`

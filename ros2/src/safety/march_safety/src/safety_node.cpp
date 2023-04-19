@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     // Add the input device and temperature safety handlers
     auto safety_handler = std::make_shared<SafetyHandler>(safety_node);
     safety_node->safety_list.push_back(std::make_unique<InputDeviceSafety>(safety_node, safety_handler));
-//    safety_node->safety_list.push_back(std::make_unique<TemperatureSafety>(safety_node, safety_handler));
+    //    safety_node->safety_list.push_back(std::make_unique<TemperatureSafety>(safety_node, safety_handler));
 
     safety_node->start();
 
