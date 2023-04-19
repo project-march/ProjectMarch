@@ -6,9 +6,9 @@ using std::placeholders::_2;
 IkSolverNode::IkSolverNode()
     : Node("ik_solver")
     , m_ik_solver()
-    , m_trajectory_index(0)
-    , m_right_foot_on_ground(true)
     , m_desired_state()
+    , m_right_foot_on_ground(true)
+    , m_trajectory_index(0)
     , m_stance_foot(0)
 {
     m_trajectory_subscriber = this->create_subscription<march_shared_msgs::msg::IkSolverCommand>(
@@ -23,13 +23,18 @@ IkSolverNode::IkSolverNode()
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&IkSolverNode::stance_foot_callback, this, _1));
 
-    m_solving_timer = this->create_wall_timer(8ms, std::bind(&IkSolverNode::timer_callback, this));
-
-    // Initialiing the IK solver
+    // Initializing the IK solver
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
     m_ik_solver.load_urdf_model(robot_description);
     m_ik_solver.initialize_solver();
+
+    // Initializing the timestep
+    declare_parameter("timestep", 1000);
+    m_timestep = this->get_parameter("timestep").as_int();
+
+    m_solving_timer
+        = this->create_wall_timer(std::chrono::milliseconds(m_timestep), std::bind(&IkSolverNode::timer_callback, this));
 
     pinocchio::Model test_model = m_ik_solver.get_model();
     for (pinocchio::FrameIndex i = 0; i < static_cast<pinocchio::FrameIndex>(test_model.nframes); i++) {
@@ -88,36 +93,46 @@ void IkSolverNode::timer_callback()
     } else {
         // IN THE POSE ARRAY, INDEX 0 IS RIGHT AND INDEX 1 IS LEFT
         if (m_stance_foot == 1) {
-            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x,
-                m_latest_foot_positions->poses[0].position.y, m_latest_foot_positions->poses[0].position.z, 0.0, 0.0,
-                0.0;
+            m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+            m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x
-                    + m_trajectory_container->swing_trajectory[m_trajectory_index].x,
-                m_latest_foot_positions->poses[1].position.y
-                + m_trajectory_container->swing_trajectory[m_trajectory_index].y,
-                m_latest_foot_positions->poses[1].position.z
-                + m_trajectory_container->swing_trajectory[m_trajectory_index].z,
+            m_desired_state.left_foot_pose << m_trajectory_container->swing_velocity[m_trajectory_index].x * (m_timestep*1e-3),
+                m_trajectory_container->swing_velocity[m_trajectory_index].y * (m_timestep*1e-3),
+                m_trajectory_container->swing_velocity[m_trajectory_index].z * (m_timestep*1e-3),
                 0.0, 0.0, 0.0;
-        } else {
-            m_desired_state.left_foot_pose << m_latest_foot_positions->poses[1].position.x,
-                m_latest_foot_positions->poses[1].position.y, m_latest_foot_positions->poses[1].position.z, 0.0, 0.0,
-                0.0;
 
-            m_desired_state.right_foot_pose << m_latest_foot_positions->poses[0].position.x
-                    + m_trajectory_container->swing_trajectory[m_trajectory_index].x,
-                m_latest_foot_positions->poses[0].position.y
-                + m_trajectory_container->swing_trajectory[m_trajectory_index].y,
-                m_latest_foot_positions->poses[0].position.z
-                + m_trajectory_container->swing_trajectory[m_trajectory_index].z,
+            m_desired_state.left_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
+                m_trajectory_container->swing_velocity[m_trajectory_index].y,
+                m_trajectory_container->swing_velocity[m_trajectory_index].z, 0.0, 0.0, 0.0;
+        }
+        if (m_stance_foot == -1){
+            m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+            m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+            m_desired_state.right_foot_pose << m_trajectory_container->swing_velocity[m_trajectory_index].x * (m_timestep*1e-3),
+                m_trajectory_container->swing_velocity[m_trajectory_index].y * (m_timestep*1e-3),
+                m_trajectory_container->swing_velocity[m_trajectory_index].z * (m_timestep*1e-3),
                 0.0, 0.0, 0.0;
+
+            m_desired_state.right_foot_vel << m_trajectory_container->swing_velocity[m_trajectory_index].x,
+                m_trajectory_container->swing_velocity[m_trajectory_index].y,
+                m_trajectory_container->swing_velocity[m_trajectory_index].z, 0.0, 0.0, 0.0;
         }
 
-        m_desired_state.com_pos << m_trajectory_container->com_trajectory[m_trajectory_index].x,
-            m_trajectory_container->com_trajectory[m_trajectory_index].y,
-            m_trajectory_container->com_trajectory[m_trajectory_index].z;
+        m_desired_state.com_pos << m_trajectory_container->com_velocity[m_trajectory_index].x * (m_timestep*1e-6),
+            m_trajectory_container->com_velocity[m_trajectory_index].y * (m_timestep*1e-6),
+            m_trajectory_container->com_velocity[m_trajectory_index].z * (m_timestep*1e-6);
+
+        m_desired_state.com_vel << m_trajectory_container->com_velocity[m_trajectory_index].x,
+            m_trajectory_container->com_velocity[m_trajectory_index].y,
+            m_trajectory_container->com_velocity[m_trajectory_index].z;
         // Get solution
-        Eigen::VectorXd solution = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state);
+        Eigen::VectorXd solution_velocity
+            = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state, m_stance_foot);
+
+        Eigen::VectorXd solution_position = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep)/1000.0);
+
     }
 }
 

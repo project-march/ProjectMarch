@@ -13,7 +13,7 @@ SolverNode::SolverNode()
     //    10);
     m_com_trajectory_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("com_trajectory", 10);
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
-    m_com_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
+    m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/desired_footsteps", 10, std::bind(&SolverNode::feet_callback, this, _1));
@@ -21,19 +21,20 @@ SolverNode::SolverNode()
         "/robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&SolverNode::stance_foot_callback, this, _1));
+
+    m_solving_timer = this->create_wall_timer(8ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
-void SolverNode::com_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+void SolverNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
 {
-    //    m_zmp_solver.set_current_com(
-    //        msg->poses[0].position.x, msg->poses[0].position.y, msg->poses[1].position.x, msg->poses[1].position.y);
-    RCLCPP_DEBUG(this->get_logger(), "com callback test");
+    m_zmp_solver.set_current_com(msg->position.x, msg->position.y, msg->velocity.x, msg->velocity.y);
+    m_zmp_solver.set_com_height(msg->position.z);
 }
 
 void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-    RCLCPP_DEBUG(this->get_logger(), "zmp callback test");
+    m_zmp_solver.set_current_zmp(msg->point.x, msg->point.y);
 }
 
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -55,11 +56,22 @@ void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 //    // }
 //}
 
-void SolverNode::publish_control_msg()
+void SolverNode::timer_callback()
 {
-    auto message = geometry_msgs::msg::PoseArray();
-    message.header.stamp = this->get_clock()->now();
-    message.header.frame_id = "map";
+    m_zmp_solver.set_current_state();
+    int solver_status = m_zmp_solver.solve_step();
+    if (solver_status != 0)
+        {
+        RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
+        }
+    auto com_msg = geometry_msgs::msg::PoseArray();
+    com_msg.header.stamp = this->get_clock()->now();
+    com_msg.header.frame_id = "map";
+
+    auto foot_msg = geometry_msgs::msg::PoseArray();
+    foot_msg.header.stamp = this->get_clock()->now();
+    foot_msg.header.frame_id = "map";
+
     geometry_msgs::msg::Pose pose_container;
 
     std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
@@ -68,13 +80,15 @@ void SolverNode::publish_control_msg()
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 0)];
         pose_container.position.y = (*trajectory_pointer)[(i * NX + 3)];
         pose_container.position.z = m_zmp_solver.get_com_height();
-        message.poses.push_back(pose_container);
+        com_msg.poses.push_back(pose_container);
+
+        // The feet
+        pose_container.position.x = (*trajectory_pointer)[(i * NX + 6)];
+        pose_container.position.y = (*trajectory_pointer)[(i * NX + 8)];
+        foot_msg.poses.push_back(pose_container);
     };
-    // message.mode = 0;
-    // message.control_inputs = 1;
-    // message.dt = (m_time_horizon / PENDULUM_ODE_N);
-    m_com_trajectory_publisher->publish(message);
-    return;
+    m_com_trajectory_publisher->publish(com_msg);
+    m_final_feet_publisher->publish(foot_msg);
 }
 
 int main(int argc, char** argv)

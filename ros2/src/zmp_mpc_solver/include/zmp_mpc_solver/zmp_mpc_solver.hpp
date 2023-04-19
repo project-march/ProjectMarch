@@ -26,10 +26,11 @@ public:
     void set_current_foot(double, double);
     void set_previous_foot(double, double);
     void set_current_com(double, double, double, double);
+    void set_com_height(double);
     void set_current_zmp(double, double);
     void set_current_stance_foot(int);
     void initialize_mpc_params();
-    const double get_com_height();
+    double get_com_height();
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);

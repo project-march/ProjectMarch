@@ -25,12 +25,11 @@ struct Foot {
     geometry_msgs::msg::PointStamped position;
     double width;
     double height;
+    double threshold;
     bool on_ground;
     // The prefix can be L or R
     void set_on_ground(const std::vector<PressureSensor> sensors, const char* prefix)
     {
-        // NOTE: Be sure to modify this threshold once we know a value which makes sense
-        double threshold = 0.5;
         double measured_foot_pressure = 0.0;
         // look for the right pressure sensors specific to the foot
         for (auto i : sensors) {
@@ -51,12 +50,14 @@ public:
     void set_foot_size(double, double, const char*);
     void update_feet(const std::vector<PressureSensor>);
     bool get_foot_on_ground(const char*);
+    void set_threshold(double);
     Foot* get_foot(const char*);
     // IMU& get_imu();
 
 private:
     Foot foot_left;
     Foot foot_right;
+    double m_threshold;
 };
 
 #endif

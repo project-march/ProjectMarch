@@ -8,16 +8,16 @@ StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this)
     , m_com_estimator()
+    , m_cop_estimator(create_pressure_sensors())
     , m_imu_estimator()
     , m_zmp_estimator()
-    , m_cop_estimator(create_pressure_sensors())
     , m_footstep_estimator()
     , m_current_stance_foot(0)
 {
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/upper_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        "/upper_imu", 10, std::bind(&StateEstimator::upper_imu_callback, this, _1));
     m_lower_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
-        "/lower_imu", 10, std::bind(&StateEstimator::sensor_callback, this, _1));
+        "/lower_imu", 10, std::bind(&StateEstimator::lower_imu_callback, this, _1));
     m_pressure_sole_subscriber = this->create_subscription<march_shared_msgs::msg::PressureSolesData>(
         "/march/pressure_sole_data", 10, std::bind(&StateEstimator::pressure_sole_callback, this, _1));
     m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
@@ -25,7 +25,7 @@ StateEstimator::StateEstimator()
 
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
-    m_com_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_com_position", 100);
+    m_com_pos_publisher = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 100);
 
     m_cop_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_cop_position", 100);
 
@@ -42,29 +42,47 @@ StateEstimator::StateEstimator()
 
     m_rviz_publisher = this->create_publisher<visualization_msgs::msg::Marker>("joint_visualizations", 100);
 
-    timer_ = this->create_wall_timer(1000ms, std::bind(&StateEstimator::publish_robot_frames, this));
+    declare_parameter("state_estimator_config.refresh_rate", 1000);
+    auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
+    timer_ = this->create_wall_timer(
+        std::chrono::milliseconds(refresh_rate), std::bind(&StateEstimator::publish_robot_frames, this));
 
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
     // Declare parameters
     // IMU parameters
-    declare_parameter("imu_estimator.IMU_exo_base_link", std::string("default"));
-    declare_parameter("imu_estimator.IMU_exo_position", std::vector<double>(3, 0.0));
-    declare_parameter("imu_estimator.IMU_exo_rotation", std::vector<double>(3, 0.0));
+    declare_parameter("imu_estimator.lower_imu.IMU_exo_base_link", std::string("default"));
+    declare_parameter("imu_estimator.lower_imu.IMU_exo_position", std::vector<double>(3, 0.0));
+    declare_parameter("imu_estimator.lower_imu.IMU_exo_rotation", std::vector<double>(3, 0.0));
+    declare_parameter("imu_estimator.upper_imu.IMU_exo_base_link", std::string("default"));
+    declare_parameter("imu_estimator.upper_imu.IMU_exo_position", std::vector<double>(3, 0.0));
+    declare_parameter("imu_estimator.upper_imu.IMU_exo_rotation", std::vector<double>(3, 0.0));
+
     declare_parameter("footstep_estimator.left_foot.size", std::vector<double>(6, 2));
     declare_parameter("footstep_estimator.right_foot.size", std::vector<double>(6, 2));
+    declare_parameter("footstep_estimator.on_ground_threshold", 0.5);
+    // Footstep parameters
     auto left_foot_size = this->get_parameter("footstep_estimator.left_foot.size").as_double_array();
     auto right_foot_size = this->get_parameter("footstep_estimator.right_foot.size").as_double_array();
+    auto on_ground_threshold = this->get_parameter("footstep_estimator.on_ground_threshold").as_double();
     m_footstep_estimator.set_foot_size(left_foot_size[0], left_foot_size[1], "l");
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
+    m_footstep_estimator.set_threshold(on_ground_threshold);
+
+    m_foot_pos_publisher->publish(m_current_stance_foot);
 
     initialize_imus();
 }
 
-void StateEstimator::sensor_callback(sensor_msgs::msg::Imu::SharedPtr msg)
+void StateEstimator::lower_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
-    m_imu_estimator.update_imu(*msg);
+    m_imu_estimator.update_imu(*msg, LOWER);
+}
+
+void StateEstimator::upper_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
+{
+    m_imu_estimator.update_imu(*msg, UPPER);
 }
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
@@ -82,9 +100,9 @@ void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSole
 void StateEstimator::initialize_imus()
 {
     IMU imu_to_set;
-    auto imu_base_link = get_parameter("imu_estimator.IMU_exo_base_link").as_string();
-    auto imu_position = get_parameter("imu_estimator.IMU_exo_position").as_double_array();
-    auto imu_rotation = get_parameter("imu_estimator.IMU_exo_rotation").as_double_array();
+    auto imu_base_link = get_parameter("imu_estimator.lower_imu.IMU_exo_base_link").as_string();
+    auto imu_position = get_parameter("imu_estimator.lower_imu.IMU_exo_position").as_double_array();
+    auto imu_rotation = get_parameter("imu_estimator.lower_imu.IMU_exo_rotation").as_double_array();
     imu_to_set.data.header.frame_id = "lowerIMU";
     imu_to_set.base_frame = imu_base_link;
     imu_to_set.imu_location.translation.x = imu_position[0];
@@ -94,14 +112,27 @@ void StateEstimator::initialize_imus()
     tf2_imu_rotation.setRPY(imu_rotation[0], imu_rotation[1], imu_rotation[2]);
     tf2_imu_rotation.normalize();
     tf2::convert(tf2_imu_rotation, imu_to_set.imu_location.rotation);
-    m_imu_estimator.set_imu(imu_to_set);
+    m_imu_estimator.set_imu(imu_to_set, LOWER);
+    //
+    imu_base_link = get_parameter("imu_estimator.upper_imu.IMU_exo_base_link").as_string();
+    imu_position = get_parameter("imu_estimator.upper_imu.IMU_exo_position").as_double_array();
+    imu_rotation = get_parameter("imu_estimator.upper_imu.IMU_exo_rotation").as_double_array();
+    imu_to_set.data.header.frame_id = "upperIMU";
+    imu_to_set.base_frame = imu_base_link;
+    imu_to_set.imu_location.translation.x = imu_position[0];
+    imu_to_set.imu_location.translation.x = imu_position[1];
+    imu_to_set.imu_location.translation.x = imu_position[2];
+    tf2_imu_rotation.setRPY(imu_rotation[0], imu_rotation[1], imu_rotation[2]);
+    tf2_imu_rotation.normalize();
+    tf2::convert(tf2_imu_rotation, imu_to_set.imu_location.rotation);
+    m_imu_estimator.set_imu(imu_to_set, UPPER);
 }
 
 void StateEstimator::update_foot_frames()
 {
     // This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
     // obtain the origin joint
-    IMU& imu = m_imu_estimator.get_imu();
+    // IMU& imu = m_imu_estimator.get_imu(LOWER);
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
             = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
@@ -149,12 +180,19 @@ void StateEstimator::publish_com_frame()
     com_transform.transform.rotation.w = 1.0;
 
     m_tf_joint_broadcaster->sendTransform(com_transform);
+
+    // Here, we also publish to the robot com position
+    march_shared_msgs::msg::CenterOfMass center_of_mass;
+    center_of_mass.position = com.position.point;
+    center_of_mass.velocity = m_zmp_estimator.get_com_velocity();
+
+    m_com_pos_publisher->publish(center_of_mass);
 }
 
 void StateEstimator::publish_robot_frames()
 {
     // publish IMU frames
-    IMU& imu = m_imu_estimator.get_imu();
+    IMU& imu = m_imu_estimator.get_imu(LOWER);
     m_tf_joint_broadcaster->sendTransform(imu.get_imu_rotation());
     update_foot_frames();
     // publish joint frames
@@ -166,14 +204,6 @@ void StateEstimator::publish_robot_frames()
     }
     // Publish each joint center of mass
     std::vector<CenterOfMass> joint_com_positions = m_joint_estimator.get_joint_com_positions("map");
-    // RCLCPP_INFO(this->get_logger(), "Array size is %i", joint_com_positions.size());
-    int i = 0;
-    for (auto com : joint_com_positions) {
-        i++;
-        if (i == 6) {
-            m_com_pos_publisher->publish(com.position);
-        }
-    }
 
     // Update and publish the actual, full center of mass
     m_com_estimator.set_com_state(joint_com_positions);
@@ -199,13 +229,30 @@ void StateEstimator::publish_robot_frames()
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
     m_foot_pos_publisher->publish(foot_positions);
-    if (m_footstep_estimator.get_foot_on_ground("l") && m_current_stance_foot != -1) {
-        m_foot_pos_publisher->publish(-1);
-        m_current_stance_foot = -1;
+
+    // double stance
+    if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
+
+        // We always take the front foot as the stance foot :)
+        if (foot_positions.poses[0].position.x>foot_positions.poses[1].position.x && m_current_stance_foot!=1){
+            m_current_stance_foot = 1;
+            m_foot_pos_publisher->publish(m_current_stance_foot);
+        }else if (foot_positions.poses[0].position.x<foot_positions.poses[1].position.x && m_current_stance_foot!=-1){
+            m_current_stance_foot = -1;
+            m_foot_pos_publisher->publish(m_current_stance_foot);
+        }
     }
-    if (m_footstep_estimator.get_foot_on_ground("r") && m_current_stance_foot != 1) {
-        m_foot_pos_publisher->publish(1);
+    // left
+    if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
+        && m_current_stance_foot != -1) {
+        m_current_stance_foot = -1;
+        m_foot_pos_publisher->publish(m_current_stance_foot);
+    }
+    // right
+    if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
+        && m_current_stance_foot != 1) {
         m_current_stance_foot = 1;
+        m_foot_pos_publisher->publish(m_current_stance_foot);
     }
 
     // Update and publish feet height

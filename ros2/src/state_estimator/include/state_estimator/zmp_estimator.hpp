@@ -28,6 +28,7 @@ public:
     ZmpEstimator();
     void set_zmp();
     geometry_msgs::msg::PointStamped get_zmp();
+    geometry_msgs::msg::Vector3 get_com_velocity();
     void set_com_states(CenterOfMass, rclcpp::Time);
 
 private:

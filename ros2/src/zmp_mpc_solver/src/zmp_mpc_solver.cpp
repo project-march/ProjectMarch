@@ -2,14 +2,14 @@
 #include "zmp_mpc_solver/zmp_mpc_solver.hpp"
 
 ZmpSolver::ZmpSolver()
-    : m_x_current()
+    : m_time_horizon(4.0)
+    , m_x_current()
     , m_u_current()
-    , m_time_horizon(10.0)
-    , m_gravity_const(9.81)
     , m_switch(0)
     , m_current_shooting_node(0)
     , m_timing_value(0)
     , m_current_stance_foot(1)
+    , m_gravity_const(9.81)
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -21,11 +21,9 @@ ZmpSolver::ZmpSolver()
     set_current_foot(0.0, 0.1);
     set_previous_foot(0.0, 0.1);
     set_current_state();
-    // m_x_current = {0.0, 0.0, 0.0, 0.06, -0.1, 0.06, 0.0, 0.0, 0.1, 0.1, 0.0, 0.0};
-    solve_step();
 }
 
-const double ZmpSolver::get_com_height()
+double ZmpSolver::get_com_height()
 {
     return m_com_height;
 }
@@ -95,6 +93,11 @@ void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
     m_com_vel_current[1] = dy;
 }
 
+void ZmpSolver::set_com_height(double height)
+{
+    m_com_height = height;
+}
+
 void ZmpSolver::set_current_zmp(double x, double y)
 {
     m_zmp_current[0] = x;
@@ -106,8 +109,8 @@ void ZmpSolver::initialize_mpc_params()
     // Later, change this to read from a yaml
     m_admissible_region_x = 0.62;
     m_admissible_region_y = 0.10;
-    m_foot_width_x = 0.10;
-    m_foot_width_y = 0.1;
+    m_foot_width_x = 0.1;
+    m_foot_width_y = 0.12;
     m_step_size_x = 0.2;
     m_step_size_y = 0.2;
 
@@ -118,7 +121,7 @@ void ZmpSolver::initialize_mpc_params()
     m_current_shooting_node = 0;
     m_timing_value = 0;
 
-    m_number_of_footsteps = 10;
+    m_number_of_footsteps = 4;
 }
 
 void ZmpSolver::set_current_stance_foot(int stance_foot)
@@ -260,14 +263,35 @@ inline int ZmpSolver::solve_zmp_mpc(
     double count = m_current_stance_foot;
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
+    // The step number
+    int step_number = 0;
+    float step_duration = 0.6; //Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
+    float step_duration_factor = 1.0/step_duration;
+
     if ((m_current_shooting_node != 0) && (m_current_shooting_node < ((N - 1) / m_number_of_footsteps))) {
         m_timing_value = (m_current_shooting_node - 1) / ((N - 1) / m_number_of_footsteps);
+        count = -count;
     }
 
     // ii is defined as the current stage
     for (int ii = 0; ii <= N; ii++) {
         if (((ii + m_current_shooting_node) % ((N - 1) / m_number_of_footsteps) == 0)
             && (ii + m_current_shooting_node != 0)) {
+
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);    
+            step_number+=1;
             count = -count;
             m_timing_value = 1;
 
@@ -276,15 +300,27 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[2] = m_switch;
             p[3] = m_timing_value;
             p[4] = 0;
+            
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-            m_timing_value = -1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
+            m_timing_value = -((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
 
         } else if (ii + m_current_shooting_node == 0) {
             // STARTING SHOOTING NODE
             count = -count;
             m_timing_value = 1;
-
+            // lh: Lower path constraints
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -m_first_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // rh: Upper path constraints
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = m_first_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             p[0] = 0;
             p[1] = -count * m_step_size_y / dt;
             p[2] = m_switch;
@@ -292,11 +328,76 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[4] = 0;
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-            m_timing_value = -1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
+            m_timing_value = -((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
 
+        } else if (step_number*((N-1)/m_number_of_footsteps)<ii-m_current_shooting_node && ii-m_current_shooting_node <
+            ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps)/(2*step_duration_factor)){
+            // KEEP SHADOW FOOT ON THE STANCE LEG, keeps increase in timing factor small after just setting a footstep
+            m_timing_value += ((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            p[0] = 0;
+            p[1] = 0;
+            p[2] = 0;
+            p[3] = m_timing_value;
+            p[4] = 0;
+            ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
+
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
+
+        } else if ((step_number+1)*((N-1)/m_number_of_footsteps) - ((N-1)/m_number_of_footsteps)/(2*step_duration_factor)<ii-m_current_shooting_node && ii-m_current_shooting_node <
+            ((N-1)/m_number_of_footsteps)){
+            // KEEP SHADOW FOOT ON THE STANCE LEG, keeps increase in timing factor small after just setting a footstep
+            m_timing_value += ((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            p[0] = 0;
+            p[1] = 0;
+            p[2] = 0;
+            p[3] = m_timing_value;
+            p[4] = 0;
+            ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
+
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
+
+        // for periodic tail constraint
         } else if (ii + m_current_shooting_node
             == (2 * (m_current_shooting_node + (N - 1) / m_number_of_footsteps) - 1)) {
-            m_timing_value += 1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
+            m_timing_value += (step_duration/(1-step_duration))/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
             p[0] = 0;
             p[1] = 0;
             p[2] = 0;
@@ -304,7 +405,21 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[4] = 1;
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
+        // for step and close
         } else if (ii + m_current_shooting_node == 2 * ((N - 1) / m_number_of_footsteps)) {
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
             count = -count;
             m_timing_value = 1;
             p[0] = m_step_size_x / dt / 2;
@@ -312,15 +427,29 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[2] = m_switch;
             p[3] = m_timing_value;
             p[4] = 0;
-
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
+            m_timing_value = -1 / (((N)-m_number_of_footsteps) / m_number_of_footsteps);
 
+        // for step and close
         } else if ((ii + m_current_shooting_node) % ((N - 1) / m_number_of_footsteps) == 0
             && (ii + m_current_shooting_node) >= (2 * ((N - 1) / m_number_of_footsteps))) {
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
             count = -count;
             m_timing_value = 1;
             p[0] = 0;
-            p[1] = -count * m_step_size_y;
+            p[1] = -count * m_step_size_y / dt;
             p[2] = m_switch;
             p[3] = m_timing_value;
             p[4] = 0;
@@ -329,45 +458,35 @@ inline int ZmpSolver::solve_zmp_mpc(
             m_timing_value = -1 / (((N)-m_number_of_footsteps) / m_number_of_footsteps);
         } else {
             // Standard weight shift
-            m_timing_value += 1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
+            // m_timing_value += 1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));
+            m_timing_value += (step_duration/(1-step_duration))/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+
             p[0] = 0;
             p[1] = 0;
             p[2] = 0;
             p[3] = m_timing_value;
-            p[4] = 0;
-
+            p[4] = 0;   
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
+            // LOWER_CONSTRAINT
+            lh[0] = -0.5 * m_admissible_region_x;
+            lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
+            lh[2] = -m_foot_width_x / 2;
+            lh[3] = -m_foot_width_y / 2;
+            // UPPER_CONSTRAINT
+            uh[0] = 0.5 * m_admissible_region_x;
+            uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
+            uh[2] = m_foot_width_x / 2;
+            uh[3] = m_foot_width_y / 2;
+            //
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
+            ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
         }
 
-        // LOWER_CONSTRAINT
-        lh[0] = -0.5 * m_admissible_region_x;
-        lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
-        lh[2] = -m_foot_width_x / 2;
-        lh[3] = -m_foot_width_y / 2;
-        // UPPER_CONSTRAINT
-        uh[0] = 0.5 * m_admissible_region_x;
-        uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
-        uh[2] = m_foot_width_x / 2;
-        uh[3] = m_foot_width_y / 2;
-        //
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
-        // printf("Shooting node %i: [%f, %f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4], p[5]);
+        // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
     }
 
     // Set terminal and initial constraints
-    // lh: Lower path constraints
-    lh[0] = -0.5 * m_admissible_region_x;
-    lh[1] = -m_first_admissible_region_y;
-    lh[2] = -m_foot_width_x / 2;
-    lh[3] = -m_foot_width_y / 2;
-    // rh: Upper path constraints
-    uh[0] = 0.5 * m_admissible_region_x;
-    uh[1] = m_first_admissible_region_y;
-    uh[2] = m_foot_width_x / 2;
-    uh[3] = m_foot_width_y / 2;
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lh", lh);
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "uh", uh);
+    
     //
     // lh[0] = -m_foot_width_x;
     // lh[1] = -m_foot_width_y;

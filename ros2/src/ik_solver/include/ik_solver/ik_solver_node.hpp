@@ -39,6 +39,7 @@ private:
     bool m_right_foot_on_ground;
     int m_trajectory_index;
     int m_stance_foot;
+    int m_timestep;
 };
 
 #endif
