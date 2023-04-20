@@ -79,7 +79,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
              frictionloss="0" stiffness="0"/>
     </default>
   </default>
-  
+
   <visual>
     <map force="0.1" zfar="30"/>
     <rgba haze="0.15 0.25 0.35 1"/>
@@ -290,14 +290,14 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="L_ADPF"    gear="1000"  joint="L_ADPF"  />
-    <motor name="L_HAA"     gear="2000"  joint="L_HAA"  />
-    <motor name="L_HFE"     gear="2000" joint="L_HFE"   />
-    <motor name="L_KFE"     gear="2000"  joint="L_KFE"   />
-    <motor name="R_ADPF"    gear="1000"  joint="R_ADPF"  />
-    <motor name="R_HAA"     gear="2000"  joint="R_HAA"  />
-    <motor name="R_HFE"     gear="2000" joint="R_HFE"   />
-    <motor name="R_KFE"     gear="2000"  joint="R_KFE" />
+    <motor name="L_ADPF"    gear="179"  joint="L_ADPF"  />
+    <motor name="L_HAA"     gear="280"  joint="L_HAA"  />
+    <motor name="L_HFE"     gear="250" joint="L_HFE"   />
+    <motor name="L_KFE"     gear="250"  joint="L_KFE"   />
+    <motor name="R_ADPF"    gear="179"  joint="R_ADPF"  />
+    <motor name="R_HAA"     gear="280"  joint="R_HAA"  />
+    <motor name="R_HFE"     gear="250" joint="R_HFE"   />
+    <motor name="R_KFE"     gear="250"  joint="R_KFE" />
   </actuator>
 
   <sensor>
