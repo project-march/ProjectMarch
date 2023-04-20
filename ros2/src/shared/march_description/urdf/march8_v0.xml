@@ -290,14 +290,14 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="L_ADPF"    gear="179"  joint="L_ADPF"  />
-    <motor name="L_HAA"     gear="280"  joint="L_HAA"  />
-    <motor name="L_HFE"     gear="250" joint="L_HFE"   />
-    <motor name="L_KFE"     gear="250"  joint="L_KFE"   />
-    <motor name="R_ADPF"    gear="179"  joint="R_ADPF"  />
-    <motor name="R_HAA"     gear="280"  joint="R_HAA"  />
-    <motor name="R_HFE"     gear="250" joint="R_HFE"   />
-    <motor name="R_KFE"     gear="250"  joint="R_KFE" />
+    <motor name="left_ankle"    gear="179"  joint="L_ADPF"  />
+    <motor name="left_hip_aa"     gear="280"  joint="L_HAA"  />
+    <motor name="left_hip_fe"     gear="250" joint="L_HFE"   />
+    <motor name="left_knee"     gear="250"  joint="L_KFE"   />
+    <motor name="right_ankle"    gear="179"  joint="R_ADPF"  />
+    <motor name="right_hip_aa"     gear="280"  joint="R_HAA"  />
+    <motor name="right_hip_fe"     gear="250" joint="R_HFE"   />
+    <motor name="right_knee"     gear="250"  joint="R_KFE" />
   </actuator>
 
   <sensor>
