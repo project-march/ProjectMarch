@@ -262,56 +262,56 @@
 	<!-- Robot Transmission Definitions -->
 	<!--                                -->
 	<transmission name="L_HAATransmission">
-            <joint name="L_HAA"/>
+            <joint name="left_hip_aa"/>
             <actuator>
                     <mechanicalReduction>25</mechanicalReduction>
                     <motorInertia>5.4</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="L_HFETransmission">
-            <joint name="L_HFE"/>
+            <joint name="left_hip_fe"/>
             <actuator>
                     <mechanicalReduction>16</mechanicalReduction>
                     <motorInertia>20.3</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="L_KFETransmission">
-            <joint name="L_KFE"/>
+            <joint name="left_knee"/>
             <actuator>
                     <mechanicalReduction>16</mechanicalReduction>
                     <motorInertia>20.3</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="L_ADPFTransmission">
-            <joint name="L_ADPF"/>
+            <joint name="left_ankle"/>
             <actuator>
                     <mechanicalReduction>50</mechanicalReduction>
                     <motorInertia>2.2</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="R_HAATransmission">
-            <joint name="R_HAA"/>
+            <joint name="right_hip_aa"/>
             <actuator>
                     <mechanicalReduction>25</mechanicalReduction>
                     <motorInertia>5.4</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="R_HFETransmission">
-            <joint name="R_HFE"/>
+            <joint name="right_hip_fe"/>
             <actuator>
                     <mechanicalReduction>16</mechanicalReduction>
                     <motorInertia>20.3</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="R_KFETransmission">
-            <joint name="R_KFE"/>
+            <joint name="right_knee"/>
             <actuator>
                     <mechanicalReduction>16</mechanicalReduction>
                     <motorInertia>20.3</motorInertia>
             </actuator>
   	</transmission>
   	<transmission name="R_ADPFTransmission">
-            <joint name="R_ADPF"/>
+            <joint name="right_ankle"/>
             <actuator>
                     <mechanicalReduction>50</mechanicalReduction>
                     <motorInertia>2.2</motorInertia>

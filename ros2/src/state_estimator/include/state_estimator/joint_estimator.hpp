@@ -29,6 +29,8 @@ struct CenterOfMass {
 
 struct JointContainer {
     std::string name;
+    std::string base_link_name;
+    double axis;
     geometry_msgs::msg::TransformStamped frame;
     CenterOfMass com;
     double length_x;
