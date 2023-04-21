@@ -21,6 +21,7 @@ find_package(ament_cmake_gmock REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 # find_package(<dependency> REQUIRED)
 include_directories(include)
 
@@ -37,6 +38,7 @@ ament_target_dependencies(
         "rclcpp"
         "march_shared_msgs"
         "geometry_msgs"
+        "std_msgs"
 )
 
 add_executable(swing_leg_trajectory_generator_node src/swing_leg_trajectory_generator_node.cpp src/swing_leg_trajectory_generator.cpp
@@ -50,6 +52,7 @@ ament_target_dependencies(
         "rclcpp"
         "march_shared_msgs"
         "geometry_msgs"
+        "std_msgs"
 )
 
 install(TARGETS swing_leg_trajectory_generator_node

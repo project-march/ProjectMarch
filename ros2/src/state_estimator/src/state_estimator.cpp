@@ -70,7 +70,7 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
 
-    m_foot_pos_publisher->publish(m_current_stance_foot);
+    m_stance_foot_publisher->publish(m_current_stance_foot);
 
     initialize_imus();
 }
