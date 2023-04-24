@@ -41,12 +41,13 @@ struct BezierCurve {
 class SwingLegTrajectoryGenerator {
 public:
     SwingLegTrajectoryGenerator();
-    Point getPoint(std::vector<Point> points, double t);
-    void generateTrajectory();
-    BezierCurve getCurve();
-    void setPoints(std::vector<Point> points);
-    void setStepLength(double step_length);
-    void updatePoints(std::vector<Point> points, double step_length);
+    Point get_point(std::vector<Point> points, double t);
+    void generate_trajectory();
+    BezierCurve get_curve();
+    double get_step_length();
+    void set_points(std::vector<Point> points);
+    void set_step_length(double step_length);
+    void update_points(std::vector<Point> points, double step_length);
 
 private:
     BezierCurve m_curve;
