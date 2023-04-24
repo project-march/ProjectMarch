@@ -27,6 +27,9 @@ IkSolverNode::IkSolverNode()
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&IkSolverNode::stance_foot_callback, this, _1));
 
+    m_joint_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+        "joint_trajectory_controller/joint_trajectory", 10);
+
     // Initializing the IK solver
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
@@ -148,6 +151,16 @@ void IkSolverNode::timer_callback()
 
         Eigen::VectorXd solution_position
             = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
+
+        trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
+        trajectory_msgs::msg::JointTrajectoryPoint point;
+        point.positions
+            = std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size());
+        point.velocities
+            = std::vector<double>(solution_velocity.data(), solution_velocity.data() + solution_velocity.size());
+        trajectory.points.push_back(point);
+        trajectory.header.stamp = this->get_clock()->now();
+        m_joint_trajectory_publisher->publish(trajectory);
     }
 }
 
