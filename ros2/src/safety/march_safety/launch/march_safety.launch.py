@@ -30,11 +30,6 @@ def generate_launch_description() -> LaunchDescription:
                 ),
                 description="Path to the configuration for the safety settings",
             ),
-            DeclareLaunchArgument(
-                name="use_sim_time",
-                default_value="true",
-                description="Whether to use simulation time",
-            ),
             Node(
                 package="march_safety",
                 executable="march_safety_node",
@@ -44,7 +39,6 @@ def generate_launch_description() -> LaunchDescription:
                 parameters=[
                     LaunchConfiguration("config_path"),
                     {
-                        "use_sim_time": LaunchConfiguration("use_sim_time"),
                         "simulation": LaunchConfiguration("simulation"),
                     },
                 ],

@@ -19,21 +19,21 @@ private:
 
 TEST_F(StateMachineTest, getCurrentStateTest)
 {
-    ASSERT_EQ(this->state_machine->get_current_state(), exoState::ForceUnknown);
+    ASSERT_EQ(this->state_machine->get_current_state(), (int)exoState::ForceUnknown);
 }
 
 TEST_F(StateMachineTest, performTransitionSucces)
 {
-    this->state_machine->performTransition(exoState::ForceUnknownStand);
-    exoState expectedState = exoState::ForceUnknownStand;
-    ASSERT_EQ(this->state_machine->get_current_state(), expectedState);
+    this->state_machine->performTransition(exoState::Stand);
+    exoState expectedState = exoState::Stand;
+    ASSERT_EQ(this->state_machine->get_current_state(), (int)expectedState);
 }
 
-TEST_F(StateMachineTest, performTransitionToError)
+TEST_F(StateMachineTest, performInvalidTansitionStateDontChange)
 {
     this->state_machine->performTransition(exoState::Walk);
-    exoState expectedState = exoState::Error;
-    ASSERT_EQ(this->state_machine->get_current_state(), expectedState);
+    exoState expectedState = exoState::ForceUnknown;
+    ASSERT_EQ(this->state_machine->get_current_state(), (int)expectedState);
 }
 
 // NOLINTEND

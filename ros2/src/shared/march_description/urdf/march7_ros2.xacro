@@ -103,7 +103,7 @@
     <xacro:property name="ankle_plate_offset"
                     value="${dimensions['ankle_plate']['offset']}"/>
     <xacro:property name="ankle_plate_collision_offset"
-                value="${dimensions['ankle_plate']['collision_offset']}"/>
+                    value="${dimensions['ankle_plate']['collision_offset']}"/>
 
     <xacro:property name="foot_height_forward"
                     value="${dimensions['foot']['height_forward']}"/>
@@ -199,7 +199,7 @@
                       visual_rpy="0 0 0"
     />
 
-<!-- Left Leg -->
+    <!-- Left Leg -->
     <xacro:frame_part name="upper_leg_left"
                       reflect="-1"
                       length="${upper_leg_height}"
@@ -226,7 +226,7 @@
                       visual_rpy="0 0 0"
     />
 
-<!-- Left Foot -->
+    <!-- Left Foot -->
     <xacro:frame_part name="ankle_plate_left"
                       reflect="-1"
                       length="${ankle_plate_height}"
@@ -249,7 +249,7 @@
 
     <xacro:pressure_sole side="left"/>
 
-<!-- Right Hip -->
+    <!-- Right Hip -->
     <xacro:frame_part name="hip_aa_frame_right_side"
                       reflect="1"
                       direction="y"
@@ -270,7 +270,7 @@
                       inertia="${inertia['hip_aa']}"
     />
 
-<!-- Right Leg -->
+    <!-- Right Leg -->
     <xacro:frame_part name="upper_leg_right"
                       reflect="1"
                       direction="z"
@@ -298,7 +298,7 @@
     />
 
 
-<!-- Right Foot -->
+    <!-- Right Foot -->
     <xacro:frame_part name="ankle_plate_right"
                       reflect="1"
                       length="${ankle_plate_height}"
@@ -455,26 +455,23 @@
         <origin xyz="0 ${-ankle_plate_collision_offset} ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
-    <!-- Takes as argument 'type={effort|rviz}' and 'gazebo={true|false}'. 'type' should not matter.-->
-    <xacro:include filename="$(find march_control)/xacro/ros2_control.xacro"/>
-
     <xacro:include filename="camera/_d435.urdf.xacro"/>
 
-    <xacro:sensor_d435 
-            name="camera_front_right" 
+    <xacro:sensor_d435
+            name="camera_front_right"
             topics_ns="camera_front_right"
             parent="upper_leg_right"
             plugin="$(arg realsense_simulation)">
-        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${61/180 * pi} ${pi}"/>
+        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${54/180 * pi} ${pi}"/>
     </xacro:sensor_d435>
-    <xacro:sensor_d435 
+    <xacro:sensor_d435
             name="camera_front_left"
             topics_ns="camera_front_left"
             parent="upper_leg_left"
             plugin="$(arg realsense_simulation)">
-        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 61) / 180 * pi} ${0 * pi}"/>
+        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 54) / 180 * pi} ${0 * pi}"/>
     </xacro:sensor_d435>
-    <xacro:sensor_d435 
+    <xacro:sensor_d435
             name="camera_back"
             topics_ns="camera_back"
             parent="hip_aa_frame_right_side"

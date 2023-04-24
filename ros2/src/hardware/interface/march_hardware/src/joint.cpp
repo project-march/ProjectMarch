@@ -14,11 +14,14 @@
 
 namespace march {
 Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
     std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , last_read_time_(std::chrono::steady_clock::now())
     , motor_controller_(std::move(motor_controller))
+    , position_pid(std::move(position_pid))
+    , torque_pid(std::move(torque_pid))
     , logger_(std::move(logger))
 
 {
@@ -29,11 +32,14 @@ Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> 
 }
 
 Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
     std::unique_ptr<TemperatureGES> temperature_ges, std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , last_read_time_(std::chrono::steady_clock::now())
     , motor_controller_(std::move(motor_controller))
+    , position_pid(std::move(position_pid))
+    , torque_pid(std::move(torque_pid))
     , temperature_ges_(std::move(temperature_ges))
     , logger_(std::move(logger))
 {
@@ -62,9 +68,24 @@ void Joint::enableActuation()
     motor_controller_->enableActuation();
 }
 
-void Joint::actuate(float target)
+/***
+ * This functions checks if the fuzzy control values are equal to one, when added together.
+ * When this is the case, the joints van be actuated, and the target torque and position can be send to the ethercat.
+ * @param target_position
+ * @param target_torque
+ * @param fuzzy_position
+ * @param fuzzy_torque
+ */
+void Joint::actuate(float target_position, float target_torque, float fuzzy_position, float fuzzy_torque)
 {
-    motor_controller_->actuate(target);
+    float total_fuzzy = fuzzy_torque + fuzzy_torque;
+    if (std::fabs(total_fuzzy - 1.0F) <= std::numeric_limits<float>::epsilon()) {
+        throw error::HardwareException(error::ErrorType::TOTAL_FUZZY_NOT_ONE,
+            "Total fuzzy exceeds value of one for fuzzy position: %f and fuzzy torque: %f: ", fuzzy_position,
+            fuzzy_torque);
+    }
+    motor_controller_->actuateTorque(target_torque, fuzzy_torque);
+    motor_controller_->actuateRadians(target_position, fuzzy_position);
 }
 
 void Joint::readFirstEncoderValues(bool operational_check)
@@ -161,6 +182,11 @@ void Joint::readEncoders()
                     this->name_.c_str(), time_between_last_update.count()));
         }
     }
+}
+
+void Joint::sendPID()
+{
+    this->motor_controller_->sendPID(std::move(this->position_pid), std::move(this->torque_pid));
 }
 
 double Joint::getPosition() const

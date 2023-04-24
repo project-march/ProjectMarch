@@ -35,6 +35,15 @@ march7:
             direction: -1
           torqueSensor:
             maxTorque: 10
+        pids:
+          position:
+            p:
+            i:
+            d:
+          torque:
+            p:
+            i:
+            d:
 
     - left_hip_aa:
         motor_controller:

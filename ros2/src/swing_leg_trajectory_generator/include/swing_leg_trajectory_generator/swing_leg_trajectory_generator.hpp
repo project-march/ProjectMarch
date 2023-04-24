@@ -6,12 +6,16 @@
 #define BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP
 
 #include "geometry_msgs/msg/point.hpp"
-#include "geometry_msgs/msg/point_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "rclcpp/rclcpp.hpp"
-using PointStamped = geometry_msgs::msg::PointStamped;
+using Point = geometry_msgs::msg::Point;
+using Pose = geometry_msgs::msg::Pose;
 
 struct BezierCurve {
-    std::vector<PointStamped> points;
+    std::vector<Point> points;
+    geometry_msgs::msg::PoseArray trajectory;
+    int point_amount;
 
     /**
      * This function is in place for comparing the struct.
@@ -37,11 +41,15 @@ struct BezierCurve {
 class SwingLegTrajectoryGenerator {
 public:
     SwingLegTrajectoryGenerator();
-    PointStamped getPoint(std::vector<PointStamped> points, double t);
+    Point getPoint(std::vector<Point> points, double t);
+    void generateTrajectory();
     BezierCurve getCurve();
-    void setPoints(std::vector<PointStamped> points);
+    void setPoints(std::vector<Point> points);
+    void setStepLength(double step_length);
+    void updatePoints(std::vector<Point> points, double step_length);
 
 private:
     BezierCurve m_curve;
+    double m_step_length;
 };
 #endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP

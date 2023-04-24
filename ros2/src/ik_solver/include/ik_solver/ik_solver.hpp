@@ -37,7 +37,11 @@ struct state {
     // Pose, in this case, is [POSITION, ANGLE]
     Eigen::Matrix<double, 6, 1> left_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
     Eigen::Matrix<double, 6, 1> right_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
-    Eigen::Vector3d com_pos = Eigen::Vector3d::Zero();
+    Eigen::Matrix<double, 3, 1> com_pos = Eigen::Vector3d::Zero();
+
+    Eigen::Matrix<double, 6, 1> left_foot_vel = Eigen::Matrix<double, 6, 1>::Zero();
+    Eigen::Matrix<double, 6, 1> right_foot_vel = Eigen::Matrix<double, 6, 1>::Zero();
+    Eigen::Matrix<double, 3, 1> com_vel = Eigen::Vector3d::Zero();
 };
 
 class IkSolver {
@@ -48,7 +52,8 @@ public:
     int set_jacobian();
     int get_model_joints();
     void initialize_solver();
-    Eigen::VectorXd solve_for_velocity(state, state);
+    Eigen::VectorXd solve_for_velocity(state, state, int);
+    Eigen::VectorXd velocity_to_pos(Eigen::VectorXd&, double);
     pinocchio::Data::Matrix6x get_model_jacobian();
     void set_current_state();
     const state get_state();

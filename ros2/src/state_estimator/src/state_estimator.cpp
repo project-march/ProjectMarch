@@ -8,9 +8,9 @@ StateEstimator::StateEstimator()
     : Node("state_estimator_node")
     , m_joint_estimator(this)
     , m_com_estimator()
+    , m_cop_estimator(create_pressure_sensors())
     , m_imu_estimator()
     , m_zmp_estimator()
-    , m_cop_estimator(create_pressure_sensors())
     , m_footstep_estimator()
     , m_current_stance_foot(0)
 {
@@ -70,7 +70,7 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
 
-    m_foot_pos_publisher->publish(m_current_stance_foot);
+    m_stance_foot_publisher->publish(m_current_stance_foot);
 
     initialize_imus();
 }
@@ -88,6 +88,7 @@ void StateEstimator::upper_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
     this->m_joint_estimator.set_joint_states(msg);
+    // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
     m_joint_state_publisher->publish(*msg);
 }
 
@@ -106,8 +107,8 @@ void StateEstimator::initialize_imus()
     imu_to_set.data.header.frame_id = "lowerIMU";
     imu_to_set.base_frame = imu_base_link;
     imu_to_set.imu_location.translation.x = imu_position[0];
-    imu_to_set.imu_location.translation.x = imu_position[1];
-    imu_to_set.imu_location.translation.x = imu_position[2];
+    imu_to_set.imu_location.translation.y = imu_position[1];
+    imu_to_set.imu_location.translation.z = imu_position[2];
     tf2::Quaternion tf2_imu_rotation;
     tf2_imu_rotation.setRPY(imu_rotation[0], imu_rotation[1], imu_rotation[2]);
     tf2_imu_rotation.normalize();
@@ -120,8 +121,8 @@ void StateEstimator::initialize_imus()
     imu_to_set.data.header.frame_id = "upperIMU";
     imu_to_set.base_frame = imu_base_link;
     imu_to_set.imu_location.translation.x = imu_position[0];
-    imu_to_set.imu_location.translation.x = imu_position[1];
-    imu_to_set.imu_location.translation.x = imu_position[2];
+    imu_to_set.imu_location.translation.y = imu_position[1];
+    imu_to_set.imu_location.translation.z = imu_position[2];
     tf2_imu_rotation.setRPY(imu_rotation[0], imu_rotation[1], imu_rotation[2]);
     tf2_imu_rotation.normalize();
     tf2::convert(tf2_imu_rotation, imu_to_set.imu_location.rotation);
@@ -132,7 +133,7 @@ void StateEstimator::update_foot_frames()
 {
     // This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
     // obtain the origin joint
-    IMU& imu = m_imu_estimator.get_imu(LOWER);
+    // IMU& imu = m_imu_estimator.get_imu(LOWER);
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
             = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
@@ -155,6 +156,7 @@ void StateEstimator::update_foot_frames()
         m.getRPY(roll, pitch, yaw);
 
         RCLCPP_DEBUG(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
+        pitch = 0.0;
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
@@ -209,15 +211,19 @@ void StateEstimator::publish_robot_frames()
     m_com_estimator.set_com_state(joint_com_positions);
     publish_com_frame();
     // Update COP
-    geometry_msgs::msg::TransformStamped left_foot_frame
-        = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
-    geometry_msgs::msg::TransformStamped right_foot_frame
-        = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
-    m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
-    // Update ZMP
-    m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
-    m_zmp_estimator.set_zmp();
-    m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+    try {
+        geometry_msgs::msg::TransformStamped left_foot_frame
+            = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
+        geometry_msgs::msg::TransformStamped right_foot_frame
+            = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
+        m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
+        // Update ZMP
+        m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
+        m_zmp_estimator.set_zmp();
+        m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+    } catch (const tf2::TransformException& ex) {
+        RCLCPP_WARN(this->get_logger(), "Error during publishing of Center of Pressure: %s", ex.what());
+    }
 
     // Update the feet
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
@@ -231,22 +237,29 @@ void StateEstimator::publish_robot_frames()
     m_foot_pos_publisher->publish(foot_positions);
 
     // double stance
-    if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
-        && m_current_stance_foot != 0) {
-        m_current_stance_foot = 0;
-        m_foot_pos_publisher->publish(m_current_stance_foot);
+    if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
+
+        // We always take the front foot as the stance foot :)
+        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
+            m_current_stance_foot = 1;
+            m_foot_pos_publisher->publish(m_current_stance_foot);
+        } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
+            && m_current_stance_foot != -1) {
+            m_current_stance_foot = -1;
+            m_foot_pos_publisher->publish(m_current_stance_foot);
+        }
     }
     // left
     if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != -1) {
         m_current_stance_foot = -1;
-        m_foot_pos_publisher->publish(m_current_stance_foot);
+        m_stance_foot_publisher->publish(m_current_stance_foot);
     }
     // right
     if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != 1) {
         m_current_stance_foot = 1;
-        m_foot_pos_publisher->publish(m_current_stance_foot);
+        m_stance_foot_publisher->publish(m_current_stance_foot);
     }
 
     // Update and publish feet height
