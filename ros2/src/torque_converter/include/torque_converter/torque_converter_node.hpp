@@ -12,6 +12,9 @@ public:
 
 private:
     TorqueConverter m_torque_converter;
+    
+    void trajectory_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr);
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_trajectory_subscriber;
 };
 
 #endif

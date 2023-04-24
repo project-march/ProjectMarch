@@ -5,8 +5,6 @@
 
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
-#include "geometry_msgs/msg/pose.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
 #include "torque_converter/torque_converter.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <cmath>
