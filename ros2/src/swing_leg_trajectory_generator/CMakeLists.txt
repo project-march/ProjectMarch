@@ -55,6 +55,12 @@ ament_target_dependencies(
         "std_msgs"
 )
 
+# Install launch files.
+install(DIRECTORY
+        launch
+        DESTINATION share/${PROJECT_NAME}/
+        )
+
 install(TARGETS swing_leg_trajectory_generator_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})

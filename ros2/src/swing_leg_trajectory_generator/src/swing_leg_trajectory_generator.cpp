@@ -38,30 +38,31 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
     m_curve.points.push_back(end_point);
 
     m_curve.point_amount = 75; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
+    m_step_length = 100.0;
 
     // Generate the trajectory for the first time
-    generateTrajectory();
+    generate_trajectory();
 }
 
-void SwingLegTrajectoryGenerator::generateTrajectory()
+void SwingLegTrajectoryGenerator::generate_trajectory()
 {
     geometry_msgs::msg::PoseArray trajectory;
     for (int i = 0; i < m_curve.point_amount; i++) {
         geometry_msgs::msg::Pose pose;
-        pose.position = getPoint(m_curve.points, i);
+        pose.position = get_point(m_curve.points, i);
         trajectory.poses.push_back(pose);
     }
     m_curve.trajectory = trajectory;
 }
 
-Point SwingLegTrajectoryGenerator::getPoint(std::vector<Point> points, double t)
+Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t)
 {
     Point point;
     if (points.size() == 1) {
         return points.at(0);
     } else {
-        auto point1 = getPoint({ points.begin(), points.end() - 1 }, t);
-        auto point2 = getPoint({ points.begin() + 1, points.end() }, t);
+        auto point1 = get_point({ points.begin(), points.end() - 1 }, t);
+        auto point2 = get_point({ points.begin() + 1, points.end() }, t);
         double nt = 1. - t;
         point.x = nt * point1.x + t * point2.x;
         point.y = nt * point1.y + t * point2.y;
@@ -70,7 +71,7 @@ Point SwingLegTrajectoryGenerator::getPoint(std::vector<Point> points, double t)
     }
 }
 
-void SwingLegTrajectoryGenerator::updatePoints(std::vector<Point> points, double step_length)
+void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, double step_length)
 {
     double scalar = step_length / points.back().x;
     for (auto& p : points) {
@@ -80,19 +81,25 @@ void SwingLegTrajectoryGenerator::updatePoints(std::vector<Point> points, double
     }
     m_curve.points = points;
     m_step_length = step_length;
+    generate_trajectory();
 }
 
-BezierCurve SwingLegTrajectoryGenerator::getCurve()
+BezierCurve SwingLegTrajectoryGenerator::get_curve()
 {
     return m_curve;
 }
 
-void SwingLegTrajectoryGenerator::setPoints(std::vector<Point> points)
+double SwingLegTrajectoryGenerator::get_step_length()
 {
-    updatePoints(points, m_step_length);
+    return m_step_length;
 }
 
-void SwingLegTrajectoryGenerator::setStepLength(double step_length)
+void SwingLegTrajectoryGenerator::set_points(std::vector<Point> points)
 {
-    updatePoints(m_curve.points, step_length);
+    update_points(points, m_step_length);
+}
+
+void SwingLegTrajectoryGenerator::set_step_length(double step_length)
+{
+    update_points(m_curve.points, step_length);
 }
