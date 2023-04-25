@@ -96,6 +96,7 @@ void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSole
 {
 
     this->m_cop_estimator.update_sensor_pressures(update_pressure_sensors_data(msg->names, msg->pressure_values));
+    this->m_cop_pos_publisher->publish(this->m_cop_estimator.get_cop_state().position);
 }
 
 void StateEstimator::initialize_imus()

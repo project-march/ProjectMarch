@@ -48,7 +48,6 @@ void JointEstimator::set_individual_joint_state(std::string joint_name, double n
             break;
     }
     quaternion_math.normalize();
-    RCLCPP_INFO(m_owner->get_logger(), "Joint Rotation of %s is %f", it->name.c_str(), it->axis);
     tf2::convert(quaternion_math, it->frame.transform.rotation);
 }
 
