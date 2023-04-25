@@ -12,9 +12,9 @@ testsetup:
           motorKV: 95
           absoluteEncoder:
             resolution: 20
-            minPositionIU: 259230
-            maxPositionIU: 551240
-            zeroPositionIU: 290000
+            minPositionIU: 280771
+            maxPositionIU: 558064
+            zeroPositionIU: 307877
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
