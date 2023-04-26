@@ -19,7 +19,7 @@ This XML was compiled by xml_generator.py at 26/04/2023 12:41:15
 using march8_v0_pre.xml and march8_v0.yaml. -->
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="meshes" angle="degree" autolimits="true"/>
+  <compiler meshdir="meshes/m8/" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
   <!-- Degree of Freedom: 27
@@ -35,15 +35,15 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="m8/Backpack.obj"/>
-    <mesh name="L_foot"      file="m8/FootLeft.obj"/>
-    <mesh name="L_hip"       file="m8/HipLeft.obj"/>
-    <mesh name="L_thigh"     file="m8/UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="m8/LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="m8/FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="m8/HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="m8/UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="m8/LowerLegLeft.obj"/>
+    <mesh name="backpack"    file="Backpack.obj"/>
+    <mesh name="L_foot"      file="FootLeft.obj"/>
+    <mesh name="L_hip"       file="HipLeft.obj"/>
+    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
+    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
   </asset>
 
   <default>
