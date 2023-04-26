@@ -41,6 +41,9 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
     m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
+
+    // ADD CANDIDATE FOOTSTEPS HERE
+    m_zmp_solver.set_candidate_footsteps(msg);
 }
 
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)

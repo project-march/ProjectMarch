@@ -1,5 +1,6 @@
 // standard
 #include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -30,6 +31,8 @@ public:
     void set_current_zmp(double, double);
     void set_current_stance_foot(int);
     void initialize_mpc_params();
+    void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
+    void set_reference_stepsize(geometry_msgs::msg::Point);
     double get_com_height();
 
 private:
@@ -43,9 +46,15 @@ private:
     std::array<double, 2> m_zmp_current;
     std::array<double, 2> m_com_current;
     std::array<double, 2> m_com_vel_current;
+    
+
+    std::vector<geometry_msgs::msg::Point> m_candidate_footsteps;
+    std::vector<double> m_reference_stepsize_x;
+    std::vector<double> m_reference_stepsize_y;
 
     // Constraints for the ZMP MPC
     int m_number_of_footsteps;
+
     double m_switch;
     int m_current_shooting_node;
     double m_timing_value;

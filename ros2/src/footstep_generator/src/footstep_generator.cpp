@@ -5,7 +5,7 @@ using std::placeholders::_2;
 
 FootstepGenerator::FootstepGenerator()
     : Node("footstep_generator_node")
-    , m_steps(8)
+    , m_steps(4) // Change this so we can interactively edit the amount of footsteps while Koengaiting
     , m_vx(1.0)
     , m_vy(0.0)
     , m_l(0.3)

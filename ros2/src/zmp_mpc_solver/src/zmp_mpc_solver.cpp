@@ -8,8 +8,11 @@ ZmpSolver::ZmpSolver()
     , m_switch(0)
     , m_current_shooting_node(0)
     , m_timing_value(0)
-    , m_current_stance_foot(1)
+    , m_current_stance_foot(-1)
     , m_gravity_const(9.81)
+    , m_candidate_footsteps()
+    , m_reference_stepsize_x()
+    , m_reference_stepsize_y()
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -18,7 +21,7 @@ ZmpSolver::ZmpSolver()
 
     set_current_com(0.0, 0.06, 0.0, -0.1);
     set_current_zmp(0.0, 0.06);
-    set_current_foot(0.0, 0.1);
+    set_current_foot(0.0, -0.1);
     set_previous_foot(0.0, 0.1);
     set_current_state();
 }
@@ -84,6 +87,33 @@ void ZmpSolver::set_previous_foot(double x, double y)
     m_pos_foot_prev[1] = y;
 }
 
+void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
+{
+    m_candidate_footsteps.clear();
+    for(auto pose : footsteps->poses)
+        {            
+            m_candidate_footsteps.push_back(pose.position);
+        }
+}
+// fix this check chatGPT
+
+void ZmpSolver::set_reference_stepsize(const std::vector<geometry_msgs::msg::Point>& candidate_footsteps)
+{
+    m_reference_stepsize_y.clear();
+    m_reference_stepsize_x.clear();
+    m_reference_stepsize_x.push_back(0.0);
+    m_reference_stepsize_y.push_back(m_current_stance_foot*-0.1)
+    int n = candidate_footsteps.size();
+
+    for (int i = 1; i < n; i++) 
+        {
+            m_reference_stepsize_x.push_back(candidate_footsteps[i].x-candidate_footsteps[i-1].x);
+            m_reference_stepsize_y.push_back(candidate_footsteps[i].y-candidate_footsteps[i-1].y);
+        }
+    
+}
+
+
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
     m_com_current[0] = x;
@@ -118,7 +148,7 @@ void ZmpSolver::initialize_mpc_params()
     m_first_admissible_region_y = 0.01;
 
     m_switch = 1.0;
-    m_current_shooting_node = 0;
+    m_current_shooting_node = 5 ;
     m_timing_value = 0;
 
     m_number_of_footsteps = 4;
@@ -256,8 +286,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     p[2] = 0;
     p[3] = 0;
     p[4] = 0;
-    printf("%f \n", (m_time_horizon) / N);
-    printf("%f \n", (10.0 / 61));
+    // printf("%f \n", (m_time_horizon) / N);
+    // printf("%f \n", (10.0 / 61));
     double dt = 0.0 + (m_time_horizon) / N;
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
     double count = m_current_stance_foot;
@@ -268,10 +298,23 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; //Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0/step_duration;
 
-    if ((m_current_shooting_node != 0) && (m_current_shooting_node < ((N - 1) / m_number_of_footsteps))) {
-        m_timing_value = (m_current_shooting_node - 1) / ((N - 1) / m_number_of_footsteps);
-        count = -count;
+    if (m_current_shooting_node != 0) {
+        if (((N-1)/m_number_of_footsteps)/(2*step_duration_factor) < m_current_shooting_node < ((N-1)/m_number_of_footsteps) - (((N-1)/m_number_of_footsteps)/(m_number_of_footsteps))) {
+            m_timing_value = (m_current_shooting_node-((N-1)/m_number_of_footsteps)/(2*step_duration_factor)*(step_duration))*(step_duration/(1-step_duration))/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            count = -count;
+        }
+        else if ((m_current_shooting_node) < ((N-1)/m_number_of_footsteps)/(2*step_duration_factor)) {
+            m_timing_value = (m_current_shooting_node)*((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            count = -count;
+        }
+        else {
+            m_timing_value = ((((N-1)/m_number_of_footsteps) - ((N-1)/m_number_of_footsteps)/(2*step_duration_factor))-((N-1)/m_number_of_footsteps)/(2*step_duration_factor)*(step_duration))*(step_duration/(1-step_duration))/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps))+
+            (m_current_shooting_node - (((N-1)/m_number_of_footsteps) - ((N-1)/m_number_of_footsteps)/(2*step_duration_factor)))*((1-step_duration)/step_duration)/(((N-1)-m_number_of_footsteps)/(m_number_of_footsteps));
+            count = -count;
+        }
     }
+
+    
 
     // ii is defined as the current stage
     for (int ii = 0; ii <= N; ii++) {
