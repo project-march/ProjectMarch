@@ -13,24 +13,24 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
     // TODO: Check if these points are correct for the ik-solver, or if they have to be altered for a realistic step.
     m_curve = BezierCurve();
     auto start_point = Point();
-    start_point.x = 0;
-    start_point.y = 0;
-    start_point.z = 0;
+    start_point.x = 0.0;
+    start_point.y = 0.0;
+    start_point.z = 0.0;
 
     auto left_point = Point();
-    left_point.x = 25;
-    left_point.y = 50;
-    left_point.z = 0;
+    left_point.x = 25.0;
+    left_point.y = 50.0;
+    left_point.z = 0.0;
 
     auto right_point = Point();
-    right_point.x = 75;
-    right_point.y = 50;
-    right_point.z = 0;
+    right_point.x = 75.0;
+    right_point.y = 50.0;
+    right_point.z = 0.0;
 
     auto end_point = Point();
-    end_point.x = 100;
-    end_point.y = 0;
-    end_point.z = 0;
+    end_point.x = 100.0;
+    end_point.y = 0.0;
+    end_point.z = 0.0;
 
     m_curve.points.push_back(start_point);
     m_curve.points.push_back(left_point);
@@ -49,8 +49,10 @@ void SwingLegTrajectoryGenerator::generate_trajectory()
     geometry_msgs::msg::PoseArray trajectory;
     for (int i = 0; i < m_curve.point_amount; i++) {
         geometry_msgs::msg::Pose pose;
-        pose.position = get_point(m_curve.points, i);
+        auto points = m_curve.points;
+        pose.position = get_point(points, i);
         trajectory.poses.push_back(pose);
+        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "trajectory point %d has x: %f, y: %f, z: %f ", i, pose.position.x, pose.position.y, pose.position.z);
     }
     m_curve.trajectory = trajectory;
 }
