@@ -49,14 +49,17 @@
     </default>
     <default class="HAA_joint">
       <joint damping="${joints/HAA/max_torque / ./max_angvel}"
+              armature="${joints/HAA/inertia}"
              frictionloss="${joints/HAA/frictionloss}" stiffness="0"/>
     </default>
     <default class="ADPF_joint">
       <joint damping="${joints/ADPF/max_torque / ./max_angvel}"
+              armature="${joints/ADPF/inertia}"
              frictionloss="${joints/ADPF/frictionloss}" stiffness="0"/>
     </default>
     <default class="rotational_joint">
       <joint damping="${joints/HFE/max_torque / ./max_angvel}"
+              armature="${joints/HFE/inertia}"
              frictionloss="${joints/HFE/frictionloss}" stiffness="0"/>
     </default>
   </default>
