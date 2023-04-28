@@ -32,7 +32,10 @@ public:
     void set_current_stance_foot(int);
     void initialize_mpc_params();
     void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
-    void set_reference_stepsize(geometry_msgs::msg::Point);
+    void set_reference_stepsize(std::vector<geometry_msgs::msg::Point>);
+    const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const {
+        return m_candidate_footsteps;    
+    }
     double get_com_height();
 
 private:

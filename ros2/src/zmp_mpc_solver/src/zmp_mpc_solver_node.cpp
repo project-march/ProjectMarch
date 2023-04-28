@@ -13,6 +13,7 @@ SolverNode::SolverNode()
     //    10);
     m_com_trajectory_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("com_trajectory", 10);
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
+
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
@@ -44,6 +45,7 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 
     // ADD CANDIDATE FOOTSTEPS HERE
     m_zmp_solver.set_candidate_footsteps(msg);
+    m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
 
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
