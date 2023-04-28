@@ -31,7 +31,7 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
         points.push_back(p.position);
     }
     m_swing_leg_generator.set_points(points);
-//    m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
+    m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
 }
 
 // void SwingLegTrajectoryGeneratorNode::stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg)

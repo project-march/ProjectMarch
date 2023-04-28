@@ -48,7 +48,7 @@ IkSolverNode::IkSolverNode()
         RCLCPP_INFO(this->get_logger(), test_model.frames[i].name);
     }
 
-    //WARNING THIS IS TEMPORARY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // WARNING THIS IS TEMPORARY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     m_stance_foot = 1;
     // auto jacobian = m_ik_solver.get_model_jacobian();
     // std::stringstream ss;

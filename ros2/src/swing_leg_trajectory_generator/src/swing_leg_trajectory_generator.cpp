@@ -42,7 +42,8 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 
     RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "step_length = %f ", m_step_length);
     for (size_t i = 0; i < m_curve.points.size(); i++) {
-        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "point %d with x: %f, y: %f, z: %f", i, m_curve.points.at(i).x, m_curve.points.at(i).y, m_curve.points.at(i).z);
+        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "point %d with x: %f, y: %f, z: %f", i, m_curve.points.at(i).x,
+            m_curve.points.at(i).y, m_curve.points.at(i).z);
     }
 
     // Generate the trajectory for the first time
@@ -52,13 +53,14 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 void SwingLegTrajectoryGenerator::generate_trajectory()
 {
     geometry_msgs::msg::PoseArray trajectory;
-    double step_size = 1.0/m_curve.point_amount;
+    double step_size = 1.0 / m_curve.point_amount;
     for (double i = 0.0; i <= 1.0; i += step_size) {
         geometry_msgs::msg::Pose pose;
         auto points = m_curve.points;
         pose.position = get_point(points, i);
         trajectory.poses.push_back(pose);
-//        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "trajectory point %f has x: %f, y: %f, z: %f ", i, pose.position.x, pose.position.y, pose.position.z);
+        //        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "trajectory point %f has x: %f, y: %f, z: %f ", i,
+        //        pose.position.x, pose.position.y, pose.position.z);
     }
     m_curve.trajectory = trajectory;
 }
@@ -91,7 +93,8 @@ void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, doubl
     m_step_length = step_length;
     RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "step_length = %f ", m_step_length);
     for (size_t i = 0; i < m_curve.points.size(); i++) {
-        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "point %d with x: %f, y: %f, z: %f", i, m_curve.points.at(i).x, m_curve.points.at(i).y, m_curve.points.at(i).z);
+        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "point %d with x: %f, y: %f, z: %f", i, m_curve.points.at(i).x,
+            m_curve.points.at(i).y, m_curve.points.at(i).z);
     }
     generate_trajectory();
 }
