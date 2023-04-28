@@ -2,7 +2,8 @@ state_estimator:
   ros__parameters:
     state_estimator_config:
       # in ms
-      refresh_rate : 100
+      refresh_rate : 48
+
     joint_estimator:
       links: ["left_origin", "left_ankle", "left_knee", "left_hip_fe"
       , "left_hip_aa", "hip_base", "right_hip_aa", "right_hip_fe"
