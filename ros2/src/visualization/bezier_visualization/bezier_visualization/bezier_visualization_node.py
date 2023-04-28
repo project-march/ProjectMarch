@@ -91,8 +91,6 @@ class BezierCurve(Node):
         :type event: MouseEvent
         """
         # Only respond to left click within the axes, right click is not relevant
-
-        self.get_logger().info("click")
         if event.button == 1 and event.inaxes in [self.axes]:
             # Check if the click is close to a point
             distance_threshold = 2.0
@@ -151,11 +149,13 @@ class BezierCurve(Node):
         self.dragging_point = None
         plt.ion()
         msg = PoseArray()
-        for key in self.points:
+        for key in sorted(self.points):
             p = Pose()
-            p.point.x = float(key)
-            p.point.y = float(self.points[key])
-            msg.points.append(p)
+            p.position.x = float(key)
+            p.position.y = float(self.points[key])
+            p.position.z = 0.0
+            msg.poses.append(p)
+        self.get_logger().info("Publish new Bezier points")
         self.publish_points.publish(msg)
         plt.ioff()
 
