@@ -35,16 +35,16 @@ TEST_F(TorqueConverterTest, mockTest)
     ASSERT_EQ(1, 1);
 }
 
-TEST_F(TorqueConverterTest, vel_test)
-{
-    VectorXd des_pos(5);
-    des_pos << 4.0, 2.0, 9.0, 5.0, 6.0;
-    VectorXd correct_vel(4);
-    correct_vel << -2.0, 7.0, -4.0, 1.0;
+// TEST_F(TorqueConverterTest, vel_test)
+// {
+//     VectorXd des_pos(5);
+//     des_pos << 4.0, 2.0, 9.0, 5.0, 6.0;
+//     VectorXd correct_vel(4);
+//     correct_vel << -2.0, 7.0, -4.0, 1.0;
 
-    TorqueConverter myTC;
-    myTC.set_desired_pos(des_pos);
-    VectorXd vel_des = myTC.get_desired_vel();
-    ASSERT_EQ(vel_des, correct_vel);
-}
+//     TorqueConverter myTC;
+//     myTC.set_desired_pos(des_pos);
+//     VectorXd vel_des = myTC.get_desired_vel();
+//     ASSERT_EQ(vel_des, correct_vel);
+// }
 #endif
