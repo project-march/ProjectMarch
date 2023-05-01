@@ -61,6 +61,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     left_weights.torque_weight = left_leg->getTorqueWeight();
     left_weights.position_weight = left_leg->getPositionWeight();
     left_weights.leg = 'l';
+    left_weights.header.frame_id = this->get_name();
     m_publish_weight->publish(left_weights);
 
     // update the weights for the right leg
@@ -72,6 +73,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     right_weights.torque_weight = right_leg->getTorqueWeight();
     right_weights.position_weight = right_leg->getPositionWeight();
     right_weights.leg = 'r';
+    right_weights.header.frame_id = this->get_name();
     m_publish_weight->publish(right_weights);
 }
 
