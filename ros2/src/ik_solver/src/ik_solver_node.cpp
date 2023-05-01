@@ -84,7 +84,7 @@ void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState:
 {
     m_ik_solver.set_joint_configuration(msg);
     m_ik_solver.set_current_state();
-    m_ik_solver.set_jacobian();
+//    m_ik_solver.set_jacobian();
 }
 
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)

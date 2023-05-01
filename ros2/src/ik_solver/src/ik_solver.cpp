@@ -2,6 +2,7 @@
 // Created by Sahand March 6th 2023
 //
 #include "ik_solver/ik_solver.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 IkSolver::IkSolver()
 {
@@ -31,7 +32,10 @@ void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr m
 {
     for (long unsigned int i = 0; i < msg->name.size(); i++) {
         pinocchio::FrameIndex index = m_model.getJointId(msg->name[i]);
-        m_model.joints[index].setIndexes(index, msg->position[i], msg->velocity[i]);
+        RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "pos[i]: %f", msg->position[i]);
+        if (msg->position[i] != 0.0 && msg->velocity[i] != 0.0){
+            m_model.joints[index].setIndexes(index, msg->position[i], msg->velocity[i]);
+        }
     }
 }
 
@@ -169,6 +173,7 @@ const pinocchio::Model IkSolver::get_model()
 
 void IkSolver::set_current_state()
 {
+    m_model_data = pinocchio::Data(m_model);
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
     pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_foot");
