@@ -89,6 +89,10 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_state_info_[i].hw_velocity));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_state_info_[i].hw_effort));
 
         //      [TO DO] For now only a position state interface is created, later when more control types are added,
         //      this should be expanded.
@@ -179,6 +183,14 @@ hardware_interface::return_type MarchMockSystemInterface::read()
     auto new_pos = comms->get_pos();
     for (size_t i = 0; i < new_pos.size(); i++) {
         hw_state_info_[i].hw_position = new_pos.at(i);
+    }
+    auto new_vel = comms->get_pos();
+    for (size_t i = 0; i < new_pos.size(); i++) {
+        hw_state_info_[i].hw_velocity = new_pos.at(i);
+    }
+    auto new_eff = comms->get_pos();
+    for (size_t i = 0; i < new_pos.size(); i++) {
+        hw_state_info_[i].hw_effort = new_eff.at(i);
     }
     return hardware_interface::return_type::OK;
 }

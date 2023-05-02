@@ -112,6 +112,7 @@ void IkSolverNode::timer_callback()
         || (m_stance_foot == 0)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
     } else {
+        RCLCPP_INFO(this->get_logger(), "Recieved input");
         // IN THE POSE ARRAY, INDEX 0 IS RIGHT AND INDEX 1 IS LEFT
         if (m_stance_foot == 1) {
             m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -140,20 +141,28 @@ void IkSolverNode::timer_callback()
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
         }
+        RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
         m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * (m_timestep * 1e-6),
             m_com_trajectory_container->velocity[m_com_trajectory_index].y * (m_timestep * 1e-6),
             m_com_trajectory_container->velocity[m_com_trajectory_index].z * (m_timestep * 1e-6);
 
+        RCLCPP_INFO(this->get_logger(), "Set desired com_pos");
+
         m_desired_state.com_vel << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y,
             m_com_trajectory_container->velocity[m_com_trajectory_index].z;
         // Get solution
+
+        RCLCPP_INFO(this->get_logger(), "Set desired com_vel");
         Eigen::VectorXd solution_velocity
             = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state, m_stance_foot);
 
+        RCLCPP_INFO(this->get_logger(), "Solved for velocity");
         Eigen::VectorXd solution_position
             = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
+
+        RCLCPP_INFO(this->get_logger(), "Solved for Position");
 
         trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
         trajectory_msgs::msg::JointTrajectoryPoint point;
@@ -164,6 +173,8 @@ void IkSolverNode::timer_callback()
         trajectory.points.push_back(point);
         trajectory.header.stamp = this->get_clock()->now();
         m_joint_trajectory_publisher->publish(trajectory);
+
+        RCLCPP_INFO(this->get_logger(), "Published trajectory");
     }
 }
 

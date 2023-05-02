@@ -59,8 +59,6 @@ void SwingLegTrajectoryGenerator::generate_trajectory()
         auto points = m_curve.points;
         pose.position = get_point(points, i);
         trajectory.poses.push_back(pose);
-        //        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "trajectory point %f has x: %f, y: %f, z: %f ", i,
-        //        pose.position.x, pose.position.y, pose.position.z);
     }
     m_curve.trajectory = trajectory;
 }
@@ -91,11 +89,6 @@ void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, doubl
     }
     m_curve.points = points;
     m_step_length = step_length;
-    RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "step_length = %f ", m_step_length);
-    for (size_t i = 0; i < m_curve.points.size(); i++) {
-        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "point %d with x: %f, y: %f, z: %f", i, m_curve.points.at(i).x,
-            m_curve.points.at(i).y, m_curve.points.at(i).z);
-    }
     generate_trajectory();
 }
 

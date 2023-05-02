@@ -33,7 +33,6 @@ void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr m
 {
     for (long unsigned int i = 0; i < msg->name.size(); i++) {
         pinocchio::JointIndex index = m_model.getJointId(msg->name[i]);
-        RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "pos[%i]: %f", index,msg->position[i]);
         if (index<m_joint_pos.size()){
             m_joint_pos[index] = msg->position[i];
             m_joint_vel[index] = msg->velocity[i];
@@ -87,7 +86,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // WEIGHTS
     double left_weight = 0.1;
     double right_weight = 0.1;
-    double CoM_weight = 1;
+    double CoM_weight = 0.0;
     double qdot_weight = 1e-6;
     double base_weight = 1;
 
