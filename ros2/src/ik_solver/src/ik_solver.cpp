@@ -34,7 +34,7 @@ void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr m
     for (long unsigned int i = 0; i < msg->name.size(); i++) {
         pinocchio::JointIndex index = m_model.getJointId(msg->name[i]);
         RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "pos[%i]: %f", index,msg->position[i]);
-        if (index>=0 && index<m_joint_pos.size()){
+        if (index<m_joint_pos.size()){
             m_joint_pos[index] = msg->position[i];
             m_joint_vel[index] = msg->velocity[i];
         }
@@ -176,8 +176,6 @@ const pinocchio::Model IkSolver::get_model()
 
 void IkSolver::set_current_state()
 {
-    m_model_data = pinocchio::Data(m_model);
-    m_joint_pos = pinocchio::neutral(m_model);
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
     pinocchio::updateFramePlacements(m_model, m_model_data);
     pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_foot");
