@@ -19,6 +19,12 @@ FuzzyNode::FuzzyNode()
     m_publish_weight = this->create_publisher<march_shared_msgs::msg::WeightStamped>("fuzzy_weight", 10); //TODO: connect to HWI
 }
 
+/**
+ * Sets the right and left leg to either swing or stance. Updates and publishes new weights accordingly.
+ *
+ * @param msg Message that contains the integer to indicate which leg is the stance leg.
+ * @return
+ */
 void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // set the stance leg
@@ -47,6 +53,12 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
     m_publish_weight->publish(right_weights);
 }
 
+/**
+ * Sets the height of both feet
+ *
+ * @param msg Message that contains the height of both feet. Updates and publishes new weights accordingly.
+ * @return
+ */
 void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
 
     // update the feet height
