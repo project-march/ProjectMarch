@@ -87,11 +87,11 @@ void StateEstimator::upper_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    for(auto& i : msg->position){
-        if (i == 0.0){
-            return;
-        }
-    }
+    // for(auto& i : msg->position){
+    //     if (i == 0.0){
+    //         return;
+    //     }
+    // }
     this->m_joint_estimator.set_joint_states(msg);
     // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
     m_joint_state_publisher->publish(*msg);
