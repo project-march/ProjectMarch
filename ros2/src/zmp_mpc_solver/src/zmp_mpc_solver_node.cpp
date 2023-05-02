@@ -23,6 +23,8 @@ SolverNode::SolverNode()
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&SolverNode::stance_foot_callback, this, _1));
 
+    // timer_callback();
+
     m_solving_timer = this->create_wall_timer(8ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
@@ -65,10 +67,9 @@ void SolverNode::timer_callback()
 {
     m_zmp_solver.set_current_state();
     int solver_status = m_zmp_solver.solve_step();
-    if (solver_status != 0)
-        {
+    if (solver_status != 0) {
         RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
-        }
+    }
     auto com_msg = geometry_msgs::msg::PoseArray();
     com_msg.header.stamp = this->get_clock()->now();
     com_msg.header.frame_id = "map";
@@ -96,10 +97,12 @@ void SolverNode::timer_callback()
     m_final_feet_publisher->publish(foot_msg);
 }
 
+
+
 int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<SolverNode>());
+    rclcpp::spin(std::make_shared<SolverNode>());    
     rclcpp::shutdown();
     return 0;
 }

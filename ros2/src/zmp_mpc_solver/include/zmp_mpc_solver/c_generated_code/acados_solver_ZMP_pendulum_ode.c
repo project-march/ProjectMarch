@@ -460,12 +460,10 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(ZMP_pendulum_ode_solver_capsule
     double* lbx0 = lubx0;
     double* ubx0 = lubx0 + NBX0;
     // change only the non-zero elements:
-    lbx0[3] = 0.03;
-    ubx0[3] = 0.03;
-    lbx0[4] = -0.06;
-    ubx0[4] = -0.06;
-    lbx0[5] = 0.08;
-    ubx0[5] = 0.08;
+    lbx0[3] = 0.09;
+    ubx0[3] = 0.09;
+    lbx0[5] = 0.1;
+    ubx0[5] = 0.1;
     lbx0[8] = 0.1;
     ubx0[8] = 0.1;
     lbx0[9] = 0.1;
@@ -515,14 +513,14 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(ZMP_pendulum_ode_solver_capsule
     
     lh[0] = -0.31;
     lh[1] = -0.01;
-    lh[2] = -0.05;
-    lh[3] = -0.06;
+    lh[2] = -0.025;
+    lh[3] = -0.05;
 
     
     uh[0] = 0.31;
     uh[1] = 0.01;
-    uh[2] = 0.05;
-    uh[3] = 0.06;
+    uh[2] = 0.025;
+    uh[3] = 0.05;
 
     for (int i = 0; i < N; i++)
     {
@@ -558,12 +556,12 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(ZMP_pendulum_ode_solver_capsule
     double* lh_e = luh_e;
     double* uh_e = luh_e + NHN;
     
-    lh_e[0] = -0.1;
-    lh_e[1] = -0.1;
+    lh_e[0] = -0.01;
+    lh_e[1] = -0.01;
 
     
-    uh_e[0] = 0.1;
-    uh_e[1] = 0.1;
+    uh_e[0] = 0.01;
+    uh_e[1] = 0.01;
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun_jac", &capsule->nl_constr_h_e_fun_jac);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun", &capsule->nl_constr_h_e_fun);
@@ -697,9 +695,8 @@ void ZMP_pendulum_ode_acados_create_7_set_nlp_out(ZMP_pendulum_ode_solver_capsul
 
     // initialize with x0
     
-    x0[3] = 0.03;
-    x0[4] = -0.06;
-    x0[5] = 0.08;
+    x0[3] = 0.09;
+    x0[5] = 0.1;
     x0[8] = 0.1;
     x0[9] = 0.1;
 
