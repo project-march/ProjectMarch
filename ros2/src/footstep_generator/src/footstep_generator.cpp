@@ -21,7 +21,7 @@ void FootstepGenerator::publish_foot_placements(
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
 
-    (footsteps);
+    m_publisher->publish(footsteps);
     response->status = true;
 }
 
