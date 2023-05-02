@@ -150,6 +150,7 @@ class InputDeviceView(QWidget):
         self,
         name: str,
         callback: Optional[Union[str, Callable]] = None,
+        control_type: Optional[str] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
@@ -159,6 +160,7 @@ class InputDeviceView(QWidget):
         Args:
             name (str): Name of the button.
             callback (Union[str, Callable], Optional): The callback to attach to the button when pressed.
+            control_type (str, Optional): the name of the control type. Options are "fuzzy", "position", "torque". Default is None
             image_path (str, Optional): The name of the image file. Default is `None`.
             size ((int,int)): Size of the button in pixels in format (width, height). Default is (w=125px, h=140px).
             always_enabled (bool): Whether the button can be disabled. Default is False.
@@ -192,7 +194,7 @@ class InputDeviceView(QWidget):
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
         else:
-            qt_button.clicked.connect(lambda: self._controller.publish_gait(name))
+            qt_button.clicked.connect(lambda: self._controller.publish_gait(name, control_type))
 
         return qt_button
 

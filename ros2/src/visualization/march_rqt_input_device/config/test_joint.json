@@ -1,13 +1,16 @@
 [
    [
       {
-         "name": "home_setup"
+         "name": "home_setup",
+         "control_type": "position"
       },
       {
-         "name": "test_joint_gait"
+         "name": "test_joint_gait",
+         "control_type": "position"
       },
       {
-         "name": "test_joint_gait_continuous"
+         "name": "test_joint_gait_continuous",
+         "control_type": "position"
       },
       {
          "name":"stop",

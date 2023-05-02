@@ -62,6 +62,11 @@ class InputDeviceController:
             topic="/march/gait_request",
             qos_profile=10,
         )
+        self._set_gait_control_type = self._node.create_publisher(
+            msg_type=String,
+            topic="weight_control_type",
+            qos_profile=10,
+        )
         self._gait_response_subscriber = self._node.create_subscription(
             msg_type=GaitResponse,
             topic="/march/gait_response",
@@ -203,7 +208,7 @@ class InputDeviceController:
             )
         )
 
-    def publish_gait(self, string) -> None:
+    def publish_gait(self, string, control_type) -> None:
         """Publish a message on `/march/input_device/instruction` to publish the gait."""
         self._node.get_logger().debug("Mock Input Device published gait: " + string)
         self._instruction_gait_pub.publish(
@@ -214,6 +219,8 @@ class InputDeviceController:
                 id=str(self._id),
             )
         )
+        if control_type is not None:
+            self._set_gait_control_type(control_type)
 
     def publish_stop(self) -> None:
         """Publish a message on `/march/input_device/instruction` to stop the gait."""
@@ -304,3 +311,17 @@ class InputDeviceController:
     def _update_eeg_on_off(self, msg: Bool) -> None:
         """Update eeg value for when it is changed in the state machine."""
         self.eeg = msg.data
+
+
+    def publish_control_type(self, control_type) -> None:
+        """Sets the allowed control type depending on the gait"""
+
+        self._set_gait_control_type.publish(String(data=control_type))
+        # onclick and if control-type != None this should be called
+
+        #     if "position-control" in self._current_gait.name:
+        #     self._set_gait_control_type.publish(String(data="position"))
+        #     elif "torque-control" in self._current_gait.name:
+        #     self._set_gait_control_type.publish(String(data="torque"))
+        # else:
+        # self._set_gait_control_type.publish(String(data="fuzzy"))

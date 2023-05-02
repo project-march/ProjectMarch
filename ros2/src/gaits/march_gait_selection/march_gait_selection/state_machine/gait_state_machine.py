@@ -112,11 +112,6 @@ class GaitStateMachine:
             callback=self._possible_gaits_cb,
             callback_group=ReentrantCallbackGroup(),
         )
-        self._set_gait_control_type = self._node.create_publisher(
-            msg_type=String,
-            topic="weight_control_type",
-            qos_profile=DEFAULT_HISTORY_DEPTH,
-        )
         self._reset_attributes()
 
         # Publisher that notifies the simulation when the queue with trajectory points has to be reset.
@@ -194,16 +189,8 @@ class GaitStateMachine:
     def _process_gait_state(self) -> None:
         """Processes the current state when there is a gait happening.
 
-        Includes setting the allowed control type depending on the gait.
-
         Schedules the next subgait if there is no trajectory happening or finishes the gait if it is done.
         """
-        if "position-control" in self._current_gait.name:
-            self._set_gait_control_type.publish(String(data="position"))
-        elif "torque-control" in self._current_gait.name:
-            self._set_gait_control_type.publish(String(data="torque"))
-        else:
-            self._set_gait_control_type.publish(String(data="fuzzy"))
 
         self._handle_stop_input()
         if self._trajectory_scheduler.failed():
