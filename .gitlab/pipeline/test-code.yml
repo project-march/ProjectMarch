@@ -23,6 +23,7 @@
       ros2bag rosbag2 rosbag2_compression rosbag2_compression_zstd rosbag2_cpp rosbag2_performance_benchmarking rosbag2_py \
       rosbag2_storage rosbag2_storage_default_plugins rosbag2_test_common rosbag2_tests rosbag2_transport shared_queues_vendor \
       ros2controlcli soem transmission_interface velocity_controllers'
+    - colcon test-result --verbose
     - lcov -q -c --directory build -o lcov.test
     - lcov -q -a lcov.base -a lcov.test -o lcov.total
     - lcov --config-file .lcovrc -r lcov.total "*/opt/*" "*/usr/*" "*/build/*" "*/install/*" "*/libraries/*" "*/test/*" "*.hpp" "*.h" "*/c_generated_code/*" -o lcov.filtered

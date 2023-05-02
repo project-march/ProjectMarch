@@ -53,7 +53,7 @@ TEST_F(IkBufferTest, checkForReadyTest)
 
 TEST_F(IkBufferTest, FilledVelTrajecoryTest)
 {
-    auto mock_com_trajectory= std::make_shared<geometry_msgs::msg::PoseArray>();
+    auto mock_com_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
     auto mock_swing_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
 
     geometry_msgs::msg::Pose p1;
