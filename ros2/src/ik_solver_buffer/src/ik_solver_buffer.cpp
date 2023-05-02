@@ -100,6 +100,7 @@ void BufferNode::publish_swing_trajectory()
     }
 
     set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity);
+    set_velocity(ik_mock_com.trajectory, ik_mock_com.velocity);
 
     m_swing_trajectory_publisher->publish(ik_command_to_send);
     m_com_trajectory_publisher->publish(ik_mock_com);

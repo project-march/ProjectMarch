@@ -93,10 +93,13 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     double CoM_gains = 0.5;
     double left_gains = 1;
     double right_gains = 1;
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
 
     Eigen::MatrixXd J_com_copy;
     J_com_copy.resize(6, m_model.nv);
     J_com_copy << J_com, 0.0, 0.0, 0.0;
+
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized J_com_copy");
 
     // Get the error vectors
     // Here, we assume the jacobians have already been set
@@ -109,6 +112,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
 
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all error vectors");
     // Set up the cost function
     // H: The quadratic term of the cost function
     // F: The linear term of the cost function
@@ -131,10 +135,14 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     cost_H += right_weight * J_right_foot.transpose() * J_right_foot;
     cost_F += right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_gains * right_foot_error);
 
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized cost function");
+
     // Add the constraints
     Eigen::MatrixXd constrained_joints = 0 * Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);
     Eigen::VectorXd joint_upper_lim = 0 * 10 * Eigen::VectorXd::Ones(m_model.nv);
     Eigen::VectorXd joint_lower_lim = -0 * 10 * Eigen::VectorXd::Ones(m_model.nv);
+
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized constraints");
 
     // dummy equality constraint
     // This is needed to set one of the feet to a fixed position
@@ -143,17 +151,23 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     Eigen::MatrixXd A_dummy = Eigen::MatrixXd::Zero(6, m_model.nv);
     Eigen::VectorXd b_dummy = Eigen::VectorXd::Zero(6);
 
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized dummy equality constraints");
+
     // We now swap the dummy foot based on the fixed Jacobian.
     if (stance_foot == 1) {
         A_dummy = J_left_foot;
     } else {
         A_dummy = J_right_foot;
     }
+
+    RCLCPP_INFO(rclcpp::get_logger(""), "Initialized dummy foot");
     // if (walkState.supportFoot == Foot::LEFT) A_dummy = Jacobian_leftFoot;
     // else				     A_dummy = Jacobian_rightFoot;
 
     m_qp_solver_ptr->solve(cost_H, cost_F, A_dummy, b_dummy, constrained_joints, joint_lower_lim, joint_upper_lim);
     Eigen::VectorXd velocity_trajectory = m_qp_solver_ptr->get_solution();
+
+    RCLCPP_INFO(rclcpp::get_logger(""), "Solved for trajectory");
 
     return velocity_trajectory.tail(8); // CHANGE 50 to [DOF-6], so [14-6]
 }
