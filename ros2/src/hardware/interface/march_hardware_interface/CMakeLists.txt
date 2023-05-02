@@ -88,16 +88,21 @@ ament_export_dependencies(
 install(
         DIRECTORY include/
         DESTINATION include
+        DIRECTORY launch/
+        DESTINATION share/${PROJECT_NAME}/
 )
 
 install(
         TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}Targets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib/${PROJECT_NAME}
+        ARCHIVE DESTINATION lib/${PROJECT_NAME}
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
 )
+
+install(TARGETS weight_node
+        RUNTIME DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)

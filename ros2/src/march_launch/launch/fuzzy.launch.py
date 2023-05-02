@@ -10,10 +10,14 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    urdf_location = os.path.join(
-        get_package_share_directory('march_description'),
-        'urdf',
-        'march7_FROST.urdf'
+
+    weight_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_hardware_interface"),
+                "weight.launch.py",
+            )
+        ),
     )
 
     return LaunchDescription([
@@ -23,10 +27,5 @@ def generate_launch_description() -> LaunchDescription:
             executable='fuzzy_node',
             name='fuzzy_generator'
         ),
-        Node(
-            package='march_hardware_interface',
-            namespace='',
-            executable='weight_node',
-            name='weight_node'
-        )
+        weight_node
     ])
