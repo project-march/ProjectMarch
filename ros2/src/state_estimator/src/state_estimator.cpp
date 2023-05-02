@@ -307,16 +307,20 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
         }
         sensor.name = initial;
         CenterOfPressure cop;
-        if (sensor.name.find("l_") != std::string::npos) {
-            cop.position.header.frame_id = "leftPressureSole";
+
+        cop.position.header.frame_id = "stink";
+        if (sensor.name[0] == *"l") {
+            cop.position.header.frame_id = "left_ankle";
         }
-        if (sensor.name.find("r_") != std::string::npos) {
-            cop.position.header.frame_id = "rightPressureSole";
+        if (sensor.name[0] == *"r") {
+            cop.position.header.frame_id = "right_ankle";
         }
 
         cop.position.point.x = x_positions.at(i);
         cop.position.point.y = y_positions.at(i);
         cop.position.point.z = z_positions.at(i);
+
+        sensor.centre_of_pressure = cop;
         sensors.push_back(sensor);
     }
     // Read the pressure sensors from the hardware interface
@@ -337,33 +341,24 @@ void StateEstimator::visualize_joints()
 {
     // Publish the joint visualizations
     visualization_msgs::msg::Marker joint_markers;
-    joint_markers.type = 5;
+    joint_markers.type = 7;
     joint_markers.header.frame_id = "map";
     joint_markers.id = 0;
-    std::vector<JointContainer> joints = m_joint_estimator.get_joints();
-    geometry_msgs::msg::TransformStamped joint_transform;
+    std::vector<PressureSensor> pressure_soles = m_cop_estimator.get_sensors();
+    geometry_msgs::msg::TransformStamped pressure_sole_transform;
     geometry_msgs::msg::Point marker_container;
-    tf2::Quaternion tf2_joint_rotation;
-    // Joint_endpoint is in local joint coordinates, we transform it to obtain global coordinates
     tf2::Vector3 joint_endpoint;
     try {
-        for (auto i : joints) {
-            joint_transform = m_tf_buffer->lookupTransform("map", i.frame.header.frame_id, tf2::TimePointZero);
-            marker_container.x = joint_transform.transform.translation.x;
-            marker_container.y = joint_transform.transform.translation.y;
-            marker_container.z = joint_transform.transform.translation.z;
+        for (auto i : pressure_soles) {
+            pressure_sole_transform = m_tf_buffer->lookupTransform("map", i.centre_of_pressure.position.header.frame_id, tf2::TimePointZero);
+            marker_container.x = pressure_sole_transform.transform.translation.x;
+            marker_container.y = pressure_sole_transform.transform.translation.y;
+            marker_container.z = pressure_sole_transform.transform.translation.z;
+
+            marker_container.x += i.centre_of_pressure.position.point.x;
+            marker_container.y += i.centre_of_pressure.position.point.y;
+            marker_container.z += i.centre_of_pressure.position.point.z;
             joint_markers.points.push_back(marker_container);
-            // We have to set up the joint transform manually because none of the transform functions work >:(
-            tf2_joint_rotation
-                = tf2::Quaternion(joint_transform.transform.rotation.x, joint_transform.transform.rotation.y,
-                    joint_transform.transform.rotation.z, joint_transform.transform.rotation.w);
-            joint_endpoint = tf2::quatRotate(tf2_joint_rotation, tf2::Vector3(i.length_x, i.length_y, i.length_z));
-            marker_container.x += joint_endpoint.getX();
-            marker_container.y += joint_endpoint.getY();
-            marker_container.z += joint_endpoint.getZ();
-            joint_markers.points.push_back(marker_container);
-            RCLCPP_DEBUG(
-                this->get_logger(), "Marker:[%f,%f,%f]", marker_container.x, marker_container.y, marker_container.z);
         }
 
     } catch (const tf2::TransformException& ex) {
@@ -372,9 +367,9 @@ void StateEstimator::visualize_joints()
     RCLCPP_DEBUG(this->get_logger(), "Published %i markers", joint_markers.points.size());
     joint_markers.action = 0;
     joint_markers.frame_locked = 1;
-    joint_markers.scale.x = 0.2;
-    joint_markers.scale.y = 1.0;
-    joint_markers.scale.z = 1.0;
+    joint_markers.scale.x = 0.03;
+    joint_markers.scale.y = 0.03;
+    joint_markers.scale.z = 0.01;
     joint_markers.pose.position.x = 0.0;
     joint_markers.pose.position.y = 0.0;
     joint_markers.pose.position.z = 0.0;

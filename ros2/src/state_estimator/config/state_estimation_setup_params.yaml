@@ -29,9 +29,9 @@ state_estimator:
     cop_estimator:
       # The sensor locations are given relative to their respective attached feet frame
       names:            ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch", "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
-      x_positions:      [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      y_positions:      [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      z_positions:      [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      x_positions:      [-0.045, -0.045,  0.137,  0.184,  0.130,  0.174,  0.118,  0.050,    -0.045, -0.045,  0.137,  0.184,  0.130,  0.174,  0.118,  0.050]
+      y_positions:      [-0.072, -0.098, -0.115, -0.105, -0.083, -0.070, -0.050, -0.061,     0.072,  0.098,  0.115,  0.105,  0.083,  0.070,  0.050, 0.061]
+      z_positions:      [-0.138, -0.138, -0.138, -0.138, -0.138, -0.138, -0.138, -0.138,    -0.138, -0.138, -0.138, -0.138, -0.138, -0.138, -0.138, -0.138,]
       #In radians
       starting_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     imu_estimator:
