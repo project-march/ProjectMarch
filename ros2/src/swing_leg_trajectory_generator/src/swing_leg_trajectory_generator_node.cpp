@@ -16,17 +16,42 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
         "bezier_points", 10, std::bind(&SwingLegTrajectoryGeneratorNode::subscriber_callback, this, _1));
     m_final_feet_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "final_feet_position", 10, std::bind(&SwingLegTrajectoryGeneratorNode::final_feet_callback, this, _1));
+    //    m_stance_feet_subscriber = this->create_subscription<std_msgs::msg::Int32>(
+    //        "current_stance_foot", 10, std::bind(&SwingLegTrajectoryGeneratorNode::stance_feet_callback, this, _1));
+    m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
+        "robot_com_position", 10, std::bind(&SwingLegTrajectoryGeneratorNode::com_callback, this, _1));
     m_swing_leg_generator = SwingLegTrajectoryGenerator();
 }
 
 void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    // TODO: implement
+    std::vector<Point> points;
+    points.reserve(msg->poses.size());
+    for (auto& p : msg->poses) {
+        points.push_back(p.position);
+    }
+    m_swing_leg_generator.set_points(points);
 }
+
+// void SwingLegTrajectoryGeneratorNode::stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg)
+//{
+//    m_swing_leg_generator.generate_trajectory();
+//    m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
+//}
 
 void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    // TODO: update implementation
+    auto steps = msg->poses;
+    auto begin_foot = steps.at(0);
+    auto end_foot = steps.at(2);
+    m_swing_leg_generator.set_step_length(end_foot.position.x - begin_foot.position.x);
+}
+
+void SwingLegTrajectoryGeneratorNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
+{
+    if (msg->position.x > (m_swing_leg_generator.get_step_length() * 0.5)) {
+        m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
+    }
 }
 
 /**

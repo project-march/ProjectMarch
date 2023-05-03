@@ -38,8 +38,8 @@ void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr m
 int IkSolver::set_jacobian()
 {
     try {
-        pinocchio::FrameIndex left_foot_index = m_model.getFrameId("foot_left");
-        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("foot_right");
+        pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_foot");
+        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_foot");
         pinocchio::computeJointJacobian(
             m_model, m_model_data, m_joint_pos, m_model.frames[left_foot_index].parent, J_left_foot);
         pinocchio::computeJointJacobian(
@@ -171,8 +171,8 @@ void IkSolver::set_current_state()
 {
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
-    pinocchio::FrameIndex left_foot_index = m_model.getFrameId("foot_left");
-    pinocchio::FrameIndex right_foot_index = m_model.getFrameId("foot_left");
+    pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_foot");
+    pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_foot");
 
     m_current_state.left_foot_pose << pinocchio::rpy::matrixToRpy(m_model_data.oMf[left_foot_index].rotation()),
         m_model_data.oMf[left_foot_index].translation();

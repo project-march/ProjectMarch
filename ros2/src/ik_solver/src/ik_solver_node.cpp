@@ -27,6 +27,9 @@ IkSolverNode::IkSolverNode()
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&IkSolverNode::stance_foot_callback, this, _1));
 
+    m_joint_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+        "joint_trajectory_controller/joint_trajectory", 10);
+
     // Initializing the IK solver
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
@@ -37,8 +40,8 @@ IkSolverNode::IkSolverNode()
     declare_parameter("timestep", 1000);
     m_timestep = this->get_parameter("timestep").as_int();
 
-    m_solving_timer
-        = this->create_wall_timer(std::chrono::milliseconds(m_timestep), std::bind(&IkSolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(
+        std::chrono::milliseconds(m_timestep), std::bind(&IkSolverNode::timer_callback, this));
 
     pinocchio::Model test_model = m_ik_solver.get_model();
     for (pinocchio::FrameIndex i = 0; i < static_cast<pinocchio::FrameIndex>(test_model.nframes); i++) {
@@ -102,7 +105,8 @@ void IkSolverNode::timer_callback()
     m_com_trajectory_index++;
     m_swing_trajectory_index++;
 
-    if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container) || (m_stance_foot == 0)) {
+    if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
+        || (m_stance_foot == 0)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
     } else {
         // IN THE POSE ARRAY, INDEX 0 IS RIGHT AND INDEX 1 IS LEFT
@@ -110,33 +114,33 @@ void IkSolverNode::timer_callback()
             m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-            m_desired_state.left_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * (m_timestep*1e-3),
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].y * (m_timestep*1e-3),
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * (m_timestep*1e-3),
-                0.0, 0.0, 0.0;
+            m_desired_state.left_foot_pose
+                << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * (m_timestep * 1e-3),
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].y * (m_timestep * 1e-3),
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * (m_timestep * 1e-3), 0.0, 0.0, 0.0;
 
             m_desired_state.left_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
         }
-        if (m_stance_foot == -1){
+        if (m_stance_foot == -1) {
             m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-            m_desired_state.right_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * (m_timestep*1e-3),
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].y * (m_timestep*1e-3),
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * (m_timestep*1e-3),
-                0.0, 0.0, 0.0;
+            m_desired_state.right_foot_pose
+                << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * (m_timestep * 1e-3),
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].y * (m_timestep * 1e-3),
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * (m_timestep * 1e-3), 0.0, 0.0, 0.0;
 
             m_desired_state.right_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
         }
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * (m_timestep*1e-6),
-            m_com_trajectory_container->velocity[m_com_trajectory_index].y * (m_timestep*1e-6),
-            m_com_trajectory_container->velocity[m_com_trajectory_index].z * (m_timestep*1e-6);
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * (m_timestep * 1e-6),
+            m_com_trajectory_container->velocity[m_com_trajectory_index].y * (m_timestep * 1e-6),
+            m_com_trajectory_container->velocity[m_com_trajectory_index].z * (m_timestep * 1e-6);
 
         m_desired_state.com_vel << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y,
@@ -145,8 +149,18 @@ void IkSolverNode::timer_callback()
         Eigen::VectorXd solution_velocity
             = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_desired_state, m_stance_foot);
 
-        Eigen::VectorXd solution_position = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep)/1000.0);
+        Eigen::VectorXd solution_position
+            = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
 
+        trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
+        trajectory_msgs::msg::JointTrajectoryPoint point;
+        point.positions
+            = std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size());
+        point.velocities
+            = std::vector<double>(solution_velocity.data(), solution_velocity.data() + solution_velocity.size());
+        trajectory.points.push_back(point);
+        trajectory.header.stamp = this->get_clock()->now();
+        m_joint_trajectory_publisher->publish(trajectory);
     }
 }
 

@@ -11,7 +11,6 @@ from march_utility.gait.edge_position import (
     EdgePosition,
 )
 from rclpy.node import Node
-from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (
     GaitNameNotFoundError,
@@ -54,7 +53,6 @@ class Gait:
         cls,
         gait_name: str,
         gait_directory: str,
-        robot: urdf.Robot,
         gait_version_map: dict,
     ):
         """Extract the data from the .gait file.
@@ -62,7 +60,6 @@ class Gait:
         Args:
           gait_name: name of the gait to unpack
           gait_directory: path of the directory where the .gait file is located
-          robot: the robot corresponding to the given .gait file
           gait_version_map: The parsed yaml file which states the version of the subgaits
         Returns:
             Gait: If the data in the files is validated a gait object is returned
@@ -72,12 +69,11 @@ class Gait:
         with open(gait_path, "r") as gait_file:
             gait_dictionary = yaml.load(gait_file, Loader=yaml.SafeLoader)
 
-        return cls.from_dict(robot, gait_dictionary, gait_directory, gait_version_map)
+        return cls.from_dict(gait_dictionary, gait_directory, gait_version_map)
 
     @classmethod
     def from_dict(
         cls,
-        robot: urdf.Robot,
         gait_dictionary: Dict[str, Union[str, Dict[str, str]]],  # noqa TAE002 too complex annotation
         gait_directory: str,
         gait_version_map: dict,
@@ -85,7 +81,6 @@ class Gait:
         """Create a new gait object using the .gait and .subgait files.
 
         Args:
-          robot: the robot corresponding to the given .gait file
           gait_dictionary: the information of the .gait file as a dictionary
           gait_directory: path of the directory where the .gait file is located
           gait_version_map: The parsed yaml file which states the version of the subgaits
@@ -98,7 +93,7 @@ class Gait:
 
         graph = SubgaitGraph(subgaits)
         subgaits = {
-            name: cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map)
+            name: cls.load_subgait(gait_directory, gait_name, name, gait_version_map)
             for name in subgaits
             if name not in ("start", "end")
         }
@@ -116,7 +111,6 @@ class Gait:
 
     @staticmethod
     def load_subgait(
-        robot: urdf.Robot,
         gait_directory: str,
         gait_name: str,
         subgait_name: str,
@@ -125,7 +119,6 @@ class Gait:
         """Read the .subgait file and extract the data.
 
         Args:
-          robot: the robot corresponding to the given .gait file
           gait_directory: path of the directory where the .gait file is located
           gait_name: the name of the gait where the subgait belongs to
           subgait_name: the name of the subgait to load
@@ -140,7 +133,7 @@ class Gait:
             raise SubgaitNameNotFoundError(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
-        return Subgait.from_name_and_version(robot, gait_directory, gait_name, subgait_name, version)
+        return Subgait.from_name_and_version(gait_directory, gait_name, subgait_name, version)
 
     def _validate_trajectory_transition(self):
         """Compares and validates the trajectory end and start points."""
@@ -263,14 +256,12 @@ class Gait:
 
     def set_subgait_versions(
         self,
-        robot: urdf.Robot,
         gait_directory: str,
         version_map: Dict[str, str],
     ):
         """Updates the given subgait versions and verifies transitions.
 
         Args:
-            robot (urdf.Robot): URDF matching subgaits
             gait_directory (str): path to the gait directory
             version_map (Dict[str, str): mapping subgait names to versions
         Raises:
@@ -281,7 +272,7 @@ class Gait:
             if subgait_name not in self.subgaits:
                 raise SubgaitNameNotFoundError(subgait_name, self.gait_name)
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
-                robot, gait_directory, self.gait_name, subgait_name, version
+                gait_directory, self.gait_name, subgait_name, version
             )
 
         try:

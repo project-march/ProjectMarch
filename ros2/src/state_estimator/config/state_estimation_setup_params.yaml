@@ -2,7 +2,8 @@ state_estimator:
   ros__parameters:
     state_estimator_config:
       # in ms
-      refresh_rate : 1000
+      refresh_rate : 48
+
     joint_estimator:
       links: ["left_origin", "left_ankle", "left_knee", "left_hip_fe"
       , "left_hip_aa", "hip_base", "right_hip_aa", "right_hip_fe"
@@ -10,10 +11,13 @@ state_estimator:
       base_links: ["left_ankle", "left_knee", "left_hip_fe", "left_hip_aa"
       , "hip_base", "right_hip_aa", "right_hip_fe", "right_knee"
       , "right_ankle", "right_origin", "map"]
+      link_rotation_axis : [1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0]
+#      link_rotation_axis : [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+#      link_rotation_axis: [ 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 ]
       #0: X
       #1: Y
       #2: Z
-      link_hinge_axis:  [1, 1, 1, 0, 2, 0, 1, 1, 1, 1] 
+      link_hinge_axis:  [1, 1, 1, 1, 2, 0, 1, 1, 1, 1] 
       link_length_x:    [-0.23, 0.0,    0.0,     -0.182, -0.021, 0.021,  0.182, 0.0,   0.0,    0.23, -0.23]
       link_length_y:    [0.0,  0.037, 0.06,    -0.182, -0.08, -0.08, -0.182, 0.06, 0.037, 0.0,   0.0] 
       link_length_z:    [0.138,   0.414, 0.413,   0.0, -0.025,   0.025,  0.0,   -0.413, -0.414,  -0.138,   0.0] 
