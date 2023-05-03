@@ -10,6 +10,7 @@ TorqueConverterNode::TorqueConverterNode()
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
     m_torque_converter.load_urdf_model(robot_description);
+
      // create subscribers
     m_joint_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
         "/measured_joint_states", 10, std::bind(&TorqueConverterNode::joint_state_subscriber_callback, this, _1));
@@ -25,6 +26,7 @@ TorqueConverterNode::TorqueConverterNode()
 
 void TorqueConverterNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+    // RCLCPP_INFO(this->get_logger(), "mq size joint callback is %i", m_torque_converter.m_q.size());
     m_torque_converter.set_joint_config(msg);
     m_torque_converter.set_inertia_matrix();
     m_torque_converter.set_coriolis_matrix();
@@ -34,10 +36,20 @@ void TorqueConverterNode::joint_state_subscriber_callback(sensor_msgs::msg::Join
 void TorqueConverterNode::trajectory_subscriber_callback(control_msgs::msg::JointTrajectoryControllerState::SharedPtr msg)
 {
     m_torque_converter.set_desired_pos(msg->desired.positions);
-    m_torque_converter.set_desired_vel(msg->desired.velocities);
+    m_torque_converter.set_vel_des(msg->desired.positions);
     m_torque_converter.set_desired_acc(msg->desired.accelerations);
-    m_torque_trajectory_publisher->publish(m_torque_converter.convert_to_torque()); //TODO: eigen to jointtrajectorypoint, this doesn't work
 
+    Eigen::VectorXd torque_des;
+    torque_des = m_torque_converter.convert_to_torque();
+    std::stringstream ss;
+    ss << "torque_des = " << torque_des.transpose();
+
+    RCLCPP_INFO(this->get_logger(),"torque des = %s", ss.str());
+
+    trajectory_msgs::msg::JointTrajectoryPoint torque_point;
+    torque_point.effort
+        = std::vector<double>(torque_des.data(),torque_des.data() + torque_des.size());
+    m_torque_trajectory_publisher->publish(torque_point);
 
 }
 

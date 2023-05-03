@@ -11,6 +11,7 @@
 #include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/parsers/urdf.hpp"
+// #include "geometry_msgs/msg"
 
 using namespace Eigen;
 
@@ -32,20 +33,31 @@ public:
     VectorXd get_desired_vel();
     VectorXd get_desired_acc();
 
+    VectorXd set_vel_des(std::vector<double> desired_pos);
+    VectorXd find_acc_des(std::vector<double> desired_vel);
+
+    VectorXd convert_to_torque(); // the main function
+
+    Eigen::VectorXd m_q; // current joint positions (need to be loaded in)
+    Eigen::VectorXd m_v; // current joint velocities
+
 private:
 
     // pinocchio
     pinocchio::Model m_model;
     pinocchio::Data m_model_data;
-    Eigen::VectorXd m_q; // current joint positions (need to be loaded in)
-    Eigen::VectorXd m_v; // current joint velocities
+
+    Vector2d m_pos_des_history;
+    Vector2d m_vel_des_history;
+
+    double m_dt = 0.008;
 
     VectorXd m_pos_des; // should be a trajectory of at least 3 angles for each joint
     VectorXd m_vel_des; // desired velocity calculated with forward euler from pos_des
     VectorXd m_acc_des; // desired acceleration calculated with forward euler from vel_des
 
     VectorXd m_torque_des; // torque trajectory
-    VectorXd convert_to_torque(); // the main function
+    //VectorXd convert_to_torque(); // the main function
 
     
     

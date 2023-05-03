@@ -1,4 +1,5 @@
 """Author: MVIII."""
+
 import mujoco
 import rclpy
 from ament_index_python.packages import get_package_share_directory
@@ -8,6 +9,8 @@ from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from sensor_msgs.msg import JointState
+from control_msgs.msg import JointTrajectoryControllerState
+from trajectory_msgs.msg import JointTrajectoryPoint
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -85,9 +88,10 @@ class MujocoSimNode(Node):
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.001
+        self.TIME_STEP_MJC = 0.005
         self.model.opt.timestep = self.TIME_STEP_MJC
-
+        # We need these options to compare mujoco and ros time, so they have the same reference starting point
+        self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
 
@@ -129,7 +133,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.0001
+        self.TIME_STEP_TRAJECTORY = 0.0005
         self.trajectory_last_updated = self.get_clock().now()
 
     def check_for_new_reference_update(self, time_current):
@@ -177,9 +181,11 @@ class MujocoSimNode(Node):
         time_difference = (time_current - self.time_last_updated).to_msg()
         mj_time_current = self.data.time
 
-        time_difference_withseconds = time_difference.nanosec / 1e9 + time_difference.sec
+        time_shifted = (time_current - self.ros_first_updated).to_msg()
 
-        while self.data.time - mj_time_current <= time_difference_withseconds:
+        time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
+
+        while self.data.time <= time_difference_withseconds:
             mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
@@ -245,3 +251,4 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
+
