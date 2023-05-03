@@ -20,10 +20,10 @@ ZmpSolver::ZmpSolver()
     m_x_trajectory.fill(0);
     m_u_current.fill(0);
 
-    set_current_com(0.0, 0.09, 0.0, 0.0);
-    set_current_zmp(0.0, 0.1);
-    set_current_foot(0.0, 0.1);
-    set_previous_foot(0.0, 0.1);
+    set_current_com(0.0, 0.2, 0.0, 0.0);
+    set_current_zmp(0.0, 0.2);
+    set_current_foot(0.0, 0.2);
+    set_previous_foot(0.0, 0.2);
     set_current_state();
 }
 
@@ -107,14 +107,12 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 {
     m_reference_stepsize_y.clear();
     m_reference_stepsize_x.clear();
-    m_reference_stepsize_x.push_back(0.0);
-    m_reference_stepsize_y.push_back(m_current_stance_foot*-0.1);
     int n = m_candidate_footsteps.size();
 
-    for (int i = 1; i < n; i++) 
+    for (int i = 0; i < n-1; i++) 
         {
-            m_reference_stepsize_x.push_back(m_candidate_footsteps[i].x-m_candidate_footsteps[i-1].x);
-            m_reference_stepsize_y.push_back(m_candidate_footsteps[i].y-m_candidate_footsteps[i-1].y);
+            m_reference_stepsize_x.push_back(m_candidate_footsteps[i+1].x-m_candidate_footsteps[i].x);
+            m_reference_stepsize_y.push_back(m_candidate_footsteps[i+1].y-m_candidate_footsteps[i].y);
         }
     
 }
@@ -146,7 +144,7 @@ void ZmpSolver::initialize_mpc_params()
     m_admissible_region_x = 0.62;
     m_admissible_region_y = 0.10;
     m_foot_width_x = 0.05;
-    m_foot_width_y = 0.1;
+    m_foot_width_y = 0.08;
     m_step_size_x = 0.2;
     m_step_size_y = 0.2;
 
@@ -560,10 +558,10 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
-    printf("\n--- utraj ---\n");
-    d_print_exp_tran_mat(NU, N, utraj, NU);
+    // printf("\n--- xtraj ---\n");
+    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    // printf("\n--- utraj ---\n");
+    // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
 
     printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
