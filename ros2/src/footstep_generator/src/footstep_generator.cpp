@@ -20,8 +20,8 @@ void FootstepGenerator::publish_foot_placements(
     std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
-    publish_footsteps(footsteps);
-    response->status = 0;
+    m_publisher->publish(footsteps);
+    response->status = true;
 }
 
 geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int stance_leg, int gait_type)

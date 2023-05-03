@@ -3,7 +3,7 @@
 #include <iostream>
 
 ZmpSolver::ZmpSolver()
-    : m_time_horizon(4.0)
+    : m_time_horizon(2.0)
     , m_x_current()
     , m_u_current()
     , m_switch(0)
@@ -157,7 +157,7 @@ void ZmpSolver::initialize_mpc_params()
     m_current_shooting_node = 0;
     m_timing_value = 0;
 
-    m_number_of_footsteps = 4;
+    m_number_of_footsteps = 2;
 }
 
 void ZmpSolver::set_current_stance_foot(int stance_foot)
