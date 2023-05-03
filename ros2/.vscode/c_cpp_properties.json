@@ -1,0 +1,31 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/marten/march/ros2/install/march_safety/include/**",
+        "/home/marten/march/ros2/install/march_utility/include/**",
+        "/home/marten/march/ros2/install/march_shared_msgs/include/**",
+        "/home/marten/march/ros2/install/diagnostic_updater/include/**",
+        "/opt/ros/foxy/include/**",
+        "/home/marten/march/ros2/src/libraries/diagnostic_updater/include/**",
+        "/home/marten/march/ros2/src/libraries/march_robot_state_publisher/include/**",
+        "/home/marten/march/ros2/src/libraries/realsense_gazebo_plugin/include/**",
+        "/home/marten/march/ros2/src/safety/march_safety/include/**",
+        "/home/marten/march/ros2/src/shared/march_utility/include/**",
+        "/home/marten/march/ros2/src/simulation/march_fake_sensor_data/include/**",
+        "/home/marten/march/ros2/src/vision/march_foot_position_finder/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

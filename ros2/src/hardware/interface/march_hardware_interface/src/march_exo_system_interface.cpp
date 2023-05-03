@@ -28,6 +28,7 @@
 #include "march_logger_cpp/ros_logger.hpp"
 #include "march_utility/logger_colors.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <csignal>
 
 using namespace march_hardware_interface_util;
 
@@ -129,6 +130,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
+        /*position_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
@@ -271,6 +273,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
     RCLCPP_INFO((*logger_), "%sAll joints are ready for reading!", LColor::BLUE);
     status_ = hardware_interface::status::STARTED;
 
+
     return hardware_interface::return_type::OK;
 }
 
@@ -287,6 +290,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_switch(
     const std::vector<std::string>& start_interfaces, const std::vector<std::string>& stop_interfaces)
 {
+        RCLCPP_INFO((*logger_), "%sStart writing on!", LColor::BLUE);
     for (const auto& start : start_interfaces) {
         RCLCPP_INFO((*logger_), "Starting interfaces: %s", start.c_str());
     }
@@ -304,6 +308,7 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
         }
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
+        stop();
         throw;
     }
 
@@ -388,6 +393,14 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     }
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
+    // Battery
+    //  auto pdb_current = march_robot_->getPowerDistributionBoard().read().pdb_current.f;
+    //  if (pdb_current < 43) {
+    //      RCLCPP_ERROR_THROTTLE((*logger_), clock_, 500, "Current is less then 43, it is: %g.", pdb_current);
+    //  } else if (pdb_current < 45) {
+    //      RCLCPP_WARN_THROTTLE((*logger_), clock_, 500, "Current is less then 45, it is: %g.", pdb_current);
+    //  }
+    //  RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Current is %g.", pdb_current);
 
     pdb_read();
     pressure_sole_read();
@@ -450,6 +463,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
+            return hardware_interface::return_type::ERROR;
         }
 
         /*MARCH 7 code can be removed later */
@@ -482,6 +496,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
+    if (jointInfo.position == 0) {
+        RCLCPP_WARN((*logger_), "The joint %s has position 0, the absolute encoder probably isn't working correctly.",
+            jointInfo.name.c_str());
+    }
     return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
 }
 
