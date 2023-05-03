@@ -32,7 +32,6 @@ void WeightNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     std::string allowed_control_type = msg->data;
     RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
 
-    // If
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
     if(allowed_control_type == "position"){
         setJointsWeight("l", 1, 0);

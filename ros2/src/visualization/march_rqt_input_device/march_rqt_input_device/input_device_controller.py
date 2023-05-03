@@ -220,7 +220,7 @@ class InputDeviceController:
             )
         )
         if control_type is not None:
-            self._set_gait_control_type(control_type)
+            self.publish_control_type(control_type)
 
     def publish_stop(self) -> None:
         """Publish a message on `/march/input_device/instruction` to stop the gait."""
@@ -315,13 +315,4 @@ class InputDeviceController:
 
     def publish_control_type(self, control_type) -> None:
         """Sets the allowed control type depending on the gait"""
-
         self._set_gait_control_type.publish(String(data=control_type))
-        # onclick and if control-type != None this should be called
-
-        #     if "position-control" in self._current_gait.name:
-        #     self._set_gait_control_type.publish(String(data="position"))
-        #     elif "torque-control" in self._current_gait.name:
-        #     self._set_gait_control_type.publish(String(data="torque"))
-        # else:
-        # self._set_gait_control_type.publish(String(data="fuzzy"))
