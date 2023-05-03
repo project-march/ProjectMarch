@@ -130,7 +130,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
-        /*position_command=*/std::numeric_limits<double>::quiet_NaN(),
+//        /*position_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
