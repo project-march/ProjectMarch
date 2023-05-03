@@ -9,6 +9,14 @@
          "control_type": "position"
       },
       {
+         "name": "test_joint_gait",
+         "control_type": "torque"
+      },
+      {
+         "name": "test_joint_gait",
+         "control_type": "fuzzy"
+      },
+      {
          "name": "test_joint_gait_continuous",
          "control_type": "position"
       },

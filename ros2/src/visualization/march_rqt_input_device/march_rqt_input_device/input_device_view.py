@@ -174,7 +174,7 @@ class InputDeviceView(QWidget):
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         qt_button.setStyleSheet("QToolButton {background-color: lightgrey; font-size: 13px; font: 'Times New Roman'}")
         qt_button.setIconSize(QSize(90, 90))
-        qt_button.setText(check_string(name))
+        qt_button.setText(check_string('\n'.join(filter(None, [name, control_type]))))
         if image_path is not None:
             qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
         elif name + ".png" in self._image_names:
