@@ -44,7 +44,7 @@ class MujocoWriterNode(Node):
 
     def execute_callback(self, goal_handle):
         """Callback for the joint_trajectory action server."""
-        self.get_logger().info('Executing goal...')
+        # self.get_logger().info('Executing goal...')
         trajectory = goal_handle.request.trajectory.points
         msg_to_send = MujocoInput()
         msg_to_send.points = trajectory
@@ -57,7 +57,7 @@ class MujocoWriterNode(Node):
 
         This callback is just a simple passthrough to keep the flow clear.
         """
-        self.get_logger().info('Executing goal...')
+        # self.get_logger().info('Executing goal...')
         trajectory = msg.points
         msg_to_send = MujocoInput()
         msg_to_send.points = trajectory
