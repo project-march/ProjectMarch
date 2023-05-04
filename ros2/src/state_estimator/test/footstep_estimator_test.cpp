@@ -55,15 +55,15 @@ TEST_F(FootstepEstimatorTest, feetOffGroundTest)
     CenterOfPressure cop;
     cop.pressure = 2;
 
-    const char prefixR = 'r';
+    const char prefixR = 'r_';
     PressureSensor mock_sensor_r;
-    mock_sensor_r.name = "r";
+    mock_sensor_r.name = "r_";
     mock_sensor_r.centre_of_pressure = cop;
     sensors.push_back(mock_sensor_r);
 
-    const char prefixL = 'l';
+    const char prefixL = 'l_';
     PressureSensor mock_sensor_l;
-    mock_sensor_l.name = "l";
+    mock_sensor_l.name = "l_";
     mock_sensor_l.centre_of_pressure = cop;
     sensors.push_back(mock_sensor_l);
 
