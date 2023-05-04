@@ -88,7 +88,7 @@ class MujocoSimNode(Node):
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.005
+        self.TIME_STEP_MJC = 0.004
         self.model.opt.timestep = self.TIME_STEP_MJC
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
@@ -101,6 +101,7 @@ class MujocoSimNode(Node):
             parameters=[
                 ("position.P", None),
                 ("position.D", None),
+                ("position.I", None),
                 ("torque.P", None),
                 ("torque.D", None),
             ],
@@ -110,7 +111,7 @@ class MujocoSimNode(Node):
         self.controller = []
         self.controller.append(
             PositionController(
-                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value
+                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value, self.get_parameter("position.I").value
             )
         )
         self.controller.append(
@@ -133,7 +134,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.0005
+        self.TIME_STEP_TRAJECTORY = 0.0328
         self.trajectory_last_updated = self.get_clock().now()
 
     def check_for_new_reference_update(self, time_current):
