@@ -42,9 +42,9 @@ void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
-
+    // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
+    // m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
+// CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION OR SOMETHING FOR CURRENT FEET POSITIONS.
     m_zmp_solver.set_candidate_footsteps(msg);
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
