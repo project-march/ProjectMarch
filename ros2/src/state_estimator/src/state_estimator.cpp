@@ -96,7 +96,9 @@ void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSole
 {
 
     this->m_cop_estimator.update_sensor_pressures(update_pressure_sensors_data(msg->names, msg->pressure_values));
-    this->m_cop_pos_publisher->publish(this->m_cop_estimator.get_cop_state().position);
+    auto cop_msg = this->m_cop_estimator.get_cop_state().position;
+    cop_msg.header.frame_id = "map";
+    this->m_cop_pos_publisher->publish(cop_msg);
 }
 
 void StateEstimator::initialize_imus()
@@ -305,7 +307,7 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
             RCLCPP_WARN(this->get_logger(),
                 "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
         }
-        sensor.name = initial;
+        sensor.name = names.at(i);
         CenterOfPressure cop;
 
         cop.position.header.frame_id = "stink";
@@ -350,7 +352,8 @@ void StateEstimator::visualize_joints()
     tf2::Vector3 joint_endpoint;
     try {
         for (auto i : pressure_soles) {
-            pressure_sole_transform = m_tf_buffer->lookupTransform("map", i.centre_of_pressure.position.header.frame_id, tf2::TimePointZero);
+            pressure_sole_transform = m_tf_buffer->lookupTransform(
+                "map", i.centre_of_pressure.position.header.frame_id, tf2::TimePointZero);
             marker_container.x = pressure_sole_transform.transform.translation.x;
             marker_container.y = pressure_sole_transform.transform.translation.y;
             marker_container.z = pressure_sole_transform.transform.translation.z;
