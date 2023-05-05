@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 See <https://www.gnu.org/licenses/>. 
 
-This XML was compiled by xml_generator.py at 26/04/2023 12:41:15 
+This XML was compiled by xml_generator.py at 04/05/2023 15:21:54 
 using march7_v1_pre.xml and march7_v1.yaml. -->
 
 <mujoco model="exoskeleton">
