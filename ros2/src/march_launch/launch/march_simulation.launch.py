@@ -287,7 +287,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             "model_to_load_mujoco",
-            default_value="model_to_load.xml",
+            default_value="march8_v0.xml",
             description="What model to load into mujoco.",
         ),
         DeclareLaunchArgument(

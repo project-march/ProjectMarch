@@ -319,7 +319,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
     <jointvel name="L_HAA_vel_output" joint="L_HAA" user="18" noise="000"/>
     <jointvel name="L_HFE_vel_output" joint="L_HFE" user="18" noise="000"/>
     <jointvel name="L_KFE_vel_output" joint="L_KFE" user="18" noise="000"/>
-    <jointvel name="R_ADPF_vel_output" joint="R_ADPF" user="18" noise="000"/> 
+    <jointvel name="R_ADPF_vel_output" joint="R_ADPF" user="18" noise="000"/>
     <jointvel name="R_HAA_vel_output" joint="R_HAA" user="18" noise="000"/>
     <jointvel name="R_HFE_vel_output" joint="R_HFE" user="18" noise="000"/>
     <jointvel name="R_KFE_vel_output" joint="R_KFE" user="18" noise="000"/>
