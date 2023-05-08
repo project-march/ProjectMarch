@@ -23,6 +23,7 @@ class PositionController(LowLvlController):
             model (Mujoco Struct): Refers to the simulated body in Mujoco
             p (float): Proportional-value of a PD controller
             d (float): Derivative-value of a PD controller
+            i (float): Integration term
         """
         # Define the amount of controllable joints based on
         # the generalized coordinates generated within Mujoco
@@ -50,7 +51,7 @@ class PositionController(LowLvlController):
             for index in range(self.actuator_amount):
                 e = self.joint_desired[index] - joint_val[index]
                 de_prev = (e - self.e_prev[index]) / dt
-                ie_prev = (e - self.e_prev[index])*dt #joi
+                ie_prev = (e - self.e_prev[index]) * dt
 
                 ctrl_input = self.p[index] * e + self.d[index] * de_prev + self.i[index] * ie_prev
                 data.ctrl[index] += ctrl_input

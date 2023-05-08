@@ -1,3 +1,4 @@
+"""Created by MVIII."""
 import xml_generator
 
 if __name__ == '__main__':

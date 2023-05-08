@@ -8,8 +8,6 @@ from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from sensor_msgs.msg import JointState
-from control_msgs.msg import JointTrajectoryControllerState
-from trajectory_msgs.msg import JointTrajectoryPoint
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -81,7 +79,6 @@ class MujocoSimNode(Node):
         self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
-        # self.model.qpos0 = [0, 0, 0.95, 1, 0, 0, 0, 0.1745, 0.1745, 0, 0, 0.1745, 0.1745, 0, 0]
 
         self.data = mujoco.MjData(self.model)
 
@@ -120,7 +117,6 @@ class MujocoSimNode(Node):
             )
         )
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
-
 
         # Create an instance of that data extractor.
         self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
@@ -180,9 +176,6 @@ class MujocoSimNode(Node):
         vs the time in ROS, so we can update the control inputs on time
         """
         time_current = self.get_clock().now()
-        time_difference = (time_current - self.time_last_updated).to_msg()
-        mj_time_current = self.data.time
-
         time_shifted = (time_current - self.ros_first_updated).to_msg()
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec

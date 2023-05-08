@@ -2,7 +2,6 @@
 
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState, Imu
-from control_msgs.msg import JointTrajectoryControllerState
 from march_shared_msgs.msg import PressureSolesData
 import rclpy
 from rclpy.node import Node

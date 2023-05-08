@@ -52,10 +52,8 @@ def generate_launch_description() -> launch.LaunchDescription:
     imu_to_use = LaunchConfiguration("imu_to_use")
     imu_topic = LaunchConfiguration("imu_topic")
     simulation = LaunchConfiguration("simulation")
-    jointless = LaunchConfiguration("jointless")
 
     # Simulation arguments
-    gazebo = LaunchConfiguration("gazebo")
     mujoco = LaunchConfiguration("mujoco")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")

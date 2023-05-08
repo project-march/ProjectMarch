@@ -1,19 +1,19 @@
-#  Copyright (C) 2023. Stichting Moving Bird
-#  Joy Brand, joy.brand@projectmarch.nl
-#  Thijn Hoekstra, thijn.hoekstra@projectmarch.nl
-#
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Copyright (C) 2023. Stichting Moving Bird.
+  Joy Brand, joy.brand@projectmarch.nl
+  Thijn Hoekstra, thijn.hoekstra@projectmarch.nl
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>."""
 
 import re
 import copy
@@ -26,7 +26,7 @@ from typing import TextIO
 from mathparser import parser as pp
 from mathparser import compute
 
-DISCLAIMER_TEXT = '\
+DISCLAIMER_TEXT = """\
 <!-- \n\
 Copyright (C) 2023. Stichting Moving Bird \n\
 Joy Brand, joy.brand@projectmarch.nl \n\
@@ -46,8 +46,8 @@ See <https://www.gnu.org/licenses/>. \n\
 \n\
 This XML was compiled by xml_generator.py at {} \n\
 using {} and {}. \
--->\n'
-
+-->\n
+"""
 SYMBOLS = [
     ' + ',
     ' - ',
@@ -56,7 +56,7 @@ SYMBOLS = [
 ]
 
 class XMLGenerator:
-    """Generates an XML usable in MuJoCo from a description
+    """Generates an XML usable in MuJoCo from a description.
 
     Uses a (modified) `.yaml` exoskeleton description and a "pre-XML" to generate a MuJoCo-ready XML format (MJCF).
     Pre-XML files are identical to MJCF XML files with the exception of that attributes also allow for flags relating
@@ -83,7 +83,7 @@ class XMLGenerator:
     """
 
     def __init__(self, mark_compile_time: bool = True):
-        """Creates an XMLGenerator
+        """Creates an XMLGenerator.
 
         Attributes:
             mark_compile_time (bool): If set to True, a header is added to the output file, containing a time stamp
@@ -97,7 +97,7 @@ class XMLGenerator:
         self.current_line: int = None
 
     def _main(self, file: TextIO, data: dict, out: TextIO):
-        """Main operation of the XMLGenerator
+        """Main operation of the XMLGenerator.
 
         Args:
             file (TextIO): Pre-XML file.
@@ -132,8 +132,8 @@ class XMLGenerator:
         verbatim_placeholder = self._get_placeholders(attribute)
 
         placeholders, new_attribute = self._add_prefix_to_relative_placeholders(verbatim_placeholder,
-                                                                                     attribute,
-                                                                                     prefix)
+                                                                                attribute,
+                                                                                prefix)
         placeholders = list(set(placeholders))
 
         keys = self._get_keys_from_string(placeholders)
@@ -149,19 +149,12 @@ class XMLGenerator:
                     f'Please check that the placeholder in {self.prexml_fname} matches '
                     f'with {self.yaml_fname}.')
 
-            # completed_line = completed_line.replace(placeholder, str(replacement))
-
-            assert placeholder in new_attribute, 'Error: placeholder "{}" not found in attribute "{}"'\
-                .format(placeholder, new_attribute)
-
             new_attribute = new_attribute.replace(placeholder, str(replacement))
 
         if any([symbol in attribute for symbol in SYMBOLS]):
             new_attribute = self._parse_math_in_attribute(new_attribute)
 
-        completed_line = completed_line.replace(attribute, new_attribute)
-
-        return completed_line
+        return completed_line.replace(attribute, new_attribute)
 
     def _add_prefix_to_relative_placeholders(self, placeholders, completed_line, prefix):
         abs_placeholders = copy.copy(placeholders)
@@ -182,7 +175,6 @@ class XMLGenerator:
 
         for symbol in SYMBOLS:
             new_attribute = new_attribute.replace(symbol, symbol.strip())
-
 
         attr_contents = self._get_contents_inside_flag(new_attribute)
 
@@ -207,12 +199,10 @@ class XMLGenerator:
 
             parsed_attr_contents.append(str(result))
         parsed_attr_contents = ' '.join(parsed_attr_contents)
-        new_attribute = new_attribute.replace(attr_contents, str(parsed_attr_contents))
-
-        return new_attribute
+        return new_attribute.replace(attr_contents, str(parsed_attr_contents))
 
     def _cancel_double_neg_in_eqs(self, text):
-        """Replaces double negatives in equations
+        """Replaces double negatives in equations.
 
         Replaces double negatives in equations with a plus or with a blank space"""
         text = re.sub('--', r'+', text)
@@ -222,12 +212,10 @@ class XMLGenerator:
 
     def _cancel_plusminus_in_eqs(self, text):
         """Replaces +- or -+ with - in equations"""
-        text = re.sub(r'\+-|-\+', '-', text)
-        return text
+        return re.sub(r'\+-|-\+', '-', text)
 
     def _get_attributes_in_line(self, line):
-        attributes = re.findall(r'\${.*?}', line)
-        return attributes
+        return re.findall(r'\${.*?}', line)
 
     def _add_timestamp_and_disclaimer(self, out):
         text = DISCLAIMER_TEXT.format(
@@ -237,6 +225,13 @@ class XMLGenerator:
         out.write(text)
 
     def __call__(self, prexml_fname: str, yaml_fname: str, output_fname: str = None) -> None:
+        """Call to make that file is opened.
+
+        :param prexml_fname:
+        :param yaml_fname:
+        :param output_fname:
+        :return:
+        """
         self.prexml_fname = prexml_fname
         self.yaml_fname = yaml_fname
 
@@ -248,13 +243,11 @@ class XMLGenerator:
         with open(yaml_fname, mode='r') as file:
             data = self._read_yaml(file)
 
-        with open(prexml_fname, mode='r') as file:
-            with open(output_fname, mode='w') as out:
+        with open(prexml_fname, mode='r') as file, open(output_fname, mode='w') as out:
                 self._main(file, data, out)
 
-
-    def _read_yaml(self, file):
-        return yaml.safe_load(file)
+    def _read_yaml(self, yaml_file):
+        return yaml.safe_load(yaml_file)
 
     def _cancel_double_negs_naive(self, text):
         return text.replace('--', '')
@@ -295,7 +288,7 @@ class XMLGenerator:
 
         elif isinstance(placeholders, str):
             return convert(placeholders)
-        
+
         else:
             raise ValueError('Could not get keys to YAML from "{}"'.format(placeholders))
 
