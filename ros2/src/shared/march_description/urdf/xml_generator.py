@@ -42,11 +42,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of \n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n\
 GNU General Public License for more details. \n\
 \n\
-See <https://www.gnu.org/licenses/>. \n\
-\n\
-This XML was compiled by xml_generator.py at {} \n\
-using {} and {}. \
--->\n
+See <https://www.gnu.org/licenses/>.
 """
 SYMBOLS = [
     ' + ',
@@ -54,6 +50,7 @@ SYMBOLS = [
     ' * ',
     ' / ',
 ]
+
 
 class XMLGenerator:
     """Generates an XML usable in MuJoCo from a description.
@@ -96,19 +93,18 @@ class XMLGenerator:
 
         self.current_line: int = None
 
-    def _main(self, file: TextIO, data: dict, out: TextIO):
+    def _main(self, xml_file: TextIO, data: dict, out: TextIO):
         """Main operation of the XMLGenerator.
 
         Args:
-            file (TextIO): Pre-XML file.
+            xml_file (TextIO): Pre-XML file.
             data (dict): Dictionary representation of the data stored in the YAML.
             out (TextIO): File to which to output the generated XML.
         """
-
         if self.mark:
             self._add_timestamp_and_disclaimer(out)
 
-        for ii, line in enumerate(file):
+        for ii, line in enumerate(xml_file):
 
             self.current_line = ii
 
@@ -204,14 +200,13 @@ class XMLGenerator:
     def _cancel_double_neg_in_eqs(self, text):
         """Replaces double negatives in equations.
 
-        Replaces double negatives in equations with a plus or with a blank space"""
+        Replaces double negatives in equations with a plus or with a blank space
+        """
         text = re.sub('--', r'+', text)
-        text = re.sub(r'^\+(.)', r'\1', text)
-
-        return text
+        return re.sub(r'^\+(.)', r'\1', text)
 
     def _cancel_plusminus_in_eqs(self, text):
-        """Replaces +- or -+ with - in equations"""
+        """Replaces +- or -+ with - in equations."""
         return re.sub(r'\+-|-\+', '-', text)
 
     def _get_attributes_in_line(self, line):
@@ -244,7 +239,7 @@ class XMLGenerator:
             data = self._read_yaml(file)
 
         with open(prexml_fname, mode='r') as file, open(output_fname, mode='w') as out:
-                self._main(file, data, out)
+            self._main(file, data, out)
 
     def _read_yaml(self, yaml_file):
         return yaml.safe_load(yaml_file)
