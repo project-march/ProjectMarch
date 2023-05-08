@@ -186,9 +186,7 @@ class XMLGenerator:
                 result = compute.compute(ast)
                 result = round(result, 6)
 
-            except ValueError as e:
-                warnings.warn('Could not parse in line of'
-                              ', because of: {} Continuing...')
+            except ValueError:
                 result = value_to_parse
 
             parsed_attr_contents.append(str(result))
