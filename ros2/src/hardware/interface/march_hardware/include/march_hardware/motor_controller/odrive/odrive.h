@@ -48,8 +48,11 @@ public:
     // Override functions for actuating the ODrive
     std::chrono::nanoseconds prepareActuation() override;
     void enableActuation() override;
-    void actuateTorque(float target_effort) override;
-    void actuateRadians(float target_position) override;
+    void actuateTorque(float target_torque, float fuzzy_weight) override;
+    void actuateRadians(float target_position, float fuzzy_weight) override;
+
+    void sendPID(
+        std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid) override;
 
     // Override reset function
     std::chrono::nanoseconds reset() override;
@@ -72,8 +75,8 @@ public:
     float getMotorTemperature();
     float getOdriveTemperature();
 
-    double getEffortLimit() const override;
-    static constexpr double EFFORT_LIMIT = 30.0; // [A]
+    double getTorqueLimit() const override;
+    static constexpr double TORQUE_LIMIT = 30.0; // TODO: Determine a better value here
 
 protected:
     // Override protected functions from MotorController class

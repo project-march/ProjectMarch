@@ -39,6 +39,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CurrentIPDState.msg"
   "msg/CurrentState.msg"
   "msg/Error.msg"
+  "msg/FeetHeightStamped.msg"
   "msg/FollowJointTrajectoryGoal.msg"
   "msg/FollowJointTrajectoryActionGoal.msg"
   "msg/FollowJointTrajectoryResult.msg"
@@ -50,6 +51,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GaitInstructionResponse.msg"
   "msg/GaitParameters.msg"
   "msg/HighVoltageState.msg"
+  "msg/IpdInput.msg"
   "msg/JointMotorControllerState.msg"
   "msg/MotorControllerState.msg"
   "msg/MotorControllerStates.msg"
@@ -64,7 +66,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcTuning.msg"
   "msg/MpcJoint.msg"
   "msg/MpcMsg.msg"
+  "msg/CenterOfMass.msg"
   "msg/RobotState.msg"
+  "msg/IkSolverCommand.msg"
+  "msg/GaitRequest.msg"
+  "msg/GaitResponse.msg"
   "msg/GaitType.msg"
   "msg/PointStampedList.msg"
   "srv/CapturePointPose.srv"
@@ -80,6 +86,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetObstacleSize.srv"
   "srv/GaitCommand.srv"
   "srv/RequestFootsteps.srv"
+  "srv/RequestGait.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs
         trajectory_msgs control_msgs actionlib_msgs sensor_msgs
  )

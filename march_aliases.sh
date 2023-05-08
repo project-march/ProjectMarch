@@ -10,9 +10,8 @@ alias sros2='source ~/march/ros2/install/local_setup.bash'
 alias cm='cd ~/march/'
 alias cm2='cd ~/march/ros2/'
 
-
 # Create xml needed for mujoco
-alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf && python3 march8_v0_generate.py && python3 march7_v1_generate.py && cm2'
+alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/xml_parser8/ && python3 march8_v0_generate.py && cm2'
 
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
@@ -59,6 +58,12 @@ alias multiplot="sfox && sros2 && ros2 launch march_plotjuggler_launcher plotjug
 alias recon2="sfox && sros2 && ros2 run rqt_reconfigure rqt_reconfigure"
 alias left="sfox && sros2 && ros2 topic echo /march/foot_position/left | grep -A 3 'displacement'"
 alias right="sfox && sros2 && ros2 topic echo /march/foot_position/right | grep -A 3 'displacement'"
+
+# run tetst setup
+alias run_test_setup_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_rotational rviz:=false gait_directory:=test_joint_rotational_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_rotational_control.yaml'\'''
+alias run_test_setup_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_linear rviz:=false gait_directory:=test_joint_linear_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_linear_control.yaml'\'''
+
+alias run_test_setup_pressure_sole='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_pressure_sole rviz:=false realsense:=false control_yaml:='\''effort_control/pressure_sole_control.yaml'\'''
 
 
 # Clean march builds

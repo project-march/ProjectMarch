@@ -41,6 +41,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
+    wireless_ipd = LaunchConfiguration("wireless_ipd")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
     layout = LaunchConfiguration("layout")
 
@@ -75,6 +76,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
+    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -111,6 +113,11 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="true",
             description="If this argument is false, the rqt input device will not be launched.",
             choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="wireless_ipd",
+            default_value="false",
+            description="If this argument is false, the wireless input device will not be launched.",
         ),
         DeclareLaunchArgument(
             name="layout",
@@ -191,7 +198,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="gait_directory",
-            default_value="airgait_vi",
+            default_value="sit_stand_m8",
             description="The directory in which the gait files to use are located, " "relative to the gait_package.",
         ),
         DeclareLaunchArgument(
@@ -316,6 +323,7 @@ def generate_launch_description() -> launch.LaunchDescription:
         launch_arguments=[
             ("use_sim_time", use_sim_time),
             ("rqt_input", rqt_input),
+            ("wireless_ipd", wireless_ipd),
             ("rviz", rviz),
             ("ping_safety_node", ping_safety_node),
             ("layout", layout),
@@ -342,11 +350,11 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
             ("scheduling_delay", scheduling_delay),
+            ("timer_period", timer_period),
             ("fake_sensor_data", fake_sensor_data),
             ("minimum_fake_temperature", minimum_fake_temperature),
             ("maximum_fake_temperature", maximum_fake_temperature),
             ("simulation", simulation),
-            ("gazebo", gazebo),
             ("mujoco", mujoco),
             ("model_to_load_mujoco", model_to_load_mujoco),
             ("tunings_to_load", tunings_to_load),

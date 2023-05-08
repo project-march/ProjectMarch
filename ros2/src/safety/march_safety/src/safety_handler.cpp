@@ -3,7 +3,6 @@
 
 #include "march_safety/safety_handler.hpp"
 #include "march_safety/safety_node.hpp"
-#include "march_shared_msgs/msg/gait_type.hpp"
 #include <march_shared_msgs/msg/error.hpp>
 #include <march_shared_msgs/msg/gait_instruction.hpp>
 
