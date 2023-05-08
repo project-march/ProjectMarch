@@ -1,19 +1,21 @@
 """Copyright (C) 2023. Stichting Moving Bird.
-  Joy Brand, joy.brand@projectmarch.nl
-  Thijn Hoekstra, thijn.hoekstra@projectmarch.nl
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+Joy Brand, joy.brand@projectmarch.nl
+Thijn Hoekstra, thijn.hoekstra@projectmarch.nl
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>."""
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
 
 import re
 import copy
@@ -147,7 +149,7 @@ class XMLGenerator:
 
             new_attribute = new_attribute.replace(placeholder, str(replacement))
 
-        if any([symbol in attribute for symbol in SYMBOLS]):
+        if any(symbol in attribute for symbol in SYMBOLS):
             new_attribute = self._parse_math_in_attribute(new_attribute)
 
         return completed_line.replace(attribute, new_attribute)
@@ -185,12 +187,8 @@ class XMLGenerator:
                 result = round(result, 6)
 
             except ValueError as e:
-                warnings.warn('Could not parse "{}" in line {} of {}'
-                              ', because of: {} Continuing...'
-                              .format(value_to_parse,
-                                      self.current_line,
-                                      self.prexml_fname,
-                                      e))
+                warnings.warn('Could not parse in line of'
+                              ', because of: {} Continuing...')
                 result = value_to_parse
 
             parsed_attr_contents.append(str(result))
@@ -285,7 +283,7 @@ class XMLGenerator:
             return convert(placeholders)
 
         else:
-            raise ValueError('Could not get keys to YAML from "{}"'.format(placeholders))
+            raise ValueError('Could not get keys to YAML from.')
 
     def _get_prefix(self, attribute):
         return re.search(r'(\w+/)+', attribute).group(0)
