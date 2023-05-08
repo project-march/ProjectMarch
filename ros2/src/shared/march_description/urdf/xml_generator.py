@@ -21,7 +21,6 @@ import re
 import copy
 import yaml
 import datetime
-import warnings
 
 from typing import TextIO
 
