@@ -76,7 +76,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
-    timer_period = LaunchConfiguration("timer_period")
 
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
@@ -350,7 +349,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
             ("scheduling_delay", scheduling_delay),
-            ("timer_period", timer_period),
             ("fake_sensor_data", fake_sensor_data),
             ("minimum_fake_temperature", minimum_fake_temperature),
             ("maximum_fake_temperature", maximum_fake_temperature),

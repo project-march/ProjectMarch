@@ -81,6 +81,7 @@ class MujocoSimNode(Node):
         self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
+        # self.model.qpos0 = [0, 0, 0.95, 1, 0, 0, 0, 0.1745, 0.1745, 0, 0, 0.1745, 0.1745, 0, 0]
 
         self.data = mujoco.MjData(self.model)
 
@@ -119,6 +120,7 @@ class MujocoSimNode(Node):
             )
         )
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
+
 
         # Create an instance of that data extractor.
         self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
