@@ -16,8 +16,10 @@ SolverNode::SolverNode()
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
+    m_desired_steps_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
+        "/desired_footsteps", 10, std::bind(&SolverNode::desired_pos_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/desired_footsteps", 10, std::bind(&SolverNode::feet_callback, this, _1));
+        "/est_foot_position", 10, std::bind(&SolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
         "/robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
@@ -40,13 +42,17 @@ void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
     m_zmp_solver.set_current_zmp(msg->point.x, msg->point.y);
 }
 
-void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
+void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    // m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
 // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION OR SOMETHING FOR CURRENT FEET POSITIONS.
     m_zmp_solver.set_candidate_footsteps(msg);
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
+}
+
+void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
+{
+    m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
+    m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
 }
 
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)

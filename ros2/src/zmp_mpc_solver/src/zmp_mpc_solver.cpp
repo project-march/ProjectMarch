@@ -20,10 +20,14 @@ ZmpSolver::ZmpSolver()
     m_x_trajectory.fill(0);
     m_u_current.fill(0);
 
-    set_current_com(0.0, 0.18, 0.0, 0.0);
-    set_current_zmp(0.0, 0.2);
-    set_current_foot(0.0, 0.2);
-    set_previous_foot(0.0, 0.0);
+    // set_current_com(0.0, 0.18, 0.0, 0.0);
+    // set_current_zmp(0.0, 0.2);
+    // set_current_foot(0.0, 0.2);
+    // set_previous_foot(0.0, 0.0);
+    set_current_com(0.0, 0.08, 0.0, -0.1);
+    set_current_zmp(0.0, 0.08);
+    set_current_foot(0.0, 0.0);
+    set_previous_foot(0.0, 0.2);
     set_current_state();
 }
 
@@ -64,7 +68,7 @@ void ZmpSolver::set_current_state()
     m_x_current[0] = m_com_current[0];
     m_x_current[1] = m_com_vel_current[0];
 
-    m_x_current[2] = m_zmp_current[0];
+    m_x_current[2] = m_zmp_current[0]; 
 
     m_x_current[3] = m_com_current[1];
     m_x_current[4] = m_com_vel_current[1];
@@ -152,7 +156,7 @@ void ZmpSolver::initialize_mpc_params()
     m_first_admissible_region_y = 0.01;
 
     m_switch = 1.0;
-    m_current_shooting_node = 0;
+    m_current_shooting_node = 100;
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
@@ -302,21 +306,31 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
-    std::cout << "Vector elements: ";
-    for (const auto& element : m_reference_stepsize_x) {
-        printf("element x is %f\n", element);
-    }
-    for (const auto& element : m_reference_stepsize_y) {
-        printf("element y is %f\n", element);
-    }
-    std::cout << std::endl;
+    // std::cout << "Vector elements: ";
+    // for (const auto& element : m_reference_stepsize_x) {
+    //     printf("element x is %f\n", element);
+    // }
+    // for (const auto& element : m_reference_stepsize_y) {
+    //     printf("element y is %f\n", element);
+    // }
+    // std::cout << std::endl;
 
-    if (m_current_shooting_node != 0 && ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps) < m_current_shooting_node < (((N-1))/(m_number_of_footsteps))) {
-    m_timing_value = m_current_shooting_node*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
-    count = -count;
-    } else if (m_current_shooting_node !=0 && m_current_shooting_node < ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps)) {
-    m_timing_value = 0;
-    count = -count;
+    // if (m_current_shooting_node != 0 && ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps) < m_current_shooting_node < (((N-1))/(m_number_of_footsteps))) {
+    
+    m_current_shooting_node = m_current_shooting_node%(((N-1))/(m_number_of_footsteps));
+
+
+    if (m_current_shooting_node != 0 && step_duration*((N-1)/m_number_of_footsteps) < m_current_shooting_node < ((N-1))/m_number_of_footsteps) {
+        // m_timing_value = m_current_shooting_node*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
+        m_timing_value = (m_current_shooting_node-step_duration*((N-1)/m_number_of_footsteps))*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
+        count = -count;
+        step_number +=1;
+        printf("now going into current_shooting node %i\n", m_current_shooting_node);
+        printf("with timing value %f\n", m_timing_value);
+    } else if (m_current_shooting_node !=0 && m_current_shooting_node < step_duration*((N-1)/m_number_of_footsteps)) {
+        m_timing_value = 0;
+        count = -count;
+        step_number +=1;
     } else{
         ;
     }
@@ -351,7 +365,8 @@ inline int ZmpSolver::solve_zmp_mpc(
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
             m_timing_value = 0;
-        
+            // printf("Timing value t is %f\n", m_timing_value);
+
         // Possibly remove this
 
         // } else if (ii + m_current_shooting_node == 0) {
@@ -383,7 +398,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         //     m_timing_value = 0;
 
 
-        } else if ((step_number-1)*((N-1)/m_number_of_footsteps)<ii+m_current_shooting_node<(step_number-1)*((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps)/step_duration_factor){
+        } else if ((step_number-1)*((N-1)/m_number_of_footsteps)< ii+m_current_shooting_node && ii + m_current_shooting_node <= (step_number - 1) * ((N - 1) / m_number_of_footsteps) + ((N - 1) / m_number_of_footsteps / step_duration_factor)){
             // KEEP SHADOW FOOT ON THE STANCE LEG, keeps timing factor at 0 for the stance leg duration
             m_timing_value = 0;
             p[0] = 0;
@@ -406,6 +421,9 @@ inline int ZmpSolver::solve_zmp_mpc(
             //
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
+            // printf("elif shooting node ii + current = %i\n", ii+m_current_shooting_node);
+            // printf("Between %d\n", (step_number-1)*((N-1)/m_number_of_footsteps));
+            // printf("and %f\n",(step_number - 1) * ((N - 1) / m_number_of_footsteps) + ((N - 1) / m_number_of_footsteps / step_duration_factor));
 
             // for periodic tail constraint
         } else if (ii + m_current_shooting_node == (2 * (m_current_shooting_node + (N - 1) / m_number_of_footsteps) - 1)) {
@@ -506,8 +524,12 @@ inline int ZmpSolver::solve_zmp_mpc(
             //
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
+            // printf("Else Timing value t is %f\n", m_timing_value);
+
         }
-    
+        // printf("current_shooting node is %i\n", ii + m_current_shooting_node);
+        // printf("tming value node is %f\n", m_timing_value);
+
         // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
     }
 
@@ -561,8 +583,8 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     printf("\n--- xtraj ---\n");
     d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
-    printf("\n--- utraj ---\n");
-    d_print_exp_tran_mat(NU, N, utraj, NU);
+    // printf("\n--- utraj ---\n");
+    // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
 
     printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);

@@ -34,6 +34,7 @@ private:
     void com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr);
     void zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr);
     void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
+    void desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
 
     void timer_callback();
@@ -45,6 +46,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
     rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_desired_steps_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
