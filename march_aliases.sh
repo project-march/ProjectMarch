@@ -11,7 +11,7 @@ alias cm='cd ~/march/'
 alias cm2='cd ~/march/ros2/'
 
 # Create xml needed for mujoco
-alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/xml_parser8/ && python3 march8_v0_generate.py && cm2'
+alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/ && python3 march8_v0_generate.py && python3 march7_v1_generate.py && cm2'
 
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'

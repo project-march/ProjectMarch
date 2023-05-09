@@ -174,7 +174,7 @@ joints:
     limits:
       min: -10
       max: 112.5
-    inertia: 20.3
+    inertia: 9.98
     frictionloss: 0
   KFE:
     max_torque: 250
@@ -182,7 +182,7 @@ joints:
     limits:
       min: 0
       max: 125
-    inertia: 20.3
+    inertia: 9.98
     frictionloss: 0
   ADPF:
     max_torque: 179
