@@ -44,6 +44,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n\
 GNU General Public License for more details. \n\
 \n\
 See <https://www.gnu.org/licenses/>.
+-->
 """
 SYMBOLS = [
     ' + ',
