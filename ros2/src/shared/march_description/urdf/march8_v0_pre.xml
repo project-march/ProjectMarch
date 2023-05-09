@@ -16,15 +16,15 @@
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="m7/Backpack.obj"/>
-    <mesh name="L_foot"      file="m7/FootLeft.obj"/>
-    <mesh name="L_hip"       file="m7/HipLeft.obj"/>
-    <mesh name="L_thigh"     file="m7/UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="m7/LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="m7/FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="m7/HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="m7/UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="m7/LowerLegLeft.obj"/>
+    <mesh name="backpack"    file="m8/Backpack.obj"/>
+    <mesh name="L_foot"      file="m8/FootLeft.obj"/>
+    <mesh name="L_hip"       file="m8/HipLeft.obj"/>
+    <mesh name="L_thigh"     file="m8/UpperLegLeft.obj"/>
+    <mesh name="L_shin"      file="m8/LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="m8/FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="m8/HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="m8/UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="m8/LowerLegLeft.obj"/>
   </asset>
 
   <default>
@@ -77,7 +77,7 @@
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
     <body name="backpack"
-          pos="${phys/backpack/origin/x ./y ./z - phys/L_hip/origin/z - phys/L_UL/origin/z - phys/L_LL/origin/z - phys/L_foot/origin/z - phys/L_foot/geom/pos/z + phys/L_foot/geom/size/z + 0.002}"
+          pos="${phys/backpack/origin/x ./y ./z}"
           childclass="exoskeleton">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -86,11 +86,11 @@
       <inertial pos="${phys/backpack/com/x ./y ./z}" mass="${phys/backpack/mass}"
                 fullinertia="${phys/backpack/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
       <freejoint/>
-      <geom type="mesh" mesh="backpack" euler="0 0 0"/>
+      <geom type="mesh" mesh="backpack" />
       <geom name="backpack" type="box"
             size="${phys/backpack/geom/size/x ./y ./z}"
             pos="${phys/backpack/geom/pos/x ./y ./z}" class="collision"/>
-      <geom name="pilot_torso" fromto=".147 0 .056 .190 0 .465" size=".141" class="ballast"/>
+      <geom name="pilot_torso" fromto=".147 0 .056 .190 0 .500" size=".161" class="ballast"/>
         <site name="imu_torso" size='0.01' pos="${sensors/imus/torso/pos/x ./y ./z}"/>
 
       <!--  LEFT LEG -->
@@ -98,8 +98,8 @@
         <inertial pos="${phys/L_hip/com/x ./y ./z}" mass="${phys/L_hip/mass}"
                   fullinertia="${phys/L_hip/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
         <joint name="L_HAA" axis="-1 0 0" range="${joints/HAA/limits/min ./max}" class="HAA_joint"/>
-        <geom type="mesh" mesh="L_hip" euler="0 0 0"/>
-        <geom name="L_hip" fromto="${phys/L_hip/geom/fromto/x0 ./y0 ./z0 ./x1 ./y1 ./z1}"
+        <geom type="mesh" mesh="L_hip" />
+        <geom name="L_hip" fromto="0 0 0 ${phys/L_UL/origin/x ./y ./z}"
               size="${phys/L_hip/geom/size}" class="L_collision"/>
         <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
 
@@ -107,8 +107,8 @@
         <inertial pos="${phys/L_UL/com/x ./y ./z}" mass="${phys/L_UL/mass}"
                   fullinertia="${phys/L_UL/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
           <joint name="L_HFE" axis="0 -1 0" range="${joints/HFE/limits/min ./max}" class="rotational_joint"/>
-          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" euler="0 0 0"/>
-          <geom name="L_UL" fromto="${phys/L_UL/geom/fromto/x0 ./y0 ./z0 ./x1 ./y1 ./z1}"
+          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
+          <geom name="L_UL" fromto="0 0 0 ${phys/L_LL/origin/x ./y ./z}"
               size="${phys/L_UL/geom/size}" class="L_collision"/>
           <geom name="L_pilot_thigh" fromto="0 -.166 -.05 0 -.149 -.423" size=".069" class="ballast"/>
           <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
@@ -117,8 +117,8 @@
             <inertial pos="${phys/L_LL/com/x ./y ./z}" mass="${phys/L_LL/mass}"
                   fullinertia="${phys/L_LL/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
             <joint name="L_KFE" axis="0 1 0" range="${joints/KFE/limits/min ./max}" class="rotational_joint"/>
-            <geom type="mesh" mesh="L_shin" pos="0 -.026 0" euler="0 0 0"/>
-            <geom name="L_LL" fromto="${phys/L_LL/geom/fromto/x0 ./y0 ./z0 ./x1 ./y1 ./z1}"
+            <geom type="mesh" mesh="L_shin"/>
+            <geom name="L_LL" fromto="0 0 0 ${phys/L_foot/origin/x ./y ./z}"
               size="${phys/L_LL/geom/size}" class="L_collision"/>
             <geom name="L_pilot_shin" fromto="0 -.116 0 0 -.124 -.399"  size=".047" class="ballast"/>
             <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
@@ -127,7 +127,7 @@
               <inertial pos="${phys/L_foot/com/x ./y ./z}" mass="${phys/L_foot/mass}"
                   fullinertia="${phys/L_foot/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
               <joint name="L_ADPF" axis="0 -1 0" range="${joints/ADPF/limits/min ./max}" class="ADPF_joint"/>
-              <geom type="mesh" mesh="L_foot" pos="0 -.019 0" euler="0 0 0"/>
+              <geom type="mesh" mesh="L_foot"/>
               <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
@@ -136,45 +136,45 @@
                   friction="${phys/L_foot/friction}"/>
 
               <!-- Pressure sole  -->
-              <body name="pres_L_1" pos="${phys/L_foot/pads/L_1/pos/x ./y ./z}">
-                <geom name="pres_L_1" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+             <body name="pres_L_0" pos="${phys/L_foot/pads/L_0/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_0" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
+                <site name="pres_L_0"/>
+              </body>
+              <body name="pres_L_1" pos="${phys/L_foot/pads/L_1/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_1" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_1"/>
               </body>
-              <body name="pres_L_2" pos="${phys/L_foot/pads/L_2/pos/x ./y ./z}">
-                <geom name="pres_L_2" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_L_2" pos="${phys/L_foot/pads/L_2/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_2" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_2"/>
               </body>
-              <body name="pres_L_3" pos="${phys/L_foot/pads/L_3/pos/x ./y ./z}">
-                <geom name="pres_L_3" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_L_3" pos="${phys/L_foot/pads/L_3/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_3" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_3"/>
               </body>
-              <body name="pres_L_4" pos="${phys/L_foot/pads/L_4/pos/x ./y ./z}" >
-                <geom name="pres_L_4" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_L_4" pos="${phys/L_foot/pads/L_4/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_4" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_4"/>
               </body>
-              <body name="pres_L_5" pos="${phys/L_foot/pads/L_5/pos/x ./y ./z}">
-                <geom name="pres_L_5" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_L_5" pos="${phys/L_foot/pads/L_5/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_5" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_5"/>
               </body>
-              <body name="pres_L_6" pos="${phys/L_foot/pads/L_6/pos/x ./y ./z}">
-                <geom name="pres_L_6" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_L_6" pos="${phys/L_foot/pads/L_6/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_6" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_6"/>
               </body>
-              <body name="pres_L_7" pos="${phys/L_foot/pads/L_7/pos/x ./y ./z}">
-                <geom name="pres_L_7" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_L_7" pos="${phys/L_foot/pads/L_7/pos/x ./y phys/L_foot/pads/global/z}">
+                <geom name="pres_L_7" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_7"/>
-              </body>
-              <body name="pres_L_8" pos="${phys/L_foot/pads/L_8/pos/x ./y ./z}" >
-                <geom name="pres_L_8" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="L_collision"  friction="${phys/L_foot/friction}"/>
-                <site name="pres_L_8"/>
               </body>
             </body>
           </body>
@@ -186,8 +186,8 @@
         <inertial pos="${phys/L_hip/com/x -./y ./z}" mass="${phys/L_hip/mass}"
                   fullinertia="${phys/L_hip/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
         <joint name="R_HAA" axis="1 0 0" range="${joints/HAA/limits/min ./max}" class="HAA_joint"/>
-        <geom type="mesh" mesh="R_hip" euler="0 0 0"/>
-        <geom name="R_hip" fromto="${phys/L_hip/geom/fromto/x0 -./y0 ./z0 ./x1 -./y1 ./z1}"
+        <geom type="mesh" mesh="R_hip" />
+        <geom name="R_hip" fromto="0 0 0 ${phys/L_UL/origin/x -./y ./z}"
               size="${phys/L_hip/geom/size}" class="R_collision"/>
         <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
 
@@ -195,8 +195,8 @@
           <inertial pos="${phys/L_UL/com/x -./y ./z}" mass="${phys/L_UL/mass}"
                   fullinertia="${phys/L_UL/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
           <joint name="R_HFE" axis="0 -1 0" range="${joints/HFE/limits/min ./max}" class="rotational_joint"/>
-          <geom type="mesh" mesh="R_thigh" pos="0 -.013 0" euler="0 0 0"/>
-          <geom name="R_UL" fromto="${phys/L_UL/geom/fromto/x0 -./y0 ./z0 ./x1 -./y1 ./z1}"
+          <geom type="mesh" mesh="R_thigh"/>
+          <geom name="R_UL" fromto="0 0 0 ${phys/L_LL/origin/x -./y ./z}"
               size="${phys/L_UL/geom/size}" class="R_collision"/>
           <geom name="R_pilot_thigh" fromto="0 .166 -.05 0 .149 -.423" size=".069" class="ballast"/>
           <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
@@ -205,8 +205,8 @@
             <inertial pos="${phys/L_LL/com/x -./y ./z}" mass="${phys/L_LL/mass}"
                   fullinertia="${phys/L_LL/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
             <joint name="R_KFE" axis="0 1 0" range="${joints/KFE/limits/min ./max}" class="rotational_joint"/>
-            <geom type="mesh" mesh="R_shin" pos="0 .026 0" euler="0 0 0"/>
-            <geom name="R_LL" fromto="${phys/L_LL/geom/fromto/x0 -./y0 ./z0 ./x1 -./y1 ./z1}"
+            <geom type="mesh" mesh="R_shin"/>
+            <geom name="R_LL" fromto="0 0 0 ${phys/L_foot/origin/x -./y ./z}"
               size="${phys/L_LL/geom/size}" class="R_collision"/>
             <geom name="R_pilot_shin" fromto="0 .116 0 0 .124 -.399"  size=".047" class="ballast"/>
             <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
@@ -214,8 +214,8 @@
             <body name="R_foot" pos="${phys/L_foot/origin/x -./y ./z}">
               <inertial pos="${phys/L_foot/com/x -./y ./z}" mass="${phys/L_foot/mass}"
                   fullinertia="${phys/L_foot/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
-              <joint name="R_ADPF" axis="0 -1 0" range="-1 25" class="ADPF_joint"/>
-              <geom type="mesh" mesh="R_foot" pos="0 .019 0" euler="0 0 0"/>
+              <joint name="R_ADPF" axis="0 -1 0" range="${joints/ADPF/limits/min ./max}" class="ADPF_joint"/>
+              <geom type="mesh" mesh="R_foot"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
@@ -224,45 +224,45 @@
                   friction="${phys/L_foot/friction}"/>
 
                   <!-- Pressure sole  -->
-              <body name="pres_R_1" pos="${phys/L_foot/pads/L_1/pos/x -./y ./z}">
-                <geom name="pres_R_1" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_0" pos="${phys/L_foot/pads/L_0/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_0" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
+                <site name="pres_R_0"/>
+              </body>
+              <body name="pres_R_1" pos="${phys/L_foot/pads/L_1/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_1" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_1"/>
               </body>
-              <body name="pres_R_2" pos="${phys/L_foot/pads/L_2/pos/x -./y ./z}">
-                <geom name="pres_R_2" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_2" pos="${phys/L_foot/pads/L_2/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_2" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_2"/>
               </body>
-              <body name="pres_R_3" pos="${phys/L_foot/pads/L_3/pos/x -./y ./z}">
-                <geom name="pres_R_3" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_3" pos="${phys/L_foot/pads/L_3/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_3" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_3"/>
               </body>
-              <body name="pres_R_4" pos="${phys/L_foot/pads/L_4/pos/x -./y ./z}">
-                <geom name="pres_R_4" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_4" pos="${phys/L_foot/pads/L_4/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_4" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_4"/>
               </body>
-              <body name="pres_R_5" pos="${phys/L_foot/pads/L_5/pos/x -./y ./z}">
-                <geom name="pres_R_5" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_5" pos="${phys/L_foot/pads/L_5/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_5" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_5"/>
               </body>
-              <body name="pres_R_6" pos="${phys/L_foot/pads/L_6/pos/x -./y ./z}">
-                <geom name="pres_R_6" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_6" pos="${phys/L_foot/pads/L_6/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_6" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_6"/>
               </body>
-              <body name="pres_R_7" pos="${phys/L_foot/pads/L_7/pos/x -./y ./z}">
-                <geom name="pres_R_7" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
+              <body name="pres_R_7" pos="${phys/L_foot/pads/L_7/pos/x -./y phys/L_foot/pads/global/z}">
+                <geom name="pres_R_7" type="sphere" pos="0 0 0"
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_7"/>
-              </body>
-              <body name="pres_R_8" pos="${phys/L_foot/pads/L_8/pos/x -./y ./z}">
-                <geom name="pres_R_8" type="sphere" pos="0 0 ${phys/L_foot/pads/global/z_offset}"
-                      size="0.01" class="R_collision"  friction="${phys/L_foot/friction}"/>
-                <site name="pres_R_8"/>
               </body>
             </body>
           </body>
@@ -317,23 +317,23 @@
     <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/>
 
     <!-- pressure soles not finished yet -->
-    <force name="L_pressuresole_1_output" site="pres_L_1" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_2_output" site="pres_L_2" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_3_output" site="pres_L_3" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_4_output" site="pres_L_4" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_5_output" site="pres_L_5" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_6_output" site="pres_L_6" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_7_output" site="pres_L_7" noise="000" cutoff="000"/>
-    <force name="L_pressuresole_8_output" site="pres_L_8" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_1_output" site="pres_L_0" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_2_output" site="pres_L_1" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_3_output" site="pres_L_2" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_4_output" site="pres_L_3" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_5_output" site="pres_L_4" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_6_output" site="pres_L_5" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_7_output" site="pres_L_6" noise="000" cutoff="000"/>
+    <force name="L_pressuresole_8_output" site="pres_L_7" noise="000" cutoff="000"/>
 
-    <force name="R_pressuresole_1_output" site="pres_R_1" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_2_output" site="pres_R_2" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_3_output" site="pres_R_3" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_4_output" site="pres_R_4" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_5_output" site="pres_R_5" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_6_output" site="pres_R_6" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_7_output" site="pres_R_7" noise="000" cutoff="000"/>
-    <force name="R_pressuresole_8_output" site="pres_R_8" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_1_output" site="pres_R_0" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_2_output" site="pres_R_1" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_3_output" site="pres_R_2" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_4_output" site="pres_R_3" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_5_output" site="pres_R_4" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_6_output" site="pres_R_5" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_7_output" site="pres_R_6" noise="000" cutoff="000"/>
+    <force name="R_pressuresole_8_output" site="pres_R_7" noise="000" cutoff="000"/>
 
     <!-- Noise & cutoff must be determined -->
     <framequat name='backpack_orientation' objtype='site' objname='imu_backpack'/>

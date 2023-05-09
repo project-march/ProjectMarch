@@ -10,7 +10,6 @@ alias sros2='source ~/march/ros2/install/local_setup.bash'
 alias cm='cd ~/march/'
 alias cm2='cd ~/march/ros2/'
 
-
 # Create xml needed for mujoco
 alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/xml_parser8/ && python3 march8_v0_generate.py && cm2'
 
@@ -36,6 +35,7 @@ alias mba='march_build_all'
 alias sim2='march_run_ros2_sim'
 alias sim='march_run_ros2_sim'
 alias mujoco='sim mujoco:=true model_to_load_mujoco:="march8_v0.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco_guus='sim mujoco:=true model_to_load_mujoco:="march7_v1.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
 alias training='march_run_ros2_training'
 alias gits='git status'
 

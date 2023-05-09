@@ -85,9 +85,10 @@ class MujocoSimNode(Node):
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.001
+        self.TIME_STEP_MJC = 0.004
         self.model.opt.timestep = self.TIME_STEP_MJC
-
+        # We need these options to compare mujoco and ros time, so they have the same reference starting point
+        self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
 
@@ -97,6 +98,7 @@ class MujocoSimNode(Node):
             parameters=[
                 ("position.P", None),
                 ("position.D", None),
+                ("position.I", None),
                 ("torque.P", None),
                 ("torque.D", None),
             ],
@@ -106,7 +108,7 @@ class MujocoSimNode(Node):
         self.controller = []
         self.controller.append(
             PositionController(
-                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value
+                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value, self.get_parameter("position.I").value
             )
         )
         self.controller.append(
@@ -129,7 +131,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.01
+        self.TIME_STEP_TRAJECTORY = 0.0329
         self.trajectory_last_updated = self.get_clock().now()
 
     def check_for_new_reference_update(self, time_current):
@@ -174,12 +176,11 @@ class MujocoSimNode(Node):
         vs the time in ROS, so we can update the control inputs on time
         """
         time_current = self.get_clock().now()
-        time_difference = (time_current - self.time_last_updated).to_msg()
-        mj_time_current = self.data.time
+        time_shifted = (time_current - self.ros_first_updated).to_msg()
 
-        time_difference_withseconds = time_difference.nanosec / 1e9 + time_difference.sec
+        time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        while self.data.time - mj_time_current <= time_difference_withseconds:
+        while self.data.time <= time_difference_withseconds:
             mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
