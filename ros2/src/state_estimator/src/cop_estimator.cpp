@@ -10,7 +10,7 @@
  * For this calculation the input of the pressure soles is used.
  * @param sensors
  */
-CopEstimator::CopEstimator(std::vector<PressureSensor> sensors)
+CopEstimator::CopEstimator(std::vector<PressureSensor*>* sensors)
     : m_sensors(sensors)
 {
 }
@@ -62,8 +62,8 @@ void CopEstimator::update_sensor_pressures(std::map<std::string, double> pressur
 
 void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure)
 {
-    auto it = std::find_if(m_sensors.begin(), m_sensors.end(), [name](const PressureSensor& sensor) {
-        return sensor.name == name;
+    auto it = std::find_if(m_sensors->begin(), m_sensors->end(), [name](const PressureSensor* sensor) {
+        return sensor->name == name;
     });
     it->update_pressure(pressure);
 }
@@ -77,7 +77,7 @@ CenterOfPressure CopEstimator::get_cop_state()
     return m_center_of_pressure;
 }
 
-std::vector<PressureSensor> CopEstimator::get_sensors()
+std::vector<PressureSensor*>* CopEstimator::get_sensors()
 {
     return m_sensors;
 }
