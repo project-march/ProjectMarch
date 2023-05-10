@@ -50,7 +50,7 @@ private:
 
     void pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg);
 
-    std::vector<PressureSensor*> *create_pressure_sensors();
+    std::vector<PressureSensor> create_pressure_sensors();
 
     void publish_robot_frames();
 

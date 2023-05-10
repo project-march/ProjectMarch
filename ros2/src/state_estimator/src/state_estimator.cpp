@@ -289,7 +289,7 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
     }
 }
 
-std::vector<PressureSensor*>* StateEstimator::create_pressure_sensors()
+std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
 {
     this->declare_parameter("cop_estimator.names", std::vector<std::string>(16, ""));
     this->declare_parameter("cop_estimator.x_positions", std::vector<double>(16, 0.0));
@@ -299,20 +299,22 @@ std::vector<PressureSensor*>* StateEstimator::create_pressure_sensors()
     auto x_positions = this->get_parameter("cop_estimator.x_positions").as_double_array();
     auto y_positions = this->get_parameter("cop_estimator.y_positions").as_double_array();
     auto z_positions = this->get_parameter("cop_estimator.z_positions").as_double_array();
-    std::vector<PressureSensor*> *sensors;
+    std::vector<PressureSensor> sensors;
     for (size_t i = 0; i < names.size(); i++) {
-        PressureSensor *sensor;
+        PressureSensor sensor;
         const char initial = names.at(i)[0];
         if (initial != 'l' && initial != 'r') {
             RCLCPP_WARN(this->get_logger(),
                 "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
         }
-        sensor->name = names.at(i);
+        sensor.name = names.at(i);
         CenterOfPressure cop;
-        if (sensor->name[0] == *"l") {
+
+        cop.position.header.frame_id = "stink";
+        if (sensor.name[0] == *"l") {
             cop.position.header.frame_id = "left_ankle";
         }
-        if (sensor->name[0] == *"r") {
+        if (sensor.name[0] == *"r") {
             cop.position.header.frame_id = "right_ankle";
         }
 
@@ -320,8 +322,8 @@ std::vector<PressureSensor*>* StateEstimator::create_pressure_sensors()
         cop.position.point.y = y_positions.at(i);
         cop.position.point.z = z_positions.at(i);
 
-        sensor->centre_of_pressure = cop;
-        sensors->push_back(sensor);
+        sensor.centre_of_pressure = cop;
+        sensors.push_back(sensor);
     }
     // Read the pressure sensors from the hardware interface
     return sensors;
