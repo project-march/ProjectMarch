@@ -37,6 +37,7 @@ public:
         return m_candidate_footsteps;    
     }
     double get_com_height();
+    void update_current_shooting_node();
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);

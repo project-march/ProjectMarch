@@ -100,6 +100,7 @@ void SolverNode::timer_callback()
     };
     m_com_trajectory_publisher->publish(com_msg);
     m_final_feet_publisher->publish(foot_msg);
+    m_zmp_solver.update_current_shooting_node();
 }
 
 

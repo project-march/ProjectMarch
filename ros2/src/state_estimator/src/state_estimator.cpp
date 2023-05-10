@@ -218,15 +218,25 @@ void StateEstimator::publish_robot_frames()
         geometry_msgs::msg::TransformStamped right_foot_frame
             = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
         m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
+
         // Update ZMP
         m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
         m_zmp_estimator.set_zmp();
         m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+
+        // get ankle frames to determine where the footsteps are at
+        geometry_msgs::msg::TransformStamped left_ankle_frame
+            = m_tf_buffer->lookupTransform("map", "left_ankle", tf2::TimePointZero);
+        geometry_msgs::msg::TransformStamped right_ankle_frame
+            = m_tf_buffer->lookupTransform("map", "right_ankle", tf2::TimePointZero);
+
+        m_footstep_estimator.set_footstep_positions(right_ankle_frame.transform.translation, left_ankle_frame.transform.translation);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "Error during publishing of Center of Pressure: %s", ex.what());
     }
 
     // Update the feet
+
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
     // Publish the feet
     // The first foot is always the right foot
@@ -235,6 +245,9 @@ void StateEstimator::publish_robot_frames()
     foot_positions.header.frame_id = "map";
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
+    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y %f",foot_positions.poses[0].position.y);
+    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot position y %f",foot_positions.poses[1].position.y);
+
     m_foot_pos_publisher->publish(foot_positions);
 
     // double stance

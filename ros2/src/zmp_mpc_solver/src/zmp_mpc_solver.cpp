@@ -20,14 +20,14 @@ ZmpSolver::ZmpSolver()
     m_x_trajectory.fill(0);
     m_u_current.fill(0);
 
-    // set_current_com(0.0, 0.18, 0.0, 0.0);
-    // set_current_zmp(0.0, 0.2);
-    // set_current_foot(0.0, 0.2);
-    // set_previous_foot(0.0, 0.0);
-    set_current_com(0.0, 0.08, 0.0, -0.1);
-    set_current_zmp(0.0, 0.08);
-    set_current_foot(0.0, 0.0);
-    set_previous_foot(0.0, 0.2);
+    set_current_com(0.0, 0.18, 0.0, 0.0);
+    set_current_zmp(0.0, 0.2);
+    set_current_foot(0.0, 0.2);
+    set_previous_foot(0.0, 0.0);
+    // set_current_com(0.0, 0.08, 0.0, -0.1);
+    // set_current_zmp(0.0, 0.08);
+    // set_current_foot(0.0, 0.0);
+    // set_previous_foot(0.0, 0.2);
     set_current_state();
 }
 
@@ -35,11 +35,6 @@ double ZmpSolver::get_com_height()
 {
     return m_com_height;
 }
-
-// double ZmpSolver::get_candidate_footsteps()
-// {
-//     return m_candidate_footsteps;
-// }
 
 int ZmpSolver::solve_step()
 {
@@ -121,7 +116,6 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
     
 }
 
-
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
     m_com_current[0] = x;
@@ -156,7 +150,7 @@ void ZmpSolver::initialize_mpc_params()
     m_first_admissible_region_y = 0.01;
 
     m_switch = 1.0;
-    m_current_shooting_node = 100;
+    m_current_shooting_node = 0;
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
@@ -166,6 +160,12 @@ void ZmpSolver::set_current_stance_foot(int stance_foot)
 {
     m_current_stance_foot = stance_foot;
 }
+
+void ZmpSolver::update_current_shooting_node()
+{
+    m_current_shooting_node +=1;
+}
+
 
 inline int ZmpSolver::solve_zmp_mpc(
     std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
@@ -527,11 +527,12 @@ inline int ZmpSolver::solve_zmp_mpc(
             // printf("Else Timing value t is %f\n", m_timing_value);
 
         }
-        // printf("current_shooting node is %i\n", ii + m_current_shooting_node);
+        printf("current_shooting node is %i\n", ii + m_current_shooting_node);
         // printf("tming value node is %f\n", m_timing_value);
 
         // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
     }
+    printf("current_shooting node is %i\n", m_current_shooting_node);
 
 
     // Set terminal and initial constraints
