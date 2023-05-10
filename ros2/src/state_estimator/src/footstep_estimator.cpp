@@ -71,7 +71,7 @@ Foot* FootstepEstimator::get_foot(const char* prefix)
     }
 }
 
-void FootstepEstimator::update_feet(const std::vector<PressureSensor> sensors)
+void FootstepEstimator::update_feet(const std::vector<PressureSensor*> sensors)
 {
     foot_left.set_on_ground(sensors, "l");
     foot_right.set_on_ground(sensors, "r");

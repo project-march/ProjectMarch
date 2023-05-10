@@ -39,11 +39,11 @@ struct CenterOfPressure {
 
 struct PressureSensor {
     std::string name;
-    CenterOfPressure centre_of_pressure;
+    CenterOfPressure* centre_of_pressure;
 
     void update_pressure(double pressure)
     {
-        centre_of_pressure.pressure = pressure;
+        centre_of_pressure->pressure = pressure;
     }
 };
 
@@ -51,16 +51,15 @@ class StateEstimator;
 
 class CopEstimator {
 public:
-    CopEstimator(std::vector<PressureSensor> sensors);
-    void set_cop_state(
-        std::vector<PressureSensor> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
-    std::vector<PressureSensor> get_sensors();
+    CopEstimator(std::vector<PressureSensor*> sensors);
+    void set_cop_state(std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
+    std::vector<PressureSensor*> get_sensors();
     void update_sensor_pressures(std::map<std::string, double> pressure_values_map);
     void update_individual_pressure_sensor(std::string name, double pressure);
     CenterOfPressure get_cop_state();
 
 private:
-    std::vector<PressureSensor> m_sensors;
+    std::vector<PressureSensor*> m_sensors;
     CenterOfPressure m_center_of_pressure;
 };
 
