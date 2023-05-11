@@ -35,7 +35,7 @@ struct Foot {
         // look for the right pressure sensors specific to the foot
         for (auto i : sensors) {
             if (i->name[0] == *prefix) {
-                measured_foot_pressure += i->centre_of_pressure->pressure;
+                measured_foot_pressure += i->pressure;
             }
         }
         // we have 8 sensors, so we divide by 1
