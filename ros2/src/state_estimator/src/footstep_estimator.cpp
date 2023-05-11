@@ -58,7 +58,7 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
             return foot_right.on_ground;
             break;
         default:
-            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0.");
+            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
             return 0;
     }
 }

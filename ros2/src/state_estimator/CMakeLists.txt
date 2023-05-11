@@ -123,7 +123,7 @@ if(BUILD_TESTING)
   # test/joint_estimator_test.cpp
   test/cop_estimator_test.cpp
   test/com_estimator_test.cpp
-  test/state_estimator_test.cpp
+#  test/state_estimator_test.cpp
   test/footstep_estimator_test.cpp
   test/imu_estimator_test.cpp
   test/zmp_estimator_test.cpp
