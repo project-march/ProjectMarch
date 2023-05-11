@@ -10,15 +10,9 @@
  * For this calculation the input of the pressure soles is used.
  * @param sensors
  */
-CopEstimator::CopEstimator(std::map<std::string, geometry_msgs::msg::PointStamped> sensor_values)
+CopEstimator::CopEstimator(std::vector<PressureSensor*> sensors)
+    : m_sensors(sensors)
 {
-    for(const auto& x : sensor_values){
-        auto s = new PressureSensor();
-        s->name = x.first;
-        s->position = x.second;
-        s->pressure = 0.0;
-        m_sensors.push_back(s);
-    }
 }
 /**
  * This function updates the cop of the exo be recalculating the cop with new input data.
@@ -26,7 +20,8 @@ CopEstimator::CopEstimator(std::map<std::string, geometry_msgs::msg::PointStampe
  * If no pressure is measured on all sensors, an error is thrown.
  * @param sensors
  */
-void CopEstimator::set_cop(std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames)
+void CopEstimator::set_cop(
+    std::vector<PressureSensor*> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames)
 {
     double total_pressure = 0.0;
     m_center_of_pressure.point.x = 0.0;
@@ -35,7 +30,7 @@ void CopEstimator::set_cop(std::array<geometry_msgs::msg::TransformStamped, 2> r
 
     geometry_msgs::msg::PointStamped transformed_point;
 
-    for (const auto sensor : m_sensors) {
+    for (const auto sensor : sensors) {
         auto pressure = sensor->pressure;
         total_pressure += pressure;
 
@@ -60,13 +55,13 @@ void CopEstimator::update_pressure_sensors(std::map<std::string, double> pressur
     for (auto& x : pressure_values_map) {
         update_individual_pressure_sensor(x.first, x.second);
     }
-//    set_cop_state(m_sensors);
+    //    set_cop_state(m_sensors);
 }
 
 void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure)
 {
-    for (auto x : m_sensors){
-        if(x->name == name){
+    for (auto x : m_sensors) {
+        if (x->name == name) {
             x->pressure = pressure;
             return;
         }

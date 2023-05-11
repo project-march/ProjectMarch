@@ -41,14 +41,15 @@ class StateEstimator;
 
 class CopEstimator {
 public:
-    CopEstimator(std::map<std::string, geometry_msgs::msg::PointStamped> sensor_values);
+    CopEstimator(std::vector<PressureSensor*> sensors);
 
     void update_pressure_sensors(std::map<std::string, double> pressure_values_map);
     void update_individual_pressure_sensor(std::string name, double pressure);
 
     std::vector<PressureSensor*>* get_sensors();
 
-    void set_cop(std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
+    void set_cop(
+        std::vector<PressureSensor*> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
     geometry_msgs::msg::PointStamped get_cop();
 
 private:

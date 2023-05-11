@@ -219,7 +219,7 @@ void StateEstimator::publish_robot_frames()
             = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped right_foot_frame
             = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
-        m_cop_estimator.set_cop({ right_foot_frame, left_foot_frame });
+        m_cop_estimator.set_cop(*m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
         // Update ZMP
         m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
         m_zmp_estimator.set_zmp();
@@ -287,9 +287,9 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
     }
 }
 
-std::map<std::string, geometry_msgs::msg::PointStamped> StateEstimator::create_pressure_sensors()
+std::vector<PressureSensor*> StateEstimator::create_pressure_sensors()
 {
-    RCLCPP_INFO(this->get_logger(), "start creating pressure soles and sensors");
+
     this->declare_parameter("cop_estimator.names", std::vector<std::string>(16, ""));
     this->declare_parameter("cop_estimator.x_positions", std::vector<double>(16, 0.0));
     this->declare_parameter("cop_estimator.y_positions", std::vector<double>(16, 0.0));
@@ -298,38 +298,32 @@ std::map<std::string, geometry_msgs::msg::PointStamped> StateEstimator::create_p
     auto x_positions = this->get_parameter("cop_estimator.x_positions").as_double_array();
     auto y_positions = this->get_parameter("cop_estimator.y_positions").as_double_array();
     auto z_positions = this->get_parameter("cop_estimator.z_positions").as_double_array();
-    std::map<std::string, geometry_msgs::msg::PointStamped> sensor_map;
+    std::vector<PressureSensor*> sensors;
     for (size_t i = 0; i < names.size(); i++) {
-        RCLCPP_INFO(this->get_logger(), "Sensor created");
-
-        // check if sensor name has left or right prefix
+        PressureSensor* sensor;
         const char initial = names.at(i)[0];
         if (initial != 'l' && initial != 'r') {
             RCLCPP_WARN(this->get_logger(),
                 "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
         }
+        sensor->name = names.at(i);
 
-        std::string name = names.at(i);
-        auto point = geometry_msgs::msg::PointStamped();
-        if (name[0] == *"l") {
-            point.header.frame_id = "left_ankle";
+        sensor->position.header.frame_id = "stink";
+        if (sensor->name[0] == *"l") {
+            sensor->position.header.frame_id = "left_ankle";
         }
-        if (name[0] == *"r") {
-            point.header.frame_id = "right_ankle";
+        if (sensor->name[0] == *"r") {
+            sensor->position.header.frame_id = "right_ankle";
         }
 
-        point.point.x = x_positions.at(i);
-        point.point.y = y_positions.at(i);
-        point.point.z = z_positions.at(i);
-        RCLCPP_INFO(this->get_logger(), "cop position and pressure set");
-
-        sensor_map.emplace(name, point);
-        RCLCPP_INFO(this->get_logger(), "sensor added to vector");
-
+        sensor->position.point.x = x_positions.at(i);
+        sensor->position.point.y = y_positions.at(i);
+        sensor->position.point.z = z_positions.at(i);
+        sensor->pressure = 0.0;
+        sensors.push_back(sensor);
     }
-    RCLCPP_INFO(this->get_logger(), "Pressure soles and sensors created");
     // Read the pressure sensors from the hardware interface
-    return sensor_map;
+    return sensors;
 }
 
 std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
@@ -355,8 +349,8 @@ void StateEstimator::visualize_joints()
     tf2::Vector3 joint_endpoint;
     try {
         for (auto i : *pressure_soles) {
-            pressure_sole_transform = m_tf_buffer->lookupTransform(
-                "map", i->position.header.frame_id, tf2::TimePointZero);
+            pressure_sole_transform
+                = m_tf_buffer->lookupTransform("map", i->position.header.frame_id, tf2::TimePointZero);
             marker_container.x = pressure_sole_transform.transform.translation.x;
             marker_container.y = pressure_sole_transform.transform.translation.y;
             marker_container.z = pressure_sole_transform.transform.translation.z;
