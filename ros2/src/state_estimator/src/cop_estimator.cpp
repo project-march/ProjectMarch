@@ -39,7 +39,6 @@ void CopEstimator::set_cop(std::array<geometry_msgs::msg::TransformStamped, 2> r
         auto pressure = sensor->pressure;
         total_pressure += pressure;
 
-        RCLCPP_WARN(rclcpp::get_logger("cop_estimator"), "sensor for %s with pressure: %f", sensor->name.c_str(), pressure);
         tf2::doTransform(sensor->position, transformed_point, reference_frames[(sensor->name[0] == *"l")]);
 
         m_center_of_pressure.point.x += transformed_point.point.x * pressure;
@@ -54,8 +53,6 @@ void CopEstimator::set_cop(std::array<geometry_msgs::msg::TransformStamped, 2> r
         RCLCPP_ERROR(rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure 0.");
         //        throw std::runtime_error("ERROR: The total measured pressure is 0.\n");
     }
-    RCLCPP_DEBUG(
-        rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure of %f", total_pressure);
 }
 
 void CopEstimator::update_pressure_sensors(std::map<std::string, double> pressure_values_map)
@@ -68,10 +65,8 @@ void CopEstimator::update_pressure_sensors(std::map<std::string, double> pressur
 
 void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure)
 {
-//    RCLCPP_WARN(rclcpp::get_logger("cop_estimator"), "update_individual_pressure_sensor for %s", name.c_str());
-    for (auto& x : m_sensors){
+    for (auto x : m_sensors){
         if(x->name == name){
-//            RCLCPP_WARN(rclcpp::get_logger("cop_estimator"), "update_individual_pressure_sensor for %s with pressure: %f", x.name.c_str(), pressure);
             x->pressure = pressure;
             return;
         }
@@ -87,7 +82,7 @@ geometry_msgs::msg::PointStamped CopEstimator::get_cop()
     return m_center_of_pressure;
 }
 
-std::vector<PressureSensor*> CopEstimator::get_sensors()
+std::vector<PressureSensor*>* CopEstimator::get_sensors()
 {
-    return m_sensors;
+    return &m_sensors;
 }

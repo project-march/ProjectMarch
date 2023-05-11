@@ -241,29 +241,27 @@ void StateEstimator::publish_robot_frames()
 
     // double stance
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
-
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
-            m_foot_pos_publisher->publish(m_current_stance_foot);
         } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
-            m_foot_pos_publisher->publish(m_current_stance_foot);
         }
     }
     // left
-    if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
+    else if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != -1) {
         m_current_stance_foot = -1;
-        m_stance_foot_publisher->publish(m_current_stance_foot);
     }
     // right
-    if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
+    else if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != 1) {
         m_current_stance_foot = 1;
-        m_stance_foot_publisher->publish(m_current_stance_foot);
     }
+    std_msgs::msg::Int32 stance_foot_msg;
+    stance_foot_msg.data = m_current_stance_foot;
+    m_stance_foot_publisher->publish(stance_foot_msg);
 
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
@@ -271,7 +269,7 @@ void StateEstimator::publish_robot_frames()
     feet_height_msg.heights = m_joint_estimator.get_feet_height();
     m_feet_height_publisher->publish(feet_height_msg);
 
-//    visualize_joints();
+    visualize_joints();
 }
 
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
@@ -351,12 +349,12 @@ void StateEstimator::visualize_joints()
     joint_markers.type = 7;
     joint_markers.header.frame_id = "map";
     joint_markers.id = 0;
-    std::vector<PressureSensor*> pressure_soles = m_cop_estimator.get_sensors();
+    std::vector<PressureSensor*>* pressure_soles = m_cop_estimator.get_sensors();
     geometry_msgs::msg::TransformStamped pressure_sole_transform;
     geometry_msgs::msg::Point marker_container;
     tf2::Vector3 joint_endpoint;
     try {
-        for (auto i : pressure_soles) {
+        for (auto i : *pressure_soles) {
             pressure_sole_transform = m_tf_buffer->lookupTransform(
                 "map", i->position.header.frame_id, tf2::TimePointZero);
             marker_container.x = pressure_sole_transform.transform.translation.x;
