@@ -159,7 +159,6 @@ void StateEstimator::update_foot_frames()
         m.getRPY(roll, pitch, yaw);
 
         RCLCPP_DEBUG(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-        pitch = 0.0;
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
@@ -300,7 +299,7 @@ std::vector<PressureSensor*> StateEstimator::create_pressure_sensors()
     auto z_positions = this->get_parameter("cop_estimator.z_positions").as_double_array();
     std::vector<PressureSensor*> sensors;
     for (size_t i = 0; i < names.size(); i++) {
-        PressureSensor* sensor;
+        auto* sensor = new PressureSensor();
         const char initial = names.at(i)[0];
         if (initial != 'l' && initial != 'r') {
             RCLCPP_WARN(this->get_logger(),

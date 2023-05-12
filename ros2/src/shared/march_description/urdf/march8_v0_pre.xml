@@ -270,14 +270,14 @@
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="L_ADPF"    gear="${joints/ADPF/max_torque}"  joint="L_ADPF"  />
-    <motor name="L_HAA"     gear="${joints/HAA/max_torque}"  joint="L_HAA"  />
-    <motor name="L_HFE"     gear="${joints/HFE/max_torque}" joint="L_HFE"   />
-    <motor name="L_KFE"     gear="${joints/KFE/max_torque}"  joint="L_KFE"   />
-    <motor name="R_ADPF"    gear="${joints/ADPF/max_torque}"  joint="R_ADPF"  />
-    <motor name="R_HAA"     gear="${joints/HAA/max_torque}"  joint="R_HAA"  />
-    <motor name="R_HFE"     gear="${joints/HFE/max_torque}" joint="R_HFE"   />
-    <motor name="R_KFE"     gear="${joints/KFE/max_torque}"  joint="R_KFE" />
+    <motor name="left_ankle"    gear="${joints/ADPF/max_torque}"  joint="L_ADPF"  />
+    <motor name="left_hip_aa"     gear="${joints/HAA/max_torque}"  joint="L_HAA"  />
+    <motor name="left_hip_fe"     gear="${joints/HFE/max_torque}" joint="L_HFE"   />
+    <motor name="left_knee"     gear="${joints/KFE/max_torque}"  joint="L_KFE"   />
+    <motor name="right_ankle"    gear="${joints/ADPF/max_torque}"  joint="R_ADPF"  />
+    <motor name="right_hip_aa"     gear="${joints/HAA/max_torque}"  joint="R_HAA"  />
+    <motor name="right_hip_fe"     gear="${joints/HFE/max_torque}" joint="R_HFE"   />
+    <motor name="right_knee"     gear="${joints/KFE/max_torque}"  joint="R_KFE" />
   </actuator>
 
   <sensor>
