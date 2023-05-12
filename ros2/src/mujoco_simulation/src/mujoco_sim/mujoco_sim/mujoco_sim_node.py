@@ -109,7 +109,7 @@ class MujocoSimNode(Node):
                                                            self.model.sensor_adr)
 
         self.set_init_joint_qpos([0, -0.1745, 0, 0.1745,
-                                  0, -0.1745, 0, 0.1745, ])
+                                  0, -0.1745, 0, 0.1745 ])
 
         joint_val = self.sensor_data_extraction.get_joint_pos()
         self.get_logger().info(f"Keeping initial joint positions, "
@@ -148,6 +148,7 @@ class MujocoSimNode(Node):
         self.trajectory_last_updated = self.get_clock().now()
 
     def set_init_joint_qpos(self, qpos_init):
+        """Set initial qpos to make eo not falling over in sim."""
         self.data.qpos[7:] = qpos_init
         mujoco.mj_step(self.model, self.data)
 
