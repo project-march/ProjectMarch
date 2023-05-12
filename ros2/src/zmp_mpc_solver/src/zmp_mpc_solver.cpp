@@ -14,6 +14,8 @@ ZmpSolver::ZmpSolver()
     , m_candidate_footsteps()
     , m_reference_stepsize_x(20,0.0)
     , m_reference_stepsize_y(20,0.0)
+    , m_real_time_com_trajectory_x()
+    , m_real_time_com_trajectory_y()
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -45,6 +47,16 @@ int ZmpSolver::solve_step()
 std::array<double, NX> ZmpSolver::get_state()
 {
     return m_x_current;
+}
+
+std::vector<double> ZmpSolver::get_real_time_com_trajectory_x()
+{
+    return m_real_time_com_trajectory_x;
+}
+
+std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
+{
+    return m_real_time_com_trajectory_y;
 }
 
 std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
@@ -165,6 +177,7 @@ void ZmpSolver::update_current_shooting_node()
 {
     m_current_shooting_node +=1;
 }
+
 
 
 inline int ZmpSolver::solve_zmp_mpc(
@@ -320,7 +333,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     m_current_shooting_node = m_current_shooting_node%(((N-1))/(m_number_of_footsteps));
 
 
-    if (m_current_shooting_node != 0 && step_duration*((N-1)/m_number_of_footsteps) < m_current_shooting_node < ((N-1))/m_number_of_footsteps) {
+    if (m_current_shooting_node != 0 && step_duration*((N-1)/m_number_of_footsteps) < m_current_shooting_node && m_current_shooting_node < ((N-1))/m_number_of_footsteps) {
         // m_timing_value = m_current_shooting_node*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
         m_timing_value = (m_current_shooting_node-step_duration*((N-1)/m_number_of_footsteps))*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
         count = -count;
@@ -331,6 +344,8 @@ inline int ZmpSolver::solve_zmp_mpc(
         m_timing_value = 0;
         count = -count;
         step_number +=1;
+        printf("with timing value in else if %f\n", m_timing_value);
+
     } else{
         ;
     }
@@ -527,7 +542,7 @@ inline int ZmpSolver::solve_zmp_mpc(
             // printf("Else Timing value t is %f\n", m_timing_value);
 
         }
-        printf("current_shooting node is %i\n", ii + m_current_shooting_node);
+        // printf("current_shooting node is %i\n", ii + m_current_shooting_node);
         // printf("tming value node is %f\n", m_timing_value);
 
         // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
@@ -582,8 +597,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    // printf("\n--- xtraj ---\n");
+    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
@@ -604,6 +619,26 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < NX; ii++) {
         x_init_input[ii] = xtraj[NX + ii];
     }
+
+    // Take solution from trajectory for visualization
+    // m_real_time_com_trajectory_x.empty();
+    // m_real_time_com_trajectory_y.empty();
+    std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
+    // for (int ii = 0; ii < NX * (N + 1); ii += NX) {
+        // m_x_trajectory[ii] = xtraj[ii];
+        // m_real_time_com_trajectory_x.push_back(xtraj[ii]);
+        // m_real_time_com_trajectory_y.push_back(xtraj[ii+3]);
+    // }
+
+    // printf("m_x_trajectory %f \n", m_x_trajectory[3+12]);
+    // printf("m_x_trajectory is %ld \n", m_x_trajectory.size());
+
+    // m_real_time_com_trajectory_x.push_back(xtraj[0]);
+    // m_real_time_com_trajectory_y.push_back(xtraj[3]);
+
+    // for (auto element : m_x_trajectory){
+    //     printf("real time trajectory is %f\n", element);
+    // }
 
     // get solution
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
@@ -628,3 +663,4 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     return status;
 }
+

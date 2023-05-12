@@ -11,6 +11,8 @@
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
+#include "visualization_msgs/msg/marker.hpp"
+
 //#include "march_shared_msgs/msg/robot_state.hpp"
 //#include "march_shared_msgs/msg/point_stamped_list.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
@@ -20,6 +22,8 @@
 #include "std_msgs/msg/int32.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
+#include "nav_msgs/msg/path.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
@@ -36,12 +40,16 @@ private:
     void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
-
     void timer_callback();
+    void visualize_trajectory();
+
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_com_trajectory_publisher;
+    rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_com_visualizer_publisher;
+    rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_zmp_visualizer_publisher;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m__footstep_visualizer_publisher;
 
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
     rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;

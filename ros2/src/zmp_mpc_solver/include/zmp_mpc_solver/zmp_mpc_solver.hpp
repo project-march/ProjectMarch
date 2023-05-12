@@ -1,6 +1,7 @@
 // standard
 #include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 #include "geometry_msgs/msg/pose_array.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -38,6 +39,8 @@ public:
     }
     double get_com_height();
     void update_current_shooting_node();
+    std::vector<double> get_real_time_com_trajectory_x();
+    std::vector<double> get_real_time_com_trajectory_y();
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
@@ -55,6 +58,8 @@ private:
     std::vector<geometry_msgs::msg::Point> m_candidate_footsteps;
     std::vector<double> m_reference_stepsize_x;
     std::vector<double> m_reference_stepsize_y;
+    std::vector<double> m_real_time_com_trajectory_x;
+    std::vector<double> m_real_time_com_trajectory_y;
 
     // Constraints for the ZMP MPC
     int m_number_of_footsteps;
