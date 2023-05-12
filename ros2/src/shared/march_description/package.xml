@@ -10,7 +10,6 @@
     <depend>xacro</depend>
     <depend>march_robot_state_publisher</depend>
     <depend>march_control</depend>
-    <depend>mathparser</depend>
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 
