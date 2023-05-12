@@ -109,7 +109,7 @@ class MujocoSimNode(Node):
                                                            self.model.sensor_adr)
 
         self.set_init_joint_qpos([0, -0.1745, 0, 0.1745,
-                                  0, -0.1745, 0, 0.1745 ])
+                                  0, -0.1745, 0, 0.1745])
 
         joint_val = self.sensor_data_extraction.get_joint_pos()
         self.get_logger().info(f"Keeping initial joint positions, "
