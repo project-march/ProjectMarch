@@ -12,7 +12,7 @@ class PositionController(LowLvlController):
     Args:
         LowLvlController (Class): Low level controller baseclass
     """
-    def __init__(self, node, model, p, d, i):
+    def __init__(self, node, model, p, d, i, joint_desired=None):
         """A class which imitates the low-level control of the robot.
 
         Functions as a PID right now which directly applies control
@@ -24,10 +24,15 @@ class PositionController(LowLvlController):
             p (float): Proportional-value of a PD controller
             d (float): Derivative-value of a PD controller
             i (float): Integration term
+            joint_desired (list): List of desired initial positions in radians. Defaults to None.
         """
         # Define the amount of controllable joints based on
         # the generalized coordinates generated within Mujoco
         super().__init__(node, model)
+
+        if joint_desired:
+            self.joint_desired = joint_desired
+
         # Define the PD - values
         self.p = p
         self.d = d

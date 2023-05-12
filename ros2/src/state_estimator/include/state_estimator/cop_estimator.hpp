@@ -18,7 +18,7 @@
 #ifndef COP_ESTIMATOR
 #define COP_ESTIMATOR
 
-struct CenterOfPressure {
+struct PressureSensor {
     std::string name;
     geometry_msgs::msg::PointStamped position;
     double pressure;
@@ -30,20 +30,10 @@ struct CenterOfPressure {
      * @param b
      * @return
      */
-    friend bool operator==(CenterOfPressure a, CenterOfPressure b)
+    friend bool operator==(PressureSensor a, PressureSensor b)
     {
         return (a.position.point.x == b.position.point.x && a.position.point.y == b.position.point.y
-            && a.position.point.z == b.position.point.z && a.pressure == b.pressure);
-    }
-};
-
-struct PressureSensor {
-    std::string name;
-    CenterOfPressure centre_of_pressure;
-
-    void update_pressure(double pressure)
-    {
-        centre_of_pressure.pressure = pressure;
+            && a.position.point.z == b.position.point.z && a.pressure == b.pressure && a.name == b.name);
     }
 };
 
@@ -51,17 +41,20 @@ class StateEstimator;
 
 class CopEstimator {
 public:
-    CopEstimator(std::vector<PressureSensor> sensors);
-    void set_cop_state(
-        std::vector<PressureSensor> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
-    std::vector<PressureSensor> get_sensors();
-    void update_sensor_pressures(std::map<std::string, double> pressure_values_map);
+    CopEstimator(std::vector<PressureSensor*> sensors);
+
+    void update_pressure_sensors(std::map<std::string, double> pressure_values_map);
     void update_individual_pressure_sensor(std::string name, double pressure);
-    CenterOfPressure get_cop_state();
+
+    std::vector<PressureSensor*>* get_sensors();
+
+    void set_cop(
+        std::vector<PressureSensor*> sensors, std::array<geometry_msgs::msg::TransformStamped, 2> reference_frames);
+    geometry_msgs::msg::PointStamped get_cop();
 
 private:
-    std::vector<PressureSensor> m_sensors;
-    CenterOfPressure m_center_of_pressure;
+    std::vector<PressureSensor*> m_sensors;
+    geometry_msgs::msg::PointStamped m_center_of_pressure;
 };
 
 #endif

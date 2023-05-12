@@ -95,8 +95,8 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg)
 {
 
-    this->m_cop_estimator.update_sensor_pressures(update_pressure_sensors_data(msg->names, msg->pressure_values));
-    auto cop_msg = this->m_cop_estimator.get_cop_state().position;
+    this->m_cop_estimator.update_pressure_sensors(update_pressure_sensors_data(msg->names, msg->pressure_values));
+    auto cop_msg = this->m_cop_estimator.get_cop();
     cop_msg.header.frame_id = "map";
     this->m_cop_pos_publisher->publish(cop_msg);
 }
@@ -159,7 +159,6 @@ void StateEstimator::update_foot_frames()
         m.getRPY(roll, pitch, yaw);
 
         RCLCPP_DEBUG(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-        pitch = 0.0;
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
@@ -219,7 +218,7 @@ void StateEstimator::publish_robot_frames()
             = m_tf_buffer->lookupTransform("map", "left_origin", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped right_foot_frame
             = m_tf_buffer->lookupTransform("map", "right_origin", tf2::TimePointZero);
-        m_cop_estimator.set_cop_state(m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
+        m_cop_estimator.set_cop(*m_cop_estimator.get_sensors(), { right_foot_frame, left_foot_frame });
         // Update ZMP
         m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
         m_zmp_estimator.set_zmp();
@@ -241,29 +240,27 @@ void StateEstimator::publish_robot_frames()
 
     // double stance
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
-
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
-            m_foot_pos_publisher->publish(m_current_stance_foot);
         } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
-            m_foot_pos_publisher->publish(m_current_stance_foot);
         }
     }
     // left
-    if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
+    else if (m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != -1) {
         m_current_stance_foot = -1;
-        m_stance_foot_publisher->publish(m_current_stance_foot);
     }
     // right
-    if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
+    else if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != 1) {
         m_current_stance_foot = 1;
-        m_stance_foot_publisher->publish(m_current_stance_foot);
     }
+    std_msgs::msg::Int32 stance_foot_msg;
+    stance_foot_msg.data = m_current_stance_foot;
+    m_stance_foot_publisher->publish(stance_foot_msg);
 
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
@@ -289,8 +286,9 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
     }
 }
 
-std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
+std::vector<PressureSensor*> StateEstimator::create_pressure_sensors()
 {
+
     this->declare_parameter("cop_estimator.names", std::vector<std::string>(16, ""));
     this->declare_parameter("cop_estimator.x_positions", std::vector<double>(16, 0.0));
     this->declare_parameter("cop_estimator.y_positions", std::vector<double>(16, 0.0));
@@ -299,30 +297,28 @@ std::vector<PressureSensor> StateEstimator::create_pressure_sensors()
     auto x_positions = this->get_parameter("cop_estimator.x_positions").as_double_array();
     auto y_positions = this->get_parameter("cop_estimator.y_positions").as_double_array();
     auto z_positions = this->get_parameter("cop_estimator.z_positions").as_double_array();
-    std::vector<PressureSensor> sensors;
+    std::vector<PressureSensor*> sensors;
     for (size_t i = 0; i < names.size(); i++) {
-        PressureSensor sensor;
+        auto* sensor = new PressureSensor();
         const char initial = names.at(i)[0];
         if (initial != 'l' && initial != 'r') {
             RCLCPP_WARN(this->get_logger(),
                 "Pressure Sensor %i has incorrect initial character %s. Required: 'l' or 'r'", i, initial);
         }
-        sensor.name = names.at(i);
-        CenterOfPressure cop;
+        sensor->name = names.at(i);
 
-        cop.position.header.frame_id = "stink";
-        if (sensor.name[0] == *"l") {
-            cop.position.header.frame_id = "left_ankle";
+        sensor->position.header.frame_id = "stink";
+        if (sensor->name[0] == *"l") {
+            sensor->position.header.frame_id = "left_ankle";
         }
-        if (sensor.name[0] == *"r") {
-            cop.position.header.frame_id = "right_ankle";
+        if (sensor->name[0] == *"r") {
+            sensor->position.header.frame_id = "right_ankle";
         }
 
-        cop.position.point.x = x_positions.at(i);
-        cop.position.point.y = y_positions.at(i);
-        cop.position.point.z = z_positions.at(i);
-
-        sensor.centre_of_pressure = cop;
+        sensor->position.point.x = x_positions.at(i);
+        sensor->position.point.y = y_positions.at(i);
+        sensor->position.point.z = z_positions.at(i);
+        sensor->pressure = 0.0;
         sensors.push_back(sensor);
     }
     // Read the pressure sensors from the hardware interface
@@ -346,21 +342,21 @@ void StateEstimator::visualize_joints()
     joint_markers.type = 7;
     joint_markers.header.frame_id = "map";
     joint_markers.id = 0;
-    std::vector<PressureSensor> pressure_soles = m_cop_estimator.get_sensors();
+    std::vector<PressureSensor*>* pressure_soles = m_cop_estimator.get_sensors();
     geometry_msgs::msg::TransformStamped pressure_sole_transform;
     geometry_msgs::msg::Point marker_container;
     tf2::Vector3 joint_endpoint;
     try {
-        for (auto i : pressure_soles) {
-            pressure_sole_transform = m_tf_buffer->lookupTransform(
-                "map", i.centre_of_pressure.position.header.frame_id, tf2::TimePointZero);
+        for (auto i : *pressure_soles) {
+            pressure_sole_transform
+                = m_tf_buffer->lookupTransform("map", i->position.header.frame_id, tf2::TimePointZero);
             marker_container.x = pressure_sole_transform.transform.translation.x;
             marker_container.y = pressure_sole_transform.transform.translation.y;
             marker_container.z = pressure_sole_transform.transform.translation.z;
 
-            marker_container.x += i.centre_of_pressure.position.point.x;
-            marker_container.y += i.centre_of_pressure.position.point.y;
-            marker_container.z += i.centre_of_pressure.position.point.z;
+            marker_container.x += i->position.point.x;
+            marker_container.y += i->position.point.y;
+            marker_container.z += i->position.point.z;
             joint_markers.points.push_back(marker_container);
         }
 
