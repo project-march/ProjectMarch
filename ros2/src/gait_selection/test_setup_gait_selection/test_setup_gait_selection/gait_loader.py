@@ -6,8 +6,9 @@ import yaml
 from typing import List, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
+from march_gait_selection.gaits.home_gait import HomeGait
 from gait_selection.setpoints_gait import SetpointsGait
-from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition
+from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
 
 
 class GaitLoader:
@@ -58,6 +59,7 @@ class GaitLoader:
     def _load_gaits(self) -> None:
         """Load all gaits."""
         self._load_named_positions()
+        self._load_home_gaits()
         self._load_sit_and_stand_gaits()
 
     def _load_named_positions(self) -> None:
@@ -79,6 +81,19 @@ class GaitLoader:
                     f"overwrite position '{self._named_positions[edge_position]}'. "
                     f"Each named position should be unique."
                 )
+
+    def _load_home_gaits(self) -> None:
+        """Create the home gaits based on the named positions."""
+        for position in self._named_positions:
+            if isinstance(position, UnknownEdgePosition):
+                continue
+
+            self._node.get_logger().info("position: " + str(position))
+            name = self._named_positions[position]
+            self._node.get_logger().info("name: " + str(name))
+            home_gait = HomeGait(name, position, "", self._node.joints)
+            self._node.get_logger().info("home_gait: " + str(home_gait))
+            self.gaits[home_gait.name] = home_gait
 
     def _load_sit_and_stand_gaits(self) -> None:
         """Loads the sit and stand gaits."""

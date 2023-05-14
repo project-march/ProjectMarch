@@ -18,15 +18,20 @@ class TestSetupGaitSelectionNode(Node):
     def __init__(self):
         super().__init__('TestSetupGaitSelectionNode')
 
-        # self.declare_parameter("test_rotational")
-        # test_rotational = self.get_parameter("test_rotational").get_parameter_value().bool_value
+        self.declare_parameter("test_rotational")
+        test_rotational = self.get_parameter("test_rotational").get_parameter_value().bool_value
 
         self.gait_package = "gait_files"
-        self.directory_name = "test_joint_rotational_gaits"
-        # if test_rotational:
-        #     self.directory_name = "test_joint_rotational_gaits"
+        self.directory_name = "test_joint_linear_gaits"
+        self.joints = ["linear_joint"]
+        if test_rotational:
+            self.directory_name = "test_joint_rotational_gaits"
+            self.joints = ["rotational_joint"]
 
         self.gait_loader = GaitLoader(self)
+        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.loaded_gaits))
+        self.get_logger().info("Possible gaits are: " + str(self.gait_loader._named_positions.values()))
+
         self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
 
         self.gait_service = self.create_service(RequestGait, "gait_selection", self.gait_service_callback)
@@ -36,23 +41,21 @@ class TestSetupGaitSelectionNode(Node):
         """The callback that sends the requested gait to the joint_trajectory_controller/joint_trajectory topic."""
         requested_gait = request.gait_type
         gait = None
-        self.get_logger().info("requested gait is: " + str(requested_gait))
-        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.loaded_gaits.keys()))
+        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.loaded_gaits))
         if requested_gait == 0:
-            self.get_logger().info("home setup called!")
-            # This is nog a gait but just one poont, so the trajectory exists of just this point.
-            # gait = self.gait_loader.loaded_gaits.get("test_joint_gait")
+            self.get_logger().info("home_setup called!")
+            gait = self.gait_loader.loaded_gaits["home_setup"]
         elif requested_gait == 1:
             self.get_logger().info("test_joint_gait called!")
             gait = self.gait_loader.loaded_gaits["test_joint_gait"]
         msg = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
         self.get_logger().info(str(msg))
         self.publisher_.publish(msg)
-        response.status = True
         return response
 
     def footstep_service_callback(self, request, response):
         """Response callback for the footstep_planner, this should not be used in the test-setup."""
+        response.status = True
         return response
 
 
