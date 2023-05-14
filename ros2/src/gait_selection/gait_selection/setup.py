@@ -21,7 +21,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'gait_selection_node = gait_selection.gait_selection_node:main'
+            'gait_selection_node = gait_selection.gait_selection_node:main',
         ],
     },
 )

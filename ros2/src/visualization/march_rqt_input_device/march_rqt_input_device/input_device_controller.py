@@ -24,7 +24,7 @@ class InputDeviceController:
     ID_FORMAT = "rqt@{machine}@{user}ros2"
 
     # Valid transition that can be made from the current state
-    POSSIBLE_TRANSITIONS = {
+    POSSIBLE_GAIT_TRANSITIONS = {
         GaitRequest.SIT: ["stand"],
         GaitRequest.STAND: ["sit", "walk", "step_and_close", "stop"],
         GaitRequest.WALK: ["stop"],
@@ -33,7 +33,15 @@ class InputDeviceController:
         GaitRequest.ERROR: []
     }
 
-    def __init__(self, node: Node):
+    # Valid transition that can be made from the current state
+    POSSIBLE_TEST_TRANSITIONS = {
+        0: ["home_setup", "test_joint_gait", "stop"],
+        1: ["home_setup"],
+        GaitRequest.FORCE_UNKNOWN: ["home_setup", "stop"],
+        GaitRequest.ERROR: []
+    }
+
+    def __init__(self, node: Node, testing: Bool):
         self._node = node
 
         self._ping = self._node.get_parameter("ping_safety_node").get_parameter_value().bool_value
@@ -70,6 +78,10 @@ class InputDeviceController:
                 callback=self._timer_callback,
                 clock=self._node.get_clock(),
             )
+        self.POSSIBLE_TRANSITIONS = self.POSSIBLE_GAIT_TRANSITIONS
+        if testing:
+            self.POSSIBLE_TRANSITIONS = self.POSSIBLE_TEST_TRANSITIONS
+
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
         self.eeg = False
         self._current_gait = GaitRequest.FORCE_UNKNOWN

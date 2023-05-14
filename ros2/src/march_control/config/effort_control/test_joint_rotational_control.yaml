@@ -1,24 +1,24 @@
-march:
-  controller:
-    pdb_state:
-      type: march_pdb_state_controller/MarchPdbStateController
-      publish_rate: 50
-    joint_state:
-      type: joint_state_controller/JointStateController
-      publish_rate: 50
-    temperature_sensor:
-      type: march_temperature_sensor_controller/MarchTemperatureSensorController
-      publish_rate: 1
-    trajectory:
-      type: effort_controllers/JointTrajectoryController
-      joints:
-        - rotational_joint
-      gains:
-        rotational_joint: {p: 60, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-      constraints:
-        goal_time: 0.5
-        rotational_joint:
-          stopped_velocity_tolerance: 0.1
-          margin_soft_limit_error: 0.5
-          goal: 0.5
-          trajectory: 0.5
+controller_manager:
+  ros__parameters:
+    update_rate: 125  # Hz
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+joint_trajectory_controller:
+  ros__parameters:
+    update_rate: 125
+    joints:
+      - rotational_joint
+    gains:
+      rotational_joint: { p: 60, i: 0, d: 5, i_clamp: 100}
+    constraints:
+      goal_time: 0.5
+      rotational_joint:
+        stopped_velocity_tolerance: 0.1
+        margin_soft_limit_error: 0.5
+        goal: 0.5
+        trajectory: 0.5
