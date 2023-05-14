@@ -65,6 +65,8 @@ alias run_test_setup_linear='sudo -v && sfox && sros2 &&  ros2 launch march_laun
 
 alias run_test_setup_pressure_sole='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_pressure_sole rviz:=false realsense:=false control_yaml:='\''effort_control/pressure_sole_control.yaml'\'''
 
+alias m8_test_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch start_test_setup.launch.py test_rotational:=true'
+alias m8_test_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch start_test_setup.launch.py test_rotational:=false'
 
 # Clean march builds
 # script to ask for confirmation before cleaning ros
