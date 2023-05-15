@@ -29,7 +29,7 @@ class TestSetupGaitSelectionNode(Node):
             self.joints = ["rotational_joint"]
 
         self.gait_loader = GaitLoader(self)
-        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.loaded_gaits))
+        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.gaits))
         self.get_logger().info("Possible gaits are: " + str(self.gait_loader._named_positions.values()))
 
         self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
@@ -41,13 +41,13 @@ class TestSetupGaitSelectionNode(Node):
         """The callback that sends the requested gait to the joint_trajectory_controller/joint_trajectory topic."""
         requested_gait = request.gait_type
         gait = None
-        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.loaded_gaits))
+        self.get_logger().info("Possible gaits are: " + str(self.gait_loader.gaits))
         if requested_gait == 0:
             self.get_logger().info("home_setup called!")
-            gait = self.gait_loader.loaded_gaits["home_setup"]
+            gait = self.gait_loader.gaits["home_setup"]
         elif requested_gait == 1:
             self.get_logger().info("test_joint_gait called!")
-            gait = self.gait_loader.loaded_gaits["test_joint_gait"]
+            gait = self.gait_loader.gaits["test_joint_gait"]
         msg = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
         self.get_logger().info(str(msg))
         self.publisher_.publish(msg)

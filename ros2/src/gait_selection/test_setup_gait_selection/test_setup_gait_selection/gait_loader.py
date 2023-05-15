@@ -1,14 +1,18 @@
-"""Author: Marco Bak MVIII."""
+"""Author: Marten Haitjema."""
 
 import os
 import yaml
 
-from typing import List, Dict
+from typing import List, Optional, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
+
 from march_gait_selection.gaits.home_gait import HomeGait
-from gait_selection.setpoints_gait import SetpointsGait
+from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
+
+NODE_NAME = "gait_selection"
+UNKNOWN = "unknown"
 
 
 class GaitLoader:
@@ -16,9 +20,13 @@ class GaitLoader:
 
     Args:
         node (rclpy.Node): the gait node
+        robot (urdf.Robot): the robot that is used
+
     Attributes:
         _node (rclpy.Node): the gait node
+        _robot (urdf.Robot): the robot that is used
         _logger (rclpy.Logger): used to log to the terminal
+        _actuating_joint_names (List[str]): a list of names of the actuating joints in the urdf
         _gait_directory (str): path to the directory that contains the gait files
         _default_yaml (str): path to the yaml that contains the named positions
         _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
@@ -26,18 +34,16 @@ class GaitLoader:
     """
 
     def __init__(
-            self,
-            node: Node,
+        self,
+        node: Node,
     ):
-        """Init the gait loader for the gait_selection."""
         self._node = node
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._actuating_joint_names = []
-
+        self._actuating_joint_names = self._node.joints
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
-        self.loaded_gaits = {}
+        self._loaded_gaits = {}
         self._named_positions = {}
         self._load_gaits()
 
@@ -49,7 +55,7 @@ class GaitLoader:
     @property
     def gaits(self) -> dict:
         """Return a dictionary containing the loaded gaits."""
-        return self.loaded_gaits
+        return self._loaded_gaits
 
     @property
     def positions(self) -> Dict[EdgePosition, str]:
@@ -87,17 +93,13 @@ class GaitLoader:
         for position in self._named_positions:
             if isinstance(position, UnknownEdgePosition):
                 continue
-
-            self._node.get_logger().info("position: " + str(position))
             name = self._named_positions[position]
-            self._node.get_logger().info("name: " + str(name))
-            home_gait = HomeGait(name, position, "", self._node.joints)
-            self._node.get_logger().info("home_gait: " + str(home_gait))
+            home_gait = HomeGait(name, position, "")
             self.gaits[home_gait.name] = home_gait
 
     def _load_sit_and_stand_gaits(self) -> None:
         """Loads the sit and stand gaits."""
         for gait in self._gait_version_map:
-            self.loaded_gaits[gait] = SetpointsGait.from_file(
+            self._loaded_gaits[gait] = SetpointsGait.from_file(
                 gait, self._gait_directory, self._gait_version_map
             )

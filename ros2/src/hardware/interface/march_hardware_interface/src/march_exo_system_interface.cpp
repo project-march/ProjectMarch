@@ -219,6 +219,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
+        RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
@@ -254,17 +255,18 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
         // Read the first encoder values for each joint
         for (JointInfo& jointInfo : joints_info_) {
-            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
-
-            jointInfo.joint.actuate((float)jointInfo.joint.getPosition());
-
             // Send PID values to the joints to initialize them
             jointInfo.joint.sendPID();
+            RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
+
+            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+            jointInfo.target_position = (float)jointInfo.joint.getPosition();
+            jointInfo.joint.actuate(jointInfo.target_position);
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.velocity = 0;
-            jointInfo.torque = jointInfo.joint.getTorque();
+            // jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
         }
@@ -394,14 +396,14 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    pdb_read();
-    pressure_sole_read();
+    // pdb_read();
+    // pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
-        jointInfo.torque = jointInfo.joint.getTorque();
+        // jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }
