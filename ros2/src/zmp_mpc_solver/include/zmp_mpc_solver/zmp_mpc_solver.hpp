@@ -69,6 +69,9 @@ private:
     double m_timing_value;
 
     int m_current_stance_foot;
+    int m_previous_stance_foot;
+    int step_counter;
+
 
     double m_admissible_region_x;
     double m_admissible_region_y;

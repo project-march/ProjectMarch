@@ -10,6 +10,8 @@ ZmpSolver::ZmpSolver()
     , m_current_shooting_node(0)
     , m_timing_value(0)
     , m_current_stance_foot(-1)
+    , m_previous_stance_foot(-1)
+    , step_counter(0)
     , m_gravity_const(9.81)
     , m_candidate_footsteps()
     , m_reference_stepsize_x(20,0.0)
@@ -330,6 +332,27 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // if (m_current_shooting_node != 0 && ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps) < m_current_shooting_node < (((N-1))/(m_number_of_footsteps))) {
     
+
+    // When a new step is set, take the next reference step from the footstep planner generated trajectory
+
+    // for (int i = 0; i < 10; ++i) {
+    //     // Simulating value change
+    //     if (i % 2 == 0) {
+    //         m_current_stance_foot = -1;
+    //     } else {
+    //         m_current_stance_foot = 1;
+    //     }
+    // }
+
+    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1) ||
+            (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
+            step_counter++;
+            m_previous_stance_foot = m_current_stance_foot;
+        }
+    printf("step_counter %i\n", step_counter);
+
+    // To decide what the timing value is depending on the current shooting node is
+
     m_current_shooting_node = m_current_shooting_node%(((N-1))/(m_number_of_footsteps));
 
 
@@ -371,8 +394,8 @@ inline int ZmpSolver::solve_zmp_mpc(
             count = -count;
             m_timing_value = 1;
 
-            p[0] = m_reference_stepsize_x[step_number] / dt;
-            p[1] = m_reference_stepsize_y[step_number] / dt;
+            p[0] = m_reference_stepsize_x[step_number + step_counter] / dt;
+            p[1] = m_reference_stepsize_y[step_number + step_counter] / dt;
             p[2] = m_switch;
             p[3] = m_timing_value;
             p[4] = 0;
@@ -381,36 +404,6 @@ inline int ZmpSolver::solve_zmp_mpc(
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
             m_timing_value = 0;
             // printf("Timing value t is %f\n", m_timing_value);
-
-        // Possibly remove this
-
-        // } else if (ii + m_current_shooting_node == 0) {
-        //     // STARTING SHOOTING NODE
-        //     count = -count;
-        //     m_timing_value = 1;
-        //     // lh: Lower path constraints
-        //     lh[0] = -0.5 * m_admissible_region_x;
-        //     lh[1] = -m_first_admissible_region_y;
-        //     lh[2] = -m_foot_width_x / 2;
-        //     lh[3] = -m_foot_width_y / 2;
-        //     // rh: Upper path constraints
-        //     uh[0] = 0.5 * m_admissible_region_x;
-        //     uh[1] = m_first_admissible_region_y;
-        //     uh[2] = m_foot_width_x / 2;
-        //     uh[3] = m_foot_width_y / 2;
-
-        //     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
-        //     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
-
-
-        //     p[0] = 0;
-        //     p[1] = -count * m_step_size_y / dt;
-        //     p[2] = m_switch;
-        //     p[3] = m_timing_value;
-        //     p[4] = 0;
-
-        //     ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-        //     m_timing_value = 0;
 
 
         } else if ((step_number-1)*((N-1)/m_number_of_footsteps)< ii+m_current_shooting_node && ii + m_current_shooting_node <= (step_number - 1) * ((N - 1) / m_number_of_footsteps) + ((N - 1) / m_number_of_footsteps / step_duration_factor)){
@@ -464,57 +457,7 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[4] = 1;
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-            // for step and close
-        // } else if (ii + m_current_shooting_node == 2 * ((N - 1) / m_number_of_footsteps)) {
-        //     // LOWER_CONSTRAINT
-        //     lh[0] = -0.5 * m_admissible_region_x;
-        //     lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
-        //     lh[2] = -m_foot_width_x / 2;
-        //     lh[3] = -m_foot_width_y / 2;
-        //     // UPPER_CONSTRAINT
-        //     uh[0] = 0.5 * m_admissible_region_x;
-        //     uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
-        //     uh[2] = m_foot_width_x / 2;
-        //     uh[3] = m_foot_width_y / 2;
-        //     //
-        //     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
-        //     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
-        //     count = -count;
-        //     m_timing_value = 1;
-        //     p[0] = m_step_size_x / dt / 2; // Change this if we are still going to use step and close with MPC
-        //     p[1] = -count * m_step_size_y / dt; // Change this if we're still going to use step and close with MPC
-        //     p[2] = m_switch;
-        //     p[3] = m_timing_value;
-        //     p[4] = 0;
-        //     ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-        //     m_timing_value = -1 / (((N)-m_number_of_footsteps) / m_number_of_footsteps);
-
-        //     // for step and close
-        // } else if ((ii + m_current_shooting_node) % ((N - 1) / m_number_of_footsteps) == 0
-        //     && (ii + m_current_shooting_node) >= (2 * ((N - 1) / m_number_of_footsteps))) {
-        //     // LOWER_CONSTRAINT
-        //     lh[0] = -0.5 * m_admissible_region_x;
-        //     lh[1] = -count * m_step_size_y - 0.5 * m_admissible_region_y;
-        //     lh[2] = -m_foot_width_x / 2;
-        //     lh[3] = -m_foot_width_y / 2;
-        //     // UPPER_CONSTRAINT
-        //     uh[0] = 0.5 * m_admissible_region_x;
-        //     uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
-        //     uh[2] = m_foot_width_x / 2;
-        //     uh[3] = m_foot_width_y / 2;
-        //     //
-        //     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
-        //     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
-        //     count = -count;
-        //     m_timing_value = 1;
-        //     p[0] = 0;
-        //     p[1] = -count * m_step_size_y / dt; // Change this if we are still going to use step and close with MPC
-        //     p[2] = m_switch;
-        //     p[3] = m_timing_value;
-        //     p[4] = 0;
-
-        //     ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
-        //     m_timing_value = -1 / (((N)-m_number_of_footsteps) / m_number_of_footsteps);
+ 
         } else {
             // Standard weight shift
             // m_timing_value += 1.0 / (((N - 1) - m_number_of_footsteps) / (m_number_of_footsteps));

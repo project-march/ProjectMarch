@@ -302,7 +302,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="true",
+            default_value="false",
             description="Whether to log simulation data or not.",
             choices=["true", "false"],
         ),
@@ -355,7 +355,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("model_to_load_mujoco", model_to_load_mujoco),
             ("tunings_to_load", tunings_to_load),
             ("control_yaml", control_yaml),
-            ("rosbags", rosbags),
+            # ("rosbags", rosbags),
         ],
     )
     # endregion

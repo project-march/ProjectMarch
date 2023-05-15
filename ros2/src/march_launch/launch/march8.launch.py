@@ -18,7 +18,7 @@ def generate_launch_description() -> LaunchDescription:
 
     DeclareLaunchArgument(
         name="rosbags",
-        default_value="true",
+        default_value="false",
         description="Whether the rosbags should stored.",
         choices=["true", "false"],
     )
@@ -158,11 +158,11 @@ def generate_launch_description() -> LaunchDescription:
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
             launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
         ),
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
-        # ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
+        ),
         mujoco_node,
         rqt_input_device,
         march_control,
-        record_rosbags_action,
+        # record_rosbags_action,
     ])

@@ -150,7 +150,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="true",
+            default_value="false",
             description="Whether the rosbags should stored.",
             choices=["true", "false"],
         ),
@@ -579,7 +579,7 @@ def generate_launch_description() -> LaunchDescription:
         point_finder_node,
         camera_aligned_frame_pub_node,
         back_sense_node,
-        record_rosbags_action,
+        # record_rosbags_action,
         imu_nodes
     ]
 
