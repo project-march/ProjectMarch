@@ -36,7 +36,6 @@
 </xacro:macro>
 
 <!-- You have 2 types 'effort' or 'simulation' if you do simulation you should only open simulation. -->
-<!-- Default is 'effort' because this makes easier bc gazebo control is activated through the urdf on published on the '/robot_description' -->
 <xacro:arg name="type" default='effort'/>
 <xacro:property name="type" value="$(arg type)"/>
 
@@ -55,10 +54,8 @@
     </xacro:if>
   </hardware>
 
-
-    <!-- Uncomment one of the following two. -->
-    <xacro:march_joint name="linear_joint"/>
-
+  <!-- Uncomment one of the following two. -->
+  <xacro:march_joint name="linear_joint"/>
 
 </ros2_control>
 

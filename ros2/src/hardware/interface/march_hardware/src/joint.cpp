@@ -76,16 +76,9 @@ void Joint::enableActuation()
  * @param fuzzy_position
  * @param fuzzy_torque
  */
-void Joint::actuate(float target_position, float target_torque, float fuzzy_position, float fuzzy_torque)
+void Joint::actuate(float target_position)
 {
-    float total_fuzzy = fuzzy_torque + fuzzy_torque;
-    if (std::fabs(total_fuzzy - 1.0F) <= std::numeric_limits<float>::epsilon()) {
-        throw error::HardwareException(error::ErrorType::TOTAL_FUZZY_NOT_ONE,
-            "Total fuzzy exceeds value of one for fuzzy position: %f and fuzzy torque: %f: ", fuzzy_position,
-            fuzzy_torque);
-    }
-    motor_controller_->actuateTorque(target_torque, fuzzy_torque);
-    motor_controller_->actuateRadians(target_position, fuzzy_position);
+    motor_controller_->actuateRadians(target_position);
 }
 
 void Joint::readFirstEncoderValues(bool operational_check)

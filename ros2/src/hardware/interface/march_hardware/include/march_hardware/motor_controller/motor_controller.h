@@ -48,7 +48,7 @@ public:
     // A MotorController should support both actuating by position (radians) or
     // by torque
     virtual void actuateTorque(float target_effort, float fuzzy_weight) = 0;
-    virtual void actuateRadians(float target_position, float fuzzy_weight) = 0;
+    virtual void actuateRadians(float target_position) = 0;
 
     virtual void sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
         = 0;

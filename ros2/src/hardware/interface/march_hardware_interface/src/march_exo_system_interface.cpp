@@ -256,6 +256,8 @@ hardware_interface::return_type MarchExoSystemInterface::start()
         for (JointInfo& jointInfo : joints_info_) {
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
 
+            jointInfo.joint.actuate((float)jointInfo.joint.getPosition());
+
             // Send PID values to the joints to initialize them
             jointInfo.joint.sendPID();
 
@@ -368,7 +370,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        jointInfo.joint.actuate(/*target=*/0, (float)jointInfo.position, 1, 0);
+        jointInfo.joint.actuate((float)jointInfo.position);
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
@@ -476,8 +478,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
-        jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
-            (float)jointInfo.fuzzy_torque, (float)jointInfo.fuzzy_position);
+        jointInfo.joint.actuate((float)jointInfo.target_position);
     }
 
     return hardware_interface::return_type::OK;

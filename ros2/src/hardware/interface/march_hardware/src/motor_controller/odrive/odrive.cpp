@@ -99,7 +99,7 @@ void ODrive::actuateTorque(float target_torque, float fuzzy_weight)
  * @param target_position
  * @param fuzzy_weight
  */
-void ODrive::actuateRadians(float target_position, float fuzzy_weight)
+void ODrive::actuateRadians(float target_position)
 {
     if (this->hasAbsoluteEncoder()
         && !this->absolute_encoder_->isValidTargetIU(
@@ -111,9 +111,9 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
     bit32 write_position {};
     write_position.f = target_position;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
-    bit32 write_fuzzy {};
-    write_fuzzy.f = fuzzy_weight;
-    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
+//    bit32 write_fuzzy {};
+//    write_fuzzy.f = fuzzy_weight;
+//    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
 }
 
 void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
