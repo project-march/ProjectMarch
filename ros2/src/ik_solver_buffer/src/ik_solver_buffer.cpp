@@ -53,6 +53,9 @@ void BufferNode::set_velocity(
             point_container.y = (it->y - point_prev.y) / (m_timestep * 1e-3);
             point_container.z = (it->z - point_prev.z) / (m_timestep * 1e-3);
             output_vector.push_back(point_container);
+            point_prev.x = it->x;
+            point_prev.y = it->y;
+            point_prev.z = it->z;
         }
 
         output_vector.push_back(point_container);

@@ -59,6 +59,9 @@ public:
     void set_current_state();
     const state get_state();
     const pinocchio::Model get_model();
+    const pinocchio::Data get_data();
+    std::vector<double> get_joint_pos();
+    std::vector<double> get_joint_vel();
 
 private:
     pinocchio::Model m_model;
@@ -67,8 +70,12 @@ private:
     Eigen::VectorXd m_joint_pos;
     Eigen::VectorXd m_joint_vel;
     Eigen::VectorXd m_joint_acc;
+    Eigen::VectorXd m_joint_lim_min;
+    Eigen::VectorXd m_joint_lim_max;
 
-    std::map<int, int> m_pinocchio_to_march_joint_map;
+    Eigen::VectorXd m_body_com;
+
+    std::map<std::string, int> m_pinocchio_to_march_joint_map;
 
     pinocchio::Data::Matrix6x J_left_foot;
     pinocchio::Data::Matrix6x J_right_foot;

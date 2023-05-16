@@ -25,6 +25,7 @@ private:
     void joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr);
     void foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
+    void publish_joint_states(std::vector<double>);
 
     void timer_callback();
 

@@ -19,13 +19,13 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 
     auto left_point = Point();
     left_point.x = 0.05;
-    left_point.y = 0.1;
-    left_point.z = 0.0;
+    left_point.y = 0.0;
+    left_point.z = 0.1;
 
     auto right_point = Point();
     right_point.x = 0.15;
-    right_point.y = 0.1;
-    right_point.z = 0.0;
+    right_point.y = 0.0;
+    right_point.z = 0.1;
 
     auto end_point = Point();
     end_point.x = 0.2;
@@ -86,6 +86,7 @@ void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, doubl
         p.x *= scalar;
         p.y *= scalar;
         p.z *= scalar;
+        std::swap(p.y,p.z);
     }
     m_curve.points = points;
     m_step_length = step_length;

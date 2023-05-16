@@ -21,6 +21,8 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "robot_com_position", 10, std::bind(&SwingLegTrajectoryGeneratorNode::com_callback, this, _1));
     m_swing_leg_generator = SwingLegTrajectoryGenerator();
+
+    m_path_publisher = this->create_publisher<nav_msgs::msg::Path>("path_visualization", 10);
 }
 
 void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -32,6 +34,7 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
     }
     m_swing_leg_generator.set_points(points);
     m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
+    publish_path_visualization();
 }
 
 // void SwingLegTrajectoryGeneratorNode::stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg)
@@ -52,7 +55,27 @@ void SwingLegTrajectoryGeneratorNode::com_callback(march_shared_msgs::msg::Cente
 {
     if (msg->position.x > (m_swing_leg_generator.get_step_length() * 0.5)) {
         m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
+        publish_path_visualization();
     }
+}
+
+void SwingLegTrajectoryGeneratorNode::publish_path_visualization()
+{
+    nav_msgs::msg::Path msg;
+    msg.header.frame_id = "map";
+    msg.header.stamp = this->get_clock()->now();
+
+    geometry_msgs::msg::PoseStamped pose_container;
+    for(int i=0; i<m_swing_leg_generator.get_curve().trajectory.poses.size(); i++)
+        {
+        pose_container.pose = m_swing_leg_generator.get_curve().trajectory.poses[i];
+        pose_container.header.frame_id = "map";
+        pose_container.header.stamp = msg.header.stamp;
+        pose_container.header.stamp.nanosec+=1e9*i;
+        msg.poses.push_back(pose_container);
+        }
+
+    m_path_publisher->publish(msg);
 }
 
 /**
