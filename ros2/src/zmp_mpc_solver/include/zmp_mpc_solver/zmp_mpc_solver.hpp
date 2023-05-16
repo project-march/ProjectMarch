@@ -1,7 +1,7 @@
 // standard
-#include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "visualization_msgs/msg/marker.hpp"
+#include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -34,8 +34,9 @@ public:
     void initialize_mpc_params();
     void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
     void set_reference_stepsize(std::vector<geometry_msgs::msg::Point>);
-    const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const {
-        return m_candidate_footsteps;    
+    const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const
+    {
+        return m_candidate_footsteps;
     }
     double get_com_height();
     void update_current_shooting_node();
@@ -53,7 +54,6 @@ private:
     std::array<double, 2> m_zmp_current;
     std::array<double, 2> m_com_current;
     std::array<double, 2> m_com_vel_current;
-    
 
     std::vector<geometry_msgs::msg::Point> m_candidate_footsteps;
     std::vector<double> m_reference_stepsize_x;
@@ -71,7 +71,6 @@ private:
     int m_current_stance_foot;
     int m_previous_stance_foot;
     int step_counter;
-
 
     double m_admissible_region_x;
     double m_admissible_region_y;

@@ -579,7 +579,7 @@ def generate_launch_description() -> LaunchDescription:
         point_finder_node,
         camera_aligned_frame_pub_node,
         back_sense_node,
-        # record_rosbags_action,
+        record_rosbags_action,
         imu_nodes
     ]
 

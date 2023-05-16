@@ -34,8 +34,8 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
     // Our frame is from the right foot, where y=0;
     // 1 is right leg
     // -1 is left leg
-    stance_leg = - 1;
-    double y = m_l/2 - stance_leg * m_l/2;
+    stance_leg = -1;
+    double y = m_l / 2 - stance_leg * m_l / 2;
     // STAND = 1
     // WALK = 2
     // STEP_CLOSE = 3
@@ -45,7 +45,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
 
             for (int i = 0; i < 1; i++) {
                 x += 0;
-                y = - stance_leg * m_l;
+                y = -stance_leg * m_l;
                 stance_leg = -stance_leg;
 
                 footstep.position.x = x;
@@ -70,7 +70,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
             footstep.position.y = y;
             footstep.position.z = 0;
             footstep_array.poses.push_back(footstep);
-            stance_leg = - stance_leg;
+            stance_leg = -stance_leg;
 
             for (int i = 2; i < m_steps; i++) {
                 x += m_vx * 1.0;
@@ -82,8 +82,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
                 footstep.position.z = 0;
 
                 footstep_array.poses.push_back(footstep);
-                printf("stance_leg %i\n",stance_leg);
-
+                printf("stance_leg %i\n", stance_leg);
             }
             break;
 

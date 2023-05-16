@@ -164,5 +164,5 @@ def generate_launch_description() -> LaunchDescription:
         mujoco_node,
         rqt_input_device,
         march_control,
-        # record_rosbags_action,
+        record_rosbags_action,
     ])

@@ -230,7 +230,8 @@ void StateEstimator::publish_robot_frames()
         geometry_msgs::msg::TransformStamped right_ankle_frame
             = m_tf_buffer->lookupTransform("map", "right_ankle", tf2::TimePointZero);
 
-        m_footstep_estimator.set_footstep_positions(right_ankle_frame.transform.translation, left_ankle_frame.transform.translation);
+        m_footstep_estimator.set_footstep_positions(
+            right_ankle_frame.transform.translation, left_ankle_frame.transform.translation);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "Error during publishing of Center of Pressure: %s", ex.what());
     }
@@ -245,8 +246,9 @@ void StateEstimator::publish_robot_frames()
     foot_positions.header.frame_id = "map";
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
-    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y %f",foot_positions.poses[0].position.y);
-    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot position y %f",foot_positions.poses[1].position.y);
+    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y
+    // %f",foot_positions.poses[0].position.y); RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot
+    // position y %f",foot_positions.poses[1].position.y);
 
     m_foot_pos_publisher->publish(foot_positions);
 

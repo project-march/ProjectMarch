@@ -15,7 +15,8 @@ SolverNode::SolverNode()
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
     m_com_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("com_visualization_trajectory", 10);
     m_zmp_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("zmp_visualization_trajectory", 10);
-    m__footstep_visualizer_publisher = this->create_publisher<visualization_msgs::msg::Marker>("footsteps_visualization", 100);
+    m__footstep_visualizer_publisher
+        = this->create_publisher<visualization_msgs::msg::Marker>("footsteps_visualization", 100);
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
@@ -47,7 +48,8 @@ void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 
 void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-// CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION OR SOMETHING FOR CURRENT FEET POSITIONS.
+    // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION
+    // OR SOMETHING FOR CURRENT FEET POSITIONS.
     m_zmp_solver.set_candidate_footsteps(msg);
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
@@ -113,7 +115,6 @@ void SolverNode::timer_callback()
     geometry_msgs::msg::PoseStamped zmp_path_wrapper;
     zmp_path_wrapper.header.frame_id = "map";
 
-
     std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
 
     for (int i = 0; i < (ZMP_PENDULUM_ODE_N); i++) {
@@ -127,17 +128,18 @@ void SolverNode::timer_callback()
         // Visualize the ZMP trajectory
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 2)];
         pose_container.position.y = (*trajectory_pointer)[(i * NX + 5)];
-        pose_container.position.z = m_zmp_solver.get_com_height();       
+        pose_container.position.z = m_zmp_solver.get_com_height();
         zmp_path_wrapper.pose = pose_container;
         zmp_path.poses.push_back(zmp_path_wrapper);
         // std::cout << "Pose Stamped:" << std::endl;
-        // std::cout << "Position: x=" << com_path_wrapper.pose.position.x << ", y=" << com_path_wrapper.pose.position.y << ", z=" << com_path_wrapper.pose.position.z << std::endl;
+        // std::cout << "Position: x=" << com_path_wrapper.pose.position.x << ", y=" << com_path_wrapper.pose.position.y
+        // << ", z=" << com_path_wrapper.pose.position.z << std::endl;
 
         // The feet
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 6)];
         pose_container.position.y = (*trajectory_pointer)[(i * NX + 8)];
         foot_msg.poses.push_back(pose_container);
-        if (i == ZMP_PENDULUM_ODE_N -1) {
+        if (i == ZMP_PENDULUM_ODE_N - 1) {
             continue;
         }
 
@@ -148,10 +150,10 @@ void SolverNode::timer_callback()
 
         marker_container.x = (*trajectory_pointer)[(i * NX + 7)];
         marker_container.y = (*trajectory_pointer)[(i * NX + 9)];
-        marker_container.z = m_zmp_solver.get_com_height()/2;
+        marker_container.z = m_zmp_solver.get_com_height() / 2;
         previous_footsteps_marker.points.push_back(marker_container);
-        // printf("marker itself point [%f,%f,%f]", current_footsteps_marker.points[0].x,current_footsteps_marker.points[0].y,current_footsteps_marker.points[0].z);
-
+        // printf("marker itself point [%f,%f,%f]",
+        // current_footsteps_marker.points[0].x,current_footsteps_marker.points[0].y,current_footsteps_marker.points[0].z);
     };
 
     current_footsteps_marker.action = 0;
@@ -188,8 +190,8 @@ void SolverNode::timer_callback()
     previous_footsteps_marker.color.r = 255.0;
     previous_footsteps_marker.color.a = 0.7;
 
-    m__footstep_visualizer_publisher-> publish(previous_footsteps_marker);
-    m__footstep_visualizer_publisher-> publish(current_footsteps_marker);
+    m__footstep_visualizer_publisher->publish(previous_footsteps_marker);
+    m__footstep_visualizer_publisher->publish(current_footsteps_marker);
     m_com_visualizer_publisher->publish(com_path);
     m_zmp_visualizer_publisher->publish(zmp_path);
     m_com_trajectory_publisher->publish(com_msg);
@@ -211,7 +213,8 @@ void SolverNode::timer_callback()
 //         com_marker_point.y = m_real_time_com_trajectory_y[ii];
 //         com_marker_point.z = m_zmp_solver.get_com_height();
 //         com_marker.points.push_back(com_marker_point);
-//         RCLCPP_INFO(rclcpp::get_logger("CoM Marker"), "CoM Marker:[%f,%f,%f]", com_marker_point.x, com_marker_point.y, com_marker_point.z);
+//         RCLCPP_INFO(rclcpp::get_logger("CoM Marker"), "CoM Marker:[%f,%f,%f]", com_marker_point.x,
+//         com_marker_point.y, com_marker_point.z);
 //     }
 //     RCLCPP_INFO(rclcpp::get_logger("CoM Marker:"), "Published %i markers", com_marker.points.size());
 //     com_marker.action = 0;
@@ -232,11 +235,10 @@ void SolverNode::timer_callback()
 //     m_rviz_com_publisher->publish(com_marker);
 // }
 
-
 int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<SolverNode>());    
+    rclcpp::spin(std::make_shared<SolverNode>());
     rclcpp::shutdown();
     return 0;
 }

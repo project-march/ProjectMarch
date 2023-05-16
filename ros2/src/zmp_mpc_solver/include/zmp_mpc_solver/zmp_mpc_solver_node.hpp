@@ -15,15 +15,15 @@
 
 //#include "march_shared_msgs/msg/robot_state.hpp"
 //#include "march_shared_msgs/msg/point_stamped_list.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
+#include "nav_msgs/msg/path.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-#include "nav_msgs/msg/path.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
 
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
@@ -42,7 +42,6 @@ private:
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void timer_callback();
     void visualize_trajectory();
-
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;

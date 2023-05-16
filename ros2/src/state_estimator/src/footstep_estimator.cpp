@@ -12,18 +12,17 @@ FootstepEstimator::FootstepEstimator()
     foot_right.position.point.z = 0.0;
 }
 
-void FootstepEstimator::set_footstep_positions(geometry_msgs::msg::Vector3 right_foot_vec, geometry_msgs::msg::Vector3 left_foot_vec)
+void FootstepEstimator::set_footstep_positions(
+    geometry_msgs::msg::Vector3 right_foot_vec, geometry_msgs::msg::Vector3 left_foot_vec)
 {
     foot_right.position.point.x = right_foot_vec.x;
     foot_right.position.point.y = right_foot_vec.y;
     foot_right.position.point.z = right_foot_vec.z;
 
-    foot_left.position.point.x = left_foot_vec.x;    
+    foot_left.position.point.x = left_foot_vec.x;
     foot_left.position.point.y = left_foot_vec.y;
     foot_left.position.point.z = left_foot_vec.z;
-
 }
-
 
 geometry_msgs::msg::Pose FootstepEstimator::get_foot_position(const char* prefix)
 {
