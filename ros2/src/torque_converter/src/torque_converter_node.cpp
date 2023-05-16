@@ -20,7 +20,7 @@ TorqueConverterNode::TorqueConverterNode()
    
     // create publisher
     m_torque_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectoryPoint>(
-        "joint_trajectory_controller/torque_trajectory", 10); // m_torque_trajectory_publisher->publish(trajectory);
+        "torque_trajectory", 10); // m_torque_trajectory_publisher->publish(trajectory);
 
 }
 
