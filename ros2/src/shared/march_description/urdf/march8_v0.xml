@@ -13,19 +13,13 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
 GNU General Public License for more details. 
 
-See <https://www.gnu.org/licenses/>. 
-
-This XML was compiled by xml_generator.py at 06/04/2023 12:32:05 
-using march8_v0_pre.xml and march8_v0.yaml. -->
+See <https://www.gnu.org/licenses/>.
+-->
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="meshes" angle="degree" autolimits="true"/>
+  <compiler meshdir="obj-files/march8" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
-  <!-- Degree of Freedom: 27
-       Actuators: 21
-  -->
-  <!-- Timestep is set to X because the high level control runs at X kHz -->
 
   <asset>
     <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="512" height="512"/>
@@ -35,15 +29,15 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="m8/Backpack.obj"/>
-    <mesh name="L_foot"      file="m8/FootLeft.obj"/>
-    <mesh name="L_hip"       file="m8/HipLeft.obj"/>
-    <mesh name="L_thigh"     file="m8/UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="m8/LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="m8/FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="m8/HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="m8/UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="m8/LowerLegLeft.obj"/>
+    <mesh name="backpack"    file="Backpack.obj"/>
+    <mesh name="L_foot"      file="FootLeft.obj"/>
+    <mesh name="L_hip"       file="HipLeft.obj"/>
+    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
+    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
   </asset>
 
   <default>
@@ -68,14 +62,17 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
     </default>
     <default class="HAA_joint">
       <joint damping="107.692308"
+              armature="5.4"
              frictionloss="0" stiffness="0"/>
     </default>
     <default class="ADPF_joint">
       <joint damping="43.658537"
+              armature="2.2"
              frictionloss="0" stiffness="0"/>
     </default>
     <default class="rotational_joint">
       <joint damping="63.451777"
+              armature="9.98"
              frictionloss="0" stiffness="0"/>
     </default>
   </default>
@@ -93,7 +90,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
     <body name="backpack"
-          pos="0 0 1.2"
+          pos="0 0 0.95"
           childclass="exoskeleton">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -101,7 +98,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
       <inertial pos="0.013 0.001 0.24" mass="11.02"
                 fullinertia="0.379 0.245 0.173 0 -0.008 0.001"/>
-      <!-- <freejoint/> -->
+      <freejoint/>
       <geom type="mesh" mesh="backpack" />
       <geom name="backpack" type="box"
             size="0.051 0.189 0.165"
@@ -122,7 +119,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
         <body name="L_UL" pos="0.182 0.182 0">
         <inertial pos="0 -0.034 -0.206" mass="8.566"
                   fullinertia="0.259 0.256 0.023 -0.001 0 -0.036"/>
-          <joint name="L_HFE" axis="0 -1 0" range="-12 115" class="rotational_joint"/>
+          <joint name="L_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
           <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
           <geom name="L_UL" fromto="0 0 0 0 -0.06 -0.413"
               size="0.069" class="L_collision"/>
@@ -132,7 +129,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
           <body name="L_LL" pos="0 -0.06 -0.413">
             <inertial pos="-0.034 -0.04 -0.223" mass="4.159"
                   fullinertia="0.055 0.064 0.019 0.001 -0.006 -0.002"/>
-            <joint name="L_KFE" axis="0 1 0" range="-1 112" class="rotational_joint"/>
+            <joint name="L_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
             <geom type="mesh" mesh="L_shin"/>
             <geom name="L_LL" fromto="0 0 0 0.0 -0.037 -0.414"
               size="0.047" class="L_collision"/>
@@ -142,7 +139,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
             <body name="L_foot" pos="0.0 -0.037 -0.414">
               <inertial pos="0.033 -0.041 -0.08" mass="1.22"
                   fullinertia="0.006 0.01 0.008 0.001 0.002 -0.002"/>
-              <joint name="L_ADPF" axis="0 -1 0" range="-25 1" class="ADPF_joint"/>
+              <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
               <geom type="mesh" mesh="L_foot"/>
               <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
@@ -210,7 +207,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
         <body name="R_UL" pos="0.182 -0.182 0">
           <inertial pos="0 0.034 -0.206" mass="8.566"
                   fullinertia="0.259 0.256 0.023 0.001 0 0.036"/>
-          <joint name="R_HFE" axis="0 -1 0" range="-12 115" class="rotational_joint"/>
+          <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
           <geom type="mesh" mesh="R_thigh"/>
           <geom name="R_UL" fromto="0 0 0 0 0.06 -0.413"
               size="0.069" class="R_collision"/>
@@ -220,7 +217,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
           <body name="R_LL" pos="0 0.06 -0.413">
             <inertial pos="-0.034 0.04 -0.223" mass="4.159"
                   fullinertia="0.055 0.064 0.019 -0.001 -0.006 0.002"/>
-            <joint name="R_KFE" axis="0 1 0" range="-1 112" class="rotational_joint"/>
+            <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
             <geom type="mesh" mesh="R_shin"/>
             <geom name="R_LL" fromto="0 0 0 0.0 0.037 -0.414"
               size="0.047" class="R_collision"/>
@@ -230,7 +227,7 @@ using march8_v0_pre.xml and march8_v0.yaml. -->
             <body name="R_foot" pos="0.0 0.037 -0.414">
               <inertial pos="0.033 0.041 -0.08" mass="1.22"
                   fullinertia="0.006 0.01 0.008 -0.001 0.002 0.002"/>
-              <joint name="R_ADPF" axis="0 -1 0" range="-25 1" class="ADPF_joint"/>
+              <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
               <geom type="mesh" mesh="R_foot"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 

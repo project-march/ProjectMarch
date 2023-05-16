@@ -20,6 +20,7 @@ void FootstepGenerator::publish_foot_placements(
     std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
+
     m_publisher->publish(footsteps);
     response->status = true;
 }
