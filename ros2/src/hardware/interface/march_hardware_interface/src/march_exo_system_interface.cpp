@@ -369,7 +369,7 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
 hardware_interface::return_type MarchExoSystemInterface::stop()
 {
     // Stopping ethercat cycle in the hardware
-    RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
+    RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
         jointInfo.joint.actuate((float)jointInfo.position);
