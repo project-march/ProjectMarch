@@ -25,8 +25,8 @@ ZmpSolver::ZmpSolver()
     m_u_current.fill(0);
 
     set_current_com(0.0, 0.18, 0.0, 0.0);
-    set_current_zmp(0.0, 0.2);
-    set_current_foot(0.0, 0.2);
+    set_current_zmp(0.0, 0.33);
+    set_current_foot(0.0, 0.33);
     set_previous_foot(0.0, 0.0);
     // set_current_com(0.0, 0.08, 0.0, -0.1);
     // set_current_zmp(0.0, 0.08);
@@ -316,14 +316,14 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
-    // std::cout << "Vector elements: ";
-    // for (const auto& element : m_reference_stepsize_x) {
-    //     printf("element x is %f\n", element);
-    // }
-    // for (const auto& element : m_reference_stepsize_y) {
-    //     printf("element y is %f\n", element);
-    // }
-    // std::cout << std::endl;
+     std::cout << "Vector elements: ";
+     for (const auto& element : m_reference_stepsize_x) {
+         printf("element x is %f\n", element);
+     }
+     for (const auto& element : m_reference_stepsize_y) {
+         printf("element y is %f\n", element);
+     }
+     std::cout << std::endl;
 
     // if (m_current_shooting_node != 0 && ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps) <
     // m_current_shooting_node < (((N-1))/(m_number_of_footsteps))) {
@@ -339,11 +339,11 @@ inline int ZmpSolver::solve_zmp_mpc(
     //     }
     // }
 
-    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
-        || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
-        step_counter++;
-        m_previous_stance_foot = m_current_stance_foot;
-    }
+//    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
+//        || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
+//        step_counter++;
+//        m_previous_stance_foot = m_current_stance_foot;
+//    }
     printf("step_counter %i\n", step_counter);
 
     // To decide what the timing value is depending on the current shooting node is
@@ -549,6 +549,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
+        return status;
     }
 
     // here, we copy our array into the std::array
