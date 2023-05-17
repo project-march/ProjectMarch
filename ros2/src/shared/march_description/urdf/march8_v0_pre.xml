@@ -1,12 +1,8 @@
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="meshes" angle="degree" autolimits="true"/>
+  <compiler meshdir="obj-files/march8" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
-  <!-- Degree of Freedom: 27
-       Actuators: 21
-  -->
-  <!-- Timestep is set to X because the high level control runs at X kHz -->
 
   <asset>
     <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="512" height="512"/>
@@ -16,15 +12,15 @@
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="m8/Backpack.obj"/>
-    <mesh name="L_foot"      file="m8/FootLeft.obj"/>
-    <mesh name="L_hip"       file="m8/HipLeft.obj"/>
-    <mesh name="L_thigh"     file="m8/UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="m8/LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="m8/FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="m8/HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="m8/UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="m8/LowerLegLeft.obj"/>
+    <mesh name="backpack"    file="Backpack.obj"/>
+    <mesh name="L_foot"      file="FootLeft.obj"/>
+    <mesh name="L_hip"       file="HipLeft.obj"/>
+    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
+    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
   </asset>
 
   <default>
@@ -49,14 +45,17 @@
     </default>
     <default class="HAA_joint">
       <joint damping="${joints/HAA/max_torque / ./max_angvel}"
+              armature="${joints/HAA/inertia}"
              frictionloss="${joints/HAA/frictionloss}" stiffness="0"/>
     </default>
     <default class="ADPF_joint">
       <joint damping="${joints/ADPF/max_torque / ./max_angvel}"
+              armature="${joints/ADPF/inertia}"
              frictionloss="${joints/ADPF/frictionloss}" stiffness="0"/>
     </default>
     <default class="rotational_joint">
       <joint damping="${joints/HFE/max_torque / ./max_angvel}"
+              armature="${joints/HFE/inertia}"
              frictionloss="${joints/HFE/frictionloss}" stiffness="0"/>
     </default>
   </default>
@@ -271,14 +270,14 @@
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="L_ADPF"    gear="${joints/ADPF/max_torque}"  joint="L_ADPF"  />
-    <motor name="L_HAA"     gear="${joints/HAA/max_torque}"  joint="L_HAA"  />
-    <motor name="L_HFE"     gear="${joints/HFE/max_torque}" joint="L_HFE"   />
-    <motor name="L_KFE"     gear="${joints/KFE/max_torque}"  joint="L_KFE"   />
-    <motor name="R_ADPF"    gear="${joints/ADPF/max_torque}"  joint="R_ADPF"  />
-    <motor name="R_HAA"     gear="${joints/HAA/max_torque}"  joint="R_HAA"  />
-    <motor name="R_HFE"     gear="${joints/HFE/max_torque}" joint="R_HFE"   />
-    <motor name="R_KFE"     gear="${joints/KFE/max_torque}"  joint="R_KFE" />
+    <motor name="left_ankle"    gear="${joints/ADPF/max_torque}"  joint="L_ADPF"  />
+    <motor name="left_hip_aa"     gear="${joints/HAA/max_torque}"  joint="L_HAA"  />
+    <motor name="left_hip_fe"     gear="${joints/HFE/max_torque}" joint="L_HFE"   />
+    <motor name="left_knee"     gear="${joints/KFE/max_torque}"  joint="L_KFE"   />
+    <motor name="right_ankle"    gear="${joints/ADPF/max_torque}"  joint="R_ADPF"  />
+    <motor name="right_hip_aa"     gear="${joints/HAA/max_torque}"  joint="R_HAA"  />
+    <motor name="right_hip_fe"     gear="${joints/HFE/max_torque}" joint="R_HFE"   />
+    <motor name="right_knee"     gear="${joints/KFE/max_torque}"  joint="R_KFE" />
   </actuator>
 
   <sensor>

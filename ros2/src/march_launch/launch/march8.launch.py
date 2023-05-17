@@ -2,7 +2,8 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -13,6 +14,14 @@ def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
+    rosbags = LaunchConfiguration("rosbags", default='true')
+
+    DeclareLaunchArgument(
+        name="rosbags",
+        default_value="true",
+        description="Whether the rosbags should stored.",
+        choices=["true", "false"],
+    )
 
     DeclareLaunchArgument(
         name="control_yaml",
@@ -83,6 +92,26 @@ def generate_launch_description() -> LaunchDescription:
         'hennie_v0.urdf'
     )
 
+    # region rosbags
+    # Make sure you have build the ros bags from the library not the ones from foxy!
+    record_rosbags_action = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "bag",
+            "record",
+            "-o",
+            '~/rosbags2/$(date -d "today" +"%Y-%m-%d-%H-%M-%S")',
+            "-a",
+        ],
+        output={
+            "stdout": "log",
+            "stderr": "log",
+        },
+        shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
+        condition=IfCondition(rosbags),
+    )
+    # endregion
+
     # declare parameters
     # in ms
     trajectory_dt = 8
@@ -135,4 +164,5 @@ def generate_launch_description() -> LaunchDescription:
         mujoco_node,
         rqt_input_device,
         march_control,
+        record_rosbags_action,
     ])

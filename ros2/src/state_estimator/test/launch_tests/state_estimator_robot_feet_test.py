@@ -132,7 +132,7 @@ class TestProcessOutput(unittest.TestCase):
 
         try:
             # Wait until the dut transmits a message over the ROS topic
-            end_time = time.time() + 10
+            end_time = time.time() + 2
             while time.time() < end_time:
                 rclpy.spin_once(self.node, timeout_sec=0.1)
 

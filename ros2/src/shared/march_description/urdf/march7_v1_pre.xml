@@ -1,6 +1,6 @@
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="meshes" angle="degree" autolimits="true"/>
+  <compiler meshdir="obj-files/march7" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
   <!-- Degree of Freedom: 27
@@ -16,15 +16,15 @@
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="m7/Backpack.obj"/>
-    <mesh name="L_foot"      file="m7/FootLeft.obj"/>
-    <mesh name="L_hip"       file="m7/HipLeft.obj"/>
-    <mesh name="L_thigh"     file="m7/UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="m7/LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="m7/FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="m7/HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="m7/UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="m7/LowerLegLeft.obj"/>
+    <mesh name="backpack"    file="Backpack.obj"/>
+    <mesh name="L_foot"      file="FootLeft.obj"/>
+    <mesh name="L_hip"       file="HipLeft.obj"/>
+    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
+    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
   </asset>
 
   <default>
@@ -49,14 +49,17 @@
     </default>
     <default class="HAA_joint">
       <joint damping="${joints/HAA/max_torque / ./max_angvel}"
+              armature="${joints/HAA/inertia}"
              frictionloss="${joints/HAA/frictionloss}" stiffness="0"/>
     </default>
     <default class="ADPF_joint">
       <joint damping="${joints/ADPF/max_torque / ./max_angvel}"
+              armature="${joints/ADPF/inertia}"
              frictionloss="${joints/ADPF/frictionloss}" stiffness="0"/>
     </default>
     <default class="rotational_joint">
       <joint damping="${joints/HFE/max_torque / ./max_angvel}"
+              armature="${joints/HFE/inertia}"
              frictionloss="${joints/HFE/frictionloss}" stiffness="0"/>
     </default>
   </default>

@@ -35,16 +35,26 @@ def generate_test_description():
         name='state_machine',
     )
 
-    srv_node = Node(
-        package='gait_loader',
-        executable='gait_loader_node',
-        name='gait_loader',
+    footstep_gen_node = Node(
+        package='footstep_generator',
+        namespace='',
+        executable='footstep_generator_node',
+        name='footstep_generator'
     )
+
+    gait_select_node = Node(
+        package='gait_selection',
+        namespace='',
+        executable='gait_selection_node',
+        name='gait_selection'
+    )
+
     context = {'dut': dut  }
 
     return (launch.LaunchDescription([
         dut,
-        srv_node,
+        footstep_gen_node,
+        gait_select_node,
         launch_testing.actions.ReadyToTest()]
     ) , context
     )
@@ -70,7 +80,7 @@ class TestProcessOutput(unittest.TestCase):
             """
         # Read input data that is send to dut
         msg = GaitRequest()
-        msg.gait_type = 2
+        msg.gait_type = 1
         self.publisher_.publish(msg)
 
     def test_dut_output_valid_transition(self, dut, proc_output):
@@ -90,7 +100,7 @@ class TestProcessOutput(unittest.TestCase):
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
         #expected data for this test is the force unknown state or int num 2.
-        expected_data = 2
+        expected_data = 1
 
         # Setup for listening to dut messages
         received_data =  []

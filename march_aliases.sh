@@ -10,9 +10,8 @@ alias sros2='source ~/march/ros2/install/local_setup.bash'
 alias cm='cd ~/march/'
 alias cm2='cd ~/march/ros2/'
 
-
 # Create xml needed for mujoco
-alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/xml_parser8/ && python3 march8_v0_generate.py && cm2'
+alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/ && python3 march8_v0_generate.py && python3 march7_v1_generate.py && cm2'
 
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
@@ -34,8 +33,9 @@ alias mb2='march_build_ros2'
 alias mb='march_build'
 alias mba='march_build_all'
 alias sim2='march_run_ros2_sim'
-alias sim='march_run_ros2_sim'
-alias mujoco='sim mujoco:=true model_to_load_mujoco:="march8_v0.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march8_v0.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco_guus='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march7_v1.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
