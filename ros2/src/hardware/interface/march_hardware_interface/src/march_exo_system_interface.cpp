@@ -472,6 +472,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //        jointInfo.effort_command_converted = converted_effort;
         //                jointInfo.joint.actuate((float)joijointInfontInfo.effort_command_converted);
 
+        // DEBUG LINE
+//        if(){
+//            RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f", LColor::GREEN);
+//            return hardware_interface::return_type::ERROR;
+//        };
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
         jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
             (float)jointInfo.torque_weight, (float)jointInfo.position_weight);
