@@ -170,7 +170,7 @@ void SolverNode::timer_callback()
     current_footsteps_marker.pose.orientation.w = 1.0;
     current_footsteps_marker.ns = "current_footstep_visualization";
     current_footsteps_marker.lifetime.sec = 1;
-    current_footsteps_marker.color.b = 255.0;
+    current_footsteps_marker.color.b = 1.0;
     current_footsteps_marker.color.a = 0.7;
 
     previous_footsteps_marker.action = 0;
@@ -187,8 +187,8 @@ void SolverNode::timer_callback()
     previous_footsteps_marker.pose.orientation.w = 1.0;
     previous_footsteps_marker.ns = "previous_footstep_visualization";
     previous_footsteps_marker.lifetime.sec = 1;
-    previous_footsteps_marker.color.r = 255.0;
-    previous_footsteps_marker.color.a = 0.7;
+    previous_footsteps_marker.color.r = 1.0;
+    previous_footsteps_marker.color.a = 1.0;
 
     m__footstep_visualizer_publisher->publish(previous_footsteps_marker);
     m__footstep_visualizer_publisher->publish(current_footsteps_marker);

@@ -11,7 +11,7 @@ ZmpSolver::ZmpSolver()
     , m_timing_value(0)
     , m_current_stance_foot(-1)
     , m_previous_stance_foot(-1)
-    , step_counter(0)
+    , step_counter(0) // How many steps are actually set based on the state estimation
     , m_gravity_const(9.81)
     , m_candidate_footsteps()
     , m_reference_stepsize_x(20, 0.0)
@@ -24,14 +24,14 @@ ZmpSolver::ZmpSolver()
     m_x_trajectory.fill(0);
     m_u_current.fill(0);
 
-    set_current_com(0.0, 0.18, 0.0, 0.0);
-    set_current_zmp(0.0, 0.33);
-    set_current_foot(0.0, 0.33);
-    set_previous_foot(0.0, 0.0);
-    // set_current_com(0.0, 0.08, 0.0, -0.1);
-    // set_current_zmp(0.0, 0.08);
-    // set_current_foot(0.0, 0.0);
-    // set_previous_foot(0.0, 0.2);
+    // set_current_com(0.0, 0.33, 0.0, 0.0);
+    // set_current_zmp(0.0, 0.33);
+    // set_current_foot(0.0, 0.33);
+    // set_previous_foot(0.0, 0.0);
+    set_current_com(0.0, 0.17, 0.0, -0.5);
+    set_current_zmp(0.0, 0.17);
+    set_current_foot(0.0, 0.0);
+    set_previous_foot(0.0, 0.33);
     set_current_state();
 }
 
@@ -98,12 +98,14 @@ void ZmpSolver::set_current_foot(double x, double y)
 {
     m_pos_foot_current[0] = x;
     m_pos_foot_current[1] = y;
+
 }
 
 void ZmpSolver::set_previous_foot(double x, double y)
 {
     m_pos_foot_prev[0] = x;
     m_pos_foot_prev[1] = y;
+
 }
 
 void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
@@ -113,7 +115,6 @@ void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr
         m_candidate_footsteps.push_back(pose.position);
     }
 }
-// fix this check chatGPT
 
 void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
 {
@@ -152,16 +153,16 @@ void ZmpSolver::initialize_mpc_params()
     // Later, change this to read from a yaml
     m_admissible_region_x = 0.62;
     m_admissible_region_y = 0.10;
-    m_foot_width_x = 0.05;
-    m_foot_width_y = 0.08;
+    m_foot_width_x = 0.1;
+    m_foot_width_y = 0.2;
     m_step_size_x = 0.2;
-    m_step_size_y = 0.2;
+    m_step_size_y = 0.33;
 
     m_com_height = 0.6; // Load this from the com position
     m_first_admissible_region_y = 0.01;
 
     m_switch = 1.0;
-    m_current_shooting_node = 0;
+    m_current_shooting_node = 100;
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
@@ -304,46 +305,36 @@ inline int ZmpSolver::solve_zmp_mpc(
     p[2] = 0;
     p[3] = 0;
     p[4] = 0;
-    // printf("%f \n", (m_time_horizon) / N);
-    // printf("%f \n", (10.0 / 61));
+
     double dt = 0.0 + (m_time_horizon) / (N - 1);
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
     double count = m_current_stance_foot;
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
     // The step number
-    int step_number = 0;
+    int step_number = 0; // the virtual step number for the MPC to predict a horizon 
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
-     std::cout << "Vector elements: ";
-     for (const auto& element : m_reference_stepsize_x) {
-         printf("element x is %f\n", element);
-     }
-     for (const auto& element : m_reference_stepsize_y) {
-         printf("element y is %f\n", element);
-     }
-     std::cout << std::endl;
+    //  std::cout << "Vector elements: ";
+    //  for (const auto& element : m_reference_stepsize_x) {
+    //      printf("element x is %f\n", element);
+    //  }
+    //  for (const auto& element : m_reference_stepsize_y) {
+    //      printf("element y is %f\n", element);
+    //  }
+    //  std::cout << std::endl;
 
     // if (m_current_shooting_node != 0 && ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps) <
     // m_current_shooting_node < (((N-1))/(m_number_of_footsteps))) {
 
     // When a new step is set, take the next reference step from the footstep planner generated trajectory
 
-    // for (int i = 0; i < 10; ++i) {
-    //     // Simulating value change
-    //     if (i % 2 == 0) {
-    //         m_current_stance_foot = -1;
-    //     } else {
-    //         m_current_stance_foot = 1;
-    //     }
-    // }
-
-//    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
-//        || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
-//        step_counter++;
-//        m_previous_stance_foot = m_current_stance_foot;
-//    }
+   if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
+       || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
+       step_counter++;
+       m_previous_stance_foot = m_current_stance_foot;
+   }
     printf("step_counter %i\n", step_counter);
 
     // To decide what the timing value is depending on the current shooting node is
@@ -537,8 +528,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    // printf("\n--- xtraj ---\n");
-    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    printf("\n--- xtraj ---\n");
+    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
@@ -549,7 +540,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
-        return status;
+        // step_counter = 0;        
     }
 
     // here, we copy our array into the std::array

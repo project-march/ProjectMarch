@@ -252,10 +252,15 @@ void StateEstimator::publish_robot_frames()
 
     m_foot_pos_publisher->publish(foot_positions);
 
+    float feet_diff_threshold = 0.05; // if the difference in feet doesn't surpass this threshold, don't update the stance foot.
+    // Otherwise the current stance foot value is going to constantly update in double stance.
+
     // double stance
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
-        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
+        if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
+            m_current_stance_foot = m_current_stance_foot;
+        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
         } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {

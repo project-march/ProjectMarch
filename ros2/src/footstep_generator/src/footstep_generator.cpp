@@ -8,7 +8,7 @@ FootstepGenerator::FootstepGenerator()
     , m_steps(20) // Change this so we can interactively edit the amount of footsteps while Koengaiting
     , m_vx(0.2)
     , m_vy(0.0)
-    , m_l(0.2)
+    , m_l(0.33)
 {
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
