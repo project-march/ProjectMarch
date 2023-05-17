@@ -36,13 +36,13 @@ TEST_F(SwingLegTrajectoryGeneratorTest, updatePointsTest)
 
     auto left_point = Point();
     left_point.x = 5;
-    left_point.y = 10;
-    left_point.z = 0;
+    left_point.y = 0;
+    left_point.z = 10;
 
     auto right_point = Point();
     right_point.x = 15;
-    right_point.y = 10;
-    right_point.z = 0;
+    right_point.y = 0;
+    right_point.z = 10;
 
     auto end_point = Point();
     end_point.x = 20;
@@ -74,13 +74,13 @@ TEST_F(SwingLegTrajectoryGeneratorTest, getCurveTest)
 
     auto left_point = Point();
     left_point.x = 25;
-    left_point.y = 50;
-    left_point.z = 0;
+    left_point.y = 0;
+    left_point.z = 50;
 
     auto right_point = Point();
     right_point.x = 75;
-    right_point.y = 50;
-    right_point.z = 0;
+    right_point.y = 0;
+    right_point.z = 50;
 
     auto end_point = Point();
     end_point.x = 100;
@@ -98,14 +98,14 @@ TEST_F(SwingLegTrajectoryGeneratorTest, getCurveTest)
 TEST_F(SwingLegTrajectoryGeneratorTest, getPointTest)
 {
     auto expected = geometry_msgs::msg::Point();
-    expected.x = 50.0;
-    expected.y = 37.5;
-    expected.z = 0;
+    expected.x = 0.1;
+    expected.y = 0;
+    expected.z = 0.075;
     double t = 0.5;
     auto actual = swing_leg_generator->get_point(swing_leg_generator->get_curve().points, t);
-    ASSERT_EQ(expected.x, actual.x);
-    ASSERT_EQ(expected.y, actual.y);
-    ASSERT_EQ(expected.z, actual.z);
+    ASSERT_LT(std::abs(expected.x - actual.x), 1e-8);
+    ASSERT_LT(std::abs(expected.y - actual.y), 1e-8);
+    ASSERT_LT(std::abs(expected.z - actual.z), 1e-8);
 }
 
 TEST_F(SwingLegTrajectoryGeneratorTest, setPointsTest)
@@ -149,13 +149,13 @@ TEST_F(SwingLegTrajectoryGeneratorTest, setPointsScalingTest)
 
     auto left_point = Point();
     left_point.x = 50;
-    left_point.y = 100;
-    left_point.z = 0;
+    left_point.y = 0;
+    left_point.z = 100;
 
     auto right_point = Point();
     right_point.x = 150;
-    right_point.y = 100;
-    right_point.z = 0;
+    right_point.y = 0;
+    right_point.z = 100;
 
     auto end_point = Point();
     end_point.x = 200;
@@ -176,13 +176,13 @@ TEST_F(SwingLegTrajectoryGeneratorTest, setPointsScalingTest)
 
     left_point = Point();
     left_point.x = 25;
-    left_point.y = 50;
-    left_point.z = 0;
+    left_point.y = 0;
+    left_point.z = 50;
 
     right_point = Point();
     right_point.x = 75;
-    right_point.y = 50;
-    right_point.z = 0;
+    right_point.y = 0;
+    right_point.z = 50;
 
     end_point = Point();
     end_point.x = 100;
