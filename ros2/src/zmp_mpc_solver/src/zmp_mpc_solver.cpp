@@ -28,8 +28,8 @@ ZmpSolver::ZmpSolver()
     // set_current_zmp(0.0, 0.33);
     // set_current_foot(0.0, 0.33);
     // set_previous_foot(0.0, 0.0);
-    set_current_com(0.0, 0.17, 0.0, -0.5);
-    set_current_zmp(0.0, 0.17);
+    set_current_com(-0.2, 0.17, 0.0, 0.0);
+    set_current_zmp(-0.2, 0.17);
     set_current_foot(0.0, 0.0);
     set_previous_foot(0.0, 0.33);
     set_current_state();

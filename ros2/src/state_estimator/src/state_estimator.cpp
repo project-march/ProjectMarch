@@ -139,9 +139,9 @@ void StateEstimator::update_foot_frames()
     // IMU& imu = m_imu_estimator.get_imu(LOWER);
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
-            = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
+            = m_tf_buffer->lookupTransform("lowerIMU", "right_origin", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped expected_hip_base_angle
-            = m_tf_buffer->lookupTransform("hip_base", "map", tf2::TimePointZero);
+            = m_tf_buffer->lookupTransform("hip_base", "right_origin", tf2::TimePointZero);
         //
         tf2::Quaternion tf2_measured_hip_base_angle;
         tf2::Quaternion tf2_expected_hip_base_angle;

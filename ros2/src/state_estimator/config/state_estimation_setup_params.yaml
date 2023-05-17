@@ -11,7 +11,7 @@ state_estimator:
       base_links: ["left_ankle", "left_knee", "left_hip_fe", "left_hip_aa"
       , "hip_base", "right_hip_aa", "right_hip_fe", "right_knee"
       , "right_ankle", "right_origin", "map"]
-      link_rotation_axis : [1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0]
+      link_rotation_axis : [-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0]
 #      link_rotation_axis : [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 #      link_rotation_axis: [ 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 ]
       #0: X
