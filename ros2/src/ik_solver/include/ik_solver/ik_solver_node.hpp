@@ -50,7 +50,6 @@ private:
     int m_stance_foot;
     int m_timestep;
 
-
     std::vector<std::string> m_joint_names;
 };
 

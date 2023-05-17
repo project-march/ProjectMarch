@@ -86,7 +86,7 @@ void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, doubl
         p.x *= scalar;
         p.y *= scalar;
         p.z *= scalar;
-        std::swap(p.y,p.z);
+        std::swap(p.y, p.z);
     }
     m_curve.points = points;
     m_step_length = step_length;
