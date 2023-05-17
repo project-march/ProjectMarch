@@ -590,6 +590,24 @@ def generate_launch_description() -> LaunchDescription:
         ),
     )
 
+    weight_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_hardware_interface"),
+                "weight.launch.py",
+            )
+        ),
+    )
+
+    fuzzy_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_hardware_interface"),
+                "fuzzy.launch.py",
+            )
+        ),
+    )
+
     nodes = [
         rqt_input_device,
         wireless_ipd_node,
@@ -606,7 +624,9 @@ def generate_launch_description() -> LaunchDescription:
         camera_aligned_frame_pub_node,
         back_sense_node,
         record_rosbags_action,
-        imu_nodes
+        imu_nodes,
+        weight_node,
+        fuzzy_node
     ]
 
     return LaunchDescription(declared_arguments + nodes)
