@@ -8,7 +8,6 @@ from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 
@@ -16,7 +15,7 @@ DEFAULT_HOMEGAIT_DURATION = Duration(seconds=3)
 ZERO_DURATION = Duration(seconds=0)
 
 
-class HomeGait(GaitInterface):
+class HomeGait():
     """A standard gait that goes from the unknown state to an idle position.
 
     Args:
@@ -49,7 +48,9 @@ class HomeGait(GaitInterface):
         self._end_time = None
         self._starting_position = UnknownEdgePosition()
         self._final_position = self._position
-        self._actuating_joint_names = get_joint_names_from_urdf()
+        self._actuating_joint_names = [
+            "left_ankle",  "left_hip_aa", "left_hip_fe", "left_knee",
+            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
     @property
     def name(self):
