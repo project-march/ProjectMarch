@@ -11,7 +11,7 @@ state_estimator:
       base_links: ["left_ankle", "left_knee", "left_hip_fe", "left_hip_aa"
       , "hip_base", "right_hip_aa", "right_hip_fe", "right_knee"
       , "right_ankle", "right_origin", "map"]
-      link_rotation_axis : [1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0]
+      link_rotation_axis : [1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0]
 #      link_rotation_axis : [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 #      link_rotation_axis: [ 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 ]
       #0: X
@@ -40,7 +40,7 @@ state_estimator:
         IMU_exo_base_link: "hip_base"
           #POS: X, Y, Z
         IMU_exo_position: [0.0, 0.0, 0.0]
-        IMU_exo_rotation: [0.0, 0.0, 0.0]
+        IMU_exo_rotation: [3.14, 0.0, 0.0]
       upper_imu:
         IMU_exo_base_link: "hip_base"
           #POS: X, Y, Z

@@ -139,7 +139,7 @@ void StateEstimator::update_foot_frames()
     // IMU& imu = m_imu_estimator.get_imu(LOWER);
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
-            = m_tf_buffer->lookupTransform("lowerIMU", "right_origin", tf2::TimePointZero);
+            = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped expected_hip_base_angle
             = m_tf_buffer->lookupTransform("hip_base", "right_origin", tf2::TimePointZero);
         //
@@ -149,7 +149,7 @@ void StateEstimator::update_foot_frames()
         tf2::fromMsg(expected_hip_base_angle.transform.rotation, tf2_expected_hip_base_angle);
         tf2_measured_hip_base_angle.normalize();
         tf2_expected_hip_base_angle.normalize();
-        tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
+        tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle * tf2_expected_hip_base_angle.inverse();
         tf2_angle_difference.normalize();
         geometry_msgs::msg::Quaternion angle_difference;
         tf2::convert(tf2_angle_difference, angle_difference);
@@ -158,8 +158,8 @@ void StateEstimator::update_foot_frames()
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-        RCLCPP_DEBUG(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-        m_joint_estimator.set_individual_joint_state("right_origin", pitch);
+        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f", roll, pitch, yaw);
+        // m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
