@@ -19,8 +19,8 @@ struct Leg {
 
     double foot_height = 0;
 
-    float torque_weight = 0.5; // holds the weight for the torque
-    float position_weight = 0.5; // holds the weight for the position
+    float torque_weight = 0; // holds the weight for the torque
+    float position_weight = 1; // holds the weight for the position
 
     // setters
     void setTorqueWeight(float weight){ torque_weight = weight; }; // set the weight for the torque (does not publish the weight yet)
