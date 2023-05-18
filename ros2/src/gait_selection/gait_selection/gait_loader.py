@@ -6,12 +6,10 @@ import yaml
 from typing import List, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
-from trajectory_msgs.msg import JointTrajectoryPoint
 
 from gait_selection.setpoints_gait import SetpointsGait
-from march_gait_selection.gaits.home_gait import HomeGait
+from gait_selection.home_gait import HomeGait
 from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
-from march_utility.utilities.duration import Duration
 
 
 class GaitLoader:
@@ -71,6 +69,7 @@ class GaitLoader:
         self._load_named_positions()
         self._load_home_gaits()
         self._load_sit_and_stand_gaits()
+
     def _load_named_positions(self) -> None:
         """Load the named positions from default.yaml."""
         with open(self._default_yaml, "r") as default_yaml_file:

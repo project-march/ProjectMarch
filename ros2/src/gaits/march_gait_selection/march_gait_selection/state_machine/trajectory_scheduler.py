@@ -97,7 +97,7 @@ class TrajectoryScheduler:
         self._action_client_to_controller = ActionClient(
             self._node, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
         )
-        self.pub = self._node.create_publisher( JointTrajectory, "test_traj", 10)
+        self.pub = self._node.create_publisher(JointTrajectory, "test_traj", 10)
 
     def schedule(self, command: TrajectoryCommand) -> None:
         """Sends a trajectory to the controller.
