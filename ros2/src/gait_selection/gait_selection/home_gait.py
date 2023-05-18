@@ -31,11 +31,11 @@ class HomeGait():
     """
 
     def __init__(
-        self,
-        name: str,
-        position: Dict[str, float],
-        gait_type: str,
-        duration: Duration = DEFAULT_HOMEGAIT_DURATION,
+            self,
+            name: str,
+            position: Dict[str, float],
+            gait_type: str,
+            duration: Duration = DEFAULT_HOMEGAIT_DURATION,
     ):
         """Initializes an executable home gait with given positions."""
         self._name = "home_{name}".format(name=name)
@@ -47,9 +47,8 @@ class HomeGait():
         self._end_time = None
         self._starting_position = UnknownEdgePosition()
         self._final_position = self._position
-        self._actuating_joint_names = [
-            "left_ankle",  "left_hip_aa", "left_hip_fe", "left_knee",
-            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
+        self._actuating_joint_names = ["left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
+                                       "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
     @property
     def name(self):
@@ -97,9 +96,9 @@ class HomeGait():
         return "home_gait_version"
 
     def start(
-        self,
-        current_time: Time,
-        first_subgait_delay: Optional[Duration] = ZERO_DURATION,
+            self,
+            current_time: Time,
+            first_subgait_delay: Optional[Duration] = ZERO_DURATION,
     ) -> GaitUpdate:
         """Start the gait.
 
@@ -136,9 +135,9 @@ class HomeGait():
             )
 
     def update(
-        self,
-        current_time: Time,
-        delay: float,
+            self,
+            current_time: Time,
+            delay: float,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
 
