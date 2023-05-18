@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Bool
 from march_shared_msgs.srv import RequestGait
 
 from gait_selection.gait_loader import GaitLoader
@@ -22,6 +23,7 @@ class GaitSelectionNode(Node):
         self.directory_name = "airgait_vi"
         self.gait_loader = GaitLoader(self)
         self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
+        self.reset_publisher = self.create_publisher(Bool, "/mujoco_reset_trajectory", 10)
         self.subscriber = self.create_subscription(
             JointState,
             "/measured_joint_states",
@@ -48,6 +50,12 @@ class GaitSelectionNode(Node):
         msg = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
         self.get_logger().info(str(msg))
         self.publisher_.publish(msg)
+
+        # Used to make sure the sim plans the gaits in time.
+        reset_msg = Bool()
+        reset_msg.data = True
+        self.reset_publisher.publish(reset_msg)
+        
         response.status = True
         return response
 
