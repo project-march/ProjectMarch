@@ -115,7 +115,6 @@ void ZmpSolver::set_previous_foot(double x, double y)
 {
     m_pos_foot_prev[0] = x;
     m_pos_foot_prev[1] = y;
-
 }
 
 void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
@@ -140,7 +139,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0 
+    m_com_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -154,7 +153,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0 
+    m_zmp_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
     m_zmp_current[1] = y;
 }
 
@@ -320,11 +319,10 @@ inline int ZmpSolver::solve_zmp_mpc(
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
     double count = m_current_stance_foot;
 
-
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
     // The step number
-    int step_number = 0; // the virtual step number for the MPC to predict a horizon 
+    int step_number = 0; // the virtual step number for the MPC to predict a horizon
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
@@ -342,11 +340,11 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // When a new step is set, take the next reference step from the footstep planner generated trajectory
 
-   if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
-       || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
-       step_counter++;
-       m_previous_stance_foot = m_current_stance_foot;
-   }
+    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
+        || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
+        step_counter++;
+        m_previous_stance_foot = m_current_stance_foot;
+    }
     printf("step_counter %i\n", step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
     printf("current stance foot is %i\n", m_previous_stance_foot);
@@ -553,7 +551,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
-        // step_counter = 0;        
+        // step_counter = 0;
     }
 
     // here, we copy our array into the std::array

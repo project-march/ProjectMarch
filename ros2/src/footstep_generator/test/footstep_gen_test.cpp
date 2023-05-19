@@ -30,7 +30,7 @@ TEST_F(FootstepGeneratorTest, gettersTest)
     ASSERT_EQ(this->footstep_gen->get_steps(), 20);
     ASSERT_EQ(this->footstep_gen->get_velocity_x(), 0.2);
     ASSERT_EQ(this->footstep_gen->get_velocity_y(), 0.0);
-    ASSERT_EQ(this->footstep_gen->get_feet_spread(), 0.2);
+    ASSERT_EQ(this->footstep_gen->get_feet_spread(), 0.33);
 }
 
 TEST_F(FootstepGeneratorTest, getWalkedDistanceTest)
