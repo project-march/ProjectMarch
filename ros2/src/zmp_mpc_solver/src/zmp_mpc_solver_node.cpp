@@ -50,7 +50,8 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
 {
     // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION
     // OR SOMETHING FOR CURRENT FEET POSITIONS.
-    m_zmp_solver.set_candidate_footsteps(msg);
+    desired_footsteps = msg;
+    m_zmp_solver.set_candidate_footsteps(desired_footsteps);
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
 
@@ -79,129 +80,134 @@ void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 
 void SolverNode::timer_callback()
 {
-    m_zmp_solver.update_current_foot();
-    m_zmp_solver.set_current_state();
-    int solver_status = m_zmp_solver.solve_step();
-    if (solver_status != 0) {
-        RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
-    }
-    auto com_msg = geometry_msgs::msg::PoseArray();
-    com_msg.header.stamp = this->get_clock()->now();
-    com_msg.header.frame_id = "map";
-
-    auto foot_msg = geometry_msgs::msg::PoseArray();
-    foot_msg.header.stamp = this->get_clock()->now();
-    foot_msg.header.frame_id = "map";
-
-    geometry_msgs::msg::Pose pose_container;
-
-    // This is all for visualization
-    visualization_msgs::msg::Marker current_footsteps_marker;
-    current_footsteps_marker.type = 8;
-    current_footsteps_marker.header.frame_id = "map";
-    current_footsteps_marker.id = 0;
-
-    visualization_msgs::msg::Marker previous_footsteps_marker;
-    previous_footsteps_marker.type = 8;
-    previous_footsteps_marker.header.frame_id = "map";
-    previous_footsteps_marker.id = 1;
-
-    geometry_msgs::msg::Point marker_container;
-
-    nav_msgs::msg::Path com_path;
-    com_path.header.frame_id = "map";
-
-    nav_msgs::msg::Path zmp_path;
-    zmp_path.header.frame_id = "map";
-
-    geometry_msgs::msg::PoseStamped com_path_wrapper;
-    com_path_wrapper.header.frame_id = "map";
-
-    geometry_msgs::msg::PoseStamped zmp_path_wrapper;
-    zmp_path_wrapper.header.frame_id = "map";
-
-    std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
-
-    for (int i = 0; i < (ZMP_PENDULUM_ODE_N); i++) {
-        pose_container.position.x = (*trajectory_pointer)[(i * NX + 0)];
-        pose_container.position.y = (*trajectory_pointer)[(i * NX + 3)];
-        pose_container.position.z = m_zmp_solver.get_com_height();
-        com_msg.poses.push_back(pose_container);
-        com_path_wrapper.pose = pose_container;
-        com_path.poses.push_back(com_path_wrapper);
-
-        // Visualize the ZMP trajectory
-        pose_container.position.x = (*trajectory_pointer)[(i * NX + 2)];
-        pose_container.position.y = (*trajectory_pointer)[(i * NX + 5)];
-        pose_container.position.z = m_zmp_solver.get_com_height();
-        zmp_path_wrapper.pose = pose_container;
-        zmp_path.poses.push_back(zmp_path_wrapper);
-        // std::cout << "Pose Stamped:" << std::endl;
-        // std::cout << "Position: x=" << com_path_wrapper.pose.position.x << ", y=" << com_path_wrapper.pose.position.y
-        // << ", z=" << com_path_wrapper.pose.position.z << std::endl;
-
-        // The feet
-        pose_container.position.x = (*trajectory_pointer)[(i * NX + 6)];
-        pose_container.position.y = (*trajectory_pointer)[(i * NX + 8)];
-        foot_msg.poses.push_back(pose_container);
-        if (i == ZMP_PENDULUM_ODE_N - 1) {
-            continue;
+    if (!(desired_footsteps)) {
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input from footstep planner");
+    } else {
+        m_zmp_solver.update_current_foot();
+        m_zmp_solver.set_current_state();
+        int solver_status = m_zmp_solver.solve_step();
+        if (solver_status != 0) {
+            RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
         }
+        auto com_msg = geometry_msgs::msg::PoseArray();
+        com_msg.header.stamp = this->get_clock()->now();
+        com_msg.header.frame_id = "map";
 
-        marker_container.x = (*trajectory_pointer)[(i * NX + 6)];
-        marker_container.y = (*trajectory_pointer)[(i * NX + 8)];
-        marker_container.z = 0.0;
-        current_footsteps_marker.points.push_back(marker_container);
+        auto foot_msg = geometry_msgs::msg::PoseArray();
+        foot_msg.header.stamp = this->get_clock()->now();
+        foot_msg.header.frame_id = "map";
 
-        marker_container.x = (*trajectory_pointer)[(i * NX + 7)];
-        marker_container.y = (*trajectory_pointer)[(i * NX + 9)];
-        marker_container.z = m_zmp_solver.get_com_height() / 2;
-        previous_footsteps_marker.points.push_back(marker_container);
-        // printf("marker itself point [%f,%f,%f]",
-        // current_footsteps_marker.points[0].x,current_footsteps_marker.points[0].y,current_footsteps_marker.points[0].z);
-    };
+        geometry_msgs::msg::Pose pose_container;
 
-    current_footsteps_marker.action = 0;
-    current_footsteps_marker.frame_locked = 1;
-    current_footsteps_marker.scale.x = 0.1;
-    current_footsteps_marker.scale.y = 0.1;
-    current_footsteps_marker.scale.z = 0.1;
-    current_footsteps_marker.pose.position.x = 0.0;
-    current_footsteps_marker.pose.position.y = 0.0;
-    current_footsteps_marker.pose.position.z = 0.0;
-    current_footsteps_marker.pose.orientation.x = 0.0;
-    current_footsteps_marker.pose.orientation.y = 0.0;
-    current_footsteps_marker.pose.orientation.z = 0.0;
-    current_footsteps_marker.pose.orientation.w = 1.0;
-    current_footsteps_marker.ns = "current_footstep_visualization";
-    current_footsteps_marker.lifetime.sec = 1;
-    current_footsteps_marker.color.b = 1.0;
-    current_footsteps_marker.color.a = 0.7;
+        // This is all for visualization
+        visualization_msgs::msg::Marker current_footsteps_marker;
+        current_footsteps_marker.type = 8;
+        current_footsteps_marker.header.frame_id = "map";
+        current_footsteps_marker.id = 0;
 
-    previous_footsteps_marker.action = 0;
-    previous_footsteps_marker.frame_locked = 1;
-    previous_footsteps_marker.scale.x = 0.1;
-    previous_footsteps_marker.scale.y = 0.1;
-    previous_footsteps_marker.scale.z = 0.1;
-    previous_footsteps_marker.pose.position.x = 0.0;
-    previous_footsteps_marker.pose.position.y = 0.0;
-    previous_footsteps_marker.pose.position.z = 0.0;
-    previous_footsteps_marker.pose.orientation.x = 0.0;
-    previous_footsteps_marker.pose.orientation.y = 0.0;
-    previous_footsteps_marker.pose.orientation.z = 0.0;
-    previous_footsteps_marker.pose.orientation.w = 1.0;
-    previous_footsteps_marker.ns = "previous_footstep_visualization";
-    previous_footsteps_marker.lifetime.sec = 1;
-    previous_footsteps_marker.color.r = 1.0;
-    previous_footsteps_marker.color.a = 1.0;
+        visualization_msgs::msg::Marker previous_footsteps_marker;
+        previous_footsteps_marker.type = 8;
+        previous_footsteps_marker.header.frame_id = "map";
+        previous_footsteps_marker.id = 1;
 
-    m__footstep_visualizer_publisher->publish(previous_footsteps_marker);
-    m__footstep_visualizer_publisher->publish(current_footsteps_marker);
-    m_com_visualizer_publisher->publish(com_path);
-    m_zmp_visualizer_publisher->publish(zmp_path);
-    m_com_trajectory_publisher->publish(com_msg);
-    m_final_feet_publisher->publish(foot_msg);
-    // m_zmp_solver.update_current_shooting_node();
+        geometry_msgs::msg::Point marker_container;
+
+        nav_msgs::msg::Path com_path;
+        com_path.header.frame_id = "map";
+
+        nav_msgs::msg::Path zmp_path;
+        zmp_path.header.frame_id = "map";
+
+        geometry_msgs::msg::PoseStamped com_path_wrapper;
+        com_path_wrapper.header.frame_id = "map";
+
+        geometry_msgs::msg::PoseStamped zmp_path_wrapper;
+        zmp_path_wrapper.header.frame_id = "map";
+
+        std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
+
+        for (int i = 0; i < (ZMP_PENDULUM_ODE_N); i++) {
+            pose_container.position.x = (*trajectory_pointer)[(i * NX + 0)];
+            pose_container.position.y = (*trajectory_pointer)[(i * NX + 3)];
+            pose_container.position.z = m_zmp_solver.get_com_height();
+            com_msg.poses.push_back(pose_container);
+            com_path_wrapper.pose = pose_container;
+            com_path.poses.push_back(com_path_wrapper);
+
+            // Visualize the ZMP trajectory
+            pose_container.position.x = (*trajectory_pointer)[(i * NX + 2)];
+            pose_container.position.y = (*trajectory_pointer)[(i * NX + 5)];
+            pose_container.position.z = m_zmp_solver.get_com_height();
+            zmp_path_wrapper.pose = pose_container;
+            zmp_path.poses.push_back(zmp_path_wrapper);
+            // std::cout << "Pose Stamped:" << std::endl;
+            // std::cout << "Position: x=" << com_path_wrapper.pose.position.x << ", y=" <<
+            // com_path_wrapper.pose.position.y
+            // << ", z=" << com_path_wrapper.pose.position.z << std::endl;
+
+            // The feet
+            pose_container.position.x = (*trajectory_pointer)[(i * NX + 6)];
+            pose_container.position.y = (*trajectory_pointer)[(i * NX + 8)];
+            foot_msg.poses.push_back(pose_container);
+            if (i == ZMP_PENDULUM_ODE_N - 1) {
+                continue;
+            }
+
+            marker_container.x = (*trajectory_pointer)[(i * NX + 6)];
+            marker_container.y = (*trajectory_pointer)[(i * NX + 8)];
+            marker_container.z = 0.0;
+            current_footsteps_marker.points.push_back(marker_container);
+
+            marker_container.x = (*trajectory_pointer)[(i * NX + 7)];
+            marker_container.y = (*trajectory_pointer)[(i * NX + 9)];
+            marker_container.z = m_zmp_solver.get_com_height() / 2;
+            previous_footsteps_marker.points.push_back(marker_container);
+            // printf("marker itself point [%f,%f,%f]",
+            // current_footsteps_marker.points[0].x,current_footsteps_marker.points[0].y,current_footsteps_marker.points[0].z);
+        };
+
+        current_footsteps_marker.action = 0;
+        current_footsteps_marker.frame_locked = 1;
+        current_footsteps_marker.scale.x = 0.1;
+        current_footsteps_marker.scale.y = 0.1;
+        current_footsteps_marker.scale.z = 0.1;
+        current_footsteps_marker.pose.position.x = 0.0;
+        current_footsteps_marker.pose.position.y = 0.0;
+        current_footsteps_marker.pose.position.z = 0.0;
+        current_footsteps_marker.pose.orientation.x = 0.0;
+        current_footsteps_marker.pose.orientation.y = 0.0;
+        current_footsteps_marker.pose.orientation.z = 0.0;
+        current_footsteps_marker.pose.orientation.w = 1.0;
+        current_footsteps_marker.ns = "current_footstep_visualization";
+        current_footsteps_marker.lifetime.sec = 1;
+        current_footsteps_marker.color.b = 1.0;
+        current_footsteps_marker.color.a = 0.7;
+
+        previous_footsteps_marker.action = 0;
+        previous_footsteps_marker.frame_locked = 1;
+        previous_footsteps_marker.scale.x = 0.1;
+        previous_footsteps_marker.scale.y = 0.1;
+        previous_footsteps_marker.scale.z = 0.1;
+        previous_footsteps_marker.pose.position.x = 0.0;
+        previous_footsteps_marker.pose.position.y = 0.0;
+        previous_footsteps_marker.pose.position.z = 0.0;
+        previous_footsteps_marker.pose.orientation.x = 0.0;
+        previous_footsteps_marker.pose.orientation.y = 0.0;
+        previous_footsteps_marker.pose.orientation.z = 0.0;
+        previous_footsteps_marker.pose.orientation.w = 1.0;
+        previous_footsteps_marker.ns = "previous_footstep_visualization";
+        previous_footsteps_marker.lifetime.sec = 1;
+        previous_footsteps_marker.color.r = 1.0;
+        previous_footsteps_marker.color.a = 1.0;
+
+        m__footstep_visualizer_publisher->publish(previous_footsteps_marker);
+        m__footstep_visualizer_publisher->publish(current_footsteps_marker);
+        m_com_visualizer_publisher->publish(com_path);
+        m_zmp_visualizer_publisher->publish(zmp_path);
+        m_com_trajectory_publisher->publish(com_msg);
+        m_final_feet_publisher->publish(foot_msg);
+        m_zmp_solver.update_current_shooting_node();
+    }
 }
 
 // void SolverNode::visualize_trajectory()
