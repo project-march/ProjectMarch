@@ -3,7 +3,7 @@ import getpass
 import socket
 
 from rclpy import Future
-from std_msgs.msg import Header, String, Bool
+from std_msgs.msg import Header, String, Bool, Integer
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
@@ -86,6 +86,11 @@ class InputDeviceController:
             qos_profile=1,
         )
         self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
+        self.direct_torque_pub = self._node.create_publisher(
+            msg_type=Integer,
+            topic="", #TODO: add a good topic
+            qos_profile=10,
+        )
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
         )
@@ -279,6 +284,17 @@ class InputDeviceController:
                 id=str(self._id),
             )
         )
+
+    def direct_torque(self) -> None:
+    """Publish a fake error message on `/march/error`."""
+    self._node.get_logger().debug("Mock Input Device published error")
+    self._error_pub.publish(
+        Error(
+            header=Header(stamp=self._node.get_clock().now().to_msg()),
+            error_message="Fake error thrown by the develop input device.",
+            type=Error.FATAL,
+        )
+    )
 
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""

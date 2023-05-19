@@ -19,6 +19,9 @@ WeightNode::WeightNode()
     m_control_type_subscription = this->create_subscription<std_msgs::msg::String>(
             "weight_control_type", 10, std::bind(&WeightNode::control_type_callback, this, _1));
 
+    m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
+            "direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
+
     this->declare_parameter("allowed_control_type", "fuzzy");
 }
 
@@ -60,6 +63,28 @@ void WeightNode::fuzzy_weight_callback(march_shared_msgs::msg::WeightStamped::Sh
     }
 
     setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
+}
+
+/**
+ * Processes the weights sent from the fuzzy generator
+ *
+ * @param msg Message that contains the weights for both torque and position
+ * @return
+ */
+void WeightNode::direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg)
+{
+
+    float torque = msg->data;
+
+    // We are setting the torque immediately
+    RCLCPP_INFO(rclcpp::get_logger("weight_node"), "We are setting the torque directly to: %f", torque);
+
+    // apply to all the joints of that leg
+    std::vector<march_hardware_interface::JointInfo>* joints_info_ = m_hardware_interface->getJointsInfo();
+
+    for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+        jointInfo.torque = torque;
+    }
 }
 
 /**
