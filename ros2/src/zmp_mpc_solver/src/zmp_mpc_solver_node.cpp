@@ -57,12 +57,11 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    if (m_zmp_solver.get_current_stance_foot() == -1){
+    if (m_zmp_solver.get_current_stance_foot() == -1) {
         m_zmp_solver.set_previous_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    }else{
+    } else {
         m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
     }
-    
 }
 
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)

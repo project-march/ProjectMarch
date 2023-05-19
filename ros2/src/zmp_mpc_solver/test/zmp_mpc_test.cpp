@@ -32,7 +32,7 @@ TEST_F(ZmpSolverTest, setterGetterTest)
     ASSERT_EQ(this->zmp_solver->get_state(), test_state);
 }
 
-//TEST_F(ZmpSolverTest, MpcIsSolvableTest)
+// TEST_F(ZmpSolverTest, MpcIsSolvableTest)
 //{
 //    // With this, we can also check if our initial conditions allow for a solvable start
 //    this->zmp_solver->initialize_mpc_params();
@@ -49,7 +49,7 @@ TEST_F(ZmpSolverTest, setterGetterTest)
 //    ASSERT_EQ(solving_status, 0);
 //}
 //
-//TEST_F(ZmpSolverTest, StateIsUpdatedTest)
+// TEST_F(ZmpSolverTest, StateIsUpdatedTest)
 //{
 //    // With this, we can also check if our initial conditions allow for a solvable start
 //    this->zmp_solver->initialize_mpc_params();
