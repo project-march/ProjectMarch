@@ -56,8 +56,13 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
 
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
+    // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
+    if (m_zmp_solver.get_current_stance_foot() == -1){
+        m_zmp_solver.set_previous_foot(msg->poses[1].position.x, msg->poses[1].position.y);
+    }else{
+        m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
+    }
+    
 }
 
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
@@ -75,6 +80,7 @@ void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 
 void SolverNode::timer_callback()
 {
+    m_zmp_solver.update_current_foot();
     m_zmp_solver.set_current_state();
     int solver_status = m_zmp_solver.solve_step();
     if (solver_status != 0) {

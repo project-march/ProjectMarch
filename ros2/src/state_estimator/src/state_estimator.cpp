@@ -12,7 +12,7 @@ StateEstimator::StateEstimator()
     , m_imu_estimator()
     , m_zmp_estimator()
     , m_footstep_estimator()
-    , m_current_stance_foot(0)
+    , m_current_stance_foot(-1)
 {
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
         "/upper_imu", 10, std::bind(&StateEstimator::upper_imu_callback, this, _1));
@@ -70,7 +70,10 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
 
-    m_stance_foot_publisher->publish(m_current_stance_foot);
+    
+    std_msgs::msg::Int32 stance_foot_msg;
+    stance_foot_msg.data = m_current_stance_foot;
+    m_stance_foot_publisher->publish(stance_foot_msg);
 
     initialize_imus();
 }
