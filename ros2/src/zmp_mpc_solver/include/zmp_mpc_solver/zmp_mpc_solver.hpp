@@ -21,11 +21,13 @@ public:
     double m_time_horizon;
     void set_current_state();
     int solve_step();
+    int get_current_stance_foot();
     std::array<double, NX> get_state();
     std::array<double, NX * ZMP_PENDULUM_ODE_N>* get_state_trajectory();
     std::array<double, NU * ZMP_PENDULUM_ODE_N> get_input_trajectory();
 
     void set_current_foot(double, double);
+    void update_current_foot();
     void set_previous_foot(double, double);
     void set_current_com(double, double, double, double);
     void set_com_height(double);

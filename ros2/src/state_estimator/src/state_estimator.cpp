@@ -12,7 +12,7 @@ StateEstimator::StateEstimator()
     , m_imu_estimator()
     , m_zmp_estimator()
     , m_footstep_estimator()
-    , m_current_stance_foot(0)
+    , m_current_stance_foot(-1)
 {
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
         "/upper_imu", 10, std::bind(&StateEstimator::upper_imu_callback, this, _1));
@@ -70,7 +70,9 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
 
-    m_stance_foot_publisher->publish(m_current_stance_foot);
+    std_msgs::msg::Int32 stance_foot_msg;
+    stance_foot_msg.data = m_current_stance_foot;
+    m_stance_foot_publisher->publish(stance_foot_msg);
 
     initialize_imus();
 }
@@ -158,8 +160,13 @@ void StateEstimator::update_foot_frames()
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
+<<<<<<< HEAD
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f", roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", 0.9*pitch);
+=======
+        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
+        // roll, pitch, yaw); m_joint_estimator.set_individual_joint_state("right_origin", pitch);
+>>>>>>> a94016c67786641f939995b96516d47abaa678db
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
@@ -252,7 +259,8 @@ void StateEstimator::publish_robot_frames()
 
     m_foot_pos_publisher->publish(foot_positions);
 
-    float feet_diff_threshold = 0.05; // if the difference in feet doesn't surpass this threshold, don't update the stance foot.
+    float feet_diff_threshold
+        = 0.05; // if the difference in feet doesn't surpass this threshold, don't update the stance foot.
     // Otherwise the current stance foot value is going to constantly update in double stance.
 
     // double stance
@@ -260,7 +268,8 @@ void StateEstimator::publish_robot_frames()
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
             m_current_stance_foot = m_current_stance_foot;
-        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
+        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
+            && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
         } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {

@@ -28,8 +28,8 @@ ZmpSolver::ZmpSolver()
     // set_current_zmp(0.0, 0.33);
     // set_current_foot(0.0, 0.33);
     // set_previous_foot(0.0, 0.0);
-    set_current_com(-0.2, 0.17, 0.0, 0.0);
-    set_current_zmp(-0.2, 0.17);
+    set_current_com(0.0, 0.17, 0.0, 0.0);
+    set_current_zmp(0.0, 0.17);
     set_current_foot(0.0, 0.0);
     set_previous_foot(0.0, 0.33);
     set_current_state();
@@ -94,18 +94,27 @@ void ZmpSolver::set_current_state()
     m_x_current[11] = 0;
 }
 
+int ZmpSolver::get_current_stance_foot()
+{
+    return m_current_stance_foot;
+}
+
 void ZmpSolver::set_current_foot(double x, double y)
 {
     m_pos_foot_current[0] = x;
     m_pos_foot_current[1] = y;
+}
 
+void ZmpSolver::update_current_foot()
+{
+    m_pos_foot_current[0] = m_x_trajectory[6];
+    m_pos_foot_current[1] = m_x_trajectory[8];
 }
 
 void ZmpSolver::set_previous_foot(double x, double y)
 {
     m_pos_foot_prev[0] = x;
     m_pos_foot_prev[1] = y;
-
 }
 
 void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
@@ -130,7 +139,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x;
+    m_com_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -144,7 +153,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x;
+    m_zmp_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
     m_zmp_current[1] = y;
 }
 
@@ -154,7 +163,7 @@ void ZmpSolver::initialize_mpc_params()
     m_admissible_region_x = 0.62;
     m_admissible_region_y = 0.10;
     m_foot_width_x = 0.1;
-    m_foot_width_y = 0.2;
+    m_foot_width_y = 0.3;
     m_step_size_x = 0.2;
     m_step_size_y = 0.33;
 
@@ -309,10 +318,11 @@ inline int ZmpSolver::solve_zmp_mpc(
     double dt = 0.0 + (m_time_horizon) / (N - 1);
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
     double count = m_current_stance_foot;
+
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
     // The step number
-    int step_number = 0; // the virtual step number for the MPC to predict a horizon 
+    int step_number = 0; // the virtual step number for the MPC to predict a horizon
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
@@ -330,13 +340,14 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // When a new step is set, take the next reference step from the footstep planner generated trajectory
 
-   if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
-       || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
-       step_counter++;
-       m_previous_stance_foot = m_current_stance_foot;
-   }
+    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
+        || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
+        step_counter++;
+        m_previous_stance_foot = m_current_stance_foot;
+    }
     printf("step_counter %i\n", step_counter);
-
+    printf("current stance foot is %i\n", m_current_stance_foot);
+    printf("current stance foot is %i\n", m_previous_stance_foot);
     // To decide what the timing value is depending on the current shooting node is
 
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
@@ -540,7 +551,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
-        // step_counter = 0;        
+        // step_counter = 0;
     }
 
     // here, we copy our array into the std::array
