@@ -9,6 +9,7 @@
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "march_shared_msgs/msg/gait_type.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
+#include "nav_msgs/msg/path.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "swing_leg_trajectory_generator/swing_leg_trajectory_generator.hpp"
@@ -28,11 +29,14 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_feet_subscriber;
 
+    rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_path_publisher;
+
     void subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg);
     void stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg);
     void final_feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg);
     void com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg);
 
+    void publish_path_visualization();
     SwingLegTrajectoryGenerator m_swing_leg_generator;
 };
 #endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_NODE_HPP

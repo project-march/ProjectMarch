@@ -53,6 +53,9 @@ void BufferNode::set_velocity(
             point_container.y = (it->y - point_prev.y) / (m_timestep * 1e-3);
             point_container.z = (it->z - point_prev.z) / (m_timestep * 1e-3);
             output_vector.push_back(point_container);
+            point_prev.x = it->x;
+            point_prev.y = it->y;
+            point_prev.z = it->z;
         }
 
         output_vector.push_back(point_container);
@@ -89,14 +92,21 @@ void BufferNode::publish_com_trajectory()
 void BufferNode::publish_swing_trajectory()
 {
     march_shared_msgs::msg::IkSolverCommand ik_command_to_send;
-
+    march_shared_msgs::msg::IkSolverCommand ik_mock_com;
     for (auto i : m_latest_swing_trajectory->poses) {
         ik_command_to_send.trajectory.push_back(i.position);
+        geometry_msgs::msg::Point p;
+        p.x = 0;
+        p.y = 0;
+        p.z = 0;
+        ik_mock_com.trajectory.push_back(p);
     }
 
     set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity);
+    set_velocity(ik_mock_com.trajectory, ik_mock_com.velocity);
 
     m_swing_trajectory_publisher->publish(ik_command_to_send);
+    m_com_trajectory_publisher->publish(ik_mock_com);
 
     // Reset all the pointers
     m_latest_swing_trajectory.reset();
