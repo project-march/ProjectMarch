@@ -5,10 +5,10 @@ using std::placeholders::_2;
 
 FootstepGenerator::FootstepGenerator()
     : Node("footstep_generator_node")
-    , m_steps(8)
-    , m_vx(1.0)
+    , m_steps(20) // Change this so we can interactively edit the amount of footsteps while Koengaiting
+    , m_vx(0.2)
     , m_vy(0.0)
-    , m_l(0.3)
+    , m_l(0.33)
 {
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
@@ -34,16 +34,18 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
     // Our frame is from the right foot, where y=0;
     // 1 is right leg
     // -1 is left leg
+    stance_leg = -1;
     double y = m_l / 2 - stance_leg * m_l / 2;
     // STAND = 1
     // WALK = 2
     // STEP_CLOSE = 3
+
     switch (gait_type) {
         case 1:
 
             for (int i = 0; i < 1; i++) {
                 x += 0;
-                y += m_vy * 1.0 - stance_leg * m_l;
+                y = -stance_leg * m_l;
                 stance_leg = -stance_leg;
 
                 footstep.position.x = x;
@@ -54,10 +56,25 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
             }
             break;
 
-        case 2:
-            for (int i = 0; i < m_steps; i++) {
+        case 2: // CHANGE SO THAT FULL FOOTSTEP PLAN GETS SENT, STARTING WITH THE CURRENT STANCE FOOTSTEP POINT
+            x = 0.0;
+            y = y;
+            footstep.position.x = x;
+            footstep.position.y = y;
+            footstep.position.z = 0;
+            footstep_array.poses.push_back(footstep);
+
+            x = 0.0;
+            y += m_vy * 1.0 + stance_leg * m_l;
+            footstep.position.x = x;
+            footstep.position.y = y;
+            footstep.position.z = 0;
+            footstep_array.poses.push_back(footstep);
+            stance_leg = -stance_leg;
+
+            for (int i = 2; i < m_steps; i++) {
                 x += m_vx * 1.0;
-                y += m_vy * 1.0 - stance_leg * m_l;
+                y += m_vy * 1.0 + stance_leg * m_l;
                 stance_leg = -stance_leg;
 
                 footstep.position.x = x;
@@ -65,6 +82,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
                 footstep.position.z = 0;
 
                 footstep_array.poses.push_back(footstep);
+                printf("stance_leg %i\n", stance_leg);
             }
             break;
 

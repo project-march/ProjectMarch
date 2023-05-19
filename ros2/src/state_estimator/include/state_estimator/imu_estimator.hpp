@@ -68,7 +68,12 @@ public:
         transform_tosend.header = data.header;
         transform_tosend.header.frame_id = "map";
         transform_tosend.child_frame_id = "lowerIMU";
-        transform_tosend.transform.rotation = data.orientation;
+
+        tf2::Quaternion tf2_imu_base_rotation;
+        tf2::fromMsg(imu_location.rotation, tf2_imu_base_rotation);
+        tf2::Quaternion tf2_imu_data_rotation;
+        tf2::fromMsg(data.orientation, tf2_imu_data_rotation);
+        tf2::convert((tf2_imu_base_rotation * tf2_imu_data_rotation).normalize(), transform_tosend.transform.rotation);
         // TODO: change this to relative IMU position on body
         transform_tosend.transform.translation.x = imu_location.translation.x;
         transform_tosend.transform.translation.y = imu_location.translation.y;

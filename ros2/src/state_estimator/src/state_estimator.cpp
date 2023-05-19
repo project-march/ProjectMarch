@@ -12,7 +12,7 @@ StateEstimator::StateEstimator()
     , m_imu_estimator()
     , m_zmp_estimator()
     , m_footstep_estimator()
-    , m_current_stance_foot(0)
+    , m_current_stance_foot(-1)
 {
     m_upper_imu_subscriber = this->create_subscription<sensor_msgs::msg::Imu>(
         "/upper_imu", 10, std::bind(&StateEstimator::upper_imu_callback, this, _1));
@@ -70,7 +70,9 @@ StateEstimator::StateEstimator()
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
 
-    m_stance_foot_publisher->publish(m_current_stance_foot);
+    std_msgs::msg::Int32 stance_foot_msg;
+    stance_foot_msg.data = m_current_stance_foot;
+    m_stance_foot_publisher->publish(stance_foot_msg);
 
     initialize_imus();
 }
@@ -146,7 +148,7 @@ void StateEstimator::update_foot_frames()
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
             = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
         geometry_msgs::msg::TransformStamped expected_hip_base_angle
-            = m_tf_buffer->lookupTransform("hip_base", "map", tf2::TimePointZero);
+            = m_tf_buffer->lookupTransform("hip_base", "right_origin", tf2::TimePointZero);
         //
         tf2::Quaternion tf2_measured_hip_base_angle;
         tf2::Quaternion tf2_expected_hip_base_angle;
@@ -154,16 +156,17 @@ void StateEstimator::update_foot_frames()
         tf2::fromMsg(expected_hip_base_angle.transform.rotation, tf2_expected_hip_base_angle);
         tf2_measured_hip_base_angle.normalize();
         tf2_expected_hip_base_angle.normalize();
-        tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle - tf2_expected_hip_base_angle;
+        tf2::Quaternion tf2_angle_difference = tf2_measured_hip_base_angle * tf2_expected_hip_base_angle.inverse();
         tf2_angle_difference.normalize();
         geometry_msgs::msg::Quaternion angle_difference;
         tf2::convert(tf2_angle_difference, angle_difference);
         // testing
-        tf2::Matrix3x3 m(tf2_angle_difference);
+        tf2::Matrix3x3 m(tf2_measured_hip_base_angle);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-        RCLCPP_DEBUG(this->get_logger(), "The difference in angle is %f, %f, %f", roll, pitch, yaw);
+        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
+        // roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
@@ -228,11 +231,21 @@ void StateEstimator::publish_robot_frames()
         m_zmp_estimator.set_com_states(m_com_estimator.get_com_state(), this->get_clock()->now());
         m_zmp_estimator.set_zmp();
         m_zmp_pos_publisher->publish(m_zmp_estimator.get_zmp());
+
+        // get ankle frames to determine where the footsteps are at
+        geometry_msgs::msg::TransformStamped left_ankle_frame
+            = m_tf_buffer->lookupTransform("map", "left_ankle", tf2::TimePointZero);
+        geometry_msgs::msg::TransformStamped right_ankle_frame
+            = m_tf_buffer->lookupTransform("map", "right_ankle", tf2::TimePointZero);
+
+        m_footstep_estimator.set_footstep_positions(
+            right_ankle_frame.transform.translation, left_ankle_frame.transform.translation);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "Error during publishing of Center of Pressure: %s", ex.what());
     }
 
     // Update the feet
+
     m_footstep_estimator.update_feet(m_cop_estimator.get_sensors());
     // Publish the feet
     // The first foot is always the right foot
@@ -241,12 +254,23 @@ void StateEstimator::publish_robot_frames()
     foot_positions.header.frame_id = "map";
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
+    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y
+    // %f",foot_positions.poses[0].position.y); RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot
+    // position y %f",foot_positions.poses[1].position.y);
+
     m_foot_pos_publisher->publish(foot_positions);
+
+    float feet_diff_threshold
+        = 0.05; // if the difference in feet doesn't surpass this threshold, don't update the stance foot.
+    // Otherwise the current stance foot value is going to constantly update in double stance.
 
     // double stance
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
-        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
+        if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
+            m_current_stance_foot = m_current_stance_foot;
+        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
+            && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
         } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {

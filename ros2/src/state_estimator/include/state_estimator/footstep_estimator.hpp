@@ -53,6 +53,8 @@ public:
     bool get_foot_on_ground(const char*);
     void set_threshold(double);
     Foot* get_foot(const char*);
+    void set_footstep_positions(geometry_msgs::msg::Vector3 right_foot_vec, geometry_msgs::msg::Vector3 left_foot_vec);
+
     // IMU& get_imu();
 
 private:

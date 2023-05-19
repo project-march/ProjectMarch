@@ -386,7 +386,7 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     if (new_time_steps) {
         ZMP_pendulum_ode_acados_update_time_steps(capsule, N, new_time_steps);
     } else { // all time_steps are identical
-        double time_step = 0.007984031936127744;
+        double time_step = 0.00796812749003984;
         for (int i = 0; i < N; i++) {
             ocp_nlp_in_set(nlp_config, nlp_dims, nlp_in, i, "Ts", &time_step);
             ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "scaling", &time_step);
@@ -435,16 +435,12 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     double* lbx0 = lubx0;
     double* ubx0 = lubx0 + NBX0;
     // change only the non-zero elements:
-    lbx0[3] = 0.03;
-    ubx0[3] = 0.03;
-    lbx0[4] = -0.06;
-    ubx0[4] = -0.06;
-    lbx0[5] = 0.08;
-    ubx0[5] = 0.08;
-    lbx0[8] = 0.1;
-    ubx0[8] = 0.1;
-    lbx0[9] = 0.1;
-    ubx0[9] = 0.1;
+    lbx0[3] = 0.33;
+    ubx0[3] = 0.33;
+    lbx0[5] = 0.33;
+    ubx0[5] = 0.33;
+    lbx0[8] = 0.33;
+    ubx0[8] = 0.33;
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "idxbx", idxbx0);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", lbx0);
@@ -478,13 +474,13 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
 
     lh[0] = -0.31;
     lh[1] = -0.01;
-    lh[2] = -0.05;
-    lh[3] = -0.06;
+    lh[2] = -0.025;
+    lh[3] = -0.04;
 
     uh[0] = 0.31;
     uh[1] = 0.01;
-    uh[2] = 0.05;
-    uh[3] = 0.06;
+    uh[2] = 0.025;
+    uh[3] = 0.04;
 
     for (int i = 0; i < N; i++) {
         // nonlinear constraints for stages 0 to N-1
@@ -504,11 +500,11 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     double* lh_e = luh_e;
     double* uh_e = luh_e + NHN;
 
-    lh_e[0] = -0.1;
-    lh_e[1] = -0.1;
+    lh_e[0] = -0.01;
+    lh_e[1] = -0.01;
 
-    uh_e[0] = 0.1;
-    uh_e[1] = 0.1;
+    uh_e[0] = 0.01;
+    uh_e[1] = 0.01;
 
     ocp_nlp_constraints_model_set(
         nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun_jac", &capsule->nl_constr_h_e_fun_jac);
@@ -634,11 +630,9 @@ void ZMP_pendulum_ode_acados_create_7_set_nlp_out(ZMP_pendulum_ode_solver_capsul
 
     // initialize with x0
 
-    x0[3] = 0.03;
-    x0[4] = -0.06;
-    x0[5] = 0.08;
-    x0[8] = 0.1;
-    x0[9] = 0.1;
+    x0[3] = 0.33;
+    x0[5] = 0.33;
+    x0[8] = 0.33;
 
     double* u0 = xu0 + NX;
 
