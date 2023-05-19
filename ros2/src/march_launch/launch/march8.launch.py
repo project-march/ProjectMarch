@@ -118,6 +118,11 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         Node(
+            package='bezier_visualization',
+            executable='bezier_visualization_node',
+            name='bezier_visualization',
+        ),
+        Node(
             package='footstep_generator',
             namespace='',
             executable='footstep_generator_node',
