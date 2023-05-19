@@ -80,8 +80,8 @@ void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 
 void SolverNode::timer_callback()
 {
-    if (!(desired_footsteps)){
-    RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input from footstep planner");
+    if (!(desired_footsteps)) {
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input from footstep planner");
     } else {
         m_zmp_solver.update_current_foot();
         m_zmp_solver.set_current_state();
@@ -141,7 +141,8 @@ void SolverNode::timer_callback()
             zmp_path_wrapper.pose = pose_container;
             zmp_path.poses.push_back(zmp_path_wrapper);
             // std::cout << "Pose Stamped:" << std::endl;
-            // std::cout << "Position: x=" << com_path_wrapper.pose.position.x << ", y=" << com_path_wrapper.pose.position.y
+            // std::cout << "Position: x=" << com_path_wrapper.pose.position.x << ", y=" <<
+            // com_path_wrapper.pose.position.y
             // << ", z=" << com_path_wrapper.pose.position.z << std::endl;
 
             // The feet
@@ -206,9 +207,7 @@ void SolverNode::timer_callback()
         m_com_trajectory_publisher->publish(com_msg);
         m_final_feet_publisher->publish(foot_msg);
         m_zmp_solver.update_current_shooting_node();
-
     }
-    
 }
 
 // void SolverNode::visualize_trajectory()
