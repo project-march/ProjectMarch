@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from trajectory_msgs.msg import JointTrajectory
+from std_msgs.msg import Bool
 from march_shared_msgs.srv import RequestGait
 
 from gait_selection.gait_loader import GaitLoader
@@ -21,7 +22,13 @@ class GaitSelectionNode(Node):
         self.directory_name = "airgait_vi"
         self.gait_loader = GaitLoader(self)
         self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
+        self.reset_publisher = self.create_publisher(Bool, "/mujoco_reset_trajectory", 10)
+        self.actual_joint_state = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.joint_names = [
+            "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
+            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
+        self.get_logger().info(str(self.gait_loader.loaded_gaits))
         self.service = self.create_service(RequestGait, "gait_selection", self.service_callback)
 
     def service_callback(self, request, response):
@@ -30,13 +37,19 @@ class GaitSelectionNode(Node):
         gait = None
         if requested_gait == 0:
             self.get_logger().warn("sit gait called!")
-            gait = self.gait_loader.loaded_gaits.get("stand")
+            gait = self.gait_loader.loaded_gaits.get("home_sit")
         elif requested_gait == 1:
             self.get_logger().warn("stand gait called!")
-            gait = self.gait_loader.loaded_gaits["sit"]
+            gait = self.gait_loader.loaded_gaits["home_stand"]
         msg = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
-        self.get_logger().debug(str(msg))
+        self.get_logger().info(str(msg))
         self.publisher_.publish(msg)
+
+        # Used to make sure the sim plans the gaits in time.
+        reset_msg = Bool()
+        reset_msg.data = True
+        self.reset_publisher.publish(reset_msg)
+
         response.status = True
         return response
 

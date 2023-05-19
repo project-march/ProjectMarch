@@ -6,8 +6,10 @@ import yaml
 from typing import List, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
+
 from gait_selection.setpoints_gait import SetpointsGait
-from march_utility.gait.edge_position import StaticEdgePosition, EdgePosition
+from gait_selection.home_gait import HomeGait
+from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
 
 
 class GaitLoader:
@@ -31,13 +33,20 @@ class GaitLoader:
         """Init the gait loader for the gait_selection."""
         self._node = node
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._actuating_joint_names = []
+        self._actuating_joint_names = [
+            "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
+            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
         self.loaded_gaits = {}
         self._named_positions = {}
+        self.gait_positions = {}
+
+        self.gait_duration = 3.0
+        self.num_trajectory_points = 4
+
         self._load_gaits()
 
     @property
@@ -58,6 +67,7 @@ class GaitLoader:
     def _load_gaits(self) -> None:
         """Load all gaits."""
         self._load_named_positions()
+        self._load_home_gaits()
         self._load_sit_and_stand_gaits()
 
     def _load_named_positions(self) -> None:
@@ -66,11 +76,13 @@ class GaitLoader:
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         self._gait_version_map = default_config["gaits"]
+        self._node.get_logger().info("gait version map is: " + str(self._gait_version_map))
 
         for position_name, position_values in default_config["positions"].items():
             edge_position = StaticEdgePosition(
                 [position_values["joints"][joint_name] for joint_name in self._actuating_joint_names]
             )
+            self.gait_positions[position_name] = edge_position
             if edge_position not in self._named_positions:
                 self._named_positions[edge_position] = position_name
             else:
@@ -80,9 +92,19 @@ class GaitLoader:
                     f"Each named position should be unique."
                 )
 
+    def _load_home_gaits(self) -> None:
+        """Create the home gaits based on the named positions."""
+        for position in self._named_positions:
+            if isinstance(position, UnknownEdgePosition):
+                continue
+            name = self._named_positions[position]
+            home_gait = HomeGait(name, position, "")
+            self.gaits[home_gait.name] = home_gait
+
     def _load_sit_and_stand_gaits(self) -> None:
         """Loads the sit and stand gaits."""
         for gait in self._gait_version_map:
+            self._node.get_logger().info("gait is: " + str(gait))
             self.loaded_gaits[gait] = SetpointsGait.from_file(
                 gait, self._gait_directory, self._gait_version_map
             )

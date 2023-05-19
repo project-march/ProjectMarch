@@ -1,4 +1,4 @@
-"""Author: ???."""
+"""Author: Marco Bak MVIII."""
 
 from typing import Optional, Dict
 from urdf_parser_py.urdf import Robot
@@ -128,9 +128,9 @@ class SetpointsGait(GaitInterface, Gait):
     DEFAULT_FIRST_SUBGAIT_START_DELAY = Duration(0)
 
     def start(
-        self,
-        current_time: Time,
-        first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_START_DELAY,
+            self,
+            current_time: Time,
+            first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_START_DELAY,
     ) -> GaitUpdate:
         """Start the gait.
 
@@ -161,9 +161,9 @@ class SetpointsGait(GaitInterface, Gait):
     DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION = Duration(0)
 
     def update(
-        self,
-        current_time: Time,
-        early_schedule_duration: Optional[Duration] = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
+            self,
+            current_time: Time,
+            early_schedule_duration: Optional[Duration] = DEFAULT_EARLY_SCHEDULE_UPDATE_DURATION,
     ) -> GaitUpdate:
         """Give an update on the progress of the gait.
 
@@ -196,9 +196,9 @@ class SetpointsGait(GaitInterface, Gait):
             return self._update_next_subgait()
 
         if (
-            early_schedule_duration > Duration(0)
-            and not self._scheduled_early
-            and self._current_time >= self._end_time - early_schedule_duration
+                early_schedule_duration > Duration(0)
+                and not self._scheduled_early
+                and self._current_time >= self._end_time - early_schedule_duration
         ):
             return self._update_next_subgait_early()
         return GaitUpdate.empty()
@@ -386,9 +386,9 @@ class SetpointsGait(GaitInterface, Gait):
     DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY = Duration(0)
 
     def _update_time_stamps(
-        self,
-        next_subgait: Subgait,
-        first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY,
+            self,
+            next_subgait: Subgait,
+            first_subgait_delay: Optional[Duration] = DEFAULT_FIRST_SUBGAIT_UPDATE_TIMESTAMPS_DELAY,
     ) -> None:
         """Update the starting and end time.
 

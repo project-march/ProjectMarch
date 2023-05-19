@@ -97,6 +97,7 @@ class TrajectoryScheduler:
         self._action_client_to_controller = ActionClient(
             self._node, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
         )
+        self.pub = self._node.create_publisher(JointTrajectory, "test_traj", 10)
 
     def schedule(self, command: TrajectoryCommand) -> None:
         """Sends a trajectory to the controller.
@@ -116,6 +117,7 @@ class TrajectoryScheduler:
             self._logger.warn(f"Failed to schedule trajectory {command} within {SCHEDULE_TIMEOUT} seconds")
             return
 
+        self._logger.warn(str(goal_msg.trajectory))
         goal_future: Future = self._action_client_to_controller.send_goal_async(goal_msg)
         goal_future.add_done_callback(self._controller_starts_trajectory_cb)
         self._messages_in_transit.add(goal_future)
