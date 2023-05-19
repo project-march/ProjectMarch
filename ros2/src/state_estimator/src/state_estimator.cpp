@@ -160,7 +160,6 @@ void StateEstimator::update_foot_frames()
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
         // roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
