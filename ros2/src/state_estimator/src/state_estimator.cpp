@@ -160,13 +160,9 @@ void StateEstimator::update_foot_frames()
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-<<<<<<< HEAD
-        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-        m_joint_estimator.set_individual_joint_state("right_origin", 0.9*pitch);
-=======
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
-        // roll, pitch, yaw); m_joint_estimator.set_individual_joint_state("right_origin", pitch);
->>>>>>> a94016c67786641f939995b96516d47abaa678db
+        // roll, pitch, yaw);
+        m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
