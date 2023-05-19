@@ -154,12 +154,12 @@ void StateEstimator::update_foot_frames()
         geometry_msgs::msg::Quaternion angle_difference;
         tf2::convert(tf2_angle_difference, angle_difference);
         // testing
-        tf2::Matrix3x3 m(tf2_angle_difference);
+        tf2::Matrix3x3 m(tf2_measured_hip_base_angle);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f", roll, pitch, yaw);
-        // m_joint_estimator.set_individual_joint_state("right_origin", pitch);
+        m_joint_estimator.set_individual_joint_state("right_origin", 0.9*pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
