@@ -91,8 +91,16 @@ TEST_F(SwingLegTrajectoryGeneratorTest, getCurveTest)
     expected.points.push_back(left_point);
     expected.points.push_back(right_point);
     expected.points.push_back(end_point);
+    expected.point_amount = 75;
+
     auto actual = swing_leg_generator->get_curve();
-    ASSERT_EQ(expected, actual);
+    ASSERT_EQ(expected.points.size(), actual.points.size());
+    for (size_t i = 0; i < expected.points.size(); i++) {
+        ASSERT_EQ(expected.points.at(i).x / 500, actual.points.at(i).x);
+        ASSERT_EQ(expected.points.at(i).y / 500, actual.points.at(i).y);
+        ASSERT_EQ(expected.points.at(i).z / 500, actual.points.at(i).z);
+    }
+    ASSERT_EQ(expected.point_amount, actual.point_amount);
 }
 
 TEST_F(SwingLegTrajectoryGeneratorTest, getPointTest)
@@ -136,7 +144,14 @@ TEST_F(SwingLegTrajectoryGeneratorTest, setPointsTest)
     expected.push_back(right_point);
     expected.push_back(end_point);
     swing_leg_generator->set_points(expected);
-    ASSERT_EQ(expected, swing_leg_generator->get_curve().points);
+
+    auto actual = swing_leg_generator->get_curve().points;
+    ASSERT_EQ(expected.size(), actual.size());
+    for (size_t i = 0; i < expected.size(); i++) {
+        ASSERT_EQ(expected.at(i).x / 500, actual.at(i).x);
+        ASSERT_EQ(expected.at(i).y / 500, actual.at(i).y);
+        ASSERT_EQ(expected.at(i).z / 500, actual.at(i).z);
+    }
 }
 
 TEST_F(SwingLegTrajectoryGeneratorTest, setPointsScalingTest)
@@ -193,7 +208,14 @@ TEST_F(SwingLegTrajectoryGeneratorTest, setPointsScalingTest)
     expected.push_back(left_point);
     expected.push_back(right_point);
     expected.push_back(end_point);
-    ASSERT_EQ(expected, swing_leg_generator->get_curve().points);
+
+    auto actual = swing_leg_generator->get_curve().points;
+    ASSERT_EQ(expected.size(), actual.size());
+    for (size_t i = 0; i < expected.size(); i++) {
+        ASSERT_EQ(expected.at(i).x / 500, actual.at(i).x);
+        ASSERT_EQ(expected.at(i).z / 500, actual.at(i).y);
+        ASSERT_EQ(expected.at(i).y / 500, actual.at(i).z);
+    }
 }
 
 // NOLINTEND

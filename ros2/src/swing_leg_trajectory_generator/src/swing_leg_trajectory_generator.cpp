@@ -104,7 +104,7 @@ double SwingLegTrajectoryGenerator::get_step_length()
 
 void SwingLegTrajectoryGenerator::set_points(std::vector<Point> points)
 {
-    for (auto& point : points){
+    for (auto& point : points) {
         std::swap(point.y, point.z);
     }
     update_points(points, m_step_length);
