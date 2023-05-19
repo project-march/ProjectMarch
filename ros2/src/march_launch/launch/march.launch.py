@@ -76,7 +76,7 @@ def generate_launch_description() -> LaunchDescription:
     to_world_transform = LaunchConfiguration("to_world_transform")
     gazebo = LaunchConfiguration("gazebo")
     mujoco = LaunchConfiguration("mujoco")
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march_v1.xml')
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation_arguments = [
         DeclareLaunchArgument(
@@ -103,7 +103,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="model_to_load_mujoco",
-            default_value="march_v1.xml",
+            default_value="march8_v0.xml",
             description="What model mujoco should load",
         ),
     ]

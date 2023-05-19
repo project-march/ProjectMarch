@@ -13,8 +13,14 @@ void ZmpEstimator::set_zmp()
     // calculate the actual zmp
     double g = 9.81;
     m_position.header.frame_id = "map";
-    m_position.point.x = m_com_history[0].x - linear_acceleration_com.getX() / g * linear_acceleration_com.getZ();
-    m_position.point.y = m_com_history[0].y - linear_acceleration_com.getY() / g * linear_acceleration_com.getZ();
+    //    m_position.point.x = m_com_history[0].x - (m_com_history[0].z / g) * -linear_acceleration_com.getX();
+    //    m_position.point.y = m_com_history[0].y - (m_com_history[0].z / g) * -linear_acceleration_com.getY();
+    //    m_position.point.z = 0.0;
+
+    m_position.point.x
+        = m_com_history[0].x - (m_com_velocity_history[0].x / std::sqrt(g / m_com_history[0].z)) * -m_com_history[0].y;
+    m_position.point.y
+        = m_com_history[0].y - (m_com_velocity_history[0].y / std::sqrt(g / m_com_history[0].z)) * -m_com_history[0].z;
     m_position.point.z = 0.0;
 
     // set_time(current_time);

@@ -34,6 +34,7 @@ class MujocoVisualizer:
         # Manually adjust the base camera distance to make the entire model visible
         self.cam.distance = 6.0
         self.cam.azimuth = 90.0
+        self.cam.trackbodyid = 1
 
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)

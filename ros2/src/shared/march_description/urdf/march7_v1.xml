@@ -13,13 +13,11 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
 GNU General Public License for more details. 
 
-See <https://www.gnu.org/licenses/>. 
-
-This XML was compiled by xml_generator.py at 07/03/2023 16:01:25 
-using march_v1_pre.xml and march_v1.yaml. -->
+See <https://www.gnu.org/licenses/>.
+-->
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="meshes" angle="degree" autolimits="true"/>
+  <compiler meshdir="obj-files/march7" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
   <!-- Degree of Freedom: 27
@@ -40,10 +38,10 @@ using march_v1_pre.xml and march_v1.yaml. -->
     <mesh name="L_hip"       file="HipLeft.obj"/>
     <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
     <mesh name="L_shin"      file="LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="m7/FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="m7/HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="m7/UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="m7/LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
   </asset>
 
   <default>
@@ -68,14 +66,17 @@ using march_v1_pre.xml and march_v1.yaml. -->
     </default>
     <default class="HAA_joint">
       <joint damping="107.692308"
+              armature="5.4"
              frictionloss="0" stiffness="0"/>
     </default>
     <default class="ADPF_joint">
       <joint damping="43.658537"
+              armature="2.2"
              frictionloss="0" stiffness="0"/>
     </default>
     <default class="rotational_joint">
       <joint damping="63.451777"
+              armature="9.98"
              frictionloss="0" stiffness="0"/>
     </default>
   </default>
@@ -93,7 +94,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
     <body name="backpack"
-          pos="0.0 0.0 1.1"
+          pos="0.0 0.0 0.933"
           childclass="exoskeleton">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -101,8 +102,8 @@ using march_v1_pre.xml and march_v1.yaml. -->
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
       <inertial pos="-0.02 0 0.16" mass="6.3"
                 fullinertia="0.121 0.06 0.077 0 -0.001 0.001"/>
-      <!-- <freejoint/> -->
-      <geom type="mesh" mesh="backpack" euler="0 0 180"/>
+      <freejoint/>
+      <geom type="mesh" mesh="backpack" euler="0 0 0"/>
       <geom name="backpack" type="box"
             size="0.051 0.189 0.165"
             pos="-0.02 0 0.13" class="collision"/>
@@ -114,7 +115,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
         <inertial pos="0.04 0.13 0" mass="2.2"
                   fullinertia="0.011 0.013 0.021 -0.007 0 0"/>
         <joint name="L_HAA" axis="-1 0 0" range="-10 5" class="HAA_joint"/>
-        <geom type="mesh" mesh="L_hip" euler="0 0 180"/>
+        <geom type="mesh" mesh="L_hip" euler="0 0 0"/>
         <geom name="L_hip" fromto="0 0 0 0.196 0.185 0"
               size="0.032" class="L_collision"/>
         <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
@@ -123,7 +124,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
         <inertial pos="0 -0.01 -0.2" mass="10.1"
                   fullinertia="0.307 0.312 0.02 0 -0.002 -0.029"/>
           <joint name="L_HFE" axis="0 -1 0" range="-12 115" class="rotational_joint"/>
-          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" euler="0 0 180"/>
+          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" euler="0 0 0"/>
           <geom name="L_UL" fromto="0 0 0 0 -0.044 -0.415"
               size="0.069" class="L_collision"/>
           <geom name="L_pilot_thigh" fromto="0 -.166 -.05 0 -.149 -.423" size=".069" class="ballast"/>
@@ -133,7 +134,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
             <inertial pos="-0.02 0 -0.21" mass="2.6"
                   fullinertia="0.035 0.039 0.006 -0.001 -0.002 -0.001"/>
             <joint name="L_KFE" axis="0 1 0" range="-1 112" class="rotational_joint"/>
-            <geom type="mesh" mesh="L_shin" pos="0 -.026 0" euler="0 0 180"/>
+            <geom type="mesh" mesh="L_shin" pos="0 -.026 0" euler="0 0 0"/>
             <geom name="L_LL" fromto="0 0 0 0 -0.018 -0.401"
               size="0.047" class="L_collision"/>
             <geom name="L_pilot_shin" fromto="0 -.116 0 0 -.124 -.399"  size=".047" class="ballast"/>
@@ -143,7 +144,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
               <inertial pos="0.03 -0.05 -0.08" mass="1.5"
                   fullinertia="0.006 0.012 0.01 0.001 0.002 -0.002"/>
               <joint name="L_ADPF" axis="0 -1 0" range="-25 1" class="ADPF_joint"/>
-              <geom type="mesh" mesh="L_foot" pos="0 -.019 0" euler="0 0 180"/>
+              <geom type="mesh" mesh="L_foot" pos="0 -.019 0" euler="0 0 0"/>
               <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
@@ -202,7 +203,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
         <inertial pos="0.04 -0.13 0" mass="2.2"
                   fullinertia="0.011 0.013 0.021 0.007 0 -0"/>
         <joint name="R_HAA" axis="1 0 0" range="-10 5" class="HAA_joint"/>
-        <geom type="mesh" mesh="R_hip" euler="0 0 180"/>
+        <geom type="mesh" mesh="R_hip" euler="0 0 0"/>
         <geom name="R_hip" fromto="0 -0 0 0.196 -0.185 0"
               size="0.032" class="R_collision"/>
         <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
@@ -211,7 +212,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
           <inertial pos="0 0.01 -0.2" mass="10.1"
                   fullinertia="0.307 0.312 0.02 -0 -0.002 0.029"/>
           <joint name="R_HFE" axis="0 -1 0" range="-12 115" class="rotational_joint"/>
-          <geom type="mesh" mesh="R_thigh" pos="0 -.013 0" euler="0 0 180"/>
+          <geom type="mesh" mesh="R_thigh" pos="0 -.013 0" euler="0 0 0"/>
           <geom name="R_UL" fromto="0 -0 0 0 0.044 -0.415"
               size="0.069" class="R_collision"/>
           <geom name="R_pilot_thigh" fromto="0 .166 -.05 0 .149 -.423" size=".069" class="ballast"/>
@@ -221,7 +222,7 @@ using march_v1_pre.xml and march_v1.yaml. -->
             <inertial pos="-0.02 -0 -0.21" mass="2.6"
                   fullinertia="0.035 0.039 0.006 0.001 -0.002 0.001"/>
             <joint name="R_KFE" axis="0 1 0" range="-1 112" class="rotational_joint"/>
-            <geom type="mesh" mesh="R_shin" pos="0 .026 0" euler="0 0 180"/>
+            <geom type="mesh" mesh="R_shin" pos="0 .026 0" euler="0 0 0"/>
             <geom name="R_LL" fromto="0 -0 0 0 0.018 -0.401"
               size="0.047" class="R_collision"/>
             <geom name="R_pilot_shin" fromto="0 .116 0 0 .124 -.399"  size=".047" class="ballast"/>
@@ -230,8 +231,8 @@ using march_v1_pre.xml and march_v1.yaml. -->
             <body name="R_foot" pos="-0.005 -0.01 -0.403">
               <inertial pos="0.03 0.05 -0.08" mass="1.5"
                   fullinertia="0.006 0.012 0.01 -0.001 0.002 0.002"/>
-              <joint name="R_ADPF" axis="0 -1 0" range="-25 1" class="ADPF_joint"/>
-              <geom type="mesh" mesh="R_foot" pos="0 .019 0" euler="0 0 180"/>
+              <joint name="R_ADPF" axis="0 -1 0" range="-1 25" class="ADPF_joint"/>
+              <geom type="mesh" mesh="R_foot" pos="0 .019 0" euler="0 0 0"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->

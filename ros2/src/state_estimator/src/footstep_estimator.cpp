@@ -3,7 +3,13 @@
 FootstepEstimator::FootstepEstimator()
 {
     foot_left.position.header.frame_id = "left_ankle";
+    foot_left.position.point.x = 0.0;
+    foot_left.position.point.y = 0.0;
+    foot_left.position.point.z = 0.0;
     foot_right.position.header.frame_id = "right_ankle";
+    foot_right.position.point.x = 0.0;
+    foot_right.position.point.y = 0.0;
+    foot_right.position.point.z = 0.0;
 }
 
 geometry_msgs::msg::Pose FootstepEstimator::get_foot_position(const char* prefix)
@@ -52,6 +58,7 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
             return foot_right.on_ground;
             break;
         default:
+            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
             return 0;
     }
 }
@@ -67,14 +74,15 @@ Foot* FootstepEstimator::get_foot(const char* prefix)
             return &foot_right;
             break;
         default:
+            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0.");
             return 0;
     }
 }
 
-void FootstepEstimator::update_feet(const std::vector<PressureSensor> sensors)
+void FootstepEstimator::update_feet(const std::vector<PressureSensor*>* sensors)
 {
-    foot_left.set_on_ground(sensors, "l");
     foot_right.set_on_ground(sensors, "r");
+    foot_left.set_on_ground(sensors, "l");
 }
 
 void FootstepEstimator::set_threshold(double threshold)

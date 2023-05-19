@@ -35,15 +35,15 @@ using march_v1_pre.xml and march_v1.yaml. -->
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="Backpack.obj"/>
-    <mesh name="L_foot"      file="FootLeft.obj"/>
-    <mesh name="L_hip"       file="HipLeft.obj"/>
-    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
+    <mesh name="backpack"    file="m7/Backpack.obj"/>
+    <mesh name="L_foot"      file="m7/FootLeft.obj"/>
+    <mesh name="L_hip"       file="m7/HipLeft.obj"/>
+    <mesh name="L_thigh"     file="m7/UpperLegLeft.obj"/>
+    <mesh name="L_shin"      file="m7/LowerLegLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="m7/FootLeft.obj"/>
+    <mesh name="R_hip"      scale="1 -1 1"    file="m7/HipLeft.obj"/>
+    <mesh name="R_thigh"    scale="1 -1 1"    file="m7/UpperLegLeft.obj"/>
+    <mesh name="R_shin"     scale="1 -1 1"    file="m7/LowerLegLeft.obj"/>
   </asset>
 
   <default>
