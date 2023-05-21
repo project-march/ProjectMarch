@@ -1,19 +1,24 @@
 testsetup:
-  if_name: enp0s31f6
+  if_name: enp2s0
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
     - rotational_joint:
         motor_controller:
           type: odrive
-          actuationMode: torque
+          actuationMode: position
           slaveIndex: 1
-          axis: 1
+          axis: 0
           motorKV: 95
           absoluteEncoder:
             resolution: 20
-            minPositionIU: 294481
-            maxPositionIU: 565958
+            minPositionIU: 280771
+            maxPositionIU: 558064
+            zeroPositionIU: 307877
+            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
             direction: 1
           incrementalEncoder:
             resolution: 12

@@ -29,6 +29,7 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEnco
     , index_found_(index_found)
     , torque_constant_(KV_TO_TORQUE_CONSTANT / (float)motor_kv)
 {
+    this->is_incremental_encoder_more_precise_ = true;
 }
 
 std::chrono::nanoseconds ODrive::reset()
@@ -55,7 +56,7 @@ void ODrive::enableActuation()
 
     // TODO: Check if this is needed.
     // Reset target torque
-    //    actuateTorque(/*target_effort=*/0.0);
+//    actuateTorque(/*target_effort=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -172,6 +173,11 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     return state;
 }
+
+//float ODrive::getTorque()
+//{
+//    return getMotorCurrent() * torque_constant_;
+//}
 
 float ODrive::getMotorTemperature()
 {

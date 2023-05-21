@@ -155,7 +155,8 @@ void Joint::readEncoders()
          *  If the absolute encoder of the joint is more precise, then we should
          * use that value This would give us a new joint position of 0.25
          */
-        if (motor_controller_->isIncrementalEncoderMorePrecise()) {
+        if (name_ != "left_hip_aa" && name_ != "right_hip_aa" && name_ != "left_ankle" && name_ != "right_ankle" && motor_controller_->isIncrementalEncoderMorePrecise()) {
+        // if (motor_controller_->isIncrementalEncoderMorePrecise()) {
             double new_incremental_position = motor_controller_->getIncrementalPosition();
             position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
         } else {

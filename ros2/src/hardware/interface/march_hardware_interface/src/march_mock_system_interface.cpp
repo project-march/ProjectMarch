@@ -24,6 +24,7 @@
 #include "march_hardware_interface/hwi_util.h"
 #include "march_hardware_interface/march_mock_system_interface.hpp"
 #include "march_utility/logger_colors.hpp"
+#include <csignal>
 
 namespace march_hardware_interface {
 
