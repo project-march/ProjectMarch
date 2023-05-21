@@ -14,7 +14,7 @@
       },
       {
          "name": "direct-torque",
-         "callback": "direct-torque",
+         "callback": "publish_direct_torque",
          "control_type": "torque"
       },
       {
