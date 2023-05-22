@@ -27,7 +27,6 @@ See <https://www.gnu.org/licenses/>.
              rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>
     <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
-    <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
     <mesh name="backpack"    file="Backpack.obj"/>
     <mesh name="L_foot"      file="FootLeft.obj"/>
@@ -56,9 +55,6 @@ See <https://www.gnu.org/licenses/>.
       <default class="R_collision">
         <geom contype="4" conaffinity="2"/>
       </default>
-    </default>
-    <default class="ballast">
-      <geom contype="0" material="mujoco_orange" conaffinity="0" group="2" type="capsule" density="985"/>
     </default>
     <default class="HAA_joint">
       <joint damping="107.692308"
@@ -96,20 +92,20 @@ See <https://www.gnu.org/licenses/>.
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
       <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
-      <inertial pos="0.013 0.001 0.24" mass="11.02"
-                fullinertia="0.379 0.245 0.173 0 -0.008 0.001"/>
+      <inertial pos="0.171 -0.006 0.342" mass="57.096"
+                fullinertia="2.931 2.492 1.522 0.023 -0.1 0.025"/>
       <freejoint/>
       <geom type="mesh" mesh="backpack" />
       <geom name="backpack" type="box"
             size="0.051 0.189 0.165"
             pos="-0.02 0 0.13" class="collision"/>
-      <geom name="pilot_torso" fromto=".147 0 .056 .190 0 .500" size=".161" class="ballast"/>
-        <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
+
+    <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
       <!--  LEFT LEG -->
       <body name="L_hip" pos="-0.021 0.08 0.025">
-        <inertial pos="0.065 0.112 0" mass="1.277"
-                  fullinertia="0.006 0.006 0.011 -0.004 0 0"/>
+        <inertial pos="0.05 0.109 0.033" mass="1.849"
+                  fullinertia="0.012 0.013 0.012 -0.004 0.002 0"/>
         <joint name="L_HAA" axis="-1 0 0" range="-15 10" class="HAA_joint"/>
         <geom type="mesh" mesh="L_hip" />
         <geom name="L_hip" fromto="0 0 0 0.182 0.182 0"
@@ -117,28 +113,26 @@ See <https://www.gnu.org/licenses/>.
         <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
 
         <body name="L_UL" pos="0.182 0.182 0">
-        <inertial pos="0 -0.034 -0.206" mass="8.566"
-                  fullinertia="0.259 0.256 0.023 -0.001 0 -0.036"/>
+        <inertial pos="0.012 -0.098 -0.151" mass="26.104"
+                  fullinertia="0.859 0.733 0.23 0.021 -0.025 0.055"/>
           <joint name="L_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
           <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
           <geom name="L_UL" fromto="0 0 0 0 -0.06 -0.413"
               size="0.069" class="L_collision"/>
-          <geom name="L_pilot_thigh" fromto="0 -.166 -.05 0 -.149 -.423" size=".069" class="ballast"/>
           <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
 
           <body name="L_LL" pos="0 -0.06 -0.413">
-            <inertial pos="-0.034 -0.04 -0.223" mass="4.159"
-                  fullinertia="0.055 0.064 0.019 0.001 -0.006 -0.002"/>
+            <inertial pos="-0.021 -0.079 -0.157" mass="7.061"
+                  fullinertia="0.12 0.117 0.034 0.003 -0.008 0.012"/>
             <joint name="L_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
             <geom type="mesh" mesh="L_shin"/>
             <geom name="L_LL" fromto="0 0 0 0.0 -0.037 -0.414"
               size="0.047" class="L_collision"/>
-            <geom name="L_pilot_shin" fromto="0 -.116 0 0 -.124 -.399"  size=".047" class="ballast"/>
             <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
 
             <body name="L_foot" pos="0.0 -0.037 -0.414">
-              <inertial pos="0.033 -0.041 -0.08" mass="1.22"
-                  fullinertia="0.006 0.01 0.008 0.001 0.002 -0.002"/>
+              <inertial pos="0.007 -0.054 -0.035" mass="2.964"
+                  fullinertia="0.023 0.031 0.019 0.004 0.011 -0.004"/>
               <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
               <geom type="mesh" mesh="L_foot"/>
               <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
@@ -196,8 +190,8 @@ See <https://www.gnu.org/licenses/>.
 
       <!--  RIGHT LEG -->
       <body name="R_hip" pos="-0.021 -0.08 0.025">
-        <inertial pos="0.065 -0.112 0" mass="1.277"
-                  fullinertia="0.006 0.006 0.011 0.004 0 -0"/>
+        <inertial pos="0.05 -0.109 0.033" mass="1.849"
+                  fullinertia="0.012 0.013 0.012 0.004 0.002 -0"/>
         <joint name="R_HAA" axis="1 0 0" range="-15 10" class="HAA_joint"/>
         <geom type="mesh" mesh="R_hip" />
         <geom name="R_hip" fromto="0 0 0 0.182 -0.182 0"
@@ -205,28 +199,26 @@ See <https://www.gnu.org/licenses/>.
         <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
 
         <body name="R_UL" pos="0.182 -0.182 0">
-          <inertial pos="0 0.034 -0.206" mass="8.566"
-                  fullinertia="0.259 0.256 0.023 0.001 0 0.036"/>
+          <inertial pos="0.012 0.098 -0.151" mass="26.104"
+                  fullinertia="0.859 0.733 0.23 -0.021 -0.025 -0.055"/>
           <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
           <geom type="mesh" mesh="R_thigh"/>
           <geom name="R_UL" fromto="0 0 0 0 0.06 -0.413"
               size="0.069" class="R_collision"/>
-          <geom name="R_pilot_thigh" fromto="0 .166 -.05 0 .149 -.423" size=".069" class="ballast"/>
           <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
           <body name="R_LL" pos="0 0.06 -0.413">
-            <inertial pos="-0.034 0.04 -0.223" mass="4.159"
-                  fullinertia="0.055 0.064 0.019 -0.001 -0.006 0.002"/>
+            <inertial pos="-0.021 0.079 -0.157" mass="7.061"
+                  fullinertia="0.12 0.117 0.034 -0.003 -0.008 -0.012"/>
             <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
             <geom type="mesh" mesh="R_shin"/>
             <geom name="R_LL" fromto="0 0 0 0.0 0.037 -0.414"
               size="0.047" class="R_collision"/>
-            <geom name="R_pilot_shin" fromto="0 .116 0 0 .124 -.399"  size=".047" class="ballast"/>
             <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
             <body name="R_foot" pos="0.0 0.037 -0.414">
-              <inertial pos="0.033 0.041 -0.08" mass="1.22"
-                  fullinertia="0.006 0.01 0.008 -0.001 0.002 0.002"/>
+              <inertial pos="0.007 0.054 -0.035" mass="2.964"
+                  fullinertia="0.023 0.031 0.019 -0.004 0.011 0.004"/>
               <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
               <geom type="mesh" mesh="R_foot"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
