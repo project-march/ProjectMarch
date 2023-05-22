@@ -331,7 +331,6 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
-
     // check footstep planner references
     //  std::cout << "Vector elements: ";
     //  for (const auto& element : m_reference_stepsize_x) {
@@ -560,7 +559,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
         // step_counter = 0;
     }
-    
+
     // here, we copy our array into the std::array
     for (int ii = 0; ii < nlp_dims->N; ii++) {
         u_current[ii] = utraj[ii];

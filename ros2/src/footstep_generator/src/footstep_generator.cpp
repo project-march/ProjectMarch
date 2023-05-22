@@ -43,9 +43,9 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
     switch (gait_type) {
         case 1:
             y = 0;
-            for (int i = 0; i < m_steps*5; i++) {
+            for (int i = 0; i < m_steps * 5; i++) {
                 x += 0;
-                y = (1-((y>0)-(y<0)))*m_l;
+                y = (1 - ((y > 0) - (y < 0))) * m_l;
                 footstep.position.x = x;
                 footstep.position.y = y;
                 footstep.position.z = 0;
@@ -114,9 +114,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
             stance_leg = -stance_leg;
             // Then, add the closing steps that stay on 0
 
-
-
-            for (int i = 2; i < m_steps*5; i++) {
+            for (int i = 2; i < m_steps * 5; i++) {
                 x = m_vx * 1.0;
                 y += m_vy * 1.0 + stance_leg * m_l;
                 stance_leg = -stance_leg;
@@ -127,7 +125,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
 
                 footstep_array.poses.push_back(footstep);
                 // printf("stance_leg %i\n", stance_leg);
-            }   
+            }
             break;
     }
 
