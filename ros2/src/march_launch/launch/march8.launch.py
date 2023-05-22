@@ -133,6 +133,12 @@ def generate_launch_description() -> LaunchDescription:
             name='footstep_generator'
         ),
         Node(
+            package='torque_converter',
+            namespace='',
+            executable='torque_converter',
+            name='torque_converter'
+        ),
+        Node(
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',

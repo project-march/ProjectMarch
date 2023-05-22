@@ -35,7 +35,7 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_foot_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
 
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_publisher;
+    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectoryPoint>::SharedPtr m_position_trajectory_publisher;
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
 

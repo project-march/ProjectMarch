@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(fuzzy_generator)
+project(joint_trajectory_buffer)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -18,49 +18,39 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(march_shared_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+include_directories(include)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
-include_directories(include)
 
 add_library(${PROJECT_NAME}
         STATIC
-        include/${PROJECT_NAME}/fuzzy_generator.hpp
-        include/${PROJECT_NAME}/fuzzy_node.hpp
-        src/fuzzy_generator.cpp
-        src/fuzzy_node.cpp
+        include/${PROJECT_NAME}/joint_trajectory_buffer.hpp
+        src/joint_trajectory_buffer.cpp
         )
 
 ament_target_dependencies(
         ${PROJECT_NAME}
         "rclcpp"
-        "march_shared_msgs"
-        "geometry_msgs"
+        "trajectory_msgs"
 )
 
-add_executable(fuzzy_node src/fuzzy_node.cpp src/fuzzy_generator.cpp include/${PROJECT_NAME}/fuzzy_generator.hpp
-        include/${PROJECT_NAME}/fuzzy_node.hpp)
-target_include_directories(fuzzy_node PUBLIC
+add_executable(joint_trajectory_buffer_node
+        src/joint_trajectory_buffer.cpp
+        include/${PROJECT_NAME}/joint_trajectory_buffer.hpp
+        src/joint_trajectory_buffer_node.cpp)
+target_include_directories(joint_trajectory_buffer_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
-
 ament_target_dependencies(
-        fuzzy_node
+        joint_trajectory_buffer_node
         "rclcpp"
-        "march_shared_msgs"
-        "geometry_msgs"
+        "trajectory_msgs"
 )
 
-install(TARGETS fuzzy_node
-        EXPORT export_${PROJECT_NAME}
+install(TARGETS joint_trajectory_buffer_node
         DESTINATION lib/${PROJECT_NAME})
-
-install(DIRECTORY
-        launch
-        DESTINATION share/${PROJECT_NAME}/
-        )
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

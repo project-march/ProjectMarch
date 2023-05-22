@@ -52,5 +52,7 @@ joint_trajectory_controller:
     interface_name: position
     command_interfaces:
       - position
+      - effort
     state_interfaces:
       - position
+      - effort

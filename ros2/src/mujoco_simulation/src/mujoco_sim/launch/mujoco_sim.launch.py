@@ -1,4 +1,5 @@
 """Author: MVIII."""
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
@@ -9,7 +10,7 @@ def generate_launch_description():
 
     These nodes are started when the mujoco simulation has be run.
     """
-    model_to_load = LaunchConfiguration('model_to_load', default='march8_v0.xml')
+    model_to_load = LaunchConfiguration('model_to_load', default='model_to_load.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load_path')
 
     return LaunchDescription([
@@ -38,3 +39,4 @@ def generate_launch_description():
             name='mujoco_writer',
         ),
     ])
+
