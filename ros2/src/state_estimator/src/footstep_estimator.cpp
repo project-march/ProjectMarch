@@ -100,6 +100,6 @@ void FootstepEstimator::update_feet(const std::vector<PressureSensor*>* sensors)
 void FootstepEstimator::set_threshold(double threshold)
 {
     m_threshold = threshold;
-    foot_left.threshold = threshold;
-    foot_right.threshold = threshold;
+    foot_left.foot_threshold = threshold;
+    foot_right.foot_threshold = threshold;
 }
