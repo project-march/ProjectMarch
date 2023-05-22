@@ -5,7 +5,7 @@ import socket
 from std_msgs.msg import Header, Bool
 from march_shared_msgs.msg import Alive, Error, GaitRequest, GaitResponse
 from rclpy import Future
-from std_msgs.msg import Header, String, Bool, Integer, Float
+from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
@@ -78,7 +78,7 @@ class InputDeviceController:
             qos_profile=10,
         )
         self.direct_torque_pub = self._node.create_publisher(
-            msg_type=Integer,
+            msg_type=Int32,
             topic="direct_torque",
             qos_profile=10,
         )
@@ -156,6 +156,15 @@ class InputDeviceController:
     def node(self):
         """Define the node."""
         return self._node
+
+    def publish_direct_torque(self, torque) -> None:
+        """Publish a message on `direct_torque` to publish the torque."""
+        self._node.get_logger().debug("Publishing direct torque " + torque)
+        self.direct_torque_pub.publish(
+            Int32(
+                data = torque
+            )
+        )
 
 
     def publish_control_type(self, control_type) -> None:

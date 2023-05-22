@@ -3,7 +3,8 @@
       {
          "name": "home_setup",
          "control_type": "position",
-         "gait_type": 0
+         "gait_type": 0,
+         "always_enabled": true
       },
       {
          "name": "test_joint_gait",
@@ -13,16 +14,19 @@
       {
          "name": "test_joint_gait",
          "control_type": "torque",
-         "gait_type": 1
+         "gait_type": 1,
+         "always_enabled": true
       },
       {
          "name": "direct-torque",
          "callback": "publish_direct_torque",
-         "control_type": "torque"
+         "control_type": "torque",
+         "always_enabled": true
       },
       {
          "name": "test_joint_gait_continuous",
-         "control_type": "position"
+         "control_type": "position",
+         "always_enabled": true
       },
       {
          "name":"stop",

@@ -73,6 +73,13 @@ void WeightNode::fuzzy_weight_callback(march_shared_msgs::msg::WeightStamped::Sh
  */
 void WeightNode::direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg)
 {
+    std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
+    if (allowed_control_type.find("torque") == std::string::npos)
+    {
+        // Directly calling torque should not be possible in any other mode than torque control
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("weight_node"), "We are not in torque control, so we will ignore the direct call. We are in control mode: " <<allowed_control_type);
+        return;
+    }
 
     float torque = msg->data;
 
