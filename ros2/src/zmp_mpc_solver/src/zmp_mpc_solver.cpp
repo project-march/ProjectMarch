@@ -40,6 +40,11 @@ double ZmpSolver::get_com_height()
     return m_com_height;
 }
 
+void ZmpSolver::set_m_current_shooting_node(int current_shooting_node)
+{
+    m_current_shooting_node = current_shooting_node;
+}
+
 int ZmpSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
@@ -349,7 +354,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
     printf("step_counter %i\n", step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
-    printf("current stance foot is %i\n", m_previous_stance_foot);
+    printf("previous stance foot is %i\n", m_previous_stance_foot);
     // To decide what the timing value is depending on the current shooting node is
 
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
@@ -541,8 +546,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    // printf("\n--- xtraj ---\n");
-    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    printf("\n--- xtraj ---\n");
+    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
