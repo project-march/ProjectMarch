@@ -26,7 +26,7 @@ def generate_launch_description():
     control_yaml = LaunchConfiguration("control_yaml")
 
     control_xacro =  "test_linear_control.xacro"
-    if IfCondition(test_rotational):
+    if test_rotational == "true":
         control_xacro =  "test_rotational_control.xacro"
 
     declared_arguments = [
