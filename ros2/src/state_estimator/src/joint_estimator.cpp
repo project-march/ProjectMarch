@@ -14,11 +14,11 @@ void JointEstimator::set_joint_states(sensor_msgs::msg::JointState::SharedPtr ne
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
     for (size_t i = 0; i < new_joint_states->name.size(); i++) {
-        // RCLCPP_INFO(m_owner->get_logger(), "Setting joint %s to %f", new_joint_states->name.at(i).c_str(),
-        // new_joint_states->position.at(i));
-        if (new_joint_states->position.at(i) == 0.0) {
-            set_individual_joint_state(new_joint_states->name.at(i), new_joint_states->position.at(i));
-        }
+        RCLCPP_INFO(m_owner->get_logger(), "Setting joint %s to %f", new_joint_states->name.at(i).c_str(),
+            new_joint_states->position.at(i));
+        // if (new_joint_states->position.at(i) == 0.0) {
+        set_individual_joint_state(new_joint_states->name.at(i), new_joint_states->position.at(i));
+        // }
     }
     // RCLCPP_INFO(m_owner->get_logger(), "Done setting joint states :)");
 }

@@ -10,7 +10,6 @@
              rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>
     <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
-    <material name="mujoco_orange" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
     <mesh name="backpack"    file="Backpack.obj"/>
     <mesh name="L_foot"      file="FootLeft.obj"/>
@@ -39,9 +38,6 @@
       <default class="R_collision">
         <geom contype="4" conaffinity="2"/>
       </default>
-    </default>
-    <default class="ballast">
-      <geom contype="0" material="mujoco_orange" conaffinity="0" group="2" type="capsule" density="985"/>
     </default>
     <default class="HAA_joint">
       <joint damping="${joints/HAA/max_torque / ./max_angvel}"
@@ -86,8 +82,8 @@
       <geom name="backpack" type="box"
             size="${phys/backpack/geom/size/x ./y ./z}"
             pos="${phys/backpack/geom/pos/x ./y ./z}" class="collision"/>
-      <geom name="pilot_torso" fromto=".147 0 .056 .190 0 .500" size=".161" class="ballast"/>
-        <site name="imu_torso" size='0.01' pos="${sensors/imus/torso/pos/x ./y ./z}"/>
+
+    <site name="imu_torso" size='0.01' pos="${sensors/imus/torso/pos/x ./y ./z}"/>
 
       <!--  LEFT LEG -->
       <body name="L_hip" pos="${phys/L_hip/origin/x ./y ./z}">
@@ -106,7 +102,6 @@
           <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
           <geom name="L_UL" fromto="0 0 0 ${phys/L_LL/origin/x ./y ./z}"
               size="${phys/L_UL/geom/size}" class="L_collision"/>
-          <geom name="L_pilot_thigh" fromto="0 -.166 -.05 0 -.149 -.423" size=".069" class="ballast"/>
           <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
 
           <body name="L_LL" pos="${phys/L_LL/origin/x ./y ./z}">
@@ -116,7 +111,6 @@
             <geom type="mesh" mesh="L_shin"/>
             <geom name="L_LL" fromto="0 0 0 ${phys/L_foot/origin/x ./y ./z}"
               size="${phys/L_LL/geom/size}" class="L_collision"/>
-            <geom name="L_pilot_shin" fromto="0 -.116 0 0 -.124 -.399"  size=".047" class="ballast"/>
             <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
 
             <body name="L_foot" pos="${phys/L_foot/origin/x ./y ./z}">
@@ -194,7 +188,6 @@
           <geom type="mesh" mesh="R_thigh"/>
           <geom name="R_UL" fromto="0 0 0 ${phys/L_LL/origin/x -./y ./z}"
               size="${phys/L_UL/geom/size}" class="R_collision"/>
-          <geom name="R_pilot_thigh" fromto="0 .166 -.05 0 .149 -.423" size=".069" class="ballast"/>
           <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
           <body name="R_LL" pos="${phys/L_LL/origin/x -./y ./z}">
@@ -204,7 +197,6 @@
             <geom type="mesh" mesh="R_shin"/>
             <geom name="R_LL" fromto="0 0 0 ${phys/L_foot/origin/x -./y ./z}"
               size="${phys/L_LL/geom/size}" class="R_collision"/>
-            <geom name="R_pilot_shin" fromto="0 .116 0 0 .124 -.399"  size=".047" class="ballast"/>
             <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
             <body name="R_foot" pos="${phys/L_foot/origin/x -./y ./z}">

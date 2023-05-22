@@ -14,18 +14,18 @@ phys:
         x: 0.051
         y: 0.189
         z: .165
-    mass: 11.02
+    mass: 57.096
     com:
-      x: 0.013
-      y: 0.001
-      z: 0.24
+      x: 0.171
+      y: -0.006
+      z: 0.342
     inertia:
-      xx: 0.379
-      yy: 0.245
-      zz: 0.173
-      xy: 0
-      xz: -0.008
-      yz: 0.001
+      xx: 2.931
+      yy: 2.492
+      zz: 1.522
+      xy: 0.023
+      xz: -0.1
+      yz: 0.025
 
   L_hip:
     origin:
@@ -36,17 +36,17 @@ phys:
       type: capsule
       size:
         0.032
-    mass: 1.277
+    mass: 1.849
     com:
-      x: 0.065
-      y: 0.112
-      z: 0
+      x: 0.05
+      y: 0.109
+      z: 0.033
     inertia:
-      xx: 0.006
-      yy: 0.006
-      zz: 0.011
+      xx: 0.012
+      yy: 0.013
+      zz: 0.012
       xy: -0.004
-      xz: 0
+      xz: 0.002
       yz: 0
 
   L_UL: # Left Upper Leg
@@ -58,18 +58,18 @@ phys:
       type: capsule
       size:
         0.069
-    mass: 8.566
+    mass: 26.104
     com:
-      x: 0
-      y: -0.034
-      z: -0.206
+      x: 0.012
+      y: -0.098
+      z: -0.151
     inertia:
-      xx: 0.259
-      yy: 0.256
-      zz: 0.023
-      xy: -0.001
-      xz: 0
-      yz: -0.036
+      xx: 0.859
+      yy: 0.733
+      zz: 0.23
+      xy: 0.021
+      xz: -0.025
+      yz: 0.055
 
   L_LL: # Left Lower Leg
     origin:
@@ -80,18 +80,18 @@ phys:
       type: capsule
       size:
         0.047
-    mass: 4.159
+    mass: 7.061
     com:
-      x: -0.034
-      y: -0.04
-      z: -0.223
+      x: -0.021
+      y: -0.079
+      z: -0.157
     inertia:
-      xx: 0.055
-      yy: 0.064
-      zz: 0.019
-      xy: 0.001
-      xz: -0.006
-      yz: -0.002
+      xx: 0.12
+      yy: 0.117
+      zz: 0.034
+      xy: 0.003
+      xz: -0.008
+      yz: 0.012
 
   L_foot: # Left footplate assembly
     origin:
@@ -108,18 +108,18 @@ phys:
         x: 0.159
         y: 0.057
         z: .007
-    mass: 1.22
+    mass: 2.964
     com:
-      x: 0.033
-      y: -0.041
-      z: -0.08
+      x: 0.007
+      y: -0.054
+      z: -0.035
     inertia:
-      xx: 0.006
-      yy: 0.01
-      zz: 0.008
-      xy: 0.001
-      xz: 0.002
-      yz: -0.002
+      xx: 0.023
+      yy: 0.031
+      zz: 0.019
+      xy: 0.004
+      xz: 0.011
+      yz: -0.004
     friction: 0.33
     pads: # Left pressure sole
       global:
