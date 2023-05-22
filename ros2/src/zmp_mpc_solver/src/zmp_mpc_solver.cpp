@@ -144,7 +144,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x; // correction factor because the x CoM is not at 0.0
+    m_com_current[0] = x; 
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -158,7 +158,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x; // correction factor because the x CoM is not at 0.0
+    m_zmp_current[0] = x; 
     m_zmp_current[1] = y;
 }
 
