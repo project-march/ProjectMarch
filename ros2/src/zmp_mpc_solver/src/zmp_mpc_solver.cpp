@@ -139,7 +139,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
+    m_com_current[0] = x; // correction factor because the x CoM is not at 0.0
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -153,7 +153,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
+    m_zmp_current[0] = x; // correction factor because the x CoM is not at 0.0
     m_zmp_current[1] = y;
 }
 
@@ -326,6 +326,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
+
+    // check footstep planner references
     //  std::cout << "Vector elements: ";
     //  for (const auto& element : m_reference_stepsize_x) {
     //      printf("element x is %f\n", element);
@@ -539,8 +541,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    // printf("\n--- xtraj ---\n");
+    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
@@ -553,7 +555,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
         // step_counter = 0;
     }
-
+    
     // here, we copy our array into the std::array
     for (int ii = 0; ii < nlp_dims->N; ii++) {
         u_current[ii] = utraj[ii];
