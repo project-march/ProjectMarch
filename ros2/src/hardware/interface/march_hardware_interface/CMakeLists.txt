@@ -88,8 +88,11 @@ ament_export_dependencies(
 install(
         DIRECTORY include/
         DESTINATION include
-#        DIRECTORY launch/
-#        DESTINATION share/${PROJECT_NAME}/
+)
+
+install(
+        DIRECTORY launch/
+        DESTINATION share/${PROJECT_NAME}/
 )
 
 install(
