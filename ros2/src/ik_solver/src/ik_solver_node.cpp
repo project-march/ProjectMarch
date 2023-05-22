@@ -30,6 +30,9 @@ IkSolverNode::IkSolverNode()
     m_joint_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
 
+    m_reset_subscriber = this->create_subscription<std_msgs::msg::Int32>(
+        "/trajectory_reset_gate", 10, std::bind(&IkSolverNode::reset_subscriber_callback, this, _1));
+
     // Initializing the IK solver
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
@@ -106,6 +109,25 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_stance_foot = msg->data;
+}
+
+void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
+{
+    // RESET 0-> SWING LEG
+    // RESET 1-> STANCE LEG
+    // RESET 2-> BOTH
+    if (msg->data == 0) {
+        m_swing_trajectory_container = nullptr;
+    }
+
+    if (msg->data == 1) {
+        m_com_trajectory_container = nullptr;
+    }
+
+    if (msg->data == 2) {
+        m_swing_trajectory_container = nullptr;
+        m_com_trajectory_container = nullptr;
+    }
 }
 
 void IkSolverNode::timer_callback()
